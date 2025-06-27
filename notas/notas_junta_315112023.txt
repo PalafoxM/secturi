@@ -1,0 +1,60 @@
+
+
+
+cat asuntos 
+audiencias
+Felicitacion,queja o sugerencia
+informacion de auditorias
+informativo
+inciativas de ley: en este caso se da respuesta de conocimiento al finalizar el procedimiento;
+invitaciones 
+peticiones coudadanas
+peticiones ordinarias y/o de emergencia;
+reportes ciudadanos 
+solicitud 
+{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}
+conocimiento cambia por informativo
+representacion cambia por solicitud
+quejas 
+{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}
+
+INVITACION	
+INFORMACION	
+CONOCIMIENTO	conocimiento cambia por informativo
+SOLICITUD	
+OTROS	
+RESPUESTA	
+REPRESENTACION	representacion cambia por solicitud
+ANALISIS	
+QUEJAS	quejas se junta con felicitaciones
+AUDIENCIA	
+DERECHO DE PETICIÓN
+REPORTE CIUDADANO	
+REPORTE INSABI	
+FELICITACIONES	se junta con quejas
+
+
+en la caratula dejar el nombre de quien realizo el turno en este caso es el alias
+hay limite de texto mas o menos 5 renglones 
+asunto aparecen las opciones a quien se turno y la fecha recepcion : dd-mmm-aaaa  y el cargo de quien lo turno y de donde procede 
+falta el logo de equidad
+permitir subir archivos escaneados a la base de datos y notificar por correo
+si es necesario dar procemiento sigue en proceso sino se "termina" cambia de estatus 
+
+
+al final se determina si ya esta terminado el turno sino sigue en proceso
+terminado,en proceso
+
+proceso 
+resuelto
+ambos es para la busqueda en el reporte
+el estatus de tipo de los 10 dias lleva un semaforo 
+
+
+ en-tiempo (verde)
+ terminado (azul)
+ vencido   (rojo)
+
+ al cargar la respuesta validar si cumple o no y cambiar el estatus.
+ 
+
