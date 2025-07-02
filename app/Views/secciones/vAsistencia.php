@@ -17,165 +17,35 @@
         <link href="<?php echo base_url() ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
 
    <style>
-      main {
-      flex:1; display:flex;
-      flex-direction:column; align-items:center;
-      justify-content:center; padding:20px;
+      /* Añade estos estilos al bloque de estilos existente */
+    .fc-event-asistencia {
+        border-left: 4px solid #4e73df;
+        background-color: #f8f9fc;
+        color: #4e73df;
     }
-    .step {
-      width:100%; max-width:500px;
-      padding:20px; border-radius:8px;
-      background:linear-gradient(135deg,#e0eafc 0%,#cfdef3 100%);
-      box-shadow:0 4px 12px rgba(0,0,0,0.1);
-      opacity:0; transform:translateY(10px);
+    .fc-event-tarde {
+        border-left-color: #e74a3b;
+        background-color: #f8e0df;
+        color: #e74a3b;
     }
-    .step.active {
-     animation:fadeIn .4s ease forwards;
+    .fc-event-temprano {
+        border-left-color: #f6c23e;
+        background-color: #fbf3d9;
+        color: #f6c23e;
     }
-    @keyframes fadeIn { to { opacity:1; transform:translateY(0); } }
-
-    /* Header gradient */
-    .step h2 {
-      background:linear-gradient(45deg,#007bff,#00d4ff);
-      color:#fff; padding:12px; border-radius:6px;
-      text-shadow:1px 1px 2px rgba(0,0,0,0.2);
-      margin-bottom:16px; width:100%; box-sizing:border-box;
+    .fc-event-puntual {
+        border-left-color: #1cc88a;
+        background-color: #e2f1eb;
+        color: #1cc88a;
     }
-
-    /* Step 1: botones más grandes */
-    #step1 .wizard-actions button {
-      padding: 14px 28px;
-      font-size: 1.1rem;
+    .fc-event-title {
+        font-weight: bold;
+        margin-bottom: 3px;
     }
-
- .rooms {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-top: 10px;
-}
-
-.room {
-    cursor: pointer;
-    text-align: center;
-    flex: 1 1 100px;
-    transition: transform 0.2s, box-shadow 0.2s; /* Agregamos box-shadow aquí */
-}
-
-/* Efecto hover (al pasar el mouse) */
-.room:hover {
-    transform: scale(1.05); /* Escala ligeramente */
-}
-
-/* Efecto cuando está seleccionado (clase "selected") */
-.room.selected {
-    transform: scale(1.1); /* Escala un poco más que el hover */
-}
-
-/* Estilo de la imagen dentro de .room */
-.room img {
-    width: 80px;
-    height: 80px;
-    border-radius: 8px;
-    transition: box-shadow 0.2s;
-}
-
-/* Efecto hover en la imagen */
-.room:hover img {
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5); /* Sombra sutil al pasar el mouse */
-}
-
-/* Efecto selected en la imagen (más destacado) */
-.room.selected img {
-    box-shadow: 0 0 0 4px #007bff; /* Borde azul más marcado */
-}
-
-    .wizard-actions {
-      margin-top:20px; text-align:right;
+    .fc-event-details {
+        font-size: 0.85em;
+        line-height: 1.4;
     }
-    .wizard-actions button {
-      padding:8px 16px; border:none; border-radius:4px;
-      background:#007bff; color:#fff; cursor:pointer;
-      margin-left:8px; animation:pulse 1.5s ease-in-out infinite;
-    }
-    @keyframes pulse { 0%{transform:scale(1);}50%{transform:scale(1.05);}100%{transform:scale(1);} }
-    #viewReservations { animation:none; }
-
-    #step2 label { display:block; margin-top:12px; font-weight:bold; color:#333; }
-    #step2 input, #step2 select {
-      width:100%; padding:10px; margin-top:6px; border:none;
-      border-radius:4px; box-shadow:inset 0 2px 4px rgba(0,0,0,0.1);
-      transition:box-shadow .3s;
-    }
-    #step2 input:focus, #step2 select:focus {
-      outline:none; box-shadow:inset 0 4px 8px rgba(0,0,0,0.2);
-    }
-
-    .error { color:#c00; text-align:center; margin-top:10px; }
-
-    /* Step 3: ancho completo para cubrir tabla */
-    #step3 {
-      width:100%;
-      max-width:none;
-    }
-
-    #confirmationTable {
-      width:100%; border-collapse:collapse; background:#fff;
-      box-shadow:0 2px 4px rgba(0,0,0,0.1); border-radius:4px;
-      overflow:hidden; margin-top:10px;
-    }
-    #confirmationTable th, #confirmationTable td {
-      padding:10px; text-align:left; border-bottom:1px solid #eee;
-    }
-    #confirmationTable th {
-      background:#007bff; color:#fff;
-    }
-
-    #calendarView { display:none; flex:1; width:100%; }
-    .calendar-container { display:flex; flex:1; width:100%; }
-    #calendar {
-      flex:1; background:#fff; border-radius:8px; overflow:auto;
-      box-shadow:0 4px 12px rgba(0,0,0,0.1); padding:20px;
-    }
-    .fc .fc-button {
-      background:#007bff!important; color:#fff!important;
-      border:none!important; border-radius:4px!important;
-      animation:pulse 2s ease-in-out infinite;
-      transition:transform .2s!important;
-    }
-    .fc .fc-button:hover:not(.fc-prev-button):not(.fc-next-button):not(.fc-today-button) {
-      transform:scale(1.1)!important;
-    }
-
-    #sidebar {
-      width:300px; background:#fff; border-radius:8px; margin-left:20px;
-      display:flex; flex-direction:column; box-shadow:0 4px 12px rgba(0,0,0,0.1);
-    }
-    .sidebar-actions {
-      text-align:center; padding:10px; border-bottom:1px solid #eee;
-    }
-    .sidebar-actions button {
-      padding:6px 12px; border:none; border-radius:4px;
-      background:#007bff; color:#fff; cursor:pointer;
-      transition:background .2s;
-    }
-    .sidebar-actions button:hover { background:#0056b3; }
-    #sidebar h2 {
-      background:#f7f7f7; color:#333; padding:10px; text-align:center; margin:0;
-    }
-    #resList {
-      flex:1; overflow:auto; padding:10px; list-style:none;
-    }
-    #resList li {
-      margin-bottom:8px; font-size:14px;
-    }
-
-    @media(max-width:768px){
-      main, .calendar-container { flex-direction:column; padding:0 15px 15px; }
-      #sidebar { width:100%; margin-top:15px; }
-    }
-
    </style>
 
         <div class="page-wrapper">
@@ -191,11 +61,12 @@
                                 <div class="float-right">
                                     <ol class="breadcrumb">
                                         <li class="breadcrumb-item"><a href="javascript:void(0);">SUSI</a></li>
-                                        <li class="breadcrumb-item"><a href="javascript:void(0);">Sala de juntas</a></li>
+                                        <li class="breadcrumb-item"><a href="javascript:void(0);">Asistencia</a></li>
                                         <li class="breadcrumb-item active">Calendario</li>
                                     </ol>
                                 </div>
                                 <h4 class="page-title">Calendario</h4>
+                                <a href="javascript: history.go(-1)" class="btn btn-gradient-danger">Atrás</a>
                             </div><!--end page-title-box-->
                         </div><!--end col-->
                     </div>
@@ -211,7 +82,7 @@
                         <div class="col-lg-8">
                             <div class="card">
                                 <div class="card-body">
-                                    <div id='calendario'></div>
+                                    <div id='calendar'></div>
                                     <div style='clear:both'></div>
                                 </div><!--end card-body-->
                             </div><!--end card-->
@@ -236,201 +107,153 @@
 
         <!-- jQuery  -->
         <script src="<?php echo base_url() ?>assets/js/jquery.min.js"></script>
-        <script src="<?php echo base_url() ?>assets/js/jquery-ui.min.js"></script>
-        <script src="<?php echo base_url() ?>assets/js/bootstrap.bundle.min.js"></script>
-        <script src="<?php echo base_url() ?>assets/js/metismenu.min.js"></script>
-        <script src="<?php echo base_url() ?>assets/js/waves.js"></script>
-        <script src="<?php echo base_url() ?>assets/js/feather.min.js"></script>
-        <script src="<?php echo base_url() ?>assets/js/jquery.slimscroll.min.js"></script>
-        <script src="<?php echo base_url() ?>plugins/apexcharts/apexcharts.min.js"></script> 
 
-        <script src="<?php echo base_url() ?>plugins/moment/moment.js"></script>
         <script src='<?php echo base_url() ?>plugins/fullcalendar/packages/core/main.js'></script>
         <script src='<?php echo base_url() ?>plugins/fullcalendar/packages/daygrid/main.js'></script>
         <script src='<?php echo base_url() ?>plugins/fullcalendar/packages/timegrid/main.js'></script>
         <script src='<?php echo base_url() ?>plugins/fullcalendar/packages/interaction/main.js'></script>
         <script src='<?php echo base_url() ?>plugins/fullcalendar/packages/list/main.js'></script>
-        <script src='<?php echo base_url() ?>assets/pages/jquery.calendar.js'></script>
-        
-        <!-- App js -->
-        <script src="<?php echo base_url() ?>assets/js/app.js"></script>
+     
 
         <script>
-            st.agregar.registroSala();
-       
-document.addEventListener('DOMContentLoaded', function() {
-    var calendarEl = document.getElementById('calendario');
+     $(document).ready(function() {
+    var calendarEl = document.getElementById('calendar');
     
-    // Datos simulados de checador (en un caso real, estos vendrían de tu base de datos)
-    const registrosChecador = [
-        {
-            id: 1,
-            empleado: 'Juan Pérez',
-            fecha: '2025-06-01',
-            entrada: '2025-06-01T08:15:00',
-            salida: '2025-06-01T17:30:00',
-            estado: 'puntual'
-        },
-        {
-            id: 2,
-            empleado: 'Juan Pérez',
-            fecha: '2025-06-02',
-            entrada: '2025-06-02T08:45:00',
-            salida: '2025-06-02T17:15:00',
-            estado: 'retardo'
-        },
-        {
-            id: 3,
-            empleado: 'Juan Pérez',
-            fecha: '2025-06-03',
-            entrada: '2025-06-03T08:00:00',
-            salida: '2025-06-03T16:00:00',
-            estado: 'salida_temprano'
-        },
-        {
-            id: 4,
-            empleado: 'María García',
-            fecha: '2025-06-01',
-            entrada: '2025-06-01T08:05:00',
-            salida: '2025-06-01T17:45:00',
-            estado: 'puntual'
-        },
-        {
-            id: 5,
-            empleado: 'María García',
-            fecha: '2025-06-02',
-            entrada: '2025-06-02T08:00:00',
-            salida: null, // No registró salida
-            estado: 'falta_salida'
-        }
-    ];
+    // Obtener los datos de asistencia desde PHP (asegúrate de que tu controlador los pase como JSON)
 
-    // Convertimos los datos a eventos para FullCalendar
-    const eventos = registrosChecador.map(registro => {
-        // Determinar color según el estado
-        let color;
-        switch(registro.estado) {
-            case 'puntual':
-                color = '#28a745'; // Verde
-                break;
-            case 'retardo':
-                color = '#ffc107'; // Amarillo
-                break;
-            case 'salida_temprano':
-                color = '#fd7e14'; // Naranja
-                break;
-            case 'falta_salida':
-                color = '#dc3545'; // Rojo
-                break;
-            default:
-                color = '#6c757d'; // Gris
-        }
-        
-        // Crear título del evento
-        let title = `${registro.empleado}\nEntrada: ${registro.entrada ? registro.entrada.substr(11, 5) : 'No registrada'}`;
-        if (registro.salida) {
-            title += `\nSalida: ${registro.salida.substr(11, 5)}`;
+    var eventosAsistencia = <?= json_encode($asistencia ?? []) ?>;
+    var mesSeleccionado = '<?= $mes ?>';
+    var anio = '<?= $anio ?>';
+    var calendarStatic = '<?= $calendarStatic ?>';
+
+    // Agrega un cero al mes si es de un solo dígito
+    var cero = (mesSeleccionado.length >= 2) ? '' : '0';
+
+    // Construir la fecha en formato YYYY-MM-DD
+    var fecha = anio + '-' + cero + mesSeleccionado + '-01';
+
+    console.log(fecha);
+
+
+    // Procesar los datos para FullCalendar
+    var eventos = eventosAsistencia.map(function(item) {
+
+        // Determinar clase CSS según el tiempo
+        var eventClass = 'fc-event-asistencia';
+        if (item.entrada >= '08:45:00') {
+            eventClass = 'fc-event-tarde';
         } else {
-            title += `\nSalida: No registrada`;
+            eventClass = 'fc-event-puntual';
         }
         
         return {
-            id: registro.id,
-            title: title,
-            start: registro.entrada,
-            end: registro.salida,
-            color: color,
+            id: item.id_asistencia,
+            start: item.fecha,
+            allDay: true, // Mostrar como evento de todo el día
+            className: eventClass,
             extendedProps: {
-                empleado: registro.empleado,
-                estado: registro.estado
+                entrada: item.entrada,
+                salida: item.salida,
+                trabajado: item.trabajado,
+                tarde: item.tarde,
+                temprano: item.temprano,
+                turno: item.turno
             }
         };
     });
 
     var calendar = new FullCalendar.Calendar(calendarEl, {
-        plugins: ['dayGrid', 'timeGrid', 'list', 'interaction'],
+   
+       plugins: ['dayGrid', 'timeGrid', 'list', 'interaction'],
         header: {
-            left: 'prev,next today',
+            left: (calendarStatic)?'prev,next today':'',
             center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+            right: (calendarStatic)?'dayGridMonth,timeGridWeek,timeGridDay,listWeek':''
         },
+        // Configuración completa en español
+        locale: 'es',
         buttonText: {
-            today: 'Hoy',
-            month: 'Mes',
-            week: 'Semana',
-            day: 'Día',
-            list: 'Lista'
+            today:    'Hoy',
+            month:    'Mes',
+            week:     'Semana',
+            day:      'Día',
+            list:     'Lista'
         },
         monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
         monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
         dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
         dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
-         defaultView: 'dayGridMonth',
-        editable: false, // No permitir edición directa
-        selectable: false, // No permitir selección de intervalos
+        dayNamesMin: ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'],
+        weekText: 'Sm',
+        allDayText: 'Todo el día',
+        noEventsText: 'No hay eventos para mostrar',
+        defaultDate: fecha,
+        initialView: 'dayGridMonth',
+        editable: false,
+        selectable: false,
         events: eventos,
-        eventTimeFormat: { // Formato de hora para los eventos
+        // Formato de fecha en español
+        titleFormat: { 
+            year: 'numeric', 
+            month: 'long' 
+        },
+        // Configuración adicional para español
+        firstDay: 1, // Lunes como primer día de la semana
+        timeZone: 'local',
+        eventTimeFormat: { // Formato de hora
             hour: '2-digit',
             minute: '2-digit',
-            hour12: true
+            hour12: true,
+            meridiem: 'short'
         },
-        eventDidMount: function(info) {
-            // Personalizar cómo se ven los eventos
-            if (info.event.extendedProps.estado === 'falta_salida') {
-                info.el.style.borderStyle = 'dashed';
-            }
+        eventRender: function(info) {
+            // Personalizar el contenido del evento
+            var eventEl = info.el;
+            eventEl.innerHTML = `
+                <div class="fc-event-title">${info.event.title}</div>
+                <div class="fc-event-details">
+                    <div>Entrada: ${info.event.extendedProps.entrada}</div>
+                    <div>Salida: ${info.event.extendedProps.salida}</div>
+                    <div>Horas: ${info.event.extendedProps.trabajado}</div>
+                </div>
+            `;
         },
         eventClick: function(info) {
-            // Mostrar detalles al hacer clic en un evento
-            const evento = info.event;
-            const empleado = evento.extendedProps.empleado;
-            const entrada = evento.start ? evento.start.toLocaleTimeString() : 'No registrada';
-            const salida = evento.end ? evento.end.toLocaleTimeString() : 'No registrada';
-            
-            let estadoMsg = '';
-            switch(evento.extendedProps.estado) {
-                case 'puntual':
-                    estadoMsg = 'Puntual';
-                    break;
-                case 'retardo':
-                    estadoMsg = 'Llegó tarde';
-                    break;
-                case 'salida_temprano':
-                    estadoMsg = 'Salió antes';
-                    break;
-                case 'falta_salida':
-                    estadoMsg = 'Falta registro de salida';
-                    break;
-            }
-            
+            // Mostrar detalles completos al hacer clic
             Swal.fire({
-                title: `Registro de ${empleado}`,
+                title: 'Detalles de Asistencia',
                 html: `
-                    <p><strong>Entrada:</strong> ${entrada}</p>
-                    <p><strong>Salida:</strong> ${salida}</p>
-                    <p><strong>Estado:</strong> ${estadoMsg}</p>
+                    <div style="text-align: left;">
+                        <p><strong>Fecha:</strong> ${info.event.start.toLocaleDateString()}</p>
+                        <p><strong>Entrada:</strong> ${info.event.extendedProps.entrada}</p>
+                        <p><strong>Salida:</strong> ${info.event.extendedProps.salida}</p>
+                        <p><strong>Horas trabajadas:</strong> ${info.event.extendedProps.trabajado}</p>
+                        <p><strong>Tiempo tarde:</strong> ${info.event.extendedProps.tarde}</p>
+                        <p><strong>Salida temprano:</strong> ${info.event.extendedProps.temprano}</p>
+                    </div>
                 `,
-                icon: 'info',
-                confirmButtonText: 'Cerrar'
+                confirmButtonText: 'Cerrar',
+                customClass: {
+                    popup: 'swal-wide' // Clase para hacer el modal más ancho
+                }
             });
         },
-        views: {
-            dayGridMonth: {
-                eventDisplay: 'list-item' // Mostrar como lista en vista mensual
-            },
-            timeGridWeek: {
-                slotMinTime: '06:00:00', // Hora mínima visible
-                slotMaxTime: '20:00:00' // Hora máxima visible
-            },
-            timeGridDay: {
-                slotMinTime: '06:00:00',
-                slotMaxTime: '20:00:00'
+        dayRender: function(info) {
+            // Resaltar días con registros de asistencia
+            var hasEvents = eventos.some(function(event) {
+                return event.start.substring(0, 10) === info.date.toISOString().substring(0, 10);
+            });
+            
+            if (hasEvents) {
+                info.el.style.backgroundColor = 'rgba(78, 115, 223, 0.05)';
             }
         }
     });
 
     calendar.render();
+    
 });
+
 // Inicializar el mapa
 var map = L.map('map').setView([20.956950, -101.360316], 16); // Coordenadas de Guanajuato, zoom 17
 

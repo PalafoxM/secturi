@@ -192,6 +192,81 @@ class Inicio extends BaseController {
         $data['contentView'] = 'secciones/vlistaPerfiles';
         $this->_renderView($data);   
     }
+  public function subirAsistencia()
+    {
+        $session     = \Config\Services::session();
+        $principal   = new Mglobal;
+        $cat_usuario = $principal->getTabla([
+            'tabla' => 'vw_asistencia',
+            'where' => ['visible' => 1]
+        ]);
+
+        // Enviar datos a la vista
+        $data['mes']           = date('m');
+        $data['cat_usuario']   = $cat_usuario->data ?? [];  
+        $data['scripts']       = ['principal', 'inicio'];
+        $data['contentView']   = 'secciones/vSubirAsistencia';
+        $this->_renderView($data);
+    }
+/*   public function subirAsistencia()
+    {
+        $session     = \Config\Services::session();
+        $principal   = new Mglobal;
+        $cat_usuario = $principal->getTabla([
+            'tabla' => 'vw_usuario',
+            'where' => ['visible' => 1]
+        ]);
+
+        if (isset($cat_usuario->data) && !empty($cat_usuario->data)) {
+              $anio = $anio ?? date('Y');
+
+            foreach ($cat_usuario->data as &$usuario) {
+                $id_usuario = $usuario->id_usuario;
+                $asistenciasPorMes = [];
+
+                for ($mes = 1; $mes <= 12; $mes++) {
+                    $fecha_inicio = date("Y-m-01", strtotime("$anio-$mes-01"));
+                    $fecha_fin    = date("Y-m-t", strtotime($fecha_inicio));
+
+                    $tabla = [
+                        'tabla' => 'asistencia',
+                        'where' => [
+                            'visible' => 1,
+                            'id_usuario' => $id_usuario
+                        ],
+                        'whereBetween' => [
+                            ['fecha', $fecha_inicio, $fecha_fin]
+                        ]
+                    ];
+
+                    $asistencia = $principal->getTabla($tabla);
+
+                    if (isset($asistencia->data) && !empty($asistencia->data)) {
+                        $diasTrabajados = count($asistencia->data);
+                        $asistenciasPorMes[$mes] = [
+                            'dias' => $diasTrabajados,
+                            'cumplio' => ($diasTrabajados >= 20) ? 1 : 0
+                        ];
+                    } else {
+                        $asistenciasPorMes[$mes] = [
+                            'dias' => 0,
+                            'cumplio' => 0
+                        ];
+                    }
+                }
+
+                // Agrega los datos de asistencia al objeto de usuario
+                $usuario->asistencias = $asistenciasPorMes;
+            }
+        }
+
+        // Enviar datos a la vista
+        $data['cat_usuario']   = $cat_usuario->data ?? [];  
+        $data['scripts']       = ['principal', 'inicio'];
+        $data['contentView']   = 'secciones/vSubirAsistencia';
+        $this->_renderView($data);
+    } */
+
     public function listaPuesto()
     {
         $session = \Config\Services::session();

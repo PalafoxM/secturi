@@ -223,6 +223,10 @@ ini.inicio = (function () {
         {
          $('#standard-modal').modal('show');
         },
+        cerrarModal: function()
+        {
+         $('#standard-modal').modal('hide');
+        },
        
         subirCsv: function()
         {
@@ -254,25 +258,10 @@ ini.inicio = (function () {
                         contentType: false,
                         processData: false,
                         success: function(response) {
-                            if (!response.error) {
-        
-                                Swal.fire("Éxito", "Los datos se guardaron correctamente.", "success");
-                                window.location.href = base_url + "index.php/Inicio/Preinscritos";
-                               // window.location.reload();
-                            } else {
-                                Swal.fire({
-                                    title: "Error",
-                                    text: response.respuesta,
-                                    icon: "error",
-                                    confirmButtonText: "Descargar archivo de ejemplo",
-                                    showCancelButton: true,
-                                    cancelButtonText: "Cerrar"
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        // Redirige a la URL del archivo de ejemplo
-                                        window.location.href =  base_url+'ejemplo.csv';
-                                    }
-                                });
+                            if(!response.error){
+                                Swal.fire("Correcto", response.respuesta, "success");
+                            }else{
+                                Swal.fire("Error", "Favor de llamar al Administrador", "error");
                             }
                         },
                         complete: function(){
@@ -1609,7 +1598,7 @@ ini.inicio = (function () {
                                         </td>
                                         <td class="text-center">
                                           <a href="${base_url}index.php/Principal/Proveedor/${p.id_proveedor}" 
-                                            class="btn btn-gradient-info px-4">
+                                            class="btn btn-gradient-success px-4">
                                             <i class="mdi mdi-arrow-collapse-right font-21"></i>
                                          </a>
 

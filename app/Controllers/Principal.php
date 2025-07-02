@@ -4,6 +4,7 @@ use App\Libraries\Curps;
 use App\Libraries\Fechas;
 use App\Libraries\Funciones;
 use App\Models\Mglobal;
+use DateTime;
 
 use stdClass;
 use CodeIgniter\API\ResponseTrait;
@@ -55,7 +56,116 @@ class Principal extends BaseController {
         $this->_renderView($data);
         
     }
-    public function uploadCSV()
+        public function uploadCSV()
+    {
+        $response = new \stdClass();
+        $session  = \Config\Services::session();
+        $globals  = new Mglobal;
+        $response->error = true;
+        $response->respuesta = 'No se subió ningún archivo válido';
+
+        if (isset($_FILES['fileParticipantes']) && $_FILES['fileParticipantes']['error'] == 0) {
+            $filePath = $_FILES['fileParticipantes']['tmp_name'];
+            $data = [];
+            $header = [];
+            $startProcessing = false;
+            $currentName = null;
+            
+            if (($handle = fopen($filePath, "r")) !== false) {
+                while (($row = fgetcsv($handle, 1000, ",")) !== false) {
+                    $encodedRow = array_map('utf8_encode', $row);
+                    $cleanRow = array_map('trim', $encodedRow);
+                    
+                    // Buscar línea con nombre (ahora verificando la columna C)
+                    if (isset($cleanRow[0])) {
+                        // Versión más robusta para detectar nombres
+                        if (strtolower($cleanRow[0]) === 'nombre' && !empty($cleanRow[2])) {
+                            $currentName = $cleanRow[2]; // Columna C (índice 2) contiene el nombre
+                            continue;
+                        }
+                        
+                        // Detectar encabezado real
+                        if (!$startProcessing && strtolower($cleanRow[0]) === 'id') {
+                            $header = array_map('strtolower', $cleanRow);
+                            $startProcessing = true;
+                            continue;
+                        }
+                        
+                        // Procesar filas de datos
+                        if ($startProcessing && is_numeric($cleanRow[0])) {
+                            $rowAssoc = array_combine($header, $cleanRow);
+                            $rowAssoc['nombre_empleado'] = $currentName;
+                            $data[] = $rowAssoc;
+                        }
+                    }
+                }
+                fclose($handle);
+            }
+            
+            // Validación de columnas
+            $columnasRequeridas = ['id', 'fecha', 'turno', 'entrada', 'salida', 'trabajado', 'tarde / temprano'];
+            $columnasFaltantes = array_diff($columnasRequeridas, $header);
+
+            if (!empty($columnasFaltantes)) {
+                $response->error = true;
+                $response->respuesta = 'Faltan columnas: ' . implode(', ', $columnasFaltantes);
+                return $this->respond($response);
+            }
+
+            foreach ($data as $row) {
+                if (empty($row['fecha'])) continue;
+
+                // Extraer tarde / temprano
+                $tarde = null;
+                $temprano = null;
+                if (isset($row['tarde / temprano']) && strpos($row['tarde / temprano'], '/') !== false) {
+                    [$tarde, $temprano] = explode('/', $row['tarde / temprano']);
+                    $tarde = trim($tarde);
+                    $temprano = trim($temprano);
+                }
+
+              
+             $nombreUser = $row['nombre_empleado'];
+                $like = [
+                    'nombre_completo' => "%$nombreUser%",
+                ];
+                $proveedor = $globals->getTabla([
+                        'tabla' => 'vw_usuario',
+                        'where' => ['visible' => 1],
+                        'orlike' => $like,
+                        'limit' => 1
+                ]);
+                if(isset($proveedor->data) && !empty($proveedor->data)){
+                      $registro = [
+                            'id_usuario'  => $proveedor->data[0]->id_usuario,
+                            'fecha'       => DateTime::createFromFormat('d/m/Y', $row['fecha'])->format('Y-m-d'),
+                            'turno'       => $row['turno'] ?? null,
+                            'entrada'     => $row['entrada'] ?? null,
+                            'salida'      => $row['salida'] ?? null,
+                            'trabajado'   => $row['trabajado'] ?? null,
+                            'tarde'       => $tarde,
+                            'temprano'    => $temprano,
+                        ];
+                     $dataConfig = [
+                        "tabla"=>"asistencia",
+                        "editar"=>false
+                    ];
+                    $response = $globals->saveTabla($registro,$dataConfig,["script"=>"Usuario.tiket"]);
+                    $response->error = false;
+                    $response->respuesta = 'Carga se guardo correctamente';
+                    
+                }
+
+            }
+
+        }
+
+
+        return $this->respond($response);
+    }
+
+
+ /*    public function uploadCSV()
     {
         $response = new \stdClass();
         $session = \Config\Services::session();
@@ -77,7 +187,6 @@ class Principal extends BaseController {
                 }
                 fclose($handle);
             }
-
             $columnasRequeridas = [
                 'nombre', 'primer_apellido', 'segundo_apellido', 'curp', 'correo',
                 'denominacion_funcional', 'nivel', 'municipio',
@@ -93,29 +202,16 @@ class Principal extends BaseController {
                 $response->respuesta = 'faltan columnas'; 
                 return $this->respond($response);
             }
-        
-      
-
             $processResponse = $this->procesarDatos($data);
             if($processResponse->error){
                 $response->error = true;
                 $response->respuesta = $processResponse->respuesta;
                 return $this->respond($response);
             }
-         
-            // Convertir el array a JSON (opcional)
-          
-           // $json_data = json_encode($dataArray, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            //echo $json_data; // Para ver el JSON resultante
-            //var_dump($json_data);
-            
         }
-
-     
         $response->error = false; 
         return $this->respond($response);
-        //return $this->response->setJSON($response);
-    }
+    } */
       function encode_img_base64($img_path = false, $img_type = 'png')
     {
         if ($img_path) {
@@ -676,6 +772,69 @@ class Principal extends BaseController {
         $data['contentView'] = 'secciones/vregistroPT';                
         $this->_renderView($data);
     }
+    public function ImprimirPT($id_pt = null)
+    {  
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $data = [];
+
+      $registro_pt = $globals->getTabla([
+            'tabla' => 'vw_registro_pt',
+            'where' => ['visible' => 1, 'id_registro_pt' => $id_pt]
+        ]);
+
+        if (!empty($registro_pt->data)) {
+            $registro = $registro_pt->data[0];
+            $data['registro'] = $registro;
+
+            $folio = $globals->getTabla([
+                'tabla' => 'direccion',
+                'where' => ['visible' => 1, 'id_area' => $registro->id_direccion_responsable]
+            ]);
+          
+            if (!empty($folio->data)) {
+            $zero = (strlen($folio->data[0]->ultimo_folio_pt) >= 2)?'0':'00';
+                $data['registro']->folio = $folio->data[0]->folio_prefijo.$zero.$folio->data[0]->ultimo_folio_pt.'/'.$folio->data[0]->periodo_pt;
+            } else {
+                $data['registro']->folio = ''; // O un valor por defecto
+            }
+
+        } else {
+            echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
+            die();
+        }
+
+
+        $html = view('secciones/vFormatoPT.php', $data);
+
+        // Crear instancia de mPDF
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 0,
+            'margin_left' => 1,
+            'margin_right' => 1,
+            'format' => [213, 268],
+            'mirrorMargins' => false,
+        ]);
+
+        // Importar el PDF base
+        $pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/formatoPT.pdf');
+
+      for ($i = 1; $i <= $pagecount; $i++) {
+            $mpdf->AddPage();
+            $tplId = $mpdf->ImportPage($i);
+            $mpdf->UseTemplate($tplId);
+
+            if ($i == 1) {
+                // Solo escribe HTML en la primera página
+                $mpdf->WriteHTML($html);
+            }
+        }
+
+
+        $mpdf->Output('Formato_pt.pdf', 'I');
+        exit();
+    }
+
  public function buscarProveedor()
     {
         $response = new \stdClass();

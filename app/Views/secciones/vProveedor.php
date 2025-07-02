@@ -214,7 +214,7 @@
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="concepto_pago">Concepto del pago.<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" id="concepto_pago" name="concepto_pago" value="<?= (isset($registro_pt->concepto_pago))?$registro_pt->concepto_pago:'' ?>" >
+                                                <input type="text" class="form-control"  autocomplete="off" id="concepto_pago" name="concepto_pago" value="<?= (isset($registro_pt->concepto_pago))?$registro_pt->concepto_pago:'' ?>" >
                                                 <div class="invalid-feedback">
                                                     Please provide a valid state.
                                                 </div>
@@ -230,7 +230,7 @@
                                         <div class="form-row">
                                             <div class="col-md-4 mb-3">
                                                 <label for="no_reserva">No. de Reserva.<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" id="no_reserva" name="no_reserva"  value="<?= (isset($registro_pt->no_reserva))?$registro_pt->no_reserva:'' ?>">
+                                                <input type="text" class="form-control" autocomplete="off" id="no_reserva" name="no_reserva"  value="<?= (isset($registro_pt->no_reserva))?$registro_pt->no_reserva:'' ?>">
                                                 <div class="invalid-feedback">
                                                     Campo no Valido
                                                 </div>

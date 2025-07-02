@@ -691,17 +691,65 @@ class Agregar extends BaseController {
         $data['scripts'] = array('agregar');
         $data['contentView'] = 'secciones/vTablaPrograma';                
         $this->_renderView($data);
-    }
-    public function Asistencia() {
-        $session     = \Config\Services::session();
-        $response    = new stdClass();
-        $Mglobal   = new Mglobal;
-  
-       
-        $data['scripts'] = array('agregar');
-        $data['contentView'] = 'secciones/vAsistencia';                
-        $this->_renderView($data);
-    }
+        }
+        private function meses($mes, $anio = null)
+        {
+            $anio = $anio ?? date('Y');
+            if ($mes < 1 || $mes > 12) {
+                throw new InvalidArgumentException("El mes debe estar entre 1 y 12");
+            }
+            $mesFormateado = str_pad($mes, 2, '0', STR_PAD_LEFT);
+            $data['mes_inicio'] = "$anio-$mesFormateado-01";
+            $data['mes_fin'] = date('Y-m-t', strtotime($data['mes_inicio']));
+            
+            return $data;
+        }
+
+        public function Asistencia($mes = null, $user = null) 
+        {
+            $session = \Config\Services::session();
+            $response = new stdClass();
+            $Mglobal = new Mglobal;
+            $calendarStatic = true;
+      
+            $data = [];
+            if (isset($mes) && !empty($mes)) {
+                try {
+                    $meses = $this->meses($mes);
+                    $agenda = $Mglobal->getTabla([
+                        'tabla' => 'asistencia',
+                        'where' => [
+                            'visible' => 1,
+                             'id_usuario' => $user
+                        ],
+                        'whereBetween' => [
+                            ['fecha', $meses['mes_inicio'], $meses['mes_fin']]
+                        ]
+                    ]);
+                } catch (InvalidArgumentException $e) {
+                    // Manejar error de mes inválido
+                    log_message('error', $e->getMessage());
+                }
+            $calendarStatic = false;
+            }else{
+                 $agenda = $Mglobal->getTabla([
+                        'tabla' => 'asistencia',
+                        'where' => [
+                            'visible' => 1,
+                             'id_usuario' => $session->get('id_usuario')
+                        ],
+                    ]);
+            }
+            $mes  = ($mes)? $mes: date('m');
+            $data['anio'] = date('Y');
+            $asistencia = (isset($agenda->data) && !empty($agenda->data))?$agenda->data:[];
+            $data['asistencia'] = $asistencia;
+            $data['mes'] = $mes;
+            $data['calendarStatic'] = $calendarStatic;
+            $data['scripts'] = array('agregar');
+            $data['contentView'] = 'secciones/vAsistencia';                
+            $this->_renderView($data);
+        }
     public function ReservarSala() {
         $session     = \Config\Services::session();
         $response    = new stdClass();

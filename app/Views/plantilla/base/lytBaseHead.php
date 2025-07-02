@@ -330,7 +330,7 @@
                         </div>
                         <ul class="nav metismenu">                                
                             <li class="nav-item">
-                                <a class="nav-link" href="#"><span class="w-100">Administración</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
+                                <a class="nav-link" href="#"><span class="w-100">Admin TI</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
                                 <ul class="nav-second-level" aria-expanded="false">
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/usuarios">Lista de Usuarios</a></li>
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/altaUsuario">Alta de Usuarios</a></li>
@@ -345,10 +345,10 @@
                                 </ul>            
                             </li><!--end nav-item-->
                             <li class="nav-item">
-                                <a class="nav-link" href="#"><span class="w-100">Forms</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
+                                <a class="nav-link" href="#"><span class="w-100">Admin RH</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
                                 <ul class="nav-second-level" aria-expanded="false">
-                                    <li><a href="../others/forms-elements.html">Basic Elements</a></li>
-                                    <li><a href="../others/forms-advanced.html">Advance Elements</a></li>
+                                    <li><a href="<?php echo base_url(); ?>index.php/Inicio/subirAsistencia">Asistencias</a></li>
+                                    <li><a href="../others/forms-advanced.html">Festivos</a></li>
                                     <li><a href="../others/forms-validation.html">Validation</a></li>
                                     <li><a href="../others/forms-wizard.html">Wizard</a></li>
                                     <li><a href="../others/forms-editors.html">Editors</a></li>
@@ -359,7 +359,7 @@
                                 </ul>            
                             </li><!--end nav-item-->
                             <li class="nav-item">
-                                <a class="nav-link" href="#"><span class="w-100">Charts</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
+                                <a class="nav-link" href="#"><span class="w-100">Admin RF</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
                                 <ul class="nav-second-level" aria-expanded="false">
                                     <li><a href="../others/charts-apex.html">Apex</a></li>
                                     <li><a href="../others/charts-morris.html">Morris</a></li>
