@@ -67,11 +67,16 @@
                                                         <td class="text-center"><?= $p->rfc?></td>
                                                         <td class="text-center"><?= $p->no_proveedor?></td>
                                                         <td class="text-center">
-                                                            <a href="<?php echo base_url(); ?>index.php/Principal/Proveedor/<?= $p->id_proveedor ?>" title="Seccionar Proveedor"
+                                                             <a style="color:white" onclick="ini.inicio.reserva(<?=$p->id_proveedor?>);" title="Seccionar Proveedor"
                                                                
                                                                 class="btn btn-gradient-success px-4"><i
                                                                     class="mdi mdi-arrow-collapse-right font-21"></i>
                                                             </a>
+                                                          <!--   <a href="<?php echo base_url(); ?>index.php/Principal/Proveedor/<?= $p->id_proveedor ?>" title="Seccionar Proveedor"
+                                                               
+                                                                class="btn btn-gradient-success px-4"><i
+                                                                    class="mdi mdi-arrow-collapse-right font-21"></i>
+                                                            </a> -->
                                                           
                                                         </td>
                                                     </tr>
@@ -93,6 +98,86 @@
     </div>
     <!-- end page content -->
 </div>
+
+<!--Inicio Modal -->
+
+<div class="modal fade" id="modalReserva" tabindex="-1" role="dialog" aria-labelledby="supportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+                <main>
+                   <div class="row">
+                        <div class="col-lg-12">
+                            <div class="card">
+                                <div class="card-body step active">        
+                                   <h2 class="mt-0 header-title">RESERVA</h2>
+                                    <form id="registroSala" > 
+
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="card">
+                                                <div class="card-body">        
+                                                    <h4 class="mt-0 header-title">Datos del Proveedor</h4>
+                                                   
+                                                    
+                                                    <div class="row">
+                                                        <div class="col-lg-6">
+                                                            <div class="form-group">
+                                                                <label for="nombre_proveedor">Nombre Proveedor</label>
+                                                                <input type="text" class="form-control" id="nombre_proveedor" name="nombre_proveedor">
+                                                            </div>
+                                                             <div class="form-group">
+                                                                <label for="nombre_proveedor">Nombre Proveedor</label>
+                                                                <input type="text" class="form-control" id="nombre_proveedor" name="nombre_proveedor">
+                                                            </div>
+                                                         
+                                                            
+                                                                                          
+                                                        </div>
+
+
+                                                        <div class="col-lg-6">
+                                                             <div class="form-group">
+                                                                <label for="no_proveedor">No. Proveedor</label>
+                                                                <input type="text" class="form-control" id="no_proveedor" name="no_proveedor">
+                                                            </div>
+                                                           <div class="form-group">
+                                                                <label for="exampleInputPassword1">No. Convenio/Contrato</label>
+                                                                <div class="input-group">
+                                                                    <span class="input-group-prepend">
+                                                                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                            Seleccione <i class="mdi mdi-chevron-down"></i>
+                                                                        </button>
+                                                                        <div class="dropdown-menu">
+                                                                            <a class="dropdown-item" href="#" onclick="setConvenio('SECTURI/CONV/')">SECTURI/CONV</a>
+                                                                            <a class="dropdown-item" href="#" onclick="setConvenio('SECTURI/CTO/')">SECTURI/CTO</a>
+                                                                        </div>
+                                                                    </span>
+                                                                    <input type="text" id="no_convenio" name="no_convenio" class="form-control" placeholder="025">
+                                                                    <span class="input-group-append">
+                                                                        <button type="button" class="btn btn-gradient-primary"><?= date('Y'); ?></button>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                          
+                                                            
+                                                                                                      
+                                                        </div>
+                                                    </div>                                                                      
+                                                </div><!--end card-body-->
+                                            </div><!--end card-->
+                                        </div><!--end col-->
+                                    </div><!--end col-->
+                                   
+                                    </form>                                                                          
+                                </div><!--end card-body-->
+                            </div><!--end card-->
+                        </div><!--end col-->
+                    </div><!--end row-->
+                </main> 
+        </div>
+    </div>
+</div>
+                                                    <!--FIN MODAL -->
 
 
 <link href="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet"
@@ -158,6 +243,8 @@ $('#buscar_proveedor').on('keyup', debounce(function () {
 
 
 
-
+function setConvenio(valor) {
+    document.getElementById('no_convenio').value = valor;
+}
 
 </script>

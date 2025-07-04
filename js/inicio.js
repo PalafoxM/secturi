@@ -227,7 +227,33 @@ ini.inicio = (function () {
         {
          $('#standard-modal').modal('hide');
         },
-       
+        reserva: function(id_proveedor)
+        {
+         $('#modalReserva').modal('show');
+         ini.inicio.traerReserva(id_proveedor);
+        },
+        traerReserva: function(id_proveedor){
+         $.ajax({
+                        url: base_url + "index.php/Principal/Proveedor",
+                        type: 'POST',
+                        dataType: "json",
+                        data: {id_proveedor:id_proveedor},
+                        success: function(response) {
+                          
+                        },
+                        complete: function(){
+                            $("#btn_csv").show();
+                            $("#load_csv").hide();
+                        },
+                        error: function(xhr, status, error) {
+                            console.log(error);
+                            Swal.fire("Error", "Favor de llamar al Administrador", "error")
+                            $("#btn_csv").show();
+                            $("#load_csv").hide();
+                            //alert("Error en la solicitud: " + error);
+                        }
+                    });
+        },
         subirCsv: function()
         {
             let formData = new FormData();

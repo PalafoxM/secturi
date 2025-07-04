@@ -208,6 +208,19 @@ class Inicio extends BaseController {
         $data['contentView']   = 'secciones/vSubirAsistencia';
         $this->_renderView($data);
     }
+  public function vehiculos()
+    {
+        $session     = \Config\Services::session();
+        $principal   = new Mglobal;
+        $vehiculos = $principal->getTabla([
+            'tabla' => 'vehiculo',
+            'where' => ['visible' => 1]
+        ]);
+        $data['vehiculos']   = $vehiculos->data ?? [];  
+        $data['scripts']       = ['principal', 'inicio'];
+        $data['contentView']   = 'secciones/vVehiculos';
+        $this->_renderView($data);
+    }
 /*   public function subirAsistencia()
     {
         $session     = \Config\Services::session();

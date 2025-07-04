@@ -866,8 +866,30 @@ class Principal extends BaseController {
        
 
     }
+        public function Proveedor()
+    {  
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error|Error al traer los proveedor';
+        $globals = new Mglobal;
+        $id_proveedor =  $this->request->getPost('id_proveedor');
+      
+        $data = [];
+       if(!empty($id_proveedor)){
+            $proveedor           = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1, 'id_proveedor' =>$id_proveedor ]]);
+            $banco               = $globals->getTabla(['tabla' => 'proveedor_banco', 'where' => ['idproveedor' => $id_proveedor ]]);
+            $response->error     = $proveedor->error;
+            $response->respuesta = $proveedor->respuesta;
+            $response->data['proveedor'] = (isset($proveedor->data[0]) && !empty($proveedor->data[0]))?$proveedor->data[0]:[];
+            $response->data['banco'] = (isset( $banco->data[0]) && !empty( $banco->data[0]))?$banco->data[0]:[];
+        }
 
-    public function Proveedor($id_proveedor = null, $id_registro_pt =  null)
+         return $this->respond($response);
+        
+    }
+
+/*     public function Proveedor($id_proveedor = null, $id_registro_pt =  null)
     {  
         $session = \Config\Services::session();
         $response = new \stdClass();
@@ -911,7 +933,7 @@ class Principal extends BaseController {
         $data['contentView'] = 'secciones/vProveedor';                
         $this->_renderView($data);
         
-    }
+    } */
     public function getProveedores()
     {  
        

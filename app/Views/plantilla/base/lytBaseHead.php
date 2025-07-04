@@ -312,14 +312,15 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="javascript: void(0);"><span class="w-100">Financieros</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
                                 <ul class="nav-second-level" aria-expanded="false">
-                                    <li><a href="<?php echo base_url(); ?>index.php/Principal/listadoPT">Solicitud PT</a></li>
+                                    <li><a href="<?php echo base_url(); ?>index.php/Principal/listadoPT">Reserva PT</a></li>
                                     <li><a href="../apps/email-read.html">Solicitud GRC</a></li>            
                                     <li><a href="../apps/email-read.html">Solicitud GO</a></li>            
                                 </ul>            
                             </li><!--end nav-item-->
                             <li class="nav-item"><a class="nav-link" href="<?php echo base_url(); ?>index.php/Principal/listadoEstatusPT">Listado PT</a></li>
                             <li class="nav-item"><a class="nav-link" href="../apps/contact-list.html">Listado GRC</a></li>
-                            <li class="nav-item"><a class="nav-link" href="../apps/calendar.html">Listado GO</a></li>                           
+                            <li class="nav-item"><a class="nav-link" href="../apps/calendar.html">Listado GO</a></li>   
+                            <li class="nav-item"><a class="nav-link" href="../apps/invoice.html" aria-expanded="false">Mesa RF</a></li>                        
                         </ul>
                     </div><!-- end Crypto -->
         
@@ -348,7 +349,7 @@
                                 <a class="nav-link" href="#"><span class="w-100">Admin RH</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
                                 <ul class="nav-second-level" aria-expanded="false">
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/subirAsistencia">Asistencias</a></li>
-                                    <li><a href="../others/forms-advanced.html">Festivos</a></li>
+                                    <li><a href="../others/forms-advanced.html">Advance Elements</a></li>
                                     <li><a href="../others/forms-validation.html">Validation</a></li>
                                     <li><a href="../others/forms-wizard.html">Wizard</a></li>
                                     <li><a href="../others/forms-editors.html">Editors</a></li>
@@ -373,9 +374,9 @@
                                 </ul>            
                             </li><!--end nav-item-->
                             <li class="nav-item">
-                                <a class="nav-link" href="#"><span class="w-100">Tables</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
+                                <a class="nav-link" href="#"><span class="w-100">Admin RM</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
                                 <ul class="nav-second-level" aria-expanded="false">
-                                    <li><a href="../others/tables-basic.html">Basic</a></li>
+                                    <li><a href="<?php echo base_url(); ?>index.php/Inicio/vehiculos">Vehiculos</a></li>
                                     <li><a href="../others/tables-datatable.html">Datatables</a></li>
                                     <li><a href="../others/tables-responsive.html">Responsive</a></li>
                                     <li><a href="../others/tables-footable.html">Footable</a></li>

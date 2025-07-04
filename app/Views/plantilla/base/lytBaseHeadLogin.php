@@ -52,20 +52,13 @@
     // Lista de imágenes de fondo
     const backgrounds = [
         "<?php echo base_url(); ?>assets/images/backgrounds/IMG4.jpg",
-        "<?php echo base_url(); ?>assets/images/backgrounds/IMG5.jpg",
-        "<?php echo base_url(); ?>assets/images/backgrounds/IMG6.jpg",
-        "<?php echo base_url(); ?>assets/images/backgrounds/IMG8.jpg",
         "<?php echo base_url(); ?>assets/images/backgrounds/IMG10.jpg",
-        "<?php echo base_url(); ?>assets/images/backgrounds/IMG11.jpg",
-        "<?php echo base_url(); ?>assets/images/backgrounds/IMG12.jpg",
-        "<?php echo base_url(); ?>assets/images/backgrounds/IMG13.jpg",
-        "<?php echo base_url(); ?>assets/images/backgrounds/IMG14.jpg",
         "<?php echo base_url(); ?>assets/images/backgrounds/IMG18.jpg",
         "<?php echo base_url(); ?>assets/images/backgrounds/guanajuato.jpg",
         "<?php echo base_url(); ?>assets/images/backgrounds/subterranea.webp",
         "<?php echo base_url(); ?>assets/images/backgrounds/leon.jpg",
         "<?php echo base_url(); ?>assets/images/backgrounds/uni.jpg",
-        "<?php echo base_url(); ?>assets/images/backgrounds/bg1.jpg"
+
     ];
 
   function setRandomBackground() {
