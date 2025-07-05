@@ -339,7 +339,7 @@
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaPuesto">Lista de Puestos</a></li>
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaArea">Lista de Área</a></li>
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaTiket">Listado de Tikets</a></li>
-                                    <li><a href="../others/ui-dragula.html">Dragula</a></li>
+                                    <li><a href="<?php echo base_url(); ?>index.php/Principal/listadoProveedores">Lista de Proveedores</a></li>
                                     <li><a href="../others/ui-check-radio.html">Check & Radio</a></li>
                                     <li><a href="../others/advanced-session.html">Session Timeout</a></li>
                                     <li><a href="../others/advanced-idle-timer.html">Idle Timer</a></li>

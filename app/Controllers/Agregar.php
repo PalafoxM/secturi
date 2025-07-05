@@ -740,6 +740,7 @@ class Agregar extends BaseController {
                         ],
                     ]);
             }
+           
             $mes  = ($mes)? $mes: date('m');
             $data['anio'] = date('Y');
             $asistencia = (isset($agenda->data) && !empty($agenda->data))?$agenda->data:[];

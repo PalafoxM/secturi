@@ -728,16 +728,129 @@ class Principal extends BaseController {
         $this->_renderView($data);
         
     }
+    public function guardarReserva()
+    {  
+       
+        $session = \Config\Services::session();
+        $globals      = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error al Guardar los datos';
+        $data =  $this->request->getPost();
+        $ruta = "";
+            $file = $this->request->getFile('instrumento');
+            $maxSize = 1 * 1024 * 1024; // 1 MB
+        
+            if ($file->getSize() > $maxSize ) {
+                $response->respuesta = "El archivo no debe exceder 1 MB.";
+                return $this->respond($response);
+            }
+
+            if ($file->isValid() && !$file->hasMoved()) {
+                   $newName = $file->getRandomName();
+                   $timestamp = date('Ymd_His'); // ejemplo: 20250704_144312
+                   $extension = $file->getClientExtension();
+                   $archivo = $newName . '_' . $timestamp . '.' . $extension; 
+                   $file->move(WRITEPATH . 'uploads/pdf/', $archivo);
+                   $ruta = 'uploads/pdf/'. $archivo;
+            } 
+
+
+        if(empty($data['no_convenio'])){
+            $response->error = true;
+            $response->respuesta = "El campo No. Convenio es requerido";
+             return $this->respond($response);
+        }
+        $hoy = date("Y-m-d H:i:s"); 
+        $dataInsert = [
+            "id_proveedor"   => $data['id_proveedor'],
+            "no_convenio"    => $data['no_convenio'],
+            "total_importe"  => $data['total_importe'],
+            "instrumento"     => $ruta, 
+            "fec_reg"        => $hoy, 
+            "usu_reg"        => $session->get('id_usuario')
+             
+        ];
+         $dataBitacora = ['id_user' =>  $session->get('id_usuario'), 'script' => 'Agregar.php/guardaReserva'];
+         $dataConfig = [
+            "tabla"=>"reserva",
+            "editar"=>false,
+            // "idEditar"=>['id_usuario'=>$data['id_usuario']]
+        ];
+         $response = $globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
+       
+         if(!$response->error){
+             $id_reserva = $response->idRegistro;
+             $datosCombinados = [];
+
+                // Verificar que todos los arrays tengan la misma longitud
+                if (count($data['proyecto']) === count($data['partida']) && count($data['partida']) === count($data['importe'])) {
+                    foreach ($data['proyecto'] as $index => $proyecto) {
+                        // Solo agregar si todos los valores existen
+                        if (!empty($data['proyecto']) && !empty($data['partida'][$index]) && !empty($data['importe'][$index])) {
+                            $datosCombinados[] = [
+                                'proyecto' => $proyecto,
+                                'partida' => $data['partida'][$index],
+                                'importe' => str_replace(',', '', $data['importe'][$index]) // Elimina comas del formato numérico
+                            ];
+                        }
+                    }
+                }
+                  $dataConfig = [
+                    "tabla"=>"presupuesto",
+                    "editar"=>false,
+                    // "idEditar"=>['id_usuario'=>$data['id_usuario']]
+                ];
+                foreach($datosCombinados as $d){
+                    $dataInsert = [
+                            "id_reserva"     => $id_reserva,
+                            "id_proyecto"    => $d['proyecto'],
+                            "id_partida"     => $d['partida'],
+                            "importe"        => $d['importe'], 
+                            "fec_reg"        => $hoy, 
+                            "usu_reg"        => $session->get('id_usuario')
+                            
+                        ];
+     
+                        $res = $globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
+                        if(!$res->error){
+                         $response->error = $res->error;
+                         $response->respuesta = $res->respuesta;
+                        }
+                }
+         }
+ 
+          return $this->respond($response);
+       
+        
+    }
+    public function listadoProveedores()
+    {  
+       
+        $session = \Config\Services::session();
+        $globals      = new Mglobal;
+        $proveedor    = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit'=>200]);
+        $data['proveedor']    = (!empty($proveedor->data))?$proveedor->data:[];
+        $data['scripts'] = array('inicio');
+        $data['edita'] = 0;
+        $data['contentView'] = 'secciones/vListadoProveedor';                
+        $this->_renderView($data);
+        
+    }
     public function listadoPT()
     {  
        
         $session = \Config\Services::session();
-        $globals = new Mglobal;
-        $cat_perfil = $globals->getTabla(['tabla' => 'perfil', 'where' => ['visible' => 1]]);
-        $proveedor = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit'=>100]);
+        $globals      = new Mglobal;
+        $cat_perfil   = $globals->getTabla(['tabla' => 'perfil', 'where' => ['visible' => 1]]);
+        $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
+        $cat_partida  = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $proveedor    = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit'=>100]);
 
-        $data['cat_perfil'] = (!empty($cat_perfil->data))?$cat_perfil->data:[];
-        $data['proveedor'] = (!empty($proveedor->data))?$proveedor->data:[];
+        $data['cat_perfil']   = (!empty($cat_perfil->data))?$cat_perfil->data:[];
+        $data['proveedor']    = (!empty($proveedor->data))?$proveedor->data:[];
+        $data['cat_proyecto'] = (!empty($cat_proyecto->data))?$cat_proyecto->data:[];
+        $data['cat_partida']  = (!empty($cat_partida->data))?$cat_partida->data:[];
         $data['scripts'] = array('inicio');
         $data['edita'] = 0;
         $data['contentView'] = 'secciones/vListadoPT';                
@@ -879,12 +992,20 @@ class Principal extends BaseController {
        if(!empty($id_proveedor)){
             $proveedor           = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1, 'id_proveedor' =>$id_proveedor ]]);
             $banco               = $globals->getTabla(['tabla' => 'proveedor_banco', 'where' => ['idproveedor' => $id_proveedor ]]);
+            if(isset( $banco->data[0]) && !empty( $banco->data[0])){
+                if(empty($banco->data[0]->no_cuenta) || empty($banco->data[0]->clabe)){
+                    $response->error = true;
+                    $response->respuesta = 'El proveedor no tiene No. de cuenta y/o cable, favor de solIcitar un Tiket a la área TI';
+                    return $this->respond($response);
+                }
+            }
             $response->error     = $proveedor->error;
             $response->respuesta = $proveedor->respuesta;
             $response->data['proveedor'] = (isset($proveedor->data[0]) && !empty($proveedor->data[0]))?$proveedor->data[0]:[];
             $response->data['banco'] = (isset( $banco->data[0]) && !empty( $banco->data[0]))?$banco->data[0]:[];
+            
         }
-
+      
          return $this->respond($response);
         
     }

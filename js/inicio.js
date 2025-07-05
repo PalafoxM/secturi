@@ -233,26 +233,140 @@ ini.inicio = (function () {
          ini.inicio.traerReserva(id_proveedor);
         },
         traerReserva: function(id_proveedor){
-         $.ajax({
-                        url: base_url + "index.php/Principal/Proveedor",
-                        type: 'POST',
-                        dataType: "json",
-                        data: {id_proveedor:id_proveedor},
-                        success: function(response) {
-                          
-                        },
-                        complete: function(){
-                            $("#btn_csv").show();
-                            $("#load_csv").hide();
-                        },
-                        error: function(xhr, status, error) {
-                            console.log(error);
-                            Swal.fire("Error", "Favor de llamar al Administrador", "error")
-                            $("#btn_csv").show();
-                            $("#load_csv").hide();
-                            //alert("Error en la solicitud: " + error);
-                        }
+          $.ajax({
+            url: base_url + "index.php/Principal/Proveedor",
+            type: 'POST',
+            dataType: "json",
+            data: {id_proveedor:id_proveedor},
+            success: function(response) {
+                 console.log(response);
+                if(response.error){
+                    Swal.fire({
+                        title: "Atención",
+                        text: response.respuesta,
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Ok"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $('#modalReserva').modal('hide');
+                            }
                     });
+                }else{
+                  $("#nombre_proveedor").val(response.data.proveedor.razon_social);
+                  $("#no_proveedor").val(response.data.proveedor.no_proveedor);
+                  $("#id_proveedor").val(response.data.proveedor.id_proveedor);
+                }
+            },
+            complete: function(){
+                $("#btn_csv").show();
+                $("#load_csv").hide();
+            },
+            error: function(xhr, status, error) {
+                console.log(error);
+                Swal.fire("Error", "Favor de llamar al Administrador", "error")
+                $("#btn_csv").show();
+                $("#load_csv").hide();
+                //alert("Error en la solicitud: " + error);
+            }
+         });
+        },
+           validarFormulario: function () {
+            // Validar campos principales
+            if($('#nombre_proveedor').val() === '') {
+                //toastr.warning('El nombre del proveedor es requerido');
+                Swal.fire("Error", "El nombre del proveedor es requerido", "error");
+                return false;
+            }
+
+            // Validar que al menos haya una fila en la tabla
+            if($('#makeEditable2 tbody tr').length === 0) {
+                //toastr.warning('Debe agregar al menos un proyecto');
+                Swal.fire("Error", "Debe agregar al menos un proyecto", "error");
+                return false;
+            }
+
+            // Validar que todas las filas tengan datos completos
+            var filasValidas = true;
+            $('#makeEditable2 tbody tr').each(function() {
+                if($(this).find('[name="proyecto[]"]').val() === '' || 
+                $(this).find('[name="partida[]"]').val() === '' || 
+                $(this).find('[name="importe[]"]').val() === '') {
+                    filasValidas = false;
+                    return false; // Sale del each
+                }
+            });
+
+            if(!filasValidas) {
+                Swal.fire("Error", "Debe agregar al menos un proyecto/partida/importe", "error");
+                return false;
+            }
+
+            return true;
+        },
+        guardarReserva: function()
+        {
+        $('#btn_guardar').click(function(e) {
+        e.preventDefault();
+        
+        // Validación básica
+        if(!ini.inicio.validarFormulario()) {
+            return false;
+        }
+
+        // Crear FormData para enviar tanto el formulario como el archivo
+        var formData = new FormData();
+        
+        // Agregar datos del formulario principal
+        formData.append('nombre_proveedor', $('#nombre_proveedor').val());
+        formData.append('no_proveedor', $('#no_proveedor').val());
+        formData.append('no_convenio', $('#no_convenio').val());
+        formData.append('id_proveedor', $('#id_proveedor').val());
+        formData.append('total_importe', $('#total_importe').val());
+        
+        // Agregar archivo si existe
+        var instrumentoFile = $('#instrumento')[0].files[0];
+        if(!instrumentoFile) {
+               Swal.fire("Error", "El <strong>Instrumento Jurídico</strong> es Requerido", "error");return
+        }
+         formData.append('instrumento', instrumentoFile);
+
+        // Agregar datos de la tabla
+        $('#makeEditable2 tbody tr').each(function(index) {
+            formData.append('proyecto[]', $(this).find('[name="proyecto[]"]').val());
+            formData.append('partida[]', $(this).find('[name="partida[]"]').val());
+            formData.append('importe[]', $(this).find('[name="importe[]"]').val());
+        });
+
+        // Enviar datos via AJAX
+        $.ajax({
+            url: base_url + "index.php/Principal/guardarReserva",
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            beforeSend: function() {
+                $('#btn_guardar').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+            },
+            success: function(response) {
+                if(response.error) {
+                    Swal.fire("Error", response.respuesta, "error");
+                } else {
+                     Swal.fire("Correcto", response.respuesta, "success");
+                }
+            },
+            error: function() {
+                //toastr.error('Error de conexión');
+                Swal.fire("Error", "Error de conexión", "error");
+            },
+            complete: function() {
+                $('#btn_guardar').prop('disabled', false).html('Guardar');
+            }
+           });
+        });
+
         },
         subirCsv: function()
         {
@@ -1623,7 +1737,7 @@ ini.inicio = (function () {
                                                 '<i class="mdi mdi-eye-off text-danger font-18"></i>'}
                                         </td>
                                         <td class="text-center">
-                                          <a href="${base_url}index.php/Principal/Proveedor/${p.id_proveedor}" 
+                                          <a style="color:white;" onclick="ini.inicio.reserva(${p.id_proveedor});" 
                                             class="btn btn-gradient-success px-4">
                                             <i class="mdi mdi-arrow-collapse-right font-21"></i>
                                          </a>
