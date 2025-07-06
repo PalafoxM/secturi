@@ -96,6 +96,7 @@ class Login extends BaseController {
                 $session->set('nombre_completo',$result->data[0]->nombre." ".$result->data[0]->primer_apellido." ".$result->data[0]->segundo_apellido);
                 $session->set('id_perfil',$result->data[0]->id_perfil);
                 $session->set('fec_nac',$result->data[0]->fec_nac);
+                $session->set('correo',$result->data[0]->correo);
                 $response->error     = $result->error;
                 $response->respuesta = $result->respuesta;
             }     

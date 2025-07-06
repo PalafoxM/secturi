@@ -320,7 +320,8 @@
                             <li class="nav-item"><a class="nav-link" href="<?php echo base_url(); ?>index.php/Principal/listadoEstatusPT">Listado PT</a></li>
                             <li class="nav-item"><a class="nav-link" href="../apps/contact-list.html">Listado GRC</a></li>
                             <li class="nav-item"><a class="nav-link" href="../apps/calendar.html">Listado GO</a></li>   
-                            <li class="nav-item"><a class="nav-link" href="../apps/invoice.html" aria-expanded="false">Mesa RF</a></li>                        
+                            <li class="nav-item"><a class="nav-link" href="../apps/invoice.html" aria-expanded="false">Mesa RF</a></li>
+                            <li class="nav-item"><a class="nav-link" href="<?php echo base_url(); ?>index.php/Principal/listaReservaPT" aria-expanded="false">Listado de Reserva PT</a></li>                     
                         </ul>
                     </div><!-- end Crypto -->
         

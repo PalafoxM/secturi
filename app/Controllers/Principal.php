@@ -19,6 +19,7 @@ use Endroid\QrCode\Label\Alignment\LabelAlignmentCenter;
 use Endroid\QrCode\Label\Font\NotoSans;
 use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
 use Endroid\QrCode\Writer\PngWriter;
+ 
 
 class Principal extends BaseController {
 
@@ -732,6 +733,7 @@ class Principal extends BaseController {
     {  
        
         $session = \Config\Services::session();
+        $email =  \Config\Services::email();
         $globals      = new Mglobal;
         $response = new \stdClass();
         $response->error = true;
@@ -747,12 +749,20 @@ class Principal extends BaseController {
             }
 
             if ($file->isValid() && !$file->hasMoved()) {
-                   $newName = $file->getRandomName();
-                   $timestamp = date('Ymd_His'); // ejemplo: 20250704_144312
-                   $extension = $file->getClientExtension();
-                   $archivo = $newName . '_' . $timestamp . '.' . $extension; 
-                   $file->move(WRITEPATH . 'uploads/pdf/', $archivo);
-                   $ruta = 'uploads/pdf/'. $archivo;
+                $timestamp = date('Ymd_His');
+                $extension = $file->getClientExtension();
+                $originalName = pathinfo($file->getName(), PATHINFO_FILENAME);
+                $archivo = $originalName . '_' . $timestamp . '.' . $extension;
+
+                // Ruta absoluta en el sistema de archivos
+                $ruta_destino = FCPATH . 'assets/pdf/';
+
+                $file->move($ruta_destino, $archivo);
+
+                // Rutas accesibles por navegador
+                $ruta_absoluta = base_url('assets/pdf/' . $archivo);
+                $ruta_relativa = 'assets/pdf/' . $archivo;
+
             } 
 
 
@@ -766,7 +776,8 @@ class Principal extends BaseController {
             "id_proveedor"   => $data['id_proveedor'],
             "no_convenio"    => $data['no_convenio'],
             "total_importe"  => $data['total_importe'],
-            "instrumento"     => $ruta, 
+            "instrumento"    => $ruta_relativa, 
+            "ruta_absoluta"  => $ruta_absoluta, 
             "fec_reg"        => $hoy, 
             "usu_reg"        => $session->get('id_usuario')
              
@@ -816,24 +827,180 @@ class Principal extends BaseController {
                         if(!$res->error){
                          $response->error = $res->error;
                          $response->respuesta = $res->respuesta;
+                     
                         }
                 }
          }
+        //$correo = 'palafox.marin@hotmail.com';
+        $correo = 'alopez@guanajuato.gob.mx';
+        $email->setFrom($session->get('correo'), 'SUSI-RESERVA');// usuario
+        $email->setTo($correo);
+        $email->setSubject('Carga de Reserva');
+        $email->setMessage('
+            <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+                <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+                    <!-- Encabezado con logotipo -->
+                    <div style="background-color: #004080; padding: 20px; text-align: center;">
+                        <img src="' . base_url('assets/images/logo.png') . '" alt="Logo" style="height: 60px;">
+                    </div>
+                    <!-- Contenido principal -->
+                    <div style="padding: 30px; color: #333;">
+                        <h1 style="color: #004080;">El usuario <strong>' . $session->get('nombre_completo') . '</strong></h1>
+                        <p style="font-size: 16px;">ha registrado una <strong>RESERVA</strong> en el sistema SUSI.</p>
+                        <p style="font-size: 15px;">Se solicita realizar las labores correspondientes.</p>
+                        <p style="font-size: 15px; color: #888;">Este correo ha sido generado automáticamente por el sistema SUSI. No es necesario responder a este mensaje.</p>
+                    </div>
+                    <!-- Pie de página -->
+                    <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 13px; color: #666;">
+                        © ' . date('Y') . ' Sistema de Atención SUSI. Todos los derechos reservados - SECTURI.
+                    </div>
+                </div>
+            </div>
+        ');
+
+                                // Intentar enviar el correo
+       if ($email->send()) {
+          $response->error = false;
+          $response->respuesta = "Correo enviado correctamente.";
+        } else {
+          $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
+        }
  
-          return $this->respond($response);
+    return $this->respond($response);
        
         
     }
-    public function listadoProveedores()
+    public function actualizarBanco()
     {  
-       
         $session = \Config\Services::session();
         $globals      = new Mglobal;
-        $proveedor    = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit'=>200]);
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error al optener los datos';
+        $data =  $this->request->getPost();
+        $dataInsert = [
+            "banco"     =>  $data['banco'],
+            "no_cuenta" =>  $data['no_cuenta'],
+            "clabe"     =>  $data['clabe'],
+        ]; 
+           $dataConfig = [
+                "tabla"     => "proveedor_banco",
+                 "editar"   => true,
+                 "idEditar" => ["id_proveedor_banco" => $data['id_proveedor_banco']]
+                ];
+        $result = $globals->saveTabla($dataInsert, $dataConfig, ["script" => "proveedor_banco.editarBanco"]); 
+        if(!$result->error){
+            $response->error = false;
+            $response->respuesta = "Datos guardados correctamente";
+        }         
+        return $this->respond($response);
+    }
+    public function eliminarBanco()
+    {  
+        $session = \Config\Services::session();
+        $globals      = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error al optener los datos';
+        $id_proveedor_banco =  $this->request->getPost('id_proveedor_banco');
+     
+           $dataConfig = [
+                "tabla"     => "proveedor_banco",
+                 "editar"   => true,
+                 "idEditar" => ["id_proveedor_banco" => $id_proveedor_banco]
+                ];
+        $result = $globals->saveTabla(['visible'=> 0], $dataConfig, ["script" => "proveedor_banco.eliminarBanco"]); 
+        if(!$result->error){
+            $response->error = false;
+            $response->respuesta = "Datos guardados correctamente";
+        }         
+        return $this->respond($response);
+    }
+    public function eliminarProveedor()
+    {  
+        $session = \Config\Services::session();
+        $globals      = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error al optener los datos';
+        $id_proveedor =  $this->request->getPost('id_proveedor');
+        $dataConfig = [
+                 "tabla"     => 'proveedor',
+                 "editar"   => true,
+                 "idEditar" => ['id_proveedor'=> $id_proveedor]
+                ];
+    
+        $result = $globals->saveTabla(['visible'=>0], $dataConfig, ["script" => "proveedo.eliminarProveedor"]); 
+        if(!$result->error){
+           $response->error = false;
+           $response->respuesta = $result->respuesta;
+        }
+        return $this->respond($response);
+    }
+    public function agregarBanco()
+    {  
+        $session = \Config\Services::session();
+        $globals      = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error al optener los datos';
+        $data =  $this->request->getPost();
+        $dataConfig = [
+                "tabla"   => 'proveedor_banco',
+                 "editar" => false
+                ];
+        $dataInsert = [
+                "idproveedor" => $data['id_proveedor'],
+                "banco"       => $data['banco'],
+                "no_cuenta"   => $data['no_cuenta'],
+                "clabe"       => $data['clabe'],
+                ];
+        $result = $globals->saveTabla($dataInsert, $dataConfig, ["script" => "proveedor_banco.agregarBanco"]); 
+        if(!$result->error){
+           $response->error = false;
+           $response->respuesta = $result->respuesta;
+        }
+        return $this->respond($response);
+    }
+ 
+    public function getProveedor()
+    {  
+        $session = \Config\Services::session();
+        $globals      = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error al optener los datos';
+        $id_proveedor =  $this->request->getPost('id_proveedor');
+        $proveedor    = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1, 'id_proveedor' => $id_proveedor]]);
+        $proveedor_banco    = $globals->getTabla(['tabla' => 'proveedor_banco', 'where' => ['visible' => 1, 'idproveedor' => $id_proveedor]]);
+        if(!$proveedor->error){
+          $response->error = false;
+          $response->respuesta = $proveedor->respuesta;
+          $response->data['proveedor'] = (isset($proveedor->data) && !empty($proveedor->data))?$proveedor->data[0]:[];
+          $response->data['proveedor_banco'] = (isset($proveedor_banco->data) && !empty($proveedor_banco->data))?$proveedor_banco->data:[];
+        }              
+         return $this->respond($response);
+    }
+    public function listadoProveedores()
+    {  
+        $session = \Config\Services::session();
+        $globals      = new Mglobal;
+        $proveedor    = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit'=>50]);
         $data['proveedor']    = (!empty($proveedor->data))?$proveedor->data:[];
         $data['scripts'] = array('inicio');
         $data['edita'] = 0;
         $data['contentView'] = 'secciones/vListadoProveedor';                
+        $this->_renderView($data); 
+    }
+    public function listaReservaPT()
+    {  
+       
+        $session = \Config\Services::session();
+        $globals      = new Mglobal;
+        $reserva    = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['visible' => 1]]);
+        $data['reserva']    = (!empty($reserva->data))?$reserva->data:[];
+        $data['scripts'] = array('inicio');
+        $data['contentView'] = 'secciones/vListadoReservaPT';                
         $this->_renderView($data);
         
     }

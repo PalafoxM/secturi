@@ -230,7 +230,203 @@ ini.inicio = (function () {
         reserva: function(id_proveedor)
         {
          $('#modalReserva').modal('show');
+         $('.dropdown-toggle').dropdown();
          ini.inicio.traerReserva(id_proveedor);
+        },
+        editarProveedor: function(id_proveedor)
+        {
+         $('#modalProveedor').modal('show');
+          $.ajax({
+            url: base_url + "index.php/Principal/getProveedor",
+            type: 'POST',
+            dataType: "json",
+            data: {id_proveedor:id_proveedor},
+            success: function(response) {
+                 console.log(response);
+                 if(!response.error){
+                    $("#id_proveedor").val(response.data.proveedor.id_proveedor);
+                    $("#razon_social").val(response.data.proveedor.razon_social);
+                    $("#no_proveedor").val(response.data.proveedor.no_proveedor);
+                    $("#rfc").val(response.data.proveedor.rfc);
+                    const tbody = $('#makeEditable3 tbody');
+                    tbody.empty();
+
+                    response.data.proveedor_banco.forEach(p => {
+                        tbody.append(`
+                            <tr class="success" data-id="${p.id_proveedor_banco}">
+                                <td><input type="text" class="form-control banco" value="${p.banco}"></td>
+                                <td><input type="text" class="form-control no_cuenta" value="${p.no_cuenta}"></td>
+                                <td><input type="text" class="form-control clabe" value="${p.clabe}"></td>
+                                <td>
+                                    <a style="cursor:pointer;" onclick="ini.inicio.guardarBanco(this)" title="Guardar" class="px-4">
+                                        <i class="fa fa-save"></i>
+                                    </a>
+                                    <a style="cursor:pointer;" onclick="ini.inicio.eliminarBanco(this)" title="Eliminar" class="px-4">
+                                        <i class="mdi mdi-trash-can font-21"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        `);
+                    });
+                                                                                                   
+                 }else{
+                     Swal.fire("Error", "Favor de llamar al Administrador", "error")
+                 }
+               
+            },
+            complete: function(){
+                $("#btn_csv").show();
+                $("#load_csv").hide();
+            },
+            error: function(xhr, status, error) {
+                console.log(error);
+                Swal.fire("Error", "Favor de llamar al Administrador", "error")
+                $("#btn_csv").show();
+                $("#load_csv").hide();
+                //alert("Error en la solicitud: " + error);
+            }
+         });
+        },
+        guardarBanco : function (element) {
+            const row = $(element).closest('tr');
+            const id = row.data('id');
+            const banco = row.find('.banco').val();
+            const noCuenta = row.find('.no_cuenta').val();
+            const clabe = row.find('.clabe').val();
+
+            Swal.fire({
+                title: "¿Está seguro?",
+                text: "¿Desea Guardar los datos del banco del proveedor?",
+                icon: "info",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                cancelButtonText: "Cancelar",
+                confirmButtonText: "Guardar",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                   $.ajax({
+                        url: base_url + 'index.php/Principal/actualizarBanco',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            id_proveedor_banco: id,
+                            banco: banco,
+                            no_cuenta: noCuenta,
+                            clabe: clabe
+                        },
+                        success: function(response) {
+                            if (!response.error) {
+                                Swal.fire('Éxito', 'Los datos se actualizaron correctamente', 'success');
+                                window.location.reload(); 
+                            } else {
+                                Swal.fire('Error', 'No se pudo actualizar', 'error');
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Error', 'Error de conexión con el servidor', 'error');
+                        }
+                    }); 
+                            
+                        }
+                    });
+        },
+        nuevoBanco: function (element) {
+             $('#modalProveedor').modal('hide');
+            let id_proveedor = $("#id_proveedor").val();
+            Swal.fire({
+                title: 'Agregar Banco',
+                html:
+                    '<input id="swal-banco" class="swal2-input" placeholder="Banco" autocomplete="off">' +
+                    '<input id="swal-no-cuenta" class="swal2-input" placeholder="No. Cuenta" autocomplete="off">' +
+                    '<input id="swal-clabe" class="swal2-input" placeholder="Clabe" autocomplete="off">',
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: 'Guardar',
+                cancelButtonText: 'Cancelar',
+                preConfirm: () => {
+                    const banco = document.getElementById('swal-banco').value;
+                    const no_cuenta = document.getElementById('swal-no-cuenta').value;
+                    const clabe = document.getElementById('swal-clabe').value;
+
+                    if (!banco || !no_cuenta || !clabe) {
+                        Swal.showValidationMessage('Todos los campos son obligatorios');
+                        return false;
+                    }
+
+                    return { banco: banco, no_cuenta: no_cuenta, clabe: clabe };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const datos = result.value;
+
+                    // Aquí puedes hacer la llamada AJAX o lógica con los datos:
+                    console.log("Datos del nuevo proveedor:", datos);
+
+                    // Ejemplo de llamada AJAX
+                    $.ajax({
+                        url: base_url + "index.php/Principal/agregarBanco",
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            id_proveedor,
+                            banco: datos.banco,
+                            no_cuenta: datos.no_cuenta,
+                            clabe: datos.clabe
+                        },
+                        success: function (response) {
+                            if (!response.error) {
+                                Swal.fire('Éxito', 'Proveedor agregado correctamente', 'success');
+                                // Recargar o actualizar tabla si es necesario
+                            } else {
+                                Swal.fire('Error', 'No se pudo agregar el proveedor', 'error');
+                            }
+                        },
+                        error: function () {
+                            Swal.fire('Error', 'Error de conexión con el servidor', 'error');
+                        }
+                    });
+                }
+            });
+        },
+
+        eliminarBanco : function (element) {
+            const row = $(element).closest('tr');
+            const id = row.data('id');
+
+            Swal.fire({
+                title: "¿Está seguro?",
+                text: "¿Desea Eliminar los datos del banco del proveedor?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                cancelButtonText: "Cancelar",
+                confirmButtonText: "Eliminar",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                   $.ajax({
+                        url: base_url + 'index.php/Principal/eliminarBanco',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            id_proveedor_banco: id,
+                        },
+                        success: function(response) {
+                            if (!response.error) {
+                                Swal.fire('Éxito', 'Los datos se actualizaron correctamente', 'success');
+                                window.location.reload(); 
+                            } else {
+                                Swal.fire('Error', 'No se pudo actualizar', 'error');
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Error', 'Error de conexión con el servidor', 'error');
+                        }
+                    }); 
+                            
+                        }
+                    });
         },
         traerReserva: function(id_proveedor){
           $.ajax({
@@ -355,6 +551,11 @@ ini.inicio = (function () {
                     Swal.fire("Error", response.respuesta, "error");
                 } else {
                      Swal.fire("Correcto", response.respuesta, "success");
+                       setTimeout(() => {
+                                 window.location.href = base_url + "index.php/Principal/listaReservaPT";
+
+                        }, 1000);
+                    
                 }
             },
             error: function() {
@@ -669,28 +870,45 @@ ini.inicio = (function () {
                 }
             });
         },
-        activarCursoSac: function(id, editar )
+        eliminarProveedor: function(id )
         {
-            $.ajax({
-                type: "POST",
-                url: base_url + "index.php/Usuario/activarCursoSac",
-                dataType: "json",
-                data:{id_curso_sac:id, editar},
-                success: function(data) {
-                    console.log(data);
-                    if (!data.error) {
-                        Swal.fire("Éxito", "Se guardo correctamente.", "success")
-                       
-                    } else {
-                        Swal.fire("Error", "Error al guardar comentario.", "error");
-                    }
-                    ini.inicio.obtenerCursosSac();
-                    
-                },
-                error: function() {
-                    Swal.fire("Error", "Error al guardar comentario.", "error")
+               Swal.fire({
+                title: "!Atención¡",
+                text: "¿Estas seguro de eliminar Proveedor?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Si"
+              }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "POST",
+                        url: base_url + "index.php/Principal/eliminarProveedor",
+                        dataType: "json",
+                        data:{id_proveedor:id},
+                        success: function(data) {
+                            console.log(data);
+                            if (!data.error) {
+                                Swal.fire("Éxito", "Se elimino correctamente.", "success");
+                                  setTimeout(() => {
+                                        window.location.reload();
+                                     }, 500);
+                               
+                            } else {
+                                Swal.fire("Error", "Error al guardar comentario.", "error");
+                            }
+                           
+                           
+                        },
+                        error: function() {
+                            Swal.fire("Error", "Error al guardar comentario.", "error")
+                        }
+                    });
+            
                 }
-            });
+              });
+
         },
         activarCat: function(id_cat,id)
         {

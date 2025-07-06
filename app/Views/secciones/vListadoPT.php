@@ -132,10 +132,10 @@
                                                                     <label for="no_proveedor">No. Proveedor</label>
                                                                     <input type="text" class="form-control" id="no_proveedor" name="no_proveedor">
                                                                 </div>
-                                                            <div class="form-group">
-                                                                    <label for="exampleInputPassword1">No. Convenio/Contrato</label>
+                                                                <div class="form-group">
+                                                                    <label for="no_convenio">No. Convenio/Contrato</label>
                                                                     <div class="input-group">
-                                                                        <span class="input-group-prepend">
+                                                                        <div class="btn-group">
                                                                             <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                                                 Seleccione <i class="mdi mdi-chevron-down"></i>
                                                                             </button>
@@ -143,15 +143,14 @@
                                                                                 <a class="dropdown-item" href="#" onclick="setConvenio('SECTURI/CONV/')">SECTURI/CONV/</a>
                                                                                 <a class="dropdown-item" href="#" onclick="setConvenio('SECTURI/CTO/')">SECTURI/CTO/</a>
                                                                             </div>
-                                                                        </span>
+                                                                        </div>
                                                                         <input type="text" id="no_convenio" name="no_convenio" class="form-control" placeholder="025">
-                                                                        <span class="input-group-append">
+                                                                        <div class="input-group-append">
                                                                             <button type="button" class="btn btn-gradient-primary"><?= date('Y'); ?></button>
-                                                                        </span>
+                                                                        </div>
                                                                     </div>
-                                                                </div>                                                 
-                                                            </div>
-                                                        </div>  
+                                                                </div>
+                                                            </div>  
                                                         <div class="row">
                                                             <div class="col-12">
                                                                 <div class="card">

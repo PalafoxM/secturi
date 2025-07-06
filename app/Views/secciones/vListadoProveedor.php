@@ -67,11 +67,11 @@
                                                         <td class="text-center"><?= $p->rfc?></td>
                                                         <td class="text-center"><?= $p->no_proveedor?></td>
                                                         <td class="text-center">
-                                                             <a style="color:white" onclick="ini.inicio.reserva(<?=$p->id_proveedor?>);" title="Editar"
+                                                             <a style="color:white" onclick="ini.inicio.editarProveedor(<?=$p->id_proveedor?>);" title="Editar"
                                                                 class="btn btn-gradient-success px-4"><i
                                                                     class="mdi mdi-border-color font-21"></i>
                                                             </a>
-                                                            <a href="<?php echo base_url(); ?>index.php/Principal/Proveedor/<?= $p->id_proveedor ?>" title="Eliminar"
+                                                            <a style="color:white" onclick="ini.inicio.eliminarProveedor(<?=$p->id_proveedor?>);" title="Eliminar"
                                                                 class="btn btn-gradient-danger px-4"><i
                                                                     class="mdi mdi-trash-can-outline font-21"></i>
                                                             </a>
@@ -93,6 +93,80 @@
     </div>
     <!-- end page content -->
 </div>
+
+
+<!--Inicio Modal -->
+
+<div class="modal fade" id="modalProveedor" tabindex="-1" role="dialog" aria-labelledby="supportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+                <main>
+                   <div class="row">
+                        <div class="col-lg-12">
+                            <div class="card">
+                                <div class="card-body step active">        
+                                   <h2 class="mt-0 header-title">EDITAR PROVEDDOR</h2>
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="card">
+                                                    <div class="card-body">        
+                                                        <h4 class="mt-0 header-title">Datos del Proveedor</h4>
+                                                        <div class="row">
+                                                            <div class="col-lg-6">
+                                                                <div class="form-group">
+                                                                    <label for="razon_social">Razon Social</label>
+                                                                    <input type="text" class="form-control" id="razon_social" name="razon_social">
+                                                                    <input type="hidden" id="id_proveedor" >
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="rfc">RFC</label>
+                                                                    <input type="text" class="form-control" id="rfc" name="rfc" >
+                                                                </div>                                                                                      
+                                                            </div>
+                                                            <div class="col-lg-6">
+                                                                <div class="form-group">
+                                                                    <label for="no_proveedor">No. Proveedor</label>
+                                                                    <input type="text" class="form-control" id="no_proveedor" name="no_proveedor">
+                                                                </div>
+                                                            </div> 
+                                                        </div>  
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <div class="card">
+                                                                    <div class="card-body">
+                                                                        <div class="table-responsive">
+                                                                              <button class="btn btn-primary mb-3" onclick="ini.inicio.nuevoBanco()">Agregar datos el banco</button>
+                                                                            <table class="table  table-bordered" id="makeEditable3">
+                                                                                <thead>
+                                                                                <tr>
+                                                                                    <th>BANCO</th>
+                                                                                    <th>No. CUENTA</th>
+                                                                                    <th>CLABE</th>
+                                                                                    <th>ACCIONES</th>
+                                                                                </tr>
+                                                                                </thead>
+                                                                                <tbody id="banco_proveedor">
+                                                                               
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </div>
+                                                                    </div><!--end card-body-->
+                                                                </div><!--end card-->
+                                                            </div> <!-- end col -->
+                                                        </div> <!-- end row -->       
+                                                    </div><!--end card-body-->
+                                                </div><!--end card-->
+                                            </div><!--end col-->
+                                        </div><!--end col-->                                                               
+                                </div><!--end card-body-->
+                            </div><!--end card-->
+                        </div><!--end col-->
+                    </div><!--end row-->
+            </main> 
+        </div>
+    </div>
+</div>
+                                                    <!--FIN MODAL -->
 
 
 <link href="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet"
