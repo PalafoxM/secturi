@@ -214,7 +214,6 @@
                 <div class="fc-event-details">
                     <div>Entrada: ${info.event.extendedProps.entrada}</div>
                     <div>Salida: ${info.event.extendedProps.salida}</div>
-                    <div>Horas: ${info.event.extendedProps.trabajado}</div>
                 </div>
             `;
         },
@@ -267,9 +266,15 @@ var marker = L.marker([20.956950, -101.360316]).addTo(map)
     .bindPopup('SECTURI')
     .openPopup();
 
-var polygon = L.polygon([
+/* var polygon = L.polygon([
     [20.956965, -101.364241],
     [20.958276, -101.358666],
     [20.954891, -101.359349]
-]).addTo(map);
+]).addTo(map); */
+var circle = L.circle([20.956950, -101.360316], {
+    color: 'red',
+    fillColor: '#f03',
+    fillOpacity: 0.5,
+    radius: 1000
+}).addTo(map);
         </script>

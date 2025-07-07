@@ -40,7 +40,8 @@
                                             <div class="form-group"> 
                                                 <div class="input-group">
                                                     <span class="input-group-prepend">
-                                                        <button type="button" class="btn btn-gradient-primary"><i class="fas fa-search"></i></button>
+                                                        <button id="icono_buscar" type="button" class="btn btn-gradient-primary"><i class="fas fa-search"></i></button>
+                                                        <button id="icono_spinner" style="display:none;" type="button" class="btn btn-gradient-primary"><div class="spinner-border spinner-border-sm" role="status"></div></button>
                                                     </span>
                                                     <input autocomplete="off" type="text" id="buscar_proveedor" name="buscar_proveedor" class="form-control" placeholder="Busqueda General.">
                                                    
@@ -115,6 +116,11 @@
                                                 <div class="card">
                                                     <div class="card-body">        
                                                         <h4 class="mt-0 header-title">Datos del Proveedor</h4>
+                                                         
+                                                        <div class="custom-control custom-switch">
+                                                            <input type="checkbox" onclick="ini.inicio.ocultarInstrumento(this);" class="custom-control-input" id="customSwitch1">
+                                                            <label class="custom-control-label" for="customSwitch1">Sin Instrumento Jurídico</label>
+                                                        </div>
                                                         <div class="row">
                                                             <div class="col-lg-6">
                                                                 <div class="form-group">
@@ -122,31 +128,38 @@
                                                                     <input type="text" class="form-control" id="nombre_proveedor" name="nombre_proveedor">
                                                                     <input type="hidden" id="id_proveedor" >
                                                                 </div>
-                                                                <div class="form-group">
+                                                                <div class="form-group" id="id_instrumento">
                                                                     <label for="instrumento">Istrumento Juridico</label>
                                                                     <input type="file" class="form-control" id="instrumento" name="instrumento" accept=".pdf">
                                                                 </div>                                                                                      
                                                             </div>
-                                                            <div class="col-lg-6">
+                                                            <div class="col-lg-6" >
                                                                 <div class="form-group">
                                                                     <label for="no_proveedor">No. Proveedor</label>
                                                                     <input type="text" class="form-control" id="no_proveedor" name="no_proveedor">
                                                                 </div>
-                                                                <div class="form-group">
+                                                                <div class="form-group" id="id_convenio">
                                                                     <label for="no_convenio">No. Convenio/Contrato</label>
                                                                     <div class="input-group">
                                                                         <div class="btn-group">
                                                                             <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                                Seleccione <i class="mdi mdi-chevron-down"></i>
+                                                                                V/T <i class="mdi mdi-chevron-down"></i>
                                                                             </button>
                                                                             <div class="dropdown-menu">
                                                                                 <a class="dropdown-item" href="#" onclick="setConvenio('SECTURI/CONV/')">SECTURI/CONV/</a>
                                                                                 <a class="dropdown-item" href="#" onclick="setConvenio('SECTURI/CTO/')">SECTURI/CTO/</a>
                                                                             </div>
                                                                         </div>
-                                                                        <input type="text" id="no_convenio" name="no_convenio" class="form-control" placeholder="025">
+                                                                        <input type="text" id="no_convenio" name="no_convenio" class="form-control" placeholder="025" autocomplete="off">
                                                                         <div class="input-group-append">
-                                                                            <button type="button" class="btn btn-gradient-primary"><?= date('Y'); ?></button>
+                                                                            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                                 AÑO <i class="mdi mdi-chevron-down"></i>
+                                                                            </button>
+                                                                            <div class="dropdown-menu">
+                                                                                <a class="dropdown-item" href="#" onclick="setAnio('/2025')">2025</a>
+                                                                                <a class="dropdown-item" href="#" onclick="setAnio('/2024')">2024</a>
+                                                                                <a class="dropdown-item" href="#" onclick="setAnio('/2023')">2023</a>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -181,7 +194,7 @@
                                                                                             <select class="select2 form-control" name="partida[]">
                                                                                                 <option value="">Seleccione</option>
                                                                                                 <?php foreach($cat_partida as $p): ?>
-                                                                                                <option value="<?= $p->id_partida?>"><?= $p->partida ?></option>
+                                                                                                <option value="<?= $p->id_partida?>"><?= $p->cuenta_cable ?></option>
                                                                                                 <?php endforeach; ?>
                                                                                             </select>
                                                                                         </td>
@@ -307,7 +320,7 @@ function formatNumber(num) {
                 <select class="select2 form-control" name="partida[]">
                     <option value="">Seleccione</option>
                     <?php foreach($cat_partida as $p): ?>
-                    <option value="<?= $p->id_partida?>"><?= $p->partida ?></option>
+                    <option value="<?= $p->id_partida?>"><?= $p->cuenta_cable ?></option>
                     <?php endforeach; ?>
                 </select>
             </td>
@@ -360,8 +373,13 @@ $('#buscar_proveedor').on('keyup', debounce(function () {
 
 
 
-function setConvenio(valor) {
-    document.getElementById('no_convenio').value = valor;
-}
+   function setConvenio(valor) {
+        document.getElementById('no_convenio').value = valor;
+    }
+
+    function setAnio(anio) {
+        let input = document.getElementById('no_convenio');
+        input.value = input.value + anio;
+    }
 
 </script>

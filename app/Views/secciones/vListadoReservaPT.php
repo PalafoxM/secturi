@@ -62,14 +62,17 @@
                                                         <td class="text-center"><?= $p->no_proveedor?></td>
                                                         <td class="text-center"><?= $p->no_convenio?></td>
                                                        
-                                                        <td class="text-center">
-                                                            <a target="_blanck" href="<?=base_url(). $p->instrumento?>" class="btn btn-gradient-info px-4">
-                                                                <i class="dripicons-document-new font-21"></i>
-                                                            </a>
+                                                     <td class="text-center">
+                                                            <?php if (!empty($p->instrumento)) : ?>
+                                                                <a target="_blank" href="<?= base_url() . $p->instrumento ?>" class="btn btn-gradient-info px-4">
+                                                                    <i class="dripicons-document-new font-21"></i>
+                                                                </a>
+                                                            <?php endif; ?>
                                                         </td>
+
                                                           <td class="text-center"><?= date('d-m-Y', strtotime($p->fec_reg))  ?></td>
                                                          <td class="text-center"><?= $p->nombre_completo?></td>
-                                                             <td class="text-center">EN PROCESO</td>
+                                                             <td class="text-center"><span class="badge badge-md badge-soft-primary">En proceso</span></td>
                                                         <td class="text-center">
                                                              <a style="color:white" onclick="ini.inicio.reserva(<?=$p->id_reserva?>);" title="Editar"
                                                                 class="btn btn-gradient-success px-4"><i

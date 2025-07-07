@@ -331,6 +331,61 @@ ini.inicio = (function () {
                         }
                     });
         },
+        nuevoProveedor: function () {
+            Swal.fire({
+                title: 'Agregar Nuevo Proveedor',
+                html:
+                    '<input id="razon" class="swal2-input" placeholder="RAZON SOCIAL" autocomplete="off">' +
+                    '<input id="rfcPro" class="swal2-input" placeholder="RFC" autocomplete="off">' +
+                    '<input id="numero" class="swal2-input" placeholder="No. PROVEEDOR" autocomplete="off">',
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: 'Guardar',
+                cancelButtonText: 'Cancelar',
+                preConfirm: () => {
+                    const razon = document.getElementById('razon').value;
+                    const rfc = document.getElementById('rfcPro').value;
+                    const numero = document.getElementById('numero').value;
+                    console.log(razon, rfc, numero);
+                    if (!razon || !rfc || !numero) {
+                        Swal.showValidationMessage('Todos los campos son obligatorios');
+                        return false;
+                    }
+
+                    return { razon:razon, rfc:rfc, numero:numero };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const datos = result.value;
+
+                    // Aquí puedes hacer la llamada AJAX o lógica con los datos:
+                    console.log("Datos del nuevo proveedor:", datos);
+
+                    // Ejemplo de llamada AJAX
+                    $.ajax({
+                        url: base_url + "index.php/Principal/agregarProveedor",
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            razon_social: datos.razon.toUpperCase(),
+                            rfc: datos.rfc.toUpperCase(),
+                            no_proveedor: datos.numero.toUpperCase()
+                        },
+                        success: function (response) {
+                            if (!response.error) {
+                                Swal.fire('Éxito', 'Proveedor agregado correctamente', 'success');
+                                // Recargar o actualizar tabla si es necesario
+                            } else {
+                                Swal.fire('Error', 'No se pudo agregar el proveedor', 'error');
+                            }
+                        },
+                        error: function () {
+                            Swal.fire('Error', 'Error de conexión con el servidor', 'error');
+                        }
+                    });
+                }
+            });
+        },
         nuevoBanco: function (element) {
              $('#modalProveedor').modal('hide');
             let id_proveedor = $("#id_proveedor").val();
@@ -376,7 +431,7 @@ ini.inicio = (function () {
                         },
                         success: function (response) {
                             if (!response.error) {
-                                Swal.fire('Éxito', 'Proveedor agregado correctamente', 'success');
+                                Swal.fire('Éxito', 'Datos agregado correctamente', 'success');
                                 // Recargar o actualizar tabla si es necesario
                             } else {
                                 Swal.fire('Error', 'No se pudo agregar el proveedor', 'error');
@@ -518,16 +573,16 @@ ini.inicio = (function () {
         // Agregar datos del formulario principal
         formData.append('nombre_proveedor', $('#nombre_proveedor').val());
         formData.append('no_proveedor', $('#no_proveedor').val());
-        formData.append('no_convenio', $('#no_convenio').val());
         formData.append('id_proveedor', $('#id_proveedor').val());
         formData.append('total_importe', $('#total_importe').val());
         
         // Agregar archivo si existe
         var instrumentoFile = $('#instrumento')[0].files[0];
-        if(!instrumentoFile) {
-               Swal.fire("Error", "El <strong>Instrumento Jurídico</strong> es Requerido", "error");return
+        if(instrumentoFile) {
+             formData.append('instrumento', instrumentoFile);
+             formData.append('no_convenio', $('#no_convenio').val());
         }
-         formData.append('instrumento', instrumentoFile);
+         
 
         // Agregar datos de la tabla
         $('#makeEditable2 tbody tr').each(function(index) {
@@ -910,28 +965,7 @@ ini.inicio = (function () {
               });
 
         },
-        activarCat: function(id_cat,id)
-        {
-            $.ajax({
-                type: "POST",
-                url: base_url + "index.php/Usuario/guardarCategoria",
-                dataType: "json",
-                data:{id_cat, editar:id},
-                success: function(data) {
-                    console.log(data);
-                    if (data) {
-                        Swal.fire("Éxito", "Se guardo correctamente.", "success")
-                       
-                    } else {
-                        Swal.fire("Error", "Error al guardar comentario.", "error");
-                    }
-                    ini.inicio.obtenerCategorias();  
-                },
-                error: function() {
-                    Swal.fire("Error", "Error al guardar comentario.", "error")
-                }
-            });
-        },
+    
         eliminarCursoSac: function(id)
         {
             Swal.fire({
@@ -944,26 +978,7 @@ ini.inicio = (function () {
                 confirmButtonText: "Si"
               }).then((result) => {
                 if (result.isConfirmed) {
-                    $.ajax({
-                        type: "POST",
-                        url: base_url + "index.php/Usuario/guardarCursoSac",
-                        dataType: "json",
-                        data:{id_cat:id, editar:2},
-                        success: function(data) {
-                            console.log(data);
-                            if (!data.error) {
-                                Swal.fire("Éxito", "Se guardo correctamente.", "success")
-                               
-                            } else {
-                                Swal.fire("Error", "Error al guardar comentario.", "error");
-                            }
-                            ini.inicio.obtenerCursosSac();  
-                           
-                        },
-                        error: function() {
-                            Swal.fire("Error", "Error al guardar comentario.", "error")
-                        }
-                    });
+                
             
                 }
               });
@@ -1922,6 +1937,75 @@ ini.inicio = (function () {
             };
         },
     
+        busquedaProveedorTI: function() {
+            const palabra = $("#buscar_proveedor_ti").val().trim(); // Elimina espacios al inicio/final
+            
+            // Solo busca si hay 3+ caracteres o el campo está vacío (para resetear)
+            if (palabra.length >= 3 || palabra.length === 0) {
+                if ($.fn.DataTable.isDataTable('#datatableProveedor')) {
+                    $('#datatableProveedor').DataTable().destroy();
+                }
+
+                $.ajax({
+                    url: base_url + "index.php/Principal/buscarProveedor",
+                    method: 'POST',
+                    data: { 
+                        termino: palabra.replace(/\s+/g, ' ') // Elimina espacios múltiples
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        if (!response.error && response.data) {
+                            const tbody = $('#datatableProveedor tbody');
+                            tbody.empty();
+                            
+                            response.data.forEach(p => {
+                                tbody.append(`
+                                    <tr>
+                                        <td class="text-center">${p.id_proveedor}</td>
+                                        <td class="text-center">${p.razon_social}</td>
+                                        <td class="text-center">${p.rfc}</td>
+                                        <td class="text-center">
+                                           ${p.no_proveedor}
+                                        </td>
+                                        <td class="text-center">
+                                           <a style="color:white" onclick="ini.inicio.editarProveedor(${p.id_proveedor});" title="Editar"
+                                                class="btn btn-gradient-success px-4"><i
+                                                    class="mdi mdi-border-color font-21"></i>
+                                            </a>
+                                            <a style="color:white" onclick="ini.inicio.eliminarProveedor(${p.id_proveedor});" title="Eliminar"
+                                                 class="btn btn-gradient-danger px-4"><i
+                                                    class="mdi mdi-trash-can-outline font-21"></i>
+                                            </a>
+
+                                        </td>
+                                    </tr>
+                                `);
+                            });
+
+                            // Re-inicializa DataTable
+                            $('#datatableProveedor').DataTable({
+                                   language: {
+                                        url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json' // Ruta al archivo de localización
+                                    },
+                                    destroy: true,
+                                    searching: true,
+                            });
+                        }
+                    },
+                    beforeSend: function() {
+                    $("#icono_spinner").show();
+                    $("#icono_buscar").hide();
+                    },
+                    complete: function() {
+                    $("#icono_spinner").hide();
+                    $("#icono_buscar").show();
+                    },
+                    error: function() {
+                        console.error("Error en la búsqueda");
+                    }
+                });
+            }
+        }, 
         busquedaProveedor: function() {
             const palabra = $("#buscar_proveedor").val().trim(); // Elimina espacios al inicio/final
             
@@ -1975,11 +2059,13 @@ ini.inicio = (function () {
                             });
                         }
                     },
-                    beforeSend: function() {
-                    $("#loading-spinner").show();
+                     beforeSend: function() {
+                    $("#icono_spinner").show();
+                    $("#icono_buscar").hide();
                     },
                     complete: function() {
-                    $("#loading-spinner").hide();
+                    $("#icono_spinner").hide();
+                    $("#icono_buscar").show();
                     },
                     error: function() {
                         console.error("Error en la búsqueda");
@@ -1987,6 +2073,17 @@ ini.inicio = (function () {
                 });
             }
         }, 
+        ocultarInstrumento: function(checkbox)
+        {
+            console.log(checkbox.checked)
+            if (checkbox.checked) {
+                $("#id_instrumento").hide();
+                $("#id_convenio").hide();
+            } else {
+                $("#id_instrumento").show();
+                $("#id_convenio").show();
+            }
+        },
         activarPeriodo: function(id_periodo, id)
         {
             $.ajax({

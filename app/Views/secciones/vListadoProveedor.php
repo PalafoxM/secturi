@@ -35,19 +35,20 @@
                                     <div class="card">
                                     
                                         <div class="card-body">
-                                             <button type="button" class="btn btn-gradient-warning waves-effect waves-light">Agregar Nuevo Proveedor</button><br><br>
+                                             <button type="button" onclick="ini.inicio.nuevoProveedor()" class="btn btn-gradient-warning waves-effect waves-light">Agregar Nuevo Proveedor</button><br><br>
                                             <span>LISTA DE PROVEEDORES</span>
                                             <div class="form-group"> 
                                                 <div class="input-group">
                                                     <span class="input-group-prepend">
-                                                        <button type="button" class="btn btn-gradient-primary"><i class="fas fa-search"></i></button>
+                                                        <button id="icono_buscar" type="button" class="btn btn-gradient-primary"><i class="fas fa-search"></i></button>
+                                                        <button id="icono_spinner" style="display:none;" type="button" class="btn btn-gradient-primary"><div class="spinner-border spinner-border-sm" role="status"></div></button>
                                                     </span>
-                                                    <input autocomplete="off" type="text" id="buscar_proveedor" name="buscar_proveedor" class="form-control" placeholder="Busqueda General.">
+                                                    <input autocomplete="off" type="text" id="buscar_proveedor_ti" name="buscar_proveedor_ti" class="form-control" placeholder="Busqueda General.">
                                                    
                                                 </div>                                                    
                                             </div>
                                            
-                                            <table id="datatableCategorias" class="table" data-toggle="table">
+                                            <table id="datatableProveedor" class="table" data-toggle="table">
                                                 <thead class="thead-light">
                                                     <tr>
                                                         <th class="text-center">ID PROVEEDOR</th>
@@ -213,5 +214,16 @@ $(document).ready(function() {
     });
     // Función debounce para retrasar la ejecución
 });
+function debounce(func, delay) {
+    let timeout;
+    return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), delay);
+    };
+}
+$('#buscar_proveedor_ti').on('keyup', debounce(function () {
+
+    ini.inicio.busquedaProveedorTI();
+}, 500));
 
 </script>

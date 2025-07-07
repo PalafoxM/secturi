@@ -249,8 +249,9 @@ class Agregar extends BaseController {
             'segundo_apellido'      => $data['segundo_apellido'],             
             'correo'                => $data['correo'],           
             'rfc'                   => $data['rfc'],                      
-            'id_area'               => $data['id_area'],                        
+            'id_area'               => (int)$data['id_area'],                        
             'fec_nac'               => $data['fec_nac'],            
+            //'fec_nac'               => $hoy,            
             'fec_reg'               => $hoy 
         ];
         if(isset($data['contrasenia']) && !empty($data['contrasenia'])){

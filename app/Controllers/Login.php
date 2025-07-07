@@ -74,6 +74,84 @@ class Login extends BaseController {
 
         return $this->response->setJSON(['success' => false, 'msg' => 'Datos incompletos']);
     }
+    private function registrarAsistencia($id_usuario = null, $Latitud = null, $Longitud = null)
+    {
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = "Error al validar usuario";
+        $response->asistencia = false;
+        
+        // Coordenadas del centro de la geocerca
+
+        $centroLat = 20.956950;
+        $centroLng = -101.360316;
+        $radio = 1000; // metros
+        
+        // Validar que se recibieron coordenadas
+        if (!$Latitud || !$Longitud) {
+            $response->respuesta = "No se recibieron coordenadas de ubicación";
+            return $response;
+        }
+        
+        // Calcular distancia (fórmula Haversine)
+        $earthRadius = 6371000; // metros
+        $latFrom = deg2rad($centroLat);
+        $lonFrom = deg2rad($centroLng);
+        $latTo = deg2rad($Latitud);
+        $lonTo = deg2rad($Longitud);
+        
+        $latDelta = $latTo - $latFrom;
+        $lonDelta = $lonTo - $lonFrom;
+        
+        $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) +
+            cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
+        $distancia = $angle * $earthRadius;
+        
+        // Validar si está dentro del radio permitido
+        if ($distancia > $radio) {
+            $response->respuesta = "Ubicación fuera del área permitida";
+            return $response;
+        }
+       
+       
+        
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        
+        if ($id_usuario) {
+            $hora = date("H:i:s"); 
+            $fecha_hoy = date("Y-m-d"); // Solo la fecha
+            
+            $check = $globals->getTabla([
+                'tabla' => 'asistencia',
+                'where' => ['id_usuario' => $id_usuario, 'visible' => 1],
+                'like' => ['fecha' => $fecha_hoy]
+            ]);
+            
+            if (empty($check->data)) {
+                $dataConfig = [
+                    "tabla" => 'asistencia',
+                    "editar" => false
+                ];
+                $dataInsert = [
+                    "id_usuario" => $id_usuario,
+                    "fecha" => $fecha_hoy,
+                    "turno" => 'DIA(08:30-16:00)',
+                    "entrada" => $hora,
+                    "latitud" => $Latitud,
+                    "longitud" => $Longitud
+                ];
+                $result = $globals->saveTabla($dataInsert, $dataConfig, ["script" => "asistencia.agregarAsiatencia"]);
+                $response->error = $result->error;
+                $response->respuesta = $result->respuesta;
+                $response->asistencia = !$result->error;
+            } else {
+                $response->respuesta = "Ya registraste tu asistencia hoy";
+            }
+        }
+        
+        return $response;
+    }
     public function validar_usuario(){
         $response = new \stdClass();
         $response->error = true;
@@ -81,8 +159,10 @@ class Login extends BaseController {
         $session = \Config\Services::session();
         $catalogos = new Mglobal;
         
-        $usuario = $this->request->getPost('usuario');
+        $usuario     = $this->request->getPost('usuario');
         $contrasenia = $this->request->getPost('contrasenia');
+        $Latitud     = $this->request->getPost('latitud');
+        $Longitud    = $this->request->getPost('longitud');
   
         $dataDB = array('tabla' => 'usuario', 'where' =>[ "usuario" => $usuario, "contrasenia"  => md5($contrasenia), "visible" => 1]);
        
@@ -99,6 +179,8 @@ class Login extends BaseController {
                 $session->set('correo',$result->data[0]->correo);
                 $response->error     = $result->error;
                 $response->respuesta = $result->respuesta;
+                $asistencia = $this->registrarAsistencia($result->data[0]->id_usuario, $Latitud,  $Longitud );
+                $session->set('asistencia', $asistencia->asistencia);
             }     
         }        
         return $this->respond($response);

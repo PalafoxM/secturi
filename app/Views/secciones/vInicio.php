@@ -1,5 +1,6 @@
 
     <!-- Page Content-->
+     <?php   $session = \Config\Services::session(); ?>
     <div class="page-content-tab">
 
         <div class="container-fluid">
@@ -690,12 +691,10 @@
                     <!--end modal-body-->
                 </div><!-- /.modal-content -->
             </div><!-- /.modal-dialog -->
-        </div><!-- /.modal -->
-
-       
+        </div><!-- /.modal --> 
     </div>
 
-<script src="<?php echo base_url(); ?>assets/js/jquery.min.js"></script>
+<script src="<?= base_url(); ?>assets/js/jquery.min.js"></script>
+<script src="<?= base_url(); ?>plugins/apexcharts/apexcharts.min.js"></script> 
+<script src="<?= base_url(); ?>assets/pages/jquery.analytics_dashboard.init.js"></script>
 
-<script src="<?php echo base_url(); ?>plugins/apexcharts/apexcharts.min.js"></script>
-<script src="<?php echo base_url(); ?>assets/pages/jquery.analytics_dashboard.init.js"></script>

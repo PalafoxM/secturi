@@ -739,49 +739,54 @@ class Principal extends BaseController {
         $response->error = true;
         $response->respuesta = 'Error al Guardar los datos';
         $data =  $this->request->getPost();
-        $ruta = "";
-            $file = $this->request->getFile('instrumento');
+        $ruta_absoluta = "";
+        $ruta_relativa = "";
+        $file = $this->request->getFile('instrumento');
+
+        if ($file && $file->isValid() && !$file->hasMoved()) {
+
             $maxSize = 1 * 1024 * 1024; // 1 MB
-        
-            if ($file->getSize() > $maxSize ) {
+
+            if ($file->getSize() > $maxSize) {
                 $response->respuesta = "El archivo no debe exceder 1 MB.";
                 return $this->respond($response);
             }
 
-            if ($file->isValid() && !$file->hasMoved()) {
-                $timestamp = date('Ymd_His');
-                $extension = $file->getClientExtension();
-                $originalName = pathinfo($file->getName(), PATHINFO_FILENAME);
-                $archivo = $originalName . '_' . $timestamp . '.' . $extension;
+            $timestamp = date('Ymd_His');
+            $extension = $file->getClientExtension();
+            $originalName = pathinfo($file->getName(), PATHINFO_FILENAME);
+            $archivo = $originalName . '_' . $timestamp . '.' . $extension;
 
-                // Ruta absoluta en el sistema de archivos
-                $ruta_destino = FCPATH . 'assets/pdf/';
+            // Ruta absoluta
+            $ruta_destino = FCPATH . 'assets/pdf/';
+            $file->move($ruta_destino, $archivo);
 
-                $file->move($ruta_destino, $archivo);
-
-                // Rutas accesibles por navegador
-                $ruta_absoluta = base_url('assets/pdf/' . $archivo);
-                $ruta_relativa = 'assets/pdf/' . $archivo;
-
-            } 
+            // Rutas públicas
+            $ruta_absoluta = base_url('assets/pdf/' . $archivo);
+            $ruta_relativa = 'assets/pdf/' . $archivo;
+        }
 
 
-        if(empty($data['no_convenio'])){
+        if(isset($data['no_convenio']) && empty($data['no_convenio'])){
             $response->error = true;
             $response->respuesta = "El campo No. Convenio es requerido";
              return $this->respond($response);
         }
         $hoy = date("Y-m-d H:i:s"); 
+    
         $dataInsert = [
             "id_proveedor"   => $data['id_proveedor'],
-            "no_convenio"    => $data['no_convenio'],
             "total_importe"  => $data['total_importe'],
-            "instrumento"    => $ruta_relativa, 
-            "ruta_absoluta"  => $ruta_absoluta, 
             "fec_reg"        => $hoy, 
             "usu_reg"        => $session->get('id_usuario')
              
         ];
+       if (!empty($ruta_relativa)) {
+            $dataInsert['instrumento']    = $ruta_relativa;
+            $dataInsert['ruta_absoluta']  = $ruta_absoluta;
+            $dataInsert['no_convenio']    = $data['no_convenio'];
+        }
+        
          $dataBitacora = ['id_user' =>  $session->get('id_usuario'), 'script' => 'Agregar.php/guardaReserva'];
          $dataConfig = [
             "tabla"=>"reserva",
@@ -831,10 +836,11 @@ class Principal extends BaseController {
                         }
                 }
          }
-        //$correo = 'palafox.marin@hotmail.com';
-        $correo = 'alopez@guanajuato.gob.mx';
-        $email->setFrom($session->get('correo'), 'SUSI-RESERVA');// usuario
-        $email->setTo($correo);
+
+      /*   $email->setFrom($session->get('correo'), 'SUSI-RESERVA');// usuario
+        $email->setTo('alopez@guanajuato.gob.mx'); // destinatario principal
+        $email->setCC(['negonzalez@guanajuato.gob.mx ', 'dhernandezq@guanajuato.gob.mx', 'amendozat@guanajuato.gob.mx']); // copia visible
+        $email->setBCC(['a.palafoxm@guanajuato.gob.com']); // copia oculta
         $email->setSubject('Carga de Reserva');
         $email->setMessage('
             <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
@@ -847,7 +853,7 @@ class Principal extends BaseController {
                     <div style="padding: 30px; color: #333;">
                         <h1 style="color: #004080;">El usuario <strong>' . $session->get('nombre_completo') . '</strong></h1>
                         <p style="font-size: 16px;">ha registrado una <strong>RESERVA</strong> en el sistema SUSI.</p>
-                        <p style="font-size: 15px;">Se solicita realizar las labores correspondientes.</p>
+                        <p style="font-size: 15px;">Para los labores correspondientes.</p>
                         <p style="font-size: 15px; color: #888;">Este correo ha sido generado automáticamente por el sistema SUSI. No es necesario responder a este mensaje.</p>
                     </div>
                     <!-- Pie de página -->
@@ -864,8 +870,8 @@ class Principal extends BaseController {
           $response->respuesta = "Correo enviado correctamente.";
         } else {
           $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
-        }
- 
+        } 
+  */
     return $this->respond($response);
        
         
@@ -931,6 +937,32 @@ class Principal extends BaseController {
                 ];
     
         $result = $globals->saveTabla(['visible'=>0], $dataConfig, ["script" => "proveedo.eliminarProveedor"]); 
+        if(!$result->error){
+           $response->error = false;
+           $response->respuesta = $result->respuesta;
+        }
+        return $this->respond($response);
+    }
+    public function agregarProveedor()
+    {  
+        $session = \Config\Services::session();
+        $globals      = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error al optener los datos';
+        $data =  $this->request->getPost();
+     
+        $dataConfig = [
+                "tabla"   => 'proveedor',
+                 "editar" => false
+                ];
+        $dataInsert = [
+                "id_tipo_proveedor" => 1,
+                "razon_social"      => $data['razon_social'],
+                "no_proveedor"      => $data['no_proveedor'],
+                "rfc"               => $data['rfc'],
+                ];
+        $result = $globals->saveTabla($dataInsert, $dataConfig, ["script" => "proveedo.agregarProveedo"]); 
         if(!$result->error){
            $response->error = false;
            $response->respuesta = $result->respuesta;
@@ -1160,11 +1192,14 @@ class Principal extends BaseController {
             $proveedor           = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1, 'id_proveedor' =>$id_proveedor ]]);
             $banco               = $globals->getTabla(['tabla' => 'proveedor_banco', 'where' => ['idproveedor' => $id_proveedor ]]);
             if(isset( $banco->data[0]) && !empty( $banco->data[0])){
-                if(empty($banco->data[0]->no_cuenta) || empty($banco->data[0]->clabe)){
-                    $response->error = true;
-                    $response->respuesta = 'El proveedor no tiene No. de cuenta y/o cable, favor de solIcitar un Tiket a la área TI';
-                    return $this->respond($response);
+                if($session->get('id_perfil') != 1){
+                    if(empty($banco->data[0]->no_cuenta) || empty($banco->data[0]->clabe)){
+                        $response->error = true;
+                        $response->respuesta = 'El proveedor no tiene No. de cuenta y/o cable, favor de solIcitar un Tiket a la área TI';
+                        return $this->respond($response);
+                    }
                 }
+                
             }
             $response->error     = $proveedor->error;
             $response->respuesta = $proveedor->respuesta;

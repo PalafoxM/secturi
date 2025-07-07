@@ -203,6 +203,7 @@ class Usuario extends BaseController
         // die();
         return $this->respond($response->data[0]);
     }
+   
     public function getUsuarios()
     {
         $session = \Config\Services::session();
