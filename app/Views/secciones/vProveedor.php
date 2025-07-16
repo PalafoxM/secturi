@@ -26,13 +26,14 @@
                         <div class="col-lg-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <h4 class="mt-0 header-title">PROVEEDOR: <?= (isset($proveedor->razon_social) && !empty($proveedor->razon_social))?$proveedor->razon_social:$registro_pt->dsc_proveedor ?></h4>
-                                    <p class="text-muted mb-3">
+                                    <h3 class="mt-0 header-title">PROVEEDOR: <strong><?= (isset($reserva->razon_social) && !empty($reserva->razon_social))?$reserva->razon_social:$registro_pt->dsc_proveedor ?></strong></h3>
+                                    <p class="text-muted mb-3" >
                                         <?= (isset($proveedor->no_proveedor) && !empty($proveedor->no_proveedor))?'No. Proveedor '.$proveedor->no_proveedor:'' ?>
                                     </p>
-                                    <form  id="form_proveedor"> 
-                                        <input type="hidden" name="id_proveedor" id="id_proveedor" value="<?= (isset($proveedor->id_proveedor) && !empty($proveedor->id_proveedor))?$proveedor->id_proveedor:$registro_pt->id_proveedor?>" >
+                                   <form id="form_proveedor" enctype="multipart/form-data">
+                                        <input type="hidden" name="id_proveedor" id="id_proveedor" value="<?= (isset($reserva->id_proveedor) && !empty($reserva->id_proveedor))?$reserva->id_proveedor:$registro_pt->id_proveedor?>" >
                                         <input type="hidden" name="editar" id="editar" value="<?= $editar?>">
+                                        <input type="hidden" name="id_reserva" id="id_reserva" value="<?= $id_reserva?>">
                                         <?php if(isset($registro_pt->id_registro_pt) && !empty($registro_pt->id_registro_pt)): ?>
                                         <input type="hidden" name="id_registro_pt" id="id_registro_pt" value="<?= $registro_pt->id_registro_pt?>">
                                         <?php endif; ?>
@@ -55,7 +56,7 @@
                                             <!-- Tipo de PT -->
                                             <div class="col-md-4 mb-3">
                                                 <label for="tipo_pt">Tipo de PT <span class="text-danger">*</span></label>
-                                                <select class="form-control" id="tipo_pt" name="tipo_pt" required>
+                                                <select class="form-control" id="tipo_pt" name="tipo_pt" >
                                                     <?php foreach($cat_tipo as $p): ?>
                                                         <option value="<?=$p->id_tipo?>" <?=(isset($registro_pt->id_tipo) && $registro_pt->id_tipo == $p->id_tipo )?'selected':''?> ><?= $p->des_tipo ?></option>
                                                     <?php endforeach; ?>
@@ -119,7 +120,7 @@
                                         <div class="form-row">
                                             <div class="col-md-4 mb-3">
                                                 <label for="cuenta_bancaria">Cuenta Bancaria del Proveedor <span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" id="cuenta_bancaria" name="cuenta_bancaria" value="<?= (isset($banco->banco) && !empty($banco->banco))?$banco->banco.''.$banco->no_cuenta:$registro_pt->cuenta_bancaria?>">
+                                                <input readonly type="text" class="form-control" id="cuenta_bancaria" name="cuenta_bancaria" value="<?= (isset($reserva->banco_completo) && !empty($reserva->banco_completo))?$reserva->banco_completo:$registro_pt->cuenta_bancaria?>">
                                                 <div class="invalid-feedback">
                                                     Campo no Valido
                                                 </div>
@@ -230,13 +231,66 @@
                                         <div class="form-row">
                                             <div class="col-md-4 mb-3">
                                                 <label for="no_reserva">No. de Reserva.<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" autocomplete="off" id="no_reserva" name="no_reserva"  value="<?= (isset($registro_pt->no_reserva))?$registro_pt->no_reserva:'' ?>">
+                                                <input type="text" class="form-control" autocomplete="off" id="no_reserva" name="no_reserva"  value="<?= (isset($reserva->no_reserva))?$reserva->no_reserva:'' ?>" readonly>
                                                 <div class="invalid-feedback">
                                                     Campo no Valido
                                                 </div>
                                             </div><!--end col-->
                                         </div><!--end form-row-->
-                                    
+                                        
+                                       
+                                            <?php foreach($presupuesto as $i => $p): ?>
+                                                <p class="text-muted mb-4 text-center">Agregar Factura PT.</p>
+                                                <hr>
+                                            <div class="form-row"> <!-- presupuesto -->
+                                                <!-- Partida y Factura PDF -->
+                                                <div class="col-md-4 mb-3">
+                                                    <label for="partida_<?= $i ?>">Partida<span style="color:red;">*</span></label>
+                                                    <select class="form-control" id="partida_<?= $i ?>" name="partida[]" disabled>
+                                                        <?php foreach($cat_partida as $o): ?>
+                                                            <option value="<?= $o->id_partida ?>" <?= (isset($p->id_partida) && $p->id_partida == $o->id_partida) ? 'selected' : '' ?>>
+                                                                <?= $o->cuenta_cable ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </div>
+
+                                                <!-- Encabezado y XML -->
+                                                <div class="col-md-4 mb-3">
+                                                    <label for="encabezado_<?= $i ?>">Encabezado<span style="color:red;">*</span></label>
+                                                    <input type="text" class="form-control" autocomplete="off" id="encabezado_<?= $i ?>" name="encabezado[]">
+                                                </div>
+
+                                                <!-- Periodo -->
+                                                <div class="col-md-4 mb-3">
+                                                    <label for="periodo_<?= $i ?>">Periodo<span style="color:red;">*</span></label>
+                                                      <div class="input-group">                                            
+                                                        <input type="text" class="form-control" name="datetimes" id="periodo_<?= $i ?>" name="periodo[]">
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text"><i class="dripicons-calendar"></i></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class="form-row">
+                                                <div class="col-md-6 mb-3">
+                                                    <a class="btn btn-primary btn-sm add-file ml-3" data-target="#factura_pdf_input_<?= $i; ?>">
+                                                        <i class="fas fa-upload mr-2"></i>Factura PDF (Máx 5MB)
+                                                    </a>
+                                                    <input id="factura_pdf_input_<?php echo $i; ?>" type="file" name="factura_pdf_<?= $i; ?>[]" multiple style="display: none;" accept=".pdf">
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <a class="btn btn-primary btn-sm add-file ml-3" data-target="#factura_xml_input_<?= $i; ?>">
+                                                        <i class="fas fa-upload mr-2"></i>Factura XML (Máx 5MB)
+                                                    </a>
+                                                    <input id="factura_xml_input_<?php echo $i; ?>" type="file" name="factura_xml_<?php echo $i; ?>[]" multiple style="display: none;" accept=".xml">
+                                                </div>
+                                            </div>
+
+                                            <?php endforeach; ?>
+                                        
+
                                             <a class="btn btn-gradient-danger" style="color:white" onclick="window.history.back()">Atrás</a>
                                              <button class="btn btn-gradient-primary" type="submit">Guardar</button>
 
@@ -252,6 +306,21 @@
                 </div><!-- container -->
             </div>
         </div>
+        <link rel="shortcut icon" href="<?= base_url()?>assets/images/favicon.ico">
+
+        <!-- Plugins css -->
+        <link href="<?= base_url()?>plugins/daterangepicker/daterangepicker.css" rel="stylesheet" />
+        <link href="<?= base_url()?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
+        <link href="<?= base_url()?>plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.css" rel="stylesheet" type="text/css" />
+        <link href="<?= base_url()?>plugins/timepicker/bootstrap-material-datetimepicker.css" rel="stylesheet">
+        <link href="<?= base_url()?>plugins/bootstrap-touchspin/css/jquery.bootstrap-touchspin.min.css" rel="stylesheet" />
+
+        <!-- App css -->
+        <link href="<?= base_url()?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="<?= base_url()?>assets/css/jquery-ui.min.css" rel="stylesheet">
+        <link href="<?= base_url()?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+        <link href="<?= base_url()?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
+        <link href="<?= base_url()?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
         <!-- end page-wrapper -->
         <!-- jQuery  -->
         <script src="<?php echo base_url() ?>assets/js/jquery.min.js"></script>
@@ -270,6 +339,27 @@
         <!-- App js -->
         <script src="<?php echo base_url() ?>assets/js/jquery.core.js"></script>
         <script src="<?php echo base_url() ?>assets/js/app.js"></script>
+
+
+        <!-- Plugins js -->
+        <script src="<?= base_url()?>plugins/moment/moment.js"></script>
+        <script src="<?= base_url()?>plugins/daterangepicker/daterangepicker.js"></script>
+        <script src="<?= base_url()?>plugins/select2/select2.min.js"></script>
+        <script src="<?= base_url()?>plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
+        <script src="<?= base_url()?>plugins/timepicker/bootstrap-material-datetimepicker.js"></script>
+        <script src="<?= base_url()?>plugins/bootstrap-maxlength/bootstrap-maxlength.min.js"></script>
+        <script src="<?= base_url()?>plugins/bootstrap-touchspin/js/jquery.bootstrap-touchspin.min.js"></script>
+
+        <script src="<?= base_url()?>assets/pages/jquery.forms-advanced.js"></script>
+        
+
+
         <script>
             ini.inicio.formPT();
+             $('.add-file').on('click', function(e) {
+                e.preventDefault();
+                const inputId = $(this).data('target');
+                $(inputId).click();
+            });
+
         </script>

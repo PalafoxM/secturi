@@ -483,6 +483,91 @@ ini.inicio = (function () {
                         }
                     });
         },
+        editarReserva: function(id_reserva) {
+      
+           
+            $.ajax({
+                url: base_url + "index.php/Principal/editarReserva",
+                type: 'POST',
+                dataType: "json",
+                data: { id_reserva: id_reserva },
+                success: function(response) {
+                    if (response && response.data && response.data.reserva) {
+                        const reserva = response.data.reserva;
+                        const presupuesto = response.data.presupuesto;
+                        const partidas = response.data.partida;
+                        const proyectos = response.data.proyecto;
+                        console.log(presupuesto);
+
+                        $("#nombre_proveedor_editar").val(reserva.razon_social || '');
+                        $("#no_proveedor_editar").val(reserva.no_proveedor || '');
+                        $("#total_importe_editar").val(reserva.total_importe || '');
+                        $("#id_reserva").val(reserva.id_reserva || '');
+                        $("#previews").empty(); // Limpiar contenido anterior del contenedor
+                        // Verifica que haya un instrumento antes de agregar el enlace
+                        if (reserva.instrumento) {
+                            const fileUrl = base_url + reserva.instrumento;
+                            const link = `<a href="${fileUrl}" target="_blank" class="me-2">
+                                            <i class="mdi mdi-file"></i> Ver archivo
+                                        </a>`;
+                            $("#previews").append(link);
+                        $("#no_convenio_editar").val(reserva.no_convenio || '');
+                           const tbody = $('#makeEditableEditar tbody');
+                            tbody.empty();
+
+                            presupuesto.forEach(p => {
+                                let opcionesProyecto = '<option value="">Seleccione</option>';
+                               proyectos.forEach(c => {
+                                    opcionesProyecto += `<option value="${c.id_proyecto}" ${(c.id_proyecto == p.id_proyecto) ? 'selected' : ''}>${c.proyecto}</option>`;
+                                });
+
+                                let opcionesPartida = '<option value="">Seleccione</option>';
+                                partidas.forEach(pa => {
+                                    opcionesPartida += `<option value="${pa.id_partida}" ${(pa.id_partida == p.id_partida) ? 'selected' : ''}>${pa.cuenta_cable}</option>`;
+                                });
+
+                                const fila = `
+                                    <tr>
+                                        <td>
+                                            <select class="select2 form-control" name="proyecto[]">
+                                                ${opcionesProyecto}
+                                            </select>
+                                            <input type="hidden" name="id_presupuesto[]" value="${p.id_presupuesto}">
+                                        </td>
+                                        <td>
+                                            <select class="select2 form-control" name="partida[]">
+                                                ${opcionesPartida}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="text" autocomplete="off" class="form-control" name="importe[]" value=${p.importe} placeholder="0,000.00">
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-danger remove-row">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `;
+                                tbody.append(fila);
+                            });
+
+                        }
+                    } else {
+                        Swal.fire("Atención", "No se encontró la información de la reserva.", "warning");
+                    }
+                },
+                complete: function() {
+                    $('#modalEditarReserva').modal('show');
+                    $('.dropdown-toggle').dropdown();
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error en la solicitud AJAX:", error);
+                    Swal.fire("Error", "Favor de llamar al Administrador", "error");
+                }
+            });
+        },
+
         traerReserva: function(id_proveedor){
           $.ajax({
             url: base_url + "index.php/Principal/Proveedor",
@@ -490,7 +575,7 @@ ini.inicio = (function () {
             dataType: "json",
             data: {id_proveedor:id_proveedor},
             success: function(response) {
-                 console.log(response);
+             
                 if(response.error){
                     Swal.fire({
                         title: "Atención",
@@ -509,6 +594,16 @@ ini.inicio = (function () {
                   $("#nombre_proveedor").val(response.data.proveedor.razon_social);
                   $("#no_proveedor").val(response.data.proveedor.no_proveedor);
                   $("#id_proveedor").val(response.data.proveedor.id_proveedor);
+                  let bancoSelect = $("#banco");
+                    bancoSelect.empty(); // Limpia opciones anteriores
+                    bancoSelect.append('<option value="">Selecciona un banco</option>');
+                    response.data.banco.forEach(function(item) {
+                            console.log(item);
+                        bancoSelect.append(
+                            `<option value="${item.id_proveedor_banco}">${item.banco+'-'+item.no_cuenta}</option>`
+                        );
+                    });
+
                 }
             },
             complete: function(){
@@ -557,6 +652,176 @@ ini.inicio = (function () {
 
             return true;
         },
+         guardarReservaEdicion: function()
+        {
+            $('#btn_guardar_edicion').click(function(e) {
+            e.preventDefault();
+
+            // Crear FormData para enviar tanto el formulario como el archivo
+            var formData = new FormData();
+            
+       
+            formData.append('id_reserva', $('#id_reserva').val());
+            formData.append('total_importe', $('#total_importe_editar').val());
+            formData.append('no_convenio', $('#no_convenio_editar').val());
+            
+            // Agregar archivo si existe
+            var instrumentoFile = $('#instrumento_editar')[0].files[0];
+            if(instrumentoFile) {
+                formData.append('instrumento', instrumentoFile);
+            }
+            
+
+            // Agregar datos de la tabla
+            $('#makeEditableEditar tbody tr').each(function(index) {
+                formData.append('proyecto[]', $(this).find('[name="proyecto[]"]').val());
+                formData.append('partida[]', $(this).find('[name="partida[]"]').val());
+                formData.append('importe[]', $(this).find('[name="importe[]"]').val());
+                formData.append('id_presupuesto[]', $(this).find('[name="id_presupuesto[]"]').val());
+            });
+
+            // Enviar datos via AJAX
+            $.ajax({
+                url: base_url + "index.php/Principal/guardarReservaEditar",
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                beforeSend: function() {
+                    $('#btn_guardar_edicion').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                },
+                success: function(response) {
+                  if(response.error) {
+                        Swal.fire("Error", response.respuesta, "error");
+                    } else {
+                        Swal.fire("Correcto", response.respuesta, "success");
+                        setTimeout(() => {
+                                    window.location.href = base_url + "index.php/Principal/listaReservaPT";
+
+                            }, 1000);
+                        
+                    } 
+                },
+                error: function() {
+                    //toastr.error('Error de conexión');
+                    Swal.fire("Error", "Error de conexión", "error");
+                },
+                complete: function() {
+                    $('#btn_guardar_edicion').prop('disabled', false).html('Guardar');
+                }
+            });
+            });
+
+        },
+        estatusReserva: function(id_reserva)
+        {
+           $("#modalEstatusReserva").modal('show');
+           $('#id_reserva_eliminar').val(id_reserva);
+           $('#motivo').val('');
+           $('#observaciones').val('');
+        },
+        selectMotivo: function()
+        {
+            
+        let motivo = $('#motivo').val();
+        console.log(motivo);
+           if(motivo == 1){
+               $('#observacion').hide();
+              $('#numero').hide();
+            }
+            if(motivo == 2){
+               $('#observacion').show();
+                 $('#numero').hide();
+            }
+             if(motivo == 3){
+               $('#numero').show();
+                $('#observacion').show();
+            }
+        },
+        formEliminarReserva: function()
+        {
+            $('#btnConfirmarEliminar').on('click', function () {
+            const id = $('#id_reserva_eliminar').val();
+            const motivo = $('#motivo').val();
+            const observaciones = $('#observaciones').val();
+            const numero_reserva = $('#numero_reserva').val();
+
+            if (!motivo) {
+                alert('Debe seleccionar un motivo para eliminar la reserva.');
+                return;
+            }
+                $.ajax({
+                    url: base_url + "index.php/Usuario/estatusReserva",
+                    type: "POST",
+                    dataType: "json",
+                    data: {
+                    id_reserva: id,
+                    motivo: motivo,
+                    observaciones: observaciones,
+                    numero_reserva: numero_reserva
+                    },
+                    beforeSend: function()
+                    {
+                     $('#btnConfirmarEliminar').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                    },
+                    success: function (response) {
+                        console.log(response);
+                        if (response.error) {
+                            Swal.fire("Atención", response.respuesta, "warning");
+                        } else {
+                            Swal.fire("Correcto", response.respuesta, "success");
+                        }
+                    },
+                    complete: function () {
+                    $('#modalEliminarReserva').modal('hide');
+                    $('#btnConfirmarEliminar').prop('disabled', false).html('Guardar');
+                     setTimeout(() => window.location.reload(), 1500);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                   // alert("Error al eliminar");
+                    console.log("Error(s):", textStatus, errorThrown);
+                    }
+                });
+            });
+
+        },
+        eliminarReserva: function(id)
+        {
+        Swal.fire({
+                        title: "¿Está seguro?",
+                        text: "¿Desea eliminar la reserva?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        cancelButtonText: "Cancelar",
+                        confirmButtonText: "Eliminar",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: base_url + "index.php/Usuario/deleteReserva",
+                                type: "post",
+                                dataType: "json", //expect return data as html from server
+                                data: { id_reserva: id },
+                                success: function (response, textStatus, jqXHR) {
+                                    if (response.error) {
+                                        Swal.fire("Atención", response.respuesta, "warning");
+                                    }else{
+                                         Swal.fire("Eliminado", response.respuesta, "success");
+                                    }
+                                },
+                                complete: function(){
+                                  window.location.reload();
+                                },
+                                error: function (jqXHR, textStatus, errorThrown) {
+                                    alert("error");
+                                    console.log("error(s):" + textStatus, errorThrown);
+                                    $("#mensajes").html("");
+                                },
+                            });
+                        }
+                    });
+        },
         guardarReserva: function()
         {
         $('#btn_guardar').click(function(e) {
@@ -575,6 +840,7 @@ ini.inicio = (function () {
         formData.append('no_proveedor', $('#no_proveedor').val());
         formData.append('id_proveedor', $('#id_proveedor').val());
         formData.append('total_importe', $('#total_importe').val());
+        formData.append('banco', $('#banco').val());
         
         // Agregar archivo si existe
         var instrumentoFile = $('#instrumento')[0].files[0];
@@ -592,6 +858,7 @@ ini.inicio = (function () {
         });
 
         // Enviar datos via AJAX
+
         $.ajax({
             url: base_url + "index.php/Principal/guardarReserva",
             type: 'POST',
@@ -2011,8 +2278,8 @@ ini.inicio = (function () {
             
             // Solo busca si hay 3+ caracteres o el campo está vacío (para resetear)
             if (palabra.length >= 3 || palabra.length === 0) {
-                if ($.fn.DataTable.isDataTable('#datatableCategorias')) {
-                    $('#datatableCategorias').DataTable().destroy();
+                if ($.fn.DataTable.isDataTable('#datatableProveedores')) {
+                    $('#datatableProveedores').DataTable().destroy();
                 }
 
                 $.ajax({
@@ -2024,7 +2291,7 @@ ini.inicio = (function () {
                     dataType: 'json',
                     success: function(response) {
                         if (!response.error && response.data) {
-                            const tbody = $('#datatableCategorias tbody');
+                            const tbody = $('#datatableProveedores tbody');
                             tbody.empty();
                             
                             response.data.forEach(p => {
@@ -2561,31 +2828,31 @@ ini.inicio = (function () {
                 }
             });
         },
-        formPT: function(){
+       formPT: function(){
             $("#form_proveedor").submit(function (e) {
                 e.preventDefault(); 
-                var formData = $("#form_proveedor").serialize();
+                var formData = new FormData(this); // Usar FormData en lugar de serialize
 
-               $.ajax({
+                $.ajax({
                     type: "POST",
                     url: base_url + "index.php/Agregar/guardaPT",
-                    data:formData,
+                    data: formData,
+                    processData: false,  // Importante para FormData
+                    contentType: false,  // Importante para FormData
                     dataType: "json",
                     success: function (response) {
                         if(!response.error){
-                           Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
+                            Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
                             setTimeout(() => {
-                                     window.location.href = base_url + "index.php/Principal/listadoEstatusPT";
-                                    }, 1500);
-                         
+                                window.location.href = base_url + "index.php/Principal/listadoEstatusPT";
+                            }, 1500);
                         }else{
                             Swal.fire("Error", '<p> '+ response.respuesta + '</p>', 'error');  
                         }
                     },
                     error: function (response,jqXHR, textStatus, errorThrown) {
-                         var res= JSON.parse (response.responseText);
-                        //  console.log(res.message);
-                         Swal.fire("Error", '<p> '+ res.message + '</p>');  
+                        var res= JSON.parse(response.responseText);
+                        Swal.fire("Error", '<p> '+ res.message + '</p>');  
                     }
                 });
             });

@@ -79,7 +79,7 @@ class Login extends BaseController {
         $response = new \stdClass();
         $response->error = true;
         $response->respuesta = "Error al validar usuario";
-        $response->asistencia = false;
+        $response->asistencia = true;
         
         // Coordenadas del centro de la geocerca
 
@@ -89,7 +89,8 @@ class Login extends BaseController {
         
         // Validar que se recibieron coordenadas
         if (!$Latitud || !$Longitud) {
-            $response->respuesta = "No se recibieron coordenadas de ubicación";
+            $response->ubicacion = "No se recibieron coordenadas de ubicación";
+             $response->asistencia = false;
             return $response;
         }
         
@@ -107,9 +108,10 @@ class Login extends BaseController {
             cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
         $distancia = $angle * $earthRadius;
         
-        // Validar si está dentro del radio permitido
+
         if ($distancia > $radio) {
-            $response->respuesta = "Ubicación fuera del área permitida";
+            $response->asistencia = false;
+            $response->ubicacion = "Ubicación fuera del área permitida";
             return $response;
         }
        
@@ -147,6 +149,7 @@ class Login extends BaseController {
                 $response->asistencia = !$result->error;
             } else {
                 $response->respuesta = "Ya registraste tu asistencia hoy";
+                 $response->error = false;
             }
         }
         
@@ -180,7 +183,10 @@ class Login extends BaseController {
                 $response->error     = $result->error;
                 $response->respuesta = $result->respuesta;
                 $asistencia = $this->registrarAsistencia($result->data[0]->id_usuario, $Latitud,  $Longitud );
-                $session->set('asistencia', $asistencia->asistencia);
+                if(!$asistencia->error){
+                   $response->asistencia = $asistencia->asistencia;
+                }
+                
             }     
         }        
         return $this->respond($response);

@@ -77,6 +77,119 @@ class Agregar extends BaseController {
             $data['contentView'] = 'formularios/vFormAgregar';                
             $this->_renderView($data);
     }
+   public function procesarPDF(array $archivos, $id_presupuesto= null)
+    {
+        $session = \Config\Services::session();
+        $data = array();
+        $this->globals = new Mglobal();
+        foreach ($archivos as $archivo) {
+            if (!$archivo->isValid()) {
+                continue;
+            }
+
+            $timestamp = date('Ymd_His');
+            $extension = $archivo->getClientExtension();
+            $originalName = pathinfo($archivo->getName(), PATHINFO_FILENAME);
+            $file = $originalName . '_' . $timestamp . '.' . $extension;
+
+            // Ruta absoluta
+            $ruta_destino = FCPATH . 'assets/pdf/';
+            $archivo->move($ruta_destino, $file);
+
+            // Rutas públicas
+            $ruta_absoluta = base_url('assets/pdf/' . $file);
+            $ruta_relativa = 'assets/pdf/' . $file;
+            $dataConfig = [
+                    "tabla"=>"factura_pdf",
+                    "editar"=>false 
+                ];
+             $dataInsert = [
+                        'id_presupuesto'           => (int)$id_presupuesto,
+                        'ruta_relativa'            => $ruta_relativa,
+                        'ruta_absoluta'            => $ruta_absoluta,
+                        'fec_reg'                  => date('Y-m-d H:i:s'),
+                        'usu_reg'                  => $session->get('id_usuario')
+               
+                    ];
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardarFacturaPDF'];
+        $response = $this->globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
+
+          }
+        
+
+        //return false;
+    }
+   public function procesarXML(array $archivos, $id_presupuesto= null)
+    {
+        $session = \Config\Services::session();
+        $data = array();
+        $this->globals = new Mglobal();
+        foreach ($archivos as $archivo) {
+            if (!$archivo->isValid()) {
+                continue;
+            }
+
+            $tipo = $archivo->getMimeType(); // Detecta tipo mime
+
+            if (in_array($tipo, ['text/xml', 'application/xml'])) {
+                $contenido = file_get_contents($archivo->getTempName());
+
+              libxml_use_internal_errors(true);
+                $xml = simplexml_load_string($contenido);
+
+                if ($xml === false) {
+                    return false;
+                }
+
+                $namespaces = $xml->getNamespaces(true);
+                $cfdi = $xml->children($namespaces['cfdi']);
+
+                $attrs = $xml->attributes();
+                $version = (string) $attrs['Version'];
+                $fecha   = (string) $attrs['Fecha'];
+                $total   = (string) $attrs['Total'];
+                $moneda  = (string) $attrs['Moneda'];
+                // ✅ Emisor
+                $emisor = $cfdi->Emisor->attributes();
+                $rfcEmisor = (string) $emisor['Rfc'];
+                $nombreEmisor = (string) $emisor['Nombre'];
+                // ✅ Receptor
+                $receptor = $cfdi->Receptor->attributes();
+                $rfcReceptor = (string) $receptor['Rfc'];
+                $nombreReceptor = (string) $receptor['Nombre'];
+
+                // ✅ UUID
+                $complemento = $cfdi->Complemento->children($namespaces['tfd'] ?? []);
+                $uuid = (string) $complemento->TimbreFiscalDigital['UUID'];
+
+              $dataConfig = [
+                    "tabla"=>"factura",
+                    "editar"=>false 
+                ];
+             $dataInsert = [
+                        'id_presupuesto'           => (int)$id_presupuesto,
+                        'version'                  => $version,
+                        'fecha'                    => date('Y-m-d H:i:s', strtotime($fecha) ),
+                        'total'                    => $total,
+                        'moneda'                   => $moneda,
+                        'emisor_rfc'               => $rfcEmisor,
+                        'emisor_nombre'            => $nombreEmisor,
+                        'receptor_rfc'             => $rfcReceptor,
+                        'receptor_nombre'          => $nombreReceptor,
+                        'uuid'                     => $uuid,
+                        'fec_reg'                  => date('Y-m-d H:i:s'),
+                        'usu_reg'                  => $session->get('id_usuario')
+               
+                    ];
+          $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardarFactura'];
+          $response = $this->globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
+
+          }
+        }
+
+       // return false;
+    }
+
     public function guardaPT()
     {
         $session = \Config\Services::session();
@@ -85,6 +198,7 @@ class Agregar extends BaseController {
         $response->respuesta = "Error|Error al guardar PT";
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
+        $archivos = $this->request->getFiles(); 
 
 
         if($data['secretario'] == 0){
@@ -147,7 +261,9 @@ class Agregar extends BaseController {
             $response->respuesta = "Es requerido el no_reserva";
             return $this->respond($response);
         }
+           
            $dataInsert = [
+                        'id_reserva'               => (int)$data['id_reserva'],
                         'id_direccion_responsable' => $data['direccion_responsable'],
                         'tipo_pt'                  => $data['tipo_pt'],
                         'id_proveedor'             => $data['id_proveedor'],
@@ -187,6 +303,34 @@ class Agregar extends BaseController {
       
    
         $response = $this->globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
+      
+        if(!$response->error){
+            $id_presupuesto = $response->idRegistro;
+            $archivosXml = [];
+            $archivosPdf = [];
+
+            // Recorremos todas las claves de los archivos enviados
+            foreach ($archivos as $key => $fileArray) {
+                if (strpos($key, 'factura_xml_') === 0) {
+                    $archivosXml = array_merge($archivosXml, $fileArray);
+                } elseif (strpos($key, 'factura_pdf_') === 0) {
+                    $archivosPdf = array_merge($archivosPdf, $fileArray);
+                }
+            }
+
+           $datosXML = $this->procesarXML($archivosXml, $id_presupuesto);
+           $datosPDF =$this->procesarPDF($archivosPdf, $id_presupuesto);
+
+            if (!$datosXML) {
+                $response->errorXML     =  true;
+                $response->respuestaXML = "XML inválido o no se encontró.";
+            }
+            if (!$datosPDF) {
+                $response->errorPDF     =  true;
+                $response->respuestaPDF = "PDF inválido o no se encontró.";
+            }
+    
+        }
         return $this->respond($response);
     }
     public function guardaUsuarioSti(){
@@ -714,7 +858,7 @@ class Agregar extends BaseController {
             $calendarStatic = true;
       
             $data = [];
-            if (isset($mes) && !empty($mes)) {
+            if (isset($mes) && !empty($mes)) { // RH
                 try {
                     $meses = $this->meses($mes);
                     $agenda = $Mglobal->getTabla([
@@ -732,7 +876,7 @@ class Agregar extends BaseController {
                     log_message('error', $e->getMessage());
                 }
             $calendarStatic = false;
-            }else{
+            }else{ // POBLACION
                  $agenda = $Mglobal->getTabla([
                         'tabla' => 'asistencia',
                         'where' => [
@@ -740,12 +884,22 @@ class Agregar extends BaseController {
                              'id_usuario' => $session->get('id_usuario')
                         ],
                     ]);
+                 $incidencia = $Mglobal->getTabla([
+                         'tabla' => 'incidencia', '
+                          where' => [
+                            'visible' => 1,
+                            'id_usuario' => $session->get('id_usuario')]]);
+                    
             }
+            $cat_incidencia = $Mglobal->getTabla(['tabla' => 'cat_incidencia', 'where' => ['visible' => 1]]);
            
+         
             $mes  = ($mes)? $mes: date('m');
             $data['anio'] = date('Y');
             $asistencia = (isset($agenda->data) && !empty($agenda->data))?$agenda->data:[];
             $data['asistencia'] = $asistencia;
+            $data['cat_incidencia'] = $cat_incidencia->data;
+            $data['incidencia'] = (isset($incidencia->data) && !empty($incidencia->data))?$incidencia->data:[];
             $data['mes'] = $mes;
             $data['calendarStatic'] = $calendarStatic;
             $data['scripts'] = array('agregar');
@@ -877,6 +1031,39 @@ class Agregar extends BaseController {
 
 
     }
+    public function getIncidencia()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $globals = new Mglobal;
+        $id_incidencia = $this->getPost('id_incidencia');
+        if( in_array($session->get('id_perfil'). [1,2 ])){
+           $inicencias = $globals->getTabla(['tabla' => 'incidencia', 'where' => ['visible' => 1]]);
+        }else{
+          $inicencias = $globals->getTabla(['tabla' => 'incidencia', 'where' => ['visible' => 1, 'id_usuario' => $session->get('id_usuario')]]);
+        }
+        if(!$inicencias->error){
+            $response->error = false;
+            $response->data = $inicencias->data; 
+
+        }
+        return $this->respond($response);
+    }
+    public function detalleIncidencia()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $globals = new Mglobal;
+        $id_incidencia = $this->getPost('id_incidencia');
+        $inicencias = $globals->getTabla(['tabla' => 'vw_incidencia', 'where' => ['visible' => 1, 'id_incidencia' => $id_incidencia]]);
+        if(!$inicencias->error){
+            $response->error = false;
+            $response->data = $inicencias->data[0]; 
+
+        }
+        return $this->respond($response);
+    }
+   
     public function getCoursesByCategoryId($id_categoria)
     {
         $session = \Config\Services::session();

@@ -16,6 +16,14 @@
         <link href="<?php echo base_url() ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
         <link href="<?php echo base_url() ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
 
+             <!-- Plugins css -->
+        <link href="<?php echo base_url() ?>plugins/daterangepicker/daterangepicker.css" rel="stylesheet" />
+        <link href="<?php echo base_url() ?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
+        <link href="<?php echo base_url() ?>plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.css" rel="stylesheet" type="text/css" />
+        <link href="<?php echo base_url() ?>plugins/timepicker/bootstrap-material-datetimepicker.css" rel="stylesheet">
+        <link href="<?php echo base_url() ?>plugins/bootstrap-touchspin/css/jquery.bootstrap-touchspin.min.css" rel="stylesheet" />
+
+
    <style>
       /* Añade estos estilos al bloque de estilos existente */
     .fc-event-asistencia {
@@ -23,6 +31,17 @@
         background-color: #f8f9fc;
         color: #4e73df;
     }
+    .fc-event-incidencia {
+        border-left: 4px solidrgb(17, 72, 236);
+        background-color:rgb(233, 58, 35);
+        color: #f8f9fc;
+    }
+    .fc-event-falta {
+        border-left-color: #dc3545;
+        background-color: #f8d7da;
+        color: #dc3545;
+    }
+
     .fc-event-tarde {
         border-left-color: #e74a3b;
         background-color: #f8e0df;
@@ -95,7 +114,176 @@
         </div>
         <!-- end page-wrapper -->
 
-<!-- Leaflet CSS -->
+<!--  Modal content for the above example -->
+        <div class="modal modal-rightbar fade" id="modalJustificar" tabindex="-1" role="dialog" aria-labelledby="MetricaRightbar"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title mt-0" id="MetricaRightbar">JUSTIFICAR POR</h5>
+                        <button type="button" class="btn btn-sm btn-soft-primary btn-circle btn-square"
+                            data-dismiss="modal" aria-hidden="true"><i class="mdi mdi-close"></i></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Nav tabs -->
+                        <ul class="nav nav-pills nav-justified mt-2 mb-4" role="tablist">
+                            <li class="nav-item waves-effect waves-light">
+                                <a class="nav-link active" data-toggle="tab" href="#ActivityTab" role="tab">DIA</a>
+                            </li>
+                            <li class="nav-item waves-effect waves-light">
+                                <a class="nav-link" data-toggle="tab" href="#TasksTab" role="tab">SEMANA</a>
+                            </li>
+                            <li class="nav-item waves-effect waves-light">
+                                <a class="nav-link" data-toggle="tab" href="#SettingsTab" role="tab">MES</a>
+                            </li>
+                        </ul>
+
+                        <!-- Tab panes -->
+                        <div class="tab-content">
+                            <div class="tab-pane active " id="ActivityTab" role="tabpanel">
+                                <input type="hidden" id="fecha"  >
+                               <h2 id="fecha_incidencia"> </h2>
+                                <div class="slimscroll scroll-rightbar">
+                                    <div class="activity">
+                                        <div class="activity-info">
+                                            <div class="activity-info-text mb-2">
+                                                <label for="tipo_incidencia" class="form-label">Tipo de Incidencia</label>
+                                                <select class="select2 form-control" id="tipo_incidencia">
+                                                     <option value="">Seleccione</option>
+                                                     <?php foreach($cat_incidencia as $c): ?>
+                                                     <option value="<?= $c->id_incidencia?>"><?= $c->dsc_incidencia ?></option>
+                                                     <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="activity-info">
+                                            <div class="activity-info-text mb-2">
+                                                 <label for="timepicker" class="form-label">Hora Inicio</label>
+                                                 <input class="form-control" id="timepicker_inicio" name="hora_inicio" placeholder="Inicio">
+                                             </div>
+                                        </div>
+                                        <div class="activity-info">
+                                            <div class="activity-info-text mb-2">
+                                                 <label for="timepicker" class="form-label">Hora Fin</label>
+                                                 <input class="form-control" id="timepicker_fin" name="hora_fin" placeholder="Fin">
+                                             </div>
+                                        </div>
+                                         <div class="activity-info">
+                                            <div class="activity-info-text mb-2">
+                                                 <label class="form-label">Detalles</label>
+                                                 <textarea class="form-control" id="detalles" ></textarea>
+                                             </div>
+                                        </div>
+                                         <div class="activity-info">
+                                            <div class="activity-info-text mb-2">
+                                                 <label class="form-label">Comentarios adicionales</label>
+                                                 <textarea class="form-control" id="comentario" ></textarea>
+                                             </div>
+                                        </div>
+                                      <a style="color:white;" id="btn_incidencia" class="btn btn-gradient-success btn-lg" onclick="st.agregar.guardarIncidencia();" role="button">Guardar</a>
+                                    </div>
+                                    <!--end activity-->
+                                </div>
+                                <!--end activity-scroll-->
+                            </div>
+                            <!--end tab-pane-->
+                            <div class="tab-pane" id="TasksTab" role="tabpanel">
+                                
+                                <h2 id="fecha_incidencia"> </h2>
+                                <div class="slimscroll scroll-rightbar">
+                                    <div class="activity">
+                                        <div class="activity-info">
+                                            <div class="activity-info-text mb-2">
+                                                <label for="tipo_incidencia" class="form-label">Tipo de Incidencia</label>
+                                                <select class="select2 form-control" id="tipo_incidencia">
+                                                     <option value="">Seleccione</option>
+                                                     <?php foreach($cat_incidencia as $c): ?>
+                                                     <option value="<?= $c->id_incidencia?>"><?= $c->dsc_incidencia ?></option>
+                                                     <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="activity-info">
+                                            <div class="activity-info-text mb-2">
+                                               <label class="my-3">Semanas</label>
+                                                <div class="input-group">                                            
+                                                    <input type="text" class="form-control" name="datetimes">
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text"><i class="dripicons-calendar"></i></span>
+                                                    </div>
+                                                </div>
+                                             </div>
+                                        </div>
+                                         <div class="activity-info">
+                                            <div class="activity-info-text mb-2">
+                                                 <label class="form-label">Detalles</label>
+                                                 <textarea class="form-control" id="detalles" ></textarea>
+                                             </div>
+                                        </div>
+                                         <div class="activity-info">
+                                            <div class="activity-info-text mb-2">
+                                                 <label class="form-label">Comentarios adicionales</label>
+                                                 <textarea class="form-control" id="comentario" ></textarea>
+                                             </div>
+                                        </div>
+                                      <a style="color:white;" id="btn_incidencia" class="btn btn-gradient-success btn-lg" onclick="st.agregar.guardarIncidencia();" role="button">Guardar</a>
+                                    </div>
+                                    <!--end activity-->
+                                </div>
+                            </div>
+                            <!--end tab-pane-->
+                            <div class="tab-pane" id="SettingsTab" role="tabpanel">
+                                <div class="slimscroll scroll-rightbar">
+                                    <div class="activity">
+                                        <div class="activity-info">
+                                            <div class="activity-info-text mb-2">
+                                                <label for="tipo_incidencia" class="form-label">Tipo de Incidencia</label>
+                                                <select class="select2 form-control" id="tipo_incidencia">
+                                                     <option value="">Seleccione</option>
+                                                     <?php foreach($cat_incidencia as $c): ?>
+                                                     <option value="<?= $c->id_incidencia?>"><?= $c->dsc_incidencia ?></option>
+                                                     <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="activity-info">
+                                            <div class="activity-info-text mb-2">
+                                             <label class="mb-3">Mes Inicio</label>
+                                               <input type="text" class="form-control" placeholder="2017-06-04" id="mdate">
+                                             </div>
+                                        </div>
+                                        <div class="activity-info">
+                                            <div class="activity-info-text mb-2">
+                                             <label class="mb-3">Mes Fin</label>
+                                               <input type="text" class="form-control" placeholder="2017-06-04" id="mdate">
+                                             </div>
+                                        </div>
+                                         <div class="activity-info">
+                                            <div class="activity-info-text mb-2">
+                                                 <label class="form-label">Detalles</label>
+                                                 <textarea class="form-control" id="detalles" ></textarea>
+                                             </div>
+                                        </div>
+                                         <div class="activity-info">
+                                            <div class="activity-info-text mb-2">
+                                                 <label class="form-label">Comentarios adicionales</label>
+                                                 <textarea class="form-control" id="comentario" ></textarea>
+                                             </div>
+                                        </div>
+                                      <a style="color:white;" id="btn_incidencia" class="btn btn-gradient-success btn-lg" onclick="st.agregar.guardarIncidencia();" role="button">Guardar</a>
+                                    </div>
+                                    <!--end activity-->
+                                </div>
+                            </div>
+                            <!--end tab-pane-->
+                        </div>
+                        <!--end tab-content-->
+                    </div>
+                    <!--end modal-body-->
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal --> 
+
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
     crossorigin=""/>
@@ -106,22 +294,64 @@
     crossorigin=""></script>
 
         <!-- jQuery  -->
-        <script src="<?php echo base_url() ?>assets/js/jquery.min.js"></script>
+ <script src="<?php echo base_url() ?>assets/js/jquery.min.js"></script>
 
-        <script src='<?php echo base_url() ?>plugins/fullcalendar/packages/core/main.js'></script>
-        <script src='<?php echo base_url() ?>plugins/fullcalendar/packages/daygrid/main.js'></script>
-        <script src='<?php echo base_url() ?>plugins/fullcalendar/packages/timegrid/main.js'></script>
-        <script src='<?php echo base_url() ?>plugins/fullcalendar/packages/interaction/main.js'></script>
-        <script src='<?php echo base_url() ?>plugins/fullcalendar/packages/list/main.js'></script>
-     
+ <script src='<?php echo base_url() ?>plugins/fullcalendar/packages/core/main.js'></script>
+ <script src='<?php echo base_url() ?>plugins/fullcalendar/packages/daygrid/main.js'></script>
+ <script src='<?php echo base_url() ?>plugins/fullcalendar/packages/timegrid/main.js'></script>
+ <script src='<?php echo base_url() ?>plugins/fullcalendar/packages/interaction/main.js'></script>
+ <script src='<?php echo base_url() ?>plugins/fullcalendar/packages/list/main.js'></script>
+
+
+
+        <script src="<?php echo base_url() ?>plugins/apexcharts/apexcharts.min.js"></script> 
+
+        <!-- Plugins js -->
+        <script src="<?php echo base_url() ?>plugins/moment/moment.js"></script>
+        <script src="<?php echo base_url() ?>plugins/daterangepicker/daterangepicker.js"></script>
+        <script src="<?php echo base_url() ?>plugins/select2/select2.min.js"></script>
+        <script src="<?php echo base_url() ?>plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
+        <script src="<?php echo base_url() ?>plugins/timepicker/bootstrap-material-datetimepicker.js"></script>
+        <script src="<?php echo base_url() ?>plugins/bootstrap-maxlength/bootstrap-maxlength.min.js"></script>
+        <script src="<?php echo base_url() ?>plugins/bootstrap-touchspin/js/jquery.bootstrap-touchspin.min.js"></script>
+
+        <script src="<?php echo base_url() ?>assets/pages/jquery.forms-advanced.js"></script>
+        
+        <!-- App js -->
+        <script src="<?php echo base_url() ?>assets/js/app.js"></script>
+
+
+        <script src="<?php echo base_url() ?>assets/js/jquery-ui.min.js"></script>
+        <script src="<?php echo base_url() ?>assets/js/bootstrap.bundle.min.js"></script>
+        <script src="<?php echo base_url() ?>assets/js/metismenu.min.js"></script>
+        <script src="<?php echo base_url() ?>assets/js/waves.js"></script>
+        <script src="<?php echo base_url() ?>assets/js/feather.min.js"></script>
+        <script src="<?php echo base_url() ?>assets/js/jquery.slimscroll.min.js"></script>
+
 
         <script>
      $(document).ready(function() {
+        // Inicialización de timepickers
+    $('#timepicker_inicio').bootstrapMaterialDatePicker({
+        format: 'HH:mm',
+        date: false,
+        shortTime: true,
+        switchOnClick: true
+    });
+
+    $('#timepicker_fin').bootstrapMaterialDatePicker({
+        format: 'HH:mm',
+        date: false,
+        shortTime: true,
+        switchOnClick: true
+    });
+    
     var calendarEl = document.getElementById('calendar');
     
     // Obtener los datos de asistencia desde PHP (asegúrate de que tu controlador los pase como JSON)
 
     var eventosAsistencia = <?= json_encode($asistencia ?? []) ?>;
+    var incidencia = <?= json_encode($incidencia ?? []) ?>;
     var mesSeleccionado = '<?= $mes ?>';
     var anio = '<?= $anio ?>';
     var calendarStatic = '<?= $calendarStatic ?>';
@@ -132,35 +362,67 @@
     // Construir la fecha en formato YYYY-MM-DD
     var fecha = anio + '-' + cero + mesSeleccionado + '-01';
 
-    console.log(fecha);
-
-
     // Procesar los datos para FullCalendar
     var eventos = eventosAsistencia.map(function(item) {
+        let eventClass = 'fc-event-asistencia';
+        let icon = ''; // Para el emoji
 
-        // Determinar clase CSS según el tiempo
-        var eventClass = 'fc-event-asistencia';
-        if (item.entrada >= '08:45:00') {
-            eventClass = 'fc-event-tarde';
-        } else {
+        if (!item.entrada || item.entrada === '') {
+            eventClass = 'fc-event-falta';
+            item.nombre = 'Falta';
+            icon = '❌';
+        } else if (item.entrada < '08:30:00') {
+            eventClass = 'fc-event-temprano';
+            item.nombre = 'Temprano';
+            icon = '✅';
+        } else if (item.entrada >= '08:30:00' && item.entrada <= '08:45:00') {
             eventClass = 'fc-event-puntual';
+            item.nombre = 'Puntual';
+            icon = '🕣';
+        } else if (item.entrada > '08:45:00') {
+            eventClass = 'fc-event-tarde';
+            item.nombre = 'Tarde';
+            icon = '⚠️';
         }
-        
+
         return {
             id: item.id_asistencia,
             start: item.fecha,
-            allDay: true, // Mostrar como evento de todo el día
+            allDay: true,
             className: eventClass,
+            title: `${item.nombre} ${icon}`,
             extendedProps: {
                 entrada: item.entrada,
                 salida: item.salida,
                 trabajado: item.trabajado,
                 tarde: item.tarde,
                 temprano: item.temprano,
-                turno: item.turno
+                turno: item.turno,
+                tipo: 'asistencia'
             }
         };
     });
+
+
+    // Procesar las incidencias como eventos adicionales
+    var eventosIncidencia = incidencia.map(function(item) {
+        console.log(item);
+        return {
+            id: 'incidencia-' + item.id_incidencia,
+            start: item.fecha,
+            allDay: true,
+            className: 'fc-event-incidencia', // Clase CSS para estilizar
+            title: 'Enviado',
+            extendedProps: {
+                tipo: 'incidencia',
+                hora_inicio: item.hora_inicio || 'En validación',
+                hora_fin: item.hora_fin,
+                comentarios: item.comentarios
+            }
+        };
+    });
+
+    var todosLosEventos = eventos.concat(eventosIncidencia);
 
     var calendar = new FullCalendar.Calendar(calendarEl, {
    
@@ -191,7 +453,7 @@
         initialView: 'dayGridMonth',
         editable: false,
         selectable: false,
-        events: eventos,
+        events: todosLosEventos,
         // Formato de fecha en español
         titleFormat: { 
             year: 'numeric', 
@@ -209,26 +471,36 @@
         eventRender: function(info) {
             // Personalizar el contenido del evento
             var eventEl = info.el;
-            eventEl.innerHTML = `
-                <div class="fc-event-title">${info.event.title}</div>
-                <div class="fc-event-details">
-                    <div>Entrada: ${info.event.extendedProps.entrada}</div>
-                    <div>Salida: ${info.event.extendedProps.salida}</div>
-                </div>
-            `;
+             console.log(info.event.title);
+            if (info.event.title === 'Enviado') {
+                eventEl.innerHTML = `
+                    <div class="fc-event-title">${info.event.title}</div>
+                    <div class="fc-event-details">
+                        <div>Hora Inicio: ${info.event.extendedProps.hora_inicio}</div>
+                        <div>Hora fin: ${info.event.extendedProps.hora_fin}</div>
+                    </div>
+                `;
+            } else {
+                eventEl.innerHTML = `
+                    <div class="fc-event-title">${info.event.title}</div>
+                    <div class="fc-event-details">
+                        <div>Entrada: ${info.event.extendedProps.entrada || '--:--'}</div>
+                        <div>Salida: ${info.event.extendedProps.salida || '--:--'}</div>
+                    </div>
+                `;
+            }
         },
         eventClick: function(info) {
             // Mostrar detalles completos al hacer clic
+            var eventEl = info.el;
+            
             Swal.fire({
-                title: 'Detalles de Asistencia',
+                title: info.event.title,
                 html: `
                     <div style="text-align: left;">
                         <p><strong>Fecha:</strong> ${info.event.start.toLocaleDateString()}</p>
-                        <p><strong>Entrada:</strong> ${info.event.extendedProps.entrada}</p>
-                        <p><strong>Salida:</strong> ${info.event.extendedProps.salida}</p>
-                        <p><strong>Horas trabajadas:</strong> ${info.event.extendedProps.trabajado}</p>
-                        <p><strong>Tiempo tarde:</strong> ${info.event.extendedProps.tarde}</p>
-                        <p><strong>Salida temprano:</strong> ${info.event.extendedProps.temprano}</p>
+                        <p><strong> ${info.event.extendedProps.entrada?'Entrada':'Hora Inicio'}:</strong> ${info.event.extendedProps.entrada || info.event.extendedProps.hora_inicio}</p>
+                        <p><strong>${info.event.extendedProps.entrada?'Salida':'Hora Fin'}:</strong> ${info.event.extendedProps.salida || info.event.extendedProps.hora_fin}</p>
                     </div>
                 `,
                 confirmButtonText: 'Cerrar',
@@ -237,16 +509,39 @@
                 }
             });
         },
-        dayRender: function(info) {
-            // Resaltar días con registros de asistencia
-            var hasEvents = eventos.some(function(event) {
-                return event.start.substring(0, 10) === info.date.toISOString().substring(0, 10);
-            });
+        dateClick: function(info) {
+                let dia = info.dateStr; 
+                  st.agregar.justificarFalta(dia); // Ejecuta la función al hacer clic
+              
+        },
+       dayRender: function(info) {
             
-            if (hasEvents) {
-                info.el.style.backgroundColor = 'rgba(78, 115, 223, 0.05)';
+            const date = info.date;
+            const day = date.getDay(); // 0 = domingo, 6 = sábado
+            const isWeekend = (day === 0 || day === 6);
+            const dateStr = date.toISOString().substring(0, 10);
+
+            const eventoDelDia = eventos.find(e => e.start.substring(0, 10) === dateStr);
+            console.log(eventoDelDia);
+            const esFalta = eventoDelDia && eventoDelDia.className.includes('fc-event-falta');
+
+            // Verificar si hay eventos para este día
+            var hasEvents = eventos.some(function(event) {
+                return event.start.substring(0, 10) === dateStr;
+            });
+         
+
+            if (isWeekend && !esFalta) {
+                info.el.style.backgroundColor = '#f0f0f0'; // gris claro para fines de semana
+            } else if (hasEvents) {
+                info.el.style.backgroundColor = 'rgba(78, 115, 223, 0.05)'; // estilo para días con eventos
+            } else {
+                info.el.style.backgroundColor = 'rgba(255, 0, 0, 0.1)'; // rojo claro para días vacíos
+                info.el.style.border = '1px solid rgba(255, 0, 0, 0.3)'; // opcional: borde rojo
             }
+            
         }
+
     });
 
     calendar.render();
@@ -266,15 +561,15 @@ var marker = L.marker([20.956950, -101.360316]).addTo(map)
     .bindPopup('SECTURI')
     .openPopup();
 
-/* var polygon = L.polygon([
+ var polygon = L.polygon([
     [20.956965, -101.364241],
     [20.958276, -101.358666],
     [20.954891, -101.359349]
-]).addTo(map); */
-var circle = L.circle([20.956950, -101.360316], {
+]).addTo(map); 
+/* var circle = L.circle([20.956950, -101.360316], {
     color: 'red',
     fillColor: '#f03',
     fillOpacity: 0.5,
     radius: 1000
-}).addTo(map);
+}).addTo(map); */
         </script>

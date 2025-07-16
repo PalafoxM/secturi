@@ -729,7 +729,7 @@ class Principal extends BaseController {
         $this->_renderView($data);
         
     }
-    public function guardarReserva()
+    public function guardarReservaEditar()
     {  
        
         $session = \Config\Services::session();
@@ -742,6 +742,7 @@ class Principal extends BaseController {
         $ruta_absoluta = "";
         $ruta_relativa = "";
         $file = $this->request->getFile('instrumento');
+   
 
         if ($file && $file->isValid() && !$file->hasMoved()) {
 
@@ -775,10 +776,140 @@ class Principal extends BaseController {
         $hoy = date("Y-m-d H:i:s"); 
     
         $dataInsert = [
-            "id_proveedor"   => $data['id_proveedor'],
-            "total_importe"  => $data['total_importe'],
-            "fec_reg"        => $hoy, 
-            "usu_reg"        => $session->get('id_usuario')
+            "total_importe" => $data['total_importe'],
+            "no_convenio"   =>$data['no_convenio'],
+            "id_estatus"   => 1,
+            "usu_act"       => $session->get('id_usuario')
+        ];
+
+       if (!empty($ruta_relativa)) {
+            $dataInsert['instrumento']    = $ruta_relativa;
+            $dataInsert['ruta_absoluta']  = $ruta_absoluta;
+        }
+        
+         $dataBitacora = ['id_user' =>  $session->get('id_usuario'), 'script' => 'Agregar.php/EditarReserva'];
+         $dataConfig = [
+            "tabla"=>"reserva",
+            "editar"=>true,
+           "idEditar"=>['id_reserva'=>$data['id_reserva']]
+        ];
+         $response = $globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
+      
+         if(!$response->error){
+               $i = 0;
+                foreach($data['id_presupuesto'] as $d){
+                    $dataInsert = [
+                            "id_proyecto"    => $data['proyecto'][$i],
+                            "id_partida"     => $data['partida'][$i],
+                            "importe"        => $data['importe'][$i], 
+                            "usu_act"        => $session->get('id_usuario')
+                            
+                        ];
+                         $dataConfig = [
+                            "tabla"=>"presupuesto",
+                            "editar"=>true,
+                            "idEditar"=>['id_presupuesto'=>$d]
+                        ];
+     
+                        $res = $globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
+                        if(!$res->error){
+                         $response->error = $res->error;
+                         $response->respuesta = $res->respuesta;
+                     
+                        }
+                            $i++;
+                }
+            
+         }
+        $email->setTo([
+            'alopez@guanajuato.gob.mx',
+            'negonzalez@guanajuato.gob.mx',
+            'dhernandezq@guanajuato.gob.mx'
+        ]);
+
+        $email->setSubject('Carga de Reserva');
+        $email->setMessage('
+            <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+                <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+                    <!-- Encabezado con logotipo -->
+                    <div style="background-color: #004080; padding: 20px; text-align: center;">
+                        <img src="' . base_url('assets/images/logo.png') . '" alt="Logo" style="height: 60px;">
+                    </div>
+                    <!-- Contenido principal -->
+                    <div style="padding: 30px; color: #333;">
+                        <h1 style="color: #004080;">El usuario <strong>' . $session->get('nombre_completo') . '</strong></h1>
+                        <p style="font-size: 16px;">ha actualizado la <strong>RESERVA</strong> en el sistema SUSI.</p>
+                        <p style="font-size: 15px;">Para los labores correspondientes.</p>
+                        <p style="font-size: 15px; color: #888;">Este correo ha sido generado automáticamente por el sistema SUSI. No es necesario responder a este mensaje.</p>
+                    </div>
+                    <!-- Pie de página -->
+                    <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 13px; color: #666;">
+                        © ' . date('Y') . ' Sistema de Atención SUSI. Todos los derechos reservados - SECTURI.
+                    </div>
+                </div>
+            </div>
+        ');                      // Intentar enviar el correo
+       if ($email->send()) {
+          $response->error = false;
+          $response->respuesta = "Correo enviado correctamente.";
+        } else {
+          $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
+        }
+           return $this->respond($response);
+     
+         
+     }
+    public function guardarReserva()
+    {  
+       
+        $session = \Config\Services::session();
+        $email =  \Config\Services::email();
+        $globals      = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error al Guardar los datos';
+        $data =  $this->request->getPost();
+        $ruta_absoluta = "";
+        $ruta_relativa = "";
+        $file = $this->request->getFile('instrumento');
+  
+        if ($file && $file->isValid() && !$file->hasMoved()) {
+
+            $maxSize = 1 * 1024 * 1024; // 1 MB
+
+            if ($file->getSize() > $maxSize) {
+                $response->respuesta = "El archivo no debe exceder 1 MB.";
+                return $this->respond($response);
+            }
+
+            $timestamp = date('Ymd_His');
+            $extension = $file->getClientExtension();
+            $originalName = pathinfo($file->getName(), PATHINFO_FILENAME);
+            $archivo = $originalName . '_' . $timestamp . '.' . $extension;
+
+            // Ruta absoluta
+            $ruta_destino = FCPATH . 'assets/pdf/';
+            $file->move($ruta_destino, $archivo);
+
+            // Rutas públicas
+            $ruta_absoluta = base_url('assets/pdf/' . $archivo);
+            $ruta_relativa = 'assets/pdf/' . $archivo;
+        }
+
+
+        if(isset($data['no_convenio']) && empty($data['no_convenio'])){
+            $response->error = true;
+            $response->respuesta = "El campo No. Convenio es requerido";
+             return $this->respond($response);
+        }
+        $hoy = date("Y-m-d H:i:s"); 
+    
+        $dataInsert = [
+            "id_proveedor"      => (int)$data['id_proveedor'],
+            "total_importe"     => $data['total_importe'],
+            "id_proveedor_banco"=> (int)$data['banco'],
+            "fec_reg"           => $hoy, 
+            "usu_reg"           => $session->get('id_usuario')
              
         ];
        if (!empty($ruta_relativa)) {
@@ -836,11 +967,30 @@ class Principal extends BaseController {
                         }
                 }
          }
+    // $this->enviarEmail();
 
-      /*   $email->setFrom($session->get('correo'), 'SUSI-RESERVA');// usuario
-        $email->setTo('alopez@guanajuato.gob.mx'); // destinatario principal
-        $email->setCC(['negonzalez@guanajuato.gob.mx ', 'dhernandezq@guanajuato.gob.mx', 'amendozat@guanajuato.gob.mx']); // copia visible
-        $email->setBCC(['a.palafoxm@guanajuato.gob.com']); // copia oculta
+    return $this->respond($response);
+    }
+
+    private function enviarEmail()
+    {
+        $session = \Config\Services::session();
+        $email =  \Config\Services::email();
+        $globals      = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error al enviar el correo';
+
+          $email->setTo([
+            'alopez@guanajuato.gob.mx',
+            'negonzalez@guanajuato.gob.mx',
+            'dhernandezq@guanajuato.gob.mx'
+          ]); 
+
+       // $email->setTo('palafox.marin31@gmail.com'); // destinatario principal
+        // $email->setCC(['palafox.marin@hotmail.com', 'palafox.marin31@gmail.com']); // copia visible
+         //$email->setCC(['negonzalez@guanajuato.gob.mx ', 'dhernandezq@guanajuato.gob.mx']); // copia visible
+     //   $email->setBCC(['a.palafoxm@guanajuato.gob.com']); // copia oculta
         $email->setSubject('Carga de Reserva');
         $email->setMessage('
             <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
@@ -862,19 +1012,42 @@ class Principal extends BaseController {
                     </div>
                 </div>
             </div>
-        ');
-
-                                // Intentar enviar el correo
+        ');                      // Intentar enviar el correo
        if ($email->send()) {
           $response->error = false;
           $response->respuesta = "Correo enviado correctamente.";
         } else {
           $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
         } 
-  */
-    return $this->respond($response);
-       
-        
+    }
+    public function guardarIncidencia()
+    {  
+        $session = \Config\Services::session();
+        $globals      = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error al optener los datos';
+        $data =  $this->request->getPost();
+        $dataInsert = [
+            "hora_inicio"        => $data['hora_inicio'],
+            "hora_fin"           => $data['hora_fin'],
+            "cat_id_incidencia"  => (int)$data['tipo_incidencia'],
+            "fecha"              => $data['fecha'],
+            "comentario"         => $data['comentario'],
+            "detalles"           => $data['detalles'],
+            "id_usuario"         => $session->get('id_usuario'),
+            "fec_reg"            => date('Y-m-d H:i:s'),
+        ]; 
+           $dataConfig = [
+                "tabla"     => "incidencia",
+                 "editar"   => false,
+                ];
+        $result = $globals->saveTabla($dataInsert, $dataConfig, ["script" => "guardar.incidencia"]);  
+        if(!$result->error){
+           $response->error= false; 
+           $response->respuesta= $result->respuesta; 
+        } 
+        return $this->respond($response);
     }
     public function actualizarBanco()
     {  
@@ -1029,9 +1202,14 @@ class Principal extends BaseController {
        
         $session = \Config\Services::session();
         $globals      = new Mglobal;
-        $reserva    = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['visible' => 1]]);
+        $reserva    = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1]]);
+        $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
+        $cat_partida  = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $proveedor    = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit'=>100]);
         $data['reserva']    = (!empty($reserva->data))?$reserva->data:[];
         $data['scripts'] = array('inicio');
+        $data['cat_proyecto'] = (!empty($cat_proyecto->data))?$cat_proyecto->data:[];
+        $data['cat_partida']  = (!empty($cat_partida->data))?$cat_partida->data:[];
         $data['contentView'] = 'secciones/vListadoReservaPT';                
         $this->_renderView($data);
         
@@ -1050,6 +1228,7 @@ class Principal extends BaseController {
         $data['proveedor']    = (!empty($proveedor->data))?$proveedor->data:[];
         $data['cat_proyecto'] = (!empty($cat_proyecto->data))?$cat_proyecto->data:[];
         $data['cat_partida']  = (!empty($cat_partida->data))?$cat_partida->data:[];
+     
         $data['scripts'] = array('inicio');
         $data['edita'] = 0;
         $data['contentView'] = 'secciones/vListadoPT';                
@@ -1084,11 +1263,66 @@ class Principal extends BaseController {
         $data['contentView'] = 'secciones/vregistroPT';                
         $this->_renderView($data);
     }
+    private function numeroEnLetras($numero)
+    {
+        //die( var_dump( $numero ) );
+        $x = explode('.', number_format($numero, 2, '.', ''));
+        $entero = intval($x[0]);
+        $decimales = $x[1];
+
+        $texto = $this->convertirNumero($entero);
+        return ucfirst(trim($texto)) . " pesos {$decimales}/100 M.N.";
+    }
+
+    private function convertirNumero($numero)
+    {
+        $unidad = [
+            '', 'uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve',
+            'diez', 'once', 'doce', 'trece', 'catorce', 'quince',
+            'dieciséis', 'diecisiete', 'dieciocho', 'diecinueve', 'veinte'
+        ];
+        $decena = ['', '', 'veinti', 'treinta', 'cuarenta', 'cincuenta', 'sesenta', 'setenta', 'ochenta', 'noventa'];
+        $centena = ['', 'ciento', 'doscientos', 'trescientos', 'cuatrocientos', 'quinientos',
+            'seiscientos', 'setecientos', 'ochocientos', 'novecientos'];
+
+        if ($numero == 0) return 'cero';
+        if ($numero == 100) return 'cien';
+        if ($numero >= 1000000) {
+            $millones = floor($numero / 1000000);
+            $resto = $numero % 1000000;
+            $txt = ($millones == 1 ? 'un millón' : $this->convertirNumero($millones) . ' millones');
+            if ($resto > 0) $txt .= ' ' . $this->convertirNumero($resto);
+            return $txt;
+        }
+        if ($numero >= 1000) {
+            $miles = floor($numero / 1000);
+            $resto = $numero % 1000;
+            $txt = ($miles == 1 ? 'mil' :  $this->convertirNumero($miles) . ' mil');
+            if ($resto > 0) $txt .= ' ' .  $this->convertirNumero($resto);
+            return $txt;
+        }
+        if ($numero >= 100) {
+            $c = floor($numero / 100);
+            $r = $numero % 100;
+            return $centena[$c] . ($r > 0 ? ' ' .  $this->convertirNumero($r) : '');
+        }
+        if ($numero <= 20) {
+            return $unidad[$numero];
+        }
+        if ($numero < 30) {
+            return $decena[floor($numero / 10)] . $unidad[$numero % 10];
+        }
+        $d = floor($numero / 10);
+        $u = $numero % 10;
+        return $decena[$d] . ($u > 0 ? ' y ' . $unidad[$u] : '');
+    }
+
     public function ImprimirPT($id_pt = null)
     {  
         $session = \Config\Services::session();
         $globals = new Mglobal;
         $data = [];
+        $id_reserva= null;
 
       $registro_pt = $globals->getTabla([
             'tabla' => 'vw_registro_pt',
@@ -1097,13 +1331,24 @@ class Principal extends BaseController {
 
         if (!empty($registro_pt->data)) {
             $registro = $registro_pt->data[0];
+            $id_reserva = $registro_pt->data[0]->id_reserva;
             $data['registro'] = $registro;
 
             $folio = $globals->getTabla([
                 'tabla' => 'direccion',
                 'where' => ['visible' => 1, 'id_area' => $registro->id_direccion_responsable]
             ]);
-          
+            $reserva = $globals->getTabla([
+                'tabla' => 'vw_reserva',
+                'where' => ['visible' => 1, 'id_reserva' => $id_reserva]
+            ]);
+            if(!empty($reserva->data)){
+             $data['reserva'] = $reserva->data;
+             $importe_str = $reserva->data[0]->total_importe;
+             $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
+             $data['numero_texto'] = $this->numeroEnLetras($importe_float);
+            }
+   
             if (!empty($folio->data)) {
             $zero = (strlen($folio->data[0]->ultimo_folio_pt) >= 2)?'0':'00';
                 $data['registro']->folio = $folio->data[0]->folio_prefijo.$zero.$folio->data[0]->ultimo_folio_pt.'/'.$folio->data[0]->periodo_pt;
@@ -1116,8 +1361,9 @@ class Principal extends BaseController {
             die();
         }
 
-
+       
         $html = view('secciones/vFormatoPT.php', $data);
+        $htmlSegundaHoja = view('secciones/vFormatoPT2.php', $data);
 
         // Crear instancia de mPDF
         $mpdf = new \Mpdf\Mpdf([
@@ -1139,6 +1385,10 @@ class Principal extends BaseController {
             if ($i == 1) {
                 // Solo escribe HTML en la primera página
                 $mpdf->WriteHTML($html);
+            }
+            if ($i == 2) {
+                // Solo escribe HTML en la primera página
+                $mpdf->WriteHTML($htmlSegundaHoja);
             }
         }
 
@@ -1195,7 +1445,7 @@ class Principal extends BaseController {
                 if($session->get('id_perfil') != 1){
                     if(empty($banco->data[0]->no_cuenta) || empty($banco->data[0]->clabe)){
                         $response->error = true;
-                        $response->respuesta = 'El proveedor no tiene No. de cuenta y/o cable, favor de solIcitar un Tiket a la área TI';
+                        $response->respuesta = 'El proveedor no tiene No. de cuenta y/o clabe, favor de solIcitar un Tiket a la área TI';
                         return $this->respond($response);
                     }
                 }
@@ -1204,15 +1454,87 @@ class Principal extends BaseController {
             $response->error     = $proveedor->error;
             $response->respuesta = $proveedor->respuesta;
             $response->data['proveedor'] = (isset($proveedor->data[0]) && !empty($proveedor->data[0]))?$proveedor->data[0]:[];
-            $response->data['banco'] = (isset( $banco->data[0]) && !empty( $banco->data[0]))?$banco->data[0]:[];
+            $response->data['banco'] = (isset( $banco->data[0]) && !empty( $banco->data[0]))?$banco->data:[];
             
         }
       
          return $this->respond($response);
         
     }
+        public function editarReserva()
+    {  
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error|Error al traer los proveedor';
+        $globals = new Mglobal;
+        $id_reserva =  $this->request->getPost('id_reserva');
+        $data = [];
+       if(!empty($id_reserva)){
+            $reserva             = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['visible' => 1, 'id_reserva' =>$id_reserva ]]);
+            $cat_proyecto        = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1 ]]);
+            $cat_partida        = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1 ]]);
+            $response->error     = $reserva->error;
+            $response->respuesta = $reserva->respuesta;
+            $response->data['reserva'] = (isset($reserva->data[0]) && !empty($reserva->data[0]))?$reserva->data[0]:[];
+            $response->data['presupuesto'] = (isset($reserva->data[0]) && !empty($reserva->data[0]))?$reserva->data:[];
+            $response->data['proyecto'] = (isset($cat_proyecto->data[0]) && !empty($cat_proyecto->data[0]))?$cat_proyecto->data:[];
+            $response->data['partida'] = (isset($cat_partida->data[0]) && !empty($cat_partida->data[0]))?$cat_partida->data:[];
+        }
+      
+         return $this->respond($response);
+        
+    }
 
-/*     public function Proveedor($id_proveedor = null, $id_registro_pt =  null)
+    public function generarTramitePago($id_reserva = null, $id_registro_pt =  null)
+    {  
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error|Error al traer los proveedor';
+        $globals = new Mglobal;
+        $cat_area  = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1 ]]);
+        if($id_reserva != 0){
+            $reserva   = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['id_reserva' => $id_reserva ]]);
+            $presupuesto   = $globals->getTabla(['tabla' => 'presupuesto', 'where' => ['id_reserva' => $id_reserva ]]);
+        }
+        if(!empty($id_registro_pt)){
+            $registro_pt   = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1, 'id_registro_pt' =>$id_registro_pt ]]);
+        }
+        
+        $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1 ]]);
+        $cat_tipo = $globals->getTabla(['tabla' => 'cat_tipo', 'where' => ['visible' => 1 ]]);
+ 
+        $usuario                = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' =>$session->get('id_usuario') ]]);
+        $cat_usuario            = $globals->getTabla(['tabla' => 'usuario', 'where' => ['visible' => 1 ]]);
+        $cat_director_general   = $globals->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1 ]]);
+        $cat_opcion             = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1 ]]);
+        $cat_partida             = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1 ]]);
+        if($id_reserva != 0){
+          $data['reserva']      = (!empty($reserva->data))?$reserva->data[0]:[];
+          $data['presupuesto']  = (!empty($presupuesto->data))?$presupuesto->data:[];
+        }
+        if(!empty($id_registro_pt)){
+           $data['registro_pt']  = (!empty($registro_pt->data))?$registro_pt->data[0]:[];
+        }
+    
+        $data['dsc_director_general'] = (!empty($cat_director_general->data))?$cat_director_general->data[0]->dsc_director_general:[];
+        $data['cat_area']             = (!empty($cat_area->data))?$cat_area->data:[];
+        $data['cat_tipo']             = (!empty($cat_tipo->data))?$cat_tipo->data:[];
+        $data['cat_opcion']           = (!empty($cat_opcion->data))?$cat_opcion->data:[];
+        $data['cat_partida']          = (!empty($cat_partida->data))?$cat_partida->data:[];
+        $data['editar']               = (!empty($id_reserva) || $id_reserva != 0)?0:1;
+        $data['secretario']           = (!empty($secretario->data))?$secretario->data:[];
+        $data['usuario']              = (!empty($usuario->data))?$usuario->data[0]:[];
+        $data['cat_usuario']          = (!empty($cat_usuario->data))?$cat_usuario->data:[];
+        $data['id_reserva']          = (!empty($id_reserva))?$id_reserva:0;
+        $data['scripts']              = array('inicio');
+        $data['edita']                = 0;
+        $data['contentView']          = 'secciones/vProveedor';                
+        $this->_renderView($data);
+        
+    }  
+/*     public function generarTramitePago($id_proveedor = null, $id_registro_pt =  null)
     {  
         $session = \Config\Services::session();
         $response = new \stdClass();
@@ -1222,7 +1544,7 @@ class Principal extends BaseController {
         $cat_area  = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1 ]]);
         if($id_proveedor != 0){
             $proveedor   = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1, 'id_proveedor' =>$id_proveedor ]]);
-            $banco       = $globals->getTabla(['tabla' => 'proveedor_banco', 'where' => ['idproveedor' => $id_proveedor ]]);
+            $banco       = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['id_proveedor' => $id_proveedor ]]);
         }
         if(!empty($id_registro_pt)){
             $registro_pt   = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1, 'id_registro_pt' =>$id_registro_pt ]]);
@@ -1256,7 +1578,8 @@ class Principal extends BaseController {
         $data['contentView'] = 'secciones/vProveedor';                
         $this->_renderView($data);
         
-    } */
+    }  
+ */
     public function getProveedores()
     {  
        

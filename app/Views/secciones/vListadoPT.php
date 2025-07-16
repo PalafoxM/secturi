@@ -48,7 +48,7 @@
                                                 </div>                                                    
                                             </div>
                                            
-                                            <table id="datatableCategorias" class="table" data-toggle="table">
+                                            <table id="datatableProveedores" class="table" data-toggle="table">
                                                 <thead class="thead-light">
                                                     <tr>
                                                         <th class="text-center">ID PROVEEDOR</th>
@@ -128,6 +128,12 @@
                                                                     <input type="text" class="form-control" id="nombre_proveedor" name="nombre_proveedor">
                                                                     <input type="hidden" id="id_proveedor" >
                                                                 </div>
+                                                              <div class="form-group">
+                                                                    <label for="banco">Banco</label>
+                                                                    <select class="form-control" id="banco">
+                                                                    </select>
+                                                                </div>
+
                                                                 <div class="form-group" id="id_instrumento">
                                                                     <label for="instrumento">Istrumento Juridico</label>
                                                                     <input type="file" class="form-control" id="instrumento" name="instrumento" accept=".pdf">
@@ -146,8 +152,8 @@
                                                                                 V/T <i class="mdi mdi-chevron-down"></i>
                                                                             </button>
                                                                             <div class="dropdown-menu">
-                                                                                <a class="dropdown-item" href="#" onclick="setConvenio('SECTURI/CONV/')">SECTURI/CONV/</a>
-                                                                                <a class="dropdown-item" href="#" onclick="setConvenio('SECTURI/CTO/')">SECTURI/CTO/</a>
+                                                                                <a class="dropdown-item" onclick="setConvenio('SECTURI/CONV/')">SECTURI/CONV/</a>
+                                                                                <a class="dropdown-item" onclick="setConvenio('SECTURI/CTO/')">SECTURI/CTO/</a>
                                                                             </div>
                                                                         </div>
                                                                         <input type="text" id="no_convenio" name="no_convenio" class="form-control" placeholder="025" autocomplete="off">
@@ -156,9 +162,9 @@
                                                                                  AÑO <i class="mdi mdi-chevron-down"></i>
                                                                             </button>
                                                                             <div class="dropdown-menu">
-                                                                                <a class="dropdown-item" href="#" onclick="setAnio('/2025')">2025</a>
-                                                                                <a class="dropdown-item" href="#" onclick="setAnio('/2024')">2024</a>
-                                                                                <a class="dropdown-item" href="#" onclick="setAnio('/2023')">2023</a>
+                                                                                <a class="dropdown-item"  onclick="setAnio('/2025')">2025</a>
+                                                                                <a class="dropdown-item"  onclick="setAnio('/2024')">2024</a>
+                                                                                <a class="dropdown-item"  onclick="setAnio('/2023')">2023</a>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -258,6 +264,8 @@
 <script src="<?php echo base_url(); ?>assets/js/jquery-ui.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/js/bootstrap.bundle.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/js/jquery.slimscroll.min.js"></script>
+
+
 <!-- Required datatable js -->
 <script src="<?php echo base_url(); ?>plugins/datatables/jquery.dataTables.min.js"></script>
 <script src="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.js"></script>
@@ -272,6 +280,7 @@
 <script src="<?= base_url()?>plugins/bootable/bootstable.js"></script> 
 <script src="<?= base_url()?>assets/pages/jquery.tabledit.init.js"></script> 
 <script src="<?= base_url(); ?>plugins/select2/select2.min.js"></script>
+
 
 <!-- include summernote css/js -->
 <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.css" rel="stylesheet">

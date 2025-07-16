@@ -119,23 +119,23 @@ class Inicio extends BaseController {
         $this->_renderView($data);
         
     }
-    public function categorias()
+    public function listaIncidencia()
     {
         $session = \Config\Services::session();
         $principal = new Mglobal;
-        if($session->id_perfil == 6){
+   
+    if (!in_array($session->get('id_perfil'), [1, 2])) {
             $data['contentView'] = 'secciones/vError500';
             $data['layout'] = 'plantilla/lytLogin';
             $this->_renderView($data);
             die();
         }
         // Obtener categorías desde la base de datos
-        $dataDB = ['tabla' => 'categoria', 'where' => ['visible' => 1]];
-        $cat  = $principal->getTabla(['tabla' => 'categorias_padre', 'where' => ['visible' =>1]]); 
+        $dataDB = ['tabla' => 'vw_incidenica', 'where' => ['visible' => 1]];
         $response = $principal->getTabla($dataDB);
-        $data['categoria']   = (isset($cat->data) && !empty($cat->data))?$cat->data:[];
+        $data['incidencia']   = (isset($response->data) && !empty($response->data))?$response->data:[];
         $data['scripts']     = ['principal', 'inicio'];
-        $data['contentView'] = 'secciones/vCategorias';
+        $data['contentView'] = 'secciones/vListaIncidencia';
         $this->_renderView($data);
     }
     public function altaUsuario()

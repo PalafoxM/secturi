@@ -501,6 +501,66 @@ st.agregar = (function () {
                 $('#fecha').val(dia.split('T')[0]);
             }, 300); // Espera a que termine la animación de cierre
         },
+        justificarFalta: function(fecha)
+        {
+          const partes = fecha.split('-'); // ["2025", "07", "03"]
+          const fechaFormateada = `${partes[2]}-${partes[1]}-${partes[0]}`; 
+          $("#modalJustificar").modal('show');
+          $("#fecha_incidencia").html('<center><strong>' + fechaFormateada + '</strong></center>');
+          $("#fecha").val(fecha);
+        },
+        guardarIncidencia: function()
+        {
+        let hora_inicio     = $('#timepicker_inicio').val();
+        let hora_fin        = $('#timepicker_fin').val();
+        let tipo_incidencia = $('#tipo_incidencia').val();
+        let comentario      = $('#comentario').val();
+        let detalles        = $('#detalles').val();
+        let fecha        = $('#fecha').val();
+            if(!hora_inicio){
+              Swal.fire("Error", 'Es requerido la <strong>hora de inicio</strong>', 'error');
+            }
+            if(!hora_fin){
+              Swal.fire("Error", 'Es requerido la <strong>hora de fin</strong>','error');
+            }
+            if(!tipo_incidencia){
+              Swal.fire("Error", 'Es requerido la <strong>tipo incidencia</strong>','error');
+            }
+            if(!comentario){
+              Swal.fire("Error", 'Es requerido la <strong>comentario</strong>','error');
+            }
+            $.ajax({
+                    type: "POST",
+                    url: base_url + "index.php/Principal/guardarIncidencia",
+                    data: {hora_inicio,hora_fin,tipo_incidencia,comentario,detalles,fecha},
+                    dataType: 'json',
+                    beforeSend: function()
+                    {
+                      $('#btn_incidencia').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                    },
+                    success: function (response) {
+                        console.log(response);
+                        if(!response.error){
+                            Swal.fire("Exitó", response.respuesta, "success");
+                           window.location.reload();
+                      
+                        }else{
+                            Swal.fire("Error", response.respuesta , "error"); 
+                        } 
+                    },
+                    
+                    complete: function(){
+                        $('#btn_incidencia').prop('disabled', false).html('Guardar');
+                    },
+                    error: function (response,jqXHR, textStatus, errorThrown) {
+                        var res= JSON.parse (response.responseText);
+                       //  console.log(res.message);
+                        Swal.fire("Error", '<p> '+ res.message + '</p>');  
+                   }
+                });
+
+        },
+       
         
     }
 })();

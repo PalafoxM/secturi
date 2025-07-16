@@ -13,11 +13,15 @@ use PHPMailer\PHPMailer\Exception;
 use stdClass;
 use CodeIgniter\API\ResponseTrait;
 
+
 require_once FCPATH . 'app/Libraries/PHPMailer/Exception.php';
 require_once FCPATH . 'app/Libraries/PHPMailer/PHPMailer.php';
 require_once FCPATH . 'app/Libraries/PHPMailer/SMTP.php';
 
 require_once FCPATH . '/mpdf/autoload.php';
+require 'vendor/autoload.php';
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Usuario extends BaseController 
 {
@@ -183,26 +187,124 @@ class Usuario extends BaseController
         // die();
         return $this->respond($response->data[0]);
     }
-    public function getDetenido()
+    public function estatusReserva()
     {
         $session = \Config\Services::session();
         $principal = new Mglobal;
-        $dataDB = array();
-        $id_detenido = $this->request->getPost('id_usuario');
-        if ($session->id_perfil == 1 ) {
-            $dataDB = array('tabla' => 'detenidos', 'where' => ['visible' => 1, 'id_detenido'=>$id_detenido]);
+        $response = new \stdClass();
+        $response->error =  true;
+        $response->respuesta =  'Error! Error al guardar en la base de datos';
+        $data = $this->request->getPost();
+
+        $dataConfig = [
+            "tabla"=>"reserva",
+            "editar"=>true,
+            "idEditar" => ['id_reserva'=>(int)$data['id_reserva']]
+        ];
+        $dataInsert = [
+            "observaciones" => (isset($data['observaciones']) && !empty($data['observaciones']))?$data['observaciones']:'',
+            "id_estatus"    => (isset($data['motivo']) && !empty($data['motivo']))?(int)$data['motivo']:'',
+            "no_reserva"    => (isset($data['numero_reserva']) && !empty($data['numero_reserva']))?(int)$data['numero_reserva']:'',
+            "usu_act"       => $session->get('id_usuario'),
+        ];
+      
+        $result = $principal->saveTabla($dataInsert,$dataConfig,['id_user' => $session->get('id_usuario'), "script"=>"estatus.Reserva"]);
+        if(!$result->error){
+            $response->error = false;
+            $response->respuesta = $result->respuesta;
+
         }
-        if ($session->id_perfil == 4) {
-            $dataDB = array('tabla' => 'detenidos', 'where' => ['visible' => 1, 'id_dep_padre' => 4, 'id_detenido'=>$id_detenido]);
-        } 
-        if($session->id_perfil != 4 || $session->id_perfil != 1 ){
-            $dataDB = array('tabla' => 'detenidos', 'where' => ['visible' => 1, 'id_dependencia' => $session->id_dependencia, 'id_detenido'=>$id_detenido]);
-        }
-        $response = $principal->getTabla($dataDB);
-        // var_dump($response);
-        // die();
-        return $this->respond($response->data[0]);
+        return $this->respond($response);
     }
+    public function deleteReserva()
+    {
+        $session = \Config\Services::session();
+        $principal = new Mglobal;
+        $response = new \stdClass();
+        $id_reserva = $this->request->getPost('id_reserva');
+        $dataConfig = [
+            "tabla"=>"reserva",
+            "editar"=>true,
+            "idEditar" => ['id_reserva'=>$id_reserva]
+        ];
+        $result = $principal->saveTabla(['visible'=>0],$dataConfig,["script"=>"eliminar.Reserva"]);
+        if(!empty($resul->data)){
+            $response->error = $result->error;
+            $response->respuesta = $result->respuesta;
+
+        }
+        return $this->respond($response);
+    }
+    public function exportarExcel()
+    {
+        // 1. Crear el documento
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // 2. Obtener datos de la BD
+        $globals = new Mglobal();
+        $resul = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['visible' => 1]]);
+
+        if (!isset($resul->data) || empty($resul->data)) {
+            echo "No hay datos para exportar";
+            return;
+        }
+
+        // 3. Encabezados
+        $encabezados = [
+            'RESERVA', 'Sociedad', 'Ejercicio', 'Clase de Documento', 'Fecha  Contabilizacion',
+            'Fecha del Documento', 'Texto de Cabecera', 'Refencia del Documento', 'Importe de la Posicion', 'Texto Posicion',
+            'Partida', 'Centro Gestor', 'Fondo', 'Area Funcional',
+            'Cuenta de Mayor', 'Division', 'Centro de Costo', 'Numero de Orden', 'Elemento PEP', 'Acreedor',
+            'Fecha de Vencimiento'
+        ];
+        $col = 'A';
+        foreach ($encabezados as $titulo) {
+            $sheet->setCellValue($col . '1', $titulo);
+            $col++;
+        }
+
+        // 4. Llenar datos
+        $fila = 2;
+        foreach ($resul->data as $row) {
+            $sheet->setCellValue('A' . $fila, '');
+            $sheet->setCellValue('B' . $fila, 'GEG');
+            $sheet->setCellValue('C' . $fila, $row->ejercicio);
+            $sheet->setCellValue('D' . $fila,'RF');
+            $sheet->setCellValue('E' . $fila, date('dmY', strtotime($row->fec_reg)));
+            $sheet->setCellValue('F' . $fila, date('dmY', strtotime($row->fec_reg)));
+            $sheet->setCellValue('G' . $fila, $row->texto_cabecera);
+            $sheet->setCellValue('H' . $fila, $row->no_convenio);
+            $sheet->setCellValue('I' . $fila, $row->importe);
+            $sheet->setCellValue('J' . $fila, $row->no_convenio);
+            $sheet->setCellValue('K' . $fila, $row->partida);
+            $sheet->setCellValue('L' . $fila, $row->centro_gestor);
+            $sheet->setCellValue('M' . $fila, $row->fondo);
+            $sheet->setCellValue('N' . $fila, $row->area);
+            $sheet->setCellValue('O' . $fila, '');
+            $sheet->setCellValue('P' . $fila, '21');
+            $sheet->setCellValue('Q' . $fila, '');
+            $sheet->setCellValue('R' . $fila, '/');
+            $sheet->setCellValue('S' . $fila, $row->elemento_pep);
+            $sheet->setCellValue('T' . $fila, '');
+            $sheet->setCellValue('U' . $fila,  '31122025');
+            $sheet->setCellValue('V' . $fila,  $row->dsc_area);
+            $fila++;
+        }
+
+        // 5. Descargar archivo
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'reserva_' . date('Ymd_His') . '.xlsx';
+
+        // Enviar headers
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$fileName\"");
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        exit;
+    }
+
    
     public function getUsuarios()
     {

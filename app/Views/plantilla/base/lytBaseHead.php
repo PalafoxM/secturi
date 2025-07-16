@@ -350,7 +350,7 @@
                                 <a class="nav-link" href="#"><span class="w-100">Admin RH</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
                                 <ul class="nav-second-level" aria-expanded="false">
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/subirAsistencia">Asistencias</a></li>
-                                    <li><a href="../others/forms-advanced.html">Advance Elements</a></li>
+                                    <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaIncidencia">Lista de Incidencia</a></li>
                                     <li><a href="../others/forms-validation.html">Validation</a></li>
                                     <li><a href="../others/forms-wizard.html">Wizard</a></li>
                                     <li><a href="../others/forms-editors.html">Editors</a></li>
