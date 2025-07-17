@@ -247,7 +247,7 @@
                         <i data-feather="monitor" class="align-self-center menu-icon icon-dual"></i>
                     </a><!--end MetricaDashboards--> 
                     <?php endif;?>
-                    <?php if(in_array($session->id_perfil, [1,2])): ?>  
+                    <?php if(in_array($session->id_perfil, [1,2,4])): ?>  
                     <a href="#MetricaApps" class="nav-link" data-toggle="tooltip-custom" data-placement="right"  data-trigger="hover" title="Pagos" data-original-title="Apps">
                         <i data-feather="dollar-sign" class="align-self-center menu-icon icon-dual"></i>
                     </a><!--end MetricaApps-->
@@ -721,8 +721,9 @@
                     <h6>
                         <?php 
                         switch($session->id_perfil){
-                            case 1: echo '<i class="mdi mdi-account-card-details font-18"></i> Administrador'; break;
-                            case 4: echo '<i class="mdi mdi-account-card-details font-18"></i> Gestor'; break;
+                            case 1: echo '<i class="mdi mdi-account-card-details font-18"></i> Super Administrador'; break;
+                            case 2: echo '<i class="mdi mdi-account-card-details font-18"></i> Admin Financieros'; break;
+                            case 4: echo '<i class="mdi mdi-account-card-details font-18"></i> Personal Adminitrativo'; break;
                             case 6: echo '<i class="mdi mdi-account-card-details font-18"></i> Enlace'; break;
                             case 8: echo '<i class="mdi mdi-account-card-details font-18"></i> Estudiante'; break;
                             default: echo 'Sin dato';

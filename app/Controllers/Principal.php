@@ -1202,7 +1202,12 @@ class Principal extends BaseController {
        
         $session = \Config\Services::session();
         $globals      = new Mglobal;
-        $reserva    = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1]]);
+        if(in_array($session->get('id_perfil'), [1,2])){
+            $reserva    = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1]]);
+        }else{
+            $reserva    = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]]);
+        }
+      
         $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
         $cat_partida  = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
         $proveedor    = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit'=>100]);
@@ -1255,7 +1260,12 @@ class Principal extends BaseController {
     {  
         $session = \Config\Services::session();
         $globals = new Mglobal;
-        $registro_pt = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1]]);
+        if(in_array($session->get('id_perfil'), [1,2])){
+         $registro_pt = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1]]);
+        }else{
+            $registro_pt = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]]);
+        }
+      
 
         $data['registro_pt'] = (!empty($registro_pt->data))?$registro_pt->data:[];
         $data['scripts'] = array('inicio');
@@ -1493,6 +1503,8 @@ class Principal extends BaseController {
         $response->error = true;
         $response->respuesta = 'Error|Error al traer los proveedor';
         $globals = new Mglobal;
+        $siExisteIdReserva  = $globals->getTabla(['tabla' => 'registro_pt', 'where' => ['visible' => 1 , 'id_reserva' => $id_reserva ]]);
+        $btn = (!empty($siExisteIdReserva->data))?true:false;
         $cat_area  = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1 ]]);
         if($id_reserva != 0){
             $reserva   = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['id_reserva' => $id_reserva ]]);
@@ -1501,6 +1513,7 @@ class Principal extends BaseController {
         if(!empty($id_registro_pt)){
             $registro_pt   = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1, 'id_registro_pt' =>$id_registro_pt ]]);
         }
+
         
         $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1 ]]);
         $cat_tipo = $globals->getTabla(['tabla' => 'cat_tipo', 'where' => ['visible' => 1 ]]);
@@ -1529,7 +1542,7 @@ class Principal extends BaseController {
         $data['cat_usuario']          = (!empty($cat_usuario->data))?$cat_usuario->data:[];
         $data['id_reserva']          = (!empty($id_reserva))?$id_reserva:0;
         $data['scripts']              = array('inicio');
-        $data['edita']                = 0;
+        $data['edita']                = $btn;
         $data['contentView']          = 'secciones/vProveedor';                
         $this->_renderView($data);
         

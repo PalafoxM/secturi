@@ -239,61 +239,70 @@
                                         </div><!--end form-row-->
                                         
                                        
-                                            <?php foreach($presupuesto as $i => $p): ?>
-                                                <p class="text-muted mb-4 text-center">Agregar Factura PT.</p>
-                                                <hr>
-                                            <div class="form-row"> <!-- presupuesto -->
-                                                <!-- Partida y Factura PDF -->
-                                                <div class="col-md-4 mb-3">
-                                                    <label for="partida_<?= $i ?>">Partida<span style="color:red;">*</span></label>
-                                                    <select class="form-control" id="partida_<?= $i ?>" name="partida[]" disabled>
-                                                        <?php foreach($cat_partida as $o): ?>
-                                                            <option value="<?= $o->id_partida ?>" <?= (isset($p->id_partida) && $p->id_partida == $o->id_partida) ? 'selected' : '' ?>>
-                                                                <?= $o->cuenta_cable ?>
-                                                            </option>
-                                                        <?php endforeach; ?>
-                                                    </select>
-                                                </div>
+                                           <?php
+                                                $partidas_mostradas = [];
+                                                foreach($presupuesto as $i => $p):
+                                                    // Evita duplicados por id_partida
+                                                    if (in_array($p->id_partida, $partidas_mostradas)) {
+                                                        continue;
+                                                    }
+                                                    $partidas_mostradas[] = $p->id_partida;
+                                                ?>
+                                                    <p class="text-muted mb-4 text-center">Agregar Factura PT.</p>
+                                                    <hr>
+                                                    <div class="form-row"> <!-- presupuesto -->
+                                                        <!-- Partida y Factura PDF -->
+                                                        <div class="col-md-4 mb-3">
+                                                            <label for="partida_<?= $i ?>">Partida<span style="color:red;">*</span></label>
+                                                            <select class="form-control" id="partida_<?= $i ?>" name="partida[]" disabled>
+                                                                <?php foreach($cat_partida as $o): ?>
+                                                                    <option value="<?= $o->id_partida ?>" <?= (isset($p->id_partida) && $p->id_partida == $o->id_partida) ? 'selected' : '' ?>>
+                                                                        <?= $o->cuenta_cable ?>
+                                                                    </option>
+                                                                <?php endforeach; ?>
+                                                            </select>
+                                                        </div>
 
-                                                <!-- Encabezado y XML -->
-                                                <div class="col-md-4 mb-3">
-                                                    <label for="encabezado_<?= $i ?>">Encabezado<span style="color:red;">*</span></label>
-                                                    <input type="text" class="form-control" autocomplete="off" id="encabezado_<?= $i ?>" name="encabezado[]">
-                                                </div>
+                                                        <!-- Encabezado y XML -->
+                                                        <div class="col-md-4 mb-3">
+                                                            <label for="encabezado_<?= $i ?>">Encabezado<span style="color:red;">*</span></label>
+                                                            <input type="text" class="form-control" autocomplete="off" id="encabezado_<?= $i ?>" name="encabezado[]">
+                                                        </div>
 
-                                                <!-- Periodo -->
-                                                <div class="col-md-4 mb-3">
-                                                    <label for="periodo_<?= $i ?>">Periodo<span style="color:red;">*</span></label>
-                                                      <div class="input-group">                                            
-                                                        <input type="text" class="form-control" name="datetimes" id="periodo_<?= $i ?>" name="periodo[]">
-                                                        <div class="input-group-append">
-                                                            <span class="input-group-text"><i class="dripicons-calendar"></i></span>
+                                                        <!-- Periodo -->
+                                                        <div class="col-md-4 mb-3">
+                                                            <label for="periodo_<?= $i ?>">Periodo<span style="color:red;">*</span></label>
+                                                            <div class="input-group">                                            
+                                                                <input type="text" class="form-control" name="datetimes" id="periodo_<?= $i ?>" name="periodo[]">
+                                                                <div class="input-group-append">
+                                                                    <span class="input-group-text"><i class="dripicons-calendar"></i></span>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
 
-                                            </div>
-                                            <div class="form-row">
-                                                <div class="col-md-6 mb-3">
-                                                    <a class="btn btn-primary btn-sm add-file ml-3" data-target="#factura_pdf_input_<?= $i; ?>">
-                                                        <i class="fas fa-upload mr-2"></i>Factura PDF (Máx 5MB)
-                                                    </a>
-                                                    <input id="factura_pdf_input_<?php echo $i; ?>" type="file" name="factura_pdf_<?= $i; ?>[]" multiple style="display: none;" accept=".pdf">
-                                                </div>
-                                                <div class="col-md-6 mb-3">
-                                                    <a class="btn btn-primary btn-sm add-file ml-3" data-target="#factura_xml_input_<?= $i; ?>">
-                                                        <i class="fas fa-upload mr-2"></i>Factura XML (Máx 5MB)
-                                                    </a>
-                                                    <input id="factura_xml_input_<?php echo $i; ?>" type="file" name="factura_xml_<?php echo $i; ?>[]" multiple style="display: none;" accept=".xml">
-                                                </div>
-                                            </div>
+                                                    <div class="form-row">
+                                                        <div class="col-md-6 mb-3">
+                                                            <a class="btn btn-primary btn-sm add-file ml-3" data-target="#factura_pdf_input_<?= $i; ?>">
+                                                                <i class="fas fa-upload mr-2"></i>Factura PDF (Máx 5MB)
+                                                            </a>
+                                                            <input id="factura_pdf_input_<?= $i; ?>" type="file" name="factura_pdf_<?= $i; ?>[]" multiple style="display: none;" accept=".pdf">
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                            <a class="btn btn-primary btn-sm add-file ml-3" data-target="#factura_xml_input_<?= $i; ?>">
+                                                                <i class="fas fa-upload mr-2"></i>Factura XML (Máx 5MB)
+                                                            </a>
+                                                            <input id="factura_xml_input_<?= $i; ?>" type="file" name="factura_xml_<?= $i; ?>[]" multiple style="display: none;" accept=".xml">
+                                                        </div>
+                                                    </div>
+                                                <?php endforeach; ?>
 
-                                            <?php endforeach; ?>
                                         
 
                                             <a class="btn btn-gradient-danger" style="color:white" onclick="window.history.back()">Atrás</a>
+                                            <?php if(!$edita): ?>
                                              <button class="btn btn-gradient-primary" type="submit">Guardar</button>
-
+                                            <?php endif; ?>
                                     </form> <!--end form-->                                          
                                 </div><!--end card-body-->
                             </div><!--end card-->

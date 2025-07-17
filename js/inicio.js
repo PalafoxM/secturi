@@ -2138,6 +2138,10 @@ ini.inicio = (function () {
                         $('#id_sexo').val(data.id_sexo).trigger('change');
                         $('#id_perfil').val(data.id_perfil).trigger('change');
                         $('#id_area').val(data.id_area).trigger('change');
+                        $('#id_jefe_inmediato').val(data.id_jefe_inmediato).trigger('change');
+                        $('#id_puesto').val(data.id_puesto).trigger('change');
+                        $('#id_tipo_empleado').val(data.id_tipo_empleado).trigger('change');
+                        $('#no_empleado').val(data.no_empleado);
                          if (data.fec_nac) {
                             const fechaCompleta = data.fec_nac;
                             const fechaFormateada = fechaCompleta.split('T')[0];

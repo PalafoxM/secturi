@@ -172,8 +172,13 @@ class Inicio extends BaseController {
         $usuario = $principal->getTabla($usuarioQuery);
         $cat_perfil  = $principal->getTabla(['tabla' => 'perfil', 'where' => ['visible' =>1]]); 
         $cat_area  = $principal->getTabla(['tabla' => 'cat_area', 'where' => ['visible' =>1]]); 
-        $data['cat_perfil'] = $cat_perfil->data;
-        $data['cat_area']   = $cat_area->data;
+        $cat_puesto  = $principal->getTabla(['tabla' => 'cat_puesto', 'where' => ['visible' =>1]]);  
+        $tipo_empleado  = $principal->getTabla(['tabla' => 'cat_tipo_empleado', 'where' => ['visible' =>1]]); 
+
+        $data['cat_perfil']   = $cat_perfil->data;
+        $data['cat_area']     = $cat_area->data;
+        $data['cat_puesto']   = $cat_puesto->data;
+        $data['tipo_empleado']     = $tipo_empleado->data;
         // Asignar datos adicionales
         $data['usuario'] = isset($usuario->data) && !empty($usuario->data) ? $usuario->data : [];
         $data['scripts'] = ['principal', 'inicio'];

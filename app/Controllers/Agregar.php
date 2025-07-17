@@ -289,6 +289,8 @@ class Agregar extends BaseController {
                     ];
             $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaTurno'];
         if($data['editar'] == 0){
+                    $dataInsert['usu_reg'] = $session->get('id_usuario');
+                    $dataInsert['fec_reg'] = date('Y-m-d H:i:s');
                     $dataConfig = [
                         "tabla"=>"registro_pt",
                         "editar"=>false
@@ -299,6 +301,7 @@ class Agregar extends BaseController {
                     "editar"=>true,
                     'idEditar'=>['id_registro_pt' => $data['id_registro_pt']]
                 ];
+                 $dataInsert['usu_act'] = $session->get('id_usuario');
         }
       
    
@@ -343,6 +346,7 @@ class Agregar extends BaseController {
      
     
         if( $data['editar'] !=1){
+
             if(empty($data['contrasenia']) || empty($data['confirmar_contrasenia'])){
                 throw new Exception("Los campos de contraseña son obligatorios");
             }
@@ -369,6 +373,9 @@ class Agregar extends BaseController {
         if(empty($data['correo']) ){
             throw new Exception("El campo correo es requerido");
         }
+        if(empty($data['fec_nac']) ){
+            throw new Exception("El campo fecha de nacimiento es requerido");
+        }
         if(empty($data['nombre']) || 
            empty($data['primer_apellido'])){
             throw new Exception("Algunos campos son requeridos");
@@ -384,8 +391,12 @@ class Agregar extends BaseController {
             }
         }
         $hoy = date("Y-m-d H:i:s"); 
+
         $dataInsert = [
             'id_sexo'               => (int)$data['id_sexo'],             
+            'id_jefe_inmediato'     => (int)$data['id_jefe_inmediato'],             
+            'id_tipo_empleado'      => (int)$data['id_tipo_empleado'],             
+            'id_puesto'             => (int)$data['id_puesto'],             
             'id_perfil'             => (int)$data['id_perfil'],                   
             'usuario'               => $data['usuario'],                
             'nombre'                => $data['nombre'],           
@@ -394,13 +405,17 @@ class Agregar extends BaseController {
             'correo'                => $data['correo'],           
             'rfc'                   => $data['rfc'],                      
             'id_area'               => (int)$data['id_area'],                        
-            'fec_nac'               => $data['fec_nac'],            
-            //'fec_nac'               => $hoy,            
+            'fec_nac'               => $data['fec_nac'],                  
             'fec_reg'               => $hoy 
         ];
+
         if(isset($data['contrasenia']) && !empty($data['contrasenia'])){
           $dataInsert['contrasenia'] = md5($data['contrasenia']); 
         }     
+        if(isset($data['no_empleado']) && !empty($data['no_empleado'])){
+          $dataInsert['no_empleado'] = $data['no_empleado']; 
+        }  
+     
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaTurno'];
         
        
