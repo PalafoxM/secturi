@@ -343,7 +343,7 @@ class Agregar extends BaseController {
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
         
-     
+    
     
         if( $data['editar'] !=1){
 
@@ -416,9 +416,9 @@ class Agregar extends BaseController {
           $dataInsert['no_empleado'] = $data['no_empleado']; 
         }  
         if(isset($data['nivel']) && !empty($data['nivel'])){
-          $dataInsert['nivel'] = (int)$data['nivel']; 
+          $dataInsert['nivel'] = $data['nivel']; 
         }  
-     
+   
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaTurno'];
         
        
