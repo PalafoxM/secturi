@@ -31,30 +31,6 @@ class Inicio extends BaseController {
     private function _renderView($data = array()) { 
         $session = \Config\Services::session();
         $Mglobal = new Mglobal;   
-        $misCursos = $Mglobal->getTabla(['tabla' => 'estudiante_curso', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario ]]);
-        $data["dscCursos"] = []; // Inicializamos como un arreglo vacío
-
-        if (isset($misCursos->data) && !empty($misCursos->data)) {
-            foreach ($misCursos->data as $c) {
-                // Obtener la información del curso
-                $miCurso = $Mglobal->getTabla([
-                    'tabla' => 'cursos_sac', 
-                    'where' => [
-                        'visible' => 1, 
-                        'id_cursos_sac' => $c->id_curso 
-                    ]
-                ]);
-                if (isset($miCurso->data) && !empty($miCurso->data)) {
-                    // Agregar los datos del curso al arreglo
-                    $data["dscCursos"][] = [
-                        'dsc_curso' => $miCurso->data[0]->dsc_curso,
-                        'img' => $miCurso->data[0]->img_ruta,
-                        'id' => $miCurso->data[0]->id_cursos_sac,
-                        'periodo'   => $c->id_periodo
-                    ];
-                }
-            }
-        }  
         //die(var_dump($data["dscCursos"]));
         $data = array_merge($this->defaultData, $data);
         echo view($data['layout'], $data); 
@@ -64,14 +40,19 @@ class Inicio extends BaseController {
     public function index()
     {        
         $session = \Config\Services::session();
-        $data        = array();
-       
-     
-   
+        $data    = array();
+        $globas  = new Mglobal;
+        $vista = null;
+        if(in_array( $session->get('id_usuario'), [1,2,3] )){
+           $vista = 'secciones/vInicio';
+        }else{
+          $vista = 'personal/vInicio';
+          $data['datos'] = $globas->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario]])->data[0];
+        }
         $data['scripts'] = array('principal','inicio');
         $data['edita'] = 0;
         $data['nombre_completo'] = $session->nombre_completo; 
-        $data['contentView'] = 'secciones/vInicio';                
+        $data['contentView'] =   $vista;               
         $this->_renderView($data);
         
     }
