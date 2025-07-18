@@ -847,18 +847,17 @@ ini.inicio = (function () {
 
        // Obtener el estado del checkbox (true/false)
         let sinInstrumento = $('#customSwitch1').is(':checked');
-        console.log(sinInstrumento);
-        // Validación
-        if (sinInstrumento) {
+     
+        if (!sinInstrumento) {
              var instrumentoFile = $('#instrumento')[0].files[0];
-             formData.append('instrumento', instrumentoFile);
-             formData.append('no_convenio', $('#no_convenio').val());
-             
-        } else {
-             Swal.fire("Atención", 'Sin Instrumento Jurídico', 'error');
-             return false;
-        }
-         
+             if(instrumentoFile){
+               formData.append('instrumento', instrumentoFile);
+               formData.append('no_convenio', $('#no_convenio').val());
+             }else{
+               Swal.fire("Atención", 'Sin Instrumento Jurídico', 'error');
+             }   
+        } 
+    
         // Agregar datos de la tabla
         $('#makeEditable2 tbody tr').each(function(index) {
             formData.append('proyecto[]', $(this).find('[name="proyecto[]"]').val());
