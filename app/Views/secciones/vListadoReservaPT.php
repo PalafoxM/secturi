@@ -98,8 +98,10 @@
                                                         <td class="text-center">
                                                             <span class="badge badge-md <?= $color ?>"><?= $texto ?></span>
                                                         </td>
+                                                        
                                                         <td class="text-center">
-                                                             <a style="color:white;" onclick="ini.inicio.editarReserva(<?=$p->id_reserva?>);" data-toggle="tooltip" data-placement="top" title="" data-original-title="Editar"
+                                                            <?php if($session->id_perfil != 2): ?>
+                                                             <a style="color:white;" onclick="ini.inicio.editarReserva(<?=$p->id_reserva?>, 0);" data-toggle="tooltip" data-placement="top" title="" data-original-title="Editar"
                                                                 class="btn btn-gradient-success px-4"><i
                                                                     class="mdi mdi-border-color font-21"></i>
                                                             </a>
@@ -107,6 +109,7 @@
                                                                 class="btn btn-gradient-danger px-4"><i
                                                                     class="mdi mdi-trash-can-outline font-21"></i>
                                                             </a>
+                                                              <?php endif; ?>
                                                             <?php if(in_array($session->get('id_perfil'), [1,2])): ?>
                                                             <a style="color:white;"  onclick="ini.inicio.estatusReserva(<?=$p->id_reserva?>);" data-toggle="tooltip" data-placement="top" title="" data-original-title="Revisar reserva"
                                                                 class="btn btn-gradient-warning px-4"><i
@@ -140,32 +143,90 @@
 
 <!-- Modal -->
 <div class="modal fade" id="modalEstatusReserva" tabindex="-1" aria-labelledby="modalEliminarReservaLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header bg-success text-white">
         <h5 class="modal-title" id="modalEliminarReservaLabel">Agregar Estatus Reserva</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
+     
       <div class="modal-body">
         <form id="formEliminarReserva">
           <input type="hidden" id="id_reserva_eliminar" name="id_reserva">
-          <div class="mb-3">
-            <label for="motivo" class="form-label">Estatus</label>
-            <select class="form-control" id="motivo" name="motivo" onchange="ini.inicio.selectMotivo();" required>
-              <option value="0">Seleccione</option>
-              <option value="1">EN PROCESO</option>
-              <option value="2">DECLINADO</option>
-              <option value="3">ACEPTADO</option>
-            </select>
-          </div>
-          <div class="mb-3" id="numero" style="display:none;" >
-            <label for="numero_reserva" class="form-label">No. Reserva</label>
-            <input class="form-control" id="numero_reserva" autocomplete="off" name="numero_reserva" rows="3" placeholder="No. reserva">
-          </div>
-          <div class="mb-3" id="observacion" style="display:none;">
-            <label for="observaciones" class="form-label">Observaciones</label>
-            <textarea class="form-control"  autocomplete="off" id="observaciones" name="observaciones" rows="3" placeholder="Escribe su observacion..."></textarea>
-          </div>
+           <div class="row">
+              <div class="col-lg-12">
+                  <div class="card">
+                      <div class="card-body">        
+                          <div class="row">
+                              <div class="col-lg-6">
+                                   <div class="form-group" >
+                                        <label for="varlidar_nombre_proveedor" class="form-label">PROVEEDOR</label>
+                                        <input class="form-control" id="varlidar_nombre_proveedor" autocomplete="off" name="varlidar_nombre_proveedor" readonly>
+                                    </div> 
+                                    <div class="form-group" >
+                                        <label for="validar_no_proveedor" class="form-label">No. Reserva</label>
+                                        <input class="form-control" id="validar_no_proveedor" autocomplete="off" name="validar_no_proveedor" readonly>
+                                    </div>                                                                                    
+                              </div>                                                             
+                              <div class="col-lg-6">
+                                   <div class="form-group" >
+                                        <label for="validar_total_importe" class="form-label">Total Importe</label>
+                                        <input class="form-control" id="validar_total_importe" autocomplete="off" name="validar_total_importe" readonly>
+                                  </div>                                                                        
+                                  <div class="form-group">   
+                                        <label for="validar_no_convenio" class="form-label"> <div id="previews"></div></label>
+                                        <input class="form-control" id="validar_no_convenio" autocomplete="off" name="validar_no_convenio" readonly>
+                                  </div>                                                                                    
+                              </div>                                                             
+                         </div>
+                          <div class="row">
+                              <div class="col-lg-12">
+                                <table class="table" id="ValidarMakeEditableEditar">
+                                    <thead>
+                                        <tr>
+                                            <th>PROYECTO-META</th>
+                                            <th>PARTIDA</th>
+                                            <th>IMPORTE</th>
+                                            <th>ACCIONES</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody> 
+                                   </tbody>
+                                </table>                                                                      
+                              </div>                                                                                                                       
+                         </div>
+                            <div class="row">
+                              <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label for="motivo" class="form-label">Estatus</label>
+                                        <select class="form-control" id="motivo" name="motivo" onchange="ini.inicio.selectMotivo();" required>
+                                            <option value="1">EN PROCESO</option>
+                                            <option value="2">DECLINADO</option>
+                                            <option value="3">ACEPTADO</option>
+                                        </select>
+                                    </div>                                                                                     
+                              </div>                                                             
+                              <div class="col-lg-6">                                                                   
+                                  <div class="form-group" >   
+                                        <label for="validar_no_convenio" class="form-label">No. Reserva</label>
+                                        <input class="form-control" id="validar_no_convenio" autocomplete="off" name="validar_no_convenio" >
+                                  </div>                                                                                    
+                              </div>                                                             
+                         </div>
+                            <div class="row">
+                              <div class="col-lg-12">
+                                    <div class="form-group">
+                                       <label for="validar_no_convenio" class="form-label">No. Reserva</label>
+                                        <textarea class="form-control" ></textarea>
+                                    </div>                                                                                     
+                              </div>                                                             
+                                                                                           
+                         </div>
+                  </div><!--end card-->
+              </div><!--end col-->
+          </div><!--end col-->    
+        
+         
         </form>
       </div>
       <div class="modal-footer">

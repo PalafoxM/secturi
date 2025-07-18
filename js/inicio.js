@@ -483,9 +483,8 @@ ini.inicio = (function () {
                         }
                     });
         },
-        editarReserva: function(id_reserva) {
-      
-           
+        editarReserva: function(id_reserva, id) {
+
             $.ajax({
                 url: base_url + "index.php/Principal/editarReserva",
                 type: 'POST',
@@ -718,10 +717,89 @@ ini.inicio = (function () {
         },
         estatusReserva: function(id_reserva)
         {
-           $("#modalEstatusReserva").modal('show');
+     
            $('#id_reserva_eliminar').val(id_reserva);
            $('#motivo').val('');
            $('#observaciones').val('');
+            $.ajax({
+                url: base_url + "index.php/Principal/editarReserva",
+                type: 'POST',
+                dataType: "json",
+                data: { id_reserva: id_reserva },
+                success: function(response) {
+                    if (response && response.data && response.data.reserva) {
+                        const reserva = response.data.reserva;
+                        const presupuesto = response.data.presupuesto;
+                        const partidas = response.data.partida;
+                        const proyectos = response.data.proyecto;
+                       
+
+                        $("#varlidar_nombre_proveedor").val(reserva.razon_social || '');
+                        $("#validar_no_proveedor").val(reserva.no_proveedor || '');
+                        $("#validar_total_importe").val(reserva.total_importe || '');
+                        if (reserva.instrumento) {
+                            const fileUrl = base_url + reserva.instrumento;
+                            const link = `<a href="${fileUrl}" target="_blank" class="me-2">
+                                            <i class="mdi mdi-file font-21"></i> Ver archivo
+                                        </a>`;
+                            $("#previews").append(link);
+                        }
+                           $("#validar_no_convenio").val(reserva.no_convenio || '');
+                           const tbody = $('#ValidarMakeEditableEditar tbody');
+                            tbody.empty();
+
+                            presupuesto.forEach(p => {
+                                let opcionesProyecto = '<option value="">Seleccione</option>';
+                               proyectos.forEach(c => {
+                                    opcionesProyecto += `<option value="${c.id_proyecto}" ${(c.id_proyecto == p.id_proyecto) ? 'selected' : ''}>${c.proyecto}</option>`;
+                                });
+
+                                let opcionesPartida = '<option value="">Seleccione</option>';
+                                partidas.forEach(pa => {
+                                    opcionesPartida += `<option value="${pa.id_partida}" ${(pa.id_partida == p.id_partida) ? 'selected' : ''}>${pa.cuenta_cable}</option>`;
+                                });
+
+                                const fila = `
+                                    <tr>
+                                        <td>
+                                            <select class="select2 form-control"  readonly>
+                                                ${opcionesProyecto}
+                                            </select>
+                                            <input type="hidden" value="${p.id_presupuesto}" readonly>
+                                        </td>
+                                        <td>
+                                            <select class="select2 form-control" readonly>
+                                                ${opcionesPartida}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="text" autocomplete="off" class="form-control" name="importe[]" value=${p.importe} readonly>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-danger remove-row">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `;
+                                tbody.append(fila);
+                            });
+
+                       
+                    } else {
+                        Swal.fire("Atención", "No se encontró la información de la reserva.", "warning");
+                    }
+                },
+                complete: function() {
+                $("#modalEstatusReserva").modal('show');
+                    $('.dropdown-toggle').dropdown();
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error en la solicitud AJAX:", error);
+                    Swal.fire("Error", "Favor de llamar al Administrador", "error");
+                }
+            });
+
         },
         selectMotivo: function()
         {
@@ -847,7 +925,7 @@ ini.inicio = (function () {
 
        // Obtener el estado del checkbox (true/false)
         let sinInstrumento = $('#customSwitch1').is(':checked');
-     
+    
         if (!sinInstrumento) {
              var instrumentoFile = $('#instrumento')[0].files[0];
              if(instrumentoFile){
@@ -855,9 +933,10 @@ ini.inicio = (function () {
                formData.append('no_convenio', $('#no_convenio').val());
              }else{
                Swal.fire("Atención", 'Sin Instrumento Jurídico', 'error');
+               return false;
              }   
         } 
-    
+
         // Agregar datos de la tabla
         $('#makeEditable2 tbody tr').each(function(index) {
             formData.append('proyecto[]', $(this).find('[name="proyecto[]"]').val());
