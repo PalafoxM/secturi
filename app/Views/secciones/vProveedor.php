@@ -283,13 +283,13 @@
 
                                                     <div class="form-row">
                                                         <div class="col-md-6 mb-3">
-                                                            <a class="btn btn-primary btn-sm add-file ml-3" data-target="#factura_pdf_input_<?= $i; ?>">
+                                                            <a style="color:white;" class="btn btn-primary btn-sm add-file ml-3" data-target="#factura_pdf_input_<?= $i; ?>">
                                                                 <i class="fas fa-upload mr-2"></i>Factura PDF (Máx 5MB)
                                                             </a>
                                                             <input id="factura_pdf_input_<?= $i; ?>" type="file" name="factura_pdf_<?= $i; ?>[]" multiple style="display: none;" accept=".pdf">
                                                         </div>
                                                         <div class="col-md-6 mb-3">
-                                                            <a class="btn btn-primary btn-sm add-file ml-3" data-target="#factura_xml_input_<?= $i; ?>">
+                                                            <a style="color:white;" class="btn btn-primary btn-sm add-file ml-3" data-target="#factura_xml_input_<?= $i; ?>">
                                                                 <i class="fas fa-upload mr-2"></i>Factura XML (Máx 5MB)
                                                             </a>
                                                             <input id="factura_xml_input_<?= $i; ?>" type="file" name="factura_xml_<?= $i; ?>[]" multiple style="display: none;" accept=".xml">
@@ -301,7 +301,7 @@
 
                                             <a class="btn btn-gradient-danger" style="color:white" onclick="window.history.back()">Atrás</a>
                                             <?php if(!$edita): ?>
-                                             <button class="btn btn-gradient-primary" type="submit">Guardar</button>
+                                             <button class="btn btn-gradient-primary" id="btnGuardatPT" type="submit">Guardar</button>
                                             <?php endif; ?>
                                     </form> <!--end form-->                                          
                                 </div><!--end card-body-->

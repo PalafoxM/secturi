@@ -61,7 +61,7 @@
                                             <td  class="text-center">ENVIADO</td>
                                             <td  class="text-center" class="text-center">
                             
-                                                <a class="btn btn-outline-info btn-round" href="<?php echo base_url().'index.php/Principal/Proveedor/0/'.$e->id_registro_pt ?>" ><i
+                                                <a class="btn btn-outline-info btn-round" href="<?php echo base_url().'index.php/Principal/generarTramitePago/0/'.$e->id_registro_pt ?>" ><i
                                                         class="mdi mdi-border-color font-18"></i></a>
                                                    <button type="button"  class="btn btn-outline-info btn-round">                       
                                                 <a href="<?php echo base_url().'index.php/Principal/ImprimirPT/'.$e->id_registro_pt ?>" target="_blank"><i

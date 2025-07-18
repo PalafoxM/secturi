@@ -28,9 +28,9 @@ class Database extends Config
         'DSN'          => '',
         'hostname'     => 'localhost',
         'username'     => 'root',
-        //'password'     => 'PalafoxMarin1989',
-        'password'     => '',
-        'database'     => '',
+        'password'     => 'PalafoxMarin1989',
+        //'password'     => '',
+        'database'     => 'susi',
         'DBDriver'     => 'MySQLi',
         'DBPrefix'     => '',
         'pConnect'     => false,
@@ -42,7 +42,7 @@ class Database extends Config
         'compress'     => false,
         'strictOn'     => false,
         'failover'     => [],
-        'port'         => 3307,
+        'port'         => 3306,
         'numberNative' => false,
     ];
 
@@ -54,9 +54,9 @@ class Database extends Config
         'DSN'         => '',
         'hostname'     => 'localhost',
         'username'     => 'root',
-        'password'     => '',
-        //'password'     => 'PalafoxMarin1989',
-        'database'    => '',
+        //'password'     => '',
+        'password'     => 'PalafoxMarin1989',
+        'database'    => 'susi',
         'DBDriver'    => 'MySQLi',
         'DBPrefix'    => '',   // Needed to ensure we're working correctly with prefixes live. DO NOT REMOVE FOR CI DEVS
         'pConnect'    => false,
@@ -68,7 +68,7 @@ class Database extends Config
         'compress'    => false,
         'strictOn'    => false,
         'failover'    => [],
-        'port'        => 3307,
+        'port'        => 3306,
         'foreignKeys' => true,
         'busyTimeout' => 1000,
     ];
@@ -90,7 +90,7 @@ class Database extends Config
         'compress'    => false,
         'strictOn'    => false,
         'failover'    => [],
-        'port'        => 3307,
+        'port'        => 3306,
         'foreignKeys' => true,
         'busyTimeout' => 1000,
     ];

@@ -35,11 +35,13 @@
                                     <div class="card">
                                     
                                         <div class="card-body">
+                                            <?php if(in_array($session->get('id_perfil'),[1,2])): ?>
                                             <a href="<?php echo base_url().'index.php/Usuario/exportarExcel'?>" class="btn btn-primary mb-3">
                                                 Descargar Excel
                                             </a>
                                             <br>
                                             <br>
+                                             <?php endif; ?>
                                             <span>LISTA DE RESERVA</span>
     
                                             <table id="datatableReserva" class="table" data-toggle="table">
@@ -205,7 +207,7 @@
                                                                 </div>
                                                                 <div class="form-group" id="id_instrumento">
                                                                     <span id="previews"></span>
-                                                                    <label for="instrumento_editar">Istrumento Juridico</label>
+                                                                    <label for="instrumento_editar">Instrumento Juridico</label>
                                                                     <input type="file" class="form-control" id="instrumento_editar" name="instrumento_editar" accept=".pdf">
                                                                 </div>                                                                                      
                                                             </div>

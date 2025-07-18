@@ -497,7 +497,7 @@ ini.inicio = (function () {
                         const presupuesto = response.data.presupuesto;
                         const partidas = response.data.partida;
                         const proyectos = response.data.proyecto;
-                        console.log(presupuesto);
+                       
 
                         $("#nombre_proveedor_editar").val(reserva.razon_social || '');
                         $("#no_proveedor_editar").val(reserva.no_proveedor || '');
@@ -505,13 +505,15 @@ ini.inicio = (function () {
                         $("#id_reserva").val(reserva.id_reserva || '');
                         $("#previews").empty(); // Limpiar contenido anterior del contenedor
                         // Verifica que haya un instrumento antes de agregar el enlace
+                         console.log(reserva.instrumento);
                         if (reserva.instrumento) {
                             const fileUrl = base_url + reserva.instrumento;
                             const link = `<a href="${fileUrl}" target="_blank" class="me-2">
                                             <i class="mdi mdi-file"></i> Ver archivo
                                         </a>`;
                             $("#previews").append(link);
-                        $("#no_convenio_editar").val(reserva.no_convenio || '');
+                        }
+                           $("#no_convenio_editar").val(reserva.no_convenio || '');
                            const tbody = $('#makeEditableEditar tbody');
                             tbody.empty();
 
@@ -552,7 +554,7 @@ ini.inicio = (function () {
                                 tbody.append(fila);
                             });
 
-                        }
+                       
                     } else {
                         Swal.fire("Atención", "No se encontró la información de la reserva.", "warning");
                     }
@@ -671,6 +673,7 @@ ini.inicio = (function () {
                 formData.append('instrumento', instrumentoFile);
             }
             
+          
 
             // Agregar datos de la tabla
             $('#makeEditableEditar tbody tr').each(function(index) {
@@ -841,15 +844,21 @@ ini.inicio = (function () {
         formData.append('id_proveedor', $('#id_proveedor').val());
         formData.append('total_importe', $('#total_importe').val());
         formData.append('banco', $('#banco').val());
-        
-        // Agregar archivo si existe
-        var instrumentoFile = $('#instrumento')[0].files[0];
-        if(instrumentoFile) {
+
+       // Obtener el estado del checkbox (true/false)
+        let sinInstrumento = $('#customSwitch1').is(':checked');
+        console.log(sinInstrumento);
+        // Validación
+        if (sinInstrumento) {
+             var instrumentoFile = $('#instrumento')[0].files[0];
              formData.append('instrumento', instrumentoFile);
              formData.append('no_convenio', $('#no_convenio').val());
+             
+        } else {
+             Swal.fire("Atención", 'Sin Instrumento Jurídico', 'error');
+             return false;
         }
          
-
         // Agregar datos de la tabla
         $('#makeEditable2 tbody tr').each(function(index) {
             formData.append('proyecto[]', $(this).find('[name="proyecto[]"]').val());
@@ -2853,6 +2862,12 @@ ini.inicio = (function () {
                         }else{
                             Swal.fire("Error", '<p> '+ response.respuesta + '</p>', 'error');  
                         }
+                    },
+                    beforeSend: function (info){
+                         $('#btnGuardatPT').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                    },
+                    complete: function (info){
+                        $('#btnGuardatPT').prop('disabled', false).html('Guardar');
                     },
                     error: function (response,jqXHR, textStatus, errorThrown) {
                         var res= JSON.parse(response.responseText);
