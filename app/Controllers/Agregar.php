@@ -404,7 +404,7 @@ class Agregar extends BaseController {
             'segundo_apellido'      => $data['segundo_apellido'],             
             'correo'                => $data['correo'],           
             'rfc'                   => $data['rfc'],                      
-            'id_area'               => (int)$data['id_area'],                        
+            'id_area'               => (int)$data['id_area'],                                              
             'fec_nac'               => $data['fec_nac'],                  
             'fec_reg'               => $hoy 
         ];
@@ -414,6 +414,9 @@ class Agregar extends BaseController {
         }     
         if(isset($data['no_empleado']) && !empty($data['no_empleado'])){
           $dataInsert['no_empleado'] = $data['no_empleado']; 
+        }  
+        if(isset($data['nivel']) && !empty($data['nivel'])){
+          $dataInsert['nivel'] = (int)$data['nivel']; 
         }  
      
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaTurno'];

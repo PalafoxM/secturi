@@ -146,16 +146,21 @@ class Inicio extends BaseController {
             header('Location:'.base_url().'index.php/');            
             die();
         }
-        $usuario     = $principal->getTabla(['tabla' => 'usuario', 'where' => ['visible' =>1]]); 
+        $usuario     = $principal->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' =>1]]); 
         $cat_perfil  = $principal->getTabla(['tabla' => 'perfil', 'where' => ['visible' =>1]]); 
-        $cat_area  = $principal->getTabla(['tabla' => 'cat_area', 'where' => ['visible' =>1]]); 
+        $cat_area    = $principal->getTabla(['tabla' => 'cat_area', 'where' => ['visible' =>1]]); 
+        $cat_puesto  = $principal->getTabla(['tabla' => 'cat_puesto', 'where' => ['visible' =>1]]); 
+        $tipo_empleado  = $principal->getTabla(['tabla' => 'cat_tipo_empleado ', 'where' => ['visible' =>1]]); 
+
      
-        $data['editar']     = 0;
-        $data['cat_perfil'] = $cat_perfil->data;
-        $data['cat_area']   = $cat_area->data;
-        $data['usuario']    = (isset($usuario->data) && !empty($usuario->data))?$usuario->data:[];
-        $data['scripts']     = ['principal', 'agregar'];
-        $data['contentView'] = 'secciones/vAltaUsuario';
+        $data['editar']        = 0;
+        $data['cat_perfil']    = $cat_perfil->data;
+        $data['cat_area']      = $cat_area->data;
+        $data['cat_puesto']    = $cat_puesto->data;
+        $data['tipo_empleado'] = $tipo_empleado->data;
+        $data['usuario']       = (isset($usuario->data) && !empty($usuario->data))?$usuario->data:[];
+        $data['scripts']       = ['principal', 'agregar'];
+        $data['contentView']   = 'secciones/vAltaUsuario';
         $this->_renderView($data);
     }
     public function usuarios()

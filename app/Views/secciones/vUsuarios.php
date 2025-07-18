@@ -295,6 +295,18 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="row">
+                                   
+                                            <div class="col-md-3">
+                                                <div class="mb-3 position-relative" id="">
+                                                    <label for="nivel"
+                                                        class="form-label campoObligatorio">NIVEL</label>
+                                                    <input type="number" autocomplete="off" class="form-control"
+                                                        id="nivel" name="nivel"
+                                                        placeholder="NIVEL">
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <!--end card -->

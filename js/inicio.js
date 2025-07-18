@@ -2151,6 +2151,7 @@ ini.inicio = (function () {
                         $('#id_puesto').val(data.id_puesto).trigger('change');
                         $('#id_tipo_empleado').val(data.id_tipo_empleado).trigger('change');
                         $('#no_empleado').val(data.no_empleado);
+                        $('#nivel').val(data.nivel);
                          if (data.fec_nac) {
                             const fechaCompleta = data.fec_nac;
                             const fechaFormateada = fechaCompleta.split('T')[0];

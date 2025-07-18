@@ -186,6 +186,71 @@
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    <div class="row">
+                                                        <div class="col-md-3">
+                                                            <div class="mb-3 position-relative" id="">
+                                                                <label for="id_jefe_inmediato" class="form-label">JEFE INMEDIATO</label>
+                                                                <select class="form-control select2" data-toggle="select2"
+                                                                    id="id_jefe_inmediato" name="id_jefe_inmediato" data-placeholder="Seleccione"
+                                                                    style="z-index:100;">
+                                                                    <option value="0">Seleccione</option>
+                                                                    <?php foreach($usuario as $a): ?>
+                                                                    <option value="<?= $a->id_usuario ?>"><?= $a->nombre_completo ?>
+                                                                    <?php endforeach; ?>
+                                                                </select>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <div class="mb-3 position-relative" id="">
+                                                                <label for="id_puesto" class="form-label">PUESTO</label>
+                                                                <select class="form-control select2" data-toggle="select2"
+                                                                    id="id_puesto" name="id_puesto" data-placeholder="Seleccione"
+                                                                    style="z-index:100;">
+                                                                    <option value="0">Seleccione</option>
+                                                                    <?php foreach($cat_puesto as $a): ?>
+                                                                    <option value="<?= $a->id_puesto ?>"><?= $a->dsc_puesto ?>
+                                                                    <?php endforeach; ?>
+                                                                </select>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <div class="mb-3 position-relative" id="">
+                                                                <label for="id_tipo_empleado" class="form-label">TIPO EMPLEADO</label>
+                                                                <select class="form-control select2" data-toggle="select2"
+                                                                    id="id_tipo_empleado" name="id_tipo_empleado" data-placeholder="Seleccione"
+                                                                    style="z-index:100;">
+                                                                    <option value="0">Seleccione</option>
+                                                                    <?php foreach($tipo_empleado as $a): ?>
+                                                                    <option value="<?= $a->id_tipo_empleado ?>"><?= $a->dsc_tipo_empleado ?>
+                                                                    <?php endforeach; ?>
+                                                                </select>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <div class="mb-3 position-relative" id="">
+                                                                <label for="no_empleado"
+                                                                    class="form-label campoObligatorio">No. EMPLEADO</label>
+                                                                <input type="text" autocomplete="off" class="form-control"
+                                                                    id="no_empleado" name="no_empleado"
+                                                                    placeholder="No. Empleado">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                            
+                                                        <div class="col-md-3">
+                                                            <div class="mb-3 position-relative" id="">
+                                                                <label for="nivel"
+                                                                    class="form-label campoObligatorio">NIVEL</label>
+                                                                <input type="number" autocomplete="off" class="form-control"
+                                                                    id="nivel" name="nivel"
+                                                                    placeholder="NIVEL">
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <!--end card -->
