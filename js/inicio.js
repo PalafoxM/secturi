@@ -1997,7 +1997,7 @@ ini.inicio = (function () {
                         $("#correo").val(data.correo);
                         $("#denominacion_funcional").val(data.denominacion_funcional);
                         $("#funcion").val(data.funcion);
-                        $("#id_nivel").val(data.id_nivel).trigger('change');
+                        $("#nivel").val(data.nivel).trigger('change');
                         $("#id_sexo").val(data.id_sexo).trigger('change');
                         //Swal.fire("Exitó",response.respuesta , "success")
                         $("#editar").val(1);
