@@ -388,6 +388,7 @@
                 center: 'title',
                 right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
             },
+            locale: 'es',
             buttonText: { // Traduce los textos de los botones
             today: 'Hoy',
             month: 'Mes',
@@ -455,6 +456,18 @@
                     <div>${horaInicio} A ${horaFin}</div>
                 </div>
             `;
+        },
+          dayRender: function(info) {
+            
+            const date = info.date;
+            const day = date.getDay(); // 0 = domingo, 6 = sábado
+            const isWeekend = (day === 0 || day === 6);
+           
+
+            if (isWeekend) {
+                info.el.style.backgroundColor = '#f0f0f0'; // gris claro para fines de semana
+            } 
+            
         },
         eventClick: function(info) {
                const horaFin = info.event.extendedProps.hora_fin.slice(0, 5);
