@@ -248,7 +248,7 @@
                     </a><!--end MetricaDashboards--> 
                     <?php endif;?>
                     <?php if(in_array($session->id_perfil, [1,2,4])): ?>  
-                    <a href="#MetricaApps" class="nav-link" data-toggle="tooltip-custom" data-placement="right"  data-trigger="hover" title="Pagos" data-original-title="Apps">
+                    <a href="#MetricaApps" class="nav-link" data-toggle="tooltip-custom" data-placement="top"  data-trigger="hover" title="Pagos" data-original-title="Pagos">
                         <i data-feather="dollar-sign" class="align-self-center menu-icon icon-dual"></i>
                     </a><!--end MetricaApps-->
                      <?php endif;?>
@@ -257,14 +257,14 @@
                         <i data-feather="user" class="align-self-center menu-icon icon-dual"></i>
                     </a><!--end MetricaUikit-->
                     <?php endif;?>
-                    <a href="#MetricaPages" class="nav-link" data-toggle="tooltip-custom" data-placement="right"  data-trigger="hover" title="" data-original-title="Pages">
+                    <a href="#MetricaPages" class="nav-link" data-toggle="tooltip-custom" data-placement="top"  data-trigger="hover" title="Mi espacio" data-original-title="Mi espacio">
                         <i data-feather="copy" class="align-self-center menu-icon icon-dual"></i>             
                     </a><!--end MetricaPages-->
-                    
+                    <?php if($session->id_perfil == 1): ?> 
                     <a href="#MetricaAuthentication" class="nav-link" data-toggle="tooltip-custom" data-placement="right"  data-trigger="hover" title="" data-original-title="Authentication">
                         <i data-feather="lock" class="align-self-center menu-icon icon-dual"></i>
                     </a> <!--end MetricaAuthentication--> 
-                   
+                   <?php endif;?>
 
             </nav><!--end nav-->
             <!--end nav-->

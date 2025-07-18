@@ -1170,7 +1170,7 @@ class Usuario extends BaseController
             $dataConfig = [
                     "tabla"=>"sala_junta",
                     "editar"=>true,
-                    "idEditar"=>['id_sala_junta'=> $id_sala_juntas]
+                    "idEditar"=>['id_sala'=> $id_sala_juntas]
             ]; 
     
             $response = $this->globals->saveTabla($dataInsert,$dataConfig,["script"=>"sala_junta.eliminarjunta"]);

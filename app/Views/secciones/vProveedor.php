@@ -296,7 +296,20 @@
                                                         </div>
                                                     </div>
                                                 <?php endforeach; ?>
-
+                                                    <div class="form-row">
+                                                        <div class="col-md-4 mb-3">
+                                                            <label for="formatos_diversos">Formatos Diversos</label>
+                                                              <input type="file" class="form-control" id="formatos_diversos"  name="formatos_diversos" accept=".pdf" >
+                                                        </div><!--end col-->
+                                                       <div class="col-md-4 mb-3">
+                                                            <label for="evidencia_entregable">Evidencia de entregables<span style="color:red;" >*</span> </label>
+                                                              <input type="file" class="form-control" id="evidencia_entregable"  name="evidencia_entregable" accept=".pdf" >
+                                                        </div><!--end col-->
+                                                        <div class="col-md-4 mb-3">
+                                                            <label for="otros">Otros</label>
+                                                              <input type="file" class="form-control" id="otros"  name="otros" accept=".pdf" >
+                                                        </div><!--end col-->
+                                                    </div><!--end form-row-->
                                         
 
                                             <a class="btn btn-gradient-danger" style="color:white" onclick="window.history.back()">Atrás</a>

@@ -365,15 +365,20 @@
         const id_perfil = <?= $session->get('id_perfil'); ?>;
         console.log(salas);
         const eventos = salas.map(s => ({
-                id: s.id_sala_junta,
-                title: s.evento,
+                id: s.id_sala,
+                title: s.sala,
                 start: s.fecha, // correcto: '2025-06-23T10:00:00'
                 end: s.fecha,
                 color: s.sala === 'A' ? '#007bff' :
                     s.sala === 'B' ? '#28a745' :
                     s.sala === 'AB' ? '#6f42c1' :
                     s.sala === 'TI' ? '#fd7e14' :
-                    '#6c757d' // color por defecto
+                    '#6c757d',
+                extendedProps: {
+                    hora_inicio: s.hora_inicio,
+                    hora_fin: s.hora_fin,
+                }
+        
             }));
 
         var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -399,20 +404,24 @@
             selectable: true, // Permite seleccionar intervalos
             events: eventos,
         dateClick: function(info) {
-                let dia = info.dateStr; 
+               let dia = info.dateStr; 
                 const fechaHoy = new Date();
-                const fechaSeleccionada = new Date(info.dateStr); 
                 fechaHoy.setHours(0, 0, 0, 0);
+                // Parseo correcto de fecha local
+                const [year, month, day] = info.dateStr.split('-');
+                const fechaSeleccionada = new Date(year, month - 1, day);
                 fechaSeleccionada.setHours(0, 0, 0, 0);
-
-                // Convertir a timestamps (opcional)
                 const hoyTimestamp = fechaHoy.getTime();
                 const seleccionadaTimestamp = fechaSeleccionada.getTime();
-       
-                if (parseInt(seleccionadaTimestamp) < parseInt(hoyTimestamp)) {
+
+                console.log(seleccionadaTimestamp);
+                console.log(hoyTimestamp);
+
+                if (seleccionadaTimestamp < hoyTimestamp) {
                     Swal.fire("Error", "No puedes agendar en una fecha pasada", "error");
                     return;
                 }
+
                 st.agregar.calendarModal();
                 let html = `<main>
                     <div id="step1" class="step active">
@@ -435,16 +444,28 @@
                     st.agregar.sala(sala, dia); // Ejecuta la función al hacer clic
                 });
             },
+        eventRender: function(info) {
+           var eventEl = info.el;
+            const horaInicio = info.event.extendedProps.hora_inicio.slice(0, 5);
+            const horaFin = info.event.extendedProps.hora_fin.slice(0, 5);
+
+            eventEl.innerHTML = `
+                <div class="fc-event-title"><strong>SALA ${info.event.title}</strong></div>
+                <div class="fc-event-details">
+                    <div>${horaInicio} A ${horaFin}</div>
+                </div>
+            `;
+        },
         eventClick: function(info) {
-   
+               const horaFin = info.event.extendedProps.hora_fin.slice(0, 5);
                 const fecha = new Date(info.event.start).toLocaleString('es-MX', {
                     weekday: 'long', year: 'numeric', month: 'long',
                     day: 'numeric', hour: '2-digit', minute: '2-digit'
                 });
 
                 Swal.fire({
-                    title: info.event.title,
-                    text: `Fecha: ${fecha}`,
+                    title: `SALA `+info.event.title,
+                    text: `Fecha: ${fecha} A ${horaFin} `,
                     icon: "warning",
                     showCancelButton: true,
                     showConfirmButton: (id_perfil == 1),
@@ -468,7 +489,7 @@
                                         Swal.fire("Error", "Error al guardar comentario.", "error");
                                     }
                                 //  ini.inicio.obtenerCategorias(); 
-                                ini.inicio.getPeriodos(); 
+                           
                                 },
                                 error: function() {
                                     Swal.fire("Error", "Error al guardar comentario.", "error")
