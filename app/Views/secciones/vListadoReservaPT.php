@@ -110,7 +110,7 @@
                                                                     class="mdi mdi-trash-can-outline font-21"></i>
                                                             </a>
                                                               <?php endif; ?>
-                                                            <?php if(in_array($session->get('id_perfil'), [1,2])): ?>
+                                                            <?php if($session->get('id_perfil')==2): ?>
                                                             <a style="color:white;"  onclick="ini.inicio.estatusReserva(<?=$p->id_reserva?>);" data-toggle="tooltip" data-placement="top" title="" data-original-title="Revisar reserva"
                                                                 class="btn btn-gradient-warning px-4"><i
                                                                     class="mdi mdi-lock-open font-21"></i>
@@ -141,106 +141,11 @@
     <!-- end page content -->
 </div>
 
-<!-- Modal -->
-<div class="modal fade" id="modalEstatusReserva" tabindex="-1" aria-labelledby="modalEliminarReservaLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header bg-success text-white">
-        <h5 class="modal-title" id="modalEliminarReservaLabel">Agregar Estatus Reserva</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-     
-      <div class="modal-body">
-        <form id="formEliminarReserva">
-          <input type="hidden" id="id_reserva_eliminar" name="id_reserva">
-           <div class="row">
-              <div class="col-lg-12">
-                  <div class="card">
-                      <div class="card-body">        
-                          <div class="row">
-                              <div class="col-lg-6">
-                                   <div class="form-group" >
-                                        <label for="varlidar_nombre_proveedor" class="form-label">PROVEEDOR</label>
-                                        <input class="form-control" id="varlidar_nombre_proveedor" autocomplete="off" name="varlidar_nombre_proveedor" readonly>
-                                    </div> 
-                                    <div class="form-group" >
-                                        <label for="validar_no_proveedor" class="form-label">No. Reserva</label>
-                                        <input class="form-control" id="validar_no_proveedor" autocomplete="off" name="validar_no_proveedor" readonly>
-                                    </div>                                                                                    
-                              </div>                                                             
-                              <div class="col-lg-6">
-                                   <div class="form-group" >
-                                        <label for="validar_total_importe" class="form-label">Total Importe</label>
-                                        <input class="form-control" id="validar_total_importe" autocomplete="off" name="validar_total_importe" readonly>
-                                  </div>                                                                        
-                                  <div class="form-group">   
-                                        <label for="validar_no_convenio" class="form-label"> <div id="previews"></div></label>
-                                        <input class="form-control" id="validar_no_convenio" autocomplete="off" name="validar_no_convenio" readonly>
-                                  </div>                                                                                    
-                              </div>                                                             
-                         </div>
-                          <div class="row">
-                              <div class="col-lg-12">
-                                <table class="table" id="ValidarMakeEditableEditar">
-                                    <thead>
-                                        <tr>
-                                            <th>PROYECTO-META</th>
-                                            <th>PARTIDA</th>
-                                            <th>IMPORTE</th>
-                                            <th>ACCIONES</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody> 
-                                   </tbody>
-                                </table>                                                                      
-                              </div>                                                                                                                       
-                         </div>
-                            <div class="row">
-                              <div class="col-lg-6">
-                                    <div class="form-group">
-                                        <label for="motivo" class="form-label">Estatus</label>
-                                        <select class="form-control" id="motivo" name="motivo" onchange="ini.inicio.selectMotivo();" required>
-                                            <option value="1">EN PROCESO</option>
-                                            <option value="2">DECLINADO</option>
-                                            <option value="3">ACEPTADO</option>
-                                        </select>
-                                    </div>                                                                                     
-                              </div>                                                             
-                              <div class="col-lg-6">                                                                   
-                                  <div class="form-group" >   
-                                        <label for="validar_no_convenio" class="form-label">No. Reserva</label>
-                                        <input class="form-control" id="validar_no_convenio" autocomplete="off" name="validar_no_convenio" >
-                                  </div>                                                                                    
-                              </div>                                                             
-                         </div>
-                            <div class="row">
-                              <div class="col-lg-12">
-                                    <div class="form-group">
-                                       <label for="validar_no_convenio" class="form-label">No. Reserva</label>
-                                        <textarea class="form-control" ></textarea>
-                                    </div>                                                                                     
-                              </div>                                                             
-                                                                                           
-                         </div>
-                  </div><!--end card-->
-              </div><!--end col-->
-          </div><!--end col-->    
-        
-         
-        </form>
-      </div>
-      <div class="modal-footer">
-          <button type="button" class="btn btn-primary" id="btnConfirmarEliminar">Guardar</button>
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 
 <!--Inicio Modal -->
 
-<div class="modal fade" id="modalEditarReserva" tabindex="-1" role="dialog" aria-labelledby="supportModalLabel" aria-hidden="true">
+<div class="modal fade" id="modalEditarReserva2" tabindex="-1" role="dialog" aria-labelledby="supportModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
                 <main>
@@ -267,7 +172,7 @@
                                                                     <input type="hidden" id="id_reserva" >
                                                                 </div>
                                                                 <div class="form-group" id="id_instrumento">
-                                                                    <span id="previews"></span>
+                                                                    <span id="previews2"></span>
                                                                     <label for="instrumento_editar">Instrumento Juridico</label>
                                                                     <input type="file" class="form-control" id="instrumento_editar" name="instrumento_editar" accept=".pdf">
                                                                 </div>                                                                                      
@@ -354,6 +259,105 @@
     </div>
 </div>
                                                     <!--FIN MODAL -->
+
+<!-- Modal -->
+<div class="modal fade" id="modalEstatusReserva" tabindex="-1" aria-labelledby="modalEliminarReservaLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="modalEliminarReservaLabel">Agregar Estatus Reserva</h5>
+        <button type="button" onclick="ini.inicio.cerrarModalAdmin()" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+     
+      <div class="modal-body">
+        <form id="formEliminarReserva">
+          <input type="hidden" id="id_reserva_estatus" name="id_reserva_estatus">
+           <div class="row">
+              <div class="col-lg-12">
+                  <div class="card">
+                      <div class="card-body">        
+                          <div class="row">
+                              <div class="col-lg-6">
+                                   <div class="form-group" >
+                                        <label for="varlidar_nombre_proveedor" class="form-label">PROVEEDOR</label>
+                                        <input class="form-control" id="varlidar_nombre_proveedor" autocomplete="off" name="varlidar_nombre_proveedor" readonly>
+                                    </div> 
+                                    <div class="form-group" >
+                                        <label for="validar_no_proveedor" class="form-label">No. Reserva</label>
+                                        <input class="form-control" id="validar_no_proveedor" autocomplete="off" name="validar_no_proveedor" readonly>
+                                    </div>                                                                                    
+                              </div>                                                             
+                              <div class="col-lg-6">
+                                   <div class="form-group" >
+                                        <label for="validar_total_importe" class="form-label">Total Importe</label>
+                                        <input class="form-control" id="validar_total_importe" autocomplete="off" name="validar_total_importe" readonly>
+                                  </div>                                                                        
+                                  <div class="form-group">   
+                                        <label for="validar_no_convenio" class="form-label"> <div id="previews"></div></label>
+                                        <input class="form-control" id="validar_no_convenio" autocomplete="off" name="validar_no_convenio" readonly>
+                                  </div>                                                                                    
+                              </div>                                                             
+                         </div>
+                          <div class="row">
+                              <div class="col-lg-12">
+                                <table class="table" id="ValidarMakeEditableEditar">
+                                    <thead>
+                                        <tr>
+                                            <th>PROYECTO-META</th>
+                                            <th>PARTIDA</th>
+                                            <th>IMPORTE</th>
+                                            <th>ACCIONES</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody> 
+                                   </tbody>
+                                </table>                                                                      
+                              </div>                                                                                                                       
+                         </div>
+                            <div class="row">
+                              <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label for="motivo" class="form-label">Estatus</label>
+                                        <select class="form-control" id="motivo" name="motivo" onchange="ini.inicio.selectMotivo();" required>
+                                            <option value="1">EN PROCESO</option>
+                                            <option value="2">DECLINADO</option>
+                                            <option value="3">ACEPTADO</option>
+                                        </select>
+                                    </div>                                                                                     
+                              </div>                                                             
+                              <div class="col-lg-6">                                                                   
+                                  <div class="form-group" id="numero" style="display:none;" >   
+                                        <label for="validar_no_reserva" class="form-label">No. Reserva</label>
+                                        <input type="text" class="form-control" id="validar_no_reserva" autocomplete="off" name="validar_no_reserva" >
+                                  </div>                                                                                    
+                              </div>                                                             
+                         </div>
+                            <div class="row">
+                              <div class="col-lg-12">
+                                    <div class="form-group" id="observacion" style="display:none;">
+                                       <label for="validar_observaciones" class="form-label">Observaciones</label>
+                                        <textarea class="form-control" id="validar_observaciones" ></textarea>
+                                    </div>                                                                                     
+                              </div>                                                             
+                                                                                           
+                         </div>
+                  </div><!--end card-->
+              </div><!--end col-->
+          </div><!--end col-->    
+        
+         
+        </form>
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="btnConfirmarEliminar">Guardar</button>
+        <button type="button" onclick="ini.inicio.cerrarModalAdmin()" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
 
 <link href="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet"
     type="text/css" />

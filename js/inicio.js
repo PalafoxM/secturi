@@ -484,33 +484,41 @@ ini.inicio = (function () {
                     });
         },
         editarReserva: function(id_reserva, id) {
-
+     
             $.ajax({
                 url: base_url + "index.php/Principal/editarReserva",
                 type: 'POST',
                 dataType: "json",
                 data: { id_reserva: id_reserva },
                 success: function(response) {
+
                     if (response && response.data && response.data.reserva) {
                         const reserva = response.data.reserva;
                         const presupuesto = response.data.presupuesto;
                         const partidas = response.data.partida;
                         const proyectos = response.data.proyecto;
-                       
+                        console.log('entro');
+                       console.log(reserva.razon_social);
+                          console.log(reserva.no_proveedor);
+                             console.log(reserva.razon_social);
+                                console.log(reserva.total_importe);
+                                console.log(reserva.id_reserva);
+                 
+
 
                         $("#nombre_proveedor_editar").val(reserva.razon_social || '');
                         $("#no_proveedor_editar").val(reserva.no_proveedor || '');
                         $("#total_importe_editar").val(reserva.total_importe || '');
                         $("#id_reserva").val(reserva.id_reserva || '');
-                        $("#previews").empty(); // Limpiar contenido anterior del contenedor
+                        $("#previews2").empty(); // Limpiar contenido anterior del contenedor
                         // Verifica que haya un instrumento antes de agregar el enlace
-                         console.log(reserva.instrumento);
                         if (reserva.instrumento) {
+           
                             const fileUrl = base_url + reserva.instrumento;
                             const link = `<a href="${fileUrl}" target="_blank" class="me-2">
                                             <i class="mdi mdi-file"></i> Ver archivo
                                         </a>`;
-                            $("#previews").append(link);
+                            $("#previews2").append(link);
                         }
                            $("#no_convenio_editar").val(reserva.no_convenio || '');
                            const tbody = $('#makeEditableEditar tbody');
@@ -559,7 +567,7 @@ ini.inicio = (function () {
                     }
                 },
                 complete: function() {
-                    $('#modalEditarReserva').modal('show');
+                         $('#modalEditarReserva2').modal('show');
                     $('.dropdown-toggle').dropdown();
                 },
                 error: function(xhr, status, error) {
@@ -568,7 +576,10 @@ ini.inicio = (function () {
                 }
             });
         },
-
+        cerrarModalAdmin: function()
+        {
+            $('#modalEstatusReserva').modal('hide');
+        },
         traerReserva: function(id_proveedor){
           $.ajax({
             url: base_url + "index.php/Principal/Proveedor",
@@ -718,9 +729,10 @@ ini.inicio = (function () {
         estatusReserva: function(id_reserva)
         {
      
-           $('#id_reserva_eliminar').val(id_reserva);
+           $('#id_reserva_estatus').val(id_reserva);
            $('#motivo').val('');
            $('#observaciones').val('');
+           $('#validar_no_reserva').val('');
             $.ajax({
                 url: base_url + "index.php/Principal/editarReserva",
                 type: 'POST',
@@ -744,6 +756,12 @@ ini.inicio = (function () {
                                         </a>`;
                             $("#previews").append(link);
                         }
+
+                        if(reserva.no_reserva){
+                            $('#numero').show();
+                           $("#validar_no_reserva").val(reserva.no_reserva).prop("readonly", true);
+                        }
+                      
                            $("#validar_no_convenio").val(reserva.no_convenio || '');
                            const tbody = $('#ValidarMakeEditableEditar tbody');
                             tbody.empty();
@@ -803,9 +821,9 @@ ini.inicio = (function () {
         },
         selectMotivo: function()
         {
-            
+ 
         let motivo = $('#motivo').val();
-        console.log(motivo);
+        console.log(validar_no_reserva);
            if(motivo == 1){
                $('#observacion').hide();
               $('#numero').hide();
@@ -815,6 +833,7 @@ ini.inicio = (function () {
                  $('#numero').hide();
             }
              if(motivo == 3){
+                $("#validar_no_reserva").prop("readonly", false);
                $('#numero').show();
                 $('#observacion').show();
             }
@@ -822,13 +841,17 @@ ini.inicio = (function () {
         formEliminarReserva: function()
         {
             $('#btnConfirmarEliminar').on('click', function () {
-            const id = $('#id_reserva_eliminar').val();
+            const id = $('#id_reserva_estatus').val();
             const motivo = $('#motivo').val();
             const observaciones = $('#observaciones').val();
-            const numero_reserva = $('#numero_reserva').val();
-
+            const numero_reserva = $('#validar_no_reserva').val();
+        
             if (!motivo) {
-                alert('Debe seleccionar un motivo para eliminar la reserva.');
+                 Swal.fire("Estatus", "Debe seleccionar un motivo para eliminar la reserva.", "error");
+                return;
+            }
+            if (motivo==3 && !numero_reserva) {
+                 Swal.fire("No, Reserva", "El numero de reserva es requerido.", "error");
                 return;
             }
                 $.ajax({

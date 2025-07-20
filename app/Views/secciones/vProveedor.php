@@ -21,6 +21,7 @@
                             </div><!--end page-title-box-->
                         </div><!--end col-->
                     </div>
+                    
                     <!-- end page title end breadcrumb -->
                     <div class="row">
                         <div class="col-lg-12">
@@ -296,20 +297,7 @@
                                                         </div>
                                                     </div>
                                                 <?php endforeach; ?>
-                                                    <div class="form-row">
-                                                        <div class="col-md-4 mb-3">
-                                                            <label for="formatos_diversos">Formatos Diversos</label>
-                                                              <input type="file" class="form-control" id="formatos_diversos"  name="formatos_diversos" accept=".pdf" >
-                                                        </div><!--end col-->
-                                                       <div class="col-md-4 mb-3">
-                                                            <label for="evidencia_entregable">Evidencia de entregables<span style="color:red;" >*</span> </label>
-                                                              <input type="file" class="form-control" id="evidencia_entregable"  name="evidencia_entregable" accept=".pdf" >
-                                                        </div><!--end col-->
-                                                        <div class="col-md-4 mb-3">
-                                                            <label for="otros">Otros</label>
-                                                              <input type="file" class="form-control" id="otros"  name="otros" accept=".pdf" >
-                                                        </div><!--end col-->
-                                                    </div><!--end form-row-->
+                                                    
                                         
 
                                             <a class="btn btn-gradient-danger" style="color:white" onclick="window.history.back()">Atrás</a>
@@ -328,14 +316,8 @@
                 </div><!-- container -->
             </div>
         </div>
-        <link rel="shortcut icon" href="<?= base_url()?>assets/images/favicon.ico">
-
-        <!-- Plugins css -->
-        <link href="<?= base_url()?>plugins/daterangepicker/daterangepicker.css" rel="stylesheet" />
-        <link href="<?= base_url()?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
-        <link href="<?= base_url()?>plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.css" rel="stylesheet" type="text/css" />
-        <link href="<?= base_url()?>plugins/timepicker/bootstrap-material-datetimepicker.css" rel="stylesheet">
-        <link href="<?= base_url()?>plugins/bootstrap-touchspin/css/jquery.bootstrap-touchspin.min.css" rel="stylesheet" />
+           <!--Form Wizard-->
+         <link rel="stylesheet" href="<?= base_url()?>plugins/jquery-steps/jquery.steps.css">
 
         <!-- App css -->
         <link href="<?= base_url()?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
@@ -343,36 +325,23 @@
         <link href="<?= base_url()?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
         <link href="<?= base_url()?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
         <link href="<?= base_url()?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
-        <!-- end page-wrapper -->
-        <!-- jQuery  -->
-        <script src="<?php echo base_url() ?>assets/js/jquery.min.js"></script>
-        <script src="<?php echo base_url() ?>assets/js/jquery-ui.min.js"></script>
-        <script src="<?php echo base_url() ?>assets/js/bootstrap.bundle.min.js"></script>
-        <script src="<?php echo base_url() ?>assets/js/metismenu.min.js"></script>
-        <script src="<?php echo base_url() ?>assets/js/waves.js"></script>
-        <script src="<?php echo base_url() ?>assets/js/feather.min.js"></script>
-        <script src="<?php echo base_url() ?>assets/js/jquery.slimscroll.min.js"></script>
-        <script src="<?php echo base_url() ?>plugins/apexcharts/apexcharts.min.js"></script>
         
-        <!-- Parsley js -->
-        <script src="<?php echo base_url() ?>plugins/parsleyjs/parsley.min.js"></script>
-        <script src="<?php echo base_url() ?>assets/pages/jquery.validation.init.js"></script>
+        <!-- jQuery  -->
+        <script src="<?= base_url()?>assets/js/jquery.min.js"></script>
+        <script src="<?= base_url()?>assets/js/jquery-ui.min.js"></script>
+        <script src="<?= base_url()?>assets/js/bootstrap.bundle.min.js"></script>
+        <script src="<?= base_url()?>assets/js/metismenu.min.js"></script>
+        <script src="<?= base_url()?>assets/js/waves.js"></script>
+        <script src="<?= base_url()?>assets/js/feather.min.js"></script>
+        <script src="<?= base_url()?>assets/js/jquery.slimscroll.min.js"></script>
+        <script src="<?= base_url()?>plugins/apexcharts/apexcharts.min.js"></script> 
+
+        <script src="<?= base_url()?>plugins/jquery-steps/jquery.steps.min.js"></script>
+        <script src="<?= base_url()?>assets/pages/jquery.form-wizard.init.js"></script>
         
         <!-- App js -->
-        <script src="<?php echo base_url() ?>assets/js/jquery.core.js"></script>
-        <script src="<?php echo base_url() ?>assets/js/app.js"></script>
-
-
-        <!-- Plugins js -->
-        <script src="<?= base_url()?>plugins/moment/moment.js"></script>
-        <script src="<?= base_url()?>plugins/daterangepicker/daterangepicker.js"></script>
-        <script src="<?= base_url()?>plugins/select2/select2.min.js"></script>
-        <script src="<?= base_url()?>plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
-        <script src="<?= base_url()?>plugins/timepicker/bootstrap-material-datetimepicker.js"></script>
-        <script src="<?= base_url()?>plugins/bootstrap-maxlength/bootstrap-maxlength.min.js"></script>
-        <script src="<?= base_url()?>plugins/bootstrap-touchspin/js/jquery.bootstrap-touchspin.min.js"></script>
-
-        <script src="<?= base_url()?>assets/pages/jquery.forms-advanced.js"></script>
+        <script src="<?= base_url()?>assets/js/app.js"></script>
+     
         
 
 

@@ -821,7 +821,7 @@ class Principal extends BaseController {
                 }
             
          }
-        $email->setTo([
+/*         $email->setTo([
             'alopez@guanajuato.gob.mx',
             'negonzalez@guanajuato.gob.mx',
             'dhernandezq@guanajuato.gob.mx'
@@ -854,7 +854,7 @@ class Principal extends BaseController {
           $response->respuesta = "Correo enviado correctamente.";
         } else {
           $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
-        }
+        } */
            return $this->respond($response);
      
          
@@ -1273,6 +1273,14 @@ class Principal extends BaseController {
         $data['contentView'] = 'secciones/vregistroPT';                
         $this->_renderView($data);
     }
+    public function tablaArchivos()
+    {  
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $data['scripts'] = array('inicio');
+        $data['contentView'] = 'personal/vTablaArchivos';                
+        $this->_renderView($data);
+    }
     private function numeroEnLetras($numero)
     {
         //die( var_dump( $numero ) );
@@ -1407,7 +1415,7 @@ class Principal extends BaseController {
         exit();
     }
 
- public function buscarProveedor()
+    public function buscarProveedor()
     {
         $response = new \stdClass();
         $response->error = true;

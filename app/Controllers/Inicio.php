@@ -43,7 +43,7 @@ class Inicio extends BaseController {
         $data    = array();
         $globas  = new Mglobal;
         $vista = null;
-        if(in_array( $session->get('id_usuario'), [1,2,3] )){
+        if(in_array( $session->get('id_perfil'), [1,2,3] )){
            $vista = 'secciones/vInicio';
         }else{
           $vista = 'personal/vInicio';
