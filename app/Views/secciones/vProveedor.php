@@ -325,6 +325,15 @@
         <link href="<?= base_url()?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
         <link href="<?= base_url()?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
         <link href="<?= base_url()?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
+
+               <!-- Plugins css -->
+        <link href="<?= base_url()?>plugins/daterangepicker/daterangepicker.css" rel="stylesheet" />
+        <link href="<?= base_url()?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
+        <link href="<?= base_url()?>plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.css" rel="stylesheet" type="text/css" />
+        <link href="<?= base_url()?>plugins/timepicker/bootstrap-material-datetimepicker.css" rel="stylesheet">
+        <link href="<?= base_url()?>plugins/bootstrap-touchspin/css/jquery.bootstrap-touchspin.min.css" rel="stylesheet" />
+
+  
         
         <!-- jQuery  -->
         <script src="<?= base_url()?>assets/js/jquery.min.js"></script>
@@ -341,6 +350,21 @@
         
         <!-- App js -->
         <script src="<?= base_url()?>assets/js/app.js"></script>
+
+    
+
+        <!-- Plugins js -->
+        <script src="<?= base_url()?>plugins/moment/moment.js"></script>
+        <script src="<?= base_url()?>plugins/daterangepicker/daterangepicker.js"></script>
+        <script src="<?= base_url()?>plugins/select2/select2.min.js"></script>
+        <script src="<?= base_url()?>plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
+        <script src="<?= base_url()?>plugins/timepicker/bootstrap-material-datetimepicker.js"></script>
+        <script src="<?= base_url()?>plugins/bootstrap-maxlength/bootstrap-maxlength.min.js"></script>
+        <script src="<?= base_url()?>plugins/bootstrap-touchspin/js/jquery.bootstrap-touchspin.min.js"></script>
+
+        <script src="<?= base_url()?>assets/pages/jquery.forms-advanced.js"></script>
+        
+
      
         
 
