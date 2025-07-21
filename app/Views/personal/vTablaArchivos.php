@@ -52,63 +52,84 @@
                                                             <tr class="table-primary">
                                                                 <th scope="row">01 Anexos y formato de los LTPOFB</th>
                                                                 <td class="">Anexo 2 - Reporte de Integración Documental y Formato de conformidad del producto recibido.</td>
-                                                                <td class="">Otto</td>
-                                                                <td class="">@mdo</td>
+                                                                <td class="">Anexo 2 - Reporte de Integración Documental</td>
+                                                                <td class="">Anexo 2 - Reporte de Integración Documental</td>
+                                                                <td class="text-center">
+                                                                     <div class="text-center">
+                                                                        <i class="far fa-file-pdf text-danger"></i>
+                                                                        <h6 class="text-truncate">Archivo01.pdf</h6>
+                                                                    </div>   
+                                                                </td>
                                                             </tr>
                                                             <tr class="">
-                                                            <th scope="row">2</th>
-                                                                <td>Jacob</td>
-                                                                <td>Thornton</td>
-                                                                <td>@fat</td>
+                                                            <th scope="row">02 Poliza</th>
+                                                            <td class="">FINANCIEROS</td>
                                                             </tr>
                                                             <tr class="table-secondary">
-                                                                <th scope="row">3</th>
-                                                                <td class="">Larry</td>
-                                                                <td class="">the Bird</td>
-                                                                <td class="">@twitter</td>
+                                                                <th scope="row">03 CFDI</th>
+                                                                <td class="">Comprobante Fiscal Digital por Internet en su representacion PDF</td>
+                                                                <td class="">Comprobante Fiscal Digital por Internet en su representacion PDF</td>
+                                                                <td class="">N/A</td>
+                                                                   <td class="text-center">
+                                                                     <div class="text-center">
+                                                                        <i class="far fa-file-pdf text-danger"></i>
+                                                                        <h6 class="text-truncate">Archivo03.pdf</h6>
+                                                                    </div>   
+                                                                </td>
                                                             </tr>
                                                             <tr class="">
-                                                                <th scope="row">4</th>
-                                                                <td>Mark</td>
-                                                                <td>Otto</td>
-                                                                <td>@mdo</td>
+                                                                <th scope="row">04 Contrato o COnvenio (Segun corresponda)</th>
+                                                                <td>Instrumento Juridico que corresponda</td>
+                                                                <td>N/A</td>
+                                                                <td>N/A</td>
+                                                                <td class="text-center">
+                                                                     <div class="text-center">
+                                                                        <i class="far fa-file-pdf text-danger"></i>
+                                                                        <h6 class="text-truncate">Archivo04.pdf</h6>
+                                                                    </div>   
+                                                                </td>
                                                             </tr>
                                                             <tr class="table-success">
-                                                            <th scope="row">5</th>
-                                                                <td>Jacob</td>
-                                                                <td>Thornton</td>
-                                                                <td>@fat</td>
+                                                            <th scope="row">05 Formatos de los LRADP</th>
+                                                                <td>OMVE-1 (Orden de Ministracion de Viaticos en el Extranjero)</td>
+                                                                <td>OMVE-1 (Orden de Ministracion de Viaticos en el Nacionales)</td>
+                                                                <td>Solicitud de gastos a reserva de compribar GRC-1 y OMVE-1 (Orden de Ministracion de Viaticos en el Extranjero)</td>
+                                                                <td class="text-center">
+                                                                     <div class="text-center">
+                                                                        <i class="far fa-file-pdf text-danger"></i>
+                                                                        <h6 class="text-truncate">Archivo05.pdf</h6>
+                                                                    </div>   
+                                                                </td>
                                                             </tr>
                                                             <tr class="">
-                                                                <th scope="row">6</th>
-                                                                <td>Larry</td>
-                                                                <td>the Bird</td>
-                                                                <td>@twitter</td>
+                                                                <th scope="row">06 Oficios de Autorizaciones</th>
+                                                                <td>Autorizacion de Servicios Profesionales (1330, 3330, 3340 y 3390), Validacion de la Coordinacion General de Comunicacion Social (3611, 3612, 3630, 3660 y 3690), Validacion de imagen, Autorizaciòn de partidas restrigidas (3710, 3760, 3810, 3820 y 3830), Autorizacion pasivo, Autorizacion refrendos  </td>
+                                                                <td>N/A</td>
+                                                                <td>Autorizacion de Servicios Profesionales (3310, 3330, 3340 y 3390), Autorizacion de partidas restringidas (3710, 3760, 3810 y 3830)</td>
+                                                                <td></td>
                                                             </tr>
                                                             <tr class="table-info">
-                                                            <th scope="row">7</th>
-                                                                <td>Jacob</td>
-                                                                <td>Thornton</td>
-                                                                <td>@fat</td>
+                                                            <th scope="row">07 Formatos diversos</th>
+                                                                <td>Caratula de pago, Oficio(s) Delegatorio(s), Oficio de Liberacion de Pago, CFDI con su respectivo encabezado de factura, oficio de comision, evidencia fotografica, lista de asistencia.</td>
+                                                                <td>Caratula de pago, Oficio(s) Delegatorio(s), Oficio de Liberacion de Gastos, CFDI con su respectivo encabezado de factura (inluir notas de consumo, check in-out vouches, tikets de peajes), formato de Desglose de Gastos (Voaticos por persona), oficio de comision, evidencia fotografica, lista de asistencia </td>
+                                                                <td>Formato de Desglose de Gastos (Viaticos por persona presupuestado), oficio de comision</td>
+                                                                <td></td>
                                                             </tr>
                                                             <tr class="">
-                                                                <th scope="row">8</th>
-                                                                <td>Larry</td>
-                                                                <td>the Bird</td>
-                                                                <td>@twitter</td>
+                                                                <th scope="row">08 Evidencia de entragable</th>
+                                                                <td>Entregable con sello, fecha y firma de recibido</td>
+                                                                <td>N/A</td>
+                                                                <td>N/A</td>
+                                                                 <td></td>
                                                             </tr>
                                                             <tr class="table-warning">
-                                                            <th scope="row">9</th>
-                                                                <td>Jacob</td>
-                                                                <td>Thornton</td>
-                                                                <td>@fat</td>
+                                                            <th scope="row">09 Otros</th>
+                                                                <td>Soporte de datos bancarios, Registro en el Padron de proveedores (Vigente), Soporte Documental inherente al tramite (Darantia, CURP, en caso de ayudas y subsidios a personas fisicas, listado de beneficios, minutas, programas, agenda, itinerarios, etc..)</td>
+                                                                <td>Programas, agendas, itinerarios, recibo de verificacion, etc...</td>
+                                                                <td>Programas, agendas, itinerarios, etc...</td>
+                                                                 <td></td>
                                                             </tr>
-                                                            <tr class="">
-                                                                <th scope="row">10</th>
-                                                                <td>Larry</td>
-                                                                <td>the Bird</td>
-                                                                <td>@twitter</td>
-                                                            </tr>
+                                                      
                                                         </tbody>
                                                     </table><!--end /table-->
                                                 </div><!--end /tableresponsive-->

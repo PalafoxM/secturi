@@ -2959,7 +2959,8 @@ ini.inicio = (function () {
                         if(!response.error){
                             Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
                             setTimeout(() => {
-                                window.location.href = base_url + "index.php/Principal/listadoEstatusPT";
+                               // window.location.href = base_url + "index.php/Principal/listadoEstatusPT";
+                                window.location.href = base_url + "index.php/Principal/tablaArchivos"
                             }, 1500);
                         }else{
                             Swal.fire("Error", '<p> '+ response.respuesta + '</p>', 'error');  
