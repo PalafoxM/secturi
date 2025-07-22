@@ -106,37 +106,45 @@
                                                             <td>Autorización de Servicios Profesionales (1330, 3330, 3340 y 3390), Validación de la Coordinación General de Comunicación Social (3611, 3612, 3630, 3660 y 3690), Validación de imagen, Autorización de partidas restringidas (3710, 3760, 3810, 3820 y 3830), Autorización de pasivos, Autorización de refrendos.</td>
                                                             <td>N/A</td>
                                                             <td>Autorización de Servicios Profesionales (3310, 3330, 3340 y 3390), Autorización de partidas restringidas (3710, 3760, 3810 y 3830)</td>
-                                                            <td></td>
+                                                            <td><input type="file" id="archivo06" name="archivo06[]" ></td>
                                                         </tr>
                                                         <tr class="table-info">
                                                             <th scope="row">07. Formatos diversos</th>
                                                             <td>Carátula de pago, Oficio(s) Delegatorio(s), Oficio de Liberación de Pago, CFDI con su respectivo encabezado de factura, Oficio de Comisión, Evidencia Fotográfica, Lista de Asistencia.</td>
                                                             <td>Carátula de pago, Oficio(s) Delegatorio(s), Oficio de Liberación de Gastos, CFDI con su respectivo encabezado de factura (incluir notas de consumo, check-in/out vouchers, tickets de peajes), Formato de Desglose de Gastos (Viáticos por persona), Oficio de Comisión, Evidencia Fotográfica, Lista de Asistencia.</td>
                                                             <td>Formato de Desglose de Gastos (Viáticos por persona presupuestado), Oficio de Comisión.</td>
-                                                            <td></td>
+                                                            <td><input type="file" id="archivo07" name="archivo07[]" ></td>
                                                         </tr>
                                                         <tr>
                                                             <th scope="row">08. Evidencia de entregable</th>
                                                             <td>Entregable con sello, fecha y firma de recibido</td>
                                                             <td>N/A</td>
                                                             <td>N/A</td>
-                                                            <td></td>
+                                                            <td><input type="file" id="archivo08" name="archivo08[]" ></td>
                                                         </tr>
                                                         <tr class="table-warning">
                                                             <th scope="row">09. Otros</th>
                                                             <td>Soporte de datos bancarios, Registro en el Padrón de Proveedores (vigente), Soporte documental inherente al trámite (Garantía, CURP; en caso de ayudas y subsidios a personas físicas: listado de beneficiarios, minutas, programas, agendas, itinerarios, etc.).</td>
                                                             <td>Programas, agendas, itinerarios, recibo de verificación, etc.</td>
                                                             <td>Programas, agendas, itinerarios, etc.</td>
-                                                            <td></td>
+                                                            <td><input type="file" id="archivo09" name="archivo09[]" ></td>
                                                         </tr>
                                                     </tbody>
 
                                                     </table><!--end /table-->
+                                                    <br>
+                                                       <div class="row mb-5">
+                                                            <div class="col-md-12 text-right">
+                                                                <button class="btn btn-info" type="submit">
+                                                                    <i class="mdi mdi-content-save"></i> Generar Zip
+                                                                </button>
+                                                            </div>
+                                                        </div>
                                                 </div><!--end /tableresponsive-->
                                             </div><!--end card-body-->
                                         </div><!--end card-->
                                     </div><!--end col-->
- 
+                             
                         </div>
                     </div>
                 </div>
