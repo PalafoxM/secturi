@@ -1273,10 +1273,11 @@ class Principal extends BaseController {
         $data['contentView'] = 'secciones/vregistroPT';                
         $this->_renderView($data);
     }
-    public function tablaArchivos()
+    public function tablaArchivos($id = null)
     {  
         $session = \Config\Services::session();
         $globals = new Mglobal;
+        $data['id_registro_pt'] = $id;
         $data['scripts'] = array('inicio');
         $data['contentView'] = 'personal/vTablaArchivos';                
         $this->_renderView($data);
@@ -1334,6 +1335,57 @@ class Principal extends BaseController {
         $d = floor($numero / 10);
         $u = $numero % 10;
         return $decena[$d] . ($u > 0 ? ' y ' . $unidad[$u] : '');
+    }
+    public function Archivo($id_registro_pt =  null, $id_archivo = null)
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $registro_pt = $globals->getTabla([
+            'tabla' => 'vw_registro_pt',
+            'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
+        ]);
+       
+        if (!empty($registro_pt->data)) {
+            $data['registro'] = $registro_pt->data[0];
+            $folio = $globals->getTabla([
+                'tabla' => 'direccion',
+                'where' => ['visible' => 1, 'id_area' => $data['registro']->id_direccion_responsable]
+            ]);
+            $data['folio'] = $folio->data[0]->folio_prefijo;
+        } else {
+            echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
+            die();
+        }
+       switch($id_archivo){
+            case 1:
+                $doc = 'assets/pdf/plantillas/anexo02.pdf';
+                $formato = 'personal/vFormato01.php';
+                break;
+            case 4:
+                $doc = 'assets/pdf/plantillas/anexo04.pdf';
+                 $formato ='personal/vFormato04.php';
+                break;
+        }
+        $html = view( $formato, $data);
+        // Crear instancia de mPDF
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 0,
+            'margin_left' => 1,
+            'margin_right' => 1,
+            'format' => [213, 268],
+            'mirrorMargins' => false,
+        ]);
+
+        // Importar el PDF base
+      
+        $pagecount = $mpdf->SetSourceFile(FCPATH . $doc );
+        $mpdf->AddPage();
+        $tplId = $mpdf->ImportPage(1);
+        $mpdf->UseTemplate($tplId);
+        $mpdf->WriteHTML($html);
+
+        $mpdf->Output('Formato_pt.pdf', 'I');
+        exit();
     }
 
     public function ImprimirPT($id_pt = null)

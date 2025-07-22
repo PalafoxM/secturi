@@ -48,89 +48,89 @@
                                                             <th scope="col">Archivo</th>
                                                             </tr>
                                                         </thead>
-                                                        <tbody>
-                                                            <tr class="table-primary">
-                                                                <th scope="row">01 Anexos y formato de los LTPOFB</th>
-                                                                <td class="">Anexo 2 - Reporte de Integración Documental y Formato de conformidad del producto recibido.</td>
-                                                                <td class="">Anexo 2 - Reporte de Integración Documental</td>
-                                                                <td class="">Anexo 2 - Reporte de Integración Documental</td>
-                                                                <td class="text-center">
-                                                                     <div class="text-center">
-                                                                        <i class="far fa-file-pdf text-danger"></i>
-                                                                        <h6 class="text-truncate">Archivo01.pdf</h6>
-                                                                    </div>   
-                                                                </td>
-                                                            </tr>
-                                                            <tr class="">
-                                                            <th scope="row">02 Poliza</th>
-                                                            <td class="">FINANCIEROS</td>
-                                                            </tr>
-                                                            <tr class="table-secondary">
-                                                                <th scope="row">03 CFDI</th>
-                                                                <td class="">Comprobante Fiscal Digital por Internet en su representacion PDF</td>
-                                                                <td class="">Comprobante Fiscal Digital por Internet en su representacion PDF</td>
-                                                                <td class="">N/A</td>
-                                                                   <td class="text-center">
-                                                                     <div class="text-center">
-                                                                        <i class="far fa-file-pdf text-danger"></i>
-                                                                        <h6 class="text-truncate">Archivo03.pdf</h6>
-                                                                    </div>   
-                                                                </td>
-                                                            </tr>
-                                                            <tr class="">
-                                                                <th scope="row">04 Contrato o COnvenio (Segun corresponda)</th>
-                                                                <td>Instrumento Juridico que corresponda</td>
-                                                                <td>N/A</td>
-                                                                <td>N/A</td>
-                                                                <td class="text-center">
-                                                                     <div class="text-center">
-                                                                        <i class="far fa-file-pdf text-danger"></i>
-                                                                        <h6 class="text-truncate">Archivo04.pdf</h6>
-                                                                    </div>   
-                                                                </td>
-                                                            </tr>
-                                                            <tr class="table-success">
-                                                            <th scope="row">05 Formatos de los LRADP</th>
-                                                                <td>OMVE-1 (Orden de Ministracion de Viaticos en el Extranjero)</td>
-                                                                <td>OMVE-1 (Orden de Ministracion de Viaticos en el Nacionales)</td>
-                                                                <td>Solicitud de gastos a reserva de compribar GRC-1 y OMVE-1 (Orden de Ministracion de Viaticos en el Extranjero)</td>
-                                                                <td class="text-center">
-                                                                     <div class="text-center">
-                                                                        <i class="far fa-file-pdf text-danger"></i>
-                                                                        <h6 class="text-truncate">Archivo05.pdf</h6>
-                                                                    </div>   
-                                                                </td>
-                                                            </tr>
-                                                            <tr class="">
-                                                                <th scope="row">06 Oficios de Autorizaciones</th>
-                                                                <td>Autorizacion de Servicios Profesionales (1330, 3330, 3340 y 3390), Validacion de la Coordinacion General de Comunicacion Social (3611, 3612, 3630, 3660 y 3690), Validacion de imagen, Autorizaciòn de partidas restrigidas (3710, 3760, 3810, 3820 y 3830), Autorizacion pasivo, Autorizacion refrendos  </td>
-                                                                <td>N/A</td>
-                                                                <td>Autorizacion de Servicios Profesionales (3310, 3330, 3340 y 3390), Autorizacion de partidas restringidas (3710, 3760, 3810 y 3830)</td>
-                                                                <td></td>
-                                                            </tr>
-                                                            <tr class="table-info">
-                                                            <th scope="row">07 Formatos diversos</th>
-                                                                <td>Caratula de pago, Oficio(s) Delegatorio(s), Oficio de Liberacion de Pago, CFDI con su respectivo encabezado de factura, oficio de comision, evidencia fotografica, lista de asistencia.</td>
-                                                                <td>Caratula de pago, Oficio(s) Delegatorio(s), Oficio de Liberacion de Gastos, CFDI con su respectivo encabezado de factura (inluir notas de consumo, check in-out vouches, tikets de peajes), formato de Desglose de Gastos (Voaticos por persona), oficio de comision, evidencia fotografica, lista de asistencia </td>
-                                                                <td>Formato de Desglose de Gastos (Viaticos por persona presupuestado), oficio de comision</td>
-                                                                <td></td>
-                                                            </tr>
-                                                            <tr class="">
-                                                                <th scope="row">08 Evidencia de entragable</th>
-                                                                <td>Entregable con sello, fecha y firma de recibido</td>
-                                                                <td>N/A</td>
-                                                                <td>N/A</td>
-                                                                 <td></td>
-                                                            </tr>
-                                                            <tr class="table-warning">
-                                                            <th scope="row">09 Otros</th>
-                                                                <td>Soporte de datos bancarios, Registro en el Padron de proveedores (Vigente), Soporte Documental inherente al tramite (Darantia, CURP, en caso de ayudas y subsidios a personas fisicas, listado de beneficios, minutas, programas, agenda, itinerarios, etc..)</td>
-                                                                <td>Programas, agendas, itinerarios, recibo de verificacion, etc...</td>
-                                                                <td>Programas, agendas, itinerarios, etc...</td>
-                                                                 <td></td>
-                                                            </tr>
-                                                      
-                                                        </tbody>
+                                                      <tbody>
+                                                        <tr class="table-primary">
+                                                            <th scope="row">01. Anexos y formato de los LTPOFB</th>
+                                                            <td>Anexo 2 - Reporte de Integración Documental y Formato de conformidad del producto recibido.</td>
+                                                            <td>Anexo 2 - Reporte de Integración Documental</td>
+                                                            <td>Anexo 2 - Reporte de Integración Documental</td>
+                                                            <td class="text-center">
+                                                                <a target="_blank" href="<?= base_url().'index.php/Principal/Archivo/'.$id_registro_pt.'/1' ?>" class="text-center">
+                                                                    <i class="far fa-file-pdf text-danger"></i>
+                                                                    <h6 class="text-truncate">Archivo01.pdf</h6>
+                                                                </a>   
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th scope="row">02. Póliza</th>
+                                                            <td>Financieros</td>
+                                                        </tr>
+                                                        <tr class="table-secondary">
+                                                            <th scope="row">03. CFDI</th>
+                                                            <td>Comprobante Fiscal Digital por Internet en su representación PDF</td>
+                                                            <td>Comprobante Fiscal Digital por Internet en su representación PDF</td>
+                                                            <td>N/A</td>
+                                                            <td class="text-center">
+                                                              <a target="_blank" href="<?= base_url().'index.php/Principal/Archivo/'.$id_registro_pt ?>" class="text-center">
+                                                                    <i class="far fa-file-pdf text-danger"></i>
+                                                                    <h6 class="text-truncate">Archivo03.pdf</h6>
+                                                                </a>   
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th scope="row">04. Contrato o Convenio (según corresponda)</th>
+                                                            <td>Instrumento jurídico que corresponda</td>
+                                                            <td>N/A</td>
+                                                            <td>N/A</td>
+                                                            <td class="text-center">
+                                                                <a target="_blank"  href="<?= base_url().'index.php/Principal/Archivo/'.$id_registro_pt.'/4' ?>" class="text-center">
+                                                                    <i class="far fa-file-pdf text-danger"></i>
+                                                                    <h6 class="text-truncate">Archivo04.pdf</h6>
+                                                                </a>   
+                                                            </td>
+                                                        </tr>
+                                                        <tr class="table-success">
+                                                            <th scope="row">05. Formatos de los LRADP</th>
+                                                            <td>OMVE-1 (Orden de Ministración de Viáticos en el Extranjero)</td>
+                                                            <td>OMVE-1 (Orden de Ministración de Viáticos Nacionales)</td>
+                                                            <td>Solicitud de gastos a reserva de comprobar GRC-1 y OMVE-1 (Orden de Ministración de Viáticos en el Extranjero)</td>
+                                                            <td class="text-center">
+                                                               <a target="_blank" href="<?= base_url().'index.php/Principal/Archivo/'.$id_registro_pt ?>" class="text-center">
+                                                                    <i class="far fa-file-pdf text-danger"></i>
+                                                                    <h6 class="text-truncate">Archivo05.pdf</h6>
+                                                                </a>   
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th scope="row">06. Oficios de Autorizaciones</th>
+                                                            <td>Autorización de Servicios Profesionales (1330, 3330, 3340 y 3390), Validación de la Coordinación General de Comunicación Social (3611, 3612, 3630, 3660 y 3690), Validación de imagen, Autorización de partidas restringidas (3710, 3760, 3810, 3820 y 3830), Autorización de pasivos, Autorización de refrendos.</td>
+                                                            <td>N/A</td>
+                                                            <td>Autorización de Servicios Profesionales (3310, 3330, 3340 y 3390), Autorización de partidas restringidas (3710, 3760, 3810 y 3830)</td>
+                                                            <td></td>
+                                                        </tr>
+                                                        <tr class="table-info">
+                                                            <th scope="row">07. Formatos diversos</th>
+                                                            <td>Carátula de pago, Oficio(s) Delegatorio(s), Oficio de Liberación de Pago, CFDI con su respectivo encabezado de factura, Oficio de Comisión, Evidencia Fotográfica, Lista de Asistencia.</td>
+                                                            <td>Carátula de pago, Oficio(s) Delegatorio(s), Oficio de Liberación de Gastos, CFDI con su respectivo encabezado de factura (incluir notas de consumo, check-in/out vouchers, tickets de peajes), Formato de Desglose de Gastos (Viáticos por persona), Oficio de Comisión, Evidencia Fotográfica, Lista de Asistencia.</td>
+                                                            <td>Formato de Desglose de Gastos (Viáticos por persona presupuestado), Oficio de Comisión.</td>
+                                                            <td></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th scope="row">08. Evidencia de entregable</th>
+                                                            <td>Entregable con sello, fecha y firma de recibido</td>
+                                                            <td>N/A</td>
+                                                            <td>N/A</td>
+                                                            <td></td>
+                                                        </tr>
+                                                        <tr class="table-warning">
+                                                            <th scope="row">09. Otros</th>
+                                                            <td>Soporte de datos bancarios, Registro en el Padrón de Proveedores (vigente), Soporte documental inherente al trámite (Garantía, CURP; en caso de ayudas y subsidios a personas físicas: listado de beneficiarios, minutas, programas, agendas, itinerarios, etc.).</td>
+                                                            <td>Programas, agendas, itinerarios, recibo de verificación, etc.</td>
+                                                            <td>Programas, agendas, itinerarios, etc.</td>
+                                                            <td></td>
+                                                        </tr>
+                                                    </tbody>
+
                                                     </table><!--end /table-->
                                                 </div><!--end /tableresponsive-->
                                             </div><!--end card-body-->

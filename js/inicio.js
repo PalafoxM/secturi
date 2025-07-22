@@ -2956,11 +2956,12 @@ ini.inicio = (function () {
                     contentType: false,  // Importante para FormData
                     dataType: "json",
                     success: function (response) {
+                        console.log(response);
                         if(!response.error){
                             Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
                             setTimeout(() => {
                                // window.location.href = base_url + "index.php/Principal/listadoEstatusPT";
-                                window.location.href = base_url + "index.php/Principal/tablaArchivos"
+                                window.location.href = base_url + "index.php/Principal/tablaArchivos/"+response.idRegistro;
                             }, 1500);
                         }else{
                             Swal.fire("Error", '<p> '+ response.respuesta + '</p>', 'error');  

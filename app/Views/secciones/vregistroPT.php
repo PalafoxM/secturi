@@ -64,10 +64,10 @@
                                                 <a class="btn btn-outline-info btn-round" href="<?php echo base_url().'index.php/Principal/generarTramitePago/0/'.$e->id_registro_pt ?>" ><i
                                                         class="mdi mdi-border-color font-18"></i></a>
                                                    <button type="button"  class="btn btn-outline-info btn-round">                       
-                                                <a href="<?php echo base_url().'index.php/Principal/ImprimirPT/'.$e->id_registro_pt ?>" target="_blank"><i
+                                                <a href="<?php echo base_url().'index.php/Principal/tablaArchivos/'.$e->id_registro_pt ?>" target="_blank"><i
                                                         class="mdi mdi-file-document text-success font-18"></i></a></button>
-                                                <a class="btn btn-outline-info btn-round" href="javascript:void(0);"  onclick="ini.inicio.deletePT(<?= $e->id_registro_pt?>)" ><i
-                                                        class="mdi mdi-delete-forever text-danger font-18"></i></a>
+                             <!--                    <a class="btn btn-outline-info btn-round" href="javascript:void(0);"  onclick="ini.inicio.deletePT(<?= $e->id_registro_pt?>)" ><i
+                                                        class="mdi mdi-delete-forever text-danger font-18"></i></a> -->
                                          
                                               
                                             </td>

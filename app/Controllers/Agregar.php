@@ -311,6 +311,7 @@ class Agregar extends BaseController {
             $id_presupuesto = $response->idRegistro;
             $archivosXml = [];
             $archivosPdf = [];
+            $response->idRegistro = $response->idRegistro;
 
             // Recorremos todas las claves de los archivos enviados
             foreach ($archivos as $key => $fileArray) {
