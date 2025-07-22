@@ -258,7 +258,7 @@
                     </a><!--end MetricaUikit-->
                     <?php endif;?>
                     <a href="#MetricaPages" class="nav-link" data-toggle="tooltip-custom" data-placement="top"  data-trigger="hover" title="Mi espacio" data-original-title="Mi espacio">
-                        <i data-feather="copy" class="align-self-center menu-icon icon-dual"></i>             
+                       <i data-feather="home" class="align-self-center menu-icon icon-dual"></i>            
                     </a><!--end MetricaPages-->
                     <?php if($session->id_perfil == 1): ?> 
                     <a href="#MetricaAuthentication" class="nav-link" data-toggle="tooltip-custom" data-placement="right"  data-trigger="hover" title="" data-original-title="Authentication">
@@ -417,25 +417,29 @@
                         </ul><!--end nav-->
                     </div><!-- end Others -->
           
-                <div id="MetricaPages" class="main-icon-menu-pane">
-                    <div class="title-box">
-                        <h6 class="menu-title">Mis secciones</h6>
-                    </div>
-                    <ul class="nav">
-                        <li class="nav-item"><a class="nav-link"
+             
+                 <div id="MetricaPages" class="main-icon-menu-pane">
+                        <div class="title-box">
+                            <h6 class="menu-title">Pages</h6>        
+                        </div>
+                        <ul class="nav">
+                           <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Agregar/ReservarSala">Salas de Juntas</a>
-                        </li>
-                    
+                          </li>
                         <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Agregar/Asistencia">Asistencias</a>
                         </li>
-
-                        
-                        <li class="nav-item"><a class="nav-link"
-                                href="<?php echo base_url(); ?>pages/pages-treeview.html">Constancias</a></li>
-
-                    </ul>
-                </div><!-- end Pages -->
+                         <li class="nav-item"><a class="nav-link"
+                                href="<?php echo base_url(); ?>index.php/Agregar/Documentos">Normatividad</a>
+                        </li>
+                            <li class="nav-item"><a class="nav-link" href="../pages/pages-treeview.html">Treeview</a></li>
+                            <li class="nav-item"><a class="nav-link" href="../pages/pages-starter.html">Starter Page</a></li>
+                            <li class="nav-item"><a class="nav-link" href="../pages/pages-pricing.html">Pricing</a></li>
+                            <li class="nav-item"><a class="nav-link" href="../pages/pages-blogs.html">Blogs</a></li>
+                            <li class="nav-item"><a class="nav-link" href="../pages/pages-faq.html">FAQs</a></li>
+                            <li class="nav-item"><a class="nav-link" href="../pages/pages-gallery.html">Gallery</a></li>
+                        </ul>
+                    </div><!-- end Pages -->
                 <div id="MetricaAuthentication" class="main-icon-menu-pane">
                     <div class="title-box">
                         <h6 class="menu-title">Authentication</h6>

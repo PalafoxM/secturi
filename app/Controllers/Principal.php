@@ -1281,6 +1281,7 @@ class Principal extends BaseController {
         $data['contentView'] = 'personal/vTablaArchivos';                
         $this->_renderView($data);
     }
+ 
     private function numeroEnLetras($numero)
     {
         //die( var_dump( $numero ) );

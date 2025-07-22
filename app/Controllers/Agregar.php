@@ -447,6 +447,14 @@ class Agregar extends BaseController {
     
         return $valor;
     }
+    public function Documentos()
+    {  
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $data['scripts'] = array('inicio');
+        $data['contentView'] = 'personal/vDocumentos';                
+        $this->_renderView($data);
+    }
     public function cambioPassword()
     {
         $session = \Config\Services::session();
