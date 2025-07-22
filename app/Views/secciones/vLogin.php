@@ -111,7 +111,7 @@
                             </a>
                         </li>
                         <li class="list-inline-item">
-                            <a href="" class="">
+                            <a href="<?= base_url()."index/Auth/login"?>" class="">
                                 <i class="fab fa-google google"></i>
                             </a>
                         </li>
