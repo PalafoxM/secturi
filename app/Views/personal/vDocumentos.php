@@ -68,21 +68,21 @@
                                             <a class="nav-link active" id="files-projects-tab" data-toggle="pill" href="#files-projects" aria-selected="true">
                                                 <span class="mr-3 text-warning d-inline-block">📁</span>
                                                 <div class="d-inline-block align-self-center">
-                                                    <h5 class="m-0">Projects</h5>
+                                                    <h5 class="m-0">Normateca</h5>
                                                     <small>80GB/200GB En uso</small>                                                    
                                                 </div>
                                             </a>
                                             <a class="nav-link" id="files-pdf-tab" data-toggle="pill" href="#files-pdf" aria-selected="false">
                                                 <span class="mr-3 text-warning d-inline-block">📁</span>
                                                 <div class="d-inline-block align-self-center">
-                                                    <h5 class="m-0">Pdf Files</h5>
+                                                    <h5 class="m-0">Normatividad Interna</h5>
                                                     <small>80GB/200GB En uso</small>                                                    
                                                 </div>
                                             </a>
                                             <a class="nav-link  align-items-center" id="files-documents-tab" data-toggle="pill" href="#files-documents" aria-selected="false">
                                                 <span class="mr-3 text-warning d-inline-block">📁</span>
                                                 <div class="d-inline-block align-self-center">
-                                                    <h5 class="m-0">Documents</h5>
+                                                    <h5 class="m-0">Formatos</h5>
                                                     <small>80GB/200GB En uso</small>                                                    
                                                 </div>                                                
                                                 <small class="badge badge-warning ml-auto">8</small>
@@ -90,7 +90,7 @@
                                             <a class="nav-link mb-0"  href="#" data-toggle="modal" data-animation="bounce" data-target=".hide-modal">
                                                 <span class="mr-3 text-warning d-inline-block">🔒</span>
                                                 <div class="d-inline-block align-self-center">
-                                                    <h5 class="m-0">Files Lock</h5>
+                                                    <h5 class="m-0">Archivos Alta Dirección</h5>
                                                     <small>80GB/200GB En uso</small>                                                    
                                                 </div>                                                                                         
                                             </a>
@@ -115,26 +115,26 @@
                                 <div class="tab-content" id="files-tabContent">
                                   
                                     <div class="tab-pane fade show active" id="files-projects">
-                                        <h4 class="header-title mt-0 mb-3">Projects</h4>                                         
+                                        <h4 class="header-title mt-0 mb-3">Normateca</h4>                                         
                                         <div class="file-box-content">
                                             <div class="file-box">
                                                 <a href="#" class="download-icon-link">
                                                     <i class="dripicons-download file-download-icon"></i>
                                                 </a>
-                                                <div class="text-center">
+                                                <div class="text-center" title="Programa de Gobierno">
                                                     <i class="far fa-file-alt text-primary"></i>
-                                                    <h6 class="text-truncate">Admin_Panel</h6>
-                                                    <small class="text-muted">06 Mar 2019</small>
+                                                    <h6 class="text-truncate">1.- Programa de Gobierno</h6>
+                                                    <small class="text-muted">2018-2024</small>
                                                 </div>                                                        
                                             </div>
                                             <div class="file-box">
                                                 <a href="#" class="download-icon-link">
                                                     <i class="dripicons-download file-download-icon"></i>
                                                 </a>
-                                                <div class="text-center">
+                                                <div class="text-center" title="Programa de Gobierno 2024 Actualización" >
                                                     <i class="far fa-file-code text-danger"></i>
-                                                    <h6 class="text-truncate">Ecommerce.pdf</h6>
-                                                    <small class="text-muted">15 Mar 2019</small>
+                                                    <h6 class="text-truncate">2.- Programa de Gobierno </h6>
+                                                    <small class="text-muted">2018 - 2024_Actualización</small>
                                                 </div>                                                        
                                             </div>
                                             <div class="file-box">
@@ -143,8 +143,8 @@
                                                 </a>
                                                 <div class="text-center">
                                                     <i class="far fa-file-archive text-warning"></i>
-                                                    <h6 class="text-truncate">Payment_app.zip</h6>
-                                                    <small class="text-muted">11 Abr 2019</small>
+                                                    <h6 class="text-truncate">3.- Programa Sectorial Economía para Todos </h6>
+                                                    <small class="text-muted">2019-2024</small>
                                                 </div>                                                        
                                             </div>
                                             <div class="file-box">
@@ -153,15 +153,45 @@
                                                 </a>
                                                 <div class="text-center">
                                                     <i class="far fa-file text-secondary"></i>
-                                                    <h6 class="text-truncate">App_landing_001</h6>
-                                                    <small class="text-muted">06 Mar 2019</small>
+                                                    <h6 class="text-truncate">4.- Actualización Programa Sectorial Eje Economía para Todos</h6>
+                                                    <small class="text-muted">2019-2024</small>
+                                                </div>                                                        
+                                            </div>                                                
+                                            <div class="file-box">
+                                                <a href="#" class="download-icon-link">
+                                                    <i class="dripicons-download file-download-icon"></i>
+                                                </a>
+                                                <div class="text-center">
+                                                    <i class="far fa-file text-secondary"></i>
+                                                    <h6 class="text-truncate">5.- Actualización Programa Sectorial Eje Economía para Todos</h6>
+                                                    <small class="text-muted">2019-2024 fe de erratas</small>
+                                                </div>                                                        
+                                            </div>                                                
+                                            <div class="file-box">
+                                                <a href="#" class="download-icon-link">
+                                                    <i class="dripicons-download file-download-icon"></i>
+                                                </a>
+                                                <div class="text-center">
+                                                    <i class="far fa-file text-secondary"></i>
+                                                    <h6 class="text-truncate">6.Programa Estatal de Turismo</h6>
+                                                    <small class="text-muted">2021-2024</small>
+                                                </div>                                                        
+                                            </div>                                                
+                                            <div class="file-box">
+                                                <a href="#" class="download-icon-link">
+                                                    <i class="dripicons-download file-download-icon"></i>
+                                                </a>
+                                                <div class="text-center">
+                                                    <i class="far fa-file text-secondary"></i>
+                                                    <h6 class="text-truncate">Actualización Programa Sectorial Eje Economía para Todos</h6>
+                                                    <small class="text-muted">2019-2024</small>
                                                 </div>                                                        
                                             </div>                                                
                                         </div> 
                                         
                                         <div class="row">
                                             <div class="col-12">
-                                                <h4 class="header-title my-3">Freelancing Projects</h4>  
+                                                <h4 class="header-title my-3">Ley, Lineamientos, Reglamentos, Acuerdos, etc.,</h4>  
                                             </div>
                                         </div>
                                         <div class="file-box-content">
@@ -171,8 +201,8 @@
                                                 </a>
                                                 <div class="text-center">
                                                     <i class="far fa-file-alt text-primary"></i>
-                                                    <h6 class="text-truncate">Admin_Panel</h6>
-                                                    <small class="text-muted">06 March 2019 / 5MB</small>
+                                                    <h6 class="text-truncate">Acuerdo de Creación del Observatorio Turístico del Estado de Guanajuato</h6>
+                                                    <small class="text-muted">2013</small>
                                                 </div>                                                        
                                             </div>
                                             <div class="file-box">
@@ -181,8 +211,26 @@
                                                 </a>
                                                 <div class="text-center">
                                                     <i class="far fa-file-code text-info"></i>
-                                                    <h6 class="text-truncate">Ecommerce.pdf</h6>
-                                                    <small class="text-muted">15 March 2019 / 8MB</small>
+                                                    <h6 class="text-truncate">Constitución Política de los Estados Unidos Mexicanos</h6>
+                                                </div>                                                        
+                                            </div>                                                                                               
+                                            <div class="file-box">
+                                                <a href="#" class="download-icon-link">
+                                                    <i class="dripicons-download file-download-icon"></i>
+                                                </a>
+                                                <div class="text-center">
+                                                    <i class="far fa-file-code text-info"></i>
+                                                    <h6 class="text-truncate">Constitución Política ra para el Estado de Guanajuato</h6>
+                                                </div>                                                        
+                                            </div>                                                                                               
+                                            <div class="file-box">
+                                                <a href="#" class="download-icon-link">
+                                                    <i class="dripicons-download file-download-icon"></i>
+                                                </a>
+                                                <div class="text-center">
+                                                    <i class="far fa-file-code text-info"></i>
+                                                    <h6 class="text-truncate">Festivales Internacionales y Eventos Especiales para el Ejercicio Fiscal de 2022</h6>
+                                                     <small class="text-muted">2022</small>
                                                 </div>                                                        
                                             </div>                                                                                               
                                         </div>
@@ -575,9 +623,6 @@
                     </div><!-- /.modal-dialog -->
                 </div><!-- /.modal --> 
 
-                <footer class="footer text-center text-sm-left">
-                    &copy; 2019 - 2020 Metrica <span class="text-muted d-none d-sm-inline-block float-right">Crafted with <i class="mdi mdi-heart text-danger"></i> by Mannatthemes</span>
-                </footer><!--end footer-->
             </div>
             <!-- end page content -->
         </div>
