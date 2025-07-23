@@ -647,79 +647,11 @@
                         <i data-feather="menu" class="align-self-center"></i>
                     </button>
                 </li>
-                <li class="dropdown">
-                    <a class="nav-link dropdown-toggle waves-effect waves-light nav-user" data-toggle="dropdown"
-                        href="#" role="button" aria-haspopup="false" aria-expanded="false">
-                        <span class="ml-1 p-2 bg-soft-classic nav-user-name hidden-sm rounded">System <i
-                                class="mdi mdi-chevron-down"></i> </span>
+                 <li>
+                    <a href="<?php echo base_url();?>index.php/Principal/familiaSecturi" class="nav-link" >
+                        <span class="ml-1 p-2 bg-soft-classic nav-user-name hidden-sm rounded">¿Quienes Somos?</span>
                     </a>
-                    <div class="dropdown-menu dropdown-xl dropdown-menu-left p-0">
-                        <div class="row no-gutters">
-                            <div class="col-12 col-lg-6">
-                                <div class="text-center system-text">
-                                    <h4 class="text-white">The Poworfull Dashboard</h4>
-                                    <p class="text-white">See all the pages Metrica.</p>
-                                    <a href="https://mannatthemes.com/metrica/" class="btn btn-sm btn-pink mt-2">See
-                                        Dashboard</a>
-                                </div>
-                                <div id="carouselExampleFade" class="carousel slide carousel-fade" data-ride="carousel">
-                                    <div class="carousel-inner">
-                                        <div class="carousel-item active">
-                                            <img src="<?php echo base_url(); ?>assets/images/dashboard/dash-1.png"
-                                                class="d-block img-fluid" alt="...">
-                                        </div>
-                                        <div class="carousel-item">
-                                            <img src="<?php echo base_url(); ?>assets/images/dashboard/dash-4.png"
-                                                class="d-block img-fluid" alt="...">
-                                        </div>
-                                        <div class="carousel-item">
-                                            <img src="<?php echo base_url(); ?>assets/images/dashboard/dash-2.png"
-                                                class="d-block img-fluid" alt="...">
-                                        </div>
-                                        <div class="carousel-item">
-                                            <img src="<?php echo base_url(); ?>assets/images/dashboard/dash-3.png"
-                                                class="d-block img-fluid" alt="...">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!--end col-->
-                            <div class="col-12 col-lg-6">
-                                <div class="divider-custom mb-0">
-                                    <div class="divider-text bg-light">All Dashboard</div>
-                                    </divi>
-                                    <div class="p-4 text-left">
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <a class="dropdown-item mb-2"
-                                                    href="<?php echo base_url(); ?>analytics/analytics-index.html">
-                                                    Analytics</a>
-                                                <a class="dropdown-item mb-2"
-                                                    href="<?php echo base_url(); ?>crypto/crypto-index.html"> Crypto</a>
-                                                <a class="dropdown-item mb-2"
-                                                    href="<?php echo base_url(); ?>crm/crm-index.html"> CRM</a>
-                                                <a class="dropdown-item"
-                                                    href="<?php echo base_url(); ?>projects/projects-index.html">
-                                                    Project</a>
-                                            </div>
-                                            <div class="col-6">
-                                                <a class="dropdown-item mb-2"
-                                                    href="<?php echo base_url(); ?>ecommerce/ecommerce-index.html">
-                                                    Ecommerce</a>
-                                                <a class="dropdown-item mb-2"
-                                                    href="<?php echo base_url(); ?>helpdesk/helpdesk-index.html">
-                                                    Helpdesk</a>
-                                                <a class="dropdown-item"
-                                                    href="<?php echo base_url(); ?>hospital/hospital-index.html">
-                                                    Hospital</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!--end col-->
-                            </div>
-                            <!--end row-->
-                        </div>
+                   
                 </li>
                 <li class="hide-phone app-search">
                     <h6>

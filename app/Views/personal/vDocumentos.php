@@ -99,15 +99,7 @@
                                 </div><!--end card-body-->
                             </div><!--end card-->
 
-                            <div class="card">
-                                <div class="card-body">                                        
-                                    <small class="float-right">62%</small>
-                                    <h6 class="mt-0">620GB / 1TB En uso</h6>
-                                    <div class="progress" style="height: 5px;">
-                                        <div class="progress-bar bg-success" role="progressbar" style="width: 62%;" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                </div><!--end card-body-->
-                            </div><!--end card-->
+                     
                         </div><!--end col-->
 
                         <div class="col-lg-9">
@@ -115,283 +107,189 @@
                                 <div class="tab-content" id="files-tabContent">
                                   
                                     <div class="tab-pane fade show active" id="files-projects">
-                                        <h4 class="header-title mt-0 mb-3">Normateca</h4>                                         
-                                        <div class="file-box-content">
-                                            <div class="file-box">
-                                                <a href="#" class="download-icon-link">
-                                                    <i class="dripicons-download file-download-icon"></i>
-                                                </a>
-                                                <div class="text-center" title="Programa de Gobierno">
-                                                    <i class="far fa-file-alt text-primary"></i>
-                                                    <h6 class="text-truncate">1.- Programa de Gobierno</h6>
-                                                    <small class="text-muted">2018-2024</small>
-                                                </div>                                                        
-                                            </div>
-                                            <div class="file-box">
-                                                <a href="#" class="download-icon-link">
-                                                    <i class="dripicons-download file-download-icon"></i>
-                                                </a>
-                                                <div class="text-center" title="Programa de Gobierno 2024 Actualización" >
-                                                    <i class="far fa-file-code text-danger"></i>
-                                                    <h6 class="text-truncate">2.- Programa de Gobierno </h6>
-                                                    <small class="text-muted">2018 - 2024_Actualización</small>
-                                                </div>                                                        
-                                            </div>
-                                            <div class="file-box">
-                                                <a href="#" class="download-icon-link">
-                                                    <i class="dripicons-download file-download-icon"></i>
-                                                </a>
-                                                <div class="text-center">
-                                                    <i class="far fa-file-archive text-warning"></i>
-                                                    <h6 class="text-truncate">3.- Programa Sectorial Economía para Todos </h6>
-                                                    <small class="text-muted">2019-2024</small>
-                                                </div>                                                        
-                                            </div>
-                                            <div class="file-box">
-                                                <a href="#" class="download-icon-link">
-                                                    <i class="dripicons-download file-download-icon"></i>
-                                                </a>
-                                                <div class="text-center">
-                                                    <i class="far fa-file text-secondary"></i>
-                                                    <h6 class="text-truncate">4.- Actualización Programa Sectorial Eje Economía para Todos</h6>
-                                                    <small class="text-muted">2019-2024</small>
-                                                </div>                                                        
-                                            </div>                                                
-                                            <div class="file-box">
-                                                <a href="#" class="download-icon-link">
-                                                    <i class="dripicons-download file-download-icon"></i>
-                                                </a>
-                                                <div class="text-center">
-                                                    <i class="far fa-file text-secondary"></i>
-                                                    <h6 class="text-truncate">5.- Actualización Programa Sectorial Eje Economía para Todos</h6>
-                                                    <small class="text-muted">2019-2024 fe de erratas</small>
-                                                </div>                                                        
-                                            </div>                                                
-                                            <div class="file-box">
-                                                <a href="#" class="download-icon-link">
-                                                    <i class="dripicons-download file-download-icon"></i>
-                                                </a>
-                                                <div class="text-center">
-                                                    <i class="far fa-file text-secondary"></i>
-                                                    <h6 class="text-truncate">6.Programa Estatal de Turismo</h6>
-                                                    <small class="text-muted">2021-2024</small>
-                                                </div>                                                        
-                                            </div>                                                
-                                            <div class="file-box">
-                                                <a href="#" class="download-icon-link">
-                                                    <i class="dripicons-download file-download-icon"></i>
-                                                </a>
-                                                <div class="text-center">
-                                                    <i class="far fa-file text-secondary"></i>
-                                                    <h6 class="text-truncate">Actualización Programa Sectorial Eje Economía para Todos</h6>
-                                                    <small class="text-muted">2019-2024</small>
-                                                </div>                                                        
-                                            </div>                                                
-                                        </div> 
-                                        
+                                                                                
                                         <div class="row">
-                                            <div class="col-12">
-                                                <h4 class="header-title my-3">Ley, Lineamientos, Reglamentos, Acuerdos, etc.,</h4>  
-                                            </div>
-                                        </div>
-                                        <div class="file-box-content">
-                                            <div class="file-box">
-                                                <a href="#" class="download-icon-link">
-                                                    <i class="dripicons-download file-download-icon"></i>
-                                                </a>
-                                                <div class="text-center">
-                                                    <i class="far fa-file-alt text-primary"></i>
-                                                    <h6 class="text-truncate">Acuerdo de Creación del Observatorio Turístico del Estado de Guanajuato</h6>
-                                                    <small class="text-muted">2013</small>
-                                                </div>                                                        
-                                            </div>
-                                            <div class="file-box">
-                                                <a href="#" class="download-icon-link">
-                                                    <i class="dripicons-download file-download-icon"></i>
-                                                </a>
-                                                <div class="text-center">
-                                                    <i class="far fa-file-code text-info"></i>
-                                                    <h6 class="text-truncate">Constitución Política de los Estados Unidos Mexicanos</h6>
-                                                </div>                                                        
-                                            </div>                                                                                               
-                                            <div class="file-box">
-                                                <a href="#" class="download-icon-link">
-                                                    <i class="dripicons-download file-download-icon"></i>
-                                                </a>
-                                                <div class="text-center">
-                                                    <i class="far fa-file-code text-info"></i>
-                                                    <h6 class="text-truncate">Constitución Política ra para el Estado de Guanajuato</h6>
-                                                </div>                                                        
-                                            </div>                                                                                               
-                                            <div class="file-box">
-                                                <a href="#" class="download-icon-link">
-                                                    <i class="dripicons-download file-download-icon"></i>
-                                                </a>
-                                                <div class="text-center">
-                                                    <i class="far fa-file-code text-info"></i>
-                                                    <h6 class="text-truncate">Festivales Internacionales y Eventos Especiales para el Ejercicio Fiscal de 2022</h6>
-                                                     <small class="text-muted">2022</small>
-                                                </div>                                                        
-                                            </div>                                                                                               
-                                        </div>
+                                            <div class="col-lg-12">
+                                                <div class="card">
+                                                    <div class="card-body">
+
+                                                        <h4 class="mt-0 header-title">Normateca</h4>
+                                                        <p class="text-muted mb-4">Seccion 1</p>
+
+                                                        <div class="custom-dd dd" id="nestable_list_1">
+                                                            <ol class="dd-list">
+                                                                <li class="dd-item" data-id="1">
+                                                                    <div class="dd-handle">
+                                                                        Programa de Gobierno 2018-2024
+                                                                    </div>
+                                                                </li>
+                                                                <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                        Programa de Gobierno 2018 - 2024_Actualización
+                                                                    </div>
+                                                                </li>
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                        Programa Sectorial Economía para Todos 2019-2024
+                                                                    </div>
+                                                                </li>  
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                        Actualización Programa Sectorial Eje Economía para Todos 2019-2024
+                                                                    </div>
+                                                                </li>  
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                        Programa Estatal de Turismo 2021 - 2024
+                                                                    </div>
+                                                                </li>  
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                        Programa de Gobierno 2018 - 2024_Actualización
+                                                                    </div>
+                                                                </li>
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                        Acuerdo de Creación del Observatorio Turístico del Estado de Guanajuato
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                     Constitución Política de los Estados Unidos Mexicanos
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                        Constitución Política ra para el Estado de Guanajuato
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                        Festivales Internacionales y Eventos Especiales para el Ejercicio Fiscal de 2022
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                       Ley de Archivos Generales del Estado y los Municipios de Guanajuato
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                        Ley de Contrataciones Públicas para el Estado de Guanajuato
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                        Ley de Hacienda para el Estado de Guanajuato
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                        Ley de Hospedaje a través de Plataformas Digitales del Estado de Guanajuato
+                                                                    </div>
+                                                                </li> 
+                                                            </ol>
+                                                        </div><!--nastable-list-1-->    
+                                                    </div><!--end card-body-->
+                                                </div><!--end card-->
+                                            </div> <!-- end col -->
+
+                                        
+                                        </div> <!-- end row -->  
                                     </div><!--end tab-pane-->
 
                                     <div class="tab-pane fade" id="files-pdf">
-                                        <h4 class="mt-0 header-title mb-3">PDF Files</h4>
-                                        <div class="file-box-content">
-                                            <div class="file-box">
-                                                <a href="#" class="download-icon-link">
-                                                    <i class="dripicons-download file-download-icon"></i>
-                                                </a>
-                                                <div class="text-center">
-                                                    <i class="far fa-file-pdf text-info"></i>
-                                                    <h6 class="text-truncate">Admin_Panel</h6>
-                                                    <small class="text-muted">06 Mar 2019</small>
-                                                </div>                                                        
-                                            </div>
-                                            <div class="file-box">
-                                                <a href="#" class="download-icon-link">
-                                                    <i class="dripicons-download file-download-icon"></i>
-                                                </a>
-                                                <div class="text-center">
-                                                    <i class="far fa-file-pdf text-danger"></i>
-                                                    <h6 class="text-truncate">Ecommerce.pdf</h6>
-                                                    <small class="text-muted">15 Mar 2019</small>
-                                                </div>                                                        
-                                            </div>
-                                            <div class="file-box">
-                                                <a href="#" class="download-icon-link">
-                                                    <i class="dripicons-download file-download-icon"></i>
-                                                </a>
-                                                <div class="text-center">
-                                                    <i class="far fa-file-pdf text-warning"></i>
-                                                    <h6 class="text-truncate">Payment_app.zip</h6>
-                                                    <small class="text-muted">11 Abr 2019</small>
-                                                </div>                                                        
-                                            </div>
-                                            <div class="file-box">
-                                                <a href="#" class="download-icon-link">
-                                                    <i class="dripicons-download file-download-icon"></i>
-                                                </a>
-                                                <div class="text-center">
-                                                    <i class="far fa-file-pdf text-secondary"></i>
-                                                    <h6 class="text-truncate">App_landing_001.pdf</h6>
-                                                    <small class="text-muted">06 Mar 2019</small>
-                                                </div>                                                        
-                                            </div>                                                
-                                        </div> 
+                                        
                                     </div><!--end tab-pane-->
 
                                     <div class="tab-pane fade" id="files-documents">
-                                        <h4 class="mt-0 header-title mb-3">Documents</h4>
-                                        <div class="file-box-content">
-                                            <div class="file-box">
-                                                <a href="#" class="download-icon-link">
-                                                    <i class="dripicons-download file-download-icon"></i>
-                                                </a>
-                                                <div class="text-center">
-                                                    <i class="far fa-file-pdf text-info"></i>
-                                                    <h6 class="text-truncate">Adharcard_update</h6>
-                                                    <small class="text-muted">06 Mar 2019</small>
-                                                </div>                                                        
-                                            </div>
-                                            <div class="file-box">
-                                                <a href="#" class="download-icon-link">
-                                                    <i class="dripicons-download file-download-icon"></i>
-                                                </a>
-                                                <div class="text-center">
-                                                    <i class="far fa-file-pdf text-danger"></i>
-                                                    <h6 class="text-truncate">Pancard</h6>
-                                                    <small class="text-muted">15 Mar 2019</small>
-                                                </div>                                                        
-                                            </div>
-                                            <div class="file-box">
-                                                <a href="#" class="download-icon-link">
-                                                    <i class="dripicons-download file-download-icon"></i>
-                                                </a>
-                                                <div class="text-center">
-                                                    <i class="far fa-file-pdf text-warning"></i>
-                                                    <h6 class="text-truncate">ICICI_statment</h6>
-                                                    <small class="text-muted">11 Abr 2019</small>
-                                                </div>                                                        
-                                            </div>
-                                            <div class="file-box">
-                                                <a href="#" class="download-icon-link">
-                                                    <i class="dripicons-download file-download-icon"></i>
-                                                </a>
-                                                <div class="text-center">
-                                                    <i class="far fa-file-pdf text-secondary"></i>
-                                                    <h6 class="text-truncate">March_Invoice</h6>
-                                                    <small class="text-muted">06 Mar 2019</small>
-                                                </div>                                                        
-                                            </div>                                                
-                                        </div> 
-
                                         <div class="row">
-                                            <div class="col-12">
-                                                <h4 class="header-title my-3">Company Documents</h4>  
-                                            </div>
-                                        </div>
-                                        <div class="file-box-content">
-                                            <div class="file-box">
-                                                <a href="#" class="download-icon-link">
-                                                    <i class="dripicons-download file-download-icon"></i>
-                                                </a>
-                                                <div class="text-center">
-                                                    <i class="far fa-file-pdf text-success"></i>
-                                                    <h6 class="text-truncate">Adharcard_update</h6>
-                                                    <small class="text-muted">06 Mar 2019</small>
-                                                </div>                                                        
-                                            </div>
-                                            <div class="file-box">
-                                                <a href="#" class="download-icon-link">
-                                                    <i class="dripicons-download file-download-icon"></i>
-                                                </a>
-                                                <div class="text-center">
-                                                    <i class="far fa-file-pdf text-pink"></i>
-                                                    <h6 class="text-truncate">Pancard</h6>
-                                                    <small class="text-muted">15 Mar 2019</small>
-                                                </div>                                                        
-                                            </div>
-                                            <div class="file-box">
-                                                <a href="#" class="download-icon-link">
-                                                    <i class="dripicons-download file-download-icon"></i>
-                                                </a>
-                                                <div class="text-center">
-                                                    <i class="far fa-file-pdf text-purple"></i>
-                                                    <h6 class="text-truncate">ICICI_statment</h6>
-                                                    <small class="text-muted">11 Abr 2019</small>
-                                                </div>                                                        
-                                            </div>                                                                                           
-                                        </div>
+                                            <div class="col-lg-12">
+                                                <div class="card">
+                                                    <div class="card-body">
 
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <h4 class="header-title my-3">Personal Documents</h4>  
-                                            </div>
-                                        </div>
-                                        <div class="file-box-content">
-                                            <div class="file-box">
-                                                <a href="#" class="download-icon-link">
-                                                    <i class="dripicons-download file-download-icon"></i>
-                                                </a>
-                                                <div class="text-center">
-                                                    <i class="far fa-file-pdf text-blue"></i>
-                                                    <h6 class="text-truncate">Adharcard_update</h6>
-                                                    <small class="text-muted">06 Mar 2019</small>
-                                                </div>                                                        
-                                            </div>
-                                            <div class="file-box">
-                                                <a href="#" class="download-icon-link">
-                                                    <i class="dripicons-download file-download-icon"></i>
-                                                </a>
-                                                <div class="text-center">
-                                                    <i class="far fa-file-pdf text-dark"></i>
-                                                    <h6 class="text-truncate">Pancard</h6>
-                                                    <small class="text-muted">15 Mar 2019</small>
-                                                </div>                                                        
-                                            </div>                                                                                    
-                                        </div>
+                                                        <h4 class="mt-0 header-title">Formatos</h4>
+                                                        <p class="text-muted mb-4">Despacho del Secretario</p>
+
+                                                        <div class="custom-dd dd" id="nestable_list_1">
+                                                            <ol class="dd-list">
+                                                               
+                                                                <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                        F-DESP-01-2020 Ministración de Viáticos
+                                                                    </div>
+                                                                </li>
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                    F-DESP-02-2020 Formato de Solicitud de Viaje
+                                                                    </div>
+                                                                </li>  
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                        F-DESP-03-20 Anexo 1 Ficha Informativa
+                                                                    </div>
+                                                                </li>  
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                       F-DESP-05-2020 Informe de Seguimiento Viaje al Extranjero
+                                                                    </div>
+                                                                </li>  
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                        F-DESP-06-2020 Tarjeta Informativa de Audiencias
+                                                                    </div>
+                                                                </li>
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                        F-DESP-07-2020 Tarjeta Informativa de Invitaciones
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                    F-DESP-08-2023-Hoja Membretada 200 años
+                                                                    </div>
+                                                                </li> 
+                                                                </ol>
+                                                                 <ol class="dd-list">
+                                                                 <p class="text-muted mb-4">Dirección de Asuntos Jurídicos</p>
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                        F-DAJ-01-2020 Portada Expediente
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                       F-DAJ-03-2020 Formato Lomos Carpetas
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                       F-DAJ-04-2020 Etiqueta Caja de Archivo
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                       F-DAJ-05-2020 Relación de Contenido Caja de Archivo
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                        F-DAJ-06-2020 Etiqueta de Mobiliario de Archivo
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                        F-DAJ-08-2020 Autorizacion de Tratamiento de Datos
+                                                                    </div>
+                                                                </li> 
+                                                            </ol>
+                                                        </div><!--nastable-list-1-->    
+                                                    </div><!--end card-body-->
+                                                </div><!--end card-->
+                                            </div> <!-- end col -->
+
+                                        
+                                        </div> <!-- end row --> 
                                     </div><!--end tab-pen-->
 
                                     <div class="tab-pane fade" id="files-hide">

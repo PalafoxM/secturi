@@ -1282,6 +1282,15 @@ class Principal extends BaseController {
         $data['contentView'] = 'personal/vTablaArchivos';                
         $this->_renderView($data);
     }
+    
+     public function familiaSecturi()
+    {  
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $data['scripts'] = array('inicio');
+        $data['contentView'] = 'personal/vfamiliaSecturi';                
+        $this->_renderView($data);
+    }
  
     private function numeroEnLetras($numero)
     {
