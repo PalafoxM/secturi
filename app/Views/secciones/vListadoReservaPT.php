@@ -379,8 +379,6 @@
 <script src="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/pages/jquery.analytics_customers.init.js"></script>
 
-
-
 <script src="<?= base_url()?>assets/js/metismenu.min.js"></script>
 <script src="<?= base_url()?>assets/js/waves.js"></script>
 <script src="<?= base_url()?>assets/js/feather.min.js"></script>

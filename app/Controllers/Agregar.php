@@ -68,14 +68,16 @@ class Agregar extends BaseController {
         $session = \Config\Services::session();
         $data = array();
         $catalogos = new Mglobal;
+        $subordinados = $catalogos->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_jefe_inmediato' => $session->id_usuario]])->data;
+        $esJefe = (!empty($subordinados))?true:false;
 
- 
 
-            $data['scripts'] = array('principal','agregar');
-            $data['edita'] = 0;
-            $data['nombre_completo'] = $session->nombre_completo; 
-            $data['contentView'] = 'formularios/vFormAgregar';                
-            $this->_renderView($data);
+       $data['scripts'] = array('principal','agregar');
+       $data['edita'] = 0;
+       $data['esJefe'] = $esJefe ;
+       $data['nombre_completo'] = $session->nombre_completo; 
+       $data['contentView'] = 'formularios/vFormAgregar';                
+       $this->_renderView($data);
     }
    public function procesarPDF(array $archivos, $id_presupuesto= null)
     {
@@ -1063,7 +1065,7 @@ class Agregar extends BaseController {
         $session = \Config\Services::session();
         $response = new \stdClass();
         $globals = new Mglobal;
-        $id_incidencia = $this->getPost('id_incidencia');
+        $id_incidencia = $this->request->getPost('id_incidencia');
         if( in_array($session->get('id_perfil'). [1,2 ])){
            $inicencias = $globals->getTabla(['tabla' => 'incidencia', 'where' => ['visible' => 1]]);
         }else{
@@ -1076,13 +1078,65 @@ class Agregar extends BaseController {
         }
         return $this->respond($response);
     }
+    public function aceptarIncidencia()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $globals = new Mglobal;
+        $id_incidencia = $this->request->getPost('id_incidencia');
+        $id_aceptar    = $this->request->getPost('id_aceptar');
+        $dataBitacora = ['id_user' =>  $session->get('id_usuario'), 'script' => 'Agregar.php/guardaIncidencia'];
+     
+
+        $dataConfig = [
+                "tabla"=>"incidencia",
+                "editar"=>true,
+                "idEditar"=>['id_incidencia'=>$id_incidencia]
+            ];
+            $Insert = [
+                'id_estatus'  => $id_aceptar,
+                'usu_act'     => $session->get('id_usuario')                    
+            ];
+           $result = $globals->saveTabla($Insert,$dataConfig,$dataBitacora);
+           if(!$result->error){
+              $response->error = false;
+              $response->respuesta = $result->respuesta;
+           }
+        
+        return $this->respond($response);
+    }
+    public function eliminarIncidencia()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $globals = new Mglobal;
+        $id_incidencia = $this->request->getPost('id_incidencia');
+        $dataBitacora = ['id_user' =>  $session->get('id_usuario'), 'script' => 'Agregar.php/EliminarIncidencia'];
+        $dataConfig = [
+                "tabla"=>"incidencia",
+                "editar"=>true,
+                "idEditar"=>['id_incidencia'=>$id_incidencia]
+            ];
+            $Insert = [
+                'visible'  => 0,
+                'usu_act'   => $session->get('id_usuario')                    
+            ];
+        $result = $globals->saveTabla($Insert,$dataConfig,$dataBitacora);
+           if(!$result->error){
+              $response->error = false;
+              $response->respuesta = $result->respuesta;
+           }
+        
+        return $this->respond($response);
+    }
     public function detalleIncidencia()
     {
         $session = \Config\Services::session();
         $response = new \stdClass();
         $globals = new Mglobal;
-        $id_incidencia = $this->getPost('id_incidencia');
-        $inicencias = $globals->getTabla(['tabla' => 'vw_incidencia', 'where' => ['visible' => 1, 'id_incidencia' => $id_incidencia]]);
+        $id_incidencia = $this->request->getPost('id_incidencia');
+        $inicencias = $globals->getTabla(['tabla' => 'vw_incidenica', 'where' => ['visible' => 1, 'id_incidencia' => $id_incidencia]]);
+       
         if(!$inicencias->error){
             $response->error = false;
             $response->data = $inicencias->data[0]; 

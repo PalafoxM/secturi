@@ -51,7 +51,7 @@ class Inicio extends BaseController {
         }
         $data['scripts'] = array('principal','inicio');
         $data['edita'] = 0;
-        $data['nombre_completo'] = $session->nombre_completo; 
+        $data['nombre_completo'] = $session->nombre_completo;
         $data['contentView'] =   $vista;               
         $this->_renderView($data);
         
@@ -105,7 +105,7 @@ class Inicio extends BaseController {
         $session = \Config\Services::session();
         $principal = new Mglobal;
    
-    if (!in_array($session->get('id_perfil'), [1, 2])) {
+    if (!in_array($session->get('id_perfil'), [1, 3])) {
             $data['contentView'] = 'secciones/vError500';
             $data['layout'] = 'plantilla/lytLogin';
             $this->_renderView($data);

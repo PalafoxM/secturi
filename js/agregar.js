@@ -25,6 +25,22 @@ st.agregar = (function () {
                 }
             });
         },
+        validacionIncapacidad: function()
+        {
+         let incidencia = $('#tipo_incidencia').val();
+         console.log(incidencia);
+         if(incidencia == 5){
+            $('#timepicker_inicio').val('8:30').prop('disabled', true)
+            $('#timepicker_fin').val('16:00').prop('disabled', true)
+            $('#detalles').val('VACACIONES').prop('disabled', true)
+            $('#comentario').val('VACACIONES').prop('disabled', true)
+         }else{
+            $('#timepicker_inicio').val('').prop('disabled', false)
+            $('#timepicker_fin').val('').prop('disabled', false)
+            $('#detalles').val('').prop('disabled', false)
+            $('#comentario').val('').prop('disabled', false)
+         }
+        },
         agregarUsuario: function(){
             $("#formAgregarUsuarioTsi").submit(function (e) {
                 e.preventDefault(); 
@@ -516,18 +532,23 @@ st.agregar = (function () {
         let tipo_incidencia = $('#tipo_incidencia').val();
         let comentario      = $('#comentario').val();
         let detalles        = $('#detalles').val();
-        let fecha        = $('#fecha').val();
+        let fecha           = $('#fecha').val();
+
             if(!hora_inicio){
-              Swal.fire("Error", 'Es requerido la <strong>hora de inicio</strong>', 'error');
+              Swal.fire("Atención", 'Es requerido la <strong>hora de inicio</strong>', 'info');
+              return
             }
             if(!hora_fin){
-              Swal.fire("Error", 'Es requerido la <strong>hora de fin</strong>','error');
+              Swal.fire("Atención", 'Es requerido la <strong>hora de fin</strong>','info');
+              return
             }
             if(!tipo_incidencia){
-              Swal.fire("Error", 'Es requerido la <strong>tipo incidencia</strong>','error');
+              Swal.fire("Atención", 'Es requerido la <strong>tipo incidencia</strong>','info');
+              return
             }
-            if(!comentario){
-              Swal.fire("Error", 'Es requerido la <strong>comentario</strong>','error');
+            if(!detalles){
+              Swal.fire("Atención", 'Es requerido la <strong>detalles</strong>','info');
+              return
             }
             $.ajax({
                     type: "POST",

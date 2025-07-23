@@ -34,6 +34,31 @@ saeg.principal = (function () {
                 event.stopImmediatePropagation();
             });
         },
+        aceptarIncidencia: function(id_incidencia, id_aceptar)
+        {
+        $.ajax({
+                url:  base_url + "index.php/Agregar/aceptarIncidencia",
+                type: 'POST',
+                data: { id_incidencia, id_aceptar },
+                dataType: 'json',
+                success: function(response) {
+                    
+                    if(!response.error){
+                      Swal.fire("Correcto", response.respuesta, "success");
+                    }else{
+                       Swal.fire("Error", response.respuesta, "error");
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire("Error", "Ocurrió un error en la solicitud: " + error, "error");
+                },
+                complete: function(){
+                       setTimeout(() => {
+                                 window.location.reload();
+                        }, 1000);
+                }
+            });
+        },
         detalleIncidencia: function(id_incidencia)
         {
           $('#detalleIncidencia').modal('show');
@@ -43,11 +68,45 @@ saeg.principal = (function () {
                     data: { id_incidencia },
                     dataType: 'json',
                     success: function(response) {
-                    
+                    let resul = response.data;
+                    if(resul){
+                        $("#nombre").val(resul.nombre_completo);
+                        $("#tipo_incidencia").val(resul.dsc_incidencia);
+                        $("#detalles").val(resul.detalles);
+                        $("#comentario").val(resul.comentario);
+                        $("#hora_fin").val(resul.hora_fin);
+                        $("#hora_inicio").val(resul.hora_inicio);
+                    }
                      
                     },
                     error: function(xhr, status, error) {
                         Swal.fire("Error", "Ocurrió un error en la solicitud: " + error, "error");
+                    }
+                });
+
+        },
+        eliminarIncidencia: function(id_incidencia)
+        {
+           $.ajax({
+                    url:  base_url + "index.php/Agregar/eliminarIncidencia",
+                    type: 'POST',
+                    data: { id_incidencia },
+                    dataType: 'json',
+                    success: function(resul) {
+                        if(!resul.error){
+                            Swal.fire("Correcto", resul.respuesta, "success");
+                        }else{
+                            Swal.fire("Error", resul.respuesta, "error");
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire("Error", "Ocurrió un error en la solicitud: " + error, "error");
+                    },
+                    complete: function()
+                    {
+                          setTimeout(() => {
+                                 window.location.reload();
+                        }, 1500);
                     }
                 });
 

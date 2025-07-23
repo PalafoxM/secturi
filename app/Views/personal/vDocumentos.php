@@ -199,7 +199,94 @@
                                     </div><!--end tab-pane-->
 
                                     <div class="tab-pane fade" id="files-pdf">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="card">
+                                                    <div class="card-body">
+
+                                                        <h4 class="mt-0 header-title">Normatividad interna</h4>
+                                                        <p class="text-muted mb-4">Seccion 2</p>
+
+                                                        <div class="custom-dd dd" id="nestable_list_1">
+                                                            <ol class="dd-list">
+                                                                <li class="dd-item" data-id="1">
+                                                                    <div class="dd-handle">
+                                                                       Norma mexicana de igualdad laboral y no discriminacion
+                                                                    </div>
+                                                                </li>
+                                                                <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                        Reglamento-Interior-SEDETUR-2007
+                                                                    </div>
+                                                                </li>
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                        Reglamento-SEDETUR-2007-Modificacion
+                                                                    </div>
+                                                                </li>  
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                        Reglamento-Interior-SEDETUR-2011-Modificacion-2
+                                                                    </div>
+                                                                </li>  
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                       Acuerdo secretarial No. 005 por el que se crea el CISMA
+                                                                    </div>
+                                                                </li>  
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                        Código de Conducta de la Secretaría de Turismo
+                                                                    </div>
+                                                                </li>
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                   Consideraciones de sustentabildad para conferencias, talleres y reuniones
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                     GUIA-DE-ACTUACION-2O17
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                        Informe de cumplimiento del PADA 2023
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                     Lineamientos de Asistencia 2025
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                      Lineamientos Recursos Destinados a Acciones y Proyectos de Inversión
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                        Manual de Inducción Interno SECTUR
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                        Manual de Integración y Funcionamiento del CISMA
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                       Manual de Organización SECTUR
+                                                                    </div>
+                                                                </li> 
+                                                            </ol>
+                                                        </div><!--nastable-list-1-->    
+                                                    </div><!--end card-body-->
+                                                </div><!--end card-->
+                                            </div> <!-- end col -->
+
                                         
+                                        </div> <!-- end row -->  
                                     </div><!--end tab-pane-->
 
                                     <div class="tab-pane fade" id="files-documents">

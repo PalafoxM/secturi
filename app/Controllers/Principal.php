@@ -971,7 +971,7 @@ class Principal extends BaseController {
 
     return $this->respond($response);
     }
-
+  
     private function enviarEmail()
     {
         $session = \Config\Services::session();
@@ -1020,6 +1020,51 @@ class Principal extends BaseController {
           $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
         } 
     }
+    private function envioCorreoJefeInmediato()
+    {
+        $session = \Config\Services::session();
+        $email =  \Config\Services::email();
+        $globals      = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+
+        $id_jefe_inmediato = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->get('id_usuario')]])->data[0]->id_jefe_inmediato;
+        $correoJefe = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $id_jefe_inmediato]])->data[0]->correo;
+
+       $email->setTo($correoJefe);
+
+       $email->setSubject('Solicitud de Autorización de Incidencia');
+
+        $email->setMessage('
+            <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+                <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+                    <!-- Encabezado con logotipo -->
+                    <div style="background-color: #004080; padding: 20px; text-align: center;">
+                        <img src="' . base_url('assets/images/logo.png') . '" alt="Logo" style="height: 60px;">
+                    </div>
+                    <!-- Contenido principal -->
+                    <div style="padding: 30px; color: #333;">
+                        <h2 style="color: #004080;">Solicitud de autorización de incidencia</h2>
+                        <p style="font-size: 16px;">El usuario <strong>' . $session->get('nombre_completo') . '</strong> ha registrado una incidencia en el sistema <strong>SUSI</strong>.</p>
+                        <p style="font-size: 16px;">Le solicitamos amablemente su <strong>revisión y autorización</strong> para proceder con el trámite correspondiente.</p>
+                        <p style="font-size: 15px;">Puede consultar y validar esta incidencia ingresando al sistema o siguiendo su flujo de aprobación.</p>
+                        <p style="font-size: 15px; color: #888;">Este mensaje fue generado automáticamente por el sistema SUSI. No es necesario responder a este correo.</p>
+                    </div>
+                    <!-- Pie de página -->
+                    <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 13px; color: #666;">
+                        © ' . date('Y') . ' Sistema de Atención SUSI. Todos los derechos reservados - SECTURI.
+                    </div>
+                </div>
+            </div>
+        ');
+                  // Intentar enviar el correo
+       if ($email->send()) {
+          $response->error = false;
+          $response->respuesta = "Correo enviado correctamente.";
+        } else {
+          $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
+        }  
+    }
     public function guardarIncidencia()
     {  
         $session = \Config\Services::session();
@@ -1046,7 +1091,8 @@ class Principal extends BaseController {
         if(!$result->error){
            $response->error= false; 
            $response->respuesta= $result->respuesta; 
-        } 
+        }
+        $this->envioCorreoJefeInmediato(); 
         return $this->respond($response);
     }
     public function actualizarBanco()
@@ -1195,6 +1241,17 @@ class Principal extends BaseController {
         $data['scripts'] = array('inicio');
         $data['edita'] = 0;
         $data['contentView'] = 'secciones/vListadoProveedor';                
+        $this->_renderView($data); 
+    }
+    public function incidenciaSubordinado()
+    {
+        $session = \Config\Services::session();
+        $globals      = new Mglobal;
+        $incidencia    = $globals->getTabla(['tabla' => 'vw_incidenica', 'where' => ['visible' => 1, 'id_jefe_inmediato' => $session->get('id_usuario')]]);
+
+        $data['incidencia']    = (!empty($incidencia->data))?$incidencia->data:[];
+        $data['scripts'] = array('inicio', 'principal');
+        $data['contentView'] = 'secciones/vListaIncidencia';                
         $this->_renderView($data); 
     }
     public function listaReservaPT()
@@ -1679,8 +1736,57 @@ class Principal extends BaseController {
 
         }
         return $this->respond($response);
-        
-        
+    }
+    public function reporteIncidencia()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $registro_pt = $globals->getTabla([
+            'tabla' => 'vw_registro_pt',
+            'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
+        ]);
+       
+        if (!empty($registro_pt->data)) {
+            $data['registro'] = $registro_pt->data[0];
+            $folio = $globals->getTabla([
+                'tabla' => 'direccion',
+                'where' => ['visible' => 1, 'id_area' => $data['registro']->id_direccion_responsable]
+            ]);
+            $data['folio'] = $folio->data[0]->folio_prefijo;
+        } else {
+            echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
+            die();
+        }
+       switch($id_archivo){
+            case 1:
+                $doc = 'assets/pdf/plantillas/anexo02.pdf';
+                $formato = 'personal/vFormato01.php';
+                break;
+            case 4:
+                $doc = 'assets/pdf/plantillas/anexo04.pdf';
+                 $formato ='personal/vFormato04.php';
+                break;
+        }
+        $html = view( $formato, $data);
+        // Crear instancia de mPDF
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 0,
+            'margin_left' => 1,
+            'margin_right' => 1,
+            'format' => [213, 268],
+            'mirrorMargins' => false,
+        ]);
+
+        // Importar el PDF base
+      
+        $pagecount = $mpdf->SetSourceFile(FCPATH . $doc );
+        $mpdf->AddPage();
+        $tplId = $mpdf->ImportPage(1);
+        $mpdf->UseTemplate($tplId);
+        $mpdf->WriteHTML($html);
+
+        $mpdf->Output('Formato_pt.pdf', 'I');
+        exit();
     }
   
 }

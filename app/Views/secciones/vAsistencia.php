@@ -195,7 +195,7 @@
                                         <div class="activity-info">
                                             <div class="activity-info-text mb-2">
                                                 <label for="tipo_incidencia" class="form-label">Tipo de Incidencia</label>
-                                                <select class="select2 form-control" id="tipo_incidencia">
+                                                <select class="select2 form-control" id="tipo_incidencia"  >
                                                      <option value="">Seleccione</option>
                                                      <?php foreach($cat_incidencia as $c): ?>
                                                      <option value="<?= $c->id_incidencia?>"><?= $c->dsc_incidencia ?></option>
@@ -301,37 +301,71 @@
  <script src='<?php echo base_url() ?>plugins/fullcalendar/packages/timegrid/main.js'></script>
  <script src='<?php echo base_url() ?>plugins/fullcalendar/packages/interaction/main.js'></script>
  <script src='<?php echo base_url() ?>plugins/fullcalendar/packages/list/main.js'></script>
-
-
-
-        <script src="<?php echo base_url() ?>plugins/apexcharts/apexcharts.min.js"></script> 
-
+  <script src="<?php echo base_url() ?>plugins/apexcharts/apexcharts.min.js"></script> 
         <!-- Plugins js -->
-        <script src="<?php echo base_url() ?>plugins/moment/moment.js"></script>
-        <script src="<?php echo base_url() ?>plugins/daterangepicker/daterangepicker.js"></script>
-        <script src="<?php echo base_url() ?>plugins/select2/select2.min.js"></script>
-        <script src="<?php echo base_url() ?>plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
-        <script src="<?php echo base_url() ?>plugins/timepicker/bootstrap-material-datetimepicker.js"></script>
-        <script src="<?php echo base_url() ?>plugins/bootstrap-maxlength/bootstrap-maxlength.min.js"></script>
-        <script src="<?php echo base_url() ?>plugins/bootstrap-touchspin/js/jquery.bootstrap-touchspin.min.js"></script>
-
-        <script src="<?php echo base_url() ?>assets/pages/jquery.forms-advanced.js"></script>
-        
+<script src="<?php echo base_url() ?>plugins/moment/moment.js"></script>
+<script src="<?php echo base_url() ?>plugins/daterangepicker/daterangepicker.js"></script>
+<script src="<?php echo base_url() ?>plugins/select2/select2.min.js"></script>
+<script src="<?php echo base_url() ?>plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
+<script src="<?php echo base_url() ?>plugins/timepicker/bootstrap-material-datetimepicker.js"></script>
+<script src="<?php echo base_url() ?>plugins/bootstrap-maxlength/bootstrap-maxlength.min.js"></script>
+<script src="<?php echo base_url() ?>plugins/bootstrap-touchspin/js/jquery.bootstrap-touchspin.min.js"></script>
+<script src="<?php echo base_url() ?>assets/pages/jquery.forms-advanced.js"></script>        
         <!-- App js -->
-        <script src="<?php echo base_url() ?>assets/js/app.js"></script>
-
-
-        <script src="<?php echo base_url() ?>assets/js/jquery-ui.min.js"></script>
-        <script src="<?php echo base_url() ?>assets/js/bootstrap.bundle.min.js"></script>
+<script src="<?php echo base_url() ?>assets/js/app.js"></script>
+<script src="<?php echo base_url() ?>assets/js/jquery-ui.min.js"></script>
+<script src="<?php echo base_url() ?>assets/js/bootstrap.bundle.min.js"></script>
         <script src="<?php echo base_url() ?>assets/js/metismenu.min.js"></script>
         <script src="<?php echo base_url() ?>assets/js/waves.js"></script>
         <script src="<?php echo base_url() ?>assets/js/feather.min.js"></script>
         <script src="<?php echo base_url() ?>assets/js/jquery.slimscroll.min.js"></script>
 
 
+        <link href="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet"
+    type="text/css" />
+<!-- App css -->
+
+
+
+
+
+
         <script>
      $(document).ready(function() {
+        $('#tipo_incidencia').on('change', function() {
+        st.agregar.validacionIncapacidad();
+    });
         // Inicialización de timepickers
+    $('input[name="datetimes"]').daterangepicker({
+        "locale": {
+            "applyLabel": "Aplicar",
+            "cancelLabel": "Cancelar",
+            "daysOfWeek": [
+                "Do",
+                "Lu",
+                "Ma",
+                "Mi",
+                "Ju",
+                "Vi",
+                "Sa"
+            ],
+             "monthNames": [
+                "Ene",
+                "Feb",
+                "Mar",
+                "Abr",
+                "May",
+                "Jun",
+                "Jul",
+                "Ago",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dic"
+            ],
+        }
+    });
+
     $('#timepicker_inicio').bootstrapMaterialDatePicker({
         format: 'HH:mm',
         date: false,
@@ -509,10 +543,16 @@
                 }
             });
         },
-        dateClick: function(info) {
-                let dia = info.dateStr; 
-                  st.agregar.justificarFalta(dia); // Ejecuta la función al hacer clic
-              
+       dateClick: function(info) {
+            const fecha = info.date; // tipo Date
+            const diaSemana = fecha.getDay(); // 0 (Domingo) a 6 (Sábado)
+            if (diaSemana === 0 || diaSemana === 6) {
+                 Swal.fire("Error", "No se permite justificar faltas en sábado o domingo. " , "error");
+                return; // Detiene la ejecución
+            }
+            // Si es un día hábil, continúa
+            let dia = info.dateStr;
+            st.agregar.justificarFalta(dia);
         },
        dayRender: function(info) {
             

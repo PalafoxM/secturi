@@ -242,18 +242,18 @@
                 </span>
             </a>
            <nav class="nav">
-                         
+                    <?php if($session->esJefe): ?>   
                         <a href="#MetricaDashboard" class="nav-link" data-toggle="tooltip-custom" data-placement="right" data-trigger="hover" title="" data-original-title="Jefes">
                             <i data-feather="award" class="align-self-center menu-icon icon-dual"></i>
                         </a>
-               
+                    <?php endif;?>
                     <?php if(in_array($session->id_perfil, [1,2,4])): ?>  
                     <a href="#MetricaApps" class="nav-link" data-toggle="tooltip-custom" data-placement="top"  data-trigger="hover" title="Pagos" data-original-title="Pagos">
                         <i data-feather="dollar-sign" class="align-self-center menu-icon icon-dual"></i>
                     </a><!--end MetricaApps-->
                      <?php endif;?>
-                    <?php if($session->id_perfil == 1): ?>   
-                    <a href="#MetricaUikit" class="nav-link" data-toggle="tooltip-custom" data-placement="right"  data-trigger="hover" title="" data-original-title="UI Kit">
+                   <?php if(in_array($session->id_perfil, [1,2,3,4])): ?>  
+                    <a href="#MetricaUikit" class="nav-link" data-toggle="tooltip-custom" data-placement="right"  data-trigger="hover" title="" data-original-title="Admin">
                         <i data-feather="user" class="align-self-center menu-icon icon-dual"></i>
                     </a><!--end MetricaUikit-->
                     <?php endif;?>
@@ -294,7 +294,7 @@
                             <h6 class="menu-title">Jefes</h6>       
                         </div>
                         <ul class="nav">
-                            <li class="nav-item"><a class="nav-link" href="../analytics/analytics-index.html">Incidencias</a></li>
+                            <li class="nav-item"><a class="nav-link" href="<?php echo base_url(); ?>index.php/Principal/incidenciaSubordinado">Incidencias</a></li>
                             <li class="nav-item"><a class="nav-link" href="../crypto/crypto-index.html">Personal</a></li>
                             <li class="nav-item"><a class="nav-link" href="../crm/crm-index.html">Actividades</a></li>
                             <li class="nav-item"><a class="nav-link" href="../projects/projects-index.html">Listos</a></li> 
@@ -328,7 +328,9 @@
                         <div class="title-box">
                             <h6 class="menu-title">ADMIN</h6>      
                         </div>
-                        <ul class="nav metismenu">                                
+
+                        <ul class="nav metismenu">   
+                            <?php if( $session->id_perfil == 1 ): ?>                             
                             <li class="nav-item">
                                 <a class="nav-link" href="#"><span class="w-100">Admin TI</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
                                 <ul class="nav-second-level" aria-expanded="false">
@@ -344,6 +346,8 @@
                                     <li><a href="../others/advanced-idle-timer.html">Idle Timer</a></li>
                                 </ul>            
                             </li><!--end nav-item-->
+                           <?php endif; ?>
+                           <?php if(in_array($session->id_perfil, [1,3])): ?>  
                             <li class="nav-item">
                                 <a class="nav-link" href="#"><span class="w-100">Admin RH</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
                                 <ul class="nav-second-level" aria-expanded="false">
@@ -358,6 +362,8 @@
                                     <li><a href="../others/forms-img-crop.html">Image Crop</a></li>
                                 </ul>            
                             </li><!--end nav-item-->
+                            <?php endif; ?>
+                            <?php if(in_array($session->id_perfil, [1,2])): ?>  
                             <li class="nav-item">
                                 <a class="nav-link" href="#"><span class="w-100">Admin RF</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
                                 <ul class="nav-second-level" aria-expanded="false">
@@ -372,6 +378,7 @@
                                     <li><a href="../others/charts-justgage.html">JustGage</a></li>
                                 </ul>            
                             </li><!--end nav-item-->
+                            <?php endif; ?>
                             <li class="nav-item">
                                 <a class="nav-link" href="#"><span class="w-100">Admin RM</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
                                 <ul class="nav-second-level" aria-expanded="false">

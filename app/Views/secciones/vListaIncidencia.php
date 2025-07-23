@@ -1,6 +1,6 @@
 
 
-
+<?php  $session = \Config\Services::session(); ?>
 <div class="page-wrapper">
 
     <!-- Page Content-->
@@ -13,12 +13,12 @@
                     <div class="page-title-box">
                         <div class="float-right">
                             <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="javascript:void(0);">Secturi</a></li>
-                                <li class="breadcrumb-item"><a href="javascript:void(0);">seccion</a></li>
-                                <li class="breadcrumb-item active">Listado de Tikets</li>
+                                <li class="breadcrumb-item"><a href="javascript:void(0);">SUSI</a></li>
+                                <li class="breadcrumb-item"><a href="javascript:void(0);">pag.</a></li>
+                                <li class="breadcrumb-item active">Incidencia</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Listado de Tikets</h4>
+                        <h4 class="page-title">Listado de Incidencia</h4>
                     </div>
                     <!--end page-title-box-->
                 </div>
@@ -35,17 +35,17 @@
                                     <div class="card">
 
                                         <div class="card-body">
-                                            <span>TIKETS</span>
-                                            <button 
-                                                class="btn btn-gradient-primary px-4 float-right mt-0 mb-3"><i
-                                                    class="mdi mdi-plus-circle-outline mr-2"></i>Agregar Perfil</button>
-                                            <table id="datatableCategorias" class="table" data-toggle="table">
+                                             <a href="<?php echo base_url().'index.php/Principal/reporteIncidencia'?>" class="btn btn-primary mb-3">
+                                                Descargar Reporte
+                                            </a>
+                               
+                                            <table id="datatableIncidencias" class="table" data-toggle="table">
                                                 <thead class="thead-light">
                                                     <tr>
-                                                        <th class="text-center">ID</th>
                                                         <th class="text-center">TIPO</th>
                                                         <th class="text-center">NOMBRE COMPLETO</th>
                                                         <th class="text-center">FECHA</th>
+                                                        <th class="text-center">DETALLES</th>
                                                         <th class="text-center">ESTATUS</th>
                                                         <th class="text-center">ACCIONES</th>
                                                     </tr>
@@ -55,29 +55,36 @@
                                                 <tbody>
                                                     <?php foreach($incidencia as $p): ?>
                                                     <tr>
-                                                        <td class="text-center"><?= $p->id_incidencia?></td>
                                                         <td class="text-center"><?= $p->dsc_incidencia?></td>
                                                         <td class="text-center"><?= $p->nombre_completo?></td>
                                                         <td class="text-center"><?= date('d-m-Y', strtotime($p->fecha))?></td>
+                                                         <td class="text-center"><?= $p->detalles?></td>
+                                                       <?php
+                                                        switch ($p->id_estatus) {
+                                                            case 1:
+                                                                $color = 'badge-soft-primary';
+                                                                $texto = 'En proceso';
+                                                                break;
+                                                            case 2:
+                                                                $color = 'badge-soft-danger';
+                                                                $texto = 'Declinado';
+                                                                break;
+                                                            case 3:
+                                                                $color = 'badge-soft-success';
+                                                                $texto = 'Aceptado';
+                                                                break;
+                                                            default:
+                                                                $color = 'badge-soft-secondary';
+                                                                $texto = 'Desconocido';
+                                                        }
+                                                        ?>
                                                         <td class="text-center">
-                                                             <?php
-                                                             switch($p->cat_id_incidencia){
-                                                                 case 1:
-                                                                    echo '<span class="badge badge-soft-primary">pendiente</span>';
-                                                                    break;
-                                                                 case 2:
-                                                                    echo '<span class="badge badge-soft-success">aprobado</span>';
-                                                                    break;
-                                                                 case 3:
-                                                                    echo '<span class="badge badge-soft-danger">rechazado</span>';
-                                                                    break;
-                                                             }
-                                                             ?>
+                                                            <span class="badge badge-md <?= $color ?>"><?= $texto ?></span>
                                                         </td>
                                                       
                                                       <td class="text-center">
                                                             <!-- Aprobar/aceptar -->
-                                                            <a href="#" class="mr-2" title="Aprobar">
+                                                            <a style="cursor:pointer;" onclick="saeg.principal.aceptarIncidencia(<?=$p->id_incidencia ?>, 3);" class="mr-2" title="Aprobar">
                                                                 <i class="fas fa-check-circle text-success font-16"></i>
                                                             </a>
                                                             
@@ -87,19 +94,20 @@
                                                             </a>
                                                             
                                                             <!-- Rechazar -->
-                                                            <a href="#" class="mr-2" title="Rechazar">
+                                                            <a  style="cursor:pointer;" onclick="saeg.principal.aceptarIncidencia(<?=$p->id_incidencia ?>, 2);" class="mr-2" title="Rechazar">
                                                                 <i class="fas fa-times-circle text-warning font-16"></i>
                                                             </a>
-                                                            
+                                                            <?php if(in_array($session->get('id_perfil'), [1,3]) ): ?>
                                                             <!-- Eliminar -->
-                                                            <a href="#" class="mr-2" title="Eliminar">
+                                                            <a style="cursor:pointer;" onclick="saeg.principal.eliminarIncidencia(<?=$p->id_incidencia ?>);"   class="mr-2" title="Eliminar">
                                                                 <i class="fas fa-trash-alt text-danger font-16"></i>
                                                             </a>
-                                                            
+                                                          
                                                             <!-- Editar (opcional) -->
-                                                            <a href="#" class="mr-2" title="Editar">
+                                                            <a style="cursor:pointer;"  class="mr-2" title="Editar">
                                                                 <i class="fas fa-edit text-primary font-16"></i>
                                                             </a>
+                                                            <?php endif; ?>
                                                         </td>
                                                     </tr>
                                                     <?php endforeach; ?>
@@ -141,30 +149,26 @@
                         <div class="col-lg-12">
                             <div class="card">
                                 <div class="card-body step active">        
-                                   <h2 class="mt-0 header-title">EDITAR RESERVA</h2>
+                                   <h2 class="mt-0 header-title">VISTA INCIDENCIA</h2>
                                         <div class="row">
                                             <div class="col-lg-12">
                                                 <div class="card">
                                                     <div class="card-body">        
                                                         <h4 class="mt-0 header-title">Detalles</h4>
                                                          
-                                                        <div class="custom-control custom-switch">
-                                                            <input type="checkbox"  class="custom-control-input" id="customSwitch1">
-                                                            <label class="custom-control-label" for="customSwitch1">Datos</label>
-                                                        </div>
+                                                    
                                                         <div class="row">
                                                             <div class="col-lg-6">
                                                                 <div class="form-group">
                                                                     <label for="nombre">NOMBRE</label>
                                                                     <input type="text" class="form-control" id="nombre" name="nombre" readonly>
-                                                                    <input type="hidden" id="id_reserva" >
                                                                 </div>
-                                                                <div class="form-group" id="id_instrumento">
+                                                                <div class="form-group">
                                                                     <span id="previews"></span>
                                                                     <label for="tipo_incidencia">TIPO INCIDENCIA</label>
                                                                     <input type="text" class="form-control" id="tipo_incidencia" name="tipo_incidencia" readonly>
                                                                 </div>                                                                                      
-                                                                <div class="form-group" id="id_instrumento">
+                                                                <div class="form-group">
                                                                     <span id="previews"></span>
                                                                     <label for="detalles">DETALLES</label>
                                                                     <textarea type="text" class="form-control" id="detalles" name="detalles" readonly></textarea>
@@ -200,6 +204,8 @@
 </div>
                   
 
+
+
 <link href="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet"
     type="text/css" />
 <!-- App css -->
@@ -218,30 +224,27 @@
 <script src="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/pages/jquery.analytics_customers.init.js"></script>
 
-<script src="<?= base_url()?>plugins/apexcharts/apexcharts.min.js"></script>
-
-<!-- App js -->
-<script src="<?= base_url()?>assets/js/app.js"></script>
-
-
 <script src="<?= base_url()?>assets/js/metismenu.min.js"></script>
 <script src="<?= base_url()?>assets/js/waves.js"></script>
 <script src="<?= base_url()?>assets/js/feather.min.js"></script>
 
 
 
-<!-- Select2 JS -->
+
+
+
+
+
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
 
-<!-- include summernote css/js -->
 <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.js"></script>
 <script>
 
 $(document).ready(function() {
-  $('#datatableCategorias,#datatablePeriodos,#datatableCursos').DataTable({
+  $('#datatableIncidencias').DataTable({
         language: {
             url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json' // Ruta al archivo de localización
         },
