@@ -242,11 +242,11 @@
                 </span>
             </a>
            <nav class="nav">
-                     <?php if($session->id_perfil == 1): ?>       
-                    <a href="#MetricaDashboard" class="nav-link" data-toggle="tooltip-custom" data-placement="right"  data-trigger="hover" title="" data-original-title="Dashboard">
-                        <i data-feather="monitor" class="align-self-center menu-icon icon-dual"></i>
-                    </a><!--end MetricaDashboards--> 
-                    <?php endif;?>
+                         
+                        <a href="#MetricaDashboard" class="nav-link" data-toggle="tooltip-custom" data-placement="right" data-trigger="hover" title="" data-original-title="Jefes">
+                            <i data-feather="award" class="align-self-center menu-icon icon-dual"></i>
+                        </a>
+               
                     <?php if(in_array($session->id_perfil, [1,2,4])): ?>  
                     <a href="#MetricaApps" class="nav-link" data-toggle="tooltip-custom" data-placement="top"  data-trigger="hover" title="Pagos" data-original-title="Pagos">
                         <i data-feather="dollar-sign" class="align-self-center menu-icon icon-dual"></i>
@@ -291,16 +291,14 @@
             <div class="menu-body slimscroll">
                     <div id="MetricaDashboard" class="main-icon-menu-pane">
                         <div class="title-box">
-                            <h6 class="menu-title">Dashboard</h6>       
+                            <h6 class="menu-title">Jefes</h6>       
                         </div>
                         <ul class="nav">
-                            <li class="nav-item"><a class="nav-link" href="../analytics/analytics-index.html">Analytic</a></li>
-                            <li class="nav-item"><a class="nav-link" href="../crypto/crypto-index.html">Crypto</a></li>
-                            <li class="nav-item"><a class="nav-link" href="../crm/crm-index.html">CRM</a></li>
-                            <li class="nav-item"><a class="nav-link" href="../projects/projects-index.html">Project</a></li> 
-                            <li class="nav-item"><a class="nav-link" href="../ecommerce/ecommerce-index.html">Ecommerce</a></li>
-                            <li class="nav-item"><a class="nav-link" href="../helpdesk/helpdesk-index.html">Helpdesk</a></li>
-                            <li class="nav-item"><a class="nav-link" href="../hospital/hospital-index.html">Hospital</a></li>
+                            <li class="nav-item"><a class="nav-link" href="../analytics/analytics-index.html">Incidencias</a></li>
+                            <li class="nav-item"><a class="nav-link" href="../crypto/crypto-index.html">Personal</a></li>
+                            <li class="nav-item"><a class="nav-link" href="../crm/crm-index.html">Actividades</a></li>
+                            <li class="nav-item"><a class="nav-link" href="../projects/projects-index.html">Listos</a></li> 
+                            <li class="nav-item"><a class="nav-link" href="../ecommerce/ecommerce-index.html">Pendientes</a></li>
                         </ul>
                     </div><!-- end Dashboards -->    
 
