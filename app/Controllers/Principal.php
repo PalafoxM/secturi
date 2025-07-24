@@ -1741,32 +1741,14 @@ class Principal extends BaseController {
     {
         $session = \Config\Services::session();
         $globals = new Mglobal;
-        $registro_pt = $globals->getTabla([
-            'tabla' => 'vw_registro_pt',
-            'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
+        $data = array();
+        $incidencia = $globals->getTabla([
+            'tabla' => 'vw_incidenica',
+            'where' => ['visible' => 1]
         ]);
-       
-        if (!empty($registro_pt->data)) {
-            $data['registro'] = $registro_pt->data[0];
-            $folio = $globals->getTabla([
-                'tabla' => 'direccion',
-                'where' => ['visible' => 1, 'id_area' => $data['registro']->id_direccion_responsable]
-            ]);
-            $data['folio'] = $folio->data[0]->folio_prefijo;
-        } else {
-            echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
-            die();
-        }
-       switch($id_archivo){
-            case 1:
-                $doc = 'assets/pdf/plantillas/anexo02.pdf';
-                $formato = 'personal/vFormato01.php';
-                break;
-            case 4:
-                $doc = 'assets/pdf/plantillas/anexo04.pdf';
-                 $formato ='personal/vFormato04.php';
-                break;
-        }
+        $data['incidencia'] = (isset($incidencia->data) && !empty($incidencia->data))?$incidencia->data:'';
+        $doc = 'assets/pdf/plantillas/asistencia.pdf';
+        $formato ='personal/vFormatoAsistencia.php';
         $html = view( $formato, $data);
         // Crear instancia de mPDF
         $mpdf = new \Mpdf\Mpdf([
