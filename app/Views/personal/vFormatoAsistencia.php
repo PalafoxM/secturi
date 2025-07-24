@@ -1,5 +1,17 @@
-<div  style="position:absolute; text-align:center; top:11%; left:80%; width:10%; height:18px; background-color:white; font-size: 11px; ">
-    <span class="proxima"><?= date('d/m/Y'); ?></span>
+<style>
+     #qr {
+      
+        width: 150px;
+        height: 150px;
+        text-align: center;
+        background-image: url('<?= $dataImagen ?>');
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+</style>
+<div  style="position:absolute; text-align:center; top:11%; left:70%; width:35%; height:18px;  font-size: 11px; ">
+    <span class="proxima">Fecha: <?= date('d/m/Y'); ?></span>
 </div>
 <?php 
 $top = 21;
@@ -21,7 +33,7 @@ foreach ($incidencia as $i):
     <span class="proxima"><strong>Dirección a la que pertenece:</strong></span>
 </div>
 <div style="position:absolute;top:<?= $top ?>%; left:35.5%; width:50%; height:20px; font-size: 12px;">
-    <i><?= 'DIRECCIÓN ADMINISTRATIVA' ?> </i>
+    <i><?= $i->dsc_area ?> </i>
 </div>
 
 <?php $top += 1.7; ?>
@@ -62,6 +74,9 @@ if ($contador % 6 == 0) {
 }
 endforeach; 
 ?>
+    <div id="qr">
+        <img src="<?= $dataImagen ?>" alt="qr" >
+    </div>
 
 
 

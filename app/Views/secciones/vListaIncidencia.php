@@ -35,7 +35,7 @@
                                     <div class="card">
 
                                         <div class="card-body">
-                                             <a href="<?php echo base_url().'index.php/Principal/reporteIncidencia'?>" class="btn btn-primary mb-3">
+                                             <a href="<?php echo base_url().'index.php/Principal/reporteIncidencia'?>" target="_blank" class="btn btn-primary mb-3">
                                                 Descargar Reporte
                                             </a>
                                

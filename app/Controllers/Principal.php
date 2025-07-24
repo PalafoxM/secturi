@@ -1081,6 +1081,7 @@ class Principal extends BaseController {
             "comentario"         => $data['comentario'],
             "detalles"           => $data['detalles'],
             "id_usuario"         => $session->get('id_usuario'),
+            "usu_reg"            => $session->get('id_usuario'),
             "fec_reg"            => date('Y-m-d H:i:s'),
         ]; 
            $dataConfig = [
@@ -1744,9 +1745,30 @@ class Principal extends BaseController {
         $data = array();
         $incidencia = $globals->getTabla([
             'tabla' => 'vw_incidenica',
-            'where' => ['visible' => 1]
+            'where' => ['visible' => 1, 'id_estatus' => 3]
         ]);
         $data['incidencia'] = (isset($incidencia->data) && !empty($incidencia->data))?$incidencia->data:'';
+
+        $tempQrPath = FCPATH . 'assets/images/qr_final.png';
+
+        // Generar el QR
+        $result = Builder::create()
+            ->writer(new PngWriter())
+            ->data(base_url().'index.php/Principal/reporteIncidencia/' . date('Y-m-d'))
+            ->encoding(new Encoding('UTF-8'))
+            ->errorCorrectionLevel(new ErrorCorrectionLevelHigh())
+            ->size(400)
+            ->margin(10)
+            ->roundBlockSizeMode(new RoundBlockSizeModeMargin())
+            ->labelText('')
+            ->labelFont(new NotoSans(16))
+            ->labelAlignment(new LabelAlignmentCenter())
+            ->build();
+
+         $result->saveToFile($tempQrPath);
+         $dataImagen = $this->encode_img_base64(FCPATH .'assets/images/qr_final.png', 'png');
+         $data['dataImagen'] =  $dataImagen;
+
         $doc = 'assets/pdf/plantillas/asistencia.pdf';
         $formato ='personal/vFormatoAsistencia.php';
         $html = view( $formato, $data);
@@ -1762,10 +1784,20 @@ class Principal extends BaseController {
         // Importar el PDF base
       
         $pagecount = $mpdf->SetSourceFile(FCPATH . $doc );
-        $mpdf->AddPage();
         $tplId = $mpdf->ImportPage(1);
+
+        // Página 1
+        $mpdf->AddPage();
         $mpdf->UseTemplate($tplId);
         $mpdf->WriteHTML($html);
+
+        // Footer en todas las páginas
+        $mpdf->SetHTMLFooter('
+            <div style="text-align: right; font-size: 10px;">
+                Página {PAGENO} de {nbpg}
+            </div>
+        ');
+
 
         $mpdf->Output('Formato_pt.pdf', 'I');
         exit();
