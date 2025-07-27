@@ -195,7 +195,7 @@ class Usuario extends BaseController
         $response->error =  true;
         $response->respuesta =  'Error! Error al guardar en la base de datos';
         $data = $this->request->getPost();
-
+    
         $dataConfig = [
             "tabla"=>"reserva",
             "editar"=>true,
@@ -209,6 +209,7 @@ class Usuario extends BaseController
         ];
       
         $result = $principal->saveTabla($dataInsert,$dataConfig,['id_user' => $session->get('id_usuario'), "script"=>"estatus.Reserva"]);
+      
         if(!$result->error){
             $response->error = false;
             $response->respuesta = $result->respuesta;

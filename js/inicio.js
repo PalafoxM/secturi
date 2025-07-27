@@ -635,14 +635,19 @@ ini.inicio = (function () {
             // Validar campos principales
             if($('#nombre_proveedor').val() === '') {
                 //toastr.warning('El nombre del proveedor es requerido');
-                Swal.fire("Error", "El nombre del proveedor es requerido", "error");
+                Swal.fire("Atenición", "El nombre del proveedor es requerido", "info");
+                return false;
+            }
+            if($('#banco').val() === '') {
+                //toastr.warning('El nombre del proveedor es requerido');
+                Swal.fire("Atenición", "El numero del <strong>BANCO</strong> es requerido", "info");
                 return false;
             }
 
             // Validar que al menos haya una fila en la tabla
             if($('#makeEditable2 tbody tr').length === 0) {
                 //toastr.warning('Debe agregar al menos un proyecto');
-                Swal.fire("Error", "Debe agregar al menos un proyecto", "error");
+                Swal.fire("Atenición", "Debe agregar al menos un proyecto", "info");
                 return false;
             }
 
@@ -725,6 +730,49 @@ ini.inicio = (function () {
             });
             });
 
+        },
+        links: function(id_registro_pt)
+        {
+            $.ajax({
+                url: base_url + "index.php/Principal/getLink",
+                type: 'POST',
+                dataType: "json",
+                data: { id_registro_pt },
+                success: function(response) {
+                    if (response) {
+                            response.forEach(p => {
+                                const fila = `
+                                           <div class="col-lg-12 mb-2">
+                                                <a target="_blank" href="${base_url + p.ruta_relativa}" class="d-flex align-items-center text-decoration-none text-dark">
+                                                    <i class="far fa-file-pdf text-danger me-2" style="font-size: 1.5rem;"></i>
+                                                    <span class="text-truncate" title="Archivo ${p.id_factura_pdf}" style="max-width: 85%;">
+                                                        Archivo ${p.id_factura_pdf}
+                                                    </span>
+                                                </a>
+                                                <hr class="my-2">
+                                            </div>
+                                `;
+                                $('#links').append(fila);
+                            });
+
+                       
+                    } else {
+                        Swal.fire("Atención", "No se encontró la información de la reserva.", "warning");
+                    }
+                },
+                complete: function() {
+                $('#modalLinks').modal('show');
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error en la solicitud AJAX:", error);
+                    Swal.fire("Error", "Favor de llamar al Administrador", "error");
+                }
+            });
+
+        },
+        cerrarModalLink: function()
+        {
+        $('#modalLinks').modal('hide');
         },
         estatusReserva: function(id_reserva)
         {
@@ -840,10 +888,10 @@ ini.inicio = (function () {
         },
         formEliminarReserva: function()
         {
-            $('#btnConfirmarEliminar').on('click', function () {
+            $('#btnConfirmarReserva').on('click', function () {
             const id = $('#id_reserva_estatus').val();
             const motivo = $('#motivo').val();
-            const observaciones = $('#observaciones').val();
+            const observaciones = $('#validar_observaciones').val();
             const numero_reserva = $('#validar_no_reserva').val();
         
             if (!motivo) {
@@ -2964,7 +3012,7 @@ ini.inicio = (function () {
                                 window.location.href = base_url + "index.php/Principal/tablaArchivos/"+response.idRegistro;
                             }, 1500);
                         }else{
-                            Swal.fire("Error", '<p> '+ response.respuesta + '</p>', 'error');  
+                            Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
                         }
                     },
                     beforeSend: function (info){

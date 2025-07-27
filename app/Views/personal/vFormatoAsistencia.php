@@ -43,7 +43,6 @@ foreach ($incidencia as $i):
 <div style="position:absolute;top:<?= $top ?>%; left:35.5%; width:50%; height:20px; font-size: 12px;">
     <i><?= $i->dsc_incidencia ?> </i>
 </div>
-
 <?php $top += 1.7; ?>
 <div style="position:absolute;top:<?= $top ?>%; left:11.5%; width:23%; height:20px; font-size: 12px;">
     <span class="proxima"><strong>Incidencia:</strong></span>
@@ -51,7 +50,6 @@ foreach ($incidencia as $i):
 <div style="position:absolute;top:<?= $top ?>%; left:35.5%; width:50%; height:20px; font-size: 12px;">
     <i><?= $i->detalles ?> </i>
 </div>
-
 <?php $top += 1.6; ?>
 <div style="position:absolute;top:<?= $top ?>%; left:11.5%; width:23%; height:20px; font-size: 12px;">
     <span class="proxima"><strong>Fecha:</strong></span>
@@ -59,7 +57,6 @@ foreach ($incidencia as $i):
 <div style="position:absolute;top:<?= $top ?>%; left:35.5%; width:23%; height:20px; font-size: 12px;">
     <i><?=  date('d/m/Y', strtotime($i->fecha)).' ' .date('H:i', strtotime($i->hora_inicio)).' - ' .date('H:i', strtotime($i->hora_fin))?> </i>
 </div>
-
 <?php $top += 1.8; ?>
 <div style="position:absolute; top:<?= $top ?>%; left:11.5%; width:80%; height:1px; border-top:1px solid #000;"></div>
 

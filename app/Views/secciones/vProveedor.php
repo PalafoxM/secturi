@@ -121,7 +121,7 @@
                                         <div class="form-row">
                                             <div class="col-md-4 mb-3">
                                                 <label for="cuenta_bancaria">Cuenta Bancaria del Proveedor <span style="color:red;">*</span></label>
-                                                <input readonly type="text" class="form-control" id="cuenta_bancaria" name="cuenta_bancaria" value="<?= (isset($reserva->banco_completo) && !empty($reserva->banco_completo))?$reserva->banco_completo:$registro_pt->cuenta_bancaria?>">
+                                                <input readonly type="text" class="form-control" id="cuenta_bancaria" name="cuenta_bancaria" value="<?= (isset($reserva->banco_completo) && !empty($reserva->banco_completo))?$reserva->banco_completo:''?>">
                                                 <div class="invalid-feedback">
                                                     Campo no Valido
                                                 </div>
@@ -284,16 +284,13 @@
 
                                                     <div class="form-row">
                                                         <div class="col-md-6 mb-3">
-                                                            <a style="color:white;" class="btn btn-primary btn-sm add-file ml-3" data-target="#factura_pdf_input_<?= $i; ?>">
-                                                                <i class="fas fa-upload mr-2"></i>Factura PDF (Máx 5MB)
-                                                            </a>
-                                                            <input id="factura_pdf_input_<?= $i; ?>" type="file" name="factura_pdf_<?= $i; ?>[]" multiple style="display: none;" accept=".pdf">
+                                                            <p class="text-muted mb-3">Factura PDF (Máx 5MB)</p>
+                                                            <input id="factura_pdf_input_<?= $i; ?>"  type="file" name="factura_pdf_<?= $i; ?>[]" class="dropify" multiple accept=".pdf" />   
                                                         </div>
                                                         <div class="col-md-6 mb-3">
-                                                            <a style="color:white;" class="btn btn-primary btn-sm add-file ml-3" data-target="#factura_xml_input_<?= $i; ?>">
-                                                                <i class="fas fa-upload mr-2"></i>Factura XML (Máx 5MB)
-                                                            </a>
-                                                            <input id="factura_xml_input_<?= $i; ?>" type="file" name="factura_xml_<?= $i; ?>[]" multiple style="display: none;" accept=".xml">
+                                                          
+                                                            <p class="text-muted mb-3">Factura XML (Máx 5MB)</p>
+                                                            <input id="factura_xml_input_<?= $i; ?>" type="file" name="factura_xml_<?= $i; ?>[]" multiple class="dropify"  accept=".xml">
                                                         </div>
                                                     </div>
                                                 <?php endforeach; ?>

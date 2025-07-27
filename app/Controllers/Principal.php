@@ -6,6 +6,8 @@ use App\Libraries\Funciones;
 use App\Models\Mglobal;
 use DateTime;
 
+
+
 use stdClass;
 use CodeIgniter\API\ResponseTrait;
 require_once FCPATH . "qr_code/autoload.php";
@@ -821,11 +823,12 @@ class Principal extends BaseController {
                 }
             
          }
-/*         $email->setTo([
+       $email->setTo('palafox.marin@hotmail.com');
+      /*  $email->setTo([
             'alopez@guanajuato.gob.mx',
             'negonzalez@guanajuato.gob.mx',
             'dhernandezq@guanajuato.gob.mx'
-        ]);
+        ]); */
 
         $email->setSubject('Carga de Reserva');
         $email->setMessage('
@@ -841,6 +844,7 @@ class Principal extends BaseController {
                         <p style="font-size: 16px;">ha actualizado la <strong>RESERVA</strong> en el sistema SUSI.</p>
                         <p style="font-size: 15px;">Para los labores correspondientes.</p>
                         <p style="font-size: 15px; color: #888;">Este correo ha sido generado automáticamente por el sistema SUSI. No es necesario responder a este mensaje.</p>
+                        <p style="font-size: 15px; color: #888;">Link: ' .  base_url() . 'index.php/Principal/listaReservaPT</p>
                     </div>
                     <!-- Pie de página -->
                     <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 13px; color: #666;">
@@ -854,7 +858,7 @@ class Principal extends BaseController {
           $response->respuesta = "Correo enviado correctamente.";
         } else {
           $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
-        } */
+        } 
            return $this->respond($response);
      
          
@@ -903,14 +907,15 @@ class Principal extends BaseController {
              return $this->respond($response);
         }
         $hoy = date("Y-m-d H:i:s"); 
-    
+        $folio = 'PT-' . date('YmdHis'); // Ejemplo: FOL-20250725133045
+
         $dataInsert = [
-            "id_proveedor"      => (int)$data['id_proveedor'],
-            "total_importe"     => $data['total_importe'],
-            "id_proveedor_banco"=> (int)$data['banco'],
-            "fec_reg"           => $hoy, 
-            "usu_reg"           => $session->get('id_usuario')
-             
+            "id_proveedor"       => (int)$data['id_proveedor'],
+            "total_importe"      => $data['total_importe'],
+            "id_proveedor_banco" => (int)$data['banco'],
+            "fec_reg"            => $hoy,
+            "usu_reg"            => $session->get('id_usuario'),
+            "folio"              => $folio
         ];
        if (!empty($ruta_relativa)) {
             $dataInsert['instrumento']    = $ruta_relativa;
@@ -967,7 +972,7 @@ class Principal extends BaseController {
                         }
                 }
          }
-    //$this->enviarEmail();
+    $this->enviarEmail();
 
     return $this->respond($response);
     }
@@ -981,13 +986,13 @@ class Principal extends BaseController {
         $response->error = true;
         $response->respuesta = 'Error al enviar el correo';
 
-          $email->setTo([
+         /*  $email->setTo([
             'alopez@guanajuato.gob.mx',
             'negonzalez@guanajuato.gob.mx',
             'dhernandezq@guanajuato.gob.mx'
-          ]); 
+          ]);  */
 
-       // $email->setTo('palafox.marin31@gmail.com'); // destinatario principal
+       $email->setTo('palafox.marin31@gmail.com'); // destinatario principal
         // $email->setCC(['palafox.marin@hotmail.com', 'palafox.marin31@gmail.com']); // copia visible
          //$email->setCC(['negonzalez@guanajuato.gob.mx ', 'dhernandezq@guanajuato.gob.mx']); // copia visible
      //   $email->setBCC(['a.palafoxm@guanajuato.gob.com']); // copia oculta
@@ -1005,6 +1010,7 @@ class Principal extends BaseController {
                         <p style="font-size: 16px;">ha registrado una <strong>RESERVA</strong> en el sistema SUSI.</p>
                         <p style="font-size: 15px;">Para los labores correspondientes.</p>
                         <p style="font-size: 15px; color: #888;">Este correo ha sido generado automáticamente por el sistema SUSI. No es necesario responder a este mensaje.</p>
+                        <p style="font-size: 15px; color: #888;">Link: ' .  base_url() . 'index.php/Principal/listaReservaPT</p>
                     </div>
                     <!-- Pie de página -->
                     <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 13px; color: #666;">
@@ -1285,7 +1291,7 @@ class Principal extends BaseController {
         $cat_perfil   = $globals->getTabla(['tabla' => 'perfil', 'where' => ['visible' => 1]]);
         $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
         $cat_partida  = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
-        $proveedor    = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit'=>100]);
+        $proveedor    = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit'=>10]);
 
         $data['cat_perfil']   = (!empty($cat_perfil->data))?$cat_perfil->data:[];
         $data['proveedor']    = (!empty($proveedor->data))?$proveedor->data:[];
@@ -1335,6 +1341,12 @@ class Principal extends BaseController {
     {  
         $session = \Config\Services::session();
         $globals = new Mglobal;
+        $PT  =  TRUE;
+        $GO  = FALSE;
+        $GRC = FALSE;
+        $data['PT']  = $PT;
+        $data['GO']  = $GO;
+        $data['GRC'] = $GRC;
         $data['id_registro_pt'] = $id;
         $data['scripts'] = array('inicio');
         $data['contentView'] = 'personal/vTablaArchivos';                
@@ -1403,6 +1415,17 @@ class Principal extends BaseController {
         $u = $numero % 10;
         return $decena[$d] . ($u > 0 ? ' y ' . $unidad[$u] : '');
     }
+    public function getLink()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $id_registro_pt =  $this->request->getPost('id_registro_pt');
+        $response = $globals->getTabla([
+                    'tabla' => 'vw_pdf_reserva',
+                    'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
+                    ])->data;
+       return $this->respond($response);
+    }
     public function Archivo($id_registro_pt =  null, $id_archivo = null)
     {
         $session = \Config\Services::session();
@@ -1411,7 +1434,13 @@ class Principal extends BaseController {
             'tabla' => 'vw_registro_pt',
             'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
         ]);
-       
+        $pdf = $globals->getTabla([
+                'tabla' => 'vw_pdf_reserva',
+                'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
+                ])->data;
+  
+        $instrumento = (isset($pdf[0]->instrumento) && !empty($pdf[0]->instrumento))?$pdf[0]->instrumento:'';      
+   
         if (!empty($registro_pt->data)) {
             $data['registro'] = $registro_pt->data[0];
             $folio = $globals->getTabla([
@@ -1423,16 +1452,23 @@ class Principal extends BaseController {
             echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
             die();
         }
+
+
+       
        switch($id_archivo){
             case 1:
                 $doc = 'assets/pdf/plantillas/anexo02.pdf';
                 $formato = 'personal/vFormato01.php';
-                break;
+            break;
+
             case 4:
-                $doc = 'assets/pdf/plantillas/anexo04.pdf';
-                 $formato ='personal/vFormato04.php';
-                break;
+                header('Location:'.base_url().$instrumento);            
+                die();
+            break;
+         
+
         }
+     
         $html = view( $formato, $data);
         // Crear instancia de mPDF
         $mpdf = new \Mpdf\Mpdf([
@@ -1443,14 +1479,15 @@ class Principal extends BaseController {
             'mirrorMargins' => false,
         ]);
 
-        // Importar el PDF base
+    //die( var_dump($doc) );
+      $pagecount = $mpdf->SetSourceFile(FCPATH . $doc );
       
-        $pagecount = $mpdf->SetSourceFile(FCPATH . $doc );
-        $mpdf->AddPage();
-        $tplId = $mpdf->ImportPage(1);
-        $mpdf->UseTemplate($tplId);
-        $mpdf->WriteHTML($html);
-
+            $mpdf->AddPage();
+            $tplId = $mpdf->ImportPage(1);
+            $mpdf->UseTemplate($tplId);
+            $mpdf->WriteHTML($html);
+        
+        
         $mpdf->Output('Formato_pt.pdf', 'I');
         exit();
     }
@@ -1462,8 +1499,12 @@ class Principal extends BaseController {
         $data = [];
         $id_reserva= null;
 
-      $registro_pt = $globals->getTabla([
+        $registro_pt = $globals->getTabla([
             'tabla' => 'vw_registro_pt',
+            'where' => ['visible' => 1, 'id_registro_pt' => $id_pt]
+        ]);
+        $formatos = $globals->getTabla([
+            'tabla' => 'vw_pdf_reserva',
             'where' => ['visible' => 1, 'id_registro_pt' => $id_pt]
         ]);
 
@@ -1499,11 +1540,9 @@ class Principal extends BaseController {
             die();
         }
 
-       
-        $html = view('secciones/vFormatoPT.php', $data);
+       $html = view('secciones/vFormatoPT.php', $data);
         $htmlSegundaHoja = view('secciones/vFormatoPT2.php', $data);
 
-        // Crear instancia de mPDF
         $mpdf = new \Mpdf\Mpdf([
             'margin_top' => 0,
             'margin_left' => 1,
@@ -1512,27 +1551,39 @@ class Principal extends BaseController {
             'mirrorMargins' => false,
         ]);
 
-        // Importar el PDF base
-        $pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/formatoPT.pdf');
+        // Importar PDF base (anexo07)
+      
+        $pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/plantillas/anexo07.pdf');
 
-      for ($i = 1; $i <= $pagecount; $i++) {
+        for ($i = 1; $i <= $pagecount; $i++) {
             $mpdf->AddPage();
             $tplId = $mpdf->ImportPage($i);
             $mpdf->UseTemplate($tplId);
 
             if ($i == 1) {
-                // Solo escribe HTML en la primera página
                 $mpdf->WriteHTML($html);
             }
             if ($i == 2) {
-                // Solo escribe HTML en la primera página
                 $mpdf->WriteHTML($htmlSegundaHoja);
             }
         }
 
+       $ruta_relativa = (isset($formatos->data) && !empty($formatos->data))?$formatos->data[0]->ruta_relativa:[];
+        if($ruta_relativa){
+        $facturaPath = FCPATH . $ruta_relativa;
+        $facturaPageCount = $mpdf->SetSourceFile($facturaPath);
+
+        for ($j = 1; $j <= $facturaPageCount; $j++) {
+            $mpdf->AddPage();
+            $tplFactura = $mpdf->ImportPage($j);
+            $mpdf->UseTemplate($tplFactura);
+        }
+        }
+      
 
         $mpdf->Output('Formato_pt.pdf', 'I');
         exit();
+
     }
 
     public function buscarProveedor()
@@ -1633,6 +1684,7 @@ class Principal extends BaseController {
         $globals = new Mglobal;
         $siExisteIdReserva  = $globals->getTabla(['tabla' => 'registro_pt', 'where' => ['visible' => 1 , 'id_reserva' => $id_reserva ]]);
         $btn = (!empty($siExisteIdReserva->data))?true:false;
+    
         $cat_area  = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1 ]]);
         if($id_reserva != 0){
             $reserva   = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['id_reserva' => $id_reserva ]]);

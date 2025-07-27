@@ -120,7 +120,7 @@
 
                                                             <?php endif; ?>
                                                              <?php if($p->id_estatus == 3 && $session->get('id_perfil')!=2): ?>
-                                                            <a href="<?= base_url().'index.php/Principal/generarTramitePago/'.$p->id_reserva ?>" style="color:white;"  data-toggle="tooltip" data-placement="top" title="" data-original-title="Generar Tramite de Pago"
+                                                            <a href="<?= base_url().'index.php/Principal/generarTramitePago/'.$p->id_reserva ?>" style="color:white;"  data-toggle="tooltip" data-placement="left" data-original-title="Generar Tramite de Pago"
                                                                 class="btn btn-gradient-primary px-4 uitooltip"><i
                                                                     class="mdi mdi-arrow-right-bold font-21"></i>
                                                             </a>
@@ -150,12 +150,17 @@
 <div class="modal fade" id="modalEditarReserva2" tabindex="-1" role="dialog" aria-labelledby="supportModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">EDITAR RESERVA</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
                 <main>
                    <div class="row">
                         <div class="col-lg-12">
                             <div class="card">
                                 <div class="card-body step active">        
-                                   <h2 class="mt-0 header-title">EDITAR RESERVA</h2>
                                         <div class="row">
                                             <div class="col-lg-12">
                                                 <div class="card">
@@ -351,7 +356,7 @@
         </form>
       </div>
       <div class="modal-footer">
-          <button type="button" class="btn btn-primary" id="btnConfirmarEliminar">Guardar</button>
+          <button type="button" class="btn btn-primary" id="btnConfirmarReserva">Guardar</button>
         <button type="button" onclick="ini.inicio.cerrarModalAdmin()" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
       </div>
     </div>
