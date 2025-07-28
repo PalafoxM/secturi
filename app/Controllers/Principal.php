@@ -1523,11 +1523,16 @@ class Principal extends BaseController {
             ]);
             if(!empty($reserva->data)){
              $data['reserva'] = $reserva->data;
-             $importe_str = $reserva->data[0]->total_importe;
+             $importe_str   = $reserva->data[0]->total_importe;
+             $usu_reg       = $reserva->data[0]->usu_reg;
              $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
              $data['numero_texto'] = $this->numeroEnLetras($importe_float);
             }
-   
+            $data['nombre_registro'] = $globals->getTabla([
+                'tabla' => 'vw_usuario',
+                'where' => ['id_usuario' => $usu_reg]
+            ])->data[0];
+
             if (!empty($folio->data)) {
             $zero = (strlen($folio->data[0]->ultimo_folio_pt) >= 2)?'0':'00';
                 $data['registro']->folio = $folio->data[0]->folio_prefijo.$zero.$folio->data[0]->ultimo_folio_pt.'/'.$folio->data[0]->periodo_pt;
@@ -1541,7 +1546,8 @@ class Principal extends BaseController {
         }
 
        $html = view('secciones/vFormatoPT.php', $data);
-        $htmlSegundaHoja = view('secciones/vFormatoPT2.php', $data);
+      $htmlSegundaHoja = view('secciones/vFormatoPT2.php', $data);
+      $htmlTercerHoja = view('personal/vFormato702.php', $data);
 
         $mpdf = new \Mpdf\Mpdf([
             'margin_top' => 0,
@@ -1553,7 +1559,7 @@ class Principal extends BaseController {
 
         // Importar PDF base (anexo07)
       
-        $pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/plantillas/anexo07.pdf');
+        $pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/plantillas/anexo07_2.pdf');
 
         for ($i = 1; $i <= $pagecount; $i++) {
             $mpdf->AddPage();
@@ -1565,20 +1571,35 @@ class Principal extends BaseController {
             }
             if ($i == 2) {
                 $mpdf->WriteHTML($htmlSegundaHoja);
+           
+            
+                
+                 $ruta_relativa = (isset($formatos->data) && !empty($formatos->data))?$formatos->data[0]->ruta_relativa:[];
+                if($ruta_relativa){
+                $facturaPath = FCPATH . $ruta_relativa;
+                $facturaPageCount = $mpdf->SetSourceFile($facturaPath);
+
+                for ($j = 1; $j <= $facturaPageCount; $j++) {
+                        $mpdf->AddPage();
+                        $tplFactura = $mpdf->ImportPage($j);
+                        $mpdf->WriteHTML($htmlTercerHoja);
+                        // Reducción solo en la última página
+                        if ($j === $facturaPageCount) {
+                            $templateSize = $mpdf->GetTemplateSize($tplFactura);
+                            $scaleFactor = 0.7; // o 0.85 si sobresale mucho
+
+                            $width = $templateSize['width'] * $scaleFactor;
+                            $height = $templateSize['height'] * $scaleFactor;
+
+                            $mpdf->UseTemplate($tplFactura, 20, 50, $width, $height);
+                        } else {
+                            $mpdf->UseTemplate($tplFactura);
+                        }
+                    }
+                }
             }
         }
 
-       $ruta_relativa = (isset($formatos->data) && !empty($formatos->data))?$formatos->data[0]->ruta_relativa:[];
-        if($ruta_relativa){
-        $facturaPath = FCPATH . $ruta_relativa;
-        $facturaPageCount = $mpdf->SetSourceFile($facturaPath);
-
-        for ($j = 1; $j <= $facturaPageCount; $j++) {
-            $mpdf->AddPage();
-            $tplFactura = $mpdf->ImportPage($j);
-            $mpdf->UseTemplate($tplFactura);
-        }
-        }
       
 
         $mpdf->Output('Formato_pt.pdf', 'I');
