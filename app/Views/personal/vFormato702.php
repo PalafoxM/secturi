@@ -5,99 +5,127 @@
        position:absolute; 
        top:5%; 
        left:8%; 
-       width:85%; 
+       width:84.5%; 
        background-color:black;
       font-size: 8px;
         height:18px; 
         color:white;
         text-align:center;
+         padding-left: 4px;     /* Espacio a la izquierda */
+        padding-top: 2px;      /* Opcional: si el texto toca el borde superior */
+        box-sizing: border-box;
     }
     #responsable{
        position:absolute; 
        top:6.77%; 
        left:8%; 
-       width:20%; 
+       width: 19.5%; 
        border:solid 1px black;
        font-size: 7px;
        height:18px; 
        text-align:left;
        background-color: #BFBDBB;
+        padding-left: 4px;     /* Espacio a la izquierda */
+        padding-top: 2px;      /* Opcional: si el texto toca el borde superior */
+        box-sizing: border-box;
     }
     #concepto{
        position:absolute; 
        top:10.5%; 
        left:8%; 
-       width:20%; 
+       width:19.5%; 
        border:solid 1px black;
        font-size: 7px;
        height:18px; 
        text-align:left;
        background-color: #BFBDBB;
+         padding-left: 4px;     /* Espacio a la izquierda */
+        padding-top: 2px;      /* Opcional: si el texto toca el borde superior */
+        box-sizing: border-box;
     }
     #comision{
        position:absolute; 
        top:8.65%; 
        left:8%; 
-       width:20%; 
+       width:19.5%; 
        border:solid 1px black;
       font-size: 7px;
         height:18px; 
         text-align:left;
        background-color: #BFBDBB;
+        padding-left: 4px;     /* Espacio a la izquierda */
+        padding-top: 2px;      /* Opcional: si el texto toca el borde superior */
+        box-sizing: border-box;
+
     }
     #partida{
        position:absolute; 
        top:12.4%; 
        left:8%; 
-       width:20%; 
+       width:19.5%; 
        border:solid 1px black;
       font-size: 7px;
        height:18px; 
        text-align:left;
        background-color: #BFBDBB;
+         padding-left: 4px;     /* Espacio a la izquierda */
+        padding-top: 2px;      /* Opcional: si el texto toca el borde superior */
+        box-sizing: border-box;
     }
     #factura{
        position:absolute; 
        top:14.3%; 
        left:8%; 
-       width:20%; 
+       width:19.5%; 
        border:solid 1px black;
       font-size: 7px;
         height:18px; 
         text-align:left;
        background-color: #BFBDBB;
+         padding-left: 4px;     /* Espacio a la izquierda */
+        padding-top: 2px;      /* Opcional: si el texto toca el borde superior */
+        box-sizing: border-box;
     }
     #fecha{
        position:absolute; 
        top:16.2%; 
        left:8%; 
-       width:20%; 
+       width:19.5%; 
        border:solid 1px black;
        font-size: 7px;
        height:18px; 
        text-align:left;
        background-color: #BFBDBB;
+         padding-left: 4px;     /* Espacio a la izquierda */
+        padding-top: 2px;      /* Opcional: si el texto toca el borde superior */
+        box-sizing: border-box;
     }
     #importe{
        position:absolute; 
        top:18.1%; 
        left:8%; 
-       width:20%; 
+       width:19.5%; 
        border:solid 1px black;
       font-size: 7px;
         height:18px; 
         text-align:left;
        background-color: #BFBDBB;
+         padding-left: 4px;     /* Espacio a la izquierda */
+        padding-top: 2px;      /* Opcional: si el texto toca el borde superior */
+        box-sizing: border-box;
     }
     #nombre{
        position:absolute; 
-       top:6.77%; 
+       top:6.62%; 
        left:28.1%; 
-       width: 64.65%; 
+       width: 64.15%; 
        border:solid 1px black;
       font-size: 7px;
         height:18px; 
        text-align:left;
+         padding-left: 4px;     /* Espacio a la izquierda */
+        padding-top: 2px;      /* Opcional: si el texto toca el borde superior */
+        box-sizing: border-box;
 
     }
     #comision_respuesta{
@@ -141,25 +169,32 @@
         text-align:left;
     }
     #fecha_respuesta{
-       position:absolute; 
-       top:16.2%; 
-       left:28.1%; 
-       width: 64.65%; 
-       border:solid 1px black;
+      position:absolute; 
+      top:16.1%; 
+      left:28.1%; 
+      width: 64.15%;
+      padding-left: 4px;     /* Espacio a la izquierda */
+      padding-top: 2px;      /* Opcional: si el texto toca el borde superior */
+      box-sizing: border-box;
+      border:solid 1px black;
       font-size: 7px;
-        height:18px; 
-        text-align:left;
+      height:18px; 
+      text-align:left;
     }
     #importe_respuesta{
        position:absolute; 
        top:18.1%; 
        left:28.1%; 
-       width: 64.65%; 
        border:solid 1px black;
        font-size: 7px;
        height:18px; 
        text-align:left;
+        width: 64.15%;
+        padding-left: 4px;     /* Espacio a la izquierda */
+        padding-top: 2px;      /* Opcional: si el texto toca el borde superior */
+        box-sizing: border-box;
     }
+
  </style>
  <div id="encabezado">
     <strong>ENCABEZADO DE FACTURA</strong>
@@ -174,19 +209,19 @@
    COMISION / REUNION / EVENTO:
 </div>
  <div id="comision_respuesta">
-   <span ><?= ($registro->comision); ?>  </span>
+   <span > &nbsp;<?= ($registro->comision); ?>  </span>
 </div>
 <div id="concepto">
    CONCEPTO DEL PAGO:
 </div>
  <div id="concepto_respuesta">
-   <span ><?= ($registro->concepto_pago); ?>  </span>
+   <span> &nbsp;<?= ($registro->concepto_pago); ?>  </span>
 </div>
 <div id="partida">
    PARTIDA:
 </div>
  <div id="partida_respuesta">
-   <span > <?= ($reserva[0]->partida);?> <?= ($reserva[0]->dsc_partida);?>  </span>
+   <span >&nbsp; <?= ($reserva[0]->partida);?> <?= ($reserva[0]->dsc_partida);?>  </span>
 </div>
 <div id="factura">
    FACTURA / RECIBO No: 

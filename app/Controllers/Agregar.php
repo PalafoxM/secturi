@@ -935,6 +935,24 @@ class Agregar extends BaseController {
             $data['contentView'] = 'secciones/vAsistencia';                
             $this->_renderView($data);
         }
+    public function generarZip()
+    {
+        $session     = \Config\Services::session();
+        $response    = new stdClass();
+        $Mglobal   = new Mglobal;
+        $data = [];
+        $response->error = true;
+
+        $id_registro_pt = $this->request->getPost('id_registro_pt');
+        $pdf_reserva = $Mglobal->getTabla(['tabla' => 'vw_pdf_reserva', 'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]]);
+        if(!$pdf_reserva->error){
+            $response->data  = $pdf_reserva->data;
+            $response->error = $pdf_reserva->error;
+
+        }
+        return $this->respond($response->data);
+
+    }
     public function ReservarSala() {
         $session     = \Config\Services::session();
         $response    = new stdClass();

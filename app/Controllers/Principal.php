@@ -1571,33 +1571,36 @@ class Principal extends BaseController {
             }
             if ($i == 2) {
                 $mpdf->WriteHTML($htmlSegundaHoja);
-             
-                $ruta_relativa = (isset($formatos->data) && !empty($formatos->data)) ? $formatos->data[0]->ruta_relativa : [];
-                if ($ruta_relativa) {
-                    $facturaPath = FCPATH . $ruta_relativa;
-                    $facturaPageCount = $mpdf->SetSourceFile($facturaPath);
+                $facturas = $formatos->data;
 
-                    for ($j = 1; $j <= $facturaPageCount; $j++) {
-                        $mpdf->AddPage();
+                if (!empty($facturas)) {
+                    foreach ($facturas as $index => $factura) {
+                        $facturaPath = FCPATH . $factura->ruta_relativa;
 
-                        $tplFactura = $mpdf->ImportPage($j);
+                        if (file_exists($facturaPath)) {
+                            $facturaPageCount = $mpdf->SetSourceFile($facturaPath);
 
-                        // Solo en la primera hoja de la factura, escribe el HTML de cabecera
-                        if ($j === 1) {
-                            $mpdf->WriteHTML($htmlTercerHoja);
+                            for ($j = 1; $j <= $facturaPageCount; $j++) {
+                                $mpdf->AddPage();
+                                $tplFactura = $mpdf->ImportPage($j);
+
+                                // Escribir HTML solo en la primera página de la primera factura
+                                if ($index === 0 && $j === 1) {
+                                    $mpdf->WriteHTML($htmlTercerHoja);
+                                }
+
+                                // Escalar factura
+                                $templateSize = $mpdf->GetTemplateSize($tplFactura);
+                                $scaleFactor = 0.6; // ajusta si es necesario
+                                $width = $templateSize['width'] * $scaleFactor;
+                                $height = $templateSize['height'] * $scaleFactor;
+
+                                $mpdf->UseTemplate($tplFactura, 40, 55, $width, $height);
+                            }
                         }
-
-                        // Obtener tamaño original del template
-                        $templateSize = $mpdf->GetTemplateSize($tplFactura);
-                        $scaleFactor = 0.6; // ajusta este valor según tu margen
-
-                        $width = $templateSize['width'] * $scaleFactor;
-                        $height = $templateSize['height'] * $scaleFactor;
-
-                        // Aplica el escalado en todas las hojas
-                        $mpdf->UseTemplate($tplFactura, 40, 55, $width, $height);
                     }
                 }
+
             }
         }
 

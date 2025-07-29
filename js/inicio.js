@@ -3028,6 +3028,37 @@ ini.inicio = (function () {
                 });
             });
         },
+        generarZip: function(id_registro_pt){
+           
+                $.ajax({
+                    type: "POST",
+                    url: base_url + "index.php/Agregar/generarZip",
+                    data:{id_registro_pt},
+                    dataType: "json",
+                    success: function (response) {
+                        console.log(response);
+                        if(response.error){
+                            Swal.fire("error", "Solicite apoyo al area de sistemas","error" );
+                        }else{
+                            Swal.fire("success", "Se guardo con exito", "success");
+                        }
+                     
+                        //window.location.href = base_url + "index.php/Agregar/Curso";
+                    },
+                    beforeSend: function()
+                    {
+                    $('#btnZip').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Generando...');
+                    },
+                    complete: function(){
+                    $('#btnZip').prop('disabled', false).html('<i class="mdi mdi-content-save"></i> Generar Zip');
+                    },
+                    error: function (response,jqXHR, textStatus, errorThrown) {
+                         var res= JSON.parse (response.responseText);
+                        //  console.log(res.message);
+                         Swal.fire("Error", '<p> '+ res.message + '</p>');  
+                    }
+                });
+        },
         agregarCategoria: function(){
             $("#formAgregarCurso").submit(function (e) {
                 e.preventDefault(); 

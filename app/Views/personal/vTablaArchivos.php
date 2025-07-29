@@ -122,7 +122,7 @@
                                                             <td>Solicitud de gastos a reserva de comprobar GRC-1 y OMVE-1 (Orden de Ministración de Viáticos en el Extranjero)</td>
                                                             <?php endif; ?>
                                                             <td class="text-center">
-                                                             <input type="file" id="archivo05" name="archivo05[]" >
+                                                             <input type="file" id="archivo05" name="archivo05[]" accept=".pdf" >
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -136,7 +136,7 @@
                                                                <?php if($GRC): ?>
                                                             <td>Autorización de Servicios Profesionales (3310, 3330, 3340 y 3390), Autorización de partidas restringidas (3710, 3760, 3810 y 3830)</td>
                                                            <?php endif; ?>
-                                                            <td><input type="file" id="archivo06" name="archivo06[]" ></td>
+                                                            <td><input type="file" id="archivo06" name="archivo06[]" accept=".pdf" ></td>
                                                         </tr>
                                                         <tr class="table-info">
                                                             <th scope="row">07. Formatos diversos</th>
@@ -167,7 +167,7 @@
                                                               <?php if($GRC): ?>
                                                             <td>N/A</td>
                                                             <?php endif; ?>
-                                                            <td><input type="file" id="archivo08" name="archivo08[]" ></td>
+                                                            <td><input type="file" id="archivo08" name="archivo08[]" accept=".pdf" ></td>
                                                         </tr>
                                                         <tr class="table-warning">
                                                             <th scope="row">09. Otros</th>
@@ -180,7 +180,7 @@
                                                               <?php if($GRC): ?>
                                                             <td>Programas, agendas, itinerarios, etc.</td>
                                                             <?php endif; ?>
-                                                            <td><input type="file" id="archivo09" name="archivo09[]" ></td>
+                                                            <td><input type="file" id="archivo09" name="archivo09[]" multiple accept=".pdf"></td>
                                                         </tr>
                                                     </tbody>
 
@@ -188,9 +188,9 @@
                                                     <br>
                                                        <div class="row mb-5">
                                                             <div class="col-md-12 text-right">
-                                                                <button class="btn btn-info" type="submit">
+                                                                <a id="btnZip" style="color:white" class="btn btn-info" onclick="ini.inicio.generarZip(<?= $id_registro_pt ?>);" >
                                                                     <i class="mdi mdi-content-save"></i> Generar Zip
-                                                                </button>
+                                                                </a>
                                                             </div>
                                                         </div>
                                                 </div><!--end /tableresponsive-->
