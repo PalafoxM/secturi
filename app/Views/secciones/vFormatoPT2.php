@@ -26,6 +26,52 @@
                 <strong>"<?= ($reserva[0]->partida);?> <?= ($reserva[0]->dsc_partida);?>".</strong>
             </span>
         </div>
+         <div style="position:absolute; top:48%; left:9.5%; width:81%; height:80px; background-color:white; font-size:13px; text-align:justify;">
+            <span class="proxima">
+                Hago de su conocimiento que de acuerdo a lo que establece la cláusula <strong>N/A</strong> de instrumento jurídico <strong>N/A</strong>
+                recibí el producto, atendido lo que establece el marco normativo aplicable. El producto recibido se nos ha
+                entregado a entera satisfacción en tiempo y forma, quedando bajo responsabilidad el uso y/o distribución,
+                así como el resguardo y custodia de los expedientes originales y entregables correspondientes.
+            </span>
+        </div>
+        <div style="position:absolute; top:58%; left:9.5%; width:81%; height:40px; background-color:white; font-size:13px; text-align:justify;">
+            <span class="proxima">
+                Daremos seguimiento al intrumento jurídico, con la finalidad de asegurar y garantizar que los recursos erogados cumplan con lo establecido,
+                así como dar continuidad a las acciones del mencionado instrumento.
+            </span>
+        </div>
+         <div style="position:absolute; top:64%; left:9.5%; width:81%; height:40px; background-color:white; font-size:13px; text-align:justify;">
+            <span class="proxima">
+               La adquisicion del producto se realizó garantizado las mejores condiciones en cuanto a precio, calidad, financiamiento, oportunidad y demás elementos,
+               en términos de la normatividad del gasto público.
+            </span>
+        </div>
+        <div style="position:absolute; top:71%; left:9.5%; width:81%; height:20px; background-color:white; font-size:13px; text-align:justify;">
+            <span class="proxima">
+              Sin otro particular por el momento, aprovecho la ocasión para enviarle un coridal saludo.
+            </span>
+        </div>
+        <div style="position:absolute; top:75%; left:9.5%; width:81%; height:20px; background-color:white; font-size:13px; text-align:center;">
+            <span class="proxima">
+             <strong> ATENTAMENTE </strong>
+            </span>
+        </div>
+        <div style="position:absolute; top:82%; left:9.5%; width:81%; height:20px; background-color:white; font-size:13px; text-align:center;">
+            <span class="proxima">
+             <strong> _________________________________________________ </strong>
+            </span>
+        </div>
+         <div style="position:absolute; top:85%; left:9.5%; width:81%; height:20px; background-color:white; font-size:13px; text-align:center;">
+            <span class="proxima">
+             <strong> NOMBRE RESPONSABLE </strong>
+            </span>
+        </div>
+           <div style="position:absolute; top:87%; left:9.5%; width:81%; height:20px; background-color:white; font-size:13px; text-align:center;">
+            <span class="proxima">
+             <strong> AREA </strong>
+            </span>
+        </div>
+       
 
 
 
