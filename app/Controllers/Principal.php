@@ -166,6 +166,82 @@ class Principal extends BaseController {
 
         return $this->respond($response);
     }
+    public function reporteIncidenciaUsuario($fechaInicio = null, $fechaFin =  null, $idUsuario = null, $folio = null)
+    {
+        $Mglobal = new Mglobal;
+
+      
+       if( $fechaInicio != 0){
+          $usuario = $Mglobal->getTabla([
+            'tabla' => 'vw_usuario',
+            'where' => ['visible' => 1, 'id_usuario' => $idUsuario]
+        ])->data[0]->nombre_completo;
+            $html = '
+                <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+                    <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+                        <!-- Encabezado con logotipo -->
+                        <div style="background-color: #004080; padding: 20px; text-align: center; color:white">
+                        <h2> SUSI</h2>
+                        </div>
+
+                        <!-- Contenido principal -->
+                        <div style="padding: 30px; color: #333;">
+                            <h2 style="color: #004080;">Reporte de Incidencias del Usuario</h2>
+                            <p style="font-size: 16px;">A continuación se presenta el reporte con datos verificados correspondientes al usuario:</p>
+                            
+                            <p style="font-size: 16px;"><strong>Nombre:</strong> ' . $usuario . '</p>
+                            <p style="font-size: 16px;"><strong>Periodo:</strong> del ' . date("d-m-Y", strtotime($fechaInicio)) . ' al ' . date("d-m-Y", strtotime($fechaFin)) . '</p>
+                            <p style="font-size: 16px;"><strong>Folio de seguimiento:</strong> <span style="color: red;">' . $folio . '</span></p>
+                            
+                            <p style="font-size: 14px; color: #888;">Este reporte ha sido generado con fines administrativos para su debido seguimiento.</p>
+                        </div>
+
+                        <!-- Pie de página -->
+                        <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 13px; color: #666;">
+                            © ' . date('Y') . ' Sistema de Atención SUSI. Todos los derechos reservados - SECTURI.
+                        </div>
+                    </div>
+                </div>
+                ';
+       }else{
+            $html = '
+            <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+                <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+                    
+                    <!-- Encabezado con logotipo o título -->
+                    <div style="background-color: #004080; padding: 20px; text-align: center; color: white;">
+                        <h2>SUSI</h2>
+                    </div>
+
+                    <!-- Contenido principal -->
+                    <div style="padding: 30px; color: #333;">
+                        <h2 style="color: #004080;">Reporte de Incidencias</h2>
+                        <p style="font-size: 16px;">
+                            Este documento ha sido generado por el Sistema Unificado de SECTURI (SUSI) y contiene información verificada.
+                        </p>
+                        <p style="font-size: 16px;">
+                            El número de folio <strong>' . $folio . '</strong> debe coincidir con el asignado en el reporte de incidencias correspondiente.
+                        </p>
+                        <p style="font-size: 14px; color: #888;">
+                            Este reporte es de carácter administrativo y está destinado exclusivamente para fines de control y seguimiento interno.
+                        </p>
+                    </div>
+
+                    <!-- Pie de página -->
+                    <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 13px; color: #666;">
+                        © ' . date('Y') . ' Sistema de Atención SUSI. Todos los derechos reservados – SECTURI.
+                    </div>
+                </div>
+            </div>
+            ';
+
+       }
+   
+
+        echo $html;
+        die();
+    }
+
 
 
  /*    public function uploadCSV()
@@ -1255,6 +1331,12 @@ class Principal extends BaseController {
         $session = \Config\Services::session();
         $globals      = new Mglobal;
         $incidencia    = $globals->getTabla(['tabla' => 'vw_incidenica', 'where' => ['visible' => 1, 'id_jefe_inmediato' => $session->get('id_usuario')]]);
+         $Periodo= ['tabla' => 'cat_periodo', 'where' => ['visible' => 1]];
+        $usuario = ['tabla' => 'vw_incidenica', 'where' => ['visible' => 1], 'groupBy' => ['id_usuario']];
+        $periodo  = $globals->getTabla($Periodo);
+        $usuario  = $globals->getTabla($usuario);
+        $data['periodo']     = (isset($periodo->data) && !empty($periodo->data))?$periodo->data:[];
+        $data['usuario']     = (isset($usuario->data) && !empty($usuario->data))?$usuario->data:[];
 
         $data['incidencia']    = (!empty($incidencia->data))?$incidencia->data:[];
         $data['scripts'] = array('inicio', 'principal');
@@ -1426,7 +1508,7 @@ class Principal extends BaseController {
                     ])->data;
        return $this->respond($response);
     }
-    public function Archivo($id_registro_pt =  null, $id_archivo = null)
+    public function Archivo($id_registro_pt =  null, $id_archivo = null, $savePath = null)
     {
         $session = \Config\Services::session();
         $globals = new Mglobal;
@@ -1461,9 +1543,18 @@ class Principal extends BaseController {
                 $formato = 'personal/vFormato01.php';
             break;
 
-            case 4:
-                header('Location:'.base_url().$instrumento);            
-                die();
+           case 4:
+            if ($savePath){
+                $source = FCPATH . $instrumento;
+                if (file_exists($source)) {
+                    copy($source, $savePath);
+                    return $savePath;
+                }
+                return null;
+            } else {
+                // Solo si se quiere mostrar directo en navegador
+                return redirect()->to(base_url() . $instrumento);
+            }
             break;
          
 
@@ -1488,11 +1579,135 @@ class Principal extends BaseController {
             $mpdf->WriteHTML($html);
         
         
+        if ($savePath) {
+            $mpdf->Output($savePath, 'F'); // F = write to file
+            return $savePath;
+        }
         $mpdf->Output('Formato_pt.pdf', 'I');
         exit();
+        
+    }
+    public function generarZip()
+    {
+        $response = new \stdClass();
+        $id_registro_pt = $this->request->getPost('id_registro_pt');
+        $Mglobal   = new Mglobal;
+        $pdf_reserva  = $Mglobal->getTabla(['tabla' => 'vw_pdf_reserva', 'where' => ['visible' =>1, 'id_registro_pt'=>$id_registro_pt]]); 
+        // Validar ID
+        if (empty($id_registro_pt)) {
+            $response->error = true;
+            $response->respuesta = 'ID de registro inválido';
+             return $this->respond($response);
+        }
+        // Directorio temporal
+        $tempDir = sys_get_temp_dir() . '/zip_temp_' . $id_registro_pt . '/';
+        if (!file_exists($tempDir)) {
+            if (!mkdir($tempDir, 0777, true)) {
+                  $response->error = true;
+                  $response->respuesta = 'No se pudo crear directorio temporal';
+                  return $this->respond($response);
+            }
+        }
+        $archivos = [];
+        // Archivos generados dinámicamente
+        $dynamicFiles = [
+            1 => 'Archivo01.pdf',
+            4 => 'Archivo04.pdf',
+        ];
+        foreach ($dynamicFiles as $id => $nombre) {
+            $rutaTemporal = $tempDir . $nombre;
+            $rutaTemporal2 = $tempDir . 'Archivo07.pdf';
+            $archivoGenerado = $this->Archivo($id_registro_pt, $id, $rutaTemporal);
+             if ($archivoGenerado && file_exists($archivoGenerado)) {
+             $archivos[] = $archivoGenerado;
+             }
+           
+        }
+
+        $archivo07 = $this->ImprimirPT($id_registro_pt, $rutaTemporal2);
+        if ($archivo07 && file_exists($archivo07)) {
+             $archivos[] = $archivo07;
+        }
+        if ($pdf_reserva->data){
+                foreach($pdf_reserva->data as $pdf){
+                    $source = FCPATH . $pdf->ruta_relativa;
+                    if (file_exists($source)) {
+                        $archivos[] = $source;
+                    }
+                }
+        }
+
+        // Archivos subidos
+        $uploadedFiles = [
+            'archivo05' => 'Archivo05.pdf',
+            'archivo06' => 'Archivo06.pdf',
+            'archivo08' => 'Archivo08.pdf',
+            'archivo09' => 'Archivo09.pdf'
+        ];
+        
+        foreach ($uploadedFiles as $inputName => $nombreArchivo) {
+            $file = $this->request->getFile($inputName);
+            if ($file && $file->isValid()) {
+                $newFile = $tempDir . $nombreArchivo;
+                if ($file->move($tempDir, $nombreArchivo)) {
+                    $archivos[] = $newFile;
+                }
+            }
+        }
+        
+        // Verificar que hay archivos para comprimir
+        if (empty($archivos)) {
+            array_map('unlink', glob($tempDir . '*'));
+            rmdir($tempDir);
+            $response->error = true;
+            $response->respuesta = 'No hay archivos para comprimir';
+             return $this->respond($response);
+        }
+         $timestamp = date('Ymd_His');
+        $zipPath = WRITEPATH . "temp_zip/Documentos_{$id_registro_pt}_{$timestamp}.zip";
+        $zipDir = dirname($zipPath);
+        if (!file_exists($zipDir)) {
+            if (!mkdir($zipDir, 0777, true)) {
+                $response->error = true;
+                $response->respuesta = 'No se pudo crear directorio para ZIP';
+                return $this->respond($response);
+            }
+        }
+       
+       
+        $zip = new \ZipArchive();
+        if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE)) {
+            foreach ($archivos as $archivo) {
+                $zip->addFile($archivo, basename($archivo)); // solo nombre, sin path completo
+            }
+            $zip->close();
+            if (!file_exists($zipPath)) {
+            $response->error = true;
+            $response->respuesta = 'El archivo ZIP no se creó correctamente';
+            return $this->respond($response);
+        }
+        }
+        foreach ($archivos as $archivo) {
+            if (file_exists($archivo)) {
+                unlink($archivo);
+            }
+        }
+        // Al final de la función, después de enviar la respuesta
+        register_shutdown_function(function() use ($zipPath) {
+            if (file_exists($zipPath)) {
+                unlink($zipPath);
+            }
+        });
+
+           return $this->response
+        ->setHeader('Content-Type', 'application/zip')
+        ->setHeader('Content-Disposition', 'attachment; filename="Documentos_' . $id_registro_pt . '.zip"')
+        ->setBody(file_get_contents($zipPath));
+        
+   
     }
 
-    public function ImprimirPT($id_pt = null)
+    public function ImprimirPT($id_pt = null,$savePath = null )
     {  
         $session = \Config\Services::session();
         $globals = new Mglobal;
@@ -1604,7 +1819,10 @@ class Principal extends BaseController {
             }
         }
 
-      
+       if ($savePath) {
+            $mpdf->Output($savePath, 'F'); // F = write to file
+            return $savePath;
+        }
 
         $mpdf->Output('Formato_pt.pdf', 'I');
         exit();
@@ -1827,11 +2045,11 @@ class Principal extends BaseController {
         $data['incidencia'] = (isset($incidencia->data) && !empty($incidencia->data))?$incidencia->data:'';
 
         $tempQrPath = FCPATH . 'assets/images/qr_final.png';
-
+        $folio = 'GTO - ' . date('YmdHis') . substr((string)microtime(), 1, 4);
         // Generar el QR
         $result = Builder::create()
             ->writer(new PngWriter())
-            ->data(base_url().'index.php/Principal/reporteIncidencia/' . date('Y-m-d'))
+            ->data(base_url().'index.php/Principal/reporteIncidenciaUsuario/0/0/0/'.$folio)
             ->encoding(new Encoding('UTF-8'))
             ->errorCorrectionLevel(new ErrorCorrectionLevelHigh())
             ->size(400)
@@ -1845,6 +2063,7 @@ class Principal extends BaseController {
          $result->saveToFile($tempQrPath);
          $dataImagen = $this->encode_img_base64(FCPATH .'assets/images/qr_final.png', 'png');
          $data['dataImagen'] =  $dataImagen;
+         $data['folio'] =  $folio;
 
         $doc = 'assets/pdf/plantillas/asistencia.pdf';
         $formato ='personal/vFormatoAsistencia.php';

@@ -35,9 +35,52 @@
                                     <div class="card">
 
                                         <div class="card-body">
+                                            <?php if(in_array($session->get('id_perfil'), [1,3] )): ?>
                                              <a href="<?php echo base_url().'index.php/Principal/reporteIncidencia'?>" target="_blank" class="btn btn-primary mb-3">
-                                                Descargar Reporte
+                                                Reporte General
                                             </a>
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label for="fecha_inicio">Periodo Inicio</label>
+                                                        <select class="form-control" id="periodoInicio">
+                                                            <?php foreach($periodo as $p): ?>
+                                                                <option value="<?= $p->fecha_inicio ?>" data-id="<?= $p->id_periodo ?>">
+                                                                    <?= 'PERIODO ' . $p->id_periodo . ' - ' . $p->dsc_periodo ?>
+                                                                </option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label for="fecha_inicio">Periodo Fin</label>
+                                                        <select class="form-control" id="periodoFin">
+                                                            <?php foreach($periodo as $p): ?>
+                                                                <option value="<?= $p->fecha_fin ?>" data-id="<?= $p->id_periodo ?>">
+                                                                    <?= 'PERIODO ' . $p->id_periodo . ' - ' . $p->dsc_periodo ?>
+                                                                </option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                       <label for="fecha_inicio">Usuario</label>
+                                                        <select class="form-control" id="usuarioIncidencia">
+                                                            <?php foreach($usuario as $p): ?>
+                                                            <option value="<?= $p->id_usuario ?>" > <?= $p->nombre_completo ?> </option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                </div>
+                                                  <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label for="fecha_fin">Enviar</label><br>
+                                                        <button id="btnReporte" class="btn btn-info mb-3" onclick="ini.inicio.generarReporteIndividual();" >Reporte usuario</button>
+                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <?php endif; ?>
                                
                                             <table id="datatableIncidencias" class="table" data-toggle="table">
                                                 <thead class="thead-light">
@@ -251,6 +294,23 @@ $(document).ready(function() {
         destroy: true,
         searching: true,
     });
-});
 
+  const inicio = document.getElementById('periodoInicio');
+  const fin = document.getElementById('periodoFin');
+    // Guardamos las opciones originales
+    const todasLasOpciones = Array.from(fin.options);
+    inicio.addEventListener('change', function() {
+        // Leer el data-id del periodo seleccionado
+        const idInicio = parseInt(inicio.selectedOptions[0].getAttribute('data-id'));
+        // Limpiar opciones actuales
+        fin.innerHTML = '';
+        // Agregar solo las opciones con id >= idInicio
+        todasLasOpciones.forEach(option => {
+            const idOpcion = parseInt(option.getAttribute('data-id'));
+            if (idOpcion >= idInicio+1) {
+                fin.appendChild(option.cloneNode(true));
+            }
+        });
+    });
+});
 </script>

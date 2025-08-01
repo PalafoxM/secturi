@@ -6,6 +6,18 @@ use App\Libraries\Funciones;
 use App\Models\Mglobal;
 use App\Models\Magregarturno;
 
+require_once FCPATH . "qr_code/autoload.php";
+require_once FCPATH . "mpdf/autoload.php";
+
+
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
+use Endroid\QrCode\Label\Alignment\LabelAlignmentCenter;
+use Endroid\QrCode\Label\Font\NotoSans;
+use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
+use Endroid\QrCode\Writer\PngWriter;
+
 
 use stdClass;
 use Exception;
@@ -935,24 +947,7 @@ class Agregar extends BaseController {
             $data['contentView'] = 'secciones/vAsistencia';                
             $this->_renderView($data);
         }
-    public function generarZip()
-    {
-        $session     = \Config\Services::session();
-        $response    = new stdClass();
-        $Mglobal   = new Mglobal;
-        $data = [];
-        $response->error = true;
-
-        $id_registro_pt = $this->request->getPost('id_registro_pt');
-        $pdf_reserva = $Mglobal->getTabla(['tabla' => 'vw_pdf_reserva', 'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]]);
-        if(!$pdf_reserva->error){
-            $response->data  = $pdf_reserva->data;
-            $response->error = $pdf_reserva->error;
-
-        }
-        return $this->respond($response->data);
-
-    }
+  
     public function ReservarSala() {
         $session     = \Config\Services::session();
         $response    = new stdClass();
@@ -975,43 +970,122 @@ class Agregar extends BaseController {
         $data['contentView'] = 'secciones/vSala';                
         $this->_renderView($data);
     }
-    public function Configuracion() {
+    function encode_img_base64($img_path = false, $img_type = 'png')
+    {
+        if ($img_path) {
+            //convert image into Binary data
+            $img_data = fopen($img_path, 'rb');
+            $img_size = filesize($img_path);
+            $binary_image = fread($img_data, $img_size);
+            fclose($img_data);
+            //Build the src string to place inside your img tag
+            $img_src = "data:image/" . $img_type . ";base64," . str_replace("\n", "", base64_encode($binary_image));
+            return $img_src;
+        }
+        return false;
+    }
+    public function ReporteUsuario($fec_inicio = null, $fec_fin = null, $usuario = null)
+    {
         $session     = \Config\Services::session();
         $response    = new stdClass();
-        $catalogos   = new Mglobal;
-        // Obtener el evento_id encriptado desde GET y desencriptarlo
-        $id_curso = $this->request->getGet('id_curso');
-    
-        if (!$id_curso) {
-            // Manejar error de desencriptación
-            echo "ID no válido o error de desencriptación.";
-            return;
-        }
-        $datos = ['courseId' => $id_curso ];
-        $categoria = "";
-        $quizz = $catalogos->createCurso($datos, 'traerQuiz');
-        $details = $catalogos->createCurso($datos, 'getCourseDetailsById');
-        //die( var_dump( $details ) );
-        if(!empty($quizz->data)){
-            $data['quizz'] = $quizz->data;
-        }
-        if(!empty($details->data)){
-            $data['details'] = $details->data;
-            $insert = [
-                 'categoryId' => $details->data[0]->categoryid
-            ];
-            $categoria = $catalogos->createCurso($insert, 'getCoursesByCategoryId');
-            $data['categoria'] = $categoria->data;
-            $data['fec_inicio'] = date('d-m-Y', $categoria->data[0]->startdate); 
-            $data['fec_fin'] = date('d-m-Y', $categoria->data[0]->enddate); 
-        }
-        //var_dump( $categoria->data[0]->modules );
-        $data['id_curso'] = $id_curso;
+        $response->error = true;
+        $response->respuesta = 'No existen incidencia del usuario' ;
+        $globals     = new Mglobal;
+        $fechaInicio = date('Y-m-d', strtotime($fec_inicio));
+        $fechaFin    = date('Y-m-d', strtotime($fec_fin));
+  
+        $data = array();
+        $incidencia = $globals->getTabla([
+            'tabla' => 'vw_incidenica',
+            'where' => ['id_usuario' => $usuario, 'id_estatus' => 3],
+            'whereBetween' => [['fecha', $fechaInicio, $fechaFin]]
+        ]);
+        $data['incidencia'] = (isset($incidencia->data) && !empty($incidencia->data))?$incidencia->data:'';
+        $data['usuario'] = (isset($incidencia->data) && !empty($incidencia->data))?$incidencia->data[0]:'';
 
-        $data['scripts'] = array('agregar');
-        $data['contentView'] = 'secciones/vConfiguracion';                
-        $this->_renderView($data);
+        $tempQrPath = FCPATH . 'assets/images/qr_final.png';
+        $folio = 'GTO - ' . date('YmdHis') . substr((string)microtime(), 1, 4);
+        // Generar el QR
+        $result = Builder::create()
+            ->writer(new PngWriter())
+            ->data(base_url().'index.php/Principal/reporteIncidenciaUsuario/' .$fechaInicio.'/'.$fechaFin.'/'.$usuario.'/'.$folio)
+            ->encoding(new Encoding('UTF-8'))
+            ->errorCorrectionLevel(new ErrorCorrectionLevelHigh())
+            ->size(400)
+            ->margin(10)
+            ->roundBlockSizeMode(new RoundBlockSizeModeMargin())
+            ->labelText('')
+            ->labelFont(new NotoSans(16))
+            ->labelAlignment(new LabelAlignmentCenter())
+            ->build();
+
+         $result->saveToFile($tempQrPath);
+         $dataImagen = $this->encode_img_base64(FCPATH .'assets/images/qr_final.png', 'png');
+         $data['dataImagen'] =  $dataImagen;
+         $data['folio'] =  $folio;
+
+        $doc = 'assets/pdf/plantillas/asistencia.pdf';
+        $formato ='personal/vFormatoAsistenciaUser.php';
+        $html = view( $formato, $data);
+        // Crear instancia de mPDF
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 0,
+            'margin_left' => 1,
+            'margin_right' => 1,
+            'format' => [213, 268],
+            'mirrorMargins' => false,
+        ]);
+
+        // Importar el PDF base
+      
+        $pagecount = $mpdf->SetSourceFile(FCPATH . $doc );
+        $tplId = $mpdf->ImportPage(1);
+
+        // Página 1
+        $mpdf->AddPage();
+        $mpdf->UseTemplate($tplId);
+        $mpdf->WriteHTML($html);
+
+        // Footer en todas las páginas
+        $mpdf->SetHTMLFooter('
+            <div style="text-align: right; font-size: 10px;">
+                Página {PAGENO} de {nbpg}
+            </div>
+        ');
+
+
+        $mpdf->Output('Formato_pt.pdf', 'I');
+        exit();
+
     }
+   
+    public function validarReporte()
+    {
+        $session     = \Config\Services::session();
+        $response    = new stdClass();
+        $response->error = true;
+        $response->respuesta = 'EL Usuario <strong style="color:red"> no tiene incidencia(s)</strong> en esos periodos' ;
+        $globals     = new Mglobal;
+        $periodoInicio = $this->request->getPost('periodoInicio');
+        $periodoFin = $this->request->getPost('periodoFin');
+        $id_usuario = $this->request->getPost('usuario');
+        $fec_ini = date('Y-m-d', strtotime($periodoInicio));
+        $fec_fin = date('Y-m-d', strtotime($periodoFin));
+        $tabla = [
+                 'tabla' => 'incidencia', 
+                 'where' => ['id_usuario' => $id_usuario],
+                 'whereBetween' => [['fecha', $fec_ini, $fec_fin]]
+                ];
+        $incidencias = $globals->getTabla($tabla);                  
+        if(!empty($incidencias->data)){
+          $response->error = false;
+          $response->respuesta = 'Si existen incidencia del usuario' ;
+        }
+
+     return $this->respond($response);
+
+    }
+   
     public function registroSala()
     {
         $session = \Config\Services::session();

@@ -16,29 +16,18 @@
 <div  style="position:absolute; text-align:center; top:11%; left:5%; width:35%; height:18px;  font-size: 11px; ">
     <span class="proxima">Folio: <strong style="color:red;" ><?= $folio ?></strong></span>
 </div>
+<div style="position:absolute;top:21%; text-align:center; left:17.5%; width:65%; background-color:white; height:20px; font-size: 12px;">
+    <span class="proxima"><strong><?= $usuario->nombre_completo?></strong></span>
+</div>
+<div style="position:absolute;top:23%;text-align:center; left:17.5%; width:65%; background-color:white; height:20px; font-size: 12px;">
+    <span class="proxima"><strong><?= $usuario->dsc_area?></strong></span>
+</div>
 <?php 
-$top = 21;
+$top = 24;
 $contador = 0;
 
 foreach ($incidencia as $i): 
 ?>
-
-<!-- Campos de cada registro -->
-<div style="position:absolute;top:<?= $top ?>%; left:11.5%; width:23%; height:20px; font-size: 12px;">
-    <span class="proxima"><strong>Nombre del Servidor Publico:</strong></span>
-</div>
-<div style="position:absolute;top:<?= $top ?>%; left:35.5%; width:23%; height:20px; font-size: 12px;">
-    <i><?= $i->nombre_completo ?> </i>
-</div>
-
-<?php $top += 1.5; ?>
-<div style="position:absolute;top:<?= $top ?>%; left:11.5%; width:23%; height:20px; font-size: 12px;">
-    <span class="proxima"><strong>Dirección a la que pertenece:</strong></span>
-</div>
-<div style="position:absolute;top:<?= $top ?>%; left:35.5%; width:50%; height:20px; font-size: 12px;">
-    <i><?= $i->dsc_area ?> </i>
-</div>
-
 <?php $top += 1.7; ?>
 <div style="position:absolute;top:<?= $top ?>%; left:11.5%; width:23%; height:20px; font-size: 12px;">
     <span class="proxima"><strong>Tipo de Incidencia:</strong></span>
@@ -64,17 +53,18 @@ foreach ($incidencia as $i):
 <div style="position:absolute; top:<?= $top ?>%; left:11.5%; width:80%; height:1px; border-top:1px solid #000;"></div>
 
 <?php 
-$top += 4;
+$top += 1.5;
 $contador++;
 
 // 👉 Cada 6 registros, fuerza salto de página y reinicia el top
-if ($contador % 5 == 0) {
+if ($contador % 6 == 0) {
     echo '<div style="page-break-after: always;"></div>';
     $top = 21; // Reinicia altura
 }
 endforeach; 
 ?>
 <div id="qr" style="top:<?= $top ?>%; left:40%;"></div>
+
 
 
 

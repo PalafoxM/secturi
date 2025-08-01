@@ -105,16 +105,10 @@
                                                        
 
                                                             <td class="text-center">
-                                                                <button title="editar"
+                                                                <button title="Imprimir Archivo"
                                                                     onclick="ini.inicio.editarPerfil(<?= $p->id_usuario ?>)"
                                                                     class="btn btn-gradient-warning px-4">
-                                                                    <i class="dripicons-pencil font-21"></i>
-                                                                </button>
-
-                                                                <button title="eliminar"
-                                                                    onclick="ini.inicio.eliminarPerfil(<?= $p->id_usuario ?>)"
-                                                                    class="btn btn-gradient-danger px-4">
-                                                                    <i class="dripicons-trash font-21"></i>
+                                                                    <i class="dripicons-document-new font-21"></i>
                                                                 </button>
                                                             </td>
                                                         </tr>
