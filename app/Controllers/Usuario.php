@@ -22,6 +22,9 @@ require_once FCPATH . '/mpdf/autoload.php';
 require 'vendor/autoload.php';
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Color;
+
 
 class Usuario extends BaseController 
 {
@@ -165,6 +168,140 @@ class Usuario extends BaseController
         } */
 
     }
+    public function validarReporteExcel()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+        $globals       = new Mglobal;
+        $periodoInicio = $this->request->getPost('periodoInicio');
+        $periodoFin    = $this->request->getPost('periodoFin');
+        $fec_ini = date('Y-m-d', strtotime($periodoInicio));
+        $fec_fin = date('Y-m-d', strtotime($periodoFin));
+        // Obtener datos de la vista
+        $tabla = [
+                 'tabla' => 'vw_incidenica', 
+                 'where' => ['visible' => 1],
+                 'whereBetween' => [['fecha', $fec_ini, $fec_fin]]
+                ];
+  
+        $incidencias = $globals->getTabla($tabla);
+        $resul = (isset($incidencias->data) && !empty($incidencias->data)) ? $incidencias->data : [];
+        if (empty($resul)) {
+            $response->respuesta = "No se encontrarón datos en el<strong> periodo indicado</strong>";
+        }else{
+           $response->error = false;
+           $response->respuesta = "Datos Correctos";
+        }
+          return $this->respond($response);
+    }
+     public function reporteIncidenciaExcel($fechaInicio = null, $fechaFin = null)
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+        $globals       = new Mglobal;
+
+        $fec_ini = date('Y-m-d', strtotime($fechaInicio));
+        $fec_fin = date('Y-m-d', strtotime($fechaFin));
+        // Obtener datos de la vista
+        $tabla = [
+                 'tabla' => 'vw_asistencia', 
+                 'where' => ['visible' => 1],
+                 'whereBetween' => [['fecha', $fec_ini, $fec_fin]]
+                ];
+  
+        $incidencias = $globals->getTabla($tabla);
+        $resul = (isset($incidencias->data) && !empty($incidencias->data)) ? $incidencias->data : [];
+  
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+ 
+        // Agrupar datos por usuario y fecha
+        $datosAgrupados = [];   // [usuario][fecha] = ['entrada' => ..., 'salida' => ...]
+        $fechasUnicas   = [];
+
+        foreach ($resul as $r) {
+            $usuario = $r->nombre_completo;
+            $fecha   = $r->fecha;
+
+            $datosAgrupados[$usuario][$fecha] = [
+                'entrada' => $r->hora_inicio,
+                'salida'  => $r->hora_fin
+            ];
+
+            $fechasUnicas[$fecha] = true;
+        }
+       
+        // Ordenar fechas
+        $fechasOrdenadas = array_keys($fechasUnicas);
+        sort($fechasOrdenadas);
+      
+        // Crear el documento
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Encabezados (fila 1: fechas, fila 2: Entrada / Salida)
+        $sheet->setCellValue('A1', '');
+        $sheet->setCellValue('A2', 'Nombre');
+
+        $col = 'B';
+        foreach ($fechasOrdenadas as $fecha) {
+            $sheet->setCellValue($col . '1', date('d/m/Y', strtotime($fecha)));
+            $sheet->setCellValue($col . '2', 'Entrada');
+            $col++;
+            $sheet->setCellValue($col . '1', ''); // celda vacía solo para mantener formato
+            $sheet->setCellValue($col . '2', 'Salida');
+            $col++;
+        } 
+        $fila = 3;
+        foreach ($datosAgrupados as $usuario => $dias) {
+            $sheet->setCellValue('A' . $fila, $usuario);
+            $col = 'B';
+
+            foreach ($fechasOrdenadas as $fecha) {
+                $entrada = isset($dias[$fecha]['entrada']) ? $dias[$fecha]['entrada'] : '';
+                $salida  = isset($dias[$fecha]['salida'])  ? $dias[$fecha]['salida']  : '';
+
+                $celdaEntrada = $col . $fila;
+
+                // Asignar entrada
+                $sheet->setCellValue($celdaEntrada, $entrada);
+
+                // 🟥 ROJO si entrada > 09:00:00
+                if ($entrada && $entrada > '09:00:00') {
+                    $sheet->getStyle($celdaEntrada)->getFill()->setFillType(Fill::FILL_SOLID)
+                        ->getStartColor()->setARGB(Color::COLOR_RED);
+                }
+                // 🟨 AMARILLO si está vacío
+                elseif ($entrada === '') {
+                    $sheet->getStyle($celdaEntrada)->getFill()->setFillType(Fill::FILL_SOLID)
+                        ->getStartColor()->setARGB('FFFFFF00'); // Amarillo
+                }
+
+                $col++;
+
+                // Asignar salida (sin condiciones de color)
+                $sheet->setCellValue($col . $fila, $salida);
+                $col++;
+            }
+
+            $fila++;
+        }
+
+        // 5. Descargar archivo
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'reporte_asistencias' . date('Ymd_His') . '.xlsx';
+
+        // Enviar headers
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$fileName\"");
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        exit;
+    }
  
     
     public function getParticipante()
@@ -305,7 +442,6 @@ class Usuario extends BaseController
         $writer->save('php://output');
         exit;
     }
-
    
     public function getUsuarios()
     {
@@ -1535,5 +1671,8 @@ class Usuario extends BaseController
         $response = $this->globals->saveTabla($dataInsert,$dataConfig,["script"=>"Usuario.saveUsuario"]);
         return $this->respond($response);
     }
+   
+
+
     
 }

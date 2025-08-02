@@ -1058,6 +1058,7 @@ class Agregar extends BaseController {
         exit();
 
     }
+  
    
     public function validarReporte()
     {
@@ -1372,6 +1373,6 @@ class Agregar extends BaseController {
 
         return $this->respond($response);
     }
-
+   
   
 }

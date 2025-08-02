@@ -1,4 +1,4 @@
-
+<?php  $session = \Config\Services::session(); ?>
 
 
 <div class="page-wrapper">
@@ -33,12 +33,48 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="card">
-
                                         <div class="card-body">
-                                            <span>PERFILES</span>
-                                            <button onclick="ini.inicio.cargaCsv()"
-                                                class="btn btn-gradient-primary px-4 float-right mt-0 mb-3"><i
+                                          <?php if(in_array($session->get('id_perfil'), [1,3] )): ?>
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label for="fecha_inicio">Periodo Inicio</label>
+                                                        <select class="form-control" id="periodoInicio">
+                                                            <?php foreach($periodo as $p): ?>
+                                                                <option value="<?= $p->fecha_inicio ?>" data-id="<?= $p->id_periodo ?>">
+                                                                    <?= 'PERIODO ' . $p->id_periodo . ' - ' . $p->dsc_periodo ?>
+                                                                </option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label for="fecha_inicio">Periodo Fin</label>
+                                                        <select class="form-control" id="periodoFin">
+                                                            <?php foreach($periodo as $p): ?>
+                                                                <option value="<?= $p->fecha_fin ?>" data-id="<?= $p->id_periodo ?>">
+                                                                    <?= 'PERIODO ' . $p->id_periodo . ' - ' . $p->dsc_periodo ?>
+                                                                </option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label for="fecha_fin">Enviar</label><br>
+                                                        <button id="btnReporteExcel" class="btn btn-info mb-3" onclick="ini.inicio.generarReporteExcel()" >Excel</button>
+                                                        
+                                                    </div>
+                                                </div>
+                                                 <div class="col-md-3">
+                                                    <button onclick="ini.inicio.cargaCsv()"
+                                                     class="btn btn-gradient-primary px-4 float-right mt-0 mb-3"><i
                                                     class="mdi mdi-plus-circle-outline mr-2"></i>Subir Archivo</button>
+                                                </div>
+                                            </div>
+                                            <?php endif; ?>
+                                      
                                                  
                                             <table id="datatableCategorias" class="table" data-toggle="table">
                                                 <thead class="thead-light">
@@ -213,5 +249,21 @@ $(document).ready(function() {
     });
 });
 
-
+  const inicio = document.getElementById('periodoInicio');
+  const fin = document.getElementById('periodoFin');
+    // Guardamos las opciones originales
+    const todasLasOpciones = Array.from(fin.options);
+    inicio.addEventListener('change', function() {
+        // Leer el data-id del periodo seleccionado
+        const idInicio = parseInt(inicio.selectedOptions[0].getAttribute('data-id'));
+        // Limpiar opciones actuales
+        fin.innerHTML = '';
+        // Agregar solo las opciones con id >= idInicio
+        todasLasOpciones.forEach(option => {
+            const idOpcion = parseInt(option.getAttribute('data-id'));
+            if (idOpcion >= idInicio+1) {
+                fin.appendChild(option.cloneNode(true));
+            }
+        });
+    });
 </script>

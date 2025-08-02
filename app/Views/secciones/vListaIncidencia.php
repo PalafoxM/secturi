@@ -39,6 +39,7 @@
                                              <a href="<?php echo base_url().'index.php/Principal/reporteIncidencia'?>" target="_blank" class="btn btn-primary mb-3">
                                                 Reporte General
                                             </a>
+                                           
                                             <div class="row">
                                                 <div class="col-md-3">
                                                     <div class="form-group">
@@ -75,7 +76,7 @@
                                                   <div class="col-md-3">
                                                     <div class="form-group">
                                                         <label for="fecha_fin">Enviar</label><br>
-                                                        <button id="btnReporte" class="btn btn-info mb-3" onclick="ini.inicio.generarReporteIndividual();" >Reporte usuario</button>
+                                                        <button id="btnReporte" class="btn btn-info mb-3" onclick="ini.inicio.generarReporteIndividual();" >PDF</button>
                                                         
                                                     </div>
                                                 </div>

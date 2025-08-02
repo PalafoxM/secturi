@@ -3084,6 +3084,39 @@ ini.inicio = (function () {
                 }
             });
         },
+     
+        generarReporteExcel: function()
+        {
+        let periodoInicio = $('#periodoInicio').val();
+        let periodoFin    = $('#periodoFin').val();
+
+            $.ajax({
+                    type: "POST",
+                    url: base_url + "index.php/Usuario/validarReporteExcel",
+                    data:{periodoInicio,periodoFin },
+                    dataType: "json",
+                    beforeSend: function(){
+                      $('#btnReporteExcel').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Generando...');
+                    },
+                    success: function (response) {
+                      if(response.error){
+                          Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
+                      }else{
+                        const url = base_url + "index.php/Usuario/reporteIncidenciaExcel/" + periodoInicio + '/' + periodoFin;
+                        window.open(url, '_blank');
+                      }
+                           
+                    },
+                    complete: function(){
+                     $('#btnReporteExcel').prop('disabled', false).html('Excel');
+                    },
+                    error: function (response,jqXHR, textStatus, errorThrown) {
+                         var res= JSON.parse (response.responseText);
+                        //  console.log(res.message);
+                         Swal.fire("Error", '<p> '+ res.message + '</p>');  
+                    }
+            });
+        },
         generarReporteIndividual: function()
         {
         let periodoInicio = $('#periodoInicio').val();
@@ -3108,7 +3141,7 @@ ini.inicio = (function () {
                         }
                     },
                     complete: function(){
-                     $('#btnReporte').prop('disabled', false).html('Reporte usuario');
+                     $('#btnReporte').prop('disabled', false).html('PDF');
                     },
                     error: function (response,jqXHR, textStatus, errorThrown) {
                          var res= JSON.parse (response.responseText);

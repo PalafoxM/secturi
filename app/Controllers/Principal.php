@@ -12,7 +12,7 @@ use stdClass;
 use CodeIgniter\API\ResponseTrait;
 require_once FCPATH . "qr_code/autoload.php";
 require_once FCPATH . "mpdf/autoload.php";
-
+require 'vendor/autoload.php';
 
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
@@ -21,7 +21,9 @@ use Endroid\QrCode\Label\Alignment\LabelAlignmentCenter;
 use Endroid\QrCode\Label\Font\NotoSans;
 use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
 use Endroid\QrCode\Writer\PngWriter;
- 
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Principal extends BaseController {
 
@@ -169,8 +171,6 @@ class Principal extends BaseController {
     public function reporteIncidenciaUsuario($fechaInicio = null, $fechaFin =  null, $idUsuario = null, $folio = null)
     {
         $Mglobal = new Mglobal;
-
-      
        if( $fechaInicio != 0){
           $usuario = $Mglobal->getTabla([
             'tabla' => 'vw_usuario',
@@ -2098,5 +2098,6 @@ class Principal extends BaseController {
         $mpdf->Output('Formato_pt.pdf', 'I');
         exit();
     }
+  
   
 }
