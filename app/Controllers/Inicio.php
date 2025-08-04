@@ -304,14 +304,13 @@ class Inicio extends BaseController {
     public function listaTiket()
     {
         $session = \Config\Services::session();
-        $principal            = new Mglobal;
+        $principal  = new Mglobal;
         if($session->get('id_perfil')==1){
         $cat_tiket  = $principal->getTabla(['tabla' => 'vw_tiket', 'where'=>['visible' => 1]]); 
         }else{
-        $cat_tiket  = $principal->getTabla(['tabla' => 'vw_tiket', 'where'=>['usuario'=> $session->get('id_usuario'), 'visible' => 1]]); 
+        $cat_tiket  = $principal->getTabla(['tabla' => 'vw_tiket', 'where'=>['id_usuario'=> $session->get('id_usuario'), 'visible' => 1]]); 
         }
-
-
+       
         $data['cat_tiket']   = (isset($cat_tiket->data) && !empty($cat_tiket->data))?$cat_tiket->data:[];
         $data['scripts']     = ['principal', 'inicio'];
         $data['contentView'] = 'secciones/vListaTiket';

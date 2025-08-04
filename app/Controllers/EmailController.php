@@ -48,7 +48,7 @@ class EmailController extends BaseController
         $correo = $usuario->data[0]->correo;
 
         // Configurar y enviar correo
-        $email->setFrom('palafox.marin31@gmail.com', 'SUSI');
+        $email->setFrom('a.palafoxm@guanajuato.gob.mx', 'SUSI');
         $email->setTo($correo);
         $email->setSubject('Soporte TI SECTURI');
        $email->setMessage('

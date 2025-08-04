@@ -26,7 +26,7 @@
                 <div class="col-lg-8">
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="header-title mt-0">Audience Overview</h4>
+                            <h4 class="header-title mt-0">Solicitud</h4>
                             <div class="">
                                 <div id="ana_dash_1" class="apex-charts"></div>
                             </div>
@@ -44,7 +44,7 @@
                                                 <span class="text-success  font-12 font-weight-normal"><i
                                                         class="mdi mdi-arrow-up mr-1"></i>21%</span>
                                             </h4>
-                                            <p class="text-dark font-weight-semibold mb-0 font-14">Users</p>
+                                            <p class="text-dark font-weight-semibold mb-0 font-14">PT</p>
                                         </div>
                                         <!--end media-body-->
                                     </div>
@@ -61,7 +61,7 @@
                                                 <span class="text-success  font-12 font-weight-normal"><i
                                                         class="mdi mdi-arrow-up mr-1"></i>21%</span>
                                             </h4>
-                                            <p class="text-dark font-weight-semibold mb-0 font-14">Page views</p>
+                                            <p class="text-dark font-weight-semibold mb-0 font-14">GO</p>
                                         </div>
                                         <!--end media-body-->
                                     </div>
@@ -78,7 +78,7 @@
                                                 <span class="text-success  font-12 font-weight-normal"><i
                                                         class="mdi mdi-arrow-up mr-1"></i>21%</span>
                                             </h4>
-                                            <p class="text-dark font-weight-semibold mb-0 font-14">Impressions</p>
+                                            <p class="text-dark font-weight-semibold mb-0 font-14">GRC</p>
                                         </div>
                                         <!--end media-body-->
                                     </div>

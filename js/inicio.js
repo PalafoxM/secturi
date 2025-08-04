@@ -209,6 +209,7 @@ ini.inicio = (function () {
                         $('#sexo').val(data.id_sexo);
                         $('#correo').val(data.correo);
                         $('#id_perfil').val(data.id_perfil);
+                        $('#nivel').val(data.nivel);
 
                     } else {
                         Swal.fire("info", "No se encontraron datos del usuario.", "info");
@@ -2272,7 +2273,7 @@ ini.inicio = (function () {
         },
         openSupportModal: function() {
         $('#supportModal').modal('show');
-          resetChat();
+        //  resetChat();
         },
         getUsuario: function(id){
             
@@ -2596,6 +2597,8 @@ ini.inicio = (function () {
                                 dataType: "json",
                                 data: { opcion, randomTicket },
                                 success: function(response) {
+                                    console.log('entro')
+                                    console.log(response);
                                     if(!response.error){
                                     Swal.fire({
                                         title: `#${randomTicket}`,

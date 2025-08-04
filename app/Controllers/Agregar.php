@@ -942,7 +942,7 @@ class Agregar extends BaseController {
             $data['incidencia'] = (isset($incidencia->data) && !empty($incidencia->data))?$incidencia->data:[];
             $data['mes'] = $mes;
             $data['calendarStatic'] = $calendarStatic;
-            $data['scripts'] = array('agregar');
+            $data['scripts'] = array('agregar', 'inicio');
             $data['contentView'] = 'secciones/vAsistencia';                
             $this->_renderView($data);
         }
