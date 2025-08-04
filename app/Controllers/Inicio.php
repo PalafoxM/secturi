@@ -114,10 +114,18 @@ class Inicio extends BaseController {
         // Obtener categorías desde la base de datos
         $Periodo= ['tabla' => 'cat_periodo', 'where' => ['visible' => 1]];
         $dataDB = ['tabla' => 'vw_incidenica', 'where' => ['visible' => 1]];
-        $usuario = ['tabla' => 'vw_incidenica', 'where' => ['visible' => 1], 'groupBy' => ['id_usuario']];
+        $usuario = [
+            'tabla'   => 'vw_incidenica',
+            'select'  => ['id_usuario', 'nombre_completo'],
+            'where'   => ['visible' => 1],
+            'groupBy' => ['id_usuario']
+            ];
+
+       
         $response = $principal->getTabla($dataDB);
         $periodo = $principal->getTabla($Periodo);
         $usuario = $principal->getTabla($usuario);
+
         $data['incidencia']  = (isset($response->data) && !empty($response->data))?$response->data:[];
         $data['periodo']     = (isset($periodo->data) && !empty($periodo->data))?$periodo->data:[];
         $data['usuario']     = (isset($usuario->data) && !empty($usuario->data))?$usuario->data:[];
