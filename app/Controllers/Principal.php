@@ -1333,7 +1333,7 @@ class Principal extends BaseController {
         $globals      = new Mglobal;
         $incidencia    = $globals->getTabla(['tabla' => 'vw_incidenica', 'where' => ['visible' => 1, 'id_jefe_inmediato' => $session->get('id_usuario')]]);
          $Periodo= ['tabla' => 'cat_periodo', 'where' => ['visible' => 1]];
-      $usuario = [
+       $usuario = [
             'tabla'   => 'vw_incidenica',
             'select'  => ['id_usuario', 'nombre_completo'],
             'where'   => ['visible' => 1],
