@@ -125,7 +125,7 @@ class Inicio extends BaseController {
         $response = $principal->getTabla($dataDB);
         $periodo = $principal->getTabla($Periodo);
         $usuario = $principal->getTabla($usuario);
-
+     
         $data['incidencia']  = (isset($response->data) && !empty($response->data))?$response->data:[];
         $data['periodo']     = (isset($periodo->data) && !empty($periodo->data))?$periodo->data:[];
         $data['usuario']     = (isset($usuario->data) && !empty($usuario->data))?$usuario->data:[];
