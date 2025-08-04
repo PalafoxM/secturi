@@ -933,7 +933,6 @@ class Agregar extends BaseController {
                     
             }
             $cat_incidencia = $Mglobal->getTabla(['tabla' => 'cat_incidencia', 'where' => ['visible' => 1]]);
-           
          
             $mes  = ($mes)? $mes: date('m');
             $data['anio'] = date('Y');

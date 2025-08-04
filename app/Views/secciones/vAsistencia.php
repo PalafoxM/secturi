@@ -445,13 +445,14 @@
             id: 'incidencia-' + item.id_incidencia,
             start: item.fecha,
             allDay: true,
-            className: 'fc-event-incidencia', // Clase CSS para estilizar
+            className: (item.id_estatus===3)?'fc-event-puntual':'fc-event-incidencia', // Clase CSS para estilizar
             title: 'Enviado',
             extendedProps: {
                 tipo: 'incidencia',
                 hora_inicio: item.hora_inicio || 'En validación',
                 hora_fin: item.hora_fin,
-                comentarios: item.comentarios
+                comentarios: item.comentarios,
+                id_estatus: item.id_estatus
             }
         };
     });
@@ -502,18 +503,27 @@
             hour12: true,
             meridiem: 'short'
         },
-        eventRender: function(info) {
-            // Personalizar el contenido del evento
+      eventRender: function(info) {
             var eventEl = info.el;
-             console.log(info.event.title);
+            console.log(info.event.title);
+
             if (info.event.title === 'Enviado') {
-                eventEl.innerHTML = `
-                    <div class="fc-event-title">${info.event.title}</div>
-                    <div class="fc-event-details">
-                        <div>Hora Inicio: ${info.event.extendedProps.hora_inicio}</div>
-                        <div>Hora fin: ${info.event.extendedProps.hora_fin}</div>
-                    </div>
-                `;
+                if (info.event.extendedProps.id_estatus === 3) {
+                    eventEl.innerHTML = `
+                        <div class="fc-event-title">Aprovado</div>
+                        <div class="fc-event-temprano">
+                            <div>Hora Inicio: ${info.event.extendedProps.hora_inicio}</div>
+                        </div>
+                    `;
+                } else {
+                    eventEl.innerHTML = `
+                        <div class="fc-event-title">${info.event.title}</div>
+                        <div class="fc-event-details">
+                            <div>Hora Inicio: ${info.event.extendedProps.hora_inicio}</div>
+                            <div>Hora fin: ${info.event.extendedProps.hora_fin}</div>
+                        </div>
+                    `;
+                }
             } else {
                 eventEl.innerHTML = `
                     <div class="fc-event-title">${info.event.title}</div>
