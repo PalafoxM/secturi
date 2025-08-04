@@ -170,6 +170,7 @@ class Usuario extends BaseController
     }
     public function validarReporteExcel()
     {
+ 
         $session = \Config\Services::session();
         $response = new \stdClass();
         $response->error = true;
@@ -180,11 +181,11 @@ class Usuario extends BaseController
         $fec_fin = date('Y-m-d', strtotime($periodoFin));
         // Obtener datos de la vista
         $tabla = [
-                 'tabla' => 'vw_incidenica', 
+                 'tabla' => 'vw_asistencia_incidencia', 
                  'where' => ['visible' => 1],
-                 'whereBetween' => [['fecha', $fec_ini, $fec_fin]]
+                 'whereBetween' => [['fechas_asistencias', $fec_ini, $fec_fin]]
                 ];
-  
+        
         $incidencias = $globals->getTabla($tabla);
         $resul = (isset($incidencias->data) && !empty($incidencias->data)) ? $incidencias->data : [];
         if (empty($resul)) {
@@ -195,54 +196,73 @@ class Usuario extends BaseController
         }
           return $this->respond($response);
     }
-     public function reporteIncidenciaExcel($fechaInicio = null, $fechaFin = null)
+    public function reporteIncidenciaExcel($fechaInicio = null, $fechaFin = null)
     {
         $session = \Config\Services::session();
         $response = new \stdClass();
         $response->error = true;
-        $globals       = new Mglobal;
+        $globals = new Mglobal;
 
         $fec_ini = date('Y-m-d', strtotime($fechaInicio));
         $fec_fin = date('Y-m-d', strtotime($fechaFin));
-        // Obtener datos de la vista
+        
+        // Obtener datos de la vista que incluye asistencias e incidencias
         $tabla = [
-                 'tabla' => 'vw_asistencia', 
-                 'where' => ['visible' => 1],
-                 'whereBetween' => [['fecha', $fec_ini, $fec_fin]]
-                ];
-  
-        $incidencias = $globals->getTabla($tabla);
-        $resul = (isset($incidencias->data) && !empty($incidencias->data)) ? $incidencias->data : [];
-  
+        'tabla' => 'vw_asistencia_incidencia',
+        'where' => ['visible' => 1],
+        'whereBetween' => [['fechas_asistencias', $fec_ini, $fec_fin]],
+        ];
+
+        $datos = $globals->getTabla($tabla);
+        $resul = (isset($datos->data) && !empty($datos->data)) ? $datos->data : [];
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
- 
         // Agrupar datos por usuario y fecha
-        $datosAgrupados = [];   // [usuario][fecha] = ['entrada' => ..., 'salida' => ...]
-        $fechasUnicas   = [];
+        $datosAgrupados = []; // [usuario][fecha] = ['entrada' => ..., 'salida' => ..., 'incidencia' => ...]
+        $fechasUnicas = [];
 
         foreach ($resul as $r) {
             $usuario = $r->nombre_completo;
-            $fecha   = $r->fecha;
+            
+            // Procesar asistencias
+            if ($r->fechas_asistencias) {
+                $fecha = $r->fechas_asistencias;
+                $datosAgrupados[$usuario][$fecha] = [
+                    'entrada' => $r->hora_inicio,
+                    'salida' => $r->hora_fin,
+                    'incidencia' => null // Inicialmente no hay incidencia
+                ];
+                $fechasUnicas[$fecha] = true;
+            }
+            
+            // Procesar incidencias
+            if ($r->fechas_incidencias) {
+                $fecha = $r->fechas_incidencias;
+                if (!isset($datosAgrupados[$usuario][$fecha])) {
+                    $datosAgrupados[$usuario][$fecha] = [
+                        'entrada' => '',
+                        'salida' => ''
+                    ];
+                }
+                // Agregar información de incidencia
+                $datosAgrupados[$usuario][$fecha]['incidencia'] = 
+                ($r->id_estatus == 1) ? 'En proceso' : 
+                (($r->id_estatus == 2) ? 'Declinada' : 'Aprobada');
 
-            $datosAgrupados[$usuario][$fecha] = [
-                'entrada' => $r->hora_inicio,
-                'salida'  => $r->hora_fin
-            ];
-
-            $fechasUnicas[$fecha] = true;
+                $fechasUnicas[$fecha] = true;
+            }
         }
-       
+      
         // Ordenar fechas
         $fechasOrdenadas = array_keys($fechasUnicas);
         sort($fechasOrdenadas);
-      
+
         // Crear el documento
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Encabezados (fila 1: fechas, fila 2: Entrada / Salida)
+        // Encabezados (fila 1: fechas, fila 2: Entrada / Salida / Incidencia)
         $sheet->setCellValue('A1', '');
         $sheet->setCellValue('A2', 'Nombre');
 
@@ -251,10 +271,14 @@ class Usuario extends BaseController
             $sheet->setCellValue($col . '1', date('d/m/Y', strtotime($fecha)));
             $sheet->setCellValue($col . '2', 'Entrada');
             $col++;
-            $sheet->setCellValue($col . '1', ''); // celda vacía solo para mantener formato
+            $sheet->setCellValue($col . '1', '');
             $sheet->setCellValue($col . '2', 'Salida');
             $col++;
-        } 
+            $sheet->setCellValue($col . '1', '');
+            $sheet->setCellValue($col . '2', 'Incidencia');
+            $col++;
+        }
+
         $fila = 3;
         foreach ($datosAgrupados as $usuario => $dias) {
             $sheet->setCellValue('A' . $fila, $usuario);
@@ -262,39 +286,59 @@ class Usuario extends BaseController
 
             foreach ($fechasOrdenadas as $fecha) {
                 $entrada = isset($dias[$fecha]['entrada']) ? $dias[$fecha]['entrada'] : '';
-                $salida  = isset($dias[$fecha]['salida'])  ? $dias[$fecha]['salida']  : '';
+                $salida = isset($dias[$fecha]['salida']) ? $dias[$fecha]['salida'] : '';
+                $incidencia = isset($dias[$fecha]['incidencia']) ? $dias[$fecha]['incidencia'] : '';
 
-                $celdaEntrada = $col . $fila;
-
-                // Asignar entrada
-                $sheet->setCellValue($celdaEntrada, $entrada);
-
-                // 🟥 ROJO si entrada > 09:00:00
+                // Celda entrada
+                $sheet->setCellValue($col . $fila, $entrada);
+                
+                // Estilo para entrada tardía
                 if ($entrada && $entrada > '09:00:00') {
-                    $sheet->getStyle($celdaEntrada)->getFill()->setFillType(Fill::FILL_SOLID)
-                        ->getStartColor()->setARGB(Color::COLOR_RED);
-                }
-                // 🟨 AMARILLO si está vacío
-                elseif ($entrada === '') {
-                    $sheet->getStyle($celdaEntrada)->getFill()->setFillType(Fill::FILL_SOLID)
+                    $sheet->getStyle($col . $fila)->getFill()->setFillType(Fill::FILL_SOLID)
+                        ->getStartColor()->setARGB('F55166');
+                } elseif ($entrada && $entrada > '08:45:00') {
+                    $sheet->getStyle($col . $fila)->getFill()->setFillType(Fill::FILL_SOLID)
+                        ->getStartColor()->setARGB('C9321A');
+                } elseif ($entrada === '') {
+                    $sheet->getStyle($col . $fila)->getFill()->setFillType(Fill::FILL_SOLID)
                         ->getStartColor()->setARGB('FFFFFF00'); // Amarillo
                 }
+               elseif (strcasecmp(trim($incidencia), 'Aprobada') === 0) {
+                    $sheet->getStyle($col . $fila)->getFill()->setFillType(Fill::FILL_SOLID)
+                        ->getStartColor()->setARGB('80F293'); // Verde
+                }
 
                 $col++;
 
-                // Asignar salida (sin condiciones de color)
+                // Celda salida
                 $sheet->setCellValue($col . $fila, $salida);
                 $col++;
-            }
 
+                // Celda incidencia
+                $sheet->setCellValue($col . $fila, $incidencia);
+                
+                // Estilo para celdas con incidencia
+                if ($incidencia) {
+                    $sheet->getStyle($col . $fila)->getFill()->setFillType(Fill::FILL_SOLID)
+                        ->getStartColor()->setARGB('FFA500'); // Naranja para incidencias
+                }
+                $col++;
+            }
             $fila++;
         }
 
-        // 5. Descargar archivo
+        // Ajustar ancho de columnas
+        $sheet->getColumnDimension('A')->setWidth(30);
+        $lastColumn = $sheet->getHighestColumn();
+        for ($col = 'B'; $col <= $lastColumn; $col++) {
+            $sheet->getColumnDimension($col)->setWidth(15);
+        }
+       // var_dump($spreadsheet);
+       // die();
+        // Descargar archivo
         $writer = new Xlsx($spreadsheet);
-        $fileName = 'reporte_asistencias' . date('Ymd_His') . '.xlsx';
+        $fileName = 'reporte_asistencias_incidencias_' . date('Ymd_His') . '.xlsx';
 
-        // Enviar headers
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment; filename=\"$fileName\"");
         header('Cache-Control: max-age=0');

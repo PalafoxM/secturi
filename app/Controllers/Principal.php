@@ -1131,6 +1131,7 @@ class Principal extends BaseController {
                         <p style="font-size: 16px;">Le solicitamos amablemente su <strong>revisión y autorización</strong> para proceder con el trámite correspondiente.</p>
                         <p style="font-size: 15px;">Puede consultar y validar esta incidencia ingresando al sistema o siguiendo su flujo de aprobación.</p>
                         <p style="font-size: 15px; color: #888;">Este mensaje fue generado automáticamente por el sistema SUSI. No es necesario responder a este correo.</p>
+                        <p style="font-size: 15px; color: #888;">Link: <a href="'.base_url().'index.php/Principal/incidenciaSubordinado" target="_blank" >Ver incidencia</a></p>
                     </div>
                     <!-- Pie de página -->
                     <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 13px; color: #666;">

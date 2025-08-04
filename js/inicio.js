@@ -3089,22 +3089,23 @@ ini.inicio = (function () {
         {
         let periodoInicio = $('#periodoInicio').val();
         let periodoFin    = $('#periodoFin').val();
-
+       
             $.ajax({
                     type: "POST",
                     url: base_url + "index.php/Usuario/validarReporteExcel",
-                    data:{periodoInicio,periodoFin },
+                    data:{periodoInicio,periodoFin},
                     dataType: "json",
                     beforeSend: function(){
                       $('#btnReporteExcel').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Generando...');
                     },
                     success: function (response) {
+                        console.log(response);
                       if(response.error){
                           Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
                       }else{
                         const url = base_url + "index.php/Usuario/reporteIncidenciaExcel/" + periodoInicio + '/' + periodoFin;
                         window.open(url, '_blank');
-                      }
+                      } 
                            
                     },
                     complete: function(){
@@ -3112,8 +3113,8 @@ ini.inicio = (function () {
                     },
                     error: function (response,jqXHR, textStatus, errorThrown) {
                          var res= JSON.parse (response.responseText);
-                        //  console.log(res.message);
-                         Swal.fire("Error", '<p> '+ res.message + '</p>');  
+                         console.log(res.message);
+                         //Swal.fire("Error", '<p> '+ res.message + '</p>');  
                     }
             });
         },
