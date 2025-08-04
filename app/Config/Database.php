@@ -20,7 +20,6 @@ class Database extends Config
      * use if no other is specified.
      */
     public string $defaultGroup = 'default';
-
     /**
      * The default database connection.
      */
