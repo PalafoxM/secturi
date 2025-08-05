@@ -32,8 +32,8 @@
                                             <div class="col-lg-4 align-self-center mb-3 mb-lg-0">
                                                 <div class="met-profile-main">
                                                     <div class="met-profile-main-pic">
-                                                        <img src="<?= base_url() ?>assets/images/users/user-4.jpg" alt="" class="rounded-circle">
-                                                        <span class="fro-profile_main-pic-change">
+                                                        <img src="<?= base_url().$datos->ruta_foto_relativa ?>" alt="" class="rounded-circle">
+                                                        <span class="fro-profile_main-pic-change" onclick="ini.inicio.abrirModalFoto();" >
                                                             <i class="fas fa-camera"></i>
                                                         </span>
                                                     </div>
@@ -1010,14 +1010,28 @@
                         </div><!-- /.modal-content -->
                     </div><!-- /.modal-dialog -->
                 </div><!-- /.modal --> 
-
-                <footer class="footer text-center text-sm-left">
-                    &copy; 2019 - 2020 Metrica <span class="text-muted d-none d-sm-inline-block float-right">Crafted with <i class="mdi mdi-heart text-danger"></i> by Mannatthemes</span>
-                </footer><!--end footer-->
             </div>
             <!-- end page content -->
         </div>
         <!-- end page-wrapper -->
+<div class="modal fade" id="modalFoto" tabindex="-1" aria-labelledby="modalEliminarReservaLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="modalEliminarReservaLabel">Agregar Imagen</h5>
+        <button type="button" onclick="ini.inicio.cerrarModalFoto()" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+        <div class="modal-body">
+         <label for="foto">Agregar Nueva Foto en JPG o PNG</label>
+         <input type="file" class="form-control" id="foto"  name="foto" accept=".png">
+        </div>
+      <div class="modal-footer">
+        <button type="button" onclick="ini.inicio.cerrarModalFoto()" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" onclick="ini.inicio.guardarFoto()" class="btn btn-primary" >Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <link href="<?= base_url() ?>plugins/dropify/css/dropify.min.css" rel="stylesheet">
 <link href="<?= base_url() ?>plugins/filter/magnific-popup.css" rel="stylesheet" type="text/css" />

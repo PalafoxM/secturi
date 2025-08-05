@@ -180,6 +180,7 @@ class Login extends BaseController {
                 $session->set('id_perfil',$result->data[0]->id_perfil);
                 $session->set('fec_nac',$result->data[0]->fec_nac);
                 $session->set('correo',$result->data[0]->correo);
+                $session->set('foto',$result->data[0]->ruta_foto_relativa);
                 $subordinados = $catalogos->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_jefe_inmediato' => $result->data[0]->id_usuario]])->data;
                 $esJefe = (!empty($subordinados))?true:false;
                 $session->set('esJefe', $esJefe);

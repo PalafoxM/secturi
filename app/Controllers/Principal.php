@@ -938,7 +938,42 @@ class Principal extends BaseController {
            return $this->respond($response);
      
          
-     }
+    }
+    public function guardarFoto()
+    {
+        $session = \Config\Services::session();
+        $globals      = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error al Guardar los datos';
+        $foto = $this->request->getFile('foto');  
+        $extension = $foto->getClientExtension();
+        $originalName = pathinfo($foto->getName(), PATHINFO_FILENAME);
+        $archivo = $originalName .'.' . $extension;
+        $ruta_destino = FCPATH . 'assets/images/fotos/';
+       
+        $foto->move($ruta_destino, $archivo);
+        $ruta_absoluta = base_url('assets/images/fotos/' . $archivo);
+        $ruta_relativa = 'assets/images/fotos/' . $archivo;
+
+        $dataInsert = [
+                "ruta_foto_absoluta" => $ruta_absoluta,
+                "ruta_foto_relativa" => $ruta_relativa, 
+                "usu_act" => $session->get('id_usuario')        
+                    ];
+        $dataBitacora = ['id_user' =>  $session->get('id_usuario'), 'script' => 'Principal.php/guardaFoto'];
+         $dataConfig = [
+            "tabla"=>"usuario",
+            "editar"=>true,
+            "idEditar"=>['id_usuario'=>$session->get('id_usuario')]
+        ];
+        $res = $globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
+        if(!$res->error){
+            $response->error = $res->error;
+            $response->respuesta = $res->respuesta;
+        }
+        return $this->respond($response);             
+    }
     public function guardarReserva()
     {  
        

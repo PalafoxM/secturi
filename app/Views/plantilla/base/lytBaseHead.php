@@ -611,8 +611,14 @@
                 <li class="dropdown">
                     <a class="nav-link dropdown-toggle waves-effect waves-light nav-user" data-toggle="dropdown"
                         href="#" role="button" aria-haspopup="false" aria-expanded="false">
+                        <?php if(!$session->foto): ?>
                         <img src="<?php echo base_url(); ?>assets/images/users/user-4.jpg" alt="profile-user"
                             class="rounded-circle" />
+                        <?php endif; ?>
+                         <?php if($session->foto): ?>
+                        <img src="<?php echo base_url().$session->foto ?>" alt="profile-user"
+                            class="rounded-circle" />
+                        <?php endif; ?>
                         <span class="ml-1 nav-user-name hidden-sm"><?= $session->nombre_completo?>
                             <i class="mdi mdi-chevron-down"></i>
                         </span>
