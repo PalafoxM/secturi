@@ -308,18 +308,31 @@
                         </div>
                         <ul class="nav metismenu">
                             <li class="nav-item">
-                                <a class="nav-link" href="javascript: void(0);"><span class="w-100">Financieros</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
+                                <a class="nav-link" href="javascript: void(0);"><span class="w-100">Registro</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
                                 <ul class="nav-second-level" aria-expanded="false">
                                     <li><a href="<?php echo base_url(); ?>index.php/Principal/listadoPT">Reserva PT</a></li>
-                                    <li><a href="../apps/email-read.html">Solicitud GRC</a></li>            
-                                    <li><a href="../apps/email-read.html">Solicitud GO</a></li>            
+                                    <li><a href="<?php echo base_url(); ?>index.php/Principal/listadoGo">Reserva GO</a></li>  
+                                    <li><a href="../apps/email-read.html">Reserva GRC</a></li>                 
                                 </ul>            
                             </li><!--end nav-item-->
-                            <li class="nav-item"><a class="nav-link" href="<?php echo base_url(); ?>index.php/Principal/listadoEstatusPT">Listado PT</a></li>
-                            <li class="nav-item"><a class="nav-link" href="../apps/contact-list.html">Listado GRC</a></li>
-                            <li class="nav-item"><a class="nav-link" href="../apps/calendar.html">Listado GO</a></li>   
-                            <li class="nav-item"><a class="nav-link" href="../apps/invoice.html" aria-expanded="false">Mesa RF</a></li>
-                            <li class="nav-item"><a class="nav-link" href="<?php echo base_url(); ?>index.php/Principal/listaReservaPT" aria-expanded="false">Listado de Reserva PT</a></li>                     
+                            <li class="nav-item">
+                                <a class="nav-link" href="javascript: void(0);"><span class="w-100">Estatus</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
+                                <ul class="nav-second-level" aria-expanded="false">
+                                    <li><a href="<?php echo base_url(); ?>index.php/Principal/listaReservaPT">Estatus PT</a></li>
+                                    <li><a href="<?php echo base_url(); ?>index.php/Principal/listaReservaGO">Estatus GO</a></li>  
+                                    <li><a href="../apps/email-read.html">Estatus GRC</a></li>                 
+                                </ul>            
+                            </li><!--end nav-item-->
+                            <li class="nav-item">
+                                <a class="nav-link" href="javascript: void(0);"><span class="w-100">Enviados</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
+                                <ul class="nav-second-level" aria-expanded="false">
+                                    <li><a href="<?php echo base_url(); ?>index.php/Principal/listadoEstatusPT">Envio PT</a></li>
+                                    <li><a href="../apps/email-read.html2">Envio GO</a></li>  
+                                    <li><a href="../apps/email-read.html">Envio GRC</a></li>                 
+                                </ul>            
+                            </li><!--end nav-item-->
+                          
+                            <li class="nav-item"><a class="nav-link" href="../apps/invoice.html" aria-expanded="false">Mesa RF</a></li>                        
                         </ul>
                     </div><!-- end Crypto -->
         

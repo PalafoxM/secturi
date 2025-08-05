@@ -15,10 +15,10 @@
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="javascript:void(0);">Secturi</a></li>
                                 <li class="breadcrumb-item"><a href="javascript:void(0);">seccion</a></li>
-                                <li class="breadcrumb-item active">Listado PT</li>
+                                <li class="breadcrumb-item active">Listado <?= (isset($GO) && !empty($GO))?'GO':'PT'; ?></li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Listado de Solicitudes PT</h4>
+                        <h4 class="page-title">Listado de Solicitudes <?= (isset($GO) && !empty($GO))?'GO':'PT' ?></h4>
                     </div>
                     <!--end page-title-box-->
                 </div>
@@ -116,34 +116,47 @@
                                                 <div class="card">
                                                     <div class="card-body">        
                                                         <h4 class="mt-0 header-title">Datos del Proveedor</h4>
-                                                         
+                                                           <?php if(isset($PT) && !empty($PT)): ?>
                                                         <div class="custom-control custom-switch">
                                                             <input type="checkbox" onclick="ini.inicio.ocultarInstrumento(this);" class="custom-control-input" id="customSwitch1">
                                                             <label class="custom-control-label" for="customSwitch1">Sin Instrumento Jurídico</label>
                                                         </div>
+                                                         <?php endif; ?>
                                                         <div class="row">
                                                             <div class="col-lg-6">
                                                                 <div class="form-group">
                                                                     <label for="nombre_proveedor">Nombre Proveedor</label>
-                                                                    <input type="text" class="form-control" id="nombre_proveedor" name="nombre_proveedor">
+                                                                    <?php if(isset($PT) && !empty($PT)): ?>
+                                                                      <input type="text" class="form-control" id="nombre_proveedor" name="nombre_proveedor">
+                                                                    <?php endif; ?>
+                                                                     <?php if(isset($GO) && !empty($GO)): ?>
+                                                                      <input type="text" class="form-control" id="nombre_go" name="nombre_go" value="D-21" readonly>
+                                                                    <?php endif; ?>
                                                                     <input type="hidden" id="id_proveedor" >
                                                                 </div>
                                                               <div class="form-group">
                                                                     <label for="banco">Banco</label>
-                                                                    <select class="form-control" id="banco">
-                                                                    </select>
+                                                                     <?php if(isset($PT) && !empty($PT)): ?>
+                                                                   <select class="form-control" id="banco"></select>
+                                                                    <?php endif; ?>
+                                                                     <?php if(isset($GO) && !empty($GO)): ?>
+                                                                      <input type="text" class="form-control" id="banco_go" name="banco_go" value="1109434000" readonly>
+                                                                    <?php endif; ?>
+                                                                    
                                                                 </div>
-
-                                                                <div class="form-group" id="id_instrumento">
-                                                                    <label for="instrumento">Istrumento Juridico</label>
-                                                                    <input type="file" class="form-control" id="instrumento" name="instrumento" accept=".pdf">
-                                                                </div>                                                                                      
+                                                               <?php if(isset($PT) && !empty($PT)): ?>
+                                                                    <div class="form-group" id="id_instrumento">
+                                                                        <label for="instrumento">Istrumento Juridico</label>
+                                                                        <input type="file" class="form-control" id="instrumento" name="instrumento" accept=".pdf">
+                                                                    </div> 
+                                                                <?php endif; ?>                                                                                     
                                                             </div>
                                                             <div class="col-lg-6" >
                                                                 <div class="form-group">
                                                                     <label for="no_proveedor">No. Proveedor</label>
                                                                     <input type="text" class="form-control" id="no_proveedor" name="no_proveedor">
                                                                 </div>
+                                                                <?php if(isset($PT) && !empty($PT)): ?>
                                                                 <div class="form-group" id="id_convenio">
                                                                     <label for="no_convenio">No. Convenio/Contrato</label>
                                                                     <div class="input-group">
@@ -169,6 +182,7 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
+                                                                <?php endif; ?> 
                                                             </div>  
                                                         <div class="row">
                                                             <div class="col-12">
@@ -230,9 +244,16 @@
                                                                         </div>   
                                                                     </div><!--end card-body-->   
                                                                 </div><!--end card-->
+                                                                 <?php if(isset($PT) && !empty($PT)): ?>
                                                                   <button id="btn_guardar" class="btn btn-success">
                                                                         Guardar
                                                                   </button>
+                                                                 <?php endif; ?>
+                                                                  <?php if(isset($GO) && !empty($GO)): ?>
+                                                                  <button id="btn_guardarGo" class="btn btn-success">
+                                                                        Guardar
+                                                                  </button>
+                                                                 <?php endif; ?>
                                                             </div> <!-- end col -->
                                                         </div> <!-- end row -->                                                                    
                                                     </div><!--end card-body-->
@@ -288,12 +309,13 @@
 <script>
 $(document).ready(function() {
     ini.inicio.guardarReserva();
-    $('#datatableCategorias').DataTable({
+    ini.inicio.guardarGo();
+    $('#datatableCategorias,#datatableProveedores').DataTable({
         language: {
             url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json' // Ruta al archivo de localización
         },
         destroy: true,
-        searching: false,
+        searching: true,
     });
     // Función debounce para retrasar la ejecución
 });

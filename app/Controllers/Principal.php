@@ -974,6 +974,82 @@ class Principal extends BaseController {
         }
         return $this->respond($response);             
     }
+    public function guardarReservaGO()
+    {  
+       
+        $session = \Config\Services::session();
+        $email =  \Config\Services::email();
+        $globals      = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error al Guardar los datos';
+        $data =  $this->request->getPost();
+
+        $hoy = date("Y-m-d H:i:s"); 
+        $folio = 'GO-' . date('YmdHis'); // Ejemplo: FOL-20250725133045
+
+        $dataInsert = [
+            "id_proveedor"       => (int)$data['id_proveedor'],
+            "total_importe"      => $data['total_importe'],
+            "id_proveedor_banco" => (int)$data['banco_go'],
+            "fec_reg"            => $hoy,
+            "usu_reg"            => $session->get('id_usuario'),
+            "folio"              => $folio
+        ];
+    
+         $dataBitacora = ['id_user' =>  $session->get('id_usuario'), 'script' => 'Principal.php/guardaReservaGO'];
+         $dataConfig = [
+            "tabla"=>"reserva_go",
+            "editar"=>false,
+            // "idEditar"=>['id_usuario'=>$data['id_usuario']]
+        ];
+         $response = $globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
+       
+         if(!$response->error){
+             $id_reserva = $response->idRegistro;
+             $datosCombinados = [];
+
+                // Verificar que todos los arrays tengan la misma longitud
+                if (count($data['proyecto']) === count($data['partida']) && count($data['partida']) === count($data['importe'])) {
+                    foreach ($data['proyecto'] as $index => $proyecto) {
+                        // Solo agregar si todos los valores existen
+                        if (!empty($data['proyecto']) && !empty($data['partida'][$index]) && !empty($data['importe'][$index])) {
+                            $datosCombinados[] = [
+                                'proyecto' => $proyecto,
+                                'partida' => $data['partida'][$index],
+                                'importe' => str_replace(',', '', $data['importe'][$index]) // Elimina comas del formato numérico
+                            ];
+                        }
+                    }
+                }
+                  $dataConfig = [
+                    "tabla"=>"presupuesto_go",
+                    "editar"=>false,
+                    // "idEditar"=>['id_usuario'=>$data['id_usuario']]
+                ];
+                foreach($datosCombinados as $d){
+                    $dataInsert = [
+                            "id_reserva"     => $id_reserva,
+                            "id_proyecto"    => $d['proyecto'],
+                            "id_partida"     => $d['partida'],
+                            "importe"        => $d['importe'], 
+                            "fec_reg"        => $hoy, 
+                            "usu_reg"        => $session->get('id_usuario')
+                            
+                        ];
+     
+                        $res = $globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
+                        if(!$res->error){
+                         $response->error = $res->error;
+                         $response->respuesta = $res->respuesta;
+                     
+                        }
+                }
+         }
+    //$this->enviarEmail();
+
+    return $this->respond($response);
+    }
     public function guardarReserva()
     {  
        
@@ -1406,6 +1482,28 @@ class Principal extends BaseController {
         $this->_renderView($data);
         
     }
+    public function listaReservaGO()
+    {  
+       
+        $session = \Config\Services::session();
+        $globals      = new Mglobal;
+        if(in_array($session->get('id_perfil'), [1,2])){
+            $reserva    = $globals->getTabla(['tabla' => 'vw_lista_reserva_go', 'where' => ['visible' => 1]]);
+        }else{
+            $reserva    = $globals->getTabla(['tabla' => 'vw_lista_reserva_go', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]]);
+        }
+      
+        $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
+        $cat_partida  = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $proveedor    = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit'=>100]);
+        $data['reserva']    = (!empty($reserva->data))?$reserva->data:[];
+        $data['scripts'] = array('inicio');
+        $data['cat_proyecto'] = (!empty($cat_proyecto->data))?$cat_proyecto->data:[];
+        $data['cat_partida']  = (!empty($cat_partida->data))?$cat_partida->data:[];
+        $data['contentView'] = 'secciones/vListadoReservaGO';                
+        $this->_renderView($data);
+        
+    }
     public function listadoPT()
     {  
        
@@ -1421,6 +1519,28 @@ class Principal extends BaseController {
         $data['cat_proyecto'] = (!empty($cat_proyecto->data))?$cat_proyecto->data:[];
         $data['cat_partida']  = (!empty($cat_partida->data))?$cat_partida->data:[];
      
+        $data['scripts'] = array('inicio');
+        $data['edita'] = 0;
+        $data['PT'] = 1;
+        $data['contentView'] = 'secciones/vListadoPT';                
+        $this->_renderView($data);
+        
+    }
+    public function listadoGo()
+    {  
+       
+        $session = \Config\Services::session();
+        $globals      = new Mglobal;
+        $cat_perfil   = $globals->getTabla(['tabla' => 'perfil', 'where' => ['visible' => 1]]);
+        $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
+        $cat_partida  = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $proveedor    = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit'=>10]);
+
+        $data['cat_perfil']   = (!empty($cat_perfil->data))?$cat_perfil->data:[];
+        $data['proveedor']    = (!empty($proveedor->data))?$proveedor->data:[];
+        $data['cat_proyecto'] = (!empty($cat_proyecto->data))?$cat_proyecto->data:[];
+        $data['cat_partida']  = (!empty($cat_partida->data))?$cat_partida->data:[];
+        $data['GO'] = 1;
         $data['scripts'] = array('inicio');
         $data['edita'] = 0;
         $data['contentView'] = 'secciones/vListadoPT';                

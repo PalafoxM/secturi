@@ -25,8 +25,8 @@ class Database extends Config
      */
     public array $default = [
         'DSN'          => '',
-        //'hostname'     => '172.16.1.220',
-        'hostname'     => 'localhost',
+        'hostname'     => '172.16.1.220',
+        //'hostname'     => 'localhost',
         'username'     => 'root',
         'password'     => 'PalafoxMarin1989',
         //'password'     => '',
@@ -52,8 +52,8 @@ class Database extends Config
      */
     public array $bitacora = [
         'DSN'         => '',
-        //'hostname'     => '172.16.1.220',
-        'hostname'     => 'localhost',
+        'hostname'     => '172.16.1.220',
+        //'hostname'     => 'localhost',
         'username'     => 'root',
         //'password'     => '',
         'password'     => 'PalafoxMarin1989',

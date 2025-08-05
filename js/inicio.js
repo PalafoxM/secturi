@@ -632,6 +632,33 @@ ini.inicio = (function () {
             }
          });
         },
+           validarFormularioGo: function () {
+    
+            // Validar que al menos haya una fila en la tabla
+            if($('#makeEditable2 tbody tr').length === 0) {
+                //toastr.warning('Debe agregar al menos un proyecto');
+                Swal.fire("Atenición", "Debe agregar al menos un proyecto", "info");
+                return false;
+            }
+
+            // Validar que todas las filas tengan datos completos
+            var filasValidas = true;
+            $('#makeEditable2 tbody tr').each(function() {
+                if($(this).find('[name="proyecto[]"]').val() === '' || 
+                $(this).find('[name="partida[]"]').val() === '' || 
+                $(this).find('[name="importe[]"]').val() === '') {
+                    filasValidas = false;
+                    return false; // Sale del each
+                }
+            });
+
+            if(!filasValidas) {
+                Swal.fire("Error", "Debe agregar al menos un proyecto/partida/importe", "error");
+                return false;
+            }
+
+            return true;
+        },
            validarFormulario: function () {
             // Validar campos principales
             if($('#nombre_proveedor').val() === '') {
@@ -974,6 +1001,66 @@ ini.inicio = (function () {
                             });
                         }
                     });
+        },
+        guardarGo: function()
+        {
+        $('#btn_guardarGo').click(function(e) {
+        e.preventDefault();
+        
+        // Validación básica
+        if(!ini.inicio.validarFormularioGo()) {
+            return false;
+        }
+        // Crear FormData para enviar tanto el formulario como el archivo
+        var formData = new FormData();
+        
+        // Agregar datos del formulario principal
+        formData.append('nombre_go', $('#nombre_go').val());
+        formData.append('id_proveedor', $('#id_proveedor').val());
+        formData.append('total_importe', $('#total_importe').val());
+        formData.append('banco_go', $('#banco_go').val());
+
+
+        // Agregar datos de la tabla
+        $('#makeEditable2 tbody tr').each(function(index) {
+            formData.append('proyecto[]', $(this).find('[name="proyecto[]"]').val());
+            formData.append('partida[]', $(this).find('[name="partida[]"]').val());
+            formData.append('importe[]', $(this).find('[name="importe[]"]').val());
+        });
+
+        // Enviar datos via AJAX
+
+        $.ajax({
+            url: base_url + "index.php/Principal/guardarReservaGO",
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            beforeSend: function() {
+                $('#btn_guardarGo').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+            },
+            success: function(response) {
+                if(response.error) {
+                    Swal.fire("Error", response.respuesta, "error");
+                } else {
+                     Swal.fire("Correcto", response.respuesta, "success");
+                       setTimeout(() => {
+                                 window.location.href = base_url + "index.php/Principal/listaReservaGO";
+
+                        }, 1000);
+                    
+                }
+            },
+            error: function() {
+                //toastr.error('Error de conexión');
+                Swal.fire("Error", "Error de conexión", "error");
+            },
+            complete: function() {
+                $('#btn_guardarGo').prop('disabled', false).html('Guardar');
+            }
+           });
+        });
+
         },
         guardarReserva: function()
         {
@@ -2512,7 +2599,7 @@ ini.inicio = (function () {
                             });
 
                             // Re-inicializa DataTable
-                            $('#datatableCategorias').DataTable({
+                            $('#datatableCategorias,#datatableProveedores').DataTable({
                                    language: {
                                         url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json' // Ruta al archivo de localización
                                     },
