@@ -376,22 +376,7 @@
                                 </ul>            
                             </li><!--end nav-item-->
                             <?php endif; ?>
-                            <?php if(in_array($session->id_perfil, [1,2])): ?>  
-                            <li class="nav-item">
-                                <a class="nav-link" href="#"><span class="w-100">Admin RF</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
-                                <ul class="nav-second-level" aria-expanded="false">
-                                    <li><a href="../others/charts-apex.html">Apex</a></li>
-                                    <li><a href="../others/charts-morris.html">Morris</a></li>
-                                    <li><a href="../others/charts-chartist.html">Chartist</a></li>
-                                    <li><a href="../others/charts-flot.html">Flot</a></li>
-                                    <li><a href="../others/charts-peity.html">Peity</a></li>
-                                    <li><a href="../others/charts-chartjs.html">Chartjs</a></li>
-                                    <li><a href="../others/charts-sparkline.html">Sparkline</a></li>
-                                    <li><a href="../others/charts-knob.html">Jquery Knob</a></li>
-                                    <li><a href="../others/charts-justgage.html">JustGage</a></li>
-                                </ul>            
-                            </li><!--end nav-item-->
-                            <?php endif; ?>
+                     
                             <li class="nav-item">
                                 <a class="nav-link" href="#"><span class="w-100">Admin RM</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
                                 <ul class="nav-second-level" aria-expanded="false">
@@ -637,7 +622,7 @@
                         </span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right">
-                        <a class="dropdown-item" href="#"><i class="dripicons-user text-muted mr-2"></i> Profile</a>
+                        <a class="dropdown-item" href="<?php echo base_url()?>index.php/Inicio/Perfil"><i class="dripicons-user text-muted mr-2"></i> Perfil</a>
                         <a class="dropdown-item" href="#"><i class="dripicons-wallet text-muted mr-2"></i> My Wallet</a>
                         <a class="dropdown-item" href="#"><i class="dripicons-gear text-muted mr-2"></i> Settings</a>
                         <a class="dropdown-item" href="#"><i class="dripicons-lock text-muted mr-2"></i> Lock screen</a>

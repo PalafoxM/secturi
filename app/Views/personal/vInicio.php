@@ -32,7 +32,13 @@
                                             <div class="col-lg-4 align-self-center mb-3 mb-lg-0">
                                                 <div class="met-profile-main">
                                                     <div class="met-profile-main-pic">
-                                                        <img src="<?= base_url().$datos->ruta_foto_relativa ?>" alt="" class="rounded-circle">
+                                                        <?php if(empty($datos->ruta_foto_relativa)): ?>
+                                                            <img src="<?= base_url() ?>assets/images/users/patient-pro.png" alt="" style="width:125px; heigth: 125px;" class="rounded-circle">
+                                                        <?php endif; ?>
+                                                        <?php if(!empty($datos->ruta_foto_relativa)): ?>
+                                                            <img src="<?= base_url().$datos->ruta_foto_relativa ?>" alt="" style="width:125px; heigth: 125px;" class="rounded-circle">
+                                                        <?php endif; ?>
+                                                        
                                                         <span class="fro-profile_main-pic-change" onclick="ini.inicio.abrirModalFoto();" >
                                                             <i class="fas fa-camera"></i>
                                                         </span>
@@ -45,7 +51,7 @@
                                             </div><!--end col-->
                                             <div class="col-lg-4 ml-auto">
                                                 <ul class="list-unstyled personal-detail">
-                                                    <li class=""><i class="dripicons-plus mr-2 text-info font-18"></i> <b> No. Empleado </b> : <?= (!empty($datos->no_empleado))?$datos->no_empleado:'' ?></li>
+                                                    <li class=""><i class="dripicons-user mr-2 text-info font-18"></i> <b> No. Empleado </b> : <?= (!empty($datos->no_empleado))?$datos->no_empleado:'' ?></li>
                                                     <li class="mt-2"><i class="dripicons-mail text-info font-18 mt-2 mr-2"></i> <b> Correo </b> : <?= (!empty($datos->correo))?$datos->correo:'' ?></li>
                                                     <li class="mt-2"><i class="dripicons-location text-info font-18 mt-2 mr-2"></i> <b>Ubicacion</b> : Silao, Gto</li>
                                                 </ul>
@@ -115,7 +121,7 @@
                                             </div><!--end card-->                        
                                             <div class="card">
                                                 <div class="card-body">
-                                                    <h4 class="header-title mt-0 mb-3">Transaction Details</h4>
+                                                    <h4 class="header-title mt-0 mb-3">Compleaños del mes</h4>
                                                     <ul class="list-unsyled m-0 pl-0 transaction-history">
                                                         <li class="align-items-center d-flex justify-content-between">
                                                             <div class="media">
@@ -124,12 +130,12 @@
                                                                 </div>                                                
                                                                 <div class="media-body align-self-center"> 
                                                                     <div class="transaction-data">                                                        
-                                                                        <h3 class="m-0">Apple Co Pvt. Ltd</h3>
-                                                                        <p class="text-muted mb-0">6 June 2019 10:25 AM</p>
+                                                                        <h3 class="m-0">Perla Martinez Martinez</h3>
+                                                                        <p class="text-muted mb-0">6 agosto</p>
                                                                     </div>                                                                                              
                                                                 </div><!--end media body-->
                                                             </div>
-                                                            <span class="text-danger">$1420.00 USA</span>
+                                                            <span class="text-danger">35 años</span>
                                                         </li>
                                                         <li class="align-items-center d-flex justify-content-between">
                                                             <div class="media">
@@ -138,12 +144,12 @@
                                                                 </div>                                                
                                                                 <div class="media-body align-self-center"> 
                                                                     <div class="transaction-data">                                                        
-                                                                        <h3 class="m-0">Vivo Mobile</h3>
-                                                                        <p class="text-muted mb-0">4 June 2019 7:05 PM</p>
+                                                                        <h3 class="m-0">Karina Guerra Hernandez</h3>
+                                                                        <p class="text-muted mb-0">4 agosto</p>
                                                                     </div>                                                                                              
                                                                 </div><!--end media body-->
                                                             </div>
-                                                            <span class="text-success">$3651.00 USA</span>
+                                                            <span class="text-success">31 años</span>
                                                         </li>
                                                         <li class="align-items-center d-flex justify-content-between">
                                                             <div class="media">
@@ -152,12 +158,12 @@
                                                                 </div>                                                
                                                                 <div class="media-body align-self-center"> 
                                                                     <div class="transaction-data">                                                        
-                                                                        <h3 class="m-0">ICICI Bank Transfer</h3>
-                                                                        <p class="text-muted mb-0">1 June 2019 11:30 PM</p>
+                                                                        <h3 class="m-0">Alejandro Medina Cabrera</h3>
+                                                                        <p class="text-muted mb-0">1 agosto</p>
                                                                     </div>                                                                                              
                                                                 </div><!--end media body-->
                                                             </div>
-                                                            <span class="text-danger">$625.22 CAN</span>
+                                                            <span class="text-danger">26 años</span>
                                                         </li>
                                                         <li class="align-items-center d-flex justify-content-between">
                                                             <div class="media">
@@ -166,15 +172,15 @@
                                                                 </div>                                                
                                                                 <div class="media-body align-self-center"> 
                                                                     <div class="transaction-data">                                                        
-                                                                        <h3 class="m-0">Sony LLP</h3>
-                                                                        <p class="text-muted mb-0">28 May 2019 08:45 AM</p>
+                                                                        <h3 class="m-0">Juan Manuel Palafox Martinez</h3>
+                                                                        <p class="text-muted mb-0">28 agosto</p>
                                                                     </div>                                                                                              
                                                                 </div><!--end media body-->
                                                             </div>
-                                                            <span class="text-danger">$6621.00 USA</span>
+                                                            <span class="text-danger">34 años</span>
                                                         </li>
                                                         <li class="align-items-center d-flex justify-content-end">
-                                                            <a href="#" class="">View All<i class="dripicons-arrow-thin-right ml-2"></i></a>
+                                                            <a href="#" class="">Ver todos<i class="dripicons-arrow-thin-right ml-2"></i></a>
                                                         </li>
                                                     </ul>                                       
                                                 </div><!--end card-body-->
@@ -208,7 +214,7 @@
                                                                 <i class="fas fa-ticket-alt bg-soft-warning"></i>
                                                             </div>
                                                             <h3 class="text-dark">184</h3>
-                                                            <h6 class="font-14 text-dark">New Tickets</h6>                                                                                                                            
+                                                            <h6 class="font-14 text-dark">Tickets Nuevos</h6>                                                                                                                            
                                                         </div><!--end card-body--> 
                                                     </div><!--end card-->   
                                                 </div><!-- end col-->
@@ -219,7 +225,7 @@
                                                                 <i class="fab fa-codepen bg-soft-pink"></i>
                                                             </div>
                                                             <h3 class="text-dark">101</h3>
-                                                            <h6 class="font-14 text-dark">Open Tickets</h6>                                                                                                                            
+                                                            <h6 class="font-14 text-dark">Tickets En Proceso</h6>                                                                                                                            
                                                         </div><!--end card-body--> 
                                                     </div><!--end card-->   
                                                 </div><!-- end col-->  
@@ -227,10 +233,10 @@
                                                     <div class="card dash-data-card text-center">
                                                         <div class="card-body"> 
                                                             <div class="icon-info mb-3">
-                                                                <i class="fas fa-hands bg-soft-success"></i>
+                                                                <i class="fas fa-check bg-soft-success"></i>
                                                             </div>
                                                             <h3 class="text-dark">18</h3>
-                                                            <h6 class="font-14 text-dark">On Hold</h6>                                                                                                                            
+                                                            <h6 class="font-14 text-dark">Tikets Hechos</h6>                                                                                                                            
                                                         </div><!--end card-body--> 
                                                     </div><!--end card-->   
                                                 </div><!-- end col-->
@@ -241,7 +247,7 @@
                                                                 <i class="fas fa-lock bg-soft-primary"></i>
                                                             </div>
                                                             <h3 class="text-danger">92</h3>
-                                                            <h6 class="font-14 text-dark">Unassigned</h6>                                                                                                                            
+                                                            <h6 class="font-14 text-dark">Eliminados</h6>                                                                                                                            
                                                         </div><!--end card-body--> 
                                                     </div><!--end card-->   
                                                 </div><!-- end col-->                       
@@ -249,19 +255,9 @@
                                             <div class="card">
                                                 <div class="card-body">
                                                     <div class="float-lg-right float-none eco-revene-history justify-content-end">
-                                                        <ul class="nav">
-                                                            <li class="nav-item">
-                                                                <a class="nav-link active" href="#">This Week</a>
-                                                            </li>
-                                                            <li class="nav-item">
-                                                                <a class="nav-link" href="#">Last Week</a>
-                                                            </li>
-                                                            <li class="nav-item">
-                                                                <a class="nav-link" href="#">Last Month</a>
-                                                            </li>                                     
-                                                        </ul>
+
                                                     </div>
-                                                    <h4 class="header-title mt-0">Revenue</h4>
+                                                    <h4 class="header-title mt-0">Resumen</h4>
                                                     <canvas id="bar" class="drop-shadow w-100"  height="350"></canvas>
                                                 </div><!--end card-body-->
                                             </div><!--end card-->
@@ -298,7 +294,7 @@
                                                                 <div class="media">
                                                                     <img src="<?= base_url() ?>assets/images/products/img-7.png" class="mr-3 thumb-xl align-self-center" alt="...">
                                                                     <div class="media-body align-self-center">                                                          
-                                                                        <h4 class="mt-0 mb-1 title-text">Unique Watch</h4>
+                                                                        <h4 class="mt-0 mb-1 title-text">Unique Watch 2</h4>
                                                                         <p class="text-muted mb-1">Standard dummy text ever since the 1500s, when an unknown printer took a galley of type.</p>
                                                                         <p class="text-muted">When an unknown printer took a galley of type.</p>
                                                                         <span class="px-2 py-1 bg-soft-pink d-inline-block">Sold 582</span>
