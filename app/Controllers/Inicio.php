@@ -239,9 +239,14 @@ class Inicio extends BaseController {
             'tabla' => 'vehiculo',
             'where' => ['visible' => 1]
         ]);
+        $usuario = $principal->getTabla([
+            'tabla' => 'vw_usuario',
+            'where' => ['visible' => 1]
+        ]);
         $data['vehiculos']   = $vehiculos->data ?? [];  
-        $data['scripts']       = ['principal', 'inicio'];
-        $data['contentView']   = 'secciones/vVehiculos';
+        $data['usuario']     = $usuario->data ?? [];  
+        $data['scripts']     = ['principal', 'inicio'];
+        $data['contentView'] = 'secciones/vVehiculos';
         $this->_renderView($data);
     }
 /*   public function subirAsistencia()

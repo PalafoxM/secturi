@@ -1002,6 +1002,90 @@ ini.inicio = (function () {
                         }
                     });
         },
+        getVehiculo: function(id_vehiculo)
+        {
+          $('#modalVehiculo').modal('show');
+           $('#modalVehiculo').on('shown.bs.modal', function () {
+            $('.select2').select2({
+                placeholder: "Seleccione una opción",
+                allowClear: true
+            });
+        });
+          console.log(id_vehiculo);
+           $.ajax({
+            url: base_url + "index.php/Principal/getVehiculo",
+            type: 'POST',
+            data: {id_vehiculo},
+            success: function(response) {
+                if(!response.error) {
+                let datos = response.data;
+                $('#no_control').val(datos.no_control);
+                $('#marca').val(datos.marca);
+                $('#tipo').val(datos.tipo);
+                $('#modelo').val(datos.modelo);
+                $('#activo').val(datos.no_activo_fijo);
+                $('#no_tarjeta').val(datos.no_tarjeta);
+                $('#dotacion').val(datos.dotacion);
+                $('#placa').val(datos.placa);
+                $('#no_serie').val(datos.no_serie);
+                $('#id_vehiculo').val(id_vehiculo);
+                $('#id_usuario').val(datos.id_usuario).change();
+                    
+                } else {
+                     Swal.fire("Error", response.respuesta, "error");
+                }
+            },
+            error: function() {
+                //toastr.error('Error de conexión');
+                Swal.fire("Error", "Error de conexión", "error");
+            },
+         
+           });
+        },
+        guardarVehiculo: function()
+        {
+            let no_control = $('#no_control').val();
+            let marca      = $('#marca').val();
+            let tipo       = $('#tipo').val();
+            let modelo     = $('#modelo').val();
+            let no_activo_fijo=$('#activo').val();
+            let no_tarjeta = $('#no_tarjeta').val();
+            let dotacion   = $('#dotacion').val();
+            let placa      = $('#placa').val();
+            let id_usuario = $('#id_usuario').val();
+            let no_serie   = $('#no_serie').val();
+            let id_vehiculo= $('#id_vehiculo').val();
+          $.ajax({
+                url: base_url + "index.php/Principal/guardarVehiculo",
+                type: 'POST',
+                data: {id_vehiculo,no_control, marca, tipo, modelo, no_activo_fijo, no_tarjeta, dotacion, placa, no_serie, id_usuario},
+                beforeSend: function() {
+                    $('#btn_vehiculo').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                },
+                success: function(response) {
+                    if(response.error) {
+                        Swal.fire("Error", response.respuesta, "error");
+                    } else {
+                        Swal.fire("Correcto", response.respuesta, "success");
+                        setTimeout(() => {
+                                    window.location.reload();
+
+                            }, 1000);
+                    }
+                },
+                error: function() {
+                    //toastr.error('Error de conexión');
+                    Swal.fire("Error", "Error de conexión", "error");
+                },
+                complete: function() {
+                    $('#btn_vehiculo').prop('disabled', false).html('Guardar');
+                }
+            });
+
+        },
+        cerrarModalVehiculo: function(){
+          $('#modalVehiculo').modal('hide');
+        },
         guardarGo: function()
         {
         $('#btn_guardarGo').click(function(e) {

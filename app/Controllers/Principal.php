@@ -1482,6 +1482,61 @@ class Principal extends BaseController {
         $this->_renderView($data);
         
     }
+    public function getVehiculo()
+    {
+        $session             = \Config\Services::session();
+        $response = new \stdClass();
+        $id_vehiculo          = $this->request->getPost('id_vehiculo');
+        $response->error     = true;
+        $response->respuesta = 'Error en la base de datos';
+        $principal = new Mglobal;
+
+     
+        $result = $principal->getTabla(['tabla' => 'vehiculo', 'where' => ['visible' => 1, 'id_vehiculo'=>$id_vehiculo]]);
+  
+        if(!$result->error){
+           $response->error     = $result->error;
+           $response->respuesta = $result->respuesta;
+           $response->data      = $result->data[0];
+        }
+        return $this->respond($response);
+    }
+    public function guardarVehiculo()
+    {
+        $session             = \Config\Services::session();
+        $response            = new \stdClass();
+        $data                = $this->request->getPost();
+        $response->error     = true;
+        $response->respuesta = 'Error al guardar en la base de datos';
+        $principal           = new Mglobal;
+        $dataBitacora        = ['id_user' => $session->get('id_usuario'), 'script' => 'Principal.php/guardaVehiculo'];
+        $dataInsert = [
+             'no_control'     => $data['no_control'],
+             'marca'          => $data['marca'],
+             'tipo'           => $data['tipo'],
+             'modelo'         => $data['modelo'],
+             'no_activo_fijo' => $data['no_activo_fijo'],
+             'no_tarjeta'     => $data['no_tarjeta'],
+             'dotacion'       => $data['dotacion'],
+             'placa'          => $data['placa'],
+             'no_serie'       => $data['no_serie'],
+             'id_usuario'     => $data['id_usuario']
+
+        ];
+       $dataConfig = [
+        'tabla' => 'vehiculo',
+        'editar' => true,
+        'idEditar' => ['id_vehiculo' => $data['id_vehiculo']]
+       ];
+       $result = $principal->saveTabla($dataInsert,$dataConfig,$dataBitacora); 
+       if(!$result->error){
+          $response->error     = false;
+          $response->respuesta = $result->respuesta;
+
+       }
+      return $this->respond($response);
+
+    }
     public function listaReservaGO()
     {  
        

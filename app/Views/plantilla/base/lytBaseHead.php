@@ -423,7 +423,7 @@
              
                  <div id="MetricaPages" class="main-icon-menu-pane">
                         <div class="title-box">
-                            <h6 class="menu-title">Pages</h6>        
+                            <h6 class="menu-title">Home</h6>        
                         </div>
                         <ul class="nav">
                            <li class="nav-item"><a class="nav-link"

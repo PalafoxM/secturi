@@ -61,9 +61,8 @@
                                             <td  class="text-center"><?= $e->dotacion?></td>
 
                                             <td  class="text-center" class="text-center">
-                            
-                                                <a class="btn btn-outline-info btn-round" title="bitacora" href="" >
-                                                    <i class="mdi mdi-content-paste font-18"></i></a>
+                                                <a class="btn btn-outline-info btn-round" title="editar" onclick="ini.inicio.getVehiculo(<?= $e->id_vehiculo?>)" >
+                                                    <i class="mdi dripicons-pencil font-18"></i></a>
                                                    <button type="button"  class="btn btn-outline-info btn-round">                       
                                                 <a href="<?php echo base_url().'index.php/Principal/ImprimirPT/'.$e->id_vehiculo ?>" target="_blank"><i
                                                         class="mdi mdi-file-document text-success font-18"></i></a></button>
@@ -85,16 +84,123 @@
                 <!--end col-->
             </div>
             <!--end row-->
-
         </div><!-- container -->
-
-
     </div>
+<div class="modal fade" id="modalVehiculo" tabindex="-1" aria-labelledby="modalEliminarReservaLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="modalEliminarReservaLabel">Editar</h5>
+        <button type="button" onclick="ini.inicio.cerrarModalVehiculo()" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+        <div class="modal-body">
+            <input type="hidden" id="id_vehiculo" name="id_vehiculo" >
+           <div class="row">                            
+                <div class="col-md-3">
+                    <div class="mb-3 position-relative" id="">
+                        <label for="no_control"
+                            class="form-label campoObligatorio">No. CONTROL</label>
+                        <input type="text" autocomplete="off" class="form-control"
+                            id="no_control" name="no_control" placeholder="No. CONTROL">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-3 position-relative" id="">
+                            <label for="marca"
+                                class="form-label campoObligatorio">MARCA</label>
+                            <input type="text" autocomplete="off" class="form-control"
+                                id="marca" name="marca"
+                                placeholder="MARCA">
+                    </div>
+                </div>
+                 <div class="col-md-3">
+                        <div class="mb-3 position-relative" id="">
+                            <label for="tipo"
+                                class="form-label campoObligatorio">TIPO</label>
+                            <input type="text" autocomplete="off" class="form-control"
+                                id="tipo" name="tipo"
+                                placeholder="TIPO">
+                        </div>
+                </div>
+                <div class="col-md-3">
+                        <div class="mb-3 position-relative" id="">
+                            <label for="modelo" class="form-label">MODELO</label>
+                            <input type="text" autocomplete="off" class="form-control"
+                                id="modelo" name="modelo" placeholder="FEC. NACIMIENTO">
+                        </div>
+                 </div>
+            </div>
+           <div class="row">                            
+                <div class="col-md-3">
+                    <div class="mb-3 position-relative" id="">
+                        <label for="activo"
+                            class="form-label campoObligatorio">ACTIVO</label>
+                        <input type="text" autocomplete="off" class="form-control"
+                            id="activo" name="activo" placeholder="ACTIVO">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-3 position-relative" id="">
+                            <label for="no_tarjeta"
+                                class="form-label campoObligatorio">No. TARJETA</label>
+                            <input type="text" autocomplete="off" class="form-control"
+                                id="no_tarjeta" name="no_tarjeta"
+                                placeholder="No. TARJETA">
+                    </div>
+                </div>
+                 <div class="col-md-3">
+                        <div class="mb-3 position-relative" id="">
+                            <label for="dotacion"
+                                class="form-label campoObligatorio">DOTACION</label>
+                            <input type="text" autocomplete="off" class="form-control"
+                                id="dotacion" name="dotacion"
+                                placeholder="DOTACION">
+                        </div>
+                </div>
+                <div class="col-md-3">
+                        <div class="mb-3 position-relative" id="">
+                            <label for="placa" class="form-label campoObligatorio">PLACA</label>
+                                <input type="text" autocomplete="off" class="form-control"
+                                id="placa" name="placa"
+                                placeholder="PLACA">
+                        </div>
+                 </div>
+            </div>
+           <div class="row">                            
+                 <div class="col-md-6">
+                        <div class="mb-3 position-relative" id="">
+                            <label for="no_serie"
+                                class="form-label campoObligatorio">No. SERIE</label>
+                            <input type="text" autocomplete="off" class="form-control"
+                                id="no_serie" name="no_serie"
+                                placeholder="No. SERIE">
+                        </div>
+                </div>
+                <div class="col-md-6">
+                        <div class="mb-3 position-relative" id="">
+                            <label for="id_usuario" class="form-label campoObligatorio">USUARIO</label>
+                               <select class="select2 form-control custom-select" id="id_usuario" name="id_usuario" >
+                                <?php foreach($usuario as $p): ?>
+                                  <option value="<?= $p->id_usuario ?>"><?= $p->nombre_completo ?></option>
+                                <?php endforeach; ?>
+                                </select>
+                        </div>
+                 </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+        <button type="button" onclick="ini.inicio.cerrarModalVehiculo()" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" onclick="ini.inicio.guardarVehiculo()" id="btn_vehiculo" class="btn btn-primary" >Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
    
 
 
     <link href="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet"
         type="text/css" />
+    <link href="<?php echo base_url(); ?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
 
     <!-- App css -->
     <link href="<?php echo base_url(); ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
@@ -110,13 +216,14 @@
     <script src="<?php echo base_url(); ?>assets/js/bootstrap.bundle.min.js"></script>
 
     <script src="<?php echo base_url(); ?>assets/js/jquery.slimscroll.min.js"></script>
-    <script src="<?php echo base_url(); ?>plugins/apexcharts/apexcharts.min.js"></script>
+   
 
     <!-- Required datatable js -->
     <script src="<?php echo base_url(); ?>plugins/datatables/jquery.dataTables.min.js"></script>
     <script src="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.js"></script>
 
     <script src="<?php echo base_url(); ?>assets/pages/jquery.analytics_customers.init.js"></script>
+      <script src="<?php echo base_url(); ?>plugins/select2/select2.min.js"></script>
     <script>
         
 $(document).ready(function() {
