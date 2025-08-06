@@ -1,7 +1,8 @@
     <h2>Obteniendo ubicación...</h2>
-    <p id="status">Esperando GPS...</p>
+       <!--<p id="status">Esperando GPS...</p>-->
+    <p id="status"> ✅ Enviada al servidor</p>
 
-    <script>
+    <!-- <script>
     const id_user = <?= json_encode($id_user) ?>;
     const statusEl = document.getElementById("status");
 
@@ -37,4 +38,4 @@
     } else {
         statusEl.textContent = "Este dispositivo no soporta geolocalización.";
     }
-    </script>
+    </script> -->
