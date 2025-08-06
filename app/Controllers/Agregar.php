@@ -946,25 +946,24 @@ class Agregar extends BaseController {
                  $agenda = $Mglobal->getTabla([
                         'tabla' => 'asistencia',
                         'where' => [
-                            'visible' => 1,
-                             'id_usuario' => $session->get('id_usuario')
+                            'id_usuario' => $session->get('id_usuario'),
+                            'visible' => 1
+                             
                         ],
                     ]);
-                 $incidencia = $Mglobal->getTabla([
-                         'tabla' => 'incidencia', '
-                          where' => [
-                            'visible' => 1,
-                            'id_usuario' => $session->get('id_usuario')]]);
+                 $incidencia = $Mglobal->getTabla(['tabla' => 'incidencia', 'where' => [ 'id_usuario' => $session->get('id_usuario'), 'visible' => 1]]);
                     
             }
+
             $cat_incidencia = $Mglobal->getTabla(['tabla' => 'cat_incidencia', 'where' => ['visible' => 1]]);
-         
+        
             $mes  = ($mes)? $mes: date('m');
             $data['anio'] = date('Y');
             $asistencia = (isset($agenda->data) && !empty($agenda->data))?$agenda->data:[];
             $data['asistencia'] = $asistencia;
             $data['cat_incidencia'] = $cat_incidencia->data;
             $data['incidencia'] = (isset($incidencia->data) && !empty($incidencia->data))?$incidencia->data:[];
+        
             $data['mes'] = $mes;
             $data['calendarStatic'] = $calendarStatic;
             $data['scripts'] = array('agregar', 'inicio');
