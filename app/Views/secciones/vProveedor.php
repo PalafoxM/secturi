@@ -237,6 +237,13 @@
                                                     Campo no Valido
                                                 </div>
                                             </div><!--end col-->
+                                            <div class="col-md-4 mb-3">
+                                                <label for="no_consecutivo">No. Consecutivo.<span style="color:red;">*</span></label>
+                                                <input type="number" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo" placeholder="001"  value="<?= (isset($reserva->no_consecutivo))?$reserva->no_consecutivo:'' ?>" >
+                                                <div class="invalid-feedback">
+                                                    Campo no Valido
+                                                </div>
+                                            </div><!--end col-->
                                         </div><!--end form-row-->
                                         
                                        

@@ -198,7 +198,8 @@ ini.inicio = (function () {
                         
                         $('#editar').prop('disabled', true);
                         $('#editar').val('');
-
+                        $('#extencion').val(data.extencion);
+                        $('#prueba').val(data.extencion);
                         $('#id_usuario').prop('disabled', false);
                         $('#id_usuario').val(data.id_usuario);
                         $('#usuario').val(data.usuario);
@@ -210,6 +211,7 @@ ini.inicio = (function () {
                         $('#correo').val(data.correo);
                         $('#id_perfil').val(data.id_perfil);
                         $('#nivel').val(data.nivel);
+                      
 
                     } else {
                         Swal.fire("info", "No se encontraron datos del usuario.", "info");
@@ -2507,6 +2509,7 @@ ini.inicio = (function () {
                         $('#id_tipo_empleado').val(data.id_tipo_empleado).trigger('change');
                         $('#no_empleado').val(data.no_empleado);
                         $('#nivel').val(data.nivel);
+                        $('#extencion').val(data.extencion);
                          if (data.fec_nac) {
                             const fechaCompleta = data.fec_nac;
                             const fechaFormateada = fechaCompleta.split('T')[0];

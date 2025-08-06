@@ -298,12 +298,20 @@
                                         <div class="row">
                                    
                                             <div class="col-md-3">
-                                                <div class="mb-3 position-relative" id="">
+                                                <div class="mb-3 position-relative" >
                                                     <label for="nivel"
                                                         class="form-label campoObligatorio">NIVEL</label>
                                                     <input type="number" autocomplete="off" class="form-control"
                                                         id="nivel" name="nivel"
                                                         placeholder="NIVEL">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3 position-relative" >
+                                                    <label for="extencion"
+                                                        class="form-label">EXTENCION</label>
+                                                    <input type="number" autocomplete="off" class="form-control" id="extencion" name="extencion"
+                                                        placeholder="EXT">
                                                 </div>
                                             </div>
                                         </div>

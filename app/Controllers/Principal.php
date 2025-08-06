@@ -1470,7 +1470,7 @@ class Principal extends BaseController {
         }else{
             $reserva    = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]]);
         }
-      
+        
         $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
         $cat_partida  = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
         $proveedor    = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit'=>100]);
@@ -1943,6 +1943,7 @@ class Principal extends BaseController {
         if (!empty($registro_pt->data)) {
             $registro = $registro_pt->data[0];
             $id_reserva = $registro_pt->data[0]->id_reserva;
+            $no_consecutivo = $registro_pt->data[0]->no_consecutivo;
             $data['registro'] = $registro;
 
             $folio = $globals->getTabla([
@@ -1966,8 +1967,8 @@ class Principal extends BaseController {
             ])->data[0];
 
             if (!empty($folio->data)) {
-            $zero = (strlen($folio->data[0]->ultimo_folio_pt) >= 2)?'0':'00';
-                $data['registro']->folio = $folio->data[0]->folio_prefijo.$zero.$folio->data[0]->ultimo_folio_pt.'/'.$folio->data[0]->periodo_pt;
+            $zero = (strlen($no_consecutivo) >= 2)?'0':'00';
+                $data['registro']->folio = $folio->data[0]->folio_prefijo.$zero.$no_consecutivo.'/'.$folio->data[0]->periodo_pt;
             } else {
                 $data['registro']->folio = ''; // O un valor por defecto
             }

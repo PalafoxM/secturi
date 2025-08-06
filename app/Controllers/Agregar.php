@@ -220,6 +220,11 @@ class Agregar extends BaseController {
             $response->respuesta = "Es requerido el Secretario o Director";
             return $this->respond($response);
         }
+        if($data['no_consecutivo'] == ''){
+            $response->error = true;
+            $response->respuesta = "Es requerido el No. Concecutivo";
+            return $this->respond($response);
+        }
         if(($data['direccion_responsable'])==0){
             $response->error = true;
             $response->respuesta = "Es requerido el Dirección Responsable";
@@ -280,6 +285,7 @@ class Agregar extends BaseController {
                         'id_reserva'               => (int)$data['id_reserva'],
                         'id_direccion_responsable' => $data['direccion_responsable'],
                         'tipo_pt'                  => $data['tipo_pt'],
+                        'no_consecutivo'           => $data['no_consecutivo'],
                         'id_proveedor'             => $data['id_proveedor'],
                         'fecha_tramite'            => $data['fecha_tramite'],
                         'id_reponsable_solicitud'  => $session->get('id_usuario'),
@@ -432,6 +438,9 @@ class Agregar extends BaseController {
         }  
         if(isset($data['nivel']) && !empty($data['nivel'])){
           $dataInsert['nivel'] = $data['nivel']; 
+        }  
+        if(isset($data['extencion']) && !empty($data['extencion'])){
+          $dataInsert['extencion'] = $data['extencion']; 
         }  
    
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaTurno'];

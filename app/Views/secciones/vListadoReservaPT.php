@@ -100,7 +100,7 @@
                                                         </td>
                                                         
                                                         <td class="text-center">
-                                                            <?php if($session->id_perfil != 2): ?>
+                                                            <?php if($session->id_perfil != 2 && empty($p->id_registro_pt) ): ?>
                                                              <a style="color:white;" onclick="ini.inicio.editarReserva(<?=$p->id_reserva?>, 0);" data-toggle="tooltip" data-placement="top" title="" data-original-title="Editar"
                                                                 class="btn btn-gradient-success px-4"><i
                                                                     class="mdi mdi-border-color font-21"></i>
