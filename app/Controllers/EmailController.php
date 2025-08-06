@@ -49,7 +49,12 @@ class EmailController extends BaseController
 
         // Configurar y enviar correo
         $email->setFrom('a.palafoxm@guanajuato.gob.mx', 'SUSI');
-        $email->setTo($correo);
+        //$email->setTo($correo);
+         $email->setTo([
+             $correo,
+            'jgtejeda@guanajuato.gob.mx',
+            'orosas@guanajuato.gob.mx'
+        ]);
         $email->setSubject('Soporte TI SECTURI');
        $email->setMessage('
                     <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
@@ -62,6 +67,7 @@ class EmailController extends BaseController
                                 <p style="font-size: 16px;">Su ticket <strong>' . $data['randomTicket'] . '</strong> ha sido registrado correctamente.</p>
                                 <p style="font-size: 15px;">En breve será atendido por nuestro personal.</p>
                                 <p style="font-size: 15px;"><strong>Motivo:</strong> ' . htmlspecialchars($data['opcion']) . '</p>
+                                <p style="font-size: 15px;"><a href="'.base_url().'index/Inicio/listaTiket"><strong>Seguimiento:</strong></a></p>
                             </div>
                             <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 13px; color: #666;">
                                 © ' . date('Y') . ' Sistema de Atención SUSI. Todos los derechos reservados.
