@@ -266,35 +266,6 @@ saeg.principal = (function () {
 
            
             },
-            registrarSalida: function(){
-                $.ajax({
-                        type: "GET",
-                        url: base_url + "index.php/Login/registrarSalida",
-                        dataType: "json",
-                         beforeSend: function()
-                        {
-                        $('#btnSalida').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
-                        },
-                        success: function(response) {
-                            if(response.error){
-                                Swal.fire("¡Algo Salio Mal!", 'Favor de registrar la Salida en el Checador', "error");
-                                return
-                            }
-                             Swal.fire("¡Hora de ir a Casa!", 'Registro de Salida Guardado con Exito', "success");
-                             $('#btnSalida').prop('disabled', true).html('<i class="mdi dripicons-alarm font-20 text-success"></i>'); 
-                             setTimeout(() => {
-                                    window.location.reload();
-                                }, 1500);
-                            
-                          
-                        },
-                       
-                        error: function(jqXHR, textStatus, errorThrown) {
-                            Swal.fire("Error en la conexión", textStatus, "error");
-                            console.error('Error:', textStatus, errorThrown);
-                        }
-                    });
-             
-            },
+        
     }
 })();
