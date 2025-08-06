@@ -45,31 +45,7 @@ class Agregar extends BaseController {
 
     private function _renderView($data = array()) {
         $session = \Config\Services::session();
-        $Mglobal = new Mglobal;   
-        $misCursos = $Mglobal->getTabla(['tabla' => 'vw_estudiante_curso', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario ]]);
-        $data["dscCursos"] = []; // Inicializamos como un arreglo vacío
-
-        if (isset($misCursos->data) && !empty($misCursos->data)) {
-            foreach ($misCursos->data as $c) {
-                // Obtener la información del curso
-                $miCurso = $Mglobal->getTabla([
-                    'tabla' => 'cursos_sac', 
-                    'where' => [
-                        'visible' => 1, 
-                        'id_cursos_sac' => $c->id_curso 
-                    ]
-                ]);
-                if (isset($miCurso->data) && !empty($miCurso->data)) {
-                    // Agregar los datos del curso al arreglo
-                    $data["dscCursos"][] = [
-                        'dsc_curso' => $miCurso->data[0]->dsc_curso,
-                        'img'       => $miCurso->data[0]->img_ruta,
-                        'id'        => $miCurso->data[0]->id_cursos_sac,
-                        'periodo'   => $c->id_periodo
-                    ];
-                }
-            }
-        }   
+        $Mglobal = new Mglobal;     
         $data = array_merge($this->defaultData, $data);
         echo view($data['layout'], $data);               
     }
@@ -466,11 +442,7 @@ class Agregar extends BaseController {
         $session = \Config\Services::session();
         $globals = new Mglobal;
         $data = array();
-          $tabla = [
-                 'tabla' => 'vw_usuario', 
-                 'where' => ['visible' => 1],
-                ];
-        
+        $tabla = array('tabla' => 'vw_usuario', 'where' => ['visible' => 1], 'orderBy' => 'nombre_completo ASC');
         $usuario = $globals->getTabla($tabla);
         $data['scripts']  = array('inicio');
         $data['usuario'] = isset($usuario->data) && !empty($usuario->data) ? $usuario->data : [];
@@ -790,119 +762,7 @@ class Agregar extends BaseController {
         $data['contentView'] = 'secciones/vDetalleProgramar';                
         $this->_renderView($data);
     }
-    public function TablaPrograma() {
-        $session     = \Config\Services::session();
-        $response    = new stdClass();
-        $Mglobal   = new Mglobal;
-        $data = [];
-        $data['usuario'] = [];
-        $data['cursos_sac'] = []; // Inicializa el array
 
-        $cursoSac = $Mglobal->getTabla(['tabla' => 'cursos_sac', 'where' => ['visible' => 1, 'activo' => 1]]);
-        if (isset($cursoSac->data) && !empty($cursoSac->data)) {
-            $sac = $cursoSac->data;
-            foreach ($sac as $s) {
-                $periodos = [];
-                $counts = [];
-                
-                for ($i = 1; $i <= 9; $i++) {
-                    $periodos[$i] = $Mglobal->getTabla([
-                        'tabla' => 'vw_estudiante_curso',
-                        'where' => ['visible' => 1, 'id_curso' => $s->id_cursos_sac, 'id_periodo' => $i]
-                    ])->data;
-                    
-                    $counts[$i] = count($periodos[$i]);
-                }
-          
-                $data['cursos_sac'][] = [
-                    'id_cursos_sac'   => $s->id_cursos_sac,
-                    'dsc_curso'       => $s->dsc_curso,
-                    'periodos'        => $periodos, // Array de nombres de estudiantes
-                    'contador'        => $counts
-                ];
-            }
-        }
-/*         if (isset($cursoSac->data) && !empty($cursoSac->data)) {
-            $sac = $cursoSac->data;
-            $contador = count($sac);
-            foreach ($sac as $s) {
-                $vwEstudianteCurso = $Mglobal->getTabla([
-                    'tabla' => 'vw_estudiante_curso',
-                    'where' => ['visible' => 1, 'id_curso' => $s->id_cursos_sac]
-                ])->data;
-                $periodos = [];
-                die( var_dump($vwEstudianteCurso) );
-                foreach ($vwEstudianteCurso as $v) {
-                    $periodos[] = $v->id_periodo; // Agregar cada estudiante al array
-                }
-                $data['cursos_sac'][] = [
-                    'id_cursos_sac'   => $s->id_cursos_sac,
-                    'dsc_curso'       => $s->dsc_curso,
-                    'periodos'        => $periodos, // Array de nombres de estudiantes
-                    'contador'        => $contador
-                ];
-            }
-        } */
-        
-       // die(var_dump($data['cursos_sac']));
-
-        if($session->id_perfil == 1):
-        $cursoDB = $Mglobal->getTabla([
-            'tabla' => 'vw_estudiante_curso', 
-            'where' => [
-                'visible' => 1, 
-            ]
-        ]);
-        endif;
-        if($session->id_perfil != 1):
-        $cursoDB = $Mglobal->getTabla([
-            'tabla' => 'vw_estudiante_curso', 
-            'where' => [
-                'visible' => 1, 
-                'id_dependencia' => $session->id_dependencia
-            ]
-        ]);
-        endif;
-        if (isset($cursoDB->data) && !empty($cursoDB->data)) {
-            // Arreglo temporal para agrupar los datos por usuario
-            $usuarios = [];
-        
-            foreach ($cursoDB->data as $c) {
-                $nombreUsuario = $c->nombre_completo;
-        
-                // Si el usuario no existe en el arreglo, lo inicializamos
-                if (!isset($usuarios[$nombreUsuario])) {
-                    $usuarios[$nombreUsuario] = [
-                        'nombre' => '<h6>'.$nombreUsuario.'</h6>',
-                        'P1' => '',
-                        'P2' => '',
-                        'P3' => '',
-                        'P4' => '',
-                        'P5' => '',
-                        'P6' => '',
-                        'P7' => '',
-                        'P8' => '',
-                        'P9' => ''
-                    ];
-                }
-        
-                $key = 'P' . $c->id_periodo;
-                if (isset($usuarios[$nombreUsuario][$key])) {
-                    // Si ya hay un curso en este periodo, agregamos el nuevo curso separado por una coma
-                    if (!empty($usuarios[$nombreUsuario][$key])) {
-                        $usuarios[$nombreUsuario][$key] .= '<br> ';
-                    }
-                    $usuarios[$nombreUsuario][$key] .= '<span class="badge badge-md badge-soft-purple">'.$c->dsc_curso.'</span>';
-                }
-            }
-
-            $data['usuario'] = array_values($usuarios);
-        }
-       
-        $data['scripts'] = array('agregar');
-        $data['contentView'] = 'secciones/vTablaPrograma';                
-        $this->_renderView($data);
-        }
         private function meses($mes, $anio = null)
         {
             $anio = $anio ?? date('Y');

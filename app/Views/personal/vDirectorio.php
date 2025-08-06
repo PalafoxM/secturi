@@ -36,13 +36,11 @@
                                     <thead class="thead-light">
                                         <tr>
                                             <th class="text-center">USUARIO</th>
-                                            <th class="text-center">NOMBRE</th>
-        
-                                            <th class="text-center">PUESTO</th>
-                       
-                                            <th class="text-center">AREA</th>
-                                            <th class="text-center">CORREO</th>
-                                            <th class="text-center">EXT.</th>
+                                            <th >NOMBRE</th>
+                                            <th>PUESTO</th>
+                                            <th>AREA</th>
+                                            <th>CORREO</th>
+                                            <th>EXT.</th>
 
                                         </tr>
                                         <!--end tr-->
@@ -58,11 +56,11 @@
                                                 <td class="text-center"><img src="<?= base_url() ?>assets/images/users/user-3.jpg" alt="" class="rounded-circle thumb-sm mr-1"></td>
                                             <?php endif; ?>
                                       
-                                            <td class="text-center"><?= $u->nombre_completo ?></td>
-                                            <td class="text-center"><?= $u->dsc_puesto?></td>
-                                            <td class="text-center"><?= $u->dsc_area?></td>
-                                            <td class="text-center"><?= $u->correo?></td>
-                                            <td class="text-center"><?= $u->extencion?></td>
+                                            <td><?= $u->nombre_completo ?></td>
+                                            <td><?= $u->dsc_puesto?></td>
+                                            <td><?= $u->dsc_area?></td>
+                                            <td><?= $u->correo?></td>
+                                            <td><?= $u->extencion?></td>
                                         </tr>
                                         <?php endforeach; ?>
                                     </tbody>
