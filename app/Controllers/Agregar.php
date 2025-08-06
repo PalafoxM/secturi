@@ -461,6 +461,22 @@ class Agregar extends BaseController {
     {
         log_message('error', "Se produjo una excepción: " . $e->getMessage());
     }
+    public function Directorio()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $data = array();
+          $tabla = [
+                 'tabla' => 'vw_usuario', 
+                 'where' => ['visible' => 1],
+                ];
+        
+        $usuario = $globals->getTabla($tabla);
+        $data['scripts']  = array('inicio');
+        $data['usuario'] = isset($usuario->data) && !empty($usuario->data) ? $usuario->data : [];
+        $data['contentView'] = 'personal/vDirectorio';                             
+        $this->_renderView($data);
+    }
     function validarCampo($valor, $nombreCampo) {
         // $pattern = "/^([a-zA-Z 0-9]+)$/";
         $pattern = "/^([a-zA-ZáéíóúüñÁÉÍÓÚÜÑ 0-9]+)$/";
