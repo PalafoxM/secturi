@@ -1,4 +1,4 @@
-    <h2>Obteniendo ubicación...</h2>
+    <h2>Se Guardo su asistencia</h2>
        <!--<p id="status">Esperando GPS...</p>-->
     <p id="status"> ✅ Enviada al servidor</p>
 
