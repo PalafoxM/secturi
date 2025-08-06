@@ -767,6 +767,7 @@ ini.inicio = (function () {
                 dataType: "json",
                 data: { id_registro_pt },
                 success: function(response) {
+                    console.log(response);
                     if (response) {
                             response.forEach(p => {
                                 const fila = `
@@ -790,6 +791,7 @@ ini.inicio = (function () {
                 },
                 complete: function() {
                 $('#modalLinks').modal('show');
+                
                 },
                 error: function(xhr, status, error) {
                     console.error("Error en la solicitud AJAX:", error);
@@ -800,7 +802,8 @@ ini.inicio = (function () {
         },
         cerrarModalLink: function()
         {
-        $('#modalLinks').modal('hide');
+            $('#modalLinks').modal('hide');
+            $('#links').empty();
         },
         estatusReserva: function(id_reserva)
         {

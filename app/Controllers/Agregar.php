@@ -91,7 +91,7 @@ class Agregar extends BaseController {
        $data['contentView'] = 'formularios/vFormAgregar';                
        $this->_renderView($data);
     }
-   public function procesarPDF(array $archivos, $id_presupuesto= null)
+   public function procesarPDF(array $archivos, $id_registro_pt= null)
     {
         $session = \Config\Services::session();
         $data = array();
@@ -118,7 +118,7 @@ class Agregar extends BaseController {
                     "editar"=>false 
                 ];
              $dataInsert = [
-                        'id_presupuesto'           => (int)$id_presupuesto,
+                        'id_registro_pt'           => (int)$id_registro_pt,
                         'ruta_relativa'            => $ruta_relativa,
                         'ruta_absoluta'            => $ruta_absoluta,
                         'fec_reg'                  => date('Y-m-d H:i:s'),
@@ -133,7 +133,7 @@ class Agregar extends BaseController {
 
         //return false;
     }
-   public function procesarXML(array $archivos, $id_presupuesto= null)
+   public function procesarXML(array $archivos, $id_registro_pt= null)
     {
         $session = \Config\Services::session();
         $data = array();
@@ -181,7 +181,7 @@ class Agregar extends BaseController {
                     "editar"=>false 
                 ];
              $dataInsert = [
-                        'id_presupuesto'           => (int)$id_presupuesto,
+                        'id_registro_pt'           => (int)$id_registro_pt,
                         'version'                  => $version,
                         'fecha'                    => date('Y-m-d H:i:s', strtotime($fecha) ),
                         'total'                    => $total,
@@ -322,7 +322,7 @@ class Agregar extends BaseController {
         $response = $this->globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
       
         if(!$response->error){
-            $id_presupuesto = $response->idRegistro;
+            $id_registro_pt = $response->idRegistro;
             $archivosXml = [];
             $archivosPdf = [];
             $response->idRegistro = $response->idRegistro;
@@ -336,8 +336,8 @@ class Agregar extends BaseController {
                 }
             }
 
-           $datosXML = $this->procesarXML($archivosXml, $id_presupuesto);
-           $datosPDF =$this->procesarPDF($archivosPdf, $id_presupuesto);
+           $datosXML = $this->procesarXML($archivosXml, $id_registro_pt);
+           $datosPDF =$this->procesarPDF($archivosPdf, $id_registro_pt);
 
             if (!$datosXML) {
                 $response->errorXML     =  true;
