@@ -67,7 +67,7 @@ class EmailController extends BaseController
                                 <p style="font-size: 16px;">Su ticket <strong>' . $data['randomTicket'] . '</strong> ha sido registrado correctamente.</p>
                                 <p style="font-size: 15px;">En breve será atendido por nuestro personal.</p>
                                 <p style="font-size: 15px;"><strong>Motivo:</strong> ' . htmlspecialchars($data['opcion']) . '</p>
-                                <p style="font-size: 15px;"><a href="'.base_url().'index/Inicio/listaTiket"><strong>Seguimiento:</strong></a></p>
+                                <p style="font-size: 15px;"><a href="'.base_url().'index.php/Inicio/listaTiket"><strong>Seguimiento Tikets</strong></a></p>
                             </div>
                             <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 13px; color: #666;">
                                 © ' . date('Y') . ' Sistema de Atención SUSI. Todos los derechos reservados.
