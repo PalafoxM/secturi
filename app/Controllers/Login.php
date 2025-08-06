@@ -155,6 +155,27 @@ class Login extends BaseController {
         
         return $response;
     }
+    public function registrarSalida()
+    {
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = "Error al registrar salida";
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $dataConfig = [
+                    "tabla" => 'asistencia',
+                    "editar" => true,
+                    "idEditar" => ['id_usuario' => $session->get('id_usuario')]
+                ];
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Login.php/guardaSalida'];  
+        $result = $globals->saveTabla(['salida' => date('H:i:s')], $dataConfig,  $dataBitacora );
+        if(!$result->error){
+          $response->error     =  $result->error;
+          $response->respuesta =  $result->respuesta;
+          $session->set('registro_salida', 1);
+        }
+        return $this->respond($response);
+    }
     public function validar_usuario(){
         $response = new \stdClass();
         $response->error = true;

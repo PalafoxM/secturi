@@ -490,17 +490,19 @@
         <nav class="navbar-custom">
             <ul class="list-unstyled topbar-nav float-right mb-0">
                 <li class="hidden-sm">
-                    <a class="nav-link dropdown-toggle waves-effect waves-light" data-toggle="dropdown"
-                        href="javascript: void(0);" role="button" aria-haspopup="false" aria-expanded="false">
-                        <i
-                            class="fas fa-cart-arrow-down font-20 <?php echo (isset($dscCursos) && !empty($dscCursos))?'text-success':''?>"></i>
-                        <i class="mdi mdi-chevron-down"></i>
+
+                    <?php if(date('H:i:s') >= '16:00' && date('H:i:s') <= '17:00' && $session->get('registro_salida') !== 1): ?>
+                    <a class="nav-link waves-effect waves-light" onclick="saeg.principal.registrarSalida();" data-toggle="tooltip" data-placement="left"  data-trigger="hover" data-original-title="Checar Salida"
+                        href="javascript: void(0);" role="button" aria-haspopup="false" aria-expanded="false" id="btnSalida" >
+                        <i class="mdi dripicons-alarm font-20 text-danger"></i>
                     </a>
-                    <div class="dropdown-menu dropdown-menu-right">
-                     
-                        <span class="dropdown-item">Sin cursos en el carrito</span>
-     
-                    </div>
+                    <?php endif; ?>
+                    <?php if($session->get('registro_salida') === 1):?>
+                    <a class="nav-link waves-effect waves-light" data-toggle="tooltip" data-placement="left"  data-trigger="hover" data-original-title="Salida Registrada"
+                      role="button" aria-haspopup="false" aria-expanded="false">
+                        <i class="mdi dripicons-alarm font-20 text-success"></i>
+                    </a>
+                     <?php endif; ?>
                 </li>
 
                 <li class="dropdown notification-list">

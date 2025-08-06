@@ -137,19 +137,15 @@
                                                                 <i class="fas fa-search text-info font-16"></i>
                                                             </a>
                                                             
-                                                            <!-- Rechazar -->
+                                                            <?php if($p->id_estatus !== 3): ?>
                                                             <a  style="cursor:pointer;" onclick="saeg.principal.aceptarIncidencia(<?=$p->id_incidencia ?>, 2);" class="mr-2" title="Rechazar">
                                                                 <i class="fas fa-times-circle text-warning font-16"></i>
                                                             </a>
+                                                              <?php endif; ?>
                                                             <?php if(in_array($session->get('id_perfil'), [1,3]) ): ?>
                                                             <!-- Eliminar -->
                                                             <a style="cursor:pointer;" onclick="saeg.principal.eliminarIncidencia(<?=$p->id_incidencia ?>);"   class="mr-2" title="Eliminar">
                                                                 <i class="fas fa-trash-alt text-danger font-16"></i>
-                                                            </a>
-                                                          
-                                                            <!-- Editar (opcional) -->
-                                                            <a style="cursor:pointer;"  class="mr-2" title="Editar">
-                                                                <i class="fas fa-edit text-primary font-16"></i>
                                                             </a>
                                                             <?php endif; ?>
                                                         </td>
