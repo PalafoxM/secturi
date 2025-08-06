@@ -1807,6 +1807,7 @@ class Principal extends BaseController {
     {
         $response = new \stdClass();
         $id_registro_pt = $this->request->getPost('id_registro_pt');
+       
         $Mglobal   = new Mglobal;
         $pdf_reserva  = $Mglobal->getTabla(['tabla' => 'vw_pdf_reserva', 'where' => ['visible' =>1, 'id_registro_pt'=>$id_registro_pt]]); 
         // Validar ID
