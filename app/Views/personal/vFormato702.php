@@ -255,17 +255,19 @@ if (!empty($reserva)) {
 
     foreach ($reserva as $r) {
         $i++;
-        if ($i <= 2) {
+        if ($i <= $total) {
             echo '&nbsp;$' . number_format($r->importe, 2);
-            // Solo agrega "/" si no es el último que deseas mostrar
-            if ($i < 2) {
+            if ($i < $total) {
                 echo ' / ';
+            }else{
+                    echo '';
             }
         }
     }
 
     // Mostrar total y texto
-    echo '&nbsp;<br>$' . $reserva[0]->total_importe . ' (' . mb_strtoupper($numero_texto, 'UTF-8').')';
+    echo  ($total >= 2 )?'&nbsp;<br>$'.$reserva[0]->total_importe:'';
+    echo  ' (' . mb_strtoupper($numero_texto, 'UTF-8').')';
 }
 ?>
 </div>

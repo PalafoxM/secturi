@@ -311,6 +311,7 @@ $(document).ready(function() {
     ini.inicio.guardarReserva();
     ini.inicio.guardarGo();
     $('#datatableCategorias,#datatableProveedores').DataTable({
+        order: [[0, 'desc']],
         language: {
             url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json' // Ruta al archivo de localización
         },

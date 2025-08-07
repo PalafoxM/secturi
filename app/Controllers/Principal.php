@@ -1046,7 +1046,7 @@ class Principal extends BaseController {
                         }
                 }
          }
-    $this->enviarEmail();
+   // $this->enviarEmail();
 
     return $this->respond($response);
     }
@@ -1807,122 +1807,135 @@ class Principal extends BaseController {
     {
         $response = new \stdClass();
         $id_registro_pt = $this->request->getPost('id_registro_pt');
-       
-        $Mglobal   = new Mglobal;
-        $pdf_reserva  = $Mglobal->getTabla(['tabla' => 'vw_pdf_reserva', 'where' => ['visible' =>1, 'id_registro_pt'=>$id_registro_pt]]); 
-        // Validar ID
+        $Mglobal = new Mglobal;
+
         if (empty($id_registro_pt)) {
             $response->error = true;
             $response->respuesta = 'ID de registro inválido';
-             return $this->respond($response);
+            return $this->respond($response);
         }
+
+        // Consulta de PDFs asociados
+        $pdf_reserva = $Mglobal->getTabla([
+            'tabla' => 'vw_pdf_reserva',
+            'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
+        ]);
+
         // Directorio temporal
         $tempDir = sys_get_temp_dir() . '/zip_temp_' . $id_registro_pt . '/';
-        if (!file_exists($tempDir)) {
-            if (!mkdir($tempDir, 0777, true)) {
-                  $response->error = true;
-                  $response->respuesta = 'No se pudo crear directorio temporal';
-                  return $this->respond($response);
-            }
+        if (!is_dir($tempDir) && !mkdir($tempDir, 0777, true)) {
+            $response->error = true;
+            $response->respuesta = 'No se pudo crear directorio temporal';
+            return $this->respond($response);
         }
+
         $archivos = [];
+        $archivosTemporales = [];
+
         // Archivos generados dinámicamente
         $dynamicFiles = [
-            1 => 'Archivo01.pdf',
-            4 => 'Archivo04.pdf',
+            1 => '01 Anexos y formato de los LTPOFB.pdf',
+            4 => '04 Contrato o Convenio (según corresponda).pdf',
         ];
         foreach ($dynamicFiles as $id => $nombre) {
-            $rutaTemporal = $tempDir . $nombre;
-            $rutaTemporal2 = $tempDir . 'Archivo07.pdf';
-            $archivoGenerado = $this->Archivo($id_registro_pt, $id, $rutaTemporal);
-             if ($archivoGenerado && file_exists($archivoGenerado)) {
-             $archivos[] = $archivoGenerado;
-             }
-           
+            $rutaTemp = $tempDir . $nombre;
+            $archivoGenerado = $this->Archivo($id_registro_pt, $id, $rutaTemp);
+            if ($archivoGenerado && file_exists($archivoGenerado)) {
+                $archivos[] = $archivoGenerado;
+                $archivosTemporales[] = $archivoGenerado;
+            }
         }
 
-        $archivo07 = $this->ImprimirPT($id_registro_pt, $rutaTemporal2);
+        // Archivo 07
+        $rutaArchivo07 = $tempDir . '07 Formatos_diversos.pdf';
+        $archivo07 = $this->ImprimirPT($id_registro_pt, $rutaArchivo07);
         if ($archivo07 && file_exists($archivo07)) {
-             $archivos[] = $archivo07;
-        }
-        if ($pdf_reserva->data){
-                foreach($pdf_reserva->data as $pdf){
-                    $source = FCPATH . $pdf->ruta_relativa;
-                    if (file_exists($source)) {
-                        $archivos[] = $source;
-                    }
-                }
+            $archivos[] = $archivo07;
+            $archivosTemporales[] = $archivo07;
         }
 
-        // Archivos subidos
-        $uploadedFiles = [
-            'archivo05' => 'Archivo05.pdf',
-            'archivo06' => 'Archivo06.pdf',
-            'archivo08' => 'Archivo08.pdf',
-            'archivo09' => 'Archivo09.pdf'
-        ];
-        
-        foreach ($uploadedFiles as $inputName => $nombreArchivo) {
-            $file = $this->request->getFile($inputName);
-            if ($file && $file->isValid()) {
-                $newFile = $tempDir . $nombreArchivo;
-                if ($file->move($tempDir, $nombreArchivo)) {
-                    $archivos[] = $newFile;
+        // Archivos desde base de datos (PDFs permanentes)
+        if (!empty($pdf_reserva->data)) {
+            foreach ($pdf_reserva->data as $pdf) {
+                $source = FCPATH . $pdf->ruta_relativa;
+                if (file_exists($source)) {
+                    $archivos[] = $source;
+                    // ¡NO lo añadimos a archivosTemporales!
                 }
             }
         }
-        
-        // Verificar que hay archivos para comprimir
+
+        // Archivos subidos (05 al 09)
+        $uploadedFiles = [
+            'archivo05' => '05 Formatos de los LRADP.pdf',
+            'archivo06' => '06 Oficios de Autorizaciones.pdf',
+            'archivo08' => '08 Evidencia de entregable.pdf',
+            'archivo09' => '09 Otros.pdf'
+        ];
+        foreach ($uploadedFiles as $input => $nombre) {
+            $file = $this->request->getFile($input);
+            if ($file && $file->isValid()) {
+                $newPath = $tempDir . $nombre;
+                if ($file->move($tempDir, $nombre)) {
+                    $archivos[] = $newPath;
+                    $archivosTemporales[] = $newPath;
+                }
+            }
+        }
+
         if (empty($archivos)) {
             array_map('unlink', glob($tempDir . '*'));
             rmdir($tempDir);
             $response->error = true;
             $response->respuesta = 'No hay archivos para comprimir';
-             return $this->respond($response);
+            return $this->respond($response);
         }
-         $timestamp = date('Ymd_His');
+
+        // Crear ZIP
+        $timestamp = date('Ymd_His');
         $zipPath = WRITEPATH . "temp_zip/Documentos_{$id_registro_pt}_{$timestamp}.zip";
-        $zipDir = dirname($zipPath);
-        if (!file_exists($zipDir)) {
-            if (!mkdir($zipDir, 0777, true)) {
-                $response->error = true;
-                $response->respuesta = 'No se pudo crear directorio para ZIP';
-                return $this->respond($response);
-            }
+        if (!is_dir(dirname($zipPath))) {
+            mkdir(dirname($zipPath), 0777, true);
         }
-       
-       
+
         $zip = new \ZipArchive();
         if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE)) {
             foreach ($archivos as $archivo) {
-                $zip->addFile($archivo, basename($archivo)); // solo nombre, sin path completo
+                $zip->addFile($archivo, basename($archivo));
             }
             $zip->close();
-            if (!file_exists($zipPath)) {
+        }
+
+        if (!file_exists($zipPath)) {
             $response->error = true;
             $response->respuesta = 'El archivo ZIP no se creó correctamente';
             return $this->respond($response);
         }
-        }
-        foreach ($archivos as $archivo) {
-            if (file_exists($archivo)) {
-                unlink($archivo);
+
+        // Borrar solo archivos temporales
+        foreach ($archivosTemporales as $tempFile) {
+            if (file_exists($tempFile)) {
+                unlink($tempFile);
             }
         }
-        // Al final de la función, después de enviar la respuesta
-        register_shutdown_function(function() use ($zipPath) {
+
+        if (is_dir($tempDir)) {
+            rmdir($tempDir);
+        }
+
+        // Eliminar ZIP automáticamente al cerrar
+        register_shutdown_function(function () use ($zipPath) {
             if (file_exists($zipPath)) {
                 unlink($zipPath);
             }
         });
 
-           return $this->response
-        ->setHeader('Content-Type', 'application/zip')
-        ->setHeader('Content-Disposition', 'attachment; filename="Documentos_' . $id_registro_pt . '.zip"')
-        ->setBody(file_get_contents($zipPath));
-        
-   
+        return $this->response
+            ->setHeader('Content-Type', 'application/zip')
+            ->setHeader('Content-Disposition', 'attachment; filename="Documentos_' . $id_registro_pt . '.zip"')
+            ->setBody(file_get_contents($zipPath));
     }
+
 
     public function ImprimirPT($id_pt = null,$savePath = null )
     {  
