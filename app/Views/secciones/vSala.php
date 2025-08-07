@@ -377,6 +377,7 @@
                 extendedProps: {
                     hora_inicio: s.hora_inicio,
                     hora_fin: s.hora_fin,
+        
                 }
         
             }));

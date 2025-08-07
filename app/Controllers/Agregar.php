@@ -1016,8 +1016,9 @@ class Agregar extends BaseController {
             'hora_fin'    => $data['hora_fin'],
             'evento'      => $data['evento'],
             'asistentes'  => $data['asistentes'],
-            'proyector'    => $data['proyecto'],
+            'proyector'   => $data['proyecto'],
             'tipo_reunion'=> $data['tipo_reunion'],
+            'id_usuario'  => $session->get('id_usuario'),
             'catering'    => $data['catering']
         ];
            $dataBitacora = ['id_user' =>  $session->id_usuario, 'script' => 'Agregar.php/guardaCurso'];

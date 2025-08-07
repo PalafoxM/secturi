@@ -157,6 +157,7 @@
       font-size: 7px;
         height:18px; 
         text-align:left;
+       /* background-color: red;*/
     }
     #factura_respuesta{
        position:absolute; 
@@ -220,9 +221,17 @@
 <div id="partida">
    PARTIDA:
 </div>
- <div id="partida_respuesta">
-   <span >&nbsp; <?= ($reserva[0]->partida);?> <?= ($reserva[0]->dsc_partida);?>  </span>
+<div id="partida_respuesta">
+   <?php
+   $total = count($reserva);
+   $i = 0;
+   foreach($reserva as $r):
+       $i++;
+   ?>
+       &nbsp;<?= $r->partida ?> <?= $r->dsc_partida ?><?= ($i < $total) ? ' /' : '' ?>
+   <?php endforeach; ?>
 </div>
+
 <div id="factura">
    FACTURA / RECIBO No: 
 </div>
@@ -238,6 +247,26 @@
 <div id="importe">
    IMPORTANTE EN PESOS (MXN):
 </div>
- <div id="importe_respuesta">
-  $<?= ($reserva[0]->total_importe); ?> (<?= mb_strtoupper($numero_texto, 'UTF-8'); ?>)
+<div id="importe_respuesta">
+<?php
+if (!empty($reserva)) {
+    $total = count($reserva);
+    $i = 0;
+
+    foreach ($reserva as $r) {
+        $i++;
+        if ($i <= 2) {
+            echo '&nbsp;$' . number_format($r->importe, 2);
+            // Solo agrega "/" si no es el último que deseas mostrar
+            if ($i < 2) {
+                echo ' / ';
+            }
+        }
+    }
+
+    // Mostrar total y texto
+    echo '&nbsp;<br>$' . $reserva[0]->total_importe . ' (' . mb_strtoupper($numero_texto, 'UTF-8').')';
+}
+?>
 </div>
+

@@ -15,6 +15,9 @@
     <!-- jvectormap -->
     <link href="<?php echo base_url(); ?>plugins/jvectormap/jquery-jvectormap-2.0.2.css" rel="stylesheet">
 
+    <link href="<?php echo base_url(); ?>plugins/sweet-alert2/sweetalert2.min.css" rel="stylesheet" type="text/css">
+    <link href="<?php echo base_url(); ?>plugins/animate/animate.css" rel="stylesheet" type="text/css">
+
     <!-- App css -->
     <link href="<?php echo base_url(); ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="<?php echo base_url(); ?>assets/css/jquery-ui.min.css" rel="stylesheet">
@@ -23,7 +26,7 @@
     <link href="<?php echo base_url(); ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
 
     <?php if (isset($scripts)): foreach ($scripts as $js): ?>
-    <script src="<?php echo base_url() . "/js/{$js}.js" ?>?filever=<?php echo time() ?>" type="text/javascript">
+    <script src="<?php echo base_url() . "js/{$js}.js" ?>?filever=<?php echo time() ?>" type="text/javascript">
     </script>
     <?php endforeach;
             endif;
