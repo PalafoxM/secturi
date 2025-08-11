@@ -1,2 +1,9 @@
+# Evitar subir la configuración de base de datos
+app/Config/Database.php
+
+# Evitar que se suba el .env local
+.env
+
+# Evitar subir la carpeta writable
 writable/
 writable/*.env

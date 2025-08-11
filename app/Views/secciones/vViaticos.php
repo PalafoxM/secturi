@@ -65,10 +65,8 @@
                                                 <textarea type="text" class="form-control" id="denomicacion_carga" name="denomicacion_carga" ></textarea>
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
-                                                <label for="tipo_integrante">Tipo de integrante del sujeto obligado</label>
-                                                 <select class="form-control" id="tipo_integrante" name="tipo_integrante" required>
-                                                    <option value="1" ></option>
-                                                </select>
+                                                <label for="tipo_integrante">Denominación del encargo o comisión</label>
+                                                <textarea type="text" class="form-control" id="denomicacion_carga" name="denomicacion_carga" ></textarea>
                                             </div><!--end col-->
                                         </div><!--end form-row-->
                                         <div class="form-row">
@@ -88,13 +86,8 @@
                                         </div><!--end form-row-->
                                         <div class="form-row">
                                             <div class="col-md-4 mb-6">
-                                                <label for="formato_establecido">Denominación del encargo o comisión<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" id="formato_establecido" value="SI" name="formato_establecido" readonly>
-                                             
-                                            </div><!--end col-->
-                                            <div class="col-md-4 mb-6">
-                                                <label for="documentacion_comprobatoria">Sexo<span style="color:red;">*</span></label>
-                                               <select class="form-control" id="direccion_responsable" name="direccion_responsable" required>
+                                                <label for="formato_establecido">Tipo de integrante del sujeto obligado<span style="color:red;">*</span></label>
+                                                  <select class="form-control" id="tipo_integrante" name="tipo_integrante" required>
                                                     <option value="1" ></option>
                                                 </select>
                                             </div><!--end col-->
@@ -126,10 +119,8 @@
                                         </div><!--end form-row-->
                                         <div class="form-row">
                                             <div class="col-md-4 mb-3">
-                                                <label for="documentacion_requerida">Documentación requerida para emitir el pago.<span style="color:red;">*</span></label>
-                                               <select class="form-control" id="direccion_responsable" name="direccion_responsable">
-                                                    <option value="1" ></option>
-                                                </select>
+                                                <label for="no_consecutivo">Fecha de actualización<span style="color:red;">*</span></label>
+                                                <input type="number" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo" placeholder="001">
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="evidencia_entrega">País origen del encargo o comisión<span style="color:red;">*</span></label>
