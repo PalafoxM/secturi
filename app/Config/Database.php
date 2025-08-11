@@ -25,11 +25,11 @@ class Database extends Config
      */
     public array $default = [
         'DSN'          => '',
-        //'hostname'     => '172.16.1.220',
-        'hostname'     => 'localhost',
+        'hostname'     => '172.16.1.220',
+        //'hostname'     => 'localhost',
         'username'     => 'root',
-        //'password'     => 'PalafoxMarin1989',
-        'password'     => '',
+        'password'     => 'PalafoxMarin1989',
+        //'password'     => '',
         'database'     => '',
         'DBDriver'     => 'MySQLi',
         'DBPrefix'     => '',
@@ -52,11 +52,11 @@ class Database extends Config
      */
     public array $bitacora = [
         'DSN'         => '',
-        //'hostname'     => '172.16.1.220',
-        'hostname'     => 'localhost',
+        'hostname'     => '172.16.1.220',
+        //'hostname'     => 'localhost',
         'username'     => 'root',
-        'password'     => '',
-        //'password'     => 'PalafoxMarin1989',
+        //'password'     => '',
+        'password'     => 'PalafoxMarin1989',
         'database'    => '',
         'DBDriver'    => 'MySQLi',
         'DBPrefix'    => '',   // Needed to ensure we're working correctly with prefixes live. DO NOT REMOVE FOR CI DEVS
