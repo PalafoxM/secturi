@@ -69,6 +69,16 @@ class Inicio extends BaseController {
         $data['contentView'] =   $vista;
         $this->_renderView($data);
     }
+    public function Viaticos()
+    {        
+        $session = \Config\Services::session();
+        $data        = array();
+        $data['scripts'] = array('inicio', 'principal');
+        $data['edita'] = 0;
+        $data['contentView'] = 'secciones/vViaticos';                
+        $this->_renderView($data);
+        
+    }
     public function Chat()
     {        
         $session = \Config\Services::session();

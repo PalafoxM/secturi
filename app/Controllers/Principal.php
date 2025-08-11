@@ -1581,24 +1581,51 @@ class Principal extends BaseController {
         $this->_renderView($data);
         
     }
-    public function listadoGo()
+
+    public function listadoGo($id_registro_pt=null, $id_reserva  = null)
     {  
        
         $session = \Config\Services::session();
         $globals      = new Mglobal;
-        $cat_perfil   = $globals->getTabla(['tabla' => 'perfil', 'where' => ['visible' => 1]]);
-        $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
-        $cat_partida  = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
-        $proveedor    = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit'=>10]);
+        $cat_area  = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1 ]]);
+        if($id_reserva != 0){
+            $reserva   = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['id_reserva' => $id_reserva ]]);
+            $presupuesto   = $globals->getTabla(['tabla' => 'presupuesto', 'where' => ['id_reserva' => $id_reserva ]]);
+            $data['reserva']      = (!empty($reserva->data))?$reserva->data[0]:[];
+            $data['presupuesto']  = (!empty($presupuesto->data))?$presupuesto->data:[];
+        }
+        if(!empty($id_registro_pt)){
+            $registro_pt   = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1, 'id_registro_pt' =>$id_registro_pt ]]);
+            $data['registro_pt']  = (!empty($registro_pt->data))?$registro_pt->data[0]:[];
+        }
 
-        $data['cat_perfil']   = (!empty($cat_perfil->data))?$cat_perfil->data:[];
-        $data['proveedor']    = (!empty($proveedor->data))?$proveedor->data:[];
-        $data['cat_proyecto'] = (!empty($cat_proyecto->data))?$cat_proyecto->data:[];
-        $data['cat_partida']  = (!empty($cat_partida->data))?$cat_partida->data:[];
-        $data['GO'] = 1;
-        $data['scripts'] = array('inicio');
-        $data['edita'] = 0;
-        $data['contentView'] = 'secciones/vListadoPT';                
+  
+        $cat_perfil   = $globals->getTabla(['tabla' => 'perfil', 'where' => ['visible' => 1]]);
+        $cat_director_general = $globals->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1 ]]);
+        $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
+        $cat_usuario  = $globals->getTabla(['tabla' => 'cat_usuario', 'where' => ['visible' => 1]]);
+        $cat_partida  = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $cat_area     = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
+        $cat_tipo     = $globals->getTabla(['tabla' => 'cat_tipo', 'where' => ['visible' => 1]]);
+        $secretario   = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1 ]]);
+        $cat_opcion   = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1 ]]);
+        $proveedor    = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit'=>10]);
+        $usuario      = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' =>$session->get('id_usuario') ]]);
+        $data['dsc_director_general'] = (!empty($cat_director_general->data))?$cat_director_general->data[0]->dsc_director_general:[];
+        $data['cat_tipo']             = (!empty($cat_tipo->data))?$cat_tipo->data:[];
+        $data['cat_opcion']           = (!empty($cat_opcion->data))?$cat_opcion->data:[];
+        $data['cat_perfil']           = (!empty($cat_perfil->data))?$cat_perfil->data:[];
+        $data['proveedor']            = (!empty($proveedor->data))?$proveedor->data:[];
+        $data['cat_proyecto']         = (!empty($cat_proyecto->data))?$cat_proyecto->data:[];
+        $data['secretario']           = (!empty($secretario->data))?$secretario->data:[];
+        $data['cat_partida']          = (!empty($cat_partida->data))?$cat_partida->data:[];
+        $data['cat_area']             = (!empty($cat_area->data))?$cat_area->data:[];
+        $data['usuario']              = (!empty($usuario->data))?$usuario->data[0]:[];
+        $data['cat_usuario']          = (!empty($cat_usuario->data))?$cat_usuario->data:[];
+        $data['GO']                   = 1;
+        $data['scripts']              = array('inicio');
+        $data['edita']                = 0;
+        $data['contentView'] = 'personal/vFormularioGo';                
         $this->_renderView($data);
         
     }

@@ -263,11 +263,13 @@
                     <a href="#MetricaPages" class="nav-link" data-toggle="tooltip-custom" data-placement="top"  data-trigger="hover" title="Mi espacio" data-original-title="Mi espacio">
                        <i data-feather="home" class="align-self-center menu-icon icon-dual"></i>            
                     </a><!--end MetricaPages-->
-                    <?php if($session->id_perfil == 1): ?> 
-                    <a href="#MetricaAuthentication" class="nav-link" data-toggle="tooltip-custom" data-placement="right"  data-trigger="hover" title="" data-original-title="Authentication">
-                        <i data-feather="lock" class="align-self-center menu-icon icon-dual"></i>
+                  <?php if($session->id_perfil == 1): ?> 
+                    <a href="#MetricaAuthentication" class="nav-link" data-toggle="tooltip-custom" data-placement="right" data-trigger="hover" title="" data-original-title="Jurídico">
+                        <i class="fas fa-balance-scale align-self-center menu-icon icon-dual"></i>
                     </a> <!--end MetricaAuthentication--> 
-                   <?php endif;?>
+                <?php endif; ?>
+
+
 
             </nav><!--end nav-->
             <!--end nav-->
@@ -450,11 +452,11 @@
                     </div><!-- end Pages -->
                 <div id="MetricaAuthentication" class="main-icon-menu-pane">
                     <div class="title-box">
-                        <h6 class="menu-title">Authentication</h6>
+                        <h6 class="menu-title">GASTOS POR CONCEPTOS</h6>
                     </div>
                     <ul class="nav">
                         <li class="nav-item"><a class="nav-link"
-                                href="<?php echo base_url(); ?>authentication/auth-login.html">Log in</a></li>
+                                href="<?php echo base_url(); ?>index.php/Inicio/Viaticos">viáticos/representación</a></li>
                         <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>authentication/auth-login-alt.html">Log in alt</a></li>
                         <li class="nav-item"><a class="nav-link"

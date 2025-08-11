@@ -269,8 +269,6 @@
     </div>
 </div>
                                                     <!--FIN MODAL -->
-
-
 <link href="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet"
     type="text/css" />
 <!-- App css -->
