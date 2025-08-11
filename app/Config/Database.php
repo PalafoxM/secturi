@@ -55,7 +55,7 @@ class Database extends Config
         //'hostname'     => '172.16.1.220',
         'hostname'     => 'localhost',
         'username'     => 'root',
-        'password'     => '',
+        //'password'     => '',
         'password'     => 'PalafoxMarin1989',
         //'database'    => '',
         'DBDriver'    => 'MySQLi',

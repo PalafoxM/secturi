@@ -111,7 +111,71 @@ saeg.principal = (function () {
                 });
 
         },
-        login: function() {
+         login: function() {
+                let usuario = $('#usuario').val();              
+                let contrasenia = $('#contrasenia').val(); 
+        
+                if (!usuario || !contrasenia) {
+                    Swal.fire("¡Atención!", "Es requerido el usuario y contraseña", "error");
+                    return;
+                }
+
+                $('#btn_login').hide();           
+                $('#btn_load').show(); 
+
+   
+                    $.ajax({
+                        type: "POST",
+                        url: base_url + "index.php/Login/validar_usuario",
+                        data: {
+                            usuario,
+                            contrasenia
+                        },
+                        dataType: "json",
+                        success: function(response) {
+                            console.log(response);
+                            if (!response.error) {
+                                Swal.fire("Bienvenido!", "Ingresando...", "success");
+                                if(response.asistencia){
+                                    setTimeout(() => {
+                                        Swal.fire({
+                                            position: "top-end",
+                                            icon: "success",
+                                            title: "Asistencia registrada automáticamente",
+                                            showConfirmButton: false,
+                                            timer: 1000
+                                        });
+                                    }, 1000);
+                                }else{
+                                    setTimeout(() => {
+                                        Swal.fire({
+                                            position: "top-end",
+                                            icon: "error",
+                                            title: "Ubicación fuera de rango, asistencia no registrada",
+                                            showConfirmButton: false,
+                                            timer: 2500
+                                        });
+                                    }, 1000);
+                                }
+
+                                setTimeout(() => {
+                                    window.location.href = base_url + "index.php/Inicio";
+                                }, 3000);
+                            } else {
+                                Swal.fire("Usuario incorrecto", "Favor de verificar sus credenciales", "error");
+                            }
+                        },
+                        complete: function () {
+                            $('#btn_login').show();
+                            $('#btn_load').hide();
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            Swal.fire("Error en la conexión", textStatus, "error");
+                            console.error('Error:', textStatus, errorThrown);
+                        }
+                    });
+            },
+        login2: function() {
                 let usuario = $('#usuario').val();              
                 let contrasenia = $('#contrasenia').val(); 
         
