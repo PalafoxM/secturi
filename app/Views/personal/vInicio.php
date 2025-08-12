@@ -84,7 +84,7 @@
                                             <a class="nav-link" id="portfolio_detail_tab" data-toggle="pill" href="#portfolio_detail">Portfolio</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" id="settings_detail_tab" data-toggle="pill" href="#settings_detail">Settings</a>
+                                            <a class="nav-link" id="settings_detail_tab" data-toggle="pill" href="#settings_detail">Configuración</a>
                                         </li>
                                     </ul>        
                                 </div><!--end card-body-->
@@ -757,39 +757,36 @@
                                         <div class="col-lg-12 col-xl-9 mx-auto">
                                             <div class="card">
                                                 <div class="card-body">
-                                                    <form method="post" class="card-box">
-                                                        <input type="file" id="input-file-now-custom-1" class="dropify" data-default-file="<?= base_url() ?>assets/images/users/user-4.jpg"/>
-                                                        <span class="input-icon icon-right">
-                                                            <textarea rows="4" class="form-control" placeholder="Post a new message"></textarea>
-                                                        </span>
-                                                        <div class="float-right my-3">
-                                                            <a class="btn btn-sm btn-gradient-primary text-white px-4 mb-0">Send</a>
-                                                        </div>
-                                                        <ul class="list-inline mt-1">                                                                
-                                                            <li class="list-inline-item">
-                                                                <a href="#"><i class=" fas fa-video font-18 mr-2 mt-2 text-primary"></i></a>
-                                                            </li>
-                                                            <li class="list-inline-item">
-                                                                <a href="#"><i class="fas fa-camera  font-18 mt-2 text-primary"></i></a>
-                                                            </li>
-                                                        </ul>
-                                                    </form>
+                                                    
         
                                                     <div class="">
                                                         <form class="form-horizontal form-material mb-0">
-                                                            <div class="form-group">
-                                                                <input type="text" placeholder="Full Name" class="form-control">
-                                                            </div>
+                                                            <h3>Información Visible en SUSI<h3>
                                                             
                                                             <div class="form-group row">
                                                                 <div class="col-md-4">
-                                                                    <input type="email" placeholder="Email" class="form-control" name="example-email" id="example-email">
+                                                                    <input type="checkbox" class="checkbox checkbox-primary" name="fec_nac" id="fec_nac" checked>
+                                                                     <label for="fec_nac">Fecha de Nacimiento</label>
+                                                                </div>
+                                                                 <div class="col-md-4">
+                                                                    <input type="checkbox" class="checkbox checkbox-primary" name="foto" id="foto" checked>
+                                                                     <label for="foto">Foto de Perfil</label>
+                                                                </div>
+                                                                 <div class="col-md-4">
+                                                                    <input type="checkbox" class="checkbox checkbox-primary" name="nivel" id="nivel" checked>
+                                                                     <label for="nivel">Nivel</label>
                                                                 </div>
                                                                 <div class="col-md-4">
-                                                                    <input type="password" placeholder="password" class="form-control">
+                                                                    <input type="checkbox" class="checkbox checkbox-primary" name="no_empleado" id="no_empleado" checked>
+                                                                     <label for="no_empleado">Numero de Empleado</label>
                                                                 </div>
                                                                 <div class="col-md-4">
-                                                                    <input type="password" placeholder="Re-password" class="form-control">
+                                                                    <input type="checkbox" class="checkbox checkbox-primary" name="sexo" id="sexo" checked>
+                                                                     <label for="sexo">Sexo</label>
+                                                                </div>
+                                                                 <div class="col-md-4">
+                                                                    <input type="checkbox" class="checkbox checkbox-primary" name="sexo" id="sexo" checked>
+                                                                     <label for="sexo">Tipo de Contrato</label>
                                                                 </div>
                                                             </div>
                                                             <div class="form-group row">
@@ -842,7 +839,7 @@
                                         <a class="nav-link" data-toggle="tab" href="#TasksTab" role="tab">Tasks</a>
                                     </li>
                                     <li class="nav-item waves-effect waves-light">
-                                        <a class="nav-link" data-toggle="tab" href="#SettingsTab" role="tab">Settings</a>
+                                        <a class="nav-link" data-toggle="tab" href="#SettingsTab" role="tab">Configuración</a>
                                     </li>
                                 </ul>                                
                                 
