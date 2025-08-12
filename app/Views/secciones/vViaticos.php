@@ -1,5 +1,4 @@
-
-
+<?php  $session = \Config\Services::session();    ?>
         <div class="page-wrapper">
 
             <!-- Page Content-->
@@ -31,7 +30,7 @@
                                     <p class="text-muted mb-3" >
                                     
                                     </p>
-                                   <form id="form_proveedor" enctype="multipart/form-data">
+                                   <form id="form_viatico" enctype="multipart/form-data">
                                        <div class="form-row">
                                             <!-- Dirección Responsable -->
                                             <div class="col-md-4 mb-3">
@@ -55,9 +54,8 @@
                                         </div><!--end form-row-->
                                         <div class="form-row">
                                             <div class="col-md-4 mb-3">
-                                                <label for="denominacion">Denominación del puesto<span style="color:red;">*</span></label>
-                                               <textarea class="form-control" id="denominacion" name="denominacion">
-                                                </textarea>
+                                                <label for="denominacion_puesto">Denominación del puesto<span style="color:red;">*</span></label>
+                                               <textarea class="form-control" id="denominacion_puesto" name="denominacion_puesto"></textarea>
 
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
@@ -75,13 +73,12 @@
                                                 <input type="text" class="form-control" id="clave_nivel" name="clave_nivel" >
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
-                                                <label for="fecha_gasto_inicio">Area de adscripcion<span style="color:red;">*</span></label>
-                                                <input type="date" class="form-control" id="fecha_gasto_inicio" name="fecha_gasto_inicio" required>
+                                                <label for="area_adscripcion">Area de adscripcion<span style="color:red;">*</span></label>
+                                                <input type="text" class="form-control" id="area_adscripcion" name="area_adscripcion">
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
-                                                 <label for="fecha_gasto_fin">Nombre<span style="color:red;">*</span></label>
-                                                <input type="date" class="form-control" id="fecha_gasto_fin" name="fecha_gasto_fin" 
-                                                required>
+                                                 <label for="nombre_completo">Nombre<span style="color:red;">*</span></label>
+                                                <input type="text" class="form-control" id="nombre_completo" name="nombre_completo" value="<?= $session->nombre_completo ?>" readonly>
                                             </div><!--end col-->
                                         </div><!--end form-row-->
                                         <div class="form-row">
@@ -92,22 +89,22 @@
                                                 </select>
                                             </div><!--end col-->
                                               <div class="col-md-4 mb-6">
-                                                <label for="documentacion_comprobatoria">Tipo de Viaje<span style="color:red;">*</span></label>
-                                               <select class="form-control" id="direccion_responsable" name="direccion_responsable" required>
+                                                <label for="tipo_viaje">Tipo de Viaje<span style="color:red;">*</span></label>
+                                               <select class="form-control" id="tipo_viaje" name="tipo_viaje" required>
                                                     <option value="1" ></option>
                                                 </select>
                                             </div><!--end col-->
                                         </div><!--end form-row-->
                                         <div class="form-row">
                                            <div class="col-md-4 mb-6">
-                                                <label for="documentacion_comprobatoria">Tipo de gasto<span style="color:red;">*</span></label>
-                                               <select class="form-control" id="direccion_responsable" name="direccion_responsable">
+                                                <label for="tipo_gasto">Tipo de gasto<span style="color:red;">*</span></label>
+                                               <select class="form-control" id="tipo_gasto" name="tipo_gasto">
                                                     <option value="1" ></option>
                                                 </select>
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="no_personas">Número de personas acompañantes en el encargo o comisión<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" id="no_personas" value="SI" name="no_personas">
+                                                <input type="text" class="form-control" id="no_personas"  name="no_personas">
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="importe_ejercicio">Importe ejercido por el total de acompañantes<span style="color:red;">*</span></label>
@@ -119,40 +116,40 @@
                                         </div><!--end form-row-->
                                         <div class="form-row">
                                             <div class="col-md-4 mb-3">
-                                                <label for="no_consecutivo">Fecha de actualización<span style="color:red;">*</span></label>
-                                                <input type="number" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo" placeholder="001">
+                                                <label for="fec_actualizacion">Fecha de actualización<span style="color:red;">*</span></label>
+                                                <input type="date" class="form-control" autocomplete="off" id="fec_actualizacion" name="fec_actualizacion" placeholder="001">
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
-                                                <label for="evidencia_entrega">País origen del encargo o comisión<span style="color:red;">*</span></label>
-                                               <select class="form-control" id="direccion_responsable" name="direccion_responsable" required>
+                                                <label for="pais_origen">País origen del encargo o comisión<span style="color:red;">*</span></label>
+                                               <select class="form-control" id="pais_origen" name="pais_origen" >
                                                     <option value="1" ></option>
                                                 </select>
                                             </div><!--end col-->
                                              <div class="col-md-4 mb-3">
-                                                <label for="evidencia_entrega">Estado origen del encargo o comisión<span style="color:red;">*</span></label>
-                                               <select class="form-control" id="direccion_responsable" name="direccion_responsable" required>
+                                                <label for="estado_origen">Estado origen del encargo o comisión<span style="color:red;">*</span></label>
+                                               <select class="form-control" id="estado_origen" name="estado_origen" >
                                                     <option value="1" ></option>
                                                 </select>
                                             </div><!--end col-->
                                         </div><!--end form-row-->
                                         <div class="form-row">
                                             <div class="col-md-4 mb-3">
-                                                <label for="clausula_contrato">Ciudad origen del encargo o comisión<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" id="clausula_contrato" name="clausula_contrato">
+                                                <label for="ciudad_origen">Ciudad origen del encargo o comisión<span style="color:red;">*</span></label>
+                                                <input type="text" class="form-control" id="ciudad_origen" name="ciudad_origen">
                                                 <div class="invalid-feedback">
                                                     Campo no Valido
                                                 </div>
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
-                                                <label for="concepto_pago">País destino del encargo o comisión<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control"  autocomplete="off" id="concepto_pago" name="concepto_pago">
+                                                <label for="pais_destino">País destino del encargo o comisión<span style="color:red;">*</span></label>
+                                                <input type="text" class="form-control"  autocomplete="off" id="pais_destino" name="pais_destino">
                                                 <div class="invalid-feedback">
                                                     Please provide a valid state.
                                                 </div>
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
-                                                <label for="comision">Estado destino del encargo o comisión</label>
-                                                <input type="text" class="form-control" id="comision"  name="comision" >
+                                                <label for="estado_destino">Estado destino del encargo o comisión</label>
+                                                <input type="text" class="form-control" id="estado_destino"  name="estado_destino" >
                                                 <div class="invalid-feedback">
                                                     Please provide a valid state.
                                                 </div>
@@ -160,16 +157,16 @@
                                         </div><!--end form-row-->
                                         <div class="form-row">
                                             <div class="col-md-4 mb-3">
-                                                <label for="no_reserva">Ciudad destino del encargo o comisión<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" autocomplete="off" id="no_reserva" name="no_reserva">
+                                                <label for="ciudad_destino">Ciudad destino del encargo o comisión<span style="color:red;">*</span></label>
+                                                <input type="text" class="form-control" autocomplete="off" id="ciudad_destino" name="ciudad_destino">
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
-                                                <label for="no_consecutivo">Motivo del encargo o comisión<span style="color:red;">*</span></label>
-                                                <input type="number" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo" placeholder="001">
+                                                <label for="motivo_encargo">Motivo del encargo o comisión<span style="color:red;">*</span></label>
+                                                <input type="number" class="form-control" autocomplete="off" id="motivo_encargo" name="motivo_encargo" >
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
-                                                <label for="no_consecutivo">Fecha de salida del encargo o comisión<span style="color:red;">*</span></label>
-                                                <input type="number" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo" placeholder="001">
+                                                <label for="fec_salida">Fecha de salida del encargo o comisión<span style="color:red;">*</span></label>
+                                                <input type="number" class="form-control" autocomplete="off" id="fec_salida" name="fec_salida" >
                                             </div><!--end col-->
                                         </div><!--end form-row-->
                                         <div class="form-row">
@@ -179,11 +176,11 @@
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="no_consecutivo">Importe ejercido por partida por concepto<span style="color:red;">*</span></label>
-                                                <input type="number" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo" placeholder="001">
+                                                <input type="number" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo" >
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="no_consecutivo">Importe total erogado con motivo del encargo o comisión<span style="color:red;">*</span></label>
-                                                <input type="number" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo" placeholder="001">
+                                                <input type="number" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo" >
                                             </div><!--end col-->
                                         </div><!--end form-row-->
                                         <div class="form-row">
@@ -193,11 +190,11 @@
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="no_consecutivo">Hipervínculo al informe de la comisión o encargo encomendado<span style="color:red;">*</span></label>
-                                                <input type="number" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo" placeholder="001">
+                                                <input type="number" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo">
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="no_consecutivo">Hipervínculo a las facturas o comprobantes.<span style="color:red;">*</span></label>
-                                                <input type="number" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo" placeholder="001">
+                                                <input type="number" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo" >
                                             </div><!--end col-->
                                         </div><!--end form-row-->
                                             <div class="form-row">
@@ -207,12 +204,9 @@
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="no_consecutivo">Área(s) responsable(s) que genera(n), posee(n), publica(n) y actualizan la información<span style="color:red;">*</span></label>
-                                                <input type="number" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo" placeholder="001">
+                                                <input type="number" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo">
                                             </div><!--end col-->
-                                            <div class="col-md-4 mb-3">
-                                                <label for="no_consecutivo">Fecha de actualización<span style="color:red;">*</span></label>
-                                                <input type="number" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo" placeholder="001">
-                                            </div><!--end col-->
+
                                         </div><!--end form-row-->
                                         <div class="form-row">
                                             <div class="col-md-12 mb-3">
@@ -223,7 +217,7 @@
                                         </div><!--end form-row-->
                                             <a class="btn btn-gradient-danger" style="color:white" onclick="window.history.back()">Atrás</a>
                                             
-                                             <button class="btn btn-gradient-primary" id="btnGuardatPT" type="submit">Guardar</button>
+                                             <button class="btn btn-gradient-primary" id="btnGuardarViatico" type="submit">Guardar</button>
                                             
                                     </form> <!--end form-->                                          
                                 </div><!--end card-body-->
@@ -287,11 +281,5 @@
 
 
         <script>
-            ini.inicio.formPT();
-             $('.add-file').on('click', function(e) {
-                e.preventDefault();
-                const inputId = $(this).data('target');
-                $(inputId).click();
-            });
-
+            ini.inicio.formViatico();
         </script>

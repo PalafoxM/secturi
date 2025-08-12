@@ -3208,6 +3208,34 @@ ini.inicio = (function () {
                 }
             });
         },
+       formViatico: function(){
+         $("#form_viatico").submit(function (e) {
+             e.preventDefault(); 
+                var formData = new FormData(this); // Usar FormData en lugar de serialize
+                console.log(formData);
+                    $.ajax({
+                    type: "POST",
+                    url: base_url + "index.php/Agregar/formViatico",
+                    data: formData,
+                    processData: false,  // Importante para FormData
+                    contentType: false,  // Importante para FormData
+                    dataType: "json",
+                    success: function (response) {
+                        console.log(response);
+                    },
+                    beforeSend: function (info){
+                         $('#btnGuardarViatico').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                    },
+                    complete: function (info){
+                        $('#btnGuardarViatico').prop('disabled', false).html('Guardar');
+                    },
+                    error: function (response,jqXHR, textStatus, errorThrown) {
+                        var res= JSON.parse(response.responseText);
+                        Swal.fire("Error", '<p> '+ res.message + '</p>');  
+                    }
+                });
+          })
+       },
        formPT: function(){
             $("#form_proveedor").submit(function (e) {
                 e.preventDefault(); 

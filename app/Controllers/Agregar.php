@@ -830,7 +830,17 @@ class Agregar extends BaseController {
             $data['contentView'] = 'secciones/vAsistencia';                
             $this->_renderView($data);
         }
-  
+    public function formViatico()
+    {
+        $session     = \Config\Services::session();
+        $response    = new stdClass();
+        $Mglobal   = new Mglobal;
+        $data = $this->request->getPost();
+        var_dump($data );
+        die();
+
+
+    }
     public function ReservarSala() {
         $session     = \Config\Services::session();
         $response    = new stdClass();
