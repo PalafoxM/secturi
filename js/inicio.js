@@ -637,7 +637,7 @@ ini.inicio = (function () {
            validarFormularioGo: function () {
     
             // Validar que al menos haya una fila en la tabla
-            if($('#makeEditable2 tbody tr').length === 0) {
+            if($('#makeEditable3 tbody tr').length === 0) {
                 //toastr.warning('Debe agregar al menos un proyecto');
                 Swal.fire("Atenición", "Debe agregar al menos un proyecto", "info");
                 return false;
@@ -645,7 +645,7 @@ ini.inicio = (function () {
 
             // Validar que todas las filas tengan datos completos
             var filasValidas = true;
-            $('#makeEditable2 tbody tr').each(function() {
+            $('#makeEditable3 tbody tr').each(function() {
                 if($(this).find('[name="proyecto[]"]').val() === '' || 
                 $(this).find('[name="partida[]"]').val() === '' || 
                 $(this).find('[name="importe[]"]').val() === '') {
@@ -1093,9 +1093,7 @@ ini.inicio = (function () {
         },
         guardarGo: function()
         {
-        $('#btn_guardarGo').click(function(e) {
-        e.preventDefault();
-        
+        $('#btn_guardarGo').click(function() {
         // Validación básica
         if(!ini.inicio.validarFormularioGo()) {
             return false;
@@ -1111,7 +1109,7 @@ ini.inicio = (function () {
 
 
         // Agregar datos de la tabla
-        $('#makeEditable2 tbody tr').each(function(index) {
+        $('#makeEditable3 tbody tr').each(function(index) {
             formData.append('proyecto[]', $(this).find('[name="proyecto[]"]').val());
             formData.append('partida[]', $(this).find('[name="partida[]"]').val());
             formData.append('importe[]', $(this).find('[name="importe[]"]').val());

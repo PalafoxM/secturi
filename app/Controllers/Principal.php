@@ -1622,7 +1622,6 @@ class Principal extends BaseController {
         $data['cat_area']             = (!empty($cat_area->data))?$cat_area->data:[];
         $data['usuario']              = (!empty($usuario->data))?$usuario->data[0]:[];
         $data['cat_usuario']          = (!empty($cat_usuario->data))?$cat_usuario->data:[];
-        $data['GO']                   = 1;
         $data['scripts']              = array('inicio');
         $data['edita']                = 0;
         $data['contentView'] = 'personal/vFormularioGo';                
