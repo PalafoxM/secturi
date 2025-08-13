@@ -486,6 +486,77 @@ ini.inicio = (function () {
                         }
                     });
         },
+        editarReservaGo: function(id_reserva_go, id) {
+     
+            $.ajax({
+                url: base_url + "index.php/Principal/editarReservaGo",
+                type: 'POST',
+                dataType: "json",
+                data: { id_reserva_go},
+                success: function(response) {
+                    if (response && response.data && response.data.reserva) {
+                        const reserva = response.data.reserva;
+                        const presupuesto = response.data.presupuesto;
+                        const partidas = response.data.partida;
+                        const proyectos = response.data.proyecto;
+                        $("#total_importe_editar").val(reserva.total_importe || '');
+                        $("#id_reserva_go").val(reserva.id_reserva_go || '');
+                
+                           const tbody = $('#editarReservaGo tbody');
+                            tbody.empty();
+
+                            presupuesto.forEach(p => {
+                                let opcionesProyecto = '<option value="">Seleccione</option>';
+                               proyectos.forEach(c => {
+                                    opcionesProyecto += `<option value="${c.id_proyecto}" ${(c.id_proyecto == p.id_proyecto) ? 'selected' : ''}>${c.proyecto}</option>`;
+                                });
+
+                                let opcionesPartida = '<option value="">Seleccione</option>';
+                                partidas.forEach(pa => {
+                                    opcionesPartida += `<option value="${pa.id_partida}" ${(pa.id_partida == p.id_partida) ? 'selected' : ''}>${pa.cuenta_cable}</option>`;
+                                });
+
+                                const fila = `
+                                    <tr>
+                                        <td>
+                                            <select class="select2 form-control" name="proyecto_go[]">
+                                                ${opcionesProyecto}
+                                            </select>
+                                            <input type="hidden" name="id_presupuesto_go[]" value="${p.id_presupuesto_go}">
+                                        </td>
+                                        <td>
+                                            <select class="select2 form-control" name="partida_go[]">
+                                                ${opcionesPartida}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="text" autocomplete="off" class="form-control" name="importe_go[]" value=${p.importe} placeholder="0,000.00">
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-danger remove-row">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `;
+                                tbody.append(fila);
+                            });
+
+                       
+                    } else {
+                        Swal.fire("Atención", "No se encontró la información de la reserva.", "warning");
+                    }
+                },
+                complete: function() {
+                    $('#reservaGo').modal('show');
+                    $('.dropdown-toggle').dropdown();
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error en la solicitud AJAX:", error);
+                    Swal.fire("Error", "Favor de llamar al Administrador", "error");
+                }
+            });
+        },
         editarReserva: function(id_reserva, id) {
      
             $.ajax({
@@ -698,6 +769,60 @@ ini.inicio = (function () {
             }
 
             return true;
+        },
+         guardarReservaEdicionGo: function()
+        {
+            $('#btnReservaGo').click(function(e) {
+            e.preventDefault();
+
+            // Crear FormData para enviar tanto el formulario como el archivo
+            var formData = new FormData();
+            
+       
+            formData.append('id_reserva_go', $('#id_reserva_go').val());
+            formData.append('total_importe', $('#total_importe_editar').val());
+          
+
+            // Agregar datos de la tabla
+            $('#editarReservaGo tbody tr').each(function(index) {
+                formData.append('proyecto[]', $(this).find('[name="proyecto_go[]"]').val());
+                formData.append('partida[]', $(this).find('[name="partida_go[]"]').val());
+                formData.append('importe[]', $(this).find('[name="importe_go[]"]').val());
+                formData.append('id_presupuesto[]', $(this).find('[name="id_presupuesto_go[]"]').val());
+            });
+
+            // Enviar datos via AJAX
+            $.ajax({
+                url: base_url + "index.php/Principal/guardarReservaEditarGo",
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                beforeSend: function() {
+                    $('#btnReservaGo').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                },
+                success: function(response) {
+                  if(response.error) {
+                        Swal.fire("Error", response.respuesta, "error");
+                    } else {
+                        Swal.fire("Correcto", response.respuesta, "success");
+                         setTimeout(() => {
+                                    window.location.reload()
+
+                            }, 1000); 
+                        
+                    } 
+                },
+                error: function() {
+                    //toastr.error('Error de conexión');
+                    Swal.fire("Error", "Error de conexión", "error");
+                },
+                complete: function() {
+                    $('#btnReservaGo').prop('disabled', false).html('Guardar');
+                }
+            });
+            });
+
         },
          guardarReservaEdicion: function()
         {

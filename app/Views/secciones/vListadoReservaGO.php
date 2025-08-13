@@ -89,26 +89,26 @@
                                                         
                                                         <td class="text-center">
                                                             <?php if($session->id_perfil != 2): ?>
-                                                             <a style="color:white;" onclick="ini.inicio.editarReserva(<?=$p->id_reserva?>, 0);" data-toggle="tooltip" data-placement="top" title="" data-original-title="Editar"
+                                                             <a style="color:white;" onclick="ini.inicio.editarReservaGo(<?=$p->id_reserva_go?>, 0);" data-toggle="tooltip" data-placement="top" title="" data-original-title="Editar"
                                                                 class="btn btn-gradient-success px-4"><i
                                                                     class="mdi mdi-border-color font-21"></i>
                                                             </a>
                                                              <?php if($p->id_estatus != 3): ?>
-                                                            <a style="color:white;"  onclick="ini.inicio.eliminarReserva(<?=$p->id_reserva?>);" data-toggle="tooltip" data-placement="top" title="" data-original-title="Eliminar"
+                                                            <a style="color:white;"  onclick="ini.inicio.eliminarReserva(<?=$p->id_reserva_go?>);" data-toggle="tooltip" data-placement="top" title="" data-original-title="Eliminar"
                                                                 class="btn btn-gradient-danger px-4"><i
                                                                     class="mdi mdi-trash-can-outline font-21"></i>
                                                             </a>
                                                             <?php endif; ?>
                                                               <?php endif; ?>
                                                             <?php if($session->get('id_perfil')==2): ?>
-                                                            <a style="color:white;"  onclick="ini.inicio.estatusReserva(<?=$p->id_reserva?>);" data-toggle="tooltip" data-placement="top" title="" data-original-title="Revisar reserva"
+                                                            <a style="color:white;"  onclick="ini.inicio.estatusReserva(<?=$p->id_reserva_go?>);" data-toggle="tooltip" data-placement="top" title="" data-original-title="Revisar reserva"
                                                                 class="btn btn-gradient-warning px-4"><i
                                                                     class="mdi mdi-lock-open font-21"></i>
                                                             </a>
 
                                                             <?php endif; ?>
                                                              <?php if($p->id_estatus == 3 && $session->get('id_perfil')!=2): ?>
-                                                            <a href="<?= base_url().'index.php/Principal/generarTramitePago/'.$p->id_reserva ?>" style="color:white;"  data-toggle="tooltip" data-placement="left" data-original-title="Generar Tramite de Pago"
+                                                            <a href="<?= base_url().'index.php/Principal/generarTramitePago/'.$p->id_reserva_go ?>" style="color:white;"  data-toggle="tooltip" data-placement="left" data-original-title="Generar Tramite de Pago"
                                                                 class="btn btn-gradient-primary px-4 uitooltip"><i
                                                                     class="mdi mdi-arrow-right-bold font-21"></i>
                                                             </a>
@@ -135,7 +135,7 @@
 
 <!--Inicio Modal -->
 
-<div class="modal fade" id="modalEditarReserva2" tabindex="-1" role="dialog" aria-labelledby="supportModalLabel" aria-hidden="true">
+<div class="modal fade" id="reservaGo" tabindex="-1" role="dialog" aria-labelledby="supportModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -154,55 +154,36 @@
                                                 <div class="card">
                                                     <div class="card-body">        
                                                         <h4 class="mt-0 header-title">Edición Datos</h4>
-                                                         
-                                                        <div class="custom-control custom-switch">
-                                                            <input type="checkbox" onclick="ini.inicio.ocultarInstrumento(this);" class="custom-control-input" id="customSwitch1">
-                                                            <label class="custom-control-label" for="customSwitch1">Sin Instrumento Jurídico</label>
-                                                        </div>
                                                         <div class="row">
-                                                            <div class="col-lg-6">
+                                                            <div class="col-lg-12">
                                                                 <div class="form-group">
-                                                                    <label for="nombre_proveedor_editar">Nombre Proveedor</label>
-                                                                    <input type="text" class="form-control" id="nombre_proveedor_editar" name="nombre_proveedor_editar" readonly>
-                                                                    <input type="hidden" id="id_reserva" >
-                                                                </div>
-                                                                <div class="form-group" id="id_instrumento">
-                                                                    <span id="previews2"></span>
-                                                                    <label for="instrumento_editar">Instrumento Juridico</label>
-                                                                    <input type="file" class="form-control" id="instrumento_editar" name="instrumento_editar" accept=".pdf">
-                                                                </div>                                                                                      
+                                                                    <label for="titular">Titular</label>
+                                                                    <input type="text" class="form-control" id="titular" value="GOBIERNO DEL ESTADO DE GUANAJUATO SFIYA SECRETARIA DE TURISMO" name="titular" readonly>
+                                                                    <input type="hidden" id="id_reserva_go" >
+                                                                </div>                                                                                 
+                                                            </div> 
+                                                        </div> 
+                                                        <div class="row">
+                                                            <div class="col-lg-4">
+                                                                <div class="form-group">
+                                                                    <label for="tipo_titularidad">Tipo de titularidad</label>
+                                                                    <input type="text" class="form-control" id="tipo_titularidad" value="INDIVIDUAL" name="tipo_titularidad" readonly>
+                                                                    <input type="hidden" id="id_reserva_go" >
+                                                                </div>                                                                                 
                                                             </div>
-                                                            <div class="col-lg-6" >
+                                                            <div class="col-lg-4" >
                                                                 <div class="form-group">
-                                                                    <label for="no_proveedor_editar">No. Proveedor</label>
-                                                                    <input type="text" class="form-control" id="no_proveedor_editar" name="no_proveedor_editar" readonly>
-                                                                </div>
-                                                                <div class="form-group" id="id_convenio">
-                                                                    <label for="no_convenio_editar">No. Convenio/Contrato</label>
-                                                                    <div class="input-group">
-                                                                        <div class="btn-group">
-                                                                            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                                V/T <i class="mdi mdi-chevron-down"></i>
-                                                                            </button>
-                                                                            <div class="dropdown-menu">
-                                                                                <a class="dropdown-item" href="#" onclick="setConvenio('SECTURI/CONV/')">SECTURI/CONV/</a>
-                                                                                <a class="dropdown-item" href="#" onclick="setConvenio('SECTURI/CTO/')">SECTURI/CTO/</a>
-                                                                            </div>
-                                                                        </div>
-                                                                        <input type="text" id="no_convenio_editar" name="no_convenio_editar" class="form-control" placeholder="025" autocomplete="off">
-                                                                        <div class="input-group-append">
-                                                                            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                                 AÑO <i class="mdi mdi-chevron-down"></i>
-                                                                            </button>
-                                                                            <div class="dropdown-menu">
-                                                                                <a class="dropdown-item" href="#" onclick="setAnio('/2025')">2025</a>
-                                                                                <a class="dropdown-item" href="#" onclick="setAnio('/2024')">2024</a>
-                                                                                <a class="dropdown-item" href="#" onclick="setAnio('/2023')">2023</a>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
+                                                                    <label for="no_cuenta">No. Cuenta</label>
+                                                                    <input type="text" class="form-control" id="no_cuenta" value="51859130201" name="no_cuenta" readonly>
                                                                 </div>
                                                             </div>  
+                                                             <div class="col-lg-4" >
+                                                                <div class="form-group">
+                                                                    <label for="banco">Banco</label>
+                                                                    <input type="text" class="form-control" id="banco" value="BAN BAJIO - 030210518591302019" name="banco" readonly>
+                                                                </div>
+                                                            </div>
+                                                        </div> 
                                                         <div class="row">
                                                             <div class="col-12">
                                                                 <div class="card">
@@ -210,7 +191,7 @@
                                         
                                                                         <h4 class="mt-0 header-title">PRESUPUESTO</h4>
                                                                         <div class="table-responsive">
-                                                                         <table class="table table-bordered" id="makeEditableEditar">
+                                                                         <table class="table table-bordered" id="editarReservaGo">
                                                                                 <thead>
                                                                                     <tr>
                                                                                         <th>PROYECTO-META</th>
@@ -236,7 +217,7 @@
                                                                         </div>   
                                                                     </div><!--end card-body-->   
                                                                 </div><!--end card-->
-                                                                  <button id="btn_guardar_edicion" class="btn btn-success">
+                                                                  <button id="btnReservaGo" class="btn btn-success">
                                                                         Guardar
                                                                   </button>
                                                             </div> <!-- end col -->
@@ -377,7 +358,7 @@
 <script src="<?= base_url()?>assets/js/feather.min.js"></script>
 <script>
 $(document).ready(function() {
-    ini.inicio.guardarReservaEdicion();
+    ini.inicio.guardarReservaEdicionGo();
     ini.inicio.formEliminarReserva();
     $('#datatableReserva').DataTable({
         language: {
@@ -390,14 +371,14 @@ $(document).ready(function() {
     });
 
     // 1. Escuchar cambios en inputs de importe
-    $(document).on('input', 'input[name="importe[]"]', function() {
+    $(document).on('input', 'input[name="importe_go[]"]', function() {
         calcularTotal();
     });
 
     // 2. Función para calcular el total
     function calcularTotal() {
         let total = 0;
-        $('input[name="importe[]"]').each(function() {
+        $('input[name="importe_go[]"]').each(function() {
             const valor = parseFloat($(this).val().replace(/,/g, '')) || 0;
             total += valor;
         });
@@ -408,14 +389,4 @@ $(document).ready(function() {
     function formatNumber(num) {
         return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
     }
-  function setConvenio(valor) {
-        document.getElementById('no_convenio_editar').value = valor;
-    }
-
-    function setAnio(anio) {
-        let input = document.getElementById('no_convenio_editar');
-        input.value = input.value + anio;
-    }
-
-
 </script>

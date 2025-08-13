@@ -807,6 +807,97 @@ class Principal extends BaseController {
         $this->_renderView($data);
         
     }
+    public function guardarReservaEditarGo()
+    {  
+       
+        $session = \Config\Services::session();
+        $email =  \Config\Services::email();
+        $globals      = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error al Guardar los datos';
+        $data =  $this->request->getPost();
+
+        $hoy = date("Y-m-d H:i:s"); 
+        $dataInsert = [
+            "total_importe" => $data['total_importe'],
+            "id_estatus"   => 1,
+            "usu_act"       => $session->get('id_usuario')
+        ];
+        
+         $dataBitacora = ['id_user' =>  $session->get('id_usuario'), 'script' => 'Agregar.php/EditarReserva'];
+         $dataConfig = [
+            "tabla"=>"reserva_go",
+            "editar"=>true,
+           "idEditar"=>['id_reserva_go'=>$data['id_reserva_go']]
+        ];
+         $response = $globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
+       
+         if(!$response->error){
+               $i = 0;
+                foreach($data['id_presupuesto'] as $d){
+                    $dataInsert = [
+                            "id_proyecto"    => $data['proyecto'][$i],
+                            "id_partida"     => $data['partida'][$i],
+                            "importe"        => $data['importe'][$i], 
+                            "usu_act"        => $session->get('id_usuario')
+                            
+                        ];
+                         $dataConfig = [
+                            "tabla"=>"presupuesto_go",
+                            "editar"=>true,
+                            "idEditar"=>['id_presupuesto_go'=>(int)$d]
+                        ];
+     
+                        $res = $globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
+                        if(!$res->error){
+                         $response->error = $res->error;
+                         $response->respuesta = $res->respuesta;
+                     
+                        }
+                            $i++;
+                }
+         }
+       $email->setTo('palafox.marin@hotmail.com');
+      /*  $email->setTo([
+            'alopez@guanajuato.gob.mx',
+            'negonzalez@guanajuato.gob.mx',
+            'dhernandezq@guanajuato.gob.mx'
+        ]); */
+
+        $email->setSubject('Carga de Reserva');
+        $email->setMessage('
+            <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+                <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+                    <!-- Encabezado con logotipo -->
+                    <div style="background-color: #004080; padding: 20px; text-align: center;">
+                        <img src="' . base_url('assets/images/logo.png') . '" alt="Logo" style="height: 60px;">
+                    </div>
+                    <!-- Contenido principal -->
+                    <div style="padding: 30px; color: #333;">
+                        <h1 style="color: #004080;">El usuario <strong>' . $session->get('nombre_completo') . '</strong></h1>
+                        <p style="font-size: 16px;">ha actualizado la <strong>RESERVA</strong> en el sistema SUSI.</p>
+                        <p style="font-size: 15px;">Para los labores correspondientes.</p>
+                        <p style="font-size: 15px; color: #888;">Este correo ha sido generado automáticamente por el sistema SUSI. No es necesario responder a este mensaje.</p>
+                        <p style="font-size: 15px; color: #888;">Link: ' .  base_url() . 'index.php/Principal/listaReservaPT</p>
+                    </div>
+                    <!-- Pie de página -->
+                    <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 13px; color: #666;">
+                        © ' . date('Y') . ' Sistema de Atención SUSI. Todos los derechos reservados - SECTURI.
+                    </div>
+                </div>
+            </div>
+        ');                      // Intentar enviar el correo
+       if ($email->send()) {
+          $response->error = false;
+          $response->respuesta = "Correo enviado correctamente.";
+        } else {
+          $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
+        } 
+           return $this->respond($response);
+     
+         
+    }
     public function guardarReservaEditar()
     {  
        
@@ -989,9 +1080,8 @@ class Principal extends BaseController {
         $folio = 'GO-' . date('YmdHis'); // Ejemplo: FOL-20250725133045
 
         $dataInsert = [
-            "id_proveedor"       => (int)$data['id_proveedor'],
+            "id_proveedor"       => 1,
             "total_importe"      => $data['total_importe'],
-            "id_proveedor_banco" => (int)$data['banco_go'],
             "fec_reg"            => $hoy,
             "usu_reg"            => $session->get('id_usuario'),
             "folio"              => $folio
@@ -2150,7 +2240,31 @@ class Principal extends BaseController {
          return $this->respond($response);
         
     }
-        public function editarReserva()
+    public function editarReservaGo()
+    {  
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error|Error al traer los proveedor';
+        $globals = new Mglobal;
+        $id_reserva_go =  $this->request->getPost('id_reserva_go');
+        $data = [];
+       if(!empty($id_reserva_go)){
+            $reserva             = $globals->getTabla(['tabla' => 'vw_reserva_go', 'where' => ['visible' => 1, 'id_reserva_go' =>$id_reserva_go ]]);
+            $cat_proyecto        = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1 ]]);
+            $cat_partida        = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1 ]]);
+            $response->error     = $reserva->error;
+            $response->respuesta = $reserva->respuesta;
+            $response->data['reserva'] = (isset($reserva->data[0]) && !empty($reserva->data[0]))?$reserva->data[0]:[];
+            $response->data['presupuesto'] = (isset($reserva->data[0]) && !empty($reserva->data[0]))?$reserva->data:[];
+            $response->data['proyecto'] = (isset($cat_proyecto->data[0]) && !empty($cat_proyecto->data[0]))?$cat_proyecto->data:[];
+            $response->data['partida'] = (isset($cat_partida->data[0]) && !empty($cat_partida->data[0]))?$cat_partida->data:[];
+        }
+      
+         return $this->respond($response);
+        
+    }
+    public function editarReserva()
     {  
         $session = \Config\Services::session();
         $response = new \stdClass();
