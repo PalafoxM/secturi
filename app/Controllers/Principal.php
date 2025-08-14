@@ -2288,6 +2288,58 @@ class Principal extends BaseController {
          return $this->respond($response);
         
     }
+    public function generarTramitePagoGo($id_reserva_go = null, $id_registro_pt =  null)
+    {  
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error|Error al traer los proveedor';
+        $globals = new Mglobal;
+        //$siExisteIdReserva  = $globals->getTabla(['tabla' => 'registro_go', 'where' => ['visible' => 1 , 'id_reserva' => $id_reserva ]]);
+        //$btn = (!empty($siExisteIdReserva->data))?true:false;
+    
+        $cat_area  = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1 ]]);
+        if($id_reserva_go != 0){
+            $reserva   = $globals->getTabla(['tabla' => 'vw_reserva_go', 'where' => ['id_reserva' => $id_reserva_go ]]);
+            $presupuesto   = $globals->getTabla(['tabla' => 'presupuesto_go', 'where' => ['id_reserva' => $id_reserva_go ]]);
+        }
+        if(!empty($id_registro_pt)){
+            $registro_pt   = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1, 'id_registro_pt' =>$id_registro_pt ]]);
+        }
+
+        
+        $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1 ]]);
+        $cat_tipo = $globals->getTabla(['tabla' => 'cat_tipo', 'where' => ['visible' => 1 ]]);
+ 
+        $usuario                = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' =>$session->get('id_usuario') ]]);
+        $cat_usuario            = $globals->getTabla(['tabla' => 'usuario', 'where' => ['visible' => 1 ]]);
+        $cat_director_general   = $globals->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1 ]]);
+        $cat_opcion             = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1 ]]);
+        $cat_partida             = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1 ]]);
+        if($id_reserva_go != 0){
+          $data['reserva']      = (!empty($reserva->data))?$reserva->data[0]:[];
+          $data['presupuesto']  = (!empty($presupuesto->data))?$presupuesto->data:[];
+        }
+        if(!empty($id_registro_pt)){
+           $data['registro_pt']  = (!empty($registro_pt->data))?$registro_pt->data[0]:[];
+        }
+    
+        $data['dsc_director_general'] = (!empty($cat_director_general->data))?$cat_director_general->data[0]->dsc_director_general:[];
+        $data['cat_area']             = (!empty($cat_area->data))?$cat_area->data:[];
+        $data['cat_tipo']             = (!empty($cat_tipo->data))?$cat_tipo->data:[];
+        $data['cat_opcion']           = (!empty($cat_opcion->data))?$cat_opcion->data:[];
+        $data['cat_partida']          = (!empty($cat_partida->data))?$cat_partida->data:[];
+       // $data['editar']               = (!empty($id_reserva) || $id_reserva != 0)?0:1;
+        $data['secretario']           = (!empty($secretario->data))?$secretario->data:[];
+        $data['usuario']              = (!empty($usuario->data))?$usuario->data[0]:[];
+        $data['cat_usuario']          = (!empty($cat_usuario->data))?$cat_usuario->data:[];
+        $data['id_reserva']          = (!empty($id_reserva))?$id_reserva:0;
+        $data['scripts']              = array('inicio');
+        //$data['edita']                = $btn;
+        $data['contentView']          = 'secciones/vRegistroGo';                
+        $this->_renderView($data);
+        
+    } 
 
     public function generarTramitePago($id_reserva = null, $id_registro_pt =  null)
     {  

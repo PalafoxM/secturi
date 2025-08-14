@@ -15,7 +15,8 @@
     <!-- jvectormap -->
     <link href="<?php echo base_url(); ?>plugins/jvectormap/jquery-jvectormap-2.0.2.css" rel="stylesheet">
 
-    <link href="<?php echo base_url(); ?>plugins/sweet-alert2/sweetalert2.min.css" rel="stylesheet" type="text/css">
+ <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.22.3/dist/sweetalert2.min.css
+" rel="stylesheet">
     <link href="<?php echo base_url(); ?>plugins/animate/animate.css" rel="stylesheet" type="text/css">
 
     <!-- App css -->

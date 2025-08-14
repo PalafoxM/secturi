@@ -368,6 +368,36 @@ class Usuario extends BaseController
         // die();
         return $this->respond($response->data[0]);
     }
+    public function estatusReservaGo()
+    {
+        $session = \Config\Services::session();
+        $principal = new Mglobal;
+        $response = new \stdClass();
+        $response->error =  true;
+        $response->respuesta =  'Error! Error al guardar en la base de datos';
+        $data = $this->request->getPost();
+    
+        $dataConfig = [
+            "tabla"=>"reserva_go",
+            "editar"=>true,
+            "idEditar" => ['id_reserva_go'=>(int)$data['id_reserva']]
+        ];
+        $dataInsert = [
+            "observaciones" => (isset($data['observaciones']) && !empty($data['observaciones']))?$data['observaciones']:'',
+            "id_estatus"    => (isset($data['motivo']) && !empty($data['motivo']))?(int)$data['motivo']:'',
+            "no_reserva"    => (isset($data['numero_reserva']) && !empty($data['numero_reserva']))?(int)$data['numero_reserva']:'',
+            "usu_act"       => $session->get('id_usuario'),
+        ];
+      
+        $result = $principal->saveTabla($dataInsert,$dataConfig,['id_user' => $session->get('id_usuario'), "script"=>"estatus.Reserva"]);
+      
+        if(!$result->error){
+            $response->error = false;
+            $response->respuesta = $result->respuesta;
+
+        }
+        return $this->respond($response);
+    }
     public function estatusReserva()
     {
         $session = \Config\Services::session();
@@ -393,6 +423,26 @@ class Usuario extends BaseController
       
         if(!$result->error){
             $response->error = false;
+            $response->respuesta = $result->respuesta;
+
+        }
+        return $this->respond($response);
+    }
+    public function deleteReservaGo()
+    {
+        $session = \Config\Services::session();
+        $principal = new Mglobal;
+        $response = new \stdClass();
+        $id_reserva = $this->request->getPost('id_reserva');
+       
+        $dataConfig = [
+            "tabla"=>"reserva_go",
+            "editar"=>true,
+            "idEditar" => ['id_reserva_go'=>$id_reserva]
+        ];
+        $result = $principal->saveTabla(['visible'=>0],$dataConfig,["script"=>"eliminar.Reserva"]);
+        if(!empty($resul->data)){
+            $response->error = $result->error;
             $response->respuesta = $result->respuesta;
 
         }

@@ -927,14 +927,96 @@ ini.inicio = (function () {
             });
 
         },
+        cerrarModalGo: function(){
+         $('#modalReservaGo').modal('hide');
+        },
         cerrarModalLink: function()
         {
             $('#modalLinks').modal('hide');
             $('#links').empty();
         },
+         estatusReservaGo: function(id_reserva)
+        {
+           $('#id_reserva_estatus_go').val(id_reserva);
+           $('#motivo_go').val('');
+           $('#observaciones_go').val('');
+           $('#validar_no_reserva_go').val('');
+            $.ajax({
+                url: base_url + "index.php/Principal/editarReservaGo",
+                type: 'POST',
+                dataType: "json",
+                data: { id_reserva_go: id_reserva },
+                success: function(response) {
+                    console.log(response);
+                    if (response && response.data && response.data.reserva) {
+                        const reserva = response.data.reserva;
+                        const presupuesto = response.data.presupuesto;
+                        const partidas = response.data.partida;
+                        const proyectos = response.data.proyecto;
+
+
+                        if(reserva.no_reserva){
+                           $("#validar_no_reserva_go").val(reserva.no_reserva).prop("readonly", true);
+                        }
+                   
+                           const tbody = $('#tablaReservaGo tbody');
+                            tbody.empty();
+
+                            presupuesto.forEach(p => {
+                                let opcionesProyecto = '<option value="">Seleccione</option>';
+                               proyectos.forEach(c => {
+                                    opcionesProyecto += `<option value="${c.id_proyecto}" ${(c.id_proyecto == p.id_proyecto) ? 'selected' : ''}>${c.proyecto}</option>`;
+                                });
+
+                                let opcionesPartida = '<option value="">Seleccione</option>';
+                                partidas.forEach(pa => {
+                                    opcionesPartida += `<option value="${pa.id_partida}" ${(pa.id_partida == p.id_partida) ? 'selected' : ''}>${pa.cuenta_cable}</option>`;
+                                });
+
+                                const fila = `
+                                    <tr>
+                                        <td>
+                                            <select class="select2 form-control"  readonly>
+                                                ${opcionesProyecto}
+                                            </select>
+                                            <input type="hidden" value="${p.id_presupuesto}" readonly>
+                                        </td>
+                                        <td>
+                                            <select class="select2 form-control" readonly>
+                                                ${opcionesPartida}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="text" autocomplete="off" class="form-control" name="importe[]" value=${p.importe} readonly>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-danger remove-row">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `;
+                                tbody.append(fila);
+                            });
+
+                       
+                    } else {
+                        Swal.fire("Atención", "No se encontró la información de la reserva.", "warning");
+                    }
+                },
+                complete: function() {
+                $("#modalReservaGo").modal('show');
+                    $('.dropdown-toggle').dropdown();
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error en la solicitud AJAX:", error);
+                    Swal.fire("Error", "Favor de llamar al Administrador", "error");
+                }
+            });
+
+        },
         estatusReserva: function(id_reserva)
         {
-     
            $('#id_reserva_estatus').val(id_reserva);
            $('#motivo').val('');
            $('#observaciones').val('');
@@ -1025,11 +1107,29 @@ ini.inicio = (function () {
             });
 
         },
+        selectMotivoGo: function()
+        {
+        let motivo = $('#motivo_go').val();
+        console.log(motivo);
+           if(motivo == 1){
+               $('#observacion_go').hide();
+              $('#numero_go').hide();
+            }
+            if(motivo == 2){
+               $('#observacion_go').show();
+                 $('#numero_go').hide();
+            }
+             if(motivo == 3){
+                $("#validar_no_reserva_go").prop("readonly", false);
+               $('#numero_go').show();
+                $('#observacion_go').show();
+            }
+        },
         selectMotivo: function()
         {
  
         let motivo = $('#motivo').val();
-        console.log(validar_no_reserva);
+ 
            if(motivo == 1){
                $('#observacion').hide();
               $('#numero').hide();
@@ -1044,13 +1144,13 @@ ini.inicio = (function () {
                 $('#observacion').show();
             }
         },
-        formEliminarReserva: function()
+        formEliminarReservaGo: function()
         {
-            $('#btnConfirmarReserva').on('click', function () {
-            const id = $('#id_reserva_estatus').val();
-            const motivo = $('#motivo').val();
-            const observaciones = $('#validar_observaciones').val();
-            const numero_reserva = $('#validar_no_reserva').val();
+            $('#btnConfirmarReservaGo').on('click', function () {
+            const id = $('#id_reserva_estatus_go').val();
+            const motivo = $('#motivo_go').val();
+            const observaciones = $('#observaciones_go').val();
+            const numero_reserva = $('#validar_no_reserva_go').val();
         
             if (!motivo) {
                  Swal.fire("Estatus", "Debe seleccionar un motivo para eliminar la reserva.", "error");
@@ -1061,7 +1161,7 @@ ini.inicio = (function () {
                 return;
             }
                 $.ajax({
-                    url: base_url + "index.php/Usuario/estatusReserva",
+                    url: base_url + "index.php/Usuario/estatusReservaGo",
                     type: "POST",
                     dataType: "json",
                     data: {
@@ -1072,7 +1172,7 @@ ini.inicio = (function () {
                     },
                     beforeSend: function()
                     {
-                     $('#btnConfirmarEliminar').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                     $('#btnConfirmarReservaGo').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
                     },
                     success: function (response) {
                         console.log(response);
@@ -1083,8 +1183,8 @@ ini.inicio = (function () {
                         }
                     },
                     complete: function () {
-                    $('#modalEliminarReserva').modal('hide');
-                    $('#btnConfirmarEliminar').prop('disabled', false).html('Guardar');
+                    $('#modalReservaGo').modal('hide');
+                    $('#btnConfirmarReservaGo').prop('disabled', false).html('Guardar');
                      setTimeout(() => window.location.reload(), 1500);
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
@@ -1094,6 +1194,42 @@ ini.inicio = (function () {
                 });
             });
 
+        },
+        eliminarReservaGo: function(id)
+        {
+        Swal.fire({
+                        title: "¿Está seguro?",
+                        text: "¿Desea eliminar la reserva?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        cancelButtonText: "Cancelar",
+                        confirmButtonText: "Eliminar",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: base_url + "index.php/Usuario/deleteReservaGo",
+                                type: "post",
+                                dataType: "json", //expect return data as html from server
+                                data: { id_reserva: id },
+                                success: function (response, textStatus, jqXHR) {
+                               
+                                    if (response.error) {
+                                        Swal.fire("Atención", response.respuesta, "warning");
+                                    }else{
+                                         Swal.fire("Eliminado", response.respuesta, "success");
+                                    }
+                                },
+                                complete: function(){
+                                  window.location.reload();
+                                },
+                                error: function (jqXHR, textStatus, errorThrown) {
+                                  Swal.fire("Error",textStatus, "error");
+                                },
+                            });
+                        }
+                    });
         },
         eliminarReserva: function(id)
         {

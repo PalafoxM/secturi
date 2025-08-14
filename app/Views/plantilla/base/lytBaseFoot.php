@@ -13,8 +13,7 @@
         
         <!-- App js -->
         <script src="<?php echo base_url(); ?>assets/js/app.js"></script>
-        <script src="<?php echo base_url(); ?>plugins/sweet-alert2/sweetalert2.min.js"></script>
-        <script src="<?php echo base_url(); ?>assets/pages/jquery.sweet-alert.init.js"></script>
-        <!-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>-->
+ 
+         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     </body>
 </html>
