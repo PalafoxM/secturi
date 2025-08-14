@@ -1144,6 +1144,57 @@ ini.inicio = (function () {
                 $('#observacion').show();
             }
         },
+        formEliminarReserva: function()
+        {
+            $('#btnConfirmarReserva').on('click', function () {
+            const id = $('#id_reserva_estatus').val();
+            const motivo = $('#motivo').val();
+            const observaciones = $('#observaciones').val();
+            const numero_reserva = $('#validar_no_reserva').val();
+        
+            if (!motivo) {
+                 Swal.fire("Estatus", "Debe seleccionar un motivo para eliminar la reserva.", "error");
+                return;
+            }
+            if (motivo==3 && !numero_reserva) {
+                 Swal.fire("No, Reserva", "El numero de reserva es requerido.", "error");
+                return;
+            }
+                $.ajax({
+                    url: base_url + "index.php/Usuario/estatusReserva",
+                    type: "POST",
+                    dataType: "json",
+                    data: {
+                    id_reserva: id,
+                    motivo: motivo,
+                    observaciones: observaciones,
+                    numero_reserva: numero_reserva
+                    },
+                    beforeSend: function()
+                    {
+                     $('#btnConfirmarReserva').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                    },
+                    success: function (response) {
+                        console.log(response);
+                        if (response.error) {
+                            Swal.fire("Atención", response.respuesta, "warning");
+                        } else {
+                            Swal.fire("Correcto", response.respuesta, "success");
+                        }
+                    },
+                    complete: function () {
+                    $('#modalEstatusReserva').modal('hide');
+                    $('#btnConfirmarReserva').prop('disabled', false).html('Guardar');
+                     setTimeout(() => window.location.reload(), 1500);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                   // alert("Error al eliminar");
+                    console.log("Error(s):", textStatus, errorThrown);
+                    }
+                });
+            });
+
+        },
         formEliminarReservaGo: function()
         {
             $('#btnConfirmarReservaGo').on('click', function () {

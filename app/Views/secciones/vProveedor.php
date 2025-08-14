@@ -281,7 +281,7 @@
                                                         <div class="col-md-4 mb-3">
                                                             <label for="periodo_<?= $i ?>">Periodo<span style="color:red;">*</span></label>
                                                             <div class="input-group">                                            
-                                                                <input type="text" class="form-control" name="datetimes" id="periodo_<?= $i ?>" name="periodo[]">
+                                                                <input type="text" class="form-control" name="datetimes" id="periodo_<?= $i ?>">
                                                                 <div class="input-group-append">
                                                                     <span class="input-group-text"><i class="dripicons-calendar"></i></span>
                                                                 </div>
@@ -367,18 +367,19 @@
         <script src="<?= base_url()?>plugins/bootstrap-touchspin/js/jquery.bootstrap-touchspin.min.js"></script>
 
         <script src="<?= base_url()?>assets/pages/jquery.forms-advanced.js"></script>
-        
-
-     
-        
-
-
         <script>
             ini.inicio.formPT();
              $('.add-file').on('click', function(e) {
                 e.preventDefault();
                 const inputId = $(this).data('target');
                 $(inputId).click();
+            });
+            $('input[name="datetimes[]"]').daterangepicker({
+                timePicker: true,
+                timePicker24Hour: true,
+                locale: {
+                    format: 'YYYY-MM-DD HH:mm:ss'
+                }
             });
 
         </script>

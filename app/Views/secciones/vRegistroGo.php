@@ -14,10 +14,10 @@
                                     <ol class="breadcrumb">
                                         <li class="breadcrumb-item"><a href="javascript:void(0);">SUSI</a></li>
                                         <li class="breadcrumb-item"><a href="javascript:void(0);">Formulario</a></li>
-                                        <li class="breadcrumb-item active">PT</li>
+                                        <li class="breadcrumb-item active">GO</li>
                                     </ol>
                                 </div>
-                                <h4 class="page-title">Formulario PT</h4>
+                                <h4 class="page-title">Formulario GO</h4>
                             </div><!--end page-title-box-->
                         </div><!--end col-->
                     </div>
@@ -27,17 +27,12 @@
                         <div class="col-lg-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <h3 class="mt-0 header-title">PROVEEDOR: <strong> </strong></h3>
+                                    <h3 class="mt-0 header-title">PROVEEDOR: <strong> GOBIERNO DEL ESTADO DE GUANAJUATO SFIYA SECRETARIA DE TURISMO</strong></h3>
                                     <p class="text-muted mb-3" >
-                                        <?= (isset($proveedor->no_proveedor) && !empty($proveedor->no_proveedor))?'No. Proveedor '.$proveedor->no_proveedor:'' ?>
+                                      GEG850101FQ2
                                     </p>
                                    <form id="form_proveedor" enctype="multipart/form-data">
-                                        <input type="hidden" name="id_proveedor" id="id_proveedor" value="<?= (isset($reserva->id_proveedor) && !empty($reserva->id_proveedor))?$reserva->id_proveedor:$registro_pt->id_proveedor?>" >
-
-                                        <input type="hidden" name="id_reserva" id="id_reserva" value="<?= $id_reserva?>">
-                                        <?php if(isset($registro_pt->id_registro_pt) && !empty($registro_pt->id_registro_pt)): ?>
-                                        <input type="hidden" name="id_registro_pt" id="id_registro_pt" value="<?= $registro_pt->id_registro_pt?>">
-                                        <?php endif; ?>
+                                        
                                        <div class="form-row">
                                             <!-- Dirección Responsable -->
                                             <div class="col-md-4 mb-3">
@@ -53,30 +48,13 @@
                                                     Por favor ingrese la dirección responsable
                                                 </div>
                                             </div><!--end col-->
-                                            
-                                            <!-- Tipo de PT -->
-                                            <div class="col-md-4 mb-3">
-                                                <label for="tipo_pt">Tipo de PT <span class="text-danger">*</span></label>
-                                                <select class="form-control" id="tipo_pt" name="tipo_pt" >
-                                                    <?php foreach($cat_tipo as $p): ?>
-                                                        <option value="<?=$p->id_tipo?>" <?=(isset($registro_pt->id_tipo) && $registro_pt->id_tipo == $p->id_tipo )?'selected':''?> ><?= $p->des_tipo ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                                <div class="invalid-feedback">
-                                                    Por favor seleccione el tipo de PT
-                                                </div>
-                                            </div><!--end col-->
-                                            
                                             <!-- Fecha de Trámite -->
                                             <div class="col-md-4 mb-3">
                                                 <label for="fecha_tramite">Fecha de Trámite <span class="text-danger">*</span></label>
                                               <input type="date" class="form-control" id="fecha_tramite" name="fecha_tramite" 
                                                 value="<?= isset($registro_pt->fecha_tramite) ? date('Y-m-d', strtotime($registro_pt->fecha_tramite)) : date('Y-m-d') ?>" 
                                                 required>
-
                                             </div><!--end col-->
-                                        </div><!--end form-row-->
-                                        <div class="form-row">
                                             <div class="col-md-4 mb-3">
                                                 <label for="reponsable_solicitud">Responsable de la Solicitud <span style="color:red;">*</span></label>
                                               <select name="id_reponsable_solicitud" class="form-control" required>
@@ -95,8 +73,10 @@
                                                         </option>
                                                     <?php endforeach; ?>
                                                 </select>
-
                                             </div><!--end col-->
+                                        </div><!--end form-row-->
+                                        <div class="form-row">
+                    
                                             <div class="col-md-4 mb-3">
                                                 <label for="director_generar">Director/a General Administrativa <span style="color:red;">*</span></label>
                                                 <input type="text" class="form-control" id="director_generar" value="<?= $dsc_director_general ?>" name="director_generar" >
@@ -117,28 +97,21 @@
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div><!--end col-->
-                                        </div><!--end form-row-->
-                                        <div class="form-row">
-                                            <div class="col-md-4 mb-3">
-                                                <label for="cuenta_bancaria">Cuenta Bancaria del Proveedor <span style="color:red;">*</span></label>
-                                                <input readonly type="text" class="form-control" id="cuenta_bancaria" name="cuenta_bancaria" value="<?= (isset($reserva->banco_completo) && !empty($reserva->banco_completo))?$reserva->banco_completo:''?>">
-                                                <div class="invalid-feedback">
-                                                    Campo no Valido
-                                                </div>
-                                            </div><!--end col-->
-                                            <div class="col-md-4 mb-3">
-                                                <label for="fecha_gasto_inicio">Fecha de gasto inicio <span style="color:red;">*</span></label>
-                                                <input type="date" class="form-control" id="fecha_gasto_inicio" name="fecha_gasto_inicio" 
-                                                value="<?= isset($registro_pt->fecha_gasto_inicio) ? date('Y-m-d', strtotime($registro_pt->fecha_gasto_inicio)) : date('Y-m-d') ?>" 
-                                                required>
-                                            </div><!--end col-->
-                                            <div class="col-md-4 mb-3">
-                                                 <label for="fecha_gasto_fin">Fecha de gasto fin <span style="color:red;">*</span></label>
-                                                <input type="date" class="form-control" id="fecha_gasto_fin" name="fecha_gasto_fin" 
-                                                value="<?= isset($registro_pt->fecha_gasto_fin) ? date('Y-m-d', strtotime($registro_pt->fecha_gasto_fin)) : date('Y-m-d') ?>" 
-                                                required>
+                                               <div class="col-md-4 mb-3">
+                                                <label for="secretario">Subsecretario(a) o Director(a) General Responsable</label><span class="text-danger">*</span>
+                                                <select type="text" class="form-control" id="secretario" placeholder="Secretario/a" name="secretario">
+                                                            <option value="0" selected >Seleccione una opcion</option>
+                                                    <?php foreach($cat_subsecretario as $s): ?>
+                                                        <?php if(isset($registro_pt->id_subsecretario) && !empty($registro_pt->id_subsecretario)){  ?>
+                                                        <option value="<?= $s->id_subsecretario?>" <?= ($s->id_subsecretario == $registro_pt->id_subsecretario)?'selected':'' ?> ><?= $s->dsc_subsecretario?></option>
+                                                         <?php }else{ ?>
+                                                              <option value="<?= $s->id_subsecretario?>" ><?= $s->dsc_subsecretario?></option>
+                                                         <?php } ?>
+                                                    <?php endforeach; ?>
+                                                </select>
                                             </div><!--end col-->
                                         </div><!--end form-row-->
+
                                         <div class="form-row">
                                             <div class="col-md-6 mb-6">
                                                 <label for="formato_establecido">Formatos establecidos en los Lineamientos Generales de Racionalidad, Austeridad y Disciplina Presupuestal de la Administración Pública Estatal vigente o formatos establecidos en la regulación del trámite ingresado.<span style="color:red;">*</span></label>
@@ -173,37 +146,26 @@
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="contrato_convenio">Contrato o Convenio.<span style="color:red;">*</span></label>
-                                                <select type="text" class="form-control" id="contrato_convenio"  name="contrato_convenio" >
-                                                  <?php foreach( $cat_opcion as $o ): ?>
-                                                    <option value="<?=$o->id_opcion ?>" <?= (isset($registro_pt->contrato_convenio) && $registro_pt->contrato_convenio == $o->id_opcion)?'selected':'' ?> ><?=$o->des_opcion ?></option>
-                                                  <?php endforeach; ?>
-                                               </select>
+                                                <input type="text" class="form-control" id="contrato_convenio" value="NO" name="contrato_convenio" readonly>
                                                
                                             </div><!--end col-->
                                         </div><!--end form-row-->
                                         <div class="form-row">
                                             <div class="col-md-4 mb-3">
                                                 <label for="documentacion_requerida">Documentación requerida para emitir el pago.<span style="color:red;">*</span></label>
-                                                 <select type="text" class="form-control" id="documentacion_requerida"  name="documentacion_requerida" >
-                                                 <?php foreach( $cat_opcion as $o ): ?>
-                                                    <option value="<?=$o->id_opcion ?>" <?= (isset($registro_pt->documentacion_requerida) && $registro_pt->documentacion_requerida == $o->id_opcion)?'selected':'' ?> ><?=$o->des_opcion ?></option>
-                                                  <?php endforeach; ?>
-                                               </select>
+                                                <input type="text" class="form-control" id="documentacion_requerida" value="SI" name="documentacion_requerida" readonly>
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="evidencia_entrega">Evidencia de entregable.<span style="color:red;">*</span></label>
                                                 <select type="text" class="form-control" id="evidencia_entrega"  name="evidencia_entrega" >
                                                <?php foreach( $cat_opcion as $o ): ?>
-                                                    <option value="<?=$o->id_opcion ?>" <?= (isset($registro_pt->evidencia_entrega) && $registro_pt->evidencia_entrega == $o->id_opcion)?'selected':'' ?> ><?=$o->des_opcion ?></option>
+                                                    <option value="<?=$o->id_opcion ?>" <?= ($o->id_opcion == 2)?'selected':'' ?> ><?=$o->des_opcion ?></option>
                                                 <?php endforeach; ?>
                                                </select>
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
-                                                <label for="otros">Otros</label>
-                                                <input type="text" class="form-control" id="otros"  name="otros" >
-                                                <div class="invalid-feedback">
-                                                    Please provide a valid state.
-                                                </div>
+                                                <label for="concepto_gasto">Concepto del gasto<span style="color:red;">*</span></label>
+                                                <input type="text" class="form-control" id="concepto_gasto" placeholder="Concepto del gasto" name="concepto_gasto" >
                                             </div><!--end col-->
                                         </div><!--end form-row-->
                                         <div class="form-row">
@@ -244,6 +206,10 @@
                                                     Campo no Valido
                                                 </div>
                                             </div><!--end col-->
+                                             <div class="col-md-4 mb-3">
+                                                <label for="lugar">Lugar<span style="color:red;">*</span></label>
+                                                <input type="text" class="form-control" id="lugar" placeholder="Lugar" name="lugar" >
+                                            </div><!--end col-->
                                         </div><!--end form-row-->
                                         
                                        
@@ -281,7 +247,7 @@
                                                         <div class="col-md-4 mb-3">
                                                             <label for="periodo_<?= $i ?>">Periodo<span style="color:red;">*</span></label>
                                                             <div class="input-group">                                            
-                                                                <input type="text" class="form-control" name="datetimes" id="periodo_<?= $i ?>" name="periodo[]">
+                                                                <input type="text" class="form-control"  id="periodo_<?= $i ?>" name="periodo[]">
                                                                 <div class="input-group-append">
                                                                     <span class="input-group-text"><i class="dripicons-calendar"></i></span>
                                                                 </div>

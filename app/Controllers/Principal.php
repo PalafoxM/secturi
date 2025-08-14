@@ -858,13 +858,12 @@ class Principal extends BaseController {
                             $i++;
                 }
          }
-       $email->setTo('palafox.marin@hotmail.com');
+     
       /*  $email->setTo([
             'alopez@guanajuato.gob.mx',
             'negonzalez@guanajuato.gob.mx',
             'dhernandezq@guanajuato.gob.mx'
-        ]); */
-
+        ]); 
         $email->setSubject('Carga de Reserva');
         $email->setMessage('
             <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
@@ -893,7 +892,8 @@ class Principal extends BaseController {
           $response->respuesta = "Correo enviado correctamente.";
         } else {
           $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
-        } 
+        } */
+
            return $this->respond($response);
      
          
@@ -990,12 +990,12 @@ class Principal extends BaseController {
                 }
             
          }
-       $email->setTo('palafox.marin@hotmail.com');
+
       /*  $email->setTo([
             'alopez@guanajuato.gob.mx',
             'negonzalez@guanajuato.gob.mx',
             'dhernandezq@guanajuato.gob.mx'
-        ]); */
+        ]); 
 
         $email->setSubject('Carga de Reserva');
         $email->setMessage('
@@ -1025,7 +1025,7 @@ class Principal extends BaseController {
           $response->respuesta = "Correo enviado correctamente.";
         } else {
           $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
-        } 
+        } */
            return $this->respond($response);
      
          
@@ -1249,7 +1249,7 @@ class Principal extends BaseController {
                         }
                 }
          }
-    $this->enviarEmail();
+   // $this->enviarEmail();
 
     return $this->respond($response);
     }
@@ -2315,7 +2315,8 @@ class Principal extends BaseController {
         $cat_usuario            = $globals->getTabla(['tabla' => 'usuario', 'where' => ['visible' => 1 ]]);
         $cat_director_general   = $globals->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1 ]]);
         $cat_opcion             = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1 ]]);
-        $cat_partida             = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1 ]]);
+        $cat_partida            = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1 ]]);
+        $cat_subsecretario      = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1 ]]);
         if($id_reserva_go != 0){
           $data['reserva']      = (!empty($reserva->data))?$reserva->data[0]:[];
           $data['presupuesto']  = (!empty($presupuesto->data))?$presupuesto->data:[];
@@ -2323,12 +2324,14 @@ class Principal extends BaseController {
         if(!empty($id_registro_pt)){
            $data['registro_pt']  = (!empty($registro_pt->data))?$registro_pt->data[0]:[];
         }
-    
+      //  var_dump( $cat_subsecretario   );
+       // die();
         $data['dsc_director_general'] = (!empty($cat_director_general->data))?$cat_director_general->data[0]->dsc_director_general:[];
         $data['cat_area']             = (!empty($cat_area->data))?$cat_area->data:[];
         $data['cat_tipo']             = (!empty($cat_tipo->data))?$cat_tipo->data:[];
         $data['cat_opcion']           = (!empty($cat_opcion->data))?$cat_opcion->data:[];
         $data['cat_partida']          = (!empty($cat_partida->data))?$cat_partida->data:[];
+        $data['cat_subsecretario']    = (!empty($cat_subsecretario->data))?$cat_subsecretario->data:[];
        // $data['editar']               = (!empty($id_reserva) || $id_reserva != 0)?0:1;
         $data['secretario']           = (!empty($secretario->data))?$secretario->data:[];
         $data['usuario']              = (!empty($usuario->data))?$usuario->data[0]:[];

@@ -67,6 +67,30 @@ class Agregar extends BaseController {
        $data['contentView'] = 'formularios/vFormAgregar';                
        $this->_renderView($data);
     }
+   public function procesarPediodo(array $periodo, $id_registro_pt= null)
+    {
+        $session = \Config\Services::session();
+        $data = array();
+        $this->globals = new Mglobal();
+     
+        foreach ($periodo as $p) {
+          
+            $dataConfig = [
+                    "tabla"=>"periodo_factura",
+                    "editar"=>false 
+                ];
+             $dataInsert = [
+                        'id_registro_pt' => (int)$id_registro_pt,
+                        'periodo'        => $p,
+                    ];
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardarFacturaPDF'];
+        $response = $this->globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
+
+          }
+        
+
+        //return false;
+    }
    public function procesarPDF(array $archivos, $id_registro_pt= null)
     {
         $session = \Config\Services::session();
@@ -256,6 +280,8 @@ class Agregar extends BaseController {
             $response->respuesta = "Es requerido el no_reserva";
             return $this->respond($response);
         }
+        //var_dump($data);
+        //die();
            
            $dataInsert = [
                         'id_reserva'               => (int)$data['id_reserva'],
@@ -307,8 +333,16 @@ class Agregar extends BaseController {
             $id_registro_pt = $response->idRegistro;
             $archivosXml = [];
             $archivosPdf = [];
+            $periodo = [];
             $response->idRegistro = $response->idRegistro;
-
+              
+            foreach( $data as $key => $p){
+              
+                if (strpos($key, 'encabezado') === 0) {
+                        $periodo = array_merge($periodo, $p);
+                } 
+            }
+          
             // Recorremos todas las claves de los archivos enviados
             foreach ($archivos as $key => $fileArray) {
                 if (strpos($key, 'factura_xml_') === 0) {
@@ -317,9 +351,12 @@ class Agregar extends BaseController {
                     $archivosPdf = array_merge($archivosPdf, $fileArray);
                 }
             }
-
+        
+       
            $datosXML = $this->procesarXML($archivosXml, $id_registro_pt);
            $datosPDF =$this->procesarPDF($archivosPdf, $id_registro_pt);
+           $datosP =$this->procesarPediodo($periodo, $id_registro_pt);
+          
 
             if (!$datosXML) {
                 $response->errorXML     =  true;
