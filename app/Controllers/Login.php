@@ -74,6 +74,51 @@ class Login extends BaseController {
 
         return $this->response->setJSON(['success' => false, 'msg' => 'Datos incompletos']);
     }
+    private function registrarAsistencia2($id_usuario = null)
+    {
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = "Error al validar usuario";
+        $response->asistencia = true;
+     
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        
+        if ($id_usuario) {
+            $hora = date("H:i:s"); 
+            $fecha_hoy = date("Y-m-d"); // Solo la fecha
+            
+            $check = $globals->getTabla([
+                'tabla' => 'asistencia',
+                'where' => ['id_usuario' => $id_usuario, 'visible' => 1],
+                'like' => ['fecha' => $fecha_hoy]
+            ]);
+            
+            if (empty($check->data)) {
+                $dataConfig = [
+                    "tabla" => 'asistencia',
+                    "editar" => false
+                ];
+                $dataInsert = [
+                    "id_usuario" => $id_usuario,
+                    "fecha" => $fecha_hoy,
+                    "turno" => 'DIA(08:30-16:00)',
+                    "entrada" => $hora,
+                    "latitud" => $Latitud,
+                    "longitud" => $Longitud
+                ];
+                $result = $globals->saveTabla($dataInsert, $dataConfig, ["script" => "asistencia.agregarAsiatencia"]);
+                $response->error = $result->error;
+                $response->respuesta = $result->respuesta;
+                $response->asistencia = !$result->error;
+            } else {
+                $response->respuesta = "Ya registraste tu asistencia hoy";
+                 $response->error = false;
+            }
+        }
+        
+        return $response;
+    }
     private function registrarAsistencia($id_usuario = null, $Latitud = null, $Longitud = null)
     {
         $response = new \stdClass();
@@ -177,6 +222,45 @@ class Login extends BaseController {
         return $this->respond($response);
     }
     public function validar_usuario(){
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = "Error al validar usuario";
+        $session = \Config\Services::session();
+        $catalogos = new Mglobal;
+        
+        $usuario     = $this->request->getPost('usuario');
+        $contrasenia = $this->request->getPost('contrasenia');
+
+  
+        $dataDB = array('tabla' => 'usuario', 'where' =>[ "usuario" => $usuario, "contrasenia"  => md5($contrasenia), "visible" => 1]);
+       
+        if($usuario && $contrasenia){
+            $result = $catalogos->getTabla($dataDB);
+            
+            if(isset($result->data) && !empty($result->data)){
+                $session->set('logueado', 1);
+                $session->set('id_usuario',$result->data[0]->id_usuario);
+                $session->set('usuario',$result->data[0]->usuario);
+                $session->set('nombre_completo',$result->data[0]->nombre." ".$result->data[0]->primer_apellido." ".$result->data[0]->segundo_apellido);
+                $session->set('id_perfil',$result->data[0]->id_perfil);
+                $session->set('fec_nac',$result->data[0]->fec_nac);
+                $session->set('correo',$result->data[0]->correo);
+                $session->set('foto',$result->data[0]->ruta_foto_relativa);
+                $subordinados = $catalogos->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_jefe_inmediato' => $result->data[0]->id_usuario]])->data;
+                $esJefe = (!empty($subordinados))?true:false;
+                $session->set('esJefe', $esJefe);
+                $response->error     = $result->error;
+                $response->respuesta = $result->respuesta;
+                $asistencia = $this->registrarAsistencia($result->data[0]->id_usuario );
+                if(!$asistencia->error){
+                   $response->asistencia = $asistencia->asistencia;
+                }
+                
+            }     
+        }        
+        return $this->respond($response);
+    }
+    public function validar_usuario2(){
         $response = new \stdClass();
         $response->error = true;
         $response->respuesta = "Error al validar usuario";
