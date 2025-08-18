@@ -70,11 +70,11 @@
                                         <div class="form-row">
                                             <div class="col-md-4 mb-3">
                                                 <label for="clave_nivel">Clave o nivel del puesto<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" id="clave_nivel" name="clave_nivel" >
+                                                <input type="text" class="form-control" autocomplete="off" id="clave_nivel" name="clave_nivel" >
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="area_adscripcion">Area de adscripcion<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" id="area_adscripcion" name="area_adscripcion">
+                                                <input type="text" class="form-control" autocomplete="off" id="area_adscripcion" name="area_adscripcion">
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                  <label for="nombre_completo">Nombre<span style="color:red;">*</span></label>
@@ -104,7 +104,7 @@
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="no_personas">Número de personas acompañantes en el encargo o comisión<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" id="no_personas"  name="no_personas">
+                                                <input type="text" class="form-control" id="no_personas" autocomplete="off" name="no_personas">
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="importe_ejercicio">Importe ejercido por el total de acompañantes<span style="color:red;">*</span></label>
@@ -135,10 +135,7 @@
                                         <div class="form-row">
                                             <div class="col-md-4 mb-3">
                                                 <label for="ciudad_origen">Ciudad origen del encargo o comisión<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" id="ciudad_origen" name="ciudad_origen">
-                                                <div class="invalid-feedback">
-                                                    Campo no Valido
-                                                </div>
+                                                <input type="text" class="form-control" autocomplete="off" id="ciudad_origen" name="ciudad_origen">
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="pais_destino">País destino del encargo o comisión<span style="color:red;">*</span></label>
@@ -149,7 +146,7 @@
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="estado_destino">Estado destino del encargo o comisión</label>
-                                                <input type="text" class="form-control" id="estado_destino"  name="estado_destino" >
+                                                <input type="text" class="form-control" id="estado_destino" autocomplete="off"  name="estado_destino" >
                                                 <div class="invalid-feedback">
                                                     Please provide a valid state.
                                                 </div>
@@ -162,56 +159,56 @@
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="motivo_encargo">Motivo del encargo o comisión<span style="color:red;">*</span></label>
-                                                <input type="number" class="form-control" autocomplete="off" id="motivo_encargo" name="motivo_encargo" >
+                                                <input type="text" class="form-control" autocomplete="off" id="motivo_encargo" name="motivo_encargo" >
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="fec_salida">Fecha de salida del encargo o comisión<span style="color:red;">*</span></label>
-                                                <input type="number" class="form-control" autocomplete="off" id="fec_salida" name="fec_salida" >
+                                                <input type="date" class="form-control" autocomplete="off" id="fec_salida" name="fec_salida" >
                                             </div><!--end col-->
                                         </div><!--end form-row-->
                                         <div class="form-row">
                                             <div class="col-md-4 mb-3">
-                                                <label for="no_reserva">Fecha de regreso del encargo o comisión<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" autocomplete="off" id="no_reserva" name="no_reserva">
+                                                <label for="fec_regreso">Fecha de regreso del encargo o comisión<span style="color:red;">*</span></label>
+                                                <input type="date" class="form-control" autocomplete="off" id="fec_regreso" name="fec_regreso">
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
-                                                <label for="no_consecutivo">Importe ejercido por partida por concepto<span style="color:red;">*</span></label>
-                                                <input type="number" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo" >
+                                                <label for="importe_ejercicio">Importe ejercido por partida por concepto<span style="color:red;">*</span></label>
+                                                <input type="text" class="form-control" autocomplete="off" id="importe_ejercicio" name="importe_ejercicio" >
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
-                                                <label for="no_consecutivo">Importe total erogado con motivo del encargo o comisión<span style="color:red;">*</span></label>
-                                                <input type="number" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo" >
+                                                <label for="importe_total">Importe total erogado con motivo del encargo o comisión<span style="color:red;">*</span></label>
+                                                <input type="text" class="form-control" autocomplete="off" id="importe_total" name="importe_total" >
                                             </div><!--end col-->
                                         </div><!--end form-row-->
                                         <div class="form-row">
                                             <div class="col-md-4 mb-3">
-                                                <label for="no_reserva">Fecha de entrega del informe de la comisión o encargo<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" autocomplete="off" id="no_reserva" name="no_reserva">
+                                                <label for="fec_entraga_informa">Fecha de entrega del informe de la comisión o encargo<span style="color:red;">*</span></label>
+                                                <input type="date" class="form-control" autocomplete="off" id="fec_entraga_informa" name="fec_entraga_informa">
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
-                                                <label for="no_consecutivo">Hipervínculo al informe de la comisión o encargo encomendado<span style="color:red;">*</span></label>
-                                                <input type="number" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo">
+                                                <label for="hipervinculo_informe">Hipervínculo al informe de la comisión o encargo encomendado<span style="color:red;">*</span></label>
+                                                <input type="text" class="form-control" autocomplete="off" id="hipervinculo_informe" name="hipervinculo_informe">
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
-                                                <label for="no_consecutivo">Hipervínculo a las facturas o comprobantes.<span style="color:red;">*</span></label>
-                                                <input type="number" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo" >
+                                                <label for="hipervinculo_factura">Hipervínculo a las facturas o comprobantes.<span style="color:red;">*</span></label>
+                                                <input type="text" class="form-control" autocomplete="off" id="hipervinculo_factura" name="hipervinculo_factura" >
                                             </div><!--end col-->
                                         </div><!--end form-row-->
                                             <div class="form-row">
                                             <div class="col-md-4 mb-3">
-                                                <label for="no_reserva">Hipervínculo a normativa que regula los gastos por concepto de viáticos y gastos de representación<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" autocomplete="off" id="no_reserva" name="no_reserva">
+                                                <label for="hipervinculo_normativa">Hipervínculo a normativa que regula los gastos por concepto de viáticos y gastos de representación<span style="color:red;">*</span></label>
+                                                <input type="text" class="form-control" autocomplete="off" id="hipervinculo_normativa" name="hipervinculo_normativa">
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
-                                                <label for="no_consecutivo">Área(s) responsable(s) que genera(n), posee(n), publica(n) y actualizan la información<span style="color:red;">*</span></label>
-                                                <input type="number" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo">
+                                                <label for="area_responsabe">Área(s) responsable(s) que genera(n), posee(n), publica(n) y actualizan la información<span style="color:red;">*</span></label>
+                                                <input type="text" class="form-control" autocomplete="off" id="area_responsabe" name="area_responsabe">
                                             </div><!--end col-->
 
                                         </div><!--end form-row-->
                                         <div class="form-row">
                                             <div class="col-md-12 mb-3">
-                                                <label for="no_reserva">Notas<span style="color:red;">*</span></label>
-                                                <textarea type="text" class="form-control"></textarea> 
+                                                <label for="nota">Notas<span style="color:red;">*</span></label>
+                                                <textarea type="text" class="form-control" name="nota" id="nota"></textarea> 
                                             </div><!--end col-->
                                             
                                         </div><!--end form-row-->
@@ -274,12 +271,6 @@
         <script src="<?= base_url()?>plugins/bootstrap-touchspin/js/jquery.bootstrap-touchspin.min.js"></script>
 
         <script src="<?= base_url()?>assets/pages/jquery.forms-advanced.js"></script>
-        
-
-     
-        
-
-
         <script>
             ini.inicio.formViatico();
         </script>

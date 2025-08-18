@@ -69,6 +69,18 @@ class Inicio extends BaseController {
         $data['contentView'] =   $vista;
         $this->_renderView($data);
     }
+    public function ListaViaticos()
+    {        
+        $session = \Config\Services::session();
+        $globas  = new Mglobal;
+        $vista = 'personal/vInicio';
+        $data['datos'] = $globas->getTabla(['tabla' => 'juridico_viaticos', 'where' => ['visible' => 1]])->data;
+        $data['scripts'] = array('principal','inicio');
+        $data['edita'] = 0;
+        $data['contentView'] = 'personal/vListaViaticos';                
+        $this->_renderView($data);
+        
+    }
     public function Viaticos()
     {        
         $session = \Config\Services::session();

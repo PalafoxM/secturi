@@ -869,13 +869,57 @@ class Agregar extends BaseController {
         }
     public function formViatico()
     {
-        $session     = \Config\Services::session();
-        $response    = new stdClass();
-        $Mglobal   = new Mglobal;
-        $data = $this->request->getPost();
-        var_dump($data );
-        die();
-
+        $session  = \Config\Services::session();
+        $response = new stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error al insertar en la tabla';
+        $globals  = new Mglobal;
+        $data     = $this->request->getPost();
+      //  if($this->validarViativos()); return false
+        $dataInsert = [
+        'ejercicio'              =>$data['ejercicio'],
+        'fecha_inicio'           =>date('Y-m-d', strtotime($data['fecha_inicio'])),
+        'fecha_termino'          =>date('Y-m-d', strtotime($data['fecha_termino'])),
+        'denominacion_puesto'    =>$data['denominacion_puesto'],
+        'denomicacion_carga'     =>$data['denomicacion_carga'],
+        'clave_nivel'            =>$data['clave_nivel'],
+        'id_usuario'             =>(int)$session->get('id_usuario'),
+        'tipo_integrante'        =>(int)$data['tipo_integrante'],
+        'tipo_viaje'             =>(int)$data['tipo_viaje'],
+        'tipo_gasto'             =>(int)$data['tipo_gasto'],
+        'no_personas'            =>(int)$data['no_personas'],
+   /*     'importe_ejercicio'      =>$data['importe_ejercicio'],
+        'fec_actualizacion'      =>$data['fec_actualizacion'],
+        'pais_origen'            =>(int)$data['pais_origen'],
+        'estado_origen'          =>(int)$data['estado_origen'],
+        'ciudad_origen'          =>(int)$data['ciudad_origen'],
+        'pais_destino'           =>(int)$data['pais_destino'],
+        'estado_destino'         =>(int)$data['estado_destino'],
+        'ciudad_destino'         =>(int)$data['ciudad_destino'],
+        'motivo_encargo'         =>$data['motivo_encargo'],
+        'fec_salida'             =>date('Y-m-d', strtotime($data['fec_salida'])),
+        'fec_regreso'            =>date('Y-m-d', strtotime($data['fec_regreso'])),
+        'importe_total'          =>$data['importe_total'],
+        'fec_entraga_informa'    =>$data['fec_entraga_informa'],
+        'hipervinculo_informe'   =>$data['hipervinculo_informe'],
+        'hipervinculo_factura'   =>$data['hipervinculo_factura'],
+        'hipervinculo_normativa' =>$data['hipervinculo_normativa'],
+        'area_responsabe'        =>$data['area_responsabe'],
+        'nota'                   =>$data['nota'], */
+        ];
+     
+ 
+        $dataConfig = [
+            "tabla"=>"juridico_viaticos",
+            "editar"=>false
+        ];
+        $dataBitacora = ['id_user' =>$session->get('id_usuario'), 'script' => 'Agregar.php/guardaViatico'];
+        $result = $globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
+        if(!$result->error){
+            $response->error     = false;
+            $response->respuesta = $result->respuesta;
+        }
+        return $this->respond($response);
 
     }
     public function ReservarSala() {

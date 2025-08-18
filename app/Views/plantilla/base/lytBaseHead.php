@@ -459,7 +459,7 @@
                         <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Inicio/Viaticos">viáticos/representación</a></li>
                         <li class="nav-item"><a class="nav-link"
-                                href="<?php echo base_url(); ?>authentication/auth-login-alt.html">Log in alt</a></li>
+                                href="<?php echo base_url(); ?>index.php/Inicio/ListaViaticos">Lista Viáticos</a></li>
                         <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>authentication/auth-register.html">Register</a></li>
                         <li class="nav-item"><a class="nav-link"

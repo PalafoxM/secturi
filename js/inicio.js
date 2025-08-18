@@ -3531,7 +3531,15 @@ ini.inicio = (function () {
                     contentType: false,  // Importante para FormData
                     dataType: "json",
                     success: function (response) {
-                        console.log(response);
+                        if(!response.error){
+                            Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
+                            setTimeout(() => {
+                               // window.location.href = base_url + "index.php/Principal/listadoEstatusPT";
+                                window.location.href = base_url + "index.php/Inicio/ListaViaticos";
+                            }, 1500);
+                        }else{
+                            Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
+                        }
                     },
                     beforeSend: function (info){
                          $('#btnGuardarViatico').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
