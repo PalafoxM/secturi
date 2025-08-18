@@ -85,7 +85,13 @@ class Inicio extends BaseController {
     {        
         $session = \Config\Services::session();
         $data        = array();
-        $data['scripts'] = array('inicio', 'principal');
+        $globas  = new Mglobal;
+        $data['cat_funcionario'] = $globas->getTabla(['tabla' => 'cat_tipo_funcionario', 'where' => ['visible' => 1]])->data;
+        $data['cat_gasto']       = $globas->getTabla(['tabla' => 'cat_gasto', 'where' => ['visible' => 1]])->data;
+        $data['cat_viaje']       = $globas->getTabla(['tabla' => 'cat_viaje', 'where' => ['visible' => 1]])->data;
+        $data['cat_pais']        = $globas->getTabla(['tabla' => 'cat_pais', 'where' => ['visible' => 1]])->data;
+        $data['cat_estado']      = $globas->getTabla(['tabla' => 'cat_estado', 'where' => ['visible' => 1]])->data;
+        $data['scripts']         = array('inicio', 'principal');
         $data['edita'] = 0;
         $data['contentView'] = 'secciones/vViaticos';                
         $this->_renderView($data);

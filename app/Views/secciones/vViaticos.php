@@ -85,23 +85,30 @@
                                             <div class="col-md-4 mb-6">
                                                 <label for="formato_establecido">Tipo de integrante del sujeto obligado<span style="color:red;">*</span></label>
                                                   <select class="form-control" id="tipo_integrante" name="tipo_integrante" required>
-                                                    <option value="1" ></option>
+                                                    <?php foreach($cat_funcionario as $p): ?>
+                                                    <option value="<?= $p->id_tipo_funcionario ?>" ><?= $p->dsc_tipo_funcionario ?></option>
+                                                    <?php endforeach; ?>
                                                 </select>
                                             </div><!--end col-->
                                               <div class="col-md-4 mb-6">
                                                 <label for="tipo_viaje">Tipo de Viaje<span style="color:red;">*</span></label>
                                                <select class="form-control" id="tipo_viaje" name="tipo_viaje" required>
-                                                    <option value="1" ></option>
+                                                     <?php foreach($cat_viaje as $c): ?>
+                                                    <option value="<?= $c->id_viaje ?>" ><?= $c->dsc_viaje ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div><!--end col-->
+                                            <div class="col-md-4 mb-6">
+                                                <label for="tipo_gasto">Tipo de gasto<span style="color:red;">*</span></label>
+                                               <select class="form-control" id="tipo_gasto" name="tipo_gasto">
+                                                      <?php foreach($cat_gasto as $c): ?>
+                                                    <option value="<?= $c->id_gasto ?>" ><?= $c->dsc_gasto ?></option>
+                                                    <?php endforeach; ?>
                                                 </select>
                                             </div><!--end col-->
                                         </div><!--end form-row-->
                                         <div class="form-row">
-                                           <div class="col-md-4 mb-6">
-                                                <label for="tipo_gasto">Tipo de gasto<span style="color:red;">*</span></label>
-                                               <select class="form-control" id="tipo_gasto" name="tipo_gasto">
-                                                    <option value="1" ></option>
-                                                </select>
-                                            </div><!--end col-->
+                                         
                                             <div class="col-md-4 mb-3">
                                                 <label for="no_personas">Número de personas acompañantes en el encargo o comisión<span style="color:red;">*</span></label>
                                                 <input type="text" class="form-control" id="no_personas" autocomplete="off" name="no_personas">
@@ -111,24 +118,28 @@
                                               <select class="form-control" id="importe_ejercicio" name="importe_ejercicio">
                                                     <option value="1" ></option>
                                                 </select>
-                                               
                                             </div><!--end col-->
-                                        </div><!--end form-row-->
-                                        <div class="form-row">
-                                            <div class="col-md-4 mb-3">
+                                             <div class="col-md-4 mb-3">
                                                 <label for="fec_actualizacion">Fecha de actualización<span style="color:red;">*</span></label>
                                                 <input type="date" class="form-control" autocomplete="off" id="fec_actualizacion" name="fec_actualizacion" placeholder="001">
                                             </div><!--end col-->
+                                        </div><!--end form-row-->
+                                        <div class="form-row">
+                                           
                                             <div class="col-md-4 mb-3">
                                                 <label for="pais_origen">País origen del encargo o comisión<span style="color:red;">*</span></label>
-                                               <select class="form-control" id="pais_origen" name="pais_origen" >
-                                                    <option value="1" ></option>
+                                               <select class="select2 form-control" id="pais_origen" name="pais_origen" >
+                                                    <?php foreach($cat_pais as $p): ?>
+                                                    <option value="<?= $p->id_pais ?>" ><?= $p->dsc_pais ?></option>
+                                                    <?php endforeach; ?>
                                                 </select>
                                             </div><!--end col-->
                                              <div class="col-md-4 mb-3">
                                                 <label for="estado_origen">Estado origen del encargo o comisión<span style="color:red;">*</span></label>
-                                               <select class="form-control" id="estado_origen" name="estado_origen" >
-                                                    <option value="1" ></option>
+                                               <select class="select2 form-control" id="estado_origen" name="estado_origen" >
+                                                      <?php foreach($cat_estado as $p): ?>
+                                                    <option value="<?= $p->id_estado ?>" ><?= $p->dsc_estado ?></option>
+                                                    <?php endforeach; ?>
                                                 </select>
                                             </div><!--end col-->
                                         </div><!--end form-row-->
