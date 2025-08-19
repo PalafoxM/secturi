@@ -44,6 +44,7 @@
                                                     <tr>
                                                         <th class="text-center">ID AREA</th>
                                                         <th class="text-center">AREA</th>
+                                                        <th class="text-center">SIGLAS</th>
                                                         <th class="text-center">ESTATUS</th>
                                                         <th class="text-center">ACCIONES</th>
                                                     </tr>
@@ -55,6 +56,7 @@
                                                     <tr>
                                                         <td class="text-center"><?= $p->id_area?></td>
                                                         <td class="text-center"><?= $p->dsc_area?></td>
+                                                        <td class="text-center"><?= $p->dsc_corto?></td>
                                                         <td class="text-center">
                                                             <?php if($p->visible == 1):?>
                                                             <i class="mdi mdi-eye text-success font-18"></i>
@@ -101,6 +103,52 @@
     </div>
     <!-- end page content -->
 </div>
+
+ 
+    <div id="modalArea" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Actualizar Area</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                    <input type="hidden" id="id_area" >
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="dsc_area">ÁREA</label>
+                                <input type="text" class="form-control" id="dsc_area">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="dsc_corto">SIGLAS</label>
+                                <input type="text" class="form-control" id="dsc_corto">
+                            </div>
+                        </div>
+                         <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="des_corto">SIGLAS</label>
+                               <select class="form-control select2" id="titular" name="titular">
+                                  <?php foreach($usuario as $u): ?>
+                                    <option value="<?= $u->id_usuario?>" ><?= $u->nombre_completo ?></option>
+                                  <?php endforeach; ?>
+                               </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                      <button type="button" class="btn btn-primary" id="guardarEdicionArea" onclick="ini.inicio.guardarEdicionArea();" >Guardar cambios</button>
+                   </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 <link href="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet"

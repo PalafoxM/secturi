@@ -2143,60 +2143,70 @@ ini.inicio = (function () {
                 }
             });
         },
-        editarArea: function(id)
+       editarArea: function(id)
         {
             $.ajax({
                 type: "POST",
                 url: base_url + "index.php/Usuario/getArea",
                 dataType: "json",
                 data:{id_area:id},
-                success: function(data) {
-                    console.log(data);
-                    Swal.fire({
-                        title: "<strong>EDITAR DE LA ÁREA</strong>",
-                        icon: "info",
-                        html: `<textarea id="comentarioInput" class="form-control" placeholder="Escriba la Categoria">${data.dsc_area}</textarea>`,
-                        showCloseButton: true,
-                        showCancelButton: true,
-                        focusConfirm: false,
-                        confirmButtonText: "Guardar",
-                        cancelButtonText: "Cancelar"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            const comentario = document.getElementById("comentarioInput").value.trim();       
-                        
-                            if (comentario === "") {
-                                Swal.fire("Error", "El campo no puede estar vacío.", "error");
-                                return;
-                            }
-                            const data = {comentario, editar:1, id_area:id };
-                            $.ajax({
-                                type: "POST",
-                                url: base_url + "index.php/Usuario/guardarArea",
-                                dataType: "json",
-                                data:data,
-                                success: function(data) {
-                                    console.log(data);
-                                    if (!data.error) {
-                                        Swal.fire("Éxito", "Se guardo correctamente.", "success")
-                                       
-                                    } else {
-                                        Swal.fire("Error", data.respuesta, "error");
-                                    }
-                                   
-                                },
-                                error: function() {
-                                    Swal.fire("Error", "Error al guardar comentario.", "error")
-                                }
-                            });
-                        }
-                    });
-                   
+                success: function(res) {
+                    console.log(res);
+                    let data = res.data;
+                    $('#dsc_area').val(data.dsc_area);
+                    $('#dsc_corto').val(data.dsc_corto);
+                    $('#id_area').val(id);
+                    if(data.titular){
+                      $('#titular').val(data.titular).change();
+                    }
+                },
+                complete: function(){
+                    $('#modalArea').modal('show');
                 },
                 error: function() {
                     Swal.fire("Error", "Error al guardar comentario.", "error")
                 }
             });
+        },
+        guardarEdicionArea: function()
+        {
+            let dsc_area   =  $('#dsc_area').val();
+            let dsc_corto  =  $('#dsc_corto').val();
+            let id_usuario =  $('#titular').val();
+            let id_area    =  $('#id_area').val();
+
+             $.ajax({
+                type: "POST",
+                url: base_url + "index.php/Usuario/guardarArea",
+                dataType: "json",
+                data:{dsc_area, dsc_corto, id_usuario, editar:1, id_area },
+                success: function(res) {
+                    console.log(res);
+                    if(res.error){
+                        Swal.fire("Atención", res.respuesta, "info")
+                    }else{
+                         Swal.fire("Correcto", res.respuesta, "success");
+                          $('#guardarEdicionArea').prop('disabled', false).html('Guardar cambios');
+                          setTimeout(() => {
+                            window.location.reload();
+                          }, 1500);
+                         
+                    }
+                 
+                },
+                beforeSend: function(){
+                         $('#guardarEdicionArea').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+
+                },
+                complete: function(){
+                    $('#modalArea').modal('show');
+                    
+                },
+                error: function() {
+                    Swal.fire("Error", "Error al guardar comentario.", "error")
+                }
+            });
+
         },
         editarPerfil: function(id)
         {

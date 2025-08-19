@@ -367,9 +367,11 @@ class Inicio extends BaseController {
     public function listaArea()
     {
         $session = \Config\Services::session();
-        $principal            = new Mglobal;
-        $cat_area             = $principal->getTabla(['tabla' => 'cat_area', 'where'=>['visible' => 1]]); 
-        $data['cat_area']     = (isset($cat_area->data) && !empty($cat_area->data))?$cat_area->data:[];
+        $principal           = new Mglobal;
+        $cat_area            = $principal->getTabla(['tabla' => 'cat_area', 'where'=>['visible' => 1]]); 
+        $usuario             = $principal->getTabla(['tabla' => 'vw_usuario', 'where'=>['visible' => 1]]); 
+        $data['cat_area']    = (isset($cat_area->data) && !empty($cat_area->data))?$cat_area->data:[];
+        $data['usuario']     = (isset($usuario->data) && !empty($usuario->data))?$usuario->data:[];
         $data['scripts']     = ['principal', 'inicio'];
         $data['contentView'] = 'secciones/vlistaArea';
         $this->_renderView($data);   

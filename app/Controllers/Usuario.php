@@ -1048,7 +1048,7 @@ class Usuario extends BaseController
         if(!$result->error){
             $response->error      =  false;
             $response->respuesta  =  $result->respuesta;
-            $response->dsc_area =  $result->data[0]->dsc_area;
+            $response->data =  $result->data[0];
         }
 
         return $this->respond($response);
@@ -1176,16 +1176,28 @@ class Usuario extends BaseController
         return $this->respond($response);
     }
     $data = $this->request->getPost();
+    //die( var_dump( $data ) );
     // Preparar datos según el tipo de operación
+
     switch ($data['editar']) {
         case 1: // Editar perfil
-            if (empty($data['comentario']) || empty($data['id_area'])) {
-                $response->respuesta = "Faltan datos requeridos para editar";
+            if (empty($data['dsc_area']) || empty($data['dsc_area'])) {
+                $response->respuesta = "El Area es requerida";
+                return $this->respond($response);
+            }
+            if (empty($data['dsc_corto']) || empty($data['dsc_corto'])) {
+                $response->respuesta = "Las SIGLAS son requeridas";
+                return $this->respond($response);
+            }
+            if (empty($data['id_usuario']) || empty($data['id_usuario'])) {
+                $response->respuesta = "El titular es requerido";
                 return $this->respond($response);
             }
             
             $dataInsert = [       
-                'dsc_area' => trim($data['comentario']),
+                'dsc_area'  => trim($data['dsc_area']),
+                'dsc_corto' => $data['dsc_corto'],
+                'titular'=> (int)$data['id_usuario'],
             ];
             $dataConfig = [
                 "tabla" => "cat_area",
@@ -1210,25 +1222,13 @@ class Usuario extends BaseController
             ];
             break;
             
-        default: // Nuevo perfil
-            if (empty($data['comentario'])) {
-                $response->respuesta = "Falta la descripción del perfil";
-                return $this->respond($response);
-            }
-            
-            $dataInsert = [       
-                'dsc_area' => trim($data['comentario']),
-                'visible' => 1 // Asegurar que nuevos perfiles estén visibles
-            ];
-            $dataConfig = [
-                "tabla" => "cat_area",
-                "editar" => false
-            ];
+   
     }
     
     // Intentar guardar
+     $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaCategoriasPadre'];
     try {
-        $response = $this->globals->saveTabla($dataInsert, $dataConfig, ["script" => "perfil.savePerfil"]);
+        $response = $this->globals->saveTabla($dataInsert, $dataConfig,$dataBitacora);
         return $this->respond($response);
     } catch (\Exception $e) {
         $response->error = true;
