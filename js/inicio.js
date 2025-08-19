@@ -1149,7 +1149,7 @@ ini.inicio = (function () {
             $('#btnConfirmarReserva').on('click', function () {
             const id = $('#id_reserva_estatus').val();
             const motivo = $('#motivo').val();
-            const observaciones = $('#observaciones').val();
+            const observaciones = $('#validar_observaciones').val();
             const numero_reserva = $('#validar_no_reserva').val();
         
             if (!motivo) {
