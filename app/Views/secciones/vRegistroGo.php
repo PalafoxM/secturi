@@ -183,8 +183,6 @@
                                                 <label for="lugar">Lugar<span style="color:red;">*</span></label>
                                                 <input type="text" class="form-control" id="lugar" placeholder="Lugar" name="lugar" >
                                             </div><!--end col-->
-                                        </div><!--end form-row-->
-                                        <div class="form-row">
                                             <div class="col-md-4 mb-3">
                                                 <label for="no_reserva">No. de Reserva.<span style="color:red;">*</span></label>
                                                 <input type="text" class="form-control" autocomplete="off" id="no_reserva" name="no_reserva"  value="<?= (isset($reserva->no_reserva))?$reserva->no_reserva:'' ?>" readonly>
@@ -192,6 +190,9 @@
                                                     Campo no Valido
                                                 </div>
                                             </div><!--end col-->
+                                        </div><!--end form-row-->
+                                        <div class="form-row">
+                                          
                                             <div class="col-md-4 mb-3">
                                                 <label for="no_consecutivo">No. Consecutivo.<span style="color:red;">*</span></label>
                                                 <input type="number" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo" placeholder="001"  value="<?= (isset($reserva->no_consecutivo))?$reserva->no_consecutivo:'' ?>" >
@@ -201,7 +202,7 @@
                                             </div><!--end col-->
                        
                                         </div><!--end form-row-->
-                                        
+                                        <br>
                                        
                                            <?php
                                                 $partidas_mostradas = [];
@@ -212,7 +213,7 @@
                                                     }
                                                     $partidas_mostradas[] = $p->id_partida;
                                                 ?>
-                                                    <p class="text-muted mb-4 text-center">Agregar Factura PT.</p>
+                                                    <p class="text-muted mb-4 text-center">Agregar Factura GO.</p>
                                                     <hr>
                                                     <div class="form-row"> <!-- presupuesto -->
                                                         <!-- Partida y Factura PDF -->
