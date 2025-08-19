@@ -3554,14 +3554,14 @@ ini.inicio = (function () {
                 });
           })
        },
-       formPT: function(){
-            $("#form_proveedor").submit(function (e) {
+       formGo: function(){
+            $("#form_go").submit(function (e) {
                 e.preventDefault(); 
                 var formData = new FormData(this); // Usar FormData en lugar de serialize
-
+               
                 $.ajax({
                     type: "POST",
-                    url: base_url + "index.php/Agregar/guardaPT",
+                    url: base_url + "index.php/Agregar/guardaGO",
                     data: formData,
                     processData: false,  // Importante para FormData
                     contentType: false,  // Importante para FormData
@@ -3579,10 +3579,10 @@ ini.inicio = (function () {
                         }
                     },
                     beforeSend: function (info){
-                         $('#btnGuardatPT').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                         $('#btnGuardaGo').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
                     },
                     complete: function (info){
-                        $('#btnGuardatPT').prop('disabled', false).html('Guardar');
+                        $('#btnGuardaGo').prop('disabled', false).html('Guardar');
                     },
                     error: function (response,jqXHR, textStatus, errorThrown) {
                         var res= JSON.parse(response.responseText);

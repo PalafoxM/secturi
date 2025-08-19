@@ -31,8 +31,9 @@
                                     <p class="text-muted mb-3" >
                                       GEG850101FQ2
                                     </p>
-                                   <form id="form_proveedor" enctype="multipart/form-data">
-                                        
+                                   <form id="form_go" enctype="multipart/form-data">
+                                        <input type="hidden" name="editar" value="<?= $editar ?>">
+                                        <input type="hidden" name="id_reserva_go" value="<?= $id_reserva ?>">
                                        <div class="form-row">
                                             <!-- Dirección Responsable -->
                                             <div class="col-md-4 mb-3">
@@ -139,7 +140,7 @@
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="formato_conformidad">Formato de conformidad del producto recibido.<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" id="formato_conformidad" value="SI" name="formato_conformidad" readonly>
+                                                <input type="text" class="form-control" id="formato_conformidad" value="NO" name="formato_conformidad" readonly>
                                                 <div class="invalid-feedback">
                                                     Please provide a valid state.
                                                 </div>
@@ -169,26 +170,18 @@
                                             </div><!--end col-->
                                         </div><!--end form-row-->
                                         <div class="form-row">
-                                            <div class="col-md-4 mb-3">
-                                                <label for="clausula_contrato">Claúsula del contrato.<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" id="clausula_contrato" name="clausula_contrato" value="<?=(isset($registro_pt->clausula_contrato))?$registro_pt->clausula_contrato:'TERCERA'?>">
-                                                <div class="invalid-feedback">
-                                                    Campo no Valido
-                                                </div>
-                                            </div><!--end col-->
-                                            <div class="col-md-4 mb-3">
-                                                <label for="concepto_pago">Concepto del pago.<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control"  autocomplete="off" id="concepto_pago" name="concepto_pago" value="<?= (isset($registro_pt->concepto_pago))?$registro_pt->concepto_pago:'' ?>" >
-                                                <div class="invalid-feedback">
-                                                    Please provide a valid state.
-                                                </div>
-                                            </div><!--end col-->
+                                       
+                                        
                                             <div class="col-md-4 mb-3">
                                                 <label for="comision">Comisión / Reunión / Evento / Programa</label>
                                                 <input type="text" class="form-control" id="comision"  name="comision" value="<?= (isset($registro_pt->comision))?$registro_pt->comision:'Comisión / Reunión / Evento / Programa' ?>" >
                                                 <div class="invalid-feedback">
                                                     Please provide a valid state.
                                                 </div>
+                                            </div><!--end col-->
+                                            <div class="col-md-4 mb-3">
+                                                <label for="lugar">Lugar<span style="color:red;">*</span></label>
+                                                <input type="text" class="form-control" id="lugar" placeholder="Lugar" name="lugar" >
                                             </div><!--end col-->
                                         </div><!--end form-row-->
                                         <div class="form-row">
@@ -206,10 +199,7 @@
                                                     Campo no Valido
                                                 </div>
                                             </div><!--end col-->
-                                             <div class="col-md-4 mb-3">
-                                                <label for="lugar">Lugar<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" id="lugar" placeholder="Lugar" name="lugar" >
-                                            </div><!--end col-->
+                       
                                         </div><!--end form-row-->
                                         
                                        
@@ -260,17 +250,14 @@
                                                             <p class="text-muted mb-3">Factura PDF (Máx 5MB)</p>
                                                             <input id="factura_pdf_input_<?= $i; ?>"  type="file" name="factura_pdf_<?= $i; ?>[]" class="dropify" multiple accept=".pdf" />   
                                                         </div>
-                                                        <div class="col-md-6 mb-3">
-                                                          
-                                                            <p class="text-muted mb-3">Factura XML (Máx 5MB)</p>
-                                                            <input id="factura_xml_input_<?= $i; ?>" type="file" name="factura_xml_<?= $i; ?>[]" multiple class="dropify"  accept=".xml">
-                                                        </div>
+                                                     
                                                     </div>
                                                 <?php endforeach; ?>
                                                     
                                         
 
                                             <a class="btn btn-gradient-danger" style="color:white" onclick="window.history.back()">Atrás</a>
+                                              <button class="btn btn-gradient-primary" id="btnGuardaGo" type="submit">Guardar</button>
                                         
                                     </form> <!--end form-->                                          
                                 </div><!--end card-body-->
@@ -338,7 +325,7 @@
 
 
         <script>
-            ini.inicio.formPT();
+            ini.inicio.formGo();
              $('.add-file').on('click', function(e) {
                 e.preventDefault();
                 const inputId = $(this).data('target');

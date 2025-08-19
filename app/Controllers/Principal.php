@@ -2288,7 +2288,7 @@ class Principal extends BaseController {
          return $this->respond($response);
         
     }
-    public function generarTramitePagoGo($id_reserva_go = null, $id_registro_pt =  null)
+    public function generarTramitePagoGo($id_reserva_go = null, $id_registro_go =  null)
     {  
         $session = \Config\Services::session();
         $response = new \stdClass();
@@ -2303,8 +2303,8 @@ class Principal extends BaseController {
             $reserva   = $globals->getTabla(['tabla' => 'vw_reserva_go', 'where' => ['id_reserva' => $id_reserva_go ]]);
             $presupuesto   = $globals->getTabla(['tabla' => 'presupuesto_go', 'where' => ['id_reserva' => $id_reserva_go ]]);
         }
-        if(!empty($id_registro_pt)){
-            $registro_pt   = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1, 'id_registro_pt' =>$id_registro_pt ]]);
+        if(!empty($id_registro_go)){
+            $registro_pt   = $globals->getTabla(['tabla' => 'vw_registro_go', 'where' => ['visible' => 1, 'id_registro_go' =>$id_registro_go ]]);
         }
 
         
@@ -2321,7 +2321,7 @@ class Principal extends BaseController {
           $data['reserva']      = (!empty($reserva->data))?$reserva->data[0]:[];
           $data['presupuesto']  = (!empty($presupuesto->data))?$presupuesto->data:[];
         }
-        if(!empty($id_registro_pt)){
+        if(!empty($id_registro_go)){
            $data['registro_pt']  = (!empty($registro_pt->data))?$registro_pt->data[0]:[];
         }
       //  var_dump( $cat_subsecretario   );
@@ -2332,11 +2332,12 @@ class Principal extends BaseController {
         $data['cat_opcion']           = (!empty($cat_opcion->data))?$cat_opcion->data:[];
         $data['cat_partida']          = (!empty($cat_partida->data))?$cat_partida->data:[];
         $data['cat_subsecretario']    = (!empty($cat_subsecretario->data))?$cat_subsecretario->data:[];
-       // $data['editar']               = (!empty($id_reserva) || $id_reserva != 0)?0:1;
+        $data['editar']               = (!empty($id_reserva_go) || $id_reserva_go == 0)?1:0;
+   
         $data['secretario']           = (!empty($secretario->data))?$secretario->data:[];
         $data['usuario']              = (!empty($usuario->data))?$usuario->data[0]:[];
         $data['cat_usuario']          = (!empty($cat_usuario->data))?$cat_usuario->data:[];
-        $data['id_reserva']          = (!empty($id_reserva))?$id_reserva:0;
+        $data['id_reserva']          = (!empty($id_reserva_go))?$id_reserva_go:0;
         $data['scripts']              = array('inicio');
         //$data['edita']                = $btn;
         $data['contentView']          = 'secciones/vRegistroGo';                

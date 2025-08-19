@@ -74,7 +74,7 @@ class Login extends BaseController {
 
         return $this->response->setJSON(['success' => false, 'msg' => 'Datos incompletos']);
     }
-    private function registrarAsistencia2($id_usuario = null)
+    private function registrarAsistencia($id_usuario = null)
     {
         $response = new \stdClass();
         $response->error = true;
@@ -103,9 +103,7 @@ class Login extends BaseController {
                     "id_usuario" => $id_usuario,
                     "fecha" => $fecha_hoy,
                     "turno" => 'DIA(08:30-16:00)',
-                    "entrada" => $hora,
-                    "latitud" => $Latitud,
-                    "longitud" => $Longitud
+                    "entrada" => $hora
                 ];
                 $result = $globals->saveTabla($dataInsert, $dataConfig, ["script" => "asistencia.agregarAsiatencia"]);
                 $response->error = $result->error;
@@ -119,7 +117,7 @@ class Login extends BaseController {
         
         return $response;
     }
-    private function registrarAsistencia($id_usuario = null, $Latitud = null, $Longitud = null)
+    private function registrarAsistencia2($id_usuario = null, $Latitud = null, $Longitud = null)
     {
         $response = new \stdClass();
         $response->error = true;
