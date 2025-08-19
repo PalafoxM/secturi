@@ -3567,6 +3567,49 @@ ini.inicio = (function () {
        formPT: function(){
             $("#form_proveedor").submit(function (e) {
                 e.preventDefault(); 
+                   let valido = true;
+                    let mensajes = [];
+
+                    // Validar cada partida
+                    $("[id^=encabezado_]").each(function(){
+                        if($(this).val().trim() === ""){
+                            valido = false;
+                            mensajes.push("El campo Encabezado es obligatorio.");
+                        }
+                    });
+
+                    $("[id^=periodo_]").each(function(){
+                        if($(this).val().trim() === ""){
+                            valido = false;
+                            mensajes.push("El campo Periodo es obligatorio.");
+                        }
+                    });
+
+                    // Validar archivos PDF
+                    $("[id^=factura_pdf_input_]").each(function(){
+                        let files = this.files;
+                        if(files.length === 0){
+                            valido = false;
+                            mensajes.push("Debe subir al menos un archivo PDF.");
+                        }
+                    });
+
+                    // Validar archivos XML
+                    $("[id^=factura_xml_input_]").each(function(){
+                        let files = this.files;
+                        if(files.length === 0){
+                            valido = false;
+                            mensajes.push("Debe subir al menos un archivo XML.");
+                        }
+                    });
+
+                    if(!valido){
+                        Swal.fire("Atención", "<p>"+mensajes.join("<br>")+"</p>", "warning");
+                        return;
+                    }
+
+
+
                 var formData = new FormData(this); // Usar FormData en lugar de serialize
                
                 $.ajax({

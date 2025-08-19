@@ -344,9 +344,9 @@ class Agregar extends BaseController {
         $response->respuesta = "Error|Error al guardar PT";
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
-        $archivos = $this->request->getFiles(); 
-
-
+       $archivos = $this->request->getFiles();
+   
+      
         if($data['secretario'] == 0){
             $response->error = true;
             $response->respuesta = "Es requerido el Secretario o Director";
