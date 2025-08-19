@@ -78,7 +78,7 @@
                                         </div><!--end form-row-->
                                         <div class="form-row">
                                             <div class="col-md-4 mb-3">
-                                                <label for="reponsable_solicitud">Responsable de la Solicitud <span style="color:red;">*</span></label>
+                                                <label for="reponsable_solicitud">Responsable del Gasto<span style="color:red;">*</span></label>
                                               <select name="id_reponsable_solicitud" class="form-control" required>
                                                     <?php foreach ($cat_usuario as $u): ?>
                                                         <?php
@@ -352,10 +352,6 @@
         <script src="<?= base_url()?>plugins/jquery-steps/jquery.steps.min.js"></script>
         <script src="<?= base_url()?>assets/pages/jquery.form-wizard.init.js"></script>
         
-        <!-- App js -->
-        <script src="<?= base_url()?>assets/js/app.js"></script>
-
-    
 
         <!-- Plugins js -->
         <script src="<?= base_url()?>plugins/moment/moment.js"></script>
@@ -366,7 +362,6 @@
         <script src="<?= base_url()?>plugins/bootstrap-maxlength/bootstrap-maxlength.min.js"></script>
         <script src="<?= base_url()?>plugins/bootstrap-touchspin/js/jquery.bootstrap-touchspin.min.js"></script>
 
-        <script src="<?= base_url()?>assets/pages/jquery.forms-advanced.js"></script>
         <script>
             ini.inicio.formPT();
              $('.add-file').on('click', function(e) {
