@@ -313,6 +313,7 @@
                             <h6 class="menu-title">Recursos</h6>
                         </div>
                         <ul class="nav metismenu">
+                            <?php if($session->get('id_perfil')!=2): ?>
                             <li class="nav-item">
                                 <a class="nav-link" href="javascript: void(0);"><span class="w-100">Registro</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
                                 <ul class="nav-second-level" aria-expanded="false">
@@ -321,6 +322,7 @@
                                     <li><a href="../apps/email-read.html">Reserva GRC</a></li>                 
                                 </ul>            
                             </li><!--end nav-item-->
+                            <?php endif; ?>
                             <li class="nav-item">
                                 <a class="nav-link" href="javascript: void(0);"><span class="w-100">Estatus</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
                                 <ul class="nav-second-level" aria-expanded="false">
