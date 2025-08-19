@@ -132,7 +132,7 @@
                         </div>
                          <div class="col-md-4">
                             <div class="form-group">
-                                <label for="des_corto">SIGLAS</label>
+                                <label for="des_corto">RESPONSABLE</label>
                                <select class="form-control select2" id="titular" name="titular">
                                   <?php foreach($usuario as $u): ?>
                                     <option value="<?= $u->id_usuario?>" ><?= $u->nombre_completo ?></option>
