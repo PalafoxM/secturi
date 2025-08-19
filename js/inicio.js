@@ -3554,6 +3554,43 @@ ini.inicio = (function () {
                 });
           })
        },
+       formPT: function(){
+            $("#form_proveedor").submit(function (e) {
+                e.preventDefault(); 
+                var formData = new FormData(this); // Usar FormData en lugar de serialize
+               
+                $.ajax({
+                    type: "POST",
+                    url: base_url + "index.php/Agregar/guardaPT",
+                    data: formData,
+                    processData: false,  // Importante para FormData
+                    contentType: false,  // Importante para FormData
+                    dataType: "json",
+                    success: function (response) {
+                        console.log(response);
+                        if(!response.error){
+                            Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
+                            setTimeout(() => {
+                               // window.location.href = base_url + "index.php/Principal/listadoEstatusPT";
+                                window.location.href = base_url + "index.php/Principal/tablaArchivos/"+response.idRegistro;
+                            }, 1500);
+                        }else{
+                            Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
+                        }
+                    },
+                    beforeSend: function (info){
+                         $('#btnGuardatPT').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                    },
+                    complete: function (info){
+                        $('#btnGuardatPT').prop('disabled', false).html('Guardar');
+                    },
+                    error: function (response,jqXHR, textStatus, errorThrown) {
+                        var res= JSON.parse(response.responseText);
+                        Swal.fire("Error", '<p> '+ res.message + '</p>');  
+                    }
+                });
+            });
+        },
        formGo: function(){
             $("#form_go").submit(function (e) {
                 e.preventDefault(); 
