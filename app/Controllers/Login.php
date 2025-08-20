@@ -205,6 +205,8 @@ class Login extends BaseController {
         $response->respuesta = "Error al registrar salida";
         $session = \Config\Services::session();
         $globals = new Mglobal;
+        $hoy = $this->globals->getTabla(["tabla"=>"asistencia", 'where' => ['visible' => 1, 'id_usuario' => $session->get('id_usuario'), 'fecha' => date('Y-m-d') ]]);
+        die( var_dump( $hoy ) );
         $dataConfig = [
                     "tabla" => 'asistencia',
                     "editar" => true,
