@@ -1736,6 +1736,22 @@ class Principal extends BaseController {
         $response = $globals->saveTabla(['visible' => 0],$dataConfig,["script"=>"opciones.DeletePT"]);
         return $this->respond($response);
     }
+    public function listadoEnvioGO()
+    {  
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        if(in_array($session->get('id_perfil'), [1,2])){
+         $registro_go = $globals->getTabla(['tabla' => 'vw_registro_go', 'where' => ['visible' => 1]]);
+        }else{
+            $registro_go = $globals->getTabla(['tabla' => 'vw_registro_go', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]]);
+        }
+      
+        $data['registro_go'] = (!empty($registro_go->data))?$registro_go->data:[];
+        $data['scripts'] = array('inicio');
+        $data['edita'] = 0;
+        $data['contentView'] = 'personal/vListadoGo';                
+        $this->_renderView($data);
+    }
     public function listadoEstatusPT()
     {  
         $session = \Config\Services::session();
@@ -1753,17 +1769,24 @@ class Principal extends BaseController {
         $data['contentView'] = 'secciones/vregistroPT';                
         $this->_renderView($data);
     }
-    public function tablaArchivos($id = null)
+    public function tablaArchivos($id = null , $tipo = null)
     {  
         $session = \Config\Services::session();
         $globals = new Mglobal;
-        $PT  =  TRUE;
-        $GO  = FALSE;
-        $GRC = FALSE;
+        if($tipo != 'PT' || $tipo != 'GO' || $tipo != 'GRC'){
+        $data['layout'] = 'plantilla/lytVacio';
+        $data['contentView'] = 'secciones/vError500';              
+        $this->_renderView($data);
+        die();
+        }
+        $PT  = ($tipo == 'PT')?TRUE:FALSE;
+        $GO  = ($tipo == 'GO')?TRUE:FALSE;
+        $GRC = ($tipo == 'GRC')?TRUE:FALSE;
         $data['PT']  = $PT;
         $data['GO']  = $GO;
         $data['GRC'] = $GRC;
-        $data['id_registro_pt'] = $id;
+        $data['id_registro'] = $id;
+        $data['tipo'] = $tipo;
         $data['scripts'] = array('inicio');
         $data['contentView'] = 'personal/vTablaArchivos';                
         $this->_renderView($data);
@@ -1841,6 +1864,85 @@ class Principal extends BaseController {
                     'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
                     ])->data;
        return $this->respond($response);
+    }
+     public function ArchivoGO($id_registro_pt =  null, $id_archivo = null, $savePath = null)
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $registro_pt = $globals->getTabla([
+            'tabla' => 'vw_registro_pt',
+            'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
+        ]);
+        $pdf = $globals->getTabla([
+                'tabla' => 'vw_pdf_reserva',
+                'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
+                ])->data;
+  
+        $instrumento = (isset($pdf[0]->instrumento) && !empty($pdf[0]->instrumento))?$pdf[0]->instrumento:'';      
+   
+        if (!empty($registro_pt->data)) {
+            $data['registro'] = $registro_pt->data[0];
+            $folio = $globals->getTabla([
+                'tabla' => 'direccion',
+                'where' => ['visible' => 1, 'id_area' => $data['registro']->id_direccion_responsable]
+            ]);
+            $data['folio'] = $folio->data[0]->folio_prefijo;
+        } else {
+            echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
+            die();
+        }
+
+
+       
+       switch($id_archivo){
+            case 1:
+                $doc = 'assets/pdf/plantillas/anexo02.pdf';
+                $formato = 'personal/vFormato01.php';
+            break;
+
+           case 4:
+            if ($savePath){
+                $source = FCPATH . $instrumento;
+                if (file_exists($source)) {
+                    copy($source, $savePath);
+                    return $savePath;
+                }
+                return null;
+            } else {
+                // Solo si se quiere mostrar directo en navegador
+                return redirect()->to(base_url() . $instrumento);
+            }
+            break;
+         
+
+        }
+     
+        $html = view( $formato, $data);
+        // Crear instancia de mPDF
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 0,
+            'margin_left' => 1,
+            'margin_right' => 1,
+            'format' => [213, 268],
+            'mirrorMargins' => false,
+        ]);
+
+    //die( var_dump($doc) );
+      $pagecount = $mpdf->SetSourceFile(FCPATH . $doc );
+      
+            $mpdf->AddPage();
+            $tplId = $mpdf->ImportPage(1);
+            $mpdf->UseTemplate($tplId);
+            $mpdf->WriteHTML($html);
+        
+        
+        if ($savePath) {
+            $mpdf->Output($savePath, 'F'); // F = write to file
+            return $savePath;
+        }
+        $mpdf->Output('Formato_pt.pdf', 'I');
+        exit();
+        
     }
     public function Archivo($id_registro_pt =  null, $id_archivo = null, $savePath = null)
     {
@@ -2297,8 +2399,8 @@ class Principal extends BaseController {
         $response->error = true;
         $response->respuesta = 'Error|Error al traer los proveedor';
         $globals = new Mglobal;
-        //$siExisteIdReserva  = $globals->getTabla(['tabla' => 'registro_go', 'where' => ['visible' => 1 , 'id_reserva' => $id_reserva ]]);
-        //$btn = (!empty($siExisteIdReserva->data))?true:false;
+        $siExisteIdReserva  = $globals->getTabla(['tabla' => 'registro_go', 'where' => ['visible' => 1 , 'id_reserva_go' => $id_reserva_go ]]);
+        $btn = (!empty($siExisteIdReserva->data))?true:false;
     
         $cat_area  = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1 ]]);
         if($id_reserva_go != 0){
@@ -2334,14 +2436,14 @@ class Principal extends BaseController {
         $data['cat_opcion']           = (!empty($cat_opcion->data))?$cat_opcion->data:[];
         $data['cat_partida']          = (!empty($cat_partida->data))?$cat_partida->data:[];
         $data['cat_subsecretario']    = (!empty($cat_subsecretario->data))?$cat_subsecretario->data:[];
-        $data['editar']               = (!empty($id_reserva_go) || $id_reserva_go == 0)?1:0;
+        //$data['editar']               = (!empty($id_reserva_go) || $id_reserva_go != 0)?1:0;
    
         $data['secretario']           = (!empty($secretario->data))?$secretario->data:[];
         $data['usuario']              = (!empty($usuario->data))?$usuario->data[0]:[];
         $data['cat_usuario']          = (!empty($cat_usuario->data))?$cat_usuario->data:[];
         $data['id_reserva']          = (!empty($id_reserva_go))?$id_reserva_go:0;
         $data['scripts']              = array('inicio');
-        //$data['edita']                = $btn;
+        $data['edita']                = $btn;
         $data['contentView']          = 'secciones/vRegistroGo';                
         $this->_renderView($data);
         

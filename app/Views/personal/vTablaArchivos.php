@@ -67,10 +67,18 @@
                                                             <td>Anexo 2 - Reporte de Integración Documental</td>
                                                             <?php endif; ?>
                                                             <td class="text-center">
-                                                                <a target="_blank" href="<?= base_url().'index.php/Principal/Archivo/'.$id_registro_pt.'/1' ?>" class="text-center">
+                                                                <?php if($PT): ?>
+                                                                <a target="_blank" href="<?= base_url().'index.php/Principal/Archivo/'.$id_registro.'/1' ?>" class="text-center">
                                                                     <i class="far fa-file-pdf text-danger"></i>
                                                                     <h6 class="text-truncate">Archivo01.pdf</h6>
-                                                                </a>   
+                                                                </a> 
+                                                                <?php endif; ?> 
+                                                                 <?php if($GO): ?>
+                                                                <a target="_blank" href="<?= base_url().'index.php/Principal/ArchivoGO/'.$id_registro.'/1' ?>" class="text-center">
+                                                                    <i class="far fa-file-pdf text-danger"></i>
+                                                                    <h6 class="text-truncate">Archivo01.pdf</h6>
+                                                                </a> 
+                                                                <?php endif; ?>  
                                                             </td>
                                                         </tr>
                                             
@@ -86,30 +94,37 @@
                                                             <td>N/A</td>
                                                             <?php endif; ?>
                                                             <td class="text-center">
-                                                              <a style="cursor:pointer;" onclick="ini.inicio.links(<?=$id_registro_pt?>);" class="text-center">
+                                                              <a style="cursor:pointer;" onclick="ini.inicio.links(<?=$id_registro?>);" class="text-center">
                                                                     <i class="far fa-file-pdf text-danger"></i>
                                                                     <h6 class="text-truncate">Archivo03.pdf</h6>
                                                                 </a>   
                                                             </td>
                                                         </tr>
+                                                          <?php if(!$GO): ?>
                                                         <tr>
                                                             <th scope="row">04. Contrato o Convenio (según corresponda)</th>
                                                              <?php if($PT): ?>
                                                             <td>Instrumento jurídico que corresponda</td>
                                                               <?php endif; ?>
-                                                               <?php if($GO): ?>
-                                                            <td>N/A</td>
-                                                            <?php endif; ?>
                                                               <?php if($GRC): ?>
                                                             <td>N/A</td>
                                                             <?php endif; ?>
                                                             <td class="text-center">
-                                                                <a target="_blank"  href="<?= base_url().'index.php/Principal/Archivo/'.$id_registro_pt.'/4' ?>" class="text-center">
+                                                                <?php if($PT): ?>
+                                                                <a target="_blank"  href="<?= base_url().'index.php/Principal/Archivo/'.$id_registro.'/4' ?>" class="text-center">
                                                                     <i class="far fa-file-pdf text-danger"></i>
                                                                     <h6 class="text-truncate">Archivo04.pdf</h6>
-                                                                </a>   
+                                                                </a>  
+                                                                <?php endif; ?> 
+                                                                <?php if($GO): ?>
+                                                                <a target="_blank"  href="<?= base_url().'index.php/Principal/ArchivoGO/'.$id_registro.'/4' ?>" class="text-center">
+                                                                    <i class="far fa-file-pdf text-danger"></i>
+                                                                    <h6 class="text-truncate">Archivo04.pdf</h6>
+                                                                </a>  
+                                                                <?php endif; ?> 
                                                             </td>
                                                         </tr>
+                                                          <?php endif; ?>
                                                         <tr class="table-success">
                                                             <th scope="row">05. Formatos de los LRADP</th>
                                                               <?php if($PT): ?>
@@ -125,19 +140,18 @@
                                                              <input type="file" id="archivo05" name="archivo05[]" accept=".pdf" >
                                                             </td>
                                                         </tr>
+                                                          <?php if(!$GO): ?>
                                                         <tr>
                                                             <th scope="row">06. Oficios de Autorizaciones</th>
                                                              <?php if($PT): ?>
                                                             <td>Autorización de Servicios Profesionales (1330, 3330, 3340 y 3390), Validación de la Coordinación General de Comunicación Social (3611, 3612, 3630, 3660 y 3690), Validación de imagen, Autorización de partidas restringidas (3710, 3760, 3810, 3820 y 3830), Autorización de pasivos, Autorización de refrendos.</td>
                                                            <?php endif; ?>
-                                                            <?php if($GO): ?>
-                                                            <td>N/A</td>
-                                                             <?php endif; ?>
                                                                <?php if($GRC): ?>
                                                             <td>Autorización de Servicios Profesionales (3310, 3330, 3340 y 3390), Autorización de partidas restringidas (3710, 3760, 3810 y 3830)</td>
                                                            <?php endif; ?>
                                                             <td><input type="file" id="archivo06" name="archivo06[]" accept=".pdf" ></td>
                                                         </tr>
+                                                         <?php endif; ?>
                                                         <tr class="table-info">
                                                             <th scope="row">07. Formatos diversos</th>
                                                              <?php if($PT): ?>
@@ -150,25 +164,24 @@
                                                             <td>Formato de Desglose de Gastos (Viáticos por persona presupuestado), Oficio de Comisión.</td>
                                                             <?php endif; ?>
                                                            <td class="text-center">
-                                                                <a target="_blank"  href="<?= base_url().'index.php/Principal/ImprimirPT/'.$id_registro_pt ?>" class="text-center">
+                                                                <a target="_blank"  href="<?= base_url().'index.php/Principal/ImprimirPT/'.$id_registro ?>" class="text-center">
                                                                     <i class="far fa-file-pdf text-danger"></i>
                                                                     <h6 class="text-truncate">Archivo07.pdf</h6>
                                                                 </a>   
                                                             </td>
                                                         </tr>
+                                                          <?php if(!$GO): ?>
                                                         <tr>
                                                             <th scope="row">08. Evidencia de entregable</th>
                                                              <?php if($PT): ?>
                                                             <td>Entregable con sello, fecha y firma de recibido</td>
-                                                            <?php endif; ?>
-                                                            <?php if($GO): ?>
-                                                            <td>N/A</td>
                                                             <?php endif; ?>
                                                               <?php if($GRC): ?>
                                                             <td>N/A</td>
                                                             <?php endif; ?>
                                                             <td><input type="file" id="archivo08" name="archivo08[]" accept=".pdf" ></td>
                                                         </tr>
+                                                          <?php endif; ?>
                                                         <tr class="table-warning">
                                                             <th scope="row">09. Otros</th>
                                                              <?php if($PT): ?>
@@ -188,7 +201,7 @@
                                                     <br>
                                                        <div class="row mb-5">
                                                             <div class="col-md-12 text-right">
-                                                                <a id="btnZip" style="color:white" class="btn btn-info" onclick="ini.inicio.generarZip(<?= $id_registro_pt ?>);" >
+                                                                <a id="btnZip" style="color:white" class="btn btn-info" onclick="ini.inicio.generarZip(<?= $id_registro ?>);" >
                                                                     <i class="mdi mdi-content-save"></i> Generar Zip
                                                                 </a>
                                                             </div>

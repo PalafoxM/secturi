@@ -1,41 +1,67 @@
-    <h2>Se Guardo su asistencia</h2>
-       <!--<p id="status">Esperando GPS...</p>-->
-    <p id="status"> ✅ Enviada al servidor</p>
+<!DOCTYPE html>
+<html lang="en">
 
-    <!-- <script>
-    const id_user = <?= json_encode($id_user) ?>;
-    const statusEl = document.getElementById("status");
+    <head>
+        <meta charset="utf-8" />
+        <title>Metrica - Admin & Dashboard Template</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
+        <meta content="" name="author" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-    if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            const latitud = position.coords.latitude;
-            const longitud = position.coords.longitude;
-            const precision = position.coords.accuracy;
+        <!-- App favicon -->
+        <link rel="shortcut icon" href="<?= base_url() ?>assets/images/favicon.ico">
 
-            statusEl.textContent = `Ubicación detectada: ${latitud}, ${longitud}`;
+        <!-- App css -->
+        <link href="<?= base_url() ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="<?= base_url() ?>assets/css/jquery-ui.min.css" rel="stylesheet">
+        <link href="<?= base_url() ?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+        <link href="<?= base_url() ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
+        <link href="<?= base_url() ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
 
-            fetch("<?= base_url('index.php/Login/guardarUbicacion') ?>", {
-                method: "POST",
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    id_user,
-                    latitud,
-                    longitud,
-                    precision
-                })
-            })
-            .then(res => res.json())
-            .then(res => {
-                if (res.success) {
-                    statusEl.textContent += " ✅ Enviada al servidor.";
-                } else {
-                    statusEl.textContent += " ❌ Error al guardar.";
-                }
-            });
-        }, function(error) {
-            statusEl.textContent = "No se pudo obtener la ubicación.";
-        });
-    } else {
-        statusEl.textContent = "Este dispositivo no soporta geolocalización.";
-    }
-    </script> -->
+    </head>
+
+    <body class="account-body accountbg">
+
+        <!-- Log In page -->
+        <div class="container">
+            <div class="row vh-100 ">
+                <div class="col-12 align-self-center">
+                    <div class="auth-page">
+                        <div class="card auth-card shadow-lg">
+                            <div class="card-body">
+                                <div class="px-3">
+                                    <div class="auth-logo-box">
+                                        <a href="<?= base_url() ?>dashboard/analytics-index.html" class="logo logo-admin"><img src="<?= base_url() ?>assets/images/logo-sm.png" height="55" alt="logo" class="auth-logo"></a>
+                                    </div><!--end auth-logo-box-->
+                                    <img src="<?= base_url() ?>assets/images/404.png" alt="" class="d-block mx-auto mt-4" height="250">
+                                    <div class="text-center auth-logo-text mb-4">
+                                        <h4 class="mt-0 mb-3 mt-5">SUSI, No encontro la pág.</h4>
+                                        <a href="<?= base_url() ?>index.php/Inicio/" class="btn btn-sm btn-gradient-primary">Regresar</a> 
+                                    </div> <!--end auth-logo-text-->
+                                </div><!--end /div-->                                
+                            </div><!--end card-body-->                            
+                        </div><!--end card-->
+                    </div><!--end auth-page-->
+                </div><!--end col-->           
+            </div><!--end row-->
+        </div><!--end container-->
+
+        
+
+
+        <!-- jQuery  -->
+        <script src="<?= base_url() ?>assets/js/jquery.min.js"></script>
+        <script src="<?= base_url() ?>assets/js/jquery-ui.min.js"></script>
+        <script src="<?= base_url() ?>assets/js/bootstrap.bundle.min.js"></script>
+        <script src="<?= base_url() ?>assets/js/metismenu.min.js"></script>
+        <script src="<?= base_url() ?>assets/js/waves.js"></script>
+        <script src="<?= base_url() ?>assets/js/feather.min.js"></script>
+        <script src="<?= base_url() ?>assets/js/jquery.slimscroll.min.js"></script>        
+
+        <!-- App js -->
+        <script src="<?= base_url() ?>assets/js/app.js"></script>
+        
+    </body>
+
+</html>

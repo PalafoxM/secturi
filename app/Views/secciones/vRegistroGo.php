@@ -32,7 +32,6 @@
                                       GEG850101FQ2
                                     </p>
                                    <form id="form_go" enctype="multipart/form-data">
-                                        <input type="hidden" name="editar" value="<?= $editar ?>">
                                         <input type="hidden" name="id_reserva_go" value="<?= $id_reserva ?>">
                                        <div class="form-row">
                                             <!-- Dirección Responsable -->
@@ -254,21 +253,15 @@
                                                      
                                                     </div>
                                                 <?php endforeach; ?>
-                                                    
-                                        
-
                                             <a class="btn btn-gradient-danger" style="color:white" onclick="window.history.back()">Atrás</a>
-                                              <button class="btn btn-gradient-primary" id="btnGuardaGo" type="submit">Guardar</button>
-                                        
+                                              <?php if(!$edita): ?>
+                                            <button class="btn btn-gradient-primary" id="btnGuardaGo" type="submit">Guardar</button>
+                                            <?php endif; ?>
                                     </form> <!--end form-->                                          
                                 </div><!--end card-body-->
                             </div><!--end card-->
                         </div><!--end col-->
-
-                   
                     </div><!--end row-->
-
-
                 </div><!-- container -->
             </div>
         </div>

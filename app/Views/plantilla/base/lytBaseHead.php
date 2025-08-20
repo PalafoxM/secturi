@@ -335,7 +335,7 @@
                                 <a class="nav-link" href="javascript: void(0);"><span class="w-100">Enviados</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
                                 <ul class="nav-second-level" aria-expanded="false">
                                     <li><a href="<?php echo base_url(); ?>index.php/Principal/listadoEstatusPT">Envio PT</a></li>
-                                    <li><a href="../apps/email-read.html2">Envio GO</a></li>  
+                                    <li><a href="<?php echo base_url(); ?>index.php/Principal/listadoEnvioGO">Envio GO</a></li>  
                                     <li><a href="../apps/email-read.html">Envio GRC</a></li>                 
                                 </ul>            
                             </li><!--end nav-item-->
