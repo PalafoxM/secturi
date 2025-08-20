@@ -103,7 +103,7 @@
                                                               <?php endif; ?>
                                                             <?php if($session->get('id_perfil')==2): ?>
                                                             <a style="color:white;"  onclick="ini.inicio.estatusReservaGo(<?=$p->id_reserva_go?>);" data-toggle="tooltip" data-placement="top" title="" data-original-title="Revisar reserva"
-                                                                class="btn btn-gradient-warning px-4"><i
+                                                                class="btn <?= ($p->id_estatus == 3)?'btn-gradient-info':'btn-gradient-warning'?> px-4"><i
                                                                     class="mdi mdi-lock-open font-21"></i>
                                                             </a>
 
