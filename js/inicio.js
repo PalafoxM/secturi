@@ -935,8 +935,10 @@ ini.inicio = (function () {
             $('#modalLinks').modal('hide');
             $('#links').empty();
         },
-         estatusReservaGo: function(id_reserva)
+         estatusReservaGo: function(id_reserva, id_estatus)
         {
+
+        id_estatus == 3?$('#btnConfirmarReservaGo').hide():$('#btnConfirmarReservaGo').show();      
            $('#id_reserva_estatus_go').val(id_reserva);
            $('#motivo_go').val('');
            $('#observaciones_go').val('');
