@@ -106,7 +106,7 @@
                                                                     class="mdi mdi-border-color font-21"></i>
                                                             </a>
                                                              <?php endif; ?>
-                                                             <?php if($p->id_estatus != 3): ?>
+                                                             <?php if($p->id_estatus != 3 && $session->id_perfil != 2): ?>
                                                             <a style="color:white;" onclick="ini.inicio.eliminarReserva(<?=$p->id_reserva?>);" data-toggle="tooltip" data-placement="top" title="" data-original-title="Eliminar"
                                                                 class="btn btn-gradient-danger px-4"><i
                                                                     class="mdi mdi-trash-can-outline font-21"></i>

@@ -88,28 +88,29 @@
                                                         </td>
                                                         
                                                         <td class="text-center">
-                                                            <?php if($session->id_perfil != 2): ?>
+                                                            <?php if($session->id_perfil != 2 && empty($p->id_registro_go)): ?>
                                                              <a style="color:white;" onclick="ini.inicio.editarReservaGo(<?=$p->id_reserva_go?>, 0);" data-toggle="tooltip" data-placement="top" title="" data-original-title="Editar"
                                                                 class="btn btn-gradient-success px-4"><i
                                                                     class="mdi mdi-border-color font-21"></i>
                                                             </a>
-                                                             <?php if($p->id_estatus != 3): ?>
+                                                             <?php endif; ?>
+                                                             <?php if($p->id_estatus != 3 && $session->id_perfil != 2): ?>
                                                             <a style="color:white;"  onclick="ini.inicio.eliminarReservaGo(<?=$p->id_reserva_go?>);" data-toggle="tooltip" data-placement="top" title="" data-original-title="Eliminar"
                                                                 class="btn btn-gradient-danger px-4"><i
                                                                     class="mdi mdi-trash-can-outline font-21"></i>
                                                             </a>
-                                                            <?php endif; ?>
+                                                           
                                                               <?php endif; ?>
                                                             <?php if($session->get('id_perfil')==2): ?>
-                                                            <a style="color:white;"  onclick="ini.inicio.estatusReservaGo(<?=$p->id_reserva_go?>, 1);" data-toggle="tooltip" data-placement="top" title="" data-original-title="Revisar reserva"
+                                                            <a style="color:white;"  onclick="ini.inicio.estatusReservaGo(<?=$p->id_reserva_go?>);" data-toggle="tooltip" data-placement="top" title="" data-original-title="Revisar reserva"
                                                                 class="btn btn-gradient-warning px-4"><i
                                                                     class="mdi mdi-lock-open font-21"></i>
                                                             </a>
 
                                                             <?php endif; ?>
                                                              <?php if($p->id_estatus == 3 && $session->get('id_perfil')!=2): ?>
-                                                            <a href="<?= base_url().'index.php/Principal/generarTramitePagoGo/'.$p->id_reserva_go ?>/0" style="color:white;"  data-toggle="tooltip" data-placement="left" data-original-title="Generar Tramite de Pago"
-                                                                class="btn btn-gradient-primary px-4 uitooltip"><i
+                                                            <a href="<?= base_url().'index.php/Principal/generarTramitePagoGo/'.$p->id_reserva_go ?>" style="color:white;"  data-toggle="tooltip" data-placement="left" data-original-title="Generar Tramite de Pago"
+                                                                class="btn <?= (!empty($p->id_registro_go) )?'btn-gradient-info':'btn-gradient-primary' ?> px-4 uitooltip"><i
                                                                     class="mdi mdi-arrow-right-bold font-21"></i>
                                                             </a>
                                                             <?php endif; ?>
