@@ -242,7 +242,9 @@
    FECHA DEL GASTO:
 </div>
  <div id="fecha_respuesta">
+   <?php if(isset($registro->fecha_gasto_inicio) && !empty($registro->fecha_gasto_inicio)): ?>
    <span > DEL <?= date('d-m-Y', strtotime($registro->fecha_gasto_inicio));?> AL <?= date('d-m-Y',strtotime($registro->fecha_gasto_fin));?>  </span>
+   <?php endif; ?>
 </div>
 <div id="importe">
    IMPORTANTE EN PESOS (MXN):

@@ -67,40 +67,116 @@ class Agregar extends BaseController {
        $data['contentView'] = 'formularios/vFormAgregar';                
        $this->_renderView($data);
     }
+   public function procesarPediodoGo($periodo = array(), $id_registro_go= null)
+    {
+        $session = \Config\Services::session();
+        $data = array();
+        $response = new \stdClass();
+        $this->globals = new Mglobal();
+     
+       foreach ($periodo as $p) {
+            $dataConfig = [
+                "tabla"  => "periodo_factura_go",
+                "editar" => false 
+            ];
+
+            $dataInsert = [
+                'id_registro_go' => (int)$id_registro_go,
+                'encabezado'     => $p['encabezado'],  // ahora sí existe
+                'periodo'        => $p['periodo'],
+            ];
+
+            $dataBitacora = [
+                'id_user' => $session->get('id_usuario'),
+                'script'  => 'Agregar.php/guardarFacturaPDF'
+            ];
+
+            $response = $this->globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
+        }
+
+        return $response;
+
+        //return false;
+    }
    public function procesarPediodo(array $periodo, $id_registro_pt= null)
     {
         $session = \Config\Services::session();
         $data = array();
         $this->globals = new Mglobal();
-     
-        foreach ($periodo as $p) {
-          
+        $response = new \stdClass();
+     foreach ($periodo as $p) {
             $dataConfig = [
-                    "tabla"=>"periodo_factura",
-                    "editar"=>false 
-                ];
-             $dataInsert = [
-                        'id_registro_pt' => (int)$id_registro_pt,
-                        'periodo'        => $p,
-                    ];
-        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardarFacturaPDF'];
-        $response = $this->globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
+                "tabla"  => "periodo_factura",
+                "editar" => false 
+            ];
 
-          }
+            $dataInsert = [
+                'id_registro_pt' => (int)$id_registro_pt,
+                'encabezado'     => $p['encabezado'],  // ahora sí existe
+                'periodo'        => $p['periodo'],
+            ];
+
+            $dataBitacora = [
+                'id_user' => $session->get('id_usuario'),
+                'script'  => 'Agregar.php/guardarFacturaPDF'
+            ];
+
+            $response = $this->globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
+        }
+
         
-
+       return $response;
         //return false;
     }
-   public function procesarPDF(array $archivos, $id_registro_pt= null)
+    public function procesarPDFgo(array $archivos, $id_registro_go= null)
     {
         $session = \Config\Services::session();
         $data = array();
+        $response = new \stdClass();
         $this->globals = new Mglobal();
         foreach ($archivos as $archivo) {
             if (!$archivo->isValid()) {
                 continue;
             }
+            $timestamp = date('Ymd_His');
+            $extension = $archivo->getClientExtension();
+            $originalName = pathinfo($archivo->getName(), PATHINFO_FILENAME);
+            $file = $originalName . '_' . $timestamp . '.' . $extension;
 
+            // Ruta absoluta
+            $ruta_destino = FCPATH . 'assets/pdf/';
+            $archivo->move($ruta_destino, $file);
+
+            // Rutas públicas
+            $ruta_absoluta = base_url('assets/pdf/' . $file);
+            $ruta_relativa = 'assets/pdf/' . $file;
+            $dataConfig = [
+                    "tabla"=>"factura_pdf_go",
+                    "editar"=>false 
+                ];
+             $dataInsert = [
+                        'id_registro_go'           => (int)$id_registro_go,
+                        'ruta_relativa'            => $ruta_relativa,
+                        'ruta_absoluta'            => $ruta_absoluta,
+                        'fec_reg'                  => date('Y-m-d H:i:s'),
+                        'usu_reg'                  => $session->get('id_usuario')
+               
+                    ];
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardarFacturaPDF'];
+        $response = $this->globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
+        }
+         return $response;
+    }
+   public function procesarPDF(array $archivos, $id_registro_pt= null)
+    {
+        $session = \Config\Services::session();
+        $data = array();
+            $response = new \stdClass();
+        $this->globals = new Mglobal();
+        foreach ($archivos as $archivo) {
+            if (!$archivo->isValid()) {
+                continue;
+            }
             $timestamp = date('Ymd_His');
             $extension = $archivo->getClientExtension();
             $originalName = pathinfo($archivo->getName(), PATHINFO_FILENAME);
@@ -129,9 +205,7 @@ class Agregar extends BaseController {
         $response = $this->globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
 
           }
-        
-
-        //return false;
+          return $response;
     }
    public function procesarXML(array $archivos, $id_registro_pt= null)
     {
@@ -212,7 +286,8 @@ class Agregar extends BaseController {
         $response->respuesta = "Error|Error al guardar PT";
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
-        
+        $archivos = $this->request->getFiles();
+
         if($data['secretario'] == 0){
             $response->error = true;
             $response->respuesta = "Es requerido el Secretario o Director";
@@ -298,20 +373,24 @@ class Agregar extends BaseController {
       
    
         $response = $this->globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
-        return $this->respond($response);
+
         if(!$response->error){
-            $id_registro_pt = $response->idRegistro;
-            $archivosXml = [];
-            $archivosPdf = [];
-            $periodo = [];
-            $response->idRegistro = $response->idRegistro;
-              
-            foreach( $data as $key => $p){
-              
+            $id_registro_go = $response->idRegistro;
+
+           $archivosPdf = [];
+           $periodo = [];
+
+            foreach ($data as $key => $p) {
                 if (strpos($key, 'encabezado') === 0) {
-                        $periodo = array_merge($periodo, $p);
+                    $index = str_replace('encabezado', '', $key); // ej. encabezado1 → 1
+                    $periodo[$index]['encabezado'] = $p;
+                } 
+                if (strpos($key, 'periodo') === 0) {
+                    $index = str_replace('periodo', '', $key); // ej. periodo1 → 1
+                    $periodo[$index]['periodo'] = $p;
                 } 
             }
+
           
             // Recorremos todas las claves de los archivos enviados
             foreach ($archivos as $key => $fileArray) {
@@ -320,14 +399,9 @@ class Agregar extends BaseController {
                 }
             }
         
-           $datosPDF =$this->procesarPDF($archivosPdf, $id_registro_pt);
-           $datosP =$this->procesarPediodo($periodo, $id_registro_pt);
+           $datosPDF =$this->procesarPDFgo($archivosPdf, $id_registro_go);
+           $datosP   =$this->procesarPediodoGo($periodo, $id_registro_go);
           
-
-            if (!$datosXML) {
-                $response->errorXML     =  true;
-                $response->respuestaXML = "XML inválido o no se encontró.";
-            }
             if (!$datosPDF) {
                 $response->errorPDF     =  true;
                 $response->respuestaPDF = "PDF inválido o no se encontró.";
@@ -467,11 +541,15 @@ class Agregar extends BaseController {
             $archivosPdf = [];
             $periodo = [];
             $response->idRegistro = $response->idRegistro;
-              
-            foreach( $data as $key => $p){
-              
+
+            foreach ($data as $key => $p) {
                 if (strpos($key, 'encabezado') === 0) {
-                        $periodo = array_merge($periodo, $p);
+                    $index = str_replace('encabezado', '', $key); // ej. encabezado1 → 1
+                    $periodo[$index]['encabezado'] = $p;
+                } 
+                if (strpos($key, 'periodo') === 0) {
+                    $index = str_replace('periodo', '', $key); // ej. periodo1 → 1
+                    $periodo[$index]['periodo'] = $p;
                 } 
             }
           

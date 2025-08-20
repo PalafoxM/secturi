@@ -1773,11 +1773,11 @@ class Principal extends BaseController {
     {  
         $session = \Config\Services::session();
         $globals = new Mglobal;
-        if($tipo != 'PT' || $tipo != 'GO' || $tipo != 'GRC'){
-        $data['layout'] = 'plantilla/lytVacio';
-        $data['contentView'] = 'secciones/vError500';              
-        $this->_renderView($data);
-        die();
+        if($tipo != 'PT' && $tipo != 'GO' && $tipo != 'GRC'){
+            $data['layout'] = 'plantilla/lytVacio';
+            $data['contentView'] = 'secciones/vError500';
+            $this->_renderView($data);
+            die();
         }
         $PT  = ($tipo == 'PT')?TRUE:FALSE;
         $GO  = ($tipo == 'GO')?TRUE:FALSE;
@@ -1865,23 +1865,28 @@ class Principal extends BaseController {
                     ])->data;
        return $this->respond($response);
     }
-     public function ArchivoGO($id_registro_pt =  null, $id_archivo = null, $savePath = null)
+    public function getLinkGo()
+    {
+        $session        = \Config\Services::session();
+        $globals        = new Mglobal;
+        $id_registro_go =  $this->request->getPost('id_registro_go');
+        $response = $globals->getTabla([
+                    'tabla' => 'vw_pdf_reserva_go',
+                    'where' => ['visible' => 1, 'id_registro_go' => $id_registro_go]
+                    ])->data;
+       return $this->respond($response);
+    }
+     public function ArchivoGO($id_registro_go =  null, $id_archivo = null, $savePath = null)
     {
         $session = \Config\Services::session();
         $globals = new Mglobal;
-        $registro_pt = $globals->getTabla([
-            'tabla' => 'vw_registro_pt',
-            'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
-        ]);
-        $pdf = $globals->getTabla([
-                'tabla' => 'vw_pdf_reserva',
-                'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
-                ])->data;
-  
-        $instrumento = (isset($pdf[0]->instrumento) && !empty($pdf[0]->instrumento))?$pdf[0]->instrumento:'';      
-   
-        if (!empty($registro_pt->data)) {
-            $data['registro'] = $registro_pt->data[0];
+        $registro_go = $globals->getTabla([
+            'tabla' => 'vw_registro_go',
+            'where' => ['visible' => 1, 'id_registro_go' => $id_registro_go]
+        ]);   
+     
+        if (!empty($registro_go->data)) {
+            $data['registro'] = $registro_go->data[0];
             $folio = $globals->getTabla([
                 'tabla' => 'direccion',
                 'where' => ['visible' => 1, 'id_area' => $data['registro']->id_direccion_responsable]
@@ -1891,8 +1896,6 @@ class Principal extends BaseController {
             echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
             die();
         }
-
-
        
        switch($id_archivo){
             case 1:
@@ -2157,6 +2160,128 @@ class Principal extends BaseController {
     }
 
 
+    public function ImprimirGO($id_pt = null,$savePath = null )
+    {  
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $data = [];
+        $id_reserva= null;
+
+        $registro_go = $globals->getTabla([
+            'tabla' => 'vw_registro_go',
+            'where' => ['visible' => 1, 'id_registro_go' => $id_pt]
+        ]);
+        $formatos = $globals->getTabla([
+            'tabla' => 'vw_pdf_reserva_go',
+            'where' => ['visible' => 1, 'id_registro_go' => $id_pt]
+        ]);
+    
+        if (!empty($registro_go->data)) {
+            $registro = $registro_go->data[0];
+            $id_reserva_go = $registro_go->data[0]->id_reserva_go;
+            $no_consecutivo = $registro_go->data[0]->no_consecutivo;
+            $data['registro'] = $registro;
+
+            $folio = $globals->getTabla([
+                'tabla' => 'direccion',
+                'where' => ['visible' => 1, 'id_area' => $registro->id_direccion_responsable]
+            ]);
+            $reserva = $globals->getTabla([
+                'tabla' => 'vw_reserva_go',
+                'where' => ['visible' => 1, 'id_reserva_go' => $id_reserva_go]
+            ]);
+            if(!empty($reserva->data)){
+             $data['reserva'] = $reserva->data;
+             $importe_str   = $reserva->data[0]->total_importe;
+             $usu_reg       = $reserva->data[0]->usu_reg;
+             $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
+             $data['numero_texto'] = $this->numeroEnLetras($importe_float);
+            }
+            $data['nombre_registro'] = $globals->getTabla([
+                'tabla' => 'vw_usuario',
+                'where' => ['id_usuario' => $usu_reg]
+            ])->data[0];
+
+            if (!empty($folio->data)) {
+            $zero = (strlen($no_consecutivo) >= 2)?'0':'00';
+                $data['registro']->folio = $folio->data[0]->folio_prefijo.$zero.$no_consecutivo.'/'.$folio->data[0]->periodo_pt;
+            } else {
+                $data['registro']->folio = ''; // O un valor por defecto
+            }
+
+        } else {
+            echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
+            die();
+        }
+      
+       $html = view('secciones/vFormatoPT.php', $data);
+      $htmlSegundaHoja = view('secciones/vFormatoPT2.php', $data);
+      $htmlTercerHoja = view('personal/vFormato702.php', $data);
+
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 0,
+            'margin_left' => 1,
+            'margin_right' => 1,
+            'format' => [213, 268],
+            'mirrorMargins' => false,
+        ]);
+
+        // Importar PDF base (anexo07)
+      
+        $pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/plantillas/anexo07_2.pdf');
+
+        for ($i = 1; $i <= $pagecount; $i++) {
+            $mpdf->AddPage();
+            $tplId = $mpdf->ImportPage($i);
+            $mpdf->UseTemplate($tplId);
+
+            if ($i == 1) {
+                $mpdf->WriteHTML($html);
+            }
+            if ($i == 2) {
+                $mpdf->WriteHTML($htmlSegundaHoja);
+                $facturas = $formatos->data;
+
+                if (!empty($facturas)) {
+                    foreach ($facturas as $index => $factura) {
+                        $facturaPath = FCPATH . $factura->ruta_relativa;
+
+                        if (file_exists($facturaPath)) {
+                            $facturaPageCount = $mpdf->SetSourceFile($facturaPath);
+
+                            for ($j = 1; $j <= $facturaPageCount; $j++) {
+                                $mpdf->AddPage();
+                                $tplFactura = $mpdf->ImportPage($j);
+
+                                // Escribir HTML solo en la primera página de la primera factura
+                                if ($index === 0 && $j === 1) {
+                                    $mpdf->WriteHTML($htmlTercerHoja);
+                                }
+
+                                // Escalar factura
+                                $templateSize = $mpdf->GetTemplateSize($tplFactura);
+                                $scaleFactor = 0.6; // ajusta si es necesario
+                                $width = $templateSize['width'] * $scaleFactor;
+                                $height = $templateSize['height'] * $scaleFactor;
+
+                                $mpdf->UseTemplate($tplFactura, 40, 55, $width, $height);
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+
+       if ($savePath) {
+            $mpdf->Output($savePath, 'F'); // F = write to file
+            return $savePath;
+        }
+
+        $mpdf->Output('Formato_pt.pdf', 'I');
+        exit();
+
+    }
     public function ImprimirPT($id_pt = null,$savePath = null )
     {  
         $session = \Config\Services::session();
@@ -2210,7 +2335,7 @@ class Principal extends BaseController {
             echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
             die();
         }
-
+    
        $html = view('secciones/vFormatoPT.php', $data);
       $htmlSegundaHoja = view('secciones/vFormatoPT2.php', $data);
       $htmlTercerHoja = view('personal/vFormato702.php', $data);

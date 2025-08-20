@@ -886,6 +886,47 @@ ini.inicio = (function () {
             });
 
         },
+        linksGo: function(id_registro_go)
+        {
+            $.ajax({
+                url: base_url + "index.php/Principal/getLinkGo",
+                type: 'POST',
+                dataType: "json",
+                data: { id_registro_go },
+                success: function(response) {
+                    console.log(response);
+                    if (response) {
+                            response.forEach(p => {
+                                const fila = `
+                                           <div class="col-lg-12 mb-2">
+                                                <a target="_blank" href="${base_url + p.ruta_relativa}" class="d-flex align-items-center text-decoration-none text-dark">
+                                                    <i class="far fa-file-pdf text-danger me-2" style="font-size: 1.5rem;"></i>
+                                                    <span class="text-truncate" title="Archivo ${p.id_factura_pdf}" style="max-width: 85%;">
+                                                        Archivo ${p.id_factura_pdf}
+                                                    </span>
+                                                </a>
+                                                <hr class="my-2">
+                                            </div>
+                                `;
+                                $('#links').append(fila);
+                            });
+
+                       
+                    } else {
+                        Swal.fire("Atención", "No se encontró la información de la reserva.", "warning");
+                    }
+                },
+                complete: function() {
+                $('#modalLinks').modal('show');
+                
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error en la solicitud AJAX:", error);
+                    Swal.fire("Error", "Favor de llamar al Administrador", "error");
+                }
+            });
+
+        },
         links: function(id_registro_pt)
         {
             $.ajax({

@@ -32,6 +32,7 @@
                                       GEG850101FQ2
                                     </p>
                                    <form id="form_go" enctype="multipart/form-data">
+                                        <input type="hidden" name="editar" value="1" >
                                         <input type="hidden" name="id_reserva_go" value="<?= $id_reserva ?>">
                                        <div class="form-row">
                                             <!-- Dirección Responsable -->

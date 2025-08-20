@@ -10,16 +10,16 @@
             <span class="proxima">PT <?= strtoupper($registro->folio);?></span>
         </div>
         <div  style="position:absolute; top:36.2%; left:66.8%; width:30%; background-color:white; font-size: 9px;  height:12px;">
-            <span ><?= strtoupper($registro->dsc_proveedor); ?></span>
+            <span ><?= (isset($registro->dsc_proveedor) && !empty($registro->dsc_proveedor))?strtoupper($registro->dsc_proveedor):'' ?></span>
         </div>
          <div  style="position:absolute; top:37.4%; left:73.5%; width:20%; background-color:white; font-size: 9px;  height:12px;">
-            <span ><?= strtoupper($registro->no_proveedor); ?></span>
+            <span ><?= (isset($registro->no_proveedor) && !empty($registro->no_proveedor))?strtoupper($registro->no_proveedor):'' ?></span>
         </div>
         <div  style="position:absolute; top:38.5%; left:64%; width:33%; background-color:white; font-size: 9px;  height:12px;">
-            <span class="proxima "><?= strtoupper($registro->rfc); ?></span>
+            <span class="proxima "><?= (isset($registro->rfc) && !empty($registro->rfc))?strtoupper($registro->rfc):'' ?></span>
         </div>
         <div  style="position:absolute; top:43.1%; left:77.2%; width:20.5%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><?= strtoupper($registro->dsc_proveedor); ?></span>
+            <span class="proxima "><?= (isset($registro->dsc_proveedor) && !empty($registro->dsc_proveedor))?strtoupper($registro->dsc_proveedor):'' ?></span>
         </div>
         <div  style="position:absolute; top:44.1%; left:65.6%; width:29%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "><?= strtoupper($registro->banco); ?></span>
@@ -55,7 +55,7 @@
             <span class="proxima "><strong><?= ($numero_texto); ?></strong></span>
         </div>
          <div  style="position:absolute; top:48.1%; left:22%; width:25%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><?= strtoupper($reserva[0]->no_convenio); ?></span>
+            <span class="proxima "><?= (isset($reserva[0]->no_convenio) && !empty($reserva[0]->no_convenio))?strtoupper($reserva[0]->no_convenio):'' ?></span>
         </div>
          <div  style="position:absolute; top:49.4%; left:12%; width:25%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "><?= strtoupper($reserva[0]->no_reserva); ?></span>

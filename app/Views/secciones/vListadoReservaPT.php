@@ -115,12 +115,13 @@
                                                             <?php endif; ?>
                                                             <?php if($session->get('id_perfil')==2): ?>
                                                             <a style="color:white;"  onclick="ini.inicio.estatusReserva(<?=$p->id_reserva?>);" data-toggle="tooltip" data-placement="top" title="" data-original-title="Revisar reserva"
-                                                                class="btn btn-gradient-warning px-4"><i
+                                                                class="btn  <?= ($p->id_estatus == 3)?'btn-gradient-info':'btn-gradient-warning'?> px-4"><i
                                                                     class="mdi mdi-lock-open font-21"></i>
                                                             </a>
 
                                                             <?php endif; ?>
                                                              <?php if($p->id_estatus == 3 && $session->get('id_perfil')!=2): ?>
+                                                             
                                                             <a href="<?= base_url().'index.php/Principal/generarTramitePago/'.$p->id_reserva ?>" style="color:white;"  data-toggle="tooltip" data-placement="left" data-original-title="<?= (!empty($p->id_registro_pt) )?'Ver Tramite de Pago':'Generar Tramite de Pago' ?>"
                                                                 class="btn <?= (!empty($p->id_registro_pt) )?'btn-gradient-info':'btn-gradient-primary' ?> px-4 uitooltip"><i
                                                                     class="mdi mdi-arrow-right-bold font-21"></i>

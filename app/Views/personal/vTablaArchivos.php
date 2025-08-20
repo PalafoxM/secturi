@@ -94,10 +94,18 @@
                                                             <td>N/A</td>
                                                             <?php endif; ?>
                                                             <td class="text-center">
-                                                              <a style="cursor:pointer;" onclick="ini.inicio.links(<?=$id_registro?>);" class="text-center">
+                                                                <?php if($PT): ?>
+                                                                <a style="cursor:pointer;" onclick="ini.inicio.links(<?=$id_registro?>);" class="text-center">
                                                                     <i class="far fa-file-pdf text-danger"></i>
                                                                     <h6 class="text-truncate">Archivo03.pdf</h6>
-                                                                </a>   
+                                                                </a>  
+                                                                <?php endif; ?> 
+                                                                 <?php if($GO): ?>
+                                                                <a style="cursor:pointer;" onclick="ini.inicio.linksGo(<?=$id_registro?>);" class="text-center">
+                                                                    <i class="far fa-file-pdf text-danger"></i>
+                                                                    <h6 class="text-truncate">Archivo03.pdf</h6>
+                                                                </a>  
+                                                                <?php endif; ?> 
                                                             </td>
                                                         </tr>
                                                           <?php if(!$GO): ?>
@@ -164,10 +172,18 @@
                                                             <td>Formato de Desglose de Gastos (Viáticos por persona presupuestado), Oficio de Comisión.</td>
                                                             <?php endif; ?>
                                                            <td class="text-center">
+                                                               <?php if($PT): ?>
                                                                 <a target="_blank"  href="<?= base_url().'index.php/Principal/ImprimirPT/'.$id_registro ?>" class="text-center">
                                                                     <i class="far fa-file-pdf text-danger"></i>
                                                                     <h6 class="text-truncate">Archivo07.pdf</h6>
-                                                                </a>   
+                                                                </a> 
+                                                                <?php endif; ?>  
+                                                               <?php if($GO): ?>
+                                                                <a target="_blank"  href="<?= base_url().'index.php/Principal/ImprimirGO/'.$id_registro ?>" class="text-center">
+                                                                    <i class="far fa-file-pdf text-danger"></i>
+                                                                    <h6 class="text-truncate">Archivo07.pdf</h6>
+                                                                </a> 
+                                                                <?php endif; ?>  
                                                             </td>
                                                         </tr>
                                                           <?php if(!$GO): ?>

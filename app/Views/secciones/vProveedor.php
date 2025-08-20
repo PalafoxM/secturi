@@ -281,7 +281,7 @@
                                                         <div class="col-md-4 mb-3">
                                                             <label for="periodo_<?= $i ?>">Periodo<span style="color:red;">*</span></label>
                                                             <div class="input-group">                                            
-                                                                <input type="text" class="form-control" name="datetimes" id="periodo_<?= $i ?>">
+                                                                <input type="text" class="form-control" name="periodo[]" id="periodo_<?= $i ?>">
                                                                 <div class="input-group-append">
                                                                     <span class="input-group-text"><i class="dripicons-calendar"></i></span>
                                                                 </div>
