@@ -278,7 +278,20 @@ class Agregar extends BaseController {
 
        // return false;
     }
+    private function cambiarStatus($id=null)
+    {
+        $session = \Config\Services::session();
+        $this->globals = new Mglobal();    
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaTurno'];
+        $dataConfig   = [
+                        "tabla"=>"reserva_go",
+                        "editar"=>true,
+                        "idEditar" => ['id_reserva_go' => (int)$id]
+                    ];
+        $response = $this->globals->saveTabla(['id_estatus' => 4],$dataConfig,$dataBitacora);
 
+
+    }
     public function guardaGO()
     {
         $session = \Config\Services::session();
@@ -337,7 +350,7 @@ class Agregar extends BaseController {
     
            $dataInsert = [
                         'id_reserva_go'            => $data['id_reserva_go'],
-                        'id_direccion_responsable'    => $data['direccion_responsable'],
+                        'id_direccion_responsable' => $data['direccion_responsable'],
                         'fecha_tramite'            => $data['fecha_tramite'],
                         'no_consecutivo'           => (int)$data['no_consecutivo'],
                         'id_reponsable_solicitud'  => (int)$data['id_reponsable_solicitud'],
@@ -365,7 +378,7 @@ class Agregar extends BaseController {
                     ];
         }else{   
                 $dataConfig = [
-                    "tabla"=>"registro_pt",
+                    "tabla"=>"registro_go",
                     "editar"=>true,
                     'idEditar'=>['id_registro_go' => $data['id_registro_go']]
                 ];
@@ -377,7 +390,8 @@ class Agregar extends BaseController {
 
         if(!$response->error){
             $id_registro_go = $response->idRegistro;
-
+            $this->cambiarStatus($data['id_reserva_go']);
+ 
            $archivosPdf = [];
            $periodo = [];
 
@@ -414,6 +428,20 @@ class Agregar extends BaseController {
     
         }
         return $this->respond($response);
+    }
+    private function cambiarStatusPT($id=null)
+    {
+        $session = \Config\Services::session();
+        $this->globals = new Mglobal();    
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaTurno'];
+        $dataConfig   = [
+                        "tabla"=>"reserva",
+                        "editar"=>true,
+                        "idEditar" => ['id_reserva' => (int)$id]
+                    ];
+        $response = $this->globals->saveTabla(['id_estatus' => 4],$dataConfig,$dataBitacora);
+
+
     }
     public function guardaPT()
     {
@@ -546,7 +574,7 @@ class Agregar extends BaseController {
             $archivosPdf = [];
             $periodo = [];
             $response->idRegistro = $response->idRegistro;
-
+             $this->cambiarStatusPT($data['id_reserva']);
             foreach ($data as $key => $p) {
                 if (strpos($key, 'encabezado') === 0) {
                     $index = str_replace('encabezado', '', $key); // ej. encabezado1 → 1

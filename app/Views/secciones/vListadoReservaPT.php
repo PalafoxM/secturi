@@ -90,8 +90,12 @@
                                                                 $color = 'badge-soft-success';
                                                                 $texto = 'Aceptado';
                                                                 break;
+                                                           case 4:
+                                                                $color = 'badge-soft-warning';
+                                                                $texto = 'Enviado';
+                                                                break;
                                                             default:
-                                                                $color = 'badge-soft-secondary';
+                                                                $color = 'badge-soft-warning';
                                                                 $texto = 'Desconocido';
                                                         }
                                                         ?>
@@ -106,7 +110,7 @@
                                                                     class="mdi mdi-border-color font-21"></i>
                                                             </a>
                                                              <?php endif; ?>
-                                                             <?php if($p->id_estatus != 3 && $session->id_perfil != 2): ?>
+                                                             <?php if(!in_array($p->id_estatus,[3,4]) && $session->id_perfil != 2): ?>
                                                             <a style="color:white;" onclick="ini.inicio.eliminarReserva(<?=$p->id_reserva?>);" data-toggle="tooltip" data-placement="top" title="" data-original-title="Eliminar"
                                                                 class="btn btn-gradient-danger px-4"><i
                                                                     class="mdi mdi-trash-can-outline font-21"></i>
@@ -120,7 +124,7 @@
                                                             </a>
 
                                                             <?php endif; ?>
-                                                             <?php if($p->id_estatus == 3 && $session->get('id_perfil')!=2): ?>
+                                                             <?php if(in_array($p->id_estatus, [3,4]) && $session->get('id_perfil')!=2): ?>
                                                              
                                                             <a href="<?= base_url().'index.php/Principal/generarTramitePago/'.$p->id_reserva ?>" style="color:white;"  data-toggle="tooltip" data-placement="left" data-original-title="<?= (!empty($p->id_registro_pt) )?'Ver Tramite de Pago':'Generar Tramite de Pago' ?>"
                                                                 class="btn <?= (!empty($p->id_registro_pt) )?'btn-gradient-info':'btn-gradient-primary' ?> px-4 uitooltip"><i

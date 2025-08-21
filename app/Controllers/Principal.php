@@ -1899,7 +1899,7 @@ class Principal extends BaseController {
             echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
             die();
         }
-       
+       $data['GO'] = true;
        switch($id_archivo){
             case 1:
                 $doc = 'assets/pdf/plantillas/anexo02.pdf';
