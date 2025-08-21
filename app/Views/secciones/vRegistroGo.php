@@ -166,7 +166,7 @@
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="concepto_gasto">Concepto del gasto<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" id="concepto_gasto" placeholder="Concepto del gasto" name="concepto_gasto" >
+                                                <input type="text" class="form-control" id="concepto_gasto" autocomplete="off" placeholder="Concepto del gasto" name="concepto_gasto" >
                                             </div><!--end col-->
                                         </div><!--end form-row-->
                                         <div class="form-row">
@@ -181,7 +181,7 @@
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="lugar">Lugar<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" id="lugar" placeholder="Lugar" name="lugar" >
+                                                <input type="text" class="form-control" id="lugar" autocomplete="off" placeholder="Lugar" name="lugar" >
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="no_reserva">No. de Reserva.<span style="color:red;">*</span></label>
@@ -231,7 +231,7 @@
                                                         <!-- Encabezado y XML -->
                                                         <div class="col-md-4 mb-3">
                                                             <label for="encabezado_<?= $i ?>">Encabezado<span style="color:red;">*</span></label>
-                                                            <input type="text" class="form-control" autocomplete="off" id="encabezado_<?= $i ?>" name="encabezado[]">
+                                                            <input type="text" class="form-control" autocomplete="off" id="encabezado_<?= $i ?>" name="encabezado[]" value="<?= (isset($p->encabezado) && !empty($p->encabezado))?$p->encabezado:'' ?>" >
                                                         </div>
 
                                                         <!-- Periodo -->

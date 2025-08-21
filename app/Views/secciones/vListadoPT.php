@@ -73,11 +73,11 @@
                                                                 class="btn btn-gradient-success px-4"><i
                                                                     class="mdi mdi-arrow-collapse-right font-21"></i>
                                                             </a>
-                                                          <!--   <a href="<?php echo base_url(); ?>index.php/Principal/Proveedor/<?= $p->id_proveedor ?>" title="Seccionar Proveedor"
+                                                            <a href="<?php echo base_url(); ?>index.php/Principal/PagoFic/<?= $p->id_proveedor ?>" title="Seccionar Proveedor"
                                                                
                                                                 class="btn btn-gradient-success px-4"><i
                                                                     class="mdi mdi-arrow-collapse-right font-21"></i>
-                                                            </a> -->
+                                                            </a>
                                                           
                                                         </td>
                                                     </tr>

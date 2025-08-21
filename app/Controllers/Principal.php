@@ -2533,7 +2533,7 @@ class Principal extends BaseController {
         $cat_area  = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1 ]]);
         if($id_reserva_go != 0){
             $reserva   = $globals->getTabla(['tabla' => 'vw_reserva_go', 'where' => ['id_reserva' => $id_reserva_go ]]);
-            $presupuesto   = $globals->getTabla(['tabla' => 'presupuesto_go', 'where' => ['id_reserva' => $id_reserva_go ]]);
+            $presupuesto   = $globals->getTabla(['tabla' => 'vw_presupuesto_go', 'where' => ['id_reserva' => $id_reserva_go ]]);
         }
         if(!empty($id_registro_go)){
             $registro_pt   = $globals->getTabla(['tabla' => 'vw_registro_go', 'where' => ['visible' => 1, 'id_registro_go' =>$id_registro_go ]]);
