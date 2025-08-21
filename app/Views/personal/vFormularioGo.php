@@ -80,6 +80,7 @@
 															<th>PROYECTO-META</th>
 															<th>PARTIDA</th>
 															<th>IMPORTE</th>
+															<th>PROPINA</th>
 															<th>ACCIONES</th>
 														</tr>
 													</thead>
@@ -102,6 +103,7 @@
                                                                 </select>
 															</td>
 															<td><input type="text" autocomplete="off" class="form-control" name="importe[]" placeholder="0,000.00"></td>
+															<td><input type="text" autocomplete="off" class="form-control" name="propina[]" placeholder="0,000.00"></td>
 															<td>
 																<button type="button" class="btn btn-sm btn-danger remove-row">
                                                                     <i class="fas fa-trash"></i>
@@ -206,10 +208,18 @@
 	$(document).on('input', 'input[name="importe[]"]', function() {
 	    calcularTotal();
 	});
+		$(document).on('input', 'input[name="propina[]"]', function() {
+	    calcularTotal();
+	});
 	function calcularTotal() {
 	    let total = 0;
 	    
 	    $('input[name="importe[]"]').each(function() {
+	        // Elimina comas y convierte a número
+	        const valor = parseFloat($(this).val().replace(/,/g, '')) || 0;
+	        total += valor;
+	    });
+		 $('input[name="propina[]"]').each(function() {
 	        // Elimina comas y convierte a número
 	        const valor = parseFloat($(this).val().replace(/,/g, '')) || 0;
 	        total += valor;
@@ -242,6 +252,9 @@
 	            <td>
 	                <input autocomplete="off" type="text" class="form-control" name="importe[]" placeholder="0,000.000">
 	            </td>
+				<td>
+	                <input autocomplete="off" type="text" class="form-control" name="propina[]" placeholder="0,000.000">
+	            </td>
 	            <td>
 	                <button type="button" class="btn btn-sm btn-danger remove-row">
 	                    <i class="fas fa-trash"></i>
@@ -256,6 +269,14 @@
 	        
 	        // Inicializar máscara para el campo de importe (opcional)
 	        $('#makeEditable3 tbody tr:last input[name="importe[]"]').inputmask('numeric', {
+	            radixPoint: ".",
+	            groupSeparator: ",",
+	            digits: 2,
+	            autoGroup: true,
+	            prefix: '$ ',
+	            rightAlign: false
+	        });
+			 $('#makeEditable3 tbody tr:last input[name="propina[]"]').inputmask('numeric', {
 	            radixPoint: ".",
 	            groupSeparator: ",",
 	            digits: 2,

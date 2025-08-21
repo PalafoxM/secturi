@@ -530,7 +530,10 @@ ini.inicio = (function () {
                                             </select>
                                         </td>
                                         <td>
-                                            <input type="text" autocomplete="off" class="form-control" name="importe_go[]" value=${p.importe} placeholder="0,000.00">
+                                            <input type="text" autocomplete="off" class="form-control" name="importe_go[]" placeholder="0,000.00" value="${p.importe}" >
+                                        </td>
+                                         <td>
+                                            <input type="text" autocomplete="off" class="form-control" name="propina_go[]" placeholder="0,000.00" value="${p.propina}" >
                                         </td>
                                         <td>
                                             <button type="button" class="btn btn-sm btn-danger remove-row">
@@ -788,6 +791,7 @@ ini.inicio = (function () {
                 formData.append('proyecto[]', $(this).find('[name="proyecto_go[]"]').val());
                 formData.append('partida[]', $(this).find('[name="partida_go[]"]').val());
                 formData.append('importe[]', $(this).find('[name="importe_go[]"]').val());
+                formData.append('propina[]', $(this).find('[name="propina_go[]"]').val());
                 formData.append('id_presupuesto[]', $(this).find('[name="id_presupuesto_go[]"]').val());
             });
 
@@ -1468,6 +1472,7 @@ ini.inicio = (function () {
             formData.append('proyecto[]', $(this).find('[name="proyecto[]"]').val());
             formData.append('partida[]', $(this).find('[name="partida[]"]').val());
             formData.append('importe[]', $(this).find('[name="importe[]"]').val());
+            formData.append('propina[]', $(this).find('[name="propina[]"]').val());
         });
 
         // Enviar datos via AJAX

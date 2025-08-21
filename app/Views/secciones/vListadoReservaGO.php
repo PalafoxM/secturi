@@ -198,6 +198,7 @@
                                                                                         <th>PROYECTO-META</th>
                                                                                         <th>PARTIDA</th>
                                                                                         <th>IMPORTE</th>
+                                                                                        <th>PROPINA</th>
                                                                                         <th>ACCIONES</th>
                                                                                     </tr>
                                                                                 </thead>
@@ -354,11 +355,18 @@ $(document).ready(function() {
     $(document).on('input', 'input[name="importe_go[]"]', function() {
         calcularTotal();
     });
+     $(document).on('input', 'input[name="propina_go[]"]', function() {
+        calcularTotal();
+    });
 
     // 2. Función para calcular el total
     function calcularTotal() {
         let total = 0;
         $('input[name="importe_go[]"]').each(function() {
+            const valor = parseFloat($(this).val().replace(/,/g, '')) || 0;
+            total += valor;
+        });
+        $('input[name="propina_go[]"]').each(function() {
             const valor = parseFloat($(this).val().replace(/,/g, '')) || 0;
             total += valor;
         });

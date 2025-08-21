@@ -832,7 +832,7 @@ class Principal extends BaseController {
            "idEditar"=>['id_reserva_go'=>$data['id_reserva_go']]
         ];
          $response = $globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
-       
+         
          if(!$response->error){
                $i = 0;
                 foreach($data['id_presupuesto'] as $d){
@@ -840,6 +840,7 @@ class Principal extends BaseController {
                             "id_proyecto"    => $data['proyecto'][$i],
                             "id_partida"     => $data['partida'][$i],
                             "importe"        => $data['importe'][$i], 
+                            "propina"        => $data['propina'][$i], 
                             "usu_act"        => $session->get('id_usuario')
                             
                         ];
@@ -1107,7 +1108,8 @@ class Principal extends BaseController {
                             $datosCombinados[] = [
                                 'proyecto' => $proyecto,
                                 'partida' => $data['partida'][$index],
-                                'importe' => str_replace(',', '', $data['importe'][$index]) // Elimina comas del formato numérico
+                                'importe' => str_replace(',', '', $data['importe'][$index]),
+                                'propina' => str_replace(',', '', $data['propina'][$index]) // Elimina comas del formato numérico
                             ];
                         }
                     }
@@ -1123,6 +1125,7 @@ class Principal extends BaseController {
                             "id_proyecto"    => $d['proyecto'],
                             "id_partida"     => $d['partida'],
                             "importe"        => $d['importe'], 
+                            "propina"        => $d['propina'],
                             "fec_reg"        => $hoy, 
                             "usu_reg"        => $session->get('id_usuario')
                             
