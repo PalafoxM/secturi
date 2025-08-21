@@ -2447,7 +2447,9 @@ class Principal extends BaseController {
         $response->respuesta = 'Error|Error al traer los proveedor';
         $globals = new Mglobal;
         $id_proveedor =  $this->request->getPost('id_proveedor');
-      
+        $fic =  $this->request->getPost('fic');
+     
+
         $data = [];
        if(!empty($id_proveedor)){
             $proveedor           = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1, 'id_proveedor' =>$id_proveedor ]]);
@@ -2462,10 +2464,11 @@ class Principal extends BaseController {
                 }
                 
             }
-            $response->error     = $proveedor->error;
-            $response->respuesta = $proveedor->respuesta;
+            $response->error             = $proveedor->error;
+            $response->respuesta         = $proveedor->respuesta;
             $response->data['proveedor'] = (isset($proveedor->data[0]) && !empty($proveedor->data[0]))?$proveedor->data[0]:[];
-            $response->data['banco'] = (isset( $banco->data[0]) && !empty( $banco->data[0]))?$banco->data:[];
+            $response->data['banco']     = (isset( $banco->data[0]) && !empty( $banco->data[0]))?$banco->data:[];
+
             
         }
       
@@ -2637,7 +2640,7 @@ class Principal extends BaseController {
         $this->_renderView($data);
         
     }  
-/*     public function generarTramitePago($id_proveedor = null, $id_registro_pt =  null)
+     public function PagoFic($id_proveedor = null)
     {  
         $session = \Config\Services::session();
         $response = new \stdClass();
@@ -2647,12 +2650,9 @@ class Principal extends BaseController {
         $cat_area  = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1 ]]);
         if($id_proveedor != 0){
             $proveedor   = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1, 'id_proveedor' =>$id_proveedor ]]);
-            $banco       = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['id_proveedor' => $id_proveedor ]]);
+            $banco       = $globals->getTabla(['tabla' => 'proveedor_banco', 'where' => ['idproveedor' => $id_proveedor ]]);
         }
-        if(!empty($id_registro_pt)){
-            $registro_pt   = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1, 'id_registro_pt' =>$id_registro_pt ]]);
-        }
-        
+
         $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1 ]]);
         $cat_tipo = $globals->getTabla(['tabla' => 'cat_tipo', 'where' => ['visible' => 1 ]]);
  
@@ -2660,14 +2660,17 @@ class Principal extends BaseController {
         $cat_usuario          = $globals->getTabla(['tabla' => 'usuario', 'where' => ['visible' => 1 ]]);
         $cat_director_general = $globals->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1 ]]);
         $cat_opcion           = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1 ]]);
+    
         if($id_proveedor != 0){
           $data['proveedor']   = (!empty($proveedor->data))?$proveedor->data[0]:[];
-          $data['banco']       = (!empty($banco->data))?$banco->data[0]:[];
+          $data['banco']       = (!empty($banco->data))?$banco->data:[];
          
         }
+  
         if(!empty($id_registro_pt)){
            $data['registro_pt']   = (!empty($registro_pt->data))?$registro_pt->data[0]:[];
         }
+        $data['FIC'] = true;
         $data['dsc_director_general'] = (!empty($cat_director_general->data))?$cat_director_general->data[0]->dsc_director_general:[];
         $data['cat_area']    = (!empty($cat_area->data))?$cat_area->data:[];
         $data['cat_tipo']    = (!empty($cat_tipo->data))?$cat_tipo->data:[];
@@ -2678,11 +2681,11 @@ class Principal extends BaseController {
         $data['cat_usuario']     = (!empty($cat_usuario->data))?$cat_usuario->data:[];
         $data['scripts']     = array('inicio');
         $data['edita']       = 0;
-        $data['contentView'] = 'secciones/vProveedor';                
+        $data['contentView'] = 'personal/vFormularioFic';                
         $this->_renderView($data);
         
     }  
- */
+
     public function getProveedores()
     {  
        

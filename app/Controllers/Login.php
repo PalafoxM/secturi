@@ -205,13 +205,24 @@ class Login extends BaseController {
         $response->respuesta = "Error al registrar salida";
         $session = \Config\Services::session();
         $globals = new Mglobal;
-        $hoy = $this->globals->getTabla(["tabla"=>"asistencia", 'where' => ['visible' => 1, 'id_usuario' => $session->get('id_usuario'), 'fecha' => date('Y-m-d') ]]);
-        die( var_dump( $hoy ) );
-        $dataConfig = [
+        $id_asistencia = null;
+        $hoy = $globals->getTabla(["tabla"=>"asistencia", 'where' => ['visible' => 1, 'id_usuario' => $session->get('id_usuario'), 'fecha' => date('Y-m-d') ]]);
+        if(isset($hoy->data) && !empty($hoy->data)){
+         $id_asistencia = $hoy->data[0]->id_asistencia;
+           $dataConfig = [
                     "tabla" => 'asistencia',
                     "editar" => true,
-                    "idEditar" => ['id_usuario' => $session->get('id_usuario')]
+                    "idEditar" => ['id_usuario' => $session->get('id_usuario'), 'id_asistencia' => $id_asistencia ]
                 ];
+        }else{
+            $dataConfig = [
+                    "tabla" => 'asistencia',
+                    "editar" => true,
+                    "idEditar" => ['id_usuario' => $session->get('id_usuario'),  'fecha' => date('Y-m-d') ]
+                ];
+
+        }
+      
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Login.php/guardaSalida'];  
         $result = $globals->saveTabla(['salida' => date('H:i:s')], $dataConfig,  $dataBitacora );
         if(!$result->error){

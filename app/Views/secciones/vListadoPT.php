@@ -68,15 +68,13 @@
                                                         <td class="text-center"><?= $p->rfc?></td>
                                                         <td class="text-center"><?= $p->no_proveedor?></td>
                                                         <td class="text-center">
-                                                             <a style="color:white" onclick="ini.inicio.reserva(<?=$p->id_proveedor?>);" title="Seccionar Proveedor"
+                                                             <a style="color:white" onclick="ini.inicio.reserva(<?=$p->id_proveedor?>);" data-toggle="tooltip" data-placement="left" data-original-title="Seleccionar Proveedor"
                                                                
                                                                 class="btn btn-gradient-success px-4"><i
                                                                     class="mdi mdi-arrow-collapse-right font-21"></i>
                                                             </a>
-                                                            <a href="<?php echo base_url(); ?>index.php/Principal/PagoFic/<?= $p->id_proveedor ?>" title="Seccionar Proveedor"
-                                                               
-                                                                class="btn btn-gradient-success px-4"><i
-                                                                    class="mdi mdi-arrow-collapse-right font-21"></i>
+                                                            <a href="<?php echo base_url(); ?>index.php/Principal/PagoFic/<?= $p->id_proveedor ?>"  data-toggle="tooltip" data-placement="left" data-original-title="Pagos FIC"
+                                                                class="btn btn-gradient-dark px-4">FIC</i>
                                                             </a>
                                                           
                                                         </td>

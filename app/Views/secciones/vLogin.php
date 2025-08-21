@@ -58,7 +58,7 @@
                                         <a href="auth-recover-pw.html" class="text-muted font-13"><i
                                                 class="dripicons-lock"></i> ¿Olvido su contraseña?</a>
                                     </div>
-                                    <!--end col-->
+                             
                                 </div>
                                 <!--end form-group-->
 
@@ -82,7 +82,7 @@
                                             Validando...
                                         </button>
                                     </div>
-                                    <!--end col-->
+                                     
                                 </div>
                                 <!--end form-group-->
                             </div>
@@ -98,7 +98,7 @@
                 </div>
                 <!--end card-->
                 <div class="account-social text-center mt-4">
-                    <h6 class="my-4">Ingresar con</h6>
+                    <h6 class="my-4">   Version 1.0</h6>
                     <ul class="list-inline mb-4">
                         <li class="list-inline-item">
                             <a href="" class="">
