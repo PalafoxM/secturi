@@ -107,13 +107,13 @@
                                                               <?php endif; ?>
                                                             <?php if($session->get('id_perfil')==2): ?>
                                                             <a style="color:white;"  onclick="ini.inicio.estatusReservaGo(<?=$p->id_reserva_go?>, <?=$p->id_estatus?> );" data-toggle="tooltip" data-placement="top" title="" data-original-title="<?= ($p->id_estatus == 3)?'Ver Reserva':'Validar Reserva'?>"
-                                                                class="btn <?= ($p->id_estatus == 3)?'btn-gradient-info':'btn-gradient-warning'?> px-4"><i
+                                                                class="btn <?= (in_array($p->id_estatus, [3,4]))?'btn-gradient-info':'btn-gradient-warning'?> px-4"><i
                                                                     class="mdi mdi-lock-open font-21"></i>
                                                             </a>
 
                                                             <?php endif; ?>
                                                              <?php if(in_array($p->id_estatus, [3,4]) && $session->get('id_perfil')!=2  ): ?>
-                                                            <a href="<?= base_url().'index.php/Principal/generarTramitePagoGo/'.$p->id_reserva_go ?>" style="color:white;"  data-toggle="tooltip" data-placement="left" data-original-title="<?=(in_array($p->id_estatus, [3,4]))?'Ver Pago':'Generar Tramite de Pago'?>"
+                                                            <a href="<?= base_url().'index.php/Principal/generarTramitePagoGo/'.$p->id_reserva_go ?>" style="color:white;"  data-toggle="tooltip" data-placement="left" data-original-title="<?=($p->id_estatus == 4)?'Ver Pago':'Generar Tramite de Pago'?>"
                                                                 class="btn <?= (!empty($p->id_registro_go) )?'btn-gradient-info':'btn-gradient-primary' ?> px-4 uitooltip"><i
                                                                     class="mdi mdi-arrow-right-bold font-21"></i>
                                                             </a>

@@ -3626,10 +3626,16 @@ ini.inicio = (function () {
                         }
                     });
 
-                    $("[id^=periodo_]").each(function(){
+                    $("[id^=periodo_inicio]").each(function(){
                         if($(this).val().trim() === ""){
                             valido = false;
-                            mensajes.push("El campo Periodo es obligatorio.");
+                            mensajes.push("El campo Periodo termino es obligatorio.");
+                        }
+                    });
+                    $("[id^=periodo_fin]").each(function(){
+                        if($(this).val().trim() === ""){
+                            valido = false;
+                            mensajes.push("El campo Periodo fin es obligatorio.");
                         }
                     });
 

@@ -2590,7 +2590,7 @@ class Principal extends BaseController {
         $cat_area  = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1 ]]);
         if($id_reserva != 0){
             $reserva   = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['id_reserva' => $id_reserva ]]);
-            $presupuesto   = $globals->getTabla(['tabla' => 'presupuesto', 'where' => ['id_reserva' => $id_reserva ]]);
+            $presupuesto   = $globals->getTabla(['tabla' => 'vw_presupuesto', 'where' => ['id_reserva' => $id_reserva ]]);
             foreach($presupuesto->data as $i => $p){ 
                 if ($p->id_partida >= 149 && $p->id_partida <= 248){
                    $partida4000 = true;
@@ -2619,7 +2619,7 @@ class Principal extends BaseController {
         }
 
        
-    
+        //die( var_dump(  $data['presupuesto'] ) );
         $data['dsc_director_general'] = (!empty($cat_director_general->data))?$cat_director_general->data[0]->dsc_director_general:[];
         $data['cat_area']             = (!empty($cat_area->data))?$cat_area->data:[];
         $data['cat_tipo']             = (!empty($cat_tipo->data))?$cat_tipo->data:[];
