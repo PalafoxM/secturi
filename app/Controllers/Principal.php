@@ -2216,7 +2216,7 @@ class Principal extends BaseController {
             echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
             die();
         }
-      
+       $data['GO'] = TRUE;
        $html = view('secciones/vFormatoPT.php', $data);
       $htmlSegundaHoja = view('secciones/vFormatoPT2.php', $data);
       $htmlTercerHoja = view('personal/vFormato702.php', $data);

@@ -3696,6 +3696,25 @@ ini.inicio = (function () {
             $("#form_go").submit(function (e) {
                 e.preventDefault(); 
                 var formData = new FormData(this); // Usar FormData en lugar de serialize
+                     let valido = true;
+                    let mensajes = [];
+
+
+                    // Validar archivos PDF
+                    $("[id^=factura_pdf_input_go_]").each(function(){
+                        let files = this.files;
+                        if(files.length === 0){
+                            valido = false;
+                            mensajes.push("Debe subir al menos un archivo PDF.");
+                        }
+                    });
+
+                    
+
+                    if(!valido){
+                        Swal.fire("Atención", "<p>"+mensajes.join("<br>")+"</p>", "warning");
+                        return;
+                    }
                
                 $.ajax({
                     type: "POST",

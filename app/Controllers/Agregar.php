@@ -83,7 +83,8 @@ class Agregar extends BaseController {
             $dataInsert = [
                 'id_registro_go' => (int)$id_registro_go,
                 'encabezado'     => $p['encabezado'],  // ahora sí existe
-                'periodo'        => $p['periodo'],
+                'periodo_inicio' => $p['periodo_inicio'],
+                'periodo_fin'    => $p['periodo_fin'],
             ];
 
             $dataBitacora = [
@@ -385,9 +386,13 @@ class Agregar extends BaseController {
                     $index = str_replace('encabezado', '', $key); // ej. encabezado1 → 1
                     $periodo[$index]['encabezado'] = $p;
                 } 
-                if (strpos($key, 'periodo') === 0) {
-                    $index = str_replace('periodo', '', $key); // ej. periodo1 → 1
-                    $periodo[$index]['periodo'] = $p;
+                if (strpos($key, 'periodo_inicio') === 0) {
+                    $index = str_replace('periodo_inicio', '', $key); // ej. periodo1 → 1
+                    $periodo[$index]['periodo_inicio'] = $p;
+                } 
+                 if (strpos($key, 'periodo_fin') === 0) {
+                    $index = str_replace('periodo_fin', '', $key); // ej. periodo1 → 1
+                    $periodo[$index]['periodo_fin'] = $p;
                 } 
             }
 

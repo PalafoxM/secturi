@@ -235,13 +235,18 @@
                                                         </div>
 
                                                         <!-- Periodo -->
-                                                        <div class="col-md-4 mb-3">
-                                                            <label for="periodo_<?= $i ?>">Periodo<span style="color:red;">*</span></label>
+                                                        <div class="col-md-2 mb-3">
+                                                            <label for="periodo_inicio<?= $i ?>">Inicio<span style="color:red;">*</span></label>
                                                             <div class="input-group">                                            
-                                                                <input type="text" class="form-control"  id="periodo_<?= $i ?>" name="periodo[]">
-                                                                <div class="input-group-append">
-                                                                    <span class="input-group-text"><i class="dripicons-calendar"></i></span>
-                                                                </div>
+                                                                <input type="date" class="form-control"  id="periodo_inicio<?= $i ?>" name="periodo_inicio[]">
+                                                                
+                                                            </div>
+                                                        </div>
+                                                         <div class="col-md-2 mb-3">
+                                                            <label for="periodo_fin<?= $i ?>">Termino<span style="color:red;">*</span></label>
+                                                            <div class="input-group">                                            
+                                                                <input type="date" class="form-control"  id="periodo_fin<?= $i ?>" name="periodo_fin[]">
+                                                                
                                                             </div>
                                                         </div>
                                                     </div>
@@ -249,8 +254,14 @@
                                                     <div class="form-row">
                                                         <div class="col-md-6 mb-3">
                                                             <p class="text-muted mb-3">Factura PDF (Máx 5MB)</p>
-                                                            <input id="factura_pdf_input_<?= $i; ?>"  type="file" name="factura_pdf_<?= $i; ?>[]" class="dropify" multiple accept=".pdf" />   
+                                                            <input id="factura_pdf_input_go_<?= $i; ?>"  type="file" name="factura_pdf_<?= $i; ?>[]" class="dropify" multiple accept=".pdf" />   
                                                         </div>
+                                                        <?php if(isset($p->propina) && !empty($p->propina)):?>
+                                                         <div class="col-md-6 mb-3">
+                                                            <p class="text-muted mb-3">Propina PDF (Máx 5MB)</p>
+                                                            <input id="propina_pdf__input_<?= $i; ?>"  type="file" name="propina_pdf_<?= $i; ?>[]" class="dropify" multiple accept=".pdf" />   
+                                                        </div>
+                                                        <?php endif; ?>
                                                      
                                                     </div>
                                                 <?php endforeach; ?>

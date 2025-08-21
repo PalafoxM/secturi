@@ -7,7 +7,7 @@
         </div>
 
         <div  style="position:absolute;text-align:center; top:18.2%; left:70.5%; width:25%; height:18px; background-color:white; font-size: 12px; ">
-            <span class="proxima">PT <?= strtoupper($registro->folio);?></span>
+            <span class="proxima"><?= (isset($GO) && !empty($GO))?'GO':'PT';?> <?= strtoupper($registro->folio);?></span>
         </div>
         <div  style="position:absolute; top:36.2%; left:66.8%; width:30%; background-color:white; font-size: 9px;  height:12px;">
             <span ><?= (isset($registro->dsc_proveedor) && !empty($registro->dsc_proveedor))?strtoupper($registro->dsc_proveedor):'' ?></span>
