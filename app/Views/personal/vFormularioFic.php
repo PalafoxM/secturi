@@ -31,7 +31,7 @@
                                     <p class="text-muted mb-3" >
                                         <?= (isset($proveedor->no_proveedor) && !empty($proveedor->no_proveedor))?'No. Proveedor '.$proveedor->no_proveedor:'' ?>
                                     </p>
-                                   <form id="form_proveedor" enctype="multipart/form-data">
+                                   <form id="form_fic" enctype="multipart/form-data">
                                         <input type="hidden" name="id_proveedor" id="id_proveedor" value="<?= (isset($proveedor->id_proveedor) && !empty($proveedor->id_proveedor))?$proveedor->id_proveedor:''?>" >
                                         <input type="hidden" name="editar" id="editar" value="<?= $editar?>">
                                         <?php if(isset($registro_pt->id_registro_pt) && !empty($registro_pt->id_registro_pt)): ?>
@@ -233,7 +233,7 @@
                                         <div class="form-row">
                                             <div class="col-md-4 mb-3">
                                                 <label for="no_reserva">Tipo Consumo<span style="color:red;">*</span></label>
-                                                 <select class="form-control">
+                                                 <select class="form-control" name="no_reserva" >
                                                     <option value="4327277">ALIMENTOS | 3390</option>
                                                     <option value="4327278">HOSPEDAJE | 3390</option>
                                                     <option value="4327279">ALIMENTOS GEG | 2210</option>
@@ -246,24 +246,29 @@
                                                     Campo no Valido
                                                 </div>
                                             </div><!--end col-->
+                                            <div class="col-md-4 mb-3">
+                                                <label for="importe">Importe<span style="color:red;">*</span></label>
+                                                <input type="number" class="form-control" autocomplete="off" id="importe" name="importe" placeholder="0,000.00" >
+                                          
+                                            </div><!--end col-->
                                         </div><!--end form-row-->
                                         
                                                     <div class="form-row">
                                                         <div class="col-md-6 mb-3">
                                                             <p class="text-muted mb-3">Factura PDF (Máx 5MB)</p>
-                                                            <input id="factura_pdf_input_"  type="file" name="factura_pdf[]" class="dropify" multiple accept=".pdf" />   
+                                                            <input id="factura_pdf_fic"  type="file" name="factura_pdf_fic[]" class="dropify" multiple accept=".pdf" />   
                                                         </div>
                                                         <div class="col-md-6 mb-3">
                                                           
                                                             <p class="text-muted mb-3">Factura XML (Máx 5MB)</p>
-                                                            <input id="factura_xml_input" type="file" name="factura_xml[]" multiple class="dropify"  accept=".xml">
+                                                            <input id="factura_xml_fic" type="file" name="factura_xml_fic[]" multiple class="dropify"  accept=".xml">
                                                         </div>
                                                     </div>
 
 
                                             <a class="btn btn-gradient-danger" style="color:white" onclick="window.history.back()">Atrás</a>
                                             <?php if(!$edita): ?>
-                                             <button class="btn btn-gradient-primary" id="btnGuardatPT" type="submit">Guardar</button>
+                                             <button class="btn btn-gradient-primary" id="btnGuardaFIC" type="submit">Guardar</button>
                                             <?php endif; ?>
                                     </form> <!--end form-->                                          
                                 </div><!--end card-body-->
@@ -320,7 +325,7 @@
         <script src="<?= base_url()?>plugins/bootstrap-touchspin/js/jquery.bootstrap-touchspin.min.js"></script>
 
         <script>
-            ini.inicio.formPT();
+            ini.inicio.formFIC();
              $('.add-file').on('click', function(e) {
                 e.preventDefault();
                 const inputId = $(this).data('target');

@@ -3715,6 +3715,70 @@ ini.inicio = (function () {
                 });
             });
         },
+        formFIC: function(){
+            $("#form_fic").submit(function (e) {
+                e.preventDefault(); 
+                   let valido = true;
+                    let mensajes = [];
+
+                    // Validar archivos PDF
+                    $("[id^=factura_pdf_fic]").each(function(){
+                        let files = this.files;
+                        if(files.length === 0){
+                            valido = false;
+                            mensajes.push("Debe subir al menos un archivo PDF.");
+                        }
+                    });
+
+                    $("[id^=factura_xml_fic]").each(function(){
+                        let files = this.files;
+                        if(files.length === 0){
+                            valido = false;
+                            mensajes.push("Debe subir al menos un archivo XML.");
+                        }
+                    });
+
+                    if(!valido){
+                        Swal.fire("Atención", "<p>"+mensajes.join("<br>")+"</p>", "warning");
+                        return;
+                    }
+
+                var formData = new FormData(this); // Usar FormData en lugar de serialize
+
+               
+                $.ajax({
+                    type: "POST",
+                    url: base_url + "index.php/Agregar/guardaFIC",
+                    data: formData,
+                    processData: false,  // Importante para FormData
+                    contentType: false,  // Importante para FormData
+                    dataType: "json",
+                    success: function (response) {
+                        console.log(response);
+                        if(!response.error){
+                            Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
+                            setTimeout(() => {
+                               // window.location.href = base_url + "index.php/Principal/listadoEstatusPT";
+                                window.location.href = base_url + "index.php/Principal/tablaArchivos/"+response.idRegistro+'/GO';
+                            }, 1500);
+                        }else{
+                            Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
+                        }
+                    },
+                    beforeSend: function (info){
+                         $('#btnGuardaFIC').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                    },
+                    complete: function (info){
+                        $('#btnGuardaFIC').prop('disabled', false).html('Guardar');
+                    },
+                    error: function (response,jqXHR, textStatus, errorThrown) {
+                        var res= JSON.parse(response.responseText);
+                        Swal.fire("Error", '<p> '+ res.message + '</p>');  
+                         $('#btnGuardaFIC').prop('disabled', false).html('Guardar');
+                    }
+                });
+            });
+        },
        formGo: function(){
             $("#form_go").submit(function (e) {
                 e.preventDefault(); 

@@ -293,6 +293,144 @@ class Agregar extends BaseController {
 
 
     }
+    public function guardaFIC()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = "Error|Error al guardar PT";
+        $this->globals = new Mglobal();
+        $data = $this->request->getPost();
+        $archivos = $this->request->getFiles();
+
+        if($data['secretario'] == 0){
+            $response->error = true;
+            $response->respuesta = "Es requerido el Secretario o Director";
+            return $this->respond($response);
+        }
+        if($data['no_consecutivo'] == ''){
+            $response->error = true;
+            $response->respuesta = "Es requerido el No. Concecutivo";
+            return $this->respond($response);
+        }
+        if(($data['direccion_responsable'])==0){
+            $response->error = true;
+            $response->respuesta = "Es requerido el Dirección Responsable";
+            return $this->respond($response);
+        }
+        if(isset($data['documentacion_comprobatoria']) && empty($data['documentacion_comprobatoria'])){
+            $response->error = true;
+            $response->respuesta = "Es requerido el documentacion_comprobatorian";
+            return $this->respond($response);
+        }
+        if(isset($data['poliza']) && empty($data['poliza'])){
+            $response->error = true;
+            $response->respuesta = "Es requerido el poliza";
+            return $this->respond($response);
+        }
+        if(isset($data['formato_conformidad']) && empty($data['formato_conformidad'])){
+            $response->error = true;
+            $response->respuesta = "Es requerido el formato_conformidad";
+            return $this->respond($response);
+        }
+        if(isset($data['concepto_gasto']) && empty($data['concepto_gasto'])){
+            $response->error = true;
+            $response->respuesta = "Es requerido el concepto gasto";
+            return $this->respond($response);
+        }
+
+        if(isset($data['no_reserva']) && empty($data['no_reserva'])){
+            $response->error = true;
+            $response->respuesta = "Es requerido el tipo de consumo";
+            return $this->respond($response);
+        }
+        if(isset($data['fecha_tramite']) && empty($data['fecha_tramite'])){
+          $data['fecha_tramite'] = date('Y-m-d');
+        }
+        
+        die(var_dump($data));
+    
+           $dataInsert = [
+                        'id_reserva_fic'           => $data['id_reserva_go'],
+                        'id_direccion_responsable' => $data['direccion_responsable'],
+                        'fecha_tramite'            => $data['fecha_tramite'],
+                        'no_consecutivo'           => (int)$data['no_consecutivo'],
+                        'id_reponsable_solicitud'  => (int)$data['id_reponsable_solicitud'],
+                        'director_general'         => 1,
+                        'secretario'               => (int)$data['secretario'],
+                        'contrato_convenio'        => ($data['contrato_convenio'] == 'NO')?2:1,
+                        'formato_establecido'      => ($data['formato_establecido']=='SI')?1:2,
+                        'documentacion_comprobatoria'=>$data['documentacion_comprobatoria'],
+                        'poliza'                   =>($data['poliza']=='SI')?1:2,
+                        'formato_conformidad'      =>($data['formato_conformidad']=='SI')?1:2,
+                        'documentacion_requerida'  =>($data['documentacion_requerida']=='SI')?1:2,
+                        'evidencia_entrega'        =>(int)$data['evidencia_entrega'],
+                        'concepto_gasto'           =>$data['concepto_gasto'],
+                        'comision'                 =>$data['comision'],
+                        'no_reserva'               =>$data['no_reserva'],
+                        'lugar'                    =>$data['lugar']  
+                    ];
+            $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaTurno'];
+        if($data['editar'] == 1){
+                    $dataInsert['usu_reg'] = $session->get('id_usuario');
+                    $dataInsert['fec_reg'] = date('Y-m-d');
+                    $dataConfig = [
+                        "tabla"=>"registro_go",
+                        "editar"=>false
+                    ];
+        }else{   
+                $dataConfig = [
+                    "tabla"=>"registro_go",
+                    "editar"=>true,
+                    'idEditar'=>['id_registro_go' => $data['id_registro_go']]
+                ];
+                 $dataInsert['usu_act'] = $session->get('id_usuario');
+        }
+      
+   
+        $response = $this->globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
+
+        if(!$response->error){
+            $id_registro_go = $response->idRegistro;
+            $this->cambiarStatus($data['id_reserva_go']);
+ 
+           $archivosPdf = [];
+           $periodo = [];
+
+            foreach ($data as $key => $p) {
+                if (strpos($key, 'encabezado') === 0) {
+                    $index = str_replace('encabezado', '', $key); // ej. encabezado1 → 1
+                    $periodo[$index]['encabezado'] = $p;
+                } 
+                if (strpos($key, 'periodo_inicio') === 0) {
+                    $index = str_replace('periodo_inicio', '', $key); // ej. periodo1 → 1
+                    $periodo[$index]['periodo_inicio'] = $p;
+                } 
+                 if (strpos($key, 'periodo_fin') === 0) {
+                    $index = str_replace('periodo_fin', '', $key); // ej. periodo1 → 1
+                    $periodo[$index]['periodo_fin'] = $p;
+                } 
+            }
+
+          
+            // Recorremos todas las claves de los archivos enviados
+            foreach ($archivos as $key => $fileArray) {
+                if (strpos($key, 'factura_pdf_') === 0) {
+                    $archivosPdf = array_merge($archivosPdf, $fileArray);
+                }
+            }
+        
+           $datosPDF =$this->procesarPDFgo($archivosPdf, $id_registro_go);
+           $datosP   =$this->procesarPediodoGo($periodo, $id_registro_go);
+          
+            if (!$datosPDF) {
+                $response->errorPDF     =  true;
+                $response->respuestaPDF = "PDF inválido o no se encontró.";
+            }
+    
+        }
+        return $this->respond($response);
+    }
     public function guardaGO()
     {
         $session = \Config\Services::session();
