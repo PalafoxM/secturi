@@ -1369,12 +1369,9 @@ ini.inicio = (function () {
         getVehiculo: function(id_vehiculo)
         {
           $('#modalVehiculo').modal('show');
-           $('#modalVehiculo').on('shown.bs.modal', function () {
-            $('.select2').select2({
-                placeholder: "Seleccione una opción",
-                allowClear: true
-            });
-        });
+       
+      
+
           console.log(id_vehiculo);
            $.ajax({
             url: base_url + "index.php/Principal/getVehiculo",
@@ -2851,7 +2848,8 @@ ini.inicio = (function () {
         //  resetChat();
         },
         getUsuario: function(id){
-            
+       
+            $('#agregarUsuario').modal('show');
             $.ajax({
                 type: "POST",
                 url: base_url + "index.php/Usuario/getUsuario",
@@ -2890,6 +2888,25 @@ ini.inicio = (function () {
                     } else {
                         Swal.fire("info", "No se encontraron datos del usuario.", "info");
                     }
+                },
+                complete: function(){
+                    $('#agregarUsuario').modal('show');
+                    
+                    $('#agregarUsuario').on('shown.bs.modal', function () {
+                        // Pequeño delay para asegurar que el DOM esté listo
+                        setTimeout(function() {
+                            // Verificar que Select2 esté disponible
+                            if (typeof $.fn.select2 === 'function') {
+                                $('.select2').select2({
+                                    placeholder: "Seleccione una opción",
+                                    allowClear: true,
+                                    width: '100%' // Para mejor responsive
+                                });
+                            } else {
+                                console.error('Select2 no está cargado. Verifica el orden de carga de los scripts.');
+                            }
+                        }, 50);
+                    });
                 },
                 error: function() {
                     Swal.fire("info", "No se encontraron datos del usuario.", "info");

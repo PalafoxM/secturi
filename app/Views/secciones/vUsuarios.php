@@ -63,10 +63,12 @@
                                             <td class="text-center"><?= $u->correo?></td>
                                             <td class="text-center"><?= $u->no_empleado?></td>
                                             <td class="text-center">
-                                                <a href="javascript:void(0);" data-toggle="modal"
-                                                    data-animation="bounce" data-target=".bs-example"
-                                                    onclick="ini.inicio.getUsuario(<?=$u->id_usuario?>)"><i
-                                                        class="mdi mdi-pencil text-success font-18"></i></a>
+                                         <!-- tu trigger -->
+                                                <a href="javascript:void(0);"
+                                                onclick="ini.inicio.getUsuario(<?= $u->id_usuario ?>)">
+                                                <i class="mdi mdi-pencil text-success font-18"></i>
+                                                </a>
+
 
                                                  <a href="<?php echo base_url().'index.php/Principal/imprimer_qr/'.$u->id_usuario ?>"
                                                     data-animation="bounce" ><i
@@ -202,7 +204,7 @@
                                             <div class="col-md-3">
                                                 <div class="mb-3 position-relative" id="">
                                                     <label for="id_area" class="form-label">AREA</label>
-                                                    <select class="form-control select2" data-toggle="select2"
+                                                    <select class="form-control select2"
                                                         id="id_area" name="id_area" data-placeholder="Seleccione"
                                                         style="z-index:100;">
                                                         <option value="0">Seleccione</option>
@@ -274,7 +276,7 @@
                                             <div class="col-md-3">
                                                 <div class="mb-3 position-relative" id="">
                                                     <label for="id_tipo_empleado" class="form-label">TIPO EMPLEADO</label>
-                                                    <select class="form-control select2" data-toggle="select2"
+                                                    <select class="form-control select2" 
                                                         id="id_tipo_empleado" name="id_tipo_empleado" data-placeholder="Seleccione"
                                                         style="z-index:100;">
                                                         <option value="0">Seleccione</option>
@@ -390,30 +392,37 @@
     </div><!-- /.modal -->
     <!-- modal -->
 
-    <link href="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet"
-        type="text/css" />
+<link href="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet"
+    type="text/css" />
+<!-- App css -->
+<link href="<?php echo base_url(); ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo base_url(); ?>assets/css/jquery-ui.min.css" rel="stylesheet">
+<link href="<?php echo base_url(); ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
+<link href="<?= base_url()?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+<link href="<?= base_url()?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
+<!-- jQuery  -->
+ 
+<script src="<?php echo base_url(); ?>assets/js/jquery.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/jquery-ui.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/bootstrap.bundle.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/jquery.slimscroll.min.js"></script>
 
-    <!-- App css -->
-    <link href="<?php echo base_url(); ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <link href="<?php echo base_url(); ?>assets/css/jquery-ui.min.css" rel="stylesheet">
-    <link href="<?php echo base_url(); ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
-    <link href="<?php echo base_url(); ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
 
+<!-- Required datatable js -->
+<script src="<?php echo base_url(); ?>plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.js"></script>
 
+<!-- App js -->
+<script src="<?= base_url()?>assets/js/app.js"></script>
+<script src="<?= base_url()?>assets/js/waves.js"></script>
+<script src="<?= base_url()?>assets/js/feather.min.js"></script>
 
-    <!-- jQuery  -->
-    <script src="<?php echo base_url(); ?>assets/js/jquery.min.js"></script>
-    <script src="<?php echo base_url(); ?>assets/js/jquery-ui.min.js"></script>
-    <script src="<?php echo base_url(); ?>assets/js/bootstrap.bundle.min.js"></script>
+<script src="<?= base_url()?>plugins/tiny-editable/mindmup-editabletable.js"></script>
+<script src="<?= base_url()?>plugins/tiny-editable/numeric-input-example.js"></script>
+<script src="<?= base_url()?>plugins/bootable/bootstable.js"></script> 
+<link href="<?php echo base_url(); ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
 
-    <script src="<?php echo base_url(); ?>assets/js/jquery.slimscroll.min.js"></script>
-    <script src="<?php echo base_url(); ?>plugins/apexcharts/apexcharts.min.js"></script>
-
-    <!-- Required datatable js -->
-    <script src="<?php echo base_url(); ?>plugins/datatables/jquery.dataTables.min.js"></script>
-    <script src="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.js"></script>
-
-    <script src="<?php echo base_url(); ?>assets/pages/jquery.analytics_customers.init.js"></script>
+<script src="<?= base_url(); ?>plugins/select2/select2.min.js"></script>
 
 
 
@@ -426,6 +435,10 @@
         destroy: true,
         searching: true,
     });
+
+
+  
+
 
     function fechas() {
         let fec_inicio = $('#fecha_inicio').val();
