@@ -674,22 +674,36 @@ class Agregar extends BaseController {
         }
         $hoy = date("Y-m-d H:i:s"); 
 
+
         $dataInsert = [
-            'id_sexo'               => (int)$data['id_sexo'],             
-            'id_jefe_inmediato'     => (int)$data['id_jefe_inmediato'],             
-            'id_tipo_empleado'      => (int)$data['id_tipo_empleado'],             
-            'id_puesto'             => (int)$data['id_puesto'],             
-            'id_perfil'             => (int)$data['id_perfil'],                   
+            'id_sexo'               => (int)$data['id_sexo'],    
+            'id_jefe_inmediato'     => (int)$data['id_jefe_inmediato'],
+            'id_tipo_empleado'      => (int)$data['id_tipo_empleado'],
+            'id_puesto'             => (int)$data['id_puesto'],
+            'id_perfil'             => (int)$data['id_perfil'],
             'usuario'               => $data['usuario'],                
-            'nombre'                => $data['nombre'],           
+            'nombre'                => $data['nombre'],  
             'primer_apellido'       => $data['primer_apellido'],           
-            'segundo_apellido'      => $data['segundo_apellido'],             
+            'segundo_apellido'      => $data['segundo_apellido'],
             'correo'                => $data['correo'],           
-            'rfc'                   => $data['rfc'],                      
-            'id_area'               => (int)$data['id_area'],                                              
-            'fec_nac'               => $data['fec_nac'],                  
+            'rfc'                   => $data['rfc'],             
+            'id_area'               => (int)$data['id_area'],               
             'fec_reg'               => $hoy 
         ];
+
+        
+        $fecha_nacimiento = $data['fec_nac'];
+   
+        // Verificar si la fecha es válida
+        if (!empty($fecha_nacimiento)) {
+            // Convertir a formato YYYY-MM-DD si es necesario
+            $fecha_formateada = date('Y-m-d H:i:s', strtotime($fecha_nacimiento));
+            
+            $dataInsert['fec_nac'] = $fecha_formateada;
+        } else {
+            $dataInsert['fec_nac'] = null;
+        }
+      
 
         if(isset($data['contrasenia']) && !empty($data['contrasenia'])){
           $dataInsert['contrasenia'] = md5($data['contrasenia']); 
