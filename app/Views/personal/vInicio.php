@@ -228,30 +228,21 @@
                                                 <div class="card-body">
                                                     <div id="carousel_2" class="carousel slide" data-ride="carousel">
                                                         <div class="carousel-inner">
+                                                             <?php foreach($lista_alba as $l): ?>
                                                             <div class="carousel-item">
                                                                 <div class="media">
-                                                                    <img src="<?= base_url() ?>assets/images/products/img-1.png" class="mr-3 thumb-xl align-self-center" alt="...">
+                                                                    <img src="<?= base_url().$l->foto; ?>" class="mr-3 thumb-xl align-self-center" alt="...">
                                                                     <div class="media-body align-self-center">                                                          
                                                                         <h4 class="mt-0 mb-1 title-text text-dark">Protocolo ALBA GTO</h4>
-                                                                        <p class="text-muted mb-1">Ariana Mayte Abonce Villalobos</p>
-                                                                        <p class="text-muted">Lugar de los hechos: Irapuato Gto, edad : 16 años</p>
-                                                                        <span class="px-2 py-1 bg-soft-pink d-inline-block">Estatura: 155 cm, peso : 55 k</span>
+                                                                        <p class="text-muted mb-1"><?= $l->nombre.' '.$l->primer_apellido.' '.$l->segundo_apellido; ?></p>
+                                                                        <p class="text-muted">nacionalidad: <?= $l->nacionalidad; ?></p>
+                                                                        <span class="px-2 py-1 bg-soft-pink d-inline-block">Edad:  <?= $l->edad; ?></span>
                                                                         <a href="" class="bg-soft-purple px-2 py-1"><i class="dripicons-download"></i></a>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <div class="carousel-item">
-                                                                <div class="media">
-                                                                    <img src="<?= base_url() ?>assets/images/products/img-2.png" class="mr-3 thumb-xl align-self-center" alt="...">
-                                                                    <div class="media-body align-self-center">                                                           
-                                                                        <h4 class="mt-0 mb-1 title-text">Unique Watch</h4>
-                                                                        <p class="text-muted mb-1">Standard dummy text ever since the 1500s, when an unknown printer took a galley of type.</p>
-                                                                        <p class="text-muted">When an unknown printer took a galley of type.</p>
-                                                                        <span class="px-2 py-1 bg-soft-pink d-inline-block">Sold 582</span>
-                                                                        <a href="" class="bg-soft-purple px-2 py-1"><i class="dripicons-download"></i></a>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
+                                                            <?php endforeach; ?>
+
                                                             <div class="carousel-item active">
                                                                 <div class="media">
                                                                     <img src="<?= base_url() ?>assets/images/products/img-7.png" class="mr-3 thumb-xl align-self-center" alt="...">

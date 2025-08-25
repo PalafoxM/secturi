@@ -88,10 +88,11 @@ class Inicio extends BaseController {
       
         //die( var_dump( $personal  ) );
 
-        $data['personal'] = $personal;
-        $data['datos'] = $globas->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario]])->data[0];
-        $data['scripts'] = array('principal','inicio');
-        $data['edita'] = 0;
+        $data['personal']   = $personal;
+        $data['datos']      = $globas->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario]])->data[0];
+        $data['lista_alba'] = $globas->getTabla(['tabla' => 'lista_alba', 'where' => ['visible' => 1]])->data;
+        $data['scripts']    = array('principal','inicio');
+        $data['edita']      = 0;
         $data['nombre_completo'] = $session->nombre_completo;
         $data['contentView'] =   $vista;
         $this->_renderView($data);
