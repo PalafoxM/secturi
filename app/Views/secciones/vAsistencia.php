@@ -522,8 +522,16 @@
                             <div>Hora Inicio: ${info.event.extendedProps.hora_inicio}</div>
                         </div>
                     `;
-                } else {
+                } else if((info.event.extendedProps.id_estatus === 2)){
                     eventEl.innerHTML = `
+                        <div class="fc-event-title">Declinada</div>
+                        <div class="fc-event-details">
+                            <div>Hora Inicio: ${info.event.extendedProps.hora_inicio}</div>
+                            <div>Hora fin: ${info.event.extendedProps.hora_fin}</div>
+                        </div>
+                    `;
+                }else{
+                       eventEl.innerHTML = `
                         <div class="fc-event-title">${info.event.title}</div>
                         <div class="fc-event-details">
                             <div>Hora Inicio: ${info.event.extendedProps.hora_inicio}</div>

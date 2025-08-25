@@ -78,10 +78,10 @@
                                             <a class="nav-link active" id="general_detail_tab" data-toggle="pill" href="#general_detail">General</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" id="activity_detail_tab" data-toggle="pill" href="#activity_detail">Activity</a>
+                                            <a class="nav-link" id="activity_detail_tab" data-toggle="pill" href="#activity_detail">Actividad</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" id="portfolio_detail_tab" data-toggle="pill" href="#portfolio_detail">Portfolio</a>
+                                            <a class="nav-link" id="portfolio_detail_tab" data-toggle="pill" href="#portfolio_detail">Portafolio</a>
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" id="settings_detail_tab" data-toggle="pill" href="#settings_detail">Configuración</a>
@@ -214,48 +214,42 @@
                                                     </div><!--end card-->   
                                                 </div><!-- end col-->                       
                                             </div><!--end row-->
-                                            <div class="card">
+                                      <!--      <div class="card">
                                                 <div class="card-body">
                                                     <div class="float-lg-right float-none eco-revene-history justify-content-end">
 
                                                     </div>
                                                     <h4 class="header-title mt-0">Resumen</h4>
                                                     <canvas id="bar" class="drop-shadow w-100"  height="350"></canvas>
-                                                </div><!--end card-body-->
-                                            </div><!--end card-->
+                                                </div>
+                                            </div> -->
                                             
                                             <div class="card dash-info-carousel">
+                                              
                                                 <div class="card-body">
+                                                      <p><strong>PROTOCOLO ALBA GUANAJUATO; <span class="text-danger"> la persona se encuentra en calidad de desaparecida.<span><strong></p>
                                                     <div id="carousel_2" class="carousel slide" data-ride="carousel">
                                                         <div class="carousel-inner">
-                                                             <?php foreach($lista_alba as $l): ?>
-                                                            <div class="carousel-item">
-                                                                <div class="media">
-                                                                    <img src="<?= base_url().$l->foto; ?>" class="mr-3 thumb-xl align-self-center" alt="...">
-                                                                    <div class="media-body align-self-center">                                                          
-                                                                        <h4 class="mt-0 mb-1 title-text text-dark">Protocolo ALBA GTO</h4>
-                                                                        <p class="text-muted mb-1"><?= $l->nombre.' '.$l->primer_apellido.' '.$l->segundo_apellido; ?></p>
-                                                                        <p class="text-muted">nacionalidad: <?= $l->nacionalidad; ?></p>
-                                                                        <span class="px-2 py-1 bg-soft-pink d-inline-block">Edad:  <?= $l->edad; ?></span>
-                                                                        <a target="_blank" href="<?= base_url().$l->protocolo; ?>" class="bg-soft-purple px-2 py-1"><i class="dripicons-download"></i></a>
+                                                            <?php foreach($lista_alba as $index => $l): ?>
+                                                                <div class="carousel-item <?= $index === 0 ? 'active' : '' ?>">
+                                                                    <div class="media">
+                                                                        <img src="<?= base_url().$l->foto; ?>" class="mr-3 thumb-xl align-self-center" alt="...">
+                                                                        <div class="media-body align-self-center">                                                          
+                                                                            <h4 class="mt-0 mb-1 title-text text-dark">
+                                                                                <?= $l->nombre.' '.$l->primer_apellido.' '.$l->segundo_apellido; ?>
+                                                                            </h4>
+                                                                            <p class="text-muted mb-1"><?= $l->edad; ?> años</p>
+                                                                            <p class="text-muted">Nacionalidad: <?= $l->nacionalidad; ?></p>
+                                                                            <span class="px-2 py-1 bg-soft-pink d-inline-block">Desaparecida</span>
+                                                                            <a target="_blank" href="<?= base_url().$l->protocolo; ?>" class="bg-soft-purple px-2 py-1">
+                                                                                <i class="dripicons-preview"></i>
+                                                                            </a>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
                                                             <?php endforeach; ?>
-
-                                                            <div class="carousel-item active">
-                                                                <div class="media">
-                                                                    <img src="<?= base_url() ?>assets/images/products/img-7.png" class="mr-3 thumb-xl align-self-center" alt="...">
-                                                                    <div class="media-body align-self-center">                                                          
-                                                                        <h4 class="mt-0 mb-1 title-text">Unique Watch 2</h4>
-                                                                        <p class="text-muted mb-1">Standard dummy text ever since the 1500s, when an unknown printer took a galley of type.</p>
-                                                                        <p class="text-muted">When an unknown printer took a galley of type.</p>
-                                                                        <span class="px-2 py-1 bg-soft-pink d-inline-block">Sold 582</span>
-                                                                        <a href="" class="bg-soft-purple px-2 py-1"><i class="dripicons-download"></i></a>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
                                                         </div>
+
                                                         <a class="carousel-control-prev" href="#carousel_2" role="button" data-slide="prev">
                                                             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                                                             <span class="sr-only">Previous</span>

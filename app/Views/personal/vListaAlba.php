@@ -17,7 +17,7 @@
                                 <li class="breadcrumb-item active">ALBA</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Atención Comunidad SETURI</h4>
+                        <h4 class="page-title">Atención Comunidad SECTURI</h4>
 
                     </div>
                     <!--end page-title-box-->
@@ -29,12 +29,12 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-body">
+                            <?php if(in_array($session->get('id_perfil'), [1,6])): ?>
                             <button onclick="ini.inicio.agregarAlba()"
                                 class="btn btn-gradient-danger px-4 float-right mt-0 mb-3"><i
                                     class="mdi mdi-account-plus-outline mr-2"></i>Agregar</button>
-                      
-                            <h4 class="header-title mt-0">
-                                En conjunto con la Investigación de Delitos en Materia de Desaparición Forzada de Personas <br>solicita de su valioso apoyo para dar informacion de la siguiente lista
+                             <?php endif; ?>
+                            <h4 class="header-title mt-0">solicita de su valioso apoyo para dar informacion de la siguiente lista
 
                             </h4>
                             <div class="table-responsive dash-social">
@@ -200,7 +200,7 @@
                                                 <div class="mb-3 position-relative" id="">
                                                     <label for="protocolo" class="form-label">PROTOCOLO</label>
                                                   <input type="file" autocomplete="off" class="form-control"
-                                                        id="protocolo" name="protocolo" accept=".pdf">
+                                                        id="protocolo" name="protocolo">
                                                 </div>
                                             </div>
                                         </div>

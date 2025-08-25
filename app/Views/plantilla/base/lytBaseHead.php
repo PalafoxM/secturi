@@ -239,7 +239,7 @@
     <!-- leftbar-tab-menu -->
     <div class="leftbar-tab-menu">
         <div class="main-icon-menu">
-            <a href="<?php echo base_url(); ?>analytics/analytics-index.html"
+            <a href="<?php echo base_url(); ?>index.php/Inicio"
                 class="logo logo-metrica d-block text-center">
                 <span>
                     <img src="<?php echo base_url(); ?>assets/images/logo-sm.png" alt="logo-small" class="logo-sm">
