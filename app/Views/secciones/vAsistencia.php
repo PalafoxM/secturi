@@ -95,14 +95,21 @@
                             <div class="card">
                                 <div class="card-body">
                                             <div id="map" style="height: 400px; width: 100%; border-radius: 8px;"></div>
+                                           
                                 </div><!--end card-body-->
                             </div><!--end card-->
                         </div><!--end col-->                      
                         <div class="col-lg-8">
                             <div class="card">
                                 <div class="card-body">
+                                     <?php if($idTipoEmpleado == 1): ?>
                                     <div id='calendar'></div>
                                     <div style='clear:both'></div>
+                                       <?php endif; ?>
+                                       <?php if($idTipoEmpleado != 1): ?>
+                                          <h4><div class="text-center">Estimado(a) Usuario(a), esta sección solo lo puede visualizar el<strong> personal de base <strong> </div> </h4>
+                                          <p>Si requieres mayor información, favor de comunicarte al Administrador del Sistema<p>
+                                       <?php endif; ?>
                                 </div><!--end card-body-->
                             </div><!--end card-->
                         </div><!--end col-->

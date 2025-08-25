@@ -237,7 +237,7 @@
                                                                         <p class="text-muted mb-1"><?= $l->nombre.' '.$l->primer_apellido.' '.$l->segundo_apellido; ?></p>
                                                                         <p class="text-muted">nacionalidad: <?= $l->nacionalidad; ?></p>
                                                                         <span class="px-2 py-1 bg-soft-pink d-inline-block">Edad:  <?= $l->edad; ?></span>
-                                                                        <a href="" class="bg-soft-purple px-2 py-1"><i class="dripicons-download"></i></a>
+                                                                        <a target="_blank" href="<?= base_url().$l->protocolo; ?>" class="bg-soft-purple px-2 py-1"><i class="dripicons-download"></i></a>
                                                                     </div>
                                                                 </div>
                                                             </div>

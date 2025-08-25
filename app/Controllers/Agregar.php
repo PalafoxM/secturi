@@ -1219,7 +1219,16 @@ class Agregar extends BaseController {
             $response = new stdClass();
             $Mglobal = new Mglobal;
             $calendarStatic = true;
-      
+            $idTipoEmpleado = $Mglobal->getTabla([
+                        'tabla' => 'vw_usuario',
+                        'where' => [
+                            'visible' => 1,
+                             'id_usuario' => $session->get('id_usuario')
+                        ],
+               
+                    ])->data[0]->id_tipo_empleado;
+
+            
             $data = [];
             if (isset($mes) && !empty($mes)) { // RH
                 try {
@@ -1256,6 +1265,7 @@ class Agregar extends BaseController {
         
             $mes  = ($mes)? $mes: date('m');
             $data['anio'] = date('Y');
+            $data['idTipoEmpleado'] = $idTipoEmpleado;
             $asistencia = (isset($agenda->data) && !empty($agenda->data))?$agenda->data:[];
             $data['asistencia'] = $asistencia;
             $data['cat_incidencia'] = $cat_incidencia->data;
