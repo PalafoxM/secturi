@@ -3125,6 +3125,9 @@ ini.inicio = (function () {
                                                  class="btn btn-gradient-danger px-4"><i
                                                     class="mdi mdi-trash-can-outline font-21"></i>
                                             </a>
+                                            <a href="<?php echo base_url(); ?>index.php/Principal/PagoFic/${p.id_proveedor}"  data-toggle="tooltip" data-placement="left" data-original-title="Pagos FIC"
+                                                class="btn btn-gradient-dark px-4">FIC</i>
+                                            </a>
 
                                         </td>
                                     </tr>
@@ -3192,6 +3195,9 @@ ini.inicio = (function () {
                                             class="btn btn-gradient-success px-4">
                                             <i class="mdi mdi-arrow-collapse-right font-21"></i>
                                          </a>
+                                           <a href="${base_url}index.php/Principal/PagoFic/${p.id_proveedor}"  data-toggle="tooltip" data-placement="left" data-original-title="Pagos FIC"
+                                                class="btn btn-gradient-dark px-4">FIC</i>
+                                            </a>
 
                                         </td>
                                     </tr>

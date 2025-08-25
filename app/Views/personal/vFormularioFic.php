@@ -232,6 +232,43 @@
                                         </div><!--end form-row-->
                                         <div class="form-row">
                                             <div class="col-md-4 mb-3">
+                                              <div class="form-group" id="id_convenio">
+                                                <label for="no_convenio_editar">No. Convenio/Contrato</label>
+                                                <div class="input-group">
+                                                    <div class="btn-group">
+                                                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                             V/T <i class="mdi mdi-chevron-down"></i>
+                                                        </button>
+                                                        <div class="dropdown-menu">
+                                                                <a class="dropdown-item"  onclick="setConvenio('SECTURI/CONV/')">SECTURI/CONV/</a>
+                                                                <a class="dropdown-item"  onclick="setConvenio('SECTURI/CTO/')">SECTURI/CTO/</a>
+                                                        </div>
+                                                     </div>
+                                                    <input type="text" id="no_convenio_editar" name="no_convenio_editar" class="form-control" placeholder="025" autocomplete="off">
+                                                    <div class="input-group-append">
+                                                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                            AÑO <i class="mdi mdi-chevron-down"></i>
+                                                        </button>
+                                                        <div class="dropdown-menu">
+                                                            <a class="dropdown-item"  onclick="setAnio('/2025')">2025</a>
+                                                            <a class="dropdown-item"  onclick="setAnio('/2024')">2024</a>
+                                                            <a class="dropdown-item"  onclick="setAnio('/2023')">2023</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                               </div>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label for="no_consecutivo">No. Consecutivo.<span style="color:red;">*</span></label>
+                                                <input type="number" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo" placeholder="001"  value="<?= (isset($reserva->no_consecutivo))?$reserva->no_consecutivo:'' ?>" >
+                                                <div class="invalid-feedback">
+                                                    Campo no Valido
+                                                </div>
+                                            </div><!--end col-->
+                                         
+                                        </div><!--end form-row-->
+                                        <div class="form-row">
+                                            <div class="col-md-4 mb-3">
                                                 <label for="no_reserva">Tipo Consumo<span style="color:red;">*</span></label>
                                                  <select class="form-control" name="no_reserva" >
                                                     <option value="4327277">ALIMENTOS | 3390</option>
@@ -239,12 +276,11 @@
                                                     <option value="4327279">ALIMENTOS GEG | 2210</option>
                                                  </select>
                                             </div><!--end col-->
+                                         
                                             <div class="col-md-4 mb-3">
-                                                <label for="no_consecutivo">No. Consecutivo.<span style="color:red;">*</span></label>
-                                                <input type="number" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo" placeholder="001"  value="<?= (isset($reserva->no_consecutivo))?$reserva->no_consecutivo:'' ?>" >
-                                                <div class="invalid-feedback">
-                                                    Campo no Valido
-                                                </div>
+                                                <label for="proyecto">Proyecto<span style="color:red;">*</span></label>
+                                                <input type="text" class="form-control" autocomplete="off" id="proyecto" name="proyecto" placeholder="E027QC04182501" readonly>
+                                          
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="importe">Importe<span style="color:red;">*</span></label>
@@ -338,5 +374,12 @@
                     format: 'YYYY-MM-DD HH:mm:ss'
                 }
             });
+        function setConvenio(valor) {
+                document.getElementById('no_convenio_editar').value = valor;
+            }
 
+            function setAnio(anio) {
+                let input = document.getElementById('no_convenio_editar');
+                input.value = input.value + anio;
+            }
         </script>
