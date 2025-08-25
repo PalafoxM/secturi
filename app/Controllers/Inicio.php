@@ -4,6 +4,7 @@ use App\Libraries\Curps;
 use App\Libraries\Fechas;
 use App\Libraries\Funciones;
 use App\Models\Mglobal;
+use DateTime;
 
 use stdClass;
 use CodeIgniter\API\ResponseTrait;
@@ -62,6 +63,32 @@ class Inicio extends BaseController {
         $data    = array();
         $globas  = new Mglobal;
         $vista = 'personal/vInicio';
+        $mes_actual = date('m');
+
+        $cumple = $globas->getTabla([
+            'tabla' => 'vw_usuario', 
+            'where' => ['visible' => 1], 
+            'whereMonth' => [['fec_nac', $mes_actual]]
+        ])->data;
+        $personal = [];
+       if(isset($cumple) && !empty($cumple)){
+            foreach($cumple as $c){
+                $fecha_nacimiento = new DateTime($c->fec_nac);
+                $hoy = new DateTime();
+                $edad = $hoy->diff($fecha_nacimiento)->y;
+                 $personal[] =  [
+                      'nombre_completo'  => $c->nombre,
+                      'edad'             => $edad,
+                      'ruta_foto_relativa' =>$c->ruta_foto_relativa,
+                      'dia'             =>  date('d', strtotime($c->fec_nac))
+                 ];
+           
+            }
+        }
+      
+        //die( var_dump( $personal  ) );
+
+        $data['personal'] = $personal;
         $data['datos'] = $globas->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario]])->data[0];
         $data['scripts'] = array('principal','inicio');
         $data['edita'] = 0;

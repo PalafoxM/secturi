@@ -123,65 +123,27 @@
                                                 <div class="card-body">
                                                     <h4 class="header-title mt-0 mb-3">Compleaños del mes</h4>
                                                     <ul class="list-unsyled m-0 pl-0 transaction-history">
+                                                      <?php foreach($personal as $k => $c):?>
                                                         <li class="align-items-center d-flex justify-content-between">
                                                             <div class="media">
                                                                 <div class="transaction-icon">
-                                                                    <i class="mdi mdi-arrow-top-right-thick"></i>
+                                                                  <?php if(!empty($c['ruta_foto_relativa'] )): ?>
+                                                                    <img src="<?= base_url().$c['ruta_foto_relativa'] ?>" alt="" class="rounded-circle thumb-sm mr-1">
+                                                                   <?php endif; ?>
+                                                                    <?php if(empty($c['ruta_foto_relativa'] )): ?>
+                                                                   <img src="<?= base_url() ?>assets/images/users/user-3.jpg" alt="" class="rounded-circle thumb-sm mr-1">
+                                                                   <?php endif; ?>
                                                                 </div>                                                
                                                                 <div class="media-body align-self-center"> 
                                                                     <div class="transaction-data">                                                        
-                                                                        <h3 class="m-0">Perla Martinez Martinez</h3>
-                                                                        <p class="text-muted mb-0">6 agosto</p>
+                                                                        <h3 class="m-0"><?= $c['nombre_completo']; ?></h3>
+                                                                        <p class="text-muted mb-0">el <?= $c['dia']; ?></p>
                                                                     </div>                                                                                              
                                                                 </div><!--end media body-->
                                                             </div>
-                                                            <span class="text-danger">35 años</span>
+                                                            <span class="text-success"><?= $c['edad']; ?> años</span>
                                                         </li>
-                                                        <li class="align-items-center d-flex justify-content-between">
-                                                            <div class="media">
-                                                                <div class="transaction-icon">
-                                                                    <i class="mdi mdi-arrow-down-thick"></i>
-                                                                </div>                                                
-                                                                <div class="media-body align-self-center"> 
-                                                                    <div class="transaction-data">                                                        
-                                                                        <h3 class="m-0">Karina Guerra Hernandez</h3>
-                                                                        <p class="text-muted mb-0">4 agosto</p>
-                                                                    </div>                                                                                              
-                                                                </div><!--end media body-->
-                                                            </div>
-                                                            <span class="text-success">31 años</span>
-                                                        </li>
-                                                        <li class="align-items-center d-flex justify-content-between">
-                                                            <div class="media">
-                                                                <div class="transaction-icon">
-                                                                    <i class="mdi mdi-arrow-top-right-thick"></i>
-                                                                </div>                                                
-                                                                <div class="media-body align-self-center"> 
-                                                                    <div class="transaction-data">                                                        
-                                                                        <h3 class="m-0">Alejandro Medina Cabrera</h3>
-                                                                        <p class="text-muted mb-0">1 agosto</p>
-                                                                    </div>                                                                                              
-                                                                </div><!--end media body-->
-                                                            </div>
-                                                            <span class="text-danger">26 años</span>
-                                                        </li>
-                                                        <li class="align-items-center d-flex justify-content-between">
-                                                            <div class="media">
-                                                                <div class="transaction-icon">
-                                                                    <i class="mdi mdi-arrow-top-right-thick"></i>
-                                                                </div>                                                
-                                                                <div class="media-body align-self-center"> 
-                                                                    <div class="transaction-data">                                                        
-                                                                        <h3 class="m-0">Juan Manuel Palafox Martinez</h3>
-                                                                        <p class="text-muted mb-0">28 agosto</p>
-                                                                    </div>                                                                                              
-                                                                </div><!--end media body-->
-                                                            </div>
-                                                            <span class="text-danger">34 años</span>
-                                                        </li>
-                                                        <li class="align-items-center d-flex justify-content-end">
-                                                            <a href="#" class="">Ver todos<i class="dripicons-arrow-thin-right ml-2"></i></a>
-                                                        </li>
+                                                        <?php endforeach; ?>
                                                     </ul>                                       
                                                 </div><!--end card-body-->
                                             </div><!--end card-->
@@ -194,8 +156,8 @@
                                                         <div class="media">
                                                             <img src="<?= base_url() ?>assets/images/users/user-2.jpg" class="mr-3 thumb-md rounded-circle" alt="...">
                                                             <div class="media-body align-self-center">                                                           
-                                                                <h5 class="mt-0 text-dark mb-1">Harry McCall</h5>  
-                                                                <p class="mb-0">Dealer USA <span class="text-muted">Today Harry's Birth Day</span></p>                                                              
+                                                                <h5 class="mt-0 text-dark mb-1">Dias Festivos</h5>  
+                                                                <p class="mb-0">Asuetos <span class="text-muted">SECTURI</span></p>                                                              
                                                             </div>
                                                         </div>
                                                         <span class="font-24 align-self-center">🎂</span>
@@ -270,10 +232,10 @@
                                                                 <div class="media">
                                                                     <img src="<?= base_url() ?>assets/images/products/img-1.png" class="mr-3 thumb-xl align-self-center" alt="...">
                                                                     <div class="media-body align-self-center">                                                          
-                                                                        <h4 class="mt-0 mb-1 title-text text-dark">White Shoe</h4>
-                                                                        <p class="text-muted mb-1">Standard dummy text ever since the 1500s, when an unknown printer took a galley of type.</p>
-                                                                        <p class="text-muted">When an unknown printer took a galley of type.</p>
-                                                                        <span class="px-2 py-1 bg-soft-pink d-inline-block">Sold 582</span>
+                                                                        <h4 class="mt-0 mb-1 title-text text-dark">Protocolo ALBA GTO</h4>
+                                                                        <p class="text-muted mb-1">Ariana Mayte Abonce Villalobos</p>
+                                                                        <p class="text-muted">Lugar de los hechos: Irapuato Gto, edad : 16 años</p>
+                                                                        <span class="px-2 py-1 bg-soft-pink d-inline-block">Estatura: 155 cm, peso : 55 k</span>
                                                                         <a href="" class="bg-soft-purple px-2 py-1"><i class="dripicons-download"></i></a>
                                                                     </div>
                                                                 </div>
@@ -319,7 +281,7 @@
                                                 <div class="col-lg-6">
                                                     <div class="card">
                                                         <div class="card-body dash-info-carousel">
-                                                            <h4 class="mt-0 header-title mb-4">New Leads</h4>
+                                                            <h4 class="mt-0 header-title mb-4">Nuevas Norticias</h4>
                                                             <div id="carousel_1" class="carousel slide" data-ride="carousel">
                                                                 <div class="carousel-inner">
                                                                     <div class="carousel-item">
@@ -1057,4 +1019,5 @@
 <script src="<?= base_url() ?>plugins/chartjs/roundedBar.min.js"></script>
 <script src="<?= base_url() ?>plugins/lightpick/lightpick.js"></script>
 <script src="<?= base_url() ?>assets/pages/jquery.profile.init.js"></script>
+
 

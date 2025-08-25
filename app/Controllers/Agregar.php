@@ -1267,6 +1267,132 @@ class Agregar extends BaseController {
             $data['contentView'] = 'secciones/vAsistencia';                
             $this->_renderView($data);
         }
+        public function deleteAlba()
+        {
+        $session  = \Config\Services::session();
+        $response = new stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error al insertar en la tabla';
+        $globals  = new Mglobal;
+        $id_alba  = $this->request->getPost('id_alba');
+        $dataBitacora = ['id_user' =>$session->get('id_usuario'), 'script' => 'Agregar.php/guardaViatico'];
+        $dataConfig = [
+            "tabla"=>"lista_alba",
+            "editar"=>true,
+            "idEditar" => ['id_alba' => $id_alba]
+        ];
+        $result = $globals->saveTabla(['visible' => 0],$dataConfig,$dataBitacora);
+        if(!$result->error){
+            $response->error     = false;
+            $response->respuesta = $result->respuesta;
+        }
+        return $this->respond($response);
+
+        }
+       public function albaAlta()
+       {
+        $session  = \Config\Services::session();
+        $response = new stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error al insertar en la tabla';
+        $globals  = new Mglobal;
+        $data     = $this->request->getPost();
+        $file = $this->request->getFile('foto');
+        $file2 = $this->request->getFile('protocolo');
+         if ($file && $file->isValid() && !$file->hasMoved()) {
+            $maxSize = 1 * 1024 * 1024; // 1 MB
+            if ($file->getSize() > $maxSize) {
+                $response->respuesta = "El archivo no debe exceder 1 MB.";
+                return $this->respond($response);
+            }
+
+            $timestamp = date('Ymd_His');
+            $extension = $file->getClientExtension();
+            $originalName = pathinfo($file->getName(), PATHINFO_FILENAME);
+            $archivo = $originalName . '_' . $timestamp . '.' . $extension;
+
+            $extension2 = $file2->getClientExtension();
+            $originalName2 = pathinfo($file2->getName(), PATHINFO_FILENAME);
+            $archivo2 = $originalName2 . '_' . $timestamp . '.' . $extension2;
+
+            // Ruta absoluta
+            $ruta_destino = FCPATH . 'assets/images/fotos/alba/';
+            $file->move($ruta_destino, $archivo);
+            $ruta_destino2 = FCPATH . 'assets/pdf/alba/';
+            $file2->move($ruta_destino2, $archivo2);
+
+            // Rutas públicas
+            //$ruta_absoluta = base_url('aassets/images/fotos/alba/' . $archivo);
+            $ruta_relativa  = 'assets/images/fotos/alba/' . $archivo;
+            $ruta_relativa2 = 'assets/pdf/alba/' . $archivo2;
+        }
+        if(empty($data['nombre'])){
+            $response->respuesta = 'El nombre es requerido';
+            return $this->respond($response);
+        }
+        if(empty($data['primer_apellido'])){
+            $response->respuesta = 'El primer_apellido es requerido';
+            return $this->respond($response);
+        }
+        if(empty($data['fecha_nacimiento'])){
+            $response->respuesta = 'El fecha_nacimiento es requerido';
+            return $this->respond($response);
+        }
+      //  if($this->validarViativos()); return false
+        $dataInsert = [
+        'nombre'           =>$data['nombre'],
+        'primer_apellido'  =>$data['primer_apellido'],
+        'segundo_apellido' =>$data['segundo_apellido'],
+        'nacionalidad'     =>$data['nacionalidad'],
+        'edad'             =>$data['edad'],
+        'foto'             =>$ruta_relativa,
+        'protocolo'        =>$ruta_relativa2,
+        'id_sexo'          =>(int)$data['id_sexo'],
+        'fecha_nacimiento' =>date('Y-m-d', strtotime($data['fecha_nacimiento'])),
+        'usu_reg'          =>(int)$session->get('id_usuario'),
+        'fec_reg'          =>date('Y-m-d'),
+        ];
+     
+        if($data['editar'] == 1){
+             $dataConfig = [
+            "tabla"=>"lista_alba",
+            "editar"=>true,
+            "idEditar"=>['id_alba' => $data['id_alba']]
+        ];
+        }else{
+           $dataConfig = [
+            "tabla"=>"lista_alba",
+            "editar"=>false
+        ];
+        }
+     
+        $dataBitacora = ['id_user' =>$session->get('id_usuario'), 'script' => 'Agregar.php/guardaViatico'];
+        $result = $globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
+        if(!$result->error){
+            $response->error     = false;
+            $response->respuesta = $result->respuesta;
+        }
+        return $this->respond($response);
+
+    }
+    public function getAlba()
+    {
+        $session  = \Config\Services::session();
+        $response = new stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error al traer la tabla';
+        $globals  = new Mglobal;
+        $id_alba     = $this->request->getPost('id_alba');
+        $result = $globals->getTabla(["tabla"=>"lista_alba", 'where' => ['visible' => 1, 'id_alba' => $id_alba ]]);
+        //var_dump( $result);
+       // die();
+        if(!$result->error){
+            $response->error     = false;
+            $response->respuesta = $result->respuesta;
+            $response->data      = $result->data[0];
+        }
+        return $this->respond($response);
+    }
     public function formViatico()
     {
         $session  = \Config\Services::session();
@@ -1460,7 +1586,18 @@ class Agregar extends BaseController {
      return $this->respond($response);
 
     }
-   
+    public function ListaAlba()
+    {
+        $session = \Config\Services::session();
+        $data        = array();
+        $globals = new Mglobal;
+        $usuario = $globals->getTabla(['tabla' => 'lista_alba', 'where' => ['visible' => 1]]);
+        $data['usuario'] = $usuario->data;
+        $data['scripts'] = array('inicio');
+        $data['edita'] = 0;
+        $data['contentView'] = 'personal/vListaAlba';                
+        $this->_renderView($data);
+    }
     public function registroSala()
     {
         $session = \Config\Services::session();

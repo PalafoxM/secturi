@@ -446,7 +446,7 @@
                             <li class="nav-item"><a class="nav-link"
                                href="<?php echo base_url(); ?>index.php/Agregar/Directorio">Directorio</a>
                             </li>
-                            <li class="nav-item"><a class="nav-link" href="../pages/pages-starter.html">Starter Page</a></li>
+                            <li class="nav-item"><a class="nav-link" href="<?php echo base_url(); ?>index.php/Agregar/ListaAlba">Lista ALBA</a></li>
                             <li class="nav-item"><a class="nav-link" href="../pages/pages-pricing.html">Pricing</a></li>
                             <li class="nav-item"><a class="nav-link" href="../pages/pages-blogs.html">Blogs</a></li>
                             <li class="nav-item"><a class="nav-link" href="../pages/pages-faq.html">FAQs</a></li>

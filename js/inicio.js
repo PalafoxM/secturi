@@ -2960,7 +2960,132 @@ ini.inicio = (function () {
                 timeout = setTimeout(() => func.apply(context, args), wait);
             };
         },
-    
+       agregarAlba: function() {
+            // Alternativa para asegurar que funcione
+            var modal = new bootstrap.Modal(document.getElementById('modalAlba'));
+            modal.show();
+        },
+        getAlba: function(id_alba){
+           var modal = new bootstrap.Modal(document.getElementById('modalAlba'));
+            modal.show();
+             $.ajax({
+                    type: "POST",
+                    url: base_url + "index.php/Agregar/getAlba",
+                    data: {id_alba},
+                    dataType: "json",
+                    success: function (response) {
+                        if(!response.error){
+                            const data = response.data;
+                            $('#editar').val(1);
+                            $('#id_alba').val(id_alba);
+                            $('#nombre').val(data.nombre);
+                            $('#primer_apellido').val(data.primer_apellido);
+                            $('#segundo_apellido').val(data.segundo_apellido);
+                           const fechaCompleta = data.fecha_nacimiento; // Ejemplo de fecha
+                           const fechaFormateada = fechaCompleta.split('T')[0]
+                            $('#fecha_nacimiento').val(fechaFormateada);
+                            $('#nacionalidad').val(data.nacionalidad);
+                            $('#edad').val(data.edad);
+                            $('#id_sexo').val(data.id_sexo).change();
+                     
+                        }else{
+                            Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
+                        }
+                    },
+                    error: function (response,jqXHR, textStatus, errorThrown) {
+                        var res= JSON.parse(response.responseText);
+                        Swal.fire("Error", '<p> '+ res.message + '</p>');  
+                    }
+                });
+        },
+        deleteAlba: function(id_alba){
+              Swal.fire({
+                    title: "¡Esta seguro de eliminar!",
+                    text:  `Esta accion eliminara el registro`,
+                    icon: "error",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    confirmButtonText: "Ok"
+                    }).then((result) => {
+                    if (result.isConfirmed) {
+                            /*===============*/
+                            $.ajax({
+                                type: "POST",
+                                url: `${base_url}index.php/agregar/deleteAlba`,
+                                dataType: "json",
+                                data: {  id_alba },
+                                success: function(response) {
+                           
+                                    if(!response.error){
+                                      Swal.fire("Correcto",response.respuesta, "success");
+                                        setTimeout(() => {
+                                            window.location.reload();
+                                               
+                                        }, 1500);
+                                    }else{
+                                     Swal.fire("error", response.respuesta, "error");
+                                    }
+                                   
+                            
+                                    },
+                                    error: function() {
+                                        Swal.fire("Error", "Error al cargar los detalles del curso.", "error");
+                                    }
+                                });
+
+                        
+                        }
+                    });
+
+        },
+        altaAlba: function(){
+        $("#formAgregarAlba").submit(function (e) {
+            e.preventDefault(); 
+            var formData = new FormData(this); // Usar FormData en lugar de serialize
+            var foto = $('#foto')[0].files[0];
+            var protocolo = $('#protocolo')[0].files[0];
+                if(!foto) {
+                    Swal.fire("Atención", 'La <strong>Foto</strong> es requerida', 'info'); 
+                    return;
+                }
+                if(!protocolo) {
+                     Swal.fire("Atención", 'La <strong>protocolo</strong> es requerida', 'info'); 
+                    return;
+                }
+
+                console.log(formData);
+                    $.ajax({
+                    type: "POST",
+                    url: base_url + "index.php/Agregar/albaAlta",
+                    data: formData,
+                    processData: false,  // Importante para FormData
+                    contentType: false,  // Importante para FormData
+                    dataType: "json",
+                    success: function (response) {
+                        if(!response.error){
+                            Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
+                            setTimeout(() => {
+                               // window.location.href = base_url + "index.php/Principal/listadoEstatusPT";
+                                window.location.reload();
+                            }, 1500);
+                        }else{
+                            Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
+                        }
+                    },
+                    beforeSend: function (info){
+                         $('#btnAlba').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                    },
+                    complete: function (info){
+                        $('#btnAlba').prop('disabled', false).html('Guardar');
+                    },
+                    error: function (response,jqXHR, textStatus, errorThrown) {
+                        var res= JSON.parse(response.responseText);
+                        Swal.fire("Error", '<p> '+ res.message + '</p>'); 
+                        $('#btnAlba').prop('disabled', false).html('Guardar');
+                    }
+                });
+          })
+        },
         busquedaProveedorTI: function() {
             const palabra = $("#buscar_proveedor_ti").val().trim(); // Elimina espacios al inicio/final
             
@@ -3552,6 +3677,7 @@ ini.inicio = (function () {
         cerrarModalFoto: function(){
         $("#modalFoto").modal('hide');
         },
+       
         agregarPuesto: function()
         {
             Swal.fire({
