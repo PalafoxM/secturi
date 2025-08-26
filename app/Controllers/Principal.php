@@ -2794,6 +2794,7 @@ class Principal extends BaseController {
             $proveedor   = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1, 'id_proveedor' =>$id_proveedor ]]);
             $banco       = $globals->getTabla(['tabla' => 'proveedor_banco', 'where' => ['idproveedor' => $id_proveedor ]]);
             $restaurantes       = $globals->getTabla(['tabla' => 'cat_restaurante_fic', 'where' => ['no_proveedor' => $proveedor->data[0]->no_proveedor ]]);
+            $hoteles       = $globals->getTabla(['tabla' => 'cat_hoteles_fic', 'where' => ['no_proveedor' => $proveedor->data[0]->no_proveedor ]]);
         }
 
         $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1 ]]);
@@ -2808,6 +2809,7 @@ class Principal extends BaseController {
           $data['proveedor']   = (!empty($proveedor->data))?$proveedor->data[0]:[];
           $data['banco']       = (!empty($banco->data))?$banco->data:[];
           $data['restaurantes']  = (!empty($restaurantes->data))?$restaurantes->data:[];
+          $data['hoteles']     = (!empty($hoteles->data))?$hoteles->data:[];
          
         }
   
