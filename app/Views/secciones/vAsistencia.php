@@ -155,7 +155,7 @@
                                         <div class="activity-info">
                                             <div class="activity-info-text mb-2">
                                                 <label for="tipo_incidencia" class="form-label">Tipo de Incidencia</label>
-                                                <select class="select2 form-control" id="tipo_incidencia">
+                                                <select class="form-control select2" id="tipo_incidencia" data-toggle="select2">
                                                      <option value="">Seleccione</option>
                                                      <?php foreach($cat_incidencia as $c): ?>
                                                      <option value="<?= $c->id_incidencia?>"><?= $c->dsc_incidencia ?></option>
@@ -339,6 +339,8 @@
     });
         // Inicialización de timepickers
     $('input[name="datetimes"]').daterangepicker({
+        startDate: moment(),   // Fecha actual
+        endDate: moment(),     // Fecha actual (si solo quieres un día)
         "locale": {
             "applyLabel": "Aplicar",
             "cancelLabel": "Cancelar",
@@ -442,22 +444,36 @@
 
     // Procesar las incidencias como eventos adicionales
     var eventosIncidencia = incidencia.map(function(item) {
-        console.log(item);
+    const esSemana = item.tipo === 'semana';
         return {
             id: 'incidencia-' + item.id_incidencia,
-            start: item.fecha,
+            start: item.start,      // YYYY-MM-DD
+            end: item.end,          // YYYY-MM-DD (EXCLUSIVO)
             allDay: true,
-            className: (item.id_estatus===3)?'fc-event-puntual':'fc-event-incidencia', // Clase CSS para estilizar
             title: 'Enviado',
+            display: esSemana ? 'background' : 'auto', // banda para semanas
+            className: (item.id_estatus === 3) ? 'fc-event-puntual' : 'fc-event-incidencia',
             extendedProps: {
-                tipo: 'incidencia',
-                hora_inicio: item.hora_inicio || 'En validación',
-                hora_fin: item.hora_fin,
-                comentarios: item.comentarios,
-                id_estatus: item.id_estatus
+            tipo: item.tipo, // 'dia' | 'semana'
+            hora_inicio: item.hora_inicio || 'En validación',
+            hora_fin: item.hora_fin,
+            comentarios: item.comentarios,
+            id_estatus: item.id_estatus,
+            // útil para el click
+            rango_legible: esSemana ? (item.start + ' - ' + dayBefore(item.end)) : null
             }
         };
     });
+
+    function dayBefore(yyyy_mm_dd) {
+        const d = new Date(yyyy_mm_dd + 'T00:00:00'); // evitar TZ
+        d.setDate(d.getDate() - 1);
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+        }
+
 
     var todosLosEventos = eventos.concat(eventosIncidencia);
 
@@ -505,62 +521,65 @@
             hour12: true,
             meridiem: 'short'
         },
-      eventRender: function(info) {
-            var eventEl = info.el;
-            console.log(info.event.title);
+     eventRender: function(info) {
+        // Evitar manipular el contenido de eventos background (semanas)
+        if (info.event.display === 'background') return;
+
+        var eventEl = info.el;
 
             if (info.event.title === 'Enviado') {
                 if (info.event.extendedProps.id_estatus === 3) {
-                    eventEl.innerHTML = `
-                        <div class="fc-event-title">Aprovado</div>
-                        <div class="fc-event-temprano">
-                            <div>Hora Inicio: ${info.event.extendedProps.hora_inicio}</div>
-                        </div>
-                    `;
-                } else if((info.event.extendedProps.id_estatus === 2)){
-                    eventEl.innerHTML = `
-                        <div class="fc-event-title">Declinada</div>
-                        <div class="fc-event-details">
-                            <div>Hora Inicio: ${info.event.extendedProps.hora_inicio}</div>
-                            <div>Hora fin: ${info.event.extendedProps.hora_fin}</div>
-                        </div>
-                    `;
-                }else{
-                       eventEl.innerHTML = `
-                        <div class="fc-event-title">${info.event.title}</div>
-                        <div class="fc-event-details">
-                            <div>Hora Inicio: ${info.event.extendedProps.hora_inicio}</div>
-                            <div>Hora fin: ${info.event.extendedProps.hora_fin}</div>
-                        </div>
-                    `;
-                }
-            } else {
+                eventEl.innerHTML = `
+                    <div class="fc-event-title">Aprovado</div>
+                    <div class="fc-event-temprano">
+                    <div>Hora Inicio: ${info.event.extendedProps.hora_inicio}</div>
+                    </div>
+                `;
+                } else if (info.event.extendedProps.id_estatus === 2) {
+                eventEl.innerHTML = `
+                    <div class="fc-event-title">Declinada</div>
+                    <div class="fc-event-details">
+                    <div>Hora Inicio: ${info.event.extendedProps.hora_inicio}</div>
+                    <div>Hora fin: ${info.event.extendedProps.hora_fin}</div>
+                    </div>
+                `;
+                } else {
                 eventEl.innerHTML = `
                     <div class="fc-event-title">${info.event.title}</div>
                     <div class="fc-event-details">
-                        <div>Entrada: ${info.event.extendedProps.entrada || '--:--'}</div>
-                        <div>Salida: ${info.event.extendedProps.salida || '--:--'}</div>
+                    <div>Hora Inicio: ${info.event.extendedProps.hora_inicio}</div>
+                    <div>Hora fin: ${info.event.extendedProps.hora_fin}</div>
                     </div>
+                `;
+                }
+            } else {
+                eventEl.innerHTML = `
+                <div class="fc-event-title">${info.event.title}</div>
+                <div class="fc-event-details">
+                    <div>Entrada: ${info.event.extendedProps.entrada || '--:--'}</div>
+                    <div>Salida: ${info.event.extendedProps.salida || '--:--'}</div>
+                </div>
                 `;
             }
         },
-        eventClick: function(info) {
-            // Mostrar detalles completos al hacer clic
-            var eventEl = info.el;
-            
+      eventClick: function(info) {
+            const esSemana = info.event.extendedProps.tipo === 'semana';
+
+            const fechaLabel = esSemana
+                ? `${info.event.extendedProps.rango_legible}` // "YYYY-MM-DD - YYYY-MM-DD"
+                : info.event.start.toLocaleDateString();
+
             Swal.fire({
                 title: info.event.title,
                 html: `
-                    <div style="text-align: left;">
-                        <p><strong>Fecha:</strong> ${info.event.start.toLocaleDateString()}</p>
-                        <p><strong> ${info.event.extendedProps.entrada?'Entrada':'Hora Inicio'}:</strong> ${info.event.extendedProps.entrada || info.event.extendedProps.hora_inicio}</p>
-                        <p><strong>${info.event.extendedProps.entrada?'Salida':'Hora Fin'}:</strong> ${info.event.extendedProps.salida || info.event.extendedProps.hora_fin}</p>
-                    </div>
+                <div style="text-align: left;">
+                    <p><strong>${esSemana ? 'Semana' : 'Fecha'}:</strong> ${fechaLabel}</p>
+                    <p><strong>${info.event.extendedProps.entrada ? 'Entrada' : 'Hora Inicio'}:</strong> ${info.event.extendedProps.entrada || info.event.extendedProps.hora_inicio}</p>
+                    <p><strong>${info.event.extendedProps.entrada ? 'Salida' : 'Hora Fin'}:</strong> ${info.event.extendedProps.salida || info.event.extendedProps.hora_fin}</p>
+                </div>
                 `,
                 confirmButtonText: 'Cerrar',
-                customClass: {
-                    popup: 'swal-wide' // Clase para hacer el modal más ancho
-                }
+                customClass: { popup: 'swal-wide' }
             });
         },
        dateClick: function(info) {
@@ -575,33 +594,36 @@
             st.agregar.justificarFalta(dia);
         },
        dayRender: function(info) {
-            
-            const date = info.date;
-            const day = date.getDay(); // 0 = domingo, 6 = sábado
+            const date = info.date;                 // Date
+            const day = date.getDay();              // 0 = dom, 6 = sáb
             const isWeekend = (day === 0 || day === 6);
-            const dateStr = date.toISOString().substring(0, 10);
 
-            const eventoDelDia = eventos.find(e => e.start.substring(0, 10) === dateStr);
-            console.log(eventoDelDia);
-            const esFalta = eventoDelDia && eventoDelDia.className.includes('fc-event-falta');
+            // Buscar si hay eventos visibles ese día (incluye background y normales)
+            const dayStart = new Date(date);
+            dayStart.setHours(0,0,0,0);
+            const dayEnd = new Date(dayStart);
+            dayEnd.setDate(dayEnd.getDate() + 1);
 
-            // Verificar si hay eventos para este día
-            var hasEvents = eventos.some(function(event) {
-                return event.start.substring(0, 10) === dateStr;
+            // Si tienes referencia al calendar instancia:
+            const eventsToday = calendar.getEvents().filter(function(e) {
+                // evento allDay por rango: e.start < dayEnd && (e.end || e.start) > dayStart
+                const evStart = e.start;
+                const evEnd = e.end || evStart;
+                return evStart < dayEnd && evEnd > dayStart;
             });
-         
+
+            const hasEvents = eventsToday.length > 0;
+            const esFalta = eventsToday.some(e => (e.classNames || []).includes('fc-event-falta'));
 
             if (isWeekend && !esFalta) {
-                info.el.style.backgroundColor = '#f0f0f0'; // gris claro para fines de semana
+                info.el.style.backgroundColor = '#f0f0f0';
             } else if (hasEvents) {
-                info.el.style.backgroundColor = 'rgba(78, 115, 223, 0.05)'; // estilo para días con eventos
+                info.el.style.backgroundColor = 'rgba(78, 115, 223, 0.05)';
             } else {
-                info.el.style.backgroundColor = 'rgba(255, 0, 0, 0.1)'; // rojo claro para días vacíos
-                info.el.style.border = '1px solid rgba(255, 0, 0, 0.3)'; // opcional: borde rojo
+                info.el.style.backgroundColor = 'rgba(255, 0, 0, 0.1)';
+                info.el.style.border = '1px solid rgba(255, 0, 0, 0.3)';
             }
-            
         }
-
     });
 
     calendar.render();

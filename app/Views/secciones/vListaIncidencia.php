@@ -67,7 +67,7 @@
                                                 </div>
                                                 <div class="col-md-3">
                                                        <label for="fecha_inicio">Usuario</label>
-                                                        <select class="form-control" id="usuarioIncidencia">
+                                                        <select class="form-control select2" id="usuarioIncidencia" data-toggle="select2">
                                                             <?php foreach($usuario as $p): ?>
                                                             <option value="<?= $p->id_usuario ?>" > <?= $p->nombre_completo ?> </option>
                                                             <?php endforeach; ?>
@@ -101,7 +101,13 @@
                                                     <tr>
                                                         <td class="text-center"><?= $p->dsc_incidencia?></td>
                                                         <td class="text-center"><?= $p->nombre_completo?></td>
-                                                        <td class="text-center"><?= date('d-m-Y', strtotime($p->fecha))?></td>
+                                                        <td class="text-center">
+                                                            <?php if (isset($p->tipo) && !empty($p->tipo) && $p->tipo === 'semana'): ?>
+                                                                <?= date('d-m-Y', strtotime($p->start)) ?> al <?= date('d-m-Y', strtotime('-1 day', strtotime($p->end))) ?>
+                                                            <?php else: ?>
+                                                                <?= date('d-m-Y', strtotime($p->fecha)) ?>
+                                                            <?php endif; ?>
+                                                        </td>
                                                          <td class="text-center"><?= $p->detalles?></td>
                                                        <?php
                                                         switch ($p->id_estatus) {
@@ -244,45 +250,49 @@
 </div>
                   
 
-
-
 <link href="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet"
     type="text/css" />
-<!-- App css -->
-<link href="<?php echo base_url(); ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-<link href="<?php echo base_url(); ?>assets/css/jquery-ui.min.css" rel="stylesheet">
-<link href="<?php echo base_url(); ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
-<link href="<?php echo base_url(); ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
-<link href="<?= base_url()?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
-<!-- jQuery  -->
-<script src="<?php echo base_url(); ?>assets/js/jquery.min.js"></script>
-<script src="<?php echo base_url(); ?>assets/js/jquery-ui.min.js"></script>
-<script src="<?php echo base_url(); ?>assets/js/bootstrap.bundle.min.js"></script>
-<script src="<?php echo base_url(); ?>assets/js/jquery.slimscroll.min.js"></script>
-<!-- Required datatable js -->
+
+        <!-- App css -->
+        <link href="<?= base_url()?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="<?= base_url()?>assets/css/jquery-ui.min.css" rel="stylesheet">
+        <link href="<?= base_url()?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+        <link href="<?= base_url()?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
+        <link href="<?= base_url()?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
+
+               <!-- Plugins css -->
+        <link href="<?= base_url()?>plugins/daterangepicker/daterangepicker.css" rel="stylesheet" />
+        <link href="<?= base_url()?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
+        <link href="<?= base_url()?>plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.css" rel="stylesheet" type="text/css" />
+
+        <link href="<?= base_url()?>plugins/bootstrap-touchspin/css/jquery.bootstrap-touchspin.min.css" rel="stylesheet" />
+
+               <script src="<?= base_url()?>plugins/apexcharts/apexcharts.min.js"></script> 
+
+        <!-- jQuery  -->
+        <script src="<?= base_url()?>assets/js/jquery.min.js"></script>
+        <script src="<?= base_url()?>assets/js/jquery-ui.min.js"></script>
+        <script src="<?= base_url()?>assets/js/bootstrap.bundle.min.js"></script>
+        <script src="<?= base_url()?>assets/js/metismenu.min.js"></script>
+        <script src="<?= base_url()?>assets/js/waves.js"></script>
+        <script src="<?= base_url()?>assets/js/feather.min.js"></script>
+        <script src="<?= base_url()?>assets/js/jquery.slimscroll.min.js"></script>
+
+        <!-- Required datatable js -->
 <script src="<?php echo base_url(); ?>plugins/datatables/jquery.dataTables.min.js"></script>
 <script src="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.js"></script>
-<script src="<?php echo base_url(); ?>assets/pages/jquery.analytics_customers.init.js"></script>
+   
+        <!-- Plugins js -->
+        <script src="<?= base_url()?>plugins/moment/moment.js"></script>
+        <script src="<?= base_url()?>plugins/daterangepicker/daterangepicker.js"></script>
+        <script src="<?= base_url()?>plugins/select2/select2.min.js"></script>
+        <script src="<?= base_url()?>plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
 
-<script src="<?= base_url()?>assets/js/metismenu.min.js"></script>
-<script src="<?= base_url()?>assets/js/waves.js"></script>
-<script src="<?= base_url()?>assets/js/feather.min.js"></script>
+        <script src="<?= base_url()?>plugins/bootstrap-maxlength/bootstrap-maxlength.min.js"></script>
+        <script src="<?= base_url()?>plugins/bootstrap-touchspin/js/jquery.bootstrap-touchspin.min.js"></script>
 
-
-
-
-
-
-
-
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-
-
-<link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.js"></script>
+        <script src="<?= base_url()?>assets/pages/jquery.forms-advanced.js"></script>
 <script>
-
 $(document).ready(function() {
   $('#datatableIncidencias').DataTable({
         language: {

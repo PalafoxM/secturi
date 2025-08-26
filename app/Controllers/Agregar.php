@@ -6,6 +6,8 @@ use App\Libraries\Funciones;
 use App\Models\Mglobal;
 use App\Models\Magregarturno;
 
+use DateTime;
+
 require_once FCPATH . "qr_code/autoload.php";
 require_once FCPATH . "mpdf/autoload.php";
 
@@ -1257,10 +1259,61 @@ class Agregar extends BaseController {
                              
                         ],
                     ]);
-                 $incidencia = $Mglobal->getTabla(['tabla' => 'incidencia', 'where' => [ 'id_usuario' => $session->get('id_usuario'), 'visible' => 1]]);
+              // Obtenemos incidencias
+                    $incidencia = $Mglobal->getTabla([
+                        'tabla' => 'incidencia',
+                        'where' => [
+                            'id_usuario' => $session->get('id_usuario'),
+                            'visible'    => 1
+                        ]
+                    ]);
+
+                    $data['incidencia'] = [];
+
+                    if (isset($incidencia->data) && !empty($incidencia->data)) {
+                        foreach ($incidencia->data as $item) {
+                            $fecha = $item->fecha;
+
+                            // Detectar si es rango tipo "08/18/2025 - 08/22/2025"
+                            if (preg_match('/\d{2}\/\d{2}\/\d{4}\s*-\s*\d{2}\/\d{2}\/\d{4}/', $fecha)) {
+                                list($iniStr, $finStr) = array_map('trim', explode('-', $fecha));
+
+                                $ini = DateTime::createFromFormat('m/d/Y', $iniStr);
+                                $fin = DateTime::createFromFormat('m/d/Y', $finStr);
+
+                                if ($ini && $fin) {
+                                    // FullCalendar → end es exclusivo: sumamos 1 día
+                                    $fin->modify('+1 day');
+
+                                    $item->start = $ini->format('Y-m-d');
+                                    $item->end   = $fin->format('Y-m-d');
+                                    $item->tipo  = 'semana';
+                                }
+                            } else {
+                                // Fecha simple: intentamos varios formatos
+                                $d = DateTime::createFromFormat('Y-m-d', $fecha) ?:
+                                    DateTime::createFromFormat('d/m/Y', $fecha) ?:
+                                    DateTime::createFromFormat('m/d/Y', $fecha);
+
+                                if ($d) {
+                                    $fin = clone $d;
+                                    $fin->modify('+1 day');
+
+                                    $item->start = $d->format('Y-m-d');
+                                    $item->end   = $fin->format('Y-m-d');
+                                    $item->tipo  = 'dia';
+                                }
+                            }
+
+                            $data['incidencia'][] = $item;
+                        }
+                    }
+
                     
             }
 
+           //var_dump( $data['incidencia']  );
+           //die();
             $cat_incidencia = $Mglobal->getTabla(['tabla' => 'cat_incidencia', 'where' => ['visible' => 1]]);
         
             $mes  = ($mes)? $mes: date('m');
@@ -1269,7 +1322,7 @@ class Agregar extends BaseController {
             $asistencia = (isset($agenda->data) && !empty($agenda->data))?$agenda->data:[];
             $data['asistencia'] = $asistencia;
             $data['cat_incidencia'] = $cat_incidencia->data;
-            $data['incidencia'] = (isset($incidencia->data) && !empty($incidencia->data))?$incidencia->data:[];
+           // $data['incidencia'] = (isset($incidencia->data) && !empty($incidencia->data))?$incidencia->data:[];
         
             $data['mes'] = $mes;
             $data['calendarStatic'] = $calendarStatic;
@@ -1508,8 +1561,9 @@ class Agregar extends BaseController {
         $incidencia = $globals->getTabla([
             'tabla' => 'vw_incidenica',
             'where' => ['id_usuario' => $usuario, 'id_estatus' => 3],
-            'whereBetween' => [['fecha', $fechaInicio, $fechaFin]]
+            'whereBetween' => [['fecha_inicio', $fechaInicio, $fechaFin]]
         ]);
+        
         $data['incidencia'] = (isset($incidencia->data) && !empty($incidencia->data))?$incidencia->data:'';
         $data['usuario'] = (isset($incidencia->data) && !empty($incidencia->data))?$incidencia->data[0]:'';
 
@@ -1585,7 +1639,7 @@ class Agregar extends BaseController {
         $tabla = [
                  'tabla' => 'incidencia', 
                  'where' => ['id_usuario' => $id_usuario],
-                 'whereBetween' => [['fecha', $fec_ini, $fec_fin]]
+                 'whereBetween' => [['fecha_inicio', $fec_ini, $fec_fin]]
                 ];
         $incidencias = $globals->getTabla($tabla);                  
         if(!empty($incidencias->data)){

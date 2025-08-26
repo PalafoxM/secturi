@@ -1360,19 +1360,27 @@ class Principal extends BaseController {
         $response->error = true;
         $response->respuesta = 'Error al optener los datos';
         $data =  $this->request->getPost();
+        list($iniStr, $finStr) = array_map('trim', explode('-', $data['datetimes']));
+
+        $ini = date('Y-m-d', strtotime($iniStr));
+        $fin = date('Y-m-d', strtotime($finStr));
         $dataInsert = [
-     
-            "id_incidencia_semana" => (int)$data['tipo_incidencia'],
-            "semana"        => $data['datetimes'],
+            "id_usuario"    => (int)$session->get('id_usuario'),
+            "id_estatus"    => 1,
+            "cat_id_incidencia" => (int)$data['tipo_incidencia'],
+            "hora_inicio"   => '8:30:00',
+            "hora_fin"      => '16:00:00',
+            "fecha"         => $data['datetimes'],
+            "tipo"          => 2,
+            "fecha_inicio"  => $ini,
+            "fecha_fin"     => $fin,
             "comentario"    => $data['comentario'],
             "detalles"      => $data['detalles'],
-            "id_usuario"    => (int)$session->get('id_usuario'),
             "usu_reg"       => (int)$session->get('id_usuario'),
-            "fec_reg"       => date('Y-m-d H:i:s'),
-            "visible"       =>1,
+            "fec_reg"       => date('Y-m-d H:i:s')
         ]; 
            $dataConfig = [
-                "tabla"     => "incidencia_semana",
+                "tabla"     => "incidencia",
                  "editar"   => false,
                 ];
         $result = $globals->saveTabla($dataInsert, $dataConfig, ["script" => "guardar.incidencia"]);  
@@ -1396,6 +1404,9 @@ class Principal extends BaseController {
             "hora_fin"           => $data['hora_fin'],
             "cat_id_incidencia"  => (int)$data['tipo_incidencia'],
             "fecha"              => $data['fecha'],
+            "tipo"              => 1,
+            "fecha_inicio"       => $data['fecha'],
+            "fecha_fin"          => $data['fecha'],
             "comentario"         => $data['comentario'],
             "detalles"           => $data['detalles'],
             "id_usuario"         => $session->get('id_usuario'),
@@ -1578,8 +1589,49 @@ class Principal extends BaseController {
         $usuario  = $globals->getTabla($usuario);
         $data['periodo']     = (isset($periodo->data) && !empty($periodo->data))?$periodo->data:[];
         $data['usuario']     = (isset($usuario->data) && !empty($usuario->data))?$usuario->data:[];
+     
+          $data['incidencia'] = [];
 
-        $data['incidencia']    = (!empty($incidencia->data))?$incidencia->data:[];
+                    if (isset($incidencia->data) && !empty($incidencia->data)) {
+                        foreach ($incidencia->data as $item) {
+                            $fecha = $item->fecha;
+
+                            // Detectar si es rango tipo "08/18/2025 - 08/22/2025"
+                            if (preg_match('/\d{2}\/\d{2}\/\d{4}\s*-\s*\d{2}\/\d{2}\/\d{4}/', $fecha)) {
+                                list($iniStr, $finStr) = array_map('trim', explode('-', $fecha));
+
+                                $ini = DateTime::createFromFormat('m/d/Y', $iniStr);
+                                $fin = DateTime::createFromFormat('m/d/Y', $finStr);
+
+                                if ($ini && $fin) {
+                                    // FullCalendar → end es exclusivo: sumamos 1 día
+                                    $fin->modify('+1 day');
+
+                                    $item->start = $ini->format('Y-m-d');
+                                    $item->end   = $fin->format('Y-m-d');
+                                    $item->tipo  = 'semana';
+                                }
+                            } else {
+                                // Fecha simple: intentamos varios formatos
+                                $d = DateTime::createFromFormat('Y-m-d', $fecha) ?:
+                                    DateTime::createFromFormat('d/m/Y', $fecha) ?:
+                                    DateTime::createFromFormat('m/d/Y', $fecha);
+
+                                if ($d) {
+                                    $fin = clone $d;
+                                    $fin->modify('+1 day');
+
+                                    $item->start = $d->format('Y-m-d');
+                                    $item->end   = $fin->format('Y-m-d');
+                                    $item->tipo  = 'dia';
+                                }
+                            }
+
+                            $data['incidencia'][] = $item;
+                        }
+                    }
+        //var_dump(  $data['incidencia'] );
+        //die();
         $data['scripts'] = array('inicio', 'principal');
         $data['contentView'] = 'secciones/vListaIncidencia';                
         $this->_renderView($data); 
