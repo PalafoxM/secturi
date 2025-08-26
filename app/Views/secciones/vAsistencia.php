@@ -199,41 +199,42 @@
                                 <h2 id="fecha_incidencia"> </h2>
                                 <div class="slimscroll scroll-rightbar">
                                     <div class="activity">
+                                      
                                         <div class="activity-info">
                                             <div class="activity-info-text mb-2">
-                                                <label for="tipo_incidencia" class="form-label">Tipo de Incidencia</label>
-                                                <select class="select2 form-control" id="tipo_incidencia"  >
-                                                     <option value="">Seleccione</option>
-                                                     <?php foreach($cat_incidencia as $c): ?>
-                                                     <option value="<?= $c->id_incidencia?>"><?= $c->dsc_incidencia ?></option>
-                                                     <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="activity-info">
-                                            <div class="activity-info-text mb-2">
-                                               <label class="my-3">Semanas</label>
+                                               <label class="form-label">Semanas</label>
                                                 <div class="input-group">                                            
-                                                    <input type="text" class="form-control" name="datetimes">
+                                                    <input type="text" class="form-control" id="datetimes" name="datetimes">
                                                     <div class="input-group-append">
                                                         <span class="input-group-text"><i class="dripicons-calendar"></i></span>
                                                     </div>
                                                 </div>
                                              </div>
                                         </div>
+                                          <div class="activity-info">
+                                            <div class="activity-info-text mb-2">
+                                                
+                                                <select class="select2 form-control" id="tipo_incidencia_semana">
+                                                     <option value="">Tipo incidencia</option>
+                                                     <?php foreach($cat_incidencia as $c): ?>
+                                                     <option value="<?= $c->id_incidencia?>"><?= $c->dsc_incidencia ?></option>
+                                                     <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                        </div>
                                          <div class="activity-info">
                                             <div class="activity-info-text mb-2">
                                                  <label class="form-label">Detalles</label>
-                                                 <textarea class="form-control" id="detalles" ></textarea>
+                                                 <textarea class="form-control" id="detalles_semana" ></textarea>
                                              </div>
                                         </div>
                                          <div class="activity-info">
                                             <div class="activity-info-text mb-2">
                                                  <label class="form-label">Comentarios adicionales</label>
-                                                 <textarea class="form-control" id="comentario" ></textarea>
+                                                 <textarea class="form-control" id="comentario_semana" ></textarea>
                                              </div>
                                         </div>
-                                      <a style="color:white;" id="btn_incidencia" class="btn btn-gradient-success btn-lg" onclick="st.agregar.guardarIncidencia();" role="button">Guardar</a>
+                                      <a style="color:white;" id="btn_semana" class="btn btn-gradient-success btn-lg" onclick="st.agregar.guardarIncidenciaS();" role="button">Guardar</a>
                                     </div>
                                     <!--end activity-->
                                 </div>
@@ -245,7 +246,7 @@
                                         <div class="activity-info">
                                             <div class="activity-info-text mb-2">
                                                 <label for="tipo_incidencia" class="form-label">Tipo de Incidencia</label>
-                                                <select class="select2 form-control" id="tipo_incidencia">
+                                                <select class="select2 form-control" id="tipo_incidencia_mes">
                                                      <option value="">Seleccione</option>
                                                      <?php foreach($cat_incidencia as $c): ?>
                                                      <option value="<?= $c->id_incidencia?>"><?= $c->dsc_incidencia ?></option>
@@ -268,16 +269,16 @@
                                          <div class="activity-info">
                                             <div class="activity-info-text mb-2">
                                                  <label class="form-label">Detalles</label>
-                                                 <textarea class="form-control" id="detalles" ></textarea>
+                                                 <textarea class="form-control" id="detalles_mes" ></textarea>
                                              </div>
                                         </div>
                                          <div class="activity-info">
                                             <div class="activity-info-text mb-2">
                                                  <label class="form-label">Comentarios adicionales</label>
-                                                 <textarea class="form-control" id="comentario" ></textarea>
+                                                 <textarea class="form-control" id="comentario_mes" ></textarea>
                                              </div>
                                         </div>
-                                      <a style="color:white;" id="btn_incidencia" class="btn btn-gradient-success btn-lg" onclick="st.agregar.guardarIncidencia();" role="button">Guardar</a>
+                                      <a style="color:white;" id="btn_incidencia" class="btn btn-gradient-success btn-lg" onclick="st.agregar.guardarIncidenciaM();" role="button">Guardar</a>
                                     </div>
                                     <!--end activity-->
                                 </div>
@@ -331,12 +332,6 @@
         <link href="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet"
     type="text/css" />
 <!-- App css -->
-
-
-
-
-
-
         <script>
      $(document).ready(function() {
         $('#tipo_incidencia').on('change', function() {

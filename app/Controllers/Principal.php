@@ -1352,6 +1352,37 @@ class Principal extends BaseController {
           $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
         }  
     }
+      public function guardarSemana()
+    {  
+        $session = \Config\Services::session();
+        $globals      = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error al optener los datos';
+        $data =  $this->request->getPost();
+        $dataInsert = [
+     
+            "id_incidencia_semana" => (int)$data['tipo_incidencia'],
+            "semana"        => $data['datetimes'],
+            "comentario"    => $data['comentario'],
+            "detalles"      => $data['detalles'],
+            "id_usuario"    => (int)$session->get('id_usuario'),
+            "usu_reg"       => (int)$session->get('id_usuario'),
+            "fec_reg"       => date('Y-m-d H:i:s'),
+            "visible"       =>1,
+        ]; 
+           $dataConfig = [
+                "tabla"     => "incidencia_semana",
+                 "editar"   => false,
+                ];
+        $result = $globals->saveTabla($dataInsert, $dataConfig, ["script" => "guardar.incidencia"]);  
+        if(!$result->error){
+           $response->error= false; 
+           $response->respuesta= $result->respuesta; 
+        }
+        $this->envioCorreoJefeInmediato(); 
+        return $this->respond($response);
+    }
     public function guardarIncidencia()
     {  
         $session = \Config\Services::session();

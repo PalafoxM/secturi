@@ -581,6 +581,112 @@ st.agregar = (function () {
                 });
 
         },
+           guardarIncidenciaS: function()
+        {
+        
+        let tipo_incidencia = $('#tipo_incidencia_semana').val();
+        let comentario      = $('#comentario_semana').val();
+        let detalles        = $('#detalles_semana').val();
+        let datetimes       = $('#datetimes').val();
+
+            if(!datetimes){
+              Swal.fire("Atención", 'Es requerido la <strong>Semana/strong>', 'info');
+              return
+            }
+       
+            if(!tipo_incidencia){
+              Swal.fire("Atención", 'Es requerido la <strong>tipo incidencia</strong>','info');
+              return
+            }
+            if(!detalles){
+              Swal.fire("Atención", 'Es requerido la <strong>detalles</strong>','info');
+              return
+            }
+            $.ajax({
+                    type: "POST",
+                    url: base_url + "index.php/Principal/guardarSemana",
+                    data: {datetimes,comentario,detalles,comentario,tipo_incidencia},
+                    dataType: 'json',
+                    beforeSend: function()
+                    {
+                      $('#btn_semana').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                    },
+                    success: function (response) {
+                        console.log(response);
+                        if(!response.error){
+                            Swal.fire("Exitó", response.respuesta, "success");
+                           window.location.reload();
+                      
+                        }else{
+                            Swal.fire("Error", response.respuesta , "error"); 
+                        } 
+                    },
+                    
+                    complete: function(){
+                        $('#btn_semana').prop('disabled', false).html('Guardar');
+                    },
+                    error: function (response,jqXHR, textStatus, errorThrown) {
+                        var res= JSON.parse (response.responseText);
+                       //  console.log(res.message);
+                        Swal.fire("Error", '<p> '+ res.message + '</p>'); 
+                        $('#btn_semana').prop('disabled', false).html('Guardar'); 
+                   }
+                });
+
+        },
+           guardarIncidenciaM: function()
+        {
+        
+        let tipo_incidencia = $('#tipo_incidencia_semana').val();
+        let comentario      = $('#comentario_semana').val();
+        let detalles        = $('#detalles_semana').val();
+        let datetimes       = $('#datetimes').val();
+
+            if(!datetimes){
+              Swal.fire("Atención", 'Es requerido la <strong>Semana/strong>', 'info');
+              return
+            }
+       
+            if(!tipo_incidencia){
+              Swal.fire("Atención", 'Es requerido la <strong>tipo incidencia</strong>','info');
+              return
+            }
+            if(!detalles){
+              Swal.fire("Atención", 'Es requerido la <strong>detalles</strong>','info');
+              return
+            }
+            $.ajax({
+                    type: "POST",
+                    url: base_url + "index.php/Principal/guardarSemana",
+                    data: {datetimes,comentario,detalles,comentario,tipo_incidencia},
+                    dataType: 'json',
+                    beforeSend: function()
+                    {
+                      $('#btn_semana').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                    },
+                    success: function (response) {
+                        console.log(response);
+                        if(!response.error){
+                            Swal.fire("Exitó", response.respuesta, "success");
+                           window.location.reload();
+                      
+                        }else{
+                            Swal.fire("Error", response.respuesta , "error"); 
+                        } 
+                    },
+                    
+                    complete: function(){
+                        $('#btn_semana').prop('disabled', false).html('Guardar');
+                    },
+                    error: function (response,jqXHR, textStatus, errorThrown) {
+                        var res= JSON.parse (response.responseText);
+                       //  console.log(res.message);
+                        Swal.fire("Error", '<p> '+ res.message + '</p>'); 
+                        $('#btn_semana').prop('disabled', false).html('Guardar'); 
+                   }
+                });
+
+        },
        
         
     }
