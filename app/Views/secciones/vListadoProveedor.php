@@ -112,12 +112,13 @@
                                                 <div class="card">
                                                     <div class="card-body">        
                                                         <h4 class="mt-0 header-title">Datos del Proveedor</h4>
+                                                     <form id="editarFic" name="editarFic">
                                                         <div class="row">
                                                             <div class="col-lg-6">
                                                                 <div class="form-group">
                                                                     <label for="razon_social">Razon Social</label>
                                                                     <input type="text" class="form-control" id="razon_social" name="razon_social">
-                                                                    <input type="hidden" id="id_proveedor" >
+                                                                    <input type="hidden" id="id_proveedor" name="id_proveedor" >
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="rfc">RFC</label>
@@ -129,8 +130,15 @@
                                                                     <label for="no_proveedor">No. Proveedor</label>
                                                                     <input type="text" class="form-control" id="no_proveedor" name="no_proveedor">
                                                                 </div>
+                                                                  <div class="form-group">
+                                                                    <label for="fic">FIC</label>
+                                                                    <input type="text" class="form-control" id="fic" name="fic">
+                                                                </div>
                                                             </div> 
-                                                        </div>  
+                                                           
+                                                        </div>
+                                                        <button class="btn btn-primary mb-3" type="submit">Guardar</button>
+                                                    </form>  
                                                         <div class="row">
                                                             <div class="col-12">
                                                                 <div class="card">
@@ -205,6 +213,7 @@
 <script>
 $(document).ready(function() {
     ini.inicio.guardarReserva();
+    ini.inicio.editarFic();
     $('#datatableCategorias').DataTable({
         language: {
             url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json' // Ruta al archivo de localización

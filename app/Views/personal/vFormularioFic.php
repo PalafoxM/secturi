@@ -27,24 +27,25 @@
                         <div class="col-lg-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <h3 class="mt-0 header-title">PROVEEDOR: <strong><?= (isset($proveedor->razon_social) && !empty($proveedor->razon_social))?$proveedor->razon_social:'' ?></strong></h3>
+                                    <h3 class="mt-0 header-title">PROVEEDOR: <strong><?= (isset($proveedor->razon_social) && !empty($proveedor->razon_social)) ? $proveedor->razon_social : '' ?></strong></h3>
                                     <p class="text-muted mb-3" >
-                                        <?= (isset($proveedor->no_proveedor) && !empty($proveedor->no_proveedor))?'No. Proveedor '.$proveedor->no_proveedor:'' ?>
+                                        <?= (isset($proveedor->no_proveedor) && !empty($proveedor->no_proveedor)) ? 'No. Proveedor ' . $proveedor->no_proveedor : '' ?>
                                     </p>
                                    <form id="form_fic" enctype="multipart/form-data">
-                                        <input type="hidden" name="id_proveedor" id="id_proveedor" value="<?= (isset($proveedor->id_proveedor) && !empty($proveedor->id_proveedor))?$proveedor->id_proveedor:''?>" >
-                                        <input type="hidden" name="editar" id="editar" value="<?= $editar?>">
-                                        <?php if(isset($registro_pt->id_registro_pt) && !empty($registro_pt->id_registro_pt)): ?>
-                                        <input type="hidden" name="id_registro_pt" id="id_registro_pt" value="<?= $registro_pt->id_registro_pt?>">
+                                        <input type="hidden" name="id_proveedor" id="id_proveedor" value="<?= (isset($proveedor->id_proveedor) && !empty($proveedor->id_proveedor)) ? $proveedor->id_proveedor : '' ?>" >
+                                        <input type="hidden" id="proyecto" name="proyecto" value="E027QC04182501">
+                                        <input type="hidden" name="editar" id="editar" value="<?= $editar ?>">
+                                        <?php if (isset($registro_pt->id_registro_pt) && !empty($registro_pt->id_registro_pt)): ?>
+                                        <input type="hidden" name="id_registro_pt" id="id_registro_pt" value="<?= $registro_pt->id_registro_pt ?>">
                                         <?php endif; ?>
                                        <div class="form-row">
                                             <!-- Dirección Responsable -->
                                             <div class="col-md-4 mb-3">
                                                 <label for="direccion_responsable">Dirección Responsable <span class="text-danger">*</span></label>
                                                 <select class="form-control" id="direccion_responsable" name="direccion_responsable" required>
-                                                    <?php foreach($cat_area as $a): ?>
-                                                    <option value="<?=$a->id_area?>" <?php echo ($a->id_area == $usuario->id_area) ? 'selected' : ''; ?>>
-                                                        <?=$a->dsc_area?>
+                                                    <?php foreach ($cat_area as $a): ?>
+                                                    <option value="<?= $a->id_area ?>" <?php echo ($a->id_area == $usuario->id_area) ? 'selected' : ''; ?>>
+                                                        <?= $a->dsc_area ?>
                                                     </option>
                                                     <?php endforeach; ?>
                                                 </select>
@@ -57,8 +58,8 @@
                                             <div class="col-md-4 mb-3">
                                                 <label for="tipo_pt">Tipo de PT <span class="text-danger">*</span></label>
                                                 <select class="form-control" id="tipo_pt" name="tipo_pt" >
-                                                    <?php foreach($cat_tipo as $p): ?>
-                                                        <option value="<?=$p->id_tipo?>" <?=(isset($registro_pt->id_tipo) && $registro_pt->id_tipo == $p->id_tipo )?'selected':''?> ><?= $p->des_tipo ?></option>
+                                                    <?php foreach ($cat_tipo as $p): ?>
+                                                        <option value="<?= $p->id_tipo ?>" <?= (isset($registro_pt->id_tipo) && $registro_pt->id_tipo == $p->id_tipo) ? 'selected' : '' ?> ><?= $p->des_tipo ?></option>
                                                     <?php endforeach; ?>
                                                 </select>
                                                 <div class="invalid-feedback">
@@ -81,13 +82,13 @@
                                               <select name="id_reponsable_solicitud" class="form-control" required>
                                                     <?php foreach ($cat_usuario as $u): ?>
                                                         <?php
-                                                            // Determina el valor que debe quedar seleccionado
-                                                            $selected = '';
-                                                            if (isset($registro_pt->id_reponsable_solicitud) && $registro_pt->id_reponsable_solicitud == $u->id_usuario) {
-                                                                $selected = 'selected';
-                                                            } elseif (!isset($registro_pt->id_reponsable_solicitud) && isset($usuario) && $usuario->id_usuario == $u->id_usuario) {
-                                                                $selected = 'selected';
-                                                            }
+                                                        // Determina el valor que debe quedar seleccionado
+                                                        $selected = '';
+                                                        if (isset($registro_pt->id_reponsable_solicitud) && $registro_pt->id_reponsable_solicitud == $u->id_usuario) {
+                                                            $selected = 'selected';
+                                                        } elseif (!isset($registro_pt->id_reponsable_solicitud) && isset($usuario) && $usuario->id_usuario == $u->id_usuario) {
+                                                            $selected = 'selected';
+                                                        }
                                                         ?>
                                                         <option value="<?= $u->id_usuario ?>" <?= $selected ?>>
                                                             <?= $u->nombre . ' ' . $u->primer_apellido . ' ' . $u->segundo_apellido ?>
@@ -107,11 +108,11 @@
                                                 <label for="secretario">Secretario(a) o Director(a) que autoriza</label>
                                                 <select type="text" class="form-control" id="secretario" placeholder="Secretario/a" name="secretario">
                                                             <option value="0" selected >Seleccione una opcion</option>
-                                                    <?php foreach($secretario as $s): ?>
-                                                        <?php if(isset($registro_pt->secretario) && !empty($registro_pt->secretario)){  ?>
-                                                        <option value="<?= $s->id_secretario?>" <?= ($s->id_secretario == $registro_pt->secretario)?'selected':'' ?> ><?= $s->dsc_secretario?></option>
-                                                         <?php }else{ ?>
-                                                              <option value="<?= $s->id_secretario?>" ><?= $s->dsc_secretario?></option>
+                                                    <?php foreach ($secretario as $s): ?>
+                                                        <?php if (isset($registro_pt->secretario) && !empty($registro_pt->secretario)) { ?>
+                                                        <option value="<?= $s->id_secretario ?>" <?= ($s->id_secretario == $registro_pt->secretario) ? 'selected' : '' ?> ><?= $s->dsc_secretario ?></option>
+                                                         <?php } else { ?>
+                                                              <option value="<?= $s->id_secretario ?>" ><?= $s->dsc_secretario ?></option>
                                                          <?php } ?>
                                                     <?php endforeach; ?>
                                                 </select>
@@ -122,8 +123,8 @@
                                                 <label for="cuenta_bancaria">Cuenta Bancaria del Proveedor <span style="color:red;">*</span></label>
                                                 
                                                 <select class="form-control" id="cuenta_bancaria" name="cuenta_bancaria" >
-                                                    <?php foreach( $banco as $b ): ?>
-                                                    <option value="<?= $b->id_proveedor_banco ?>" ><?= $b->banco.' / '. $b->no_cuenta ?></option>
+                                                    <?php foreach ($banco as $b): ?>
+                                                    <option value="<?= $b->id_proveedor_banco ?>" ><?= $b->banco . ' / ' . $b->no_cuenta ?></option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div><!--end col-->
@@ -151,8 +152,8 @@
                                             <div class="col-md-6 mb-6">
                                                 <label for="documentacion_comprobatoria">Documentación comprobatoria fiscalmente requisitada, atendiendo a lo establecido en los Lineamientos Generales de Racionalidad, Austeridad y Disciplina Presupuestal de la Administración Pública Estatal vigentes.<span style="color:red;">*</span></label>
                                                 <select type="text" class="form-control" id="documentacion_comprobatoria"  name="documentacion_comprobatoria" >
-                                                  <?php foreach( $cat_opcion as $o ): ?>
-                                                    <option value="<?=$o->id_opcion ?>" <?= (isset($registro_pt->documentacion_comprobatoria) && $registro_pt->documentacion_comprobatoria == $o->id_opcion)?'selected':'' ?> ><?=$o->des_opcion ?></option>
+                                                  <?php foreach ($cat_opcion as $o): ?>
+                                                    <option value="<?= $o->id_opcion ?>" <?= (isset($registro_pt->documentacion_comprobatoria) && $registro_pt->documentacion_comprobatoria == $o->id_opcion) ? 'selected' : '' ?> ><?= $o->des_opcion ?></option>
                                                   <?php endforeach; ?>
                                                </select>
                                             </div><!--end col-->
@@ -175,8 +176,8 @@
                                             <div class="col-md-4 mb-3">
                                                 <label for="contrato_convenio">Contrato o Convenio.<span style="color:red;">*</span></label>
                                                 <select type="text" class="form-control" id="contrato_convenio"  name="contrato_convenio" >
-                                                  <?php foreach( $cat_opcion as $o ): ?>
-                                                    <option value="<?=$o->id_opcion ?>" <?= (isset($registro_pt->contrato_convenio) && $registro_pt->contrato_convenio == $o->id_opcion)?'selected':'' ?> ><?=$o->des_opcion ?></option>
+                                                  <?php foreach ($cat_opcion as $o): ?>
+                                                    <option value="<?= $o->id_opcion ?>" <?= (isset($registro_pt->contrato_convenio) && $registro_pt->contrato_convenio == $o->id_opcion) ? 'selected' : '' ?> ><?= $o->des_opcion ?></option>
                                                   <?php endforeach; ?>
                                                </select>
                                                
@@ -186,16 +187,16 @@
                                             <div class="col-md-4 mb-3">
                                                 <label for="documentacion_requerida">Documentación requerida para emitir el pago.<span style="color:red;">*</span></label>
                                                  <select type="text" class="form-control" id="documentacion_requerida"  name="documentacion_requerida" >
-                                                 <?php foreach( $cat_opcion as $o ): ?>
-                                                    <option value="<?=$o->id_opcion ?>" <?= (isset($registro_pt->documentacion_requerida) && $registro_pt->documentacion_requerida == $o->id_opcion)?'selected':'' ?> ><?=$o->des_opcion ?></option>
+                                                 <?php foreach ($cat_opcion as $o): ?>
+                                                    <option value="<?= $o->id_opcion ?>" <?= (isset($registro_pt->documentacion_requerida) && $registro_pt->documentacion_requerida == $o->id_opcion) ? 'selected' : '' ?> ><?= $o->des_opcion ?></option>
                                                   <?php endforeach; ?>
                                                </select>
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="evidencia_entrega">Evidencia de entregable.<span style="color:red;">*</span></label>
                                                 <select type="text" class="form-control" id="evidencia_entrega"  name="evidencia_entrega" >
-                                               <?php foreach( $cat_opcion as $o ): ?>
-                                                    <option value="<?=$o->id_opcion ?>" <?= (isset($registro_pt->evidencia_entrega) && $registro_pt->evidencia_entrega == $o->id_opcion)?'selected':'' ?> ><?=$o->des_opcion ?></option>
+                                               <?php foreach ($cat_opcion as $o): ?>
+                                                    <option value="<?= $o->id_opcion ?>" <?= (isset($registro_pt->evidencia_entrega) && $registro_pt->evidencia_entrega == $o->id_opcion) ? 'selected' : '' ?> ><?= $o->des_opcion ?></option>
                                                 <?php endforeach; ?>
                                                </select>
                                             </div><!--end col-->
@@ -210,21 +211,21 @@
                                         <div class="form-row">
                                             <div class="col-md-4 mb-3">
                                                 <label for="clausula_contrato">Claúsula del contrato.<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" id="clausula_contrato" name="clausula_contrato" value="<?=(isset($registro_pt->clausula_contrato))?$registro_pt->clausula_contrato:'TERCERA'?>">
+                                                <input type="text" class="form-control" id="clausula_contrato" name="clausula_contrato" value="<?= (isset($registro_pt->clausula_contrato)) ? $registro_pt->clausula_contrato : 'TERCERA' ?>">
                                                 <div class="invalid-feedback">
                                                     Campo no Valido
                                                 </div>
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="concepto_pago">Concepto del pago.<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control"  autocomplete="off" id="concepto_pago" name="concepto_pago" value="<?= (isset($registro_pt->concepto_pago))?$registro_pt->concepto_pago:'' ?>" >
+                                                <input type="text" class="form-control"  autocomplete="off" id="concepto_pago" name="concepto_pago" value="<?= (isset($registro_pt->concepto_pago)) ? $registro_pt->concepto_pago : '' ?>" >
                                                 <div class="invalid-feedback">
                                                     Please provide a valid state.
                                                 </div>
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="comision">Comisión / Reunión / Evento / Programa</label>
-                                                <input type="text" class="form-control" id="comision"  name="comision" value="<?= (isset($registro_pt->comision))?$registro_pt->comision:'Comisión / Reunión / Evento / Programa' ?>" >
+                                                <input type="text" class="form-control" id="comision"  name="comision" value="<?= (isset($registro_pt->comision)) ? $registro_pt->comision : 'Comisión / Reunión / Evento / Programa' ?>" >
                                                 <div class="invalid-feedback">
                                                     Please provide a valid state.
                                                 </div>
@@ -260,126 +261,211 @@
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label for="no_consecutivo">No. Consecutivo.<span style="color:red;">*</span></label>
-                                                <input type="number" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo" placeholder="001"  value="<?= (isset($reserva->no_consecutivo))?$reserva->no_consecutivo:'' ?>" >
+                                                <input type="number" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo" placeholder="001"  value="<?= (isset($reserva->no_consecutivo)) ? $reserva->no_consecutivo : '' ?>" >
                                                 <div class="invalid-feedback">
                                                     Campo no Valido
                                                 </div>
                                             </div><!--end col-->
                                          
                                         </div><!--end form-row-->
-                                        <div class="form-row">
-                                            <div class="col-md-4 mb-3">
-                                                <label for="no_reserva">Tipo Consumo<span style="color:red;">*</span></label>
-                                                 <select class="form-control" name="no_reserva" >
-                                                    <option value="4327277">ALIMENTOS | 3390</option>
-                                                    <option value="4327278">HOSPEDAJE | 3390</option>
-                                                    <option value="4327279">ALIMENTOS GEG | 2210</option>
-                                                 </select>
-                                            </div><!--end col-->
-                                         
-                                            <div class="col-md-4 mb-3">
-                                                <label for="proyecto">Proyecto<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" autocomplete="off" id="proyecto" name="proyecto" placeholder="E027QC04182501" readonly>
-                                          
-                                            </div><!--end col-->
-                                            <div class="col-md-4 mb-3">
-                                                <label for="importe">Importe<span style="color:red;">*</span></label>
-                                                <input type="number" class="form-control" autocomplete="off" id="importe" name="importe" placeholder="0,000.00" >
-                                          
-                                            </div><!--end col-->
-                                        </div><!--end form-row-->
-                                        
-                                                    <div class="form-row">
-                                                        <div class="col-md-6 mb-3">
-                                                            <p class="text-muted mb-3">Factura PDF (Máx 5MB)</p>
-                                                            <input id="factura_pdf_fic"  type="file" name="factura_pdf_fic[]" class="dropify" multiple accept=".pdf" />   
-                                                        </div>
-                                                        <div class="col-md-6 mb-3">
-                                                          
-                                                            <p class="text-muted mb-3">Factura XML (Máx 5MB)</p>
-                                                            <input id="factura_xml_fic" type="file" name="factura_xml_fic[]" multiple class="dropify"  accept=".xml">
+                    
+                                  	<div class="row">
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-body">
+
+                                                <h4 class="mt-0 header-title">FIC</h4>
+                                                <div class="table-responsive">
+                                                    <table class="table table-bordered" id="makeEditable3">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>TIPO CONSUMO</th>
+                                                                <th>ESTABLECIMIENTO</th>
+                                                                <th>IMPORTE</th>
+                                                                <th>ACCIONES</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <select class="form-control" name="no_reserva" >
+                                                                        <option value="4327277">ALIMENTOS | 3390</option>
+                                                                        <option value="4327278">HOSPEDAJE | 3390</option>
+                                                                        <option value="4327279">ALIMENTOS GEG | 2210</option>
+                                                                    </select>
+                                                                </td>
+                                                                <td>
+                                                                    <select class="form-control" name="restautante_fic" >
+                                                                        <?php foreach ($restaurantes as $r): ?>
+                                                                            <option value="<?= $r->id_restaurante_fic ?>" > <?= $r->dsc_restaurante ?> </option>
+                                                                        <?php endforeach; ?>
+                                                                    </select>
+                                                                </td>
+                                                                <td>
+                                                                    <input type="text" autocomplete="off" class="form-control" name="importe[]" placeholder="0,000.00">
+                                                                </td>
+                                                                <td>
+                                                                    <a type="button" class="btn btn-sm btn-danger remove-row text-white">
+                                                                        <i class="fas fa-trash"></i>
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                    <div class="text-right mt-2">
+                                                        <!-- Contenedor mejorado para el botón -->
+                                                        <a id="but_add" class="btn btn-primary text-white">
+                                                            <i class="fas fa-plus"></i> Agregar Fila
+                                                        </a>
+                                                    </div>
+                                                    <div class="row mt-3">
+                                                        <div class="col-md-8"></div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label>TOTAL:</label>
+                                                                <input type="text" class="form-control font-weight-bold text-right" id="total_importe" value="0.00" readonly>
+                                                            </div>
                                                         </div>
                                                     </div>
-
-
-                                            <a class="btn btn-gradient-danger" style="color:white" onclick="window.history.back()">Atrás</a>
-                                            <?php if(!$edita): ?>
-                                             <button class="btn btn-gradient-primary" id="btnGuardaFIC" type="submit">Guardar</button>
-                                            <?php endif; ?>
-                                    </form> <!--end form-->                                          
-                                </div><!--end card-body-->
-                            </div><!--end card-->
-                        </div><!--end col-->
-
-                   
-                    </div><!--end row-->
-
-
-                </div><!-- container -->
-            </div>
-        </div>
+                                                </div>
+                                            </div>
+                                            <!--end card-body-->
+                                        </div>
+                                    </div>
+                                    <!-- end col -->
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-md-6 mb-3">
+                                        <p class="text-muted mb-3">Factura PDF (Máx 5MB)</p>
+                                        <input id="factura_pdf_fic"  type="file" name="factura_pdf_fic[]" class="dropify" multiple accept=".pdf" />   
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                      
+                                        <p class="text-muted mb-3">Factura XML (Máx 5MB)</p>
+                                        <input id="factura_xml_fic" type="file" name="factura_xml_fic[]" multiple class="dropify"  accept=".xml">
+                                    </div>
+                                </div>
+                               <a class="btn btn-gradient-danger" style="color:white" onclick="window.history.back()">Atrás</a>
+                               <?php if (!$edita): ?>
+                                <button class="btn btn-gradient-primary" id="btnGuardaFIC" type="submit">Guardar</button>
+                               <?php endif; ?>
+                            </form> <!--end form-->                                          
+                        </div><!--end card-body-->
+                    </div><!--end card-->
+                </div><!--end col-->
+             </div><!--end row-->
+         </div><!-- container -->
+     </div>
+</div>
            <!--Form Wizard-->
-         <link rel="stylesheet" href="<?= base_url()?>plugins/jquery-steps/jquery.steps.css">
+<link href="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+<!-- App css -->
+<link href="<?php echo base_url(); ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo base_url(); ?>assets/css/jquery-ui.min.css" rel="stylesheet">
+<link href="<?php echo base_url(); ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
+<link href="<?= base_url() ?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+<link href="<?= base_url() ?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
+<!-- jQuery  -->
 
-        <!-- App css -->
-        <link href="<?= base_url()?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-        <link href="<?= base_url()?>assets/css/jquery-ui.min.css" rel="stylesheet">
-        <link href="<?= base_url()?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
-        <link href="<?= base_url()?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
-        <link href="<?= base_url()?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
+<script src="<?php echo base_url(); ?>assets/js/jquery.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/jquery-ui.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/bootstrap.bundle.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/jquery.slimscroll.min.js"></script>
 
-               <!-- Plugins css -->
-        <link href="<?= base_url()?>plugins/daterangepicker/daterangepicker.css" rel="stylesheet" />
-        <link href="<?= base_url()?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
-        <link href="<?= base_url()?>plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.css" rel="stylesheet" type="text/css" />
-        <link href="<?= base_url()?>plugins/timepicker/bootstrap-material-datetimepicker.css" rel="stylesheet">
-        <link href="<?= base_url()?>plugins/bootstrap-touchspin/css/jquery.bootstrap-touchspin.min.css" rel="stylesheet" />
 
-  
-        
-        <!-- jQuery  -->
-        <script src="<?= base_url()?>assets/js/jquery.min.js"></script>
-        <script src="<?= base_url()?>assets/js/jquery-ui.min.js"></script>
-        <script src="<?= base_url()?>assets/js/bootstrap.bundle.min.js"></script>
-        <script src="<?= base_url()?>assets/js/metismenu.min.js"></script>
-        <script src="<?= base_url()?>assets/js/waves.js"></script>
-        <script src="<?= base_url()?>assets/js/feather.min.js"></script>
-        <script src="<?= base_url()?>assets/js/jquery.slimscroll.min.js"></script>
-        <script src="<?= base_url()?>plugins/apexcharts/apexcharts.min.js"></script> 
+<!-- Required datatable js -->
+<script src="<?php echo base_url(); ?>plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.js"></script>
 
-        <script src="<?= base_url()?>plugins/jquery-steps/jquery.steps.min.js"></script>
-        <script src="<?= base_url()?>assets/pages/jquery.form-wizard.init.js"></script>
-        
+<script src="<?= base_url() ?>assets/js/waves.js"></script>
+<script src="<?= base_url() ?>assets/js/feather.min.js"></script>
 
-        <!-- Plugins js -->
-        <script src="<?= base_url()?>plugins/moment/moment.js"></script>
-        <script src="<?= base_url()?>plugins/daterangepicker/daterangepicker.js"></script>
-        <script src="<?= base_url()?>plugins/select2/select2.min.js"></script>
-        <script src="<?= base_url()?>plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
-        <script src="<?= base_url()?>plugins/timepicker/bootstrap-material-datetimepicker.js"></script>
-        <script src="<?= base_url()?>plugins/bootstrap-maxlength/bootstrap-maxlength.min.js"></script>
-        <script src="<?= base_url()?>plugins/bootstrap-touchspin/js/jquery.bootstrap-touchspin.min.js"></script>
-
-        <script>
-            ini.inicio.formFIC();
-             $('.add-file').on('click', function(e) {
-                e.preventDefault();
-                const inputId = $(this).data('target');
-                $(inputId).click();
-            });
-            $('input[name="datetimes[]"]').daterangepicker({
-                timePicker: true,
-                timePicker24Hour: true,
-                locale: {
-                    format: 'YYYY-MM-DD HH:mm:ss'
-                }
-            });
-        function setConvenio(valor) {
-                document.getElementById('no_convenio_editar').value = valor;
-            }
-
-            function setAnio(anio) {
-                let input = document.getElementById('no_convenio_editar');
-                input.value = input.value + anio;
-            }
-        </script>
+<script src="<?= base_url() ?>plugins/tiny-editable/mindmup-editabletable.js"></script>
+<script src="<?= base_url() ?>plugins/tiny-editable/numeric-input-example.js"></script>
+<script src="<?= base_url() ?>plugins/bootable/bootstable.js"></script>
+<script src="<?= base_url() ?>assets/pages/jquery.tabledit.init.js"></script>
+<script src="<?= base_url(); ?>plugins/select2/select2.min.js"></script>
+<script>
+ini.inicio.formFIC();           
+function setConvenio(valor) {
+    document.getElementById('no_convenio_editar').value = valor;
+}
+function setAnio(anio) {
+    let input = document.getElementById('no_convenio_editar');
+    input.value = input.value + anio;
+}
+	$(document).on('input', 'input[name="importe[]"]', function() {
+	    calcularTotal();
+	});
+		$(document).on('input', 'input[name="propina[]"]', function() {
+	    calcularTotal();
+	});
+	function calcularTotal() {
+	    let total = 0;
+	    
+	    $('input[name="importe[]"]').each(function() {
+	        // Elimina comas y convierte a número
+	        const valor = parseFloat($(this).val().replace(/,/g, '')) || 0;
+	        total += valor;
+	    });
+		 $('input[name="propina[]"]').each(function() {
+	        // Elimina comas y convierte a número
+	        const valor = parseFloat($(this).val().replace(/,/g, '')) || 0;
+	        total += valor;
+	    });
+	    
+	    // Formatea el total con separadores de miles
+	    $('#total_importe').val(formatNumber(total.toFixed(2)));
+	}
+	function formatNumber(num) {
+	    return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+	}
+	   $('#but_add').click(function() {
+	    var newRow = `<tr>
+	            <td>
+	               <select class="form-control" name="no_reserva[]" >
+                       <option value="4327277">ALIMENTOS | 3390</option>
+                       <option value="4327278">HOSPEDAJE | 3390</option>
+                       <option value="4327279">ALIMENTOS GEG | 2210</option>
+                   </select>
+	            </td>
+	            <td>
+	                <select class="form-control" name="restautante_fic[]" >
+                        <?php foreach ($restaurantes as $r): ?>
+                            <option value="<?= $r->id_restaurante_fic ?>" > <?= $r->dsc_restaurante ?> </option>
+                        <?php endforeach; ?>
+                   </select>
+	            </td>
+	            <td>
+	                <input autocomplete="off" type="text" class="form-control" name="importe[]" placeholder="0,000.000">
+	            </td>
+		
+	            <td>
+	                <button type="button" class="btn btn-sm btn-danger remove-row">
+	                    <i class="fas fa-trash"></i>
+	                </button>
+	            </td>
+	        </tr>`;
+	        
+	        $('#makeEditable3 tbody').append(newRow);
+	        
+	        // Inicializar Select2 en la nueva fila
+	        $('#makeEditable3 tbody tr:last .select2').select2();
+	        
+	        // Inicializar máscara para el campo de importe (opcional)
+	        $('#makeEditable3 tbody tr:last input[name="importe[]"]').inputmask('numeric', {
+	            radixPoint: ".",
+	            groupSeparator: ",",
+	            digits: 2,
+	            autoGroup: true,
+	            prefix: '$ ',
+	            rightAlign: false
+	        });
+		
+	        calcularTotal();
+	    });
+	    $(document).on('click', '.remove-row', function() {
+	        $(this).closest('tr').remove();
+	    });
+	
+</script>

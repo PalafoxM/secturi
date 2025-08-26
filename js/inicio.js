@@ -236,6 +236,42 @@ ini.inicio = (function () {
          $('.dropdown-toggle').dropdown();
          ini.inicio.traerReserva(id_proveedor);
         },
+        editarFic: function(){
+                $("#editarFic").submit(function (e) {
+                e.preventDefault(); 
+                 var formData = $("#editarFic").serialize();
+            
+                $.ajax({
+                    type: "POST",
+                    url: base_url + "index.php/Principal/editarFic",
+                    data: formData,
+                    dataType: 'json',
+                    success: function (response) {
+      
+                        if(response.error == false){
+                            Swal.fire("Exitó", response.respuesta, "success");
+
+                            //window.location.reload();
+                                                    
+                        }else{
+                            Swal.fire("Error", response.respuesta , "error"); 
+                            //$("#formParticipante")[0].reset();                         
+                            return false;
+                        } 
+                    },
+                    complete: function(){
+                        $("#btn_guardar_detenido").show();             
+                        $("#btn_load_detenido").hide();   
+                    },
+                    error: function (response,jqXHR, textStatus, errorThrown) {
+                        var res= JSON.parse (response.responseText);
+                       //  console.log(res.message);
+                        Swal.fire("Error", '<p> '+ res.message + '</p>');  
+                   }
+                });
+            });
+
+        },
         editarProveedor: function(id_proveedor)
         {
          $('#modalProveedor').modal('show');
@@ -247,10 +283,11 @@ ini.inicio = (function () {
             success: function(response) {
                  console.log(response);
                  if(!response.error){
-                    $("#id_proveedor").val(response.data.proveedor.id_proveedor);
+                    $("#id_proveedor").val(id_proveedor);
                     $("#razon_social").val(response.data.proveedor.razon_social);
                     $("#no_proveedor").val(response.data.proveedor.no_proveedor);
                     $("#rfc").val(response.data.proveedor.rfc);
+                    $("#fic").val(response.data.proveedor.fic);
                     const tbody = $('#makeEditable3 tbody');
                     tbody.empty();
 
@@ -3180,6 +3217,17 @@ ini.inicio = (function () {
                             tbody.empty();
                             
                             response.data.forEach(p => {
+                                let btn = `
+                                 <a style="color:white;" onclick="ini.inicio.reserva(${p.id_proveedor});" 
+                                            class="btn btn-gradient-success px-4">
+                                            <i class="mdi mdi-arrow-collapse-right font-21"></i>
+                                 </a>
+                                `;
+                                if(p.fic == 1){
+                                    btn +=  `<a href="${base_url}index.php/Principal/PagoFic/${p.id_proveedor}"  data-toggle="tooltip" data-placement="left" data-original-title="Pagos FIC"
+                                                class="btn btn-gradient-dark px-4">FIC</i>
+                                            </a>`;
+                                }
                                 tbody.append(`
                                     <tr>
                                         <td class="text-center">${p.id_proveedor}</td>
@@ -3191,14 +3239,7 @@ ini.inicio = (function () {
                                                 '<i class="mdi mdi-eye-off text-danger font-18"></i>'}
                                         </td>
                                         <td class="text-center">
-                                          <a style="color:white;" onclick="ini.inicio.reserva(${p.id_proveedor});" 
-                                            class="btn btn-gradient-success px-4">
-                                            <i class="mdi mdi-arrow-collapse-right font-21"></i>
-                                         </a>
-                                           <a href="${base_url}index.php/Principal/PagoFic/${p.id_proveedor}"  data-toggle="tooltip" data-placement="left" data-original-title="Pagos FIC"
-                                                class="btn btn-gradient-dark px-4">FIC</i>
-                                            </a>
-
+                                            ${btn}
                                         </td>
                                     </tr>
                                 `);

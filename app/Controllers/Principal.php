@@ -1691,6 +1691,30 @@ class Principal extends BaseController {
         }
         return $this->respond($response);
     }
+    public function editarFic()
+    {
+        $session             = \Config\Services::session();
+        $response            = new \stdClass();
+        $data                = $this->request->getPost();
+        $response->error     = true;
+        $response->respuesta = 'Error al guardar en la base de datos';
+        $principal           = new Mglobal;
+        $dataBitacora        = ['id_user' => $session->get('id_usuario'), 'script' => 'Principal.php/guardaVehiculo'];
+       // die( var_dump($data) );
+       $dataConfig = [
+        'tabla' => 'proveedor',
+        'editar' => true,
+        'idEditar' => ['id_proveedor' => $data['id_proveedor']]
+       ];
+       $result = $principal->saveTabla(['fic' =>1],$dataConfig,$dataBitacora); 
+       if(!$result->error){
+          $response->error     = false;
+          $response->respuesta = $result->respuesta;
+
+       }
+      return $this->respond($response);
+
+    }
     public function guardarVehiculo()
     {
         $session             = \Config\Services::session();
@@ -1781,7 +1805,7 @@ class Principal extends BaseController {
         $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
         $cat_partida  = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
         $proveedor    = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit'=>10]);
-
+        //die( var_dump( $proveedor ) );
         $data['cat_perfil']   = (!empty($cat_perfil->data))?$cat_perfil->data:[];
         $data['proveedor']    = (!empty($proveedor->data))?$proveedor->data:[];
         $data['cat_proyecto'] = (!empty($cat_proyecto->data))?$cat_proyecto->data:[];
@@ -2769,6 +2793,7 @@ class Principal extends BaseController {
         if($id_proveedor != 0){
             $proveedor   = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1, 'id_proveedor' =>$id_proveedor ]]);
             $banco       = $globals->getTabla(['tabla' => 'proveedor_banco', 'where' => ['idproveedor' => $id_proveedor ]]);
+            $restaurantes       = $globals->getTabla(['tabla' => 'cat_restaurante_fic', 'where' => ['no_proveedor' => $proveedor->data[0]->no_proveedor ]]);
         }
 
         $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1 ]]);
@@ -2782,6 +2807,7 @@ class Principal extends BaseController {
         if($id_proveedor != 0){
           $data['proveedor']   = (!empty($proveedor->data))?$proveedor->data[0]:[];
           $data['banco']       = (!empty($banco->data))?$banco->data:[];
+          $data['restaurantes']  = (!empty($restaurantes->data))?$restaurantes->data:[];
          
         }
   

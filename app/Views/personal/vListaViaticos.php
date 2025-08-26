@@ -47,14 +47,14 @@
                                                     <!--end tr-->
                                                 </thead>
                                                 <tbody>
-                                                    <?php foreach($datos as $p): ?>
+                                                    <?php foreach ($datos as $p): ?>
                                                     <tr>
-                                                        <td class="text-center"><?= $p->ejercicio?></td>
-                                                        <td class="text-center"><?= date('d-m-Y', strtotime($p->fecha_inicio))?></td>
-                                                        <td class="text-center"><?= date('d-m-Y', strtotime($p->fecha_termino))?></td>
-                                                        <td class="text-center"><?= $p->denominacion_puesto?></td>
+                                                        <td class="text-center"><?= $p->ejercicio ?></td>
+                                                        <td class="text-center"><?= date('d-m-Y', strtotime($p->fecha_inicio)) ?></td>
+                                                        <td class="text-center"><?= date('d-m-Y', strtotime($p->fecha_termino)) ?></td>
+                                                        <td class="text-center"><?= $p->denominacion_puesto ?></td>
                                                         <td class="text-center">
-                                                             <a style="color:white" onclick="ini.inicio.reserva(<?=$p->id_juridico_viatico?>);" title="Seccionar Proveedor"
+                                                             <a style="color:white" onclick="ini.inicio.reserva(<?= $p->id_juridico_viatico ?>);" title="Seccionar Proveedor"
                                                                
                                                                 class="btn btn-gradient-success px-4"><i
                                                                     class="mdi mdi-arrow-collapse-right font-21"></i>
@@ -92,8 +92,8 @@
 <link href="<?php echo base_url(); ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 <link href="<?php echo base_url(); ?>assets/css/jquery-ui.min.css" rel="stylesheet">
 <link href="<?php echo base_url(); ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
-<link href="<?= base_url()?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
-<link href="<?= base_url()?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
+<link href="<?= base_url() ?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+<link href="<?= base_url() ?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
 <!-- jQuery  -->
  
 <script src="<?php echo base_url(); ?>assets/js/jquery.min.js"></script>
@@ -107,14 +107,14 @@
 <script src="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.js"></script>
 
 <!-- App js -->
-<script src="<?= base_url()?>assets/js/app.js"></script>
-<script src="<?= base_url()?>assets/js/waves.js"></script>
-<script src="<?= base_url()?>assets/js/feather.min.js"></script>
+<script src="<?= base_url() ?>assets/js/app.js"></script>
+<script src="<?= base_url() ?>assets/js/waves.js"></script>
+<script src="<?= base_url() ?>assets/js/feather.min.js"></script>
 
-<script src="<?= base_url()?>plugins/tiny-editable/mindmup-editabletable.js"></script>
-<script src="<?= base_url()?>plugins/tiny-editable/numeric-input-example.js"></script>
-<script src="<?= base_url()?>plugins/bootable/bootstable.js"></script> 
-<script src="<?= base_url()?>assets/pages/jquery.tabledit.init.js"></script> 
+<script src="<?= base_url() ?>plugins/tiny-editable/mindmup-editabletable.js"></script>
+<script src="<?= base_url() ?>plugins/tiny-editable/numeric-input-example.js"></script>
+<script src="<?= base_url() ?>plugins/bootable/bootstable.js"></script> 
+<script src="<?= base_url() ?>assets/pages/jquery.tabledit.init.js"></script> 
 <script src="<?= base_url(); ?>plugins/select2/select2.min.js"></script>
 
 
