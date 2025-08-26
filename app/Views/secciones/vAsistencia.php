@@ -257,13 +257,13 @@
                                         <div class="activity-info">
                                             <div class="activity-info-text mb-2">
                                              <label class="mb-3">Mes Inicio</label>
-                                               <input type="text" class="form-control" placeholder="2017-06-04" id="mdate">
+                                               <input type="text" class="form-control" placeholder="<?= date('d-m-Y'); ?>" id="mdate_inicio">
                                              </div>
                                         </div>
                                         <div class="activity-info">
                                             <div class="activity-info-text mb-2">
                                              <label class="mb-3">Mes Fin</label>
-                                               <input type="text" class="form-control" placeholder="2017-06-04" id="mdate">
+                                               <input type="text" class="form-control" placeholder="<?= date('d-m-Y'); ?>" id="mdate_fin">
                                              </div>
                                         </div>
                                          <div class="activity-info">
@@ -369,6 +369,24 @@
             ],
         }
     });
+   // Establecer moment a español globalmente
+moment.locale('es');
+
+    $('#mdate_inicio').bootstrapMaterialDatePicker({
+
+        cancelText: 'Cancelar',
+        okText: 'Aceptar',
+
+    });
+
+    $('#mdate_fin').bootstrapMaterialDatePicker({
+
+        cancelText: 'Cancelar',
+        okText: 'Aceptar',
+
+    });
+
+
 
     $('#timepicker_inicio').bootstrapMaterialDatePicker({
         format: 'HH:mm',

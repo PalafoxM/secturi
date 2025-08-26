@@ -605,7 +605,7 @@ st.agregar = (function () {
             $.ajax({
                     type: "POST",
                     url: base_url + "index.php/Principal/guardarSemana",
-                    data: {datetimes,comentario,detalles,comentario,tipo_incidencia},
+                    data: {datetimes,comentario,detalles,tipo_incidencia},
                     dataType: 'json',
                     beforeSend: function()
                     {
@@ -636,14 +636,20 @@ st.agregar = (function () {
         },
            guardarIncidenciaM: function()
         {
-        
-        let tipo_incidencia = $('#tipo_incidencia_semana').val();
-        let comentario      = $('#comentario_semana').val();
-        let detalles        = $('#detalles_semana').val();
-        let datetimes       = $('#datetimes').val();
 
-            if(!datetimes){
-              Swal.fire("Atención", 'Es requerido la <strong>Semana/strong>', 'info');
+        let tipo_incidencia = $('#tipo_incidencia_mes').val();
+        let comentario      = $('#comentario_mes').val();
+        let detalles        = $('#detalles_mes').val();
+        let fecha_inicio    = $('#mdate_inicio').val();
+        let fecha_fin       = $('#mdate_inicio').val();
+
+
+            if(!fecha_inicio){
+              Swal.fire("Atención", 'Es requerido la <strong>fecha_inicio/strong>', 'info');
+              return
+            }
+            if(!fecha_fin){
+              Swal.fire("Atención", 'Es requerido la <strong>fecha_fin/strong>', 'info');
               return
             }
        
@@ -657,8 +663,8 @@ st.agregar = (function () {
             }
             $.ajax({
                     type: "POST",
-                    url: base_url + "index.php/Principal/guardarSemana",
-                    data: {datetimes,comentario,detalles,comentario,tipo_incidencia},
+                    url: base_url + "index.php/Principal/guardarMes",
+                    data: {fecha_fin,fecha_inicio,detalles,comentario,tipo_incidencia},
                     dataType: 'json',
                     beforeSend: function()
                     {
@@ -685,7 +691,6 @@ st.agregar = (function () {
                         $('#btn_semana').prop('disabled', false).html('Guardar'); 
                    }
                 });
-
         },
        
         

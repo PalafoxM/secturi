@@ -1391,6 +1391,41 @@ class Principal extends BaseController {
         $this->envioCorreoJefeInmediato(); 
         return $this->respond($response);
     }
+    public function guardarMes()
+    {  
+        $session = \Config\Services::session();
+        $globals      = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error al optener los datos';
+        $data =  $this->request->getPost();
+        $dataInsert = [
+            "id_usuario"    => (int)$session->get('id_usuario'),
+            "id_estatus"    => 1,
+            "cat_id_incidencia" => (int)$data['tipo_incidencia'],
+            "hora_inicio"   => '8:30:00',
+            "hora_fin"      => '16:00:00',
+            "fecha"         => date('d/m/Y', strtotime($data['fecha_inicio'])).' - '.date('d/m/Y', strtotime($data['fecha_fin'])),
+            "tipo"          => 3,
+            "fecha_inicio"  => $data['fecha_inicio'],
+            "fecha_fin"     => $data['fecha_fin'],
+            "comentario"    => $data['comentario'],
+            "detalles"      => $data['detalles'],
+            "usu_reg"       => (int)$session->get('id_usuario'),
+            "fec_reg"       => date('Y-m-d H:i:s')
+        ]; 
+           $dataConfig = [
+                "tabla"     => "incidencia",
+                 "editar"   => false,
+                ];
+        $result = $globals->saveTabla($dataInsert, $dataConfig, ["script" => "guardar.incidencia"]);  
+        if(!$result->error){
+           $response->error= false; 
+           $response->respuesta= $result->respuesta; 
+        }
+        $this->envioCorreoJefeInmediato(); 
+        return $this->respond($response);
+    }
     public function guardarIncidencia()
     {  
         $session = \Config\Services::session();
