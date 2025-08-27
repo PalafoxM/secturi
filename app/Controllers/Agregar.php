@@ -350,7 +350,18 @@ class Agregar extends BaseController {
           $data['fecha_tramite'] = date('Y-m-d');
         }
         
-        die(var_dump($data));
+        $dataInsert = [
+            'id_proveedor'       => $data['id_proveedor'],
+            'id_estatus'         => 3,
+            'id_proveedor_banco' => $data['id_proveedor_banco'],
+            'folio'              => 'PT - ' . date('YmdHis') . substr((string)microtime(), 1, 4),
+            'no_reserva'         => $data['id_proveedor_banco'],
+        ];
+     
+        echo "<pre>";
+         var_dump($data);
+        echo "</pre>";
+        die();
     
            $dataInsert = [
                         'id_reserva_fic'           => $data['id_reserva_go'],

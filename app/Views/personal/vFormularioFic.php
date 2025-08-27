@@ -122,7 +122,7 @@
                                             <div class="col-md-4 mb-3">
                                                 <label for="cuenta_bancaria">Cuenta Bancaria del Proveedor <span style="color:red;">*</span></label>
                                                 
-                                                <select class="form-control" id="cuenta_bancaria" name="cuenta_bancaria" >
+                                                <select class="form-control" id="id_proveedor_banco" name="id_proveedor_banco" >
                                                     <?php foreach ($banco as $b): ?>
                                                     <option value="<?= $b->id_proveedor_banco ?>" ><?= $b->banco . ' / ' . $b->no_cuenta ?></option>
                                                     <?php endforeach; ?>
@@ -232,7 +232,7 @@
                                             </div><!--end col-->
                                         </div><!--end form-row-->
                                         <div class="form-row">
-                                            <div class="col-md-4 mb-3">
+                                            <div class="col-md-6 mb-3">
                                               <div class="form-group" id="id_convenio">
                                                 <label for="no_convenio_editar">No. Convenio/Contrato</label>
                                                 <div class="input-group">
@@ -259,7 +259,7 @@
                                                 </div>
                                                </div>
                                             </div>
-                                            <div class="col-md-4 mb-3">
+                                            <div class="col-md-6 mb-3">
                                                 <label for="no_consecutivo">No. Consecutivo.<span style="color:red;">*</span></label>
                                                 <input type="number" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo" placeholder="001"  value="<?= (isset($reserva->no_consecutivo)) ? $reserva->no_consecutivo : '' ?>" >
                                                 <div class="invalid-feedback">
@@ -276,42 +276,39 @@
 
                                                 <h4 class="mt-0 header-title">FIC</h4>
                                                 <div class="table-responsive">
-                                                    <table class="table table-bordered" id="makeEditable3">
+                                                   <table class="table table-bordered" id="makeEditable3">
                                                         <thead>
                                                             <tr>
-                                                                <th>TIPO CONSUMO</th>
-                                                                <th>ESTABLECIMIENTO</th>
-                                                                <th>IMPORTE</th>
-                                                                <th>ACCIONES</th>
+                                                            <th>TIPO CONSUMO</th>
+                                                            <th>ESTABLECIMIENTO</th>
+                                                            <th>IMPORTE</th>
+                                                            <th>ACCIONES</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
                                                             <tr>
-                                                                <td>
-                                                                    <select class="form-control" name="no_reserva" >
-                                                                        <option value="4327277">ALIMENTOS | 3390</option>
-                                                                        <option value="4327278">HOSPEDAJE | 3390</option>
-                                                                        <option value="4327279">ALIMENTOS GEG | 2210</option>
-                                                                    </select>
-                                                                </td>
-                                                                <td>
-                                                                    <select class="form-control" name="restautante_fic" >
-                                                                        <?php foreach ($restaurantes as $r): ?>
-                                                                            <option value="<?= $r->id_restaurante_fic ?>" > <?= $r->dsc_restaurante ?> </option>
-                                                                        <?php endforeach; ?>
-                                                                    </select>
-                                                                </td>
-                                                                <td>
-                                                                    <input type="text" autocomplete="off" class="form-control" name="importe[]" placeholder="0,000.00">
-                                                                </td>
-                                                                <td>
-                                                                    <a type="button" class="btn btn-sm btn-danger remove-row text-white">
-                                                                        <i class="fas fa-trash"></i>
-                                                                    </a>
-                                                                </td>
+                                                            <td>
+                                                                <select class="form-control catalogo" name="no_reserva[]">
+                                                                <option value="restaurantes">ALIMENTOS | 3390</option>
+                                                                <option value="hoteles">HOSPEDAJE | 3390</option>
+                                                                <option value="restaurantes_geg">ALIMENTOS GEG | 2210</option>
+                                                                </select>
+                                                            </td>
+                                                            <td>
+                                                                <select class="form-control catalogo-detalle" name="catalogo_detalle[]"></select>
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" autocomplete="off" class="form-control" name="importe[]" placeholder="0,000.00">
+                                                            </td>
+                                                            <td>
+                                                                <button type="button" class="btn btn-sm btn-danger remove-row">
+                                                                <i class="fas fa-trash"></i>
+                                                                </button>
+                                                            </td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
+
                                                     <div class="text-right mt-2">
                                                         <!-- Contenedor mejorado para el botón -->
                                                         <a id="but_add" class="btn btn-primary text-white">
@@ -386,7 +383,12 @@
 <script src="<?= base_url() ?>assets/pages/jquery.tabledit.init.js"></script>
 <script src="<?= base_url(); ?>plugins/select2/select2.min.js"></script>
 <script>
-ini.inicio.formFIC();           
+ini.inicio.formFIC();
+
+    var restaurantes = <?= json_encode($restaurantes); ?>;
+    var hoteles      = <?= json_encode($hoteles); ?>;
+
+
 function setConvenio(valor) {
     document.getElementById('no_convenio_editar').value = valor;
 }
@@ -420,38 +422,61 @@ function setAnio(anio) {
 	function formatNumber(num) {
 	    return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 	}
-	   $('#but_add').click(function() {
-	    var newRow = `<tr>
-	            <td>
-	               <select class="form-control" name="no_reserva[]" >
-                       <option value="4327277">ALIMENTOS | 3390</option>
-                       <option value="4327278">HOSPEDAJE | 3390</option>
-                       <option value="4327279">ALIMENTOS GEG | 2210</option>
-                   </select>
-	            </td>
-	            <td>
-	                <select class="form-control" name="restautante_fic[]" >
-                        <?php foreach ($restaurantes as $r): ?>
-                            <option value="<?= $r->id_restaurante_fic ?>" > <?= $r->dsc_restaurante ?> </option>
-                        <?php endforeach; ?>
-                   </select>
-	            </td>
-	            <td>
-	                <input autocomplete="off" type="text" class="form-control" name="importe[]" placeholder="0,000.000">
-	            </td>
-		
-	            <td>
-	                <button type="button" class="btn btn-sm btn-danger remove-row">
-	                    <i class="fas fa-trash"></i>
-	                </button>
-	            </td>
-	        </tr>`;
-	        
-	        $('#makeEditable3 tbody').append(newRow);
-	        
-	        // Inicializar Select2 en la nueva fila
-	        $('#makeEditable3 tbody tr:last .select2').select2();
-	        
+	
+	 
+function llenarOpciones($select, lista, valueKey, textKey) {
+  $select.empty();
+  if (!Array.isArray(lista)) return;
+  lista.forEach(function (item) {
+    $select.append(new Option(item[textKey], item[valueKey]));
+  });
+}
+
+// Mapa de catálogos → { lista, valueKey, textKey }
+const CATALOGOS = {
+  'restaurantes':     { lista: () => restaurantes, valueKey: 'id_restaurante_fic', textKey: 'dsc_restaurante' },
+  'hoteles':          { lista: () => hoteles,      valueKey: 'id_hotel_fic',       textKey: 'dsc_hotel' },
+  'restaurantes_geg': { lista: () => restaurantes, valueKey: 'id_restaurante_fic', textKey: 'dsc_restaurante' } // ejemplo
+};
+
+// --- Delegación: cuando cambie el select de catálogo en cualquier fila ---
+$(document).on('change', '.catalogo', function () {
+  const $row = $(this).closest('tr');
+  const $detalle = $row.find('.catalogo-detalle');
+  const tipo = $(this).val();
+
+  const cfg = CATALOGOS[tipo];
+  if (!cfg) { $detalle.empty(); return; }
+
+  llenarOpciones($detalle, cfg.lista(), cfg.valueKey, cfg.textKey);
+});
+
+// --- Agregar fila ---
+$('#but_add').on('click', function () {
+  const newRow = `
+    <tr>
+      <td>
+        <select class="form-control catalogo" name="no_reserva[]">
+          <option value="restaurantes">ALIMENTOS | 3390</option>
+          <option value="hoteles">HOSPEDAJE | 3390</option>
+          <option value="restaurantes_geg">ALIMENTOS GEG | 2210</option>
+        </select>
+      </td>
+      <td>
+        <select class="form-control catalogo-detalle" name="catalogo_detalle[]"></select>
+      </td>
+      <td>
+        <input type="text" autocomplete="off" class="form-control" name="importe[]" placeholder="0,000.00">
+      </td>
+      <td>
+        <button type="button" class="btn btn-sm btn-danger remove-row">
+          <i class="fas fa-trash"></i>
+        </button>
+      </td>
+    </tr>`;
+  $('#makeEditable3 tbody').append(newRow);
+
+
 	        // Inicializar máscara para el campo de importe (opcional)
 	        $('#makeEditable3 tbody tr:last input[name="importe[]"]').inputmask('numeric', {
 	            radixPoint: ".",
@@ -463,9 +488,14 @@ function setAnio(anio) {
 	        });
 		
 	        calcularTotal();
-	    });
-	    $(document).on('click', '.remove-row', function() {
-	        $(this).closest('tr').remove();
-	    });
+});
+
+// --- Eliminar fila ---
+$(document).on('click', '.remove-row', function () {
+  $(this).closest('tr').remove();
+});
+
+// Inicializar la primera fila
+$('.catalogo').first().trigger('change');
 	
 </script>
