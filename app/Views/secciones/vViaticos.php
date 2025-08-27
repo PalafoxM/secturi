@@ -78,7 +78,12 @@
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                  <label for="nombre_completo">Nombre<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" id="nombre_completo" name="nombre_completo" value="<?= $session->nombre_completo ?>" readonly>
+                                                 <select class="form-control select2" id="nombre_completo" name="nombre_completo" required>
+                                                    <?php foreach($usuarios as $p): ?>
+                                                    <option value="<?= $p->id_usuario ?>" ><?= $p->nombre_completo ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                                
                                             </div><!--end col-->
                                         </div><!--end form-row-->
                                         <div class="form-row">
@@ -139,6 +144,14 @@
                                                <select class="select2 form-control" id="estado_origen" name="estado_origen" >
                                                       <?php foreach($cat_estado as $p): ?>
                                                     <option value="<?= $p->id_estado ?>" ><?= $p->dsc_estado ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div><!--end col-->
+                                             <div class="col-md-4 mb-3">
+                                                <label for="estado_origen">Estado origen del encargo o comisión<span style="color:red;">*</span></label>
+                                               <select class="select2 form-control" id="estado_origen" name="estado_origen" >
+                                                      <?php foreach($cat_municipios as $p): ?>
+                                                    <option value="<?= $p->id_municipio ?>" ><?= $p->nombre_municipio ?></option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div><!--end col-->

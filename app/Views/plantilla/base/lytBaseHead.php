@@ -463,9 +463,9 @@
                         <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Inicio/ListaViaticos">Lista Viáticos</a></li>
                         <li class="nav-item"><a class="nav-link"
-                                href="<?php echo base_url(); ?>authentication/auth-register.html">Register</a></li>
+                                href="<?php echo base_url(); ?>index.php/Principal/listadoPTjuridico">Lista PT</a></li>
                         <li class="nav-item"><a class="nav-link"
-                                href="<?php echo base_url(); ?>authentication/auth-register-alt.html">Register-alt</a>
+                                href="<?php echo base_url(); ?>index.php/Principal/listaGOjuridico">Lista Go</a>
                         </li>
                         <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>authentication/auth-recover-pw.html">Re-Password</a></li>

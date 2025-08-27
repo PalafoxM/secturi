@@ -145,6 +145,8 @@ class Inicio extends BaseController {
         $data['cat_viaje']       = $globas->getTabla(['tabla' => 'cat_viaje', 'where' => ['visible' => 1]])->data;
         $data['cat_pais']        = $globas->getTabla(['tabla' => 'cat_pais', 'where' => ['visible' => 1]])->data;
         $data['cat_estado']      = $globas->getTabla(['tabla' => 'cat_estado', 'where' => ['visible' => 1]])->data;
+        $data['cat_municipios']  = $globas->getTabla(['tabla' => 'cat_municipios', 'where' => ['visible' => 1]])->data;
+        $data['usuarios']  = $globas->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]])->data;
         $data['scripts']         = array('inicio', 'principal');
         $data['edita'] = 0;
         $data['contentView'] = 'secciones/vViaticos';                

@@ -1897,6 +1897,39 @@ class Principal extends BaseController {
         $data['contentView'] = 'personal/vListadoGo';                
         $this->_renderView($data);
     }
+    public function listaGOjuridico()
+    {  
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        if(in_array($session->get('id_perfil'), [1,2])){
+         $registro_go = $globals->getTabla(['tabla' => 'vw_registro_go', 'where' => ['visible' => 1]]);
+        }else{
+            $registro_go = $globals->getTabla(['tabla' => 'vw_registro_go', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]]);
+        }
+      
+        $data['registro_go'] = (!empty($registro_go->data))?$registro_go->data:[];
+        $data['scripts'] = array('inicio');
+        $data['edita'] = 0;
+        $data['contentView'] = 'personal/vListadoGo';                
+        $this->_renderView($data);
+    }
+    public function listadoPTjuridico()
+    {  
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        if(in_array($session->get('id_perfil'), [1,2])){
+         $registro_pt = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1]]);
+        }else{
+            $registro_pt = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]]);
+        }
+      
+
+        $data['registro_pt'] = (!empty($registro_pt->data))?$registro_pt->data:[];
+        $data['scripts'] = array('inicio');
+        $data['edita'] = 0;
+        $data['contentView'] = 'secciones/vregistroPT';                
+        $this->_renderView($data);
+    }
     public function listadoEstatusPT()
     {  
         $session = \Config\Services::session();

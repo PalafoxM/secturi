@@ -1,5 +1,5 @@
 <!-- Top Bar End -->
-
+<?php $session     = \Config\Services::session();?>
 <div class="page-wrapper">
 
     <!-- Page Content-->
@@ -63,10 +63,10 @@
                                             <button type="button"  class="btn btn-outline-info btn-round">                       
                                                 <a href="<?php echo base_url().'index.php/Principal/tablaArchivos/'.$e->id_registro_pt.'/PT' ?>" target="_blank"><i
                                                         class="mdi mdi-file-document text-success font-18"></i></a></button>
-                             <!--                    <a class="btn btn-outline-info btn-round" href="javascript:void(0);"  onclick="ini.inicio.deletePT(<?= $e->id_registro_pt?>)" ><i
-                                                        class="mdi mdi-delete-forever text-danger font-18"></i></a> -->
-                                         
-                                              
+                                                <?php if(in_array($session->get('id_perfil'),[1,7] )): ?>
+                                                <a class="btn btn-outline-info btn-round" href="<?php echo base_url().'index.php/Inicio/Viaticos/'.$e->id_registro_pt?>"  ><i
+                                                        class="mdi mdi-check text-success font-18"></i></a> 
+                                                <?php endif; ?>
                                             </td>
                                         </tr>
                                         <?php endforeach; ?>
