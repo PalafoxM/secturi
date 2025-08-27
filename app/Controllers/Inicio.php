@@ -140,6 +140,13 @@ class Inicio extends BaseController {
         $session = \Config\Services::session();
         $data        = array();
         $globas  = new Mglobal;
+          if (!in_array($session->get('id_perfil'), [1, 7])) {
+            $data['contentView'] = 'secciones/vError500';
+            $data['layout'] = 'plantilla/lytVacio';
+            $this->_renderView($data);
+            die();
+        }
+        
         $data['cat_funcionario'] = $globas->getTabla(['tabla' => 'cat_tipo_funcionario', 'where' => ['visible' => 1]])->data;
         $data['cat_gasto']       = $globas->getTabla(['tabla' => 'cat_gasto', 'where' => ['visible' => 1]])->data;
         $data['cat_viaje']       = $globas->getTabla(['tabla' => 'cat_viaje', 'where' => ['visible' => 1]])->data;
@@ -204,7 +211,7 @@ class Inicio extends BaseController {
    
     if (!in_array($session->get('id_perfil'), [1, 3])) {
             $data['contentView'] = 'secciones/vError500';
-            $data['layout'] = 'plantilla/lytLogin';
+            $data['layout'] = 'plantilla/lytVacio';
             $this->_renderView($data);
             die();
         }

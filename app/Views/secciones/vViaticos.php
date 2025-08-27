@@ -80,7 +80,7 @@
                                                  <label for="nombre_completo">Nombre<span style="color:red;">*</span></label>
                                                  <select class="form-control select2" id="nombre_completo" name="nombre_completo" required>
                                                     <?php foreach($usuarios as $p): ?>
-                                                    <option value="<?= $p->id_usuario ?>" ><?= $p->nombre_completo ?></option>
+                                                    <option value="<?= $p->id_usuario ?>" <?=($session->get('id_usuario')) == $p->id_usuario ?'selected':''?> ><?= $p->nombre_completo ?></option>
                                                     <?php endforeach; ?>
                                                 </select>
                                                 
@@ -129,33 +129,48 @@
                                                 <input type="date" class="form-control" autocomplete="off" id="fec_actualizacion" name="fec_actualizacion" placeholder="001">
                                             </div><!--end col-->
                                         </div><!--end form-row-->
-                                        <div class="form-row">
-                                           
-                                            <div class="col-md-4 mb-3">
-                                                <label for="pais_origen">País origen del encargo o comisión<span style="color:red;">*</span></label>
-                                               <select class="select2 form-control" id="pais_origen" name="pais_origen" >
-                                                    <?php foreach($cat_pais as $p): ?>
-                                                    <option value="<?= $p->id_pais ?>" ><?= $p->dsc_pais ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div><!--end col-->
-                                             <div class="col-md-4 mb-3">
-                                                <label for="estado_origen">Estado origen del encargo o comisión<span style="color:red;">*</span></label>
-                                               <select class="select2 form-control" id="estado_origen" name="estado_origen" >
-                                                      <?php foreach($cat_estado as $p): ?>
-                                                    <option value="<?= $p->id_estado ?>" ><?= $p->dsc_estado ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div><!--end col-->
-                                             <div class="col-md-4 mb-3">
-                                                <label for="estado_origen">Estado origen del encargo o comisión<span style="color:red;">*</span></label>
-                                               <select class="select2 form-control" id="estado_origen" name="estado_origen" >
-                                                      <?php foreach($cat_municipios as $p): ?>
-                                                    <option value="<?= $p->id_municipio ?>" ><?= $p->nombre_municipio ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div><!--end col-->
-                                        </div><!--end form-row-->
+                                    <!-- En la vista -->
+                                     <div class="form-row">
+                                    <!-- País -->
+                                    <div class="col-md-4 mb-3">
+                                        <label for="pais_origen">País origen <span style="color:red;">*</span></label>
+                                        <select class="select2 form-control" id="pais_origen" name="pais_origen">
+                                        <?php foreach($cat_pais as $p): ?>
+                                            <option value="<?= $p->id_pais ?>"><?= $p->dsc_pais ?></option>
+                                        <?php endforeach; ?>
+                                        </select>
+                                    </div>
+
+                                    <!-- Estado (select) -->
+                                    <div class="col-md-4 mb-3" id="wrap_estado_select">
+                                        <label for="estado_origen">Estado origen <span style="color:red;">*</span></label>
+                                        <select class="select2 form-control" id="estado_origen" name="estado_origen_id">
+                                        <!-- Lo llena JS si país = México -->
+                                        </select>
+                                    </div>
+
+                                    <!-- Estado (texto libre) -->
+                                    <div class="col-md-4 mb-3" id="wrap_estado_text">
+                                        <label for="estado_origen_text">Estado origen <span style="color:red;">*</span></label>
+                                        <input type="text" class="form-control" id="estado_origen_text" name="estado_origen_text" placeholder="Escribe el estado">
+                                    </div>
+
+                                    <!-- Municipio (select) -->
+                                    <div class="col-md-4 mb-3" id="wrap_municipio_select">
+                                        <label for="municipio_origen">Municipio origen <span style="color:red;">*</span></label>
+                                        <select class="select2 form-control" id="municipio_origen" name="municipio_origen_id">
+                                        <!-- Lo llena JS si estado = Guanajuato -->
+                                        </select>
+                                    </div>
+
+                                    <!-- Municipio (texto libre) -->
+                                    <div class="col-md-4 mb-3" id="wrap_municipio_text">
+                                        <label for="municipio_origen_text">Municipio origen <span style="color:red;">*</span></label>
+                                        <input type="text" class="form-control" id="municipio_origen_text" name="municipio_origen_text" placeholder="Escribe el municipio">
+                                    </div>
+                                    </div>
+
+
                                         <div class="form-row">
                                             <div class="col-md-4 mb-3">
                                                 <label for="ciudad_origen">Ciudad origen del encargo o comisión<span style="color:red;">*</span></label>
@@ -296,5 +311,70 @@
 
         <script src="<?= base_url()?>assets/pages/jquery.forms-advanced.js"></script>
         <script>
-            ini.inicio.formViatico();
+         ini.inicio.formViatico();
+
+  // Catálogos completos
+  const CAT_PAISES     = <?= json_encode($cat_pais ?? []) ?>;
+  const CAT_ESTADOS    = <?= json_encode($cat_estado ?? []) ?>;      // requiere: id_estado, dsc_estado, id_pais
+  const CAT_MUNICIPIOS = <?= json_encode($cat_municipios ?? []) ?>;  // requiere: id_municipio, nombre_municipio, id_estado
+
+
+
+
+$(function() {
+  $('#pais_origen, #estado_origen, #municipio_origen').select2({ width: '100%' });
+
+  function llenarSelect($sel, items, valueKey, textKey, placeholder) {
+    $sel.empty();
+    if (placeholder) $sel.append(new Option(placeholder, '', false, false));
+    items.forEach(it => $sel.append(new Option(it[textKey], it[valueKey], false, false)));
+    $sel.trigger('change.select2');
+  }
+
+
+
+  // País → decide si usamos selects o textos
+  $('#pais_origen').on('change', function() {
+    const idPais = $(this).val();
+
+    if (String(idPais) === String(142)) {
+        $('#wrap_estado_select').show();
+        $('#wrap_estado_text').hide();
+
+      llenarSelect($('#estado_origen'), CAT_ESTADOS, 'id_estado', 'dsc_estado', 'Seleccione estado');
+
+      $('#municipio_origen').empty();
+    } else {
+      // País distinto a México: estado y municipio en texto libre
+      $('#wrap_municipio_text').show();
+      $('#wrap_estado_text').show();
+      $('#wrap_estado_select').hide();
+      $('#wrap_municipio_select').hide();
+ 
+    }
+  });
+
+  // Estado → decide municipio select o texto
+  $('#estado_origen').on('change', function() {
+    const idEstado = $(this).val();
+     $('#wrap_municipio_text').hide();
+      $('#wrap_municipio_select').show();
+    if (String(idEstado) === String(11)) {
+
+
+      llenarSelect($('#municipio_origen'), CAT_MUNICIPIOS, 'id_municipio', 'nombre_municipio', 'Seleccione municipio');
+    } else {
+      $('#wrap_municipio_text').show();
+      $('#wrap_municipio_select').hide();
+    }
+  });
+
+  // Inicialización: seleccionar primer país y disparar lógica
+  const primerPais = $('#pais_origen option:first').val();
+  if (primerPais) {
+    $('#pais_origen').val(primerPais).trigger('change');
+  }
+});
+
+
         </script>
