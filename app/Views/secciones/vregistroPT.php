@@ -35,7 +35,6 @@
                                 <table id="datatableUsuario" class="table">
                                     <thead class="thead-light">
                                         <tr>
-                                            <th class="text-center">ID</th>
                                             <th class="text-center">PREVEEDOR</th>
                                             <th class="text-center">TIPO</th>
                                             <th class="text-center">FECHA</th>
@@ -51,7 +50,6 @@
                                     <tbody>
                                         <?php foreach($registro_pt as $e): ?>
                                         <tr>
-                                            <td  class="text-center"><?= $e->id_registro_pt?></td>
                                             <td  class="text-center"><?= $e->dsc_proveedor?></td>
                                             <td  class="text-center"><?= $e->dsc_tipo?></td>
                                             <td  class="text-center"><?= date('d/m/Y', strtotime($e->fecha_tramite)); ?> </td>
