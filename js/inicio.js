@@ -272,6 +272,43 @@ ini.inicio = (function () {
             });
 
         },
+        pagoFic: function(id_proveedor){
+           Swal.fire({
+                title: 'Selecciona tipo de consumo',
+                input: 'select',
+                inputOptions: {
+                    'alimentos': 'ALIMENTOS | 3390',
+                    'hospedaje': 'HOSPEDAJE | 3390',
+                    'transporte': 'ALIMENTOS GEG | 2210'
+                },
+                inputPlaceholder: 'Elige una opción',
+                showCancelButton: true,
+                cancelButtonText: 'Cancelar',
+                confirmButtonText: 'Aceptar'
+                }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: base_url + "index.php/Usuario/reservaFic",
+                        type: "post",
+                        dataType: "json", //expect return data as html from server
+                        data: { id_proveedor, partida: result.value },
+                        success: function (response, textStatus, jqXHR) {
+                            if (response.error) {
+                                Swal.fire("Atención", response.respuesta, "warning");
+                                return false;
+                            }
+                            Swal.fire("Éxito", response.respuesta, "success");
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            alert("error");
+                            console.log("error(s):" + textStatus, errorThrown);
+                            $("#mensajes").html("");
+                        },
+                    });
+                }
+            });
+
+        },
         editarProveedor: function(id_proveedor)
         {
          $('#modalProveedor').modal('show');
@@ -3224,7 +3261,7 @@ ini.inicio = (function () {
                                  </a>
                                 `;
                                 if(p.fic == 1){
-                                    btn +=  `<a href="${base_url}index.php/Principal/PagoFic/${p.id_proveedor}"  data-toggle="tooltip" data-placement="left" data-original-title="Pagos FIC"
+                                    btn +=  `<a style="color:white;" onclick="ini.inicio.pagoFic(${p.id_proveedor})" data-toggle="tooltip" data-placement="left" data-original-title="Pagos FIC"
                                                 class="btn btn-gradient-dark px-4">FIC</i>
                                             </a>`;
                                 }
