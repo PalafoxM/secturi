@@ -396,7 +396,7 @@ class Agregar extends BaseController {
                 $id_presupuesto = $response->idRegistro;
                 $insertRegistro = [
                 'id_reserva'               => $id_reserva,
-                'id_proveedor'             => 34,
+                'id_proveedor'             => $data['id_proveedor'],
                 'id_direccion_responsable' =>(int)$data['direccion_responsable'],
                 'no_consecutivo'           =>$data['no_consecutivo'],
                 'tipo_pt'                  =>(int)$data['tipo_pt'],
