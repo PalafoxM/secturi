@@ -274,12 +274,12 @@ ini.inicio = (function () {
         },
         pagoFic: function(id_proveedor){
            Swal.fire({
-                title: 'Selecciona tipo de consumo',
+                title: 'Selecciona Tipo de Consumo',
                 input: 'select',
                 inputOptions: {
-                    'alimentos': 'ALIMENTOS | 3390',
-                    'hospedaje': 'HOSPEDAJE | 3390',
-                    'transporte': 'ALIMENTOS GEG | 2210'
+                    '4327277': 'ALIMENTOS | 3390',
+                    '4327278': 'HOSPEDAJE | 3390',
+                    '4327279': 'ALIMENTOS GEG | 2210'
                 },
                 inputPlaceholder: 'Elige una opción',
                 showCancelButton: true,
@@ -288,7 +288,7 @@ ini.inicio = (function () {
                 }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: base_url + "index.php/Usuario/reservaFic",
+                        url: base_url + "index.php/Principal/reservaFic",
                         type: "post",
                         dataType: "json", //expect return data as html from server
                         data: { id_proveedor, partida: result.value },
@@ -3261,8 +3261,8 @@ ini.inicio = (function () {
                                  </a>
                                 `;
                                 if(p.fic == 1){
-                                    btn +=  `<a style="color:white;" onclick="ini.inicio.pagoFic(${p.id_proveedor})" data-toggle="tooltip" data-placement="left" data-original-title="Pagos FIC"
-                                                class="btn btn-gradient-dark px-4">FIC</i>
+                                    btn +=  `<a href="${base_url}index.php/Principal/PagoFic/${p.id_proveedor}"  data-toggle="tooltip" data-placement="left" data-original-title="Pagos FIC"
+                                                    class="btn btn-gradient-dark px-4">FIC</i>
                                             </a>`;
                                 }
                                 tbody.append(`

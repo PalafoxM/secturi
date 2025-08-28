@@ -73,16 +73,16 @@
                                                                 class="btn btn-gradient-success px-4"><i
                                                                     class="mdi mdi-arrow-collapse-right font-21"></i>
                                                             </a>
-                                                              <?php if($p->fic == 1):?>
+                                                           <!--      <?php if($p->fic == 1):?>
                                                             <a onclick="ini.inicio.pagoFic(<?= $p->id_proveedor ?>)"  data-toggle="tooltip" data-placement="left" data-original-title="Pagos FIC"
                                                                 class="btn btn-gradient-dark px-4">FIC</i>
                                                             </a>
-                                                            <?php endif;?>
-                                                          <!--   <?php if($p->fic == 1):?>
+                                                            <?php endif;?>-->
+                                                            <?php if($p->fic == 1):?>
                                                             <a href="<?php echo base_url(); ?>index.php/Principal/PagoFic/<?= $p->id_proveedor ?>"  data-toggle="tooltip" data-placement="left" data-original-title="Pagos FIC"
                                                                 class="btn btn-gradient-dark px-4">FIC</i>
                                                             </a>
-                                                            <?php endif;?> -->
+                                                            <?php endif;?> 
                                                         </td>
                                                     </tr>
                                                     <?php endforeach; ?>
