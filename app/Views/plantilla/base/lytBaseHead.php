@@ -251,11 +251,11 @@
                             <i data-feather="award" class="align-self-center menu-icon icon-dual"></i>
                         </a>
                     <?php endif;?>
-                    <?php if(in_array($session->id_perfil, [1,2,4])): ?>  
+                
                     <a href="#MetricaApps" class="nav-link" data-toggle="tooltip-custom" data-placement="top"  data-trigger="hover" title="Pagos" data-original-title="Pagos">
                         <i data-feather="dollar-sign" class="align-self-center menu-icon icon-dual"></i>
                     </a><!--end MetricaApps-->
-                     <?php endif;?>
+             
                    <?php if(in_array($session->id_perfil, [1,2,3,4])): ?>  
                     <a href="#MetricaUikit" class="nav-link" data-toggle="tooltip-custom" data-placement="right"  data-trigger="hover" title="" data-original-title="Admin">
                         <i data-feather="user" class="align-self-center menu-icon icon-dual"></i>
@@ -264,7 +264,7 @@
                     <a href="#MetricaPages" class="nav-link" data-toggle="tooltip-custom" data-placement="top"  data-trigger="hover" title="Mi espacio" data-original-title="Mi espacio">
                        <i data-feather="home" class="align-self-center menu-icon icon-dual"></i>            
                     </a><!--end MetricaPages-->
-                  <?php if($session->id_perfil == 1): ?> 
+                  <?php if(in_array($session->id_perfil, [1,6,7])): ?> 
                     <a href="#MetricaAuthentication" class="nav-link" data-toggle="tooltip-custom" data-placement="right" data-trigger="hover" title="" data-original-title="Jurídico">
                         <i class="fas fa-balance-scale align-self-center menu-icon icon-dual"></i>
                     </a> <!--end MetricaAuthentication--> 

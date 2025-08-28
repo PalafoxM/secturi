@@ -40,7 +40,7 @@
                                     <ol class="breadcrumb">
                                         <li class="breadcrumb-item"><a href="javascript:void(0);">SUSI</a></li>
                                         <li class="breadcrumb-item"><a href="javascript:void(0);">doc.</a></li>
-                                        <li class="breadcrumb-item active">Mormatividad</li>
+                                        <li class="breadcrumb-item active">Normatividad</li>
                                     </ol>
                                 </div>
                                 <h4 class="page-title">Normateca</h4>

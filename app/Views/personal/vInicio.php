@@ -214,23 +214,14 @@
                                                     </div><!--end card-->   
                                                 </div><!-- end col-->                       
                                             </div><!--end row-->
-                                      <!--      <div class="card">
-                                                <div class="card-body">
-                                                    <div class="float-lg-right float-none eco-revene-history justify-content-end">
-
-                                                    </div>
-                                                    <h4 class="header-title mt-0">Resumen</h4>
-                                                    <canvas id="bar" class="drop-shadow w-100"  height="350"></canvas>
-                                                </div>
-                                            </div> -->
+                                    
                                             
+                                     
                                             <div class="card dash-info-carousel">
-                                              
                                                 <div class="card-body">
-                                                      <p><strong>PROTOCOLO ALBA GUANAJUATO; <span class="text-danger"> la persona se encuentra en calidad de desaparecida.<span><strong></p>
                                                     <div id="carousel_2" class="carousel slide" data-ride="carousel">
                                                         <div class="carousel-inner">
-                                                            <?php foreach($lista_alba as $index => $l): ?>
+                                                             <?php foreach($lista_alba as $index => $l): ?>
                                                                 <div class="carousel-item <?= $index === 0 ? 'active' : '' ?>">
                                                                     <div class="media">
                                                                         <img src="<?= base_url().$l->foto; ?>" class="mr-3 thumb-xl align-self-center" alt="...">
@@ -248,8 +239,8 @@
                                                                     </div>
                                                                 </div>
                                                             <?php endforeach; ?>
+                                                          
                                                         </div>
-
                                                         <a class="carousel-control-prev" href="#carousel_2" role="button" data-slide="prev">
                                                             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                                                             <span class="sr-only">Previous</span>
@@ -260,7 +251,7 @@
                                                         </a>
                                                     </div>
                                                 </div>
-                                            </div>  
+                                            </div> 
                                             <div class="row">
                                                  
                                                 <div class="col-lg-6">
@@ -973,36 +964,38 @@
   </div>
 </div>
 
-<link href="<?= base_url() ?>plugins/dropify/css/dropify.min.css" rel="stylesheet">
-<link href="<?= base_url() ?>plugins/filter/magnific-popup.css" rel="stylesheet" type="text/css" />
-<link href="<?= base_url() ?>plugins/lightpick/lightpick.css" rel="stylesheet" />
+    <link href="<?= base_url() ?>plugins/dropify/css/dropify.min.css" rel="stylesheet">
+        <link href="<?= base_url() ?>plugins/filter/magnific-popup.css" rel="stylesheet" type="text/css" />
+        <link href="<?= base_url() ?>plugins/lightpick/lightpick.css" rel="stylesheet" />
 
         <!-- App css -->
-<link href="<?= base_url() ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-<link href="<?= base_url() ?>assets/css/jquery-ui.min.css" rel="stylesheet">
-<link href="<?= base_url() ?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
-<link href="<?= base_url() ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
+        <link href="<?= base_url() ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="<?= base_url() ?>assets/css/jquery-ui.min.css" rel="stylesheet">
+        <link href="<?= base_url() ?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+        <link href="<?= base_url() ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
         <link href="<?= base_url() ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
 
-<script src="<?= base_url(); ?>assets/js/jquery.min.js"></script>
-<script src="<?= base_url(); ?>plugins/apexcharts/apexcharts.min.js"></script> 
-<script src="<?= base_url(); ?>assets/pages/jquery.analytics_dashboard.init.js"></script>
+        <!-- jQuery  -->
+        <script src="<?= base_url() ?>assets/js/jquery.min.js"></script>
+        <script src="<?= base_url() ?>assets/js/jquery-ui.min.js"></script>
+        <script src="<?= base_url() ?>assets/js/bootstrap.bundle.min.js"></script>
+        <script src="<?= base_url() ?>assets/js/metismenu.min.js"></script>
+        <script src="<?= base_url() ?>assets/js/waves.js"></script>
+        <script src="<?= base_url() ?>assets/js/feather.min.js"></script>
+        <script src="<?= base_url() ?>assets/js/jquery.slimscroll.min.js"></script>
+        <script src="<?= base_url() ?>plugins/apexcharts/apexcharts.min.js"></script> 
 
-<script src="<?= base_url() ?>assets/js/jquery-ui.min.js"></script>
-<script src="<?= base_url() ?>assets/js/bootstrap.bundle.min.js"></script>
-<script src="<?= base_url() ?>assets/js/metismenu.min.js"></script>
-<script src="<?= base_url() ?>assets/js/waves.js"></script>
-<script src="<?= base_url() ?>assets/js/feather.min.js"></script>
-<script src="<?= base_url() ?>assets/js/jquery.slimscroll.min.js"></script>
-
-<script src="<?= base_url() ?>plugins/dropify/js/dropify.min.js"></script>
-<script src="<?= base_url() ?>plugins/moment/moment.js"></script>
-<script src="<?= base_url() ?>plugins/filter/isotope.pkgd.min.js"></script>
-<script src="<?= base_url() ?>plugins/filter/masonry.pkgd.min.js"></script>
-<script src="<?= base_url() ?>plugins/filter/jquery.magnific-popup.min.js"></script>
-<script src="<?= base_url() ?>plugins/chartjs/chart.min.js"></script>
-<script src="<?= base_url() ?>plugins/chartjs/roundedBar.min.js"></script>
-<script src="<?= base_url() ?>plugins/lightpick/lightpick.js"></script>
-<script src="<?= base_url() ?>assets/pages/jquery.profile.init.js"></script>
+        <script src="<?= base_url() ?>plugins/dropify/js/dropify.min.js"></script>
+        <script src="<?= base_url() ?>plugins/moment/moment.js"></script>
+        <script src="<?= base_url() ?>plugins/filter/isotope.pkgd.min.js"></script>
+        <script src="<?= base_url() ?>plugins/filter/masonry.pkgd.min.js"></script>
+        <script src="<?= base_url() ?>plugins/filter/jquery.magnific-popup.min.js"></script>
+        <script src="<?= base_url() ?>plugins/chartjs/chart.min.js"></script>
+        <script src="<?= base_url() ?>plugins/chartjs/roundedBar.min.js"></script>
+        <script src="<?= base_url() ?>plugins/lightpick/lightpick.js"></script>
+        <script src="<?= base_url() ?>assets/pages/jquery.profile.init.js"></script>
+        
+        <!-- App js -->
+        <script src="<?= base_url() ?>assets/js/app.js"></script>
 
 
