@@ -272,43 +272,7 @@ ini.inicio = (function () {
             });
 
         },
-        pagoFic: function(id_proveedor){
-           Swal.fire({
-                title: 'Selecciona Tipo de Consumo',
-                input: 'select',
-                inputOptions: {
-                    '4327277': 'ALIMENTOS | 3390',
-                    '4327278': 'HOSPEDAJE | 3390',
-                    '4327279': 'ALIMENTOS GEG | 2210'
-                },
-                inputPlaceholder: 'Elige una opción',
-                showCancelButton: true,
-                cancelButtonText: 'Cancelar',
-                confirmButtonText: 'Aceptar'
-                }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: base_url + "index.php/Principal/reservaFic",
-                        type: "post",
-                        dataType: "json", //expect return data as html from server
-                        data: { id_proveedor, partida: result.value },
-                        success: function (response, textStatus, jqXHR) {
-                            if (response.error) {
-                                Swal.fire("Atención", response.respuesta, "warning");
-                                return false;
-                            }
-                            Swal.fire("Éxito", response.respuesta, "success");
-                        },
-                        error: function (jqXHR, textStatus, errorThrown) {
-                            alert("error");
-                            console.log("error(s):" + textStatus, errorThrown);
-                            $("#mensajes").html("");
-                        },
-                    });
-                }
-            });
-
-        },
+      
         editarProveedor: function(id_proveedor)
         {
          $('#modalProveedor').modal('show');
@@ -3969,7 +3933,7 @@ ini.inicio = (function () {
                             Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
                             setTimeout(() => {
                                // window.location.href = base_url + "index.php/Principal/listadoEstatusPT";
-                                window.location.href = base_url + "index.php/Principal/tablaArchivos/"+response.idRegistro+'/GO';
+                                window.location.href = base_url + "index.php/Principal/tablaArchivos/"+response.idRegistro+'/PT';
                             }, 1500);
                         }else{
                             Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  

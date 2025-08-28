@@ -120,7 +120,7 @@
                                         </div><!--end form-row-->
                                         <div class="form-row">
                                             <div class="col-md-4 mb-3">
-                                                <label for="cuenta_bancaria">Cuenta Bancaria del Proveedor <span style="color:red;">*</span></label>
+                                                <label for="id_proveedor_banco">Cuenta Bancaria del Proveedor <span style="color:red;">*</span></label>
                                                 
                                                 <select class="form-control" id="id_proveedor_banco" name="id_proveedor_banco" >
                                                     <?php foreach ($banco as $b): ?>
@@ -234,7 +234,7 @@
                                         <div class="form-row">
                                             <div class="col-md-6 mb-3">
                                               <div class="form-group" id="id_convenio">
-                                                <label for="no_convenio_editar">No. Convenio/Contrato</label>
+                                                <label for="no_convenio">No. Convenio/Contrato</label>
                                                 <div class="input-group">
                                                     <div class="btn-group">
                                                         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -245,7 +245,7 @@
                                                                 <a class="dropdown-item"  onclick="setConvenio('SECTURI/CTO/')">SECTURI/CTO/</a>
                                                         </div>
                                                      </div>
-                                                    <input type="text" id="no_convenio_editar" name="no_convenio_editar" class="form-control" placeholder="025" autocomplete="off">
+                                                    <input type="text" id="no_convenio" name="no_convenio" class="form-control" placeholder="025" autocomplete="off">
                                                     <div class="input-group-append">
                                                         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                             AÑO <i class="mdi mdi-chevron-down"></i>
@@ -282,6 +282,7 @@
                                                             <th>TIPO CONSUMO</th>
                                                             <th>ESTABLECIMIENTO</th>
                                                             <th>IMPORTE</th>
+                                                            <th>FACTURAS</th>
                                                             <th>ACCIONES</th>
                                                             </tr>
                                                         </thead>
@@ -301,9 +302,17 @@
                                                                 <input type="text" autocomplete="off" class="form-control" name="importe[]" placeholder="0,000.00">
                                                             </td>
                                                             <td>
+                                                             
+                                                                <p class="text-muted mb-3">Factura PDF (Máx 5MB)</p>
+                                                                <input id="factura_pdf_fic"  type="file" name="factura_pdf_fic[]" class="dropify" multiple accept=".pdf" />
+                                                                <p class="text-muted mb-3">Factura XML (Máx 5MB)</p>
+                                                                <input id="factura_xml_fic" type="file" name="factura_xml_fic[]" multiple class="dropify"  accept=".xml">
+                                                            </td>
+                                                            <td>
                                                                 <button type="button" class="btn btn-sm btn-danger remove-row">
                                                                 <i class="fas fa-trash"></i>
                                                                 </button>
+                                                            
                                                             </td>
                                                             </tr>
                                                         </tbody>
@@ -320,7 +329,7 @@
                                                         <div class="col-md-4">
                                                             <div class="form-group">
                                                                 <label>TOTAL:</label>
-                                                                <input type="text" class="form-control font-weight-bold text-right" id="total_importe" value="0.00" readonly>
+                                                                <input type="text" class="form-control font-weight-bold text-right" id="total_importe" name="total_importe" value="0.00" readonly>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -331,7 +340,7 @@
                                     </div>
                                     <!-- end col -->
                                 </div>
-                                <div class="form-row">
+                               <!--  <div class="form-row">
                                     <div class="col-md-6 mb-3">
                                         <p class="text-muted mb-3">Factura PDF (Máx 5MB)</p>
                                         <input id="factura_pdf_fic"  type="file" name="factura_pdf_fic[]" class="dropify" multiple accept=".pdf" />   
@@ -341,7 +350,7 @@
                                         <p class="text-muted mb-3">Factura XML (Máx 5MB)</p>
                                         <input id="factura_xml_fic" type="file" name="factura_xml_fic[]" multiple class="dropify"  accept=".xml">
                                     </div>
-                                </div>
+                                </div> -->
                                <a class="btn btn-gradient-danger" style="color:white" onclick="window.history.back()">Atrás</a>
                                <?php if (!$edita): ?>
                                 <button class="btn btn-gradient-primary" id="btnGuardaFIC" type="submit">Guardar</button>
@@ -392,10 +401,10 @@ ini.inicio.formFIC();
 
 
 function setConvenio(valor) {
-    document.getElementById('no_convenio_editar').value = valor;
+    document.getElementById('no_convenio').value = valor;
 }
 function setAnio(anio) {
-    let input = document.getElementById('no_convenio_editar');
+    let input = document.getElementById('no_convenio');
     input.value = input.value + anio;
 }
 	$(document).on('input', 'input[name="importe[]"]', function() {
@@ -469,6 +478,12 @@ $('#but_add').on('click', function () {
       </td>
       <td>
         <input type="text" autocomplete="off" class="form-control" name="importe[]" placeholder="0,000.00">
+      </td>
+      <td>
+            <p class="text-muted mb-3">Factura PDF (Máx 5MB)</p>
+            <input id="factura_pdf_fic"  type="file" name="factura_pdf_fic[]" class="dropify" multiple accept=".pdf" />
+            <p class="text-muted mb-3">Factura XML (Máx 5MB)</p>
+            <input id="factura_xml_fic" type="file" name="factura_xml_fic[]" multiple class="dropify"  accept=".xml">
       </td>
       <td>
         <button type="button" class="btn btn-sm btn-danger remove-row">

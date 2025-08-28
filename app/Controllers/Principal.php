@@ -2152,29 +2152,44 @@ class Principal extends BaseController {
             die();
         }
 
-
-       
-       switch($id_archivo){
-            case 1:
-                $doc = 'assets/pdf/plantillas/anexo02.pdf';
-                $formato = 'personal/vFormato01.php';
-            break;
-
-           case 4:
-            if ($savePath){
-                $source = FCPATH . $instrumento;
-                if (file_exists($source)) {
-                    copy($source, $savePath);
-                    return $savePath;
+        if(!empty($instrumento)){
+             switch($id_archivo){
+                case 1:
+                    $doc = 'assets/pdf/plantillas/anexo02.pdf';
+                    $formato = 'personal/vFormato01.php';
+                break;
+            case 4:
+                if ($savePath){
+                    $source = FCPATH . $instrumento;
+                    if (file_exists($source)) {
+                        copy($source, $savePath);
+                        return $savePath;
+                    }
+                    return null;
+                } else {
+                    // Solo si se quiere mostrar directo en navegador
+                    return redirect()->to(base_url() . $instrumento);
                 }
-                return null;
-            } else {
-                // Solo si se quiere mostrar directo en navegador
-                return redirect()->to(base_url() . $instrumento);
-            }
-            break;
-         
+                break;
+            
 
+            }
+            
+        }else{
+            switch($id_archivo){
+            case 1:
+                    $doc = 'assets/pdf/plantillas/anexo02.pdf';
+                    $formato = 'personal/vFormato01.php';
+             break;
+            case 4:
+                 $data['layout'] = 'plantilla/lytVacio';
+                $data['contentView'] = 'secciones/vError500';
+                $this->_renderView($data);
+                die();
+                break;
+            
+
+            }
         }
      
         $html = view( $formato, $data);
@@ -2209,6 +2224,8 @@ class Principal extends BaseController {
         $response = new \stdClass();
         $id_registro_pt = $this->request->getPost('id_registro_pt');
         $Mglobal = new Mglobal;
+        
+        
 
         if (empty($id_registro_pt)) {
             $response->error = true;
@@ -2222,6 +2239,11 @@ class Principal extends BaseController {
             'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
         ]);
 
+        $id_reserva = $Mglobal->getTabla([
+            'tabla' => 'registro_pt',
+            'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
+        ])->data[0]->id_reserva;
+
         // Directorio temporal
         $tempDir = sys_get_temp_dir() . '/zip_temp_' . $id_registro_pt . '/';
         if (!is_dir($tempDir) && !mkdir($tempDir, 0777, true)) {
@@ -2233,11 +2255,23 @@ class Principal extends BaseController {
         $archivos = [];
         $archivosTemporales = [];
 
+        $instrumento = $Mglobal->getTabla([
+            'tabla' => 'reserva',
+            'where' => ['visible' => 1, 'id_reserva' => $id_reserva]
+        ])->data[0]->instrumento;
+
         // Archivos generados dinámicamente
-        $dynamicFiles = [
-            1 => '01 Anexos y formato de los LTPOFB.pdf',
-            4 => '04 Contrato o Convenio (según corresponda).pdf',
-        ];
+        if(empty($instrumento)){
+            $dynamicFiles = [
+                1 => '01 Anexos y formato de los LTPOFB.pdf'
+            ];
+        }else{
+            $dynamicFiles = [
+                1 => '01 Anexos y formato de los LTPOFB.pdf',
+                4 => '04 Contrato o Convenio (según corresponda).pdf',
+            ];
+        }
+      
         foreach ($dynamicFiles as $id => $nombre) {
             $rutaTemp = $tempDir . $nombre;
             $archivoGenerado = $this->Archivo($id_registro_pt, $id, $rutaTemp);
@@ -2246,7 +2280,8 @@ class Principal extends BaseController {
                 $archivosTemporales[] = $archivoGenerado;
             }
         }
-
+    
+        
         // Archivo 07
         $rutaArchivo07 = $tempDir . '07 Formatos_diversos.pdf';
         $archivo07 = $this->ImprimirPT($id_registro_pt, $rutaArchivo07);

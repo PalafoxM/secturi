@@ -350,98 +350,120 @@ class Agregar extends BaseController {
           $data['fecha_tramite'] = date('Y-m-d');
         }
         
-        $dataInsert = [
-            'id_proveedor'       => $data['id_proveedor'],
-            'id_estatus'         => 3,
-            'id_proveedor_banco' => $data['id_proveedor_banco'],
-            'folio'              => 'PT - ' . date('YmdHis') . substr((string)microtime(), 1, 4),
-            'no_reserva'         => $data['id_proveedor_banco'],
-        ];
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaTurno'];
      
-        echo "<pre>";
-         var_dump($data);
-        echo "</pre>";
-        die();
-    
-           $dataInsert = [
-                        'id_reserva_fic'           => $data['id_reserva_go'],
-                        'id_direccion_responsable' => $data['direccion_responsable'],
-                        'fecha_tramite'            => $data['fecha_tramite'],
-                        'no_consecutivo'           => (int)$data['no_consecutivo'],
-                        'id_reponsable_solicitud'  => (int)$data['id_reponsable_solicitud'],
-                        'director_general'         => 1,
-                        'secretario'               => (int)$data['secretario'],
-                        'contrato_convenio'        => ($data['contrato_convenio'] == 'NO')?2:1,
-                        'formato_establecido'      => ($data['formato_establecido']=='SI')?1:2,
-                        'documentacion_comprobatoria'=>$data['documentacion_comprobatoria'],
-                        'poliza'                   =>($data['poliza']=='SI')?1:2,
-                        'formato_conformidad'      =>($data['formato_conformidad']=='SI')?1:2,
-                        'documentacion_requerida'  =>($data['documentacion_requerida']=='SI')?1:2,
-                        'evidencia_entrega'        =>(int)$data['evidencia_entrega'],
-                        'concepto_gasto'           =>$data['concepto_gasto'],
-                        'comision'                 =>$data['comision'],
-                        'no_reserva'               =>$data['no_reserva'],
-                        'lugar'                    =>$data['lugar']  
-                    ];
-            $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaTurno'];
-        if($data['editar'] == 1){
-                    $dataInsert['usu_reg'] = $session->get('id_usuario');
-                    $dataInsert['fec_reg'] = date('Y-m-d');
-                    $dataConfig = [
-                        "tabla"=>"registro_go",
+        foreach( $data['no_reserva'] as $k => $v){
+   
+        $insertReserva = [
+            'id_proveedor'       => (int)$data['id_proveedor'],
+            'id_estatus'         => 3,
+            'id_proveedor_banco' => (int)$data['id_proveedor_banco'],
+            'folio'              => 'PT - ' . date('YmdHis') . substr((string)microtime(), 1, 4),
+            'no_reserva'         =>($v == 'hoteles')?4327278:($v == 'restaurantes'?4327277:4327279),
+            'no_convenio'        =>$data['no_convenio'],
+            'total_importe'      =>$data['total_importe'],
+            'observaciones'      =>'PAGOS FIC',
+            'fec_reg'            =>date('Y-m-d H:i:s'),
+            'usu_reg'            =>$session->get('id_usuario')
+         ];
+ 
+         $dataConfig = [
+                        "tabla"=>"reserva",
                         "editar"=>false
                     ];
-        }else{   
-                $dataConfig = [
-                    "tabla"=>"registro_go",
-                    "editar"=>true,
-                    'idEditar'=>['id_registro_go' => $data['id_registro_go']]
-                ];
-                 $dataInsert['usu_act'] = $session->get('id_usuario');
-        }
+        $response = $this->globals->saveTabla($insertReserva,$dataConfig,$dataBitacora);
       
-   
-        $response = $this->globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
-
-        if(!$response->error){
-            $id_registro_go = $response->idRegistro;
-            $this->cambiarStatus($data['id_reserva_go']);
- 
-           $archivosPdf = [];
-           $periodo = [];
-
-            foreach ($data as $key => $p) {
-                if (strpos($key, 'encabezado') === 0) {
-                    $index = str_replace('encabezado', '', $key); // ej. encabezado1 → 1
-                    $periodo[$index]['encabezado'] = $p;
-                } 
-                if (strpos($key, 'periodo_inicio') === 0) {
-                    $index = str_replace('periodo_inicio', '', $key); // ej. periodo1 → 1
-                    $periodo[$index]['periodo_inicio'] = $p;
-                } 
-                 if (strpos($key, 'periodo_fin') === 0) {
-                    $index = str_replace('periodo_fin', '', $key); // ej. periodo1 → 1
-                    $periodo[$index]['periodo_fin'] = $p;
-                } 
-            }
-
-          
-            // Recorremos todas las claves de los archivos enviados
-            foreach ($archivos as $key => $fileArray) {
-                if (strpos($key, 'factura_pdf_') === 0) {
-                    $archivosPdf = array_merge($archivosPdf, $fileArray);
-                }
-            }
+            if(!$response->error){
+                $id_reserva = $response->idRegistro;
+                $insertPresupuesto = [
+                'id_reserva'         => $id_reserva,
+                'id_proyecto'        => 34,
+                'id_partida'         =>($insertReserva['no_reserva'] == 4327279)?10:94,
+                'importe'            =>$data['importe'][$k],
+                'fec_reg'            =>date('Y-m-d H:i:s'),
+            'usu_reg'            =>$session->get('id_usuario') 
         
-           $datosPDF =$this->procesarPDFgo($archivosPdf, $id_registro_go);
-           $datosP   =$this->procesarPediodoGo($periodo, $id_registro_go);
-          
-            if (!$datosPDF) {
-                $response->errorPDF     =  true;
-                $response->respuestaPDF = "PDF inválido o no se encontró.";
+            ];
+        
+            $dataConfig = [
+                            "tabla"=>"presupuesto",
+                            "editar"=>false
+                        ];
+        
+            $response = $this->globals->saveTabla($insertPresupuesto,$dataConfig,$dataBitacora);
             }
-    
+            if(!$response->error){
+                $id_presupuesto = $response->idRegistro;
+                $insertRegistro = [
+                'id_reserva'               => $id_reserva,
+                'id_proveedor'             => 34,
+                'id_direccion_responsable' =>(int)$data['direccion_responsable'],
+                'no_consecutivo'           =>$data['no_consecutivo'],
+                'tipo_pt'                  =>(int)$data['tipo_pt'],
+                'fecha_tramite'            =>$data['fecha_tramite'], 
+                'id_reponsable_solicitud'  =>(int)$data['id_reponsable_solicitud'], 
+                'director_general'         =>(int)$data['director_generar'], 
+                'secretario'               =>(int)$data['secretario'], 
+                //'cuenta_bancaria'          =>$data['id_proveedor_banco'], 
+                'fecha_gasto_inicio'       =>$data['fecha_gasto_inicio'], 
+                'fecha_gasto_fin'          =>$data['fecha_gasto_fin'],
+                'formato_establecido'      =>($data['formato_establecido']=='SI')?1:2,
+                'documentacion_comprobatoria'=>(int)$data['documentacion_comprobatoria'],
+                'evidencia_entrega'        =>(int)$data['evidencia_entrega'],
+                'otros'                    =>$data['otros'],
+                'comision'                 =>$data['comision'],
+                'clausula_contrato'        =>$data['clausula_contrato'],
+                'contrato_convenio'        =>(int)$data['contrato_convenio'],
+                'concepto_pago'            =>$data['concepto_pago'],
+                'fec_reg'                  =>date('Y-m-d H:i:s'),
+                'usu_reg'                  =>$session->get('id_usuario')
+            ];
+        
+        
+            $dataConfig = [
+                            "tabla"=>"registro_pt",
+                            "editar"=>false
+                        ];
+            
+            $response = $this->globals->saveTabla($insertRegistro,$dataConfig,$dataBitacora);
+            }
+            if(!$response->error){
+                $id_registro_pt = $response->idRegistro;
+                $archivo = $archivos['factura_pdf_fic'][$k];
+            
+                $timestamp = date('Ymd_His');
+                $extension = $archivo->getClientExtension();
+                $originalName = pathinfo($archivo->getName(), PATHINFO_FILENAME);
+                $file = $originalName . '_' . $timestamp . '.' . $extension;
+
+                // Ruta absoluta
+                $ruta_destino = FCPATH . 'assets/pdf/';
+                $archivo->move($ruta_destino, $file);
+
+                // Rutas públicas
+                $ruta_absoluta = base_url('assets/pdf/' . $file);
+                $ruta_relativa = 'assets/pdf/' . $file;
+            
+                $insertFacturaPdf = [
+                    'id_registro_pt' =>$id_registro_pt,
+                    'ruta_absoluta'  =>$ruta_absoluta,
+                    'ruta_relativa'  =>$ruta_relativa,
+                    'fec_reg'        =>date('Y-m-d H:i:s'),
+                    'usu_reg'        =>$session->get('id_usuario') 
+        
+            ];
+        
+            $dataConfig = [
+                            "tabla"=>"factura_pdf",
+                            "editar"=>false
+                        ];
+        
+            $response = $this->globals->saveTabla($insertFacturaPdf,$dataConfig,$dataBitacora);
+
+            }
+          
         }
+     
         return $this->respond($response);
     }
     public function guardaGO()
