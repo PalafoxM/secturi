@@ -25,20 +25,39 @@ st.agregar = (function () {
                 }
             });
         },
+        editarRegistro: function(item)
+        {
+        console.log(item);
+        },
         validacionIncapacidad: function()
         {
          let incidencia = $('#tipo_incidencia').val();
          console.log(incidencia);
-         if(incidencia == 5){
+         if(incidencia == 5 || incidencia == 4){
+            let texto = (incidencia==5)?'VACACIONES':'LICENCIA MÉDICA';
             $('#timepicker_inicio').val('8:30').prop('disabled', true)
             $('#timepicker_fin').val('16:00').prop('disabled', true)
-            $('#detalles').val('VACACIONES').prop('disabled', true)
-            $('#comentario').val('VACACIONES').prop('disabled', true)
+            $('#detalles').val(texto).prop('disabled', true)
+            $('#comentario').val(texto).prop('disabled', true)
          }else{
             $('#timepicker_inicio').val('').prop('disabled', false)
             $('#timepicker_fin').val('').prop('disabled', false)
             $('#detalles').val('').prop('disabled', false)
             $('#comentario').val('').prop('disabled', false)
+         }
+        },
+        validacionIncapacidadS: function()
+        {
+         let incidencia = $('#tipo_incidencia_semana').val();
+         console.log(incidencia);
+         if(incidencia == 5 || incidencia == 4){
+            let texto = (incidencia==5)?'VACACIONES':'LICENCIA MÉDICA';
+  
+            $('#detalles_semana').val(texto).prop('disabled', true)
+            $('#comentario_semana').val(texto).prop('disabled', true)
+         }else{
+            $('#detalles_semana').val('').prop('disabled', false)
+            $('#comentario_semana').val('').prop('disabled', false)
          }
         },
         agregarUsuario: function(){

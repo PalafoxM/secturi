@@ -395,9 +395,13 @@
 <script src="<?= base_url(); ?>plugins/select2/select2.min.js"></script>
 <script>
 ini.inicio.formFIC();
+$(document).ready(function() {
+    $('.dropdown-toggle').dropdown();
+});
 
     var restaurantes = <?= json_encode($restaurantes); ?>;
     var hoteles      = <?= json_encode($hoteles); ?>;
+    console.log(hoteles);
 
 
 function setConvenio(valor) {

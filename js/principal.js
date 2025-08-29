@@ -34,28 +34,62 @@ saeg.principal = (function () {
                 event.stopImmediatePropagation();
             });
         },
-        aceptarIncidencia: function(id_incidencia, id_aceptar)
-        {
-        $.ajax({
-                url:  base_url + "index.php/Agregar/aceptarIncidencia",
-                type: 'POST',
-                data: { id_incidencia, id_aceptar },
-                dataType: 'json',
-                success: function(response) {
-                    
-                    if(!response.error){
-                      Swal.fire("Correcto", response.respuesta, "success");
-                    }else{
-                       Swal.fire("Error", response.respuesta, "error");
+        aceptarIncidencia: function(id_incidencia, id_aceptar, id_usuario) {
+    // Primero mostrar el modal para capturar observaciones
+            Swal.fire({
+                title: 'Agregar Observaciones',
+                input: 'textarea',
+                inputLabel: 'Observaciones (opcional)',
+                inputPlaceholder: 'Escribe tus observaciones aquí...',
+                inputAttributes: {
+                    'aria-label': 'Escribe tus observaciones aquí'
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Aceptar Incidencia',
+                cancelButtonText: 'Cancelar',
+                showLoaderOnConfirm: true,
+                preConfirm: (observaciones) => {
+                    // Validar si es necesario (opcional)
+                    if (observaciones && observaciones.length > 500) {
+                        Swal.showValidationMessage('Máximo 500 caracteres permitidos');
+                        return false;
                     }
+                    return observaciones;
                 },
-                error: function(xhr, status, error) {
-                    Swal.fire("Error", "Ocurrió un error en la solicitud: " + error, "error");
-                },
-                complete: function(){
-                       setTimeout(() => {
-                                 window.location.reload();
-                        }, 1000);
+                customClass: {
+                    popup: 'swal-wide'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Si confirma, enviar al servidor con las observaciones
+                    var observaciones = result.value || ''; // Si no escribió nada, enviar string vacío
+                    
+                    $.ajax({
+                        url: base_url + "index.php/Agregar/aceptarIncidencia",
+                        type: 'POST',
+                        data: { 
+                            id_incidencia: id_incidencia, 
+                            id_aceptar: id_aceptar, 
+                            id_usuario: id_usuario,
+                            observaciones: observaciones // ← Nuevo campo
+                        },
+                        dataType: 'json',
+                        success: function(response) {
+                            if (!response.error) {
+                                Swal.fire("Correcto", response.respuesta, "success");
+                            } else {
+                                Swal.fire("Error", response.respuesta, "error");
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire("Error", "Ocurrió un error en la solicitud: " + error, "error");
+                        },
+                        complete: function() {
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                        }
+                    });
                 }
             });
         },

@@ -90,6 +90,7 @@
                                                         <th class="text-center">NOMBRE COMPLETO</th>
                                                         <th class="text-center">FECHA</th>
                                                         <th class="text-center">DETALLES</th>
+                                                        <th class="text-center">OBSERVACIONES</th>
                                                         <th class="text-center">ESTATUS</th>
                                                         <th class="text-center">ACCIONES</th>
                                                     </tr>
@@ -109,6 +110,7 @@
                                                             <?php endif; ?>
                                                         </td>
                                                          <td class="text-center"><?= $p->detalles?></td>
+                                                         <td class="text-center"><?= $p->observaciones?></td>
                                                        <?php
                                                         switch ($p->id_estatus) {
                                                             case 1:
@@ -134,7 +136,7 @@
                                                       
                                                       <td class="text-center">
                                                             <!-- Aprobar/aceptar -->
-                                                            <a style="cursor:pointer;" onclick="saeg.principal.aceptarIncidencia(<?=$p->id_incidencia ?>, 3);" class="mr-2" title="Aprobar">
+                                                            <a style="cursor:pointer;" onclick="saeg.principal.aceptarIncidencia(<?=$p->id_incidencia ?>, 3, <?=$p->id_usuario ?>);" class="mr-2" title="Aprobar">
                                                                 <i class="fas fa-check-circle text-success font-16"></i>
                                                             </a>
                                                             
@@ -144,7 +146,7 @@
                                                             </a>
                                                             
                                                             <?php if($p->id_estatus !== 3): ?>
-                                                            <a  style="cursor:pointer;" onclick="saeg.principal.aceptarIncidencia(<?=$p->id_incidencia ?>, 2);" class="mr-2" title="Rechazar">
+                                                            <a  style="cursor:pointer;" onclick="saeg.principal.aceptarIncidencia(<?=$p->id_incidencia ?>, 2,<?=$p->id_usuario ?>);" class="mr-2" title="Rechazar">
                                                                 <i class="fas fa-times-circle text-warning font-16"></i>
                                                             </a>
                                                               <?php endif; ?>

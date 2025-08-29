@@ -335,8 +335,11 @@
         <script>
      $(document).ready(function() {
         $('#tipo_incidencia').on('change', function() {
-        st.agregar.validacionIncapacidad();
-    });
+            st.agregar.validacionIncapacidad();
+        });
+        $('#tipo_incidencia_semana').on('change', function() {
+            st.agregar.validacionIncapacidadS();
+        });
         // Inicialización de timepickers
     $('input[name="datetimes"]').daterangepicker({
         startDate: moment(),   // Fecha actual
@@ -449,7 +452,7 @@ moment.locale('es');
             title: `${item.nombre} ${icon}`,
             extendedProps: {
                 entrada: item.entrada,
-                salida: item.salida,
+                salida: (!item.salida)?'Sin salida':item.salida,
                 trabajado: item.trabajado,
                 tarde: item.tarde,
                 temprano: item.temprano,
@@ -473,6 +476,7 @@ moment.locale('es');
             className: (item.id_estatus === 3) ? 'fc-event-puntual' : 'fc-event-incidencia',
             extendedProps: {
             tipo: item.tipo, // 'dia' | 'semana'
+            id_incidencia: item.id_incidencia,
             hora_inicio: item.hora_inicio || 'En validación',
             hora_fin: item.hora_fin,
             comentarios: item.comentarios,
@@ -580,11 +584,10 @@ moment.locale('es');
                 `;
             }
         },
-      eventClick: function(info) {
+        eventClick: function(info) {
             const esSemana = info.event.extendedProps.tipo === 'semana';
-
             const fechaLabel = esSemana
-                ? `${info.event.extendedProps.rango_legible}` // "YYYY-MM-DD - YYYY-MM-DD"
+                ? `${info.event.extendedProps.rango_legible}`
                 : info.event.start.toLocaleDateString();
 
             Swal.fire({
@@ -593,11 +596,59 @@ moment.locale('es');
                 <div style="text-align: left;">
                     <p><strong>${esSemana ? 'Semana' : 'Fecha'}:</strong> ${fechaLabel}</p>
                     <p><strong>${info.event.extendedProps.entrada ? 'Entrada' : 'Hora Inicio'}:</strong> ${info.event.extendedProps.entrada || info.event.extendedProps.hora_inicio}</p>
-                    <p><strong>${info.event.extendedProps.entrada ? 'Salida' : 'Hora Fin'}:</strong> ${info.event.extendedProps.salida || info.event.extendedProps.hora_fin}</p>
+                    <p><strong>${info.event.extendedProps.salida ? 'Salida' : 'Hora Fin'}:</strong> ${info.event.extendedProps.salida || info.event.extendedProps.hora_fin}</p>
                 </div>
                 `,
-                confirmButtonText: 'Cerrar',
-                customClass: { popup: 'swal-wide' }
+                showDenyButton: true,
+                showCancelButton: true,
+                confirmButtonText: '<i class="mdi mdi-plus-circle"></i> Agregar Incidencia',
+                denyButtonText: '<i class="mdi mdi-pencil"></i> Editar',
+                cancelButtonText: '<i class="mdi mdi-close"></i> Cerrar',
+                customClass: { 
+                    popup: 'swal-wide',
+                    confirmButton: 'btn btn-success mx-1',
+                    denyButton: 'btn btn-primary mx-1',
+                    cancelButton: 'btn btn-secondary mx-1'
+                },
+                buttonsStyling: false,
+                showCloseButton: true,
+                reverseButtons: true,
+                focusConfirm: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // FUNCIÓN PARA OBTENER LA FECHA EN FORMATO CORRECTO
+                    const obtenerFechaFormateada = () => {
+                        // Intentar diferentes métodos para obtener la fecha
+                        if (info.dateStr) {
+                            return info.dateStr; // Usar dateStr si está disponible
+                        }
+                        
+                        if (info.event.start) {
+                            // Formatear a YYYY-MM-DD
+                            const fecha = info.event.start;
+                            const year = fecha.getFullYear();
+                            const month = String(fecha.getMonth() + 1).padStart(2, '0');
+                            const day = String(fecha.getDate()).padStart(2, '0');
+                            return `${year}-${month}-${day}`;
+                        }
+                        
+                        if (info.event.extendedProps.fecha) {
+                            return info.event.extendedProps.fecha;
+                        }
+                        
+                        // Si no se puede obtener, usar la fecha actual
+                        console.warn('No se pudo obtener la fecha del evento, usando fecha actual');
+                        const hoy = new Date();
+                        return hoy.toISOString().split('T')[0];
+                    };
+                    
+                    const dia = obtenerFechaFormateada();
+
+                    st.agregar.justificarFalta(dia);
+                    
+                } else if (result.isDenied) {
+                    st.agregar.editarRegistro(info.event.extendedProps.id_incidencia);
+                }
             });
         },
        dateClick: function(info) {
