@@ -682,8 +682,9 @@
                             case 2: echo '<i class="mdi mdi-account-card-details font-18"></i> Admin Financieros'; break;
                             case 4: echo '<i class="mdi mdi-account-card-details font-18"></i> Personal Adminitrativo'; break;
                             case 6: echo '<i class="mdi mdi-account-card-details font-18"></i> Enlace'; break;
-                            case 8: echo '<i class="mdi mdi-account-card-details font-18"></i> Estudiante'; break;
-                            default: echo 'Sin dato';
+                            case 6: echo '<i class="mdi mdi-account-card-details font-18"></i> Admin Protocolo ALBA'; break;
+                            case 7: echo '<i class="mdi mdi-account-card-details font-18"></i> Personal Juridico'; break;
+                            default: echo 'PERSONAL SECTURI';
                         }  
                         ?>
                     </h6>
