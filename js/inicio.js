@@ -3281,6 +3281,30 @@ ini.inicio = (function () {
                 $("#id_convenio").show();
             }
         },
+        // Función global para validar
+        validarDiaSemana: function(input) {
+            const fecha = new Date(input.value);
+            console.log(fecha);
+            const dia = fecha.getDay();
+            console.log(dia);
+            // 2=Martes, 3=Miércoles, 4=Jueves
+            if (dia < 2 || dia > 4) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Día no válido',
+                    text: 'Solo se permiten martes, miércoles y jueves',
+                    confirmButtonText: 'OK'
+                });
+                
+                // Limpiar el input o ajustar al próximo día permitido
+                input.value = '';
+                
+                // O ajustar automáticamente al próximo día permitido
+                const diasParaSumar = dia < 2 ? (2 - dia) : (2 + (7 - dia));
+                fecha.setDate(fecha.getDate() + diasParaSumar);
+                input.value = fecha.toISOString().split('T')[0];
+            }
+        },
         activarPeriodo: function(id_periodo, id)
         {
             $.ajax({

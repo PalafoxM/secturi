@@ -1,4 +1,4 @@
- <?php $session = \Config\Services::session(); ?>
+<?php $session = \Config\Services::session(); ?>
         <!-- App favicon -->
         <link rel="shortcut icon" href="<?php echo base_url() ?>assets/images/favicon.ico">
 
@@ -28,6 +28,11 @@
       /* Añade estos estilos al bloque de estilos existente */
     .fc-event-asistencia {
         border-left: 4px solid #4e73df;
+        background-color: #1950f5ff;
+        color: #4e73df;
+    }
+    .fc-event-espera {
+        border-left: 4px solid #4e73df;
         background-color: #f8f9fc;
         color: #4e73df;
     }
@@ -40,6 +45,11 @@
         border-left-color: #dc3545;
         background-color: #f8d7da;
         color: #dc3545;
+    }
+     .fc-event-declinado {
+        border-left: 4px solidrgb(17, 72, 236);
+        background-color:rgba(216, 46, 23, 1);
+        color: white;
     }
 
     .fc-event-tarde {
@@ -292,6 +302,104 @@
             </div><!-- /.modal-dialog -->
         </div><!-- /.modal --> 
 
+<div class="modal fade" id="modalAsistencia" tabindex="-1" role="dialog" aria-labelledby="supportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <!-- Encabezado del modal con botón de cerrar -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="supportModalLabel">Editar Asistencia</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-body step active">        
+                                <form id="editarAsistencia"> 
+                                    <input type="hidden" id="id_incidencia" name="id_incidencia">
+                                       <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="form-group"> 
+                                                <label for="tipo_incidencia">Tipo Incidencia</label>
+                                                <div class="input-group">
+                                                    <select class="form-control select2" id="tipo_incidencia" data-toggle="select2">
+                                                        <option value="">Seleccione</option>
+                                                        <?php foreach($cat_incidencia as $c): ?>
+                                                        <option value="<?= $c->id_incidencia?>"><?= $c->dsc_incidencia ?></option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </div>                                                    
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <div class="form-group"> 
+                                                <label for="fecha_inicio_asistencia">Fecha Inicio</label>
+                                                <div class="input-group">
+                                                    <input type="date" class="form-control" id="fecha_inicio_asistencia" 
+                                                        name="fecha_inicio_asistencia" onchange="ini.inicio.validarDiaSemana(this)">
+                                                </div>                                                    
+                                            </div>
+                                          
+                                            <div class="form-group">
+                                                <label for="hora_inicio_asistencia">Hora Inicio</label>
+                                                <div class="input-group">
+                                                    <input type="time" id="hora_inicio_asistencia" name="hora_inicio_asistencia" class="form-control">
+                                                </div>                                                    
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="detalle_asistencia">Detalles</label>
+                                                <div class="input-group">
+                                                    <textarea id="detalle_asistencia" name="detalle_asistencia" class="form-control"></textarea>  
+                                                </div>                                                   
+                                            </div>  
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label for="fecha_fin_asistencia">Fecha Fin</label>
+                                                <div class="input-group">
+                                                    <input type="date" id="fecha_fin_asistencia" name="fecha_fin_asistencia" class="form-control">
+                                                </div>                                                    
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="hora_fin_asistencia">Hora Fin</label>
+                                                <div class="input-group">
+                                                    <input type="time" id="hora_fin_asistencia" name="hora_fin_asistencia" class="form-control">
+                                                </div>                                                   
+                                            </div> 
+                                            <div class="form-group">
+                                                <label for="comentario_asistencia">Comentario</label>
+                                                <div class="input-group">
+                                                    <textarea id="comentario_asistencia" name="comentario_asistencia" class="form-control"></textarea>  
+                                                </div>                                                   
+                                            </div>   
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>                                                                      
+                        </div><!--end card-->
+                    </div><!--end col-->
+                </div><!--end row-->
+            </div><!--end modal-body-->
+            
+            <!-- Footer del modal con botones -->
+            <!-- En el modal-footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                <button type="submit" form="editarAsistencia" class="btn btn-success">
+                    Guardar ✔️
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
     crossorigin=""/>
@@ -333,6 +441,9 @@
     type="text/css" />
 <!-- App css -->
         <script>
+    var eventosAsistencia = <?= json_encode($asistencia) ?>;
+    var incidencia = <?= json_encode($incidencia ?? []) ?>;
+
      $(document).ready(function() {
         $('#tipo_incidencia').on('change', function() {
             st.agregar.validacionIncapacidad();
@@ -409,8 +520,7 @@ moment.locale('es');
     
     // Obtener los datos de asistencia desde PHP (asegúrate de que tu controlador los pase como JSON)
 
-    var eventosAsistencia = <?= json_encode($asistencia ?? []) ?>;
-    var incidencia = <?= json_encode($incidencia ?? []) ?>;
+
     var mesSeleccionado = '<?= $mes ?>';
     var anio = '<?= $anio ?>';
     var calendarStatic = '<?= $calendarStatic ?>';
@@ -464,37 +574,66 @@ moment.locale('es');
 
 
     // Procesar las incidencias como eventos adicionales
+// Procesar las incidencias como eventos adicionales
     var eventosIncidencia = incidencia.map(function(item) {
-    const esSemana = item.tipo === 'semana';
+        const esSemana = item.tipo === 'semana';
+
+
+        if (item.id_estatus == 1) {
+            eventClass = 'fc-event-espera';
+            item.nombre = 'Enviado';
+            icon = '✉️';
+        } else if (item.id_estatus == 2) {
+            eventClass = 'fc-event-declinado';
+            item.nombre = 'Declinado';
+            icon = '❌';
+        } else if (item.id_estatus == 3) {
+            eventClass = 'fc-event-puntual';
+            item.nombre = 'Aprobado';
+            icon = '✅';
+        } else if (item.id_estatus == 4) {
+            eventClass = 'fc-event-espera';
+            item.nombre = 'Proceso';
+            icon = '';
+        }
+
+        // LIMPIAR LAS FECHAS - EXTRAER SOLO LA PARTE YYYY-MM-DD
+        const startDate = item.start ? item.start.split(' ')[0] : null;
+        const endDate = item.end ? item.end.split(' ')[0] : null;
+
+     
         return {
             id: 'incidencia-' + item.id_incidencia,
-            start: item.start,      // YYYY-MM-DD
-            end: item.end,          // YYYY-MM-DD (EXCLUSIVO)
+            start: item.fecha_inicio,      // SOLO YYYY-MM-DD
+            end: item.fecha_fin,          // SOLO YYYY-MM-DD (EXCLUSIVO)
             allDay: true,
-            title: 'Enviado',
-            display: esSemana ? 'background' : 'auto', // banda para semanas
-            className: (item.id_estatus === 3) ? 'fc-event-puntual' : 'fc-event-incidencia',
+            title: `${item.nombre} ${icon}`,
+            display: esSemana ? 'background' : 'auto',
+            className: eventClass,
             extendedProps: {
-            tipo: item.tipo, // 'dia' | 'semana'
-            id_incidencia: item.id_incidencia,
-            hora_inicio: item.hora_inicio || 'En validación',
-            hora_fin: item.hora_fin,
-            comentarios: item.comentarios,
-            id_estatus: item.id_estatus,
-            // útil para el click
-            rango_legible: esSemana ? (item.start + ' - ' + dayBefore(item.end)) : null
+                tipo: item.tipo,
+                id_incidencia: item.id_incidencia,
+                hora_inicio: item.hora_inicio,
+                hora_fin: item.hora_fin,
+                comentarios: item.comentarios,
+                id_estatus: item.id_estatus,
+                esIncidencia: true,
+                observaciones: item.observaciones,
+                rango_legible: esSemana ? (startDate + ' - ' + dayBefore(endDate)) : null
             }
         };
     });
 
     function dayBefore(yyyy_mm_dd) {
-        const d = new Date(yyyy_mm_dd + 'T00:00:00'); // evitar TZ
+        if (!yyyy_mm_dd) return '';
+        
+        const d = new Date(yyyy_mm_dd + 'T00:00:00');
         d.setDate(d.getDate() - 1);
         const y = d.getFullYear();
         const m = String(d.getMonth() + 1).padStart(2, '0');
         const day = String(d.getDate()).padStart(2, '0');
         return `${y}-${m}-${day}`;
-        }
+    }
 
 
     var todosLosEventos = eventos.concat(eventosIncidencia);
@@ -548,32 +687,13 @@ moment.locale('es');
         if (info.event.display === 'background') return;
 
         var eventEl = info.el;
-
-            if (info.event.title === 'Enviado') {
-                if (info.event.extendedProps.id_estatus === 3) {
+            if (info.event.extendedProps.esIncidencia) {
                 eventEl.innerHTML = `
-                    <div class="fc-event-title">Aprovado</div>
-                    <div class="fc-event-temprano">
+                     <div class="fc-event-title">${info.event.title}</div>
+                    <div class="${info.event.className}">
                     <div>Hora Inicio: ${info.event.extendedProps.hora_inicio}</div>
                     </div>
                 `;
-                } else if (info.event.extendedProps.id_estatus === 2) {
-                eventEl.innerHTML = `
-                    <div class="fc-event-title">Declinada</div>
-                    <div class="fc-event-details">
-                    <div>Hora Inicio: ${info.event.extendedProps.hora_inicio}</div>
-                    <div>Hora fin: ${info.event.extendedProps.hora_fin}</div>
-                    </div>
-                `;
-                } else {
-                eventEl.innerHTML = `
-                    <div class="fc-event-title">${info.event.title}</div>
-                    <div class="fc-event-details">
-                    <div>Hora Inicio: ${info.event.extendedProps.hora_inicio}</div>
-                    <div>Hora fin: ${info.event.extendedProps.hora_fin}</div>
-                    </div>
-                `;
-                }
             } else {
                 eventEl.innerHTML = `
                 <div class="fc-event-title">${info.event.title}</div>
@@ -593,13 +713,14 @@ moment.locale('es');
             Swal.fire({
                 title: info.event.title,
                 html: `
+                ${(info.event.extendedProps.id_estatus==2)?'<div style="text-center">'+info.event.extendedProps.observaciones+'</div>':''}
                 <div style="text-align: left;">
                     <p><strong>${esSemana ? 'Semana' : 'Fecha'}:</strong> ${fechaLabel}</p>
                     <p><strong>${info.event.extendedProps.entrada ? 'Entrada' : 'Hora Inicio'}:</strong> ${info.event.extendedProps.entrada || info.event.extendedProps.hora_inicio}</p>
                     <p><strong>${info.event.extendedProps.salida ? 'Salida' : 'Hora Fin'}:</strong> ${info.event.extendedProps.salida || info.event.extendedProps.hora_fin}</p>
                 </div>
                 `,
-                showDenyButton: true,
+                showDenyButton: (info.event.extendedProps.id_estatus==2)?true:false,
                 showCancelButton: true,
                 confirmButtonText: '<i class="mdi mdi-plus-circle"></i> Agregar Incidencia',
                 denyButtonText: '<i class="mdi mdi-pencil"></i> Editar',
@@ -724,3 +845,4 @@ var marker = L.marker([20.956950, -101.360316]).addTo(map)
     radius: 1000
 }).addTo(map); */
         </script>
+

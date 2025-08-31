@@ -348,26 +348,17 @@ class Usuario extends BaseController
     }
  
     
-    public function getParticipante()
+    public function getIncidencia()
     {
         $session = \Config\Services::session();
         $principal = new Mglobal;
-        $dataDB = array();
-        $id_participante = $this->request->getPost('id_usuario');
-        if ($session->id_perfil == 1 ) {
-            $dataDB = array('tabla' => 'participantes', 'where' => ['visible' => 1, 'id_participante'=>$id_participante]);
-        }
-        if ($session->id_perfil == 4) {
-            $dataDB = array('tabla' => 'participantes', 'where' => ['visible' => 1, 'id_dep_padre' => 4, 'id_participante'=>$id_participante]);
-        } 
-        if($session->id_perfil == 6  ){
-            $dataDB = array('tabla' => 'participantes', 'where' => ['visible' => 1, 'id_dependencia' => $session->id_dependencia, 'id_participante'=>$id_participante]);
-        }
+
+        $id_incidencia = $this->request->getPost('id_incidencia');
+        $dataDB = array('tabla' => 'incidencia', 'where' => ['visible' => 1, 'id_incidencia'=>$id_incidencia]);
         $response = $principal->getTabla($dataDB);
-        // var_dump($response);
-        // die();
         return $this->respond($response->data[0]);
     }
+ 
     public function estatusReservaGo()
     {
         $session = \Config\Services::session();

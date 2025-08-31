@@ -25,9 +25,38 @@ st.agregar = (function () {
                 }
             });
         },
-        editarRegistro: function(item)
+        editarRegistro: function(id_incidencia)
         {
-        console.log(item);
+         $("#modalAsistencia").modal('show');
+         $.ajax({
+                type: "POST",
+                url: base_url + "index.php/Usuario/getIncidencia",
+                dataType: "json",
+                data:{id_incidencia},
+              success: function(data) {
+                    console.log(data);
+                    
+                    // Convertir ISO a YYYY-MM-DD
+                    const fechaInicio = new Date(data.fecha_inicio);
+                    const fechaFin = new Date(data.fecha_fin);
+                    
+                    // Formatear a YYYY-MM-DD
+                    const formatoFecha = (fecha) => {
+                        return fecha.toISOString().split('T')[0];
+                    };
+                    
+                    $("#fecha_inicio_asistencia").val(formatoFecha(fechaInicio));
+                    $("#fecha_fin_asistencia").val(formatoFecha(fechaFin));
+                    $("#hora_inicio_asistencia").val(data.hora_inicio);
+                    $("#hora_fin_asistencia").val(data.hora_fin);
+                    $("#comentario_asistencia").val(data.comentario);
+                    $("#detalle_asistencia").val(data.detalles);
+                    $("#id_incidencia").val(data.id_incidencia);
+                },
+                error: function() {
+                    Swal.fire("Error", "Error al guardar comentario.", "error")
+                }
+            });
         },
         validacionIncapacidad: function()
         {
