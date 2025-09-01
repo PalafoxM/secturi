@@ -41,7 +41,7 @@
                                             <th class="text-center">CUENTA</th>
                                             <th class="text-center">RESPONSABLE</th>
                                             <th class="text-center">CONCEPTO</th>
-                                            <th class="text-center">ESTATUS</th>
+                                            <th class="text-center">PAGO</th>
                                             <th class="text-center">ACCIONES</th>
                                         </tr>
                                         <!--end tr-->
@@ -56,7 +56,7 @@
                                             <td  class="text-center"><?= $e->cuenta_bancaria?></td>
                                             <td  class="text-center"><?= $e->nombre_completo?></td>
                                             <td  class="text-center"><?= $e->concepto_pago?></td>
-                                            <td  class="text-center">ENVIADO</td>
+                                            <td  class="text-center <?= ($e->fic==1)?'text-success':'text-info'?>"><strong><?= ($e->fic==1)?'FIC':'PT'?></strong></td>
                                             <td  class="text-center" class="text-center">
                                             <button type="button"  class="btn btn-outline-info btn-round">                       
                                                 <a href="<?php echo base_url().'index.php/Principal/tablaArchivos/'.$e->id_registro_pt.'/PT' ?>" target="_blank"><i

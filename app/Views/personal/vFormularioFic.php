@@ -79,43 +79,19 @@
                                         <div class="form-row">
                                             <div class="col-md-4 mb-3">
                                                 <label for="reponsable_solicitud">Responsable del Gasto<span style="color:red;">*</span></label>
-                                              <select name="id_reponsable_solicitud" class="form-control" required>
-                                                    <?php foreach ($cat_usuario as $u): ?>
-                                                        <?php
-                                                        // Determina el valor que debe quedar seleccionado
-                                                        $selected = '';
-                                                        if (isset($registro_pt->id_reponsable_solicitud) && $registro_pt->id_reponsable_solicitud == $u->id_usuario) {
-                                                            $selected = 'selected';
-                                                        } elseif (!isset($registro_pt->id_reponsable_solicitud) && isset($usuario) && $usuario->id_usuario == $u->id_usuario) {
-                                                            $selected = 'selected';
-                                                        }
-                                                        ?>
-                                                        <option value="<?= $u->id_usuario ?>" <?= $selected ?>>
-                                                            <?= $u->nombre . ' ' . $u->primer_apellido . ' ' . $u->segundo_apellido ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                </select>
+                                                <input id="id_reponsable_solicitud" class="form-control" name="id_reponsable_solicitud" value="HUGO RAMÍREZ DUARTE" readonly>
 
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="director_generar">Director/a General Administrativa <span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" id="director_generar" value="<?= $dsc_director_general ?>" name="director_generar" >
+                                                <input type="text" class="form-control" id="director_generar" value="<?= $dsc_director_general ?>" name="director_generar" readonly>
                                                 <div class="invalid-feedback">
                                                     Please provide a valid state.
                                                 </div>
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="secretario">Secretario(a) o Director(a) que autoriza</label>
-                                                <select type="text" class="form-control" id="secretario" placeholder="Secretario/a" name="secretario">
-                                                            <option value="0" selected >Seleccione una opcion</option>
-                                                    <?php foreach ($secretario as $s): ?>
-                                                        <?php if (isset($registro_pt->secretario) && !empty($registro_pt->secretario)) { ?>
-                                                        <option value="<?= $s->id_secretario ?>" <?= ($s->id_secretario == $registro_pt->secretario) ? 'selected' : '' ?> ><?= $s->dsc_secretario ?></option>
-                                                         <?php } else { ?>
-                                                              <option value="<?= $s->id_secretario ?>" ><?= $s->dsc_secretario ?></option>
-                                                         <?php } ?>
-                                                    <?php endforeach; ?>
-                                                </select>
+                                                <input type="text" id="secretario"  name="secretario" class="form-control" value="DAVID AYALA SAUCEDO" readonly>
                                             </div><!--end col-->
                                         </div><!--end form-row-->
                                         <div class="form-row">

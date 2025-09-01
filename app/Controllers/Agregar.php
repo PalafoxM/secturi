@@ -310,11 +310,7 @@ class Agregar extends BaseController {
         $data = $this->request->getPost();
         $archivos = $this->request->getFiles();
 
-        if($data['secretario'] == 0){
-            $response->error = true;
-            $response->respuesta = "Es requerido el Secretario o Director";
-            return $this->respond($response);
-        }
+    
         if($data['no_consecutivo'] == ''){
             $response->error = true;
             $response->respuesta = "Es requerido el No. Concecutivo";
@@ -402,14 +398,14 @@ class Agregar extends BaseController {
                 $insertRegistro = [
                 'id_reserva'               => $id_reserva,
                 'id_proveedor'             => $data['id_proveedor'],
-                'id_direccion_responsable' =>(int)$data['direccion_responsable'],
+                'id_direccion_responsable' =>99,
                 'no_consecutivo'           =>$data['no_consecutivo'],
                 'tipo_pt'                  =>(int)$data['tipo_pt'],
                 'fecha_tramite'            =>$data['fecha_tramite'], 
                 'id_reponsable_solicitud'  =>(int)$data['id_reponsable_solicitud'], 
                 'director_general'         =>(int)$data['director_generar'], 
-                'secretario'               =>(int)$data['secretario'], 
-                //'cuenta_bancaria'          =>$data['id_proveedor_banco'], 
+                'secretario'               =>18, 
+                'fic'                      =>1, 
                 'fecha_gasto_inicio'       =>$data['fecha_gasto_inicio'], 
                 'fecha_gasto_fin'          =>$data['fecha_gasto_fin'],
                 'formato_establecido'      =>($data['formato_establecido']=='SI')?1:2,
