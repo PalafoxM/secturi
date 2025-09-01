@@ -112,11 +112,11 @@
                         <div class="col-lg-8">
                             <div class="card">
                                 <div class="card-body">
-                                     <?php if($idTipoEmpleado == 1): ?>
+                                     <?php if ($idTipoEmpleado == 1): ?>
                                     <div id='calendar'></div>
                                     <div style='clear:both'></div>
                                        <?php endif; ?>
-                                       <?php if($idTipoEmpleado != 1): ?>
+                                       <?php if ($idTipoEmpleado != 1): ?>
                                           <h4><div class="text-center">Estimado(a) Usuario(a), esta sección solo lo puede visualizar el<strong> personal de base <strong> </div> </h4>
                                           <p>Si requieres mayor información, favor de comunicarte al Administrador del Sistema<p>
                                        <?php endif; ?>
@@ -167,8 +167,8 @@
                                                 <label for="tipo_incidencia" class="form-label">Tipo de Incidencia</label>
                                                 <select class="form-control select2" id="tipo_incidencia" data-toggle="select2">
                                                      <option value="">Seleccione</option>
-                                                     <?php foreach($cat_incidencia as $c): ?>
-                                                     <option value="<?= $c->id_incidencia?>"><?= $c->dsc_incidencia ?></option>
+                                                     <?php foreach ($cat_incidencia as $c): ?>
+                                                     <option value="<?= $c->id_incidencia ?>"><?= $c->dsc_incidencia ?></option>
                                                      <?php endforeach; ?>
                                                 </select>
                                             </div>
@@ -226,8 +226,8 @@
                                                 
                                                 <select class="select2 form-control" id="tipo_incidencia_semana">
                                                      <option value="">Tipo incidencia</option>
-                                                     <?php foreach($cat_incidencia as $c): ?>
-                                                     <option value="<?= $c->id_incidencia?>"><?= $c->dsc_incidencia ?></option>
+                                                     <?php foreach ($cat_incidencia as $c): ?>
+                                                     <option value="<?= $c->id_incidencia ?>"><?= $c->dsc_incidencia ?></option>
                                                      <?php endforeach; ?>
                                                 </select>
                                             </div>
@@ -258,8 +258,8 @@
                                                 <label for="tipo_incidencia" class="form-label">Tipo de Incidencia</label>
                                                 <select class="select2 form-control" id="tipo_incidencia_mes">
                                                      <option value="">Seleccione</option>
-                                                     <?php foreach($cat_incidencia as $c): ?>
-                                                     <option value="<?= $c->id_incidencia?>"><?= $c->dsc_incidencia ?></option>
+                                                     <?php foreach ($cat_incidencia as $c): ?>
+                                                     <option value="<?= $c->id_incidencia ?>"><?= $c->dsc_incidencia ?></option>
                                                      <?php endforeach; ?>
                                                 </select>
                                             </div>
@@ -325,10 +325,10 @@
                                             <div class="form-group"> 
                                                 <label for="tipo_incidencia">Tipo Incidencia</label>
                                                 <div class="input-group">
-                                                    <select class="form-control select2" id="tipo_incidencia" data-toggle="select2">
+                                                    <select class="form-control select2" id="tipo_incidencia" name="tipo_incidencia" data-toggle="select2">
                                                         <option value="">Seleccione</option>
-                                                        <?php foreach($cat_incidencia as $c): ?>
-                                                        <option value="<?= $c->id_incidencia?>"><?= $c->dsc_incidencia ?></option>
+                                                        <?php foreach ($cat_incidencia as $c): ?>
+                                                        <option value="<?= $c->id_incidencia ?>"><?= $c->dsc_incidencia ?></option>
                                                         <?php endforeach; ?>
                                                     </select>
                                                 </div>                                                    
@@ -341,7 +341,7 @@
                                                 <label for="fecha_inicio_asistencia">Fecha Inicio</label>
                                                 <div class="input-group">
                                                     <input type="date" class="form-control" id="fecha_inicio_asistencia" 
-                                                        name="fecha_inicio_asistencia" onchange="ini.inicio.validarDiaSemana(this)">
+                                                        name="fecha_inicio_asistencia">
                                                 </div>                                                    
                                             </div>
                                           
@@ -390,7 +390,7 @@
             <!-- En el modal-footer -->
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
-                <button type="submit" form="editarAsistencia" class="btn btn-success">
+                <button type="submit" form="editarAsistencia" id="btn_asistencia" class="btn btn-success">
                     Guardar ✔️
                 </button>
             </div>
@@ -440,7 +440,8 @@
         <link href="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet"
     type="text/css" />
 <!-- App css -->
-        <script>
+    <script>
+    ini.inicio.formIncidencia();
     var eventosAsistencia = <?= json_encode($asistencia) ?>;
     var incidencia = <?= json_encode($incidencia ?? []) ?>;
 
@@ -582,7 +583,7 @@ moment.locale('es');
         if (item.id_estatus == 1) {
             eventClass = 'fc-event-espera';
             item.nombre = 'Enviado';
-            icon = '✉️';
+            icon = '✈️';
         } else if (item.id_estatus == 2) {
             eventClass = 'fc-event-declinado';
             item.nombre = 'Declinado';
@@ -592,9 +593,10 @@ moment.locale('es');
             item.nombre = 'Aprobado';
             icon = '✅';
         } else if (item.id_estatus == 4) {
-            eventClass = 'fc-event-espera';
+           eventClass = 'fc-event-espera';
             item.nombre = 'Proceso';
-            icon = '';
+            icon = '⏳'; // reloj de arena en proceso
+
         }
 
         // LIMPIAR LAS FECHAS - EXTRAER SOLO LA PARTE YYYY-MM-DD

@@ -33,8 +33,8 @@ st.agregar = (function () {
                 url: base_url + "index.php/Usuario/getIncidencia",
                 dataType: "json",
                 data:{id_incidencia},
-              success: function(data) {
-                    console.log(data);
+                success: function(data) {
+                console.log(data);
                     
                     // Convertir ISO a YYYY-MM-DD
                     const fechaInicio = new Date(data.fecha_inicio);
@@ -52,6 +52,9 @@ st.agregar = (function () {
                     $("#comentario_asistencia").val(data.comentario);
                     $("#detalle_asistencia").val(data.detalles);
                     $("#id_incidencia").val(data.id_incidencia);
+                    $("#tipo_incidencia").select2(); // inicializar
+                    $("#tipo_incidencia").val(data.cat_id_incidencia).trigger("change"); // asignar valor
+
                 },
                 error: function() {
                     Swal.fire("Error", "Error al guardar comentario.", "error")

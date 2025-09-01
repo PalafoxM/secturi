@@ -3282,28 +3282,42 @@ ini.inicio = (function () {
             }
         },
         // Función global para validar
-        validarDiaSemana: function(input) {
-            const fecha = new Date(input.value);
-            console.log(fecha);
-            const dia = fecha.getDay();
-            console.log(dia);
-            // 2=Martes, 3=Miércoles, 4=Jueves
-            if (dia < 2 || dia > 4) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Día no válido',
-                    text: 'Solo se permiten martes, miércoles y jueves',
-                    confirmButtonText: 'OK'
+        formIncidencia: function(){
+            $("#editarAsistencia").submit(function (e) {
+             e.preventDefault(); 
+                var formData = new FormData(this); // Usar FormData en lugar de serialize
+                console.log(formData);
+                    $.ajax({
+                    type: "POST",
+                    url: base_url + "index.php/Agregar/formIncidencia",
+                    data: formData,
+                    processData: false,  // Importante para FormData
+                    contentType: false,  // Importante para FormData
+                    dataType: "json",
+                    success: function (response) {
+                        if(!response.error){
+                            Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
+                            setTimeout(() => {
+                               // window.location.href = base_url + "index.php/Principal/listadoEstatusPT";
+                               // window.location.href = base_url + "index.php/Inicio/ListaViaticos";
+                            }, 1500);
+                        }else{
+                            Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
+                        }
+                    },
+                    beforeSend: function (info){
+                         $('#btn_asistencia').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                    },
+                    complete: function (info){
+                        $('#btn_asistencia').prop('disabled', false).html('Guardar');
+                    },
+                    error: function (response,jqXHR, textStatus, errorThrown) {
+                        var res= JSON.parse(response.responseText);
+                        Swal.fire("Error", '<p> '+ res.message + '</p>'); 
+                        $('#btn_asistencia').prop('disabled', false).html('Guardar'); 
+                    }
                 });
-                
-                // Limpiar el input o ajustar al próximo día permitido
-                input.value = '';
-                
-                // O ajustar automáticamente al próximo día permitido
-                const diasParaSumar = dia < 2 ? (2 - dia) : (2 + (7 - dia));
-                fecha.setDate(fecha.getDate() + diasParaSumar);
-                input.value = fecha.toISOString().split('T')[0];
-            }
+          })
         },
         activarPeriodo: function(id_periodo, id)
         {

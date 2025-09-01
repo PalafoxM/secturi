@@ -1847,6 +1847,57 @@ class Agregar extends BaseController {
     
 
     }
+    public function formIncidencia()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $globals = new Mglobal;
+        $data = $this->request->getPost();
+
+        // Convierte la fecha a timestamp
+        $fecha = $data['fecha_inicio_asistencia'];
+        $diaSemana = date('N', strtotime($fecha));
+        
+        if(empty($data['tipo_incidencia'] ) || $data['tipo_incidencia']  == 0){
+            $response->error = true;
+            $response->respuesta = 'Es requerido el tipo de incidencia';
+            return $this->respond($response);
+
+        }
+        // Validar que NO sea lunes (1) ni viernes (5)
+        if($data['tipo_incidencia'] == 9){
+            if ($diaSemana == 1 || $diaSemana == 5) {
+                 $response->error = true;
+                 $response->respuesta = 'La fecha no puede ser lunes ni viernes';
+                 return $this->respond($response);
+            }
+        }
+       $dataBitacora = ['id_user' => $session->id_usuario, 'script' => 'Agregar.php/edotaIncidencia'];
+        $dataInsert = [
+            "cat_id_incidencia"=> $data['tipo_incidencia'],
+            "fecha"            => $data['fecha_inicio_asistencia'], 
+            "fecha_inicio"     => $data['fecha_inicio_asistencia'], 
+            "fecha_fin"        => $data['fecha_fin_asistencia'], 
+            "hora_inicio"      => $data['hora_inicio_asistencia'], 
+            "hora_fin"         => $data['hora_fin_asistencia'], 
+            "id_estatus"       => 1, 
+            "usu_act"          => $session->get('id_usuario'), 
+
+        ];
+        $dataConfig = [
+             "tabla"    => "incidencia",
+             "editar"   => true,
+             "idEditar" => ['id_incidencia' => $data['id_incidencia'] ],
+        ];
+      
+       $response = $globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);  
+       
+
+       return $this->respond($response);
+
+       
+    }
+
     public function aceptarIncidencia()
     {
         $session = \Config\Services::session();
