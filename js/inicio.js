@@ -3299,7 +3299,7 @@ ini.inicio = (function () {
                             Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
                             setTimeout(() => {
                                // window.location.href = base_url + "index.php/Principal/listadoEstatusPT";
-                               // window.location.href = base_url + "index.php/Inicio/ListaViaticos";
+                                window.location.reload();
                             }, 1500);
                         }else{
                             Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  

@@ -614,7 +614,7 @@ st.agregar = (function () {
                         console.log(response);
                         if(!response.error){
                             Swal.fire("Exitó", response.respuesta, "success");
-                           window.location.reload();
+                          // window.location.reload();
                       
                         }else{
                             Swal.fire("Error", response.respuesta , "error"); 

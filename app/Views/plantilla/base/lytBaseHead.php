@@ -247,7 +247,7 @@
             </a>
            <nav class="nav">
                     <?php if($session->esJefe): ?>   
-                        <a href="#MetricaDashboard" class="nav-link" data-toggle="tooltip-custom" data-placement="right" data-trigger="hover" title="" data-original-title="Jefes">
+                        <a href="#MetricaDashboard" class="nav-link" data-toggle="tooltip-custom" data-placement="right" data-trigger="hover" title="" data-original-title="Persona Superior Jerárquica">
                             <i data-feather="award" class="align-self-center menu-icon icon-dual"></i>
                         </a>
                     <?php endif;?>
@@ -297,7 +297,7 @@
             <div class="menu-body slimscroll">
                     <div id="MetricaDashboard" class="main-icon-menu-pane">
                         <div class="title-box">
-                            <h6 class="menu-title">Jefes</h6>       
+                            <h6 class="menu-title">Persona Superior Jerárquica</h6>       
                         </div>
                         <ul class="nav">
                             <li class="nav-item"><a class="nav-link" href="<?php echo base_url(); ?>index.php/Principal/incidenciaSubordinado">Incidencias</a></li>

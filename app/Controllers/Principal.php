@@ -1434,9 +1434,78 @@ class Principal extends BaseController {
         $response->error = true;
         $response->respuesta = 'Error al optener los datos';
         $data =  $this->request->getPost();
+
+        if(empty($data['tipo_incidencia'] ) || $data['tipo_incidencia']  == 0){
+            $response->error = true;
+            $response->respuesta = 'Es requerido el tipo de incidencia';
+            return $this->respond($response);
+
+        }
+        $fecha = $data['fecha'];
+        $diaSemana = date('N', strtotime($fecha));
+
+        if($data['tipo_incidencia'] == 9){
+            if ($diaSemana == 1 || $diaSemana == 5) {
+                 $response->error = true;
+                 $response->respuesta = 'La fecha no puede ser lunes ni viernes';
+                 return $this->respond($response);
+            }
+        }
+        if ($data['tipo_incidencia'] == 1) {
+            $hora_fin = $data['hora_fin']; // usa el índice correcto
+            if (strtotime($hora_fin) >= strtotime('16:00:00')) {
+                $hora_fin = "16:00:00";
+            }
+        } 
+       if ($data['tipo_incidencia'] == 11) {
+            $hora_inicio = $data['hora_inicio'];
+            $hora_fin    = $data['hora_fin'];
+
+            // Crear objetos DateTime
+            $inicio = new DateTime($hora_inicio);
+            $fin    = new DateTime($hora_fin);
+
+            // Calcular diferencia
+            $diff = $inicio->diff($fin);
+
+            // Pasar todo a horas decimales
+            $horas = $diff->h + ($diff->days * 24); 
+            $minutos = $diff->i;
+            $totalHoras = $horas + ($minutos / 60);
+
+            if ($totalHoras > 5) {
+                // Aquí ya superó las 5 horas
+                $response->error = true;
+                $response->respuesta = 'Un permiso personal  no puede superar las 5 horas';
+                return $this->respond($response);
+            }
+        }
+   /*      if ((int)$data['tipo_incidencia'] === 10) {
+            $horaInicio = $data['hora_inicio'] ?? null; // "HH:MM" o "HH:MM:SS"
+            $horaFin    = $data['hora_fin']    ?? null;
+
+            // Normaliza a HH:MM:SS si vienen en HH:MM
+            $horaInicio = $horaInicio && strlen($horaInicio) === 5 ? $horaInicio . ':00' : $horaInicio;
+            $horaFin    = $horaFin    && strlen($horaFin) === 5    ? $horaFin    . ':00' : $horaFin;
+
+            // Reglas
+            $permiteEntradaManana = $horaInicio && strtotime($horaInicio) <= strtotime('09:30:00');
+            $permiteSalidaTres    = $horaFin    && strtotime($horaFin)    === strtotime('15:00:00');
+
+            if (!($permiteEntradaManana || $permiteSalidaTres)) {
+                $response->error  = true;
+                $response->respuesta = 'Para esta incidencia sólo se permite entrada antes o a las 09:30, o salida exactamente a las 15:00.';
+                 return $this->respond($response);
+            }
+
+        } */
+
+
+
         $dataInsert = [
             "hora_inicio"        => $data['hora_inicio'],
-            "hora_fin"           => $data['hora_fin'],
+            "hora_fin"           => $hora_fin,
+            "hora_fin_real"      => $data['hora_fin'],
             "cat_id_incidencia"  => (int)$data['tipo_incidencia'],
             "fecha"              => $data['fecha'],
             "tipo"              => 1,
@@ -1457,7 +1526,7 @@ class Principal extends BaseController {
            $response->error= false; 
            $response->respuesta= $result->respuesta; 
         }
-        $this->envioCorreoJefeInmediato(); 
+       // $this->envioCorreoJefeInmediato(); 
         return $this->respond($response);
     }
     public function actualizarBanco()
