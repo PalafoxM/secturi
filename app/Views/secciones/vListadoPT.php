@@ -62,6 +62,7 @@
 
                                                 <tbody>
                                                     <?php foreach($proveedor as $p): ?>
+                                                        
                                                     <tr>
                                                         <td class="text-center"><?= $p->id_proveedor?></td>
                                                         <td class="text-center"><?= $p->razon_social?></td>
