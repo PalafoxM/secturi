@@ -2202,6 +2202,10 @@ class Principal extends BaseController {
             'tabla' => 'vw_registro_pt',
             'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
         ]);
+        echo "<pre>";
+        print_r($registro_pt);
+        echo "</pre>";
+        die();
         $pdf = $globals->getTabla([
                 'tabla' => 'vw_pdf_reserva',
                 'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]

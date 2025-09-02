@@ -382,7 +382,7 @@ class Agregar extends BaseController {
                 'id_partida'         =>($insertReserva['no_reserva'] == 4327279)?10:94,
                 'importe'            =>$data['importe'][$k],
                 'fec_reg'            =>date('Y-m-d H:i:s'),
-            'usu_reg'            =>$session->get('id_usuario') 
+                'usu_reg'            =>$session->get('id_usuario') 
         
             ];
         
@@ -420,7 +420,6 @@ class Agregar extends BaseController {
                 'usu_reg'                  =>$session->get('id_usuario')
             ];
         
-        
             $dataConfig = [
                             "tabla"=>"registro_pt",
                             "editar"=>false
@@ -430,9 +429,10 @@ class Agregar extends BaseController {
             }
             if(!$response->error){
                 $id_registro_pt = $response->idRegistro;
-                $archivo = $archivos['factura_pdf_fic'][$k];
-            
-                $timestamp = date('Ymd_His');
+              
+                //$archivo = $archivos['factura_pdf_fic'][$k];
+                foreach($archivos['factura_pdf_fic'] as $archivo){
+                        $timestamp = date('Ymd_His');
                 $extension = $archivo->getClientExtension();
                 $originalName = pathinfo($archivo->getName(), PATHINFO_FILENAME);
                 $file = $originalName . '_' . $timestamp . '.' . $extension;
@@ -461,6 +461,10 @@ class Agregar extends BaseController {
         
             $response = $this->globals->saveTabla($insertFacturaPdf,$dataConfig,$dataBitacora);
 
+                
+                }
+   
+            
             }
           
         }
