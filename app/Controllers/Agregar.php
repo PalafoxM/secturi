@@ -309,7 +309,7 @@ class Agregar extends BaseController {
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
         $archivos = $this->request->getFiles();
-
+        $response->idReserva = "";
     
         if($data['no_consecutivo'] == ''){
             $response->error = true;
@@ -460,7 +460,7 @@ class Agregar extends BaseController {
                         ];
         
             $response = $this->globals->saveTabla($insertFacturaPdf,$dataConfig,$dataBitacora);
-
+            $response->idReserva = $id_reserva;
                 
                 }
    
