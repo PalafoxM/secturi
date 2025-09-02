@@ -2591,13 +2591,15 @@ class Principal extends BaseController {
             'tabla' => 'vw_pdf_reserva',
             'where' => ['visible' => 1, 'id_registro_pt' => $id_pt]
         ]);
+    
 
         if (!empty($registro_pt->data)) {
             $registro = $registro_pt->data[0];
             $id_reserva = $registro_pt->data[0]->id_reserva;
             $no_consecutivo = $registro_pt->data[0]->no_consecutivo;
             $data['registro'] = $registro;
-
+            
+           
             $folio = $globals->getTabla([
                 'tabla' => 'direccion',
                 'where' => ['visible' => 1, 'id_area' => $registro->id_direccion_responsable]
@@ -2606,6 +2608,7 @@ class Principal extends BaseController {
                 'tabla' => 'vw_reserva',
                 'where' => ['visible' => 1, 'id_reserva' => $id_reserva]
             ]);
+            
             if(!empty($reserva->data)){
              $data['reserva'] = $reserva->data;
              $importe_str   = $reserva->data[0]->total_importe;
@@ -2617,19 +2620,31 @@ class Principal extends BaseController {
                 'tabla' => 'vw_usuario',
                 'where' => ['id_usuario' => $usu_reg]
             ])->data[0];
-
+                if (strlen($no_consecutivo) == 2) {
+                    $zero = '0';
+                } elseif (strlen($no_consecutivo) == 1) {
+                    $zero = '00';
+                } else {
+                    $zero = '';
+                }
             if (!empty($folio->data)) {
-            $zero = (strlen($no_consecutivo) >= 2)?'0':'00';
-                $data['registro']->folio = $folio->data[0]->folio_prefijo.$zero.$no_consecutivo.'/'.$folio->data[0]->periodo_pt;
+               
+            $data['registro']->folio = $folio->data[0]->folio_prefijo.$zero.$no_consecutivo.'/2025';
             } else {
-                $data['registro']->folio = ''; // O un valor por defecto
+                 if($registro_pt->data[0]->no_reserva == 4327278){
+                    $data['registro']->folio = 'SECTURI/DGDT/DCT/FIC-TA/'.$zero.$no_consecutivo.'/2028';
+                 }elseif($registro_pt->data[0]->no_reserva == 4327277 || $registro_pt->data[0]->no_reserva == 4327279){
+                    $data['registro']->folio = 'SECTURI/DGDT/DCT/FIC-TA/'.$zero.$no_consecutivo.'/2025';
+                 }else{
+                   $data['registro']->folio = '';
+                 }
             }
 
         } else {
             echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
             die();
         }
-    
+       
        $html = view('secciones/vFormatoPT.php', $data);
       $htmlSegundaHoja = view('secciones/vFormatoPT2.php', $data);
       $htmlTercerHoja = view('personal/vFormato702.php', $data);

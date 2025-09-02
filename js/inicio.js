@@ -3927,18 +3927,30 @@ ini.inicio = (function () {
                 });
             });
         },
+        formatBytes :function(bytes) {
+        const units = ['B','KB','MB','GB'];
+        let i = 0, num = bytes;
+        while (num >= 1024 && i < units.length - 1) { num /= 1024; i++; }
+        return `${num.toFixed(1)} ${units[i]}`;
+        },
         formFIC: function(){
             $("#form_fic").submit(function (e) {
                 e.preventDefault(); 
                    let valido = true;
                     let mensajes = [];
-
+                    const MAX_BYTES = 500 * 1024;
                     // Validar archivos PDF
                     $("[id^=factura_pdf_fic]").each(function(){
                         let files = this.files;
                         if(files.length === 0){
                             valido = false;
                             mensajes.push("Debe subir al menos un archivo PDF.");
+                        }
+                         for (const f of files) {
+                            if (f.size > MAX_BYTES) {
+                                valido = false;
+                                mensajes.push(`"${f.name}" pesa ${ini.inicio.formatBytes(f.size)}; el límite es 500 KB por archivo.`);
+                            }
                         }
                     });
 
