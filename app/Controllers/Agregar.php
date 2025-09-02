@@ -1013,8 +1013,7 @@ class Agregar extends BaseController {
             'resultado_turno'              => $data['resultado_turno'],             
             'firma_turno'                  => $data['firma_turno'],         
             'usuario_registro'             => $session->id_usuario,             
-            'fecha_registro'               => $formattedDate, 
-            // arrays
+            'fecha_registro'               => $formattedDate,
             'id_destinatario'              => isset($data['nombre_turno']) ? $data['nombre_turno'] : array(), 
             'id_destinatario_copia'        => isset($data['cpp']) ? $data['cpp'] : array(),
             'id_indicacion'                => isset($data['indicacion']) ? $data['indicacion'] : array(),
