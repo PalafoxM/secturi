@@ -300,6 +300,15 @@ class Agregar extends BaseController {
 
 
     }
+    public function Denuncia()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $data['scripts']     = array('inicio');
+        $data['contentView'] = 'personal/vDenuncia';                
+        $this->_renderView($data);
+
+    }
     public function guardaFIC()
     {
         $session = \Config\Services::session();

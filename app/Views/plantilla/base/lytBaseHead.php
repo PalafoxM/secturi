@@ -447,10 +447,10 @@
                                href="<?php echo base_url(); ?>index.php/Agregar/Directorio">Directorio</a>
                             </li>
                             <li class="nav-item"><a class="nav-link" href="<?php echo base_url(); ?>index.php/Agregar/ListaAlba">Lista ALBA</a></li>
-                            <li class="nav-item"><a class="nav-link" href="../pages/pages-pricing.html">Pricing</a></li>
-                            <li class="nav-item"><a class="nav-link" href="../pages/pages-blogs.html">Blogs</a></li>
-                            <li class="nav-item"><a class="nav-link" href="../pages/pages-faq.html">FAQs</a></li>
-                            <li class="nav-item"><a class="nav-link" href="../pages/pages-gallery.html">Gallery</a></li>
+                            <li class="nav-item"><a class="nav-link" href="<?php echo base_url(); ?>index.php/Agregar/Denuncia">Denuncia</a></li>
+                            <li class="nav-item"><a class="nav-link" href="../pages/pages-blogs.html">Inventario</a></li>
+                            <li class="nav-item"><a class="nav-link" href="../pages/pages-faq.html">Tickets Diseño</a></li>
+                            <li class="nav-item"><a class="nav-link" href="../pages/pages-gallery.html">sobre SUSI</a></li>
                         </ul>
                     </div><!-- end Pages -->
                 <div id="MetricaAuthentication" class="main-icon-menu-pane">
