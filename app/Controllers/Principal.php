@@ -2202,10 +2202,10 @@ class Principal extends BaseController {
             'tabla' => 'vw_registro_pt',
             'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
         ]);
-        echo "<pre>";
-        print_r($registro_pt);
-        echo "</pre>";
-        die();
+        //echo "<pre>";
+        //print_r($registro_pt);
+        //echo "</pre>";
+        //die();
         $pdf = $globals->getTabla([
                 'tabla' => 'vw_pdf_reserva',
                 'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
@@ -2219,7 +2219,15 @@ class Principal extends BaseController {
                 'tabla' => 'direccion',
                 'where' => ['visible' => 1, 'id_area' => $data['registro']->id_direccion_responsable]
             ]);
-            $data['folio'] = $folio->data[0]->folio_prefijo;
+            if($registro_pt->data[0]->no_reserva == '4327278' || $registro_pt->data[0]->no_reserva == '4327277'){
+               $data['folio'] = "SECTURI/DGDT/DCT/FIC-TH/";
+            }
+            else if($registro_pt->data[0]->no_reserva == '4327279'){
+               $data['folio'] = "SECTURI/DGDT/DCT/FIC-TA/";
+            }else{
+               $data['folio'] = $folio->data[0]->folio_prefijo;
+            }
+            
         } else {
             echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
             die();
