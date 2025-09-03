@@ -1588,16 +1588,17 @@ class Agregar extends BaseController {
         $Mglobal   = new Mglobal;
         $data = [];
 
-        $sala_junta  = $Mglobal->getTabla(['tabla' => 'sala_junta', 'where' => ['visible' =>1]]); 
+        $sala_junta  = $Mglobal->getTabla(['tabla' => 'vw_sala_junta', 'where' => ['visible' =>1]]); 
+    
         $hoy = date("Y-m-d");
         $sala_hoy = $Mglobal->getTabla([
-            'tabla' => 'sala_junta',
+            'tabla' => 'vw_sala_junta',
             'where' => [
                 'visible' => 1,
                 'DATE(fecha)' => $hoy // Filtra solo el día, ignorando la hora
             ]
         ]);
-
+       
         $data['sala_junta'] = (isset($sala_junta->data) && !empty($sala_junta->data))?$sala_junta->data:[];
         $data['sala_hoy']   = (isset($sala_hoy->data) && !empty($sala_hoy->data))?$sala_hoy->data:[];
         $data['scripts']    = array('agregar', 'inicio');
@@ -1727,7 +1728,9 @@ class Agregar extends BaseController {
         $data        = array();
         $globals = new Mglobal;
         $usuario = $globals->getTabla(['tabla' => 'lista_alba', 'where' => ['visible' => 1]]);
+        $cat_municipios  = $globals->getTabla(['tabla' => 'cat_municipios', 'where' => ['id_estado' => 11,'visible' =>1]]); 
         $data['usuario'] = $usuario->data;
+        $data['cat_municipios'] = $cat_municipios->data;
         $data['scripts'] = array('inicio');
         $data['edita'] = 0;
         $data['contentView'] = 'personal/vListaAlba';                

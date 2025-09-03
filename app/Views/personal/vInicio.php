@@ -707,8 +707,8 @@
                                                                      <label for="fec_nac">Fecha de Nacimiento</label>
                                                                 </div>
                                                                  <div class="col-md-4">
-                                                                    <input type="checkbox" class="checkbox checkbox-primary" name="foto" id="foto" checked>
-                                                                     <label for="foto">Foto de Perfil</label>
+                                                                    <input type="checkbox" class="checkbox checkbox-primary" name="edad" id="edad" checked>
+                                                                     <label for="edad">Edad</label>
                                                                 </div>
                                                                  <div class="col-md-4">
                                                                     <input type="checkbox" class="checkbox checkbox-primary" name="nivel" id="nivel" checked>
@@ -727,23 +727,10 @@
                                                                      <label for="sexo">Tipo de Contrato</label>
                                                                 </div>
                                                             </div>
-                                                            <div class="form-group row">
-                                                                <div class="col-md-6">
-                                                                    <input type="text" placeholder="Phone No" class="form-control">
-                                                                </div>
-                                                                <div class="col-md-6">
-                                                                    <select class="form-control">
-                                                                        <option>London</option>
-                                                                        <option>India</option>
-                                                                        <option>Usa</option>
-                                                                        <option>Canada</option>
-                                                                        <option>Thailand</option>
-                                                                    </select>
-                                                                </div>
-                                                            </div>
+                                                         
                                                             <div class="form-group">
                                                                 <textarea rows="5" placeholder="Message" class="form-control"></textarea>
-                                                                <button class="btn btn-gradient-primary btn-sm px-4 mt-3 float-right mb-0">Update Profile</button>
+                                                                <button class="btn btn-gradient-primary btn-sm px-4 mt-3 float-right mb-0">Guardar Configuración</button>
                                                             </div>
                                                         </form>
                                                     </div>
@@ -954,11 +941,11 @@
       </div>
         <div class="modal-body">
          <label for="foto">Agregar Nueva Foto en JPG o PNG</label>
-         <input type="file" class="form-control" id="foto"  name="foto" accept=".png">
+         <input type="file" class="form-control" id="foto" name="foto" accept=".png">
         </div>
       <div class="modal-footer">
         <button type="button" onclick="ini.inicio.cerrarModalFoto()" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" onclick="ini.inicio.guardarFoto()" class="btn btn-primary" >Guardar</button>
+        <button type="button" onclick="guardarFoto();" class="btn btn-primary" >Guardar</button>
       </div>
     </div>
   </div>
@@ -997,5 +984,48 @@
         
         <!-- App js -->
         <script src="<?= base_url() ?>assets/js/app.js"></script>
+
+<script>
+function guardarFoto() {
+    // Usar JavaScript puro para evitar problemas con jQuery
+    const fotoInput = document.getElementById('foto');
+      console.log(fotoInput );
+    if (!fotoInput) {
+        Swal.fire("Error", "No se encontró el campo de imagen", "error");
+        return;
+    }
+  
+    if (!fotoInput.files || fotoInput.files.length === 0) {
+        Swal.fire("Atención", "Es requerida la imagen", "info");
+        return;
+    }
+    
+    let foto = fotoInput.files[0];
+    let formData = new FormData();
+    formData.append('foto', foto);
+    
+    $.ajax({
+        url: base_url + "index.php/Principal/guardarFoto",
+        type: 'POST',
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function(response) {
+            if(!response.error){
+                Swal.fire("Correcto", response.respuesta, "success");
+                setTimeout(() => {
+                    window.location.reload(); 
+                }, 1000);
+            } else {
+                Swal.fire("Error", "Favor de llamar al Administrador", "error");
+            }
+        },
+        error: function(xhr, status, error) {
+            console.log(error);
+            Swal.fire("Error", "Favor de llamar al Administrador", "error");
+        }
+    });
+}
+</script>
 
 

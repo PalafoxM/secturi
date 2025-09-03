@@ -377,6 +377,7 @@
                 extendedProps: {
                     hora_inicio: s.hora_inicio,
                     hora_fin: s.hora_fin,
+                    usuario:s.nombre_completo,
         
                 }
         
@@ -450,11 +451,13 @@
            var eventEl = info.el;
             const horaInicio = info.event.extendedProps.hora_inicio.slice(0, 5);
             const horaFin = info.event.extendedProps.hora_fin.slice(0, 5);
+        
 
             eventEl.innerHTML = `
                 <div class="fc-event-title"><strong>SALA ${info.event.title}</strong></div>
                 <div class="fc-event-details">
                     <div>${horaInicio} A ${horaFin}</div>
+                    
                 </div>
             `;
         },
@@ -476,10 +479,11 @@
                     weekday: 'long', year: 'numeric', month: 'long',
                     day: 'numeric', hour: '2-digit', minute: '2-digit'
                 });
+                const usuario = info.event.extendedProps.usuario;
 
                 Swal.fire({
                     title: `SALA `+info.event.title,
-                    text: `Fecha: ${fecha} A ${horaFin} `,
+                    text: `Fecha: ${fecha} a ${horaFin} registro: ${usuario} `,
                     icon: "warning",
                     showCancelButton: true,
                     showConfirmButton: (id_perfil == 1),

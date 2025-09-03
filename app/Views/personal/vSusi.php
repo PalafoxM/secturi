@@ -1,6 +1,4 @@
-<!--  <div class="page-wrapper">
-
-            <!-- Page Content-->
+<?php  $session = \Config\Services::session(); ?>
             <div class="page-content-tab">
 
                 <div class="container-fluid">
@@ -95,14 +93,14 @@
                                             <div class="card-header" id="headingOne">
                                             <h5 class="my-0">
                                                 <button class="btn btn-link ml-4 shadow-none" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                                   ¿ Quieres saber mas?
+                                                   ¿Quieres saber mas?
                                                 </button>
                                             </h5>
                                             </div>
                                         
                                             <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample-faq">
                                             <div class="card-body">
-                                               A lo largo de la historia, se ha acostumbrado a nombrar con nombres femeninos a objetos simbólicos como barcos (por ejemplo, la Niña, la Pinta y la Santa María) o espadas. Esto se hacía como un símbolo de buena suerte y belleza.
+                                               A lo largo de la historia, se ha acostumbrado a nombrar con nombres femeninos a objetos simbólicos (por ejemplo,en los barcos la Niña, la Pinta y la Santa María, en huracane, etc.) Esto se hacía como un símbolo de poder, impredicible y belleza.
                                             </div>
                                             </div>
                                         </div>
@@ -110,13 +108,13 @@
                                             <div class="card-header" id="headingTwo">
                                             <h5 class="my-0">
                                                 <button class="btn btn-link collapsed ml-4 align-self-center shadow-none" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                                    How buy Metrica on coin?
+                                                   Hechos Reales
                                                 </button>
                                             </h5>
                                             </div>
                                             <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample-faq">
                                             <div class="card-body">
-                                                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. 
+                                               Aviones de combate y bombarderos: Era muy común que los pilotos estadounidenses, y de otros países aliados, pintaran en la parte delantera de sus aviones imágenes de mujeres atractivas, a menudo inspiradas en actrices, novias o esposas. Estos aviones recibían nombres como "La Bella de Detroit" o "La muñequita de Texas".
                                             </div>
                                             </div>
                                         </div>
@@ -124,13 +122,17 @@
                                             <div class="card-header" id="headingThree">
                                             <h5 class="my-0">
                                                 <button class="btn btn-link collapsed ml-4 shadow-none" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                                    What cryptocurrency can i use to buy Metrica?
+                                                   Razones detrás de esta costumbre:
                                                 </button>
                                             </h5>
                                             </div>
                                             <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample-faq">
                                             <div class="card-body">
-                                                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch.
+                                              Buena suerte y moral: Consideraban que poner el nombre de una mujer traía buena suerte y los protegía en el combate. La imagen de la mujer servía como un recordatorio visual de lo que estaban luchando para defender: su patria, sus familias y las mujeres que habían dejado en casa.
+                                               <br>
+                                               Humanizar la máquina: Se creaba un vínculo emocional, que se convertía en una "compañera" en el frente de batalla.
+                                                <br>        
+                                               Símbolo de belleza y vida: En medio del caos y la brutalidad de la guerra, la imagen de una mujer representaba la belleza, la vida y la esperanza, un contraste con el peligro y la muerte que enfrentaban a diario.
                                             </div>
                                             </div>
                                         </div>                                                
@@ -141,33 +143,33 @@
                         <div class="col-lg-6">
                             <div class="card">
                                 <div class="card-body">
-                                    <h4 class="mt-0 header-title">Have More Questions</h4>
-                                    <p class="text-muted">Don't Worry ! Email us your Questions or you can send us twitter.</p>
+                                    <h4 class="mt-0 header-title">Tienes alguna sugencias o quejas</h4>
+                                    <p class="text-muted">Favor de mandarnos tus comentarios y con gusto le daremos seguimiento.</p>
                                     <div class="row">
                                         <div class="col-4 align-self-center">
                                             <img src="<?= base_url() ?>assets/images/widgets/faq.svg" alt="" class="img-fluid">
                                         </div><!--end col-->
                                         <div class="col-8">
-                                            <form>
+                                            <form id="formComentario" >
                                                 <div class="form-group row">
                                                     <div class="col-lg-6  mo-b-15">
-                                                        <input class="form-control" type="text" id="name" placeholder="Name">                                                       
+                                                        <input class="form-control" type="text" id="correo" value="<?= $session->correo?>">                                                       
                                                     </div> 
                                                     <div class="col-lg-6">
-                                                        <input class="form-control" type="email" id="example-email-input3" placeholder="Email">
+                                                        <input class="form-control" type="hidden" id="usuario" value="<?= $session->id_usuario ?>" >
                                                     </div>                                                   
                                                 </div>
                                                 
                                                 <div class="form-group row">
                                                     <div class="col-12">
-                                                        <input class="form-control" type="text" id="subject2" placeholder="Subject">                                                       
+                                                        <input class="form-control" type="text" id="nombre" name="nombre" value="<?= $session->nombre_completo?>">                                                       
                                                     </div>                                                    
                                                 </div>
                                                 <div class="form-group">
-                                                    <textarea class="form-control" id="exampleFormControlTextarea1" rows="4" placeholder="Your message"></textarea>
+                                                    <textarea class="form-control" id="exampleFormControlTextarea1" rows="4" placeholder="Escirbe tu comentario"></textarea>
                                                 </div>                                                
                                                
-                                                <button type="submit" class="btn btn-gradient-primary btn-block px-4">Send Email</button>
+                                                <button  class="btn btn-gradient-primary btn-block px-4">Enviar Comentario</button>
                                             </form>
                                         </div><!--end col-->
                                     </div><!--end row-->

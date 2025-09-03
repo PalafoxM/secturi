@@ -1619,37 +1619,7 @@ ini.inicio = (function () {
         });
 
         },
-        guardarFoto: function(){
-          let formData = new FormData();
-          let foto = $('#foto')[0].files[0];  
-            if (!foto) {
-                Swal.fire("Atención", "Es requerido la imagen", "info");
-                return;
-            }
-             formData.append('foto', $('#foto')[0].files[0])
-             $.ajax({
-                    url: base_url + "index.php/Principal/guardarFoto",
-                    type: 'POST',
-                     data: formData,
-                    contentType: false,
-                    processData: false,
-                    success: function(response) {
-                      if(!response.error){
-                           Swal.fire("Correcto", response.respuesta, "success");
-                             setTimeout(() => {
-                                      window.location.reload(); 
-                                    }, 1000);
-                            
-                      }else{
-                            Swal.fire("Error", "Favor de llamar al Administrador", "error");
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.log(error);
-                        Swal.fire("Error", "Favor de llamar al Administrador", "error")
-                        }
-                    });
-        },
+      
         subirCsv: function()
         {
             let formData = new FormData();

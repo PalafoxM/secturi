@@ -163,8 +163,10 @@
                                             <div class="col-md-3">
                                                 <div class="mb-3 position-relative" id="">
                                                     <label for="nacionalidad" class="form-label campoObligatorio">NACIONALIDAD</label>
-                                                    <input type="text" autocomplete="off" class="form-control" id="nacionalidad"
-                                                        name="nacionalidad" placeholder="NACIONALIDAD">
+                                                    <select class="form-control" name="nacionalidad" id="nacionalidad">
+                                                        <option value="MEXICANA">MEXICANA </option>
+                                                        <option value="EXTRAJERA">EXTRAJERA</option>
+                                                    </select>
                                                 </div>
                                             </div>
                                             <div class="col-md-3">
@@ -183,6 +185,16 @@
                                                         <option value="0">seleccione</option>
                                                         <option value="1">HOMBRE</option>
                                                         <option value="2">MUJER</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3 position-relative" id="">
+                                                    <label for="municipio" class="form-label">MUNICIPIO</label>
+                                                    <select class="form-control select2" id="municipio" name="municipio">
+                                                       <?php foreach($cat_municipios as $m): ?>
+                                                           <option value="<?=$m->id_municipio?>" ><?=$m->nombre_municipio?></option>
+                                                       <?php endforeach; ?>
                                                     </select>
                                                 </div>
                                             </div>
