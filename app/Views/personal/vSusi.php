@@ -1,4 +1,4 @@
- <div class="page-wrapper">
+<!--  <div class="page-wrapper">
 
             <!-- Page Content-->
             <div class="page-content-tab">
@@ -24,28 +24,31 @@
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <h4 class="mt-0 header-title">SUSI es una Iniciativa por la Direccion de General Administrativa.</h4>
-                                    <p class="text-muted">En conjunto con la Coordinacion de Tecnologias de la Informacion. 
+                                    <h4 class="mt-0 header-title">Susi es una iniciativa de la Dirección General Administrativa,</h4>
+                                    <p class="text-muted">en conjunto con la Coordinación de Tecnologías de la Información.
                                     </p>
                                     <div class="row">
                                         <div class="col-lg-6">
                                             <ul class="list-unstyled faq-qa">
                                                 <li class="mb-5">
-                                                    <h6 class="">1. Que es SUSI?</h6>
-                                                    <p class="font-14 text-muted ml-3">Susi surge para sistematizar los procesos de SECTURI, en la optimizancion de tiempos, recursos y pasar a la digitalizacion.
+                                                    <h6 class="">1. ¿Qué es Susi?</h6>
+                                                    <p class="font-14 text-muted ml-3">Es un desarrollo web para sistematizar los procesos de la Secretaría de Turismo e Identidad (SECTURI), con el fin de optimizar tiempos y recursos, y avanzar hacia la digitalización.
                                                     </p>
                                                 </li>
                                                 <li class="mb-5">
-                                                    <h6 class="">3. Cual es su Vision?</h6>
-                                                    <p class="font-14 text-muted  ml-3">que SECTURI se encuentre dentro de una de las mejores dependencias de Gobierno por su Iniciativa, Diseño, Innovacion Tecnica y tecnologica,  
+                                                    <h6 class="">3. Visión</h6>
+                                                    <p class="font-14 text-muted  ml-3">Que SECTURI se posicione como una de las mejores dependencias del gobierno gracias a su iniciativa, diseño e innovación técnica y tecnológica  
                                                     </p>
                                                 </li>
                                                 <li class="mb-5">
-                                                    <h6 class="">5. Quienes pueden pedir sistemas internos?</h6>
-                                                    <p class="font-14 text-muted ml-3">Toda la comunidad SECTURI, puedo solicitar a la CTI.
-                                                        1.-Nuevo Sistema.
-                                                        2.-Mejoras en SUSI.
-                                                        3.-Integracion de formulario en SUSI.
+                                                    <h6 class="">¿Quiénes pueden solicitar sistemas internos?</h6>
+                                                    <p class="font-14 text-muted ml-3">Toda la comunidad de SECTURI puede hacer una solicitud a la Coordinación de Tecnologías de la Información (CTI) para:
+                                                            <br>
+                                                            1.-Un nuevo sistema
+                                                            <br>
+                                                            2.-Mejoras en SUSI
+                                                            <br>
+                                                            3.-La integración de un formulario en SUSI
                                                     </p>
                                                 </li>
                                             </ul>
@@ -53,23 +56,22 @@
                                         <div class="col-lg-6">
                                             <ul class="list-unstyled faq-qa">
                                                 <li class="mb-5">
-                                                    <h6 class="">2. Cual es su Mision?</h6>
-                                                    <p class="font-14 text-muted ml-3">Dejar de depender de proveedores externos y cuidar el recurso de SECTURI para enfocarlos a nuevos proceso y continuar con la mejora continua.
+                                                    <h6 class="">2. Misión</h6>
+                                                    <p class="font-14 text-muted ml-3">Dejar de depender de proveedores externos en TI y optimizar los recursos de SECTURI para enfocarlos en nuevos procesos, fomentando una mejora continua.
                                                     </p>
                                                 </li>
                                                 <li class="mb-5">
-                                                    <h6 class="">4. Valores?</h6>
-                                                    <p class="font-14 text-muted ml-3">Los principales valores de SUSI son:
-                                                        1.-Desarrollar software a la medida.
-                                                        2.-Atacar las necesidades del personal con un sistema.
-                                                        3.-Garantizar la operatividad del personal
+                                                    <h6 class="">4. Valores</h6>
+                                                    <p class="font-14 text-muted ml-3">Los principales valores de SUSI son:<br>
+                                                        1.- Desarrollar software a la medida de las necesidades.<br>
+                                                        2.- Satisfacer las necesidades del personal con soluciones de sistemas.<br>
+                                                        3.- Garantizar la operatividad del personal.<br>
                                                     </p>
                                                 </li>
                                                 <li class="mb-5">
-                                                    <h6 class="">6. Que tecnologias usa?</h6>
+                                                    <h6 class="">6. ¿Qué tecnologías utiliza?</h6>
                                                     <p class="font-14 text-muted ml-3">
-                                                        SUSI, esta desarrollada con unos lenguajes de programacion mas sofesticados y con tecnologia de punta como lo es TypeScript,
-                                                        se pretende realizar interfaces interativas e intuitivas.
+                                                        SUSI está desarrollada con tecnologías de punta, incluyendo lenguajes de programación sofisticados como TypeScript. El objetivo es crear interfaces interactivas e intuitivas.
                                                     </p>
                                                 </li>
                                             </ul>
@@ -84,23 +86,23 @@
                         <div class="col-lg-6">
                             <div class="card">
                                 <div class="card-body">
-                                    <h4 class="mt-0 header-title">SISTEMA UNIFICADO SECTURI</h4>
+                                    <h4 class="mt-0 header-title">Sistema Unificado SECTURI</h4>
                                     <p class="text-muted">
-                                        En el ambito del desarrollo en los sistemas como Alexa, Siri, Cortana, Gemini, etc. se les da un nombre femenino por razones historicas, culturales y de diseño 
+                                      En el mundo del desarrollo de sistemas como Alexa, Siri, Cortana, Gemini, etc., se les asigna un nombre femenino por diversas razones históricas, culturales y de diseño
                                     </p>
                                     <div class="accordion" id="accordionExample-faq">
                                         <div class="card shadow-none border mb-1">
                                             <div class="card-header" id="headingOne">
                                             <h5 class="my-0">
                                                 <button class="btn btn-link ml-4 shadow-none" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                                    Quieres saber mas?
+                                                   ¿ Quieres saber mas?
                                                 </button>
                                             </h5>
                                             </div>
                                         
                                             <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample-faq">
                                             <div class="card-body">
-                                                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. 
+                                               A lo largo de la historia, se ha acostumbrado a nombrar con nombres femeninos a objetos simbólicos como barcos (por ejemplo, la Niña, la Pinta y la Santa María) o espadas. Esto se hacía como un símbolo de buena suerte y belleza.
                                             </div>
                                             </div>
                                         </div>
@@ -143,7 +145,7 @@
                                     <p class="text-muted">Don't Worry ! Email us your Questions or you can send us twitter.</p>
                                     <div class="row">
                                         <div class="col-4 align-self-center">
-                                            <img src="<?=base_url()?>assets/images/widgets/faq.svg" alt="" class="img-fluid">
+                                            <img src="<?= base_url() ?>assets/images/widgets/faq.svg" alt="" class="img-fluid">
                                         </div><!--end col-->
                                         <div class="col-8">
                                             <form>
@@ -177,21 +179,21 @@
 
                 </div><!-- container -->
         
-        <link href="<?=base_url()?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-        <link href="<?=base_url()?>assets/css/jquery-ui.min.css" rel="stylesheet">
-        <link href="<?=base_url()?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
-        <link href="<?=base_url()?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
-        <link href="<?=base_url()?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
+        <link href="<?= base_url() ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="<?= base_url() ?>assets/css/jquery-ui.min.css" rel="stylesheet">
+        <link href="<?= base_url() ?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+        <link href="<?= base_url() ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
+        <link href="<?= base_url() ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
         <!-- jQuery  -->
-        <script src="<?=base_url()?>assets/js/jquery.min.js"></script>
-        <script src="<?=base_url()?>assets/js/jquery-ui.min.js"></script>
-        <script src="<?=base_url()?>assets/js/bootstrap.bundle.min.js"></script>
-        <script src="<?=base_url()?>assets/js/metismenu.min.js"></script>
-        <script src="<?=base_url()?>assets/js/waves.js"></script>
-        <script src="<?=base_url()?>assets/js/feather.min.js"></script>
-        <script src="<?=base_url()?>assets/js/jquery.slimscroll.min.js"></script>
-        <script src="<?=base_url()?>plugins/apexcharts/apexcharts.min.js"></script> 
+        <script src="<?= base_url() ?>assets/js/jquery.min.js"></script>
+        <script src="<?= base_url() ?>assets/js/jquery-ui.min.js"></script>
+        <script src="<?= base_url() ?>assets/js/bootstrap.bundle.min.js"></script>
+        <script src="<?= base_url() ?>assets/js/metismenu.min.js"></script>
+        <script src="<?= base_url() ?>assets/js/waves.js"></script>
+        <script src="<?= base_url() ?>assets/js/feather.min.js"></script>
+        <script src="<?= base_url() ?>assets/js/jquery.slimscroll.min.js"></script>
+        <script src="<?= base_url() ?>plugins/apexcharts/apexcharts.min.js"></script> 
         
         <!-- App js -->
-        <script src="<?=base_url()?>assets/js/app.js"></script>
-        
+        <script src="<?= base_url() ?>assets/js/app.js"></script>
+         -->
