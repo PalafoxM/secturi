@@ -1,5 +1,5 @@
 
-
+<?php $session = \Config\Services::session(); ?>
         <div class="page-wrapper">
 
             <!-- Page Content-->
@@ -14,7 +14,7 @@
                                     <ol class="breadcrumb">
                                         <li class="breadcrumb-item"><a href="javascript:void(0);">SUSI</a></li>
                                         <li class="breadcrumb-item"><a href="javascript:void(0);">Formulario</a></li>
-                                        <li class="breadcrumb-item active">FIC</li>
+                                        <li class="breadcrumb-item active">Denuncia</li>
                                     </ol>
                                 </div>
                                 <h4 class="page-title">Denuncia por incumplimiento al Código de Ética del Poder Ejecutivo del Estado de Guanajuato y/o Código de Conducta de la SECTURI </h4>
@@ -29,20 +29,20 @@
                                 <div class="card-body">
                                     <h3 class="mt-0 header-title">DATOS DEL DENUNCIANTE<strong></strong></h3>
                                     
-                                   <form id="form_fic" enctype="multipart/form-data">
+                                   <form id="form_denuncia" enctype="multipart/form-data">
 
                                        <div class="form-row">
                                             <!-- Dirección Responsable -->
                                             <div class="col-md-6 mb-6">
-                                                <label for="direccion_responsable">Indicar su Nombre completo o "Anónimo"<span class="text-danger">*</span></label>
-                                                <input id="id_reponsable_solicitud" class="form-control" name="id_reponsable_solicitud" value="HUGO RAMÍREZ DUARTE" >
+                                                <label for="nombre">Indicar su Nombre completo o "Anónimo"<span class="text-danger">*</span></label>
+                                                <input id="nombre" class="form-control" name="nombre" value="<?= $session->nombre_completo ?>" >
                                              
                                             </div><!--end col-->
                                             
                                             <!-- Tipo de PT -->
                                             <div class="col-md-6 mb-6">
-                                                <label for="tipo_pt">Domicilio con código postal<span class="text-danger">*</span></label>
-                                                <input id="id_reponsable_solicitud" class="form-control" name="id_reponsable_solicitud" value="HUGO RAMÍREZ DUARTE" >
+                                                <label for="domicilio">Domicilio con código postal<span class="text-danger">*</span></label>
+                                                <input id="domicilio" class="form-control" name="domicilio" placeholder="Col. la joya, calle florida #12"  >
                                                
                                             </div><!--end col-->
                                          
@@ -51,22 +51,22 @@
                                     
                                         <div class="form-row">
                                             <div class="col-md-6 mb-6">
-                                                <label for="formato_establecido">Correo electrónico para recibir informes o notificaciones del seguimiento.<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" id="formato_establecido" value="SI" name="formato_establecido" readonly>
+                                                <label for="correo">Correo electrónico para recibir informes o notificaciones del seguimiento.<span style="color:red;">*</span></label>
+                                                <input type="text" class="form-control" id="correo" value="<?= $session->correo?>"  name="correo" >
                                         
                                             </div><!--end col-->
                                             <div class="col-md-6 mb-6">
-                                                <label for="documentacion_comprobatoria">Número Telefónico.<span style="color:red;">*</span></label>
-                                               
+                                                <label for="telefono">Número Telefónico.<span style="color:red;">*</span></label>
+                                                <input type="text" class="form-control" id="telefono" placeholder="XXX-XXX-XX-XX" name="telefono" >
                                             </div><!--end col-->
                                         </div><!--end form-row-->
                                       
                                       
-                             
+                             <br>
                                
                                <a class="btn btn-gradient-danger" style="color:white" onclick="window.history.back()">Atrás</a>
                       
-                                <button class="btn btn-gradient-primary" id="btnGuardaFIC" type="submit">Guardar</button>
+                                <button class="btn btn-gradient-primary" id="btnDenuncia" type="submit">Guardar</button>
                          
                             </form> <!--end form-->                                          
                         </div><!--end card-body-->
@@ -107,7 +107,7 @@
 <script src="<?= base_url() ?>assets/pages/jquery.tabledit.init.js"></script>
 <script src="<?= base_url(); ?>plugins/select2/select2.min.js"></script>
 <script>
-ini.inicio.formFIC();
+ini.inicio.formDenuncia();
 
 	
 </script>

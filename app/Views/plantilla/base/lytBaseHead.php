@@ -301,7 +301,7 @@
                         </div>
                         <ul class="nav">
                             <li class="nav-item"><a class="nav-link" href="<?php echo base_url(); ?>index.php/Principal/incidenciaSubordinado">Incidencias</a></li>
-                            <li class="nav-item"><a class="nav-link" href="../crypto/crypto-index.html">Personal</a></li>
+                            <li class="nav-item"><a class="nav-link" href="<?php echo base_url(); ?>index.php/Principal/Personal">Personal</a></li>
                             <li class="nav-item"><a class="nav-link" href="../crm/crm-index.html">Actividades</a></li>
                             <li class="nav-item"><a class="nav-link" href="../projects/projects-index.html">Listos</a></li> 
                             <li class="nav-item"><a class="nav-link" href="../ecommerce/ecommerce-index.html">Pendientes</a></li>
@@ -446,11 +446,11 @@
                             <li class="nav-item"><a class="nav-link"
                                href="<?php echo base_url(); ?>index.php/Agregar/Directorio">Directorio</a>
                             </li>
-                            <li class="nav-item"><a class="nav-link" href="<?php echo base_url(); ?>index.php/Agregar/ListaAlba">Lista ALBA</a></li>
-                            <li class="nav-item"><a class="nav-link" href="<?php echo base_url(); ?>index.php/Agregar/Denuncia">Denuncia</a></li>
-                            <li class="nav-item"><a class="nav-link" href="../pages/pages-blogs.html">Inventario</a></li>
-                            <li class="nav-item"><a class="nav-link" href="../pages/pages-faq.html">Tickets Diseño</a></li>
-                            <li class="nav-item"><a class="nav-link" href="../pages/pages-gallery.html">sobre SUSI</a></li>
+                            <li class="nav-item"><a class="nav-link" href="<?php echo base_url();?>index.php/Agregar/ListaAlba">Lista ALBA</a></li>
+                            <li class="nav-item"><a class="nav-link" href="<?php echo base_url();?>index.php/Agregar/Denuncia">Denuncia</a></li>
+                            <li class="nav-item"><a class="nav-link" href="<?php echo base_url();?>index.php/Agregar/Inventario">Inventario</a></li>
+                            <li class="nav-item"><a class="nav-link" href="<?php echo base_url();?>index.php/Agregar/vTiketDisenio">Tickets Diseño</a></li>
+                            <li class="nav-item"><a class="nav-link" href="<?php echo base_url();?>index.php/Agregar/aboutSusi">sobre SUSI</a></li>
                         </ul>
                     </div><!-- end Pages -->
                 <div id="MetricaAuthentication" class="main-icon-menu-pane">

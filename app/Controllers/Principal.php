@@ -1677,6 +1677,18 @@ class Principal extends BaseController {
         $data['contentView'] = 'secciones/vListadoProveedor';                
         $this->_renderView($data); 
     }
+    public function Personal()
+    {
+        $session = \Config\Services::session();
+        $globals         = new Mglobal;
+        $personal        = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['id_jefe_inmediato' => $session->id_usuario ]]);
+       
+        $data['personal']= (!empty($personal->data))?$personal->data:[];
+        $data['scripts'] = array('inicio');
+       
+        $data['contentView'] = 'personal/vPersonal';                
+        $this->_renderView($data); 
+    }
     public function incidenciaSubordinado()
     {
         $session = \Config\Services::session();

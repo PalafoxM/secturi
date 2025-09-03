@@ -309,6 +309,31 @@ class Agregar extends BaseController {
         $this->_renderView($data);
 
     }
+    public function aboutSusi()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $data['scripts']     = array('inicio');
+        $data['contentView'] = 'personal/vSusi';                
+        $this->_renderView($data);   
+    }
+    public function Inventario()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $data['scripts']     = array('inicio');
+        $data['contentView'] = 'personal/vInventario';                
+        $this->_renderView($data);
+
+    }
+    public function vTiketDisenio()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $data['scripts']     = array('inicio');
+        $data['contentView'] = 'personal/vTiketDisenio';                
+        $this->_renderView($data);
+    }
     public function guardaFIC()
     {
         $session = \Config\Services::session();
