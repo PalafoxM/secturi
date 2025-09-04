@@ -1677,13 +1677,44 @@ class Principal extends BaseController {
         $data['contentView'] = 'secciones/vListadoProveedor';                
         $this->_renderView($data); 
     }
+    public function formComentario()
+    {
+        $session = \Config\Services::session();
+        $globals      = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $data = $this->request->getPost();
+
+        if(empty($data['comentario'])){
+            $response->respuesta = "Es requerido el comentario";
+            return $this->respond($response);
+        }
+
+        $dataInsert=[
+            "comentario"=>$data['comentario'],
+            "id_usuario"=>$session->id_usuario,
+            "fec_reg"   =>date('Y-m-d'),
+            "usu_act"   =>$session->id_usuario
+        ];
+         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Principal.php/guardarComentario'];
+          $dataConfig = [
+                "tabla" => "comentarios",
+                "editar" => false,
+                //"idEditar" => ['id_area' => (int)$data['id_area']]
+            ];
+         $response = $globals->saveTabla($dataInsert, $dataConfig,$dataBitacora);
+         return $this->respond($response);
+
+    }
     public function Personal()
     {
         $session = \Config\Services::session();
         $globals         = new Mglobal;
         $personal        = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['id_jefe_inmediato' => $session->id_usuario ]]);
+        $actividad        = $globals->getTabla(['tabla' => 'vw_actividad', 'where' => ['usu_reg' => $session->id_usuario ]]);
        
-        $data['personal']= (!empty($personal->data))?$personal->data:[];
+        $data['personal'] = (!empty($personal->data))?$personal->data:[];
+        $data['actividad']= (!empty($actividad->data))?$actividad->data:[];
         $data['scripts'] = array('inicio');
        
         $data['contentView'] = 'personal/vPersonal';                
@@ -2840,6 +2871,59 @@ class Principal extends BaseController {
       
          return $this->respond($response);
         
+    }
+    public function formActividad()
+    {
+        $session  = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error|Error al traer los proveedor';
+        $globals  = new Mglobal;
+        $data     = $this->request->getPost();
+
+        if(empty($data['actividad'])){
+            $response->respuesta = 'La descripción de la actividad es requerida';
+            return $this->respond($response);
+        }
+        if(empty($data['fec_inicio'])){
+            $response->respuesta = 'La fec. inicioes requerida';
+            return $this->respond($response);
+        }
+        if(empty($data['fec_fin'])){
+            $response->respuesta = 'La fec_fin es requerida';
+            return $this->respond($response);
+        }
+        if(empty($data['actividad'])){
+            $response->respuesta = 'La actividad es requerida';
+            return $this->respond($response);
+        }
+       
+        $dataInsert= [
+            "actividad"   => $data['actividad'],
+            "fec_inicio"  => $data['fec_inicio'],
+            "fec_fin"     => $data['fec_fin'],
+            "actividad"   => $data['actividad'],
+            "estado"      => $data['estatus'],
+            "descripcion" => $data['des_actividad'],
+            "id_usuario"  => $data['id_usuario'],
+            "usu_reg"     => $session->id_usuario,
+            "fec_reg"     => date('Y-m-d'),
+        ];
+        $dataConfig = [
+            "tabla"=>"actividad",
+            "editar"=>false,
+            //"idEditar" => ['id_reserva'=>(int)$data['id_reserva']]
+        ];
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Principal.php/guardaActividad'];
+        $res = $globals->saveTabla($dataInsert, $dataConfig,$dataBitacora);
+               
+        if(!$res->error){
+          $response->error = false;
+          $response->respuesta = $res->respuesta;
+        }
+
+        return $this->respond($response);
+
     }
     public function generarTramitePagoGo($id_reserva_go = null, $id_registro_go =  null)
     {  

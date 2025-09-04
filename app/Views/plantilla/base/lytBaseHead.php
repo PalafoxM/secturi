@@ -463,29 +463,14 @@
                         <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Inicio/ListaViaticos">Lista Viáticos</a></li>
                         <li class="nav-item"><a class="nav-link"
-                                href="<?php echo base_url(); ?>index.php/Principal/listadoPTjuridico">Lista PT</a></li>
-                        <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Principal/listaGOjuridico">Lista Go</a>
                         </li>
                         <li class="nav-item"><a class="nav-link"
-                                href="<?php echo base_url(); ?>authentication/auth-recover-pw.html">Re-Password</a></li>
+                                href="<?php echo base_url(); ?>authentication/auth-recover-pw.html">Lista GRC</a></li>
                         <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>authentication/auth-recover-pw-alt.html">Re-Password-alt</a>
                         </li>
-                        <li class="nav-item"><a class="nav-link"
-                                href="<?php echo base_url(); ?>authentication/auth-lock-screen.html">Lock Screen</a>
-                        </li>
-                        <li class="nav-item"><a class="nav-link"
-                                href="<?php echo base_url(); ?>authentication/auth-lock-screen-alt.html">Lock Screen</a>
-                        </li>
-                        <li class="nav-item"><a class="nav-link"
-                                href="<?php echo base_url(); ?>authentication/auth-404.html">Error 404</a></li>
-                        <li class="nav-item"><a class="nav-link"
-                                href="<?php echo base_url(); ?>authentication/auth-404-alt.html">Error 404-alt</a></li>
-                        <li class="nav-item"><a class="nav-link"
-                                href="<?php echo base_url(); ?>authentication/auth-500.html">Error 500</a></li>
-                        <li class="nav-item"><a class="nav-link"
-                                href="<?php echo base_url(); ?>authentication/auth-500-alt.html">Error 500-alt</a></li>
+                       
                     </ul>
                 </div><!-- end Authentication-->
             </div>
@@ -681,7 +666,7 @@
                             case 1: echo '<i class="mdi mdi-account-card-details font-18"></i> Super Administrador'; break;
                             case 2: echo '<i class="mdi mdi-account-card-details font-18"></i> Admin Financieros'; break;
                             case 4: echo '<i class="mdi mdi-account-card-details font-18"></i> Personal Adminitrativo'; break;
-                            case 6: echo '<i class="mdi mdi-account-card-details font-18"></i> Enlace'; break;
+                            case 5: echo '<i class="mdi mdi-account-card-details font-18"></i> Enlace'; break;
                             case 6: echo '<i class="mdi mdi-account-card-details font-18"></i> Admin Protocolo ALBA'; break;
                             case 7: echo '<i class="mdi mdi-account-card-details font-18"></i> Personal Juridico'; break;
                             default: echo 'PERSONAL SECTURI';

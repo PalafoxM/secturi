@@ -50,6 +50,7 @@ class Inicio extends BaseController {
           $vista = 'personal/vInicio';
           $data['datos'] = $globas->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario]])->data[0];
            $data['lista_alba'] = $globas->getTabla(['tabla' => 'lista_alba', 'where' => ['visible' => 1]])->data;
+          
         }
           $mes_actual = date('m');
            $cumple = $globas->getTabla([
@@ -72,9 +73,9 @@ class Inicio extends BaseController {
            
             }
         }
-      
-        //die( var_dump( $personal  ) );
+         $actividad = $globas->getTabla(['tabla' => 'vw_actividad', 'where' => ['visible' => 1, "id_usuario" => $session->id_usuario]])->data;
 
+        $data['actividad'] = (isset($actividad) && !empty($actividad))?$actividad:[];
         $data['personal']   = $personal;
         $data['scripts'] = array('principal','inicio');
         $data['edita'] = 0;

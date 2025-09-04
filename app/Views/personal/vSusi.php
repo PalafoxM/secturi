@@ -153,10 +153,10 @@
                                             <form id="formComentario" >
                                                 <div class="form-group row">
                                                     <div class="col-lg-6  mo-b-15">
-                                                        <input class="form-control" type="text" id="correo" value="<?= $session->correo?>">                                                       
+                                                        <input class="form-control" type="text" id="correo" name="correo" value="<?= $session->correo?>">                                                       
                                                     </div> 
                                                     <div class="col-lg-6">
-                                                        <input class="form-control" type="hidden" id="usuario" value="<?= $session->id_usuario ?>" >
+                                                        <input class="form-control" type="hidden" id="usuario" name="usuario" value="<?= $session->id_usuario ?>" >
                                                     </div>                                                   
                                                 </div>
                                                 
@@ -166,10 +166,10 @@
                                                     </div>                                                    
                                                 </div>
                                                 <div class="form-group">
-                                                    <textarea class="form-control" id="exampleFormControlTextarea1" rows="4" placeholder="Escirbe tu comentario"></textarea>
+                                                    <textarea class="form-control" id="exampleFormControlTextarea1" name="comentario" placeholder="Escirbe tu comentario"></textarea>
                                                 </div>                                                
                                                
-                                                <button  class="btn btn-gradient-primary btn-block px-4">Enviar Comentario</button>
+                                                <button type="submit" id="btnComentario" class="btn btn-gradient-primary btn-block px-4">Enviar Comentario</button>
                                             </form>
                                         </div><!--end col-->
                                     </div><!--end row-->
@@ -198,4 +198,6 @@
         
         <!-- App js -->
         <script src="<?= base_url() ?>assets/js/app.js"></script>
-         -->
+        <script>
+            ini.inicio.formComentario();
+        </script>

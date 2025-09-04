@@ -1619,7 +1619,81 @@ ini.inicio = (function () {
         });
 
         },
-      
+        formComentario: function()
+        {
+             $("#formComentario").submit(function (e) {
+                e.preventDefault();                
+                $.ajax({
+                    type: "POST",
+                    url: base_url + "index.php/Principal/formComentario",
+                    data: $(this).serialize(),
+                    dataType: 'json',
+                    beforeSend: function(){
+                        $('#btnComentario').prop('disabled', true).html('Guardando...'); 
+                    },
+                    success: function (response) {
+                        console.log(response);
+
+                        if(response.error == false){
+                            Swal.fire("Exitó", response.respuesta, "success");
+                              setTimeout(() => {
+                                 window.location.reload();
+                               }, 1500);
+                                                    
+                        }else{
+                            Swal.fire("Error", response.respuesta , "error"); 
+                            
+                        } 
+                    },
+                    complete: function(){
+                      $('#btnComentario').prop('disabled', false).html('Guardar'); 
+                    },
+                    error: function (response,jqXHR, textStatus, errorThrown) {
+                        var res= JSON.parse (response.responseText);
+                       $('#btnComentario').prop('disabled', false).html('Guardar'); 
+                        Swal.fire("Error", '<p> '+ res.message + '</p>');  
+                   }
+                });
+            });
+        },
+        formActividad: function()
+        {
+            $("#form_actividad").submit(function (e) {
+                e.preventDefault();                
+                $.ajax({
+                    type: "POST",
+                    url: base_url + "index.php/Principal/formActividad",
+                    data: $(this).serialize(),
+                    dataType: 'json',
+                    beforeSend: function(){
+                        $('#btnActividad').prop('disabled', true).html('Guardando...'); 
+                    },
+                    success: function (response) {
+                        console.log(response);
+
+                        if(response.error == false){
+                            Swal.fire("Exitó", response.respuesta, "success");
+                      
+                            window.location.reload();
+                                                    
+                        }else{
+                            Swal.fire("Error", response.respuesta , "error"); 
+                            //$("#formParticipante")[0].reset();                         
+                            return false;
+                        } 
+                    },
+                    complete: function(){
+                      $('#btnActividad').prop('disabled', false).html('Guardar'); 
+                    },
+                    error: function (response,jqXHR, textStatus, errorThrown) {
+                        var res= JSON.parse (response.responseText);
+                       $('#btnActividad').prop('disabled', false).html('Guardar'); 
+                        Swal.fire("Error", '<p> '+ res.message + '</p>');  
+                   }
+                });
+            });
+
+        },
         subirCsv: function()
         {
             let formData = new FormData();
@@ -3007,7 +3081,7 @@ ini.inicio = (function () {
                 });
         },
         deleteAlba: function(id_alba){
-              Swal.fire({
+            Swal.fire({
                     title: "¡Esta seguro de eliminar!",
                     text:  `Esta accion eliminara el registro`,
                     icon: "error",
@@ -3016,7 +3090,6 @@ ini.inicio = (function () {
                     confirmButtonText: "Ok"
                     }).then((result) => {
                     if (result.isConfirmed) {
-                            /*===============*/
                             $.ajax({
                                 type: "POST",
                                 url: `${base_url}index.php/agregar/deleteAlba`,
@@ -3040,16 +3113,15 @@ ini.inicio = (function () {
                                         Swal.fire("Error", "Error al cargar los detalles del curso.", "error");
                                     }
                                 });
-
-                        
-                        }
-                    });
+                    }
+            });
 
         },
-        modalActividad: function(event)
+        modalActividad: function(event, id_usuario)
         {
             if(event){
               $("#modalActividad").modal("show");
+              $("#id_usuario").val(id_usuario);
             }else{
                $("#modalActividad").modal("hide"); 
             }

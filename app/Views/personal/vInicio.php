@@ -1,6 +1,83 @@
 
     <!-- Page Content-->
-     <?php   $session = \Config\Services::session(); ?>
+     <?php $session = \Config\Services::session(); ?>
+<style>
+.met-profile-main-pic{
+  /* tamaño del marco */
+  width: 125px;            /* ajusta a lo que necesites */
+  aspect-ratio: 1 / 1;     /* círculo perfecto; si no tienes soporte, usa height:125px */
+  border-radius: 50%;
+  overflow: hidden;        /* recorta lo que sobresalga */
+  position: relative;
+  /* (opcional) “margen” visual tipo marco */
+  padding: 4px;
+  background: #fff;
+  box-shadow: 0 0 0 2px #e5e7eb;  /* borde suave */
+}
+
+.met-profile-main-pic .avatar{
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;       /* rellena sin deformar, recortando */
+  object-position: center; /* centrada */
+  border-radius: 50%;
+}
+
+/* Botón de cámara */
+.fro-profile_main-pic-change{
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  background: rgba(0,0,0,.6);
+  color: #fff;
+  border-radius: 9999px;
+  padding: 6px;
+  line-height: 1;
+  cursor: pointer;
+  font-size: 12px;
+}
+/* Avatar genérico */
+.avatar{
+  border-radius: 50%;
+  overflow: hidden;
+  display: inline-block;
+  position: relative;
+}
+
+/* Tamaño pequeño (ajusta a tu gusto) */
+.avatar-sm{
+  width: 40px;
+  height: 40px;
+}
+
+/* Imagen rellenando el círculo sin deformarse */
+.avatar img{
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center;
+}
+/* Imagen grande del carousel */
+.thumb-xl{
+  width: 128px;          /* ajusta a tu gusto (96/128/160) */
+  height: 128px;
+  border-radius: 12px;   /* usa 50% si la quieres circular */
+  object-fit: cover;     /* rellena sin deformar, recorta exceso */
+  object-position: center;
+  flex-shrink: 0;        /* evita que la imagen se aplaste en el .media */
+}
+
+/* (Opcional) si notas saltos de layout entre slides, fija una altura mínima */
+.carousel-item .media{
+  min-height: 140px;     /* un poco más que la imagen para textos cortos */
+}
+
+
+
+
+</style>
       <div class="page-wrapper">
 
             <!-- Page Content-->
@@ -31,17 +108,18 @@
                                         <div class="row">
                                             <div class="col-lg-4 align-self-center mb-3 mb-lg-0">
                                                 <div class="met-profile-main">
-                                                    <div class="met-profile-main-pic">
-                                                        <?php if(empty($datos->ruta_foto_relativa)): ?>
-                                                            <img src="<?= base_url() ?>assets/images/users/patient-pro.png" alt="" style="width:125px; heigth: 125px;" class="rounded-circle">
-                                                        <?php endif; ?>
-                                                        <?php if(!empty($datos->ruta_foto_relativa)): ?>
-                                                            <img src="<?= base_url().$datos->ruta_foto_relativa ?>" alt="" style="width:125px; heigth: 125px;" class="rounded-circle">
-                                                        <?php endif; ?>
-                                                        
-                                                        <span class="fro-profile_main-pic-change" onclick="ini.inicio.abrirModalFoto();" >
-                                                            <i class="fas fa-camera"></i>
-                                                        </span>
+                                                   <div class="met-profile-main-pic">
+                                                    <img
+                                                        src="<?= empty($datos->ruta_foto_relativa)
+                                                                ? base_url().'assets/images/users/patient-pro.png'
+                                                                : base_url().$datos->ruta_foto_relativa ?>"
+                                                        alt="Foto de perfil"
+                                                        class="avatar"
+                                                    >
+
+                                                    <span class="fro-profile_main-pic-change" onclick="ini.inicio.abrirModalFoto();">
+                                                        <i class="fas fa-camera"></i>
+                                                    </span>
                                                     </div>
                                                     <div class="met-profile_user-detail">
                                                         <h5 class="met-user-name"><?= $session->nombre_completo ?></h5>                                                        
@@ -51,8 +129,8 @@
                                             </div><!--end col-->
                                             <div class="col-lg-4 ml-auto">
                                                 <ul class="list-unstyled personal-detail">
-                                                    <li class=""><i class="dripicons-user mr-2 text-info font-18"></i> <b> No. Empleado </b> : <?= (!empty($datos->no_empleado))?$datos->no_empleado:'' ?></li>
-                                                    <li class="mt-2"><i class="dripicons-mail text-info font-18 mt-2 mr-2"></i> <b> Correo </b> : <?= (!empty($datos->correo))?$datos->correo:'' ?></li>
+                                                    <li class=""><i class="dripicons-user mr-2 text-info font-18"></i> <b> No. Empleado </b> : <?= (!empty($datos->no_empleado)) ? $datos->no_empleado : '' ?></li>
+                                                    <li class="mt-2"><i class="dripicons-mail text-info font-18 mt-2 mr-2"></i> <b> Correo </b> : <?= (!empty($datos->correo)) ? $datos->correo : '' ?></li>
                                                     <li class="mt-2"><i class="dripicons-location text-info font-18 mt-2 mr-2"></i> <b>Ubicacion</b> : Silao, Gto</li>
                                                 </ul>
                                                 <div class="button-list btn-social-icon">                                                
@@ -80,9 +158,7 @@
                                         <li class="nav-item">
                                             <a class="nav-link" id="activity_detail_tab" data-toggle="pill" href="#activity_detail">Actividad</a>
                                         </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" id="portfolio_detail_tab" data-toggle="pill" href="#portfolio_detail">Portafolio</a>
-                                        </li>
+                                       
                                         <li class="nav-item">
                                             <a class="nav-link" id="settings_detail_tab" data-toggle="pill" href="#settings_detail">Configuración</a>
                                         </li>
@@ -98,72 +174,43 @@
                                     <div class="row">
                                         <div class="col-xl-4"> 
                                             
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <div class=" d-flex justify-content-between">
-                                                        <img src="<?= base_url() ?>assets/images/widgets/monthly-re.png" alt="" height="75">
-                                                        <div class="align-self-center">
-                                                            <h2 class="mt-0 mb-2 font-weight-semibold">$955<span class="badge badge-soft-success font-11 ml-2"><i class="fas fa-arrow-up"></i> 8.6%</span></h2>
-                                                            <h4 class="title-text mb-0">Monthly Revenue</h4>
-                                                        </div>
-                                                    </div>
-                                                    <div class="d-flex justify-content-between bg-light p-3 mt-3 rounded">
-                                                        <div>
-                                                            <h4 class="mb-1 font-weight-semibold">$10255</h4>
-                                                            <p class="mb-0">Card Balance</p>
-                                                        </div>
-                                                        <div>
-                                                            <h4 class=" mb-1 font-weight-semibold">25.12 <small>BTC</small></h4>
-                                                            <p class="mb-0">Crypto Balance</p>
-                                                        </div>
-                                                    </div>                                    
-                                                </div><!--end card-body-->
-                                            </div><!--end card-->                        
+                                                               
                                             <div class="card">
                                                 <div class="card-body">
                                                     <h4 class="header-title mt-0 mb-3">Compleaños del mes</h4>
                                                     <ul class="list-unsyled m-0 pl-0 transaction-history">
-                                                      <?php foreach($personal as $k => $c):?>
-                                                        <li class="align-items-center d-flex justify-content-between">
-                                                            <div class="media">
-                                                                <div class="transaction-icon">
-                                                                  <?php if(!empty($c['ruta_foto_relativa'] )): ?>
-                                                                    <img src="<?= base_url().$c['ruta_foto_relativa'] ?>" alt="" class="rounded-circle thumb-sm mr-1">
-                                                                   <?php endif; ?>
-                                                                    <?php if(empty($c['ruta_foto_relativa'] )): ?>
-                                                                   <img src="<?= base_url() ?>assets/images/users/user-3.jpg" alt="" class="rounded-circle thumb-sm mr-1">
-                                                                   <?php endif; ?>
-                                                                </div>                                                
-                                                                <div class="media-body align-self-center"> 
-                                                                    <div class="transaction-data">                                                        
+                                                      <?php foreach ($personal as $k => $c): ?>
+                                                            <?php
+                                                                $foto = !empty($c['ruta_foto_relativa'])
+                                                                    ? base_url() . $c['ruta_foto_relativa']
+                                                                    : base_url() . 'assets/images/users/user-3.jpg';
+                                                                ?>
+                                                            <li class="align-items-center d-flex justify-content-between">
+                                                                <div class="media">
+                                                                    <div class="transaction-icon avatar avatar-sm mr-2">
+                                                                    <img
+                                                                        src="<?= $foto ?>"
+                                                                        alt="Foto de <?= htmlspecialchars($c['nombre_completo'] ?? 'usuario', ENT_QUOTES, 'UTF-8') ?>"
+                                                                        loading="lazy"
+                                                                        width="40" height="40"
+                                                                        onerror="this.onerror=null;this.src='<?= base_url() ?>assets/images/users/user-3.jpg';"
+                                                                    >
+                                                                    </div>
+
+                                                                    <div class="media-body align-self-center"> 
+                                                                    <div class="transaction-data">                                                         
                                                                         <h3 class="m-0"><?= $c['nombre_completo']; ?></h3>
                                                                         <p class="text-muted mb-0">el <?= $c['dia']; ?></p>
                                                                     </div>                                                                                              
-                                                                </div><!--end media body-->
-                                                            </div>
-                                                            <span class="text-success"><?= $c['edad']; ?> años</span>
-                                                        </li>
+                                                                    </div>
+                                                                </div>
+                                                                <span class="text-success"><?= $c['edad']; ?> años</span>
+                                                            </li>
                                                         <?php endforeach; ?>
                                                     </ul>                                       
                                                 </div><!--end card-body-->
                                             </div><!--end card-->
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <div class="dash-datepick">
-                                                        <input type="hidden" id="light_datepick"/>
-                                                    </div>
-                                                    <div class="d-flex justify-content-between p-3 bg-light">
-                                                        <div class="media">
-                                                            <img src="<?= base_url() ?>assets/images/users/user-2.jpg" class="mr-3 thumb-md rounded-circle" alt="...">
-                                                            <div class="media-body align-self-center">                                                           
-                                                                <h5 class="mt-0 text-dark mb-1">Dias Festivos</h5>  
-                                                                <p class="mb-0">Asuetos <span class="text-muted">SECTURI</span></p>                                                              
-                                                            </div>
-                                                        </div>
-                                                        <span class="font-24 align-self-center">🎂</span>
-                                                    </div>
-                                                </div><!--end card-body-->                                                                                                  
-                                            </div><!--end card-->
+                                           
                                             
                                         </div><!--end col-->
 
@@ -221,23 +268,37 @@
                                                 <div class="card-body">
                                                     <div id="carousel_2" class="carousel slide" data-ride="carousel">
                                                         <div class="carousel-inner">
-                                                             <?php foreach($lista_alba as $index => $l): ?>
-                                                                <div class="carousel-item <?= $index === 0 ? 'active' : '' ?>">
+                                                             <?php foreach ($lista_alba as $index => $l): ?>
+                                                               <?php
+                                                                    $nombreCompleto = trim(($l->nombre ?? '').' '.($l->primer_apellido ?? '').' '.($l->segundo_apellido ?? ''));
+                                                                    $foto = !empty($l->foto)
+                                                                        ? base_url() . $l->foto
+                                                                        : base_url() . 'assets/images/placeholder-xxl.jpg'; // tu placeholder
+                                                                    ?>
+                                                                    <div class="carousel-item <?= $index === 0 ? 'active' : '' ?>">
                                                                     <div class="media">
-                                                                        <img src="<?= base_url().$l->foto; ?>" class="mr-3 thumb-xl align-self-center" alt="...">
-                                                                        <div class="media-body align-self-center">                                                          
-                                                                            <h4 class="mt-0 mb-1 title-text text-dark">
-                                                                                <?= $l->nombre.' '.$l->primer_apellido.' '.$l->segundo_apellido; ?>
-                                                                            </h4>
-                                                                            <p class="text-muted mb-1"><?= $l->edad; ?> años</p>
-                                                                            <p class="text-muted">Nacionalidad: <?= $l->nacionalidad; ?></p>
-                                                                            <span class="px-2 py-1 bg-soft-pink d-inline-block">Desaparecida</span>
-                                                                            <a target="_blank" href="<?= base_url().$l->protocolo; ?>" class="bg-soft-purple px-2 py-1">
-                                                                                <i class="dripicons-preview"></i>
-                                                                            </a>
+                                                                        <img
+                                                                        src="<?= $foto ?>"
+                                                                        alt="Foto de <?= htmlspecialchars($nombreCompleto, ENT_QUOTES, 'UTF-8') ?>"
+                                                                        class="thumb-xl mr-3 align-self-center"
+                                                                        width="128" height="128"
+                                                                        loading="<?= $index === 0 ? 'eager' : 'lazy' ?>"
+                                                                        onerror="this.onerror=null;this.src='<?= base_url() ?>assets/images/placeholder-xxl.jpg';"
+                                                                        >
+                                                                        <div class="media-body align-self-center">
+                                                                        <h4 class="mt-0 mb-1 title-text text-dark">
+                                                                            <?= $nombreCompleto ?>
+                                                                        </h4>
+                                                                        <p class="text-muted mb-1"><?= $l->edad; ?> años</p>
+                                                                        <p class="text-muted">Nacionalidad: <?= $l->nacionalidad; ?></p>
+                                                                        <span class="px-2 py-1 bg-soft-pink d-inline-block">Desaparecida</span>
+                                                                        <a target="_blank" rel="noopener" href="<?= base_url() . $l->protocolo; ?>" class="bg-soft-purple px-2 py-1">
+                                                                            <i class="dripicons-preview"></i>
+                                                                        </a>
                                                                         </div>
                                                                     </div>
-                                                                </div>
+                                                                    </div>
+
                                                             <?php endforeach; ?>
                                                           
                                                         </div>
@@ -340,90 +401,28 @@
                                         <div class="col-lg-4">
                                             <div class="card">
                                                 <div class="card-body"> 
-                                                    <h4 class="header-title mt-0 mb-4">Latest Activity</h4>
+                                                    <h4 class="header-title mt-0 mb-4">Actividades Asignadas</h4>
                                                     <div class="slimscroll profile-activity-height">
                                                         <div class="activity">
-                                                            <div class="activity-info">
-                                                                <div class="icon-info-activity">
-                                                                    <i class="mdi mdi-checkbox-marked-circle-outline bg-soft-success"></i>
-                                                                </div>
-                                                                <div class="activity-info-text">
-                                                                    <div class="d-flex justify-content-between align-items-center">
-                                                                        <p class="text-muted mb-0 font-14 w-75"><span class="text-dark font-14">Donald</span> 
-                                                                            updated the status of <a href="" class="text-dark">Refund #1234</a> to awaiting customer response
-                                                                        </p>
-                                                                        <span class="text-muted">10 Min ago</span>
-                                                                    </div>    
-                                                                </div>
-                                                            </div>   
-                
-                                                            <div class="activity-info">
-                                                                <div class="icon-info-activity">
-                                                                    <i class="mdi mdi-timer-off bg-soft-pink"></i>
-                                                                </div>
-                                                                <div class="activity-info-text">
-                                                                    <div class="d-flex justify-content-between align-items-center">
-                                                                        <p class="text-muted mb-0 font-14 w-75"><span class="text-dark font-14">Lucy Peterson</span> 
-                                                                            was added to the group, group name is <a href="" class="text-dark">Overtake</a>
-                                                                        </p>
-                                                                        <span class="text-muted">50 Min ago</span>
-                                                                    </div>    
-                                                                </div>
-                                                            </div>   
-                
-                                                            <div class="activity-info">
-                                                                <div class="icon-info-activity">
-                                                                    <i class="mdi mdi-alert-decagram bg-soft-purple"></i>
-                                                                </div>
-                                                                <div class="activity-info-text">
-                                                                    <div class="d-flex justify-content-between align-items-center">
-                                                                        <p class="text-muted mb-0 font-14 w-75"><span class="text-dark font-14">Joseph Rust</span> 
-                                                                            opened new showcase <a href="" class="text-dark">Mannat #112233</a> with theme market
-                                                                        </p>
-                                                                        <span class="text-muted">10 hours ago</span>
-                                                                    </div>    
-                                                                </div>
-                                                            </div>   
-                
+                                                             
+                                                        <?php if(isset($actividad) && !empty($actividad)): ?>
+                                                            <?php foreach ($actividad as $a): ?>
                                                             <div class="activity-info">
                                                                 <div class="icon-info-activity">
                                                                     <i class="mdi mdi-clipboard-alert bg-soft-warning"></i>
                                                                 </div>
                                                                 <div class="activity-info-text">
                                                                     <div class="d-flex justify-content-between align-items-center">
-                                                                        <p class="text-muted mb-0 font-14 w-75"><span class="text-dark font-14">Donald</span> 
-                                                                            updated the status of <a href="" class="text-dark">Refund #1234</a> to awaiting customer response
+                                                                        <p class="text-muted mb-0 font-14 w-75"><span class="text-dark font-14"><?= $a->actividad ?></span> 
+                                                                          <?= $a->descripcion ?>
                                                                         </p>
-                                                                        <span class="text-muted">Yesterday</span>
-                                                                    </div>    
-                                                                </div>
-                                                            </div>   
-                                                            <div class="activity-info">
-                                                                <div class="icon-info-activity">
-                                                                    <i class="mdi mdi-clipboard-alert bg-soft-secondary"></i>
-                                                                </div>
-                                                                <div class="activity-info-text">
-                                                                    <div class="d-flex justify-content-between align-items-center">
-                                                                        <p class="text-muted mb-0 font-14 w-75"><span class="text-dark font-14">Lucy Peterson</span> 
-                                                                            was added to the group, group name is <a href="" class="text-dark">Overtake</a>
-                                                                        </p>
-                                                                        <span class="text-muted">14 Nov 2019</span>
+                                                                        <span class="text-muted"><?= date('d/m/Y', strtotime($a->fec_reg)) ?></span>
                                                                     </div>    
                                                                 </div>
                                                             </div> 
-                                                            <div class="activity-info">
-                                                                <div class="icon-info-activity">
-                                                                    <i class="mdi mdi-clipboard-alert bg-soft-info"></i>
-                                                                </div>
-                                                                <div class="activity-info-text">
-                                                                    <div class="d-flex justify-content-between align-items-center">
-                                                                        <p class="text-muted mb-0 font-14 w-75"><span class="text-dark font-14">Joseph Rust</span> 
-                                                                            opened new showcase <a href="" class="text-dark">Mannat #112233</a> with theme market
-                                                                        </p>
-                                                                        <span class="text-muted">15 Nov 2019</span>
-                                                                    </div>    
-                                                                </div>
-                                                            </div>                                                                                                                                      
+                                                            <?php endforeach; ?>  
+                                                        <?php endif; ?>
+                                                                                                                                                                                            
                                                         </div><!--end activity-->
                                                     </div><!--crypot dash activity-->
                                                 </div><!--end card-body-->
@@ -521,174 +520,6 @@
                                     </div><!--end row-->  
                                 </div><!--end education detail-->
 
-                                <div class="tab-pane fade" id="portfolio_detail">
-                                    <div class="row">
-                                        <div class="col-lg-8">
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <div class="row">
-                                                        <ul class="col container-filter categories-filter mb-0" id="filter">
-                                                            <li><a class="categories active" data-filter="*">All</a></li>
-                                                            <li><a class="categories" data-filter=".branding">Branding</a></li>
-                                                            <li><a class="categories" data-filter=".design">Design</a></li>
-                                                            <li><a class="categories" data-filter=".photo">Photo</a></li>
-                                                            <li><a class="categories" data-filter=".coffee">coffee</a></li>
-                                                        </ul>
-                                                    </div><!-- End portfolio  -->
-                                                </div><!--end card-body-->
-                                            </div><!--end card-->
-                                            
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <div class="row container-grid nf-col-3  projects-wrapper">
-                                                        <div class="col-lg-4 col-md-6 p-0 nf-item branding design coffee spacing">
-                                                            <div class="item-box">
-                                                                <a class="cbox-gallary1 mfp-image" href="<?= base_url() ?>assets/images/small/img-1.jpg" title="Consequat massa quis">
-                                                                    <img class="item-container " src="<?= base_url() ?>assets/images/small/img-1.jpg" alt="7" />
-                                                                    <div class="item-mask">
-                                                                        <div class="item-caption">
-                                                                            <h5 class="text-white">Consequat massa quis</h5>
-                                                                            <p class="text-white">Branding, Design, Coffee</p>
-                                                                        </div>
-                                                                    </div>
-                                                                </a>
-                                                            </div><!--end item-box-->
-                                                        </div><!--end col-->
-                                        
-                                                        <div class="col-lg-4 col-md-6 p-0 nf-item photo spacing">
-                                                            <div class="item-box">
-                                                                <a class="cbox-gallary1 mfp-image" href="<?= base_url() ?>assets/images/small/img-2.jpg" title="Vivamus elementum semper">
-                                                                    <img class="item-container mfp-fade" src="<?= base_url() ?>assets/images/small/img-2.jpg" alt="2" />
-                                                                    <div class="item-mask">
-                                                                        <div class="item-caption">
-                                                                            <h5 class="text-light">Vivamus elementum semper</h5>
-                                                                            <p class="text-light">Photo</p>
-                                                                        </div>
-                                                                    </div>
-                                                                </a>
-                                                            </div><!--end item-box-->
-                                                        </div><!--end col-->
-                                        
-                                                        <div class="col-lg-4 col-md-6 p-0 nf-item branding coffee spacing">
-                                                            <div class="item-box">
-                                                                <a class="cbox-gallary1 mfp-image" href="<?= base_url() ?>assets/images/small/img-3.jpg" title="Quisque rutrum">
-                                                                    <img class="item-container" src="<?= base_url() ?>assets/images/small/img-3.jpg" alt="4" />
-                                                                    <div class="item-mask">
-                                                                        <div class="item-caption">
-                                                                            <h5 class="text-light">Quisque rutrum</h5>
-                                                                            <p class="text-light">Branding, Design, Coffee</p>
-                                                                        </div>
-                                                                    </div>
-                                                                </a>
-                                                            </div><!--end item-box-->
-                                                        </div><!--end col-->
-                                        
-                                                        <div class="col-lg-4 col-md-6 p-0 nf-item branding design spacing">
-                                                            <div class="item-box">
-                                                                <a class="cbox-gallary1 mfp-image" href="<?= base_url() ?>assets/images/small/img-4.jpg" title="Tellus eget condimentum">
-                                                                    <img class="item-container" src="<?= base_url() ?>assets/images/small/img-4.jpg" alt="5" />
-                                                                    <div class="item-mask">
-                                                                        <div class="item-caption">
-                                                                            <h5 class="text-light">Tellus eget condimentum</h5>
-                                                                            <p class="text-light">Design</p>
-                                                                        </div>
-                                                                    </div>
-                                                                </a>
-                                                            </div><!--end item-box-->
-                                                        </div><!--end col-->
-                                        
-                                                        <div class="col-lg-4 col-md-6 p-0 nf-item branding design spacing">
-                                                            <div class="item-box">
-                                                                <a class="cbox-gallary1 mfp-image" href="<?= base_url() ?>assets/images/small/img-5.jpg" title="Nullam quis ant">
-                                                                    <img class="item-container" src="<?= base_url() ?>assets/images/small/img-5.jpg" alt="6" />
-                                                                    <div class="item-mask">
-                                                                        <div class="item-caption">
-                                                                            <h5 class="text-light">Nullam quis ant</h5>
-                                                                            <p class="text-light">Branding, Design</p>
-                                                                        </div>
-                                                                    </div>
-                                                                </a>
-                                                            </div><!--end item-box-->
-                                                        </div><!--end col-->
-                                        
-                                                        <div class="col-lg-4 col-md-6 p-0 nf-item photo spacing">
-                                                            <div class="item-box">
-                                                                <a class="cbox-gallary1 mfp-image" href="<?= base_url() ?>assets/images/small/img-6.jpg" title="Sed fringilla mauris">
-                                                                    <img class="item-container" src="<?= base_url() ?>assets/images/small/img-6.jpg" alt="1" />
-                                                                    <div class="item-mask">
-                                                                        <div class="item-caption">
-                                                                            <h5 class="text-light">Sed fringilla mauris</h5>
-                                                                            <p class="text-light">Photo</p>
-                                                                        </div>
-                                                                    </div>
-                                                                </a>
-                                                            </div><!--end item-box-->
-                                                        </div><!--end col-->
-                                                    </div><!--end row-->
-                                                </div><!--end card-body-->
-                                            </div><!--end card-->
-                                        </div><!--end col-->
-                                        <div class="col-lg-4">
-                                            <div class="card ">
-                                                <div class="card-body">
-                                                    <div class="text-center">
-                                                        <h4><i class="fas fa-quote-left text-primary"></i></h4>
-                                                    </div>                                            
-                                                    <div id="carouselExampleFade2" class="carousel slide" data-ride="carousel">
-                                                        <div class="carousel-inner">
-                                                            <div class="carousel-item">
-                                                                <div class="text-center">
-                                                                    <p class="text-muted px-4">
-                                                                        It is a long established fact that a reader will be distracted by 
-                                                                        the readable content of a page when looking at its layout. 
-                                                                        The point of using Lorem Ipsum is that it has a more-or-less 
-                                                                        normal distribution of letters, as opposed to using.
-                                                                    </p>
-                                                                    <div class="">
-                                                                        <img src="<?= base_url() ?>assets/images/users/user-10.jpg" alt="" class="rounded-circle thumb-lg mb-2">
-                                                                        <p class="mb-0 text-primary"><b>- Mary K. Myers</b></p>
-                                                                        <small class="text-muted">CEO Facebook</small>
-                                                                    </div>                                                            
-                                                                </div>
-                                                            </div>
-                                                            <div class="carousel-item active">
-                                                                <div class="text-center">
-                                                                    <p class="text-muted px-4">                                                                
-                                                                        Where does it come from?
-                                                                        Contrary to popular belief, Lorem Ipsum is not simply random text. 
-                                                                        It has roots in a piece of classical Latin literature from 45 BC, 
-                                                                        making it over 2000 years  popular belief,old.
-                                                                    </p>
-                                                                    <div class="">
-                                                                        <img src="<?= base_url() ?>assets/images/users/user-4.jpg" alt="" class="rounded-circle  thumb-lg mb-2">
-                                                                        <p class="mb-0 text-primary"><b>- Michael C. Rios</b></p>
-                                                                        <small class="text-muted">CEO Facebook</small>
-                                                                    </div>                                                            
-                                                                </div>
-                                                            </div>
-                                                            <div class="carousel-item">
-                                                                <div class="text-center">
-                                                                    <p class="text-muted px-4">
-                                                                        There are many variations of passages of Lorem Ipsum available, 
-                                                                        but the majority have suffered alteration in some form, by injected humour, 
-                                                                        or randomised words which don't look even slightly believable. 
-                                                                        If you are going to use a passage of Lorem Ipsum. 
-                                                                    </p>
-                                                                    <div class="">
-                                                                        <img src="<?= base_url() ?>assets/images/users/user-5.jpg" alt="" class="rounded-circle  thumb-lg mb-2">
-                                                                        <p class="mb-0 text-primary"><b>- Lisa D. Pullen</b></p>
-                                                                        <small class="text-muted">CEO Facebook</small>
-                                                                    </div>                                                            
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div><!--end row-->
-                                </div><!--end portfolio detail-->
                                 
                                 <div class="tab-pane fade" id="settings_detail">
                                     <div class="row">
@@ -729,7 +560,7 @@
                                                             </div>
                                                          
                                                             <div class="form-group">
-                                                                <textarea rows="5" placeholder="Message" class="form-control"></textarea>
+                                                             
                                                                 <button class="btn btn-gradient-primary btn-sm px-4 mt-3 float-right mb-0">Guardar Configuración</button>
                                                             </div>
                                                         </form>
@@ -940,12 +771,28 @@
         <button type="button" onclick="ini.inicio.cerrarModalFoto()" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
         <div class="modal-body">
-         <label for="foto">Agregar Nueva Foto en JPG o PNG</label>
-         <input type="file" class="form-control" id="foto" name="foto" accept=".png">
+           <div class="met-profile-main-pic">
+               <?php
+                $foto = !empty($datos->ruta_foto_relativa)
+                    ? base_url() . $datos->ruta_foto_relativa
+                    : base_url() . 'assets/images/users/patient-pro.png';
+                $alt  = htmlspecialchars($datos->nombre ?? 'Foto de perfil', ENT_QUOTES, 'UTF-8');
+                ?>
+                <img
+                src="<?= $foto ?>"
+                alt="<?= $alt ?>"
+                class="avatar"
+                width="125" height="125"
+                loading="lazy"
+                onerror="this.onerror=null;this.src='<?= base_url() ?>assets/images/users/patient-pro.png';"
+                />
+            </div>
+          <label for="foto">Agregar Nueva Foto en JPG o PNG</label>
+         <input type="file" class="form-control" id="foto" name="foto" accept=".jpg, .jpeg, .png">
         </div>
       <div class="modal-footer">
         <button type="button" onclick="ini.inicio.cerrarModalFoto()" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" onclick="guardarFoto();" class="btn btn-primary" >Guardar</button>
+        <button type="button" id="btnFotos" onclick="guardarFoto();" class="btn btn-primary" >Guardar</button>
       </div>
     </div>
   </div>
@@ -981,10 +828,10 @@
         <script src="<?= base_url() ?>plugins/chartjs/roundedBar.min.js"></script>
         <script src="<?= base_url() ?>plugins/lightpick/lightpick.js"></script>
         <script src="<?= base_url() ?>assets/pages/jquery.profile.init.js"></script>
-        
-        <!-- App js -->
-        <script src="<?= base_url() ?>assets/js/app.js"></script>
 
+<script src="<?= base_url(); ?>assets/pages/jquery.analytics_dashboard.init.js"></script>
+        
+ 
 <script>
 function guardarFoto() {
     // Usar JavaScript puro para evitar problemas con jQuery
@@ -1010,6 +857,9 @@ function guardarFoto() {
         data: formData,
         contentType: false,
         processData: false,
+        beforeSend: function(){
+            $('#btnFotos').prop('disabled', true).html('Guardando...'); 
+        },
         success: function(response) {
             if(!response.error){
                 Swal.fire("Correcto", response.respuesta, "success");
@@ -1019,6 +869,9 @@ function guardarFoto() {
             } else {
                 Swal.fire("Error", "Favor de llamar al Administrador", "error");
             }
+        },
+        complete: function(){
+           $('#btnFotos').prop('disabled', false).html('Guardar'); 
         },
         error: function(xhr, status, error) {
             console.log(error);
