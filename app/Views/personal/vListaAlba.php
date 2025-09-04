@@ -67,20 +67,20 @@
                                             <td class="text-center"><?= $u->id_sexo==1?'HOMBRE':'MUJER' ?></td>
                                             <td class="text-center"><?= $u->nacionalidad?></td>
                                             <td class="text-center">
-                                         <!-- tu trigger -->
+                                         <?php if(in_array($session->get('id_perfil'), [1,6])): ?>
                                                 <a href="javascript:void(0);"
                                                 onclick="ini.inicio.getAlba(<?= $u->id_alba ?>)" >
                                                 <i class="mdi mdi-pencil text-success font-18"></i>
                                                 </a>
-
-
-                                                 <a href="<?php echo base_url(). $u->protocolo ?>" target="_blank"
+                                        <?php endif; ?>
+                                                 <a href="<?php echo base_url().$u->protocolo ?>" target="_blank"
                                                     data-animation="bounce" ><i
                                                         class="mdi mdi-eye text-success font-18"></i></a>
+                                        <?php if(in_array($session->get('id_perfil'), [1,6])): ?>
                                                 <a href="javascript:void(0);"
                                                     onclick="ini.inicio.deleteAlba(<?=$u->id_alba?>)"><i
                                                         class="mdi mdi-trash-can text-danger font-18"></i></a>
-                                               
+                                         <?php endif; ?>      
 
                                             </td>
                                         </tr>
@@ -234,12 +234,7 @@
                                 </button>
                             </div>
                         </div>
-           
-
                     </form>
-
-
-
                 </div>
             </div>
         </div>

@@ -3046,6 +3046,15 @@ ini.inicio = (function () {
                     });
 
         },
+        modalActividad: function(event)
+        {
+            if(event){
+              $("#modalActividad").modal("show");
+            }else{
+               $("#modalActividad").modal("hide"); 
+            }
+         
+        },
         altaAlba: function(){
         $("#formAgregarAlba").submit(function (e) {
             e.preventDefault(); 
@@ -3087,7 +3096,7 @@ ini.inicio = (function () {
                         $('#btnAlba').prop('disabled', false).html('Guardar');
                     },
                     error: function (response,jqXHR, textStatus, errorThrown) {
-                        var res= JSON.parse(response.responseText);
+                       
                         Swal.fire("Error", '<p> '+ res.message + '</p>'); 
                         $('#btnAlba').prop('disabled', false).html('Guardar');
                     }

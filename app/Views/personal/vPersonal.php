@@ -68,7 +68,12 @@
                                     </p> 
                                     <div>
                                         <button type="button" class="btn btn-sm btn-soft-secondary">Ver actividades</button>
-                                        <button type="button" class="btn btn-sm btn-soft-primary">Agregar Actividad</button>
+                                        <button type="button"
+                                                class="btn btn-sm btn-soft-primary"
+                                                onclick="ini.inicio.modalActividad(true);">
+                                        Agregar Actividad
+                                        </button>
+
                                     </div>
                                 </div><!--end card-body-->                                                                     
                             </div>  <!--end card-->                          
@@ -85,11 +90,11 @@
                                         <table class="table mb-0">
                                             <thead class="thead-light">
                                                 <tr>
+                                                    <th class="border-top-0">Personal</th>
                                                     <th class="border-top-0">Actividad</th>
-                                                    <th class="border-top-0">Total Calls</th>
-                                                    <th class="border-top-0">Calls Answered</th>
-                                                    <th class="border-top-0">Avg.Speed of answer</th>
-                                                    <th class="border-top-0">Avance%</th>
+                                                    <th class="border-top-0">Inicio</th>
+                                                    <th class="border-top-0">Termino</th>
+                                                    <th class="border-top-0">Avance en %</th>
                                                     <th class="border-top-0">Acciones</th>
                                                 </tr><!--end tr-->
                                             </thead>
@@ -203,6 +208,74 @@
                     </div><!--end row-->
 
                 </div><!-- container -->
+<div id="modalActividad" class="modal fade bs-example" tabindex="-1" aria-labelledby="modalActividadLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 id="modalActividadLabel" class="modal-title">Nueva actividad</h5>
+        <button type="button" class="btn-close" onclick="ini.inicio.modalActividad(false)" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+         <div class="row">
+                                         
+                                            <div class="col-md-2">
+                                                <div class="mb-3 position-relative" id="">
+                                                    <label for="fec_inicio"
+                                                        class="form-label">FEC. INICIO</label>
+                                                    <input type="date" autocomplete="off" class="form-control"
+                                                        id="fec_inicio" name="fec_inicio">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="mb-3 position-relative" id="">
+                                                    <label for="fec_fin"
+                                                        class="form-label ">FEC. FIN</label>
+                                                    <input type="date" autocomplete="off" class="form-control"
+                                                        id="fec_fin" name="fec_fin"
+                                                        >
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3 position-relative" id="">
+                                                    <label for="actividad"
+                                                        class="form-label ">ACTIVIDAD</label>
+                                                    <input type="text" autocomplete="off" class="form-control"
+                                                        id="actividad" name="actividad"
+                                                        placeholder="Agregar Actividad..">
+                                                </div>
+                                            </div>
+                                             <div class="col-md-4">
+                                                <div class="mb-3 position-relative" id="">
+                                                    <label for="estatus"
+                                                        class="form-label ">ESTATUS</label>
+                                                    <select autocomplete="off" class="form-control"
+                                                        id="estatus" name="estatus">
+                                                         <option value="1">ALTA</option>
+                                                         <option value="2">MEDIA</option>
+                                                         <option value="3">BAJA</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                                <div class="mb-3 position-relative" >
+                                                    <label for="des_actividad"
+                                                        class="form-label">DESCRIPCION</label>
+                                                    <textarea autocomplete="off" class="form-control"
+                                                        id="des_actividad" name="des_actividad"></textarea>
+                                                </div>
+                                            </div>
+      </div>
+      
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" onclick="ini.inicio.modalActividad(false)">Cerrar</button>
+        <button type="button" class="btn btn-primary">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
  <!-- App css -->
         <link href="<?= base_url();?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
@@ -220,10 +293,7 @@
         <script src="<?= base_url();?>assets/js/waves.js"></script>
         <script src="<?= base_url();?>assets/js/feather.min.js"></script>
         <script src="<?= base_url();?>assets/js/jquery.slimscroll.min.js"></script>
-        <script src="<?= base_url();?>plugins/apexcharts/apexcharts.min.js"></script> 
-
+      
         <script src="<?= base_url();?>assets/pages/jquery.agents.init.js"></script> 
-        
-        <!-- App js -->
-        <script src="<?= base_url();?>assets/js/app.js"></script>
+
         

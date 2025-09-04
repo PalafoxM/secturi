@@ -1465,11 +1465,20 @@ class Agregar extends BaseController {
             return $this->respond($response);
         }
         if(empty($data['primer_apellido'])){
+
             $response->respuesta = 'El primer_apellido es requerido';
             return $this->respond($response);
         }
         if(empty($data['fecha_nacimiento'])){
             $response->respuesta = 'El fecha_nacimiento es requerido';
+            return $this->respond($response);
+        }
+        if(empty($data['municipio'])){
+            $response->respuesta = 'El municipio es requerido';
+            return $this->respond($response);
+        }
+          if(empty($data['nacionalidad'])){
+            $response->respuesta = 'El nacionalidad es requerido';
             return $this->respond($response);
         }
       //  if($this->validarViativos()); return false
@@ -1478,6 +1487,7 @@ class Agregar extends BaseController {
         'primer_apellido'  =>$data['primer_apellido'],
         'segundo_apellido' =>$data['segundo_apellido'],
         'nacionalidad'     =>$data['nacionalidad'],
+        'id_municipio'     =>(int)$data['municipio'],
         'edad'             =>$data['edad'],
         'foto'             =>$ruta_relativa,
         'protocolo'        =>$ruta_relativa2,
