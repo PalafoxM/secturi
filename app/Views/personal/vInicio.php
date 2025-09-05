@@ -379,16 +379,9 @@
                                                     <div class="card">
                                                         <div class="card-body">
                                                             <div class="p-4 bg-light text-center align-item-center">                                                                    
-                                                                <h1 class="font-weight-semibold">4.8</h1> 
-                                                                <h4 class="header-title">Overall Rating</h4>  
-                                                                <ul class="list-inline mb-0 product-review">
-                                                                    <li class="list-inline-item mr-0"><i class="mdi mdi-star text-warning font-24"></i></li>
-                                                                    <li class="list-inline-item mr-0"><i class="mdi mdi-star text-warning font-24"></i></li>
-                                                                    <li class="list-inline-item mr-0"><i class="mdi mdi-star text-warning font-24"></i></li>
-                                                                    <li class="list-inline-item mr-0"><i class="mdi mdi-star text-warning font-24"></i></li>
-                                                                    <li class="list-inline-item mr-0"><i class="mdi mdi-star-half text-warning font-24"></i></li>
-                                                                    <li class="list-inline-item"><small class="text-muted">Total Review (700)</small></li>
-                                                                </ul>                                     
+                                                                <h1 class="font-weight-semibold">Hoy no hay Eventos</h1> 
+                                                                <h4 class="header-title">Sin eventos</h4>  
+                                                                                                  
                                                             </div> 
                                                         </div><!--end card-body-->                                                                                                  
                                                     </div><!--end card-->
@@ -540,7 +533,7 @@
                                                                      <label for="fec_nac">Fecha de Nacimiento</label>
                                                                 </div>
                                                                  <div class="col-md-4">
-                                                                    <input type="checkbox" class="checkbox checkbox-primary" name="edad" id="edad" <?= (isset($configuracion) && $configuracion->edad==0)?'':'checked' ?>>
+                                                                    <input type="checkbox" class="checkbox checkbox-primary" name="edad" id="edad" <?= (isset($configuracion) && !empty($configuracion) && $configuracion->edad==0)?'':'checked' ?>>
                                                                      <label for="edad">Edad</label>
                                                                 </div>
                                                                  <div class="col-md-4">

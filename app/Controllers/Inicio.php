@@ -76,10 +76,10 @@ class Inicio extends BaseController {
         }
         $actividad     = $globas->getTabla(['tabla' => 'vw_actividad', 'where' => ['visible' => 1, "id_usuario" => $session->id_usuario]])->data;
         $configuracion = $globas->getTabla(['tabla' => 'vw_configuracion', 'where' => ['visible' => 1, "id_usuario" => $session->id_usuario]])->data;
-        //echo "<pre>";
-        //print_r($configuracion );
-        //echo "</pre>";
-        //die();
+       /*  echo "<pre>";
+        print_r($configuracion );
+        echo "</pre>";
+        die();  */
         $data['actividad']       = (isset($actividad) && !empty($actividad))?$actividad:[];
         $data['configuracion']   = (isset($configuracion[0]) && !empty($configuracion))?$configuracion[0]:'';
         $data['personal']        = $personal;
@@ -144,7 +144,7 @@ class Inicio extends BaseController {
         $session = \Config\Services::session();
         $globas  = new Mglobal;
         $vista = 'personal/vInicio';
-        $data['datos'] = $globas->getTabla(['tabla' => 'juridico_viaticos', 'where' => ['visible' => 1]])->data;
+        $data['datos'] = $globas->getTabla(['tabla' => 'vw_juridico_viaticos', 'where' => ['visible' => 1]])->data;
         $data['scripts'] = array('principal','inicio');
         $data['edita'] = 0;
         $data['contentView'] = 'personal/vListaViaticos';                
@@ -169,6 +169,10 @@ class Inicio extends BaseController {
         $data['cat_pais']        = $globas->getTabla(['tabla' => 'cat_pais', 'where' => ['visible' => 1]])->data;
         $data['cat_estado']      = $globas->getTabla(['tabla' => 'cat_estado', 'where' => ['visible' => 1]])->data;
         $data['cat_municipios']  = $globas->getTabla(['tabla' => 'cat_municipios', 'where' => ['visible' => 1]])->data;
+        $data['deno_puesto']     = $globas->getTabla(['tabla' => 'deno_puesto', 'where' => ['visible' => 1]])->data;
+        $data['deno_cargo']      = $globas->getTabla(['tabla' => 'deno_cargo', 'where' => ['visible' => 1]])->data;
+        $data['cat_area']        = $globas->getTabla(['tabla' => 'cat_area_adscripcion', 'where' => ['visible' => 1]])->data;
+       // die( var_dump( $data['deno_puesto'] ) );
         $data['usuarios']  = $globas->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]])->data;
         $data['scripts']         = array('inicio', 'principal');
         $data['edita'] = 0;

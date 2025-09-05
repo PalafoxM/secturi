@@ -2013,7 +2013,7 @@ class Principal extends BaseController {
     {  
         $session = \Config\Services::session();
         $globals = new Mglobal;
-        if(in_array($session->get('id_perfil'), [1,2])){
+        if(in_array($session->get('id_perfil'), [1,2,7])){
          $registro_go = $globals->getTabla(['tabla' => 'vw_registro_go', 'where' => ['visible' => 1]]);
         }else{
             $registro_go = $globals->getTabla(['tabla' => 'vw_registro_go', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]]);

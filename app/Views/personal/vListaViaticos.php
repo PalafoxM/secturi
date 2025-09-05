@@ -41,7 +41,8 @@
                                                         <th class="text-center">EJERCICIO</th>
                                                         <th class="text-center">INICIO</th>
                                                         <th class="text-center">TERMINO</th>
-                                                        <th class="text-center">PUESTO</th>
+                                                        <th class="text-center">INTEGRANTE</th>
+                                                        <th class="text-center">DENOMINACION</th>
                                                         <th class="text-center">ACCIONES</th>
                                                     </tr>
                                                     <!--end tr-->
@@ -50,9 +51,10 @@
                                                     <?php foreach ($datos as $p): ?>
                                                     <tr>
                                                         <td class="text-center"><?= $p->ejercicio ?></td>
-                                                        <td class="text-center"><?= date('d-m-Y', strtotime($p->fecha_inicio)) ?></td>
-                                                        <td class="text-center"><?= date('d-m-Y', strtotime($p->fecha_termino)) ?></td>
-                                                        <td class="text-center"><?= $p->denominacion_puesto ?></td>
+                                                        <td class="text-center"><?= date('d/m/Y', strtotime($p->fecha_inicio)) ?></td>
+                                                        <td class="text-center"><?= date('d/m/Y', strtotime($p->fecha_termino)) ?></td>
+                                                        <td class="text-center"><?= $p->dsc_tipo_funcionario ?></td>
+                                                        <td class="text-center"><?= $p->dsc_denominacion ?></td>
                                                         <td class="text-center">
                                                              <a style="color:white" onclick="ini.inicio.reserva(<?= $p->id_juridico_viatico ?>);" title="Seccionar Proveedor"
                                                                
