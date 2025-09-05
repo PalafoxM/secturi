@@ -204,7 +204,7 @@
                                                                     </div>                                                                                              
                                                                     </div>
                                                                 </div>
-                                                                <?php if($c['id_edad']==0): ?>
+                                                                <?php if($c['id_edad']!='0'): ?>
                                                                 <span class="text-success"><?= $c['edad']; ?> años</span>
                                                                 <?php endif; ?>
                                                             </li>
@@ -540,7 +540,7 @@
                                                                      <label for="fec_nac">Fecha de Nacimiento</label>
                                                                 </div>
                                                                  <div class="col-md-4">
-                                                                    <input type="checkbox" class="checkbox checkbox-primary" name="edad" id="edad" <?= ($configuracion->edad==0)?'':'checked' ?>>
+                                                                    <input type="checkbox" class="checkbox checkbox-primary" name="edad" id="edad" <?= (isset($configuracion) && $configuracion->edad==0)?'':'checked' ?>>
                                                                      <label for="edad">Edad</label>
                                                                 </div>
                                                                  <div class="col-md-4">

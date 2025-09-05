@@ -111,6 +111,7 @@ class Inicio extends BaseController {
                 $edad = $hoy->diff($fecha_nacimiento)->y;
                  $personal[] =  [
                       'nombre_completo'  => $c->nombre,
+                      'id_edad'          => $c->id_edad,
                       'edad'             => $edad,
                       'ruta_foto_relativa' =>$c->ruta_foto_relativa,
                       'dia'             =>  date('d', strtotime($c->fec_nac))
@@ -118,6 +119,14 @@ class Inicio extends BaseController {
            
             }
         }
+         $actividad     = $globas->getTabla(['tabla' => 'vw_actividad', 'where' => ['visible' => 1, "id_usuario" => $session->id_usuario]])->data;
+        $configuracion = $globas->getTabla(['tabla' => 'vw_configuracion', 'where' => ['visible' => 1, "id_usuario" => $session->id_usuario]])->data;
+        //echo "<pre>";
+        //print_r($configuracion );
+        //echo "</pre>";
+        //die();
+        $data['actividad']       = (isset($actividad) && !empty($actividad))?$actividad:[];
+        $data['configuracion']   = (isset($configuracion[0]) && !empty($configuracion))?$configuracion[0]:'';
       
         //die( var_dump( $personal  ) );
 
