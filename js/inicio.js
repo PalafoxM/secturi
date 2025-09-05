@@ -3047,6 +3047,49 @@ ini.inicio = (function () {
             var modal = new bootstrap.Modal(document.getElementById('modalAlba'));
             modal.show();
         },
+        formConfiguracion: function()
+        {
+              $("#formConfiguracion").submit(function (e) {
+                e.preventDefault(); 
+            
+                var formData = $("#formConfiguracion").serialize();
+             
+                $.ajax({
+                    type: "POST",
+                    url: base_url + "index.php/Agregar/formConfiguracion",
+                    data:formData,
+                    dataType: "json",
+                     beforeSend: function()
+                    {
+                      $('#btnConfig').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                    },
+                    success: function (response) {
+                        console.log(response);
+                        if(response.error){
+                            Swal.fire("error", response.respuesta ,"error");
+                        }else{
+                            Swal.fire("success", response.respuesta, 'success');
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1500);
+                      
+                       }
+                       
+                    },
+                    complete: function()
+                    {
+                      $('#btnConfig').prop('disabled', false).html('Guardar Configuración');
+                    },
+                    error: function (response,jqXHR, textStatus, errorThrown) {
+                         var res= JSON.parse (response.responseText);
+                        //  console.log(res.message);
+                         Swal.fire("Error", '<p> '+ res.message + '</p>', 'error');  
+                        $('#btnConfig').prop('disabled', false).html('Guardar Configuración');
+                    }
+                });
+            });
+
+        },
         getAlba: function(id_alba){
            var modal = new bootstrap.Modal(document.getElementById('modalAlba'));
             modal.show();

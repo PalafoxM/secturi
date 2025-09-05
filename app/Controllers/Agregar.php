@@ -1537,6 +1537,36 @@ class Agregar extends BaseController {
         }
         return $this->respond($response);
     }
+    public function formConfiguracion()
+    {
+     $session  = \Config\Services::session();
+     $response = new stdClass();
+     $response->error = true;
+     $globals  = new Mglobal;
+     $response->respuesta = 'Error al traer la tabla';
+     $data     = $this->request->getPost();
+
+     $dataInsert = [
+        "fec_nac"     => (isset($data['fec_nac']) && !empty($data['fec_nac']))?1:0,
+        "edad"        => (isset($data['edad']) && !empty($data['edad']))?1:0,
+        "nivel"       => (isset($data['nivel']) && !empty($data['nivel']))?1:0,
+        "no_empleado" => (isset($data['no_empleado']) && !empty($data['no_empleado']))?1:0,
+        "sexo"        => (isset($data['sexo']) && !empty($data['sexo']))?1:0,
+        "contrato"    => (isset($data['contrato']) && !empty($data['contrato']))?1:0,
+        "id_usuario"  => $session->id_usuario,
+     ];
+
+     $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaConfiguracion'];
+     $dataConfig = [
+                "tabla" => "configuracion",
+                "editar" => false
+                //"idEditar" => ['id_area' => (int)$data['id_area']]
+            ];
+     $response = $globals->saveTabla($dataInsert, $dataConfig,$dataBitacora);
+     return $this->respond($response);
+
+     
+    }
     public function formViatico()
     {
         $session  = \Config\Services::session();

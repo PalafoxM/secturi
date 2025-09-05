@@ -204,7 +204,9 @@
                                                                     </div>                                                                                              
                                                                     </div>
                                                                 </div>
+                                                                <?php if($c['id_edad']==0): ?>
                                                                 <span class="text-success"><?= $c['edad']; ?> años</span>
+                                                                <?php endif; ?>
                                                             </li>
                                                         <?php endforeach; ?>
                                                     </ul>                                       
@@ -529,7 +531,7 @@
                                                     
         
                                                     <div class="">
-                                                        <form class="form-horizontal form-material mb-0">
+                                                        <form id="formConfiguracion" class="form-horizontal form-material mb-0">
                                                             <h3>Información Visible en SUSI<h3>
                                                             
                                                             <div class="form-group row">
@@ -538,7 +540,7 @@
                                                                      <label for="fec_nac">Fecha de Nacimiento</label>
                                                                 </div>
                                                                  <div class="col-md-4">
-                                                                    <input type="checkbox" class="checkbox checkbox-primary" name="edad" id="edad" checked>
+                                                                    <input type="checkbox" class="checkbox checkbox-primary" name="edad" id="edad" <?= ($configuracion->edad==0)?'':'checked' ?>>
                                                                      <label for="edad">Edad</label>
                                                                 </div>
                                                                  <div class="col-md-4">
@@ -554,14 +556,13 @@
                                                                      <label for="sexo">Sexo</label>
                                                                 </div>
                                                                  <div class="col-md-4">
-                                                                    <input type="checkbox" class="checkbox checkbox-primary" name="sexo" id="sexo" checked>
-                                                                     <label for="sexo">Tipo de Contrato</label>
+                                                                    <input type="checkbox" class="checkbox checkbox-primary" name="contrato" id="contrato" checked>
+                                                                     <label for="contrato">Tipo de Contrato</label>
                                                                 </div>
                                                             </div>
                                                          
                                                             <div class="form-group">
-                                                             
-                                                                <button class="btn btn-gradient-primary btn-sm px-4 mt-3 float-right mb-0">Guardar Configuración</button>
+                                                                <button type="submit" id="btnConfig" class="btn btn-gradient-primary btn-sm px-4 mt-3 float-right mb-0">Guardar Configuración</button>
                                                             </div>
                                                         </form>
                                                     </div>
@@ -833,6 +834,7 @@
         
  
 <script>
+    ini.inicio.formConfiguracion();
 function guardarFoto() {
     // Usar JavaScript puro para evitar problemas con jQuery
     const fotoInput = document.getElementById('foto');
