@@ -129,6 +129,40 @@ ini.inicio = (function () {
         });
           
         },
+       formContrasenia: function()
+       {
+          var formData = $("#formContrasenia").serialize();
+           $.ajax({
+                type: "POST",
+                url: base_url + "index.php/Principal/formContrasenia",
+                dataType: "json",
+                data:formData,
+                beforeSend: function()
+                {
+                 $('#btnPass').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                },
+                success: function(data) {
+                    console.log(data);
+                    if (!data.error) {
+                        Swal.fire("Éxito", data.respuesta, "success");
+                        setTimeout(() => {
+                          window.location.href = base_url + 'index.php/Login/cerrar';
+                        }, 1500);
+                      
+                    } else {
+                        Swal.fire("info",  data.respuesta , "info");
+                    }
+                },
+                complete: function()
+                {
+                 $("#btnPass").prop('disabled', false).html('Guardar');
+                },
+                error: function() {
+                    Swal.fire("info", "No se encontraron datos del usuario.", "info");
+                    $("#btnPass").prop("disabled", false).html('Guardar');
+                }
+            });
+       },
         enviarCorreo: function(id_participante)
         {
             $.ajax({
@@ -182,6 +216,36 @@ ini.inicio = (function () {
             }
         });
           
+        },
+        cerrarUsuario: function()
+        {
+          $("#modalUsuario").modal('hide');
+        },
+        verDetalles: function(id){
+            $.ajax({
+                type: "POST",
+                url: base_url + "index.php/Usuario/getUsuario",
+                dataType: "json",
+                data:{id_usuario:id},
+              success: function(data) {
+                    let img = (data.ruta_foto_relativa)?`<img src="${base_url+data.ruta_foto_relativa}" class="img-fluid rounded"/>`:'';
+                    if (data) {
+                        $(".met-profile-main-pic").html(`
+                            <p> ${data.nombre} ${data.primer_apellido} ${data.segundo_apellido}</p>
+                            <p><strong>Nivel: ${data.nivel} | ${data.dsc_tipo_empleado} | ${data.dsc_puesto}</strong></p>
+                            ${img}
+                        `);
+                    } else {
+                        Swal.fire("info", "No se encontraron datos del usuario.", "info");
+                    }
+                },
+                complete: function(){
+                   $("#modalUsuario").modal('show');
+                },
+                error: function() {
+                    Swal.fire("info", "No se encontraron datos del usuario.", "info");
+                }
+            });
         },
         getUsuario: function(id){
             

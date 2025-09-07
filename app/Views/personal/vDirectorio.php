@@ -12,8 +12,8 @@
                     <div class="page-title-box">
                         <div class="float-right">
                             <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="javascript:void(0);">Metrica</a></li>
-                                <li class="breadcrumb-item"><a href="javascript:void(0);">Analytics</a></li>
+                                <li class="breadcrumb-item"><a href="javascript:void(0);">SUSI</a></li>
+                                <li class="breadcrumb-item"><a href="javascript:void(0);">Personal</a></li>
                                 <li class="breadcrumb-item active">Directorio</li>
                             </ol>
                         </div>
@@ -50,10 +50,10 @@
                                         <?php foreach($usuario as $u): ?>
                                         <tr>
                                             <?php if(!empty($u->ruta_foto_relativa )): ?>
-                                            <td class="text-center"><img src="<?= base_url().$u->ruta_foto_relativa ?>" alt="" class="rounded-circle thumb-sm mr-1"></td>
+                                            <td class="text-center"><a href="javascript:void(0);" onclick="ini.inicio.verDetalles(<?= $u->id_usuario?>)" ><img src="<?= base_url().$u->ruta_foto_relativa ?>" alt="" class="rounded-circle thumb-sm mr-1"></a></td>
                                             <?php endif; ?>
                                              <?php if(empty($u->ruta_foto_relativa )): ?>
-                                                <td class="text-center"><img src="<?= base_url() ?>assets/images/users/user-3.jpg" alt="" class="rounded-circle thumb-sm mr-1"></td>
+                                            <td class="text-center"><a href="javascript:void(0);" onclick="ini.inicio.verDetalles(<?= $u->id_usuario?>)" ><img src="<?= base_url() ?>assets/images/users/user-3.jpg" alt="" class="rounded-circle thumb-sm mr-1"></a></td>
                                             <?php endif; ?>
                                       
                                             <td><?= $u->nombre_completo ?></td>
@@ -72,7 +72,25 @@
             </div>
         </div>
     </div>
-
+<div class="modal fade" id="modalUsuario" tabindex="-1" aria-labelledby="" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="">Agregar Imagen</h5>
+        <button type="button" onclick="ini.inicio.cerrarUsuario()" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+        <div class="modal-body">
+           <div class="met-profile-main-pic">
+               
+               
+            </div>
+        </div>
+      <div class="modal-footer">
+        <button type="button" onclick="ini.inicio.cerrarUsuario()" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 
     <link href="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet"

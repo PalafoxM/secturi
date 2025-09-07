@@ -217,57 +217,13 @@
                                         </div><!--end col-->
 
                                         <div class="col-lg-8">
-                                            <div class="row">
-                                                <div class="col-lg-3">
-                                                    <div class="card dash-data-card text-center">
-                                                        <div class="card-body"> 
-                                                            <div class="icon-info mb-3">
-                                                                <i class="fas fa-ticket-alt bg-soft-warning"></i>
-                                                            </div>
-                                                            <h3 class="text-dark">184</h3>
-                                                            <h6 class="font-14 text-dark">Tickets Nuevos</h6>                                                                                                                            
-                                                        </div><!--end card-body--> 
-                                                    </div><!--end card-->   
-                                                </div><!-- end col-->
-                                                <div class="col-lg-3">
-                                                    <div class="card dash-data-card text-center">
-                                                        <div class="card-body"> 
-                                                            <div class="icon-info mb-3">
-                                                                <i class="fab fa-codepen bg-soft-pink"></i>
-                                                            </div>
-                                                            <h3 class="text-dark">101</h3>
-                                                            <h6 class="font-14 text-dark">Tickets En Proceso</h6>                                                                                                                            
-                                                        </div><!--end card-body--> 
-                                                    </div><!--end card-->   
-                                                </div><!-- end col-->  
-                                                <div class="col-lg-3">
-                                                    <div class="card dash-data-card text-center">
-                                                        <div class="card-body"> 
-                                                            <div class="icon-info mb-3">
-                                                                <i class="fas fa-check bg-soft-success"></i>
-                                                            </div>
-                                                            <h3 class="text-dark">18</h3>
-                                                            <h6 class="font-14 text-dark">Tikets Hechos</h6>                                                                                                                            
-                                                        </div><!--end card-body--> 
-                                                    </div><!--end card-->   
-                                                </div><!-- end col-->
-                                                <div class="col-lg-3">
-                                                    <div class="card dash-data-card text-center">
-                                                        <div class="card-body"> 
-                                                            <div class="icon-info mb-3">
-                                                                <i class="fas fa-lock bg-soft-primary"></i>
-                                                            </div>
-                                                            <h3 class="text-danger">92</h3>
-                                                            <h6 class="font-14 text-dark">Eliminados</h6>                                                                                                                            
-                                                        </div><!--end card-body--> 
-                                                    </div><!--end card-->   
-                                                </div><!-- end col-->                       
-                                            </div><!--end row-->
+                                            
                                     
                                             
                                      
                                             <div class="card dash-info-carousel">
                                                 <div class="card-body">
+                                                     <h4 class="mt-0 header-title mb-4">Protocolo ALBA Guanajuato</h4>
                                                     <div id="carousel_2" class="carousel slide" data-ride="carousel">
                                                         <div class="carousel-inner">
                                                              <?php foreach ($lista_alba as $index => $l): ?>
@@ -315,6 +271,42 @@
                                                     </div>
                                                 </div>
                                             </div> 
+                                            <div class="row">
+                                                <div class="col-lg-4">
+                                                    <div class="card dash-data-card text-center">
+                                                        <div class="card-body"> 
+                                                            <div class="icon-info mb-3">
+                                                                <i class="fas fa-ticket-alt bg-soft-warning"></i>
+                                                            </div>
+                                                            <h3 class="text-dark"><?= $tiketNuevo?></h3>
+                                                            <h6 class="font-14 text-dark">Nuevos Tickets</h6>                                                                                                                            
+                                                        </div><!--end card-body--> 
+                                                    </div><!--end card-->   
+                                                </div><!-- end col-->
+                                                <div class="col-lg-4">
+                                                    <div class="card dash-data-card text-center">
+                                                        <div class="card-body"> 
+                                                            <div class="icon-info mb-3">
+                                                                <i class="fab fa-codepen bg-soft-pink"></i>
+                                                            </div>
+                                                            <h3 class="text-dark"><?= $tiketProceso?></h3>
+                                                            <h6 class="font-14 text-dark">Tickets En Proceso</h6>                                                                                                                            
+                                                        </div><!--end card-body--> 
+                                                    </div><!--end card-->   
+                                                </div><!-- end col-->  
+                                                <div class="col-lg-4">
+                                                    <div class="card dash-data-card text-center">
+                                                        <div class="card-body"> 
+                                                            <div class="icon-info mb-3">
+                                                                <i class="fas fa-check bg-soft-success"></i>
+                                                            </div>
+                                                            <h3 class="text-dark"><?= $tiketConcluido?></h3>
+                                                            <h6 class="font-14 text-dark">Tikets Concluidos</h6>                                                                                                                            
+                                                        </div><!--end card-body--> 
+                                                    </div><!--end card-->   
+                                                </div><!-- end col-->
+                                                             
+                                            </div><!--end row-->
                                             <div class="row">
                                                  
                                                 <div class="col-lg-6">
@@ -379,8 +371,8 @@
                                                     <div class="card">
                                                         <div class="card-body">
                                                             <div class="p-4 bg-light text-center align-item-center">                                                                    
-                                                                <h1 class="font-weight-semibold">Hoy no hay Eventos</h1> 
-                                                                <h4 class="header-title">Sin eventos</h4>  
+                                                                <h1 class="font-weight-semibold"> <?= (!empty($eventos))?$eventos->evento :'Hoy no hay Eventos' ?> </h1> 
+                                                                <h4 class="header-title"><?= (!empty($eventos))?$eventos->dsc_eventos :'Sin evento' ?> </h4>  
                                                                                                   
                                                             </div> 
                                                         </div><!--end card-body-->                                                                                                  
@@ -427,7 +419,7 @@
                                         <div class="col-lg-4">
                                             <div class="card">                                       
                                                 <div class="card-body"> 
-                                                    <h4 class="header-title mt-0 mb-3">Sales Category</h4>
+                                                    <h4 class="header-title mt-0 mb-3">Hoy</h4>
                                                     <div class="row">
                                                         <div class="col-4">
                                                             <img src="<?= base_url() ?>assets/images/widgets/sales-re.svg" alt="" class="img-fluid">

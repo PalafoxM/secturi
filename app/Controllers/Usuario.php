@@ -575,8 +575,8 @@ class Usuario extends BaseController
         // var_dump($id_usuario);
         // die();
         $response = $this->globals->getTabla(["tabla"=>"vw_usuario","where"=>["id_usuario" => $id_usuario, "visible" => 1]])->data;
-        // var_dump($response[0]);
-        // die();
+        //var_dump($response[0]);
+        //die();
         return $this->respond($response[0]);
     }
     public function deleteParticipante()

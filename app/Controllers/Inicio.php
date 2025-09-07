@@ -98,6 +98,7 @@ class Inicio extends BaseController {
         $vista = 'personal/vInicio';
         $mes_actual = date('m');
 
+
         $cumple = $globas->getTabla([
             'tabla' => 'vw_usuario', 
             'where' => ['visible' => 1], 
@@ -119,15 +120,40 @@ class Inicio extends BaseController {
            
             }
         }
-         $actividad     = $globas->getTabla(['tabla' => 'vw_actividad', 'where' => ['visible' => 1, "id_usuario" => $session->id_usuario]])->data;
+        $data['eventos']  = "";
+        $fechaInicio   = date("Y-m-d");
+        $fechaFin      = date("Y-m-d");
+        $actividad     = $globas->getTabla(['tabla' => 'vw_actividad', 'where' => ['visible' => 1, "id_usuario" => $session->id_usuario]])->data;
         $configuracion = $globas->getTabla(['tabla' => 'vw_configuracion', 'where' => ['visible' => 1, "id_usuario" => $session->id_usuario]])->data;
-        //echo "<pre>";
-        //print_r($configuracion );
-        //echo "</pre>";
-        //die();
+
+        $tiket = $globas->getTabla(['tabla' => 'vw_tiket', 'where' => ['visible' => 1, "id_usuario" => $session->id_usuario]])->data;
+        $eventos = $globas->getTabla(['tabla' => 'eventos', 'where' => ['visible' => 1],  'whereMonth' => [['fecha', $mes_actual]] ])->data;
+        $tiketNuevo    = [];
+        $tiketProceso  = [];
+        $tiketConcluido= [];
+        foreach($eventos as $e){
+                 if(date('d-m') == date('d-m', strtotime($e->fecha))){
+                     $data['eventos'] = $e;
+                 }
+
+        }
+        foreach($tiket as $t){
+                 if($t->estatus == 0){
+                     $tiketNuevo[] = $t->estatus;
+                 }
+                 if($t->estatus == 1){
+                     $tiketConcluido[] = $t->estatus;
+                 }
+                 if($t->estatus == 2){
+                     $tiketProceso[] = $t->estatus;
+                 }
+
+        }
+        $data['tiketNuevo']      = count($tiketNuevo);
+        $data['tiketConcluido']  = count($tiketConcluido);
+        $data['tiketProceso']    = count($tiketProceso);
         $data['actividad']       = (isset($actividad) && !empty($actividad))?$actividad:[];
         $data['configuracion']   = (isset($configuracion[0]) && !empty($configuracion))?$configuracion[0]:'';
-      
         //die( var_dump( $personal  ) );
 
         $data['personal']   = $personal;

@@ -1677,6 +1677,35 @@ class Principal extends BaseController {
         $data['contentView'] = 'secciones/vListadoProveedor';                
         $this->_renderView($data); 
     }
+    public function formContrasenia()
+    {
+        $session = \Config\Services::session();
+        $globals      = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $data = $this->request->getPost();
+        if($data['contrasenia'] != $data['new_contrasenia']){
+            $response->respuesta = "Las contraseñas no coinciden";
+            return $this->respond($response);
+        }
+        if($data['contrasenia'] == '' || $data['new_contrasenia']==''){
+           $response->respuesta = "Los campos son requeridos";
+            return $this->respond($response);
+        }
+        $dataInsert=[
+            "contrasenia"=>md5($data['contrasenia']),
+            "usu_act"   =>$session->id_usuario
+        ];
+         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Principal.php/cambioContrasenia'];
+          $dataConfig = [
+                "tabla" => "usuario",
+                "editar" => true,
+                "idEditar" => ['id_usuario' => $session->id_usuario]
+            ];
+         $response = $globals->saveTabla($dataInsert, $dataConfig,$dataBitacora);
+         return $this->respond($response);
+
+    }
     public function formComentario()
     {
         $session = \Config\Services::session();

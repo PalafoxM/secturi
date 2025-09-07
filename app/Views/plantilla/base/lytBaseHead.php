@@ -620,6 +620,7 @@
                     </a>
                     <div class="dropdown-menu dropdown-menu-right">
                         <a class="dropdown-item" href="<?php echo base_url()?>index.php/Inicio/Perfil"><i class="dripicons-user text-muted mr-2"></i> Perfil</a>
+                           <a class="dropdown-item" data-toggle="modal" data-animation="bounce" data-target=".hide-modal" href="<?php echo base_url()?>index.php/Inicio/CambiarPass"><i class="dripicons-lock text-muted mr-2"></i> Cambiar Contraseña</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="<?php echo base_url()?>index.php/Login/cerrar"><i
                                 class="dripicons-exit text-muted mr-2"></i> Salir</a>
@@ -690,6 +691,50 @@
         </nav>
         <!-- end navbar-->
     </div>
+
+
+                 <div class="modal fade hide-modal" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title mt-0" id="exampleModalLabel">Cambiar Contraseña</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="p-3">
+                                    <form id="formContrasenia" >
+            
+                                        <div class="text-center mb-4">
+                                            <div class="avatar-box thumb-xl align-self-center mr-2">
+                                                <span class="avatar-title bg-light rounded-circle text-danger"><i class="fas fa-lock"></i></span>
+                                            </div>
+                                        </div>
+                                      
+                                        <div class="input-group">
+                                            <input type="password" id="contrasenia" name="contrasenia" class="form-control" placeholder="Nueva Contraseña" aria-label="Password" aria-describedby="HideCard">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-gradient-primary" type="button" id="HideCard"><i class="mdi mdi-key"></i></button>
+                                            </div>
+                                        </div>
+                                         <br>
+                                        <div class="input-group">
+                                            <input type="password" id="new_contrasenia" name="new_contrasenia" class="form-control" placeholder="Ingresar nuevamente la contraseña" aria-label="Password" aria-describedby="HideCard">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-gradient-primary" type="button" id="HideCard"><i class="mdi mdi-key"></i></button>
+                                            </div>
+                                        </div>
+                                          <br>
+                                        <a onclick="ini.inicio.formContrasenia()" id="btnPass" class="btn btn-primary text-white">Guardar</a>
+
+                                    </form>
+                                </div>
+                            </div>
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal-dialog -->
+                </div><!-- /.modal -->
+
     <!--modal -->
     <!-- Modal de Soporte TI -->
 <div class="modal fade" id="supportModal" tabindex="-1" role="dialog" aria-labelledby="supportModalLabel" aria-hidden="true">
@@ -746,6 +791,8 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1"></script>
 
    <script>
+  
+
         // Variables de estado
         let currentCategory = '';
         let ticketData = {};
@@ -1175,4 +1222,5 @@
                     });
              
             }
+
     </script>
