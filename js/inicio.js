@@ -247,6 +247,58 @@ ini.inicio = (function () {
                 }
             });
         },
+        closeCumple: function(){
+          $("#verDetallesCumple").modal('hide');
+        },
+     verDetallesCumple: function(id){
+        // lanzar confetti
+        confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 },
+            scalar: 1.2,
+            shapes: ["circle", "square"],
+            colors: ["#ff0000", "#ff8000", "#ffff00", "#00ff00", "#0000ff"]
+        });
+
+        // forzar el z-index del canvas del confetti
+        let canvasConfetti = document.querySelector('canvas');
+        if (canvasConfetti) {
+            canvasConfetti.style.position = 'fixed';
+            canvasConfetti.style.top = '0';
+            canvasConfetti.style.left = '0';
+            canvasConfetti.style.width = '100%';
+            canvasConfetti.style.height = '100%';
+            canvasConfetti.style.pointerEvents = 'none';
+            canvasConfetti.style.zIndex = '9999'; // más alto que el modal
+        }
+
+        $.ajax({
+            type: "POST",
+            url: base_url + "index.php/Usuario/getUsuario",
+            dataType: "json",
+            data:{id_usuario:id},
+            success: function(data) {
+                let img = (data.ruta_foto_relativa)
+                    ? `<img src="${base_url+data.ruta_foto_relativa}" class="img-fluid rounded"/>`
+                    : '';
+                if (data) {
+                    $(".met-profile-main-pic2").html(`
+                        <p>${data.nombre} ${data.primer_apellido} ${data.segundo_apellido}</p>
+                        ${img}
+                    `);
+                } else {
+                    Swal.fire("info", "No se encontraron datos del usuario.", "info");
+                }
+            },
+            complete: function(){
+                $("#verDetallesCumple").modal('show');
+            },
+            error: function() {
+                Swal.fire("info", "No se encontraron datos del usuario.", "info");
+            }
+        });
+    },
         getUsuario: function(id){
             
             $.ajax({

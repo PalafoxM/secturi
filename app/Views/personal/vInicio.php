@@ -188,6 +188,7 @@
                                                             <li class="align-items-center d-flex justify-content-between">
                                                                 <div class="media">
                                                                     <div class="transaction-icon avatar avatar-sm mr-2">
+                                                                    <a href="javascript:void(0)" onclick="ini.inicio.verDetallesCumple(<?= $c['id_usuario']?>)">
                                                                     <img
                                                                         src="<?= $foto ?>"
                                                                         alt="Foto de <?= htmlspecialchars($c['nombre_completo'] ?? 'usuario', ENT_QUOTES, 'UTF-8') ?>"
@@ -195,6 +196,7 @@
                                                                         width="40" height="40"
                                                                         onerror="this.onerror=null;this.src='<?= base_url() ?>assets/images/users/user-3.jpg';"
                                                                     >
+                                                                   </a>
                                                                     </div>
 
                                                                     <div class="media-body align-self-center"> 
@@ -784,6 +786,26 @@
   </div>
 </div>
 
+<div class="modal fade" id="verDetallesCumple" tabindex="-1" aria-labelledby="" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="">CUMPLEAÑERO DEL MES</h5>
+        <button type="button" onclick="ini.inicio.closeCumple()" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+        <div class="modal-body">
+           <div class="met-profile-main-pic2 text-center">
+               
+               
+            </div>
+        </div>
+      <div class="modal-footer">
+        <button type="button" onclick="ini.inicio.closeCumple()" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
     <link href="<?= base_url() ?>plugins/dropify/css/dropify.min.css" rel="stylesheet">
         <link href="<?= base_url() ?>plugins/filter/magnific-popup.css" rel="stylesheet" type="text/css" />
         <link href="<?= base_url() ?>plugins/lightpick/lightpick.css" rel="stylesheet" />
@@ -817,9 +839,10 @@
 
 <script src="<?= base_url(); ?>assets/pages/jquery.analytics_dashboard.init.js"></script>
         
- 
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1"></script>
 <script>
     ini.inicio.formConfiguracion();
+
 function guardarFoto() {
     // Usar JavaScript puro para evitar problemas con jQuery
     const fotoInput = document.getElementById('foto');

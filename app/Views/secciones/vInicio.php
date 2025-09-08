@@ -698,3 +698,4 @@
 <script src="<?= base_url(); ?>plugins/apexcharts/apexcharts.min.js"></script> 
 <script src="<?= base_url(); ?>assets/pages/jquery.analytics_dashboard.init.js"></script>
 
+

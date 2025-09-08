@@ -66,6 +66,7 @@ class Inicio extends BaseController {
                 $edad = $hoy->diff($fecha_nacimiento)->y;
                  $personal[] =  [
                       'nombre_completo'  => $c->nombre,
+                      'id_usuario'       => $c->id_usuario,
                       'id_edad'          => $c->id_edad,
                       'edad'             => $edad,
                       'ruta_foto_relativa' =>$c->ruta_foto_relativa,
@@ -76,10 +77,29 @@ class Inicio extends BaseController {
         }
         $actividad     = $globas->getTabla(['tabla' => 'vw_actividad', 'where' => ['visible' => 1, "id_usuario" => $session->id_usuario]])->data;
         $configuracion = $globas->getTabla(['tabla' => 'vw_configuracion', 'where' => ['visible' => 1, "id_usuario" => $session->id_usuario]])->data;
-       /*  echo "<pre>";
-        print_r($configuracion );
-        echo "</pre>";
-        die();  */
+      
+        $tiket = $globas->getTabla(['tabla' => 'vw_tiket', 'where' => ['visible' => 1, "id_usuario" => $session->id_usuario]])->data;
+        $eventos = $globas->getTabla(['tabla' => 'eventos', 'where' => ['visible' => 1],  'whereMonth' => [['fecha', $mes_actual]] ])->data;
+        $tiketNuevo    = [];
+        $tiketProceso  = [];
+        $tiketConcluido= [];
+    
+        foreach($tiket as $t){
+                 if($t->estatus == 0){
+                     $tiketNuevo[] = $t->estatus;
+                 }
+                 if($t->estatus == 1){
+                     $tiketConcluido[] = $t->estatus;
+                 }
+                 if($t->estatus == 2){
+                     $tiketProceso[] = $t->estatus;
+                 }
+
+        }
+        $data['tiketNuevo']      = count($tiketNuevo);
+        $data['tiketConcluido']  = count($tiketConcluido);
+        $data['tiketProceso']    = count($tiketProceso);
+
         $data['actividad']       = (isset($actividad) && !empty($actividad))?$actividad:[];
         $data['configuracion']   = (isset($configuracion[0]) && !empty($configuracion))?$configuracion[0]:'';
         $data['personal']        = $personal;
@@ -113,6 +133,7 @@ class Inicio extends BaseController {
                  $personal[] =  [
                       'nombre_completo'  => $c->nombre,
                       'id_edad'          => $c->id_edad,
+                      'id_usuario'       => $c->id_usuario,
                       'edad'             => $edad,
                       'ruta_foto_relativa' =>$c->ruta_foto_relativa,
                       'dia'             =>  date('d', strtotime($c->fec_nac))
@@ -154,7 +175,7 @@ class Inicio extends BaseController {
         $data['tiketProceso']    = count($tiketProceso);
         $data['actividad']       = (isset($actividad) && !empty($actividad))?$actividad:[];
         $data['configuracion']   = (isset($configuracion[0]) && !empty($configuracion))?$configuracion[0]:'';
-        //die( var_dump( $personal  ) );
+        //die( var_dump( $data['tiketNuevo']   ) );
 
         $data['personal']   = $personal;
         $data['datos']      = $globas->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario]])->data[0];
