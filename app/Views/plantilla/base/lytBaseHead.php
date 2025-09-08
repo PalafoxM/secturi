@@ -10,7 +10,8 @@
     <meta content="SECTURI" name="author" />
 
     <!-- App favicon -->
-    <link rel="shortcut icon" href="<?php echo base_url(); ?>assets/images/favicon.ico">
+    <link rel="shortcut icon" href="<?php echo base_url(); ?>assets/susi.webp">
+    
 
     <!-- jvectormap -->
     <link href="<?php echo base_url(); ?>plugins/jvectormap/jquery-jvectormap-2.0.2.css" rel="stylesheet">
@@ -242,7 +243,7 @@
             <a href="<?php echo base_url(); ?>index.php/Inicio"
                 class="logo logo-metrica d-block text-center">
                 <span>
-                    <img src="<?php echo base_url(); ?>assets/images/logo-sm.png" alt="logo-small" class="logo-sm">
+                    <img src="<?php echo base_url(); ?>assets/susi2.webp" alt="logo-small" style="width:50px; heigth:50px;">
                 </span>
             </a>
            <nav class="nav">

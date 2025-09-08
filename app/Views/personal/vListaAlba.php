@@ -44,10 +44,15 @@
                                             <th class="text-center">FOTO</th>
                                             <th class="text-center">NOMBRE</th>
                                             <th class="text-center">FECHA NAC.</th>
-                       
                                             <th class="text-center">EDAD</th>
                                             <th class="text-center">SEXO</th>
                                             <th class="text-center">NACIONALIDAD</th>
+                                            <?php if(in_array($session->get('id_perfil'), [1,6])): ?>
+                                            <th class="text-center">ESTATUS</th>
+                                            <th class="text-center">DIFUSION</th>
+                                            <th class="text-center">FEC. ACTIVACION</th>
+                                            <th class="text-center">FE. DESACTIVACION</th>
+                                            <?php endif; ?>
                                             <th class="text-center">ACCIONES</th>
                                         </tr>
                                         <!--end tr-->
@@ -66,6 +71,12 @@
                                             <td class="text-center"><?= $u->edad?></td>
                                             <td class="text-center"><?= $u->id_sexo==1?'HOMBRE':'MUJER' ?></td>
                                             <td class="text-center"><?= $u->nacionalidad?></td>
+                                            <?php if(in_array($session->get('id_perfil'), [1,6])): ?>
+                                            <td class="text-center"><?= $u->id_estatus?></td>
+                                            <td class="text-center"><?= $u->id_difusion?></td>
+                                            <td class="text-center"><?= date('d-m-Y', strtotime($u->fec_activacion))?></td>
+                                            <td class="text-center"><?= date('d-m-Y', strtotime($u->fec_desactivacion))?></td>
+                                               <?php endif; ?>
                                             <td class="text-center">
                                          <?php if(in_array($session->get('id_perfil'), [1,6])): ?>
                                                 <a href="javascript:void(0);"
@@ -198,7 +209,45 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                           
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="mb-3 position-relative" id="">
+                                                    <label for="id_estatus" class="form-label campoObligatorio">ESTATUS</label>
+                                                    <select class="form-control" name="id_estatus" id="id_estatus">
+                                                        <option value="1">ACTIVA </option>
+                                                        <option value="2">DESACTIVA</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-md-3">
+                                                <div class="mb-3 position-relative" id="">
+                                                    <label for="id_difusion" class="form-label">DIFUSION</label>
+                                                    <select class="form-control" id="id_difusion" name="id_difusion"
+                                                        data-placeholder="seleccione" style="z-index:100;">
+                                                        <option value="0">seleccione</option>
+                                                        <option value="1">MASIVA</option>
+                                                        <option value="2">INTERNA</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                           <div class="col-md-3">
+                                                <div class="mb-3 position-relative" id="">
+                                                    <label for="fec_activacion"
+                                                        class="form-label campoObligatorio">FEC. ACTIVACION</label>
+                                                    <input type="date" autocomplete="off" class="form-control"
+                                                        id="fec_activacion" name="fec_activacion" >
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3 position-relative" id="">
+                                                    <label for="fec_desactivacion"
+                                                        class="form-label campoObligatorio">FEC. DESACTIVACION</label>
+                                                    <input type="date" autocomplete="off" class="form-control"
+                                                        id="fec_desactivacion" name="fec_desactivacion" >
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="row">
                                           <div class="col-md-6">
