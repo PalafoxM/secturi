@@ -18,7 +18,9 @@
                                 <li class="breadcrumb-item active">Listado</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Listado 9-LTAIPG26F1_IX</h4>
+                        <h4 class="page-title">Listado 9-LTAIPG26F1_IX</h4><br>
+                          <a href="<?= base_url().'index.php/Usuario/Descarga' ?>" class="btn btn-gradient-primary px-4 float-right mt-0 mb-3 text-white">
+                            <i class="dripicons-arrow-thin-down mr-2"></i>Descargar Plantilla</a>
                     </div>
                     <!--end page-title-box-->
                 </div>
@@ -30,11 +32,12 @@
                 <div class="col-12">
                     <div class="tab-content detail-list" id="pills-tabContent">
                         <div class="tab-pane fade show active" id="general_detail">
+                          
                             <div class="row">
                                 <div class="col-12">
                                     <div class="card">
                                         <div class="card-body">
-                                            <span>LISTA 9-LTAIPG26F1_IX</span>
+                                                  
                                             <table id="datatableProveedores" class="table" data-toggle="table">
                                                 <thead class="thead-light">
                                                     <tr>

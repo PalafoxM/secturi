@@ -1601,6 +1601,7 @@ class Agregar extends BaseController {
             'estado_destino_text'  => $data['estado_destino_text'],
             'denomicacion_encargo' => $data['denomicacion_encargo'],
             'municipio_destino_text'=>$data['municipio_destino_text'],
+            'municipio_destino_id' =>$data['municipio_destino'],
             'motivo_encargo'       => $data['motivo_encargo'],
             'fec_salida'           => $data['fec_salida'],
             'fec_regreso'          => $data['fec_regreso'],

@@ -232,7 +232,7 @@ ini.inicio = (function () {
                     if (data) {
                         $(".met-profile-main-pic").html(`
                             <p> ${data.nombre} ${data.primer_apellido} ${data.segundo_apellido}</p>
-                            <p><strong>Nivel: ${data.nivel} | ${data.dsc_tipo_empleado} | ${data.dsc_puesto}</strong></p>
+                            <p><strong> Personal de:  ${data.dsc_tipo_empleado} | ${data.dsc_puesto}</strong></p>
                             ${img}
                         `);
                     } else {

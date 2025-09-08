@@ -24,6 +24,9 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+
+
 
 
 class Usuario extends BaseController 
@@ -527,6 +530,69 @@ class Usuario extends BaseController
         $writer->save('php://output');
         exit;
     }
+   public function Descarga()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+
+        $ruta = FCPATH . 'assets/pdf/plantillas/9-LTAIPG26F1_IX.xlsx';
+        $spreadsheet = IOFactory::load($ruta);
+
+        // Selecciona la hoja exacta por nombre
+        $sheet = $spreadsheet->getSheetByName('Reporte de Formatos');
+        if (!$sheet) {
+            // fallback: activa la primera si no encuentra esa hoja
+            $sheet = $spreadsheet->getActiveSheet();
+        }
+
+        // obtén los registros
+        $resul = $globals->getTabla([
+            'tabla' => 'vw_juridico_viaticos',
+            'where' => ['visible' => 1]
+        ]);
+
+        $fila = 8; // fila inicial
+
+        if (!empty($resul->data)) {
+            foreach ($resul->data as $row) {
+                $sheet->setCellValue('A' . $fila, $row->ejercicio);
+                $sheet->setCellValue('B' . $fila, date('dmY', strtotime($row->fecha_inicio)));
+                $sheet->setCellValue('C' . $fila, date('dmY', strtotime($row->fecha_termino)));
+                $sheet->setCellValue('D' . $fila, $row->dsc_tipo_funcionario);
+                $sheet->setCellValue('E' . $fila, $row->clave_nivel);
+                $sheet->setCellValue('F' . $fila, $row->dsc_denominacion);
+                $sheet->setCellValue('G' . $fila, $row->dsc_cargo);
+                $sheet->setCellValue('H' . $fila, $row->dsc_area);
+                $sheet->setCellValue('I' . $fila, $row->nombre);
+                $sheet->setCellValue('J' . $fila, $row->primer_apellido);
+                $sheet->setCellValue('K' . $fila, $row->segundo_apellido);
+                $sheet->setCellValue('L' . $fila, ($row->id_sexo==2)?'HOMBRE':'MUJER');
+                $sheet->setCellValue('M' . $fila, $row->dsc_gasto);
+                $sheet->setCellValue('N' . $fila, 'revisar');
+                $sheet->setCellValue('O' . $fila, $row->dsc_viaje);
+                $sheet->setCellValue('P' . $fila, $row->no_personas);
+                $sheet->setCellValue('Q' . $fila, $row->importe_total);
+                $sheet->setCellValue('R' . $fila, $row->dsc_pais_origen);
+                $sheet->setCellValue('S' . $fila, (empty($row->estado_origen_text))?$row->dsc_estado_origen:$row->estado_origen_text);
+                $sheet->setCellValue('T' . $fila, (empty($row->municipio_origen_text))?$row->dsc_municipio_origen:$row->municipio_origen_text);
+                $sheet->setCellValue('U' . $fila, $row->dsc_pais_destino);
+                $sheet->setCellValue('V' . $fila, (empty($row->estado_destino_text))?$row->dsc_estado_destino:$row->estado_destino_text);
+                $sheet->setCellValue('W' . $fila, (empty($row->municipio_destino_text))?$row->dsc_municipio_destino:$row->municipio_destino_text);
+                $sheet->setCellValue('X' . $fila, $row->motivo_encargo);
+                $sheet->setCellValue('Y' . $fila, $row->fec_salida);
+                $sheet->setCellValue('Z' . $fila, $row->fec_regreso); // corregido
+                $fila++;
+            }
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'reporte_generado.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        $writer->save("php://output");
+    }
+
    
     public function getUsuarios()
     {

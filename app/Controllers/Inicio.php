@@ -44,6 +44,7 @@ class Inicio extends BaseController {
         $data    = array();
         $globas  = new Mglobal;
         $vista = null;
+        $data['eventos']  = "";
         if(in_array( $session->get('id_perfil'), [1,2,3] )){
            $vista = 'secciones/vInicio';
         }else{
@@ -93,6 +94,13 @@ class Inicio extends BaseController {
                  }
                  if($t->estatus == 2){
                      $tiketProceso[] = $t->estatus;
+                 }
+
+        }
+        foreach($eventos as $e){
+           
+                 if(date('d-m') == date('d-m', strtotime($e->fecha))){
+                     $data['eventos'] = $e;
                  }
 
         }
@@ -152,12 +160,16 @@ class Inicio extends BaseController {
         $tiketNuevo    = [];
         $tiketProceso  = [];
         $tiketConcluido= [];
+       
         foreach($eventos as $e){
+           
                  if(date('d-m') == date('d-m', strtotime($e->fecha))){
                      $data['eventos'] = $e;
                  }
 
         }
+        
+       
         foreach($tiket as $t){
                  if($t->estatus == 0){
                      $tiketNuevo[] = $t->estatus;

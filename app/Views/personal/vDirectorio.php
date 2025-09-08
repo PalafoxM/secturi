@@ -76,11 +76,11 @@
   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header bg-success text-white">
-        <h5 class="modal-title" id="">Agregar Imagen</h5>
+        <h5 class="modal-title" id="">Ver detalles</h5>
         <button type="button" onclick="ini.inicio.cerrarUsuario()" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
         <div class="modal-body">
-           <div class="met-profile-main-pic">
+           <div class="met-profile-main-pic text-center">
                
                
             </div>
