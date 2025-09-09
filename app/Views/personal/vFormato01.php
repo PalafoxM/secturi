@@ -15,7 +15,7 @@
         <div  style="position:absolute; text-align:center; top:42.3%; left:84.5%; width:7%; height:18px; background-color:white; font-size: 10px; ">
             <span class="proxima"><?= (isset($registro->contrato_convenio) && !empty($registro->contrato_convenio) && $registro->contrato_convenio == 1)?'SI':'NO'; ?></span>
         </div>
-        <div  style="position:absolute; text-align:center; top:29.5%; left:84.5%; width:7%; height:18px; background-color:white; font-size: 10px; ">
+        <div  style="position:absolute; text-align:center; top:29.5%; left:84.5%; width:7%; height:18px; background-color:white; font-size: 10px;">
             <span class="proxima"><?= ($registro->formato_establecido == 1)?'SI':'NO'; ?></span>
         </div>
         <div  style="position:absolute; text-align:center; top:37%; left:84.5%; width:7%; height:18px; background-color:white; font-size: 10px; ">

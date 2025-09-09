@@ -2037,20 +2037,37 @@ class Principal extends BaseController {
     {
         $session = \Config\Services::session();
         $globals = new Mglobal;
+        $data['reserva']  = "";
         $registro_pt = $globals->getTabla([
             'tabla' => 'vw_registro_pt',
             'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
         ]);
-        //echo "<pre>";
-        //print_r($registro_pt);
-        //echo "</pre>";
-        //die();
+        
+        $area = $globals->getTabla([ 'tabla' => 'usuario',  'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario] ]);
+        if(!empty($area->data)){
+            $id_area   = $area->data[0]->id_area;
+            $direccion = $globals->getTabla([ 'tabla' => 'vw_direccion',  'where' => ['visible' => 1, 'id_area' => $id_area ] ]);
+            if(!empty($direccion->data)){
+                $folio_prefijo = $direccion->data[0]->folio_prefijo.$registro_pt->data[0]->no_consecutivo.'/'.date('Y'); //ESTO HAY QUE OREGUNTAR
+                $data['direccion'] = $direccion->data[0];
+            }
+        }
+
         $pdf = $globals->getTabla([
                 'tabla' => 'vw_pdf_reserva',
                 'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
                 ])->data;
-  
+       
         $instrumento = (isset($pdf[0]->instrumento) && !empty($pdf[0]->instrumento))?$pdf[0]->instrumento:'';      
+        $id_reserva = (isset($pdf[0]->id_reserva) && !empty($pdf[0]->id_reserva))?$pdf[0]->id_reserva:'';  
+        if(!empty($id_reserva)){
+            $reserva = $globals->getTabla([
+                'tabla' => 'vw_reserva',
+                'where' => ['visible' => 1, 'id_reserva' => $id_reserva]
+                ])->data;
+            $data['reserva'] = $reserva[0]; 
+
+        }    
    
         if (!empty($registro_pt->data)) {
             $data['registro'] = $registro_pt->data[0];
@@ -2064,7 +2081,7 @@ class Principal extends BaseController {
             else if($registro_pt->data[0]->no_reserva == '4327279'){
                $data['folio'] = "SECTURI/DGDT/DCT/FIC-TA/";
             }else{
-               $data['folio'] = $folio->data[0]->folio_prefijo;
+               $data['folio'] = $folio_prefijo;
             }
             
         } else {
@@ -2075,7 +2092,7 @@ class Principal extends BaseController {
         if(!empty($instrumento)){
              switch($id_archivo){
                 case 1:
-                    $doc = 'assets/pdf/plantillas/anexo02.pdf';
+                    $doc = 'assets/pdf/plantillas/anexo01.pdf';
                     $formato = 'personal/vFormato01.php';
                 break;
             case 4:
@@ -2098,7 +2115,7 @@ class Principal extends BaseController {
         }else{
             switch($id_archivo){
             case 1:
-                    $doc = 'assets/pdf/plantillas/anexo02.pdf';
+                    $doc = 'assets/pdf/plantillas/anexo01.pdf';
                     $formato = 'personal/vFormato01.php';
              break;
             case 4:
@@ -2111,9 +2128,11 @@ class Principal extends BaseController {
 
             }
         }
-     
+
+       // die( var_dump(  $data ) );
         $html = view( $formato, $data);
-        // Crear instancia de mPDF
+        $htmlSegundaHoja = view('personal/vFormato02.php', $data);
+        //Crear instancia de mPDF
         $mpdf = new \Mpdf\Mpdf([
             'margin_top' => 0,
             'margin_left' => 1,
@@ -2121,14 +2140,20 @@ class Principal extends BaseController {
             'format' => [213, 268],
             'mirrorMargins' => false,
         ]);
-
-    //die( var_dump($doc) );
-      $pagecount = $mpdf->SetSourceFile(FCPATH . $doc );
-      
+     
+        $pagecount = $mpdf->SetSourceFile(FCPATH . $doc );
+        for ($i = 1; $i <= $pagecount; $i++) {
             $mpdf->AddPage();
-            $tplId = $mpdf->ImportPage(1);
+            $tplId = $mpdf->ImportPage($i);
             $mpdf->UseTemplate($tplId);
-            $mpdf->WriteHTML($html);
+
+            if ($i == 1) {
+                $mpdf->WriteHTML($html);
+            }
+            if ($i == 2) {
+                $mpdf->WriteHTML($htmlSegundaHoja);
+            }
+        }
         
         
         if ($savePath) {
