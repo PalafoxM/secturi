@@ -69,6 +69,7 @@ class Inicio extends BaseController {
                       'nombre_completo'  => $c->nombre,
                       'id_usuario'       => $c->id_usuario,
                       'id_edad'          => $c->id_edad,
+                      'id_fec_nac'       => $c->id_fec_nac,
                       'edad'             => $edad,
                       'ruta_foto_relativa' =>$c->ruta_foto_relativa,
                       'dia'             =>  date('d', strtotime($c->fec_nac))
@@ -141,6 +142,7 @@ class Inicio extends BaseController {
                  $personal[] =  [
                       'nombre_completo'  => $c->nombre,
                       'id_edad'          => $c->id_edad,
+                      'id_fec_nac'       => $c->id_fec_nac,
                       'id_usuario'       => $c->id_usuario,
                       'edad'             => $edad,
                       'ruta_foto_relativa' =>$c->ruta_foto_relativa,

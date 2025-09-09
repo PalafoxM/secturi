@@ -185,8 +185,11 @@
                                                                     ? base_url() . $c['ruta_foto_relativa']
                                                                     : base_url() . 'assets/images/users/user-3.jpg';
                                                                 ?>
+                                                            <?php if($c['id_fec_nac']!="0" ): ?>
                                                             <li class="align-items-center d-flex justify-content-between">
+                                                             
                                                                 <div class="media">
+                                                                    
                                                                     <div class="transaction-icon avatar avatar-sm mr-2">
                                                                     <a href="javascript:void(0)" onclick="ini.inicio.verDetallesCumple(<?= $c['id_usuario']?>)">
                                                                     <img
@@ -198,18 +201,20 @@
                                                                     >
                                                                    </a>
                                                                     </div>
-
+                                                                  
                                                                     <div class="media-body align-self-center"> 
-                                                                    <div class="transaction-data">                                                         
-                                                                        <h3 class="m-0"><?= $c['nombre_completo']; ?></h3>
-                                                                        <p class="text-muted mb-0">el <?= $c['dia']; ?></p>
-                                                                    </div>                                                                                              
+                                                                        <div class="transaction-data">                                                         
+                                                                            <h3 class="m-0"><?= $c['nombre_completo']; ?></h3>
+                                                                            <p class="text-muted mb-0">el <?= $c['dia']; ?></p>
+                                                                        </div>                                                                                              
                                                                     </div>
                                                                 </div>
                                                                 <?php if($c['id_edad']!='0'): ?>
                                                                 <span class="text-success"><?= $c['edad']; ?> años</span>
                                                                 <?php endif; ?>
+                                                              
                                                             </li>
+                                                              <?php endif; ?>
                                                         <?php endforeach; ?>
                                                     </ul>                                       
                                                 </div><!--end card-body-->
@@ -523,7 +528,7 @@
                                                             
                                                             <div class="form-group row">
                                                                 <div class="col-md-4">
-                                                                    <input type="checkbox" class="checkbox checkbox-primary" name="fec_nac" id="fec_nac" checked>
+                                                                    <input type="checkbox" class="checkbox checkbox-primary" name="fec_nac" id="fec_nac" <?= (isset($configuracion) && !empty($configuracion) && $configuracion->fec_nac==0)?'':'checked' ?>>
                                                                      <label for="fec_nac">Fecha de Nacimiento</label>
                                                                 </div>
                                                                  <div class="col-md-4">
