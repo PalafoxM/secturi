@@ -520,42 +520,7 @@ class Inicio extends BaseController {
         $data['contentView'] = 'secciones/vlistaArea';
         $this->_renderView($data);   
     }
-    public function activarCategoria()
-    {
-        $session = \Config\Services::session();
-        $principal = new Mglobal;
-        $response = new \stdClass();
-        if($session->id_usuario != 1) {
-            $response->error =true;
-            $response->respuesta ='Perfil AG';
-            return $this->respond($response);
-        }
-        $response->error =true;
-        $response->respuesta ='Error al guardar';
-        $id_categoria = $this->request->getPost('id_categoria');
-        $id = $this->request->getPost('id');
-        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaCategoriasPadre'];
-        $dataConfig = [
-            "tabla"=>"categorias_padre",
-            "editar"=>true,
-            "idEditar"=>['id_categoria'  => (int)$id_categoria]
-        ]; 
-        if($id == 1){
-            $insert = ['activo' => 1];
-        }else{
-            $insert = ['activo' => 0];
-        }
-       
-        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaCategoriasPadre'];
-        $dataConfig = ["tabla"=>"categorias_padre", "editar"=>true, "idEditar"=>['id_categoria'=> (int)$id_categoria]];
-        $result    = $principal->saveTabla($insert ,$dataConfig, $dataBitacora );
-           if(!$result->error){
-               $response->error= $result->error;
-               $response->respuesta= $result->respuesta;
-           }
-        
-        return $this->respond($response);
-    }
+
     // Función para formatear el árbol para jsTree
     private function formatForJsTree($tree)
     {

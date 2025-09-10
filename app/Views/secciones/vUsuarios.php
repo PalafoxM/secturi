@@ -70,9 +70,9 @@
                                                 </a>
 
 
-                                                 <a href="<?php echo base_url().'index.php/Principal/imprimer_qr/'.$u->id_usuario ?>"
+                                                 <a href="<?php echo base_url().'index.php/Principal/imprimer_qr/'.$u->no_empleado ?>"
                                                     data-animation="bounce" ><i
-                                                        class="mdi mdi-eye text-success font-18"></i></a>
+                                                        class="mdi mdi-barcode-scan text-info font-18"></i></a>
 
                                                 <?php if($session->id_usuario != $u->id_usuario):?>
                                                 <a href="javascript:void(0);"

@@ -57,12 +57,12 @@
         text-align: right;
     }
 
-    #folio {
-        top: 67.5em;
-        left: 47em;
+    #no_empleado {
+          top: 52em;
+        left: 32em;
         width: 95px;
-        font-size: 9px;
-        background: white;
+        font-size: 25px;
+        background: red;
     }
 
     #qr {
@@ -80,22 +80,7 @@
 
 <div id="container">
     <!-- Personal Information -->
-    <div id="nombre_completo" class="campo"><?= 'AGUSTIN PALAFOX MARIN' ?></div>
-    <div id="fecha_nacimiento" class="campo"><?= '31-12-1989' ?></div>
-    <div id="edad" class="campo"><?= '35' ?></div>
-    <div id="curp" class="campo"><?= 'PAMA891231HGTLRG05' ?></div>
-    
-    <!-- Work Information -->
-    <div id="puesto" class="campo"><?= 'Coordinador de Técnologias de la Información' ?></div>
-    <div id="fecha_ingreso" class="campo"><?= '16/05/2025' ?></div>
-    <div id="numero_expediente" class="campo"><?= '1109435' ?></div>
-    
-    <!-- Contact -->
-    <div id="tel_movil" class="campo"><?= '437-139-1180' ?></div>
-    
-    <!-- Document Details -->
-    <div id="folio" class="campo"><?= '83068' ?></div>
-    
-    <!-- QR Code -->
+    <div id="nombre_completo" class="campo"><?= $usuario->nombre_completo ?></div>
     <div id="qr" class="campo"></div>
+
 </div>

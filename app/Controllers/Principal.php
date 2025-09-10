@@ -306,15 +306,26 @@ class Principal extends BaseController {
         return false;
     }
   
-    public function imprimer_qr($id_usuario)
+    public function imprimer_qr($noEmpleado)
     {
         // Ruta del QR
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        // $response->error = true;
+        $this->globals = new Mglobal();
+        $data = array();
         $tempQrPath = FCPATH . 'assets/images/qr_final.png';
+        $usuario = $this->globals->getTabla(["tabla"=>"vw_usuario","where"=>["no_empleado" => $noEmpleado, "visible" => 1]])->data;
+        if(empty($usuario)){
+            echo "<center>EL USUARIO NO EXISTE, FAVOR DE LLAMAR AL ADMINISTRADOR DE SUSI</center>";
+            die();
 
+        }
+        $data['usuario'] = $usuario[0];
         // Generar el QR
         $result = Builder::create()
             ->writer(new PngWriter())
-            ->data(base_url().'index.php/Login?id_user=' . $id_usuario)
+            ->data(base_url().'index.php/Login?no_empleado=' . $noEmpleado)
             ->encoding(new Encoding('UTF-8'))
             ->errorCorrectionLevel(new ErrorCorrectionLevelHigh())
             ->size(400)
@@ -327,8 +338,9 @@ class Principal extends BaseController {
 
          $result->saveToFile($tempQrPath);
          $dataImagen = $this->encode_img_base64(FCPATH .'assets/images/qr_final.png', 'png');
-         $data = array();
+        
          $data['dataImagen'] =  $dataImagen;
+        // die( var_dump( $data ) );
          $html = view('secciones/vFormato.php', $data);
 
         // Configuración mPDF
