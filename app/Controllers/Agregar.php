@@ -682,6 +682,11 @@ class Agregar extends BaseController {
             $response->respuesta = "Es requerido el Dirección Responsable";
             return $this->respond($response);
         }
+        if(($data['id_reponsable_solicitud'])==0){
+            $response->error = true;
+            $response->respuesta = "Es requerido el Responsable de la Solicitud";
+            return $this->respond($response);
+        }
         if($data['tipo_pt'] == 0){
             $response->error = true;
             $response->respuesta = "Es requerido el Tipo pt";
@@ -742,7 +747,7 @@ class Agregar extends BaseController {
                         'no_consecutivo'           => $data['no_consecutivo'],
                         'id_proveedor'             => $data['id_proveedor'],
                         'fecha_tramite'            => $data['fecha_tramite'],
-                        'id_reponsable_solicitud'  => $session->get('id_usuario'),
+                        'id_reponsable_solicitud'  => (int)$data['id_reponsable_solicitud'],
                         'director_general'         => 1,
                         'secretario'               => $data['secretario'],
                         'cuenta_bancaria'          => $data['cuenta_bancaria'],
@@ -1481,6 +1486,14 @@ class Agregar extends BaseController {
             $response->respuesta = 'El nacionalidad es requerido';
             return $this->respond($response);
         }
+          if(empty($data['fec_activacion'])){
+            $response->respuesta = 'El fec activacion es requerido';
+            return $this->respond($response);
+        }
+          if(empty($data['fec_desactivacion'])){
+            $response->respuesta = 'El fec desactivacion es requerido';
+            return $this->respond($response);
+        }
       //  if($this->validarViativos()); return false
         $dataInsert = [
         'nombre'           =>$data['nombre'],
@@ -1493,15 +1506,20 @@ class Agregar extends BaseController {
         'fec_desactivacion'=>date('Y-m-d', strtotime($data['fec_desactivacion'])),
         'fec_activacion'   =>date('Y-m-d', strtotime($data['fec_activacion'])),
         'edad'             =>$data['edad'],
-        'foto'             =>$ruta_relativa,
-        'protocolo'        =>$ruta_relativa2,
         'id_sexo'          =>(int)$data['id_sexo'],
         'fecha_nacimiento' =>date('Y-m-d', strtotime($data['fecha_nacimiento'])),
         'usu_reg'          =>(int)$session->get('id_usuario'),
         'fec_reg'          =>date('Y-m-d'),
         ];
-     
-        if($data['editar'] == 1){
+
+       // Agrega campos de archivos solo si existen
+        if (isset($ruta_relativa) && !empty($ruta_relativa)) {
+            $dataInsert['foto'] = $ruta_relativa;      // <- operador correcto
+        }
+        if (isset($ruta_relativa2) && !empty($ruta_relativa2)) {
+            $dataInsert['protocolo'] = $ruta_relativa2; // <- operador correcto
+        }
+                if($data['editar'] == 1){
              $dataConfig = [
             "tabla"=>"lista_alba",
             "editar"=>true,

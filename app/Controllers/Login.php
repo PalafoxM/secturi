@@ -43,15 +43,11 @@ class Login extends BaseController {
        
 
        $res = $this->registrarAsistencia($id_usuario);
-       if(!$res->error){
-            echo "
-            <div class='alert alert-success text-center' role='alert' style='font-size:16px;'>
-                <i class='mdi mdi-check-all me-2'></i>
-                Registro de entrada <strong>guardado satisfactoriamente</strong>.
-            </div>";
-            die();
-        }
-       
+       $data['scripts'] = array('principal');
+        $data['layout'] = 'plantilla/lytVacio';
+        $data['contentView'] = 'personal/vRegistroQr';                
+        $this->_renderView($data); 
+        die();
     }
 
 

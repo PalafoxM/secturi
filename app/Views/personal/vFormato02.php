@@ -22,7 +22,7 @@
         </div>
         <div  style="position:absolute; text-align:justify;top:31.5%; left:7.5%; width:85%; height:35px; background-color:white; font-size:13px; ">
             <span class="proxima">Solicito que se realice trámite de pago del comprobante fiscal con <strong><?= $reserva->folio_interno;?></strong>,
-                 derivado del contrato ó convenio número <strong><?= (isset($GO) && !empty($GO))?'GO':'TP' ?> <?= $folio;?></strong> por la cantidad de <strong>$<?= number_format($reserva->total_importe, 2);?></strong>
+                 derivado del contrato ó convenio número <strong><?= (isset($GO) && !empty($GO))?'GO':'TP' ?> <?= $folio;?></strong> por la cantidad de <strong>$<?= $reserva->total_importe;?></strong>
                  <strong>(<?= $numero_texto?>)</strong>, por el servicio <strong><?= $reserva->dsc_partida ?></strong> prestado por el proveedor <strong><?= $reserva->razon_social ?></strong>. Se cuenta con suficiencia presupuestal en la partida <strong><?= $reserva->partida;?></strong> correspondiente.
            </span>
         </div>

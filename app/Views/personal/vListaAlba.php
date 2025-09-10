@@ -72,8 +72,8 @@
                                             <td class="text-center"><?= $u->id_sexo==1?'HOMBRE':'MUJER' ?></td>
                                             <td class="text-center"><?= $u->nacionalidad?></td>
                                             <?php if(in_array($session->get('id_perfil'), [1,6])): ?>
-                                            <td class="text-center"><?= $u->id_estatus?></td>
-                                            <td class="text-center"><?= $u->id_difusion?></td>
+                                            <td class="text-center"><?= ($u->id_estatus==1)?'<span class="badge badge-soft-danger">Activa</span>':'<span class="badge badge-soft-info">Desactivada</span>'?></td>
+                                            <td class="text-center"><?= ($u->id_difusion==1)?'<span class="badge badge-soft-success">Interna</span>':'<span class="badge badge-soft-warning">Externa</span>'?></td>
                                             <td class="text-center"><?= date('d-m-Y', strtotime($u->fec_activacion))?></td>
                                             <td class="text-center"><?= date('d-m-Y', strtotime($u->fec_desactivacion))?></td>
                                                <?php endif; ?>
@@ -251,17 +251,17 @@
                                         </div>
                                         <div class="row">
                                           <div class="col-md-6">
-                                                <div class="mb-3 position-relative" id="">
+                                                <div class="mb-3 position-relative">
                                                     <label for="foto" class="form-label">FOTO</label>
-                                                  <input type="file" autocomplete="off" class="form-control"
-                                                        id="foto" name="foto" accept=".png">
+                                                    <input type="file" class="form-control" id="foto" name="foto" accept=".png">
+                                                    <img id="previewFoto" src="" class="mt-2 img-thumbnail" style="max-width: 150px; display:none;">
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
-                                                <div class="mb-3 position-relative" id="">
+                                                <div class="mb-3 position-relative">
                                                     <label for="protocolo" class="form-label">PROTOCOLO</label>
-                                                  <input type="file" autocomplete="off" class="form-control"
-                                                        id="protocolo" name="protocolo">
+                                                    <input type="file" class="form-control" id="protocolo" name="protocolo">
+                                                    <img id="previewProtocolo" src="" class="mt-2 img-thumbnail" style="max-width: 150px; display:none;">
                                                 </div>
                                             </div>
                                         </div>

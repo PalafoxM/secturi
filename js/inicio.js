@@ -3162,6 +3162,10 @@ ini.inicio = (function () {
             // Alternativa para asegurar que funcione
             var modal = new bootstrap.Modal(document.getElementById('modalAlba'));
             modal.show();
+            document.getElementById("formAgregarAlba").reset();
+            $("#previewFoto").attr("src", "").hide();
+           $("#previewProtocolo").attr("src", "").hide();
+
         },
         formConfiguracion: function()
         {
@@ -3214,22 +3218,47 @@ ini.inicio = (function () {
                     url: base_url + "index.php/Agregar/getAlba",
                     data: {id_alba},
                     dataType: "json",
-                    success: function (response) {
-                        if(!response.error){
+                   success: function (response) {
+                        if (!response.error) {
                             const data = response.data;
+
                             $('#editar').val(1);
                             $('#id_alba').val(id_alba);
                             $('#nombre').val(data.nombre);
                             $('#primer_apellido').val(data.primer_apellido);
                             $('#segundo_apellido').val(data.segundo_apellido);
-                           const fechaCompleta = data.fecha_nacimiento; // Ejemplo de fecha
-                           const fechaFormateada = fechaCompleta.split('T')[0]
-                            $('#fecha_nacimiento').val(fechaFormateada);
+                            $('#id_estatus').val(data.id_estatus).change();
+                              $('#id_estatus').val(data.id_estatus).change();
+                               // Mostrar imagen si viene de la BD
+                            if (data.foto) {
+                            $('#previewFoto').attr('src', base_url + data.foto).show();
+                            } else {
+                            $('#previewFoto').hide();
+                            }
+
+                            if (data.protocolo) {
+                            $('#previewProtocolo').attr('src', base_url + data.protocolo).show();
+                            } else {
+                            $('#previewProtocolo').hide();
+                            }
                             $('#nacionalidad').val(data.nacionalidad);
                             $('#edad').val(data.edad);
                             $('#id_sexo').val(data.id_sexo).change();
-                     
-                        }else{
+
+                            const fechaCompleta = data.fecha_nacimiento;
+                            const fecDesactivacion = data.fec_desactivacion;
+                            const fecActivacion = data.fec_activacion;
+                            const fechaFormateada = fechaCompleta.split('T')[0];
+                            const fechaFormateadaD = fecDesactivacion.split('T')[0];
+                            const fechaFormateadaA = fecActivacion.split('T')[0];
+                            $('#fecha_nacimiento').val(fechaFormateada);
+                            $('#fec_desactivacion').val(fechaFormateadaD);
+                            $('#fec_activacion').val(fechaFormateadaA);
+                         
+
+                         
+
+                        } else {
                             Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
                         }
                     },
@@ -3292,6 +3321,8 @@ ini.inicio = (function () {
             var formData = new FormData(this); // Usar FormData en lugar de serialize
             var foto = $('#foto')[0].files[0];
             var protocolo = $('#protocolo')[0].files[0];
+            let id_alba = $('#id_alba').val();
+            if(id_alba == 0){
                 if(!foto) {
                     Swal.fire("Atención", 'La <strong>Foto</strong> es requerida', 'info'); 
                     return;
@@ -3301,37 +3332,38 @@ ini.inicio = (function () {
                     return;
                 }
 
-                console.log(formData);
-                    $.ajax({
-                    type: "POST",
-                    url: base_url + "index.php/Agregar/albaAlta",
-                    data: formData,
-                    processData: false,  // Importante para FormData
-                    contentType: false,  // Importante para FormData
-                    dataType: "json",
-                    success: function (response) {
-                        if(!response.error){
-                            Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
-                            setTimeout(() => {
-                               // window.location.href = base_url + "index.php/Principal/listadoEstatusPT";
-                                window.location.reload();
-                            }, 1500);
-                        }else{
-                            Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
-                        }
-                    },
-                    beforeSend: function (info){
-                         $('#btnAlba').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
-                    },
-                    complete: function (info){
-                        $('#btnAlba').prop('disabled', false).html('Guardar');
-                    },
-                    error: function (response,jqXHR, textStatus, errorThrown) {
-                       
-                        Swal.fire("Error", '<p> '+ res.message + '</p>'); 
-                        $('#btnAlba').prop('disabled', false).html('Guardar');
+            }    
+
+                $.ajax({
+                type: "POST",
+                url: base_url + "index.php/Agregar/albaAlta",
+                data: formData,
+                processData: false,  // Importante para FormData
+                contentType: false,  // Importante para FormData
+                dataType: "json",
+                success: function (response) {
+                    if(!response.error){
+                        Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
+                        setTimeout(() => {
+                           // window.location.href = base_url + "index.php/Principal/listadoEstatusPT";
+                            window.location.reload();
+                        }, 1500);
+                    }else{
+                        Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
                     }
-                });
+                },
+                beforeSend: function (info){
+                     $('#btnAlba').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                },
+                complete: function (info){
+                    $('#btnAlba').prop('disabled', false).html('Guardar');
+                },
+                error: function (response,jqXHR, textStatus, errorThrown) {
+                   
+                    Swal.fire("Error", '<p> '+ res.message + '</p>'); 
+                    $('#btnAlba').prop('disabled', false).html('Guardar');
+                }
+            });
           })
         },
         busquedaProveedorTI: function() {
