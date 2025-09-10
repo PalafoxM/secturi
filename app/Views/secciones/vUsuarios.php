@@ -49,6 +49,7 @@
                                             <th class="text-center">AREA</th>
                                             <th class="text-center">CORREO</th>
                                             <th class="text-center">NO EMPLEADO</th>
+                                            <th class="text-center">PERSONAL</th>
                                             <th class="text-center">ACCIONES</th>
                                         </tr>
                                         <!--end tr-->
@@ -62,6 +63,7 @@
                                             <td class="text-center"><?= $u->dsc_area?></td>
                                             <td class="text-center"><?= $u->correo?></td>
                                             <td class="text-center"><?= $u->no_empleado?></td>
+                                            <td class="text-center"><?= $u->dsc_tipo_empleado?></td>
                                             <td class="text-center">
                                          <!-- tu trigger -->
                                                 <a href="javascript:void(0);"
