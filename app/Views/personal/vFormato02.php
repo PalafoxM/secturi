@@ -3,10 +3,10 @@
         </div>
 
         <div  style="position:absolute; text-align:center; top:16.2%; left:70%; width:22%; height:10px; background-color:white; font-size: 7px; ">
-            <span class="proxima"><?= (isset($GO) && !empty($GO))?'GO':'TP' ?> <?= strtoupper($folio);?></span>
+            <span class="proxima"><?= (isset($GO) && !empty($GO))?'GO':'TP' ?> <?= $folio;?></span>
         </div>
         <div  style="position:absolute; text-align:center; top:18.5%; left:70%; width:22%; height:10px; background-color:white; font-size: 7px; ">
-            <span class="proxima"><?= (isset($reserva->partida) && !empty($reserva->partida))?$reserva->partida.'-'.$reserva->dsc_partida:''; ?></span>
+            <span class="proxima"><?= (isset($reserva->partida) && !empty($reserva->partida))?$reserva->partida:''; ?></span>
         </div>
          <div  style="position:absolute; text-align:center; top:15.5%; left:22%; width:36%; height:30px; background-color:white; font-size: 7px; ">
             <span class="proxima"><?= (isset($reserva->razon_social) && !empty($reserva->razon_social))?$reserva->razon_social:'';?></span>
@@ -20,14 +20,52 @@
        <div  style="position:absolute; top:29.8%; left:22%; width:25%; height:10px; background-color:white; font-size: 7px; ">
             <span class="proxima"><?= (isset($direccion->dsc_area ) && !empty($direccion->dsc_area ))?$direccion->dsc_area :'';  ?></span>
         </div>
-        <div  style="position:absolute; text-align:center;top:31.5%; left:7.5%; width:85%; height:25px; background-color:white; font-size:12px; ">
-            <span class="proxima">Solicito que se realice trámite de pago del comprobante fiscal con folio 110943 ,
-                 derivado del contrato ó convenio número <?= (isset($GO) && !empty($GO))?'GO':'TP' ?> <?= strtoupper($folio);?> por la cantidad de $1450
-                 , por el servicio ___________ prestado por el proveedor ____________. Se cuenta con suficiencia presupuestal en la partida correspondiente.
+        <div  style="position:absolute; text-align:justify;top:31.5%; left:7.5%; width:85%; height:35px; background-color:white; font-size:13px; ">
+            <span class="proxima">Solicito que se realice trámite de pago del comprobante fiscal con <strong><?= $reserva->folio_interno;?></strong>,
+                 derivado del contrato ó convenio número <strong><?= (isset($GO) && !empty($GO))?'GO':'TP' ?> <?= $folio;?></strong> por la cantidad de <strong>$<?= number_format($reserva->total_importe, 2);?></strong>
+                 <strong>(<?= $numero_texto?>)</strong>, por el servicio <strong><?= $reserva->dsc_partida ?></strong> prestado por el proveedor <strong><?= $reserva->razon_social ?></strong>. Se cuenta con suficiencia presupuestal en la partida <strong><?= $reserva->partida;?></strong> correspondiente.
            </span>
         </div>
-        <div  style="position:absolute; text-align:center; top:50.5%; left:25%; width:70%; height:18px; background-color:white; font-size: 10px; ">
-            <span class="proxima"><?= strtoupper($registro->otros); ?></span>
+        
+        <div  style="position:absolute; top:43.2%; left:49.5%; width:2%; height:20px; background-color:white; font-size: 10px; ">
+            <span class="proxima">SI</span>
+        </div>
+        <div  style="position:absolute; top:46.8%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
+            <span class="proxima">Nombre del responsable</span>
+        </div>
+        <div  style="position:absolute; top:49.5%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
+            <span class="proxima">Puesto</span>
+        </div>
+         <div  style="position:absolute; top:52.5%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
+            <span class="proxima">Dependencia</span>
+        </div>
+         <div  style="position:absolute; top:56.2%; left:49.5%; width:2%; height:20px; background-color:white; font-size: 10px; ">
+            <span class="proxima">SI</span>
+        </div>
+        <div  style="position:absolute; top:60%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
+            <span class="proxima">Nombre del responsable</span>
+        </div>
+         <div  style="position:absolute; top:62.5%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
+            <span class="proxima">Puesto</span>
+        </div>
+         <div  style="position:absolute; top:65.5%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
+            <span class="proxima">Dependencia</span>
+        </div>
+         <div  style="position:absolute; top:73%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
+            <span class="proxima">Nombre del responsable</span>
+        </div>
+         <div  style="position:absolute; top:75.5%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
+            <span class="proxima">Puesto</span>
+        </div>
+         <div  style="position:absolute; top:78%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
+            <span class="proxima">Dependencia</span>
+        </div>
+
+        <div  style="position:absolute; top:94.7%; left:21.2%; width:30%; height:10px; background-color:white; font-size: 10px; ">
+            <span class="proxima">Nombre</span>
+        </div>
+         <div  style="position:absolute; top:96.8%; left:21.2%; width:30%; height:10px; background-color:white; font-size: 10px; ">
+            <span class="proxima">Puesto</span>
         </div>
 
 

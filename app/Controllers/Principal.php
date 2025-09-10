@@ -1969,26 +1969,44 @@ class Principal extends BaseController {
         $registro_go = $globals->getTabla([
             'tabla' => 'vw_registro_go',
             'where' => ['visible' => 1, 'id_registro_go' => $id_registro_go]
-        ]);   
-     
+        ]);
+        $data['reserva'] = "";
+        $pdf = $globals->getTabla([
+                'tabla' => 'vw_pdf_reserva_go',
+                'where' => ['visible' => 1, 'id_registro_go' => $id_registro_go]
+                ])->data;
+        $id_reserva_go = (isset($pdf[0]->id_reserva_go) && !empty($pdf[0]->id_reserva_go))?$pdf[0]->id_reserva_go:'';  
+       
+        if(!empty($id_reserva_go)){
+            $reserva = $globals->getTabla([
+                'tabla' => 'vw_reserva_go',
+                'where' => ['visible' => 1, 'id_reserva_go' => $id_reserva_go]
+                ])->data;
+            $data['reserva'] = $reserva[0]; 
+             $importe_str   = $reserva[0]->total_importe;
+             $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
+             $data['numero_texto'] = $this->numeroEnLetras($importe_float);
+        } 
+
         if (!empty($registro_go->data)) {
             $data['registro'] = $registro_go->data[0];
             $folio = $globals->getTabla([
-                'tabla' => 'direccion',
+                'tabla' => 'vw_direccion',
                 'where' => ['visible' => 1, 'id_area' => $data['registro']->id_direccion_responsable]
             ]);
             $data['folio'] = $folio->data[0]->folio_prefijo;
+       
         } else {
             echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
             die();
         }
+       
        $data['GO'] = true;
        switch($id_archivo){
             case 1:
-                $doc = 'assets/pdf/plantillas/anexo02.pdf';
+                $doc = 'assets/pdf/plantillas/anexo01.pdf';
                 $formato = 'personal/vFormato01.php';
             break;
-
            case 4:
             if ($savePath){
                 $source = FCPATH . $instrumento;
@@ -2002,11 +2020,14 @@ class Principal extends BaseController {
                 return redirect()->to(base_url() . $instrumento);
             }
             break;
-         
-
         }
+        //echo "<pre>";
+        //print_r( $data['reserva']  );
+        //echo "</pre>";
+        //die();
      
         $html = view( $formato, $data);
+        $htmlSegundaHoja = view('personal/vFormato02.php', $data);
         // Crear instancia de mPDF
         $mpdf = new \Mpdf\Mpdf([
             'margin_top' => 0,
@@ -2019,10 +2040,18 @@ class Principal extends BaseController {
     //die( var_dump($doc) );
       $pagecount = $mpdf->SetSourceFile(FCPATH . $doc );
       
+      for ($i = 1; $i <= $pagecount; $i++) {
             $mpdf->AddPage();
-            $tplId = $mpdf->ImportPage(1);
+            $tplId = $mpdf->ImportPage($i);
             $mpdf->UseTemplate($tplId);
-            $mpdf->WriteHTML($html);
+
+            if ($i == 1) {
+                $mpdf->WriteHTML($html);
+            }
+            if ($i == 2) {
+                $mpdf->WriteHTML($htmlSegundaHoja);
+            }
+        }
         
         
         if ($savePath) {
@@ -2066,6 +2095,9 @@ class Principal extends BaseController {
                 'where' => ['visible' => 1, 'id_reserva' => $id_reserva]
                 ])->data;
             $data['reserva'] = $reserva[0]; 
+             $importe_str   = $reserva[0]->total_importe;
+             $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
+             $data['numero_texto'] = $this->numeroEnLetras($importe_float);
 
         }    
    
@@ -2128,8 +2160,7 @@ class Principal extends BaseController {
 
             }
         }
-
-       // die( var_dump(  $data ) );
+      
         $html = view( $formato, $data);
         $htmlSegundaHoja = view('personal/vFormato02.php', $data);
         //Crear instancia de mPDF

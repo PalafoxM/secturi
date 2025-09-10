@@ -105,7 +105,7 @@
                                                             </a>
                                                            
                                                               <?php endif; ?>
-                                                            <?php if($session->get('id_perfil')==2): ?>
+                                                            <?php if(in_array($session->get('id_perfil'),[1,2])): ?>
                                                             <a style="color:white;"  onclick="ini.inicio.estatusReservaGo(<?=$p->id_reserva_go?>, <?=$p->id_estatus?> );" data-toggle="tooltip" data-placement="top" title="" data-original-title="<?= (in_array($p->id_estatus, [3,4]))?'Ver Reserva':'Validar Reserva'?>"
                                                                 class="btn <?= (in_array($p->id_estatus, [3,4]))?'btn-gradient-info':'btn-gradient-warning'?> px-4"><i
                                                                     class="mdi mdi-lock-open font-21"></i>
