@@ -72,7 +72,7 @@
                                                 </a>
 
 
-                                                 <a href="<?php echo base_url().'index.php/Principal/imprimer_qr/'.$u->no_empleado ?>"
+                                                 <a target="_blank" href="<?php echo base_url().'index.php/Principal/imprimer_qr/'.$u->no_empleado ?>"
                                                     data-animation="bounce" ><i
                                                         class="mdi mdi-barcode-scan text-info font-18"></i></a>
 

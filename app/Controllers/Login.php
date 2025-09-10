@@ -34,12 +34,24 @@ class Login extends BaseController {
     }
     private function asistencia_qr($id)
     {
-       $data['id_user'] = $id; 
-       $data['scripts'] = array('principal');
-        $data['layout'] = 'plantilla/lytVacio';
-        $data['contentView'] = 'secciones/vError500';                
-        $this->_renderView($data); 
-        die();
+        
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        // $response->error = true;
+        $this->globals = new Mglobal();
+        $id_usuario  = $this->globals->getTabla(['tabla' => 'usuario', 'where' => ['no_empleado' => $id , 'visible' =>1]])->data[0]->id_usuario; 
+       
+
+       $res = $this->registrarAsistencia($id_usuario);
+       if(!$res->error){
+            echo "
+            <div class='alert alert-success text-center' role='alert' style='font-size:16px;'>
+                <i class='mdi mdi-check-all me-2'></i>
+                Registro de entrada <strong>guardado satisfactoriamente</strong>.
+            </div>";
+            die();
+        }
+       
     }
 
 
@@ -47,7 +59,7 @@ class Login extends BaseController {
     {        
         $session = \Config\Services::session();
         $data = array();
-        $id= $this->request->getGet('id_user');
+        $id= $this->request->getGet('no_empleado');
         if(isset($id) && !empty($id)){
           $this->asistencia_qr($id);
         }
