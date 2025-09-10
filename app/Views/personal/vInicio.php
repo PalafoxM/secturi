@@ -536,15 +536,15 @@
                                                                      <label for="edad">Edad</label>
                                                                 </div>
                                                                  <div class="col-md-4">
-                                                                    <input type="checkbox" class="checkbox checkbox-primary" name="nivel" id="nivel" checked>
+                                                                    <input type="checkbox" class="checkbox checkbox-primary" name="nivel" id="nivel" <?= (isset($configuracion) && !empty($configuracion) && $configuracion->id_nivel==0)?'':'checked' ?>>
                                                                      <label for="nivel">Nivel</label>
                                                                 </div>
                                                                 <div class="col-md-4">
-                                                                    <input type="checkbox" class="checkbox checkbox-primary" name="no_empleado" id="no_empleado" checked>
-                                                                     <label for="no_empleado">Numero de Empleado</label>
+                                                                    <input type="checkbox" class="checkbox checkbox-primary" name="id_foto" id="id_foto" checked>
+                                                                     <label for="no_empleado">Foto</label>
                                                                 </div>
                                                                 <div class="col-md-4">
-                                                                    <input type="checkbox" class="checkbox checkbox-primary" name="sexo" id="sexo" checked>
+                                                                    <input type="checkbox" class="checkbox checkbox-primary" name="sexo" id="sexo" <?= (isset($configuracion) && !empty($configuracion) && $configuracion->sexo==0)?'':'checked' ?>>
                                                                      <label for="sexo">Sexo</label>
                                                                 </div>
                                                                  <div class="col-md-4">

@@ -87,13 +87,13 @@
                                                 </div>                                                
                                                 <small class="badge badge-warning ml-auto">8</small>
                                             </a>
-                                            <a class="nav-link mb-0"  href="#" data-toggle="modal" data-animation="bounce" data-target=".hide-modal">
+                                          <!--   <a class="nav-link mb-0"  href="#" data-toggle="modal" data-animation="bounce" data-target=".hide-modal">
                                                 <span class="mr-3 text-warning d-inline-block">🔒</span>
                                                 <div class="d-inline-block align-self-center">
                                                     <h5 class="m-0">Archivos Alta Dirección</h5>
                                                     <small>80GB/200GB En uso</small>                                                    
                                                 </div>                                                                                         
-                                            </a>
+                                            </a> -->
                                         </div>
                                     </div>
                                 </div><!--end card-body-->
@@ -120,74 +120,50 @@
                                                             <ol class="dd-list">
                                                                 <li class="dd-item" data-id="1">
                                                                     <div class="dd-handle">
-                                                                        Programa de Gobierno 2018-2024
+                                                                       Lineamientos Centro de Atención de Visitantes para el Ejercicio Fiscal de 2025
                                                                     </div>
                                                                 </li>
                                                                 <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
-                                                                        Programa de Gobierno 2018 - 2024_Actualización
+                                                                        Lineamientos Gestión de Desarrollo Turístico Regional Sustentable para el Ejercicio Fiscal de 2025
                                                                     </div>
                                                                 </li>
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
-                                                                        Programa Sectorial Economía para Todos 2019-2024
+                                                                        Reglas de Operación Apoyo a Festivales Internacionales y Eventos Especiales para el Ejercicio Fiscal de 2025
                                                                     </div>
                                                                 </li>  
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
-                                                                        Actualización Programa Sectorial Eje Economía para Todos 2019-2024
+                                                                        Reglas de Operación Guanajuato, ¡Sí Sabe! para el Ejercicio Fiscal de 2025
                                                                     </div>
                                                                 </li>  
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
-                                                                        Programa Estatal de Turismo 2021 - 2024
+                                                                        Reglas de Operación Modelo de Excelencia Turística para el Ejercicio Fiscal de 2025
                                                                     </div>
                                                                 </li>  
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
-                                                                        Programa de Gobierno 2018 - 2024_Actualización
+                                                                        Reglas de Operación Fondo para los Destinos Turísticos de Guanajuato para el Ejercicio Fiscal del 2025
                                                                     </div>
                                                                 </li>
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
-                                                                        Acuerdo de Creación del Observatorio Turístico del Estado de Guanajuato
+                                                                        Reglas de Operación Turismo al 100
                                                                     </div>
                                                                 </li> 
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
-                                                                     Constitución Política de los Estados Unidos Mexicanos
+                                                                       Programa Anual de Desarrollo Archivístico 2025
                                                                     </div>
                                                                 </li> 
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
-                                                                        Constitución Política ra para el Estado de Guanajuato
+                                                                       Informe de cumplimiento del PADA 2024
                                                                     </div>
                                                                 </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                        Festivales Internacionales y Eventos Especiales para el Ejercicio Fiscal de 2022
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                       Ley de Archivos Generales del Estado y los Municipios de Guanajuato
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                        Ley de Contrataciones Públicas para el Estado de Guanajuato
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                        Ley de Hacienda para el Estado de Guanajuato
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                        Ley de Hospedaje a través de Plataformas Digitales del Estado de Guanajuato
-                                                                    </div>
-                                                                </li> 
+                                                                
                                                             </ol>
                                                         </div><!--nastable-list-1-->    
                                                     </div><!--end card-body-->
@@ -211,72 +187,22 @@
                                                             <ol class="dd-list">
                                                                 <li class="dd-item" data-id="1">
                                                                     <div class="dd-handle">
-                                                                       Norma mexicana de igualdad laboral y no discriminacion
+                                                                       Manual de Procesos y Procedimientos 2024
                                                                     </div>
                                                                 </li>
                                                                 <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
-                                                                        Reglamento-Interior-SEDETUR-2007
+                                                                        Política de Igualdad Laboral y No Discriminación
                                                                     </div>
                                                                 </li>
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
-                                                                        Reglamento-SEDETUR-2007-Modificacion
+                                                                        Protocolo para prevenir y atender la violencia
                                                                     </div>
                                                                 </li>  
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
-                                                                        Reglamento-Interior-SEDETUR-2011-Modificacion-2
-                                                                    </div>
-                                                                </li>  
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                       Acuerdo secretarial No. 005 por el que se crea el CISMA
-                                                                    </div>
-                                                                </li>  
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                        Código de Conducta de la Secretaría de Turismo
-                                                                    </div>
-                                                                </li>
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                   Consideraciones de sustentabildad para conferencias, talleres y reuniones
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                     GUIA-DE-ACTUACION-2O17
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                        Informe de cumplimiento del PADA 2023
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                     Lineamientos de Asistencia 2025
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                      Lineamientos Recursos Destinados a Acciones y Proyectos de Inversión
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                        Manual de Inducción Interno SECTUR
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                        Manual de Integración y Funcionamiento del CISMA
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                       Manual de Organización SECTUR
+                                                                        Lineamientos de Asistencia 2025
                                                                     </div>
                                                                 </li> 
                                                             </ol>
@@ -296,79 +222,363 @@
                                                     <div class="card-body">
 
                                                         <h4 class="mt-0 header-title">Formatos</h4>
-                                                        <p class="text-muted mb-4">Despacho del Secretario</p>
+                                                        <p class="text-muted mb-4">Dirección General Jurídica</p>
 
                                                         <div class="custom-dd dd" id="nestable_list_1">
                                                             <ol class="dd-list">
                                                                
                                                                 <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
-                                                                        F-DESP-01-2020 Ministración de Viáticos
+                                                                        Autorizacion de Tratamiento de Datos
                                                                     </div>
                                                                 </li>
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
-                                                                    F-DESP-02-2020 Formato de Solicitud de Viaje
+                                                                   Formato Solicitud de Convenios
                                                                     </div>
                                                                 </li>  
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
-                                                                        F-DESP-03-20 Anexo 1 Ficha Informativa
+                                                                     Solicitud de Contratos de Adquisición
                                                                     </div>
                                                                 </li>  
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
-                                                                       F-DESP-05-2020 Informe de Seguimiento Viaje al Extranjero
+                                                                      Solicitud de Contratos
                                                                     </div>
                                                                 </li>  
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
-                                                                        F-DESP-06-2020 Tarjeta Informativa de Audiencias
+                                                                       Solicitud de Honorarios
                                                                     </div>
                                                                 </li>
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
-                                                                        F-DESP-07-2020 Tarjeta Informativa de Invitaciones
+                                                                        Autorización de Tratamiento de Datos Personales-HONORARIOS
                                                                     </div>
                                                                 </li> 
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
-                                                                    F-DESP-08-2023-Hoja Membretada 200 años
+                                                                      Inventario
                                                                     </div>
                                                                 </li> 
                                                                 </ol>
-                                                                 <ol class="dd-list">
-                                                                 <p class="text-muted mb-4">Dirección de Asuntos Jurídicos</p>
+                                                            <ol class="dd-list">
+                                                                 <p class="text-muted mb-4">Coordinación de Planeación</p>
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
-                                                                        F-DAJ-01-2020 Portada Expediente
+                                                                        Formato de Verificación Alineación de Información Estratégica
                                                                     </div>
                                                                 </li> 
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
-                                                                       F-DAJ-03-2020 Formato Lomos Carpetas
+                                                                       Formato de Afectación a Metas de Proyectos de Inversión
                                                                     </div>
                                                                 </li> 
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
-                                                                       F-DAJ-04-2020 Etiqueta Caja de Archivo
+                                                                      Instructivo FM
                                                                     </div>
                                                                 </li> 
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
-                                                                       F-DAJ-05-2020 Relación de Contenido Caja de Archivo
+                                                                      Aplicabilidad y Ejemplos
                                                                     </div>
                                                                 </li> 
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
-                                                                        F-DAJ-06-2020 Etiqueta de Mobiliario de Archivo
+                                                                      Guía de Operación Etapa Seguimiento SED
+                                                                    </div>
+                                                                </li> 
+                                                                
+                                                            </ol>
+                                                            <ol class="dd-list">
+                                                                 <p class="text-muted mb-4">Coodinación de Recursos Financieros</p>
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                       Disposiciones Administrativas SECTURI 2025
                                                                     </div>
                                                                 </li> 
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
-                                                                        F-DAJ-08-2020 Autorizacion de Tratamiento de Datos
+                                                                      Oficios de Comisión
                                                                     </div>
                                                                 </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                      Encabezado Factura
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                     Evidencia Fotográfica
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                     Anexo 2.- Reporte de Integración Documental
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                     Orden de Ministración (Hoja Verde)
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                    Gasto a Reserva de Comprobar
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                     SOLICITUD GRC
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                    Pagos a Tercero
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                    Gasto de Operación
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                    Formato Conformidad Producto Recibido
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                    Formato de Afectación Presupuestal
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                    Pagos a Tercero Refrendo de Recursos
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                    Viáticos por Persona
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                    Solicitud de Operaciones Financieras
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                    Lineamientos Generales de Racionalidad Austeridad y Disciplina Presupuestal 2025
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                    Lista de Asistencia
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                    Clasificador por Objeto del Gasto
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                    Oficio de Liberación de Trámite de Pago
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                    Oficio de Liberación de Trámite de Pago a Tercero ALTA DE USUARIO SERVICIOS PROFESIONALES
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                    XXX-GASTOS-00XX-XXX-P38X0-20XX
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                    Orden de Ministración de Viáticos en el Extranjero
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                    Oficio de Liberación de Gasto GO y GRC
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                    PROCESO CANCELACION CFDI
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                    Datos de Facturacion
+                                                                    </div>
+                                                                </li> 
+                                                            </ol>
+                                                            <ol class="dd-list">
+                                                                 <p class="text-muted mb-4">Coordinación de Recursos Materiales</p>
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                     Solicitud de Mantenimiento Vehicular
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                       Bitácora de Revisión de Niveles
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                     Investigación de Mercado
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                      Investigación de Mercado Servicios
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                      Investigación de Mercado Adquisiciones
+                                                                    </div>
+                                                                </li> 
+                                                            </ol>
+                                                            <ol class="dd-list">
+                                                                 <p class="text-muted mb-4">Archivo</p>
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                     Señaletica para espacios AT
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                      Formato para lomo de carpeta
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                    Formatos para lomos de carpetas
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                      Pestaña de Expediente
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                      Etiqueta de caja at
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                      Formato inventario documental
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                      Instructivo llenado portada
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                      Portada archivística
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                      Formato registro de préstamo y/o consulta
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                      Formato listado de documentos ejemplo
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                     Registros de correspondencia
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                      Unidad de correspondencia 2023
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                      Instrumentos de Clasificación Archivistica
+                                                                    </div>
+                                                                </li> 
+                                                            </ol>
+                                                             <ol class="dd-list">
+                                                                 <p class="text-muted mb-4">Coordinación de Recursos Humanos</p>
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                     Ejemplo Entregable
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                       Solicitud de Beca para Hijos
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                     Seguro Gastos Médicos Mayores
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                     Carta Compromiso CT
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                      Solicitud Apoyo para Estudios
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                      Justificante Incidencias
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                     Licencia por Paternidad
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                      Licencia por Lactancia
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                      Permiso Económico
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                      Requisitos Apoyo para estudios y formación básica
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                      Becas para Descendientes
+                                                                    </div>
+                                                                </li> 
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <div class="dd-handle">
+                                                                      Seguro de Gastos Médicos Mayores
+                                                                    </div>
+                                                                </li> 
+                                                                 
                                                             </ol>
                                                         </div><!--nastable-list-1-->    
                                                     </div><!--end card-body-->

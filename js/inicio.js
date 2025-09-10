@@ -3228,7 +3228,7 @@ ini.inicio = (function () {
                             $('#primer_apellido').val(data.primer_apellido);
                             $('#segundo_apellido').val(data.segundo_apellido);
                             $('#id_estatus').val(data.id_estatus).change();
-                              $('#id_estatus').val(data.id_estatus).change();
+                            $('#id_estatus').val(data.id_estatus).change();
                                // Mostrar imagen si viene de la BD
                             if (data.foto) {
                             $('#previewFoto').attr('src', base_url + data.foto).show();

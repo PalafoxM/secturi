@@ -1578,12 +1578,23 @@ class Agregar extends BaseController {
         "id_usuario"  => $session->id_usuario,
      ];
 
-     $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaConfiguracion'];
-     $dataConfig = [
+     $result = $globals->getTabla(["tabla"=>"configuracion", 'where' => ['visible' => 1, 'id_usuario' =>  $session->id_usuario ]]);
+     if(!empty($result->data)){
+            $dataConfig = [
                 "tabla" => "configuracion",
-                "editar" => false
-                //"idEditar" => ['id_area' => (int)$data['id_area']]
+                "editar" => true,
+                "idEditar" => ['id_usuario' => $session->id_usuario]
             ];
+     }else{
+         $dataConfig = [
+                "tabla" => "configuracion",
+                "editar" => false,
+                //"idEditar" => ['id_usuario' => $session->id_usuario]
+            ];
+     }
+
+     $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaConfiguracion'];
+    
      $response = $globals->saveTabla($dataInsert, $dataConfig,$dataBitacora);
      return $this->respond($response);
 
