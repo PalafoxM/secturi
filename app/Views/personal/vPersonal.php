@@ -91,7 +91,7 @@
    <div class="col-12">
       <div class="card">
          <div class="card-body">
-            <p class="badge badge-soft-pink font-11 p-1 mb-1 float-lg-right float-md-none">Last updated 15 minutes ago</p>
+            <p class="badge badge-soft-pink font-11 p-1 mb-1 float-lg-right float-md-none">Actividades Asignadas hace 15 min.</p>
             <h4 class="header-title mt-0 mb-3">Actividades</h4>
             <div class="table-responsive browser_users">
                <table class="table mb-0">
@@ -124,8 +124,8 @@
                         <td><?= date('d/m/Y', strtotime($a->fec_fin)) ?></td>
                         <td>80%</td>
                         <td>                                                                                                       
-                           <a href="#" class="mr-2"><i class="fas fa-edit text-info font-16"></i></a>
-                           <a href="#"><i class="fas fa-trash-alt text-danger font-16"></i></a>
+                           <a href="javascript:void(0)" onclick="ini.inicio.modalActividadEditar(<?= $a->id_actividad ?>)" class="mr-2"><i class="fas fa-edit text-info font-16"></i></a>
+                           <a href="javascript:void(0)" onclick="ini.inicio.deleteActividad(<?= $a->id_actividad ?>);"><i class="fas fa-trash-alt text-danger font-16"></i></a>
                         </td>
                      </tr>
                       <?php endforeach; ?>
@@ -153,6 +153,7 @@
          <div class="modal-body">
             <form id="form_actividad" >
             <input type="hidden" id="id_usuario" name="id_usuario">
+            <input type="hidden" id="id_actividad" name="id_actividad" value="0">
             <div class="row">
                <div class="col-md-2">
                   <div class="mb-3 position-relative" id="">
@@ -203,7 +204,7 @@
             </div>
          </div>
          <div class="modal-footer">
-            <button class="btn btn-light" onclick="ini.inicio.modalActividad(false, 0)">Cerrar</button>
+            <a class="btn btn-danger text-white" onclick="ini.inicio.modalActividad(false, 0)">Cerrar</a>
             <button id="btnActividad" class="btn btn-primary">Guardar</button>
          </div>
     </form>

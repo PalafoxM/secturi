@@ -1514,12 +1514,34 @@ class Principal extends BaseController {
          return $this->respond($response);
 
     }
-    public function Personal()
+    public function deleteActividad()
     {
         $session = \Config\Services::session();
         $globals         = new Mglobal;
-        $personal        = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['id_jefe_inmediato' => $session->id_usuario ]]);
-        $actividad        = $globals->getTabla(['tabla' => 'vw_actividad', 'where' => ['usu_reg' => $session->id_usuario ]]);
+        $id_actividad =  $this->request->getPost('id_actividad');
+        $response = new \stdClass();
+           $dataBitacora = ['id_user' =>  $session->id_usuario, 'script' => 'Principal.php/eliminarActividad'];
+           $dataConfig = [
+                "tabla"=>"actividad",
+                "editar"=>true,
+                "idEditar" => ['id_actividad' => $id_actividad]
+            ];
+          
+           $sala = $globals->saveTabla(['visible' => 0],$dataConfig,$dataBitacora);
+           if(!$sala->error){
+            $response->error     = $sala->error;
+            $response->respuesta = $sala->respuesta;
+           }
+        
+         return $this->respond($response);
+
+    }
+    public function Personal()
+    {
+        $session = \Config\Services::session();
+        $globals   = new Mglobal;
+        $personal  = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['id_jefe_inmediato' => $session->id_usuario, 'visible' => 1 ]]);
+        $actividad = $globals->getTabla(['tabla' => 'vw_actividad', 'where' => ['usu_reg' => $session->id_usuario, 'visible' => 1 ]]);
        
         $data['personal'] = (!empty($personal->data))?$personal->data:[];
         $data['actividad']= (!empty($actividad->data))?$actividad->data:[];
@@ -2771,12 +2793,15 @@ class Principal extends BaseController {
             "descripcion" => $data['des_actividad'],
             "id_usuario"  => $data['id_usuario'],
             "usu_reg"     => $session->id_usuario,
-            "fec_reg"     => date('Y-m-d'),
+            "fec_reg"     => date('Y-m-d')
         ];
+        if($data['id_actividad']==0){
+           $dataInsert['usu_act'] = $session->id_usuario;
+        }
         $dataConfig = [
             "tabla"=>"actividad",
-            "editar"=>false,
-            //"idEditar" => ['id_reserva'=>(int)$data['id_reserva']]
+            "editar"=>($data['id_actividad']==0)?false:true,
+            "idEditar" => ['id_actividad'=>(int)$data['id_actividad']]
         ];
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Principal.php/guardaActividad'];
         $res = $globals->saveTabla($dataInsert, $dataConfig,$dataBitacora);

@@ -1819,6 +1819,23 @@ class Agregar extends BaseController {
         $data['contentView'] = 'personal/vListaAlba';                
         $this->_renderView($data);
     }
+    public function getActividad()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error =true;
+        $response->respuesta ='Error| Error al consultar la actividad';
+        $globals = new Mglobal;
+        $id_actividad = $this->request->getPost('id_actividad');
+        $resul = $globals->getTabla(['tabla' => 'vw_actividad', 'where' => ['visible' => 1, 'id_actividad' => $id_actividad]]);
+        if(!$resul->error){
+            $response->error = false;
+            $response->respuesta = $resul->respuesta;
+            $response->data = $resul->data[0];
+
+        }
+        return $this->respond($response);
+    }
     public function registroSala()
     {
         $session = \Config\Services::session();

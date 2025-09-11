@@ -426,56 +426,29 @@
                                         <div class="col-lg-4">
                                             <div class="card">                                       
                                                 <div class="card-body"> 
-                                                    <h4 class="header-title mt-0 mb-3">Hoy</h4>
+                                                    <h4 class="header-title mt-0 mb-3">Avances Actividad</h4>
                                                     <div class="row">
-                                                        <div class="col-4">
-                                                            <img src="<?= base_url() ?>assets/images/widgets/sales-re.svg" alt="" class="img-fluid">
-                                                        </div>
-                                                        <div class="col-8 align-self-center">
-                                                            <p class="skill-detail">Contrary to popular belief, Lorem Ipsum is not simply random text. 
-                                                                It has roots in a piece of classical Latin literature from 45 BC, 
-                                                                making it over 2000 years old. Richard McClintock, a Latin professor.
+                                                   
+                                                        <div class="col-12 align-self-center">
+                                                            <p class="skill-detail">
+                                                                Favor de ajustar el porcentaje de las actividad(es)
                                                             </p>
                                                         </div>
+                                                  
                                                     </div>
-                                                    <div class="text-right mt-3">
-                                                        <span class="bg-light p-2 rounded">Last Update : 2 hours</span>
-                                                    </div>
-                                                    
+                                                 
+                                                     <?php if(isset($actividad) && !empty($actividad)): ?>
+                                                      <?php foreach ($actividad as $a): ?>
                                                     <div class="skills mt-4">
                                                         <div class="skill-box"> 
-                                                            <h4 class="skill-title">Electronic</h4> 
-                                                            <div class="progress-line"> 
-                                                                <span data-percent="78" style="width: 78%;">
-                                                                    <span class="percent-tooltip">78%</span>
-                                                                </span> 
-                                                            </div>
-                                                        </div>
-                                                        <div class="skill-box"> 
-                                                            <h4 class="skill-title">Clothes</h4> 
-                                                            <div class="progress-line"> 
-                                                                <span data-percent="90" style="width: 90%;">
-                                                                    <span class="percent-tooltip">90%</span>
-                                                                </span> 
-                                                            </div>
-                                                        </div>
-                                                        <div class="skill-box"> 
-                                                            <h4 class="skill-title">Phones</h4> 
-                                                            <div class="progress-line"> 
-                                                                <span data-percent="80" style="width: 80%;">
-                                                                    <span class="percent-tooltip">80%</span>
-                                                                </span> 
-                                                            </div>
-                                                        </div>
-                                                        <div class="skill-box"> 
-                                                            <h4 class="skill-title">Medicine</h4> 
-                                                            <div class="progress-line"> 
-                                                                <span data-percent="95" style="width: 95%;">
-                                                                    <span class="percent-tooltip">95%</span>
-                                                                </span> 
+                                                            <h4 class="skill-title"><?= $a->actividad ?></h4> 
+                                                            <div class="p-3">
+                                                                   <input type="text" id="range_02">
                                                             </div>
                                                         </div>
                                                     </div>
+                                                      <?php endforeach; ?>  
+                                                    <?php endif; ?>
                                                 </div>  <!--end card-body-->                                     
                                             </div><!--end card-->
                                         </div><!--end col-->
@@ -822,6 +795,10 @@
         <link href="<?= base_url() ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
         <link href="<?= base_url() ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
 
+           <!-- ION Slider -->
+        <link href="<?= base_url() ?>plugins/ion-rangeslider/ion.rangeSlider.css" rel="stylesheet" type="text/css"/>
+
+
         <!-- jQuery  -->
         <script src="<?= base_url() ?>assets/js/jquery.min.js"></script>
         <script src="<?= base_url() ?>assets/js/jquery-ui.min.js"></script>
@@ -841,6 +818,10 @@
         <script src="<?= base_url() ?>plugins/chartjs/roundedBar.min.js"></script>
         <script src="<?= base_url() ?>plugins/lightpick/lightpick.js"></script>
         <script src="<?= base_url() ?>assets/pages/jquery.profile.init.js"></script>
+
+                <!-- Range slider js -->
+        <script src="<?= base_url() ?>plugins/ion-rangeslider/ion.rangeSlider.min.js"></script>
+        <script src="<?= base_url() ?>assets/pages/jquery.rangeslider.init.js"></script> 
 
 <script src="<?= base_url(); ?>assets/pages/jquery.analytics_dashboard.init.js"></script>
         

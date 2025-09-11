@@ -303,9 +303,7 @@
                         <ul class="nav">
                             <li class="nav-item"><a class="nav-link" href="<?php echo base_url(); ?>index.php/Principal/incidenciaSubordinado">Incidencias</a></li>
                             <li class="nav-item"><a class="nav-link" href="<?php echo base_url(); ?>index.php/Principal/Personal">Personal</a></li>
-                            <li class="nav-item"><a class="nav-link" href="../crm/crm-index.html">Actividades</a></li>
-                            <li class="nav-item"><a class="nav-link" href="../projects/projects-index.html">Listos</a></li> 
-                            <li class="nav-item"><a class="nav-link" href="../ecommerce/ecommerce-index.html">Pendientes</a></li>
+
                         </ul>
                     </div><!-- end Dashboards -->    
 
@@ -363,9 +361,7 @@
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaArea">Lista de Área</a></li>
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaTiket">Listado de Tikets</a></li>
                                     <li><a href="<?php echo base_url(); ?>index.php/Principal/listadoProveedores">Lista de Proveedores</a></li>
-                                    <li><a href="../others/ui-check-radio.html">Check & Radio</a></li>
-                                    <li><a href="../others/advanced-session.html">Session Timeout</a></li>
-                                    <li><a href="../others/advanced-idle-timer.html">Idle Timer</a></li>
+                                   
                                 </ul>            
                             </li><!--end nav-item-->
                            <?php endif; ?>
@@ -375,13 +371,7 @@
                                 <ul class="nav-second-level" aria-expanded="false">
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/subirAsistencia">Asistencias</a></li>
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaIncidencia">Lista de Incidencia</a></li>
-                                    <li><a href="../others/forms-validation.html">Validation</a></li>
-                                    <li><a href="../others/forms-wizard.html">Wizard</a></li>
-                                    <li><a href="../others/forms-editors.html">Editors</a></li>
-                                    <li><a href="../others/forms-repeater.html">Repeater</a></li>
-                                    <li><a href="../others/forms-x-editable.html">X Editable</a></li>
-                                    <li><a href="../others/forms-uploads.html">File Upload</a></li>
-                                    <li><a href="../others/forms-img-crop.html">Image Crop</a></li>
+                                  
                                 </ul>            
                             </li><!--end nav-item-->
                             <?php endif; ?>
@@ -390,40 +380,8 @@
                                 <a class="nav-link" href="#"><span class="w-100">Admin RM</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
                                 <ul class="nav-second-level" aria-expanded="false">
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/vehiculos">Vehiculos</a></li>
-                                    <li><a href="../others/tables-datatable.html">Datatables</a></li>
-                                    <li><a href="../others/tables-responsive.html">Responsive</a></li>
-                                    <li><a href="../others/tables-footable.html">Footable</a></li>
-                                    <li><a href="../others/tables-jsgrid.html">Jsgrid</a></li>
-                                    <li><a href="../others/tables-dragger.html">Dragger</a></li>
-                                    <li><a href="../others/tables-editable.html">Editable</a></li>
-                                </ul>            
-                            </li><!--end nav-item-->
-                            <li class="nav-item">
-                                <a class="nav-link" href="#"><span class="w-100">Icons</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
-                                <ul class="nav-second-level" aria-expanded="false">
-                                    <li><a href="../others/icons-materialdesign.html">Material Design</a></li>
-                                    <li><a href="../others/icons-dripicons.html">Dripicons</a></li>
-                                    <li><a href="../others/icons-fontawesome.html">Font awesome</a></li>
-                                    <li><a href="../others/icons-themify.html">Themify</a></li>
-                                    <li><a href="../others/icons-feather.html">Feather</a></li>
-                                    <li><a href="../others/icons-typicons.html">Typicons</a></li>
-                                    <li><a href="../others/icons-emoji.html">Emoji <i class="em em-ok_hand"></i></a></li>
-                                </ul>            
-                            </li><!--end nav-item-->
-                            <li class="nav-item">
-                                <a class="nav-link" href="#"><span class="w-100">Maps</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
-                                <ul class="nav-second-level" aria-expanded="false">
-                                    <li><a href="../others/maps-google.html">Google Maps</a></li>
-                                    <li><a href="../others/maps-leaflet.html">Leaflet Maps</a></li>
-                                    <li><a href="../others/maps-vector.html">Vector Maps</a></li>       
-                                </ul>            
-                            </li><!--end nav-item-->
-                            <li class="nav-item">
-                                <a class="nav-link" href="#"><span class="w-100">Email Templates</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
-                                <ul class="nav-second-level" aria-expanded="false">
-                                    <li><a href="../others/email-templates-basic.html">Basic Action Email</a></li>
-                                    <li><a href="../others/email-templates-alert.html">Alert Email</a></li>
-                                    <li><a href="../others/email-templates-billing.html">Billing Email</a></li>         
+                                    <li><a href="../others/tables-datatable.html">Inventarios</a></li>
+
                                 </ul>            
                             </li><!--end nav-item-->
                         </ul><!--end nav-->
