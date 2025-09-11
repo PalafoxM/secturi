@@ -122,7 +122,7 @@
                         <td><?= $a->actividad ?></td>
                         <td><?= date('d/m/Y', strtotime($a->fec_inicio)) ?></td>
                         <td><?= date('d/m/Y', strtotime($a->fec_fin)) ?></td>
-                        <td>80%</td>
+                        <td><?= $a->avance ?>%</td>
                         <td>                                                                                                       
                            <a href="javascript:void(0)" onclick="ini.inicio.modalActividadEditar(<?= $a->id_actividad ?>)" class="mr-2"><i class="fas fa-edit text-info font-16"></i></a>
                            <a href="javascript:void(0)" onclick="ini.inicio.deleteActividad(<?= $a->id_actividad ?>);"><i class="fas fa-trash-alt text-danger font-16"></i></a>

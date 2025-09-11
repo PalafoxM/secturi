@@ -2505,6 +2505,36 @@ class Principal extends BaseController {
         exit();
 
     }
+    public function avanceActividad()
+    {   
+        $session = \Config\Services::session();
+        $response     = new \stdClass();
+        $response->error = true;
+        $response->respuesta = "Error al validar usuario";
+        $globals      = new Mglobal;
+        $data         =  $this->request->getPost();
+      
+        $dataConfig = [
+            "tabla"=>"actividad",
+            "editar"=>true,
+            "idEditar"=>['id_actividad'=>$data['id_actividad']]
+        ];
+        $dataBitacora = ['id_user' =>  $session->id_usuario, 'script' => 'Agregar.php/guardaTurno'];
+        $response = $globals->saveTabla(["avance"=>$data['avance']],$dataConfig,$dataBitacora);
+        return $this->respond($response);
+
+
+    }
+    public function ListaDenuncia()
+    {   
+        $session = \Config\Services::session();   
+        $data = array();
+        $globals      = new Mglobal;
+        $data['denuncia'] = $globals->getTabla(["tabla"=>"denuncia", "where"=>["visible"=>1]])->data; 
+        $data['scripts'] = array('principal','inicio');
+        $data['contentView'] = 'personal/vListaDenuncia';                
+        $this->_renderView($data);
+    }
     public function ImprimirPT($id_pt = null,$savePath = null )
     {  
         $session = \Config\Services::session();

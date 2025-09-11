@@ -205,12 +205,12 @@
                                                                     <div class="media-body align-self-center"> 
                                                                         <div class="transaction-data">                                                         
                                                                             <h3 class="m-0"><?= $c['nombre_completo']; ?></h3>
-                                                                            <p class="text-muted mb-0">el <?= $c['dia']; ?></p>
+                                                                            <p class="text-muted mb-0"><?= $c['dsc_area']; ?></p>
                                                                         </div>                                                                                              
                                                                     </div>
                                                                 </div>
                                                                 <?php if($c['id_edad']!='0'): ?>
-                                                                <span class="text-success"><?= $c['edad']; ?> años</span>
+                                                                <span class="text-success"><?= $c['dia']; ?></span>
                                                                 <?php endif; ?>
                                                               
                                                             </li>
@@ -375,15 +375,35 @@
                                                 </div> <!--end col-->
                                                 
                                                 <div class="col-lg-6">
-                                                    <div class="card">
-                                                        <div class="card-body">
-                                                            <div class="p-4 bg-light text-center align-item-center">                                                                    
-                                                                <h1 class="font-weight-semibold"> <?= (!empty($eventos))?$eventos->evento :'Hoy no hay Eventos' ?> </h1> 
-                                                                <h4 class="header-title"><?= (!empty($eventos))?$eventos->dsc_eventos :'Sin evento' ?> </h4>  
-                                                                                                  
-                                                            </div> 
-                                                        </div><!--end card-body-->                                                                                                  
-                                                    </div><!--end card-->
+                                                        <div class="card">
+                                                            <div class="card-body">
+                                                                <div class="blog-card">
+                                                                    <img src="<?= base_url() ?>assets/images/small/img-9.jpg" alt="" class="img-fluid"/>
+                                                                    <span class="badge badge-purple px-3 py-2 bg-soft-secondary font-weight-semibold mt-3">Photography</span>   
+                                                                    <h4 class="my-3">
+                                                                        <a href="" class="">There are many variations of passages of Lorem</a>
+                                                                    </h4>
+                                                                    <p class="text-muted">The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Cum sociis natoque penatibus et magnis.</p>
+                                                                    <hr class="hr-dashed">
+                                                                    <div class="d-flex justify-content-between">
+                                                                        <div class="meta-box">
+                                                                            <div class="media">
+                                                                                <img src="<?= base_url()?>assets/images/users/user-1.png" alt="" class="thumb-sm rounded-circle mr-2">                                       
+                                                                                <div class="media-body align-self-center text-truncate">
+                                                                                    <h6 class="mt-0 mb-1 text-dark">Donald Gardner</h6>
+                                                                                    <ul class="p-0 list-inline mb-0">
+                                                                                        <li class="list-inline-item">26 mars 2020</li>
+                                                                                        <li class="list-inline-item">by <a href="">admin</a></li>
+                                                                                    </ul>
+                                                                                </div><!--end media-body-->
+                                                                            </div>                                            
+                                                                        </div><!--end meta-box-->
+                                                                       
+                                                                    </div>                                        
+                                                                </div><!--end blog-card--> 
+                                                                                        
+                                                            </div><!--end card-body-->
+                                                        </div><!--end card-->
                                                 </div><!--end col--> 
                                             </div><!--end row-->                                          
                                         </div><!--end col-->
@@ -426,7 +446,7 @@
                                         <div class="col-lg-4">
                                             <div class="card">                                       
                                                 <div class="card-body"> 
-                                                    <h4 class="header-title mt-0 mb-3">Avances Actividad</h4>
+                                                    <h4 class="header-title mt-0 mb-3">Avance Actividad</h4>
                                                     <div class="row">
                                                    
                                                         <div class="col-12 align-self-center">
@@ -439,15 +459,18 @@
                                                  
                                                      <?php if(isset($actividad) && !empty($actividad)): ?>
                                                       <?php foreach ($actividad as $a): ?>
-                                                    <div class="skills mt-4">
-                                                        <div class="skill-box"> 
+                                                        <div class="skills mt-4">
+                                                            <div class="skill-box"> 
                                                             <h4 class="skill-title"><?= $a->actividad ?></h4> 
                                                             <div class="p-3">
-                                                                   <input type="text" id="range_02">
+                                                                <input type="text" 
+                                                                    class="range_actividad" 
+                                                                    value="<?=($a->avance)?>"
+                                                                    data-id="<?= (int)$a->id_actividad ?>">
+                                                            </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                      <?php endforeach; ?>  
+                                                        <?php endforeach; ?>
                                                     <?php endif; ?>
                                                 </div>  <!--end card-body-->                                     
                                             </div><!--end card-->
@@ -807,7 +830,7 @@
         <script src="<?= base_url() ?>assets/js/waves.js"></script>
         <script src="<?= base_url() ?>assets/js/feather.min.js"></script>
         <script src="<?= base_url() ?>assets/js/jquery.slimscroll.min.js"></script>
-        <script src="<?= base_url() ?>plugins/apexcharts/apexcharts.min.js"></script> 
+
 
         <script src="<?= base_url() ?>plugins/dropify/js/dropify.min.js"></script>
         <script src="<?= base_url() ?>plugins/moment/moment.js"></script>
@@ -828,6 +851,29 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1"></script>
 <script>
     ini.inicio.formConfiguracion();
+    $(".range_actividad").each(function () {
+        let $input = $(this);
+        let idActividad = $input.data("id");
+        
+        // Variable para controlar el debounce
+        let timeoutId = null;
+        
+        $input.ionRangeSlider({
+            min: 0,
+            max: 100,
+            step: 1,
+            grid: true,
+            onFinish: function (data) {
+                // Clear cualquier timeout existente
+                clearTimeout(timeoutId);
+                
+                // Establecer nuevo timeout (300ms de delay)
+                timeoutId = setTimeout(function() {
+                    ini.inicio.avanceActividad(idActividad, data.from);
+                }, 300);
+            }
+        });
+    });
 
 function guardarFoto() {
     // Usar JavaScript puro para evitar problemas con jQuery

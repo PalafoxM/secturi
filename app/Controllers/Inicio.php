@@ -72,6 +72,7 @@ class Inicio extends BaseController {
                       'id_sexo'          => $c->sexo,
                       'id_fec_nac'       => $c->id_fec_nac,
                       'id_usuario'       => $c->id_usuario,
+                      'dsc_area'         => $c->dsc_area,
                       'edad'             => $edad,
                       'ruta_foto_relativa' =>$c->ruta_foto_relativa,
                       'dia'             =>  date('d', strtotime($c->fec_nac))
@@ -148,6 +149,7 @@ class Inicio extends BaseController {
                       'id_sexo'          => $c->sexo,
                       'id_fec_nac'       => $c->id_fec_nac,
                       'id_usuario'       => $c->id_usuario,
+                      'dsc_area'         => $c->dsc_area,
                       'edad'             => $edad,
                       'ruta_foto_relativa' =>$c->ruta_foto_relativa,
                       'dia'             =>  date('d', strtotime($c->fec_nac))
@@ -244,6 +246,20 @@ class Inicio extends BaseController {
         $data['contentView'] = 'secciones/vViaticos';                
         $this->_renderView($data);
         
+    }
+    public function ListaInventario()
+    {
+        $session            = \Config\Services::session();
+        $data               = array();
+        $globas             = new Mglobal;
+        $data['usuario']    = $globas->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]])->data;
+        $data['cat_perfil'] = $globas->getTabla(['tabla' => 'perfil', 'where' => ['visible' => 1]])->data;
+        $data['cat_area']   = $globas->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]])->data;
+   
+        $data['scripts']    = array('principal','inicio');
+        $data['contentView']= 'personal/vListaInventario';                
+        $this->_renderView($data);
+
     }
     public function Chat()
     {        

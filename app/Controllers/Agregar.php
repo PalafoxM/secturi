@@ -304,6 +304,11 @@ class Agregar extends BaseController {
     {
         $session = \Config\Services::session();
         $response = new \stdClass();
+        $globals = new Mglobal(); 
+        $data['usuario'] = $globals->getTabla([
+                'tabla' => 'vw_usuario',
+                'where' => ['visible' => 1]
+            ])->data;
         $data['scripts']     = array('inicio');
         $data['contentView'] = 'personal/vDenuncia';                
         $this->_renderView($data);
@@ -653,6 +658,38 @@ class Agregar extends BaseController {
                         "idEditar" => ['id_reserva' => (int)$id]
                     ];
         $response = $this->globals->saveTabla(['id_estatus' => 4],$dataConfig,$dataBitacora);
+
+
+    }
+    public function formDenuncia()
+    {
+        $session = \Config\Services::session();
+        $this->globals = new Mglobal(); 
+        $data = $this->request->getPost();
+
+        $dataInsert = [
+            "nombre"     => $data['nombre'],
+            "domicilio"  => $data['domicilio'],
+            "correo"     => $data['correo'],
+            "telefono"   => $data['telefono'],
+            "donde_ocurrieron"  => $data['donde_ocurrieron'],
+            "cuando_ocurrieron"  => $data['cuando_ocurrieron'],
+            "testigo"    => (int)$data['testigo'],
+            "denunciando"=> $data['denunciando'],
+            "denunciando_text"=> $data['denunciando_text'],
+            "como_ocurrieron"=> $data['como_ocurrieron'],
+            "usu_reg"    => $session->id_usuario,
+            "fec_reg"    => date('Y-m-d'),
+        ];
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaDenuncia'];
+        $dataConfig   = [
+                        "tabla"=>"denuncia",
+                        "editar"=>false
+                        //"idEditar" => ['id_reserva' => (int)$id]
+                    ];
+        $response = $this->globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
+  
+        return $this->respond($response);
 
 
     }

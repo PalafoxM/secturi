@@ -380,7 +380,7 @@
                                 <a class="nav-link" href="#"><span class="w-100">Admin RM</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
                                 <ul class="nav-second-level" aria-expanded="false">
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/vehiculos">Vehiculos</a></li>
-                                    <li><a href="../others/tables-datatable.html">Inventarios</a></li>
+                                    <li><a href="<?php echo base_url(); ?>index.php/Inicio/ListaInventario">Inventarios</a></li>
 
                                 </ul>            
                             </li><!--end nav-item-->
@@ -427,7 +427,7 @@
                         <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>authentication/auth-recover-pw.html">Lista GRC</a></li>
                         <li class="nav-item"><a class="nav-link"
-                                href="<?php echo base_url(); ?>authentication/auth-recover-pw-alt.html">Re-Password-alt</a>
+                                href="<?php echo base_url(); ?>index.php/Principal/ListaDenuncia">Lista Denuncia</a>
                         </li>
                        
                     </ul>

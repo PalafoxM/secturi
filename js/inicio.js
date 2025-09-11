@@ -250,91 +250,55 @@ ini.inicio = (function () {
         closeCumple: function(){
           $("#verDetallesCumple").modal('hide');
         },
-        verDetallesCumple: function(id){
-            // lanzar confetti
-            confetti({
-                particleCount: 100,
-                spread: 70,
-                origin: { y: 0.6 },
-                scalar: 1.2,
-                shapes: ["circle", "square"],
-                colors: ["#ff0000", "#ff8000", "#ffff00", "#00ff00", "#0000ff"]
-            });
+     verDetallesCumple: function(id){
+        // lanzar confetti
+        confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 },
+            scalar: 1.2,
+            shapes: ["circle", "square"],
+            colors: ["#ff0000", "#ff8000", "#ffff00", "#00ff00", "#0000ff"]
+        });
 
-            // forzar el z-index del canvas del confetti
-            let canvasConfetti = document.querySelector('canvas');
-            if (canvasConfetti) {
-                canvasConfetti.style.position = 'fixed';
-                canvasConfetti.style.top = '0';
-                canvasConfetti.style.left = '0';
-                canvasConfetti.style.width = '100%';
-                canvasConfetti.style.height = '100%';
-                canvasConfetti.style.pointerEvents = 'none';
-                canvasConfetti.style.zIndex = '9999'; // más alto que el modal
-            }
+        // forzar el z-index del canvas del confetti
+        let canvasConfetti = document.querySelector('canvas');
+        if (canvasConfetti) {
+            canvasConfetti.style.position = 'fixed';
+            canvasConfetti.style.top = '0';
+            canvasConfetti.style.left = '0';
+            canvasConfetti.style.width = '100%';
+            canvasConfetti.style.height = '100%';
+            canvasConfetti.style.pointerEvents = 'none';
+            canvasConfetti.style.zIndex = '9999'; // más alto que el modal
+        }
 
-            $.ajax({
-                type: "POST",
-                url: base_url + "index.php/Usuario/getUsuario",
-                dataType: "json",
-                data:{id_usuario:id},
-                success: function(data) {
-                    let img = (data.ruta_foto_relativa)
-                        ? `<img src="${base_url+data.ruta_foto_relativa}" class="img-fluid rounded"/>`
-                        : '';
-                    if (data) {
-                        $(".met-profile-main-pic2").html(`
-                            <p>${data.nombre} ${data.primer_apellido} ${data.segundo_apellido}</p>
-                            ${img}
-                        `);
-                    } else {
-                        Swal.fire("info", "No se encontraron datos del usuario.", "info");
-                    }
-                },
-                complete: function(){
-                    $("#verDetallesCumple").modal('show');
-                },
-                error: function() {
+        $.ajax({
+            type: "POST",
+            url: base_url + "index.php/Usuario/getUsuario",
+            dataType: "json",
+            data:{id_usuario:id},
+            success: function(data) {
+                let img = (data.ruta_foto_relativa)
+                    ? `<img src="${base_url+data.ruta_foto_relativa}" class="img-fluid rounded"/>`
+                    : '';
+                if (data) {
+                    $(".met-profile-main-pic2").html(`
+                        <p>${data.nombre} ${data.primer_apellido} ${data.segundo_apellido}</p>
+                        ${img}
+                    `);
+                } else {
                     Swal.fire("info", "No se encontraron datos del usuario.", "info");
                 }
-            });
-        },
-        deleteActividad: function(id_actividad){
-            console.log(id_actividad);
-            Swal.fire({
-                title: "¿Está seguro?",
-                text: "¿Desea Eliminar la actividad?",
-                icon: "info",
-                showCancelButton: true,
-                cancelButtonText: "Cancelar",
-                confirmButtonText: "Eliminar",
-            }).then((result) => {
-                if (result.isConfirmed) {
-                   $.ajax({
-                        url: base_url + 'index.php/Principal/deleteActividad',
-                        type: 'POST',
-                        dataType: 'json',
-                        data: { id_actividad },
-                        success: function(response) {
-                            if (!response.error) {
-                                Swal.fire('Éxito', response.respuesta, 'success');
-                               // window.location.reload(); 
-                               setTimeout(() => {
-                                    window.location.reload(); 
-                                }, 1000);
-                            } else {
-                                Swal.fire('Error', response.respuesta, 'error');
-                            }
-                        },
-                        error: function() {
-                            Swal.fire('Error', 'Error de conexión con el servidor', 'error');
-                        }
-                    }); 
-                            
-                        }
-            });
-
-        },
+            },
+            complete: function(){
+                $("#verDetallesCumple").modal('show');
+            },
+            error: function() {
+                Swal.fire("info", "No se encontraron datos del usuario.", "info");
+            }
+        });
+    },
         getUsuario: function(id){
             
             $.ajax({
@@ -522,7 +486,7 @@ ini.inicio = (function () {
                     }); 
                             
                         }
-            });
+                    });
         },
         nuevoProveedor: function () {
             Swal.fire({
@@ -3194,6 +3158,63 @@ ini.inicio = (function () {
                 timeout = setTimeout(() => func.apply(context, args), wait);
             };
         },
+       avanceActividad: function(id_actividad, avance){
+           console.log(id_actividad, avance);
+            $.ajax({
+                    url: base_url + "index.php/Principal/avanceActividad",
+                    type: 'POST',
+                    data: {id_actividad, avance},
+                    success: function(response) {
+                       console.log(response);
+                    },
+                    error: function(xhr, status, error) {
+                        console.log(error);
+                        Swal.fire("Error", "Favor de llamar al Administrador", "error");
+                    }
+                }); 
+       },
+       formDenuncia: function()
+       {
+        var formData = $("#form_denuncia").serialize();
+        $.ajax({
+                    type: "POST",
+                    url: base_url + "index.php/Agregar/formDenuncia",
+                    data:formData,
+                    dataType: "json",
+                     beforeSend: function()
+                    {
+                      $('#btnDenuncia').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                    },
+                    success: function (response) {
+                        console.log(response);
+                        if(response.error){
+                            Swal.fire("error", response.respuesta ,"error");
+                        }else{
+                            Swal.fire("success", response.respuesta, 'success');
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1500);
+                      
+                       }
+                       
+                    },
+                    complete: function()
+                    {
+                      $('#btnDenuncia').prop('disabled', false).html('Guardar Configuración');
+                    },
+                    error: function (response,jqXHR, textStatus, errorThrown) {
+                         var res= JSON.parse (response.responseText);
+                        //  console.log(res.message);
+                         Swal.fire("Error", '<p> '+ res.message + '</p>', 'error');  
+                        $('#btnDenuncia').prop('disabled', false).html('Guardar Configuración');
+                    }
+                });
+
+       },
+       agregarInventario: function()
+       {
+         $("#modelInventarios").modal('show');
+       },
        agregarAlba: function() {
             // Alternativa para asegurar que funcione
             var modal = new bootstrap.Modal(document.getElementById('modalAlba'));
@@ -3338,37 +3359,6 @@ ini.inicio = (function () {
                                     }
                                 });
                     }
-            });
-
-        },
-        modalActividadEditar: function(id_actividad)
-        {
-              $.ajax({
-                type: "POST",
-                url: base_url + "index.php/Agregar/getActividad",
-                data: {id_actividad},
-                dataType: "json",
-                success: function (response) {
-                    const datos = response.data;
-                    console.log(datos);
-                    $("#actividad").val(datos.actividad);
-                    $("#id_actividad").val(datos.id_actividad);
-                    $("#id_usuario").val(datos.id_usuario);
-                    $("#estatus").val(datos.estado).change();
-                    $("#des_actividad").val(datos.descripcion);
-                    const fechaCompleta = datos.fec_fin; // Ejemplo de fecha
-                    const fechaInicio = datos.fec_inicio; // Ejemplo de fecha
-                    const fechaFormateada = fechaCompleta.split('T')[0];
-                    const fechaFormateada2 = fechaInicio.split('T')[0];  // Extrae "1983-10-10"
-                    $('#fec_fin').val(fechaFormateada); // Asigna la fecha al campo
-                    $("#fec_inicio").val(fechaFormateada2);
-                },
-                complete: function (info){
-                    $("#modalActividad").modal("show");
-                },
-                error: function (response,jqXHR, textStatus, errorThrown) {  
-                    Swal.fire("Error", '<p> '+ res.message + '</p>'); 
-                }
             });
 
         },
