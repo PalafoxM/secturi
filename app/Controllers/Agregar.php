@@ -300,19 +300,29 @@ class Agregar extends BaseController {
 
 
     }
-    public function deleteActividad()
+    public function deleteDenuncia()
     {
         $session = \Config\Services::session();
         $response = new \stdClass();
         $globals = new Mglobal(); 
+        $id_denuncia = $this->request->getPost('id_denuncia'); 
         $dataBitacora = ['id_user' => $session->id_usuario, 'script' => 'Agregar.php/eliminarDenuncia'];
         $dataConfig = [
             "tabla"=>"denuncia",
-            "editar"=>false,
-            //"idEditar"=>['id_usuario'=>$data['id_usuario']]
+            "editar"=>true,
+            "idEditar"=>['id_denuncia'=>$id_denuncia]
         ];
         $response = $globals->saveTabla(['visible' => 0],$dataConfig,$dataBitacora);
         return $this->respond($response);
+    }
+    public function getDenuncia()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $globals = new Mglobal(); 
+        $id_denuncia = $this->request->getPost('id_denuncia'); 
+        $response = $globals->getTabla(['tabla' => 'denuncia', 'where' => ['id_denuncia' => $id_denuncia]]);
+        return $this->respond($response->data[0]);
     }
     public function Denuncia()
     {
@@ -675,6 +685,52 @@ class Agregar extends BaseController {
 
 
     }
+     public function enviarCorreoDenuncia()
+    {
+        // Inicializar servicios y objetos
+        $email = Services::email();
+        $session = Services::session();
+        $response = new \stdClass();
+
+        // Configurar y enviar correo
+        $email->setFrom('a.palafoxm@guanajuato.gob.mx' , 'SUSI');
+        //$email->setTo("palafox.marin31@gmail.com");
+        $email->setTo([
+            'tmares@guanajuato.gob.mx',
+            'luis.perez@guanajuato.gob.mx'
+        ]);
+        $email->setSubject('REGISTRO DE DENUNCIA');
+       $email->setMessage('
+                    <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+                        <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+                            <div style="background-color: #004080; padding: 20px; text-align: center;">
+                                <img src="' . base_url('assets/images/logo-sm.png') . '" alt="Logo" style="height: 60px;">
+                            </div>
+                            <div style="padding: 30px; color: #333;">
+                                <h1 style="color: #004080;">¡Se ha registrado una Denuncia por Incumplimiento al codigo de Ética!</h1>
+                                <p style="font-size: 16px;">Favor de <strong> Ingresar a SUSI</strong>.</p>
+                                <p style="font-size: 15px;"><a href="'.base_url().'index.php/Principal/ListaDenuncia"><strong>Seguimiento Denuncia</strong></a></p>
+                            </div>
+                            <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 13px; color: #666;">
+                                © ' . date('Y') . ' Sistema de Atención SUSI. Todos los derechos reservados.
+                            </div>
+                        </div>
+                    </div>
+                ');
+
+
+        // Intentar enviar el correo
+        if ($email->send()) {
+            $response->error = false;
+            $response->respuesta = "Correo enviado correctamente.";
+        } else {
+            $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
+        }
+        
+        return $this->response->setJSON($response);
+    
+
+    }
     public function formDenuncia()
     {
         $session = \Config\Services::session();
@@ -702,11 +758,16 @@ class Agregar extends BaseController {
                         //"idEditar" => ['id_reserva' => (int)$id]
                     ];
         $response = $this->globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
+        if(!$response->error){
+            $this->enviarCorreoDenuncia();
+
+        }
   
         return $this->respond($response);
 
 
     }
+    
     public function guardaPT()
     {
         $session = \Config\Services::session();

@@ -257,7 +257,7 @@
                         <i data-feather="dollar-sign" class="align-self-center menu-icon icon-dual"></i>
                     </a><!--end MetricaApps-->
              
-                   <?php if(in_array($session->id_perfil, [1,2,3,4])): ?>  
+                   <?php if(in_array($session->id_perfil, [1,2,3])): ?>  
                     <a href="#MetricaUikit" class="nav-link" data-toggle="tooltip-custom" data-placement="right"  data-trigger="hover" title="" data-original-title="Admin">
                         <i data-feather="user" class="align-self-center menu-icon icon-dual"></i>
                     </a><!--end MetricaUikit-->
@@ -318,7 +318,7 @@
                                 <ul class="nav-second-level" aria-expanded="false">
                                     <li><a href="<?php echo base_url(); ?>index.php/Principal/listadoPT">Reserva PT</a></li>
                                     <li><a href="<?php echo base_url(); ?>index.php/Principal/listadoGo">Reserva GO</a></li>  
-                                    <li><a href="../apps/email-read.html">Reserva GRC</a></li>                 
+                                   <!--  <li><a href="../apps/email-read.html">Reserva GRC</a></li>   -->               
                                 </ul>            
                             </li><!--end nav-item-->
                             <?php endif; ?>
@@ -327,7 +327,7 @@
                                 <ul class="nav-second-level" aria-expanded="false">
                                     <li><a href="<?php echo base_url(); ?>index.php/Principal/listaReservaPT">Estatus PT</a></li>
                                     <li><a href="<?php echo base_url(); ?>index.php/Principal/listaReservaGO">Estatus GO</a></li>  
-                                    <li><a href="../apps/email-read.html">Estatus GRC</a></li>                 
+                                    <!-- <li><a href="../apps/email-read.html">Estatus GRC</a></li>  -->                
                                 </ul>            
                             </li><!--end nav-item-->
                             <li class="nav-item">
@@ -335,11 +335,11 @@
                                 <ul class="nav-second-level" aria-expanded="false">
                                     <li><a href="<?php echo base_url(); ?>index.php/Principal/listadoEstatusPT">Envio PT</a></li>
                                     <li><a href="<?php echo base_url(); ?>index.php/Principal/listadoEnvioGO">Envio GO</a></li>  
-                                    <li><a href="../apps/email-read.html">Envio GRC</a></li>                 
+                                   <!--  <li><a href="../apps/email-read.html">Envio GRC</a></li>     -->             
                                 </ul>            
                             </li><!--end nav-item-->
                           
-                            <li class="nav-item"><a class="nav-link" href="../apps/invoice.html" aria-expanded="false">Mesa RF</a></li>                        
+                            <!-- <li class="nav-item"><a class="nav-link" href="../apps/invoice.html" aria-expanded="false">Mesa RF</a></li>   -->                      
                         </ul>
                     </div><!-- end Crypto -->
         

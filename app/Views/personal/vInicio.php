@@ -319,37 +319,54 @@
                                                 <div class="col-lg-6">
                                                     <div class="card">
                                                         <div class="card-body dash-info-carousel">
-                                                            <h4 class="mt-0 header-title mb-4">Codigo de Etica</h4>
+                                                            <h4 class="mt-0 header-title mb-4">Código de Ética</h4>
                                                             <div id="carousel_1" class="carousel slide" data-ride="carousel">
-                                                                <div class="carousel-inner">
-                                                                    <div class="carousel-item">
-                                                                        <div class="media">
-                                                                            <img src="<?= base_url() ?>assets/images/users/user-1.jpg" class="mr-2 thumb-lg rounded-circle" alt="...">
-                                                                            <div class="media-body align-self-center">                                                          
-                                                                                <h4 class="mt-0 mb-1 title-text text-dark">Important Watch</h4>
-                                                                                <p class="text-muted mb-0">Python Devloper</p>
-                                                                            </div>
+                                                               <div class="carousel-inner">
+                                                                <div class="carousel-item">
+                                                                    <a href="<?= base_url().'assets/pdf/plantillas/principios.pdf' ?>" target="_black" >
+                                                                    <div class="media">
+                                                                        <div class="icon-info mb-3">
+                                                                        <!-- Constitución, leyes, normas -->
+                                                                        <i class="fas fa-balance-scale bg-soft-primary"></i>
+                                                                        </div>
+                                                                        <div class="media-body align-self-center">                                                          
+                                                                        <h4 class="mt-0 mb-1 title-text text-dark">Constitucionales y Legales</h4>
+                                                                        <p class="text-muted mb-0">Ver más</p>
                                                                         </div>
                                                                     </div>
-                                                                    <div class="carousel-item">
-                                                                        <div class="media">
-                                                                            <img src="<?= base_url() ?>assets/images/users/user-2.jpg" class="mr-2 thumb-lg rounded-circle" alt="...">
-                                                                            <div class="media-body align-self-center">                                                           
-                                                                                <h4 class="mt-0 mb-1 title-text">Wireless Headphone</h4>
-                                                                                <p class="text-muted mb-0">Python Devloper</p>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="carousel-item active">
-                                                                        <div class="media">
-                                                                            <img src="<?= base_url() ?>assets/images/users/user-3.jpg" class="mr-2 thumb-lg rounded-circle" alt="...">
-                                                                            <div class="media-body align-self-center">                                                          
-                                                                                <h4 class="mt-0 mb-1 title-text">Leather Bag</h4>
-                                                                                <p class="text-muted mb-0">Python Devloper</p>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
+                                                                     </a>
                                                                 </div>
+
+                                                                <div class="carousel-item">
+                                                                   <a href="<?= base_url().'assets/pdf/plantillas/reglas.pdf' ?>" target="_black" >
+                                                                    <div class="media">
+                                                                        <div class="icon-info mb-3">
+                                                                        <!-- Reglas, integridad, lineamientos -->
+                                                                        <i class="fas fa-gavel bg-soft-success"></i>
+                                                                        </div>
+                                                                        <div class="media-body align-self-center">                                                           
+                                                                        <h4 class="mt-0 mb-1 title-text">Reglas de Integridad</h4>
+                                                                        <p class="text-muted mb-0">Saber más</p>
+                                                                        </div>
+                                                                    </div>
+                                                                   </a>
+                                                                </div>
+
+                                                                <div class="carousel-item active">
+                                                                   <a href="<?= base_url().'assets/pdf/plantillas/valores.pdf' ?>" target="_black" >
+                                                                    <div class="media">
+                                                                        <div class="icon-info mb-3">
+                                                                        <!-- Valores, ética, principios -->
+                                                                        <i class="fas fa-hand-holding-heart bg-soft-warning"></i>
+                                                                        </div>
+                                                                        <div class="media-body align-self-center">                                                          
+                                                                        <h4 class="mt-0 mb-1 title-text">Valores</h4>
+                                                                        <p class="text-muted mb-0">Conoce los Valores</p>
+                                                                        </div>
+                                                                    </div>
+                                                                   </a>
+                                                                </div>
+                                                            </div>
                                                                 <a class="carousel-control-prev" href="#carousel_1" role="button" data-slide="prev">
                                                                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                                                                     <span class="sr-only">Previous</span>
@@ -361,14 +378,14 @@
                                                             </div>
                                                             <div class="row my-3">
                                                                 <div class="col-sm-6">
-                                                                    <p class="mb-0 text-muted font-13"><i class="mdi mdi-album mr-2 text-secondary"></i>New Leads</p>                            
+                                                                    <p class="mb-0 text-muted font-13"><i class="mdi mdi-album mr-2 text-secondary"></i>Avance de SUSI</p>                            
                                                                 </div><!-- end col-->
                                                                 <div class="col-sm-6">
-                                                                    <p class="mb-0 text-muted font-13"><i class="mdi mdi-album mr-2 text-warning"></i>New Leads Target</p>
+                                                                    <p class="mb-0 text-muted font-13"><i class="mdi mdi-album mr-2 text-warning">Termino des Sistema</i></p>
                                                                 </div><!-- end col-->
                                                             </div><!-- end row-->
                                                             <div class="progress bg-warning mb-3" style="height:5px;">
-                                                                <div class="progress-bar bg-secondary" role="progressbar" style="width: 65%" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                <div class="progress-bar bg-secondary" role="progressbar" style="width: 15%" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>
                                                             </div>                                                            
                                                         </div><!--end card-body-->
                                                     </div><!--end card-->
@@ -378,28 +395,7 @@
                                                         <div class="card">
                                                             <div class="card-body">
                                                                 <div class="blog-card">
-                                                                    <img src="<?= base_url() ?>assets/images/small/img-9.jpg" alt="" class="img-fluid"/>
-                                                                    <span class="badge badge-purple px-3 py-2 bg-soft-secondary font-weight-semibold mt-3">Photography</span>   
-                                                                    <h4 class="my-3">
-                                                                        <a href="" class="">There are many variations of passages of Lorem</a>
-                                                                    </h4>
-                                                                    <p class="text-muted">The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Cum sociis natoque penatibus et magnis.</p>
-                                                                    <hr class="hr-dashed">
-                                                                    <div class="d-flex justify-content-between">
-                                                                        <div class="meta-box">
-                                                                            <div class="media">
-                                                                                <img src="<?= base_url()?>assets/images/users/user-1.png" alt="" class="thumb-sm rounded-circle mr-2">                                       
-                                                                                <div class="media-body align-self-center text-truncate">
-                                                                                    <h6 class="mt-0 mb-1 text-dark">Donald Gardner</h6>
-                                                                                    <ul class="p-0 list-inline mb-0">
-                                                                                        <li class="list-inline-item">26 mars 2020</li>
-                                                                                        <li class="list-inline-item">by <a href="">admin</a></li>
-                                                                                    </ul>
-                                                                                </div><!--end media-body-->
-                                                                            </div>                                            
-                                                                        </div><!--end meta-box-->
-                                                                       
-                                                                    </div>                                        
+                                                                    <img src="<?= base_url() ?>assets/images/sep.png" alt="" class="img-fluid"/>                          
                                                                 </div><!--end blog-card--> 
                                                                                         
                                                             </div><!--end card-body-->
@@ -479,28 +475,25 @@
                                             <div class="card">
                                                 <div class="card-body">
                                                     <div class="blog-card">
-                                                        <img src="<?= base_url() ?>assets/images/small/img-12.jpg" alt="" class="img-fluid">
-                                                        <span class="badge badge-purple px-3 py-2 bg-soft-secondary font-weight-semibold mt-3">Food</span>   
+                                                       <div class="ratio ratio-16x9"> <!-- BS5 -->
+                                                            <iframe
+                                                                src="<?= base_url() ?>assets/pdf/plantillas/Codigo_de_Conducta_SECTUR.pdf"
+                                                                title="Código de Conducta"
+                                                                style="border:0"
+                                                                loading="lazy"
+                                                                width="100%">
+                                                            </iframe>
+                                                        </div>
+
                                                         <h4 class="my-3">
-                                                            <a href="" class="">It is a long established fact that a reader will be</a>
+                                                            <a href="" class="">Código de Conducta</a>
                                                         </h4>
-                                                        <p class="text-muted text-truncate">The standard chunk of Lorem Ipsum used since the for those interested.</p>
+                                                        <p class="text-muted text-truncate">PERIODICO OFICIAL DEL GOBIERNO DEL ESTADO DE GUANAJUATO.</p>
                                                         <hr class="hr-dashed">
                                                         <div class="d-flex justify-content-between">
-                                                            <div class="meta-box">
-                                                                <div class="media">
-                                                                    <img src="<?= base_url() ?>assets/images/users/user-1.png" alt="" class="thumb-sm rounded-circle mr-2">                                       
-                                                                    <div class="media-body align-self-center text-truncate">
-                                                                        <h6 class="mt-0 mb-1 text-dark">Donald Gardner</h6>
-                                                                        <ul class="p-0 list-inline mb-0">
-                                                                            <li class="list-inline-item">26 mars 2020</li>
-                                                                            <li class="list-inline-item">by <a href="">admin</a></li>
-                                                                        </ul>
-                                                                    </div><!--end media-body-->
-                                                                </div>                                            
-                                                            </div><!--end meta-box-->
+                                                           
                                                             <div class="align-self-center">
-                                                                <a href="#" class="text-primary">Read more <i class="fas fa-long-arrow-alt-right"></i></a>
+                                                                <a href="<?= base_url() ?>assets/pdf/plantillas/Codigo_de_Conducta_SECTUR.pdf" target="_blank" class="text-primary">Leer más <i class="fas fa-long-arrow-alt-right"></i></a>
                                                             </div>
                                                         </div>                                        
                                                     </div><!--end blog-card-->                                                                               

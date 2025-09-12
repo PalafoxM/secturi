@@ -2531,6 +2531,7 @@ class Principal extends BaseController {
         $data = array();
         $globals      = new Mglobal;
         $data['denuncia'] = $globals->getTabla(["tabla"=>"denuncia", "where"=>["visible"=>1]])->data; 
+        $data['usuario'] = $globals->getTabla(["tabla"=>"vw_usuario", "where"=>["visible"=>1]])->data; 
         $data['scripts'] = array('principal','inicio');
         $data['contentView'] = 'personal/vListaDenuncia';                
         $this->_renderView($data);

@@ -3200,13 +3200,13 @@ ini.inicio = (function () {
                     },
                     complete: function()
                     {
-                      $('#btnDenuncia').prop('disabled', false).html('Guardar Configuración');
+                      $('#btnDenuncia').prop('disabled', false).html('Guardar');
                     },
                     error: function (response,jqXHR, textStatus, errorThrown) {
                          var res= JSON.parse (response.responseText);
                         //  console.log(res.message);
                          Swal.fire("Error", '<p> '+ res.message + '</p>', 'error');  
-                        $('#btnDenuncia').prop('disabled', false).html('Guardar Configuración');
+                        $('#btnDenuncia').prop('disabled', false).html('Guardar');
                     }
                 });
 
@@ -3372,11 +3372,42 @@ ini.inicio = (function () {
             }
          
         },
-        deleteActividad: function(id_denuncia)
+        getDenuncia: function(id_denuncia){
+            $.ajax({
+                type: "POST",
+                url: base_url + "index.php/Agregar/getDenuncia",
+                data: {id_denuncia},
+                dataType: "json",
+                success: function (response) {
+                     console.log(response);
+                     $("#como_ocurrieron").val(response.como_ocurrieron);
+                     $("#correo").val(response.correo);
+                     $("#cuando_ocurrieron").val(response.cuando_ocurrieron);
+                     $("#denunciando").val(response.denunciando);
+                     $("#domicilio").val(response.domicilio);
+                     $("#donde_ocurrieron").val(response.donde_ocurrieron);
+                     $("#nombre").val(response.nombre);
+                     $("#telefono").val(response.telefono);
+                },
+                complete: function(){
+                   $("#modalDenuncia").modal('show');
+                },
+                error: function (response,jqXHR, textStatus, errorThrown) {          
+                    Swal.fire("Error", '<p> '+ res.message + '</p>'); 
+                    $('#btnAlba').prop('disabled', false).html('Guardar');
+                }
+            });
+
+        },
+        modalDenuncia: function(event)
+        {
+         (!event)?$("#modalDenuncia").modal('hide'):$("#modalDenuncia").modal('show');
+        },
+        deleteDenuncia: function(id_denuncia)
         {
             $.ajax({
                 type: "POST",
-                url: base_url + "index.php/Agregar/deleteActividad",
+                url: base_url + "index.php/Agregar/deleteDenuncia",
                 data: {id_denuncia},
                 dataType: "json",
                 success: function (response) {
@@ -3397,7 +3428,7 @@ ini.inicio = (function () {
             });
 
         },
-        deleteAc: function(id_denuncia)
+        deleteDe: function(id_denuncia)
         {
             Swal.fire({
                 title: "¿Está seguro?",
@@ -3410,7 +3441,7 @@ ini.inicio = (function () {
                 confirmButtonText: "Eliminar",
             }).then((result) => {
                 if (result.isConfirmed) {
-                   ini.inicio.deleteActividad(id_denuncia);
+                   ini.inicio.deleteDenuncia(id_denuncia);
                 }
             });
             
