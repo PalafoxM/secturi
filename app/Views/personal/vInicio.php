@@ -319,7 +319,7 @@
                                                 <div class="col-lg-6">
                                                     <div class="card">
                                                         <div class="card-body dash-info-carousel">
-                                                            <h4 class="mt-0 header-title mb-4">Nuevas Norticias</h4>
+                                                            <h4 class="mt-0 header-title mb-4">Codigo de Etica</h4>
                                                             <div id="carousel_1" class="carousel slide" data-ride="carousel">
                                                                 <div class="carousel-inner">
                                                                     <div class="carousel-item">

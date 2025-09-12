@@ -3192,7 +3192,7 @@ ini.inicio = (function () {
                         }else{
                             Swal.fire("success", response.respuesta, 'success');
                             setTimeout(() => {
-                                window.location.reload();
+                                window.location.href = base_url + "index.php/Principal/ListaDenuncia";
                             }, 1500);
                       
                        }
@@ -3371,6 +3371,49 @@ ini.inicio = (function () {
                $("#modalActividad").modal("hide"); 
             }
          
+        },
+        deleteActividad: function(id_denuncia)
+        {
+            $.ajax({
+                type: "POST",
+                url: base_url + "index.php/Agregar/deleteActividad",
+                data: {id_denuncia},
+                dataType: "json",
+                success: function (response) {
+                    if(!response.error){
+                        Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
+                        setTimeout(() => {
+                           // window.location.href = base_url + "index.php/Principal/listadoEstatusPT";
+                            window.location.reload();
+                        }, 1500);
+                    }else{
+                        Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
+                    }
+                },
+                error: function (response,jqXHR, textStatus, errorThrown) {          
+                    Swal.fire("Error", '<p> '+ res.message + '</p>'); 
+                    $('#btnAlba').prop('disabled', false).html('Guardar');
+                }
+            });
+
+        },
+        deleteAc: function(id_denuncia)
+        {
+            Swal.fire({
+                title: "¿Está seguro?",
+                text: "¿Desea eliminar el registro?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                cancelButtonText: "Cancelar",
+                confirmButtonText: "Eliminar",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                   ini.inicio.deleteActividad(id_denuncia);
+                }
+            });
+            
         },
         altaAlba: function(){
         $("#formAgregarAlba").submit(function (e) {

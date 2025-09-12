@@ -300,6 +300,20 @@ class Agregar extends BaseController {
 
 
     }
+    public function deleteActividad()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $globals = new Mglobal(); 
+        $dataBitacora = ['id_user' => $session->id_usuario, 'script' => 'Agregar.php/eliminarDenuncia'];
+        $dataConfig = [
+            "tabla"=>"denuncia",
+            "editar"=>false,
+            //"idEditar"=>['id_usuario'=>$data['id_usuario']]
+        ];
+        $response = $globals->saveTabla(['visible' => 0],$dataConfig,$dataBitacora);
+        return $this->respond($response);
+    }
     public function Denuncia()
     {
         $session = \Config\Services::session();

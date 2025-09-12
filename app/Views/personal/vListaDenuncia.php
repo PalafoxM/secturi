@@ -18,7 +18,7 @@
                                 <li class="breadcrumb-item active">Listado de Tikets</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Listado de Tikets</h4>
+                        <h4 class="page-title">Listado de Denuncia</h4>
                     </div>
                     <!--end page-title-box-->
                 </div>
@@ -35,18 +35,18 @@
                                     <div class="card">
 
                                         <div class="card-body">
-                                            <span>TIKETS</span>
+                                            <span>DENUNCIA</span>
                                             <button 
                                                 class="btn btn-gradient-primary px-4 float-right mt-0 mb-3"><i
                                                     class="mdi mdi-plus-circle-outline mr-2"></i>Agregar Perfil</button>
                                             <table id="datatableCategorias" class="table" data-toggle="table">
                                                 <thead class="thead-light">
                                                     <tr>
-                                                        <th class="text-center">ID TIKET</th>
                                                         <th class="text-center">USUARIO</th>
-                                                        <th class="text-center">NÚMERO DE TIKETS</th>
-                                                        <th class="text-center">DESCRIPCIÓN</th>
-                                                        <th class="text-center">ESTATUS</th>
+                                                        <th class="text-center">CORREO</th>
+                                                        <th class="text-center">TELEFONO</th>
+                                                        <th class="text-center">COMO</th>
+                                                        <th class="text-center">TESTIGOS</th>
                                                         <th class="text-center">ACCIONES</th>
                                                     </tr>
                                                     <!--end tr-->
@@ -61,19 +61,29 @@
                                                         <td class="text-center"><?= $p->como_ocurrieron?></td>
                                                         <td class="text-center">
                                                             <?= ($p->testigo==1)?
-                                                            '<i class="dripicons-cross text-danger font-18"></i>':
-                                                            '<i class="dripicons-checkmark text-success font-18"></i>'
+                                                            'SI':'NO'
                                                              ?>
                                                         </td>
                                                       
-                                                        <td class="text-center">
-                                                              <?php if($p->testigo == 1):?>
-                                                            <button title="Hecho"
-                                                                onclick="ini.inicio.tiketListo(<?= $p->id_denuncia?>)"
-                                                                class="btn btn-gradient-info px-4">Hecho
-                                                            </button>
-                                                            <?php endif; ?>
-                                                        </td>
+                                                         <td class="text-center">
+                                                        <!-- tu trigger -->
+                                                                <a href="javascript:void(0);"
+                                                                onclick="ini.inicio.getUsuario()">
+                                                                <i class="mdi mdi-pencil text-success font-18"></i>
+                                                                </a>
+
+
+                                                                <a target="_blank" 
+                                                                    data-animation="bounce" ><i
+                                                                        class="mdi mdi-eye text-info font-18"></i></a>
+
+                                
+                                                                <a href="javascript:void(0);"
+                                                                    onclick="ini.inicio.deleteAc(<?= $p->id_denuncia ?>)"><i
+                                                                        class="mdi mdi-trash-can text-danger font-18"></i></a>
+                                                 
+
+                                                            </td>
                                                         
                                                     </tr>
                                                     <?php endforeach; ?>
