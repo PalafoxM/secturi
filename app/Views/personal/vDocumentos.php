@@ -119,51 +119,271 @@
                                                         <div class="custom-dd dd" id="nestable_list_1">
                                                             <ol class="dd-list">
                                                                 <li class="dd-item" data-id="1">
-                                                                    <div class="dd-handle">
-                                                                       Lineamientos Centro de Atención de Visitantes para el Ejercicio Fiscal de 2025
-                                                                    </div>
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Programa_de_Gobierno_2018-2024-9c20.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                        Programa de Gobierno 2018-2024
+                                                                        </div>
+                                                                    </a>
                                                                 </li>
-                                                                <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                        Lineamientos Gestión de Desarrollo Turístico Regional Sustentable para el Ejercicio Fiscal de 2025
-                                                                    </div>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Actualizacion_Programa_de_Gobierno_2018-2024-db52.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                        Programa de Gobierno 2018 - 2024_Actualización
+                                                                        </div>
+                                                                    </a>
                                                                 </li>
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                        Reglas de Operación Apoyo a Festivales Internacionales y Eventos Especiales para el Ejercicio Fiscal de 2025
-                                                                    </div>
-                                                                </li>  
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                        Reglas de Operación Guanajuato, ¡Sí Sabe! para el Ejercicio Fiscal de 2025
-                                                                    </div>
-                                                                </li>  
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                        Reglas de Operación Modelo de Excelencia Turística para el Ejercicio Fiscal de 2025
-                                                                    </div>
-                                                                </li>  
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                        Reglas de Operación Fondo para los Destinos Turísticos de Guanajuato para el Ejercicio Fiscal del 2025
-                                                                    </div>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Programa_Sectorial_Economia_para_Todos_2019-2024-fa05.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                        Programa Sectorial Economía para Todos 2019-2024
+                                                                        </div>
+                                                                    </a>
                                                                 </li>
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                        Reglas de Operación Turismo al 100
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                       Programa Anual de Desarrollo Archivístico 2025
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                       Informe de cumplimiento del PADA 2024
-                                                                    </div>
-                                                                </li> 
-                                                                
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Actualizacion_Programa_Sectorial_Eje_Economia_para_Todos_2019-2024-48e5.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                        Actualización Programa Sectorial Eje Economía para Todos 2019-2024
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Actualizacion_Programa_Sectorial_Eje_Economia_para_Todos_2019-2024__fe_de_erratas-2b4d.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                        Actualización Programa Sectorial Eje Economía para Todos 2019-2024 fe de erratas
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Programa_Estatal_de_Turismo_2021_-_2024-2ad3.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                        Programa Estatal de Turismo 2021 - 2024
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Actualizacion_Programa_de_Gobierno_2018-2024-db52.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                        Acuerdo de Creación del Observatorio Turístico del Estado de Guanajuato
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Constitucion_Politica_de_los_Estados_Unidos_Mexicanos_-d214.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                        Constitución Política de los Estados Unidos Mexicanos
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Constitucion_Politica_ra_para_el_Estado_de_Guanajuato-3710.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                        Constitución Política ra para el Estado de Guanajuato
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Festivales_Internacionales_y_Eventos_Especiales_para_el_Ejercicio_Fiscal_de_2022-f83b.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                        Festivales Internacionales y Eventos Especiales para el Ejercicio Fiscal de 2022
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Ley_de_Archivos_Generales_del_Estado_y_los_Municipios_de_Guanajuato-909e.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                        Ley de Archivos Generales del Estado y los Municipios de Guanajuato
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Ley_de_Contrataciones_Publicas_para_el_Estado_de_Guanajuato-0195.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                        Ley de Contrataciones Públicas para el Estado de Guanajuato
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Ley_de_Hacienda_para_el_Estado_de_Guanajuato-06de.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                        Ley de Hacienda para el Estado de Guanajuato
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Ley_de_Hospedaje_a_traves_de_Plataformas_Digitales_del_Estado_de_Guanajuato-d109.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                        Ley de Hospedaje a través de Plataformas Digitales del Estado de Guanajuato
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Ley_de_Mejora_Regulatoria_para_el_Estado_de_Guanajuato-6300.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Ley de Mejora Regulatoria para el Estado de Guanajuato
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Ley_de_Ingresos_para_el_Estado_de_Guanajuato_para_el_Ejercicio_Fiscal_2021-20c4.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                        Ley de Ingresos para el Estado de Guanajuato para el Ejercicio Fiscal 2021
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Ley_de_Proteccion_de_Datos_Personales_en_Posesion_de_Sujetos_Obligados_para_el_Estado_de_Guanajuato-6b9f.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                        Ley de Protección de Datos Personales en Posesión de Sujetos Obligados para el Estado de Guanajuato
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Ley_de_Transparencia_y_Acceso_a_la_Informacion_Publica_para_el_Estado_de_Guanajuato-bb63.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                        Ley de Transparencia y Acceso a la Información Pública para el Estado de Guanajuato
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Ley_de_Turismo_para_el_Estado_de_Guanajuato_y_sus_Municipios-1a2a.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                        Ley de Turismo para el Estado de Guanajuato y sus Municipios
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Ley_del_Sistema_Estatal_Anticorrupcion_de_Guanajuato-9673.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                        Ley del Sistema Estatal Anticorrupción de Guanajuato
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Ley_del_Trabajo_de_los_Servidores_Publicos_al_Servicio_del_Estado_y_los_Municipios_-2e31.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Ley del Trabajo de los Servidores Públicos al Servicio del Estado y los Municipios
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Ley_General_de_Turismo-cfa3.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                         Ley General de Turismo
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Ley_Organica_del_Poder_Ejecutivo_para_el_Estado_de_Guanajuato-b646.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                        Ley Orgánica del Poder Ejecutivo para el Estado de Guanajuato
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Ley_del_Trabajo_de_los_Servidores_Publicos_al_Servicio_del_Estado_y_los_Municipios_-2e31.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Ley del Trabajo de los Servidores Públicos al Servicio del Estado y los Municipios
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Ley_para_el_Fomento_de_la_Industria_Cinematografica_y_Audiovisual_del_Estado_de_Guanajuato-0c6a.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Ley para el Ejercicio y Control de los Recursos Públicos para el Estado y los Municipios del Estado de Guanajuato
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Ley_para_el_Fomento_de_la_Industria_Cinematografica_y_Audiovisual_del_Estado_de_Guanajuato-0c6a.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Ley para el Fomento de la Industria Cinematográfica y Audiovisual del Estado de Guanajuato
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Lineamientos_de_Servicios_Generales_de_la_Administracion_Publica_Estatal-0479.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Lineamientos de Servicios Generales de la Administración Pública Estatal
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Lineamientos_de_Tecnologias_de_la_Informacion_y_Comunicaciones_de_la_Administracion_Publica_Estatal-3f3c.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Lineamientos de Tecnologías de la Información y Comunicaciones de la Administración Pública Estatal
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Lineamientos_del_Proyecto_Centro_de_Atencion_a_Visitantes_del_Estado_para_el_Ejercicio_Fiscal_de_2022-6a6d.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Lineamientos del Proyecto Centro de Atención a Visitantes del Estado para el Ejercicio Fiscal de 2022
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Lineamientos_del_Proyecto_Gestion_del_Desarrollo_Turistico_Regional_Sustentable_para_el_Ejercicio_Fiscal_de_2022-40f2.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Lineamientos del Proyecto Gestión del Desarrollo Turístico Regional Sustentable para el Ejercicio Fiscal de 2022
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Lineamientos_Generales_de_Control_Interno_para_el_Poder_Ejecutivo_del_Estado_de_Guanajuato-0f86.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Lineamientos Generales de Control Interno para el Poder Ejecutivo del Estado de Guanajuato
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Lineamientos_Generales_de_Control_Patrimonial_de_la_Administracion_Publica_Estatal-c171.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Lineamientos Generales de Control Patrimonial de la Administración Pública Estatal
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Lineamientos_Generales_para_el_Otorgamiento_y_Recepcion_de_Garantias_a_Favor_del_Gobierno_Estatal-8a80.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Lineamientos Generales para el Otorgamiento y Recepción de Garantías a Favor del Gobierno Estatal
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Lineamientos_para_el_Registro_Estatal_de_Turismo_para_el_Estado_de_Guanajuato-40f9.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Lineamientos para el Registro Estatal de Turismo para el Estado de Guanajuato
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Manual_para_la_elaboracion_y_formalizacion_de_contratos_y_convenios_-4e2e.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Manual para la elaboración y formalización de contratos y convenios
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Plan_Anual_de_Trabajo_2024%C2%A0-6b1b.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Plan Anual de Trabajo 2024 
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Reglamento_de_la_Ley_de_Turismo_para_el_Estado_de_Guanajuato_y_sus_Municipios-501c.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Reglamento de la Ley de Turismo para el Estado de Guanajuato y sus Municipios
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Reglamento_de_la_Ley_General_de_Turismo-f621.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Reglamento de la Ley General de Turismo
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
                                                             </ol>
                                                         </div><!--nastable-list-1-->    
                                                     </div><!--end card-body-->
@@ -185,26 +405,120 @@
 
                                                         <div class="custom-dd dd" id="nestable_list_1">
                                                             <ol class="dd-list">
-                                                                <li class="dd-item" data-id="1">
-                                                                    <div class="dd-handle">
-                                                                       Manual de Procesos y Procedimientos 2024
-                                                                    </div>
+                                                                <li class="dd-item" data-id="2">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/1-Reglamento-Interior-SEDETUR-2007-404e.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Reglamento-Interior-SEDETUR-2007
+                                                                        </div>
+                                                                    </a>
                                                                 </li>
                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                        Política de Igualdad Laboral y No Discriminación
-                                                                    </div>
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/2-Reglamento-SEDETUR-2007-Modificacion-7403.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Reglamento-SEDETUR-2007-Modificacion
+                                                                        </div>
+                                                                    </a>
                                                                 </li>
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                        Protocolo para prevenir y atender la violencia
-                                                                    </div>
-                                                                </li>  
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                        Lineamientos de Asistencia 2025
-                                                                    </div>
-                                                                </li> 
+                                                                <li class="dd-item" data-id="2">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/3-Reglamento-Interior-SEDETUR-2011-Modificacion-2-c75d.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Reglamento-Interior-SEDETUR-2011-Modificacion-2
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="2">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Codigo_de_Conducta_de_la_Secretaria_de_Turismo-8f56.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Código de Conducta de la Secretaría de Turismo
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="2">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Consideraciones_de_sustentabildad_para_conferencias_talleres_y_reuniones-d8fa.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Consideraciones de sustentabildad para conferencias, talleres y reuniones
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="2">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/GUIA-DE-ACTUACION-2O17-efab.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       GUIA-DE-ACTUACION-2O17
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="2">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Informe_de_cumplimiento_del_PADA_2023-d8ff.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Informe de cumplimiento del PADA 2023
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="2">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Lineamientos_de_Asistencia_2025-be68.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Lineamientos de Asistencia 2025
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="2">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Lineamientos_Recursos_Destinados_a_Acciones_y_Proyectos_de_Inversion-b15b.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Lineamientos Recursos Destinados a Acciones y Proyectos de Inversión
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="2">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Manual_de_Induccion_Interno_SECTUR-3889.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Manual de Inducción Interno SECTUR
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="2">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Manual_de_Integracion_y_Funcionamiento_del_CISMA-66ad.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Manual de Integración y Funcionamiento del CISMA
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="2">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Manual_de_Organizacion_SECTUR-d937.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Manual de Organización SECTUR
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="2">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Manual_de_Procesos_y_Procedimientos-c3eb.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Manual de Procesos y Procedimientos
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="2">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Manual_de_Procesos_y_Procedimientos_2024-1086.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Manual de Procesos y Procedimientos 2024
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="2">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Manual_para_la_Elaboracion_y_Formalizacion_de_Contratos_y_Convenios-e6a1.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Manual para la Elaboración y Formalización de Contratos y Convenios
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="2">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Plan_de_Trabajo_Anual_2022-93b6.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Plan de Trabajo Anual 2022
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                              
+                                                              
                                                             </ol>
                                                         </div><!--nastable-list-1-->    
                                                     </div><!--end card-body-->

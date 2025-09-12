@@ -100,18 +100,9 @@
                 <div class="account-social text-center mt-4">
                     <h6 class="my-4">   Version 1.0</h6>
                     <ul class="list-inline mb-4">
+                      
                         <li class="list-inline-item">
-                            <a href="" class="">
-                                <i class="fab fa-facebook-f facebook"></i>
-                            </a>
-                        </li>
-                        <li class="list-inline-item">
-                            <a href="" class="">
-                                <i class="fab fa-twitter twitter"></i>
-                            </a>
-                        </li>
-                        <li class="list-inline-item">
-                            <a href="<?= base_url()."index/Auth/login"?>" class="">
+                            <a href="<?= base_url()."index.php/Auth/login"?>" class="">
                                 <i class="fab fa-google google"></i>
                             </a>
                         </li>
