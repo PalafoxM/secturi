@@ -408,7 +408,7 @@
                             <li class="nav-item"><a class="nav-link" href="<?php echo base_url();?>index.php/Agregar/ListaAlba">Lista ALBA</a></li>
                             <li class="nav-item"><a class="nav-link" href="<?php echo base_url();?>index.php/Agregar/Denuncia">Denuncia</a></li>
                             <li class="nav-item"><a class="nav-link" href="<?php echo base_url();?>index.php/Agregar/Inventario">Inventario</a></li>
-                            <li class="nav-item"><a class="nav-link" href="<?php echo base_url();?>index.php/Agregar/vTiketDisenio">Tickets Diseño</a></li>
+                          <!--   <li class="nav-item"><a class="nav-link" href="<?php echo base_url();?>index.php/Agregar/vTiketDisenio">Tickets Diseño</a></li> -->
                             <li class="nav-item"><a class="nav-link" href="<?php echo base_url();?>index.php/Agregar/aboutSusi">sobre SUSI</a></li>
                         </ul>
                     </div><!-- end Pages -->
