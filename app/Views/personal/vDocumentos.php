@@ -540,359 +540,474 @@
 
                                                         <div class="custom-dd dd" id="nestable_list_1">
                                                             <ol class="dd-list">
-                                                               
-                                                                <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                        Autorizacion de Tratamiento de Datos
-                                                                    </div>
-                                                                </li>
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                   Formato Solicitud de Convenios
-                                                                    </div>
-                                                                </li>  
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                     Solicitud de Contratos de Adquisición
-                                                                    </div>
-                                                                </li>  
+                                                               <a target="_blank" href="<?= base_url()?>assets/documentos/DAJ_3_Autorizacion_tratamiento_datos_personales-338f.xlsx" >
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                            Autorizacion de Tratamiento de Datos
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/F-DAJ-09-2020_Formato_Solicitud_de_Convenios-40e5.xlsx" >
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                    Formato Solicitud de Convenios
+                                                                        </div>
+                                                                    </li>  
+                                                                </a>
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/F-DAJ-10-2020_Solicitud_de_Contratos_De_Adquisicion-97a6.xlsx" >
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Solicitud de Contratos de Adquisición
+                                                                        </div>
+                                                                    </li> 
+                                                                </a> 
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/F-DAJ-11-2020_Solicitud_de_Contratos-07eb.xlsx">
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
                                                                       Solicitud de Contratos
                                                                     </div>
                                                                 </li>  
+                                                                </a>
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/F-DAJ-12-2022_Solicitud_de_Honorarios-5763.xlsx">
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
                                                                        Solicitud de Honorarios
                                                                     </div>
                                                                 </li>
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                        Autorización de Tratamiento de Datos Personales-HONORARIOS
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                      Inventario
-                                                                    </div>
-                                                                </li> 
+                                                                 </a>
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/F-DAJ-12-2022_Solicitud_de_Honorarios-f9f3.xlsx">
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                            Autorización de Tratamiento de Datos Personales-HONORARIOS
+                                                                        </div>
+                                                                    </li> 
+                                                                 </a>
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/F-A-07-2024 Formato_Inventario_Documental.xlsx">
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Inventario
+                                                                        </div>
+                                                                    </li>
+                                                                 </a>
                                                                 </ol>
                                                             <ol class="dd-list">
                                                                  <p class="text-muted mb-4">Coordinación de Planeación</p>
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                        Formato de Verificación Alineación de Información Estratégica
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                       Formato de Afectación a Metas de Proyectos de Inversión
-                                                                    </div>
-                                                                </li> 
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-CPE-02-2023__Formato_de_Verificacion_Alineacion_de_Informacion_Estrategica-030c.xlsx">
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                            Formato de Verificación Alineación de Información Estratégica
+                                                                        </div>
+                                                                    </li> 
+                                                                </a>
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/F-DPE-01-2021_Formato_de_Ajuste_de_Metas_-0977.xlsx">
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Formato de Afectación a Metas de Proyectos de Inversión
+                                                                        </div>
+                                                                    </li> 
+                                                                </a>
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/I-CPE-03-2023__Instructivo_FM-8d90.pdf">
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
                                                                       Instructivo FM
                                                                     </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                      Aplicabilidad y Ejemplos
-                                                                    </div>
-                                                                </li> 
+                                                                </li>
+                                                                 </a> 
+                                                          
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/C-13- a)_Seguimiento_SED_proyectos_Q.pdf">  
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
                                                                       Guía de Operación Etapa Seguimiento SED
                                                                     </div>
                                                                 </li> 
-                                                                
+                                                                </a>
                                                             </ol>
                                                             <ol class="dd-list">
                                                                  <p class="text-muted mb-4">Coodinación de Recursos Financieros</p>
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                       Disposiciones Administrativas SECTURI 2025
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                      Oficios de Comisión
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                      Encabezado Factura
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                     Evidencia Fotográfica
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                     Anexo 2.- Reporte de Integración Documental
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                     Orden de Ministración (Hoja Verde)
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                    Gasto a Reserva de Comprobar
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                     SOLICITUD GRC
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                    Pagos a Tercero
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                    Gasto de Operación
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                    Formato Conformidad Producto Recibido
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                    Formato de Afectación Presupuestal
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                    Pagos a Tercero Refrendo de Recursos
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                    Viáticos por Persona
-                                                                    </div>
-                                                                </li> 
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/Disposiciones_Administrativas_SECTUR_2025-70b2.pdf">  
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Disposiciones Administrativas SECTURI 2025
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/F-RF-01-2025_Oficios_de_Comision-1955.xlsx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Oficios de Comisión
+                                                                        </div>
+                                                                    </li> 
+                                                                 </a>
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/F-RF-02-2025-Encabezado-Factura.xlsx" >
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Encabezado Factura
+                                                                        </div>
+                                                                    </li>
+                                                                 </a>
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/F-RF-03-2025_Evidencia_Fotografica-4a44.xlsx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Evidencia Fotográfica
+                                                                        </div>
+                                                                    </li>
+                                                                 </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-RF-04-2025-Anexo-2-Reporte-de-Integracion-Documental.xlsx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Anexo 2.- Reporte de Integración Documental
+                                                                        </div>
+                                                                    </li> 
+                                                                </a>
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/F-RF-05-2025_Orden_de_Ministracion.docx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Orden de Ministración (Hoja Verde)
+                                                                        </div>
+                                                                    </li>
+                                                                </a> 
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/F-RF-06-2025_Gasto_a_Reserva_Comprobar.xlsm" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Gasto a Reserva de Comprobar
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/F-RF-07-2025_SOLICITUD_GRC.xlsm" >  
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        SOLICITUD GRC
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/F-RF-08-2025_Pagos_Tercero.xlsm" >  
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Pagos a Tercero
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/Gastos_de_Operacion-b285.xlsx" >  
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Gasto de Operación
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/F-RF-10-2025_Formato_Conformidad_Producto_Recibido-def1.xlsx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Formato Conformidad Producto Recibido
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/Formato-de-Afectacion-Presupuestal.xlsx" >  
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Formato de Afectación Presupuestal
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/F-RF-12-2025_Pagos_Tercero_Refrendo_Recursos.xlsm" >  
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Pagos a Tercero Refrendo de Recursos
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/F-RF-13-2025-Viaticos-por-Persona.xlsm" >  
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Viáticos por Persona
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/F-RF-15-2025_Solicitud_de_Operaciones_Financieras-3043.xlsx" >  
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
                                                                     Solicitud de Operaciones Financieras
                                                                     </div>
-                                                                </li> 
+                                                                </li>
+                                                                </a>
+                                                                  <a target="_blank" href="<?= base_url()?>assets/documentos/L-RF-13-2025_Lineamientos_Generales_de_Racionalidad_Austeridad_y_Disciplina_Presupuestal_2025-b60d.pdf" >  
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
                                                                     Lineamientos Generales de Racionalidad Austeridad y Disciplina Presupuestal 2025
                                                                     </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                    Lista de Asistencia
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                    Clasificador por Objeto del Gasto
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                    Oficio de Liberación de Trámite de Pago
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                    Oficio de Liberación de Trámite de Pago a Tercero ALTA DE USUARIO SERVICIOS PROFESIONALES
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                    XXX-GASTOS-00XX-XXX-P38X0-20XX
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                    Orden de Ministración de Viáticos en el Extranjero
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                    Oficio de Liberación de Gasto GO y GRC
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                    PROCESO CANCELACION CFDI
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                    Datos de Facturacion
-                                                                    </div>
-                                                                </li> 
+                                                                </li>
+                                                                </a> 
+                                                                  <a target="_blank" href="<?= base_url()?>assets/documentos/L-RF-14-2025_Lista_de_Asistencia-a721.xlsx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Lista de Asistencia
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                  <a target="_blank" href="<?= base_url()?>assets/documentos/L-RF-16-2025_Clasificador_por_Objeto_del_Gasto-553e.pdf" >  
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Clasificador por Objeto del Gasto
+                                                                        </div>
+                                                                    </li>
+                                                                </a> 
+                                                                  <a target="_blank" href="<?= base_url()?>assets/documentos/O-RF-18-2025_Oficio_de_Liberacion_de_Tramite_de_Pago_a_Tercero-8ff9.docx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Oficio de Liberación de Trámite de Pago
+                                                                        </div>
+                                                                    </li>
+                                                                </a> 
+                                                                  <a target="_blank" href="<?= base_url()?>assets/documentos/O-RF-17-2025_Oficio_de_Liberacion_de_Tramite_de_Pago_a_Tercero_ALTA_DE_USUARIO_SERVICIOS_PROFESIONALES-df7f.docx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Oficio de Liberación de Trámite de Pago a Tercero ALTA DE USUARIO SERVICIOS PROFESIONALES
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                  <a target="_blank" href="<?= base_url()?>assets/documentos/O-RF-21-2025_XXX-GASTOS_-00XX-XXX-38X0-20XX-7d77.docx" >  
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        XXX-GASTOS-00XX-XXX-P38X0-20XX
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                  <a target="_blank" href="<?= base_url()?>assets/documentos/F-RF-05-2025_Orden_de_Ministracion.docx" >  
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Orden de Ministración de Viáticos en el Extranjero
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/O-RF-19-2025_Oficio_de_Liberacion_de_Gasto_GO_y_GRC-c374.docx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Oficio de Liberación de Gasto GO y GRC
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/P-RF-20-2025_PROCESO_CANCELACION_CFDI-352a.pdf" >  
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        PROCESO CANCELACION CFDI
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/M-RF-16-2025_Datos_de_Facturacion-d36e.pdf" >  
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Datos de Facturacion
+                                                                        </div>
+                                                                    </li>
+                                                                </a> 
                                                             </ol>
                                                             <ol class="dd-list">
                                                                  <p class="text-muted mb-4">Coordinación de Recursos Materiales</p>
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                     Solicitud de Mantenimiento Vehicular
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                       Bitácora de Revisión de Niveles
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                     Investigación de Mercado
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                      Investigación de Mercado Servicios
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                      Investigación de Mercado Adquisiciones
-                                                                    </div>
-                                                                </li> 
+                                                                  <a target="_blank" href="<?= base_url()?>assets/documentos/F-CRMG-02-2020_Solicitud_de_Mantenimiento_Vehicular-4388.xlsx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Solicitud de Mantenimiento Vehicular
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/BITACORA_DE_REVISION_DE_NIVELES-7c5f.xlsx" >  
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Bitácora de Revisión de Niveles
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-CRMSG-04-2021_INVESTIGACION_DE_MERCADO-a766.xlsx" >  
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Investigación de Mercado
+                                                                        </div>
+                                                                    </li>
+                                                                 </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-CRMSG-04-2021__ANEXO_4_Investigacion_de_Mercado_-a8a8.xlsx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Investigación de Mercado Servicios
+                                                                        </div>
+                                                                    </li>
+                                                                 </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-CRMSG-04-2021_Investigacion_de_Mercado__Federal_-f397.xlsx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Investigación de Mercado Adquisiciones
+                                                                        </div>
+                                                                    </li>
+                                                                 </a>
+                                                                 
                                                             </ol>
                                                             <ol class="dd-list">
                                                                  <p class="text-muted mb-4">Archivo</p>
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                     Señaletica para espacios AT
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                      Formato para lomo de carpeta
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                    Formatos para lomos de carpetas
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                      Pestaña de Expediente
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                      Etiqueta de caja at
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                      Formato inventario documental
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                      Instructivo llenado portada
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                      Portada archivística
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                      Formato registro de préstamo y/o consulta
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                      Formato listado de documentos ejemplo
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                     Registros de correspondencia
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                      Unidad de correspondencia 2023
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                      Instrumentos de Clasificación Archivistica
-                                                                    </div>
-                                                                </li> 
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-A-01-2024 señaletica para espacios AT.pptx" >
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Señaletica para espacios AT
+                                                                        </div>
+                                                                    </li>
+                                                                 </a>
+                                  
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-A-06-2024 Formato para lomos de carpeta.pptx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Formatos para lomos de carpetas
+                                                                        </div>
+                                                                </li>
+                                                                 </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-A-02-2024 Pestaña de expediente.pptx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Pestaña de Expediente
+                                                                        </div>
+                                                                    </li>
+                                                                 </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-DAJ-04-2020_Etiqueta_Caja_de_Archivo-3203.docx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Etiqueta de caja at
+                                                                        </div>
+                                                                    </li>
+                                                                 </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-A-07-2024 Formato_Inventario_Documental.xlsx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Formato inventario documental
+                                                                        </div>
+                                                                    </li>
+                                                                 </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-A-08-2024 Instructivo_Llenado_Portada.docx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Instructivo llenado portada
+                                                                        </div>
+                                                                    </li>
+                                                                 </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-A-09-2024  Portada_archivística.docx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Portada archivística
+                                                                        </div>
+                                                                    </li>
+                                                                 </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-A-10-2024  Formato_Registro_de_préstamo_y_o_consulta.xlsx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Formato registro de préstamo y/o consulta
+                                                                        </div>
+                                                                    </li>
+                                                                 </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-A-11-2024  Formato_ listado de documentos ejemplo.docx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Formato listado de documentos ejemplo
+                                                                        </div>
+                                                                    </li>
+                                                                 </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/R-A-01-2024 Registros de correspondencia.xlsx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Registros de correspondencia
+                                                                        </div>
+                                                                    </li>
+                                                                 </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/U-A-01-2024 Unidad de correspondencia_2023.pdf" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Unidad de correspondencia 2023
+                                                                        </div>
+                                                                    </li>
+                                                                 </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/IN-DAJ-07-2020_Instrumentos_de_Clasificacion_Archivistica-4407.pdf" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Instrumentos de Clasificación Archivistica
+                                                                        </div>
+                                                                    </li>
+                                                                </a> 
                                                             </ol>
                                                              <ol class="dd-list">
                                                                  <p class="text-muted mb-4">Coordinación de Recursos Humanos</p>
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                     Ejemplo Entregable
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                       Solicitud de Beca para Hijos
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                     Seguro Gastos Médicos Mayores
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                     Carta Compromiso CT
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                      Solicitud Apoyo para Estudios
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                      Justificante Incidencias
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                     Licencia por Paternidad
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                      Licencia por Lactancia
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                      Permiso Económico
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                      Requisitos Apoyo para estudios y formación básica
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                      Becas para Descendientes
-                                                                    </div>
-                                                                </li> 
-                                                                 <li class="dd-item" data-id="2">
-                                                                    <div class="dd-handle">
-                                                                      Seguro de Gastos Médicos Mayores
-                                                                    </div>
-                                                                </li> 
-                                                                 
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-RH-01-2025_Ejemplo_Entregable-8d10.docx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Ejemplo Entregable
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-RH-02-2025_Solicitud_de_Beca_para_Hijos-0597.docx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Solicitud de Beca para Hijos
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/R-RH-03-2025_Seguro_de_Gastos_Medicos_Mayores-fef2.pdf" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Seguro Gastos Médicos Mayores
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-RH-04-2025_Carta_Compromiso_CT-352a.docx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Carta Compromiso CT
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-RH-05-2025_Solicitud_Apoyo_para_Estudios-b422.docx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Solicitud Apoyo para Estudios
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-RH-06-2025_Justificante_Incidencias-2b64.xlsx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Justificante Incidencias
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/S-RH-15-2021_LICENCIA_PATERNIDAD-841a.docx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Licencia por Paternidad
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-RH-08-2025_Licencia_por_Lactancia-2fb6.docx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Licencia por Lactancia
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-RH-09-2025_Permiso_Economico-8dce.docx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Permiso Económico
+                                                                        </div>
+                                                                    </li> 
+                                                                </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/R-RH-01-2025_Requisitos_Apoyo_para_estudios_y_formacion_basica-9b36.pdf" >
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Requisitos Apoyo para estudios y formación básica
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/R-RH-02-2025_Solicitud_de_Beca_para_Descendientes-cef8.pdf" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Becas para Descendientes
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                               
                                                             </ol>
                                                         </div><!--nastable-list-1-->    
                                                     </div><!--end card-body-->
