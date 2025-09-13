@@ -350,6 +350,17 @@ class Agregar extends BaseController {
     {
         $session = \Config\Services::session();
         $response = new \stdClass();
+        $this->globals = new Mglobal();
+        $dataDB = array('tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario'=>$session->id_usuario]);
+        $response = $this->globals->getTabla($dataDB)->data;
+        if(!empty($response)){
+            $no_empleado = $response[0]->no_empleado;
+            $dataDB = array('tabla' => 'inventario', 'where' => ['visible' => 1, 'no_empleado'=>$no_empleado]);
+            $inventario = $this->globals->getTabla($dataDB)->data;
+            $data['inventario'] = $inventario;
+
+        }
+      
         $data['scripts']     = array('inicio');
         $data['contentView'] = 'personal/vInventario';                
         $this->_renderView($data);
