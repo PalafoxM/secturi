@@ -315,6 +315,21 @@ class Agregar extends BaseController {
         $response = $globals->saveTabla(['visible' => 0],$dataConfig,$dataBitacora);
         return $this->respond($response);
     }
+    public function deleteInventario()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $globals = new Mglobal(); 
+        $id_inventario = $this->request->getPost('id_inventario'); 
+        $dataBitacora = ['id_user' => $session->id_usuario, 'script' => 'Agregar.php/eliminarIncentario'];
+        $dataConfig = [
+            "tabla"=>"inventario",
+            "editar"=>true,
+            "idEditar"=>['id_inventario'=>$id_inventario]
+        ];
+        $response = $globals->saveTabla(['visible' => 0],$dataConfig,$dataBitacora);
+        return $this->respond($response);
+    }
     public function getDenuncia()
     {
         $session = \Config\Services::session();
@@ -747,7 +762,6 @@ class Agregar extends BaseController {
         $session = \Config\Services::session();
         $this->globals = new Mglobal(); 
         $data = $this->request->getPost();
-
         $dataInsert = [
             "nombre"     => $data['nombre'],
             "domicilio"  => $data['domicilio'],
@@ -773,12 +787,57 @@ class Agregar extends BaseController {
             $this->enviarCorreoDenuncia();
 
         }
-  
         return $this->respond($response);
+    }
+    public function formInventario()
+    {
+        $session = \Config\Services::session();
+        $this->globals = new Mglobal(); 
+        $data = $this->request->getPost();
+       // die( var_dump( $data ) );
+        $dataInsert = [
+            "activo_fijo"             => $data['activo_fijo'],
+            "no_empleado"             => $data['usuario'],
+            "denominacion_activo_fijo"=> $data['denominacion_activo_fijo'],
+            "prefijo_activo_fijo"     => $data['prefijo_activo_fijo'],
+            "no_serie"                => $data['no_serie'],
+            "fabricante"              => $data['fabricante'],
+            "marca"                   => $data['marca'],
+            "modelo"                  => $data['modelo'],
+            "material"                => $data['material'],
+            "color"                   => $data['color'],
+            "ubicacion"               => $data['ubicacion'],
+            "observaciones"           => $data['observaciones'],
+            "estado"                  => $data['estado'],
+            "valor"                   => $data['valor'],
+            "fec_cap"                 => date('Y-m-d', strtotime($data['fec_cap'])),
+            "usu_reg"                 => $session->id_usuario,
+            "fec_reg"                 => date('Y-m-d'),
+        ];
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaDenuncia'];
+        $dataConfig   = [
+                        "tabla"=>"inventario",
+                        "editar"=>($data['editar']==0)?false:true,
+                        "idEditar" => ['id_inventario' => (int)$data['id_inventario']]
+                    ];
+        $response = $this->globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
+        if(!$response->error){
+            $this->enviarCorreoDenuncia();
 
+        }
+        return $this->respond($response);
+    }
+    public function getInventario()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response = new \stdClass();
+        $id_inventario = $this->request->getPost('id_inventario');
+         $dataDB = array('tabla' => 'inventario', 'where' => ['visible' => 1, 'id_inventario'=>$id_inventario]);
+        $response = $globals->getTabla($dataDB);
+        return $this->respond($response->data[0]);
 
     }
-    
     public function guardaPT()
     {
         $session = \Config\Services::session();

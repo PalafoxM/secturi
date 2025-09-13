@@ -252,9 +252,10 @@ class Inicio extends BaseController {
         $session            = \Config\Services::session();
         $data               = array();
         $globas             = new Mglobal;
-        $data['usuario']    = $globas->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]])->data;
+        $data['inventario']    = $globas->getTabla(['tabla' => 'vw_inventario', 'where' => ['visible' => 1]])->data;
         $data['cat_perfil'] = $globas->getTabla(['tabla' => 'perfil', 'where' => ['visible' => 1]])->data;
         $data['cat_area']   = $globas->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]])->data;
+        $data['usuario']   = $globas->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]])->data;
    
         $data['scripts']    = array('principal','inicio');
         $data['contentView']= 'personal/vListaInventario';                

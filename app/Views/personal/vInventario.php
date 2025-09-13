@@ -11,12 +11,12 @@
                             <div class="page-title-box">
                                 <div class="float-right">
                                     <ol class="breadcrumb">
-                                        <li class="breadcrumb-item"><a href="javascript:void(0);">Metrica</a></li>
-                                        <li class="breadcrumb-item"><a href="javascript:void(0);">Pages</a></li>
+                                        <li class="breadcrumb-item"><a href="javascript:void(0);">SUSI</a></li>
+                                        <li class="breadcrumb-item"><a href="javascript:void(0);">Lista</a></li>
                                         <li class="breadcrumb-item active">Inventario</li>
                                     </ol>
                                 </div>
-                                <h4 class="page-title">Inventario</h4>
+                                <h4 class="page-title">Mi Inventario</h4>
                             </div><!--end page-title-box-->
                         </div><!--end col-->
                     </div>

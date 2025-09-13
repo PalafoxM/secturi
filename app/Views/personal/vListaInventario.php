@@ -13,10 +13,10 @@
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="javascript:void(0);">SUSI</a></li>
                                 <li class="breadcrumb-item"><a href="javascript:void(0);">Lista</a></li>
-                                <li class="breadcrumb-item active">ALBA</li>
+                                <li class="breadcrumb-item active">Inventario</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Atención Comunidad SECTURI</h4>
+                        <h4 class="page-title">Lista de Inventario SECTURI</h4>
 
                     </div>
                     <!--end page-title-box-->
@@ -41,53 +41,41 @@
                                     <thead class="thead-light">
                                         <tr>
                                             <th class="text-center">FOTO</th>
-                                            <th class="text-center">NOMBRE</th>
-                                            <th class="text-center">FECHA NAC.</th>
-                                            <th class="text-center">EDAD</th>
-                                            <th class="text-center">SEXO</th>
-                                            <th class="text-center">NACIONALIDAD</th>
-
-                                            <th class="text-center">ESTATUS</th>
-                                            <th class="text-center">DIFUSION</th>
-                                            <th class="text-center">FEC. ACTIVACION</th>
-                                            <th class="text-center">FE. DESACTIVACION</th>
-
+                                            <th class="text-center">AC. FIJO</th>
+                                            <th class="text-center">DESCRIPCION</th>
+                                            <th class="text-center">PREFIJO</th>
+                                            <th class="text-center">No. SERIE</th>
+                                            <th class="text-center">UBICACION</th>
+                                            <th class="text-center">OBSERVACIONES</th>
+                                            <th class="text-center">USUARIO</th>
                                             <th class="text-center">ACCIONES</th>
                                         </tr>
                                         <!--end tr-->
                                     </thead>
 
                                     <tbody>
-                                        <?php foreach($usuario as $u): ?>
+                                        <?php foreach($inventario as $i): ?>
                                         <tr>
                                             <td class="text-center">
                                                 
                                             </td>
-                                            <td class="text-center"><?= $u->nombre.' '.$u->primer_apellido.' '.$u->segundo_apellido ?></td>
-                                            <td class="text-center"></td>
-                                            <td class="text-center"></td>
-                                            <td class="text-center"><?= $u->id_sexo==1?'HOMBRE':'MUJER' ?></td>
-                                            <td class="text-center"></td>
-  
-                                            <td class="text-center"><?= ($u->id_sexo==1)?'<span class="badge badge-soft-danger">Activa</span>':'<span class="badge badge-soft-info">Desactivada</span>'?></td>
-                                            <td class="text-center"><?= ($u->id_sexo==1)?'<span class="badge badge-soft-success">Interna</span>':'<span class="badge badge-soft-warning">Externa</span>'?></td>
-                                            <td class="text-center"></td>
-                                            <td class="text-center"></td>
-    
+                                            <td class="text-center"><?= $i->activo_fijo ?></td>
+                                            <td class="text-center"><?= $i->denominacion_activo_fijo ?></td>
+                                            <td class="text-center"><?= $i->prefijo_activo_fijo ?></td>
+                                            <td class="text-center"><?= $i->no_serie?></td>
+                                            <td class="text-center"><?= $i->ubicacion?></td>
+                                            <td class="text-center"><?= $i->observaciones?></td>
+                                            <td class="text-center"><?= $i->nombre_completo?></td>
                                             <td class="text-center">
-                                         <?php if(in_array($session->get('id_perfil'), [1,6])): ?>
+
                                                 <a href="javascript:void(0);"
-                                                onclick="ini.inicio.getAlba()" >
-                                                <i class="mdi mdi-pencil text-success font-18"></i>
+                                                    onclick="ini.inicio.getInventario(<?= $i->id_inventario?>)" >
+                                                    <i class="mdi mdi-pencil text-success font-18"></i>
                                                 </a>
-                                        <?php endif; ?>
-                                                 <i
-                                                        class="mdi mdi-eye text-success font-18"></i>
-                                        <?php if(in_array($session->get('id_perfil'), [1,6])): ?>
                                                 <a href="javascript:void(0);"
-                                                    onclick="ini.inicio.deleteAlba()"><i
-                                                        class="mdi mdi-trash-can text-danger font-18"></i></a>
-                                         <?php endif; ?>      
+                                                    onclick="ini.inicio.deleteIn(<?= $i->id_inventario?>)"><i
+                                                        class="mdi mdi-trash-can text-danger font-18"></i>
+                                                </a>    
 
                                             </td>
                                         </tr>
@@ -114,9 +102,9 @@
                     </button>
                 </div>
                 <div class="modal-body" id="detalleCurso" style="max-height: 70vh; overflow-y: auto;">
-                    <form id="formAgregarUsuarioTsi" name="formAgregarUsuarioTsi">
+                    <form id="formInventario" name="formInventario">
                         <div class="row">
-                            <input type="hidden" value="0" name="id_usuario" id="id_usuario">
+                            <input type="hidden" value="0" name="id_inventario" id="id_inventario">
                             <input type="hidden" value="0" name="editar" id="editar">
                             <!-- seccion izquierdo incio -->
                             <div class="col-md-12 ">
@@ -129,15 +117,8 @@
                                             <div class="col-md-3">
                                                 <div class="mb-3 position-relative" id="">
                                                     <label for="unidad"
-                                                        class="form-label campoObligatorio">Unidad Responsable</label>
-                                                    <select class="form-control select2"
-                                                        id="unidad" name="unidad"
-                                                        style="z-index:100;">
-                                                        <option value="0">Seleccione</option>
-                                                        <?php foreach($cat_area as $a): ?>
-                                                        <option value="<?= $a->id_area ?>"><?= $a->dsc_area ?>
-                                                        <?php endforeach; ?>
-                                                    </select>
+                                                        class="form-label campoObligatorio">Activo Fijo</label>
+                                                    <input class="form-control" id="activo_fijo" name="activo_fijo" placeholder="100010356">
                                                 </div>
                                             </div>
                                             <div class="col-md-3">
@@ -148,26 +129,25 @@
                                                         id="usuario" name="usuario">
                                                         <option value="0">Seleccione</option>
                                                         <?php foreach($usuario as $a): ?>
-                                                        <option value="<?= $a->id_usuario ?>"><?= $a->nombre_completo ?>
+                                                        <option value="<?= $a->no_empleado ?>"><?= $a->nombre_completo ?>
                                                         <?php endforeach; ?>
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="col-md-3">
                                                 <div class="mb-3 position-relative" id="">
-                                                    <label for="plaza"
-                                                        class="form-label campoObligatorio">Plaza</label>
+                                                    <label for="denominacion_activo_fijo"
+                                                        class="form-label campoObligatorio">Denominacion activo fijo</label>
                                                     <input type="text" autocomplete="off" class="form-control"
-                                                        id="plaza" name="plaza"
-                                                        placeholder="PLAZA">
+                                                        id="denominacion_activo_fijo" name="denominacion_activo_fijo"
+                                                        placeholder="DENOMINACION ACTIVO FIJO">
                                                 </div>
                                             </div>
                                              <div class="col-md-3">
                                                 <div class="mb-3 position-relative" id="">
-                                                    <label for="fec_nac" class="form-label campoObligatorio">FECHA
-                                                        NACIMIENTO</label>
-                                                    <input type="date" autocomplete="off" class="form-control"
-                                                        id="fec_nac" name="fec_nac" placeholder="FEC. NACIMIENTO">
+                                                    <label for="prefijo_activo_fijo" class="form-label campoObligatorio">Prefijo Activo Fijo</label>
+                                                    <input type="text" autocomplete="off" class="form-control"
+                                                        id="prefijo_activo_fijo" name="prefijo_activo_fijo" placeholder="PREFIJO ACTIVO">
                                                 </div>
                                             </div>
                                         </div>
@@ -176,19 +156,97 @@
                                    
                                             <div class="col-md-3">
                                                 <div class="mb-3 position-relative" >
-                                                    <label for="nivel"
-                                                        class="form-label campoObligatorio">NIVEL</label>
-                                                    <input type="number" autocomplete="off" class="form-control"
-                                                        id="nivel" name="nivel"
-                                                        placeholder="NIVEL">
+                                                    <label for="no_serie"
+                                                        class="form-label campoObligatorio">No. Serie</label>
+                                                    <input type="text" autocomplete="off" class="form-control"
+                                                        id="no_serie" name="no_serie"
+                                                        placeholder="NO. SERIE">
                                                 </div>
                                             </div>
                                             <div class="col-md-3">
                                                 <div class="mb-3 position-relative" >
-                                                    <label for="extencion"
-                                                        class="form-label">EXTENCION</label>
-                                                    <input type="number" autocomplete="off" class="form-control" id="extencion" name="extencion"
-                                                        placeholder="EXT">
+                                                    <label for="fabricante"
+                                                        class="form-label">Fabricante</label>
+                                                    <input type="text" autocomplete="off" class="form-control" id="fabricante" name="fabricante"
+                                                        placeholder="FABRICANTE">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3 position-relative" >
+                                                    <label for="marca"
+                                                        class="form-label">Marca</label>
+                                                    <input type="text" autocomplete="off" class="form-control" id="marca" name="marca"
+                                                        placeholder="MARCA">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3 position-relative" >
+                                                    <label for="modelo"
+                                                        class="form-label">Modelo</label>
+                                                    <input type="text" autocomplete="off" class="form-control" id="modelo" name="modelo"
+                                                        placeholder="MODELO">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                   
+                                            <div class="col-md-3">
+                                                <div class="mb-3 position-relative" >
+                                                    <label for="material"
+                                                        class="form-label campoObligatorio">Material</label>
+                                                    <input type="text" autocomplete="off" class="form-control"
+                                                        id="material" name="material"
+                                                        placeholder="MATERIAL">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3 position-relative" >
+                                                    <label for="color"
+                                                        class="form-label">Color</label>
+                                                    <input type="text" autocomplete="off" class="form-control" id="color" name="color"
+                                                        placeholder="COLOR">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3 position-relative" >
+                                                    <label for="ubicacion"
+                                                        class="form-label">Ubicacion</label>
+                                                    <input type="text" autocomplete="off" class="form-control" id="ubicacion" name="ubicacion"
+                                                        placeholder="UBICACION">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3 position-relative" >
+                                                    <label for="observaciones"
+                                                        class="form-label">observaciones</label>
+                                                    <input type="text" autocomplete="off" class="form-control" id="observaciones" name="observaciones"
+                                                        placeholder="OBSERVACIONES">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="mb-3 position-relative" >
+                                                    <label for="estado"
+                                                        class="form-label">Estado</label>
+                                                    <input type="text" autocomplete="off" class="form-control" id="estado" name="estado"
+                                                        placeholder="ESTADO">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3 position-relative" >
+                                                    <label for="fec_cap"
+                                                        class="form-label">Fec. cap.</label>
+                                                    <input type="date" autocomplete="off" class="form-control" id="fec_cap" name="fec_cap"
+                                                        placeholder="FEC. CAP.">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3 position-relative" >
+                                                    <label for="valor"
+                                                        class="form-label">valor</label>
+                                                    <input type="text" autocomplete="off" class="form-control" id="valor" name="valor"
+                                                        placeholder="VALOR">
                                                 </div>
                                             </div>
                                         </div>
@@ -203,20 +261,12 @@
 
                         <div class="row mb-5" id="btn_save">
                             <div class="col-md-12 text-center ">
-                                <button class="btn btn-info" type="submit"><i class="mdi mdi-content-save"></i> Guardar
-                                </button>
-                                <button class="btn btn-warning" type="button" data-dismiss="modal"><i
+                                
+                                <a  class="btn btn-warning text-white" type="button" data-dismiss="modal"><i
                                         class="mdi mdi-content-save-off-outline" id="cancelarTurno"></i> Cancelar
-                                </button>
-                            </div>
-                        </div>
-                        <div class="row mb-5" id="btn_load" style="display:none;">
-                            <div class="col-md-12 text-center ">
-                                <button class="btn btn-info" type="button" disabled>
-                                    <span class="spinner-grow spinner-grow-sm me-1" role="status"
-                                        aria-hidden="true"></span>
-                                    Guardando...
-                                </button>
+                                </a>
+                                <a onclick="ini.inicio.formInventario();" class="btn btn-info text-white" id="btnInventario"><i class="mdi mdi-content-save"></i> Guardar
+                                </a>
                             </div>
                         </div>
 
@@ -263,3 +313,12 @@
 <link href="<?php echo base_url(); ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
 
 <script src="<?= base_url(); ?>plugins/select2/select2.min.js"></script>
+<script>
+  $('#usuariosTable').DataTable({
+        language: {
+            url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json' // Ruta al archivo de localización
+        },
+        destroy: true,
+        searching: true,
+    });
+</script>

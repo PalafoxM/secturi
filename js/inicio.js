@@ -3428,6 +3428,121 @@ ini.inicio = (function () {
             });
 
         },
+        formInventario: function()
+        {
+            let formData = $("#formInventario").serialize();
+             $.ajax({
+                type: "POST",
+                url: base_url + "index.php/Agregar/formInventario",
+                data: formData,
+                dataType: "json",
+                beforeSend: function(){
+                   $('#btnInventario').prop('disabled', true).html('<i class="mdi mdi-content-save"></i>Guardando...');
+                },
+                success: function (response) {
+                    if(!response.error){
+                        Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
+                        setTimeout(() => {
+                           // window.location.href = base_url + "index.php/Principal/listadoEstatusPT";
+                            window.location.reload();
+                        }, 1500);
+                    }else{
+                        Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
+                    }
+                },
+                complete: function(){
+                  $("#btnInventario").prop('disabled', false).html('<i class="mdi mdi-content-save"></i>Guardar');
+                },
+                error: function (response,jqXHR, textStatus, errorThrown) {          
+                    Swal.fire("Error", '<p> '+ response.message + '</p>'); 
+                    $('#btnInventario').prop('disabled', false).html('<i class="mdi mdi-content-save"></i>Guardar');
+                }
+            });
+
+        },
+        getInventario: function(id_inventario)
+        {
+            $.ajax({
+                type: "POST",
+                url: base_url + "index.php/Agregar/getInventario",
+                data: {id_inventario},
+                dataType: "json",
+                success: function (response) {
+                    console.log(response);
+                    $("#editar").val(1);
+                    $("#activo_fijo").val(response.activo_fijo);
+                    $("#denominacion_activo_fijo").val(response.denominacion_activo_fijo);
+                    $("#color").val(response.color);
+                    $("#fabricante").val(response.fabricante);
+                    $("#estado").val(response.estado);
+                    $("#id_inventario").val(id_inventario);
+                    $("#marca").val(response.marca);
+                    $("#material").val(response.material);
+                    $("#modelo").val(response.modelo);
+                    $("#usuario").val(response.no_empleado);
+                    $("#no_serie").val(response.no_serie);
+                    $("#observaciones").val(response.observaciones);
+                    $("#prefijo_activo_fijo").val(response.prefijo_activo_fijo);
+                    $("#ubicacion").val(response.ubicacion);
+                    $("#valor").val(response.valor);
+                    const fechaCompleta = response.fec_cap; // Ejemplo de fecha
+                    const fechaFormateada = fechaCompleta.split('T')[0]; // Extrae "1983-10-10"
+                    $('#fec_cap').val(fechaFormateada); // Asigna la fecha al campo
+                   
+                },
+                complete: function(){
+                    $("#modelInventarios").modal('show');
+
+                },
+                error: function (response,jqXHR, textStatus, errorThrown) {          
+                    Swal.fire("Error", '<p> '+ res.message + '</p>'); 
+                   
+                }
+            });
+        },
+        deleteInventario: function(id_inventario)
+        {
+            $.ajax({
+                type: "POST",
+                url: base_url + "index.php/Agregar/deleteInventario",
+                data: {id_inventario},
+                dataType: "json",
+                success: function (response) {
+                    if(!response.error){
+                        Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
+                        setTimeout(() => {
+                           // window.location.href = base_url + "index.php/Principal/listadoEstatusPT";
+                            window.location.reload();
+                        }, 1500);
+                    }else{
+                        Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
+                    }
+                },
+                error: function (response,jqXHR, textStatus, errorThrown) {          
+                    Swal.fire("Error", '<p> '+ res.message + '</p>'); 
+                    $('#btnAlba').prop('disabled', false).html('Guardar');
+                }
+            });
+
+        },
+        deleteIn: function(id_inventario)
+        {
+            Swal.fire({
+                title: "¿Está seguro?",
+                text: "¿Desea eliminar el registro?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                cancelButtonText: "Cancelar",
+                confirmButtonText: "Eliminar",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                   ini.inicio.deleteInventario(id_inventario);
+                }
+            });
+            
+        },
         deleteDe: function(id_denuncia)
         {
             Swal.fire({

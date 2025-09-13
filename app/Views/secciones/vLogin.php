@@ -1,4 +1,13 @@
 <!-- Log In page -->
+ <style>
+.logo-bottom {
+  position: fixed;
+  bottom: 30px;
+  left: 30px; /* puedes usar left si lo quieres en la esquina izquierda */
+  z-index: 9999; /* para que quede encima */
+}
+
+ </style>
 <div id="particles-js"></div>
 <div class="container">
     <div class="row vh-100 ">
@@ -8,8 +17,8 @@
                     <div class="card-body">
                         <div class="px-3">
                             <div class="auth-logo-box">
-                                <a href="../dashboard/analytics-index.html" class="logo logo-admin"><img
-                                        src="<?php echo base_url();?>assets/images/backgrounds/logo.png" height="55" alt="logo"
+                                <a class="logo logo-admin"><img
+                                        src="<?= base_url(); ?>assets/susi2.webp" height="60" alt="logo"
                                         class="auth-logo"></a>
                             </div>
                             <!--end auth-logo-box-->
@@ -102,19 +111,26 @@
                     <ul class="list-inline mb-4">
                       
                         <li class="list-inline-item">
-                            <a href="<?= base_url()."index.php/Auth/login"?>" class="">
+                            <a href="<?= base_url() . 'index.php/Auth/login' ?>" class="">
                                 <i class="fab fa-google google"></i>
                             </a>
                         </li>
                     </ul>
                 </div>
+
                 <!--end account-social-->
             </div>
+         
             <!--end auth-page-->
         </div>
+      
         <!--end col-->
     </div>
+    
     <!--end row-->
+</div>
+<div class="logo-bottom">
+  <img src="<?= base_url(); ?>assets/logo-guanajuato.png" height="75" alt="logo">
 </div>
 <!--end container-->
 <!-- End Log In page -->
