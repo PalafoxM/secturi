@@ -10,7 +10,7 @@
     <meta content="SECTURI" name="author" />
 
     <!-- App favicon -->
-    <link rel="shortcut icon" href="<?php echo base_url(); ?>assets/susi.webp">
+    <link rel="shortcut icon" href="<?php echo base_url(); ?>assets/logo-guanajuato.png">
     
 
     <!-- jvectormap -->

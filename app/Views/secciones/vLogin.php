@@ -2,8 +2,8 @@
  <style>
 .logo-bottom {
   position: fixed;
-  bottom: 30px;
-  left: 30px; /* puedes usar left si lo quieres en la esquina izquierda */
+  bottom: 40px;
+  left: 40px; /* puedes usar left si lo quieres en la esquina izquierda */
   z-index: 9999; /* para que quede encima */
 }
 
@@ -18,14 +18,14 @@
                         <div class="px-3">
                             <div class="auth-logo-box">
                                 <a class="logo logo-admin"><img
-                                        src="<?= base_url(); ?>assets/susi2.webp" height="60" alt="logo"
+                                        src="<?= base_url(); ?>assets/huella.png" height="80" alt="logo"
                                         class="auth-logo"></a>
                             </div>
                             <!--end auth-logo-box-->
 
                             <div class="text-center auth-logo-text">
                                 <h4 class="mt-0 mb-3 mt-5">SUSI</h4>
-                                <p class="text-muted mb-0">Sistema Unificado SECTURI</p>
+                                <p class="text-muted mb-0">SISTEMA UNIFICADO SECTURI</p>
                             </div>
                             <!--end auth-logo-text-->
                             <div class="form-horizontal auth-form my-4">
@@ -44,11 +44,10 @@
                                 <div class="form-group">
                                     <label for="contrasenia">Contraseña</label>
                                     <div class="input-group mb-3">
-                                        <span class="auth-form-icon">
-                                            <i class="dripicons-lock"></i>
-                                        </span>
-                                        <input type="password" class="form-control" id="contrasenia" name="contrasenia"
-                                            placeholder="Ingresar Contraseña">
+                                      <span class="auth-form-icon">
+                                        <i id="icon-pass" onclick="showPass();" class="dripicons-lock" style="cursor:pointer"></i>
+                                      </span>
+                                      <input type="password" class="form-control" id="contrasenia" name="contrasenia" placeholder="Ingresar Contraseña">
                                     </div>
                                 </div>
                                 <!--end form-group-->
@@ -64,7 +63,7 @@
                                     </div>
                                     <!--end col-->
                                     <div class="col-sm-6 text-right">
-                                        <a href="auth-recover-pw.html" class="text-muted font-13"><i
+                                        <a href="javascript:void(0)" onclick="losePass();" class="text-muted font-13"><i
                                                 class="dripicons-lock"></i> ¿Olvido su contraseña?</a>
                                     </div>
                              
@@ -132,5 +131,27 @@
 <div class="logo-bottom">
   <img src="<?= base_url(); ?>assets/logo-guanajuato.png" height="75" alt="logo">
 </div>
+<script>
+
+function showPass() {
+  const input = document.getElementById("contrasenia");
+  const icon  = document.getElementById("icon-pass");
+  const show  = input.type === "password";
+
+  input.type = show ? "text" : "password";
+
+  // Dripicons: usa lock / lock-open (NO 'unlock')
+  icon.classList.toggle("dripicons-lock", !show);
+  icon.classList.toggle("dripicons-lock-open", show);
+
+  // opcional accesibilidad / tooltip
+  icon.setAttribute("aria-pressed", show ? "true" : "false");
+  icon.title = show ? "Ocultar contraseña" : "Mostrar contraseña";
+}
+function  losePass() {
+    Swal.fire("Para restablecer la contraseña", '<p>Favor de comunicarte con el Administrador</p>', 'info'); 
+}
+
+</script>
 <!--end container-->
 <!-- End Log In page -->
