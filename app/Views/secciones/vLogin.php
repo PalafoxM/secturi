@@ -1,14 +1,24 @@
 <!-- Log In page -->
  <style>
+
 .logo-bottom {
   position: fixed;
   bottom: 40px;
-  left: 40px; /* puedes usar left si lo quieres en la esquina izquierda */
-  z-index: 9999; /* para que quede encima */
+  left: 40px;
+  z-index: 9999;
 }
 
+#lgo {
+    background-color: white;
+    border: solid 2px #506ee4;
+    border-radius: 25px;
+}
+
+
+
+
  </style>
-<div id="particles-js"></div>
+
 <div class="container">
     <div class="row vh-100 ">
         <div class="col-12 align-self-center">
@@ -129,7 +139,7 @@
     <!--end row-->
 </div>
 <div class="logo-bottom">
-  <img src="<?= base_url(); ?>assets/logo-guanajuato.png" height="75" alt="logo">
+  <img src="<?= base_url(); ?>assets/logo-guanajuato.png" height="75" alt="logo" id="lgo" >
 </div>
 <script>
 
@@ -153,5 +163,9 @@ function  losePass() {
 }
 
 </script>
+
+
+
+
 <!--end container-->
 <!-- End Log In page -->
