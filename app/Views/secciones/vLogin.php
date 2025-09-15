@@ -119,11 +119,11 @@
                     <h6 class="my-4">   Version 1.0</h6>
                     <ul class="list-inline mb-4">
                       
-                        <li class="list-inline-item">
+                      <!--   <li class="list-inline-item">
                             <a href="<?= base_url() . 'index.php/Auth/login' ?>" class="">
                                 <i class="fab fa-google google"></i>
                             </a>
-                        </li>
+                        </li> -->
                     </ul>
                 </div>
 
