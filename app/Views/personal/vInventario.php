@@ -74,7 +74,4 @@
         <script src="<?= base_url();?>assets/js/waves.js"></script>
         <script src="<?= base_url();?>assets/js/feather.min.js"></script>
         <script src="<?= base_url();?>assets/js/jquery.slimscroll.min.js"></script>
-        <script src="<?= base_url();?>plugins/apexcharts/apexcharts.min.js"></script> 
-        
-        <!-- App js -->
-        <script src="<?= base_url();?>assets/js/app.js"></script>
+ 
