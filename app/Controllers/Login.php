@@ -270,10 +270,10 @@ class Login extends BaseController {
                 $session->set('esJefe', $esJefe);
                 $response->error     = $result->error;
                 $response->respuesta = $result->respuesta;
-                $asistencia = $this->registrarAsistencia($result->data[0]->id_usuario );
-                if(!$asistencia->error){
+                //$asistencia = $this->registrarAsistencia($result->data[0]->id_usuario );
+              /*   if(!$asistencia->error){
                    $response->asistencia = $asistencia->asistencia;
-                }
+                } */
                 
             }     
         }        

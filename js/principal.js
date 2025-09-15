@@ -170,7 +170,7 @@ saeg.principal = (function () {
                             console.log(response);
                             if (!response.error) {
                                 Swal.fire("Bienvenido!", "Ingresando...", "success");
-                                if(response.asistencia){
+                             /*    if(response.asistencia){
                                     setTimeout(() => {
                                         Swal.fire({
                                             position: "top-end",
@@ -190,11 +190,11 @@ saeg.principal = (function () {
                                             timer: 2500
                                         });
                                     }, 1000);
-                                }
+                                }*/
 
                                 setTimeout(() => {
                                     window.location.href = base_url + "index.php/Inicio";
-                                }, 3000);
+                                }, 1000); 
                             } else {
                                 Swal.fire("Usuario incorrecto", "Favor de verificar sus credenciales", "error");
                             }
