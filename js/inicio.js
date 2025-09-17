@@ -3525,6 +3525,26 @@ ini.inicio = (function () {
             });
 
         },
+        descargaDirectorio: function() {
+            // Crear un formulario temporal para la descarga
+            var form = document.createElement('form');
+            form.method = 'POST';
+            form.action = base_url + 'index.php/Usuario/descargaDirectorio';
+            form.target = '_blank'; // Abrir en nueva pestaña para descarga
+            
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+            
+            // Opcional: mostrar mensaje de que la descarga comenzó
+            Swal.fire({
+                icon: 'info',
+                title: 'Descargando',
+                text: 'La descarga del directorio comenzará en breve',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        },
         deleteIn: function(id_inventario)
         {
             Swal.fire({

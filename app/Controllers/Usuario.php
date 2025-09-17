@@ -461,6 +461,68 @@ class Usuario extends BaseController
         }
         return $this->respond($response);
     }
+    public function descargaDirectorio()
+    {
+        // 1. Crear el documento
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // 2. Obtener datos de la BD
+        $globals = new Mglobal();
+        $resul = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
+
+        if (!isset($resul->data) || empty($resul->data)) {
+            echo "No hay datos para exportar";
+            return;
+        }
+
+        // 3. Encabezados CORREGIDOS
+        $encabezados = [
+            'ID', 'NOMBRE', 'PRIMER APELLIDO', 'SEGUNDO APELLIDO', 'RFC',
+            'AREA', 'EXTENCION'
+        ];
+        
+        // Colocar encabezados correctamente
+        $columnas = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+        foreach ($encabezados as $index => $titulo) {
+            $sheet->setCellValue($columnas[$index] . '1', $titulo);
+            
+            // Opcional: estilo para encabezados
+            $sheet->getStyle($columnas[$index] . '1')->getFont()->setBold(true);
+        }
+
+        // 4. Llenar datos CORREGIDOS
+        $fila = 2;
+        foreach ($resul->data as $row) {
+            $sheet->setCellValue('A' . $fila, $row->id_usuario);
+            $sheet->setCellValue('B' . $fila, $row->nombre);
+            $sheet->setCellValue('C' . $fila, $row->primer_apellido);
+            $sheet->setCellValue('D' . $fila, $row->segundo_apellido);
+            $sheet->setCellValue('E' . $fila, $row->rfc);
+            $sheet->setCellValue('F' . $fila, $row->dsc_area);
+            $sheet->setCellValue('G' . $fila, $row->extencion);
+            $fila++;
+        }
+
+        // Autoajustar columnas
+        foreach ($columnas as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // 5. Descargar archivo
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'directorio_' . date('Ymd_His') . '.xlsx';
+
+        // Enviar headers CORRECTOS
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        header('Cache-Control: max-age=0');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        $writer->save('php://output');
+        exit;
+    }
     public function exportarExcel()
     {
         // 1. Crear el documento

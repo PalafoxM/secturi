@@ -18,7 +18,9 @@
                             </ol>
                         </div>
                         <h4 class="page-title">Directorio</h4>
-
+                        <button id="btnExportarExcel" class="btn btn-success text-white" onclick="ini.inicio.descargaDirectorio()">
+                            <i class="fas fa-file-excel"></i> Exportar a Excel
+                        </button>
                     </div>
                     <!--end page-title-box-->
                 </div>
@@ -29,33 +31,35 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-body">
-                       
                             <h4 class="header-title mt-0">Directorio Activo</h4>
                             <div class="table-responsive dash-social">
                                 <table id="usuariosTable" class="table">
                                     <thead class="thead-light">
                                         <tr>
                                             <th class="text-center">USUARIO</th>
-                                            <th >NOMBRE</th>
+                                            <th>NOMBRE</th>
                                             <th>PUESTO</th>
                                             <th>AREA</th>
                                             <th>CORREO</th>
                                             <th>EXT.</th>
-
                                         </tr>
-                                        <!--end tr-->
                                     </thead>
-
                                     <tbody>
                                         <?php foreach($usuario as $u): ?>
                                         <tr>
-                                            <?php if(!empty($u->ruta_foto_relativa )): ?>
-                                            <td class="text-center"><a href="javascript:void(0);" onclick="ini.inicio.verDetalles(<?= $u->id_usuario?>)" ><img src="<?= base_url().$u->ruta_foto_relativa ?>" alt="" class="rounded-circle thumb-sm mr-1"></a></td>
+                                            <?php if(!empty($u->ruta_foto_relativa)): ?>
+                                            <td class="text-center">
+                                                <a href="javascript:void(0);" onclick="ini.inicio.verDetalles(<?= $u->id_usuario?>)">
+                                                    <img src="<?= base_url().$u->ruta_foto_relativa ?>" alt="" class="rounded-circle thumb-sm mr-1">
+                                                </a>
+                                            </td>
+                                            <?php else: ?>
+                                            <td class="text-center">
+                                                <a href="javascript:void(0);" onclick="ini.inicio.verDetalles(<?= $u->id_usuario?>)">
+                                                    <img src="<?= base_url() ?>assets/images/users/user-3.jpg" alt="" class="rounded-circle thumb-sm mr-1">
+                                                </a>
+                                            </td>
                                             <?php endif; ?>
-                                             <?php if(empty($u->ruta_foto_relativa )): ?>
-                                            <td class="text-center"><a href="javascript:void(0);" onclick="ini.inicio.verDetalles(<?= $u->id_usuario?>)" ><img src="<?= base_url() ?>assets/images/users/user-3.jpg" alt="" class="rounded-circle thumb-sm mr-1"></a></td>
-                                            <?php endif; ?>
-                                      
                                             <td><?= $u->nombre_completo ?></td>
                                             <td><?= $u->dsc_puesto?></td>
                                             <td><?= $u->dsc_area?></td>
@@ -70,7 +74,6 @@
                     </div>
                 </div>
             </div>
-        </div>
     </div>
 <div class="modal fade" id="modalUsuario" tabindex="-1" aria-labelledby="" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
@@ -129,5 +132,6 @@
         destroy: true,
         searching: true,
     });
+
 
     </script>
