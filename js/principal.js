@@ -39,7 +39,7 @@ saeg.principal = (function () {
             Swal.fire({
                 title: 'Agregar Observaciones',
                 input: 'textarea',
-                inputLabel: 'Observaciones (opcional)',
+                inputLabel: `Observaciones (${id_aceptar == 1 ?'opcional':'requerido'})`,
                 inputPlaceholder: 'Escribe tus observaciones aquí...',
                 inputAttributes: {
                     'aria-label': 'Escribe tus observaciones aquí'
@@ -63,6 +63,11 @@ saeg.principal = (function () {
                 if (result.isConfirmed) {
                     // Si confirma, enviar al servidor con las observaciones
                     var observaciones = result.value || ''; // Si no escribió nada, enviar string vacío
+                    if(!observaciones && id_aceptar == 2){
+                         Swal.fire("Atención", "El Campo de observaciones es requerido", "info");
+                        return 
+
+                    }
                     
                     $.ajax({
                         url: base_url + "index.php/Agregar/aceptarIncidencia",

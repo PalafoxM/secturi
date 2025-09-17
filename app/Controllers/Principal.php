@@ -1130,6 +1130,8 @@ class Principal extends BaseController {
         } else {
           $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
         }  
+        return $this->respond($response);
+
     }
       public function guardarSemana()
     {  
@@ -1283,7 +1285,7 @@ class Principal extends BaseController {
 
         $dataInsert = [
             "hora_inicio"        => $data['hora_inicio'],
-            "hora_fin"           => $hora_fin,
+            "hora_fin"           => (isset($hora_fin) && !empty($hora_fin))?$hora_fin:$data['hora_fin'],
             "hora_fin_real"      => $data['hora_fin'],
             "cat_id_incidencia"  => (int)$data['tipo_incidencia'],
             "fecha"              => $data['fecha'],
@@ -1305,7 +1307,7 @@ class Principal extends BaseController {
            $response->error= false; 
            $response->respuesta= $result->respuesta; 
         }
-       // $this->envioCorreoJefeInmediato(); 
+        $this->envioCorreoJefeInmediato(); 
         return $this->respond($response);
     }
     public function actualizarBanco()

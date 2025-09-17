@@ -82,8 +82,9 @@ class Inicio extends BaseController {
         }
         $actividad     = $globas->getTabla(['tabla' => 'vw_actividad', 'where' => ['visible' => 1, "id_usuario" => $session->id_usuario]])->data;
         $configuracion = $globas->getTabla(['tabla' => 'vw_configuracion', 'where' => ['visible' => 1, "id_usuario" => $session->id_usuario]])->data;
-      
+       
         $tiket = $globas->getTabla(['tabla' => 'vw_tiket', 'where' => ['visible' => 1, "id_usuario" => $session->id_usuario]])->data;
+        //die( var_dump( $tiket) );
         $eventos = $globas->getTabla(['tabla' => 'eventos', 'where' => ['visible' => 1],  'whereMonth' => [['fecha', $mes_actual]] ])->data;
         $tiketNuevo    = [];
         $tiketProceso  = [];
