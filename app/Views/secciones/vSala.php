@@ -213,7 +213,7 @@
                                                 <img src="<?php echo base_url() ?>assets/images/widgets/project1.jpg" class="mr-3 thumb-sm align-self-center rounded-circle" alt="...">
                                                 <div class="media-body align-self-center"> 
                                                     <h5 class="mt-0 mb-1"><?= $s->evento?></h5>
-                                                    <p class="text-muted mb-0">sala : <?= $s->sala.' de '.$s->hora_inicio.' a '.$s->hora_fin ?></p>                                                                                             
+                                                    <p class="text-muted mb-0">sala : <?= $s->sala.' inicia '.$s->hora_inicio.' termina '.$s->hora_fin ?></p>                                                                                             
                                                 </div><!--end media body-->
                                             </div>
                                             <?php endforeach; ?>
