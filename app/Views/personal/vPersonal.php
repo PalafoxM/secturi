@@ -26,7 +26,12 @@
       <div class="card">
          <div class="card-body">
             <div class="media mb-3">
-               <img src="<?= base_url(); ?>assets/images/users/user-1.jpg" class="mr-3 thumb-xl align-self-center rounded-circle" alt="...">
+               <?php if(isset($p->ruta_foto_relativa) && !empty($p->ruta_foto_relativa)): ?>
+               <img src="<?= base_url().$p->ruta_foto_relativa ?>" class="mr-3 thumb-xl align-self-center rounded-circle" alt="...">
+               <?php endif; ?>
+               <?php if(empty($p->ruta_foto_relativa)): ?>
+               <img src="<?= base_url()?>assets/images/users/user-1.jpg" class="mr-3 thumb-xl align-self-center rounded-circle" alt="...">
+               <?php endif; ?>
                <div class="media-body align-self-center">
                   <h4 class="mt-0 mb-1"><?= $p->nombre_completo; ?></h4>
                   <p class="text-muted mb-0 font-12"><?= $p->dsc_puesto; ?> </p>
