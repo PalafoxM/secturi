@@ -563,6 +563,7 @@ moment.locale('es');
             title: `${item.nombre} ${icon}`,
             extendedProps: {
                 entrada: item.entrada,
+                esFestivo:false,
                 salida: (!item.salida)?'Sin salida':item.salida,
                 trabajado: item.trabajado,
                 tarde: item.tarde,
@@ -613,6 +614,7 @@ moment.locale('es');
             display: esSemana ? 'background' : 'auto',
             className: eventClass,
             extendedProps: {
+                esFestivo:false,
                 tipo: item.tipo,
                 id_incidencia: item.id_incidencia,
                 hora_inicio: item.hora_inicio,
@@ -637,8 +639,33 @@ moment.locale('es');
         return `${y}-${m}-${day}`;
     }
 
+    // Definir los días festivos (formato: 'YYYY-MM-DD')
+const diasFestivos = [
+    '2025-01-01', // Año Nuevo
+    '2025-02-05', // Día de la Constitución
+    '2025-03-18', // Natalicio de Benito Juárez
+    '2025-05-01', // Día del Trabajo
+    '2025-09-16', // Día de la Independencia
+    '2025-11-18', // Día de la Revolución
+    '2025-12-25', // Navidad
+    // Agrega más fechas según necesites
+];
 
-    var todosLosEventos = eventos.concat(eventosIncidencia);
+const eventosFestivos = diasFestivos.map(fecha => {
+    return {
+        title: 'Día Asueto',
+        start: fecha,
+        display: 'background',
+        backgroundColor: '#ffebee', // Color de fondo rojo claro
+        className: 'fc-event-festivo',
+        extendedProps: {
+            esFestivo: true
+        }
+    };
+});
+
+
+    var todosLosEventos = eventos.concat(eventosIncidencia, eventosFestivos);
 
     var calendar = new FullCalendar.Calendar(calendarEl, {
    
@@ -696,7 +723,12 @@ moment.locale('es');
                     <div>Hora Inicio: ${info.event.extendedProps.hora_inicio}</div>
                     </div>
                 `;
-            } else {
+            } else if(info.event.extendedProps.esFestivo){
+                `
+                     <div class="fc-event-title">${info.event.title}</div>
+                `;
+
+            }else {
                 eventEl.innerHTML = `
                 <div class="fc-event-title">${info.event.title}</div>
                 <div class="fc-event-details">
@@ -774,40 +806,56 @@ moment.locale('es');
                 }
             });
         },
-       dateClick: function(info) {
-            const fecha = info.date; // tipo Date
-            const diaSemana = fecha.getDay(); // 0 (Domingo) a 6 (Sábado)
-            if (diaSemana === 0 || diaSemana === 6) {
-                 Swal.fire("Error", "No se permite justificar faltas en sábado o domingo. " , "error");
-                return; // Detiene la ejecución
+      dateClick: function(info) {
+            const fecha = info.date;
+            const diaSemana = fecha.getDay();
+            const fechaStr = fecha.toISOString().split('T')[0];
+            const esFestivo = diasFestivos.includes(fechaStr);
+            
+            if (esFestivo) {
+                Swal.fire("Día Festivo", "No se puede justificar faltas en días festivos.", "info");
+                return;
             }
+            
+            if (diaSemana === 0 || diaSemana === 6) {
+                Swal.fire("Error", "No se permite justificar faltas en sábado o domingo.", "error");
+                return;
+            }
+            
             // Si es un día hábil, continúa
             let dia = info.dateStr;
             st.agregar.justificarFalta(dia);
         },
-       dayRender: function(info) {
-            const date = info.date;                 // Date
-            const day = date.getDay();              // 0 = dom, 6 = sáb
+      dayRender: function(info) {
+            const date = info.date;
+            const day = date.getDay();
             const isWeekend = (day === 0 || day === 6);
-
-            // Buscar si hay eventos visibles ese día (incluye background y normales)
+            
+            // Verificar si es día festivo
+            const fechaStr = date.toISOString().split('T')[0];
+            const esFestivo = diasFestivos.includes(fechaStr);
+            
+            // Buscar eventos del día
             const dayStart = new Date(date);
             dayStart.setHours(0,0,0,0);
             const dayEnd = new Date(dayStart);
             dayEnd.setDate(dayEnd.getDate() + 1);
-
-            // Si tienes referencia al calendar instancia:
+            
             const eventsToday = calendar.getEvents().filter(function(e) {
-                // evento allDay por rango: e.start < dayEnd && (e.end || e.start) > dayStart
                 const evStart = e.start;
                 const evEnd = e.end || evStart;
                 return evStart < dayEnd && evEnd > dayStart;
             });
-
+            
             const hasEvents = eventsToday.length > 0;
             const esFalta = eventsToday.some(e => (e.classNames || []).includes('fc-event-falta'));
-
-            if (isWeekend && !esFalta) {
+            
+            // Aplicar estilos según el tipo de día
+            if (esFestivo) {
+                info.el.style.backgroundColor = '#fff3cd'; // Amarillo para festivos
+                info.el.style.border = '2px solid #ffc107';
+                info.el.title = 'Día Festivo';
+            } else if (isWeekend && !esFalta) {
                 info.el.style.backgroundColor = '#f0f0f0';
             } else if (hasEvents) {
                 info.el.style.backgroundColor = 'rgba(78, 115, 223, 0.05)';
