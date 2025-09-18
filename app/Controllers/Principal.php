@@ -819,8 +819,8 @@ class Principal extends BaseController {
         $response->respuesta = 'Error al Guardar los datos';
         $foto = $this->request->getFile('foto');  
         $extension = $foto->getClientExtension();
-        $originalName = pathinfo($foto->getName(), PATHINFO_FILENAME);
-        $archivo = $originalName .'.' . $extension;
+        //$originalName = pathinfo($foto->getName(), PATHINFO_FILENAME);
+        $archivo = $session->usuario .'.' . $extension;
         $ruta_destino = FCPATH . 'assets/images/fotos/';
        
         $foto->move($ruta_destino, $archivo);
