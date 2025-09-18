@@ -1025,8 +1025,9 @@ class Agregar extends BaseController {
         // $response->error = true;
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
+        $file = $this->request->getFile('foto');
         
-    
+       
     
         if( $data['editar'] !=1){
 
@@ -1073,6 +1074,16 @@ class Agregar extends BaseController {
                 throw new Exception("El <strong> usuario y/o contraseña</strong> ya existe en la base de datos, favor de cambiar los datos");
             }
         }
+
+        $timestamp = date('Ymd_His');
+        $extension = $file->getClientExtension();
+        $originalName = pathinfo($file->getName(), PATHINFO_FILENAME);
+        $archivo = $session->usuario. '.' . $extension;
+
+        $ruta_destino = FCPATH . 'assets/images/fotos/';
+        $file->move($ruta_destino, $archivo);
+
+        $ruta_relativa  = 'assets/images/fotos/' . $archivo;
         $hoy = date("Y-m-d H:i:s"); 
 
 
@@ -1086,6 +1097,7 @@ class Agregar extends BaseController {
             'nombre'                => $data['nombre'],  
             'primer_apellido'       => $data['primer_apellido'],           
             'segundo_apellido'      => $data['segundo_apellido'],
+            'ruta_foto_relativa'    => $ruta_relativa,
             'correo'                => $data['correo'],           
             'rfc'                   => $data['rfc'],             
             'id_area'               => (int)$data['id_area'],               
@@ -1475,10 +1487,7 @@ class Agregar extends BaseController {
             return $data;
         }
        
-        private function getFaltasRangoQuincena(
-            DateTime $inicio,
-            DateTime $fin,
-        ): array {
+        private function getFaltasRangoQuincena(DateTime $inicio,DateTime $fin){
             $Mglobal = new Mglobal;
              $session = \Config\Services::session();
             // Solo días pasados o hoy (nunca futuros)

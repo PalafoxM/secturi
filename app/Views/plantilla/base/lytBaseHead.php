@@ -355,7 +355,7 @@
                                 <a class="nav-link" href="#"><span class="w-100">Admin TI</span><span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
                                 <ul class="nav-second-level" aria-expanded="false">
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/usuarios">Lista de Usuarios</a></li>
-                                    <li><a href="<?php echo base_url(); ?>index.php/Inicio/altaUsuario">Alta de Usuarios</a></li>
+                                    <li><a href="<?php echo base_url(); ?>index.php/Inicio/altaUsuario">Alta de Usuarios</a></li> 
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaPerfil">Lista de Perfiles</a></li>
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaPuesto">Lista de Puestos</a></li>
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaArea">Lista de Área</a></li>

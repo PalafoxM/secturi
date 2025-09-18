@@ -250,6 +250,15 @@
                                                                     placeholder="NIVEL">
                                                             </div>
                                                         </div>
+                                                        <div class="col-md-3">
+                                                            <div class="mb-3 position-relative" id="">
+                                                                <label for="nivel"
+                                                                    class="form-label campoObligatorio">FOTO</label>
+                                                                <input type="file" autocomplete="off" class="form-control"
+                                                                    id="foto" name="foto" accept=".jpg, .jpeg, .png"
+                                                                    placeholder="NIVEL">
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -312,50 +321,42 @@
         </div>
     </div>
 
-    <link href="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet"
-        type="text/css" />
+  <link href="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet"
+    type="text/css" />
+<!-- App css -->
+<link href="<?php echo base_url(); ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo base_url(); ?>assets/css/jquery-ui.min.css" rel="stylesheet">
+<link href="<?php echo base_url(); ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
+<link href="<?= base_url()?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+<link href="<?= base_url()?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
+<!-- jQuery  -->
+ 
+<script src="<?php echo base_url(); ?>assets/js/jquery.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/jquery-ui.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/bootstrap.bundle.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/jquery.slimscroll.min.js"></script>
 
-    <!-- App css -->
-    <link href="<?php echo base_url(); ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <link href="<?php echo base_url(); ?>assets/css/jquery-ui.min.css" rel="stylesheet">
-    <link href="<?php echo base_url(); ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
-    <link href="<?php echo base_url(); ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
 
+<!-- Required datatable js -->
+<script src="<?php echo base_url(); ?>plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.js"></script>
 
+<!-- App js -->
+<script src="<?= base_url()?>assets/js/app.js"></script>
+<script src="<?= base_url()?>assets/js/waves.js"></script>
+<script src="<?= base_url()?>assets/js/feather.min.js"></script>
 
-    <!-- jQuery  -->
-    <script src="<?php echo base_url(); ?>assets/js/jquery.min.js"></script>
-    <script src="<?php echo base_url(); ?>assets/js/jquery-ui.min.js"></script>
-    <script src="<?php echo base_url(); ?>assets/js/bootstrap.bundle.min.js"></script>
+<script src="<?= base_url()?>plugins/tiny-editable/mindmup-editabletable.js"></script>
+<script src="<?= base_url()?>plugins/tiny-editable/numeric-input-example.js"></script>
+<script src="<?= base_url()?>plugins/bootable/bootstable.js"></script> 
+<link href="<?php echo base_url(); ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
 
-    <script src="<?php echo base_url(); ?>assets/js/jquery.slimscroll.min.js"></script>
-    <script src="<?php echo base_url(); ?>plugins/apexcharts/apexcharts.min.js"></script>
-
-    <!-- Required datatable js -->
-    <script src="<?php echo base_url(); ?>plugins/datatables/jquery.dataTables.min.js"></script>
-    <script src="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.js"></script>
-
-    <script src="<?php echo base_url(); ?>assets/pages/jquery.analytics_customers.init.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="<?= base_url(); ?>plugins/select2/select2.min.js"></script>
 
     <script>
     $(document).ready(function() {
         st.agregar.agregarUsuario();
-        $('#id_dependencia').select2({
-            placeholder: "Seleccione",
-            allowClear: true,
-            width: '100%',
-            dropdownAutoWidth: true,
-            minimumResultsForSearch: 10 // Muestra la barra de búsqueda si hay más de 10 opciones
-        });
-        $('#id_nivel').select2({
-            placeholder: "Seleccione",
-            allowClear: true,
-            width: '100%',
-            dropdownAutoWidth: true,
-            minimumResultsForSearch: 10 // Muestra la barra de búsqueda si hay más de 10 opciones
-        });
+   
 
     });
     </script>

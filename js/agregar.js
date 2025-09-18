@@ -96,7 +96,7 @@ st.agregar = (function () {
             $("#formAgregarUsuarioTsi").submit(function (e) {
                 e.preventDefault(); 
                 $("#id_perfil").prop("disabled", false);
-                var formData = $("#formAgregarUsuarioTsi").serialize();
+               var formData = new FormData(this);
                 $("#id_perfil").prop("disabled", true);
                 $("#btn_save").hide();
                 $("#btn_load").show();
@@ -104,6 +104,8 @@ st.agregar = (function () {
                     type: "POST",
                     url: base_url + "index.php/Agregar/guardaUsuarioSti",
                     data:formData,
+                    processData: false,  // evita que jQuery convierta el FormData en string
+                    contentType: false,  // evita que jQuery ponga content-type incorrecto
                     dataType: "json",
                     success: function (response) {
                         console.log(response);
