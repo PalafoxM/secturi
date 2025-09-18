@@ -1074,8 +1074,7 @@ class Agregar extends BaseController {
                 throw new Exception("El <strong> usuario y/o contraseña</strong> ya existe en la base de datos, favor de cambiar los datos");
             }
         }
-
-        $timestamp = date('Ymd_His');
+        if(isset($file) && !empty($file)){ $timestamp = date('Ymd_His');
         $extension = $file->getClientExtension();
         $originalName = pathinfo($file->getName(), PATHINFO_FILENAME);
         $archivo = $session->usuario. '.' . $extension;
@@ -1084,6 +1083,9 @@ class Agregar extends BaseController {
         $file->move($ruta_destino, $archivo);
 
         $ruta_relativa  = 'assets/images/fotos/' . $archivo;
+
+        }
+       
         $hoy = date("Y-m-d H:i:s"); 
 
 
@@ -1097,7 +1099,7 @@ class Agregar extends BaseController {
             'nombre'                => $data['nombre'],  
             'primer_apellido'       => $data['primer_apellido'],           
             'segundo_apellido'      => $data['segundo_apellido'],
-            'ruta_foto_relativa'    => $ruta_relativa,
+            'ruta_foto_relativa'    => (isset($ruta_relativa) && !empty($ruta_relativa))?$ruta_relativa:'',
             'correo'                => $data['correo'],           
             'rfc'                   => $data['rfc'],             
             'id_area'               => (int)$data['id_area'],               
