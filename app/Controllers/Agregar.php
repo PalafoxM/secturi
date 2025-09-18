@@ -1514,14 +1514,14 @@ class Agregar extends BaseController {
                 'where' => [
                     'id_usuario' => $session->id_usuario,
                     'visible'    => 1,
-                    'fecha >='   => $inicio->format('Y-m-d'),
-                    'fecha <='   => $fin->format('Y-m-d')
+                    //'whereBetween' => [['fecha', $inicio, $fin]]
                 ],
             ]);
-
+            //var_dump($agenda);
             $asistencias = (!empty($agenda->data)) ? $agenda->data : [];
             $faltas = [];
             
+            //die();
             // Crear array con las fechas que tienen registro
             $fechasConRegistro = [];
             foreach ($asistencias as $row) {

@@ -57,7 +57,7 @@
                                         <?php foreach($inventario as $i): ?>
                                         <tr>
                                             <td class="text-center">
-                                                
+                                                 <img src="<?= base_url().$i->foto ?>" alt="" class="rounded-circle thumb-sm mr-1">
                                             </td>
                                             <td class="text-center"><?= $i->activo_fijo ?></td>
                                             <td class="text-center"><?= $i->denominacion_activo_fijo ?></td>

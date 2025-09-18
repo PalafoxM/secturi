@@ -27,7 +27,13 @@
                             <div class="card">
                                 <div class="card-body">
                                     <div class="blog-card">
-                                        <img src="<?= base_url(); ?>assets/images/small/img-9.jpg" alt="" class="img-fluid"/>
+                                        <?php if(isset($i->foto) && !empty($i->foto)): ?>
+                                            <img src="<?= base_url().$i->foto?>" alt="" class="img-fluid"/>
+                                        <?php endif; ?>
+                                        <?php if(empty($i->foto)): ?>
+                                           <img src="<?= base_url(); ?>assets/images/small/img-9.jpg" alt="" class="img-fluid"/>
+                                        <?php endif; ?>
+                                        
                                         <h4 class="my-3">
                                             <a href="" class=""><?= $i->denominacion_activo_fijo ?></a>
                                         </h4>
@@ -39,7 +45,7 @@
                                                     <div class="media-body align-self-center text-truncate">
                                                         <h6 class="mt-0 mb-1 text-dark">Fabricante: <?= $i->fabricante ?></h6>
                                                         <ul class="p-0 list-inline mb-0">
-                                                            <li class="list-inline-item">Fec. Cap: <?= date('d/m/Y', strtotime($i->fec_cap)); ?></li>
+                                         
                                                             <li class="list-inline-item">No. Serie: <?= $i->no_serie ?> </li>
                                                         </ul>
                                                     </div><!--end media-body-->
