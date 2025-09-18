@@ -44,7 +44,7 @@
                                         <tr>
                                             <th class="text-center">NOMBRE</th>
         
-                                            <th class="text-center">PERFIL</th>
+                                            <th class="text-center">PUESTO</th>
                        
                                             <th class="text-center">AREA</th>
                                             <th class="text-center">CORREO</th>
@@ -59,7 +59,7 @@
                                         <?php foreach($usuario as $u): ?>
                                         <tr>
                                             <td class="text-center"><?= $u->nombre_completo ?></td>
-                                            <td class="text-center"><?= $u->dsc_perfil?></td>
+                                            <td class="text-center"><?= $u->dsc_puesto?></td>
                                             <td class="text-center"><?= $u->dsc_area?></td>
                                             <td class="text-center"><?= $u->correo?></td>
                                             <td class="text-center"><?= $u->no_empleado?></td>
