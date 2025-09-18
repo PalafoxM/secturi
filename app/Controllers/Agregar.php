@@ -1508,72 +1508,107 @@ class Agregar extends BaseController {
             $Mglobal = new Mglobal;
             $session = \Config\Services::session();
             
+            // Convertir DateTime a string en formato YYYY-MM-DD
+            $inicioStr = $inicio->format('Y-m-d');
+            $finStr = $fin->format('Y-m-d');
+            
             // Obtener todos los registros de asistencia en el rango
             $agenda = $Mglobal->getTabla([
-                'tabla' => 'asistencia',
+                'tabla' => 'vw_asistencia_incidencia',
                 'where' => [
                     'id_usuario' => $session->id_usuario,
                     'visible'    => 1,
-                    //'whereBetween' => [['fecha', $inicio, $fin]]
                 ],
+                'whereBetween' => [['fechas_asistencias', $inicioStr, $finStr]]
             ]);
-            //var_dump($agenda);
+            
             $asistencias = (!empty($agenda->data)) ? $agenda->data : [];
             $faltas = [];
-            
-            //die();
-            // Crear array con las fechas que tienen registro
-            $fechasConRegistro = [];
+
+            // --- CICLO ÚNICO Y EFICIENTE ---
+            // Recorremos solo los registros que trajo la base de datos, una sola vez.
             foreach ($asistencias as $row) {
-                $fechasConRegistro[$row->fecha] = [
-                    'entrada' => $row->entrada,
-                    'salida' => $row->salida
-                ];
-            }
-            
-            // Recorrer todos los días del rango (de lunes a viernes)
-            $currentDate = clone $inicio;
-            $interval = new DateInterval('P1D');
-            
-            while ($currentDate <= $fin) {
-                $dayOfWeek = (int)$currentDate->format('N'); // 1 (lunes) a 7 (domingo)
-                $fechaStr = $currentDate->format('Y-m-d');
                 
-                // Solo procesar días laborales (lunes a viernes)
-                if ($dayOfWeek >= 1 && $dayOfWeek <= 5) {
-                    
-                    // Verificar si hay registro para esta fecha
-                    if (!isset($fechasConRegistro[$fechaStr])) {
-                        // No hay registro = FALTA
+                // Opcional: Si la tabla puede tener registros en fines de semana y quieres ignorarlos.
+                $dayOfWeek = (int)date('N', strtotime($row->fechas_asistencias)); // 1 (lunes) a 7 (domingo)
+                if ($dayOfWeek > 5) {
+                    continue; // Si es sábado o domingo, salta al siguiente registro
+                }
+                if($row->id_estatus == 3){
                         $faltas[] = (object)[
                             'id_usuario'    => $session->id_usuario,
-                            'fecha'         => $fechaStr,
+                            'fecha'         => $row->fechas_asistencias,
+                            'observaciones' => 'Aprobado',
+                        ];
+                }
+                if($dayOfWeek == 1){
+                    if(empty($row->hora_inicio) && empty($row->hora_fin)){
+                        $faltas[] = (object)[
+                            'id_usuario'    => $session->id_usuario,
+                            'fecha'         => $row->fechas_asistencias,
                             'observaciones' => 'Falta (sin registro)',
                         ];
-                    } else {
-                        // Hay registro, verificar llegadas tarde y salidas temprano
-                        $registro = $fechasConRegistro[$fechaStr];
-                        
-                        if ($registro['entrada'] > '09:00:00') {               
-                            $faltas[] = (object)[
-                                'id_usuario'    => $session->id_usuario,
-                                'fecha'         => $fechaStr,
-                                'observaciones' => 'Llegada Tarde',
-                            ];
-                        }
-                        
-                        if ($registro['salida'] < '16:00:00') {               
-                            $faltas[] = (object)[
-                                'id_usuario'    => $session->id_usuario,
-                                'fecha'         => $fechaStr,
-                                'observaciones' => 'Salida Fuera de Tiempo',
-                            ];
-                        }
                     }
+
+                }
+                if($dayOfWeek == 2){
+                    if(empty($row->hora_inicio) && empty($row->hora_fin)){
+                        $faltas[] = (object)[
+                            'id_usuario'    => $session->id_usuario,
+                            'fecha'         => $row->fechas_asistencias,
+                            'observaciones' => 'Falta (sin registro)',
+                        ];
+                    }
+
+                }
+
+                if($row->id_estatus == 1){
+                     $faltas[] = (object)[
+                        'id_usuario'    => $session->id_usuario,
+                        'fecha'         => $row->fechas_asistencias,
+                        'observaciones' => 'En validación',
+                    ];
+ 
+                   //  return $faltas;
                 }
                 
-                $currentDate->add($interval);
+                // Chequeo de llegada tarde
+                if ($row->hora_inicio > '09:00:00') {      
+                    $faltas[] = (object)[
+                        'id_usuario'    => $session->id_usuario,
+                        'fecha'         => $row->fechas_asistencias,
+                        'observaciones' => 'Llegada Tarde',
+                    ];
+                }
+
+                // Chequeo de salida temprana
+                if ($row->hora_fin < '16:00:00' && !empty($row->hora_fin)) { // Asegurarse de que no esté vacío
+                    $faltas[] = (object)[
+                        'id_usuario'    => $session->id_usuario,
+                        'fecha'         => $row->fechas_asistencias,
+                        'observaciones' => 'Salida Fuera de Tiempo',
+                    ];
+                }
+
+                // Chequeo de salida no registrada (CORREGIDO: usando == en lugar de =)
+                if (empty($row->hora_fin)) { // Es una forma más limpia de chequear si está vacío
+                    $faltas[] = (object)[
+                        'id_usuario'    => $session->id_usuario,
+                        'fecha'         => $row->fechas_asistencias,
+                        'observaciones' => 'Registro de Salida No Registrado',
+                    ];
+                }
+                if ($row->id_estatus == 3) { // Es una forma más limpia de chequear si está vacío
+                    $faltas[] = (object)[
+                        'id_usuario'    => $session->id_usuario,
+                        'fecha'         => $row->fechas_asistencias,
+                        'observaciones' => 'Enviado',
+                    ];
+                }
+            
             }
+            
+            // Aquí puedes continuar si necesitas encontrar los días de ausencia total.
             
             return $faltas;
         }

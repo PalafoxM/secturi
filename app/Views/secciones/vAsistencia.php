@@ -124,14 +124,18 @@
                             </div><!--end card-->
                         </div><!--end col-->
                     </div><!-- End row -->
-                    <!-- <div class="row">
+                    <div class="row">
                             <div class="col-12">
                                 <div class="card">
                                     <div class="card-body">
 
                                         <h4 class="header-title mt-0">Incidencias de <?=$inicio?> al <?=$fin?></h4>
                                         <div class="table-responsive dash-social">
-                                            <table id="datatableVehiculo" class="table">
+                                            <?php if(empty($faltas)): ?>
+                                                    <span class="text-center text-success" ><strong>Sin Incidencia(s)</strong><span>
+                                            <?php endif; ?>
+                                             <?php if(!empty($faltas)): ?>
+                                                     <table id="datatableVehiculo" class="table">
                                                 <thead class="thead-light">
                                                     <tr>
                                                         <th class="text-center">ID</th>
@@ -143,6 +147,7 @@
                                                 </thead>
 
                                                 <tbody>
+                                                   
                                                     <?php foreach($faltas as $e => $k): ?>
                                                     <tr>
                                                         <td  class="text-center"><?= $e?></td>
@@ -150,6 +155,11 @@
                                                         <td  class="text-center"><?= $k->observaciones?></td>
                                                         <?php 
                                                           switch ($k->observaciones) {
+                                                                case 'En validación':
+                                                                    $icono = 'mdi mdi-send-circle-outline'; // Icono de falta
+                                                                    $clase = 'btn-outline-info';
+                                                                    $titulo = 'Enviado';
+                                                                    break;
                                                                 case 'Falta (sin registro)':
                                                                     $icono = 'mdi mdi-close-circle-outline'; // Icono de falta
                                                                     $clase = 'btn-outline-danger';
@@ -182,12 +192,14 @@
                                                     <?php endforeach; ?>
                                                 </tbody>
                                             </table>
+                                            <?php endif; ?>
+                                           
                                         </div>
                                     </div>
                                    
                                 </div>
                                 
-                            </div> -->
+                            </div>
                            
                         </div>  
 
@@ -792,19 +804,19 @@ const eventosFestivos = diasFestivos.map(fecha => {
                     <div>Hora Inicio: ${info.event.extendedProps.hora_inicio}</div>
                     </div>
                 `;
-            } else if(info.event.extendedProps.esFestivo){
+            }else if(info.event.extendedProps.esFestivo){
                 `
                      <div class="fc-event-title">${info.event.title}</div>
                 `;
 
             }else {
-                eventEl.innerHTML = `
-                <div class="fc-event-title">${info.event.title}</div>
-                <div class="fc-event-details">
-                    <div>Entrada: ${info.event.extendedProps.entrada || '--:--'}</div>
-                    <div>Salida: ${info.event.extendedProps.salida || '--:--'}</div>
-                </div>
-                `;
+                     eventEl.innerHTML = `
+                        <div class="fc-event-title">${info.event.title}</div>
+                        <div class="fc-event-details">
+                            <div>Entrada: ${info.event.extendedProps.entrada || '--:--'}</div>
+                            <div>Salida: ${info.event.extendedProps.salida || '--:--'}</div>
+                        </div>
+                        `;
             }
         },
         eventClick: function(info) {

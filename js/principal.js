@@ -39,7 +39,7 @@ saeg.principal = (function () {
             Swal.fire({
                 title: 'Agregar Observaciones',
                 input: 'textarea',
-                inputLabel: `Observaciones (${id_aceptar == 1 ?'opcional':'requerido'})`,
+                inputLabel: `Observaciones (${id_aceptar == 2 ?'requerido':'opcional'})`,
                 inputPlaceholder: 'Escribe tus observaciones aquí...',
                 inputAttributes: {
                     'aria-label': 'Escribe tus observaciones aquí'
