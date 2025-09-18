@@ -124,7 +124,7 @@
                             </div><!--end card-->
                         </div><!--end col-->
                     </div><!-- End row -->
-                      <div class="row">
+                      <!-- <div class="row">
                             <div class="col-12">
                                 <div class="card">
                                     <div class="card-body">
@@ -138,7 +138,7 @@
                                                         <th class="text-center">FECHA</th>
                                                         <th class="text-center">ACCIONES</th>
                                                     </tr>
-                                                    <!--end tr-->
+                                                   
                                                 </thead>
 
                                                 <tbody>
@@ -163,12 +163,12 @@
                                             </table>
                                         </div>
                                     </div>
-                                    <!--end card-body-->
+                                   
                                 </div>
-                                <!--end card-->
+                                
                             </div>
-                            <!--end col-->
-                        </div>
+                           
+                        </div> -->
 
                 </div><!-- container -->
             </div>
