@@ -10,6 +10,8 @@ use Config\Services;
 
 
 use DateTime;
+use DatePeriod;
+use DateInterval;
 
 
 
@@ -1472,6 +1474,68 @@ class Agregar extends BaseController {
             
             return $data;
         }
+       
+        private function getFaltasRangoQuincena(
+            DateTime $inicio,
+            DateTime $fin,
+        ): array {
+            $Mglobal = new Mglobal;
+             $session = \Config\Services::session();
+            // Solo días pasados o hoy (nunca futuros)
+            $hoy = new DateTime('today');
+            if ($fin > $hoy) $fin = $hoy;
+
+            if ($inicio > $fin) {
+                return []; // nada que mostrar si la quincena aún no empezó
+            }
+
+            // 1) Trae asistencias SOLO dentro del rango (optimiza la consulta)
+            // Si tu wrapper no permite BETWEEN, usa el Query Builder (ver ejemplo más abajo)
+            $agenda = $Mglobal->getTabla([
+                'tabla' => 'asistencia',
+                'where' => [
+                    'id_usuario' => $session->id_usuario,
+                    'visible'    => 1,
+                    // Si tu getTabla no admite expresiones, luego te dejo alternativa con Query Builder
+                ],
+                // Si tu getTabla permite "extra" o "raw", puedes pasar un BETWEEN aquí.
+                // 'extra' => "AND fecha BETWEEN '{$inicio->format('Y-m-d')}' AND '{$fin->format('Y-m-d')}'",
+            ]);
+
+            $asistencias = (!empty($agenda->data)) ? $agenda->data : [];
+
+            // 2) Indexa por fecha las asistencias válidas (ajusta la lógica si usas estatus)
+            $presentes = [];
+            foreach ($asistencias as $row) {
+                // Asume: $row->fecha en formato Y-m-d
+                // Si manejas 'estatus', podrías hacer:
+                // if ($row->estatus !== 'FALTA') { $presentes[$row->fecha] = true; }
+                $presentes[$row->fecha] = true;
+            }
+
+            // 3) Recorre de inicio a fin (inclusive) y marca faltas solo L–V
+            $faltas = [];
+            $periodo = new DatePeriod(
+                $inicio,
+                new DateInterval('P1D'),
+                (clone $fin)->modify('+1 day') // DatePeriod es exclusivo en el final
+            );
+
+            foreach ($periodo as $dia) {
+                $dow = (int)$dia->format('N'); // 1=Lun ... 7=Dom
+                if ($dow >= 1 && $dow <= 5) {  // L–V
+                    $f = $dia->format('Y-m-d');
+                    if (!isset($presentes[$f])) {
+                        $faltas[] = (object)[
+                            'id_usuario' => $session->id_usuario,
+                            'fecha'      => $f,
+                        ];
+                    }
+                }
+            }
+
+            return $faltas;
+        }
 
         public function Asistencia($mes = null, $user = null) 
         {
@@ -1577,11 +1641,33 @@ class Agregar extends BaseController {
             $mes  = ($mes)? $mes: date('m');
             $data['anio'] = date('Y');
             $data['idTipoEmpleado'] = $idTipoEmpleado;
+            $finMes    = new DateTime('last day of this month');
+            $hoy       = new DateTime('today');
+            $dia = (int) $hoy->format('d'); // número del día
+
+            if ($dia >= 16) {
+                // quincena 2: arranca día 16
+                $inicio = new DateTime($hoy->format('Y-m-16')); 
+                $fin    = $finMes;
+            } else {
+                // quincena 1: arranca día 1
+                $inicio = new DateTime($hoy->format('Y-m-01')); ;
+                $fin = new DateTime($hoy->format('Y-m-15')); 
+            }
+            $data['inicio'] = $inicio->format('d/m/Y');
+            $data['fin'] = $fin->format('d/m/Y');;
+      
             $asistencia = (isset($agenda->data) && !empty($agenda->data))?$agenda->data:[];
+            $presentes = [];
+           
+            //$faltas = new DatePeriod($inicio, new DateInterval('P1D'), (clone $fin)->modify('+1 day'));
+            $faltas = $this->getFaltasRangoQuincena($inicio, $fin );
+           // var_dump( $faltas );
+            $data['faltas'] = $faltas;
             $data['asistencia'] = $asistencia;
             $data['cat_incidencia'] = $cat_incidencia->data;
            // $data['incidencia'] = (isset($incidencia->data) && !empty($incidencia->data))?$incidencia->data:[];
-        
+            //die();
             $data['mes'] = $mes;
             $data['calendarStatic'] = $calendarStatic;
             $data['scripts'] = array('agregar', 'inicio');

@@ -124,12 +124,60 @@
                             </div><!--end card-->
                         </div><!--end col-->
                     </div><!-- End row -->
+                      <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-body">
+
+                                        <h4 class="header-title mt-0">Incidencias de <?=$inicio?> al <?=$fin?></h4>
+                                        <div class="table-responsive dash-social">
+                                            <table id="datatableVehiculo" class="table">
+                                                <thead class="thead-light">
+                                                    <tr>
+                                                        <th class="text-center">ID</th>
+                                                        <th class="text-center">FECHA</th>
+                                                        <th class="text-center">ACCIONES</th>
+                                                    </tr>
+                                                    <!--end tr-->
+                                                </thead>
+
+                                                <tbody>
+                                                    <?php foreach($faltas as $e => $k): ?>
+                                                    <tr>
+                                                        <td  class="text-center"><?= $e?></td>
+                                                        <td  class="text-center"><?= $k->fecha?></td>
+                                            
+
+                                                        <td  class="text-center" class="text-center">
+                                                            <a class="btn btn-outline-info btn-round" title="editar" onclick="ini.inicio.getVehiculo(<?= $k->fecha?>)" >
+                                                                <i class="mdi dripicons-pencil font-18"></i></a>
+                                                    
+                                                            <a class="btn btn-outline-info btn-round" href="javascript:void(0);"  onclick="ini.inicio.deletePT(<?= $k->fecha?>)" ><i
+                                                                    class="mdi mdi-delete-forever text-danger font-18"></i></a>
+                                                    
+                                                        
+                                                        </td>
+                                                    </tr>
+                                                    <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <!--end card-body-->
+                                </div>
+                                <!--end card-->
+                            </div>
+                            <!--end col-->
+                        </div>
 
                 </div><!-- container -->
             </div>
             <!-- end page content -->
         </div>
         <!-- end page-wrapper -->
+
+
+          
 
 <!--  Modal content for the above example -->
         <div class="modal modal-rightbar fade" id="modalJustificar" tabindex="-1" role="dialog" aria-labelledby="MetricaRightbar"
