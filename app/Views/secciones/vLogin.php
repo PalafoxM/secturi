@@ -116,7 +116,7 @@
                 </div>
                 <!--end card-->
                 <div class="account-social text-center mt-4">
-                    <h6 class="my-4">   Version 1.0</h6>
+                    <h6 class="my-4">   Version 1.1</h6>
                     <ul class="list-inline mb-4">
                       
                         <!-- <li class="list-inline-item">
