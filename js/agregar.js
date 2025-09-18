@@ -570,13 +570,77 @@ st.agregar = (function () {
                 $('#fecha').val(dia.split('T')[0]);
             }, 300); // Espera a que termine la animación de cierre
         },
-        justificarFalta: function(fecha)
-        {
-          const partes = fecha.split('-'); // ["2025", "07", "03"]
-          const fechaFormateada = `${partes[2]}-${partes[1]}-${partes[0]}`; 
-          $("#modalJustificar").modal('show');
-          $("#fecha_incidencia").html('<center><strong>' + fechaFormateada + '</strong></center>');
-          $("#fecha").val(fecha);
+       justificarFalta: function(fecha) {
+            try {
+                // Validar que el parámetro no sea undefined o null
+                if (fecha === undefined || fecha === null) {
+                    throw new Error('Fecha no proporcionada');
+                }
+
+                // Convertir a string si es necesario
+                let fechaStr;
+                if (typeof fecha === 'string') {
+                    fechaStr = fecha;
+                } else if (fecha instanceof Date) {
+                    fechaStr = fecha.toISOString().split('T')[0];
+                } else {
+                    // Intentar convertir otros tipos (números, objetos)
+                    fechaStr = String(fecha);
+                }
+
+                // Validar formato esperado (YYYY-MM-DD)
+                const regex = /^\d{4}-\d{2}-\d{2}$/;
+                if (!regex.test(fechaStr)) {
+                    throw new Error('Formato de fecha inválido. Se esperaba YYYY-MM-DD, se recibió: ' + fechaStr);
+                }
+
+                // Dividir la fecha en partes
+                const partes = fechaStr.split('-');
+                
+                // Validar que tenga exactamente 3 partes
+                if (partes.length !== 3) {
+                    throw new Error('La fecha no tiene el formato correcto: ' + fechaStr);
+                }
+
+                // Validar que cada parte sean números válidos
+                const anio = parseInt(partes[0]);
+                const mes = parseInt(partes[1]);
+                const dia = parseInt(partes[2]);
+
+                if (isNaN(anio) || isNaN(mes) || isNaN(dia)) {
+                    throw new Error('La fecha contiene valores no numéricos: ' + fechaStr);
+                }
+
+                // Validar rangos razonables
+                if (anio < 2000 || anio > 2100) {
+                    throw new Error('Año fuera de rango válido: ' + anio);
+                }
+                if (mes < 1 || mes > 12) {
+                    throw new Error('Mes fuera de rango válido: ' + mes);
+                }
+                if (dia < 1 || dia > 31) {
+                    throw new Error('Día fuera de rango válido: ' + dia);
+                }
+
+                // Formatear la fecha (DD-MM-YYYY)
+                const fechaFormateada = `${partes[2]}-${partes[1]}-${partes[0]}`; 
+                
+                // Mostrar el modal y establecer valores
+                $("#modalJustificar").modal('show');
+                $("#fecha_incidencia").html('<center><strong>' + fechaFormateada + '</strong></center>');
+                $("#fecha").val(fechaStr);
+
+            } catch (error) {
+                console.error('Error en justificarFalta:', error);
+                
+                // Mostrar mensaje de error al usuario
+                alert('Error: ' + error.message + '\nPor favor, contacte al administrador.');
+                
+                // Opcional: puedes mostrar el modal igual pero con un mensaje de error
+                $("#modalJustificar").modal('show');
+                $("#fecha_incidencia").html('<center><strong style="color: red;">Error en fecha</strong></center>');
+                $("#fecha").val('invalid-date');
+            }
         },
         guardarIncidencia: function()
         {

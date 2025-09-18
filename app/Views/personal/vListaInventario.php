@@ -102,7 +102,7 @@
                     </button>
                 </div>
                 <div class="modal-body" id="detalleCurso" style="max-height: 70vh; overflow-y: auto;">
-                    <form id="formInventario" name="formInventario">
+                    <form id="formInventario" >
                         <div class="row">
                             <input type="hidden" value="0" name="id_inventario" id="id_inventario">
                             <input type="hidden" value="0" name="editar" id="editar">
@@ -247,6 +247,14 @@
                                                         class="form-label">valor</label>
                                                     <input type="text" autocomplete="off" class="form-control" id="valor" name="valor"
                                                         placeholder="VALOR">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3 position-relative" >
+                                                    <label for="valor"
+                                                        class="form-label">FOTO</label>
+                                                    <input type="file" autocomplete="off" class="form-control" id="foto" name="foto"
+                                                        accept=".jpg, .png, .jpeg">
                                                 </div>
                                             </div>
                                         </div>

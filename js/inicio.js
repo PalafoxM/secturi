@@ -3428,37 +3428,51 @@ ini.inicio = (function () {
             });
 
         },
-        formInventario: function()
-        {
-            let formData = $("#formInventario").serialize();
-             $.ajax({
+       formInventario: function() {
+            let formData = new FormData();
+
+            // Agregar el archivo usando el id del input
+            let fileInput = document.getElementById("foto");
+            if (fileInput.files.length > 0) {
+                formData.append("foto", fileInput.files[0]);
+            }
+
+            // Agregar el resto de los campos del formulario
+            $("#formInventario").serializeArray().forEach(function (campo) {
+                formData.append(campo.name, campo.value);
+            });
+
+            $.ajax({
                 type: "POST",
                 url: base_url + "index.php/Agregar/formInventario",
                 data: formData,
+                processData: false,
+                contentType: false,
                 dataType: "json",
-                beforeSend: function(){
-                   $('#btnInventario').prop('disabled', true).html('<i class="mdi mdi-content-save"></i>Guardando...');
+                beforeSend: function () {
+                    $('#btnInventario').prop('disabled', true)
+                        .html('<i class="mdi mdi-content-save"></i>Guardando...');
                 },
                 success: function (response) {
-                    if(!response.error){
-                        Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
+                    if (!response.error) {
+                        Swal.fire("Correcto", '<p>' + response.respuesta + '</p>', 'success');  
                         setTimeout(() => {
-                           // window.location.href = base_url + "index.php/Principal/listadoEstatusPT";
                             window.location.reload();
                         }, 1500);
-                    }else{
-                        Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
+                    } else {
+                        Swal.fire("Atención", '<p>' + response.respuesta + '</p>', 'info');  
                     }
                 },
-                complete: function(){
-                  $("#btnInventario").prop('disabled', false).html('<i class="mdi mdi-content-save"></i>Guardar');
+                complete: function () {
+                    $("#btnInventario").prop('disabled', false)
+                        .html('<i class="mdi mdi-content-save"></i>Guardar');
                 },
-                error: function (response,jqXHR, textStatus, errorThrown) {          
-                    Swal.fire("Error", '<p> '+ response.message + '</p>'); 
-                    $('#btnInventario').prop('disabled', false).html('<i class="mdi mdi-content-save"></i>Guardar');
+                error: function (xhr, status, error) {          
+                    Swal.fire("Error", '<p>' + error + '</p>'); 
+                    $('#btnInventario').prop('disabled', false)
+                        .html('<i class="mdi mdi-content-save"></i>Guardar');
                 }
             });
-
         },
         getInventario: function(id_inventario)
         {

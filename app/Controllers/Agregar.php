@@ -796,7 +796,21 @@ class Agregar extends BaseController {
         $session = \Config\Services::session();
         $this->globals = new Mglobal(); 
         $data = $this->request->getPost();
-       // die( var_dump( $data ) );
+        $file = $this->request->getFile('foto');
+        
+        if(isset($file) && !empty($file)){ 
+            $timestamp = date('Ymd_His');
+            $extension = $file->getClientExtension();
+   
+            $archivo = $session->usuario.'_'.$timestamp. '.' . $extension;
+
+            $ruta_destino = FCPATH . 'assets/images/fotos/';
+            $file->move($ruta_destino, $archivo);
+
+            $ruta_relativa  = 'assets/images/fotos/' . $archivo;
+
+        }
+
         $dataInsert = [
             "activo_fijo"             => $data['activo_fijo'],
             "no_empleado"             => $data['usuario'],
@@ -808,6 +822,7 @@ class Agregar extends BaseController {
             "modelo"                  => $data['modelo'],
             "material"                => $data['material'],
             "color"                   => $data['color'],
+            "foto"                    =>(isset($ruta_relativa) && !empty($ruta_relativa))?$ruta_relativa:'',
             "ubicacion"               => $data['ubicacion'],
             "observaciones"           => $data['observaciones'],
             "estado"                  => $data['estado'],
@@ -1489,62 +1504,77 @@ class Agregar extends BaseController {
             return $data;
         }
        
-        private function getFaltasRangoQuincena(DateTime $inicio,DateTime $fin){
+       private function getFaltasRangoQuincena(DateTime $inicio, DateTime $fin) {
             $Mglobal = new Mglobal;
-             $session = \Config\Services::session();
-            // Solo días pasados o hoy (nunca futuros)
-            $hoy = new DateTime('today');
-            if ($fin > $hoy) $fin = $hoy;
-
-            if ($inicio > $fin) {
-                return []; // nada que mostrar si la quincena aún no empezó
-            }
-
-            // 1) Trae asistencias SOLO dentro del rango (optimiza la consulta)
-            // Si tu wrapper no permite BETWEEN, usa el Query Builder (ver ejemplo más abajo)
+            $session = \Config\Services::session();
+            
+            // Obtener todos los registros de asistencia en el rango
             $agenda = $Mglobal->getTabla([
                 'tabla' => 'asistencia',
                 'where' => [
                     'id_usuario' => $session->id_usuario,
                     'visible'    => 1,
-                    // Si tu getTabla no admite expresiones, luego te dejo alternativa con Query Builder
+                    'fecha >='   => $inicio->format('Y-m-d'),
+                    'fecha <='   => $fin->format('Y-m-d')
                 ],
-                // Si tu getTabla permite "extra" o "raw", puedes pasar un BETWEEN aquí.
-                // 'extra' => "AND fecha BETWEEN '{$inicio->format('Y-m-d')}' AND '{$fin->format('Y-m-d')}'",
             ]);
 
             $asistencias = (!empty($agenda->data)) ? $agenda->data : [];
-
-            // 2) Indexa por fecha las asistencias válidas (ajusta la lógica si usas estatus)
-            $presentes = [];
-            foreach ($asistencias as $row) {
-                // Asume: $row->fecha en formato Y-m-d
-                // Si manejas 'estatus', podrías hacer:
-                // if ($row->estatus !== 'FALTA') { $presentes[$row->fecha] = true; }
-                $presentes[$row->fecha] = true;
-            }
-
-            // 3) Recorre de inicio a fin (inclusive) y marca faltas solo L–V
             $faltas = [];
-            $periodo = new DatePeriod(
-                $inicio,
-                new DateInterval('P1D'),
-                (clone $fin)->modify('+1 day') // DatePeriod es exclusivo en el final
-            );
-
-            foreach ($periodo as $dia) {
-                $dow = (int)$dia->format('N'); // 1=Lun ... 7=Dom
-                if ($dow >= 1 && $dow <= 5) {  // L–V
-                    $f = $dia->format('Y-m-d');
-                    if (!isset($presentes[$f])) {
+            
+            // Crear array con las fechas que tienen registro
+            $fechasConRegistro = [];
+            foreach ($asistencias as $row) {
+                $fechasConRegistro[$row->fecha] = [
+                    'entrada' => $row->entrada,
+                    'salida' => $row->salida
+                ];
+            }
+            
+            // Recorrer todos los días del rango (de lunes a viernes)
+            $currentDate = clone $inicio;
+            $interval = new DateInterval('P1D');
+            
+            while ($currentDate <= $fin) {
+                $dayOfWeek = (int)$currentDate->format('N'); // 1 (lunes) a 7 (domingo)
+                $fechaStr = $currentDate->format('Y-m-d');
+                
+                // Solo procesar días laborales (lunes a viernes)
+                if ($dayOfWeek >= 1 && $dayOfWeek <= 5) {
+                    
+                    // Verificar si hay registro para esta fecha
+                    if (!isset($fechasConRegistro[$fechaStr])) {
+                        // No hay registro = FALTA
                         $faltas[] = (object)[
-                            'id_usuario' => $session->id_usuario,
-                            'fecha'      => $f,
+                            'id_usuario'    => $session->id_usuario,
+                            'fecha'         => $fechaStr,
+                            'observaciones' => 'Falta (sin registro)',
                         ];
+                    } else {
+                        // Hay registro, verificar llegadas tarde y salidas temprano
+                        $registro = $fechasConRegistro[$fechaStr];
+                        
+                        if ($registro['entrada'] > '09:00:00') {               
+                            $faltas[] = (object)[
+                                'id_usuario'    => $session->id_usuario,
+                                'fecha'         => $fechaStr,
+                                'observaciones' => 'Llegada Tarde',
+                            ];
+                        }
+                        
+                        if ($registro['salida'] < '16:00:00') {               
+                            $faltas[] = (object)[
+                                'id_usuario'    => $session->id_usuario,
+                                'fecha'         => $fechaStr,
+                                'observaciones' => 'Salida Fuera de Tiempo',
+                            ];
+                        }
                     }
                 }
+                
+                $currentDate->add($interval);
             }
-
+            
             return $faltas;
         }
 
@@ -1659,7 +1689,7 @@ class Agregar extends BaseController {
             if ($dia >= 16) {
                 // quincena 2: arranca día 16
                 $inicio = new DateTime($hoy->format('Y-m-16')); 
-                $fin    = $finMes;
+                $fin    = $hoy;
             } else {
                 // quincena 1: arranca día 1
                 $inicio = new DateTime($hoy->format('Y-m-01')); ;
@@ -1671,9 +1701,8 @@ class Agregar extends BaseController {
             $asistencia = (isset($agenda->data) && !empty($agenda->data))?$agenda->data:[];
             $presentes = [];
            
-            //$faltas = new DatePeriod($inicio, new DateInterval('P1D'), (clone $fin)->modify('+1 day'));
             $faltas = $this->getFaltasRangoQuincena($inicio, $fin );
-           // var_dump( $faltas );
+       
             $data['faltas'] = $faltas;
             $data['asistencia'] = $asistencia;
             $data['cat_incidencia'] = $cat_incidencia->data;

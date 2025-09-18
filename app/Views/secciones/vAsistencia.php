@@ -124,7 +124,7 @@
                             </div><!--end card-->
                         </div><!--end col-->
                     </div><!-- End row -->
-                      <!-- <div class="row">
+                    <div class="row">
                             <div class="col-12">
                                 <div class="card">
                                     <div class="card-body">
@@ -136,6 +136,7 @@
                                                     <tr>
                                                         <th class="text-center">ID</th>
                                                         <th class="text-center">FECHA</th>
+                                                        <th class="text-center">OBSERVACIONES</th>
                                                         <th class="text-center">ACCIONES</th>
                                                     </tr>
                                                    
@@ -145,16 +146,36 @@
                                                     <?php foreach($faltas as $e => $k): ?>
                                                     <tr>
                                                         <td  class="text-center"><?= $e?></td>
-                                                        <td  class="text-center"><?= $k->fecha?></td>
-                                            
+                                                        <td  class="text-center"><?= date('d/m/Y', strtotime($k->fecha))?></td>
+                                                        <td  class="text-center"><?= $k->observaciones?></td>
+                                                        <?php 
+                                                          switch ($k->observaciones) {
+                                                                case 'Falta (sin registro)':
+                                                                    $icono = 'mdi mdi-close-circle-outline'; // Icono de falta
+                                                                    $clase = 'btn-outline-danger';
+                                                                    $titulo = 'Falta completa';
+                                                                    break;
+                                                                case 'Llegada Tarde':
+                                                                    $icono = 'mdi mdi-clock-alert-outline'; // Icono de retardo
+                                                                    $clase = 'btn-outline-warning';
+                                                                    $titulo = 'Llegada tarde';
+                                                                    break;
+                                                                case 'Salida Fuera de Tiempo':
+                                                                    $icono = 'mdi mdi-run-fast'; // Icono de salida temprano
+                                                                    $clase = 'btn-outline-warning';
+                                                                    $titulo = 'Salida temprano';
+                                                                    break;
+                                                                default:
+                                                                    $icono = 'mdi mdi-check-circle-outline'; // Icono de asistencia completa
+                                                                    $clase = 'btn-outline-success';
+                                                                    $titulo = 'Asistencia completa';
+                                                            }
+                                                        ?>
 
                                                         <td  class="text-center" class="text-center">
-                                                            <a class="btn btn-outline-info btn-round" title="editar" onclick="ini.inicio.getVehiculo(<?= $k->fecha?>)" >
-                                                                <i class="mdi dripicons-pencil font-18"></i></a>
-                                                    
-                                                            <a class="btn btn-outline-info btn-round" href="javascript:void(0);"  onclick="ini.inicio.deletePT(<?= $k->fecha?>)" ><i
-                                                                    class="mdi mdi-delete-forever text-danger font-18"></i></a>
-                                                    
+                                                            <a class="btn <?=$clase?> btn-round" title="<?=$titulo?>" onclick="st.agregar.justificarFalta('<?= date('Y-m-d', strtotime($k->fecha)) ?>')">
+                                                                <i class="<?=$icono?> font-18"></i>
+                                                            </a>
                                                         
                                                         </td>
                                                     </tr>
@@ -168,7 +189,7 @@
                                 
                             </div>
                            
-                        </div> -->
+                        </div> 
 
                 </div><!-- container -->
             </div>
