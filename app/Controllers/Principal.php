@@ -23,6 +23,7 @@ use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
 use Endroid\QrCode\Writer\PngWriter;
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Principal extends BaseController {
@@ -61,7 +62,135 @@ class Principal extends BaseController {
         $this->_renderView($data);
         
     }
-        public function uploadCSV()
+   public function uploadCSV()
+    {
+        $response = new \stdClass();
+        $session  = \Config\Services::session();
+        $globals  = new Mglobal;
+        $response->error = true;
+        $response->respuesta = 'No se subió ningún archivo válido';
+
+        $file = $this->request->getFile('fileParticipantes');
+        
+        if (!$file->isValid()) {
+            return $this->respond($response);
+        }
+
+        try {
+            $spreadsheet = IOFactory::load($file->getTempName());
+            $worksheet = $spreadsheet->getActiveSheet();
+            $rows = $worksheet->toArray();
+            
+            $registrosProcesados = 0;
+            $errores = [];
+            
+         
+            
+            foreach ($rows as $index => $row) {
+                if (empty($row[0]) || empty($row[1])) {
+                    continue;
+                }
+                
+                try {
+                    $noEmpleado = $row[0];
+                    $fechaHora = $row[1];
+    
+                    // Convertir fecha
+                    $fechaHoraObj = DateTime::createFromFormat('d/m/Y H:i', $fechaHora);
+                    if (!$fechaHoraObj) {
+                        $errores[] = "Fila " . ($index + 1) . ": Formato de fecha inválido";
+                        continue;
+                    }
+                    
+                    $fecha = $fechaHoraObj->format('Y-m-d');
+                    $hora = $fechaHoraObj->format('H:i:s');
+                    
+                    // Obtener ID usuario
+                    $dataDB = ['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'no_empleado' => $noEmpleado]];
+                    $userResponse = $globals->getTabla($dataDB);
+                    
+                    if (empty($userResponse->data)) {
+                        $errores[] = "Fila " . ($index + 1) . ": Usuario $noEmpleado no encontrado";
+                        continue;
+                    }
+                    
+                    $idUsuario = $userResponse->data[0]->id_usuario;
+                    
+                    // Verificar si ya existe registro para esta fecha
+                    $asistenciaDB = [
+                        'tabla' => 'asistencia', 
+                        'where' => [
+                            'visible' => 1, 
+                            'id_usuario' => $idUsuario, 
+                            'fecha' => $fecha
+                        ]
+                    ];
+                    
+                    $asistenciaExistente = $globals->getTabla($asistenciaDB);
+                    
+                    // Determinar si es entrada o salida (lógica mejorada)
+                    $esEntrada = ($hora <= '12:00:00'); // Antes del mediodía = entrada
+                    $esSalida = ($hora >= '12:00:00');  // Después del mediodía = salida
+                    
+                    if (!empty($asistenciaExistente->data)) {
+                        // ACTUALIZAR registro existente
+                        $registro = $asistenciaExistente->data[0];
+                        $datosActualizar = [];
+                        
+                        if ($esEntrada && (empty($registro->entrada) || $registro->entrada == '00:00:00')) {
+                            $datosActualizar['entrada'] = $hora;
+                        }
+                        
+                        if ($esSalida && (empty($registro->salida) || $registro->salida == '00:00:00')) {
+                            $datosActualizar['salida'] = $hora;
+                        }
+                        
+                        if (!empty($datosActualizar)) {
+                            $dataConfig = [
+                                "tabla" => "asistencia",
+                                "editar" => true,
+                                "idEditar" => ['id_asistencia' => $registro->id_asistencia]
+                            ];
+                            
+                            $globals->saveTabla($datosActualizar, $dataConfig, ["script" => "Principal.asistenciaExcel"]);
+                        }
+                        
+                    } else {
+                        // CREAR nuevo registro
+                        $datosNuevos = [
+                            'id_usuario' => $idUsuario,
+                            'fecha' => $fecha,
+                            'entrada' => $esEntrada ? $hora : '00:00:00',
+                            'salida' => $esSalida ? $hora : '00:00:00',
+                            'visible' => 1
+                        ];
+                        
+                        $dataConfig = [
+                            "tabla" => "asistencia",
+                            "editar" => false
+                        ];
+                        
+                        $globals->saveTabla($datosNuevos, $dataConfig, ["script" => "Principal.asistenciaExcel"]);
+                    }
+                    
+                    $registrosProcesados++;
+                    
+                } catch (Exception $e) {
+                    $errores[] = "Fila " . ($index + 1) . ": " . $e->getMessage();
+                }
+            }
+            
+            $response->error = false;
+            $response->respuesta = "Procesados $registrosProcesados registros. Errores: " . count($errores);
+            $response->errores = $errores;
+            
+        } catch (Exception $e) {
+            $response->respuesta = "Error al procesar archivo: " . $e->getMessage();
+        }
+        
+        return $this->respond($response);
+    }
+    public function uploadCSV2()
     {
         $response = new \stdClass();
         $session  = \Config\Services::session();
