@@ -858,9 +858,9 @@
                         return;
                     }
 
-                    if (info.event.extendedProps.entrada >= '08:30:00' && 
-                        info.event.extendedProps.entrada <= '08:45:00') {
-                        Swal.fire(info.event.title, "Entrada :"+info.event.extendedProps.entrada, 'success');
+                    if (info.event.extendedProps.entrada >= '07:30:00' && 
+                        info.event.extendedProps.entrada <= '08:46:00') {
+                        Swal.fire(info.event.title, "Entrada : "+info.event.extendedProps.entrada+"- Salida : "+info.event.extendedProps.salida, 'success');
                         return;
                     }
 
