@@ -1710,8 +1710,16 @@ class Agregar extends BaseController {
                     
             }
 
-           //var_dump( $data['incidencia']  );
-           //die();
+           $data['onlyAsistencias'] = [];
+           $onlyAsistencias = $Mglobal->getTabla(['tabla' => 'asistencia', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario]]);
+           if(isset($onlyAsistencias->data) && !empty($onlyAsistencias->data)){
+              foreach($onlyAsistencias->data as $f){
+                  $data['onlyAsistencias'][] =  date('Y-m-d', strtotime($f->fecha));
+              }
+
+           }
+ 
+         
             $cat_incidencia = $Mglobal->getTabla(['tabla' => 'cat_incidencia', 'where' => ['visible' => 1]]);
         
             $mes  = ($mes)? $mes: date('m');

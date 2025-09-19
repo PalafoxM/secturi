@@ -28,6 +28,8 @@
 
 <style>
     /* Añade estos estilos al bloque de estilos existente */
+ 
+
     .fc-event-asistencia {
         border-left: 4px solid #4e73df;
         background-color: #1950f5ff;
@@ -171,27 +173,27 @@
                                                             <?php
                                                             switch ($k->observaciones) {
                                                                 case 'En validación':
-                                                                    $icono = 'mdi mdi-send-circle-outline'; // Icono de falta
+                                                                    $icono = 'mdi mdi-send-circle-outline';  // Icono de falta
                                                                     $clase = 'btn-outline-info';
                                                                     $titulo = 'Enviado';
                                                                     break;
                                                                 case 'Falta (sin registro)':
-                                                                    $icono = 'mdi mdi-close-circle-outline'; // Icono de falta
+                                                                    $icono = 'mdi mdi-close-circle-outline';  // Icono de falta
                                                                     $clase = 'btn-outline-danger';
                                                                     $titulo = 'Falta completa';
                                                                     break;
                                                                 case 'Llegada Tarde':
-                                                                    $icono = 'mdi mdi-clock-alert-outline'; // Icono de retardo
+                                                                    $icono = 'mdi mdi-clock-alert-outline';  // Icono de retardo
                                                                     $clase = 'btn-outline-warning';
                                                                     $titulo = 'Llegada tarde';
                                                                     break;
                                                                 case 'Salida Fuera de Tiempo':
-                                                                    $icono = 'mdi mdi-run-fast'; // Icono de salida temprano
+                                                                    $icono = 'mdi mdi-run-fast';  // Icono de salida temprano
                                                                     $clase = 'btn-outline-warning';
                                                                     $titulo = 'Salida temprano';
                                                                     break;
                                                                 default:
-                                                                    $icono = 'mdi mdi-check-circle-outline'; // Icono de asistencia completa
+                                                                    $icono = 'mdi mdi-check-circle-outline';  // Icono de asistencia completa
                                                                     $clase = 'btn-outline-success';
                                                                     $titulo = 'Asistencia completa';
                                                             }
@@ -552,6 +554,50 @@
     ini.inicio.formIncidencia();
     var eventosAsistencia = <?= json_encode($asistencia) ?>;
     var incidencia = <?= json_encode($incidencia ?? []) ?>;
+    var onlyAsistencias = <?= json_encode($onlyAsistencias) ?>;
+
+
+    // Helpers
+    function horaToSegundos(hora) {
+        if (!hora || typeof hora !== 'string' || !hora.includes(':')) return null;
+        const [hh, mm, ss] = hora.split(':').map(x => parseInt(x, 10) || 0);
+        return hh * 3600 + mm * 60 + ss;
+    }
+    function parseHoras(valor) {
+        // Admite: array de horas ["08:00:00","14:00:00"], string "08:00:00",
+        // o string con comas "08:00:00,14:00:00"
+        if (Array.isArray(valor)) return valor.filter(Boolean);
+        if (typeof valor === 'string') return valor.split(',').map(s => s.trim()).filter(Boolean);
+        return [];
+    }
+    function getEntradas(info) {
+    const ep = info.event.extendedProps || {};
+    // Preferir 'entradas' si existe; si no, usar 'entrada'
+    return parseHoras(ep.entradas ?? ep.entrada ?? '');
+    }
+    function getSalidas(info) {
+    const ep = info.event.extendedProps || {};
+    // Preferir 'salidas' si existe; si no, usar 'salida'
+    const s = parseHoras(ep.salidas ?? ep.salida ?? '');
+    // Preservar el literal "Sin salida" si viene único
+    if (!s.length && typeof ep.salida === 'string' && ep.salida.toLowerCase().includes('sin salida')) {
+        return ['Sin salida'];
+    }
+    return s;
+    }
+
+    function esHabil(date) {
+     const d = date.getDay(); // 0=Dom, 6=Sáb
+     return d >= 1 && d <= 5;
+    }
+    function esPasado(date) {
+       const hoy = new Date();
+       hoy.setHours(0,0,0,0);
+       const d = new Date(date);
+       d.setHours(0,0,0,0);
+       return d < hoy;
+    }
+
 
     $(document).ready(function () {
         $('#tipo_incidencia').on('change', function () {
@@ -747,6 +793,12 @@
             return `${y}-${m}-${day}`;
         }
 
+        function horaToSegundos(hora) {
+          if (!hora || typeof hora !== 'string' || !hora.includes(':')) return null;
+          const [hh, mm, ss] = hora.split(':').map(n => parseInt(n, 10) || 0);
+          return hh * 3600 + mm * 60 + ss;
+        }
+
         // Definir los días festivos (formato: 'YYYY-MM-DD')
         const diasFestivos = [
             '2025-01-01', // Año Nuevo
@@ -851,16 +903,47 @@
                 const fechaLabel = esSemana
                     ? `${info.event.extendedProps.rango_legible}`
                     : info.event.start.toLocaleDateString();
-                    console.log(info.event.extendedProps.entrada);
-                   if (info.event.extendedProps.entrada >= '08:46:00' && 
-                        info.event.extendedProps.entrada <= '09:00:00') {
-                        Swal.fire('Atención', "Los retrasos no se pueden justificar.",'info');
+                
+                    const entradas = getEntradas(info);
+                    const salidas  = getSalidas(info);
+
+                    // 🚫 Si hay múltiples entradas o múltiples salidas, no mostrar listado/justificar
+                    const multiplesEntradas = entradas.length > 1;
+                    const multiplesSalidas  = salidas.length > 1;
+
+                    if (multiplesEntradas || multiplesSalidas) {
+                        Swal.fire('Aviso', 'Este registro contiene múltiples entradas/salidas. Favor de gestionarlo desde "Editar".', 'info');
                         return;
                     }
 
-                    if (info.event.extendedProps.entrada >= '07:30:00' && 
-                        info.event.extendedProps.entrada <= '08:46:00') {
-                        Swal.fire(info.event.title, "Entrada : "+info.event.extendedProps.entrada+"- Salida : "+info.event.extendedProps.salida, 'success');
+                    // ✅ Caso de un solo par entrada–salida (o salida "Sin salida")
+                    const entrada = entradas[0] || null;
+                    const salida  = salidas[0] || null;
+
+                    // Si entrada viene vacía, no seguimos con reglas de horario
+                    if (!entrada) {
+                        Swal.fire('Atención', 'No se encontró hora de entrada válida para este registro.', 'warning');
+                        return;
+                    }
+
+                    // Reglas por rango de hora de entrada
+                    const ent = horaToSegundos(entrada);
+                    const r1i = horaToSegundos('08:46:00');
+                    const r1f = horaToSegundos('09:00:00');
+                    const r2i = horaToSegundos('07:00:00');
+                    const r2f = horaToSegundos('08:46:00');
+
+                    const tieneSalidaValida = salida && typeof salida === 'string' && salida.toLowerCase() !== 'sin salida';
+
+                    // Regla 1: 08:46:00–09:00:00 => no justificar
+                    if (ent !== null && ent >= r1i && ent <= r1f && tieneSalidaValida) {
+                        Swal.fire('Atención', 'Los retrasos no se pueden justificar.', 'info');
+                        return;
+                    }
+
+                    // Regla 2: 07:30:00–08:46:00 => mostrar mensaje de entrada/salida
+                    if (ent !== null && ent >= r2i && ent <= r2f && tieneSalidaValida) {
+                        Swal.fire(info.event.title, `Entrada: ${entrada} — Salida: ${salida}`, 'success');
                         return;
                     }
 
@@ -948,43 +1031,67 @@
                 st.agregar.justificarFalta(dia);
             },
             dayRender: function (info) {
-                const date = info.date;
-                const day = date.getDay();
-                const isWeekend = (day === 0 || day === 6);
+            
+            const date = info.date;
+            const day = date.getDay();
+            const isWeekend = (day === 0 || day === 6);
 
-                // Verificar si es día festivo
-                const fechaStr = date.toISOString().split('T')[0];
-                const esFestivo = diasFestivos.includes(fechaStr);
+            // Verificar si es día festivo
+            const fechaStr = date.toISOString().split('T')[0];
+           
+            const esFestivo = diasFestivos.includes(fechaStr);
+            const esRegistro = onlyAsistencias.includes(fechaStr);
+   
+            // Rango del día (00:00 – 24:00)
+            const dayStart = new Date(date);
+            dayStart.setHours(0, 0, 0, 0);
+            const dayEnd = new Date(dayStart);
+            dayEnd.setDate(dayEnd.getDate() + 1);
 
-                // Buscar eventos del día
-                const dayStart = new Date(date);
-                dayStart.setHours(0, 0, 0, 0);
-                const dayEnd = new Date(dayStart);
-                dayEnd.setDate(dayEnd.getDate() + 1);
+            // Eventos del día
+            const eventsToday = calendar.getEvents().filter(function (e) {
+                const evStart = e.start;
+                const evEnd = e.end || evStart;
+                return evStart < dayEnd && evEnd > dayStart;
+            });
+         
+            const hasEvents = eventsToday.length > 0;
+            const esFalta = eventsToday.some(e => (e.classNames || []).includes('fc-event-falta'));
 
-                const eventsToday = calendar.getEvents().filter(function (e) {
-                    const evStart = e.start;
-                    const evEnd = e.end || evStart;
-                    return evStart < dayEnd && evEnd > dayStart;
-                });
+            // ======= Marcado visual existente (lo conservas) =======
+            if (esFestivo) {
+                info.el.style.backgroundColor = '#fff3cd';
+                info.el.style.border = '2px solid #ffc107';
+                info.el.title = 'Día Festivo';
+            } else if (isWeekend && !esFalta) {
+                info.el.style.backgroundColor = '#f0f0f0';
+            } else if (hasEvents) {
+                info.el.style.backgroundColor = 'rgba(78, 115, 223, 0.05)';
+            } else {
+                info.el.style.backgroundColor = 'rgba(255, 0, 0, 0.1)';
+                info.el.style.border = '1px solid rgba(255, 0, 0, 0.3)';
+            }
 
-                const hasEvents = eventsToday.length > 0;
-                const esFalta = eventsToday.some(e => (e.classNames || []).includes('fc-event-falta'));
+            // ======= NUEVO: Bandera para días hábiles pasados sin registros =======
+                if (!esFestivo && esHabil(date) && esPasado(date) && !hasEvents && !esRegistro) {
+                    info.el.classList.add('fc-dia-sin-chequeo');
 
-                // Aplicar estilos según el tipo de día
-                if (esFestivo) {
-                    info.el.style.backgroundColor = '#fff3cd'; // Amarillo para festivos
-                    info.el.style.border = '2px solid #ffc107';
-                    info.el.title = 'Día Festivo';
-                } else if (isWeekend && !esFalta) {
-                    info.el.style.backgroundColor = '#f0f0f0';
-                } else if (hasEvents) {
-                    info.el.style.backgroundColor = 'rgba(78, 115, 223, 0.05)';
-                } else {
-                    info.el.style.backgroundColor = 'rgba(255, 0, 0, 0.1)';
-                    info.el.style.border = '1px solid rgba(255, 0, 0, 0.3)';
+                    // Evita duplicar badge si FullCalendar re-renderiza
+                    if (!info.el.querySelector('.flag-missing')) {
+                    const badge = document.createElement('div');
+                        badge.className = 'flag-missing';
+                        badge.innerHTML = `
+                        <div class="spinner-grow text-danger" role="status"></div>`;
+                        info.el.appendChild(badge);
+
+                    }
+
+                    // (Opcional) Tooltip
+                    info.el.title = 'Día hábil pasado sin registro de entrada/salida';
                 }
             },
+          
+
            
         });
 
