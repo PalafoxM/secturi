@@ -854,7 +854,13 @@
                     console.log(info.event.extendedProps.entrada);
                    if (info.event.extendedProps.entrada >= '08:46:00' && 
                         info.event.extendedProps.entrada <= '09:00:00') {
-                        Swal.fire('Atención', "Los retardos no se pueden justificar");
+                        Swal.fire('Atención', "Los retrasos no se pueden justificar.",'info');
+                        return;
+                    }
+
+                    if (info.event.extendedProps.entrada >= '08:30:00' && 
+                        info.event.extendedProps.entrada <= '08:45:00') {
+                        Swal.fire(info.event.title, "Entrada :"+info.event.extendedProps.entrada, 'success');
                         return;
                     }
 
