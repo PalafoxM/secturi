@@ -140,87 +140,7 @@
                     </div><!--end card-->
                 </div><!--end col-->
             </div><!-- End row -->
-        <!--     <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-
-                            <h4 class="header-title mt-0">Incidencias de <?= $inicio ?> al <?= $fin ?></h4>
-                            <div class="table-responsive dash-social">
-                                <?php if (empty($faltas)): ?>
-                                    <span class="text-center text-success"><strong>Sin Incidencia(s)</strong><span>
-                                        <?php endif; ?>
-                                        <?php if (!empty($faltas)): ?>
-                                            <table id="datatableVehiculo" class="table">
-                                                <thead class="thead-light">
-                                                    <tr>
-                                                        <th class="text-center">ID</th>
-                                                        <th class="text-center">FECHA</th>
-                                                        <th class="text-center">OBSERVACIONES</th>
-                                                        <th class="text-center">ACCIONES</th>
-                                                    </tr>
-
-                                                </thead>
-
-                                                <tbody>
-
-                                                    <?php foreach ($faltas as $e => $k): ?>
-                                                        <tr>
-                                                            <td class="text-center"><?= $e ?></td>
-                                                            <td class="text-center"><?= date('d/m/Y', strtotime($k->fecha)) ?>
-                                                            </td>
-                                                            <td class="text-center"><?= $k->observaciones ?></td>
-                                                            <?php
-                                                            switch ($k->observaciones) {
-                                                                case 'En validación':
-                                                                    $icono = 'mdi mdi-send-circle-outline';  // Icono de falta
-                                                                    $clase = 'btn-outline-info';
-                                                                    $titulo = 'Enviado';
-                                                                    break;
-                                                                case 'Falta (sin registro)':
-                                                                    $icono = 'mdi mdi-close-circle-outline';  // Icono de falta
-                                                                    $clase = 'btn-outline-danger';
-                                                                    $titulo = 'Falta completa';
-                                                                    break;
-                                                                case 'Llegada Tarde':
-                                                                    $icono = 'mdi mdi-clock-alert-outline';  // Icono de retardo
-                                                                    $clase = 'btn-outline-warning';
-                                                                    $titulo = 'Llegada tarde';
-                                                                    break;
-                                                                case 'Salida Fuera de Tiempo':
-                                                                    $icono = 'mdi mdi-run-fast';  // Icono de salida temprano
-                                                                    $clase = 'btn-outline-warning';
-                                                                    $titulo = 'Salida temprano';
-                                                                    break;
-                                                                default:
-                                                                    $icono = 'mdi mdi-check-circle-outline';  // Icono de asistencia completa
-                                                                    $clase = 'btn-outline-success';
-                                                                    $titulo = 'Asistencia completa';
-                                                            }
-                                                            ?>
-
-                                                            <td class="text-center" class="text-center">
-                                                                <a class="btn <?= $clase ?> btn-round" title="<?= $titulo ?>"
-                                                                    onclick="st.agregar.justificarFalta('<?= date('Y-m-d', strtotime($k->fecha)) ?>')">
-                                                                    <i class="<?= $icono ?> font-18"></i>
-                                                                </a>
-
-                                                            </td>
-                                                        </tr>
-                                                    <?php endforeach; ?>
-                                                </tbody>
-                                            </table>
-                                        <?php endif; ?>
-
-                            </div>
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div> -->
-
+ 
         </div><!-- container -->
     </div>
     <!-- end page content -->
@@ -816,7 +736,8 @@
                 title: 'Día Asueto',
                 start: fecha,
                 display: 'background',
-                backgroundColor: '#ffebee', // Color de fondo rojo claro
+                //backgroundColor: '#3388ff', // Color de fondo rojo claro
+                backgroundColor: '#ffebee', // Color de fondo rojo claro/
                 className: 'fc-event-festivo',
                 extendedProps: {
                     esFestivo: true
@@ -1064,11 +985,11 @@
                 info.el.style.border = '2px solid #ffc107';
                 info.el.title = 'Día Festivo';
             } else if (isWeekend && !esFalta) {
-                info.el.style.backgroundColor = '#f0f0f0';
+                info.el.style.backgroundColor = '#c7bbbbff';
             } else if (hasEvents) {
                 info.el.style.backgroundColor = 'rgba(78, 115, 223, 0.05)';
             } else {
-                info.el.style.backgroundColor = 'rgba(255, 0, 0, 0.1)';
+                info.el.style.backgroundColor = 'rgba(58, 23, 75, 0.1)';
                 info.el.style.border = '1px solid rgba(255, 0, 0, 0.3)';
             }
 
@@ -1086,8 +1007,7 @@
 
                     }
 
-                    // (Opcional) Tooltip
-                    info.el.title = 'Día hábil pasado sin registro de entrada/salida';
+                  
                 }
             },
           

@@ -443,7 +443,7 @@
         <!-- Navbar -->
         <nav class="navbar-custom">
             <ul class="list-unstyled topbar-nav float-right mb-0">
-                <li class="hidden-sm">
+             <!--    <li class="hidden-sm">
 
                     <?php if(date('H:i:s') >= '16:00' && date('H:i:s') <= '17:00' && $session->get('registro_salida') !== 1): ?>
                     <a class="nav-link waves-effect waves-light" onclick="registrarSalida();" data-toggle="tooltip" data-placement="left"  data-trigger="hover" data-original-title="Checar Salida"
@@ -457,7 +457,7 @@
                         <i class="mdi dripicons-alarm font-20 text-success"></i>
                     </a>
                      <?php endif; ?>
-                </li>
+                </li> -->
 
                 <li class="dropdown notification-list">
                     <a class="nav-link dropdown-toggle arrow-none waves-light waves-effect" data-toggle="dropdown"
