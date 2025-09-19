@@ -851,6 +851,13 @@
                 const fechaLabel = esSemana
                     ? `${info.event.extendedProps.rango_legible}`
                     : info.event.start.toLocaleDateString();
+                    console.log(info.event.extendedProps.entrada);
+                   if (info.event.extendedProps.entrada >= '08:46:00' && 
+                        info.event.extendedProps.entrada <= '09:00:00') {
+                        Swal.fire('Atención', "Los retardos no se pueden justificar");
+                        return;
+                    }
+
 
                 Swal.fire({
                     title: info.event.title,
@@ -862,7 +869,7 @@
                     <p><strong>${info.event.extendedProps.salida ? 'Salida' : 'Hora Fin'}:</strong> ${info.event.extendedProps.salida || info.event.extendedProps.hora_fin}</p>
                 </div>
                 `,
-                    showDenyButton: (info.event.extendedProps.id_estatus == 2 && info.event.entrada >= '09:01:00') ? true : false,
+                    showDenyButton: (info.event.extendedProps.id_estatus == 2) ? true : false,
                     showCancelButton: true,
                     confirmButtonText: '<i class="mdi mdi-plus-circle"></i> Agregar Incidencia',
                     denyButtonText: '<i class="mdi mdi-pencil"></i> Editar',
