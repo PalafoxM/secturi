@@ -653,11 +653,11 @@
                 eventClass = 'fc-event-temprano';
                 item.nombre = 'Temprano';
                 icon = '✅';
-            } else if (item.entrada >= '08:30:00' && item.entrada <= '08:45:00') {
+            } else if (item.entrada >= '08:30:00' && item.entrada <= '08:46:00') {
                 eventClass = 'fc-event-puntual';
                 item.nombre = 'Puntual';
                 icon = '🕣';
-            } else if (item.entrada > '08:45:00') {
+            } else if (item.entrada > '08:46:00') {
                 eventClass = 'fc-event-tarde';
                 item.nombre = 'Tarde';
                 icon = '⚠️';
