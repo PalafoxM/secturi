@@ -846,15 +846,22 @@
                         `;
                 }
             },
-            eventClick: function (info) {
-                const esSemana = info.event.extendedProps.tipo === 'semana';
-                const fechaLabel = esSemana
-                    ? `${info.event.extendedProps.rango_legible}`
-                    : info.event.start.toLocaleDateString();
+          eventClick: function (info) {
+            const esSemana = info.event.extendedProps.tipo === 'semana';
+            const fechaLabel = esSemana
+                ? `${info.event.extendedProps.rango_legible}`
+                : info.event.start.toLocaleDateString();
 
-                Swal.fire({
-                    title: info.event.title,
-                    html: `
+            // --- corte por hora actual: >= 09:01:00 ---
+            const passedCutoff = (() => {
+                const now = new Date();
+                const h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+                return (h > 9) || (h === 9 && (m > 1 || (m === 1 && s >= 0)));
+            })();
+
+            Swal.fire({
+                title: info.event.title,
+                html: `
                 ${(info.event.extendedProps.id_estatus == 2) ? '<div style="text-center">' + info.event.extendedProps.observaciones + '</div>' : ''}
                 <div style="text-align: left;">
                     <p><strong>${esSemana ? 'Semana' : 'Fecha'}:</strong> ${fechaLabel}</p>
@@ -862,58 +869,49 @@
                     <p><strong>${info.event.extendedProps.salida ? 'Salida' : 'Hora Fin'}:</strong> ${info.event.extendedProps.salida || info.event.extendedProps.hora_fin}</p>
                 </div>
                 `,
-                    showDenyButton: (info.event.extendedProps.id_estatus == 2) ? true : false,
-                    showCancelButton: true,
-                    confirmButtonText: '<i class="mdi mdi-plus-circle"></i> Agregar Incidencia',
-                    denyButtonText: '<i class="mdi mdi-pencil"></i> Editar',
-                    cancelButtonText: '<i class="mdi mdi-close"></i> Cerrar',
-                    customClass: {
-                        popup: 'swal-wide',
-                        confirmButton: 'btn btn-success mx-1',
-                        denyButton: 'btn btn-primary mx-1',
-                        cancelButton: 'btn btn-secondary mx-1'
-                    },
-                    buttonsStyling: false,
-                    showCloseButton: true,
-                    reverseButtons: true,
-                    focusConfirm: false
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // FUNCIÓN PARA OBTENER LA FECHA EN FORMATO CORRECTO
-                        const obtenerFechaFormateada = () => {
-                            // Intentar diferentes métodos para obtener la fecha
-                            if (info.dateStr) {
-                                return info.dateStr; // Usar dateStr si está disponible
-                            }
-
-                            if (info.event.start) {
-                                // Formatear a YYYY-MM-DD
-                                const fecha = info.event.start;
-                                const year = fecha.getFullYear();
-                                const month = String(fecha.getMonth() + 1).padStart(2, '0');
-                                const day = String(fecha.getDate()).padStart(2, '0');
-                                return `${year}-${month}-${day}`;
-                            }
-
-                            if (info.event.extendedProps.fecha) {
-                                return info.event.extendedProps.fecha;
-                            }
-
-                            // Si no se puede obtener, usar la fecha actual
-                            console.warn('No se pudo obtener la fecha del evento, usando fecha actual');
-                            const hoy = new Date();
-                            return hoy.toISOString().split('T')[0];
-                        };
-
-                        const dia = obtenerFechaFormateada();
-
-                        st.agregar.justificarFalta(dia);
-
-                    } else if (result.isDenied) {
-                        st.agregar.editarRegistro(info.event.extendedProps.id_incidencia);
+                // 🔹 Oculta el botón de "Justificar" (confirm) si ya pasó 09:01:00
+                showConfirmButton: !passedCutoff,
+                confirmButtonText: '<i class="mdi mdi-plus-circle"></i> Justificar',
+                // 🔹 Muestra "Editar" solo si aplica (corrigiendo el acceso a extendedProps)
+                showDenyButton: (info.event.extendedProps.id_estatus == 2),
+                denyButtonText: '<i class="mdi mdi-pencil"></i> Editar',
+                showCancelButton: true,
+                cancelButtonText: '<i class="mdi mdi-close"></i> Cerrar',
+                customClass: {
+                popup: 'swal-wide',
+                confirmButton: 'btn btn-success mx-1',
+                denyButton: 'btn btn-primary mx-1',
+                cancelButton: 'btn btn-secondary mx-1'
+                },
+                buttonsStyling: false,
+                showCloseButton: true,
+                reverseButtons: true,
+                focusConfirm: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                // Obtener fecha en formato YYYY-MM-DD
+                const obtenerFechaFormateada = () => {
+                    if (info.dateStr) return info.dateStr;
+                    if (info.event.start) {
+                    const f = info.event.start;
+                    const y = f.getFullYear();
+                    const m = String(f.getMonth() + 1).padStart(2, '0');
+                    const d = String(f.getDate()).padStart(2, '0');
+                    return `${y}-${m}-${d}`;
                     }
-                });
+                    if (info.event.extendedProps.fecha) return info.event.extendedProps.fecha;
+                    const hoy = new Date();
+                    return hoy.toISOString().split('T')[0];
+                };
+
+                const dia = obtenerFechaFormateada();
+                st.agregar.justificarFalta(dia);
+                } else if (result.isDenied) {
+                st.agregar.editarRegistro(info.event.extendedProps.id_incidencia);
+                }
+            });
             },
+
             dateClick: function (info) {
                 const fecha = info.date;
                 const diaSemana = fecha.getDay();
@@ -971,7 +969,8 @@
                     info.el.style.backgroundColor = 'rgba(255, 0, 0, 0.1)';
                     info.el.style.border = '1px solid rgba(255, 0, 0, 0.3)';
                 }
-            }
+            },
+           
         });
 
         calendar.render();
