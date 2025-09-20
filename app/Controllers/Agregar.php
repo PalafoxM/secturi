@@ -1722,7 +1722,7 @@ class Agregar extends BaseController
 
 
         }
-
+       
         $data['onlyAsistencias'] = [];
         $onlyAsistencias = $Mglobal->getTabla([
             'tabla' => 'asistencia',
@@ -1745,14 +1745,45 @@ class Agregar extends BaseController
         foreach ($periodo as $d) {
             $otras[] = $d->format('Y-m-d');
         }
-
-        // 3) Unir + quitar duplicados + ordenar
+        //Traer incidencia para quitar el spinner
+        $incidenciaUser = $Mglobal->getTabla(['tabla' => 'incidencia', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario, 'id_estatus' => 3]]);
+        if(isset($incidenciaUser->data) && !empty($incidenciaUser->data)) {
+             foreach ($incidenciaUser->data as $f) {
+                    $otras[] = $f->fecha;
+                }
+        }
+        
         $data['onlyAsistencias'] = array_values(array_unique(array_merge($data['onlyAsistencias'], $otras)));
         sort($data['onlyAsistencias']); // ascendente
 
-        
-        $cat_incidencia = $Mglobal->getTabla(['tabla' => 'cat_incidencia', 'where' => ['visible' => 1]]);
+        $incidenciaGeneral = $Mglobal->getTabla([
+            'tabla' => 'cat_incidencia', 
+            'where' => ['visible' => 1, 'sexo' => 3]
+        ])->data;
 
+        $incidenciaPorSexo = $Mglobal->getTabla([
+            'tabla' => 'cat_incidencia', 
+            'where' => ['visible' => 1, 'sexo' => $session->id_sexo]
+        ])->data;
+
+        // Usar array temporal para evitar duplicados
+        $tempArray = [];
+        foreach ($incidenciaGeneral as $item) {
+            $tempArray[$item->id_incidencia] = $item;
+        }
+        foreach ($incidenciaPorSexo as $item) {
+            $tempArray[$item->id_incidencia] = $item;
+        }
+
+        // Convertir a array indexado numéricamente
+        $data['cat_incidencia'] = array_values($tempArray);
+
+        // Ordenar por nombre
+        usort($data['cat_incidencia'], function($a, $b) {
+            return strcmp($a->dsc_incidencia, $b->dsc_incidencia);
+        });
+
+        // die(var_dump($data['cat_incidencia']));
         $mes = ($mes) ? $mes : date('m');
         $data['anio'] = date('Y');
         $data['idTipoEmpleado'] = $idTipoEmpleado;
@@ -1775,13 +1806,13 @@ class Agregar extends BaseController
         ;
 
         $asistencia = (isset($agenda->data) && !empty($agenda->data)) ? $agenda->data : [];
-        $presentes = [];
 
+ //die( var_dump( $asistencia ) );
         $faltas = $this->getFaltasRangoQuincena($inicio, $fin);
 
         $data['faltas'] = $faltas;
         $data['asistencia'] = $asistencia;
-        $data['cat_incidencia'] = $cat_incidencia->data;
+        //$data['cat_incidencia'] = $cat_incidencia->data;
         // $data['incidencia'] = (isset($incidencia->data) && !empty($incidencia->data))?$incidencia->data:[];
         //die();
         $data['mes'] = $mes;
@@ -2379,14 +2410,14 @@ class Agregar extends BaseController
         $fecha = $data['fecha_inicio_asistencia'];
         $diaSemana = date('N', strtotime($fecha));
 
-        if (empty($data['tipo_incidencia']) || $data['tipo_incidencia'] == 0) {
+        if (empty($data['tipo_incidencia_editar']) || $data['tipo_incidencia_editar'] == 0) {
             $response->error = true;
             $response->respuesta = 'Es requerido el tipo de incidencia';
             return $this->respond($response);
 
         }
         // Validar que NO sea lunes (1) ni viernes (5)
-        if ($data['tipo_incidencia'] == 9) {
+        if ($data['tipo_incidencia_editar'] == 9) {
             if ($diaSemana == 1 || $diaSemana == 5) {
                 $response->error = true;
                 $response->respuesta = 'La fecha no puede ser lunes ni viernes';
@@ -2395,12 +2426,14 @@ class Agregar extends BaseController
         }
         $dataBitacora = ['id_user' => $session->id_usuario, 'script' => 'Agregar.php/edotaIncidencia'];
         $dataInsert = [
-            "cat_id_incidencia" => $data['tipo_incidencia'],
+            "cat_id_incidencia" => $data['tipo_incidencia_editar'],
             "fecha" => $data['fecha_inicio_asistencia'],
             "fecha_inicio" => $data['fecha_inicio_asistencia'],
             "fecha_fin" => $data['fecha_fin_asistencia'],
             "hora_inicio" => $data['hora_inicio_asistencia'],
             "hora_fin" => $data['hora_fin_asistencia'],
+            "comentario" => $data['comentario_asistencia'],
+            "detalles" => $data['detalle_asistencia'],
             "id_estatus" => 1,
             "usu_act" => $session->get('id_usuario'),
 
@@ -2430,8 +2463,11 @@ class Agregar extends BaseController
         $observaciones = $this->request->getPost('observaciones');
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaIncidencia'];
         //optener el correo el empleado de la incidenci
-        $correo = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['id_usuario' => $id_usuario]])->data[0]->correo;
-
+        $datos = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['id_usuario' => $id_usuario]])->data[0];
+        if($datos){
+           $correo = $datos->correo;
+           $no_empleado = $datos->no_empleado;
+        }
         $dataConfig = [
             "tabla" => "incidencia",
             "editar" => true,
@@ -2442,15 +2478,32 @@ class Agregar extends BaseController
             'observaciones' => $observaciones,
             'usu_act' => $session->get('id_usuario')
         ];
+       
         $result = $globals->saveTabla($Insert, $dataConfig, $dataBitacora);
         if (!$result->error) {
             $response->error = false;
             $response->respuesta = $result->respuesta;
-            $res = $this->enviarCorreo($correo);
+            //$res = $this->enviarCorreo($correo);
 
         }
-
         return $this->respond($response);
+     /*            //traer fecha de la incidencia para eliminar el spinner
+        $fecha = $globals->getTabla(['tabla' => 'incidencia', 'where' => ['id_incidencia' => $id_incidencia, 'visible' =>1]])->data[0]->fecha;
+        $dataConfig = [
+            "tabla" => "asistencia",
+            "editar" => false
+        ];
+        $Insert = [
+            'id_usuario' => $id_usuario,
+            'fecha' => $fecha,
+            'tipo_registro' => ($id_aceptar==3)?'Justificacion':'Declinado',
+            'entrada' => '08:30:00',
+            'salida' => '16:00:00',
+            'no_empleado' => $no_empleado
+        ];
+       
+        $response = $globals->saveTabla($Insert, $dataConfig, $dataBitacora); */
+      
     }
     public function eliminarIncidencia()
     {

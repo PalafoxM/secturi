@@ -2,180 +2,178 @@ var st = window.ssa || {};
 
 st.agregar = (function () {
     return {
-        sha256: function(str) {
+        sha256: function (str) {
             var buffer = new TextEncoder("utf-8").encode(str);
-            return crypto.subtle.digest("SHA-256", buffer).then(function(hash) {
-                return Array.prototype.map.call(new Uint8Array(hash), function(x) {
+            return crypto.subtle.digest("SHA-256", buffer).then(function (hash) {
+                return Array.prototype.map.call(new Uint8Array(hash), function (x) {
                     return ('00' + x.toString(16)).slice(-2);
                 }).join('');
             });
         },
-        crearEvento: function() {
+        crearEvento: function () {
             $.ajax({
                 url: base_url + "index.php/Principal/crearEvento",
                 type: 'POST',
                 data: formData,
-                success: function(response) {
-                    
+                success: function (response) {
+
                     Swal.fire("Éxito", "Datos enviados correctamente", "success");
                     form[0].reset(); // Limpiar el formulario después del envío
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     alert('Error al enviar los datos: ' + error);
                 }
             });
         },
-        editarRegistro: function(id_incidencia)
-        {
-         $("#modalAsistencia").modal('show');
-         $.ajax({
+        editarRegistro: function (id_incidencia) {
+            $.ajax({
                 type: "POST",
                 url: base_url + "index.php/Usuario/getIncidencia",
                 dataType: "json",
-                data:{id_incidencia},
-                success: function(data) {
-                console.log(data);
-                    
+                data: { id_incidencia },
+                success: function (data) {
+                    console.log(data);
+
                     // Convertir ISO a YYYY-MM-DD
-                    const fechaInicio = new Date(data.fecha_inicio);
-                    const fechaFin = new Date(data.fecha_fin);
-                    
-                    // Formatear a YYYY-MM-DD
                     const formatoFecha = (fecha) => {
-                        return fecha.toISOString().split('T')[0];
+                        return new Date(fecha).toISOString().split('T')[0];
                     };
-                    
-                    $("#fecha_inicio_asistencia").val(formatoFecha(fechaInicio));
-                    $("#fecha_fin_asistencia").val(formatoFecha(fechaFin));
+
+                    // Llenar los campos del formulario
+                    $("#fecha_inicio_asistencia").val(formatoFecha(data.fecha_inicio));
+                    $("#fecha_fin_asistencia").val(formatoFecha(data.fecha_fin));
                     $("#hora_inicio_asistencia").val(data.hora_inicio);
                     $("#hora_fin_asistencia").val(data.hora_fin);
                     $("#comentario_asistencia").val(data.comentario);
                     $("#detalle_asistencia").val(data.detalles);
                     $("#id_incidencia").val(data.id_incidencia);
-                    $("#tipo_incidencia").select2(); // inicializar
-                    $("#tipo_incidencia").val(data.cat_id_incidencia).trigger("change"); // asignar valor
 
+                    // Inicializar Select2 SIEMPRE antes de asignar el valor
+                   // $("#tipo_incidencia_editar").select2();
+
+                    // Asignar valor a Select2
+                    $("#tipo_incidencia_editar").val(data.cat_id_incidencia).change();
+
+                    // Mostrar el modal DESPUÉS de llenar los datos
+                    $("#modalAsistencia").modal('show');
                 },
-                error: function() {
-                    Swal.fire("Error", "Error al guardar comentario.", "error")
+                error: function () {
+                    Swal.fire("Error", "Error al obtener los datos de la incidencia.", "error");
                 }
             });
         },
-        validacionIncapacidad: function()
-        {
-         let incidencia = $('#tipo_incidencia').val();
-         console.log(incidencia);
-         if(incidencia == 5 || incidencia == 4){
-            let texto = (incidencia==5)?'VACACIONES':'LICENCIA MÉDICA';
-            $('#timepicker_inicio').val('8:30').prop('disabled', true)
-            $('#timepicker_fin').val('16:00').prop('disabled', true)
-            $('#detalles').val(texto).prop('disabled', true)
-            $('#comentario').val(texto).prop('disabled', true)
-         }else{
-            $('#timepicker_inicio').val('').prop('disabled', false)
-            $('#timepicker_fin').val('').prop('disabled', false)
-            $('#detalles').val('').prop('disabled', false)
-            $('#comentario').val('').prop('disabled', false)
-         }
+        validacionIncapacidad: function () {
+            let incidencia = $('#tipo_incidencia').val();
+            console.log(incidencia);
+            if (incidencia == 5 || incidencia == 4) {
+                let texto = (incidencia == 5) ? 'VACACIONES' : 'LICENCIA MÉDICA';
+                $('#timepicker_inicio').val('8:30').prop('disabled', true)
+                $('#timepicker_fin').val('16:00').prop('disabled', true)
+                $('#detalles').val(texto).prop('disabled', true)
+                $('#comentario').val(texto).prop('disabled', true)
+            } else {
+                $('#timepicker_inicio').val('').prop('disabled', false)
+                $('#timepicker_fin').val('').prop('disabled', false)
+                $('#detalles').val('').prop('disabled', false)
+                $('#comentario').val('').prop('disabled', false)
+            }
         },
-        validacionIncapacidadS: function()
-        {
-         let incidencia = $('#tipo_incidencia_semana').val();
-         console.log(incidencia);
-         if(incidencia == 5 || incidencia == 4){
-            let texto = (incidencia==5)?'VACACIONES':'LICENCIA MÉDICA';
-  
-            $('#detalles_semana').val(texto).prop('disabled', true)
-            $('#comentario_semana').val(texto).prop('disabled', true)
-         }else{
-            $('#detalles_semana').val('').prop('disabled', false)
-            $('#comentario_semana').val('').prop('disabled', false)
-         }
+        validacionIncapacidadS: function () {
+            let incidencia = $('#tipo_incidencia_semana').val();
+            console.log(incidencia);
+            if (incidencia == 5 || incidencia == 4) {
+                let texto = (incidencia == 5) ? 'VACACIONES' : 'LICENCIA MÉDICA';
+
+                $('#detalles_semana').val(texto).prop('disabled', true)
+                $('#comentario_semana').val(texto).prop('disabled', true)
+            } else {
+                $('#detalles_semana').val('').prop('disabled', false)
+                $('#comentario_semana').val('').prop('disabled', false)
+            }
         },
-        agregarUsuario: function(){
+        agregarUsuario: function () {
             $("#formAgregarUsuarioTsi").submit(function (e) {
-                e.preventDefault(); 
+                e.preventDefault();
                 $("#id_perfil").prop("disabled", false);
-               var formData = new FormData(this);
+                var formData = new FormData(this);
                 $("#id_perfil").prop("disabled", true);
                 $("#btn_save").hide();
                 $("#btn_load").show();
                 $.ajax({
                     type: "POST",
                     url: base_url + "index.php/Agregar/guardaUsuarioSti",
-                    data:formData,
+                    data: formData,
                     processData: false,  // evita que jQuery convierta el FormData en string
                     contentType: false,  // evita que jQuery ponga content-type incorrecto
                     dataType: "json",
                     success: function (response) {
                         console.log(response);
-                        if(response.error){
-                            Swal.fire("error", response.respuesta ,"error");
-                        }else{
-                        Swal.fire("success", "Se guardo con exito", 'success');
-                        $("#formAgregarUsuarioTsi")[0].reset();
+                        if (response.error) {
+                            Swal.fire("error", response.respuesta, "error");
+                        } else {
+                            Swal.fire("success", "Se guardo con exito", 'success');
+                            $("#formAgregarUsuarioTsi")[0].reset();
+                            $("#btn_save").show();
+                            $("#btn_load").hide();
+                            window.location.href = base_url + "index.php/Inicio/usuarios";
+                        }
+
+                    },
+                    error: function (response, jqXHR, textStatus, errorThrown) {
+                        var res = JSON.parse(response.responseText);
+                        //  console.log(res.message);
+                        Swal.fire("Error", '<p> ' + res.message + '</p>', 'error');
                         $("#btn_save").show();
                         $("#btn_load").hide();
-                        window.location.href = base_url + "index.php/Inicio/usuarios";
-                    }
-                       
-                    },
-                    error: function (response,jqXHR, textStatus, errorThrown) {
-                         var res= JSON.parse (response.responseText);
-                        //  console.log(res.message);
-                         Swal.fire("Error", '<p> '+ res.message + '</p>', 'error');  
-                         $("#btn_save").show();
-                         $("#btn_load").hide();
                     }
                 });
             });
         },
-        registroSala: function(){
+        registroSala: function () {
             $("#registroSala").submit(function (e) {
-                e.preventDefault(); 
-       
+                e.preventDefault();
+
                 var formData = $("#registroSala").serialize();
-              
+
                 $.ajax({
                     type: "POST",
                     url: base_url + "index.php/Agregar/registroSala",
-                    data:formData,
+                    data: formData,
                     dataType: "json",
                     success: function (response) {
                         console.log(response);
-                        if(!response.error){
-                          Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success'); 
-                           
-                              setTimeout(() => {
-                                 window.location.reload();
-                        }, 1500);
-                        }else{
-                        Swal.fire("Error", '<p> '+ response.respuesta + '</p>', 'error'); 
+                        if (!response.error) {
+                            Swal.fire("Correcto", '<p> ' + response.respuesta + '</p>', 'success');
+
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1500);
+                        } else {
+                            Swal.fire("Error", '<p> ' + response.respuesta + '</p>', 'error');
                         }
-               
-                       // window.location.href = base_url + "index.php/Inicio/usuarios";
-                    
-                       
+
+                        // window.location.href = base_url + "index.php/Inicio/usuarios";
+
+
                     },
-                    error: function (response,jqXHR, textStatus, errorThrown) {
-                         var res= JSON.parse (response.responseText);
+                    error: function (response, jqXHR, textStatus, errorThrown) {
+                        var res = JSON.parse(response.responseText);
                         //  console.log(res.message);
-                         Swal.fire("Error", '<p> '+ res.message + '</p>', 'error');  
-                         $("#btn_save").show();
-                         $("#btn_load").hide();
+                        Swal.fire("Error", '<p> ' + res.message + '</p>', 'error');
+                        $("#btn_save").show();
+                        $("#btn_load").hide();
                     }
                 });
             });
         },
-        
-        validarCURP: function()
-        {
+
+        validarCURP: function () {
             const btnBuscar = document.getElementById('icono');
             const inputCurp = document.getElementById('curp');
 
             const curp = inputCurp.value.trim().toUpperCase();
             inputCurp.value = curp; // Convertir a mayúsculas
-        
+
             if (curp.length >= 18) {
                 st.agregar.toggleButtonState('check');
                 inputCurp.style.color = "black";
@@ -189,7 +187,7 @@ st.agregar = (function () {
                 inputCurp.style.color = "red";
             }
         },
-        btnEliminar :function(id){
+        btnEliminar: function (id) {
             Swal.fire({
                 title: "¿Está seguro?",
                 text: "¿Desea eliminar el registro?",
@@ -223,17 +221,17 @@ st.agregar = (function () {
             });
 
         },
-        programar: function(id) {
+        programar: function (id) {
             const radioSeleccionado = document.querySelector('input[name="periodo"]:checked');
             if (!radioSeleccionado) {
                 Swal.fire('Atención', 'Por favor, selecciona un período antes de guardar.', 'info'); // Mensaje de error
                 return;
             }
             const periodoSeleccionado = radioSeleccionado.value;
-           $('#guardar_programa').hide();
-           $('#load_programar_curso').show();
-           let editar = $("#editar_detalle").val();
-           let id_periodo_editar = $("#id_periodo_editar").val();
+            $('#guardar_programa').hide();
+            $('#load_programar_curso').show();
+            let editar = $("#editar_detalle").val();
+            let id_periodo_editar = $("#id_periodo_editar").val();
             $.ajax({
                 type: "POST",
                 url: base_url + "index.php/Agregar/guardarCursoPrograma",
@@ -244,7 +242,7 @@ st.agregar = (function () {
                     editar,
                     id_periodo_editar
                 },
-                success: function(data) {
+                success: function (data) {
                     console.log(data);
                     if (!data.error) {
                         Swal.fire("Éxito", data.respuesta, "success");
@@ -253,35 +251,35 @@ st.agregar = (function () {
                         Swal.fire("Error", data.respuesta, "error");
                     }
                 },
-                complete: function(){
+                complete: function () {
                     $('#guardar_programa').show();
                     $('#load_programar_curso').hide();
                 },
-                error: function() {
+                error: function () {
                     Swal.fire("Error", "Error al guardar comentario.", "error");
                 }
             });
         },
-        toggleButtonState: function(state) {
+        toggleButtonState: function (state) {
             const spinner = document.getElementById('spinner');
             const btnBuscar = document.getElementById('icono');
             spinner.style.display = state === 'loading' ? "block" : "none";
             btnBuscar.classList.remove('dripicons-search', 'dripicons-checkmark', 'dripicons-loading');
-        
+
             if (state === 'check') btnBuscar.classList.add('dripicons-checkmark');
             //else if (state === 'loading') btnBuscar.classList.add('dripicons-loading');
             //else btnBuscar.classList.add('dripicons-search');
         },
-        consultarCURP: function() {
+        consultarCURP: function () {
             const inputCurp = document.getElementById('curp');
             const curp = inputCurp.value;
-        
+
             if (curp.length !== 18) {
                 Swal.fire("Error", 'Ingresa una CURP válida.', "error");
                 $("#formParticipante")[0].reset();
                 return;
             }
-        
+
             $.ajax({
                 url: api,
                 type: 'POST',
@@ -295,7 +293,7 @@ st.agregar = (function () {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 },
-                success: function(result) {
+                success: function (result) {
                     console.log(result)
                     if (result.datos) {
                         Swal.fire({
@@ -323,10 +321,10 @@ st.agregar = (function () {
                         st.agregar.toggleButtonState('check');
                         st.agregar.mostrarCamposDatos(result.datos);
                     }
-        
-        
+
+
                 },
-                error: function(xhr) {
+                error: function (xhr) {
                     console.log("Error:", xhr.responseText);
                     inputCurp.style.color = "red";
                 }
@@ -344,29 +342,29 @@ st.agregar = (function () {
             document.getElementById('contrasenia').value = datos.CURP;
             document.getElementById('confirmar_contrasenia').value = datos.CURP;
         },
-        cancelarTurno: function(){
+        cancelarTurno: function () {
             Swal.fire({
                 title: "¿Está seguro de que desea cancelar?",
                 showDenyButton: true,
                 showCancelButton: false,
                 confirmButtonText: "Si",
-                
-              }).then((result) => {
+
+            }).then((result) => {
                 if (result.isConfirmed) {
                     $("#formAgregarTurno")[0].reset();
                     window.location.href = base_url + "index.php/Inicio";
                 } else if (result.isDenied) {
-                  Swal.fire("Ok", "", "info");
+                    Swal.fire("Ok", "", "info");
                 }
-              });
-               
-           
+            });
+
+
         },
-        saveTempNombreTurno: function(){
-            $('#nombre_turno').on('change', function() {
+        saveTempNombreTurno: function () {
+            $('#nombre_turno').on('change', function () {
                 // Obtener los valores y textos de las opciones seleccionadas
                 var selectedValues = $(this).val();
-                var selectedTexts = $('#nombre_turno option:selected').map(function() {
+                var selectedTexts = $('#nombre_turno option:selected').map(function () {
                     return $(this).text();
                 }).get();
                 updateTable(selectedValues, selectedTexts);
@@ -390,13 +388,13 @@ st.agregar = (function () {
                 }
             }
         },
- 
-        saveTempccp: function(){
-            
-            $('#cpp').on('change', function() {
+
+        saveTempccp: function () {
+
+            $('#cpp').on('change', function () {
                 // Obtener los valores y textos de las opciones seleccionadas
                 var selectedValues = $(this).val();
-                var selectedTexts = $('#cpp option:selected').map(function() {
+                var selectedTexts = $('#cpp option:selected').map(function () {
                     return $(this).text();
                 }).get();
 
@@ -422,11 +420,11 @@ st.agregar = (function () {
                 }
             }
         },
-        saveTempIndicacion: function(){
-            $('#indicacion').on('change', function() {
+        saveTempIndicacion: function () {
+            $('#indicacion').on('change', function () {
                 // Obtener los valores y textos de las opciones seleccionadas
                 var selectedValues = $(this).val();
-                var selectedTexts = $('#indicacion option:selected').map(function() {
+                var selectedTexts = $('#indicacion option:selected').map(function () {
                     return $(this).text();
                 }).get();
                 updateTable(selectedValues, selectedTexts);
@@ -450,57 +448,57 @@ st.agregar = (function () {
                 }
             }
         },
-        validarEntrada:function(input) {
+        validarEntrada: function (input) {
             var resumen = input.val();
             var regex = /^[a-zA-Z0-9\s.,!?()-]+$/;
             $pattern = "/^([a-zA-ZáéíóúüñÁÉÍÓÚÜÑ 0-9]+)$/";
             if (resumen.length > 0 && resumen.length <= 600 && regex.test(resumen)) {
-              input.removeClass("invalid-input");
-              return true;  
+                input.removeClass("invalid-input");
+                return true;
             } else {
-              input.addClass("invalid-input");
-              return false;
-              
+                input.addClass("invalid-input");
+                return false;
+
             }
-          },
-          // convioerte todo los de los inputs a mayusculas
-          toUpperCase:function(element){
+        },
+        // convioerte todo los de los inputs a mayusculas
+        toUpperCase: function (element) {
             element.value = element.value.toUpperCase();
         },
-        formConfigurarCurso: function(){
-            $('#btn_guardar_conf').on('click', function() {
+        formConfigurarCurso: function () {
+            $('#btn_guardar_conf').on('click', function () {
                 $("#btn_guardar_conf").hide();
                 $("#btn_guardar_load").show();
                 let tableData = [];
-            
+
                 // Itera sobre cada fila en el cuerpo de la tabla
-                $('tbody tr').each(function() {
+                $('tbody tr').each(function () {
                     let rowData = {
                         name: $(this).find('td:first').text(),  // Nombre del curso
                         id_curso: $(this).find('input[name^="id_curso"]').val(), // Fecha de inicio
                         timeopen: $(this).find('input[name^="timeopen"]').val(), // Fecha de inicio
                         timeclose: $(this).find('input[name^="timeclose"]').val(), // Fecha de fin
-                       // timelimit: $(this).find('td:nth-child(4)').text(), // Límite de tiempo
-                       // visible: $(this).find('input[type="checkbox"]').is(':checked') ? 1 : 0 // Si está visible
+                        // timelimit: $(this).find('td:nth-child(4)').text(), // Límite de tiempo
+                        // visible: $(this).find('input[type="checkbox"]').is(':checked') ? 1 : 0 // Si está visible
                     };
-            
+
                     tableData.push(rowData);
                 });
                 let id_curso = $("#id_curso").val();
                 let fec_inicio = $("#fec_inicio").val();
                 let fec_fin = $("#fec_fin").val();
-                if(fec_inicio > fec_fin){
+                if (fec_inicio > fec_fin) {
                     Swal.fire("Error", "Fecha inicio debe ser mayor a Fecha fin", "error");
                     $("#btn_guardar_conf").show();
                     $("#btn_guardar_load").hide();
                     return
                 }
                 $.ajax({
-                    url:  base_url + "index.php/Agregar/formConfigurarCurso",
+                    url: base_url + "index.php/Agregar/formConfigurarCurso",
                     type: 'POST',
-                    data: { tableData: tableData, id_curso:id_curso, fec_inicio, fec_fin },
+                    data: { tableData: tableData, id_curso: id_curso, fec_inicio, fec_fin },
                     dataType: 'json',
-                    success: function(response) {
+                    success: function (response) {
                         if (!response.error) {
                             Swal.fire("Éxito", "Datos guardados correctamente.", "success");
                             //window.location.reload();
@@ -511,20 +509,20 @@ st.agregar = (function () {
                         $("#btn_guardar_conf").show();
                         $("#btn_guardar_load").hide();
                     },
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         Swal.fire("Error", "Ocurrió un error en la solicitud: " + error, "error");
                     }
                 });
-             
-             
+
+
             });
-            
+
         },
-        formParticipante: function(){
+        formParticipante: function () {
             $("#formParticipante").submit(function (e) {
-                e.preventDefault();   
-                $("#btn_guardar_detenido").hide();             
-                $("#btn_load_detenido").show();             
+                e.preventDefault();
+                $("#btn_guardar_detenido").hide();
+                $("#btn_load_detenido").show();
                 $.ajax({
                     type: "POST",
                     url: base_url + "index.php/Principal/guardarParticipantes",
@@ -534,34 +532,34 @@ st.agregar = (function () {
                         console.log(response);
                         console.log(response.error);
                         console.log(response.respuesta);
-                        if(response.error == false){
+                        if (response.error == false) {
                             Swal.fire("Exitó", response.respuesta, "success");
                             $('#formParticipante')[0].reset();
                             $('#modalDetenidos').modal('hide');
                             window.location.reload();
-                                                    
-                        }else{
-                            Swal.fire("Error", response.respuesta , "error"); 
+
+                        } else {
+                            Swal.fire("Error", response.respuesta, "error");
                             //$("#formParticipante")[0].reset();                         
                             return false;
-                        } 
+                        }
                     },
-                    complete: function(){
-                        $("#btn_guardar_detenido").show();             
-                        $("#btn_load_detenido").hide();   
+                    complete: function () {
+                        $("#btn_guardar_detenido").show();
+                        $("#btn_load_detenido").hide();
                     },
-                    error: function (response,jqXHR, textStatus, errorThrown) {
-                        var res= JSON.parse (response.responseText);
-                       //  console.log(res.message);
-                        Swal.fire("Error", '<p> '+ res.message + '</p>');  
-                   }
+                    error: function (response, jqXHR, textStatus, errorThrown) {
+                        var res = JSON.parse(response.responseText);
+                        //  console.log(res.message);
+                        Swal.fire("Error", '<p> ' + res.message + '</p>');
+                    }
                 });
             });
         },
-         calendarModal: function() {
-        $('#calendarModal').modal('show');
+        calendarModal: function () {
+            $('#calendarModal').modal('show');
         },
-       sala: function(sala, dia) {
+        sala: function (sala, dia) {
             $('#calendarModal').modal('hide');
             setTimeout(() => {
                 $('#calendarModal2').modal('show');
@@ -570,7 +568,7 @@ st.agregar = (function () {
                 $('#fecha').val(dia.split('T')[0]);
             }, 300); // Espera a que termine la animación de cierre
         },
-       justificarFalta: function(fecha) {
+        justificarFalta: function (fecha) {
             try {
                 // Validar que el parámetro no sea undefined o null
                 if (fecha === undefined || fecha === null) {
@@ -596,7 +594,7 @@ st.agregar = (function () {
 
                 // Dividir la fecha en partes
                 const partes = fechaStr.split('-');
-                
+
                 // Validar que tenga exactamente 3 partes
                 if (partes.length !== 3) {
                     throw new Error('La fecha no tiene el formato correcto: ' + fechaStr);
@@ -623,8 +621,8 @@ st.agregar = (function () {
                 }
 
                 // Formatear la fecha (DD-MM-YYYY)
-                const fechaFormateada = `${partes[2]}-${partes[1]}-${partes[0]}`; 
-                
+                const fechaFormateada = `${partes[2]}-${partes[1]}-${partes[0]}`;
+
                 // Mostrar el modal y establecer valores
                 $("#modalJustificar").modal('show');
                 $("#fecha_incidencia").html('<center><strong>' + fechaFormateada + '</strong></center>');
@@ -632,184 +630,193 @@ st.agregar = (function () {
 
             } catch (error) {
                 console.error('Error en justificarFalta:', error);
-                
+
                 // Mostrar mensaje de error al usuario
                 alert('Error: ' + error.message + '\nPor favor, contacte al administrador.');
-                
+
                 // Opcional: puedes mostrar el modal igual pero con un mensaje de error
                 $("#modalJustificar").modal('show');
                 $("#fecha_incidencia").html('<center><strong style="color: red;">Error en fecha</strong></center>');
                 $("#fecha").val('invalid-date');
             }
         },
-        guardarIncidencia: function()
-        {
-        let hora_inicio     = $('#timepicker_inicio').val();
-        let hora_fin        = $('#timepicker_fin').val();
-        let tipo_incidencia = $('#tipo_incidencia').val();
-        let comentario      = $('#comentario').val();
-        let detalles        = $('#detalles').val();
-        let fecha           = $('#fecha').val();
+        existeIncidencia: function (fecha, callback) {
+            $.ajax({
+                url: base_url + "index.php/Principal/existeIncidencia",
+                type: "post",
+                dataType: "json",
+                data: { fecha },
+                success: function (response, textStatus, jqXHR) {
+                    callback(response.error);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    Swal.fire("Atención", textStatus, 'info');
+                    callback(false); // O manejar el error según necesites
+                },
+            });
+        },
+        guardarIncidencia: function () {
+            let hora_inicio = $('#timepicker_inicio').val();
+            let hora_fin = $('#timepicker_fin').val();
+            let tipo_incidencia = $('#tipo_incidencia').val();
+            let comentario = $('#comentario').val();
+            let detalles = $('#detalles').val();
+            let fecha = $('#fecha').val();
 
-            if(!hora_inicio){
-              Swal.fire("Atención", 'Es requerido la <strong>hora de inicio</strong>', 'info');
-              return
+            if (!hora_inicio) {
+                Swal.fire("Atención", 'Es requerido la <strong>hora de inicio</strong>', 'info');
+                return
             }
-            if(!hora_fin){
-              Swal.fire("Atención", 'Es requerido la <strong>hora de fin</strong>','info');
-              return
+            if (!hora_fin) {
+                Swal.fire("Atención", 'Es requerido la <strong>hora de fin</strong>', 'info');
+                return
             }
-            if(!tipo_incidencia){
-              Swal.fire("Atención", 'Es requerido la <strong>tipo incidencia</strong>','info');
-              return
+            if (!tipo_incidencia) {
+                Swal.fire("Atención", 'Es requerido la <strong>tipo incidencia</strong>', 'info');
+                return
             }
-            if(!detalles){
-              Swal.fire("Atención", 'Es requerido la <strong>detalles</strong>','info');
-              return
+            if (!detalles) {
+                Swal.fire("Atención", 'Es requerido la <strong>detalles</strong>', 'info');
+                return
             }
             $.ajax({
-                    type: "POST",
-                    url: base_url + "index.php/Principal/guardarIncidencia",
-                    data: {hora_inicio,hora_fin,tipo_incidencia,comentario,detalles,fecha},
-                    dataType: 'json',
-                    beforeSend: function()
-                    {
-                      $('#btn_incidencia').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
-                    },
-                    success: function (response) {
-                        console.log(response);
-                        if(!response.error){
-                            Swal.fire("Exitó", response.respuesta, "success");
-                            window.location.reload();
-                      
-                        }else{
-                            Swal.fire("Error", response.respuesta , "error"); 
-                        } 
-                    },
-                    
-                    complete: function(){
-                        $('#btn_incidencia').prop('disabled', false).html('Guardar');
-                    },
-                    error: function (response,jqXHR, textStatus, errorThrown) {
-                        var res= JSON.parse (response.responseText);
-                       //  console.log(res.message);
-                        Swal.fire("Error", '<p> '+ res.message + '</p>');  
-                   }
-                });
+                type: "POST",
+                url: base_url + "index.php/Principal/guardarIncidencia",
+                data: { hora_inicio, hora_fin, tipo_incidencia, comentario, detalles, fecha },
+                dataType: 'json',
+                beforeSend: function () {
+                    $('#btn_incidencia').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                },
+                success: function (response) {
+                    console.log(response);
+                    if (!response.error) {
+                        Swal.fire("Exitó", response.respuesta, "success");
+                        window.location.reload();
+
+                    } else {
+                        Swal.fire("Error", response.respuesta, "error");
+                    }
+                },
+
+                complete: function () {
+                    $('#btn_incidencia').prop('disabled', false).html('Guardar');
+                },
+                error: function (response, jqXHR, textStatus, errorThrown) {
+                    var res = JSON.parse(response.responseText);
+                    //  console.log(res.message);
+                    Swal.fire("Error", '<p> ' + res.message + '</p>');
+                }
+            });
 
         },
-           guardarIncidenciaS: function()
-        {
-        
-        let tipo_incidencia = $('#tipo_incidencia_semana').val();
-        let comentario      = $('#comentario_semana').val();
-        let detalles        = $('#detalles_semana').val();
-        let datetimes       = $('#datetimes').val();
+        guardarIncidenciaS: function () {
 
-            if(!datetimes){
-              Swal.fire("Atención", 'Es requerido la <strong>Semana/strong>', 'info');
-              return
+            let tipo_incidencia = $('#tipo_incidencia_semana').val();
+            let comentario = $('#comentario_semana').val();
+            let detalles = $('#detalles_semana').val();
+            let datetimes = $('#datetimes').val();
+
+            if (!datetimes) {
+                Swal.fire("Atención", 'Es requerido la <strong>Semana/strong>', 'info');
+                return
             }
-       
-            if(!tipo_incidencia){
-              Swal.fire("Atención", 'Es requerido la <strong>tipo incidencia</strong>','info');
-              return
+
+            if (!tipo_incidencia) {
+                Swal.fire("Atención", 'Es requerido la <strong>tipo incidencia</strong>', 'info');
+                return
             }
-            if(!detalles){
-              Swal.fire("Atención", 'Es requerido la <strong>detalles</strong>','info');
-              return
+            if (!detalles) {
+                Swal.fire("Atención", 'Es requerido la <strong>detalles</strong>', 'info');
+                return
             }
             $.ajax({
-                    type: "POST",
-                    url: base_url + "index.php/Principal/guardarSemana",
-                    data: {datetimes,comentario,detalles,tipo_incidencia},
-                    dataType: 'json',
-                    beforeSend: function()
-                    {
-                      $('#btn_semana').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
-                    },
-                    success: function (response) {
-                        console.log(response);
-                        if(!response.error){
-                            Swal.fire("Exitó", response.respuesta, "success");
-                           window.location.reload();
-                      
-                        }else{
-                            Swal.fire("Error", response.respuesta , "error"); 
-                        } 
-                    },
-                    
-                    complete: function(){
-                        $('#btn_semana').prop('disabled', false).html('Guardar');
-                    },
-                    error: function (response,jqXHR, textStatus, errorThrown) {
-                        var res= JSON.parse (response.responseText);
-                       //  console.log(res.message);
-                        Swal.fire("Error", '<p> '+ res.message + '</p>'); 
-                        $('#btn_semana').prop('disabled', false).html('Guardar'); 
-                   }
-                });
+                type: "POST",
+                url: base_url + "index.php/Principal/guardarSemana",
+                data: { datetimes, comentario, detalles, tipo_incidencia },
+                dataType: 'json',
+                beforeSend: function () {
+                    $('#btn_semana').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                },
+                success: function (response) {
+                    console.log(response);
+                    if (!response.error) {
+                        Swal.fire("Exitó", response.respuesta, "success");
+                        window.location.reload();
+
+                    } else {
+                        Swal.fire("Error", response.respuesta, "error");
+                    }
+                },
+
+                complete: function () {
+                    $('#btn_semana').prop('disabled', false).html('Guardar');
+                },
+                error: function (response, jqXHR, textStatus, errorThrown) {
+                    var res = JSON.parse(response.responseText);
+                    //  console.log(res.message);
+                    Swal.fire("Error", '<p> ' + res.message + '</p>');
+                    $('#btn_semana').prop('disabled', false).html('Guardar');
+                }
+            });
 
         },
-           guardarIncidenciaM: function()
-        {
+        guardarIncidenciaM: function () {
 
-        let tipo_incidencia = $('#tipo_incidencia_mes').val();
-        let comentario      = $('#comentario_mes').val();
-        let detalles        = $('#detalles_mes').val();
-        let fecha_inicio    = $('#mdate_inicio').val();
-        let fecha_fin       = $('#mdate_inicio').val();
+            let tipo_incidencia = $('#tipo_incidencia_mes').val();
+            let comentario = $('#comentario_mes').val();
+            let detalles = $('#detalles_mes').val();
+            let fecha_inicio = $('#mdate_inicio').val();
+            let fecha_fin = $('#mdate_inicio').val();
 
 
-            if(!fecha_inicio){
-              Swal.fire("Atención", 'Es requerido la <strong>fecha_inicio/strong>', 'info');
-              return
+            if (!fecha_inicio) {
+                Swal.fire("Atención", 'Es requerido la <strong>fecha_inicio/strong>', 'info');
+                return
             }
-            if(!fecha_fin){
-              Swal.fire("Atención", 'Es requerido la <strong>fecha_fin/strong>', 'info');
-              return
+            if (!fecha_fin) {
+                Swal.fire("Atención", 'Es requerido la <strong>fecha_fin/strong>', 'info');
+                return
             }
-       
-            if(!tipo_incidencia){
-              Swal.fire("Atención", 'Es requerido la <strong>tipo incidencia</strong>','info');
-              return
+
+            if (!tipo_incidencia) {
+                Swal.fire("Atención", 'Es requerido la <strong>tipo incidencia</strong>', 'info');
+                return
             }
-            if(!detalles){
-              Swal.fire("Atención", 'Es requerido la <strong>detalles</strong>','info');
-              return
+            if (!detalles) {
+                Swal.fire("Atención", 'Es requerido la <strong>detalles</strong>', 'info');
+                return
             }
             $.ajax({
-                    type: "POST",
-                    url: base_url + "index.php/Principal/guardarMes",
-                    data: {fecha_fin,fecha_inicio,detalles,comentario,tipo_incidencia},
-                    dataType: 'json',
-                    beforeSend: function()
-                    {
-                      $('#btn_semana').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
-                    },
-                    success: function (response) {
-                        console.log(response);
-                        if(!response.error){
-                            Swal.fire("Exitó", response.respuesta, "success");
-                           window.location.reload();
-                      
-                        }else{
-                            Swal.fire("Error", response.respuesta , "error"); 
-                        } 
-                    },
-                    
-                    complete: function(){
-                        $('#btn_semana').prop('disabled', false).html('Guardar');
-                    },
-                    error: function (response,jqXHR, textStatus, errorThrown) {
-                        var res= JSON.parse (response.responseText);
-                       //  console.log(res.message);
-                        Swal.fire("Error", '<p> '+ res.message + '</p>'); 
-                        $('#btn_semana').prop('disabled', false).html('Guardar'); 
-                   }
-                });
+                type: "POST",
+                url: base_url + "index.php/Principal/guardarMes",
+                data: { fecha_fin, fecha_inicio, detalles, comentario, tipo_incidencia },
+                dataType: 'json',
+                beforeSend: function () {
+                    $('#btn_semana').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                },
+                success: function (response) {
+                    console.log(response);
+                    if (!response.error) {
+                        Swal.fire("Exitó", response.respuesta, "success");
+                        window.location.reload();
+
+                    } else {
+                        Swal.fire("Error", response.respuesta, "error");
+                    }
+                },
+
+                complete: function () {
+                    $('#btn_semana').prop('disabled', false).html('Guardar');
+                },
+                error: function (response, jqXHR, textStatus, errorThrown) {
+                    var res = JSON.parse(response.responseText);
+                    //  console.log(res.message);
+                    Swal.fire("Error", '<p> ' + res.message + '</p>');
+                    $('#btn_semana').prop('disabled', false).html('Guardar');
+                }
+            });
         },
-       
-        
+
+
     }
 })();

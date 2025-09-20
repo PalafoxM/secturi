@@ -259,6 +259,7 @@ class Login extends BaseController {
             if(isset($result->data) && !empty($result->data)){
                 $session->set('logueado', 1);
                 $session->set('id_usuario',$result->data[0]->id_usuario);
+                $session->set('id_sexo',$result->data[0]->id_sexo);
                 $session->set('usuario',$result->data[0]->usuario);
                 $session->set('nombre_completo',$result->data[0]->nombre." ".$result->data[0]->primer_apellido." ".$result->data[0]->segundo_apellido);
                 $session->set('id_perfil',$result->data[0]->id_perfil);

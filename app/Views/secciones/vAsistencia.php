@@ -28,7 +28,7 @@
 
 <style>
     /* Añade estos estilos al bloque de estilos existente */
- 
+
 
     .fc-event-asistencia {
         border-left: 4px solid #4e73df;
@@ -140,7 +140,7 @@
                     </div><!--end card-->
                 </div><!--end col-->
             </div><!-- End row -->
- 
+
         </div><!-- container -->
     </div>
     <!-- end page content -->
@@ -332,99 +332,80 @@
     aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
-            <!-- Encabezado del modal con botón de cerrar -->
+            <!-- Encabezado -->
             <div class="modal-header">
-                <h5 class="modal-title" id="supportModalLabel">Editar Asistencia</h5>
+                <h5 class="modal-title">Editar Asistencia</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
 
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="card">
-                            <div class="card-body step active">
-                                <form id="editarAsistencia">
-                                    <input type="hidden" id="id_incidencia" name="id_incidencia">
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <div class="form-group">
-                                                <label for="tipo_incidencia">Tipo Incidencia</label>
-                                                <div class="input-group">
-                                                    <select class="form-control select2" id="tipo_incidencia" name="tipo_incidencia" data-toggle="select2">
-                                                        <option value="">Seleccione</option>
-                                                        <?php foreach ($cat_incidencia as $c): ?>
-                                                        <option value="<?= $c->id_incidencia ?>"><?= $c->dsc_incidencia ?></option>
-                                                        <?php endforeach; ?>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-lg-6">
-                                            <div class="form-group">
-                                                <label for="fecha_inicio_asistencia">Fecha Inicio</label>
-                                                <div class="input-group">
-                                                    <input type="date" class="form-control" id="fecha_inicio_asistencia"
-                                                        name="fecha_inicio_asistencia">
-                                                </div>
-                                            </div>
+            <!-- Cuerpo del modal SIMPLIFICADO -->
+            <div class="modal-body p-3"> <!-- Reducir padding -->
+                <form id="editarAsistencia">
+                    <input type="hidden" id="id_incidencia" name="id_incidencia">
 
-                                            <div class="form-group">
-                                                <label for="hora_inicio_asistencia">Hora Inicio</label>
-                                                <div class="input-group">
-                                                    <input type="time" id="hora_inicio_asistencia"
-                                                        name="hora_inicio_asistencia" class="form-control">
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="detalle_asistencia">Detalles</label>
-                                                <div class="input-group">
-                                                    <textarea id="detalle_asistencia" name="detalle_asistencia"
-                                                        class="form-control"></textarea>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <div class="form-group">
-                                                <label for="fecha_fin_asistencia">Fecha Fin</label>
-                                                <div class="input-group">
-                                                    <input type="date" id="fecha_fin_asistencia"
-                                                        name="fecha_fin_asistencia" class="form-control">
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="hora_fin_asistencia">Hora Fin</label>
-                                                <div class="input-group">
-                                                    <input type="time" id="hora_fin_asistencia"
-                                                        name="hora_fin_asistencia" class="form-control">
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="comentario_asistencia">Comentario</label>
-                                                <div class="input-group">
-                                                    <textarea id="comentario_asistencia" name="comentario_asistencia"
-                                                        class="form-control"></textarea>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
+                    <!-- Tipo Incidencia -->
+                    <div class="form-group">
+                        <label for="tipo_incidencia_editar">Tipo Incidencia</label>
+                        <select class="form-control select2" id="tipo_incidencia_editar" name="tipo_incidencia_editar">
+                            <option value="">Seleccione</option>
+                            <?php foreach ($cat_incidencia as $c): ?>
+                                <option value="<?= $c->id_incidencia ?>"><?= $c->dsc_incidencia ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="row">
+                        <!-- Columna Izquierda -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="fecha_inicio_asistencia">Fecha Inicio</label>
+                                <input type="date" class="form-control" id="fecha_inicio_asistencia"
+                                    name="fecha_inicio_asistencia">
                             </div>
-                        </div><!--end card-->
-                    </div><!--end col-->
-                </div><!--end row-->
-            </div><!--end modal-body-->
 
-            <!-- Footer del modal con botones -->
-            <!-- En el modal-footer -->
+                            <div class="form-group">
+                                <label for="hora_inicio_asistencia">Hora Inicio</label>
+                                <input type="time" class="form-control" id="hora_inicio_asistencia"
+                                    name="hora_inicio_asistencia">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="detalle_asistencia">Detalles</label>
+                                <textarea class="form-control" id="detalle_asistencia" name="detalle_asistencia"
+                                    rows="3"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Columna Derecha -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="fecha_fin_asistencia">Fecha Fin</label>
+                                <input type="date" class="form-control" id="fecha_fin_asistencia"
+                                    name="fecha_fin_asistencia">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="hora_fin_asistencia">Hora Fin</label>
+                                <input type="time" class="form-control" id="hora_fin_asistencia"
+                                    name="hora_fin_asistencia">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="comentario_asistencia">Comentario</label>
+                                <textarea class="form-control" id="comentario_asistencia" name="comentario_asistencia"
+                                    rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Footer -->
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
-                <button type="submit" form="editarAsistencia" id="btn_asistencia" class="btn btn-success">
-                    Guardar ✔️
-                </button>
+                <button type="submit" form="editarAsistencia" class="btn btn-success">Guardar ✔️</button>
             </div>
         </div>
     </div>
@@ -458,7 +439,7 @@
 <script src="<?php echo base_url() ?>plugins/bootstrap-touchspin/js/jquery.bootstrap-touchspin.min.js"></script>
 <script src="<?php echo base_url() ?>assets/pages/jquery.forms-advanced.js"></script>
 <!-- App js -->
-<script src="<?php echo base_url() ?>assets/js/app.js"></script>
+
 <script src="<?php echo base_url() ?>assets/js/jquery-ui.min.js"></script>
 <script src="<?php echo base_url() ?>assets/js/bootstrap.bundle.min.js"></script>
 <script src="<?php echo base_url() ?>assets/js/metismenu.min.js"></script>
@@ -491,31 +472,31 @@
         return [];
     }
     function getEntradas(info) {
-    const ep = info.event.extendedProps || {};
-    // Preferir 'entradas' si existe; si no, usar 'entrada'
-    return parseHoras(ep.entradas ?? ep.entrada ?? '');
+        const ep = info.event.extendedProps || {};
+        // Preferir 'entradas' si existe; si no, usar 'entrada'
+        return parseHoras(ep.entradas ?? ep.entrada ?? '');
     }
     function getSalidas(info) {
-    const ep = info.event.extendedProps || {};
-    // Preferir 'salidas' si existe; si no, usar 'salida'
-    const s = parseHoras(ep.salidas ?? ep.salida ?? '');
-    // Preservar el literal "Sin salida" si viene único
-    if (!s.length && typeof ep.salida === 'string' && ep.salida.toLowerCase().includes('sin salida')) {
-        return ['Sin salida'];
-    }
-    return s;
+        const ep = info.event.extendedProps || {};
+        // Preferir 'salidas' si existe; si no, usar 'salida'
+        const s = parseHoras(ep.salidas ?? ep.salida ?? '');
+        // Preservar el literal "Sin salida" si viene único
+        if (!s.length && typeof ep.salida === 'string' && ep.salida.toLowerCase().includes('sin salida')) {
+            return ['Sin salida'];
+        }
+        return s;
     }
 
     function esHabil(date) {
-     const d = date.getDay(); // 0=Dom, 6=Sáb
-     return d >= 1 && d <= 5;
+        const d = date.getDay(); // 0=Dom, 6=Sáb
+        return d >= 1 && d <= 5;
     }
     function esPasado(date) {
-       const hoy = new Date();
-       hoy.setHours(0,0,0,0);
-       const d = new Date(date);
-       d.setHours(0,0,0,0);
-       return d < hoy;
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+        const d = new Date(date);
+        d.setHours(0, 0, 0, 0);
+        return d < hoy;
     }
 
 
@@ -615,7 +596,8 @@
                 eventClass = 'fc-event-falta';
                 item.nombre = 'Falta';
                 icon = '❌';
-            } else if (item.entrada < '08:30:00') {
+            }
+            else if (item.entrada < '08:30:00') {
                 eventClass = 'fc-event-temprano';
                 item.nombre = 'Temprano';
                 icon = '✅';
@@ -637,6 +619,7 @@
                 title: `${item.nombre} ${icon}`,
                 extendedProps: {
                     entrada: item.entrada,
+                    tipo_registro: item.tipo_registro,
                     esFestivo: false,
                     salida: (!item.salida) ? 'Sin salida' : item.salida,
                     trabajado: item.trabajado,
@@ -662,11 +645,11 @@
             } else if (item.id_estatus == 2) {
                 eventClass = 'fc-event-declinado';
                 item.nombre = 'Declinado';
-                icon = '❌';
+                icon = '😢';
             } else if (item.id_estatus == 3) {
                 eventClass = 'fc-event-puntual';
                 item.nombre = 'Aprobado';
-                icon = '✅';
+                icon = '😊';
             } else if (item.id_estatus == 4) {
                 eventClass = 'fc-event-espera';
                 item.nombre = 'Proceso';
@@ -714,9 +697,9 @@
         }
 
         function horaToSegundos(hora) {
-          if (!hora || typeof hora !== 'string' || !hora.includes(':')) return null;
-          const [hh, mm, ss] = hora.split(':').map(n => parseInt(n, 10) || 0);
-          return hh * 3600 + mm * 60 + ss;
+            if (!hora || typeof hora !== 'string' || !hora.includes(':')) return null;
+            const [hh, mm, ss] = hora.split(':').map(n => parseInt(n, 10) || 0);
+            return hh * 3600 + mm * 60 + ss;
         }
 
         // Definir los días festivos (formato: 'YYYY-MM-DD')
@@ -793,15 +776,18 @@
                 meridiem: 'short'
             },
             eventRender: function (info) {
-                // Evitar manipular el contenido de eventos background (semanas)
+
+
                 if (info.event.display === 'background') return;
+
+
+
 
                 var eventEl = info.el;
                 if (info.event.extendedProps.esIncidencia) {
                     eventEl.innerHTML = `
                      <div class="fc-event-title">${info.event.title}</div>
                     <div class="${info.event.className}">
-                    <div>Hora Inicio: ${info.event.extendedProps.hora_inicio}</div>
                     </div>
                 `;
                 } else if (info.event.extendedProps.esFestivo) {
@@ -821,52 +807,55 @@
             },
             eventClick: function (info) {
                 const esSemana = info.event.extendedProps.tipo === 'semana';
+                const idEstatus = info.event.extendedProps.id_estatus == 3;
+                const enviado = info.event.extendedProps.id_estatus == 1;
+               // console.log(idEstatus);
                 const fechaLabel = esSemana
                     ? `${info.event.extendedProps.rango_legible}`
                     : info.event.start.toLocaleDateString();
-                
-                    const entradas = getEntradas(info);
-                    const salidas  = getSalidas(info);
 
-                    // 🚫 Si hay múltiples entradas o múltiples salidas, no mostrar listado/justificar
-                    const multiplesEntradas = entradas.length > 1;
-                    const multiplesSalidas  = salidas.length > 1;
+                const entradas = getEntradas(info);
+                const salidas = getSalidas(info);
 
-                    if (multiplesEntradas || multiplesSalidas) {
-                        Swal.fire('Aviso', 'Este registro contiene múltiples entradas/salidas. Favor de gestionarlo desde "Editar".', 'info');
-                        return;
-                    }
+                // 🚫 Si hay múltiples entradas o múltiples salidas, no mostrar listado/justificar
+                const multiplesEntradas = entradas.length > 1;
+                const multiplesSalidas = salidas.length > 1;
 
-                    // ✅ Caso de un solo par entrada–salida (o salida "Sin salida")
-                    const entrada = entradas[0] || null;
-                    const salida  = salidas[0] || null;
+                if (multiplesEntradas || multiplesSalidas) {
+                    Swal.fire('Aviso', 'Este registro contiene múltiples entradas/salidas. Favor de gestionarlo desde "Editar".', 'info');
+                    return;
+                }
 
-                    // Si entrada viene vacía, no seguimos con reglas de horario
-                    if (!entrada) {
-                        Swal.fire('Atención', 'No se encontró hora de entrada válida para este registro.', 'warning');
-                        return;
-                    }
+                // ✅ Caso de un solo par entrada–salida (o salida "Sin salida")
+                const entrada = entradas[0] || null;
+                const salida = salidas[0] || null;
 
-                    // Reglas por rango de hora de entrada
-                    const ent = horaToSegundos(entrada);
-                    const r1i = horaToSegundos('08:46:00');
-                    const r1f = horaToSegundos('09:00:00');
-                    const r2i = horaToSegundos('07:00:00');
-                    const r2f = horaToSegundos('08:46:00');
+                // Si entrada viene vacía, no seguimos con reglas de horario
+                if (!entrada && idEstatus || enviado) {
+                    Swal.fire('Atención', 'Es espera de validación', 'warning');
+                    return;
+                }
 
-                    const tieneSalidaValida = salida && typeof salida === 'string' && salida.toLowerCase() !== 'sin salida';
+                // Reglas por rango de hora de entrada
+                const ent = horaToSegundos(entrada);
+                const r1i = horaToSegundos('08:46:00');
+                const r1f = horaToSegundos('09:00:00');
+                const r2i = horaToSegundos('07:00:00');
+                const r2f = horaToSegundos('08:46:00');
 
-                    // Regla 1: 08:46:00–09:00:00 => no justificar
-                    if (ent !== null && ent >= r1i && ent <= r1f && tieneSalidaValida) {
-                        Swal.fire('Atención', 'Los retrasos no se pueden justificar.', 'info');
-                        return;
-                    }
+                const tieneSalidaValida = salida && typeof salida === 'string' && salida.toLowerCase() !== 'sin salida';
 
-                    // Regla 2: 07:30:00–08:46:00 => mostrar mensaje de entrada/salida
-                    if (ent !== null && ent >= r2i && ent <= r2f && tieneSalidaValida) {
-                        Swal.fire(info.event.title, `Entrada: ${entrada} — Salida: ${salida}`, 'success');
-                        return;
-                    }
+                // Regla 1: 08:46:00–09:00:00 => no justificar
+                if (ent !== null && ent >= r1i && ent <= r1f && tieneSalidaValida) {
+                    Swal.fire('Atención', 'Los retrasos no se pueden justificar.', 'info');
+                    return;
+                }
+
+                // Regla 2: 07:30:00–08:46:00 => mostrar mensaje de entrada/salida
+                if (ent !== null && ent >= r2i && ent <= r2f && tieneSalidaValida) {
+                    Swal.fire(info.event.title, `Entrada: ${entrada} — Salida: ${salida}`, 'success');
+                    return;
+                }
 
 
                 Swal.fire({
@@ -917,14 +906,15 @@
                             }
 
                             // Si no se puede obtener, usar la fecha actual
-                            console.warn('No se pudo obtener la fecha del evento, usando fecha actual');
+                            console.warn('Se encuentra en proceso de validación');
                             const hoy = new Date();
                             return hoy.toISOString().split('T')[0];
                         };
+                        if (info.event.extendedProps.id_estatus != 1) {
+                            const dia = obtenerFechaFormateada();
+                            st.agregar.justificarFalta(dia);
+                        }
 
-                        const dia = obtenerFechaFormateada();
-
-                        st.agregar.justificarFalta(dia);
 
                     } else if (result.isDenied) {
                         st.agregar.editarRegistro(info.event.extendedProps.id_incidencia);
@@ -932,6 +922,7 @@
                 });
             },
             dateClick: function (info) {
+                console.log(info);
                 const fecha = info.date;
                 const diaSemana = fecha.getDay();
                 const fechaStr = fecha.toISOString().split('T')[0];
@@ -948,71 +939,81 @@
                 }
 
                 // Si es un día hábil, continúa
+
                 let dia = info.dateStr;
-                st.agregar.justificarFalta(dia);
+                st.agregar.existeIncidencia(dia, function (validar) {
+                    if (validar) {
+                        Swal.fire("Atención", "En proceso de validación y/o validado", "info");
+                    } else {
+                        st.agregar.justificarFalta(dia);
+                    }
+
+                });
             },
             dayRender: function (info) {
-            
-            const date = info.date;
-            const day = date.getDay();
-            const isWeekend = (day === 0 || day === 6);
 
-            // Verificar si es día festivo
-            const fechaStr = date.toISOString().split('T')[0];
-           
-            const esFestivo = diasFestivos.includes(fechaStr);
-            const esRegistro = onlyAsistencias.includes(fechaStr);
-   
-            // Rango del día (00:00 – 24:00)
-            const dayStart = new Date(date);
-            dayStart.setHours(0, 0, 0, 0);
-            const dayEnd = new Date(dayStart);
-            dayEnd.setDate(dayEnd.getDate() + 1);
+                const date = info.date;
+                const day = date.getDay();
+                const isWeekend = (day === 0 || day === 6);
 
-            // Eventos del día
-            const eventsToday = calendar.getEvents().filter(function (e) {
-                const evStart = e.start;
-                const evEnd = e.end || evStart;
-                return evStart < dayEnd && evEnd > dayStart;
-            });
-         
-            const hasEvents = eventsToday.length > 0;
-            const esFalta = eventsToday.some(e => (e.classNames || []).includes('fc-event-falta'));
+                // Verificar si es día festivo
+                const fechaStr = date.toISOString().split('T')[0];
 
-            // ======= Marcado visual existente (lo conservas) =======
-            if (esFestivo) {
-                info.el.style.backgroundColor = '#fff3cd';
-                info.el.style.border = '2px solid #ffc107';
-                info.el.title = 'Día Festivo';
-            } else if (isWeekend && !esFalta) {
-                info.el.style.backgroundColor = '#c7bbbbff';
-            } else if (hasEvents) {
-                info.el.style.backgroundColor = 'rgba(78, 115, 223, 0.05)';
-            } else {
-                info.el.style.backgroundColor = 'rgba(58, 23, 75, 0.1)';
-                info.el.style.border = '1px solid rgba(255, 0, 0, 0.3)';
-            }
+                const esFestivo = diasFestivos.includes(fechaStr);
+                const esRegistro = onlyAsistencias.includes(fechaStr);
 
-            // ======= NUEVO: Bandera para días hábiles pasados sin registros =======
+                // Rango del día (00:00 – 24:00)
+                const dayStart = new Date(date);
+                dayStart.setHours(0, 0, 0, 0);
+                const dayEnd = new Date(dayStart);
+                dayEnd.setDate(dayEnd.getDate() + 1);
+
+                // Eventos del día
+                const eventsToday = calendar.getEvents().filter(function (e) {
+                    const evStart = e.start;
+                    const evEnd = e.end || evStart;
+                    return evStart < dayEnd && evEnd > dayStart;
+                });
+
+                const hasEvents = eventsToday.length > 0;
+                const esFalta = eventsToday.some(e => (e.classNames || []).includes('fc-event-falta'));
+
+                // ======= Marcado visual existente (lo conservas) =======
+                if (esFestivo) {
+                    info.el.style.backgroundColor = '#fff3cd';
+                    info.el.style.border = '2px solid #ffc107';
+                    info.el.title = 'Día Festivo';
+                } else if (isWeekend && !esFalta) {
+                    info.el.style.backgroundColor = '#c7bbbbff';
+                } else if (hasEvents) {
+                    info.el.style.backgroundColor = 'rgba(78, 115, 223, 0.05)';
+                } else {
+                    info.el.style.backgroundColor = 'rgba(58, 23, 75, 0.1)';
+                    info.el.style.border = '1px solid rgba(255, 0, 0, 0.3)';
+                }
+
+                // ======= NUEVO: Bandera para días hábiles pasados sin registros =======
                 if (!esFestivo && esHabil(date) && esPasado(date) && !hasEvents && !esRegistro) {
                     info.el.classList.add('fc-dia-sin-chequeo');
 
                     // Evita duplicar badge si FullCalendar re-renderiza
                     if (!info.el.querySelector('.flag-missing')) {
-                    const badge = document.createElement('div');
+                        const badge = document.createElement('div');
                         badge.className = 'flag-missing';
                         badge.innerHTML = `
-                        <div class="spinner-grow text-danger" role="status"></div>`;
+                        <div class="spinner-grow text-danger"  role="status"></div>
+                          <div class="fc-event-title text-danger" style="text-align: center;">Falta Sin Justificar</div>
+                        `;
                         info.el.appendChild(badge);
 
                     }
 
-                  
+
                 }
             },
-          
 
-           
+
+
         });
 
         calendar.render();

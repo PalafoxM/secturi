@@ -136,16 +136,17 @@
                                                       
                                                       <td class="text-center">
                                                             <!-- Aprobar/aceptar -->
+                                                             <?php if($p->id_estatus !== 3): ?>
                                                             <a style="cursor:pointer;" onclick="saeg.principal.aceptarIncidencia(<?=$p->id_incidencia ?>, 3, <?=$p->id_usuario ?>);" class="mr-2" title="Aprobar">
                                                                 <i class="fas fa-check-circle text-success font-16"></i>
                                                             </a>
-                                                            
+                                                            <?php endif; ?>
                                                             <!-- Revisar/editar -->
                                                             <a style="cursor:pointer;" onclick="saeg.principal.detalleIncidencia(<?=$p->id_incidencia ?>);" class="mr-2" title="Revisar">
                                                                 <i class="fas fa-search text-info font-16"></i>
                                                             </a>
                                                             
-                                                            <?php if($p->id_estatus !== 3): ?>
+                                                            <?php if($p->id_estatus == 1 ): ?>
                                                             <a  style="cursor:pointer;" onclick="saeg.principal.aceptarIncidencia(<?=$p->id_incidencia ?>, 2,<?=$p->id_usuario ?>);" class="mr-2" title="Rechazar">
                                                                 <i class="fas fa-times-circle text-warning font-16"></i>
                                                             </a>

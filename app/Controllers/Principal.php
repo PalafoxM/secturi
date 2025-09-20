@@ -1436,7 +1436,7 @@ class Principal extends BaseController {
            $response->error= false; 
            $response->respuesta= $result->respuesta; 
         }
-        $this->envioCorreoJefeInmediato(); 
+        //$this->envioCorreoJefeInmediato(); 
         return $this->respond($response);
     }
     public function actualizarBanco()
@@ -1761,6 +1761,22 @@ class Principal extends BaseController {
            $response->error     = $result->error;
            $response->respuesta = $result->respuesta;
            $response->data      = $result->data[0];
+        }
+        return $this->respond($response);
+    }
+    public function existeIncidencia()
+    {
+        $session             = \Config\Services::session();
+        $response            = new \stdClass();
+        $fecha                = $this->request->getPost('fecha');
+        $response->error     = false;
+        $response->respuesta = 'Error al guardar en la base de datos';
+        $principal           = new Mglobal;
+         $result = $principal->getTabla(['tabla' => 'incidencia', 'where' => ['visible' => 1, 'fecha'=>$fecha, 'id_usuario' => $session->get('id_usuario')]]);
+  
+        if(isset($result->data) && !empty($result->data)){
+           $response->error     = true;
+   
         }
         return $this->respond($response);
     }
