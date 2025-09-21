@@ -3213,7 +3213,13 @@ ini.inicio = (function () {
        },
        agregarInventario: function()
        {
+        
          $("#modelInventarios").modal('show');
+          $('.select2').select2({
+             placeholder: "Seleccione una opción",
+             allowClear: true,
+             width: '100%' // Para mejor responsive
+         });
        },
        agregarAlba: function() {
             // Alternativa para asegurar que funcione

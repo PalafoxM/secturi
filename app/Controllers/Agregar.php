@@ -830,10 +830,12 @@ class Agregar extends BaseController
             "observaciones" => $data['observaciones'],
             "estado" => $data['estado'],
             "valor" => $data['valor'],
-            "fec_cap" => date('Y-m-d', strtotime($data['fec_cap'])),
             "usu_reg" => $session->id_usuario,
             "fec_reg" => date('Y-m-d'),
         ];
+        if(isset($data['fec_cap']) && !empty($data['fec_cap'])){
+            $dataInsert['fec_cap'] = date('Y-m-d', strtotime($data['fec_cap']));
+        }
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaDenuncia'];
         $dataConfig = [
             "tabla" => "inventario",

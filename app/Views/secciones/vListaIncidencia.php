@@ -99,6 +99,7 @@
 
                                                 <tbody>
                                                     <?php foreach($incidencia as $p): ?>
+                                                        <?php if($p->id_estatus !== 3): ?>
                                                     <tr>
                                                         <td class="text-center"><?= $p->dsc_incidencia?></td>
                                                         <td class="text-center"><?= $p->nombre_completo?></td>
@@ -146,7 +147,7 @@
                                                                 <i class="fas fa-search text-info font-16"></i>
                                                             </a>
                                                             
-                                                            <?php if($p->id_estatus == 1 ): ?>
+                                                            <?php if($p->id_estatus == 1): ?>
                                                             <a  style="cursor:pointer;" onclick="saeg.principal.aceptarIncidencia(<?=$p->id_incidencia ?>, 2,<?=$p->id_usuario ?>);" class="mr-2" title="Rechazar">
                                                                 <i class="fas fa-times-circle text-warning font-16"></i>
                                                             </a>
@@ -159,6 +160,7 @@
                                                             <?php endif; ?>
                                                         </td>
                                                     </tr>
+                                                    <?php endif; ?>
                                                     <?php endforeach; ?>
                                                 </tbody>
                                             </table>

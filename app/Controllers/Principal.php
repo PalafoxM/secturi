@@ -1,4 +1,5 @@
-<?php namespace App\Controllers;
+<?php
+namespace App\Controllers;
 use CodeIgniter\Controller;
 use App\Libraries\Curps;
 use App\Libraries\Fechas;
@@ -26,7 +27,8 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
-class Principal extends BaseController {
+class Principal extends BaseController
+{
 
     use ResponseTrait;
     private $defaultData = array(
@@ -38,40 +40,41 @@ class Principal extends BaseController {
     public function __construct()
     {
         setlocale(LC_TIME, 'es_ES.utf8', 'es_MX.UTF-8', 'es_MX', 'esp_esp', 'Spanish'); // usar solo LC_TIME para evitar que los decimales los separe con coma en lugar de punto y fallen los inserts de peso y talla
-        date_default_timezone_set('America/Mexico_City');  
+        date_default_timezone_set('America/Mexico_City');
         $session = \Config\Services::session();
-        if($session->get('logueado')!= 1){
-            header('Location:'.base_url().'index.php/Login/cerrar?inactividad=1');            
+        if ($session->get('logueado') != 1) {
+            header('Location:' . base_url() . 'index.php/Login/cerrar?inactividad=1');
             die();
         }
     }
 
-    private function _renderView($data = array()) {     
+    private function _renderView($data = array())
+    {
         $data = array_merge($this->defaultData, $data);
-        echo view($data['layout'], $data);               
+        echo view($data['layout'], $data);
     }
-   
+
     public function index()
-    {  
-       
+    {
+
         $session = \Config\Services::session();
         $data = array();
         $data['scripts'] = array('principal');
         $data['edita'] = 0;
-        $data['contentView'] = 'secciones/vVacio';                
+        $data['contentView'] = 'secciones/vVacio';
         $this->_renderView($data);
-        
+
     }
-   public function uploadCSV()
+    public function uploadCSV()
     {
         $response = new \stdClass();
-        $session  = \Config\Services::session();
-        $globals  = new Mglobal;
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
         $response->error = true;
         $response->respuesta = 'No se subió ningún archivo válido';
 
         $file = $this->request->getFile('fileParticipantes');
-        
+
         if (!$file->isValid()) {
             return $this->respond($response);
         }
@@ -80,81 +83,81 @@ class Principal extends BaseController {
             $spreadsheet = IOFactory::load($file->getTempName());
             $worksheet = $spreadsheet->getActiveSheet();
             $rows = $worksheet->toArray();
-            
+
             $registrosProcesados = 0;
             $errores = [];
-            
-         
-            
+
+
+
             foreach ($rows as $index => $row) {
                 if (empty($row[0]) || empty($row[1])) {
                     continue;
                 }
-                
+
                 try {
                     $noEmpleado = $row[0];
                     $fechaHora = $row[1];
-    
+
                     // Convertir fecha
                     $fechaHoraObj = DateTime::createFromFormat('d/m/Y H:i', $fechaHora);
                     if (!$fechaHoraObj) {
                         $errores[] = "Fila " . ($index + 1) . ": Formato de fecha inválido";
                         continue;
                     }
-                    
+
                     $fecha = $fechaHoraObj->format('Y-m-d');
                     $hora = $fechaHoraObj->format('H:i:s');
-                    
+
                     // Obtener ID usuario
                     $dataDB = ['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'no_empleado' => $noEmpleado]];
                     $userResponse = $globals->getTabla($dataDB);
-                    
+
                     if (empty($userResponse->data)) {
                         $errores[] = "Fila " . ($index + 1) . ": Usuario $noEmpleado no encontrado";
                         continue;
                     }
-                    
+
                     $idUsuario = $userResponse->data[0]->id_usuario;
-                    
+
                     // Verificar si ya existe registro para esta fecha
                     $asistenciaDB = [
-                        'tabla' => 'asistencia', 
+                        'tabla' => 'asistencia',
                         'where' => [
-                            'visible' => 1, 
-                            'id_usuario' => $idUsuario, 
+                            'visible' => 1,
+                            'id_usuario' => $idUsuario,
                             'fecha' => $fecha
                         ]
                     ];
-                    
+
                     $asistenciaExistente = $globals->getTabla($asistenciaDB);
-                    
+
                     // Determinar si es entrada o salida (lógica mejorada)
                     $esEntrada = ($hora <= '12:00:00'); // Antes del mediodía = entrada
                     $esSalida = ($hora >= '12:00:00');  // Después del mediodía = salida
-                    
+
                     if (!empty($asistenciaExistente->data)) {
                         // ACTUALIZAR registro existente
                         $registro = $asistenciaExistente->data[0];
                         $datosActualizar = [];
-                        
+
                         if ($esEntrada && (empty($registro->entrada) || $registro->entrada == '00:00:00')) {
                             $datosActualizar['entrada'] = $hora;
                         }
-                        
+
                         if ($esSalida && (empty($registro->salida) || $registro->salida == '00:00:00')) {
                             $datosActualizar['salida'] = $hora;
                         }
-                        
+
                         if (!empty($datosActualizar)) {
                             $dataConfig = [
                                 "tabla" => "asistencia",
                                 "editar" => true,
                                 "idEditar" => ['id_asistencia' => $registro->id_asistencia]
                             ];
-                            
+
                             $globals->saveTabla($datosActualizar, $dataConfig, ["script" => "Principal.asistenciaExcel"]);
                         }
-                        
+
                     } else {
                         // CREAR nuevo registro
                         $datosNuevos = [
@@ -164,37 +167,37 @@ class Principal extends BaseController {
                             'salida' => $esSalida ? $hora : '00:00:00',
                             'visible' => 1
                         ];
-                        
+
                         $dataConfig = [
                             "tabla" => "asistencia",
                             "editar" => false
                         ];
-                        
+
                         $globals->saveTabla($datosNuevos, $dataConfig, ["script" => "Principal.asistenciaExcel"]);
                     }
-                    
+
                     $registrosProcesados++;
-                    
+
                 } catch (Exception $e) {
                     $errores[] = "Fila " . ($index + 1) . ": " . $e->getMessage();
                 }
             }
-            
+
             $response->error = false;
             $response->respuesta = "Procesados $registrosProcesados registros. Errores: " . count($errores);
             $response->errores = $errores;
-            
+
         } catch (Exception $e) {
             $response->respuesta = "Error al procesar archivo: " . $e->getMessage();
         }
-        
+
         return $this->respond($response);
     }
     public function uploadCSV2()
     {
         $response = new \stdClass();
-        $session  = \Config\Services::session();
-        $globals  = new Mglobal;
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
         $response->error = true;
         $response->respuesta = 'No se subió ningún archivo válido';
 
@@ -204,12 +207,12 @@ class Principal extends BaseController {
             $header = [];
             $startProcessing = false;
             $currentName = null;
-            
+
             if (($handle = fopen($filePath, "r")) !== false) {
                 while (($row = fgetcsv($handle, 1000, ",")) !== false) {
                     $encodedRow = array_map('utf8_encode', $row);
                     $cleanRow = array_map('trim', $encodedRow);
-                    
+
                     // Buscar línea con nombre (ahora verificando la columna C)
                     if (isset($cleanRow[0])) {
                         // Versión más robusta para detectar nombres
@@ -217,14 +220,14 @@ class Principal extends BaseController {
                             $currentName = $cleanRow[2]; // Columna C (índice 2) contiene el nombre
                             continue;
                         }
-                        
+
                         // Detectar encabezado real
                         if (!$startProcessing && strtolower($cleanRow[0]) === 'id') {
                             $header = array_map('strtolower', $cleanRow);
                             $startProcessing = true;
                             continue;
                         }
-                        
+
                         // Procesar filas de datos
                         if ($startProcessing && is_numeric($cleanRow[0])) {
                             $rowAssoc = array_combine($header, $cleanRow);
@@ -235,7 +238,7 @@ class Principal extends BaseController {
                 }
                 fclose($handle);
             }
-            
+
             // Validación de columnas
             $columnasRequeridas = ['id', 'fecha', 'turno', 'entrada', 'salida', 'trabajado', 'tarde / temprano'];
             $columnasFaltantes = array_diff($columnasRequeridas, $header);
@@ -247,7 +250,8 @@ class Principal extends BaseController {
             }
 
             foreach ($data as $row) {
-                if (empty($row['fecha'])) continue;
+                if (empty($row['fecha']))
+                    continue;
 
                 // Extraer tarde / temprano
                 $tarde = null;
@@ -258,36 +262,36 @@ class Principal extends BaseController {
                     $temprano = trim($temprano);
                 }
 
-              
-             $nombreUser = $row['nombre_empleado'];
+
+                $nombreUser = $row['nombre_empleado'];
                 $like = [
                     'nombre_completo' => "%$nombreUser%",
                 ];
                 $proveedor = $globals->getTabla([
-                        'tabla' => 'vw_usuario',
-                        'where' => ['visible' => 1],
-                        'orlike' => $like,
-                        'limit' => 1
+                    'tabla' => 'vw_usuario',
+                    'where' => ['visible' => 1],
+                    'orlike' => $like,
+                    'limit' => 1
                 ]);
-                if(isset($proveedor->data) && !empty($proveedor->data)){
-                      $registro = [
-                            'id_usuario'  => $proveedor->data[0]->id_usuario,
-                            'fecha'       => DateTime::createFromFormat('d/m/Y', $row['fecha'])->format('Y-m-d'),
-                            'turno'       => $row['turno'] ?? null,
-                            'entrada'     => $row['entrada'] ?? null,
-                            'salida'      => $row['salida'] ?? null,
-                            'trabajado'   => $row['trabajado'] ?? null,
-                            'tarde'       => $tarde,
-                            'temprano'    => $temprano,
-                        ];
-                     $dataConfig = [
-                        "tabla"=>"asistencia",
-                        "editar"=>false
+                if (isset($proveedor->data) && !empty($proveedor->data)) {
+                    $registro = [
+                        'id_usuario' => $proveedor->data[0]->id_usuario,
+                        'fecha' => DateTime::createFromFormat('d/m/Y', $row['fecha'])->format('Y-m-d'),
+                        'turno' => $row['turno'] ?? null,
+                        'entrada' => $row['entrada'] ?? null,
+                        'salida' => $row['salida'] ?? null,
+                        'trabajado' => $row['trabajado'] ?? null,
+                        'tarde' => $tarde,
+                        'temprano' => $temprano,
                     ];
-                    $response = $globals->saveTabla($registro,$dataConfig,["script"=>"Usuario.tiket"]);
+                    $dataConfig = [
+                        "tabla" => "asistencia",
+                        "editar" => false
+                    ];
+                    $response = $globals->saveTabla($registro, $dataConfig, ["script" => "Usuario.tiket"]);
                     $response->error = false;
                     $response->respuesta = 'Carga se guardo correctamente';
-                    
+
                 }
 
             }
@@ -297,14 +301,14 @@ class Principal extends BaseController {
 
         return $this->respond($response);
     }
-    public function reporteIncidenciaUsuario($fechaInicio = null, $fechaFin =  null, $idUsuario = null, $folio = null)
+    public function reporteIncidenciaUsuario($fechaInicio = null, $fechaFin = null, $idUsuario = null, $folio = null)
     {
         $Mglobal = new Mglobal;
-       if( $fechaInicio != 0){
-          $usuario = $Mglobal->getTabla([
-            'tabla' => 'vw_usuario',
-            'where' => ['visible' => 1, 'id_usuario' => $idUsuario]
-        ])->data[0]->nombre_completo;
+        if ($fechaInicio != 0) {
+            $usuario = $Mglobal->getTabla([
+                'tabla' => 'vw_usuario',
+                'where' => ['visible' => 1, 'id_usuario' => $idUsuario]
+            ])->data[0]->nombre_completo;
             $html = '
                 <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
                     <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
@@ -332,7 +336,7 @@ class Principal extends BaseController {
                     </div>
                 </div>
                 ';
-       }else{
+        } else {
             $html = '
             <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
                 <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
@@ -364,8 +368,8 @@ class Principal extends BaseController {
             </div>
             ';
 
-       }
-   
+        }
+
 
         echo $html;
         die();
@@ -373,54 +377,54 @@ class Principal extends BaseController {
 
 
 
- /*    public function uploadCSV()
-    {
-        $response = new \stdClass();
-        $session = \Config\Services::session();
-    
-        if (isset($_FILES['fileParticipantes']) && $_FILES['fileParticipantes']['error'] == 0) {
-            $filePath = $_FILES['fileParticipantes']['tmp_name'];
-            
-            // Lee el archivo CSV y convierte sus datos en un array
-            $data = [];
-        
-            if (($handle = fopen($filePath, "r")) !== false) {
-                $header = fgetcsv($handle, 1000, ","); // Lee la primera fila como encabezado
-        
-                while (($row = fgetcsv($handle, 1000, ",")) !== false) {
-                    $encodedRow = array_map('utf8_encode', $row); // Codifica los valores a UTF-8
-                    $courseData = array_combine($header, $encodedRow); // Combina encabezado y valores
+    /*    public function uploadCSV()
+       {
+           $response = new \stdClass();
+           $session = \Config\Services::session();
 
-                    $data[] = $courseData;
-                }
-                fclose($handle);
-            }
-            $columnasRequeridas = [
-                'nombre', 'primer_apellido', 'segundo_apellido', 'curp', 'correo',
-                'denominacion_funcional', 'nivel', 'municipio',
-                 'area', 'jefe_inmediato', 'centro_gestor'
-            ];
-        
-            // Compara las columnas requeridas con el encabezado del archivo CSV
-            $columnasFaltantes = array_diff($columnasRequeridas, $header);
-        
-            if (!empty($columnasFaltantes)) {
-                // Si faltan columnas, devolver error con los nombres de las columnas faltantes
-                $response->error = true; 
-                $response->respuesta = 'faltan columnas'; 
-                return $this->respond($response);
-            }
-            $processResponse = $this->procesarDatos($data);
-            if($processResponse->error){
-                $response->error = true;
-                $response->respuesta = $processResponse->respuesta;
-                return $this->respond($response);
-            }
-        }
-        $response->error = false; 
-        return $this->respond($response);
-    } */
-      function encode_img_base64($img_path = false, $img_type = 'png')
+           if (isset($_FILES['fileParticipantes']) && $_FILES['fileParticipantes']['error'] == 0) {
+               $filePath = $_FILES['fileParticipantes']['tmp_name'];
+
+               // Lee el archivo CSV y convierte sus datos en un array
+               $data = [];
+
+               if (($handle = fopen($filePath, "r")) !== false) {
+                   $header = fgetcsv($handle, 1000, ","); // Lee la primera fila como encabezado
+
+                   while (($row = fgetcsv($handle, 1000, ",")) !== false) {
+                       $encodedRow = array_map('utf8_encode', $row); // Codifica los valores a UTF-8
+                       $courseData = array_combine($header, $encodedRow); // Combina encabezado y valores
+
+                       $data[] = $courseData;
+                   }
+                   fclose($handle);
+               }
+               $columnasRequeridas = [
+                   'nombre', 'primer_apellido', 'segundo_apellido', 'curp', 'correo',
+                   'denominacion_funcional', 'nivel', 'municipio',
+                    'area', 'jefe_inmediato', 'centro_gestor'
+               ];
+
+               // Compara las columnas requeridas con el encabezado del archivo CSV
+               $columnasFaltantes = array_diff($columnasRequeridas, $header);
+
+               if (!empty($columnasFaltantes)) {
+                   // Si faltan columnas, devolver error con los nombres de las columnas faltantes
+                   $response->error = true; 
+                   $response->respuesta = 'faltan columnas'; 
+                   return $this->respond($response);
+               }
+               $processResponse = $this->procesarDatos($data);
+               if($processResponse->error){
+                   $response->error = true;
+                   $response->respuesta = $processResponse->respuesta;
+                   return $this->respond($response);
+               }
+           }
+           $response->error = false; 
+           return $this->respond($response);
+       } */
+    function encode_img_base64($img_path = false, $img_type = 'png')
     {
         if ($img_path) {
             //convert image into Binary data
@@ -434,7 +438,7 @@ class Principal extends BaseController {
         }
         return false;
     }
-  
+
     public function imprimer_qr($noEmpleado)
     {
         // Ruta del QR
@@ -444,8 +448,8 @@ class Principal extends BaseController {
         $this->globals = new Mglobal();
         $data = array();
         $tempQrPath = FCPATH . 'assets/images/qr_final.png';
-        $usuario = $this->globals->getTabla(["tabla"=>"vw_usuario","where"=>["no_empleado" => $noEmpleado, "visible" => 1]])->data;
-        if(empty($usuario)){
+        $usuario = $this->globals->getTabla(["tabla" => "vw_usuario", "where" => ["no_empleado" => $noEmpleado, "visible" => 1]])->data;
+        if (empty($usuario)) {
             echo "<center>EL USUARIO NO EXISTE, FAVOR DE LLAMAR AL ADMINISTRADOR DE SUSI</center>";
             die();
 
@@ -454,7 +458,7 @@ class Principal extends BaseController {
         // Generar el QR
         $result = Builder::create()
             ->writer(new PngWriter())
-            ->data(base_url().'index.php/Login?no_empleado=' . $noEmpleado)
+            ->data(base_url() . 'index.php/Login?no_empleado=' . $noEmpleado)
             ->encoding(new Encoding('UTF-8'))
             ->errorCorrectionLevel(new ErrorCorrectionLevelHigh())
             ->size(400)
@@ -465,21 +469,21 @@ class Principal extends BaseController {
             ->labelAlignment(new LabelAlignmentCenter())
             ->build();
 
-         $result->saveToFile($tempQrPath);
-         $dataImagen = $this->encode_img_base64(FCPATH .'assets/images/qr_final.png', 'png');
-        
-         $data['dataImagen'] =  $dataImagen;
+        $result->saveToFile($tempQrPath);
+        $dataImagen = $this->encode_img_base64(FCPATH . 'assets/images/qr_final.png', 'png');
+
+        $data['dataImagen'] = $dataImagen;
         // die( var_dump( $data ) );
-         $html = view('secciones/vFormato.php', $data);
+        $html = view('secciones/vFormato.php', $data);
 
         // Configuración mPDF
         $mpdf = new \Mpdf\Mpdf([
-                'margin_top' => 0,
-                'margin_left' => 1,
-                'margin_right' => 1,
-                'format' => [208, 268],
-                'mirrorMargins' => false,
-            ]);
+            'margin_top' => 0,
+            'margin_left' => 1,
+            'margin_right' => 1,
+            'format' => [208, 268],
+            'mirrorMargins' => false,
+        ]);
 
 
         $mpdf->WriteHTML($html);
@@ -488,7 +492,7 @@ class Principal extends BaseController {
     }
 
 
-    
+
     public function procesarDatos($data)
     {
         $response = new \stdClass();
@@ -497,11 +501,11 @@ class Principal extends BaseController {
         $dataClean = [];
         $dataTrash = [];
         $emailsSeen = []; // Lista para verificar correos duplicados en el CSV
-        $curpSeen = []; 
-    
+        $curpSeen = [];
+
         foreach ($data as $d) {
             if (isset($d['curp']) && !empty($d['curp'])) {
-    
+
                 // Validación de duplicados de correo en el archivo CSV
                 if (in_array($d['correo'], $emailsSeen)) {
                     $response->respuesta = "Existen correos duplicados en el CSV";
@@ -517,18 +521,24 @@ class Principal extends BaseController {
                 } else {
                     $curpSeen[] = $d['curp']; // Guardar correo para evitar duplicados en el CSV
                 }
-               
-                $curpDB = $this->globals->getTabla(['tabla' => 'participantes', 'where' => [
-                    'visible' => 1,
-                    'id_dependencia' => $session->get('id_dependencia'),
-                    'curp' => $d['curp']
-                ]]);
-                $correoDB = $this->globals->getTabla(['tabla' => 'participantes', 'where' => [
-                    'visible' => 1,
-                    'id_dependencia' => $session->get('id_dependencia'),
-                    'correo' => $d['correo']
-                ]]);
-    
+
+                $curpDB = $this->globals->getTabla([
+                    'tabla' => 'participantes',
+                    'where' => [
+                        'visible' => 1,
+                        'id_dependencia' => $session->get('id_dependencia'),
+                        'curp' => $d['curp']
+                    ]
+                ]);
+                $correoDB = $this->globals->getTabla([
+                    'tabla' => 'participantes',
+                    'where' => [
+                        'visible' => 1,
+                        'id_dependencia' => $session->get('id_dependencia'),
+                        'correo' => $d['correo']
+                    ]
+                ]);
+
                 if (!empty($curpDB->data)) {
                     $d['observaciones'] = 'Curp ya existe en la base de datos';
                     $dataTrash[] = $d;
@@ -544,8 +554,8 @@ class Principal extends BaseController {
                     $dataTrash[] = $d;
                     continue;
                 }
-                
-    
+
+
                 // Validar la CURP en formato y datos
                 $result = $this->validarCURP($d['curp']);
                 if (is_object($result) && !$result->error) {
@@ -564,10 +574,10 @@ class Principal extends BaseController {
                 $dataTrash[] = $d;
             }
         }
-    
+
         // Procesar y guardar los datos limpios y descartados en la base de datos
         $this->guardarEnBaseDeDatos($dataClean, $dataTrash);
-    
+
         // Respuesta final
         $response->error = false;
         return $response;
@@ -575,56 +585,56 @@ class Principal extends BaseController {
     private function guardarEnBaseDeDatos($dataClean, $dataTrash)
     {
         $session = \Config\Services::session();
-       
+
         if (!empty($dataTrash)) {
             foreach ($dataTrash as $c) {
                 $dataInsert = [
-                    'nombre'             => $c['nombre'],
-                    'primer_apellido'    => $c['primer_apellido'],
-                    'segundo_apellido'   => $c['segundo_apellido'],
-                    'curp'               => $c['curp'],
-                    'correo'             => $c['correo'],
-                   // 'fec_nac'            => date("Y-m-d H:i:s", strtotime($c['fec_nac'])),
-                    'centro_gestor'      => $c['centro_gestor'],
-                    'jefe_inmediato'     => $c['jefe_inmediato'],
-                    'area'               => $c['area'],
-                    'rfc'                => substr($c['curp'], 0, 10), 
-                    'observaciones'      => $c['observaciones'],
+                    'nombre' => $c['nombre'],
+                    'primer_apellido' => $c['primer_apellido'],
+                    'segundo_apellido' => $c['segundo_apellido'],
+                    'curp' => $c['curp'],
+                    'correo' => $c['correo'],
+                    // 'fec_nac'            => date("Y-m-d H:i:s", strtotime($c['fec_nac'])),
+                    'centro_gestor' => $c['centro_gestor'],
+                    'jefe_inmediato' => $c['jefe_inmediato'],
+                    'area' => $c['area'],
+                    'rfc' => substr($c['curp'], 0, 10),
+                    'observaciones' => $c['observaciones'],
                     //'id_sexo'            => ($c['sexo'] == 'HOMBRE') ? 1 : 2,
-                    'id_municipio'       => 15,
-                    'id_dependencia'     => (int)$session->get('id_dependencia'),
-                    'id_dep_padre'       => (int)$session->get('id_padre'),
-                    'id_nivel'           => (int)$c['nivel'],
-                    'fec_reg'            => date("Y-m-d H:i:s"),
-                    'usu_reg'            => $session->get('id_usuario')
+                    'id_municipio' => 15,
+                    'id_dependencia' => (int) $session->get('id_dependencia'),
+                    'id_dep_padre' => (int) $session->get('id_padre'),
+                    'id_nivel' => (int) $c['nivel'],
+                    'fec_reg' => date("Y-m-d H:i:s"),
+                    'usu_reg' => $session->get('id_usuario')
                 ];
                 $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardarDetenido'];
                 $dataConfig = ["tabla" => "detenidos", "editar" => false];
                 $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
             }
         }
-    
+
         if (!empty($dataClean)) {
             foreach ($dataClean as $c) {
                 $dataInsert = [
-                    'nombre'             => $c['nombre'],
-                    'primer_apellido'    => $c['primer_apellido'],
-                    'segundo_apellido'   => $c['segundo_apellido'],
-                    'curp'               => $c['curp'],
-                    'correo'             => $c['correo'],
-                    'fec_nac'            => $c['fecha_nacimiento'],
-                    'centro_gestor'      => $c['centro_gestor'],
-                    'jefe_inmediato'     => $c['jefe_inmediato'],
-                    'area'               => $c['area'],
-                    'rfc'                => substr($c['curp'], 0, 10),
-                    'edad'               => $c['edad'],
-                    'id_sexo'            => ($c['sexo'] == 'H') ? 1 : 2,
-                    'id_municipio'       => 15,
-                    'id_dependencia'     => (int)$session->get('id_dependencia'),
-                    'id_dep_padre'       => (int)$session->get('id_padre'),
-                    'id_nivel'           => (int)$c['nivel'],
-                    'fec_reg'            => date("Y-m-d H:i:s"),
-                    'usu_reg'            => $session->get('id_usuario')
+                    'nombre' => $c['nombre'],
+                    'primer_apellido' => $c['primer_apellido'],
+                    'segundo_apellido' => $c['segundo_apellido'],
+                    'curp' => $c['curp'],
+                    'correo' => $c['correo'],
+                    'fec_nac' => $c['fecha_nacimiento'],
+                    'centro_gestor' => $c['centro_gestor'],
+                    'jefe_inmediato' => $c['jefe_inmediato'],
+                    'area' => $c['area'],
+                    'rfc' => substr($c['curp'], 0, 10),
+                    'edad' => $c['edad'],
+                    'id_sexo' => ($c['sexo'] == 'H') ? 1 : 2,
+                    'id_municipio' => 15,
+                    'id_dependencia' => (int) $session->get('id_dependencia'),
+                    'id_dep_padre' => (int) $session->get('id_padre'),
+                    'id_nivel' => (int) $c['nivel'],
+                    'fec_reg' => date("Y-m-d H:i:s"),
+                    'usu_reg' => $session->get('id_usuario')
                 ];
                 $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardarParticipantes'];
                 $dataConfig = ["tabla" => "participantes", "editar" => false];
@@ -632,79 +642,110 @@ class Principal extends BaseController {
             }
         }
     }
-    function validarCURP($curp) {
+    function validarCURP($curp)
+    {
         // Lista de códigos de entidades válidos en México
         $response = new \stdClass();
         $response->error = true;
         $entidadesValidas = [
-            'AS', 'BC', 'BS', 'CC', 'CL', 'CM', 'CS', 'CH', 'DF', 'DG', 'GT', 
-            'GR', 'HG', 'JC', 'MC', 'MN', 'MS', 'NT', 'NL', 'OC', 'PL', 'QT', 
-            'QR', 'SP', 'SL', 'SR', 'TC', 'TL', 'TS', 'VZ', 'YN', 'ZS'
+            'AS',
+            'BC',
+            'BS',
+            'CC',
+            'CL',
+            'CM',
+            'CS',
+            'CH',
+            'DF',
+            'DG',
+            'GT',
+            'GR',
+            'HG',
+            'JC',
+            'MC',
+            'MN',
+            'MS',
+            'NT',
+            'NL',
+            'OC',
+            'PL',
+            'QT',
+            'QR',
+            'SP',
+            'SL',
+            'SR',
+            'TC',
+            'TL',
+            'TS',
+            'VZ',
+            'YN',
+            'ZS'
         ];
-        
+
         // Validación de longitud de 18 caracteres y el formato general
-        if (strlen($curp) !== 18 ) {
+        if (strlen($curp) !== 18) {
             $response->respuesta = "CURP no válida por formato general";
             return false; // CURP no válida por formato general
         }
-       
+
         // Validación de fecha de nacimiento en CURP
         $anio = intval(substr($curp, 4, 2));
         $mes = intval(substr($curp, 6, 2));
         $dia = intval(substr($curp, 8, 2));
-        
+
         // Ajustar año para fechas de 1900 a 2099
         $anioCompleto = ($anio < 50) ? 2000 + $anio : 1900 + $anio;
-    
+
         // Verificar si el año de nacimiento es en el futuro
         $anioActual = intval(date('Y'));
         if ($anioCompleto > $anioActual) {
             $anioCompleto -= 100; // Ajustar el año si es en el futuro
         }
-    
+
         if (!checkdate($mes, $dia, $anioCompleto)) {
             $response->respuesta = "CURP no válida por fecha de nacimiento incorrecta";
             return $response; // CURP no válida por fecha de nacimiento incorrecta
         }
-    
+
         // Validación de sexo (posición 11)
         $sexo = $curp[10];
         if ($sexo !== 'H' && $sexo !== 'M') {
             $response->respuesta = "Validación de sexo solo es valido H o M";
             return $response; // CURP no válida por sexo incorrecto
         }
-    
+
         // Validación de entidad de nacimiento (posiciones 12 y 13)
         $entidad = substr($curp, 11, 2);
         if (!in_array($entidad, $entidadesValidas)) {
             $response->respuesta = "CURP no válida por entidad de nacimiento ejemplo GT";
             return $response;// CURP no válida por entidad incorrecta
         }
-    
+
         // Validación de primeras consonantes internas en apellidos y nombre (posiciones 14, 15 y 16)
         $consonantesInternas = substr($curp, 13, 3);
         if (!preg_match("/^[B-DF-HJ-NP-TV-Z]{3}$/", $consonantesInternas)) {
             $response->respuesta = "CURP no válida por consonantes internas incorrectas del apellidos y nombre";
             return $response; // CURP no válida por consonantes internas incorrectas
         }
-    
+
         $ultimosDos = substr($curp, -1);
         if (!ctype_digit($ultimosDos)) {
             $response->respuesta = "los ultimos 1 digitos tiene que ser números entero";
-            return $response;; // CURP no válida por consonantes internas incorrectas
+            return $response;
+            ; // CURP no válida por consonantes internas incorrectas
         }
-    
+
         // CURP válida - calcular fecha de nacimiento y edad
         $fechaNacimiento = "$anioCompleto-$mes-$dia";
         $timestampNacimiento = strtotime($fechaNacimiento);
         $timestampHoy = time();
         $edad = (int) date('Y', $timestampHoy) - (int) date('Y', $timestampNacimiento);
-    
+
         // Ajuste en caso de que el cumpleaños aún no haya ocurrido en el año actual
         if (date('md', $timestampHoy) < date('md', $timestampNacimiento)) {
             $edad--;
         }
-    
+
         $response->error = false;
         $response->respuesta = "CURP válida";
         $response->fecha_nacimiento = $fechaNacimiento;
@@ -713,114 +754,114 @@ class Principal extends BaseController {
         return $response;
     }
 
-  
+
 
     public function guardarReservaEditarGo()
-    {  
-       
+    {
+
         $session = \Config\Services::session();
-        $email =  \Config\Services::email();
-        $globals      = new Mglobal;
+        $email = \Config\Services::email();
+        $globals = new Mglobal;
         $response = new \stdClass();
         $response->error = true;
         $response->respuesta = 'Error al Guardar los datos';
-        $data =  $this->request->getPost();
+        $data = $this->request->getPost();
 
-        $hoy = date("Y-m-d H:i:s"); 
+        $hoy = date("Y-m-d H:i:s");
         $dataInsert = [
             "total_importe" => $data['total_importe'],
-            "id_estatus"   => 1,
-            "usu_act"       => $session->get('id_usuario')
+            "id_estatus" => 1,
+            "usu_act" => $session->get('id_usuario')
         ];
-        
-         $dataBitacora = ['id_user' =>  $session->get('id_usuario'), 'script' => 'Agregar.php/EditarReserva'];
-         $dataConfig = [
-            "tabla"=>"reserva_go",
-            "editar"=>true,
-           "idEditar"=>['id_reserva_go'=>$data['id_reserva_go']]
-        ];
-         $response = $globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
-         
-         if(!$response->error){
-               $i = 0;
-                foreach($data['id_presupuesto'] as $d){
-                    $dataInsert = [
-                            "id_proyecto"    => $data['proyecto'][$i],
-                            "id_partida"     => $data['partida'][$i],
-                            "importe"        => $data['importe'][$i], 
-                            "propina"        => $data['propina'][$i], 
-                            "usu_act"        => $session->get('id_usuario')
-                            
-                        ];
-                         $dataConfig = [
-                            "tabla"=>"presupuesto_go",
-                            "editar"=>true,
-                            "idEditar"=>['id_presupuesto_go'=>(int)$d]
-                        ];
-     
-                        $res = $globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
-                        if(!$res->error){
-                         $response->error = $res->error;
-                         $response->respuesta = $res->respuesta;
-                     
-                        }
-                            $i++;
-                }
-         }
-     
-      /*  $email->setTo([
-            'alopez@guanajuato.gob.mx',
-            'negonzalez@guanajuato.gob.mx',
-            'dhernandezq@guanajuato.gob.mx'
-        ]); 
-        $email->setSubject('Carga de Reserva');
-        $email->setMessage('
-            <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
-                <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-                    <!-- Encabezado con logotipo -->
-                    <div style="background-color: #004080; padding: 20px; text-align: center;">
-                        <img src="' . base_url('assets/images/logo.png') . '" alt="Logo" style="height: 60px;">
-                    </div>
-                    <!-- Contenido principal -->
-                    <div style="padding: 30px; color: #333;">
-                        <h1 style="color: #004080;">El usuario <strong>' . $session->get('nombre_completo') . '</strong></h1>
-                        <p style="font-size: 16px;">ha actualizado la <strong>RESERVA</strong> en el sistema SUSI.</p>
-                        <p style="font-size: 15px;">Para los labores correspondientes.</p>
-                        <p style="font-size: 15px; color: #888;">Este correo ha sido generado automáticamente por el sistema SUSI. No es necesario responder a este mensaje.</p>
-                        <p style="font-size: 15px; color: #888;">Link: ' .  base_url() . 'index.php/Principal/listaReservaPT</p>
-                    </div>
-                    <!-- Pie de página -->
-                    <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 13px; color: #666;">
-                        © ' . date('Y') . ' Sistema de Atención SUSI. Todos los derechos reservados - SECTURI.
-                    </div>
-                </div>
-            </div>
-        ');                      // Intentar enviar el correo
-       if ($email->send()) {
-          $response->error = false;
-          $response->respuesta = "Correo enviado correctamente.";
-        } else {
-          $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
-        } */
 
-           return $this->respond($response);
-     
-         
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/EditarReserva'];
+        $dataConfig = [
+            "tabla" => "reserva_go",
+            "editar" => true,
+            "idEditar" => ['id_reserva_go' => $data['id_reserva_go']]
+        ];
+        $response = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+
+        if (!$response->error) {
+            $i = 0;
+            foreach ($data['id_presupuesto'] as $d) {
+                $dataInsert = [
+                    "id_proyecto" => $data['proyecto'][$i],
+                    "id_partida" => $data['partida'][$i],
+                    "importe" => $data['importe'][$i],
+                    "propina" => $data['propina'][$i],
+                    "usu_act" => $session->get('id_usuario')
+
+                ];
+                $dataConfig = [
+                    "tabla" => "presupuesto_go",
+                    "editar" => true,
+                    "idEditar" => ['id_presupuesto_go' => (int) $d]
+                ];
+
+                $res = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+                if (!$res->error) {
+                    $response->error = $res->error;
+                    $response->respuesta = $res->respuesta;
+
+                }
+                $i++;
+            }
+        }
+
+        /*  $email->setTo([
+              'alopez@guanajuato.gob.mx',
+              'negonzalez@guanajuato.gob.mx',
+              'dhernandezq@guanajuato.gob.mx'
+          ]); 
+          $email->setSubject('Carga de Reserva');
+          $email->setMessage('
+              <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+                  <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+                      <!-- Encabezado con logotipo -->
+                      <div style="background-color: #004080; padding: 20px; text-align: center;">
+                          <img src="' . base_url('assets/images/logo.png') . '" alt="Logo" style="height: 60px;">
+                      </div>
+                      <!-- Contenido principal -->
+                      <div style="padding: 30px; color: #333;">
+                          <h1 style="color: #004080;">El usuario <strong>' . $session->get('nombre_completo') . '</strong></h1>
+                          <p style="font-size: 16px;">ha actualizado la <strong>RESERVA</strong> en el sistema SUSI.</p>
+                          <p style="font-size: 15px;">Para los labores correspondientes.</p>
+                          <p style="font-size: 15px; color: #888;">Este correo ha sido generado automáticamente por el sistema SUSI. No es necesario responder a este mensaje.</p>
+                          <p style="font-size: 15px; color: #888;">Link: ' .  base_url() . 'index.php/Principal/listaReservaPT</p>
+                      </div>
+                      <!-- Pie de página -->
+                      <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 13px; color: #666;">
+                          © ' . date('Y') . ' Sistema de Atención SUSI. Todos los derechos reservados - SECTURI.
+                      </div>
+                  </div>
+              </div>
+          ');                      // Intentar enviar el correo
+         if ($email->send()) {
+            $response->error = false;
+            $response->respuesta = "Correo enviado correctamente.";
+          } else {
+            $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
+          } */
+
+        return $this->respond($response);
+
+
     }
     public function guardarReservaEditar()
-    {  
-       
+    {
+
         $session = \Config\Services::session();
-        $email =  \Config\Services::email();
-        $globals      = new Mglobal;
+        $email = \Config\Services::email();
+        $globals = new Mglobal;
         $response = new \stdClass();
         $response->error = true;
         $response->respuesta = 'Error al Guardar los datos';
-        $data =  $this->request->getPost();
+        $data = $this->request->getPost();
         $ruta_absoluta = "";
         $ruta_relativa = "";
         $file = $this->request->getFile('instrumento');
-   
+
 
         if ($file && $file->isValid() && !$file->hasMoved()) {
 
@@ -846,225 +887,225 @@ class Principal extends BaseController {
         }
 
 
-        if(isset($data['no_convenio']) && empty($data['no_convenio'])){
+        if (isset($data['no_convenio']) && empty($data['no_convenio'])) {
             $response->error = true;
             $response->respuesta = "El campo No. Convenio es requerido";
-             return $this->respond($response);
+            return $this->respond($response);
         }
-        $hoy = date("Y-m-d H:i:s"); 
-    
+        $hoy = date("Y-m-d H:i:s");
+
         $dataInsert = [
             "total_importe" => $data['total_importe'],
-            "no_convenio"   =>$data['no_convenio'],
-            "id_estatus"   => 1,
-            "usu_act"       => $session->get('id_usuario')
+            "no_convenio" => $data['no_convenio'],
+            "id_estatus" => 1,
+            "usu_act" => $session->get('id_usuario')
         ];
 
-       if (!empty($ruta_relativa)) {
-            $dataInsert['instrumento']    = $ruta_relativa;
-            $dataInsert['ruta_absoluta']  = $ruta_absoluta;
+        if (!empty($ruta_relativa)) {
+            $dataInsert['instrumento'] = $ruta_relativa;
+            $dataInsert['ruta_absoluta'] = $ruta_absoluta;
         }
-        
-         $dataBitacora = ['id_user' =>  $session->get('id_usuario'), 'script' => 'Agregar.php/EditarReserva'];
-         $dataConfig = [
-            "tabla"=>"reserva",
-            "editar"=>true,
-           "idEditar"=>['id_reserva'=>$data['id_reserva']]
+
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/EditarReserva'];
+        $dataConfig = [
+            "tabla" => "reserva",
+            "editar" => true,
+            "idEditar" => ['id_reserva' => $data['id_reserva']]
         ];
-         $response = $globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
-      
-         if(!$response->error){
-               $i = 0;
-                foreach($data['id_presupuesto'] as $d){
-                    $dataInsert = [
-                            "id_proyecto"    => $data['proyecto'][$i],
-                            "id_partida"     => $data['partida'][$i],
-                            "importe"        => $data['importe'][$i], 
-                            "usu_act"        => $session->get('id_usuario')
-                            
-                        ];
-                         $dataConfig = [
-                            "tabla"=>"presupuesto",
-                            "editar"=>true,
-                            "idEditar"=>['id_presupuesto'=>$d]
-                        ];
-     
-                        $res = $globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
-                        if(!$res->error){
-                         $response->error = $res->error;
-                         $response->respuesta = $res->respuesta;
-                     
-                        }
-                            $i++;
+        $response = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+
+        if (!$response->error) {
+            $i = 0;
+            foreach ($data['id_presupuesto'] as $d) {
+                $dataInsert = [
+                    "id_proyecto" => $data['proyecto'][$i],
+                    "id_partida" => $data['partida'][$i],
+                    "importe" => $data['importe'][$i],
+                    "usu_act" => $session->get('id_usuario')
+
+                ];
+                $dataConfig = [
+                    "tabla" => "presupuesto",
+                    "editar" => true,
+                    "idEditar" => ['id_presupuesto' => $d]
+                ];
+
+                $res = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+                if (!$res->error) {
+                    $response->error = $res->error;
+                    $response->respuesta = $res->respuesta;
+
                 }
-            
-         }
+                $i++;
+            }
 
-      /*  $email->setTo([
-            'alopez@guanajuato.gob.mx',
-            'negonzalez@guanajuato.gob.mx',
-            'dhernandezq@guanajuato.gob.mx'
-        ]); 
+        }
 
-        $email->setSubject('Carga de Reserva');
-        $email->setMessage('
-            <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
-                <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-                    <!-- Encabezado con logotipo -->
-                    <div style="background-color: #004080; padding: 20px; text-align: center;">
-                        <img src="' . base_url('assets/images/logo.png') . '" alt="Logo" style="height: 60px;">
-                    </div>
-                    <!-- Contenido principal -->
-                    <div style="padding: 30px; color: #333;">
-                        <h1 style="color: #004080;">El usuario <strong>' . $session->get('nombre_completo') . '</strong></h1>
-                        <p style="font-size: 16px;">ha actualizado la <strong>RESERVA</strong> en el sistema SUSI.</p>
-                        <p style="font-size: 15px;">Para los labores correspondientes.</p>
-                        <p style="font-size: 15px; color: #888;">Este correo ha sido generado automáticamente por el sistema SUSI. No es necesario responder a este mensaje.</p>
-                        <p style="font-size: 15px; color: #888;">Link: ' .  base_url() . 'index.php/Principal/listaReservaPT</p>
-                    </div>
-                    <!-- Pie de página -->
-                    <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 13px; color: #666;">
-                        © ' . date('Y') . ' Sistema de Atención SUSI. Todos los derechos reservados - SECTURI.
-                    </div>
-                </div>
-            </div>
-        ');                      // Intentar enviar el correo
-       if ($email->send()) {
-          $response->error = false;
-          $response->respuesta = "Correo enviado correctamente.";
-        } else {
-          $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
-        } */
-           return $this->respond($response);
-     
-         
+        /*  $email->setTo([
+              'alopez@guanajuato.gob.mx',
+              'negonzalez@guanajuato.gob.mx',
+              'dhernandezq@guanajuato.gob.mx'
+          ]); 
+
+          $email->setSubject('Carga de Reserva');
+          $email->setMessage('
+              <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+                  <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+                      <!-- Encabezado con logotipo -->
+                      <div style="background-color: #004080; padding: 20px; text-align: center;">
+                          <img src="' . base_url('assets/images/logo.png') . '" alt="Logo" style="height: 60px;">
+                      </div>
+                      <!-- Contenido principal -->
+                      <div style="padding: 30px; color: #333;">
+                          <h1 style="color: #004080;">El usuario <strong>' . $session->get('nombre_completo') . '</strong></h1>
+                          <p style="font-size: 16px;">ha actualizado la <strong>RESERVA</strong> en el sistema SUSI.</p>
+                          <p style="font-size: 15px;">Para los labores correspondientes.</p>
+                          <p style="font-size: 15px; color: #888;">Este correo ha sido generado automáticamente por el sistema SUSI. No es necesario responder a este mensaje.</p>
+                          <p style="font-size: 15px; color: #888;">Link: ' .  base_url() . 'index.php/Principal/listaReservaPT</p>
+                      </div>
+                      <!-- Pie de página -->
+                      <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 13px; color: #666;">
+                          © ' . date('Y') . ' Sistema de Atención SUSI. Todos los derechos reservados - SECTURI.
+                      </div>
+                  </div>
+              </div>
+          ');                      // Intentar enviar el correo
+         if ($email->send()) {
+            $response->error = false;
+            $response->respuesta = "Correo enviado correctamente.";
+          } else {
+            $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
+          } */
+        return $this->respond($response);
+
+
     }
     public function guardarFoto()
     {
         $session = \Config\Services::session();
-        $globals      = new Mglobal;
+        $globals = new Mglobal;
         $response = new \stdClass();
         $response->error = true;
         $response->respuesta = 'Error al Guardar los datos';
-        $foto = $this->request->getFile('foto');  
+        $foto = $this->request->getFile('foto');
         $extension = $foto->getClientExtension();
         //$originalName = pathinfo($foto->getName(), PATHINFO_FILENAME);
-        $archivo = $session->usuario .'.' . $extension;
+        $archivo = $session->usuario . '.' . $extension;
         $ruta_destino = FCPATH . 'assets/images/fotos/';
-       
+
         $foto->move($ruta_destino, $archivo);
         $ruta_absoluta = base_url('assets/images/fotos/' . $archivo);
         $ruta_relativa = 'assets/images/fotos/' . $archivo;
 
         $dataInsert = [
-                "ruta_foto_absoluta" => $ruta_absoluta,
-                "ruta_foto_relativa" => $ruta_relativa, 
-                "usu_act" => $session->get('id_usuario')        
-                    ];
-        $dataBitacora = ['id_user' =>  $session->get('id_usuario'), 'script' => 'Principal.php/guardaFoto'];
-         $dataConfig = [
-            "tabla"=>"usuario",
-            "editar"=>true,
-            "idEditar"=>['id_usuario'=>$session->get('id_usuario')]
+            "ruta_foto_absoluta" => $ruta_absoluta,
+            "ruta_foto_relativa" => $ruta_relativa,
+            "usu_act" => $session->get('id_usuario')
         ];
-        $res = $globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
-        if(!$res->error){
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Principal.php/guardaFoto'];
+        $dataConfig = [
+            "tabla" => "usuario",
+            "editar" => true,
+            "idEditar" => ['id_usuario' => $session->get('id_usuario')]
+        ];
+        $res = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+        if (!$res->error) {
             $response->error = $res->error;
             $response->respuesta = $res->respuesta;
         }
-        return $this->respond($response);             
+        return $this->respond($response);
     }
     public function guardarReservaGO()
-    {  
-       
+    {
+
         $session = \Config\Services::session();
-        $email =  \Config\Services::email();
-        $globals      = new Mglobal;
+        $email = \Config\Services::email();
+        $globals = new Mglobal;
         $response = new \stdClass();
         $response->error = true;
         $response->respuesta = 'Error al Guardar los datos';
-        $data =  $this->request->getPost();
+        $data = $this->request->getPost();
 
-        $hoy = date("Y-m-d H:i:s"); 
+        $hoy = date("Y-m-d H:i:s");
         $folio = 'GO-' . date('YmdHis'); // Ejemplo: FOL-20250725133045
 
         $dataInsert = [
-            "id_proveedor"       => 1,
-            "total_importe"      => $data['total_importe'],
-            "fec_reg"            => $hoy,
-            "usu_reg"            => $session->get('id_usuario'),
-            "folio"              => $folio
+            "id_proveedor" => 1,
+            "total_importe" => $data['total_importe'],
+            "fec_reg" => $hoy,
+            "usu_reg" => $session->get('id_usuario'),
+            "folio" => $folio
         ];
-    
-         $dataBitacora = ['id_user' =>  $session->get('id_usuario'), 'script' => 'Principal.php/guardaReservaGO'];
-         $dataConfig = [
-            "tabla"=>"reserva_go",
-            "editar"=>false,
+
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Principal.php/guardaReservaGO'];
+        $dataConfig = [
+            "tabla" => "reserva_go",
+            "editar" => false,
             // "idEditar"=>['id_usuario'=>$data['id_usuario']]
         ];
-         $response = $globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
-       
-         if(!$response->error){
-             $id_reserva = $response->idRegistro;
-             $datosCombinados = [];
+        $response = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
 
-                // Verificar que todos los arrays tengan la misma longitud
-                if (count($data['proyecto']) === count($data['partida']) && count($data['partida']) === count($data['importe'])) {
-                    foreach ($data['proyecto'] as $index => $proyecto) {
-                        // Solo agregar si todos los valores existen
-                        if (!empty($data['proyecto']) && !empty($data['partida'][$index]) && !empty($data['importe'][$index])) {
-                            $datosCombinados[] = [
-                                'proyecto' => $proyecto,
-                                'partida' => $data['partida'][$index],
-                                'importe' => str_replace(',', '', $data['importe'][$index]),
-                                'propina' => str_replace(',', '', $data['propina'][$index]) // Elimina comas del formato numérico
-                            ];
-                        }
+        if (!$response->error) {
+            $id_reserva = $response->idRegistro;
+            $datosCombinados = [];
+
+            // Verificar que todos los arrays tengan la misma longitud
+            if (count($data['proyecto']) === count($data['partida']) && count($data['partida']) === count($data['importe'])) {
+                foreach ($data['proyecto'] as $index => $proyecto) {
+                    // Solo agregar si todos los valores existen
+                    if (!empty($data['proyecto']) && !empty($data['partida'][$index]) && !empty($data['importe'][$index])) {
+                        $datosCombinados[] = [
+                            'proyecto' => $proyecto,
+                            'partida' => $data['partida'][$index],
+                            'importe' => str_replace(',', '', $data['importe'][$index]),
+                            'propina' => str_replace(',', '', $data['propina'][$index]) // Elimina comas del formato numérico
+                        ];
                     }
                 }
-                  $dataConfig = [
-                    "tabla"=>"presupuesto_go",
-                    "editar"=>false,
-                    // "idEditar"=>['id_usuario'=>$data['id_usuario']]
-                ];
-                foreach($datosCombinados as $d){
-                    $dataInsert = [
-                            "id_reserva"     => $id_reserva,
-                            "id_proyecto"    => $d['proyecto'],
-                            "id_partida"     => $d['partida'],
-                            "importe"        => $d['importe'], 
-                            "propina"        => $d['propina'],
-                            "fec_reg"        => $hoy, 
-                            "usu_reg"        => $session->get('id_usuario')
-                            
-                        ];
-     
-                        $res = $globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
-                        if(!$res->error){
-                         $response->error = $res->error;
-                         $response->respuesta = $res->respuesta;
-                     
-                        }
-                }
-         }
-   // $this->enviarEmail();
+            }
+            $dataConfig = [
+                "tabla" => "presupuesto_go",
+                "editar" => false,
+                // "idEditar"=>['id_usuario'=>$data['id_usuario']]
+            ];
+            foreach ($datosCombinados as $d) {
+                $dataInsert = [
+                    "id_reserva" => $id_reserva,
+                    "id_proyecto" => $d['proyecto'],
+                    "id_partida" => $d['partida'],
+                    "importe" => $d['importe'],
+                    "propina" => $d['propina'],
+                    "fec_reg" => $hoy,
+                    "usu_reg" => $session->get('id_usuario')
 
-    return $this->respond($response);
+                ];
+
+                $res = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+                if (!$res->error) {
+                    $response->error = $res->error;
+                    $response->respuesta = $res->respuesta;
+
+                }
+            }
+        }
+        // $this->enviarEmail();
+
+        return $this->respond($response);
     }
     public function guardarReserva()
-    {  
-       
+    {
+
         $session = \Config\Services::session();
-        $email =  \Config\Services::email();
-        $globals      = new Mglobal;
+        $email = \Config\Services::email();
+        $globals = new Mglobal;
         $response = new \stdClass();
         $response->error = true;
         $response->respuesta = 'Error al Guardar los datos';
-        $data =  $this->request->getPost();
+        $data = $this->request->getPost();
         $ruta_absoluta = "";
         $ruta_relativa = "";
         $file = $this->request->getFile('instrumento');
-  
+
         if ($file && $file->isValid() && !$file->hasMoved()) {
 
             $maxSize = 1 * 1024 * 1024; // 1 MB
@@ -1089,101 +1130,101 @@ class Principal extends BaseController {
         }
 
 
-        if(isset($data['no_convenio']) && empty($data['no_convenio'])){
+        if (isset($data['no_convenio']) && empty($data['no_convenio'])) {
             $response->error = true;
             $response->respuesta = "El campo No. Convenio es requerido";
-             return $this->respond($response);
+            return $this->respond($response);
         }
-        $hoy = date("Y-m-d H:i:s"); 
+        $hoy = date("Y-m-d H:i:s");
         $folio = 'PT-' . date('YmdHis'); // Ejemplo: FOL-20250725133045
 
         $dataInsert = [
-            "id_proveedor"       => (int)$data['id_proveedor'],
-            "total_importe"      => $data['total_importe'],
-            "id_proveedor_banco" => (int)$data['banco'],
-            "fec_reg"            => $hoy,
-            "usu_reg"            => $session->get('id_usuario'),
-            "folio"              => $folio
+            "id_proveedor" => (int) $data['id_proveedor'],
+            "total_importe" => $data['total_importe'],
+            "id_proveedor_banco" => (int) $data['banco'],
+            "fec_reg" => $hoy,
+            "usu_reg" => $session->get('id_usuario'),
+            "folio" => $folio
         ];
-       if (!empty($ruta_relativa)) {
-            $dataInsert['instrumento']    = $ruta_relativa;
-            $dataInsert['ruta_absoluta']  = $ruta_absoluta;
-            $dataInsert['no_convenio']    = $data['no_convenio'];
+        if (!empty($ruta_relativa)) {
+            $dataInsert['instrumento'] = $ruta_relativa;
+            $dataInsert['ruta_absoluta'] = $ruta_absoluta;
+            $dataInsert['no_convenio'] = $data['no_convenio'];
         }
-        
-         $dataBitacora = ['id_user' =>  $session->get('id_usuario'), 'script' => 'Agregar.php/guardaReserva'];
-         $dataConfig = [
-            "tabla"=>"reserva",
-            "editar"=>false,
+
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaReserva'];
+        $dataConfig = [
+            "tabla" => "reserva",
+            "editar" => false,
             // "idEditar"=>['id_usuario'=>$data['id_usuario']]
         ];
-         $response = $globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
-       
-         if(!$response->error){
-             $id_reserva = $response->idRegistro;
-             $datosCombinados = [];
+        $response = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
 
-                // Verificar que todos los arrays tengan la misma longitud
-                if (count($data['proyecto']) === count($data['partida']) && count($data['partida']) === count($data['importe'])) {
-                    foreach ($data['proyecto'] as $index => $proyecto) {
-                        // Solo agregar si todos los valores existen
-                        if (!empty($data['proyecto']) && !empty($data['partida'][$index]) && !empty($data['importe'][$index])) {
-                            $datosCombinados[] = [
-                                'proyecto' => $proyecto,
-                                'partida' => $data['partida'][$index],
-                                'importe' => str_replace(',', '', $data['importe'][$index]) // Elimina comas del formato numérico
-                            ];
-                        }
+        if (!$response->error) {
+            $id_reserva = $response->idRegistro;
+            $datosCombinados = [];
+
+            // Verificar que todos los arrays tengan la misma longitud
+            if (count($data['proyecto']) === count($data['partida']) && count($data['partida']) === count($data['importe'])) {
+                foreach ($data['proyecto'] as $index => $proyecto) {
+                    // Solo agregar si todos los valores existen
+                    if (!empty($data['proyecto']) && !empty($data['partida'][$index]) && !empty($data['importe'][$index])) {
+                        $datosCombinados[] = [
+                            'proyecto' => $proyecto,
+                            'partida' => $data['partida'][$index],
+                            'importe' => str_replace(',', '', $data['importe'][$index]) // Elimina comas del formato numérico
+                        ];
                     }
                 }
-                  $dataConfig = [
-                    "tabla"=>"presupuesto",
-                    "editar"=>false,
-                    // "idEditar"=>['id_usuario'=>$data['id_usuario']]
-                ];
-                foreach($datosCombinados as $d){
-                    $dataInsert = [
-                            "id_reserva"     => $id_reserva,
-                            "id_proyecto"    => $d['proyecto'],
-                            "id_partida"     => $d['partida'],
-                            "importe"        => $d['importe'], 
-                            "fec_reg"        => $hoy, 
-                            "usu_reg"        => $session->get('id_usuario')
-                            
-                        ];
-     
-                        $res = $globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);
-                        if(!$res->error){
-                         $response->error = $res->error;
-                         $response->respuesta = $res->respuesta;
-                     
-                        }
-                }
-         }
-   // $this->enviarEmail();
+            }
+            $dataConfig = [
+                "tabla" => "presupuesto",
+                "editar" => false,
+                // "idEditar"=>['id_usuario'=>$data['id_usuario']]
+            ];
+            foreach ($datosCombinados as $d) {
+                $dataInsert = [
+                    "id_reserva" => $id_reserva,
+                    "id_proyecto" => $d['proyecto'],
+                    "id_partida" => $d['partida'],
+                    "importe" => $d['importe'],
+                    "fec_reg" => $hoy,
+                    "usu_reg" => $session->get('id_usuario')
 
-    return $this->respond($response);
+                ];
+
+                $res = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+                if (!$res->error) {
+                    $response->error = $res->error;
+                    $response->respuesta = $res->respuesta;
+
+                }
+            }
+        }
+        // $this->enviarEmail();
+
+        return $this->respond($response);
     }
-  
+
     private function enviarEmail()
     {
         $session = \Config\Services::session();
-        $email =  \Config\Services::email();
-        $globals      = new Mglobal;
+        $email = \Config\Services::email();
+        $globals = new Mglobal;
         $response = new \stdClass();
         $response->error = true;
         $response->respuesta = 'Error al enviar el correo';
 
-         /*  $email->setTo([
-            'alopez@guanajuato.gob.mx',
-            'negonzalez@guanajuato.gob.mx',
-            'dhernandezq@guanajuato.gob.mx'
-          ]);  */
+        /*  $email->setTo([
+           'alopez@guanajuato.gob.mx',
+           'negonzalez@guanajuato.gob.mx',
+           'dhernandezq@guanajuato.gob.mx'
+         ]);  */
 
-       $email->setTo('palafox.marin31@gmail.com'); // destinatario principal
+        $email->setTo('palafox.marin31@gmail.com'); // destinatario principal
         // $email->setCC(['palafox.marin@hotmail.com', 'palafox.marin31@gmail.com']); // copia visible
-         //$email->setCC(['negonzalez@guanajuato.gob.mx ', 'dhernandezq@guanajuato.gob.mx']); // copia visible
-     //   $email->setBCC(['a.palafoxm@guanajuato.gob.com']); // copia oculta
+        //$email->setCC(['negonzalez@guanajuato.gob.mx ', 'dhernandezq@guanajuato.gob.mx']); // copia visible
+        //   $email->setBCC(['a.palafoxm@guanajuato.gob.com']); // copia oculta
         $email->setSubject('Carga de Reserva');
         $email->setMessage('
             <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
@@ -1198,7 +1239,7 @@ class Principal extends BaseController {
                         <p style="font-size: 16px;">ha registrado una <strong>RESERVA</strong> en el sistema SUSI.</p>
                         <p style="font-size: 15px;">Para los labores correspondientes.</p>
                         <p style="font-size: 15px; color: #888;">Este correo ha sido generado automáticamente por el sistema SUSI. No es necesario responder a este mensaje.</p>
-                        <p style="font-size: 15px; color: #888;">Link: ' .  base_url() . 'index.php/Principal/listaReservaPT</p>
+                        <p style="font-size: 15px; color: #888;">Link: ' . base_url() . 'index.php/Principal/listaReservaPT</p>
                     </div>
                     <!-- Pie de página -->
                     <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 13px; color: #666;">
@@ -1207,27 +1248,27 @@ class Principal extends BaseController {
                 </div>
             </div>
         ');                      // Intentar enviar el correo
-       if ($email->send()) {
-          $response->error = false;
-          $response->respuesta = "Correo enviado correctamente.";
+        if ($email->send()) {
+            $response->error = false;
+            $response->respuesta = "Correo enviado correctamente.";
         } else {
-          $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
-        } 
+            $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
+        }
     }
     private function envioCorreoJefeInmediato()
     {
         $session = \Config\Services::session();
-        $email =  \Config\Services::email();
-        $globals      = new Mglobal;
+        $email = \Config\Services::email();
+        $globals = new Mglobal;
         $response = new \stdClass();
         $response->error = true;
 
-        $id_jefe_inmediato = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => [ 'id_usuario' => $session->get('id_usuario'), 'visible' => 1]])->data[0]->id_jefe_inmediato;
+        $id_jefe_inmediato = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['id_usuario' => $session->get('id_usuario'), 'visible' => 1]])->data[0]->id_jefe_inmediato;
         $correoJefe = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['id_usuario' => $id_jefe_inmediato, 'visible' => 1]])->data[0]->correo;
 
-       $email->setTo($correoJefe);
+        $email->setTo($correoJefe);
 
-       $email->setSubject('Solicitud de Autorización de Incidencia');
+        $email->setSubject('Solicitud de Autorización de Incidencia');
 
         $email->setMessage('
             <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
@@ -1243,7 +1284,7 @@ class Principal extends BaseController {
                         <p style="font-size: 16px;">Le solicitamos amablemente su <strong>revisión y autorización</strong> para proceder con el trámite correspondiente.</p>
                         <p style="font-size: 15px;">Puede consultar y validar esta incidencia ingresando al sistema o siguiendo su flujo de aprobación.</p>
                         <p style="font-size: 15px; color: #888;">Este mensaje fue generado automáticamente por el sistema SUSI. No es necesario responder a este correo.</p>
-                        <p style="font-size: 15px; color: #888;">Link: <a href="'.base_url().'index.php/Principal/incidenciaSubordinado" target="_blank" >Ver incidencia</a></p>
+                        <p style="font-size: 15px; color: #888;">Link: <a href="' . base_url() . 'index.php/Principal/incidenciaSubordinado" target="_blank" >Ver incidencia</a></p>
                     </div>
                     <!-- Pie de página -->
                     <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 13px; color: #666;">
@@ -1252,100 +1293,100 @@ class Principal extends BaseController {
                 </div>
             </div>
         ');
-                  // Intentar enviar el correo
-       if ($email->send()) {
-          $response->error = false;
-          $response->respuesta = "Correo enviado correctamente.";
+        // Intentar enviar el correo
+        if ($email->send()) {
+            $response->error = false;
+            $response->respuesta = "Correo enviado correctamente.";
         } else {
-          $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
-        }  
+            $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
+        }
         return $this->respond($response);
 
     }
-      public function guardarSemana()
-    {  
+    public function guardarSemana()
+    {
         $session = \Config\Services::session();
-        $globals      = new Mglobal;
+        $globals = new Mglobal;
         $response = new \stdClass();
         $response->error = true;
         $response->respuesta = 'Error al optener los datos';
-        $data =  $this->request->getPost();
+        $data = $this->request->getPost();
         list($iniStr, $finStr) = array_map('trim', explode('-', $data['datetimes']));
 
         $ini = date('Y-m-d', strtotime($iniStr));
         $fin = date('Y-m-d', strtotime($finStr));
         $dataInsert = [
-            "id_usuario"    => (int)$session->get('id_usuario'),
-            "id_estatus"    => 1,
-            "cat_id_incidencia" => (int)$data['tipo_incidencia'],
-            "hora_inicio"   => '8:30:00',
-            "hora_fin"      => '16:00:00',
-            "fecha"         => $data['datetimes'],
-            "tipo"          => 2,
-            "fecha_inicio"  => $ini,
-            "fecha_fin"     => $fin,
-            "comentario"    => $data['comentario'],
-            "detalles"      => $data['detalles'],
-            "usu_reg"       => (int)$session->get('id_usuario'),
-            "fec_reg"       => date('Y-m-d H:i:s')
-        ]; 
-           $dataConfig = [
-                "tabla"     => "incidencia",
-                 "editar"   => false,
-                ];
-        $result = $globals->saveTabla($dataInsert, $dataConfig, ["script" => "guardar.incidencia"]);  
-        if(!$result->error){
-           $response->error= false; 
-           $response->respuesta= $result->respuesta; 
+            "id_usuario" => (int) $session->get('id_usuario'),
+            "id_estatus" => 1,
+            "cat_id_incidencia" => (int) $data['tipo_incidencia'],
+            "hora_inicio" => '8:30:00',
+            "hora_fin" => '16:00:00',
+            "fecha" => $data['datetimes'],
+            "tipo" => 2,
+            "fecha_inicio" => $ini,
+            "fecha_fin" => $fin,
+            "comentario" => $data['comentario'],
+            "detalles" => $data['detalles'],
+            "usu_reg" => (int) $session->get('id_usuario'),
+            "fec_reg" => date('Y-m-d H:i:s')
+        ];
+        $dataConfig = [
+            "tabla" => "incidencia",
+            "editar" => false,
+        ];
+        $result = $globals->saveTabla($dataInsert, $dataConfig, ["script" => "guardar.incidencia"]);
+        if (!$result->error) {
+            $response->error = false;
+            $response->respuesta = $result->respuesta;
         }
-        $this->envioCorreoJefeInmediato(); 
+        $this->envioCorreoJefeInmediato();
         return $this->respond($response);
     }
     public function guardarMes()
-    {  
+    {
         $session = \Config\Services::session();
-        $globals      = new Mglobal;
+        $globals = new Mglobal;
         $response = new \stdClass();
         $response->error = true;
         $response->respuesta = 'Error al optener los datos';
-        $data =  $this->request->getPost();
+        $data = $this->request->getPost();
         $dataInsert = [
-            "id_usuario"    => (int)$session->get('id_usuario'),
-            "id_estatus"    => 1,
-            "cat_id_incidencia" => (int)$data['tipo_incidencia'],
-            "hora_inicio"   => '8:30:00',
-            "hora_fin"      => '16:00:00',
-            "fecha"         => date('d/m/Y', strtotime($data['fecha_inicio'])).' - '.date('d/m/Y', strtotime($data['fecha_fin'])),
-            "tipo"          => 3,
-            "fecha_inicio"  => $data['fecha_inicio'],
-            "fecha_fin"     => $data['fecha_fin'],
-            "comentario"    => $data['comentario'],
-            "detalles"      => $data['detalles'],
-            "usu_reg"       => (int)$session->get('id_usuario'),
-            "fec_reg"       => date('Y-m-d H:i:s')
-        ]; 
-           $dataConfig = [
-                "tabla"     => "incidencia",
-                 "editar"   => false,
-                ];
-        $result = $globals->saveTabla($dataInsert, $dataConfig, ["script" => "guardar.incidencia"]);  
-        if(!$result->error){
-           $response->error= false; 
-           $response->respuesta= $result->respuesta; 
+            "id_usuario" => (int) $session->get('id_usuario'),
+            "id_estatus" => 1,
+            "cat_id_incidencia" => (int) $data['tipo_incidencia'],
+            "hora_inicio" => '8:30:00',
+            "hora_fin" => '16:00:00',
+            "fecha" => date('d/m/Y', strtotime($data['fecha_inicio'])) . ' - ' . date('d/m/Y', strtotime($data['fecha_fin'])),
+            "tipo" => 3,
+            "fecha_inicio" => $data['fecha_inicio'],
+            "fecha_fin" => $data['fecha_fin'],
+            "comentario" => $data['comentario'],
+            "detalles" => $data['detalles'],
+            "usu_reg" => (int) $session->get('id_usuario'),
+            "fec_reg" => date('Y-m-d H:i:s')
+        ];
+        $dataConfig = [
+            "tabla" => "incidencia",
+            "editar" => false,
+        ];
+        $result = $globals->saveTabla($dataInsert, $dataConfig, ["script" => "guardar.incidencia"]);
+        if (!$result->error) {
+            $response->error = false;
+            $response->respuesta = $result->respuesta;
         }
-        $this->envioCorreoJefeInmediato(); 
+        $this->envioCorreoJefeInmediato();
         return $this->respond($response);
     }
     public function guardarIncidencia()
-    {  
+    {
         $session = \Config\Services::session();
-        $globals      = new Mglobal;
+        $globals = new Mglobal;
         $response = new \stdClass();
         $response->error = true;
         $response->respuesta = 'Error al optener los datos';
-        $data =  $this->request->getPost();
+        $data = $this->request->getPost();
 
-        if(empty($data['tipo_incidencia'] ) || $data['tipo_incidencia']  == 0){
+        if (empty($data['tipo_incidencia']) || $data['tipo_incidencia'] == 0) {
             $response->error = true;
             $response->respuesta = 'Es requerido el tipo de incidencia';
             return $this->respond($response);
@@ -1354,11 +1395,11 @@ class Principal extends BaseController {
         $fecha = $data['fecha'];
         $diaSemana = date('N', strtotime($fecha));
 
-        if($data['tipo_incidencia'] == 9){
+        if ($data['tipo_incidencia'] == 9) {
             if ($diaSemana == 1 || $diaSemana == 5) {
-                 $response->error = true;
-                 $response->respuesta = 'La fecha no puede ser lunes ni viernes';
-                 return $this->respond($response);
+                $response->error = true;
+                $response->respuesta = 'La fecha no puede ser lunes ni viernes';
+                return $this->respond($response);
             }
         }
         if ($data['tipo_incidencia'] == 1) {
@@ -1366,20 +1407,20 @@ class Principal extends BaseController {
             if (strtotime($hora_fin) >= strtotime('16:00:00')) {
                 $hora_fin = "16:00:00";
             }
-        } 
-       if ($data['tipo_incidencia'] == 11) {
+        }
+        if ($data['tipo_incidencia'] == 11) {
             $hora_inicio = $data['hora_inicio'];
-            $hora_fin    = $data['hora_fin'];
+            $hora_fin = $data['hora_fin'];
 
             // Crear objetos DateTime
             $inicio = new DateTime($hora_inicio);
-            $fin    = new DateTime($hora_fin);
+            $fin = new DateTime($hora_fin);
 
             // Calcular diferencia
             $diff = $inicio->diff($fin);
 
             // Pasar todo a horas decimales
-            $horas = $diff->h + ($diff->days * 24); 
+            $horas = $diff->h + ($diff->days * 24);
             $minutos = $diff->i;
             $totalHoras = $horas + ($minutos / 60);
 
@@ -1390,684 +1431,691 @@ class Principal extends BaseController {
                 return $this->respond($response);
             }
         }
-   /*      if ((int)$data['tipo_incidencia'] === 10) {
-            $horaInicio = $data['hora_inicio'] ?? null; // "HH:MM" o "HH:MM:SS"
-            $horaFin    = $data['hora_fin']    ?? null;
+        /*      if ((int)$data['tipo_incidencia'] === 10) {
+                 $horaInicio = $data['hora_inicio'] ?? null; // "HH:MM" o "HH:MM:SS"
+                 $horaFin    = $data['hora_fin']    ?? null;
 
-            // Normaliza a HH:MM:SS si vienen en HH:MM
-            $horaInicio = $horaInicio && strlen($horaInicio) === 5 ? $horaInicio . ':00' : $horaInicio;
-            $horaFin    = $horaFin    && strlen($horaFin) === 5    ? $horaFin    . ':00' : $horaFin;
+                 // Normaliza a HH:MM:SS si vienen en HH:MM
+                 $horaInicio = $horaInicio && strlen($horaInicio) === 5 ? $horaInicio . ':00' : $horaInicio;
+                 $horaFin    = $horaFin    && strlen($horaFin) === 5    ? $horaFin    . ':00' : $horaFin;
 
-            // Reglas
-            $permiteEntradaManana = $horaInicio && strtotime($horaInicio) <= strtotime('09:30:00');
-            $permiteSalidaTres    = $horaFin    && strtotime($horaFin)    === strtotime('15:00:00');
+                 // Reglas
+                 $permiteEntradaManana = $horaInicio && strtotime($horaInicio) <= strtotime('09:30:00');
+                 $permiteSalidaTres    = $horaFin    && strtotime($horaFin)    === strtotime('15:00:00');
 
-            if (!($permiteEntradaManana || $permiteSalidaTres)) {
-                $response->error  = true;
-                $response->respuesta = 'Para esta incidencia sólo se permite entrada antes o a las 09:30, o salida exactamente a las 15:00.';
-                 return $this->respond($response);
-            }
+                 if (!($permiteEntradaManana || $permiteSalidaTres)) {
+                     $response->error  = true;
+                     $response->respuesta = 'Para esta incidencia sólo se permite entrada antes o a las 09:30, o salida exactamente a las 15:00.';
+                      return $this->respond($response);
+                 }
 
-        } */
+             } */
 
 
 
         $dataInsert = [
-            "hora_inicio"        => $data['hora_inicio'],
-            "hora_fin"           => (isset($hora_fin) && !empty($hora_fin))?$hora_fin:$data['hora_fin'],
-            "hora_fin_real"      => $data['hora_fin'],
-            "cat_id_incidencia"  => (int)$data['tipo_incidencia'],
-            "fecha"              => $data['fecha'],
-            "tipo"              => 1,
-            "fecha_inicio"       => $data['fecha'],
-            "fecha_fin"          => $data['fecha'],
-            "comentario"         => $data['comentario'],
-            "detalles"           => $data['detalles'],
-            "id_usuario"         => $session->get('id_usuario'),
-            "usu_reg"            => $session->get('id_usuario'),
-            "fec_reg"            => date('Y-m-d H:i:s'),
-        ]; 
-           $dataConfig = [
-                "tabla"     => "incidencia",
-                 "editar"   => false,
-                ];
-        $result = $globals->saveTabla($dataInsert, $dataConfig, ["script" => "guardar.incidencia"]);  
-        if(!$result->error){
-           $response->error= false; 
-           $response->respuesta= $result->respuesta; 
+            "hora_inicio" => $data['hora_inicio'],
+            "hora_fin" => (isset($hora_fin) && !empty($hora_fin)) ? $hora_fin : $data['hora_fin'],
+            "hora_fin_real" => $data['hora_fin'],
+            "cat_id_incidencia" => (int) $data['tipo_incidencia'],
+            "fecha" => $data['fecha'],
+            "tipo" => 1,
+            "fecha_inicio" => $data['fecha'],
+            "fecha_fin" => $data['fecha'],
+            "comentario" => $data['comentario'],
+            "detalles" => $data['detalles'],
+            "id_usuario" => $session->get('id_usuario'),
+            "usu_reg" => $session->get('id_usuario'),
+            "fec_reg" => date('Y-m-d H:i:s'),
+        ];
+        $dataConfig = [
+            "tabla" => "incidencia",
+            "editar" => false,
+        ];
+        $result = $globals->saveTabla($dataInsert, $dataConfig, ["script" => "guardar.incidencia"]);
+        if (!$result->error) {
+            $response->error = false;
+            $response->respuesta = $result->respuesta;
         }
         //$this->envioCorreoJefeInmediato(); 
         return $this->respond($response);
     }
     public function actualizarBanco()
-    {  
+    {
         $session = \Config\Services::session();
-        $globals      = new Mglobal;
+        $globals = new Mglobal;
         $response = new \stdClass();
         $response->error = true;
         $response->respuesta = 'Error al optener los datos';
-        $data =  $this->request->getPost();
+        $data = $this->request->getPost();
         $dataInsert = [
-            "banco"     =>  $data['banco'],
-            "no_cuenta" =>  $data['no_cuenta'],
-            "clabe"     =>  $data['clabe'],
-        ]; 
-           $dataConfig = [
-                "tabla"     => "proveedor_banco",
-                 "editar"   => true,
-                 "idEditar" => ["id_proveedor_banco" => $data['id_proveedor_banco']]
-                ];
-        $result = $globals->saveTabla($dataInsert, $dataConfig, ["script" => "proveedor_banco.editarBanco"]); 
-        if(!$result->error){
+            "banco" => $data['banco'],
+            "no_cuenta" => $data['no_cuenta'],
+            "clabe" => $data['clabe'],
+        ];
+        $dataConfig = [
+            "tabla" => "proveedor_banco",
+            "editar" => true,
+            "idEditar" => ["id_proveedor_banco" => $data['id_proveedor_banco']]
+        ];
+        $result = $globals->saveTabla($dataInsert, $dataConfig, ["script" => "proveedor_banco.editarBanco"]);
+        if (!$result->error) {
             $response->error = false;
             $response->respuesta = "Datos guardados correctamente";
-        }         
+        }
         return $this->respond($response);
     }
     public function eliminarBanco()
-    {  
+    {
         $session = \Config\Services::session();
-        $globals      = new Mglobal;
+        $globals = new Mglobal;
         $response = new \stdClass();
         $response->error = true;
         $response->respuesta = 'Error al optener los datos';
-        $id_proveedor_banco =  $this->request->getPost('id_proveedor_banco');
-     
-           $dataConfig = [
-                "tabla"     => "proveedor_banco",
-                 "editar"   => true,
-                 "idEditar" => ["id_proveedor_banco" => $id_proveedor_banco]
-                ];
-        $result = $globals->saveTabla(['visible'=> 0], $dataConfig, ["script" => "proveedor_banco.eliminarBanco"]); 
-        if(!$result->error){
+        $id_proveedor_banco = $this->request->getPost('id_proveedor_banco');
+
+        $dataConfig = [
+            "tabla" => "proveedor_banco",
+            "editar" => true,
+            "idEditar" => ["id_proveedor_banco" => $id_proveedor_banco]
+        ];
+        $result = $globals->saveTabla(['visible' => 0], $dataConfig, ["script" => "proveedor_banco.eliminarBanco"]);
+        if (!$result->error) {
             $response->error = false;
             $response->respuesta = "Datos guardados correctamente";
-        }         
+        }
         return $this->respond($response);
     }
     public function eliminarProveedor()
-    {  
+    {
         $session = \Config\Services::session();
-        $globals      = new Mglobal;
+        $globals = new Mglobal;
         $response = new \stdClass();
         $response->error = true;
         $response->respuesta = 'Error al optener los datos';
-        $id_proveedor =  $this->request->getPost('id_proveedor');
+        $id_proveedor = $this->request->getPost('id_proveedor');
         $dataConfig = [
-                 "tabla"     => 'proveedor',
-                 "editar"   => true,
-                 "idEditar" => ['id_proveedor'=> $id_proveedor]
-                ];
-    
-        $result = $globals->saveTabla(['visible'=>0], $dataConfig, ["script" => "proveedo.eliminarProveedor"]); 
-        if(!$result->error){
-           $response->error = false;
-           $response->respuesta = $result->respuesta;
+            "tabla" => 'proveedor',
+            "editar" => true,
+            "idEditar" => ['id_proveedor' => $id_proveedor]
+        ];
+
+        $result = $globals->saveTabla(['visible' => 0], $dataConfig, ["script" => "proveedo.eliminarProveedor"]);
+        if (!$result->error) {
+            $response->error = false;
+            $response->respuesta = $result->respuesta;
         }
         return $this->respond($response);
     }
     public function agregarProveedor()
-    {  
+    {
         $session = \Config\Services::session();
-        $globals      = new Mglobal;
+        $globals = new Mglobal;
         $response = new \stdClass();
         $response->error = true;
         $response->respuesta = 'Error al optener los datos';
-        $data =  $this->request->getPost();
-     
+        $data = $this->request->getPost();
+
         $dataConfig = [
-                "tabla"   => 'proveedor',
-                 "editar" => false
-                ];
+            "tabla" => 'proveedor',
+            "editar" => false
+        ];
         $dataInsert = [
-                "id_tipo_proveedor" => 1,
-                "razon_social"      => $data['razon_social'],
-                "no_proveedor"      => $data['no_proveedor'],
-                "rfc"               => $data['rfc'],
-                ];
-        $result = $globals->saveTabla($dataInsert, $dataConfig, ["script" => "proveedo.agregarProveedo"]); 
-        if(!$result->error){
-           $response->error = false;
-           $response->respuesta = $result->respuesta;
+            "id_tipo_proveedor" => 1,
+            "razon_social" => $data['razon_social'],
+            "no_proveedor" => $data['no_proveedor'],
+            "rfc" => $data['rfc'],
+        ];
+        $result = $globals->saveTabla($dataInsert, $dataConfig, ["script" => "proveedo.agregarProveedo"]);
+        if (!$result->error) {
+            $response->error = false;
+            $response->respuesta = $result->respuesta;
         }
         return $this->respond($response);
     }
     public function agregarBanco()
-    {  
+    {
         $session = \Config\Services::session();
-        $globals      = new Mglobal;
+        $globals = new Mglobal;
         $response = new \stdClass();
         $response->error = true;
         $response->respuesta = 'Error al optener los datos';
-        $data =  $this->request->getPost();
+        $data = $this->request->getPost();
         $dataConfig = [
-                "tabla"   => 'proveedor_banco',
-                 "editar" => false
-                ];
+            "tabla" => 'proveedor_banco',
+            "editar" => false
+        ];
         $dataInsert = [
-                "idproveedor" => $data['id_proveedor'],
-                "banco"       => $data['banco'],
-                "no_cuenta"   => $data['no_cuenta'],
-                "clabe"       => $data['clabe'],
-                ];
-        $result = $globals->saveTabla($dataInsert, $dataConfig, ["script" => "proveedor_banco.agregarBanco"]); 
-        if(!$result->error){
-           $response->error = false;
-           $response->respuesta = $result->respuesta;
+            "idproveedor" => $data['id_proveedor'],
+            "banco" => $data['banco'],
+            "no_cuenta" => $data['no_cuenta'],
+            "clabe" => $data['clabe'],
+        ];
+        $result = $globals->saveTabla($dataInsert, $dataConfig, ["script" => "proveedor_banco.agregarBanco"]);
+        if (!$result->error) {
+            $response->error = false;
+            $response->respuesta = $result->respuesta;
         }
         return $this->respond($response);
     }
- 
+
     public function getProveedor()
-    {  
+    {
         $session = \Config\Services::session();
-        $globals      = new Mglobal;
+        $globals = new Mglobal;
         $response = new \stdClass();
         $response->error = true;
         $response->respuesta = 'Error al optener los datos';
-        $id_proveedor =  $this->request->getPost('id_proveedor');
-        $proveedor    = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1, 'id_proveedor' => $id_proveedor]]);
-        $proveedor_banco    = $globals->getTabla(['tabla' => 'proveedor_banco', 'where' => ['visible' => 1, 'idproveedor' => $id_proveedor]]);
-        if(!$proveedor->error){
-          $response->error = false;
-          $response->respuesta = $proveedor->respuesta;
-          $response->data['proveedor'] = (isset($proveedor->data) && !empty($proveedor->data))?$proveedor->data[0]:[];
-          $response->data['proveedor_banco'] = (isset($proveedor_banco->data) && !empty($proveedor_banco->data))?$proveedor_banco->data:[];
-        }              
-         return $this->respond($response);
+        $id_proveedor = $this->request->getPost('id_proveedor');
+        $proveedor = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1, 'id_proveedor' => $id_proveedor]]);
+        $proveedor_banco = $globals->getTabla(['tabla' => 'proveedor_banco', 'where' => ['visible' => 1, 'idproveedor' => $id_proveedor]]);
+        if (!$proveedor->error) {
+            $response->error = false;
+            $response->respuesta = $proveedor->respuesta;
+            $response->data['proveedor'] = (isset($proveedor->data) && !empty($proveedor->data)) ? $proveedor->data[0] : [];
+            $response->data['proveedor_banco'] = (isset($proveedor_banco->data) && !empty($proveedor_banco->data)) ? $proveedor_banco->data : [];
+        }
+        return $this->respond($response);
     }
     public function listadoProveedores()
-    {  
+    {
         $session = \Config\Services::session();
-        $globals      = new Mglobal;
-        $proveedor    = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit'=>50]);
-        $data['proveedor']    = (!empty($proveedor->data))?$proveedor->data:[];
+        $globals = new Mglobal;
+        $proveedor = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit' => 50]);
+        $data['proveedor'] = (!empty($proveedor->data)) ? $proveedor->data : [];
         $data['scripts'] = array('inicio');
         $data['edita'] = 0;
-        $data['contentView'] = 'secciones/vListadoProveedor';                
-        $this->_renderView($data); 
+        $data['contentView'] = 'secciones/vListadoProveedor';
+        $this->_renderView($data);
     }
     public function formContrasenia()
     {
         $session = \Config\Services::session();
-        $globals      = new Mglobal;
+        $globals = new Mglobal;
         $response = new \stdClass();
         $response->error = true;
         $data = $this->request->getPost();
-        if($data['contrasenia'] != $data['new_contrasenia']){
+        if ($data['contrasenia'] != $data['new_contrasenia']) {
             $response->respuesta = "Las contraseñas no coinciden";
             return $this->respond($response);
         }
-        if($data['contrasenia'] == '' || $data['new_contrasenia']==''){
-           $response->respuesta = "Los campos son requeridos";
+        if ($data['contrasenia'] == '' || $data['new_contrasenia'] == '') {
+            $response->respuesta = "Los campos son requeridos";
             return $this->respond($response);
         }
-        $dataInsert=[
-            "contrasenia"=>md5($data['contrasenia']),
-            "usu_act"   =>$session->id_usuario
+        $dataInsert = [
+            "contrasenia" => md5($data['contrasenia']),
+            "usu_act" => $session->id_usuario
         ];
-         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Principal.php/cambioContrasenia'];
-          $dataConfig = [
-                "tabla" => "usuario",
-                "editar" => true,
-                "idEditar" => ['id_usuario' => $session->id_usuario]
-            ];
-         $response = $globals->saveTabla($dataInsert, $dataConfig,$dataBitacora);
-         return $this->respond($response);
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Principal.php/cambioContrasenia'];
+        $dataConfig = [
+            "tabla" => "usuario",
+            "editar" => true,
+            "idEditar" => ['id_usuario' => $session->id_usuario]
+        ];
+        $response = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+        return $this->respond($response);
 
     }
     public function formComentario()
     {
         $session = \Config\Services::session();
-        $globals      = new Mglobal;
+        $globals = new Mglobal;
         $response = new \stdClass();
         $response->error = true;
         $data = $this->request->getPost();
 
-        if(empty($data['comentario'])){
+        if (empty($data['comentario'])) {
             $response->respuesta = "Es requerido el comentario";
             return $this->respond($response);
         }
 
-        $dataInsert=[
-            "comentario"=>$data['comentario'],
-            "id_usuario"=>$session->id_usuario,
-            "fec_reg"   =>date('Y-m-d'),
-            "usu_act"   =>$session->id_usuario
+        $dataInsert = [
+            "comentario" => $data['comentario'],
+            "id_usuario" => $session->id_usuario,
+            "fec_reg" => date('Y-m-d'),
+            "usu_act" => $session->id_usuario
         ];
-         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Principal.php/guardarComentario'];
-          $dataConfig = [
-                "tabla" => "comentarios",
-                "editar" => false,
-                //"idEditar" => ['id_area' => (int)$data['id_area']]
-            ];
-         $response = $globals->saveTabla($dataInsert, $dataConfig,$dataBitacora);
-         return $this->respond($response);
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Principal.php/guardarComentario'];
+        $dataConfig = [
+            "tabla" => "comentarios",
+            "editar" => false,
+            //"idEditar" => ['id_area' => (int)$data['id_area']]
+        ];
+        $response = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+        return $this->respond($response);
 
     }
     public function deleteActividad()
     {
         $session = \Config\Services::session();
-        $globals         = new Mglobal;
-        $id_actividad =  $this->request->getPost('id_actividad');
+        $globals = new Mglobal;
+        $id_actividad = $this->request->getPost('id_actividad');
         $response = new \stdClass();
-           $dataBitacora = ['id_user' =>  $session->id_usuario, 'script' => 'Principal.php/eliminarActividad'];
-           $dataConfig = [
-                "tabla"=>"actividad",
-                "editar"=>true,
-                "idEditar" => ['id_actividad' => $id_actividad]
-            ];
-          
-           $sala = $globals->saveTabla(['visible' => 0],$dataConfig,$dataBitacora);
-           if(!$sala->error){
-            $response->error     = $sala->error;
+        $dataBitacora = ['id_user' => $session->id_usuario, 'script' => 'Principal.php/eliminarActividad'];
+        $dataConfig = [
+            "tabla" => "actividad",
+            "editar" => true,
+            "idEditar" => ['id_actividad' => $id_actividad]
+        ];
+
+        $sala = $globals->saveTabla(['visible' => 0], $dataConfig, $dataBitacora);
+        if (!$sala->error) {
+            $response->error = $sala->error;
             $response->respuesta = $sala->respuesta;
-           }
-        
-         return $this->respond($response);
+        }
+
+        return $this->respond($response);
 
     }
     public function Personal()
     {
         $session = \Config\Services::session();
-        $globals   = new Mglobal;
-        $personal  = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['id_jefe_inmediato' => $session->id_usuario, 'visible' => 1 ]]);
-        $actividad = $globals->getTabla(['tabla' => 'vw_actividad', 'where' => ['usu_reg' => $session->id_usuario, 'visible' => 1 ]]);
-       
-        $data['personal'] = (!empty($personal->data))?$personal->data:[];
-        $data['actividad']= (!empty($actividad->data))?$actividad->data:[];
+        $globals = new Mglobal;
+        $personal = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['id_jefe_inmediato' => $session->id_usuario, 'visible' => 1]]);
+        $actividad = $globals->getTabla(['tabla' => 'vw_actividad', 'where' => ['usu_reg' => $session->id_usuario, 'visible' => 1]]);
+
+        $data['personal'] = (!empty($personal->data)) ? $personal->data : [];
+        $data['actividad'] = (!empty($actividad->data)) ? $actividad->data : [];
         $data['scripts'] = array('inicio');
-       
-        $data['contentView'] = 'personal/vPersonal';                
-        $this->_renderView($data); 
+
+        $data['contentView'] = 'personal/vPersonal';
+        $this->_renderView($data);
     }
     public function incidenciaSubordinado()
     {
         $session = \Config\Services::session();
-        $globals      = new Mglobal;
-        $incidencia    = $globals->getTabla(['tabla' => 'vw_incidenica', 'where' => ['visible' => 1, 'id_jefe_inmediato' => $session->get('id_usuario')]]);
-         $Periodo= ['tabla' => 'cat_periodo', 'where' => ['visible' => 1]];
-       $usuario = [
-            'tabla'   => 'vw_incidenica',
-            'select'  => ['id_usuario', 'nombre_completo'],
-            'where'   => ['visible' => 1],
+        $globals = new Mglobal;
+        $incidencia = $globals->getTabla([
+            'tabla' => 'vw_incidenica',
+            'where' => [
+                'visible'    => 1,
+                'id_jefe_inmediato' => $session->get('id_usuario')
+            ],
+        ]);
+      
+        $Periodo = ['tabla' => 'cat_periodo', 'where' => ['visible' => 1]];
+        $usuario = [
+            'tabla' => 'vw_incidenica',
+            'select' => ['id_usuario', 'nombre_completo'],
+            'where' => ['visible' => 1],
             'groupBy' => ['id_usuario']
-            ];
-        $periodo  = $globals->getTabla($Periodo);
-        $usuario  = $globals->getTabla($usuario);
-        $data['periodo']     = (isset($periodo->data) && !empty($periodo->data))?$periodo->data:[];
-        $data['usuario']     = (isset($usuario->data) && !empty($usuario->data))?$usuario->data:[];
-     
-          $data['incidencia'] = [];
+        ];
+        $periodo = $globals->getTabla($Periodo);
+        $usuario = $globals->getTabla($usuario);
+        $data['periodo'] = (isset($periodo->data) && !empty($periodo->data)) ? $periodo->data : [];
+        $data['usuario'] = (isset($usuario->data) && !empty($usuario->data)) ? $usuario->data : [];
 
-                    if (isset($incidencia->data) && !empty($incidencia->data)) {
-                        foreach ($incidencia->data as $item) {
-                            $fecha = $item->fecha;
+        $data['incidencia'] = [];
 
-                            // Detectar si es rango tipo "08/18/2025 - 08/22/2025"
-                            if (preg_match('/\d{2}\/\d{2}\/\d{4}\s*-\s*\d{2}\/\d{2}\/\d{4}/', $fecha)) {
-                                list($iniStr, $finStr) = array_map('trim', explode('-', $fecha));
+        if (isset($incidencia->data) && !empty($incidencia->data)) {
+            foreach ($incidencia->data as $item) {
+                $fecha = $item->fecha;
 
-                                $ini = DateTime::createFromFormat('m/d/Y', $iniStr);
-                                $fin = DateTime::createFromFormat('m/d/Y', $finStr);
+                // Detectar si es rango tipo "08/18/2025 - 08/22/2025"
+                if (preg_match('/\d{2}\/\d{2}\/\d{4}\s*-\s*\d{2}\/\d{2}\/\d{4}/', $fecha)) {
+                    list($iniStr, $finStr) = array_map('trim', explode('-', $fecha));
 
-                                if ($ini && $fin) {
-                                    // FullCalendar → end es exclusivo: sumamos 1 día
-                                    $fin->modify('+1 day');
+                    $ini = DateTime::createFromFormat('m/d/Y', $iniStr);
+                    $fin = DateTime::createFromFormat('m/d/Y', $finStr);
 
-                                    $item->start = $ini->format('Y-m-d');
-                                    $item->end   = $fin->format('Y-m-d');
-                                    $item->tipo  = 'semana';
-                                }
-                            } else {
-                                // Fecha simple: intentamos varios formatos
-                                $d = DateTime::createFromFormat('Y-m-d', $fecha) ?:
-                                    DateTime::createFromFormat('d/m/Y', $fecha) ?:
-                                    DateTime::createFromFormat('m/d/Y', $fecha);
+                    if ($ini && $fin) {
+                        // FullCalendar → end es exclusivo: sumamos 1 día
+                        $fin->modify('+1 day');
 
-                                if ($d) {
-                                    $fin = clone $d;
-                                    $fin->modify('+1 day');
-
-                                    $item->start = $d->format('Y-m-d');
-                                    $item->end   = $fin->format('Y-m-d');
-                                    $item->tipo  = 'dia';
-                                }
-                            }
-
-                            $data['incidencia'][] = $item;
-                        }
+                        $item->start = $ini->format('Y-m-d');
+                        $item->end = $fin->format('Y-m-d');
+                        $item->tipo = 'semana';
                     }
+                } else {
+                    // Fecha simple: intentamos varios formatos
+                    $d = DateTime::createFromFormat('Y-m-d', $fecha) ?:
+                        DateTime::createFromFormat('d/m/Y', $fecha) ?:
+                        DateTime::createFromFormat('m/d/Y', $fecha);
+
+                    if ($d) {
+                        $fin = clone $d;
+                        $fin->modify('+1 day');
+
+                        $item->start = $d->format('Y-m-d');
+                        $item->end = $fin->format('Y-m-d');
+                        $item->tipo = 'dia';
+                    }
+                }
+
+                $data['incidencia'][] = $item;
+            }
+        }
         //var_dump(  $data['incidencia'] );
         //die();
         $data['scripts'] = array('inicio', 'principal');
-        $data['contentView'] = 'secciones/vListaIncidencia';                
-        $this->_renderView($data); 
+        $data['contentView'] = 'secciones/vListaIncidencia';
+        $this->_renderView($data);
     }
-   
+
     public function getVehiculo()
     {
-        $session             = \Config\Services::session();
+        $session = \Config\Services::session();
         $response = new \stdClass();
-        $id_vehiculo          = $this->request->getPost('id_vehiculo');
-        $response->error     = true;
+        $id_vehiculo = $this->request->getPost('id_vehiculo');
+        $response->error = true;
         $response->respuesta = 'Error en la base de datos';
         $principal = new Mglobal;
 
-     
-        $result = $principal->getTabla(['tabla' => 'vehiculo', 'where' => ['visible' => 1, 'id_vehiculo'=>$id_vehiculo]]);
-  
-        if(!$result->error){
-           $response->error     = $result->error;
-           $response->respuesta = $result->respuesta;
-           $response->data      = $result->data[0];
+
+        $result = $principal->getTabla(['tabla' => 'vehiculo', 'where' => ['visible' => 1, 'id_vehiculo' => $id_vehiculo]]);
+
+        if (!$result->error) {
+            $response->error = $result->error;
+            $response->respuesta = $result->respuesta;
+            $response->data = $result->data[0];
         }
         return $this->respond($response);
     }
     public function existeIncidencia()
     {
-        $session             = \Config\Services::session();
-        $response            = new \stdClass();
-        $fecha                = $this->request->getPost('fecha');
-        $response->error     = false;
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $fecha = $this->request->getPost('fecha');
+        $response->error = false;
         $response->respuesta = 'Error al guardar en la base de datos';
-        $principal           = new Mglobal;
-         $result = $principal->getTabla(['tabla' => 'incidencia', 'where' => ['visible' => 1, 'fecha'=>$fecha, 'id_usuario' => $session->get('id_usuario')]]);
-  
-        if(isset($result->data) && !empty($result->data)){
-           $response->error     = true;
-   
+        $principal = new Mglobal;
+        $result = $principal->getTabla(['tabla' => 'incidencia', 'where' => ['visible' => 1, 'fecha' => $fecha, 'id_usuario' => $session->get('id_usuario')]]);
+
+        if (isset($result->data) && !empty($result->data)) {
+            $response->error = true;
+
         }
         return $this->respond($response);
     }
     public function editarFic()
     {
-        $session             = \Config\Services::session();
-        $response            = new \stdClass();
-        $data                = $this->request->getPost();
-        $response->error     = true;
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $data = $this->request->getPost();
+        $response->error = true;
         $response->respuesta = 'Error al guardar en la base de datos';
-        $principal           = new Mglobal;
-        $dataBitacora        = ['id_user' => $session->get('id_usuario'), 'script' => 'Principal.php/guardaVehiculo'];
-       // die( var_dump($data) );
-       $dataConfig = [
-        'tabla' => 'proveedor',
-        'editar' => true,
-        'idEditar' => ['id_proveedor' => $data['id_proveedor']]
-       ];
-       $result = $principal->saveTabla(['fic' =>1],$dataConfig,$dataBitacora); 
-       if(!$result->error){
-          $response->error     = false;
-          $response->respuesta = $result->respuesta;
+        $principal = new Mglobal;
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Principal.php/guardaVehiculo'];
+        // die( var_dump($data) );
+        $dataConfig = [
+            'tabla' => 'proveedor',
+            'editar' => true,
+            'idEditar' => ['id_proveedor' => $data['id_proveedor']]
+        ];
+        $result = $principal->saveTabla(['fic' => 1], $dataConfig, $dataBitacora);
+        if (!$result->error) {
+            $response->error = false;
+            $response->respuesta = $result->respuesta;
 
-       }
-      return $this->respond($response);
+        }
+        return $this->respond($response);
 
     }
     public function guardarVehiculo()
     {
-        $session             = \Config\Services::session();
-        $response            = new \stdClass();
-        $data                = $this->request->getPost();
-        $response->error     = true;
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $data = $this->request->getPost();
+        $response->error = true;
         $response->respuesta = 'Error al guardar en la base de datos';
-        $principal           = new Mglobal;
-        $dataBitacora        = ['id_user' => $session->get('id_usuario'), 'script' => 'Principal.php/guardaVehiculo'];
+        $principal = new Mglobal;
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Principal.php/guardaVehiculo'];
         $dataInsert = [
-             'no_control'     => $data['no_control'],
-             'marca'          => $data['marca'],
-             'tipo'           => $data['tipo'],
-             'modelo'         => $data['modelo'],
-             'no_activo_fijo' => $data['no_activo_fijo'],
-             'no_tarjeta'     => $data['no_tarjeta'],
-             'dotacion'       => $data['dotacion'],
-             'placa'          => $data['placa'],
-             'no_serie'       => $data['no_serie'],
-             'id_usuario'     => $data['id_usuario']
+            'no_control' => $data['no_control'],
+            'marca' => $data['marca'],
+            'tipo' => $data['tipo'],
+            'modelo' => $data['modelo'],
+            'no_activo_fijo' => $data['no_activo_fijo'],
+            'no_tarjeta' => $data['no_tarjeta'],
+            'dotacion' => $data['dotacion'],
+            'placa' => $data['placa'],
+            'no_serie' => $data['no_serie'],
+            'id_usuario' => $data['id_usuario']
 
         ];
-       $dataConfig = [
-        'tabla' => 'vehiculo',
-        'editar' => true,
-        'idEditar' => ['id_vehiculo' => $data['id_vehiculo']]
-       ];
-       $result = $principal->saveTabla($dataInsert,$dataConfig,$dataBitacora); 
-       if(!$result->error){
-          $response->error     = false;
-          $response->respuesta = $result->respuesta;
+        $dataConfig = [
+            'tabla' => 'vehiculo',
+            'editar' => true,
+            'idEditar' => ['id_vehiculo' => $data['id_vehiculo']]
+        ];
+        $result = $principal->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+        if (!$result->error) {
+            $response->error = false;
+            $response->respuesta = $result->respuesta;
 
-       }
-      return $this->respond($response);
+        }
+        return $this->respond($response);
 
     }
-     public function listaReservaPT()
-    {  
-       
+    public function listaReservaPT()
+    {
+
         $session = \Config\Services::session();
-        $globals      = new Mglobal;
-        if(in_array($session->get('id_perfil'), [1,2])){
-            $reserva    = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1]]);
-        }else{
-            $reserva    = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['usu_reg' => $session->get('id_usuario'), 'visible' => 1]]);
+        $globals = new Mglobal;
+        if (in_array($session->get('id_perfil'), [1, 2])) {
+            $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1]]);
+        } else {
+            $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['usu_reg' => $session->get('id_usuario'), 'visible' => 1]]);
         }
-        
+
         $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
-        $cat_partida  = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
-        $proveedor    = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit'=>100]);
-        $data['reserva']    = (!empty($reserva->data))?$reserva->data:[];
+        $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $proveedor = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit' => 100]);
+        $data['reserva'] = (!empty($reserva->data)) ? $reserva->data : [];
         $data['scripts'] = array('inicio');
-        $data['cat_proyecto'] = (!empty($cat_proyecto->data))?$cat_proyecto->data:[];
-        $data['cat_partida']  = (!empty($cat_partida->data))?$cat_partida->data:[];
-        $data['contentView'] = 'secciones/vListadoReservaPT';                
+        $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
+        $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+        $data['contentView'] = 'secciones/vListadoReservaPT';
         $this->_renderView($data);
-        
+
     }
     public function listaReservaGO()
-    {  
-       
+    {
+
         $session = \Config\Services::session();
-        $globals      = new Mglobal;
-        if(in_array($session->get('id_perfil'), [1,2])){
-            $reserva    = $globals->getTabla(['tabla' => 'vw_lista_reserva_go', 'where' => ['visible' => 1]]);
-        }else{
-            $reserva    = $globals->getTabla(['tabla' => 'vw_lista_reserva_go', 'where' => ['usu_reg' => $session->get('id_usuario'), 'visible' => 1]]);
+        $globals = new Mglobal;
+        if (in_array($session->get('id_perfil'), [1, 2])) {
+            $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva_go', 'where' => ['visible' => 1]]);
+        } else {
+            $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva_go', 'where' => ['usu_reg' => $session->get('id_usuario'), 'visible' => 1]]);
         }
-      
+
         $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
-        $cat_partida  = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
-        $proveedor    = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit'=>100]);
-        $data['reserva']    = (!empty($reserva->data))?$reserva->data:[];
-       
+        $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $proveedor = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit' => 100]);
+        $data['reserva'] = (!empty($reserva->data)) ? $reserva->data : [];
+
         $data['scripts'] = array('inicio');
-        $data['cat_proyecto'] = (!empty($cat_proyecto->data))?$cat_proyecto->data:[];
-        $data['cat_partida']  = (!empty($cat_partida->data))?$cat_partida->data:[];
-        $data['contentView'] = 'secciones/vListadoReservaGO';                
+        $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
+        $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+        $data['contentView'] = 'secciones/vListadoReservaGO';
         $this->_renderView($data);
-        
+
     }
     public function listadoPT()
-    {  
-       
+    {
+
         $session = \Config\Services::session();
-        $globals      = new Mglobal;
-        $cat_perfil   = $globals->getTabla(['tabla' => 'perfil', 'where' => ['visible' => 1]]);
+        $globals = new Mglobal;
+        $cat_perfil = $globals->getTabla(['tabla' => 'perfil', 'where' => ['visible' => 1]]);
         $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
-        $cat_partida  = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
-        $proveedor    = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit'=>10]);
+        $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $proveedor = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit' => 10]);
         //die( var_dump( $proveedor ) );
-        $data['cat_perfil']   = (!empty($cat_perfil->data))?$cat_perfil->data:[];
-        $data['proveedor']    = (!empty($proveedor->data))?$proveedor->data:[];
-        $data['cat_proyecto'] = (!empty($cat_proyecto->data))?$cat_proyecto->data:[];
-        $data['cat_partida']  = (!empty($cat_partida->data))?$cat_partida->data:[];
-     
+        $data['cat_perfil'] = (!empty($cat_perfil->data)) ? $cat_perfil->data : [];
+        $data['proveedor'] = (!empty($proveedor->data)) ? $proveedor->data : [];
+        $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
+        $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+
         $data['scripts'] = array('inicio');
         $data['edita'] = 0;
         $data['PT'] = 1;
-        $data['contentView'] = 'secciones/vListadoPT';                
+        $data['contentView'] = 'secciones/vListadoPT';
         $this->_renderView($data);
-        
+
     }
 
-    public function listadoGo($id_registro_pt=null, $id_reserva  = null)
-    {  
-       
-        $session = \Config\Services::session();
-        $globals      = new Mglobal;
-        $cat_area  = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1 ]]);
-        if($id_reserva != 0){
-            $reserva   = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['id_reserva' => $id_reserva ]]);
-            $presupuesto   = $globals->getTabla(['tabla' => 'presupuesto', 'where' => ['id_reserva' => $id_reserva ]]);
-            $data['reserva']      = (!empty($reserva->data))?$reserva->data[0]:[];
-            $data['presupuesto']  = (!empty($presupuesto->data))?$presupuesto->data:[];
-        }
-        if(!empty($id_registro_pt)){
-            $registro_pt   = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1, 'id_registro_pt' =>$id_registro_pt ]]);
-            $data['registro_pt']  = (!empty($registro_pt->data))?$registro_pt->data[0]:[];
-        }
+    public function listadoGo($id_registro_pt = null, $id_reserva = null)
+    {
 
-  
-        $cat_perfil   = $globals->getTabla(['tabla' => 'perfil', 'where' => ['visible' => 1]]);
-        $cat_director_general = $globals->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1 ]]);
-        $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
-        $cat_usuario  = $globals->getTabla(['tabla' => 'cat_usuario', 'where' => ['visible' => 1]]);
-        $cat_partida  = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
-        $cat_area     = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
-        $cat_tipo     = $globals->getTabla(['tabla' => 'cat_tipo', 'where' => ['visible' => 1]]);
-        $secretario   = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1 ]]);
-        $cat_opcion   = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1 ]]);
-        $proveedor    = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit'=>10]);
-        $usuario      = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' =>$session->get('id_usuario') ]]);
-        $data['dsc_director_general'] = (!empty($cat_director_general->data))?$cat_director_general->data[0]->dsc_director_general:[];
-        $data['cat_tipo']             = (!empty($cat_tipo->data))?$cat_tipo->data:[];
-        $data['cat_opcion']           = (!empty($cat_opcion->data))?$cat_opcion->data:[];
-        $data['cat_perfil']           = (!empty($cat_perfil->data))?$cat_perfil->data:[];
-        $data['proveedor']            = (!empty($proveedor->data))?$proveedor->data:[];
-        $data['cat_proyecto']         = (!empty($cat_proyecto->data))?$cat_proyecto->data:[];
-        $data['secretario']           = (!empty($secretario->data))?$secretario->data:[];
-        $data['cat_partida']          = (!empty($cat_partida->data))?$cat_partida->data:[];
-        $data['cat_area']             = (!empty($cat_area->data))?$cat_area->data:[];
-        $data['usuario']              = (!empty($usuario->data))?$usuario->data[0]:[];
-        $data['cat_usuario']          = (!empty($cat_usuario->data))?$cat_usuario->data:[];
-        $data['scripts']              = array('inicio');
-        $data['edita']                = 0;
-        $data['contentView'] = 'personal/vFormularioGo';                
-        $this->_renderView($data);
-        
-    }
-    public function deletePT()
-    {  
         $session = \Config\Services::session();
         $globals = new Mglobal;
-        $id_registro_pt     = $this->request->getPost('id_registro_pt');
-   
-            $dataConfig = [
-                "tabla"=>"registro_pt",
-                "editar"=>true,
-                "idEditar"=>['id_registro_pt'=>$id_registro_pt]
-            ];
-    
-        
-        $response = $globals->saveTabla(['visible' => 0],$dataConfig,["script"=>"opciones.DeletePT"]);
+        $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
+        if ($id_reserva != 0) {
+            $reserva = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['id_reserva' => $id_reserva]]);
+            $presupuesto = $globals->getTabla(['tabla' => 'presupuesto', 'where' => ['id_reserva' => $id_reserva]]);
+            $data['reserva'] = (!empty($reserva->data)) ? $reserva->data[0] : [];
+            $data['presupuesto'] = (!empty($presupuesto->data)) ? $presupuesto->data : [];
+        }
+        if (!empty($id_registro_pt)) {
+            $registro_pt = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]]);
+            $data['registro_pt'] = (!empty($registro_pt->data)) ? $registro_pt->data[0] : [];
+        }
+
+
+        $cat_perfil = $globals->getTabla(['tabla' => 'perfil', 'where' => ['visible' => 1]]);
+        $cat_director_general = $globals->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1]]);
+        $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
+        $cat_usuario = $globals->getTabla(['tabla' => 'cat_usuario', 'where' => ['visible' => 1]]);
+        $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
+        $cat_tipo = $globals->getTabla(['tabla' => 'cat_tipo', 'where' => ['visible' => 1]]);
+        $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1]]);
+        $cat_opcion = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1]]);
+        $proveedor = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit' => 10]);
+        $usuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->get('id_usuario')]]);
+        $data['dsc_director_general'] = (!empty($cat_director_general->data)) ? $cat_director_general->data[0]->dsc_director_general : [];
+        $data['cat_tipo'] = (!empty($cat_tipo->data)) ? $cat_tipo->data : [];
+        $data['cat_opcion'] = (!empty($cat_opcion->data)) ? $cat_opcion->data : [];
+        $data['cat_perfil'] = (!empty($cat_perfil->data)) ? $cat_perfil->data : [];
+        $data['proveedor'] = (!empty($proveedor->data)) ? $proveedor->data : [];
+        $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
+        $data['secretario'] = (!empty($secretario->data)) ? $secretario->data : [];
+        $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+        $data['cat_area'] = (!empty($cat_area->data)) ? $cat_area->data : [];
+        $data['usuario'] = (!empty($usuario->data)) ? $usuario->data[0] : [];
+        $data['cat_usuario'] = (!empty($cat_usuario->data)) ? $cat_usuario->data : [];
+        $data['scripts'] = array('inicio');
+        $data['edita'] = 0;
+        $data['contentView'] = 'personal/vFormularioGo';
+        $this->_renderView($data);
+
+    }
+    public function deletePT()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $id_registro_pt = $this->request->getPost('id_registro_pt');
+
+        $dataConfig = [
+            "tabla" => "registro_pt",
+            "editar" => true,
+            "idEditar" => ['id_registro_pt' => $id_registro_pt]
+        ];
+
+
+        $response = $globals->saveTabla(['visible' => 0], $dataConfig, ["script" => "opciones.DeletePT"]);
         return $this->respond($response);
     }
     public function listadoEnvioGO()
-    {  
+    {
         $session = \Config\Services::session();
         $globals = new Mglobal;
-        if(in_array($session->get('id_perfil'), [1,2])){
-         $registro_go = $globals->getTabla(['tabla' => 'vw_registro_go', 'where' => ['visible' => 1]]);
-        }else{
+        if (in_array($session->get('id_perfil'), [1, 2])) {
+            $registro_go = $globals->getTabla(['tabla' => 'vw_registro_go', 'where' => ['visible' => 1]]);
+        } else {
             $registro_go = $globals->getTabla(['tabla' => 'vw_registro_go', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]]);
         }
-      
-        $data['registro_go'] = (!empty($registro_go->data))?$registro_go->data:[];
+
+        $data['registro_go'] = (!empty($registro_go->data)) ? $registro_go->data : [];
         $data['scripts'] = array('inicio');
         $data['edita'] = 0;
-        $data['contentView'] = 'personal/vListadoGo';                
+        $data['contentView'] = 'personal/vListadoGo';
         $this->_renderView($data);
     }
     public function listaGOjuridico()
-    {  
+    {
         $session = \Config\Services::session();
         $globals = new Mglobal;
-        if(in_array($session->get('id_perfil'), [1,2,7])){
-         $registro_go = $globals->getTabla(['tabla' => 'vw_registro_go', 'where' => ['visible' => 1]]);
-        }else{
+        if (in_array($session->get('id_perfil'), [1, 2, 7])) {
+            $registro_go = $globals->getTabla(['tabla' => 'vw_registro_go', 'where' => ['visible' => 1]]);
+        } else {
             $registro_go = $globals->getTabla(['tabla' => 'vw_registro_go', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]]);
         }
-      
-        $data['registro_go'] = (!empty($registro_go->data))?$registro_go->data:[];
+
+        $data['registro_go'] = (!empty($registro_go->data)) ? $registro_go->data : [];
         $data['scripts'] = array('inicio');
         $data['edita'] = 0;
-        $data['contentView'] = 'personal/vListadoGo';                
+        $data['contentView'] = 'personal/vListadoGo';
         $this->_renderView($data);
     }
     public function listadoPTjuridico()
-    {  
+    {
         $session = \Config\Services::session();
         $globals = new Mglobal;
-        if(in_array($session->get('id_perfil'), [1,2])){
-         $registro_pt = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1]]);
-        }else{
+        if (in_array($session->get('id_perfil'), [1, 2])) {
+            $registro_pt = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1]]);
+        } else {
             $registro_pt = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]]);
         }
-      
 
-        $data['registro_pt'] = (!empty($registro_pt->data))?$registro_pt->data:[];
+
+        $data['registro_pt'] = (!empty($registro_pt->data)) ? $registro_pt->data : [];
         $data['scripts'] = array('inicio');
         $data['edita'] = 0;
-        $data['contentView'] = 'secciones/vregistroPT';                
+        $data['contentView'] = 'secciones/vregistroPT';
         $this->_renderView($data);
     }
     public function listadoEstatusPT()
-    {  
+    {
         $session = \Config\Services::session();
         $globals = new Mglobal;
-        if(in_array($session->get('id_perfil'), [1,2])){
-         $registro_pt = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1]]);
-        }else{
+        if (in_array($session->get('id_perfil'), [1, 2])) {
+            $registro_pt = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1]]);
+        } else {
             $registro_pt = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]]);
         }
-      
 
-        $data['registro_pt'] = (!empty($registro_pt->data))?$registro_pt->data:[];
+
+        $data['registro_pt'] = (!empty($registro_pt->data)) ? $registro_pt->data : [];
         $data['scripts'] = array('inicio');
         $data['edita'] = 0;
-        $data['contentView'] = 'secciones/vregistroPT';                
+        $data['contentView'] = 'secciones/vregistroPT';
         $this->_renderView($data);
     }
-    public function tablaArchivos($id = null , $tipo = null)
-    {  
+    public function tablaArchivos($id = null, $tipo = null)
+    {
         $session = \Config\Services::session();
         $globals = new Mglobal;
-        if($tipo != 'PT' && $tipo != 'GO' && $tipo != 'GRC'){
+        if ($tipo != 'PT' && $tipo != 'GO' && $tipo != 'GRC') {
             $data['layout'] = 'plantilla/lytVacio';
             $data['contentView'] = 'secciones/vError500';
             $this->_renderView($data);
             die();
         }
-        $PT  = ($tipo == 'PT')?TRUE:FALSE;
-        $GO  = ($tipo == 'GO')?TRUE:FALSE;
-        $GRC = ($tipo == 'GRC')?TRUE:FALSE;
-        $data['PT']  = $PT;
-        $data['GO']  = $GO;
+        $PT = ($tipo == 'PT') ? TRUE : FALSE;
+        $GO = ($tipo == 'GO') ? TRUE : FALSE;
+        $GRC = ($tipo == 'GRC') ? TRUE : FALSE;
+        $data['PT'] = $PT;
+        $data['GO'] = $GO;
         $data['GRC'] = $GRC;
         $data['id_registro'] = $id;
         $data['tipo'] = $tipo;
         $data['scripts'] = array('inicio');
-        $data['contentView'] = 'personal/vTablaArchivos';                
+        $data['contentView'] = 'personal/vTablaArchivos';
         $this->_renderView($data);
     }
-    
-     public function familiaSecturi()
-    {  
+
+    public function familiaSecturi()
+    {
         $session = \Config\Services::session();
         $globals = new Mglobal;
         $data['scripts'] = array('inicio');
-        $data['contentView'] = 'personal/vfamiliaSecturi';                
+        $data['contentView'] = 'personal/vfamiliaSecturi';
         $this->_renderView($data);
     }
- 
+
     private function numeroEnLetras($numero)
     {
         //die( var_dump( $numero ) );
@@ -2082,34 +2130,66 @@ class Principal extends BaseController {
     private function convertirNumero($numero)
     {
         $unidad = [
-            '', 'uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve',
-            'diez', 'once', 'doce', 'trece', 'catorce', 'quince',
-            'dieciséis', 'diecisiete', 'dieciocho', 'diecinueve', 'veinte'
+            '',
+            'uno',
+            'dos',
+            'tres',
+            'cuatro',
+            'cinco',
+            'seis',
+            'siete',
+            'ocho',
+            'nueve',
+            'diez',
+            'once',
+            'doce',
+            'trece',
+            'catorce',
+            'quince',
+            'dieciséis',
+            'diecisiete',
+            'dieciocho',
+            'diecinueve',
+            'veinte'
         ];
         $decena = ['', '', 'veinti', 'treinta', 'cuarenta', 'cincuenta', 'sesenta', 'setenta', 'ochenta', 'noventa'];
-        $centena = ['', 'ciento', 'doscientos', 'trescientos', 'cuatrocientos', 'quinientos',
-            'seiscientos', 'setecientos', 'ochocientos', 'novecientos'];
+        $centena = [
+            '',
+            'ciento',
+            'doscientos',
+            'trescientos',
+            'cuatrocientos',
+            'quinientos',
+            'seiscientos',
+            'setecientos',
+            'ochocientos',
+            'novecientos'
+        ];
 
-        if ($numero == 0) return 'cero';
-        if ($numero == 100) return 'cien';
+        if ($numero == 0)
+            return 'cero';
+        if ($numero == 100)
+            return 'cien';
         if ($numero >= 1000000) {
             $millones = floor($numero / 1000000);
             $resto = $numero % 1000000;
             $txt = ($millones == 1 ? 'un millón' : $this->convertirNumero($millones) . ' millones');
-            if ($resto > 0) $txt .= ' ' . $this->convertirNumero($resto);
+            if ($resto > 0)
+                $txt .= ' ' . $this->convertirNumero($resto);
             return $txt;
         }
         if ($numero >= 1000) {
             $miles = floor($numero / 1000);
             $resto = $numero % 1000;
-            $txt = ($miles == 1 ? 'mil' :  $this->convertirNumero($miles) . ' mil');
-            if ($resto > 0) $txt .= ' ' .  $this->convertirNumero($resto);
+            $txt = ($miles == 1 ? 'mil' : $this->convertirNumero($miles) . ' mil');
+            if ($resto > 0)
+                $txt .= ' ' . $this->convertirNumero($resto);
             return $txt;
         }
         if ($numero >= 100) {
             $c = floor($numero / 100);
             $r = $numero % 100;
-            return $centena[$c] . ($r > 0 ? ' ' .  $this->convertirNumero($r) : '');
+            return $centena[$c] . ($r > 0 ? ' ' . $this->convertirNumero($r) : '');
         }
         if ($numero <= 20) {
             return $unidad[$numero];
@@ -2125,25 +2205,25 @@ class Principal extends BaseController {
     {
         $session = \Config\Services::session();
         $globals = new Mglobal;
-        $id_registro_pt =  $this->request->getPost('id_registro_pt');
+        $id_registro_pt = $this->request->getPost('id_registro_pt');
         $response = $globals->getTabla([
-                    'tabla' => 'vw_pdf_reserva',
-                    'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
-                    ])->data;
-       return $this->respond($response);
+            'tabla' => 'vw_pdf_reserva',
+            'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
+        ])->data;
+        return $this->respond($response);
     }
     public function getLinkGo()
     {
-        $session        = \Config\Services::session();
-        $globals        = new Mglobal;
-        $id_registro_go =  $this->request->getPost('id_registro_go');
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $id_registro_go = $this->request->getPost('id_registro_go');
         $response = $globals->getTabla([
-                    'tabla' => 'vw_pdf_reserva_go',
-                    'where' => ['visible' => 1, 'id_registro_go' => $id_registro_go]
-                    ])->data;
-       return $this->respond($response);
+            'tabla' => 'vw_pdf_reserva_go',
+            'where' => ['visible' => 1, 'id_registro_go' => $id_registro_go]
+        ])->data;
+        return $this->respond($response);
     }
-     public function ArchivoGO($id_registro_go =  null, $id_archivo = null, $savePath = null)
+    public function ArchivoGO($id_registro_go = null, $id_archivo = null, $savePath = null)
     {
         $session = \Config\Services::session();
         $globals = new Mglobal;
@@ -2153,21 +2233,21 @@ class Principal extends BaseController {
         ]);
         $data['reserva'] = "";
         $pdf = $globals->getTabla([
-                'tabla' => 'vw_pdf_reserva_go',
-                'where' => ['visible' => 1, 'id_registro_go' => $id_registro_go]
-                ])->data;
-        $id_reserva_go = (isset($pdf[0]->id_reserva_go) && !empty($pdf[0]->id_reserva_go))?$pdf[0]->id_reserva_go:'';  
-       
-        if(!empty($id_reserva_go)){
+            'tabla' => 'vw_pdf_reserva_go',
+            'where' => ['visible' => 1, 'id_registro_go' => $id_registro_go]
+        ])->data;
+        $id_reserva_go = (isset($pdf[0]->id_reserva_go) && !empty($pdf[0]->id_reserva_go)) ? $pdf[0]->id_reserva_go : '';
+
+        if (!empty($id_reserva_go)) {
             $reserva = $globals->getTabla([
                 'tabla' => 'vw_reserva_go',
                 'where' => ['visible' => 1, 'id_reserva_go' => $id_reserva_go]
-                ])->data;
-            $data['reserva'] = $reserva[0]; 
-             $importe_str   = $reserva[0]->total_importe;
-             $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
-             $data['numero_texto'] = $this->numeroEnLetras($importe_float);
-        } 
+            ])->data;
+            $data['reserva'] = $reserva[0];
+            $importe_str = $reserva[0]->total_importe;
+            $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
+            $data['numero_texto'] = $this->numeroEnLetras($importe_float);
+        }
 
         if (!empty($registro_go->data)) {
             $data['registro'] = $registro_go->data[0];
@@ -2176,140 +2256,20 @@ class Principal extends BaseController {
                 'where' => ['visible' => 1, 'id_area' => $data['registro']->id_direccion_responsable]
             ]);
             $data['folio'] = $folio->data[0]->folio_prefijo;
-       
+
         } else {
             echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
             die();
         }
-       
-       $data['GO'] = true;
-       switch($id_archivo){
+
+        $data['GO'] = true;
+        switch ($id_archivo) {
             case 1:
                 $doc = 'assets/pdf/plantillas/anexo01.pdf';
                 $formato = 'personal/vFormato01.php';
-            break;
-           case 4:
-            if ($savePath){
-                $source = FCPATH . $instrumento;
-                if (file_exists($source)) {
-                    copy($source, $savePath);
-                    return $savePath;
-                }
-                return null;
-            } else {
-                // Solo si se quiere mostrar directo en navegador
-                return redirect()->to(base_url() . $instrumento);
-            }
-            break;
-        }
-        //echo "<pre>";
-        //print_r( $data['reserva']  );
-        //echo "</pre>";
-        //die();
-     
-        $html = view( $formato, $data);
-        $htmlSegundaHoja = view('personal/vFormato02.php', $data);
-        // Crear instancia de mPDF
-        $mpdf = new \Mpdf\Mpdf([
-            'margin_top' => 0,
-            'margin_left' => 1,
-            'margin_right' => 1,
-            'format' => [213, 268],
-            'mirrorMargins' => false,
-        ]);
-
-    //die( var_dump($doc) );
-      $pagecount = $mpdf->SetSourceFile(FCPATH . $doc );
-      
-      for ($i = 1; $i <= $pagecount; $i++) {
-            $mpdf->AddPage();
-            $tplId = $mpdf->ImportPage($i);
-            $mpdf->UseTemplate($tplId);
-
-            if ($i == 1) {
-                $mpdf->WriteHTML($html);
-            }
-            if ($i == 2) {
-                $mpdf->WriteHTML($htmlSegundaHoja);
-            }
-        }
-        
-        
-        if ($savePath) {
-            $mpdf->Output($savePath, 'F'); // F = write to file
-            return $savePath;
-        }
-        $mpdf->Output('Formato_pt.pdf', 'I');
-        exit();
-        
-    }
-    public function Archivo($id_registro_pt =  null, $id_archivo = null, $savePath = null)
-    {
-        $session = \Config\Services::session();
-        $globals = new Mglobal;
-        $data['reserva']  = "";
-        $registro_pt = $globals->getTabla([
-            'tabla' => 'vw_registro_pt',
-            'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
-        ]);
-        
-        $area = $globals->getTabla([ 'tabla' => 'usuario',  'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario] ]);
-        if(!empty($area->data)){
-            $id_area   = $area->data[0]->id_area;
-            $direccion = $globals->getTabla([ 'tabla' => 'vw_direccion',  'where' => ['visible' => 1, 'id_area' => $id_area ] ]);
-            if(!empty($direccion->data)){
-                $folio_prefijo = $direccion->data[0]->folio_prefijo.$registro_pt->data[0]->no_consecutivo.'/'.date('Y'); //ESTO HAY QUE OREGUNTAR
-                $data['direccion'] = $direccion->data[0];
-            }
-        }
-
-        $pdf = $globals->getTabla([
-                'tabla' => 'vw_pdf_reserva',
-                'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
-                ])->data;
-       
-        $instrumento = (isset($pdf[0]->instrumento) && !empty($pdf[0]->instrumento))?$pdf[0]->instrumento:'';      
-        $id_reserva = (isset($pdf[0]->id_reserva) && !empty($pdf[0]->id_reserva))?$pdf[0]->id_reserva:'';  
-        if(!empty($id_reserva)){
-            $reserva = $globals->getTabla([
-                'tabla' => 'vw_reserva',
-                'where' => ['visible' => 1, 'id_reserva' => $id_reserva]
-                ])->data;
-            $data['reserva'] = $reserva[0]; 
-             $importe_str   = $reserva[0]->total_importe;
-             $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
-             $data['numero_texto'] = $this->numeroEnLetras($importe_float);
-
-        }    
-   
-        if (!empty($registro_pt->data)) {
-            $data['registro'] = $registro_pt->data[0];
-            $folio = $globals->getTabla([
-                'tabla' => 'direccion',
-                'where' => ['visible' => 1, 'id_area' => $data['registro']->id_direccion_responsable]
-            ]);
-            if($registro_pt->data[0]->no_reserva == '4327278' || $registro_pt->data[0]->no_reserva == '4327277'){
-               $data['folio'] = "SECTURI/DGDT/DCT/FIC-TH/";
-            }
-            else if($registro_pt->data[0]->no_reserva == '4327279'){
-               $data['folio'] = "SECTURI/DGDT/DCT/FIC-TA/";
-            }else{
-               $data['folio'] = $folio_prefijo;
-            }
-            
-        } else {
-            echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
-            die();
-        }
-
-        if(!empty($instrumento)){
-             switch($id_archivo){
-                case 1:
-                    $doc = 'assets/pdf/plantillas/anexo01.pdf';
-                    $formato = 'personal/vFormato01.php';
                 break;
             case 4:
-                if ($savePath){
+                if ($savePath) {
                     $source = FCPATH . $instrumento;
                     if (file_exists($source)) {
                         copy($source, $savePath);
@@ -2321,30 +2281,15 @@ class Principal extends BaseController {
                     return redirect()->to(base_url() . $instrumento);
                 }
                 break;
-            
-
-            }
-            
-        }else{
-            switch($id_archivo){
-            case 1:
-                    $doc = 'assets/pdf/plantillas/anexo01.pdf';
-                    $formato = 'personal/vFormato01.php';
-             break;
-            case 4:
-                 $data['layout'] = 'plantilla/lytVacio';
-                $data['contentView'] = 'secciones/vError500';
-                $this->_renderView($data);
-                die();
-                break;
-            
-
-            }
         }
-      
-        $html = view( $formato, $data);
+        //echo "<pre>";
+        //print_r( $data['reserva']  );
+        //echo "</pre>";
+        //die();
+
+        $html = view($formato, $data);
         $htmlSegundaHoja = view('personal/vFormato02.php', $data);
-        //Crear instancia de mPDF
+        // Crear instancia de mPDF
         $mpdf = new \Mpdf\Mpdf([
             'margin_top' => 0,
             'margin_left' => 1,
@@ -2352,8 +2297,10 @@ class Principal extends BaseController {
             'format' => [213, 268],
             'mirrorMargins' => false,
         ]);
-     
-        $pagecount = $mpdf->SetSourceFile(FCPATH . $doc );
+
+        //die( var_dump($doc) );
+        $pagecount = $mpdf->SetSourceFile(FCPATH . $doc);
+
         for ($i = 1; $i <= $pagecount; $i++) {
             $mpdf->AddPage();
             $tplId = $mpdf->ImportPage($i);
@@ -2366,23 +2313,155 @@ class Principal extends BaseController {
                 $mpdf->WriteHTML($htmlSegundaHoja);
             }
         }
-        
-        
+
+
         if ($savePath) {
             $mpdf->Output($savePath, 'F'); // F = write to file
             return $savePath;
         }
         $mpdf->Output('Formato_pt.pdf', 'I');
         exit();
-        
+
+    }
+    public function Archivo($id_registro_pt = null, $id_archivo = null, $savePath = null)
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $data['reserva'] = "";
+        $registro_pt = $globals->getTabla([
+            'tabla' => 'vw_registro_pt',
+            'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
+        ]);
+
+        $area = $globals->getTabla(['tabla' => 'usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario]]);
+        if (!empty($area->data)) {
+            $id_area = $area->data[0]->id_area;
+            $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_area' => $id_area]]);
+            if (!empty($direccion->data)) {
+                $folio_prefijo = $direccion->data[0]->folio_prefijo . $registro_pt->data[0]->no_consecutivo . '/' . date('Y'); //ESTO HAY QUE OREGUNTAR
+                $data['direccion'] = $direccion->data[0];
+            }
+        }
+
+        $pdf = $globals->getTabla([
+            'tabla' => 'vw_pdf_reserva',
+            'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
+        ])->data;
+
+        $instrumento = (isset($pdf[0]->instrumento) && !empty($pdf[0]->instrumento)) ? $pdf[0]->instrumento : '';
+        $id_reserva = (isset($pdf[0]->id_reserva) && !empty($pdf[0]->id_reserva)) ? $pdf[0]->id_reserva : '';
+        if (!empty($id_reserva)) {
+            $reserva = $globals->getTabla([
+                'tabla' => 'vw_reserva',
+                'where' => ['visible' => 1, 'id_reserva' => $id_reserva]
+            ])->data;
+            $data['reserva'] = $reserva[0];
+            $importe_str = $reserva[0]->total_importe;
+            $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
+            $data['numero_texto'] = $this->numeroEnLetras($importe_float);
+
+        }
+
+        if (!empty($registro_pt->data)) {
+            $data['registro'] = $registro_pt->data[0];
+            $folio = $globals->getTabla([
+                'tabla' => 'direccion',
+                'where' => ['visible' => 1, 'id_area' => $data['registro']->id_direccion_responsable]
+            ]);
+            if ($registro_pt->data[0]->no_reserva == '4327278' || $registro_pt->data[0]->no_reserva == '4327277') {
+                $data['folio'] = "SECTURI/DGDT/DCT/FIC-TH/";
+            } else if ($registro_pt->data[0]->no_reserva == '4327279') {
+                $data['folio'] = "SECTURI/DGDT/DCT/FIC-TA/";
+            } else {
+                $data['folio'] = $folio_prefijo;
+            }
+
+        } else {
+            echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
+            die();
+        }
+
+        if (!empty($instrumento)) {
+            switch ($id_archivo) {
+                case 1:
+                    $doc = 'assets/pdf/plantillas/anexo01.pdf';
+                    $formato = 'personal/vFormato01.php';
+                    break;
+                case 4:
+                    if ($savePath) {
+                        $source = FCPATH . $instrumento;
+                        if (file_exists($source)) {
+                            copy($source, $savePath);
+                            return $savePath;
+                        }
+                        return null;
+                    } else {
+                        // Solo si se quiere mostrar directo en navegador
+                        return redirect()->to(base_url() . $instrumento);
+                    }
+                    break;
+
+
+            }
+
+        } else {
+            switch ($id_archivo) {
+                case 1:
+                    $doc = 'assets/pdf/plantillas/anexo01.pdf';
+                    $formato = 'personal/vFormato01.php';
+                    break;
+                case 4:
+                    $data['layout'] = 'plantilla/lytVacio';
+                    $data['contentView'] = 'secciones/vError500';
+                    $this->_renderView($data);
+                    die();
+                    break;
+
+
+            }
+        }
+
+        $html = view($formato, $data);
+        $htmlSegundaHoja = view('personal/vFormato02.php', $data);
+        //Crear instancia de mPDF
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 0,
+            'margin_left' => 1,
+            'margin_right' => 1,
+            'format' => [213, 268],
+            'mirrorMargins' => false,
+        ]);
+
+        $pagecount = $mpdf->SetSourceFile(FCPATH . $doc);
+        for ($i = 1; $i <= $pagecount; $i++) {
+            $mpdf->AddPage();
+            $tplId = $mpdf->ImportPage($i);
+            $mpdf->UseTemplate($tplId);
+
+            if ($i == 1) {
+                $mpdf->WriteHTML($html);
+            }
+            if ($i == 2) {
+                $mpdf->WriteHTML($htmlSegundaHoja);
+            }
+        }
+
+
+        if ($savePath) {
+            $mpdf->Output($savePath, 'F'); // F = write to file
+            return $savePath;
+        }
+        $mpdf->Output('Formato_pt.pdf', 'I');
+        exit();
+
     }
     public function generarZip()
     {
         $response = new \stdClass();
         $id_registro_pt = $this->request->getPost('id_registro_pt');
         $Mglobal = new Mglobal;
-        
-        
+
+
 
         if (empty($id_registro_pt)) {
             $response->error = true;
@@ -2418,17 +2497,17 @@ class Principal extends BaseController {
         ])->data[0]->instrumento;
 
         // Archivos generados dinámicamente
-        if(empty($instrumento)){
+        if (empty($instrumento)) {
             $dynamicFiles = [
                 1 => '01 Anexos y formato de los LTPOFB.pdf'
             ];
-        }else{
+        } else {
             $dynamicFiles = [
                 1 => '01 Anexos y formato de los LTPOFB.pdf',
                 4 => '04 Contrato o Convenio (según corresponda).pdf',
             ];
         }
-      
+
         foreach ($dynamicFiles as $id => $nombre) {
             $rutaTemp = $tempDir . $nombre;
             $archivoGenerado = $this->Archivo($id_registro_pt, $id, $rutaTemp);
@@ -2437,8 +2516,8 @@ class Principal extends BaseController {
                 $archivosTemporales[] = $archivoGenerado;
             }
         }
-    
-        
+
+
         // Archivo 07
         $rutaArchivo07 = $tempDir . '07 Formatos_diversos.pdf';
         $archivo07 = $this->ImprimirPT($id_registro_pt, $rutaArchivo07);
@@ -2530,12 +2609,12 @@ class Principal extends BaseController {
     }
 
 
-    public function ImprimirGO($id_pt = null,$savePath = null )
-    {  
+    public function ImprimirGO($id_pt = null, $savePath = null)
+    {
         $session = \Config\Services::session();
         $globals = new Mglobal;
         $data = [];
-        $id_reserva= null;
+        $id_reserva = null;
 
         $registro_go = $globals->getTabla([
             'tabla' => 'vw_registro_go',
@@ -2545,7 +2624,7 @@ class Principal extends BaseController {
             'tabla' => 'vw_pdf_reserva_go',
             'where' => ['visible' => 1, 'id_registro_go' => $id_pt]
         ]);
-    
+
         if (!empty($registro_go->data)) {
             $registro = $registro_go->data[0];
             $id_reserva_go = $registro_go->data[0]->id_reserva_go;
@@ -2560,12 +2639,12 @@ class Principal extends BaseController {
                 'tabla' => 'vw_reserva_go',
                 'where' => ['visible' => 1, 'id_reserva_go' => $id_reserva_go]
             ]);
-            if(!empty($reserva->data)){
-             $data['reserva'] = $reserva->data;
-             $importe_str   = $reserva->data[0]->total_importe;
-             $usu_reg       = $reserva->data[0]->usu_reg;
-             $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
-             $data['numero_texto'] = $this->numeroEnLetras($importe_float);
+            if (!empty($reserva->data)) {
+                $data['reserva'] = $reserva->data;
+                $importe_str = $reserva->data[0]->total_importe;
+                $usu_reg = $reserva->data[0]->usu_reg;
+                $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
+                $data['numero_texto'] = $this->numeroEnLetras($importe_float);
             }
             $data['nombre_registro'] = $globals->getTabla([
                 'tabla' => 'vw_usuario',
@@ -2573,8 +2652,8 @@ class Principal extends BaseController {
             ])->data[0];
 
             if (!empty($folio->data)) {
-            $zero = (strlen($no_consecutivo) >= 2)?'0':'00';
-                $data['registro']->folio = $folio->data[0]->folio_prefijo.$zero.$no_consecutivo.'/'.$folio->data[0]->periodo_pt;
+                $zero = (strlen($no_consecutivo) >= 2) ? '0' : '00';
+                $data['registro']->folio = $folio->data[0]->folio_prefijo . $zero . $no_consecutivo . '/' . $folio->data[0]->periodo_pt;
             } else {
                 $data['registro']->folio = ''; // O un valor por defecto
             }
@@ -2583,10 +2662,10 @@ class Principal extends BaseController {
             echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
             die();
         }
-       $data['GO'] = TRUE;
-       $html = view('secciones/vFormatoPT.php', $data);
-      $htmlSegundaHoja = view('secciones/vFormatoPT2.php', $data);
-      $htmlTercerHoja = view('personal/vFormato702.php', $data);
+        $data['GO'] = TRUE;
+        $html = view('secciones/vFormatoPT.php', $data);
+        $htmlSegundaHoja = view('secciones/vFormatoPT2.php', $data);
+        $htmlTercerHoja = view('personal/vFormato702.php', $data);
 
         $mpdf = new \Mpdf\Mpdf([
             'margin_top' => 0,
@@ -2597,7 +2676,7 @@ class Principal extends BaseController {
         ]);
 
         // Importar PDF base (anexo07)
-      
+
         $pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/plantillas/anexo07_2.pdf');
 
         for ($i = 1; $i <= $pagecount; $i++) {
@@ -2643,7 +2722,7 @@ class Principal extends BaseController {
             }
         }
 
-       if ($savePath) {
+        if ($savePath) {
             $mpdf->Output($savePath, 'F'); // F = write to file
             return $savePath;
         }
@@ -2653,42 +2732,42 @@ class Principal extends BaseController {
 
     }
     public function avanceActividad()
-    {   
+    {
         $session = \Config\Services::session();
-        $response     = new \stdClass();
+        $response = new \stdClass();
         $response->error = true;
         $response->respuesta = "Error al validar usuario";
-        $globals      = new Mglobal;
-        $data         =  $this->request->getPost();
-      
+        $globals = new Mglobal;
+        $data = $this->request->getPost();
+
         $dataConfig = [
-            "tabla"=>"actividad",
-            "editar"=>true,
-            "idEditar"=>['id_actividad'=>$data['id_actividad']]
+            "tabla" => "actividad",
+            "editar" => true,
+            "idEditar" => ['id_actividad' => $data['id_actividad']]
         ];
-        $dataBitacora = ['id_user' =>  $session->id_usuario, 'script' => 'Agregar.php/guardaTurno'];
-        $response = $globals->saveTabla(["avance"=>$data['avance']],$dataConfig,$dataBitacora);
+        $dataBitacora = ['id_user' => $session->id_usuario, 'script' => 'Agregar.php/guardaTurno'];
+        $response = $globals->saveTabla(["avance" => $data['avance']], $dataConfig, $dataBitacora);
         return $this->respond($response);
 
 
     }
     public function ListaDenuncia()
-    {   
-        $session = \Config\Services::session();   
+    {
+        $session = \Config\Services::session();
         $data = array();
-        $globals      = new Mglobal;
-        $data['denuncia'] = $globals->getTabla(["tabla"=>"denuncia", "where"=>["visible"=>1]])->data; 
-        $data['usuario'] = $globals->getTabla(["tabla"=>"vw_usuario", "where"=>["visible"=>1]])->data; 
-        $data['scripts'] = array('principal','inicio');
-        $data['contentView'] = 'personal/vListaDenuncia';                
+        $globals = new Mglobal;
+        $data['denuncia'] = $globals->getTabla(["tabla" => "denuncia", "where" => ["visible" => 1]])->data;
+        $data['usuario'] = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["visible" => 1]])->data;
+        $data['scripts'] = array('principal', 'inicio');
+        $data['contentView'] = 'personal/vListaDenuncia';
         $this->_renderView($data);
     }
-    public function ImprimirPT($id_pt = null,$savePath = null )
-    {  
+    public function ImprimirPT($id_pt = null, $savePath = null)
+    {
         $session = \Config\Services::session();
         $globals = new Mglobal;
         $data = [];
-        $id_reserva= null;
+        $id_reserva = null;
 
         $registro_pt = $globals->getTabla([
             'tabla' => 'vw_registro_pt',
@@ -2698,15 +2777,15 @@ class Principal extends BaseController {
             'tabla' => 'vw_pdf_reserva',
             'where' => ['visible' => 1, 'id_registro_pt' => $id_pt]
         ]);
-    
+
 
         if (!empty($registro_pt->data)) {
             $registro = $registro_pt->data[0];
             $id_reserva = $registro_pt->data[0]->id_reserva;
             $no_consecutivo = $registro_pt->data[0]->no_consecutivo;
             $data['registro'] = $registro;
-            
-           
+
+
             $folio = $globals->getTabla([
                 'tabla' => 'direccion',
                 'where' => ['visible' => 1, 'id_area' => $registro->id_direccion_responsable]
@@ -2715,36 +2794,36 @@ class Principal extends BaseController {
                 'tabla' => 'vw_reserva',
                 'where' => ['visible' => 1, 'id_reserva' => $id_reserva]
             ]);
-            
-            if(!empty($reserva->data)){
-             $data['reserva'] = $reserva->data;
-             $importe_str   = $reserva->data[0]->total_importe;
-             $usu_reg       = $reserva->data[0]->usu_reg;
-             $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
-             $data['numero_texto'] = $this->numeroEnLetras($importe_float);
+
+            if (!empty($reserva->data)) {
+                $data['reserva'] = $reserva->data;
+                $importe_str = $reserva->data[0]->total_importe;
+                $usu_reg = $reserva->data[0]->usu_reg;
+                $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
+                $data['numero_texto'] = $this->numeroEnLetras($importe_float);
             }
             $data['nombre_registro'] = $globals->getTabla([
                 'tabla' => 'vw_usuario',
                 'where' => ['id_usuario' => $usu_reg]
             ])->data[0];
-                if (strlen($no_consecutivo) == 2) {
-                    $zero = '0';
-                } elseif (strlen($no_consecutivo) == 1) {
-                    $zero = '00';
-                } else {
-                    $zero = '';
-                }
-            if (!empty($folio->data)) {
-               
-            $data['registro']->folio = $folio->data[0]->folio_prefijo.$zero.$no_consecutivo.'/2025';
+            if (strlen($no_consecutivo) == 2) {
+                $zero = '0';
+            } elseif (strlen($no_consecutivo) == 1) {
+                $zero = '00';
             } else {
-                 if($registro_pt->data[0]->no_reserva == 4327278){
-                    $data['registro']->folio = 'SECTURI/DGDT/DCT/FIC-TA/'.$zero.$no_consecutivo.'/2028';
-                 }elseif($registro_pt->data[0]->no_reserva == 4327277 || $registro_pt->data[0]->no_reserva == 4327279){
-                    $data['registro']->folio = 'SECTURI/DGDT/DCT/FIC-TA/'.$zero.$no_consecutivo.'/2025';
-                 }else{
-                   $data['registro']->folio = '';
-                 }
+                $zero = '';
+            }
+            if (!empty($folio->data)) {
+
+                $data['registro']->folio = $folio->data[0]->folio_prefijo . $zero . $no_consecutivo . '/2025';
+            } else {
+                if ($registro_pt->data[0]->no_reserva == 4327278) {
+                    $data['registro']->folio = 'SECTURI/DGDT/DCT/FIC-TA/' . $zero . $no_consecutivo . '/2028';
+                } elseif ($registro_pt->data[0]->no_reserva == 4327277 || $registro_pt->data[0]->no_reserva == 4327279) {
+                    $data['registro']->folio = 'SECTURI/DGDT/DCT/FIC-TA/' . $zero . $no_consecutivo . '/2025';
+                } else {
+                    $data['registro']->folio = '';
+                }
             }
 
         } else {
@@ -2752,9 +2831,9 @@ class Principal extends BaseController {
             die();
         }
         //die( var_dump($data ) );
-       $html = view('secciones/vFormatoPT.php', $data);
-      $htmlSegundaHoja = view('secciones/vFormatoPT2.php', $data);
-      $htmlTercerHoja = view('personal/vFormato702.php', $data);
+        $html = view('secciones/vFormatoPT.php', $data);
+        $htmlSegundaHoja = view('secciones/vFormatoPT2.php', $data);
+        $htmlTercerHoja = view('personal/vFormato702.php', $data);
 
         $mpdf = new \Mpdf\Mpdf([
             'margin_top' => 0,
@@ -2765,7 +2844,7 @@ class Principal extends BaseController {
         ]);
 
         // Importar PDF base (anexo07)
-      
+
         $pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/plantillas/anexo07_2.pdf');
 
         for ($i = 1; $i <= $pagecount; $i++) {
@@ -2811,7 +2890,7 @@ class Principal extends BaseController {
             }
         }
 
-       if ($savePath) {
+        if ($savePath) {
             $mpdf->Output($savePath, 'F'); // F = write to file
             return $savePath;
         }
@@ -2842,337 +2921,337 @@ class Principal extends BaseController {
             'limit' => 50
         ]);
 
-       if(isset($proveedor->data) && !empty($proveedor->data)){
-            $response->error     = $proveedor->error;
+        if (isset($proveedor->data) && !empty($proveedor->data)) {
+            $response->error = $proveedor->error;
             $response->respuesta = $proveedor->respuesta;
-            $response->data      =  $proveedor->data;
+            $response->data = $proveedor->data;
 
         }
         return $this->respond($response);
-       
+
 
     }
-        public function Proveedor()
-    {  
+    public function Proveedor()
+    {
         $session = \Config\Services::session();
         $response = new \stdClass();
         $response->error = true;
         $response->respuesta = 'Error|Error al traer los proveedor';
         $globals = new Mglobal;
-        $id_proveedor =  $this->request->getPost('id_proveedor');
-        $fic =  $this->request->getPost('fic');
-     
+        $id_proveedor = $this->request->getPost('id_proveedor');
+        $fic = $this->request->getPost('fic');
+
 
         $data = [];
-       if(!empty($id_proveedor)){
-            $proveedor           = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1, 'id_proveedor' =>$id_proveedor ]]);
-            $banco               = $globals->getTabla(['tabla' => 'proveedor_banco', 'where' => ['idproveedor' => $id_proveedor ]]);
-            if(isset( $banco->data[0]) && !empty( $banco->data[0])){
-                if($session->get('id_perfil') != 1){
-                    if(empty($banco->data[0]->no_cuenta) || empty($banco->data[0]->clabe)){
+        if (!empty($id_proveedor)) {
+            $proveedor = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1, 'id_proveedor' => $id_proveedor]]);
+            $banco = $globals->getTabla(['tabla' => 'proveedor_banco', 'where' => ['idproveedor' => $id_proveedor]]);
+            if (isset($banco->data[0]) && !empty($banco->data[0])) {
+                if ($session->get('id_perfil') != 1) {
+                    if (empty($banco->data[0]->no_cuenta) || empty($banco->data[0]->clabe)) {
                         $response->error = true;
                         $response->respuesta = 'El proveedor no tiene No. de cuenta y/o clabe, favor de solIcitar un Tiket a la área TI';
                         return $this->respond($response);
                     }
                 }
-                
+
             }
-            $response->error             = $proveedor->error;
-            $response->respuesta         = $proveedor->respuesta;
-            $response->data['proveedor'] = (isset($proveedor->data[0]) && !empty($proveedor->data[0]))?$proveedor->data[0]:[];
-            $response->data['banco']     = (isset( $banco->data[0]) && !empty( $banco->data[0]))?$banco->data:[];
+            $response->error = $proveedor->error;
+            $response->respuesta = $proveedor->respuesta;
+            $response->data['proveedor'] = (isset($proveedor->data[0]) && !empty($proveedor->data[0])) ? $proveedor->data[0] : [];
+            $response->data['banco'] = (isset($banco->data[0]) && !empty($banco->data[0])) ? $banco->data : [];
 
-            
-        }
-      
-         return $this->respond($response);
-        
-    }
-    public function editarReservaGo()
-    {  
-        $session = \Config\Services::session();
-        $response = new \stdClass();
-        $response->error = true;
-        $response->respuesta = 'Error|Error al traer los proveedor';
-        $globals = new Mglobal;
-        $id_reserva_go =  $this->request->getPost('id_reserva_go');
-        $data = [];
-       if(!empty($id_reserva_go)){
-            $reserva             = $globals->getTabla(['tabla' => 'vw_reserva_go', 'where' => ['visible' => 1, 'id_reserva_go' =>$id_reserva_go ]]);
-            $cat_proyecto        = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1 ]]);
-            $cat_partida        = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1 ]]);
-            $response->error     = $reserva->error;
-            $response->respuesta = $reserva->respuesta;
-            $response->data['reserva'] = (isset($reserva->data[0]) && !empty($reserva->data[0]))?$reserva->data[0]:[];
-            $response->data['presupuesto'] = (isset($reserva->data[0]) && !empty($reserva->data[0]))?$reserva->data:[];
-            $response->data['proyecto'] = (isset($cat_proyecto->data[0]) && !empty($cat_proyecto->data[0]))?$cat_proyecto->data:[];
-            $response->data['partida'] = (isset($cat_partida->data[0]) && !empty($cat_partida->data[0]))?$cat_partida->data:[];
-        }
-      
-         return $this->respond($response);
-        
-    }
-    public function editarReserva()
-    {  
-        $session = \Config\Services::session();
-        $response = new \stdClass();
-        $response->error = true;
-        $response->respuesta = 'Error|Error al traer los proveedor';
-        $globals = new Mglobal;
-        $id_reserva =  $this->request->getPost('id_reserva');
-        $data = [];
-       if(!empty($id_reserva)){
-            $reserva             = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['visible' => 1, 'id_reserva' =>$id_reserva ]]);
-            $cat_proyecto        = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1 ]]);
-            $cat_partida        = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1 ]]);
-            $response->error     = $reserva->error;
-            $response->respuesta = $reserva->respuesta;
-            $response->data['reserva'] = (isset($reserva->data[0]) && !empty($reserva->data[0]))?$reserva->data[0]:[];
-            $response->data['presupuesto'] = (isset($reserva->data[0]) && !empty($reserva->data[0]))?$reserva->data:[];
-            $response->data['proyecto'] = (isset($cat_proyecto->data[0]) && !empty($cat_proyecto->data[0]))?$cat_proyecto->data:[];
-            $response->data['partida'] = (isset($cat_partida->data[0]) && !empty($cat_partida->data[0]))?$cat_partida->data:[];
-        }
-      
-         return $this->respond($response);
-        
-    }
-    public function formActividad()
-    {
-        $session  = \Config\Services::session();
-        $response = new \stdClass();
-        $response->error = true;
-        $response->respuesta = 'Error|Error al traer los proveedor';
-        $globals  = new Mglobal;
-        $data     = $this->request->getPost();
 
-        if(empty($data['actividad'])){
-            $response->respuesta = 'La descripción de la actividad es requerida';
-            return $this->respond($response);
-        }
-        if(empty($data['fec_inicio'])){
-            $response->respuesta = 'La fec. inicioes requerida';
-            return $this->respond($response);
-        }
-        if(empty($data['fec_fin'])){
-            $response->respuesta = 'La fec_fin es requerida';
-            return $this->respond($response);
-        }
-        if(empty($data['actividad'])){
-            $response->respuesta = 'La actividad es requerida';
-            return $this->respond($response);
-        }
-       
-        $dataInsert= [
-            "actividad"   => $data['actividad'],
-            "fec_inicio"  => $data['fec_inicio'],
-            "fec_fin"     => $data['fec_fin'],
-            "actividad"   => $data['actividad'],
-            "estado"      => $data['estatus'],
-            "descripcion" => $data['des_actividad'],
-            "id_usuario"  => $data['id_usuario'],
-            "usu_reg"     => $session->id_usuario,
-            "fec_reg"     => date('Y-m-d')
-        ];
-        if($data['id_actividad']==0){
-           $dataInsert['usu_act'] = $session->id_usuario;
-        }
-        $dataConfig = [
-            "tabla"=>"actividad",
-            "editar"=>($data['id_actividad']==0)?false:true,
-            "idEditar" => ['id_actividad'=>(int)$data['id_actividad']]
-        ];
-        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Principal.php/guardaActividad'];
-        $res = $globals->saveTabla($dataInsert, $dataConfig,$dataBitacora);
-               
-        if(!$res->error){
-          $response->error = false;
-          $response->respuesta = $res->respuesta;
         }
 
         return $this->respond($response);
 
     }
-    public function generarTramitePagoGo($id_reserva_go = null, $id_registro_go =  null)
-    {  
+    public function editarReservaGo()
+    {
         $session = \Config\Services::session();
         $response = new \stdClass();
         $response->error = true;
         $response->respuesta = 'Error|Error al traer los proveedor';
         $globals = new Mglobal;
-        $siExisteIdReserva  = $globals->getTabla(['tabla' => 'registro_go', 'where' => ['visible' => 1 , 'id_reserva_go' => $id_reserva_go ]]);
-        $btn = (!empty($siExisteIdReserva->data))?true:false;
-    
-        $cat_area  = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1 ]]);
-        if($id_reserva_go != 0){
-            $reserva   = $globals->getTabla(['tabla' => 'vw_reserva_go', 'where' => ['id_reserva' => $id_reserva_go ]]);
-            $presupuesto   = $globals->getTabla(['tabla' => 'vw_presupuesto_go', 'where' => ['id_reserva' => $id_reserva_go ]]);
-        }
-        if(!empty($id_registro_go)){
-            $registro_pt   = $globals->getTabla(['tabla' => 'vw_registro_go', 'where' => ['visible' => 1, 'id_registro_go' =>$id_registro_go ]]);
+        $id_reserva_go = $this->request->getPost('id_reserva_go');
+        $data = [];
+        if (!empty($id_reserva_go)) {
+            $reserva = $globals->getTabla(['tabla' => 'vw_reserva_go', 'where' => ['visible' => 1, 'id_reserva_go' => $id_reserva_go]]);
+            $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
+            $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+            $response->error = $reserva->error;
+            $response->respuesta = $reserva->respuesta;
+            $response->data['reserva'] = (isset($reserva->data[0]) && !empty($reserva->data[0])) ? $reserva->data[0] : [];
+            $response->data['presupuesto'] = (isset($reserva->data[0]) && !empty($reserva->data[0])) ? $reserva->data : [];
+            $response->data['proyecto'] = (isset($cat_proyecto->data[0]) && !empty($cat_proyecto->data[0])) ? $cat_proyecto->data : [];
+            $response->data['partida'] = (isset($cat_partida->data[0]) && !empty($cat_partida->data[0])) ? $cat_partida->data : [];
         }
 
-        
-        $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1 ]]);
-        $cat_tipo = $globals->getTabla(['tabla' => 'cat_tipo', 'where' => ['visible' => 1 ]]);
- 
-        $usuario                = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' =>$session->get('id_usuario') ]]);
-        $cat_usuario            = $globals->getTabla(['tabla' => 'usuario', 'where' => ['visible' => 1 ]]);
-        $cat_director_general   = $globals->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1 ]]);
-        $cat_opcion             = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1 ]]);
-        $cat_partida            = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1 ]]);
-        $cat_subsecretario      = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1 ]]);
-        if($id_reserva_go != 0){
-          $data['reserva']      = (!empty($reserva->data))?$reserva->data[0]:[];
-          $data['presupuesto']  = (!empty($presupuesto->data))?$presupuesto->data:[];
+        return $this->respond($response);
+
+    }
+    public function editarReserva()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error|Error al traer los proveedor';
+        $globals = new Mglobal;
+        $id_reserva = $this->request->getPost('id_reserva');
+        $data = [];
+        if (!empty($id_reserva)) {
+            $reserva = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['visible' => 1, 'id_reserva' => $id_reserva]]);
+            $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
+            $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+            $response->error = $reserva->error;
+            $response->respuesta = $reserva->respuesta;
+            $response->data['reserva'] = (isset($reserva->data[0]) && !empty($reserva->data[0])) ? $reserva->data[0] : [];
+            $response->data['presupuesto'] = (isset($reserva->data[0]) && !empty($reserva->data[0])) ? $reserva->data : [];
+            $response->data['proyecto'] = (isset($cat_proyecto->data[0]) && !empty($cat_proyecto->data[0])) ? $cat_proyecto->data : [];
+            $response->data['partida'] = (isset($cat_partida->data[0]) && !empty($cat_partida->data[0])) ? $cat_partida->data : [];
         }
-        if(!empty($id_registro_go)){
-           $data['registro_pt']  = (!empty($registro_pt->data))?$registro_pt->data[0]:[];
+
+        return $this->respond($response);
+
+    }
+    public function formActividad()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error|Error al traer los proveedor';
+        $globals = new Mglobal;
+        $data = $this->request->getPost();
+
+        if (empty($data['actividad'])) {
+            $response->respuesta = 'La descripción de la actividad es requerida';
+            return $this->respond($response);
         }
-      //  var_dump( $cat_subsecretario   );
-       // die();
-        $data['dsc_director_general'] = (!empty($cat_director_general->data))?$cat_director_general->data[0]->dsc_director_general:[];
-        $data['cat_area']             = (!empty($cat_area->data))?$cat_area->data:[];
-        $data['cat_tipo']             = (!empty($cat_tipo->data))?$cat_tipo->data:[];
-        $data['cat_opcion']           = (!empty($cat_opcion->data))?$cat_opcion->data:[];
-        $data['cat_partida']          = (!empty($cat_partida->data))?$cat_partida->data:[];
-        $data['cat_subsecretario']    = (!empty($cat_subsecretario->data))?$cat_subsecretario->data:[];
+        if (empty($data['fec_inicio'])) {
+            $response->respuesta = 'La fec. inicioes requerida';
+            return $this->respond($response);
+        }
+        if (empty($data['fec_fin'])) {
+            $response->respuesta = 'La fec_fin es requerida';
+            return $this->respond($response);
+        }
+        if (empty($data['actividad'])) {
+            $response->respuesta = 'La actividad es requerida';
+            return $this->respond($response);
+        }
+
+        $dataInsert = [
+            "actividad" => $data['actividad'],
+            "fec_inicio" => $data['fec_inicio'],
+            "fec_fin" => $data['fec_fin'],
+            "actividad" => $data['actividad'],
+            "estado" => $data['estatus'],
+            "descripcion" => $data['des_actividad'],
+            "id_usuario" => $data['id_usuario'],
+            "usu_reg" => $session->id_usuario,
+            "fec_reg" => date('Y-m-d')
+        ];
+        if ($data['id_actividad'] == 0) {
+            $dataInsert['usu_act'] = $session->id_usuario;
+        }
+        $dataConfig = [
+            "tabla" => "actividad",
+            "editar" => ($data['id_actividad'] == 0) ? false : true,
+            "idEditar" => ['id_actividad' => (int) $data['id_actividad']]
+        ];
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Principal.php/guardaActividad'];
+        $res = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+
+        if (!$res->error) {
+            $response->error = false;
+            $response->respuesta = $res->respuesta;
+        }
+
+        return $this->respond($response);
+
+    }
+    public function generarTramitePagoGo($id_reserva_go = null, $id_registro_go = null)
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error|Error al traer los proveedor';
+        $globals = new Mglobal;
+        $siExisteIdReserva = $globals->getTabla(['tabla' => 'registro_go', 'where' => ['visible' => 1, 'id_reserva_go' => $id_reserva_go]]);
+        $btn = (!empty($siExisteIdReserva->data)) ? true : false;
+
+        $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
+        if ($id_reserva_go != 0) {
+            $reserva = $globals->getTabla(['tabla' => 'vw_reserva_go', 'where' => ['id_reserva' => $id_reserva_go]]);
+            $presupuesto = $globals->getTabla(['tabla' => 'vw_presupuesto_go', 'where' => ['id_reserva' => $id_reserva_go]]);
+        }
+        if (!empty($id_registro_go)) {
+            $registro_pt = $globals->getTabla(['tabla' => 'vw_registro_go', 'where' => ['visible' => 1, 'id_registro_go' => $id_registro_go]]);
+        }
+
+
+        $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1]]);
+        $cat_tipo = $globals->getTabla(['tabla' => 'cat_tipo', 'where' => ['visible' => 1]]);
+
+        $usuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->get('id_usuario')]]);
+        $cat_usuario = $globals->getTabla(['tabla' => 'usuario', 'where' => ['visible' => 1]]);
+        $cat_director_general = $globals->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1]]);
+        $cat_opcion = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1]]);
+        $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $cat_subsecretario = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1]]);
+        if ($id_reserva_go != 0) {
+            $data['reserva'] = (!empty($reserva->data)) ? $reserva->data[0] : [];
+            $data['presupuesto'] = (!empty($presupuesto->data)) ? $presupuesto->data : [];
+        }
+        if (!empty($id_registro_go)) {
+            $data['registro_pt'] = (!empty($registro_pt->data)) ? $registro_pt->data[0] : [];
+        }
+        //  var_dump( $cat_subsecretario   );
+        // die();
+        $data['dsc_director_general'] = (!empty($cat_director_general->data)) ? $cat_director_general->data[0]->dsc_director_general : [];
+        $data['cat_area'] = (!empty($cat_area->data)) ? $cat_area->data : [];
+        $data['cat_tipo'] = (!empty($cat_tipo->data)) ? $cat_tipo->data : [];
+        $data['cat_opcion'] = (!empty($cat_opcion->data)) ? $cat_opcion->data : [];
+        $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+        $data['cat_subsecretario'] = (!empty($cat_subsecretario->data)) ? $cat_subsecretario->data : [];
         //$data['editar']               = (!empty($id_reserva_go) || $id_reserva_go != 0)?1:0;
-   
-        $data['secretario']           = (!empty($secretario->data))?$secretario->data:[];
-        $data['usuario']              = (!empty($usuario->data))?$usuario->data[0]:[];
-        $data['cat_usuario']          = (!empty($cat_usuario->data))?$cat_usuario->data:[];
-        $data['id_reserva']          = (!empty($id_reserva_go))?$id_reserva_go:0;
-        $data['scripts']              = array('inicio');
-        $data['edita']                = $btn;
-        $data['contentView']          = 'secciones/vRegistroGo';                
-        $this->_renderView($data);
-        
-    } 
 
-    public function generarTramitePago($id_reserva = null, $id_registro_pt =  null)
-    {  
+        $data['secretario'] = (!empty($secretario->data)) ? $secretario->data : [];
+        $data['usuario'] = (!empty($usuario->data)) ? $usuario->data[0] : [];
+        $data['cat_usuario'] = (!empty($cat_usuario->data)) ? $cat_usuario->data : [];
+        $data['id_reserva'] = (!empty($id_reserva_go)) ? $id_reserva_go : 0;
+        $data['scripts'] = array('inicio');
+        $data['edita'] = $btn;
+        $data['contentView'] = 'secciones/vRegistroGo';
+        $this->_renderView($data);
+
+    }
+
+    public function generarTramitePago($id_reserva = null, $id_registro_pt = null)
+    {
         $session = \Config\Services::session();
         $response = new \stdClass();
         $response->error = true;
         $response->respuesta = 'Error|Error al traer los proveedor';
         $globals = new Mglobal;
-        $siExisteIdReserva  = $globals->getTabla(['tabla' => 'registro_pt', 'where' => ['visible' => 1 , 'id_reserva' => $id_reserva ]]);
-        $btn = (!empty($siExisteIdReserva->data))?true:false;
+        $siExisteIdReserva = $globals->getTabla(['tabla' => 'registro_pt', 'where' => ['visible' => 1, 'id_reserva' => $id_reserva]]);
+        $btn = (!empty($siExisteIdReserva->data)) ? true : false;
         $partida4000 = false;
-        $cat_area  = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1 ]]);
-        if($id_reserva != 0){
-            $reserva   = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['id_reserva' => $id_reserva ]]);
-            $presupuesto   = $globals->getTabla(['tabla' => 'vw_presupuesto', 'where' => ['id_reserva' => $id_reserva ]]);
-            foreach($presupuesto->data as $i => $p){ 
-                if ($p->id_partida >= 149 && $p->id_partida <= 248){
-                   $partida4000 = true;
+        $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
+        if ($id_reserva != 0) {
+            $reserva = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['id_reserva' => $id_reserva]]);
+            $presupuesto = $globals->getTabla(['tabla' => 'vw_presupuesto', 'where' => ['id_reserva' => $id_reserva]]);
+            foreach ($presupuesto->data as $i => $p) {
+                if ($p->id_partida >= 149 && $p->id_partida <= 248) {
+                    $partida4000 = true;
                 }
             }
-           
+
         }
-        if(!empty($id_registro_pt)){
-            $registro_pt   = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1, 'id_registro_pt' =>$id_registro_pt ]]);
-        }
-        
-        $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1 ]]);
-        $cat_tipo = $globals->getTabla(['tabla' => 'cat_tipo', 'where' => ['visible' => 1 ]]);
- 
-        $usuario                = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' =>$session->get('id_usuario') ]]);
-        $cat_usuario            = $globals->getTabla(['tabla' => 'usuario', 'where' => ['visible' => 1 ]]);
-        $cat_director_general   = $globals->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1 ]]);
-        $cat_opcion             = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1 ]]);
-        $cat_partida             = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1 ]]);
-        if($id_reserva != 0){
-          $data['reserva']      = (!empty($reserva->data))?$reserva->data[0]:[];
-          $data['presupuesto']  = (!empty($presupuesto->data))?$presupuesto->data:[];
-        }
-        if(!empty($id_registro_pt)){
-           $data['registro_pt']  = (!empty($registro_pt->data))?$registro_pt->data[0]:[];
+        if (!empty($id_registro_pt)) {
+            $registro_pt = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]]);
         }
 
-       
+        $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1]]);
+        $cat_tipo = $globals->getTabla(['tabla' => 'cat_tipo', 'where' => ['visible' => 1]]);
+
+        $usuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->get('id_usuario')]]);
+        $cat_usuario = $globals->getTabla(['tabla' => 'usuario', 'where' => ['visible' => 1]]);
+        $cat_director_general = $globals->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1]]);
+        $cat_opcion = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1]]);
+        $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        if ($id_reserva != 0) {
+            $data['reserva'] = (!empty($reserva->data)) ? $reserva->data[0] : [];
+            $data['presupuesto'] = (!empty($presupuesto->data)) ? $presupuesto->data : [];
+        }
+        if (!empty($id_registro_pt)) {
+            $data['registro_pt'] = (!empty($registro_pt->data)) ? $registro_pt->data[0] : [];
+        }
+
+
         //die( var_dump(  $data['presupuesto'] ) );
-        $data['dsc_director_general'] = (!empty($cat_director_general->data))?$cat_director_general->data[0]->dsc_director_general:[];
-        $data['cat_area']             = (!empty($cat_area->data))?$cat_area->data:[];
-        $data['cat_tipo']             = (!empty($cat_tipo->data))?$cat_tipo->data:[];
-        $data['cat_opcion']           = (!empty($cat_opcion->data))?$cat_opcion->data:[];
-        $data['cat_partida']          = (!empty($cat_partida->data))?$cat_partida->data:[];
-        $data['editar']               = (!empty($id_reserva) || $id_reserva != 0)?0:1;
-        $data['secretario']           = (!empty($secretario->data))?$secretario->data:[];
-        $data['usuario']              = (!empty($usuario->data))?$usuario->data[0]:[];
-        $data['cat_usuario']          = (!empty($cat_usuario->data))?$cat_usuario->data:[];
-        $data['id_reserva']          = (!empty($id_reserva))?$id_reserva:0;
-        $data['scripts']              = array('inicio');
-        $data['edita']                = $btn;
-        $data['partida4000']          = $partida4000;
-        $data['contentView']          = 'secciones/vProveedor';                
+        $data['dsc_director_general'] = (!empty($cat_director_general->data)) ? $cat_director_general->data[0]->dsc_director_general : [];
+        $data['cat_area'] = (!empty($cat_area->data)) ? $cat_area->data : [];
+        $data['cat_tipo'] = (!empty($cat_tipo->data)) ? $cat_tipo->data : [];
+        $data['cat_opcion'] = (!empty($cat_opcion->data)) ? $cat_opcion->data : [];
+        $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+        $data['editar'] = (!empty($id_reserva) || $id_reserva != 0) ? 0 : 1;
+        $data['secretario'] = (!empty($secretario->data)) ? $secretario->data : [];
+        $data['usuario'] = (!empty($usuario->data)) ? $usuario->data[0] : [];
+        $data['cat_usuario'] = (!empty($cat_usuario->data)) ? $cat_usuario->data : [];
+        $data['id_reserva'] = (!empty($id_reserva)) ? $id_reserva : 0;
+        $data['scripts'] = array('inicio');
+        $data['edita'] = $btn;
+        $data['partida4000'] = $partida4000;
+        $data['contentView'] = 'secciones/vProveedor';
         $this->_renderView($data);
-        
-    }  
-     public function PagoFic($id_proveedor = null)
-    {  
+
+    }
+    public function PagoFic($id_proveedor = null)
+    {
         $session = \Config\Services::session();
         $response = new \stdClass();
         $response->error = true;
         $response->respuesta = 'Error|Error al traer los proveedor';
         $globals = new Mglobal;
-        $cat_area  = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1 ]]);
-        if($id_proveedor != 0){
-            $proveedor   = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1, 'id_proveedor' =>$id_proveedor ]]);
-            $banco       = $globals->getTabla(['tabla' => 'proveedor_banco', 'where' => ['idproveedor' => $id_proveedor ]]);
-            $restaurantes       = $globals->getTabla(['tabla' => 'cat_restaurante_fic', 'where' => ['no_proveedor' => $proveedor->data[0]->no_proveedor ]]);
-            $hoteles       = $globals->getTabla(['tabla' => 'cat_hoteles_fic', 'where' => ['no_proveedor' => $proveedor->data[0]->no_proveedor ]]);
+        $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
+        if ($id_proveedor != 0) {
+            $proveedor = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1, 'id_proveedor' => $id_proveedor]]);
+            $banco = $globals->getTabla(['tabla' => 'proveedor_banco', 'where' => ['idproveedor' => $id_proveedor]]);
+            $restaurantes = $globals->getTabla(['tabla' => 'cat_restaurante_fic', 'where' => ['no_proveedor' => $proveedor->data[0]->no_proveedor]]);
+            $hoteles = $globals->getTabla(['tabla' => 'cat_hoteles_fic', 'where' => ['no_proveedor' => $proveedor->data[0]->no_proveedor]]);
         }
-       // var_dump( $hoteles);
-        $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1 ]]);
-        $cat_tipo = $globals->getTabla(['tabla' => 'cat_tipo', 'where' => ['visible' => 1 ]]);
- 
-        $usuario              = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' =>$session->get('id_usuario') ]]);
-        $cat_usuario          = $globals->getTabla(['tabla' => 'usuario', 'where' => ['visible' => 1 ]]);
-        $cat_director_general = $globals->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1 ]]);
-        $cat_opcion           = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1 ]]);
-    
-        if($id_proveedor != 0){
-          $data['proveedor']   = (!empty($proveedor->data))?$proveedor->data[0]:[];
-          $data['banco']       = (!empty($banco->data))?$banco->data:[];
-          $data['restaurantes']  = (!empty($restaurantes->data))?$restaurantes->data:[];
-          $data['hoteles']     = (!empty($hoteles->data))?$hoteles->data:[];
-         
+        // var_dump( $hoteles);
+        $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1]]);
+        $cat_tipo = $globals->getTabla(['tabla' => 'cat_tipo', 'where' => ['visible' => 1]]);
+
+        $usuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->get('id_usuario')]]);
+        $cat_usuario = $globals->getTabla(['tabla' => 'usuario', 'where' => ['visible' => 1]]);
+        $cat_director_general = $globals->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1]]);
+        $cat_opcion = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1]]);
+
+        if ($id_proveedor != 0) {
+            $data['proveedor'] = (!empty($proveedor->data)) ? $proveedor->data[0] : [];
+            $data['banco'] = (!empty($banco->data)) ? $banco->data : [];
+            $data['restaurantes'] = (!empty($restaurantes->data)) ? $restaurantes->data : [];
+            $data['hoteles'] = (!empty($hoteles->data)) ? $hoteles->data : [];
+
         }
-       // die( );
-  
-        if(!empty($id_registro_pt)){
-           $data['registro_pt']   = (!empty($registro_pt->data))?$registro_pt->data[0]:[];
+        // die( );
+
+        if (!empty($id_registro_pt)) {
+            $data['registro_pt'] = (!empty($registro_pt->data)) ? $registro_pt->data[0] : [];
         }
         $data['FIC'] = true;
-        $data['dsc_director_general'] = (!empty($cat_director_general->data))?$cat_director_general->data[0]->dsc_director_general:[];
-        $data['cat_area']    = (!empty($cat_area->data))?$cat_area->data:[];
-        $data['cat_tipo']    = (!empty($cat_tipo->data))?$cat_tipo->data:[];
-        $data['cat_opcion']  = (!empty($cat_opcion->data))?$cat_opcion->data:[];
-        $data['editar']      = (!empty($id_proveedor) || $id_proveedor != 0)?0:1;
-        $data['secretario']  = (!empty($secretario->data))?$secretario->data:[];
-        $data['usuario']     = (!empty($usuario->data))?$usuario->data[0]:[];
-        $data['cat_usuario']     = (!empty($cat_usuario->data))?$cat_usuario->data:[];
-        $data['scripts']     = array('inicio');
-        $data['edita']       = 0;
-        $data['contentView'] = 'personal/vFormularioFic';                
+        $data['dsc_director_general'] = (!empty($cat_director_general->data)) ? $cat_director_general->data[0]->dsc_director_general : [];
+        $data['cat_area'] = (!empty($cat_area->data)) ? $cat_area->data : [];
+        $data['cat_tipo'] = (!empty($cat_tipo->data)) ? $cat_tipo->data : [];
+        $data['cat_opcion'] = (!empty($cat_opcion->data)) ? $cat_opcion->data : [];
+        $data['editar'] = (!empty($id_proveedor) || $id_proveedor != 0) ? 0 : 1;
+        $data['secretario'] = (!empty($secretario->data)) ? $secretario->data : [];
+        $data['usuario'] = (!empty($usuario->data)) ? $usuario->data[0] : [];
+        $data['cat_usuario'] = (!empty($cat_usuario->data)) ? $cat_usuario->data : [];
+        $data['scripts'] = array('inicio');
+        $data['edita'] = 0;
+        $data['contentView'] = 'personal/vFormularioFic';
         $this->_renderView($data);
-        
-    }  
+
+    }
 
     public function getProveedores()
-    {  
-       
+    {
+
         $session = \Config\Services::session();
         $response = new \stdClass();
         $response->error = true;
         $response->respuesta = 'Error|Error al traer los proveedores';
         $globals = new Mglobal;
         $proveedor = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1]]);
-        if(isset($proveedor->data) && !empty($proveedor->data)){
-            $response->error     = $proveedor->error;
+        if (isset($proveedor->data) && !empty($proveedor->data)) {
+            $response->error = $proveedor->error;
             $response->respuesta = $proveedor->respuesta;
-            $response->data      =  $proveedor->data;
+            $response->data = $proveedor->data;
 
         }
         return $this->respond($response);
@@ -3186,14 +3265,14 @@ class Principal extends BaseController {
             'tabla' => 'vw_incidenica',
             'where' => ['visible' => 1, 'id_estatus' => 3]
         ]);
-        $data['incidencia'] = (isset($incidencia->data) && !empty($incidencia->data))?$incidencia->data:'';
+        $data['incidencia'] = (isset($incidencia->data) && !empty($incidencia->data)) ? $incidencia->data : '';
 
         $tempQrPath = FCPATH . 'assets/images/qr_final.png';
-        $folio = 'GTO - ' . date('YmdHis') . substr((string)microtime(), 1, 4);
+        $folio = 'GTO - ' . date('YmdHis') . substr((string) microtime(), 1, 4);
         // Generar el QR
         $result = Builder::create()
             ->writer(new PngWriter())
-            ->data(base_url().'index.php/Principal/reporteIncidenciaUsuario/0/0/0/'.$folio)
+            ->data(base_url() . 'index.php/Principal/reporteIncidenciaUsuario/0/0/0/' . $folio)
             ->encoding(new Encoding('UTF-8'))
             ->errorCorrectionLevel(new ErrorCorrectionLevelHigh())
             ->size(400)
@@ -3204,14 +3283,14 @@ class Principal extends BaseController {
             ->labelAlignment(new LabelAlignmentCenter())
             ->build();
 
-         $result->saveToFile($tempQrPath);
-         $dataImagen = $this->encode_img_base64(FCPATH .'assets/images/qr_final.png', 'png');
-         $data['dataImagen'] =  $dataImagen;
-         $data['folio'] =  $folio;
+        $result->saveToFile($tempQrPath);
+        $dataImagen = $this->encode_img_base64(FCPATH . 'assets/images/qr_final.png', 'png');
+        $data['dataImagen'] = $dataImagen;
+        $data['folio'] = $folio;
 
         $doc = 'assets/pdf/plantillas/asistencia.pdf';
-        $formato ='personal/vFormatoAsistencia.php';
-        $html = view( $formato, $data);
+        $formato = 'personal/vFormatoAsistencia.php';
+        $html = view($formato, $data);
         // Crear instancia de mPDF
         $mpdf = new \Mpdf\Mpdf([
             'margin_top' => 0,
@@ -3222,8 +3301,8 @@ class Principal extends BaseController {
         ]);
 
         // Importar el PDF base
-      
-        $pagecount = $mpdf->SetSourceFile(FCPATH . $doc );
+
+        $pagecount = $mpdf->SetSourceFile(FCPATH . $doc);
         $tplId = $mpdf->ImportPage(1);
 
         // Página 1
@@ -3242,6 +3321,6 @@ class Principal extends BaseController {
         $mpdf->Output('Formato_pt.pdf', 'I');
         exit();
     }
-  
-  
+
+
 }
