@@ -49,7 +49,7 @@ st.agregar = (function () {
                     $("#id_incidencia").val(data.id_incidencia);
 
                     // Inicializar Select2 SIEMPRE antes de asignar el valor
-                   // $("#tipo_incidencia_editar").select2();
+                    // $("#tipo_incidencia_editar").select2();
 
                     // Asignar valor a Select2
                     $("#tipo_incidencia_editar").val(data.cat_id_incidencia).change();
@@ -61,6 +61,34 @@ st.agregar = (function () {
                     Swal.fire("Error", "Error al obtener los datos de la incidencia.", "error");
                 }
             });
+        },
+        modalSala: function (id) {
+            $("#verSala").modal('show');
+            let img = "";
+            let sala = "";
+            switch (id) {
+                case 1:
+                    img = `<img src="${base_url + 'assets/images/fotos/alba/salas/salaAB2'}" class="img-fluid rounded"/>`;
+                    sala = "SALA DE JUNSTAS <strong>A</strong>";
+                    break;
+                case 2:
+                    img = `<img src="${base_url + 'assets/images/fotos/alba/salas/salaTI2'}" class="img-fluid rounded"/>`;
+                    sala = "SALA DE JUNSTAS <strong>B</strong>";
+                    break;
+                case 3:
+                    img = `<img src="${base_url + 'assets/images/fotos/alba/salas/salaAB'}" class="img-fluid rounded"/>`;
+                    sala = "SALA DE JUNSTAS <strong>AB</strong>";
+                    break;
+                case 4:
+                    img = `<img src="${base_url + 'assets/images/fotos/alba/salas/salaTI'}" class="img-fluid rounded"/>`;
+                    sala = "SALA DE JUNSTAS <strong>TI</strong>";
+                    break;
+
+            }
+            $(".met-profile-main-pic3").html(`<p>${sala}</p>${img}`);
+        },
+        cerrarSala: function () {
+            $("#verSala").modal('hide');
         },
         validacionIncapacidad: function () {
             let incidencia = $('#tipo_incidencia').val();
