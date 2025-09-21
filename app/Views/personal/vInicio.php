@@ -395,7 +395,7 @@
                                                         <div class="card">
                                                             <div class="card-body">
                                                                 <div class="blog-card">
-                                                                    <img src="<?= base_url() ?>assets/images/sep.png" alt="" class="img-fluid"/>                          
+                                                                    <img src="<?= base_url() ?>assets/images/sep2.png" alt="" class="img-fluid"/>                          
                                                                 </div><!--end blog-card--> 
                                                                                         
                                                             </div><!--end card-body-->
