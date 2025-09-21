@@ -3214,7 +3214,7 @@ ini.inicio = (function () {
        agregarInventario: function()
        {
         
-         $("#modelInventarios").modal('show');
+         $("#modelInventarios").modal('show');  
           $('.select2').select2({
              placeholder: "Seleccione una opción",
              allowClear: true,

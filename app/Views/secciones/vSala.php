@@ -210,7 +210,19 @@
                                         <?php foreach($sala_hoy as $s): ?>
                                         <li class="list-group-item align-items-center d-flex">
                                             <div class="media">
-                                                <img src="<?php echo base_url() ?>assets/images/widgets/project1.jpg" class="mr-3 thumb-sm align-self-center rounded-circle" alt="...">
+                                                <?php if($s->sala == "A"): ?>
+                                                    <img src="<?php echo base_url() ?>assets/images/widgets/project1.jpg" class="mr-3 thumb-sm align-self-center rounded-circle" alt="...">
+                                                <?php endif; ?>
+                                                <?php if($s->sala == "B"): ?>
+                                                    <img src="<?php echo base_url() ?>assets/images/widgets/project1.jpg" class="mr-3 thumb-sm align-self-center rounded-circle" alt="...">
+                                                <?php endif; ?>
+                                                <?php if($s->sala == "AB"): ?>
+                                                    <img src="<?php echo base_url() ?>assets/images/fotos/alba/salas/salaAB.jpg" class="mr-3 thumb-sm align-self-center rounded-circle" alt="...">
+                                                <?php endif; ?>
+                                                <?php if($s->sala == "TI"): ?>
+                                                    <img src="<?php echo base_url() ?>assets/images/fotos/alba/salas/salaTI.jpg" class="mr-3 thumb-sm align-self-center rounded-circle" alt="...">
+                                                <?php endif; ?>
+                                               
                                                 <div class="media-body align-self-center"> 
                                                     <h5 class="mt-0 mb-1"><?= $s->evento?></h5>
                                                     <p class="text-muted mb-0">sala : <?= $s->sala.' inicia '.$s->hora_inicio.' termina '.$s->hora_fin ?></p>                                                                                             
@@ -353,9 +365,7 @@
         <script src='<?php echo base_url() ?>plugins/fullcalendar/packages/list/main.js'></script>
         <script src='<?php echo base_url() ?>assets/pages/jquery.calendar.js'></script>
         
-        <!-- App js -->
-        <script src="<?php echo base_url() ?>assets/js/app.js"></script>
-
+  
         <script>
             st.agregar.registroSala();
        
