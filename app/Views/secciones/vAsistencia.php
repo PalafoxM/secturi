@@ -118,9 +118,9 @@
                         <div class="card-body">
                             <div id="map" style="height: 400px; width: 100%; border-radius: 8px;"></div>
 
-                        </div><!--end card-body-->
-                    </div><!--end card-->
-                </div><!--end col-->
+                        </div>
+                    </div>
+                </div>
                 <div class="col-lg-8">
                     <div class="card">
                         <div class="card-body">

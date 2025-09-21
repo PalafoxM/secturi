@@ -414,13 +414,13 @@
                                                         </div><!-- end col-->
                                                         <div class="col-sm-6">
                                                             <p class="mb-0 text-muted font-13"><i
-                                                                    class="mdi mdi-album mr-2 text-warning">Termino des
+                                                                    class="mdi mdi-album mr-2 text-warning">Termino del
                                                                     Sistema</i></p>
                                                         </div><!-- end col-->
                                                     </div><!-- end row-->
                                                     <div class="progress bg-warning mb-3" style="height:5px;">
                                                         <div class="progress-bar bg-secondary" role="progressbar"
-                                                            style="width: 15%" aria-valuenow="15" aria-valuemin="0"
+                                                            style="width: 10%" aria-valuenow="10" aria-valuemin="0"
                                                             aria-valuemax="100"></div>
                                                     </div>
                                                 </div><!--end card-body-->
