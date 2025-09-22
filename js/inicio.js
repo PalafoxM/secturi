@@ -4664,7 +4664,7 @@ ini.inicio = (function () {
                       if(response.error){
                           Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
                       }else{
-                        const url = base_url + "index.php/Usuario/reporteIncidenciaExcel/" + periodoInicio;
+                        const url = base_url + "index.php/Usuario/reporteIncidenciaExcel2/" + periodoInicio;
                         window.open(url, '_blank');
                       } 
                            

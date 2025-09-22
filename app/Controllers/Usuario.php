@@ -26,7 +26,9 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Color;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
-
+use DateTime;
+use DatePeriod;
+use DateInterval;
 
 
 class Usuario extends BaseController 
@@ -170,6 +172,44 @@ class Usuario extends BaseController
             return $this->respond($response);
         } */
 
+    }
+  public function validarReporteExcel2()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+        $globals       = new Mglobal;
+        $periodoInicio = $this->request->getPost('periodoInicio');
+        
+        $dia = date('d', strtotime($periodoInicio));
+
+        // OBTENER EL ÚLTIMO DÍA DEL MES
+        $ultimoDiaMes = date('t', strtotime($periodoInicio)); // 't' devuelve el número de días del mes
+        
+        if($dia == '01'){
+            $fec_ini = date('Y-m-01', strtotime($periodoInicio));
+            $fec_fin = date('Y-m-15', strtotime($periodoInicio));
+        }else{
+            $fec_ini = date('Y-m-16', strtotime($periodoInicio));
+            $fec_fin = date('Y-m-' . $ultimoDiaMes, strtotime($periodoInicio)); // Usar el último día real
+        }
+        
+        $tabla = [
+                'tabla' => 'vw_asistencia_incidencia', 
+                'where' => ['visible' => 1],
+                'whereBetween' => [['fechas_asistencias', $fec_ini, $fec_fin]]
+                ];
+        
+        $incidencias = $globals->getTabla($tabla);
+        $resul = (isset($incidencias->data) && !empty($incidencias->data)) ? $incidencias->data : [];
+    
+        if (empty($resul)) {
+            $response->respuesta = "No se encontrarón datos en el<strong> periodo indicado</strong>";
+        }else{
+        $response->error = false;
+        $response->respuesta = "Datos Correctos";
+        }
+        return $this->respond($response);
     }
     public function validarReporteExcel()
     {
@@ -349,8 +389,218 @@ class Usuario extends BaseController
         $writer->save('php://output');
         exit;
     }
- 
-    
+    public function reporteIncidenciaExcel2($periodoInicio = null)
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+
+        // fallback si no viene periodo
+        if (empty($periodoInicio)) {
+            $periodoInicio = date('Y-m-d');
+        }
+
+        $dia = date('d', strtotime($periodoInicio));
+        $ultimoDiaMes = date('t', strtotime($periodoInicio));
+        
+        if ($dia == '01') {
+            $fec_ini = date('Y-m-01', strtotime($periodoInicio));
+            $fec_fin = date('Y-m-15', strtotime($periodoInicio));
+        } else {
+            $fec_ini = date('Y-m-16', strtotime($periodoInicio));
+            $fec_fin = date('Y-m-' . $ultimoDiaMes, strtotime($periodoInicio));
+        }
+
+        // Traer datos desde la vista
+        $tabla = [
+            'tabla' => 'vw_asistencia_incidencia',
+            'where' => ['visible' => 1],
+            'whereBetween' => [['fechas_asistencias', $fec_ini, $fec_fin]],
+        ];
+        $datos = $globals->getTabla($tabla);
+        $resul = (isset($datos->data) && !empty($datos->data)) ? $datos->data : [];
+
+        // Map para estatus (si vienen id_estatus)
+        $mapEstatus = [
+            1 => 'EN PROCESO',
+            2 => 'VALIDADO',
+            3 => 'DECLINADO'
+        ];
+
+        // 1) Construir lista de fechas del periodo (Y-m-d)
+        $start = new \DateTime($fec_ini);
+        $end = new \DateTime($fec_fin);
+        $end->modify('+1 day'); // incluir fecha final
+        $interval = new \DateInterval('P1D');
+        $period = new \DatePeriod($start, $interval, $end);
+
+        $fechasDelPeriodo = [];
+        foreach ($period as $d) {
+            $fechasDelPeriodo[] = $d->format('Y-m-d');
+        }
+
+        // 2) Agrupar por usuario y por fecha
+        // Estructura: $usuarios[$nombre][$fecha] = ['entrada'=>'','salida'=>'','incidencias'=>[]]
+        $usuarios = [];
+
+        foreach ($resul as $r) {
+            $nombre = trim($r->nombre_completo ?: 'Sin nombre');
+            $fechaYmd = !empty($r->fechas_asistencias) ? date('Y-m-d', strtotime($r->fechas_asistencias)) : null;
+            if (!$fechaYmd) continue; // saltar filas sin fecha válida
+
+            if (!in_array($fechaYmd, $fechasDelPeriodo, true)) {
+                // si por alguna razón la fecha no está en el periodo, la ignoramos
+                continue;
+            }
+
+            if (!isset($usuarios[$nombre])) {
+                $usuarios[$nombre] = [];
+            }
+            if (!isset($usuarios[$nombre][$fechaYmd])) {
+                $usuarios[$nombre][$fechaYmd] = [
+                    'entrada' => '',
+                    'salida' => '',
+                    'incidencias' => [] // array para luego concatenar
+                ];
+            }
+
+            // Guardar entrada / salida si vienen y aún no establecidas
+            if (!empty($r->hora_inicio) && empty($usuarios[$nombre][$fechaYmd]['entrada'])) {
+                $usuarios[$nombre][$fechaYmd]['entrada'] = $r->hora_inicio;
+            }
+            if (!empty($r->hora_fin) && empty($usuarios[$nombre][$fechaYmd]['salida'])) {
+                $usuarios[$nombre][$fechaYmd]['salida'] = $r->hora_fin;
+            }
+
+            // Incidencias: usar id_estatus para mapear (si viene)
+            if (isset($r->id_estatus) && !empty($r->id_estatus)) {
+                $texto = $mapEstatus[$r->id_estatus] ?? '';
+                if ($texto !== '' && !in_array($texto, $usuarios[$nombre][$fechaYmd]['incidencias'], true)) {
+                    $usuarios[$nombre][$fechaYmd]['incidencias'][] = $texto;
+                }
+            }
+        }
+
+        // 3) Preparar Spreadsheet
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Filas de encabezado
+        $sheet->setCellValue('A1', '');
+        $sheet->setCellValue('A2', 'Nombre');
+
+        // Construir cabeceras por fecha: cada fecha ocupará 3 columnas
+        // Empezamos en columna 2 (B)
+        $colIndex = 2;
+        foreach ($fechasDelPeriodo as $fecha) {
+            $colStart = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
+            $colMid   = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 1);
+            $colEnd   = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 2);
+
+            // Escribir la fecha en formato DD/MM/YYYY en la fila 1 y hacer merge sobre 3 celdas
+            $sheet->setCellValue($colStart . '1', date('d/m/Y', strtotime($fecha)));
+            $sheet->mergeCells("{$colStart}1:{$colEnd}1");
+
+            // Subcabeceras
+            $sheet->setCellValue($colStart . '2', 'Entrada');
+            $sheet->setCellValue($colMid . '2', 'Salida');
+            $sheet->setCellValue($colEnd . '2', 'Incidencia');
+
+            // Centrar texto de la fecha
+            $sheet->getStyle($colStart . '1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+            $colIndex += 3;
+        }
+
+        // 4) Escribir datos por usuario
+        $fila = 3;
+        // Ordenar usuarios alfabéticamente
+        ksort($usuarios, SORT_STRING);
+        foreach ($usuarios as $nombre => $fechas) {
+            $sheet->setCellValue('A' . $fila, $nombre);
+
+            $colIndex = 2;
+            foreach ($fechasDelPeriodo as $fecha) {
+                $colEntrada = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
+                $colSalida  = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 1);
+                $colInc     = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 2);
+
+                $entrada = isset($usuarios[$nombre][$fecha]) ? $usuarios[$nombre][$fecha]['entrada'] : '';
+                $salida  = isset($usuarios[$nombre][$fecha]) ? $usuarios[$nombre][$fecha]['salida'] : '';
+                $incArr  = isset($usuarios[$nombre][$fecha]) ? $usuarios[$nombre][$fecha]['incidencias'] : [];
+
+                $incidenciaTexto = !empty($incArr) ? implode('; ', $incArr) : '';
+
+                $sheet->setCellValue($colEntrada . $fila, $entrada);
+                $sheet->setCellValue($colSalida . $fila, $salida);
+                $sheet->setCellValue($colInc . $fila, $incidenciaTexto);
+
+                // Estilos: si entrada es hora válida, colorear si es tardía
+                if (preg_match('/^\d{2}:\d{2}:\d{2}$/', $entrada)) {
+                    list($hh, $mm, $ss) = explode(':', $entrada);
+                    $seg = ($hh * 3600) + ($mm * 60) + $ss;
+                    $u09 = 9 * 3600;
+                    $u0845 = (8 * 3600) + (45 * 60);
+
+                    if ($seg > $u09) {
+                        $sheet->getStyle($colEntrada . $fila)
+                            ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                            ->getStartColor()->setARGB('FFFF5166'); // rojo fuerte
+                    } elseif ($seg > $u0845) {
+                        $sheet->getStyle($colEntrada . $fila)
+                            ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                            ->getStartColor()->setARGB('FFCC3A1A'); // rojo medio
+                    }
+                } else {
+                    // entrada vacía -> amarillo sutil
+                    if ($entrada === '') {
+                        $sheet->getStyle($colEntrada . $fila)
+                            ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                            ->getStartColor()->setARGB('FFFFFF00');
+                    }
+                }
+
+                // Estilo para incidencia
+                if (!empty($incidenciaTexto)) {
+                    $sheet->getStyle($colInc . $fila)
+                        ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                        ->getStartColor()->setARGB('FFFFA500'); // naranja
+                    $sheet->getStyle($colInc . $fila)->getAlignment()->setWrapText(true);
+                }
+
+                $colIndex += 3;
+            }
+
+            $fila++;
+        }
+
+        // 5) Ajustar anchos de columna
+        $sheet->getColumnDimension('A')->setWidth(40);
+        $totalCols = 1 + (count($fechasDelPeriodo) * 3); // A + 3 columnas por fecha
+        for ($i = 2; $i <= $totalCols; $i++) {
+            $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i);
+            $sheet->getColumnDimension($colLetter)->setWidth(15);
+        }
+
+        // Estilos encabezado: negrita
+        $sheet->getStyle('A1:A2')->getFont()->setBold(true);
+        // negrita para la fila 2 entera
+        $lastColLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($totalCols);
+        $sheet->getStyle("A2:{$lastColLetter}2")->getFont()->setBold(true);
+        $sheet->getStyle("A1:{$lastColLetter}1")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+        // 6) Descargar archivo
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $fileName = 'reporte_asistencias_incidencias_' . date('Ymd_His') . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"{$fileName}\"");
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        exit;
+    }
+
+
     public function getIncidencia()
     {
         $session = \Config\Services::session();
@@ -790,343 +1040,8 @@ class Usuario extends BaseController
         }
         return $this->respond($response);
     }
-    public function editarCurso()
-    {
-        $session = \Config\Services::session();
-        $response = new \stdClass();
-        $response->error = true;
-        $data = $this->request->getPost();
-        $file = $this->request->getFile('img_ruta');
-        $file2 = $this->request->getFile('img_deta_ruta');
-    
-        // Validar campos obligatorios
-        if (!isset($data['categoria']) || empty($data['categoria'])) {
-            $response->respuesta = "Es requerido categoría.";
-            return $this->respond($response);
-        }
-        if (!isset($data['periodo']) || empty($data['periodo'])) {
-            $response->respuesta = "Es requerido periodo.";
-            return $this->respond($response);
-        }
-        if (!isset($data['nombre_curso']) || empty($data['nombre_curso'])) {
-            $response->respuesta = "Es requerido nombre curso.";
-            return $this->respond($response);
-        }
-    
-        // Validar archivos solo si se han subido nuevos
-        $allowedMimeTypes = ['image/png', 'image/jpeg'];
-        $maxSize = 1 * 1024 * 1024; // 1 MB
-    
-        if ($file && $file->isValid()) {
-            if (!in_array($file->getMimeType(), $allowedMimeTypes)) {
-                $response->respuesta = "El archivo img_ruta debe ser una imagen PNG o JPG.";
-                return $this->respond($response);
-            }
-            if ($file->getSize() > $maxSize) {
-                $response->respuesta = "El archivo img_ruta no debe exceder 1 MB.";
-                return $this->respond($response);
-            }
-        }
-    
-        if ($file2 && $file2->isValid()) {
-            if (!in_array($file2->getMimeType(), $allowedMimeTypes)) {
-                $response->respuesta = "El archivo img_deta_ruta debe ser una imagen PNG o JPG.";
-                return $this->respond($response);
-            }
-            if ($file2->getSize() > $maxSize) {
-                $response->respuesta = "El archivo img_deta_ruta no debe exceder 1 MB.";
-                return $this->respond($response);
-            }
-        }
-    
-        // Mover los archivos a la carpeta de destino (solo si se han subido nuevos)
-        $uploadPath = FCPATH . 'assets/images/cartas/';
-    
-        if (!is_dir($uploadPath)) {
-            mkdir($uploadPath, 0777, true); // Crear la carpeta si no existe
-        }
-    
-        $newName = null;
-        $newName2 = null;
-    
-        if ($file && $file->isValid()) {
-            $newName = $file->getRandomName(); // Generar un nombre único
-            $file->move($uploadPath, 'imagen_' . $newName);
-        }
-    
-        if ($file2 && $file2->isValid()) {
-            $newName2 = $file2->getRandomName(); // Generar un nombre único
-            $file2->move($uploadPath, 'imagen_detalle' . $newName2);
-        }
-    
-        // Preparar datos para actualizar el curso
-        $dataUpdate = [
-            'dsc_curso'    => $data['nombre_curso'],
-            'descripcion'  => $data['descripcion'],
-            'des_larga'    => $data['des_larga'],
-            'usu_act'      => (int)$session->id_usuario,
-        ];
-        if(isset($data['new_curso']) && !empty($data['new_curso'])){
-            $dataUpdate['nuevo'] = 1;
-        }else{
-            $dataUpdate['nuevo'] = 0;
-        }
-        if(isset($data['dirigido']) && !empty($data['dirigido'])){
-            $dataUpdate['dirigido'] = $data['dirigido'];
-        }
-        if(isset($data['duracion']) && !empty($data['duracion'])){
-            $dataUpdate['duracion'] = $data['duracion'];
-        }
-        if(isset($data['autogestivo']) && !empty($data['autogestivo'])){
-            $dataUpdate['autogestivo'] = $data['autogestivo'];
-        }
-        if(isset($data['horas']) && !empty($data['horas'])){
-            $dataUpdate['horas'] = $data['horas'];
-        }
-        if(isset($data['curso_linea']) && !empty($data['curso_linea'])){
-            $dataUpdate['curso_linea'] = $data['curso_linea'];
-        }
-        if(isset($data['informacion']) && !empty($data['informacion'])){
-            $dataUpdate['informacion']  = $data['informacion'];
-        }
-        // Actualizar las rutas de las imágenes solo si se han subido nuevos archivos
-        if ($newName) {
-            $dataUpdate['img_ruta'] = 'assets/images/cartas/imagen_' . $newName;
-        }
-        if ($newName2) {
-            $dataUpdate['img_deta_ruta'] = 'assets/images/cartas/imagen_detalle' . $newName2;
-        }
-    
-        if (isset($data['id_moodle']) && !empty($data['id_moodle'])) {
-            $dataUpdate['id_moodle'] = $data['id_moodle'];
-        }
-    
-        // Configuración para la actualización
-        $dataConfig = [
-            "tabla" => "cursos_sac",
-            "editar" => true,
-            "idEditar" => ['id_cursos_sac' => (int)$data['editar_curso']]
-        ];
-    
-        // Guardar en la base de datos
-        $result = $this->globals->saveTabla($dataUpdate, $dataConfig, ["script" => "categoriaCurso.editarCurso"]);
-    
-        if (!$result->error) {
-            // Desactivar categorías y periodos anteriores
-            $categoria_curso = $this->globals->getTabla([
-                "tabla" => "categoria_curso",
-                "where" => ["id_curso" => $data['editar_curso']]
-            ]);
-            $periodo_curso = $this->globals->getTabla([
-                "tabla" => "periodo_curso",
-                "where" => ["id_curso" => $data['editar_curso']]
-            ]);
-    
-            foreach ($categoria_curso->data as $j) {
-                $dataInsert = [
-                    'visible' => 0, // Desactivar la categoría
-                    'usu_act' => $session->id_usuario,
-                ];
-                $dataConfig = [
-                    "tabla" => "categoria_curso",
-                    "editar" => true,
-                    "idEditar" => ['id_curso' => $data['editar_curso']]
-                ];
-                $this->globals->saveTabla($dataInsert, $dataConfig, ["script" => "categoriaCurso.editarCurso"]);
-            }
-    
-            foreach ($data['categoria'] as $key) {
-                $dataInsert = [
-                    'id_curso'     => $data['editar_curso'],
-                    'id_categoria' => $key,
-                    'fec_reg'      => date('Y-m-d H:i:s'),
-                    'usu_reg'      => $session->id_usuario,
-                ];
-                $dataConfig = [
-                    "tabla" => "categoria_curso",
-                    "editar" => false
-                ];
-                $this->globals->saveTabla($dataInsert, $dataConfig, ["script" => "categoriaCurso.guardarCurso"]);
-            }
-    
-            foreach ($periodo_curso->data as $k) {
-                $dataInsert = [
-                    'visible' => 0, // Desactivar el periodo
-                    'usu_act' => $session->id_usuario,
-                ];
-                $dataConfig = [
-                    "tabla" => "periodo_curso",
-                    "editar" => true,
-                    "idEditar" => ['id_curso' => $data['editar_curso']]
-                ];
-                $this->globals->saveTabla($dataInsert, $dataConfig, ["script" => "categoriaCurso.editarCurso"]);
-            }
-    
-            foreach ($data['periodo'] as $key) {
-                $dataInsert = [
-                    'id_curso'     => $data['editar_curso'],
-                    'id_periodo'   => $key,
-                    'fec_reg'      => date('Y-m-d H:i:s'),
-                    'usu_reg'      => $session->id_usuario,
-                ];
-                $dataConfig = [
-                    "tabla" => "periodo_curso",
-                    "editar" => false
-                ];
-                $this->globals->saveTabla($dataInsert, $dataConfig, ["script" => "categoriaCurso.guardarCurso"]);
-            }
-    
-            $response->error = false;
-            $response->respuesta = "Curso actualizado correctamente.";
-        } else {
-            $response->respuesta = $result->respuesta;
-        }
-    
-        return $this->respond($response);
-    }
-    public function guardarCursos()
-    {
-        $session = \Config\Services::session();
-        $response = new \stdClass();
-        $response->error = true;
-        $data = $this->request->getPost();
-        $file = $this->request->getFile('img_ruta');
-        $file2 = $this->request->getFile('img_deta_ruta');
-    
-        // Validar archivo
-        if ($file === null || !$file->isValid() || $file2 === null || !$file2->isValid() ) {
-            $response->respuesta = "El archivo de imagen no es válido.";
-            return $this->respond($response);
-        }
-    
-        // Validar tipo MIME y tamaño del archivo
-        $allowedMimeTypes = ['image/png', 'image/jpeg'];
-        $maxSize = 1 * 1024 * 1024; // 1 MB
-    
-        if (!in_array($file->getMimeType(), $allowedMimeTypes)) {
-            $response->respuesta = "El archivo debe ser una imagen PNG o JPG.";
-            return $this->respond($response);
-        }
-        if (!in_array($file2->getMimeType(), $allowedMimeTypes)) {
-            $response->respuesta = "El archivo debe ser una imagen PNG o JPG.";
-            return $this->respond($response);
-        }
-    
-        if ($file->getSize() > $maxSize || $file2->getSize() > $maxSize ) {
-            $response->respuesta = "El archivo no debe exceder 1 MB.";
-            return $this->respond($response);
-        }
-    
-        // Mover el archivo a la carpeta de destino
-        $uploadPath = FCPATH . 'assets/images/cartas/';
-    
-        if (!is_dir($uploadPath)) {
-            mkdir($uploadPath, 0777, true); // Crear la carpeta si no existe
-        }
-    
-        $newName = $file->getRandomName(); // Generar un nombre único para el archivo
-        $newName2 = $file2->getRandomName(); // Generar un nombre único para el archivo
-        $file->move($uploadPath, 'imagen_'.$newName); // Mover el archivo
-        $file2->move($uploadPath, 'imagen_detalle'.$newName2); // Mover el archivo
-
-    
-    
-        // Validar campos obligatorios
-        if (!isset($data['categoria']) || empty($data['categoria'])) {
-            $response->respuesta = "Es requerido categoría.";
-            return $this->respond($response);
-        }
-        if (!isset($data['periodo']) || empty($data['periodo'])) {
-            $response->respuesta = "Es requerido periodo.";
-            return $this->respond($response);
-        }
-        if (!isset($data['nombre_curso']) || empty($data['nombre_curso'])) {
-            $response->respuesta = "Es requerido nombre curso.";
-            return $this->respond($response);
-        }
-    
-        // Preparar datos para insertar en la tabla de cursos
-        $dataInsert = [
-            'dsc_curso'    => $data['nombre_curso'],
-            'descripcion'  => $data['descripcion'],
-            'des_larga'    => $data['des_larga'],
-            'dirigido'     => $data['dirigido'],
-            'duracion'     => $data['duracion'],
-            'autogestivo'  => $data['autogestivo'],
-            'horas'        => $data['horas'],
-            'curso_linea'  => $data['curso_linea'],
-            'informacion'  => $data['informacion'],
-            'img_ruta'     => 'assets/images/cartas/imagen_' . $newName, // Guardar la ruta relativa
-            'img_deta_ruta'=> 'assets/images/cartas/imagen_detalle' . $newName2, // Guardar la ruta relativa
-            'usu_reg'      => $session->id_usuario,
-        ];
-    
-        if (isset($data['id_moodle']) && !empty($data['id_moodle'])) {
-            $dataInsert['id_moodle'] = $data['id_moodle'];
-        }
-        if (isset($data['new_curso']) && !empty($data['new_curso'])) {
-            $dataInsert['nuevo'] = 1;
-        }
-    
-        // Guardar en la tabla de cursos
-        $dataConfig = [
-            "tabla" => "cursos_sac",
-            "editar" => false,
-        ];
-    
-        $result = $this->globals->saveTabla($dataInsert, $dataConfig, ["script" => "Usuario.guardarCurso"]);
-    
-        if (!$result->error) {
-            $idRegistro = $result->idRegistro;
-    
-            // Guardar periodos asociados al curso
-            foreach ($data['periodo'] as $p) {
-                $dataInsert = [
-                    'id_curso'   => $idRegistro,
-                    'id_periodo' => $p,
-                    'fec_reg'    => date('Y-m-d H:i:s'),
-                    'usu_reg'    => $session->id_usuario,
-                ];
-                $dataConfig = [
-                    "tabla" => "periodo_curso",
-                    "editar" => false,
-                ];
-                $result = $this->globals->saveTabla($dataInsert, $dataConfig, ["script" => "Usuario.guardarCurso"]);
-                if ($result->error) {
-                    $response->error = $result->error;
-                    $response->respuesta = $result->respuesta;
-                    return $this->respond($response);
-                }
-            }
-    
-            // Guardar categorías asociadas al curso
-            foreach ($data['categoria'] as $c) {
-                $dataInsert = [
-                    'id_curso'    => $idRegistro,
-                    'id_categoria' => $c,
-                    'fec_reg'     => date('Y-m-d H:i:s'),
-                    'usu_reg'     => $session->id_usuario,
-                ];
-                $dataConfig = [
-                    "tabla" => "categoria_curso",
-                    "editar" => false,
-                ];
-                $result = $this->globals->saveTabla($dataInsert, $dataConfig, ["script" => "Usuario.guardarCurso"]);
-                if ($result->error) {
-                    $response->error = $result->error;
-                    $response->respuesta = $result->respuesta;
-                    return $this->respond($response);
-                }
-            }
-    
-            $response->error = false;
-            $response->respuesta = "Curso guardado correctamente.";
-        } else {
-            $response->respuesta = $result->respuesta;
-        }
-    
-        return $this->respond($response);
-    }
+  
+   
     public function getCursos()
     {
         $session = \Config\Services::session();
@@ -1749,71 +1664,7 @@ class Usuario extends BaseController
         }
         return $this->respond($response);
     }
-    public function guardarCursoSac()
-    {
-        $session = \Config\Services::session();
-        $response = new \stdClass();
-        $response->error = true;
-        $data = $this->request->getPost();
-        if(isset($data['editar']) && !empty($data['editar'])){
-            if($data['editar'] == 2){
-                $dataInsert=[       
-                    'visible' => 0,
-                    'usu_act' => $session->id_usuario
-                ];
-                $dataConfig = [
-                        "tabla"=>"cursos_sac",
-                        "editar"=>true,
-                        "idEditar" =>["id_cursos_sac" => $data['id_cat']]
-                ];
-                   
-            }
-            if($data['editar'] == 1){
-                $dataInsert=[       
-                    'id_curso_sac'    => (int)$data['categoria'],
-                    'dsc_curso_sac'   => $data['nombre_curso'],
-                    'id_moodle'         => $data['id_moodle'],
-                    'usu_act'           => $session->id_usuario,
-                  
-        
-                ];
-                $dataConfig = [
-                        "tabla"=>"cat_curso_sac",
-                        "editar"=>true,
-                        "idEditar" =>["id_curso_sac" => $data['editar_curso']]
-                ];
-                   
-            }
-            if($data['editar'] == 3){
-                $dataInsert=[       
-                    'visible' => 1,
-                    'usu_act'    => $session->id_usuario,
-                ];
-                $dataConfig = [
-                        "tabla"=>"cat_curso_sac",
-                        "editar"=>true,
-                        "idEditar" =>["id_curso_sac" => $data['id_cat']]
-                ];
-                   
-            }
-
-        }else{
-            $dataInsert=[       
-                'dsc_categoria_sac' => $data['comentario'],
-                'fec_reg'    => date('Y-m-d H:i:s'),
-                'usu_reg'    => $session->id_usuario,
-    
-            ];
-            $dataConfig = [
-                    "tabla"=>"cat_curso_sac",
-                    "editar"=>false,
-                    //  "idEditar"=>['id_usuario'=>$data['id_usuario']]
-            ];  
-        }
-      
-        $response = $this->globals->saveTabla($dataInsert,$dataConfig,["script"=>"categoria_sac.saveCategoria"]);
-        return $this->respond($response);
-    }
+  
     public function UpdateUsuario()
     {
         $response = new \stdClass();

@@ -1413,55 +1413,7 @@ class Agregar extends BaseController
 
         return $this->respond($response);
     }
-    public function guardarCursoPrograma()
-    {
-        $session = \Config\Services::session();
-        $response = new stdClass();
-        $response->error = true;
-        $response->respuesta = 'Error| Error al generar la consulta';
-        $Mglobal = new Mglobal;
-        $data = $this->request->getPost();
-        $hoy = date("Y-m-d H:i:s");
-        if ($data['editar'] == 0) {
-            $where = ['visible' => 1, 'id_curso' => $data['id_curso_sac'], 'id_periodo' => $data['periodo'], 'id_usuario' => $session->id_usuario];
-            $registro = $Mglobal->getTabla(['tabla' => 'estudiante_curso', 'where' => $where]);
-
-            if (isset($registro->data) && !empty($registro->data)) {
-                $response->error = true;
-                $response->respuesta = 'El Usuario ya tiene registrado este curso y periodo';
-                return $this->respond($response);
-            }
-        }
-
-        $dataConfig = [
-            "tabla" => "estudiante_curso",
-            "editar" => ($data['editar'] == 1) ? true : false,
-            "idEditar" => ['id_estudiante_curso' => $data['id_periodo_editar']]
-        ];
-        if ($data['editar'] == 0) {
-            $Insert = [
-                'id_curso' => (int) $data['id_curso_sac'],
-                'id_periodo' => (int) $data['periodo'],
-                'id_usuario' => (int) $session->id_usuario,
-                'usu_reg' => (int) $session->id_usuario,
-                'fec_reg' => $hoy
-            ];
-        } else {
-            $Insert = [
-                'id_periodo' => (int) $data['periodo'],
-                'usu_act' => (int) $session->id_usuario,
-            ];
-        }
-
-        $dataBitacora = ['id_user' => $session->id_usuario, 'script' => 'Agregar.php/guardaCurso'];
-        $result = $Mglobal->saveTabla($Insert, $dataConfig, $dataBitacora);
-        if (!$result->error) {
-            $response->error = false;
-            $response->respuesta = $result->respuesta;
-        }
-
-        return $this->respond($response);
-    }
+  
     public function detalleCurso($id_cursos_sac = null)
     {
         $session = \Config\Services::session();
@@ -2305,7 +2257,7 @@ class Agregar extends BaseController
             'id_usuario' => $session->get('id_usuario'),
             'catering' => $data['catering']
         ];
-        $dataBitacora = ['id_user' => $session->id_usuario, 'script' => 'Agregar.php/guardaCurso'];
+        $dataBitacora = ['id_user' => $session->id_usuario, 'script' => 'Agregar.php/guardaSala'];
         $dataConfig = [
             "tabla" => "sala_junta",
             "editar" => false
