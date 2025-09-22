@@ -340,13 +340,13 @@
                                         <div class="media">
                                             <?php if ($s->sala == "A"): ?>
                                                 <a href="javascript:void(0)" onclick="st.agregar.modalSala(1);">
-                                                    <img src="<?= base_url('assets/images/widgets/project1.jpg') ?>"
+                                                    <img src="<?= base_url('assets/images/fotos/alba/salas/salaA.jpg') ?>"
                                                         class="mr-3 thumb-sm align-self-center rounded-circle" alt="...">
                                                 </a>
                                             <?php endif; ?>
                                             <?php if ($s->sala == "B"): ?>
                                                 <a href="javascript:void(0)" onclick="st.agregar.modalSala(2);">
-                                                    <img src="<?= base_url('assets/images/widgets/project1.jpg') ?>"
+                                                    <img src="<?= base_url('assets/images/fotos/alba/salas/salaB.jpg') ?>"
                                                         class="mr-3 thumb-sm align-self-center rounded-circle" alt="...">
                                                 </a>
 
