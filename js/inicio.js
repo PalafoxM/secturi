@@ -2818,38 +2818,42 @@ ini.inicio = (function () {
             });
 
         },
-        agregarUsuario: function(){
+      agregarUsuario: function(){
             $("#formAgregarUsuarioTsi").submit(function (e) {
                 e.preventDefault(); 
                 $("#id_dependencia").prop("disabled", false);
-                var formData = $("#formAgregarUsuarioTsi").serialize();
+                
+                // CREAR FormData PARA ENVIAR ARCHIVOS
+                var formData = new FormData(this);
+                
                 $("#id_dependencia").prop("disabled", true);
                 $("#btn_save").hide();
                 $("#btn_load").show();
+                
                 $.ajax({
                     type: "POST",
                     url: base_url + "index.php/Agregar/guardaUsuarioSti",
-                    data:formData,
+                    data: formData, // Usar FormData en lugar de serialize()
                     dataType: "json",
+                    contentType: false, // IMPORTANTE para FormData
+                    processData: false, // IMPORTANTE para FormData
                     success: function (response) {
                         console.log(response);
                         if(response.error){
                             Swal.fire("error", response.respuesta ,"error");
-                        }else{
-                        Swal.fire("success", "Se guardo con exito", 'success');
-                        $("#formAgregarUsuarioTsi")[0].reset();
+                        } else {
+                            Swal.fire("success", "Se guardó con éxito", 'success');
+                            $("#formAgregarUsuarioTsi")[0].reset();
+                            $("#btn_save").show();
+                            $("#btn_load").hide();
+                            window.location.href = base_url + "index.php/Inicio/usuarios";
+                        }
+                    },
+                    error: function (response, jqXHR, textStatus, errorThrown) {
+                        var res = JSON.parse(response.responseText);
+                        Swal.fire("Error", '<p> '+ res.message + '</p>', 'error');  
                         $("#btn_save").show();
                         $("#btn_load").hide();
-                        window.location.href = base_url + "index.php/Inicio/usuarios";
-                    }
-                       
-                    },
-                    error: function (response,jqXHR, textStatus, errorThrown) {
-                         var res= JSON.parse (response.responseText);
-                        //  console.log(res.message);
-                         Swal.fire("Error", '<p> '+ res.message + '</p>', 'error');  
-                         $("#btn_save").show();
-                         $("#btn_load").hide();
                     }
                 });
             });

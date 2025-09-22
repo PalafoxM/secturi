@@ -1,5 +1,5 @@
 <!-- Top Bar End -->
-<?php  $session = \Config\Services::session();    ?>
+<?php $session = \Config\Services::session(); ?>
 <div class="page-wrapper">
 
     <!-- Page Content-->
@@ -32,7 +32,7 @@
                             <a href="<?php echo base_url(); ?>index.php/Inicio/altaUsuario"
                                 class="btn btn-gradient-danger px-4 float-right mt-0 mb-3"><i
                                     class="mdi mdi-account-plus-outline mr-2"></i>Agregar</a>
-                                    <?php if($session->id_perfil == 1):?>
+                                    <?php if ($session->id_perfil == 1): ?>
                             <button onclick="ini.inicio.cargaCsv()"
                                 class="btn btn-gradient-primary px-4 float-right mt-0 mb-3"><i
                                     class="mdi mdi-plus-circle-outline mr-2"></i>Subir y Procesar</button>
@@ -42,6 +42,8 @@
                                 <table id="usuariosTable" class="table">
                                     <thead class="thead-light">
                                         <tr>
+                                            <th class="text-center">ID</th>
+                                            <th class="text-center">FOTO</th>
                                             <th class="text-center">NOMBRE</th>
         
                                             <th class="text-center">PUESTO</th>
@@ -56,14 +58,20 @@
                                     </thead>
 
                                     <tbody>
-                                        <?php foreach($usuario as $u): ?>
+                                        <?php foreach ($usuario as $u): ?>
                                         <tr>
+                                            <td class="text-center"><?= $u->id_usuario ?></td>
+                                            <td class="text-center">
+                                                <a href="javascript:void(0);" onclick="ini.inicio.verDetalles(<?= $u->id_usuario ?>)">
+                                                <img src="<?= base_url() . $u->ruta_foto_relativa ?>" alt="" class="rounded-circle thumb-sm mr-1">
+                                                 </a>
+                                            </td>
                                             <td class="text-center"><?= $u->nombre_completo ?></td>
-                                            <td class="text-center"><?= $u->dsc_puesto?></td>
-                                            <td class="text-center"><?= $u->dsc_area?></td>
-                                            <td class="text-center"><?= $u->correo?></td>
-                                            <td class="text-center"><?= $u->no_empleado?></td>
-                                            <td class="text-center"><?= $u->dsc_tipo_empleado?></td>
+                                            <td class="text-center"><?= $u->dsc_puesto ?></td>
+                                            <td class="text-center"><?= $u->dsc_area ?></td>
+                                            <td class="text-center"><?= $u->correo ?></td>
+                                            <td class="text-center"><?= $u->no_empleado ?></td>
+                                            <td class="text-center"><?= $u->dsc_tipo_empleado ?></td>
                                             <td class="text-center">
                                          <!-- tu trigger -->
                                                 <a href="javascript:void(0);"
@@ -72,13 +80,13 @@
                                                 </a>
 
 
-                                                 <a target="_blank" href="<?php echo base_url().'index.php/Principal/imprimer_qr/'.$u->no_empleado ?>"
+                                                 <a target="_blank" href="<?php echo base_url() . 'index.php/Principal/imprimer_qr/' . $u->no_empleado ?>"
                                                     data-animation="bounce" ><i
                                                         class="mdi mdi-barcode-scan text-info font-18"></i></a>
 
-                                                <?php if($session->id_usuario != $u->id_usuario):?>
+                                                <?php if ($session->id_usuario != $u->id_usuario): ?>
                                                 <a href="javascript:void(0);"
-                                                    onclick="ini.inicio.deleteUsuario(<?=$u->id_usuario?>)"><i
+                                                    onclick="ini.inicio.deleteUsuario(<?= $u->id_usuario ?>)"><i
                                                         class="mdi mdi-trash-can text-danger font-18"></i></a>
                                                 <?php endif; ?>
 
@@ -94,6 +102,26 @@
             </div>
         </div>
     </div>
+
+<div class="modal fade" id="modalUsuario" tabindex="-1" aria-labelledby="" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="">Ver detalles</h5>
+        <button type="button" onclick="ini.inicio.cerrarUsuario()" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+        <div class="modal-body">
+           <div class="met-profile-main-pic text-center">
+               
+               
+            </div>
+        </div>
+      <div class="modal-footer">
+        <button type="button" onclick="ini.inicio.cerrarUsuario()" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
 
     <!-- Modal -->
 
@@ -193,7 +221,7 @@
                                                         id="id_perfil" name="id_perfil" data-placeholder="Seleccione"
                                                         style="z-index:100;">
                                                         <option value="0">Seleccione</option>
-                                                        <?php foreach($cat_perfil as $p): ?>
+                                                        <?php foreach ($cat_perfil as $p): ?>
                                                         <option value="<?= $p->id_perfil ?>"><?= $p->dsc_perfil ?>
                                                         <?php endforeach; ?>
                                                     </select>
@@ -210,7 +238,7 @@
                                                         id="id_area" name="id_area" data-placeholder="Seleccione"
                                                         style="z-index:100;">
                                                         <option value="0">Seleccione</option>
-                                                        <?php foreach($cat_area as $a): ?>
+                                                        <?php foreach ($cat_area as $a): ?>
                                                         <option value="<?= $a->id_area ?>"><?= $a->dsc_area ?>
                                                         <?php endforeach; ?>
                                                     </select>
@@ -254,7 +282,7 @@
                                                         id="id_jefe_inmediato" name="id_jefe_inmediato" data-placeholder="Seleccione"
                                                         style="z-index:100;">
                                                         <option value="0">Seleccione</option>
-                                                        <?php foreach($usuario as $a): ?>
+                                                        <?php foreach ($usuario as $a): ?>
                                                         <option value="<?= $a->id_usuario ?>"><?= $a->nombre_completo ?>
                                                         <?php endforeach; ?>
                                                     </select>
@@ -268,7 +296,7 @@
                                                         id="id_puesto" name="id_puesto" data-placeholder="Seleccione"
                                                         style="z-index:100;">
                                                         <option value="0">Seleccione</option>
-                                                        <?php foreach($cat_puesto as $a): ?>
+                                                        <?php foreach ($cat_puesto as $a): ?>
                                                         <option value="<?= $a->id_puesto ?>"><?= $a->dsc_puesto ?>
                                                         <?php endforeach; ?>
                                                     </select>
@@ -282,7 +310,7 @@
                                                         id="id_tipo_empleado" name="id_tipo_empleado" data-placeholder="Seleccione"
                                                         style="z-index:100;">
                                                         <option value="0">Seleccione</option>
-                                                        <?php foreach($tipo_empleado as $a): ?>
+                                                        <?php foreach ($tipo_empleado as $a): ?>
                                                         <option value="<?= $a->id_tipo_empleado ?>"><?= $a->dsc_tipo_empleado ?>
                                                         <?php endforeach; ?>
                                                     </select>
@@ -316,6 +344,13 @@
                                                         class="form-label">EXTENCION</label>
                                                     <input type="number" autocomplete="off" class="form-control" id="extencion" name="extencion"
                                                         placeholder="EXT">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3 position-relative" >
+                                                    <label for="extencion"
+                                                        class="form-label">FOTO</label>
+                                                    <input type="file" autocomplete="off" class="form-control" id="foto" name="foto" accept=".jpeg, .png, .jpg">
                                                 </div>
                                             </div>
                                         </div>
@@ -397,8 +432,8 @@
 <link href="<?php echo base_url(); ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 <link href="<?php echo base_url(); ?>assets/css/jquery-ui.min.css" rel="stylesheet">
 <link href="<?php echo base_url(); ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
-<link href="<?= base_url()?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
-<link href="<?= base_url()?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
+<link href="<?= base_url() ?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+<link href="<?= base_url() ?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
 <!-- jQuery  -->
  
 <script src="<?php echo base_url(); ?>assets/js/jquery.min.js"></script>
@@ -412,13 +447,13 @@
 <script src="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.js"></script>
 
 <!-- App js -->
-<script src="<?= base_url()?>assets/js/app.js"></script>
-<script src="<?= base_url()?>assets/js/waves.js"></script>
-<script src="<?= base_url()?>assets/js/feather.min.js"></script>
+<script src="<?= base_url() ?>assets/js/app.js"></script>
+<script src="<?= base_url() ?>assets/js/waves.js"></script>
+<script src="<?= base_url() ?>assets/js/feather.min.js"></script>
 
-<script src="<?= base_url()?>plugins/tiny-editable/mindmup-editabletable.js"></script>
-<script src="<?= base_url()?>plugins/tiny-editable/numeric-input-example.js"></script>
-<script src="<?= base_url()?>plugins/bootable/bootstable.js"></script> 
+<script src="<?= base_url() ?>plugins/tiny-editable/mindmup-editabletable.js"></script>
+<script src="<?= base_url() ?>plugins/tiny-editable/numeric-input-example.js"></script>
+<script src="<?= base_url() ?>plugins/bootable/bootstable.js"></script> 
 <link href="<?php echo base_url(); ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
 
 <script src="<?= base_url(); ?>plugins/select2/select2.min.js"></script>
