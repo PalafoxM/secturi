@@ -4646,13 +4646,11 @@ ini.inicio = (function () {
      
         generarReporteExcel: function()
         {
-        let periodoInicio = $('#periodoInicio').val();
-        let periodoFin    = $('#periodoFin').val();
-       
+        let periodoInicio = $('#periodoInicio').val();  
             $.ajax({
                     type: "POST",
-                    url: base_url + "index.php/Usuario/validarReporteExcel",
-                    data:{periodoInicio,periodoFin},
+                    url: base_url + "index.php/Usuario/validarReporteExcel2",
+                    data:{periodoInicio},
                     dataType: "json",
                     beforeSend: function(){
                       $('#btnReporteExcel').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Generando...');
@@ -4662,7 +4660,7 @@ ini.inicio = (function () {
                       if(response.error){
                           Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
                       }else{
-                        const url = base_url + "index.php/Usuario/reporteIncidenciaExcel/" + periodoInicio + '/' + periodoFin;
+                        const url = base_url + "index.php/Usuario/reporteIncidenciaExcel/" + periodoInicio;
                         window.open(url, '_blank');
                       } 
                            

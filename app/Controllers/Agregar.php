@@ -1102,10 +1102,8 @@ class Agregar extends BaseController
             $extension = $file->getClientExtension();
             $originalName = pathinfo($file->getName(), PATHINFO_FILENAME);
             $archivo = $session->usuario . '.' . $extension;
-
             $ruta_destino = FCPATH . 'assets/images/fotos/';
             $file->move($ruta_destino, $archivo);
-
             $ruta_relativa = 'assets/images/fotos/' . $archivo;
 
         }
@@ -1123,13 +1121,15 @@ class Agregar extends BaseController
             'nombre' => $data['nombre'],
             'primer_apellido' => $data['primer_apellido'],
             'segundo_apellido' => $data['segundo_apellido'],
-            'ruta_foto_relativa' => (isset($ruta_relativa) && !empty($ruta_relativa)) ? $ruta_relativa : '',
             'correo' => $data['correo'],
             'rfc' => $data['rfc'],
             'id_area' => (int) $data['id_area'],
             'fec_reg' => $hoy
         ];
-
+        if(isset($ruta_relativa) && !empty($ruta_relativa)){
+            $dataInsert['ruta_foto_relativa'] = $ruta_relativa;
+        }
+        
 
         $fecha_nacimiento = $data['fec_nac'];
 

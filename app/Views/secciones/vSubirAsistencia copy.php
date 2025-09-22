@@ -1,4 +1,4 @@
-
+<?php  $session = \Config\Services::session(); ?>
 
 
 <div class="page-wrapper">
@@ -33,12 +33,48 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="card">
-
                                         <div class="card-body">
-                                            <span>PERFILES</span>
-                                            <button onclick="ini.inicio.cargaCsv()"
-                                                class="btn btn-gradient-primary px-4 float-right mt-0 mb-3"><i
+                                          <?php if(in_array($session->get('id_perfil'), [1,3] )): ?>
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label for="fecha_inicio">Periodo Inicio</label>
+                                                        <select class="form-control" id="periodoInicio">
+                                                            <?php foreach($periodo as $p): ?>
+                                                                <option value="<?= $p->fecha_inicio ?>" data-id="<?= $p->id_periodo ?>">
+                                                                    <?= 'PERIODO ' . $p->id_periodo . ' - ' . $p->dsc_periodo ?>
+                                                                </option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label for="fecha_inicio">Periodo Fin</label>
+                                                        <select class="form-control" id="periodoFin">
+                                                            <?php foreach($periodo as $p): ?>
+                                                                <option value="<?= $p->fecha_fin ?>" data-id="<?= $p->id_periodo ?>">
+                                                                    <?= 'PERIODO ' . $p->id_periodo . ' - ' . $p->dsc_periodo ?>
+                                                                </option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label for="fecha_fin">Enviar</label><br>
+                                                        <button id="btnReporteExcel" class="btn btn-info mb-3" onclick="ini.inicio.generarReporteExcel()" >Excel</button>
+                                                        
+                                                    </div>
+                                                </div>
+                                                 <div class="col-md-3">
+                                                    <button onclick="ini.inicio.cargaCsv()"
+                                                     class="btn btn-gradient-primary px-4 float-right mt-0 mb-3"><i
                                                     class="mdi mdi-plus-circle-outline mr-2"></i>Subir Archivo</button>
+                                                </div>
+                                            </div>
+                                            <?php endif; ?>
+                                      
                                                  
                                             <table id="datatableCategorias" class="table" data-toggle="table">
                                                 <thead class="thead-light">
@@ -65,29 +101,50 @@
                                                     <?php foreach($cat_usuario as $p): ?>
                                                         <tr>
                                                             <td class="text-center"><?= $p->nombre_completo ?></td>
+                                                            <td class="text-center" style="cursor:pointer;" title="número de asistencias <?= $p->ene ?>" >
+                                                                <a href="<?= base_url().'index.php/Agregar/Asistencia/1/'.$p->id_usuario?>" ><i class="mdi mdi-calendar <?= ($p->ene <= 5)?'text-danger':'text-success' ?> font-18" ></i>
+                                                             </td>
+                                                            <td class="text-center" style="cursor:pointer;" title="número de asistencias <?= $p->feb ?>" >
+                                                                <a href="<?= base_url().'index.php/Agregar/Asistencia/2/'.$p->id_usuario?>" ><i class="mdi mdi-calendar  <?= ($p->feb <= 5)?'text-danger':'text-success' ?> font-18" ></i>
+                                                             </td>
+                                                            <td class="text-center" style="cursor:pointer;" title="número de asistencias <?= $p->mar ?>" >
+                                                                <a href="<?= base_url().'index.php/Agregar/Asistencia/3/'.$p->id_usuario?>" ><i class="mdi mdi-calendar <?= ($p->mar <= 5)?'text-danger':'text-success' ?> font-18" ></i>
+                                                             </td>
+                                                            <td class="text-center" style="cursor:pointer;" title="número de asistencias <?= $p->abr ?>" >
+                                                                <a href="<?= base_url().'index.php/Agregar/Asistencia/4/'.$p->id_usuario?>" ><i class="mdi mdi-calendar <?= ($p->abr <= 5)?'text-danger':'text-success' ?> font-18" ></i>
+                                                             </td>
+                                                            <td class="text-center" style="cursor:pointer;" title="número de asistencias <?= $p->may ?>">
+                                                                <a href="<?= base_url().'index.php/Agregar/Asistencia/5/'.$p->id_usuario?>" ><i class="mdi mdi-calendar  <?= ($p->may <= 5)?'text-danger':'text-success' ?> font-18" ></i>
+                                                             </td>
+                                                            <td class="text-center" style="cursor:pointer;" title="número de asistencias <?= $p->jun ?>" >
+                                                                <a href="<?= base_url().'index.php/Agregar/Asistencia/6/'.$p->id_usuario?>" ><i class="mdi mdi-calendar  <?= ($p->jun <= 5)?'text-danger':'text-success' ?> font-18" ></i>
+                                                             </td>
+                                                            <td class="text-center" style="cursor:pointer;" title="número de asistencias <?= $p->jul ?>">
+                                                                <a href="<?= base_url().'index.php/Agregar/Asistencia/7/'.$p->id_usuario?>" ><i class="mdi mdi-calendar  <?= ($p->jul <= 5)?'text-danger':'text-success' ?> font-18" ></i>
+                                                             </td>
+                                                            <td class="text-center" style="cursor:pointer;" title="número de asistencias <?= $p->ago ?>" >
+                                                                <a href="<?= base_url().'index.php/Agregar/Asistencia/8/'.$p->id_usuario?>" ><i class="mdi mdi-calendar  <?= ($p->ago <= 5)?'text-danger':'text-success' ?> font-18" ></i>
+                                                             </td>
+                                                            <td class="text-center" style="cursor:pointer;" title="número de asistencias <?= $p->sep ?>">
+                                                                <a href="<?= base_url().'index.php/Agregar/Asistencia/9/'.$p->id_usuario?>" ><i class="mdi mdi-calendar  <?= ($p->sep <= 5)?'text-danger':'text-success' ?> font-18" ></i>
+                                                             </td>
+                                                            <td class="text-center" style="cursor:pointer;" title="número de asistencias <?= $p->oct ?>">
+                                                                <a href="<?= base_url().'index.php/Agregar/Asistencia/10/'.$p->id_usuario?>" ><i class="mdi mdi-calendar  <?= ($p->oct <= 5)?'text-danger':'text-success' ?> font-18" ></i>
+                                                             </td>
+                                                            <td class="text-center" style="cursor:pointer;" title="número de asistencias <?= $p->nov ?>">
+                                                                <a href="<?= base_url().'index.php/Agregar/Asistencia/11/'.$p->id_usuario?>" ><i class="mdi mdi-calendar  <?= ($p->nov <= 5)?'text-danger':'text-success' ?> font-18" ></i>
+                                                             </td>
+                                                            <td class="text-center" style="cursor:pointer;" title="número de asistencias <?= $p->dic ?>" >
+                                                                <a href="<?= base_url().'index.php/Agregar/Asistencia/12/'.$p->id_usuario?>" ><i class="mdi mdi-calendar  <?= ($p->dic <= 5)?'text-danger':'text-success' ?> font-18" ></i>
+                                                             </td>
 
-                                                            <?php for ($m = 1; $m <= 12; $m++): ?>
-                                                                <?php
-                                                                    $cumplio = isset($p->asistencias[$m]) ? $p->asistencias[$m]['cumplio'] : 0;
-                                                                    $dias = isset($p->asistencias[$m]) ? $p->asistencias[$m]['dias'] : 0;
-                                                                    $color = $cumplio ? 'text-success' : 'text-danger';
-                                                                ?>
-                                                                <td class="text-center" style="cursor:pointer;" >
-                                                                    <a href="<?= base_url().'index.php/Agregar/Asistencia/'.$m.'/'.$p->id_usuario?>" ><i class="mdi mdi-calendar <?= $color ?> font-18" title="<?= $dias ?> días trabajados"></i>
-                                                                </td>
-                                                            <?php endfor; ?>
+                                                       
 
                                                             <td class="text-center">
-                                                                <button title="editar"
+                                                                <button title="Imprimir Archivo"
                                                                     onclick="ini.inicio.editarPerfil(<?= $p->id_usuario ?>)"
                                                                     class="btn btn-gradient-warning px-4">
-                                                                    <i class="dripicons-pencil font-21"></i>
-                                                                </button>
-
-                                                                <button title="eliminar"
-                                                                    onclick="ini.inicio.eliminarPerfil(<?= $p->id_usuario ?>)"
-                                                                    class="btn btn-gradient-danger px-4">
-                                                                    <i class="dripicons-trash font-21"></i>
+                                                                    <i class="dripicons-document-new font-21"></i>
                                                                 </button>
                                                             </td>
                                                         </tr>
@@ -192,5 +249,21 @@ $(document).ready(function() {
     });
 });
 
-
+  const inicio = document.getElementById('periodoInicio');
+  const fin = document.getElementById('periodoFin');
+    // Guardamos las opciones originales
+    const todasLasOpciones = Array.from(fin.options);
+    inicio.addEventListener('change', function() {
+        // Leer el data-id del periodo seleccionado
+        const idInicio = parseInt(inicio.selectedOptions[0].getAttribute('data-id'));
+        // Limpiar opciones actuales
+        fin.innerHTML = '';
+        // Agregar solo las opciones con id >= idInicio
+        todasLasOpciones.forEach(option => {
+            const idOpcion = parseInt(option.getAttribute('data-id'));
+            if (idOpcion >= idInicio+1) {
+                fin.appendChild(option.cloneNode(true));
+            }
+        });
+    });
 </script>

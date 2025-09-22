@@ -36,7 +36,7 @@
                                         <div class="card-body">
                                           <?php if(in_array($session->get('id_perfil'), [1,3] )): ?>
                                             <div class="row">
-                                                <div class="col-md-3">
+                                                <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label for="fecha_inicio">Periodo Inicio</label>
                                                         <select class="form-control" id="periodoInicio">
@@ -48,18 +48,7 @@
                                                         </select>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-3">
-                                                    <div class="form-group">
-                                                        <label for="fecha_inicio">Periodo Fin</label>
-                                                        <select class="form-control" id="periodoFin">
-                                                            <?php foreach($periodo as $p): ?>
-                                                                <option value="<?= $p->fecha_fin ?>" data-id="<?= $p->id_periodo ?>">
-                                                                    <?= 'PERIODO ' . $p->id_periodo . ' - ' . $p->dsc_periodo ?>
-                                                                </option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </div>
-                                                </div>
+                            
                                                 <div class="col-md-3">
                                                     <div class="form-group">
                                                         <label for="fecha_fin">Enviar</label><br>
