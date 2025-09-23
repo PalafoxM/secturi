@@ -16,7 +16,7 @@
                                         <li class="breadcrumb-item active">Inventario</li>
                                     </ol>
                                 </div>
-                                <h4 class="page-title">Bitacora de Hoy</h4>
+                                <h4 class="page-title">Bitacora de hoy</h4>
                             </div><!--end page-title-box-->
                         </div><!--end col-->
                     </div>
@@ -38,7 +38,7 @@
                                             <div class="meta-box">
                                                 <div class="media">
                                                     <div class="media-body align-self-center text-truncate">
-                                                        <h6 class="mt-0 mb-1 text-dark"> Nombre: <?= $i->nombre_completo ?></h6>
+                                                        <h6 class="mt-0 mb-1 text-dark"> Nombre: <?= $i->nombre_completo ?> Hora: <?= $i->hora ?></h6>
                                                         <ul class="p-0 list-inline mb-0">
                                          
                                                             <li class="list-inline-item">Correo: <?= $i->correo ?> </li>
