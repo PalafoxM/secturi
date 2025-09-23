@@ -2438,7 +2438,7 @@ class Agregar extends BaseController
         if (!$result->error) {
             $response->error = false;
             $response->respuesta = $result->respuesta;
-            //$res = $this->enviarCorreo($correo);
+            $res = $this->enviarCorreo($correo);
 
         }
         return $this->respond($response);
