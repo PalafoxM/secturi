@@ -661,6 +661,11 @@
                      item.nombre = 'Puntual';
                      icon = '🕣';
                 }
+                if (item.entrada >= '08:46:00' && item.entrada <= '09:00:00') {
+                     eventClass = 'fc-event-puntual';
+                     item.nombre = 'Tarde';
+                     icon = '⏳';
+                }
                 if (item.entrada < '08:30:00' && item.salida > '16:00:00') {
                      eventClass = 'fc-event-temprano';
                      item.nombre = 'Temprano';
