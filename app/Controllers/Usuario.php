@@ -197,7 +197,7 @@ class Usuario extends BaseController
         $tabla = [
                 'tabla' => 'vw_asistencia_incidencia', 
                 'where' => ['visible' => 1],
-                'whereBetween' => [['fechas_asistencias', $fec_ini, $fec_fin]]
+                'whereBetween' => [['fecha', $fec_ini, $fec_fin]]
                 ];
         
         $incidencias = $globals->getTabla($tabla);
@@ -389,7 +389,7 @@ class Usuario extends BaseController
         $writer->save('php://output');
         exit;
     }
-    public function reporteIncidenciaExcel2($periodoInicio = null)
+   public function reporteIncidenciaExcel2($periodoInicio = null)
     {
         $session = \Config\Services::session();
         $globals = new Mglobal;
@@ -410,16 +410,18 @@ class Usuario extends BaseController
             $fec_fin = date('Y-m-' . $ultimoDiaMes, strtotime($periodoInicio));
         }
 
-        // Traer datos desde la vista
+        // Traer datos desde la vista (CON LA NUEVA ESTRUCTURA)
         $tabla = [
             'tabla' => 'vw_asistencia_incidencia',
             'where' => ['visible' => 1],
-            'whereBetween' => [['fechas_asistencias', $fec_ini, $fec_fin]],
+            'whereBetween' => [['fecha', $fec_ini, $fec_fin]], // AHORA usa 'fecha' en lugar de 'fechas_asistencias'
         ];
+
+        
         $datos = $globals->getTabla($tabla);
         $resul = (isset($datos->data) && !empty($datos->data)) ? $datos->data : [];
-
-        // Map para estatus (si vienen id_estatus)
+    
+        // Map para estatus
         $mapEstatus = [
             1 => 'EN PROCESO',
             2 => 'VALIDADO',
@@ -438,17 +440,17 @@ class Usuario extends BaseController
             $fechasDelPeriodo[] = $d->format('Y-m-d');
         }
 
-        // 2) Agrupar por usuario y por fecha
-        // Estructura: $usuarios[$nombre][$fecha] = ['entrada'=>'','salida'=>'','incidencias'=>[]]
+        // 2) Agrupar por usuario y por fecha - CORREGIDO PARA NUEVA VISTA
         $usuarios = [];
 
         foreach ($resul as $r) {
             $nombre = trim($r->nombre_completo ?: 'Sin nombre');
-            $fechaYmd = !empty($r->fechas_asistencias) ? date('Y-m-d', strtotime($r->fechas_asistencias)) : null;
-            if (!$fechaYmd) continue; // saltar filas sin fecha válida
+            
+            // CORRECCIÓN: Ahora el campo se llama 'fecha' en lugar de 'fechas_asistencias'
+            $fechaYmd = !empty($r->fecha) ? date('Y-m-d', strtotime($r->fecha)) : null;
+            if (!$fechaYmd) continue;
 
             if (!in_array($fechaYmd, $fechasDelPeriodo, true)) {
-                // si por alguna razón la fecha no está en el periodo, la ignoramos
                 continue;
             }
 
@@ -459,20 +461,26 @@ class Usuario extends BaseController
                 $usuarios[$nombre][$fechaYmd] = [
                     'entrada' => '',
                     'salida' => '',
-                    'incidencias' => [] // array para luego concatenar
+                    'incidencias' => []
                 ];
             }
 
-            // Guardar entrada / salida si vienen y aún no establecidas
-            if (!empty($r->hora_inicio) && empty($usuarios[$nombre][$fechaYmd]['entrada'])) {
-                $usuarios[$nombre][$fechaYmd]['entrada'] = $r->hora_inicio;
-            }
-            if (!empty($r->hora_fin) && empty($usuarios[$nombre][$fechaYmd]['salida'])) {
-                $usuarios[$nombre][$fechaYmd]['salida'] = $r->hora_fin;
+            // DETERMINAR SI ES ASISTENCIA O INCIDENCIA
+            $tipoRegistro = $r->tipo_registro ?? 'asistencia'; // Nuevo campo de la vista UNION
+            
+            if ($tipoRegistro === 'asistencia' || $tipoRegistro === 'asistencia_con_incidencia') {
+                // Es una asistencia - guardar entrada/salida
+                if (!empty($r->hora_inicio) && empty($usuarios[$nombre][$fechaYmd]['entrada'])) {
+                    $usuarios[$nombre][$fechaYmd]['entrada'] = $r->hora_inicio;
+                }
+                if (!empty($r->hora_fin) && empty($usuarios[$nombre][$fechaYmd]['salida'])) {
+                    $usuarios[$nombre][$fechaYmd]['salida'] = $r->hora_fin;
+                }
             }
 
-            // Incidencias: usar id_estatus para mapear (si viene)
-            if (isset($r->id_estatus) && !empty($r->id_estatus)) {
+            // Incidencias: solo si es registro de incidencia
+            if (($tipoRegistro === 'incidencia' || $tipoRegistro === 'asistencia_con_incidencia') && 
+                isset($r->id_estatus) && !empty($r->id_estatus)) {
                 $texto = $mapEstatus[$r->id_estatus] ?? '';
                 if ($texto !== '' && !in_array($texto, $usuarios[$nombre][$fechaYmd]['incidencias'], true)) {
                     $usuarios[$nombre][$fechaYmd]['incidencias'][] = $texto;
@@ -480,7 +488,7 @@ class Usuario extends BaseController
             }
         }
 
-        // 3) Preparar Spreadsheet
+        // 3) Preparar Spreadsheet (este código sigue igual)
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
@@ -488,32 +496,26 @@ class Usuario extends BaseController
         $sheet->setCellValue('A1', '');
         $sheet->setCellValue('A2', 'Nombre');
 
-        // Construir cabeceras por fecha: cada fecha ocupará 3 columnas
-        // Empezamos en columna 2 (B)
+        // Construir cabeceras por fecha
         $colIndex = 2;
         foreach ($fechasDelPeriodo as $fecha) {
             $colStart = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
             $colMid   = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 1);
             $colEnd   = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 2);
 
-            // Escribir la fecha en formato DD/MM/YYYY en la fila 1 y hacer merge sobre 3 celdas
             $sheet->setCellValue($colStart . '1', date('d/m/Y', strtotime($fecha)));
             $sheet->mergeCells("{$colStart}1:{$colEnd}1");
 
-            // Subcabeceras
             $sheet->setCellValue($colStart . '2', 'Entrada');
             $sheet->setCellValue($colMid . '2', 'Salida');
             $sheet->setCellValue($colEnd . '2', 'Incidencia');
 
-            // Centrar texto de la fecha
             $sheet->getStyle($colStart . '1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-
             $colIndex += 3;
         }
 
         // 4) Escribir datos por usuario
         $fila = 3;
-        // Ordenar usuarios alfabéticamente
         ksort($usuarios, SORT_STRING);
         foreach ($usuarios as $nombre => $fechas) {
             $sheet->setCellValue('A' . $fila, $nombre);
@@ -534,7 +536,7 @@ class Usuario extends BaseController
                 $sheet->setCellValue($colSalida . $fila, $salida);
                 $sheet->setCellValue($colInc . $fila, $incidenciaTexto);
 
-                // Estilos: si entrada es hora válida, colorear si es tardía
+                // Estilos (mantener igual)
                 if (preg_match('/^\d{2}:\d{2}:\d{2}$/', $entrada)) {
                     list($hh, $mm, $ss) = explode(':', $entrada);
                     $seg = ($hh * 3600) + ($mm * 60) + $ss;
@@ -544,14 +546,13 @@ class Usuario extends BaseController
                     if ($seg > $u09) {
                         $sheet->getStyle($colEntrada . $fila)
                             ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                            ->getStartColor()->setARGB('FFFF5166'); // rojo fuerte
+                            ->getStartColor()->setARGB('FFFF5166');
                     } elseif ($seg > $u0845) {
                         $sheet->getStyle($colEntrada . $fila)
                             ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                            ->getStartColor()->setARGB('FFCC3A1A'); // rojo medio
+                            ->getStartColor()->setARGB('FFCC3A1A');
                     }
                 } else {
-                    // entrada vacía -> amarillo sutil
                     if ($entrada === '') {
                         $sheet->getStyle($colEntrada . $fila)
                             ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
@@ -559,31 +560,28 @@ class Usuario extends BaseController
                     }
                 }
 
-                // Estilo para incidencia
                 if (!empty($incidenciaTexto)) {
                     $sheet->getStyle($colInc . $fila)
                         ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                        ->getStartColor()->setARGB('FFFFA500'); // naranja
+                        ->getStartColor()->setARGB('FFFFA500');
                     $sheet->getStyle($colInc . $fila)->getAlignment()->setWrapText(true);
                 }
 
                 $colIndex += 3;
             }
-
             $fila++;
         }
 
-        // 5) Ajustar anchos de columna
+        // 5) Ajustar anchos de columna (mantener igual)
         $sheet->getColumnDimension('A')->setWidth(40);
-        $totalCols = 1 + (count($fechasDelPeriodo) * 3); // A + 3 columnas por fecha
+        $totalCols = 1 + (count($fechasDelPeriodo) * 3);
         for ($i = 2; $i <= $totalCols; $i++) {
             $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i);
             $sheet->getColumnDimension($colLetter)->setWidth(15);
         }
 
-        // Estilos encabezado: negrita
+        // Estilos encabezado
         $sheet->getStyle('A1:A2')->getFont()->setBold(true);
-        // negrita para la fila 2 entera
         $lastColLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($totalCols);
         $sheet->getStyle("A2:{$lastColLetter}2")->getFont()->setBold(true);
         $sheet->getStyle("A1:{$lastColLetter}1")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
