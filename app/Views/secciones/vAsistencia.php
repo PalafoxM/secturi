@@ -28,7 +28,11 @@
 
 <style>
     /* Añade estos estilos al bloque de estilos existente */
-
+    .fc-event-trabajando {
+        background-color: #4A90E2 !important; /* Azul */
+        border-color: #357ABD !important;
+        color: #fff !important; /* Texto blanco */
+    }
 
     .fc-event-asistencia {
         border-left: 4px solid #4e73df;
@@ -606,10 +610,19 @@
             let eventClass = 'fc-event-asistencia';
             let icon = ''; // Para el emoji
              console.log(item.salida);
-            if (item.entrada < '09:00:00' && !item.salida) {
-                eventClass = 'fc-event-falta';
-                item.nombre = 'Sin Salida';
-                icon = '🚷';
+            if (item.entrada < '08:30:00') {
+                eventClass = 'fc-event-temprano';
+                item.nombre = 'Temprano';
+                icon = '✅';
+            }else if(item.entrada >= '08:30:00' && item.entrada <= '08:46:00'){
+                eventClass = 'fc-event-puntual';
+                item.nombre = 'Puntual';
+                icon = '🕣';
+            }
+            else if (item.entrada > '08:46:00') {
+                eventClass = 'fc-event-tarde';
+                item.nombre = 'Tarde';
+                icon = '⚠️';
             }
             else if (item.entrada < '08:30:00' && item.salida > '16:00:00') {
                 eventClass = 'fc-event-temprano';
@@ -619,11 +632,7 @@
                 eventClass = 'fc-event-puntual';
                 item.nombre = 'Puntual';
                 icon = '🕣';
-            } else if (item.entrada > '08:46:00') {
-                eventClass = 'fc-event-tarde';
-                item.nombre = 'Tarde';
-                icon = '⚠️';
-            }
+            } 
            else if (item.entrada < '09:00:00' && item.salida < '16:00:00') {
                 eventClass = 'fc-event-tarde';
                 item.nombre = 'Salida antes';
