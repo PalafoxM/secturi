@@ -490,6 +490,26 @@
         }
         return s;
     }
+    function normalizarFecha(fecha) {
+        if (!fecha) return '';
+        
+        // Si ya es solo fecha (YYYY-MM-DD)
+        if (typeof fecha === 'string' && fecha.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            return fecha;
+        }
+        
+        // Si tiene formato ISO (con T)
+        if (typeof fecha === 'string' && fecha.includes('T')) {
+            return fecha.split('T')[0];
+        }
+        
+        // Si es un objeto Date
+        if (fecha instanceof Date) {
+            return fecha.toISOString().split('T')[0];
+        }
+        
+        return '';
+    }
 
     function esHabil(date) {
         const d = date.getDay(); // 0=Dom, 6=Sáb
@@ -609,37 +629,66 @@
         var eventos = eventosAsistencia.map(function (item) {
             let eventClass = 'fc-event-asistencia';
             let icon = ''; // Para el emoji
-             console.log(item.salida);
-            if (item.entrada < '08:30:00') {
-                eventClass = 'fc-event-temprano';
-                item.nombre = 'Temprano';
-                icon = '✅';
-            }else if(item.entrada >= '08:30:00' && item.entrada <= '08:46:00'){
-                eventClass = 'fc-event-puntual';
-                item.nombre = 'Puntual';
-                icon = '🕣';
+            
+            const hoy = '<?= date("Y-m-d") ?>'; // Formato YYYY-MM-DD
+           const fechaNormalizada = normalizarFecha(item.fecha);
+           console.log('Fecha normalizada:', fechaNormalizada, 'Hoy:', hoy, '¿Son iguales?', fechaNormalizada === hoy);
+
+            if(fechaNormalizada === hoy){
+                if (item.entrada < '08:30:00') {
+                    eventClass = 'fc-event-temprano';
+                    item.nombre = 'Temprano';
+                    icon = '<i class="em em-smiley"></i>';
+                }
+                if (item.entrada >= '08:30:00' && item.entrada <= '08:46:00') {
+                    eventClass = 'fc-event-puntual';
+                    item.nombre = 'Puntual';
+                    icon = '<i class="em em-slightly_smiling_face"></i>';
+                }
+                if (item.entrada > '08:46:00') {
+                    eventClass = 'fc-event-tarde';
+                    item.nombre = 'Tarde';
+                    icon = '<i class="em em-slightly_frowning_face"></i>';
+                }
+                if (item.entrada > '09:00:00') {
+                    eventClass = 'fc-event-tarde';
+                    item.nombre = 'Falta';
+                    icon = '❌';
+                }
+            }else{
+                if (item.entrada >= '08:30:00' && item.entrada <= '08:46:00') {
+                     eventClass = 'fc-event-puntual';
+                     item.nombre = 'Puntual';
+                     icon = '🕣';
+                }
+                if (item.entrada < '08:30:00' && item.salida > '16:00:00') {
+                     eventClass = 'fc-event-temprano';
+                     item.nombre = 'Temprano';
+                     icon = '✅';
+                }
+                if (item.entrada >= '08:30:00' && item.entrada <= '08:46:00' && item.salida > '16:00:00') {
+                    eventClass = 'fc-event-puntual';
+                    item.nombre = 'Puntual';
+                    icon = '🕣';
+                }
+                if (item.entrada < '09:00:00' && item.salida < '16:00:00') {
+                     eventClass = 'fc-event-tarde';
+                     item.nombre = 'Salida antes';
+                     icon = '🏃'; // Avance rápido (salida anticipada)
+                }
+                if (item.entrada < '09:00:00' && !item.salida) {
+                     eventClass = 'fc-event-tarde';
+                     item.nombre = 'Sin Salida';
+                     icon = '🏃'; // Avance rápido (salida anticipada)
+                }
+                 if (item.entrada > '09:00:00') {
+                    eventClass = 'fc-event-tarde';
+                    item.nombre = 'Falta';
+                    icon = '❌';
+                }
             }
-            else if (item.entrada > '08:46:00') {
-                eventClass = 'fc-event-tarde';
-                item.nombre = 'Tarde';
-                icon = '⚠️';
-            }
-            else if (item.entrada < '08:30:00' && item.salida > '16:00:00') {
-                eventClass = 'fc-event-temprano';
-                item.nombre = 'Temprano';
-                icon = '✅';
-            } else if (item.entrada >= '08:30:00' && item.entrada <= '08:46:00' && item.salida > '16:00:00') {
-                eventClass = 'fc-event-puntual';
-                item.nombre = 'Puntual';
-                icon = '🕣';
-            } 
-           else if (item.entrada < '09:00:00' && item.salida < '16:00:00') {
-                eventClass = 'fc-event-tarde';
-                item.nombre = 'Salida antes';
-                icon = '🏃'; // Avance rápido (salida anticipada)
-                // icon = '🏃'; // Persona corriendo (saliendo rápido)
-                // icon = '👋'; // Mano saludando (despidiéndose)
-            }
+
+
 
             return {
                 id: item.id_asistencia,
