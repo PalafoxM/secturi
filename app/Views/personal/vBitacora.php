@@ -24,41 +24,32 @@
                     <div class="row">
                         <?php if(isset($bitacora) && !empty($bitacora)): ?>
                         <?php foreach($bitacora as $i): ?>
-                            <div class="col-lg-4">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <div class="blog-card">
-                                            <?php if(isset($i->foto) && !empty($i->foto)): ?>
-                                                <img src="<?= base_url().$i->foto?>" alt="" class="img-fluid"/>
-                                            <?php endif; ?>
-                                            <?php if(empty($i->foto)): ?>
-                                            <img src="<?= base_url(); ?>assets/images/small/img-9.jpg" alt="" class="img-fluid"/>
-                                            <?php endif; ?>
-                                            <hr class="hr-dashed">
-                                            <div class="d-flex justify-content-between">
-                                                <div class="meta-box">
-                                                    <div class="media">
-                                                        <div class="media-body align-self-center text-truncate">
-                                                            <h6 class="mt-0 mb-1 text-dark"> Nombre: <?= $i->nombre_completo ?> Hora: <?= $i->hora ?></h6>
-                                                            <ul class="p-0 list-inline mb-0">
-                                            
-                                                                <li class="list-inline-item">Correo: <?= $i->correo ?> </li>
-                                                            </ul>
-                                                        </div><!--end media-body-->
-                                                    </div>                                            
-                                                </div><!--end meta-box-->
-                                            </div>                                        
-                                        </div><!--end blog-card--> 
-                                                                
-                                    </div><!--end card-body-->
-                                </div><!--end card-->
-                            </div> <!--end col-->
+                       <div class="col-lg-4">
+                            <div class="card profile-card">
+                                <div class="card-body p-0">
+                                    <div class="media p-3  align-items-center">                                                
+                                            <img src="<?= base_url().$i->foto?>" alt="user" class="rounded-circle thumb-xl">                                        
+                                            <div class="media-body ml-3 align-self-center">
+                                                <h5 class="pro-title"><?= $i->nombre_completo ?></h5>
+                                                <p class="mb-1 text-muted"><?= $i->correo ?></p> 
+                                                <p class="mb-0 text-muted"><i class="mdi mdi-checkbox-blank-circle text-danger mr-1"></i><?= $i->hora ?></p>
+                                            </div>
+                                            <div class="action-btn">
+                                                <button class="mr-1 btn btn-sm btn-soft-info"><i class="fas fa-pen"></i></button>
+                                                <button class="btn btn-sm btn-soft-danger"><i class="far fa-trash-alt"></i></button>  
+                                            </div>                                                                              
+                                        </div>                                    
+                                    </div><!--end card-body-->                 
+                                </div><!--end card--> 
+                            </div><!--end col-->
+                           
 
                             <?php endforeach; ?>
                             <?php endif; ?>
                     </div><!--end row--> 
 
                 </div><!-- container -->
+             
 
         <!-- App css -->
         <link href="<?= base_url();?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
