@@ -240,6 +240,27 @@ class Login extends BaseController {
         }
         return $this->respond($response);
     }
+    public function activarActividad($id_usuario)
+    {
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = "Error al registrar salida";
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $dataConfig = [
+                "tabla" => 'bitacora_susi',
+                "editar" => false,
+                ];
+      
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Login.php/guardaSalida'];
+        $dataInsert = [
+                'id_usuario' =>$id_usuario,
+                'fec_act' => date('Y-m-d H:i:s'),
+                'activo' => 1
+        ];
+        $result = $globals->saveTabla($dataInsert, $dataConfig,  $dataBitacora );
+   
+    }
     public function validar_usuario(){
         $response = new \stdClass();
         $response->error = true;
@@ -258,6 +279,7 @@ class Login extends BaseController {
             
             if(isset($result->data) && !empty($result->data)){
                 $session->set('logueado', 1);
+                
                 $session->set('id_usuario',$result->data[0]->id_usuario);
                 $session->set('id_sexo',$result->data[0]->id_sexo);
                 $session->set('usuario',$result->data[0]->usuario);
@@ -266,6 +288,7 @@ class Login extends BaseController {
                 $session->set('fec_nac',$result->data[0]->fec_nac);
                 $session->set('correo',$result->data[0]->correo);
                 $session->set('foto',$result->data[0]->ruta_foto_relativa);
+                $this->activarActividad($result->data[0]->id_usuario);
                 $subordinados = $catalogos->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_jefe_inmediato' => $result->data[0]->id_usuario]])->data;
                 $esJefe = (!empty($subordinados))?true:false;
                 $session->set('esJefe', $esJefe);
