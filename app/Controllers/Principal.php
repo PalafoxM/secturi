@@ -1485,7 +1485,7 @@ class Principal extends BaseController
         $session = \Config\Services::session();
         $response = new \stdClass();
         $this->globals = new Mglobal();
-        $dataDB = array('tabla' => 'vw_bitacora', 'where' => ['visible' => 1, ], 'orlike' => date('Y-m-d'));
+        $dataDB = array('tabla' => 'vw_bitacora', 'where' => ['visible' => 1, ],  'orlike' => ['fec_act' => date('Y-m-d')] );
         $response = $this->globals->getTabla($dataDB)->data;
         $data['bitacora'] = $response;
         $data['scripts'] = array('inicio');
