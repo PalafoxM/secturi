@@ -32,7 +32,7 @@
                                             <div class="media-body ml-3 align-self-center">
                                                 <h5 class="pro-title"><?= $i->nombre_completo ?></h5>
                                                 <p class="mb-1 text-muted"><?= $i->correo ?></p> 
-                                                <p class="mb-0 text-muted"><i class="mdi mdi-checkbox-blank-circle text-danger mr-1"></i><?= $i->hora ?></p>
+                                                <p class="mb-0 text-muted"><i class="mdi mdi-checkbox-blank-circle text-success mr-1"></i><?= $i->hora ?></p>
                                             </div>
                                             <div class="action-btn">
                                                 <button class="mr-1 btn btn-sm btn-soft-info"><i class="fas fa-pen"></i></button>
@@ -42,13 +42,57 @@
                                     </div><!--end card-body-->                 
                                 </div><!--end card--> 
                             </div><!--end col-->
-                           
+    
 
                             <?php endforeach; ?>
                             <?php endif; ?>
                     </div><!--end row--> 
 
-                </div><!-- container -->
+                    <div class="row">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                                 
+                                            <table id="datatableCategorias" class="table" data-toggle="table">
+                                                <thead class="thead-light">
+                                                    <tr>
+                                                        <th class="text-center">PERSONAL</th>
+                                                        <th class="text-center">ENTRADA</th>
+                                                        <th class="text-center">SALIADA</th>
+                                             
+                                                        <th class="text-center">ACCIONES</th>
+                                                    </tr>
+                                                    <!--end tr-->
+                                                </thead>
+
+                                                <tbody>
+                                                    <?php foreach($usuario as $p): ?>
+                                                        <tr>
+                                                            <td class="text-center"><?= $p->nombre_completo ?></td>
+                                                            <td class="text-center" style="cursor:pointer;"  >
+                                                              <?= $p->hora_inicio ?>
+                                                             </td>
+                                                            <td class="text-center" style="cursor:pointer;" >
+                                                                <?= $p->hora_fin ?> 
+                                                             </td>                                                                                                     
+                                                            <td class="text-center">
+                                                                <button title="Imprimir Archivo"
+                                                                    onclick="ini.inicio.editarPerfil(<?= $p->id_usuario ?>)"
+                                                                    class="btn btn-gradient-warning px-4">
+                                                                    <i class="dripicons-document-new font-21"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                        <?php endforeach; ?>
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+            </div><!-- container -->
              
 
         <!-- App css -->

@@ -414,7 +414,6 @@ class Inicio extends BaseController {
             'where' => ['visible' => 1]
         ]);
         $Periodo= ['tabla' => 'cat_periodo', 'where' => ['visible' => 1]];
-
         $periodo = $principal->getTabla($Periodo);
         $data['periodo']     = (isset($periodo->data) && !empty($periodo->data))?$periodo->data:[];
         // Enviar datos a la vista

@@ -1486,6 +1486,12 @@ class Principal extends BaseController
         $response = new \stdClass();
         $this->globals = new Mglobal();
         $dataDB = array('tabla' => 'vw_bitacora', 'where' => ['visible' => 1, ],  'orlike' => ['fec_act' => date('Y-m-d')] );
+        $usuarioBD= ['tabla' => 'vw_asistencia_incidencia', 'where' => ['visible' => 1], 'orlike' => ['fecha' => date('Y-m-d')] ];
+        $usuario = $this->globals ->getTabla($usuarioBD);
+        $data['periodo']     = (isset($periodo->data) && !empty($periodo->data))?$periodo->data:[];
+        $data['usuario']     = (isset($usuario->data) && !empty($usuario->data))?$usuario->data:[];
+        // Enviar datos a la vista
+
         $response = $this->globals->getTabla($dataDB)->data;
         $data['bitacora'] = $response;
         $data['scripts'] = array('inicio');
