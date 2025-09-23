@@ -1763,9 +1763,9 @@ class Agregar extends BaseController
         $asistencia = (isset($agenda->data) && !empty($agenda->data)) ? $agenda->data : [];
 
  //die( var_dump( $asistencia ) );
-        $faltas = $this->getFaltasRangoQuincena($inicio, $fin);
+//$faltas = $this->getFaltasRangoQuincena($inicio, $fin);
 
-        $data['faltas'] = $faltas;
+       // $data['faltas'] = $faltas;
         $data['asistencia'] = $asistencia;
         //$data['cat_incidencia'] = $cat_incidencia->data;
         // $data['incidencia'] = (isset($incidencia->data) && !empty($incidencia->data))?$incidencia->data:[];
