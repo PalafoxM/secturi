@@ -256,6 +256,7 @@ class Login extends BaseController {
         $dataInsert = [
                 'id_usuario' =>$id_usuario,
                 'fec_act' => date('Y-m-d H:i:s'),
+                'hora'    =>   date('H:i:s'),
                 'activo' => 1
         ];
         $result = $globals->saveTabla($dataInsert, $dataConfig,  $dataBitacora );

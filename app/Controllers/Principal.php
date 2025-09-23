@@ -1480,6 +1480,18 @@ class Principal extends BaseController
         $this->envioCorreoJefeInmediato(); 
         return $this->respond($response);
     }
+    public function bitacora()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $this->globals = new Mglobal();
+        $dataDB = array('tabla' => 'vw_bitacora', 'where' => ['visible' => 1, 'fec_act' => date('Y-m-d')]);
+        $response = $this->globals->getTabla($dataDB)->data;
+        $data['bitacora'] = $response;
+        $data['scripts'] = array('inicio');
+        $data['contentView'] = 'personal/vBitacora';
+        $this->_renderView($data);
+    }
     public function actualizarBanco()
     {
         $session = \Config\Services::session();

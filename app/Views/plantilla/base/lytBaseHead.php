@@ -361,6 +361,7 @@
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaArea">Lista de Área</a></li>
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaTiket">Listado de Tikets</a></li>
                                     <li><a href="<?php echo base_url(); ?>index.php/Principal/listadoProveedores">Lista de Proveedores</a></li>
+                                    <li><a href="<?php echo base_url(); ?>index.php/Principal/bitacora">Bitacora</a></li>
                                    
                                 </ul>            
                             </li><!--end nav-item-->
