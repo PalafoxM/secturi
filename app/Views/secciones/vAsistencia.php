@@ -492,13 +492,27 @@
         return d >= 1 && d <= 5;
     }
     function esPasado(date) {
+        const ahora = new Date();
+
+        // Normalizamos "hoy" a medianoche
         const hoy = new Date();
         hoy.setHours(0, 0, 0, 0);
+
+        // Normalizamos la fecha a evaluar
         const d = new Date(date);
         d.setHours(0, 0, 0, 0);
-        return d < hoy;
-    }
 
+        // Si es un día anterior → pasado
+        if (d < hoy) return true;
+
+        // Si es el mismo día y ya pasó la hora límite → también pasado
+        if (d.getTime() === hoy.getTime() && ahora.getHours() >= 16) {
+            return true;
+        }
+
+        // En cualquier otro caso no es pasado
+        return false;
+    }
 
     $(document).ready(function () {
         $('#tipo_incidencia').on('change', function () {
@@ -591,17 +605,17 @@
         var eventos = eventosAsistencia.map(function (item) {
             let eventClass = 'fc-event-asistencia';
             let icon = ''; // Para el emoji
-
-            if (!item.entrada || item.entrada === '') {
+             console.log(item.salida);
+            if (item.entrada < '09:00:00' && !item.salida) {
                 eventClass = 'fc-event-falta';
-                item.nombre = 'Falta';
-                icon = '❌';
+                item.nombre = 'Sin Salida';
+                icon = '🚷';
             }
-            else if (item.entrada < '08:30:00') {
+            else if (item.entrada < '08:30:00' && item.salida > '16:00:00') {
                 eventClass = 'fc-event-temprano';
                 item.nombre = 'Temprano';
                 icon = '✅';
-            } else if (item.entrada >= '08:30:00' && item.entrada <= '08:46:00') {
+            } else if (item.entrada >= '08:30:00' && item.entrada <= '08:46:00' && item.salida > '16:00:00') {
                 eventClass = 'fc-event-puntual';
                 item.nombre = 'Puntual';
                 icon = '🕣';
@@ -609,6 +623,13 @@
                 eventClass = 'fc-event-tarde';
                 item.nombre = 'Tarde';
                 icon = '⚠️';
+            }
+           else if (item.entrada < '09:00:00' && item.salida < '16:00:00') {
+                eventClass = 'fc-event-tarde';
+                item.nombre = 'Salida antes';
+                icon = '🏃'; // Avance rápido (salida anticipada)
+                // icon = '🏃'; // Persona corriendo (saliendo rápido)
+                // icon = '👋'; // Mano saludando (despidiéndose)
             }
 
             return {
@@ -958,7 +979,7 @@
 
                 // Verificar si es día festivo
                 const fechaStr = date.toISOString().split('T')[0];
-
+       
                 const esFestivo = diasFestivos.includes(fechaStr);
                 const esRegistro = onlyAsistencias.includes(fechaStr);
 

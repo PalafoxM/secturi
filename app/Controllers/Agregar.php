@@ -1682,14 +1682,14 @@ class Agregar extends BaseController
             'tabla' => 'asistencia',
             'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario]
         ]);
-
+      
         if (isset($onlyAsistencias->data) && !empty($onlyAsistencias->data)) {
             foreach ($onlyAsistencias->data as $f) {
                 $data['onlyAsistencias'][] = date('Y-m-d', strtotime($f->fecha));
             }
         }
 
-
+       
 
         $inicio = new DateTime('2025-09-01');
         $fin    = new DateTime('2025-09-16'); // inclusive
@@ -1706,8 +1706,8 @@ class Agregar extends BaseController
                     $otras[] = $f->fecha;
                 }
         }
-        
-        $data['onlyAsistencias'] = array_values(array_unique(array_merge($data['onlyAsistencias'], $otras)));
+       
+         $data['onlyAsistencias'] = array_values(array_unique(array_merge($data['onlyAsistencias'], $otras)));
         sort($data['onlyAsistencias']); // ascendente
 
         $incidenciaGeneral = $Mglobal->getTabla([
@@ -1728,6 +1728,8 @@ class Agregar extends BaseController
         foreach ($incidenciaPorSexo as $item) {
             $tempArray[$item->id_incidencia] = $item;
         }
+        //var_dump($data['onlyAsistencias']);
+        //die();
 
         // Convertir a array indexado numéricamente
         $data['cat_incidencia'] = array_values($tempArray);
@@ -1752,12 +1754,11 @@ class Agregar extends BaseController
         } else {
             // quincena 1: arranca día 1
             $inicio = new DateTime($hoy->format('Y-m-01'));
-            ;
             $fin = new DateTime($hoy->format('Y-m-15'));
         }
         $data['inicio'] = $inicio->format('d/m/Y');
         $data['fin'] = $fin->format('d/m/Y');
-        ;
+        
 
         $asistencia = (isset($agenda->data) && !empty($agenda->data)) ? $agenda->data : [];
 
