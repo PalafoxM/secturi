@@ -56,6 +56,7 @@
                                             <table id="datatableCategorias" class="table" data-toggle="table">
                                                 <thead class="thead-light">
                                                     <tr>
+                                                        <th class="text-center">ID</th>
                                                         <th class="text-center">PERSONAL</th>
                                                         <th class="text-center">ENTRADA</th>
                                                         <th class="text-center">SALIADA</th>
@@ -68,6 +69,7 @@
                                                 <tbody>
                                                     <?php foreach($usuario as $p): ?>
                                                         <tr>
+                                                            <td class="text-center"><?= $p->id_usuario ?></td>
                                                             <td class="text-center"><?= $p->nombre_completo ?></td>
                                                             <td class="text-center" style="cursor:pointer;"  >
                                                               <?= $p->hora_inicio ?>
