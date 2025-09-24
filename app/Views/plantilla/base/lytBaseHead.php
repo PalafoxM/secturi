@@ -374,7 +374,7 @@
                     <i data-feather="dollar-sign" class="align-self-center menu-icon icon-dual"></i>
                 </a><!--end MetricaApps-->
 
-                <?php if (in_array($session->id_perfil, [1, 2, 3])): ?>
+                <?php if (in_array($session->id_perfil, [1,3,5])): ?>
                     <a href="#MetricaUikit" class="nav-link" data-toggle="tooltip-custom" data-placement="right"
                         data-trigger="hover" title="" data-original-title="Admin">
                         <i data-feather="user" class="align-self-center menu-icon icon-dual"></i>
@@ -519,7 +519,7 @@
                                 </ul>
                             </li><!--end nav-item-->
                         <?php endif; ?>
-                        <?php if (in_array($session->id_perfil, [1, 2])): ?>
+                        <?php if (in_array($session->id_perfil, [1, 5])): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="#"><span class="w-100">Admin RM</span><span class="menu-arrow"><i
                                         class="mdi mdi-chevron-right"></i></span></a>
