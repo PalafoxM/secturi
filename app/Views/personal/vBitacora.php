@@ -1,4 +1,4 @@
-
+<?php $session = \Config\Services::session(); ?>
         <div class="page-wrapper">
 
             <!-- Page Content-->

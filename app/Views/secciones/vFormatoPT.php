@@ -66,11 +66,17 @@
          <div  style="position:absolute;  text-align:center; top:67.7%; left:35.5%; width:30%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "><?= strtoupper($registro->secretario); ?></span>
         </div>
-         <div  style="position:absolute;  text-align:center; top:67.7%; left:67.1%; width:30%; background-color:gray; font-size: 12px;  height:12px;">
-            <span class="proxima ">SUBSECRETARIA</span>
+         <div  style="position:absolute;  text-align:center; top:67.7%; left:67.1%; width:30%; background-color:white; font-size: 12px;  height:12px;">
+            <span class="proxima "><?= $usu_sub->nombre_completo?></span>
         </div>
-         <div  style="position:absolute;  text-align:center; top:79%; left:67.1%; width:30%; background-color:gray; font-size: 12px;  height:12px;">
-            <span class="proxima "> CLAUDIA </span>
+         <div  style="position:absolute;  text-align:center; top:69%; left:67.1%; width:30%; background-color:white; font-size: 12px;  height:12px;">
+            <span class="proxima "><?= $usu_sub->dsc_puesto?></span>
+        </div>
+         <div  style="position:absolute;  text-align:center; top:79%; left:67.1%; width:30%; background-color:white; font-size: 12px;  height:12px;">
+            <span class="proxima "> <?= $registro->responsable ?> </span>
+        </div>
+         <div  style="position:absolute;  text-align:center; top:80.4%; left:67.1%; width:30%; background-color:white; font-size: 12px;  height:12px;">
+            <span class="proxima "> <?= $registro->dsc_puesto ?> </span>
         </div>
 
         

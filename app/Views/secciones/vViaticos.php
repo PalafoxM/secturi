@@ -52,7 +52,7 @@
                                               <input type="date" class="form-control" id="fecha_termino" name="fecha_termino" required>
                                             </div><!--end col-->
                                         </div><!--end form-row-->
-                                           <div class="form-row">
+                                        <div class="form-row">
                                             <div class="col-md-4 mb-6">
                                                 <label for="formato_establecido">Tipo de integrante del sujeto obligado<span style="color:red;">*</span></label>
                                                   <select class="form-control" id="tipo_integrante" name="tipo_integrante" required>

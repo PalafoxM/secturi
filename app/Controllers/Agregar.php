@@ -954,6 +954,7 @@ class Agregar extends BaseController
             'id_reponsable_solicitud' => (int) $data['id_reponsable_solicitud'],
             'director_general' => 1,
             'secretario' => $data['secretario'],
+            'id_subsecretario' => $data['id_subsecretario'],
             'cuenta_bancaria' => $data['cuenta_bancaria'],
             'fecha_gasto_inicio' => $data['fecha_gasto_inicio'],
             'fecha_gasto_fin' => $data['fecha_gasto_fin'],

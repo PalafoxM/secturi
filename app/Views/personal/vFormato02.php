@@ -31,41 +31,41 @@
             <span class="proxima">SI</span>
         </div>
         <div  style="position:absolute; top:46.8%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
-            <span class="proxima">Nombre del responsable</span>
+            <span class="proxima"><?= $registro->responsable ?></span>
         </div>
         <div  style="position:absolute; top:49.5%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
-            <span class="proxima">Puesto</span>
+            <span class="proxima"><?= $registro->dsc_puesto?></span>
         </div>
          <div  style="position:absolute; top:52.5%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
-            <span class="proxima">Dependencia</span>
+            <span class="proxima"><?= $registro->dsc_area ?></span>
         </div>
          <div  style="position:absolute; top:56.2%; left:49.5%; width:2%; height:20px; background-color:white; font-size: 10px; ">
             <span class="proxima">SI</span>
         </div>
         <div  style="position:absolute; top:60%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
-            <span class="proxima">Nombre del responsable</span>
+            <span class="proxima"><?= $registro->responsable ?></span>
         </div>
          <div  style="position:absolute; top:62.5%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
-            <span class="proxima">Puesto</span>
+            <span class="proxima"><?= $registro->dsc_puesto?></span>
         </div>
          <div  style="position:absolute; top:65.5%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
-            <span class="proxima">Dependencia</span>
+            <span class="proxima"><?= $registro->dsc_area ?></span>
         </div>
          <div  style="position:absolute; top:73%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
-            <span class="proxima">Nombre del responsable</span>
+            <span class="proxima"><?= $registro->responsable ?></span>
         </div>
          <div  style="position:absolute; top:75.5%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
-            <span class="proxima">Puesto</span>
+            <span class="proxima"><?= $registro->dsc_puesto?></span>
         </div>
          <div  style="position:absolute; top:78%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
-            <span class="proxima">Dependencia</span>
+            <span class="proxima"><?= $registro->dsc_area ?></span>
         </div>
 
         <div  style="position:absolute; top:94.7%; left:21.2%; width:30%; height:10px; background-color:white; font-size: 10px; ">
-            <span class="proxima">Nombre</span>
+            <span class="proxima"><?= $registro->responsable ?></span>
         </div>
          <div  style="position:absolute; top:96.8%; left:21.2%; width:30%; height:10px; background-color:white; font-size: 10px; ">
-            <span class="proxima">Puesto</span>
+            <span class="proxima"><?= $registro->dsc_puesto?></span>
         </div>
 
 

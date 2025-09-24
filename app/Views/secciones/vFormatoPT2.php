@@ -68,7 +68,7 @@
         </div>
            <div style="position:absolute; top:87%; left:9.5%; width:81%; height:20px; background-color:white; font-size:13px; text-align:center;">
             <span class="proxima">
-              <strong> <?= $registro->dsc_area ?> </strong>
+              <strong> <?= $registro->dsc_puesto ?></strong>
             </span>
         </div>
        

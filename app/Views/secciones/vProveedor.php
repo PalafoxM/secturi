@@ -77,7 +77,7 @@
                                             </div><!--end col-->
                                         </div><!--end form-row-->
                                         <div class="form-row">
-                                            <div class="col-md-4 mb-3">
+                                            <div class="col-md-6 mb-6">
                                                 <label for="reponsable_solicitud">Responsable del Gasto<span style="color:red;">*</span></label>
                                               <select name="id_reponsable_solicitud" class="form-control" required>
                                                     <?php foreach ($cat_usuario as $u): ?>
@@ -97,22 +97,37 @@
                                                 </select>
 
                                             </div><!--end col-->
-                                            <div class="col-md-4 mb-3">
+                                            <div class="col-md-6 mb-6">
                                                 <label for="director_generar">Director/a General Administrativa <span style="color:red;">*</span></label>
                                                 <input type="text" class="form-control" id="director_generar" value="<?= $dsc_director_general ?>" name="director_generar" >
                                                 <div class="invalid-feedback">
                                                     Please provide a valid state.
                                                 </div>
                                             </div><!--end col-->
-                                            <div class="col-md-4 mb-3">
+                                        </div><!--end form-row-->
+                                        <div class="form-row">
+                                           <div class="col-md-6 mb-6">
                                                 <label for="secretario">Secretario(a) o Director(a) que autoriza</label>
-                                                <select type="text" class="form-control" id="secretario" placeholder="Secretario/a" name="secretario">
+                                                <select type="text" class="form-control" id="secretario"  name="secretario">
                                                             <option value="0" selected >Seleccione una opcion</option>
                                                     <?php foreach($secretario as $s): ?>
                                                         <?php if(isset($registro_pt->secretario) && !empty($registro_pt->secretario)){  ?>
                                                         <option value="<?= $s->id_secretario?>" <?= ($s->id_secretario == $registro_pt->secretario)?'selected':'' ?> ><?= $s->dsc_secretario?></option>
                                                          <?php }else{ ?>
                                                               <option value="<?= $s->id_secretario?>" ><?= $s->dsc_secretario?></option>
+                                                         <?php } ?>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div><!--end col-->
+                                            <div class="col-md-6 mb-6">
+                                                <label for="secretario">Subsecreatrio(a) o Director(a) General Responsable</label>
+                                                <select type="text" class="form-control" id="id_subsecretario" name="id_subsecretario">
+                                                            <option value="0" selected >Seleccione una opcion</option>
+                                                    <?php foreach($cat_subsecretario as $s): ?>
+                                                        <?php if(isset($registro_pt->id_subsecretario) && !empty($registro_pt->id_subsecretario)){  ?>
+                                                        <option value="<?= $s->id_subsecretario?>" <?= ($s->id_subsecretario == $registro_pt->id_subsecretario)?'selected':'' ?> ><?= $s->dsc_secretario?></option>
+                                                         <?php }else{ ?>
+                                                              <option value="<?= $s->id_subsecretario?>" ><?= $s->dsc_subsecretario?></option>
                                                          <?php } ?>
                                                     <?php endforeach; ?>
                                                 </select>
