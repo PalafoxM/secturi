@@ -481,7 +481,7 @@
                     </div>
 
                     <ul class="nav metismenu">
-                        <?php if ($session->id_perfil == 1): ?>
+                        <?php if (in_array($session->id_perfil, [1,3])): ?>
                             <li class="nav-item">
                                 <a class="nav-link" href="#"><span class="w-100">Admin TI</span><span class="menu-arrow"><i
                                             class="mdi mdi-chevron-right"></i></span></a>
@@ -490,6 +490,7 @@
                                     </li>
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/altaUsuario">Alta de Usuarios</a>
                                     </li>
+                                    <?php if($session->id_perfil == 1): ?>
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaPerfil">Lista de
                                             Perfiles</a></li>
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaPuesto">Lista de Puestos</a>
@@ -500,6 +501,7 @@
                                     <li><a href="<?php echo base_url(); ?>index.php/Principal/listadoProveedores">Lista de
                                             Proveedores</a></li>
                                     <li><a href="<?php echo base_url(); ?>index.php/Principal/bitacora">Bitacora</a></li>
+                                     <?php endif; ?>
 
                                 </ul>
                             </li><!--end nav-item-->
@@ -517,7 +519,7 @@
                                 </ul>
                             </li><!--end nav-item-->
                         <?php endif; ?>
-
+                        <?php if (in_array($session->id_perfil, [1, 2])): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="#"><span class="w-100">Admin RM</span><span class="menu-arrow"><i
                                         class="mdi mdi-chevron-right"></i></span></a>
@@ -528,6 +530,7 @@
 
                             </ul>
                         </li><!--end nav-item-->
+                         <?php endif; ?>
                     </ul><!--end nav-->
                 </div><!-- end Others -->
 
