@@ -252,7 +252,7 @@ class Login extends BaseController {
                 "editar" => false,
                 ];
       
-        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Login.php/guardaSalida'];
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Login.php/guardaEntrada'];
         $dataInsert = [
                 'id_usuario' =>$id_usuario,
                 'fec_act' => date('Y-m-d H:i:s'),
