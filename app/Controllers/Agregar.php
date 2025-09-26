@@ -1581,6 +1581,25 @@ class Agregar extends BaseController
         return $faltas;
     }
 
+    private function marcarMultiples(&$asistencia) {
+    $fechas = [];
+    foreach ($asistencia as $registro) {
+            $fecha = date('Y-m-d', strtotime($registro->fecha));
+   
+            if (!isset($fechas[$fecha])) {
+                $fechas[$fecha] = 0;
+            }
+            $fechas[$fecha]++;
+        }
+        // Marcar registros que pertenecen a días múltiples
+        foreach ($asistencia as $registro) {
+            $fecha = date('Y-m-d', strtotime($registro->fecha));
+            $registro->multiple = ($fechas[$fecha] > 1);
+        }
+        return $asistencia;
+    }
+
+
     public function Asistencia($mes = null, $user = null)
     {
         $session = \Config\Services::session();
@@ -1762,12 +1781,13 @@ class Agregar extends BaseController
         
 
         $asistencia = (isset($agenda->data) && !empty($agenda->data)) ? $agenda->data : [];
-
- //die( var_dump( $asistencia ) );
+        $registrosAgrupados = $asistencia = $this->marcarMultiples($asistencia);
+        //var_dump( $asistencia);
+        //die( var_dump( $registrosAgrupados ) );
 //$faltas = $this->getFaltasRangoQuincena($inicio, $fin);
 
        // $data['faltas'] = $faltas;
-        $data['asistencia'] = $asistencia;
+        $data['asistencia'] = $registrosAgrupados;
         //$data['cat_incidencia'] = $cat_incidencia->data;
         // $data['incidencia'] = (isset($incidencia->data) && !empty($incidencia->data))?$incidencia->data:[];
         //die();

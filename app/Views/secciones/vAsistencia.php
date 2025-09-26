@@ -704,6 +704,7 @@
                 extendedProps: {
                     entrada: item.entrada,
                     tipo_registro: item.tipo_registro,
+                    multiple: item.multiple,
                     esFestivo: false,
                     salida: (!item.salida) ? 'Sin salida' : item.salida,
                     trabajado: item.trabajado,
@@ -863,9 +864,7 @@
 
 
                 if (info.event.display === 'background') return;
-
-
-
+              console.log(info.event.extendedProps.multiple);
 
                 var eventEl = info.el;
                 if (info.event.extendedProps.esIncidencia) {
@@ -879,7 +878,16 @@
                      <div class="fc-event-title">${info.event.title}</div>
                 `;
 
-                } else {
+                }else if(info.event.extendedProps.multiple){
+                         eventEl.innerHTML = `
+                        <div class="fc-event-title">Justificar Periodo</div>
+                        <div class="fc-event-details">
+                            <div>Entrada: ${info.event.extendedProps.entrada || '--:--'}</div>
+                            <div>Salida: ${info.event.extendedProps.salida || '--:--'}</div>
+                        </div>
+                        `;
+                } 
+                 else {
                     eventEl.innerHTML = `
                         <div class="fc-event-title">${info.event.title}</div>
                         <div class="fc-event-details">
@@ -936,7 +944,7 @@
                 }
 
                 // Regla 2: 07:30:00–08:46:00 => mostrar mensaje de entrada/salida
-                if (ent !== null && ent >= r2i && ent <= r2f && tieneSalidaValida) {
+                if (ent !== null && ent >= r2i && ent <= r2f && tieneSalidaValida && salida < '10:00:00') {
                     Swal.fire(info.event.title, `Entrada: ${entrada} — Salida: ${salida}`, 'success');
                     return;
                 }
