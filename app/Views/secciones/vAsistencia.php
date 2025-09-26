@@ -786,6 +786,7 @@
             const [hh, mm, ss] = hora.split(':').map(n => parseInt(n, 10) || 0);
             return hh * 3600 + mm * 60 + ss;
         }
+   
 
         // Definir los días festivos (formato: 'YYYY-MM-DD')
         const diasFestivos = [
@@ -864,7 +865,7 @@
 
 
                 if (info.event.display === 'background') return;
-              console.log(info.event.extendedProps.multiple);
+              console.log(info.event.extendedProps.id_estatus);
 
                 var eventEl = info.el;
                 if (info.event.extendedProps.esIncidencia) {
@@ -878,7 +879,8 @@
                      <div class="fc-event-title">${info.event.title}</div>
                 `;
 
-                }else if(info.event.extendedProps.multiple){
+                }
+                else if(info.event.extendedProps.multiple){
                          eventEl.innerHTML = `
                         <div class="fc-event-title">Justificar Periodo</div>
                         <div class="fc-event-details">
@@ -936,18 +938,20 @@
                 const r2f = horaToSegundos('08:46:00');
 
                 const tieneSalidaValida = salida && typeof salida === 'string' && salida.toLowerCase() !== 'sin salida';
+                
 
                 // Regla 1: 08:46:00–09:00:00 => no justificar
-                if (ent !== null && ent >= r1i && ent <= r1f && tieneSalidaValida) {
+                if (ent !== null && ent >= r1i && ent <= r1f && salida >= '10:00:00' && salida > '16:00:00') {
                     Swal.fire('Atención', 'Los retrasos no se pueden justificar.', 'info');
                     return;
                 }
 
                 // Regla 2: 07:30:00–08:46:00 => mostrar mensaje de entrada/salida
-                if (ent !== null && ent >= r2i && ent <= r2f && tieneSalidaValida && salida < '10:00:00') {
+                if (ent !== null && ent >= r2i && ent <= r2f && salida >= '10:00:00' && salida > '16:00:00') {
                     Swal.fire(info.event.title, `Entrada: ${entrada} — Salida: ${salida}`, 'success');
                     return;
                 }
+               
 
 
                 Swal.fire({
