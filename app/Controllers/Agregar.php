@@ -1581,22 +1581,59 @@ class Agregar extends BaseController
         return $faltas;
     }
 
-    private function marcarMultiples(&$asistencia) {
-    $fechas = [];
-    foreach ($asistencia as $registro) {
-            $fecha = date('Y-m-d', strtotime($registro->fecha));
-   
-            if (!isset($fechas[$fecha])) {
-                $fechas[$fecha] = 0;
-            }
-            $fechas[$fecha]++;
-        }
-        // Marcar registros que pertenecen a días múltiples
+   private function marcarMultiples(&$asistencia) {
+        $agrupadosPorFecha = [];
+        
+        // Primero agrupar todos los registros por fecha
         foreach ($asistencia as $registro) {
             $fecha = date('Y-m-d', strtotime($registro->fecha));
-            $registro->multiple = ($fechas[$fecha] > 1);
+            
+            if (!isset($agrupadosPorFecha[$fecha])) {
+                $agrupadosPorFecha[$fecha] = [];
+            }
+            
+            $agrupadosPorFecha[$fecha][] = $registro;
         }
-        return $asistencia;
+        
+        $resultado = [];
+        
+        // Procesar cada grupo de registros de la misma fecha
+        foreach ($agrupadosPorFecha as $fecha => $registros) {
+            // Ordenar registros por hora de inicio
+            usort($registros, function($a, $b) {
+                return strtotime($a->hora_inicio) - strtotime($b->hora_inicio);
+            });
+            
+            // Si solo hay un registro, mantenerlo como está
+            if (count($registros) === 1) {
+                $registros[0]->multiple = false;
+                $registros[0]->horas_agrupadas = $registros[0]->hora_inicio . ' - ' . $registros[0]->hora_fin;
+                $resultado = array_merge($resultado, $registros);
+                continue;
+            }
+            
+            // Para múltiples registros, crear uno consolidado
+            $primerRegistro = $registros[0];
+            $ultimoRegistro = end($registros);
+            
+            // Crear nuevo objeto consolidado
+            $registroConsolidado = clone $primerRegistro;
+            $registroConsolidado->multiple = true;
+            $registroConsolidado->hora_inicio = $primerRegistro->hora_inicio;
+            $registroConsolidado->hora_fin = $ultimoRegistro->hora_fin;
+            
+            // Crear cadena con todas las horas agrupadas
+            $horas = [];
+            foreach ($registros as $reg) {
+                $horas[] = $reg->hora_inicio . ' - ' . $reg->hora_fin;
+            }
+            $registroConsolidado->horas_agrupadas = implode(' | ', $horas);
+            $registroConsolidado->registros_individuales = $registros; // Opcional: guardar los registros originales
+            
+            $resultado[] = $registroConsolidado;
+        }
+        
+        return $resultado;
     }
 
 
@@ -1621,7 +1658,7 @@ class Agregar extends BaseController
             try {
                 $meses = $this->meses($mes);
                 $agenda = $Mglobal->getTabla([
-                    'tabla' => 'asistencia',
+                    'tabla' => 'vw_asistencia_incidencia',
                     'where' => [
                         'visible' => 1,
                         'id_usuario' => $user
@@ -1637,7 +1674,7 @@ class Agregar extends BaseController
             $calendarStatic = false;
         } else { // POBLACION
             $agenda = $Mglobal->getTabla([
-                'tabla' => 'asistencia',
+                'tabla' => 'vw_asistencia_incidencia',
                 'where' => [
                     'id_usuario' => $session->get('id_usuario'),
                     'visible' => 1
@@ -1645,56 +1682,6 @@ class Agregar extends BaseController
                 ],
             ]);
             // Obtenemos incidencias
-            $incidencia = $Mglobal->getTabla([
-                'tabla' => 'incidencia',
-                'where' => [
-                    'id_usuario' => $session->get('id_usuario'),
-                    'visible' => 1
-                ]
-            ]);
-
-            $data['incidencia'] = [];
-
-            if (isset($incidencia->data) && !empty($incidencia->data)) {
-                foreach ($incidencia->data as $item) {
-                    $fecha = $item->fecha;
-
-                    // Detectar si es rango tipo "08/18/2025 - 08/22/2025"
-                    if (preg_match('/\d{2}\/\d{2}\/\d{4}\s*-\s*\d{2}\/\d{2}\/\d{4}/', $fecha)) {
-                        list($iniStr, $finStr) = array_map('trim', explode('-', $fecha));
-
-                        $ini = DateTime::createFromFormat('m/d/Y', $iniStr);
-                        $fin = DateTime::createFromFormat('m/d/Y', $finStr);
-
-                        if ($ini && $fin) {
-                            // FullCalendar → end es exclusivo: sumamos 1 día
-                            $fin->modify('+1 day');
-
-                            $item->start = $ini->format('Y-m-d');
-                            $item->end = $fin->format('Y-m-d');
-                            $item->tipo = 'semana';
-                        }
-                    } else {
-                        // Fecha simple: intentamos varios formatos
-                        $d = DateTime::createFromFormat('Y-m-d', $fecha) ?:
-                            DateTime::createFromFormat('d/m/Y', $fecha) ?:
-                            DateTime::createFromFormat('m/d/Y', $fecha);
-
-                        if ($d) {
-                            $fin = clone $d;
-                            $fin->modify('+1 day');
-
-                            $item->start = $d->format('Y-m-d');
-                            $item->end = $fin->format('Y-m-d');
-                            $item->tipo = 'dia';
-                        }
-                    }
-
-                    $data['incidencia'][] = $item;
-                }
-            }
-
-
         }
        
         $data['onlyAsistencias'] = [];
@@ -1781,10 +1768,35 @@ class Agregar extends BaseController
         
 
         $asistencia = (isset($agenda->data) && !empty($agenda->data)) ? $agenda->data : [];
-        $registrosAgrupados = $asistencia = $this->marcarMultiples($asistencia);
-        //var_dump( $asistencia);
-        //die( var_dump( $registrosAgrupados ) );
-//$faltas = $this->getFaltasRangoQuincena($inicio, $fin);
+        $registrosAgrupados = $this->marcarMultiples($asistencia);
+        //die(  var_dump( $registrosAgrupados ) );
+        // Definir los días festivos
+        $cumple = date('m-d', strtotime($session->fec_nac));
+        $anio = date('Y');
+        $diasFestivos = [
+            $anio.'-01-01' => 'Año Nuevo',
+            $anio.'-02-05' => 'Día de la Constitución',
+            $anio.'-03-18' => 'Natalicio de Benito Juárez',
+            $anio.'-05-01' => 'Día del Trabajo',
+            $anio.'-09-16' => 'Día de la Independencia',
+            $anio.'-11-18' => 'Día de la Revolución',
+            $anio.'-12-25' => 'Navidad',
+            $anio.'-'.$cumple => 'Mi cumpleaños'
+        ];
+
+        // Agregar días festivos al resultado
+        foreach($diasFestivos as $fecha => $titulo) {
+            $registrosAgrupados[] = [
+                'title' => $titulo,
+                'fecha' => $fecha,
+                'backgroundColor' => '#3388ff',
+                'esFestivo' => true
+            ];
+        }
+       
+    
+       // die( var_dump( $registrosAgrupados ) );
+       //$faltas = $this->getFaltasRangoQuincena($inicio, $fin);
 
        // $data['faltas'] = $faltas;
         $data['asistencia'] = $registrosAgrupados;

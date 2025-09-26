@@ -81,6 +81,11 @@
         background-color: #e2f1eb;
         color: #1cc88a;
     }
+   .fc-event-asueto {
+    border-left-color: #9B59B6;       /* Morado vivo */
+    background-color: #F3E8F9;        /* Morado pastel */
+    color: #9B59B6;    
+    }
 
     .fc-event-title {
         font-weight: bold;
@@ -458,38 +463,9 @@
 <script>
     ini.inicio.formIncidencia();
     var eventosAsistencia = <?= json_encode($asistencia) ?>;
-    var incidencia = <?= json_encode($incidencia ?? []) ?>;
     var onlyAsistencias = <?= json_encode($onlyAsistencias) ?>;
 
 
-    // Helpers
-    function horaToSegundos(hora) {
-        if (!hora || typeof hora !== 'string' || !hora.includes(':')) return null;
-        const [hh, mm, ss] = hora.split(':').map(x => parseInt(x, 10) || 0);
-        return hh * 3600 + mm * 60 + ss;
-    }
-    function parseHoras(valor) {
-        // Admite: array de horas ["08:00:00","14:00:00"], string "08:00:00",
-        // o string con comas "08:00:00,14:00:00"
-        if (Array.isArray(valor)) return valor.filter(Boolean);
-        if (typeof valor === 'string') return valor.split(',').map(s => s.trim()).filter(Boolean);
-        return [];
-    }
-    function getEntradas(info) {
-        const ep = info.event.extendedProps || {};
-        // Preferir 'entradas' si existe; si no, usar 'entrada'
-        return parseHoras(ep.entradas ?? ep.entrada ?? '');
-    }
-    function getSalidas(info) {
-        const ep = info.event.extendedProps || {};
-        // Preferir 'salidas' si existe; si no, usar 'salida'
-        const s = parseHoras(ep.salidas ?? ep.salida ?? '');
-        // Preservar el literal "Sin salida" si viene único
-        if (!s.length && typeof ep.salida === 'string' && ep.salida.toLowerCase().includes('sin salida')) {
-            return ['Sin salida'];
-        }
-        return s;
-    }
     function normalizarFecha(fecha) {
         if (!fecha) return '';
         
@@ -624,152 +600,6 @@
 
         // Construir la fecha en formato YYYY-MM-DD
         var fecha = anio + '-' + cero + mesSeleccionado + '-01';
-
-        // Procesar los datos para FullCalendar
-        var eventos = eventosAsistencia.map(function (item) {
-            let eventClass = 'fc-event-asistencia';
-            let icon = ''; // Para el emoji
-            
-            const hoy = '<?= date("Y-m-d") ?>'; // Formato YYYY-MM-DD
-           const fechaNormalizada = normalizarFecha(item.fecha);
-           console.log('Fecha normalizada:', fechaNormalizada, 'Hoy:', hoy, '¿Son iguales?', fechaNormalizada === hoy);
-
-            if(fechaNormalizada === hoy){
-                if (item.entrada < '08:30:00') {
-                    eventClass = 'fc-event-temprano';
-                    item.nombre = 'Temprano';
-                    icon = '<i class="em em-smiley"></i>';
-                }
-                if (item.entrada >= '08:30:00' && item.entrada <= '08:46:00') {
-                    eventClass = 'fc-event-puntual';
-                    item.nombre = 'Puntual';
-                    icon = '<i class="em em-slightly_smiling_face"></i>';
-                }
-                if (item.entrada > '08:46:00') {
-                    eventClass = 'fc-event-tarde';
-                    item.nombre = 'Tarde';
-                    icon = '<i class="em em-slightly_frowning_face"></i>';
-                }
-                if (item.entrada > '09:00:00') {
-                    eventClass = 'fc-event-tarde';
-                    item.nombre = 'Falta';
-                    icon = '❌';
-                }
-            }else{
-                if (item.entrada >= '08:30:00' && item.entrada <= '08:46:00') {
-                     eventClass = 'fc-event-puntual';
-                     item.nombre = 'Puntual';
-                     icon = '🕣';
-                }
-                if (item.entrada >= '08:46:00' && item.entrada <= '09:00:00') {
-                     eventClass = 'fc-event-puntual';
-                     item.nombre = 'Tarde';
-                     icon = '⏳';
-                }
-                if (item.entrada < '08:30:00' && item.salida > '16:00:00') {
-                     eventClass = 'fc-event-temprano';
-                     item.nombre = 'Temprano';
-                     icon = '✅';
-                }
-                if (item.entrada >= '08:30:00' && item.entrada <= '08:46:00' && item.salida > '16:00:00') {
-                    eventClass = 'fc-event-puntual';
-                    item.nombre = 'Puntual';
-                    icon = '🕣';
-                }
-                if (item.entrada < '09:00:00' && item.salida < '16:00:00') {
-                     eventClass = 'fc-event-tarde';
-                     item.nombre = 'Salida antes';
-                     icon = '🏃'; // Avance rápido (salida anticipada)
-                }
-                if (item.entrada < '09:00:00' && !item.salida) {
-                     eventClass = 'fc-event-tarde';
-                     item.nombre = 'Sin Salida';
-                     icon = '🏃'; // Avance rápido (salida anticipada)
-                }
-                 if (item.entrada > '09:00:00') {
-                    eventClass = 'fc-event-tarde';
-                    item.nombre = 'Falta';
-                    icon = '❌';
-                }
-            }
-
-
-
-            return {
-                id: item.id_asistencia,
-                start: item.fecha,
-                allDay: true,
-                className: eventClass,
-                title: `${item.nombre} ${icon}`,
-                extendedProps: {
-                    entrada: item.entrada,
-                    tipo_registro: item.tipo_registro,
-                    multiple: item.multiple,
-                    esFestivo: false,
-                    salida: (!item.salida) ? 'Sin salida' : item.salida,
-                    trabajado: item.trabajado,
-                    tarde: item.tarde,
-                    temprano: item.temprano,
-                    turno: item.turno,
-                    tipo: 'asistencia'
-                }
-            };
-        });
-
-
-        // Procesar las incidencias como eventos adicionales
-        // Procesar las incidencias como eventos adicionales
-        var eventosIncidencia = incidencia.map(function (item) {
-            const esSemana = item.tipo === 'semana';
-
-
-            if (item.id_estatus == 1) {
-                eventClass = 'fc-event-espera';
-                item.nombre = 'Enviado';
-                icon = '✈️';
-            } else if (item.id_estatus == 2) {
-                eventClass = 'fc-event-declinado';
-                item.nombre = 'Declinado';
-                icon = '😢';
-            } else if (item.id_estatus == 3) {
-                eventClass = 'fc-event-puntual';
-                item.nombre = 'Aprobado';
-                icon = '😊';
-            } else if (item.id_estatus == 4) {
-                eventClass = 'fc-event-espera';
-                item.nombre = 'Proceso';
-                icon = '⏳'; // reloj de arena en proceso
-
-            }
-
-            // LIMPIAR LAS FECHAS - EXTRAER SOLO LA PARTE YYYY-MM-DD
-            const startDate = item.start ? item.start.split(' ')[0] : null;
-            const endDate = item.end ? item.end.split(' ')[0] : null;
-
-
-            return {
-                id: 'incidencia-' + item.id_incidencia,
-                start: item.fecha_inicio,      // SOLO YYYY-MM-DD
-                end: item.fecha_fin,          // SOLO YYYY-MM-DD (EXCLUSIVO)
-                allDay: true,
-                title: `${item.nombre} ${icon}`,
-                display: esSemana ? 'background' : 'auto',
-                className: eventClass,
-                extendedProps: {
-                    esFestivo: false,
-                    tipo: item.tipo,
-                    id_incidencia: item.id_incidencia,
-                    hora_inicio: item.hora_inicio,
-                    hora_fin: item.hora_fin,
-                    comentarios: item.comentarios,
-                    id_estatus: item.id_estatus,
-                    esIncidencia: true,
-                    observaciones: item.observaciones,
-                    rango_legible: esSemana ? (startDate + ' - ' + dayBefore(endDate)) : null
-                }
-            };
-        });
-
         function dayBefore(yyyy_mm_dd) {
             if (!yyyy_mm_dd) return '';
 
@@ -780,42 +610,137 @@
             const day = String(d.getDate()).padStart(2, '0');
             return `${y}-${m}-${day}`;
         }
+        // Procesar los datos para FullCalendar
+        var eventos = eventosAsistencia.map(function (item) {
+            let eventClass = 'fc-event-asistencia';
+            let icon = ''; // Para el emoji
+            let entrada =  item.hora_inicio;
+            const esSemana = item.tipo === 2;
+            let salida =  item.hora_fin;
+            let esFestivo =  item.esFestivo;
+            let multiple =  item.multiple;
+            let idEstatus =  item.id_estatus;
+     
+        
+            const hoy = '<?= date("Y-m-d") ?>'; // Formato YYYY-MM-DD
+           const fechaNormalizada = normalizarFecha(item.fecha);
 
-        function horaToSegundos(hora) {
-            if (!hora || typeof hora !== 'string' || !hora.includes(':')) return null;
-            const [hh, mm, ss] = hora.split(':').map(n => parseInt(n, 10) || 0);
-            return hh * 3600 + mm * 60 + ss;
-        }
-   
+            if(fechaNormalizada === hoy){
+                if (entrada < '08:30:00') {
+                    eventClass = 'fc-event-temprano';
+                    item.nombre = 'Temprano';
+                    icon = '😀';
+                }
+                if (entrada >= '08:30:00' && entrada <= '08:46:00') {
+                    eventClass = 'fc-event-puntual';
+                    item.nombre = 'Puntual';
+                    icon = '😊';
+                }
+                if (entrada > '08:46:00') {
+                    eventClass = 'fc-event-tarde';
+                    item.nombre = 'Tarde';
+                    icon = '😢';
+                }
+                if (entrada > '09:00:00') {
+                    eventClass = 'fc-event-tarde';
+                    item.nombre = 'Falta';
+                    icon = '❌';
+                }
+            }else{
+                if (entrada >= '08:30:00' && entrada <= '08:46:00') {
+                     eventClass = 'fc-event-puntual';
+                     item.nombre = 'Puntual';
+                     icon = '🕣';
+                }
+                if (entrada >= '08:46:00' && entrada <= '09:00:00') {
+                     eventClass = 'fc-event-puntual';
+                     item.nombre = 'Tarde';
+                     icon = '⏳';
+                }
+                if (entrada < '08:30:00' && salida > '16:00:00') {
+                     eventClass = 'fc-event-temprano';
+                     item.nombre = 'Temprano';
+                     icon = '✅';
+                }
+                if (entrada >= '08:30:00' && entrada <= '08:46:00' && salida > '16:00:00') {
+                    eventClass = 'fc-event-puntual';
+                    item.nombre = 'Puntual';
+                    icon = '🕣';
+                }
+                if (entrada < '09:00:00' && salida < '16:00:00') {
+                     eventClass = 'fc-event-tarde';
+                     item.nombre = 'Salida antes';
+                     icon = '🏃'; // Avance rápido (salida anticipada)
+                }
+                if (entrada < '09:00:00' && !salida) {
+                     eventClass = 'fc-event-tarde';
+                     item.nombre = 'Sin Salida';
+                     icon = '🏃'; // Avance rápido (salida anticipada)
+                }
+                 if (entrada > '09:00:00') {
+                    eventClass = 'fc-event-tarde';
+                    item.nombre = 'Falta';
+                    icon = '❌';
+                }if(esFestivo){
+                     eventClass = 'fc-event-asueto';
+                     item.nombre = item.title;
+                     icon = '🎉';
+                }
+                if(multiple){
+                     eventClass = 'fc-event-tarde';
+                     item.nombre = 'Justificar Periodo';
+                     icon = '🏃';
+                }
+                if(esSemana && idEstatus == 1){
+                     eventClass = 'fc-event-espera';
+                     item.nombre = 'Enviado';
+                     icon = '✈️';
+                }
+                if(esSemana && idEstatus == 3){
+                     eventClass = 'fc-event-temprano';
+                     item.nombre = 'Aprobado';
+                     icon = '😊';
+                }
+                if(esSemana && idEstatus == 2){
+                     eventClass = 'fc-event-falta';
+                     item.nombre = 'Declinado';
+                     icon = '😢';
+                }
+           
 
-        // Definir los días festivos (formato: 'YYYY-MM-DD')
-        const diasFestivos = [
-            '2025-01-01', // Año Nuevo
-            '2025-02-05', // Día de la Constitución
-            '2025-03-18', // Natalicio de Benito Juárez
-            '2025-05-01', // Día del Trabajo
-            '2025-09-16', // Día de la Independencia
-            '2025-11-18', // Día de la Revolución
-            '2025-12-25', // Navidad
-            // Agrega más fechas según necesites
-        ];
+            }
 
-        const eventosFestivos = diasFestivos.map(fecha => {
+             const startDate = item.fecha_inicio ? item.fecha_inicio_incidencia.split(' ')[0] : null;
+            const endDate = item.fecha_fin_incidencia ? item.fecha_fin_incidencia.split(' ')[0] : null;
+
             return {
-                title: 'Día Asueto',
-                start: fecha,
-                display: 'background',
-                //backgroundColor: '#3388ff', // Color de fondo rojo claro
-                backgroundColor: '#ffebee', // Color de fondo rojo claro/
-                className: 'fc-event-festivo',
+                id: item.id_usuario,
+                start: (esSemana)?item.fecha_inicio_incidencia:item.fecha,
+                end: (esSemana)?item.fecha_fin_incidencia:item.fecha,
+                allDay: true,
+                className: eventClass,
+                display: esSemana ? 'background' : 'auto',
+                title: `${item.nombre} ${icon}`,
                 extendedProps: {
-                    esFestivo: true
+                    entrada: entrada,
+                    tipo_registro: item.tipo_registro,
+                    multiple: multiple,
+                    esFestivo: esFestivo,
+                    salida: (!salida) ? 'Sin salida' : salida,
+                    trabajado: item.trabajado,
+                    tarde: item.tarde,
+                    temprano: item.temprano,
+                    turno: item.turno,
+                    tipo: 'asistencia',
+                    esSemana: esSemana,
+                    idEstatus: idEstatus,
+                    horas_agrupadas: item.horas_agrupadas,
+                    rango_legible: esSemana ? (startDate + ' - ' + dayBefore(endDate)) : null
                 }
             };
         });
 
 
-        var todosLosEventos = eventos.concat(eventosIncidencia, eventosFestivos);
 
         var calendar = new FullCalendar.Calendar(calendarEl, {
 
@@ -846,7 +771,7 @@
             initialView: 'dayGridMonth',
             editable: false,
             selectable: false,
-            events: todosLosEventos,
+            events: eventos,
             // Formato de fecha en español
             titleFormat: {
                 year: 'numeric',
@@ -861,251 +786,42 @@
                 hour12: true,
                 meridiem: 'short'
             },
-            eventRender: function (info) {
-
-
-                if (info.event.display === 'background') return;
-              console.log(info.event.extendedProps.id_estatus);
-
+             eventRender: function (info) {
                 var eventEl = info.el;
-                if (info.event.extendedProps.esIncidencia) {
-                    eventEl.innerHTML = `
-                     <div class="fc-event-title">${info.event.title}</div>
-                    <div class="${info.event.className}">
-                    </div>
-                `;
-                } else if (info.event.extendedProps.esFestivo) {
-                    `
-                     <div class="fc-event-title">${info.event.title}</div>
-                `;
-
+                const esSemana = info.event.extendedProps.esSemana;
+                const idEstatus = info.event.extendedProps.idEstatus;
+                if(info.event.extendedProps.esFestivo){
+                   eventEl.innerHTML = `<div class="fc-event-title">${info.event.title}</div>`;
+                   return;
                 }
-                else if(info.event.extendedProps.multiple){
-                         eventEl.innerHTML = `
-                        <div class="fc-event-title">Justificar Periodo</div>
-                        <div class="fc-event-details">
-                            <div>Entrada: ${info.event.extendedProps.entrada || '--:--'}</div>
-                            <div>Salida: ${info.event.extendedProps.salida || '--:--'}</div>
-                        </div>
-                        `;
-                } 
-                 else {
-                    eventEl.innerHTML = `
+                if(esSemana && idEstatus == 1){
+                   eventEl.innerHTML = `<div class="fc-event-title">${info.event.title}</div>`;
+                   return;
+                }
+                if(info.event.extendedProps.multiple){
+                   eventEl.innerHTML = `<div class="fc-event-title">${info.event.title}</div>
+                    <div class="fc-event-details">
+                            <div>${info.event.extendedProps.horas_agrupadas || '--:--'}</div>
+                        </div>`;
+                   return;
+                }
+             
+                 eventEl.innerHTML = `
                         <div class="fc-event-title">${info.event.title}</div>
                         <div class="fc-event-details">
                             <div>Entrada: ${info.event.extendedProps.entrada || '--:--'}</div>
                             <div>Salida: ${info.event.extendedProps.salida || '--:--'}</div>
                         </div>
                         `;
-                }
             },
             eventClick: function (info) {
-                const esSemana = info.event.extendedProps.tipo === 'semana';
-                const idEstatus = info.event.extendedProps.id_estatus == 3;
-                const enviado = info.event.extendedProps.id_estatus == 1;
-               // console.log(idEstatus);
-                const fechaLabel = esSemana
-                    ? `${info.event.extendedProps.rango_legible}`
-                    : info.event.start.toLocaleDateString();
-
-                const entradas = getEntradas(info);
-                const salidas = getSalidas(info);
-
-                // 🚫 Si hay múltiples entradas o múltiples salidas, no mostrar listado/justificar
-                const multiplesEntradas = entradas.length > 1;
-                const multiplesSalidas = salidas.length > 1;
-
-                if (multiplesEntradas || multiplesSalidas) {
-                    Swal.fire('Aviso', 'Este registro contiene múltiples entradas/salidas. Favor de gestionarlo desde "Editar".', 'info');
-                    return;
-                }
-
-                // ✅ Caso de un solo par entrada–salida (o salida "Sin salida")
-                const entrada = entradas[0] || null;
-                const salida = salidas[0] || null;
-
-                // Si entrada viene vacía, no seguimos con reglas de horario
-                if (!entrada && idEstatus || enviado) {
-                    Swal.fire('Atención', 'Es espera de validación', 'warning');
-                    return;
-                }
-
-                // Reglas por rango de hora de entrada
-                const ent = horaToSegundos(entrada);
-                const r1i = horaToSegundos('08:46:00');
-                const r1f = horaToSegundos('09:00:00');
-                const r2i = horaToSegundos('07:00:00');
-                const r2f = horaToSegundos('08:46:00');
-
-                const tieneSalidaValida = salida && typeof salida === 'string' && salida.toLowerCase() !== 'sin salida';
-                
-
-                // Regla 1: 08:46:00–09:00:00 => no justificar
-                if (ent !== null && ent >= r1i && ent <= r1f && salida >= '10:00:00' && salida > '16:00:00') {
-                    Swal.fire('Atención', 'Los retrasos no se pueden justificar.', 'info');
-                    return;
-                }
-
-                // Regla 2: 07:30:00–08:46:00 => mostrar mensaje de entrada/salida
-                if (ent !== null && ent >= r2i && ent <= r2f && salida >= '10:00:00' && salida > '16:00:00') {
-                    Swal.fire(info.event.title, `Entrada: ${entrada} — Salida: ${salida}`, 'success');
-                    return;
-                }
-               
-
-
-                Swal.fire({
-                    title: info.event.title,
-                    html: `
-                ${(info.event.extendedProps.id_estatus == 2) ? '<div style="text-center">' + info.event.extendedProps.observaciones + '</div>' : ''}
-                <div style="text-align: left;">
-                    <p><strong>${esSemana ? 'Semana' : 'Fecha'}:</strong> ${fechaLabel}</p>
-                    <p><strong>${info.event.extendedProps.entrada ? 'Entrada' : 'Hora Inicio'}:</strong> ${info.event.extendedProps.entrada || info.event.extendedProps.hora_inicio}</p>
-                    <p><strong>${info.event.extendedProps.salida ? 'Salida' : 'Hora Fin'}:</strong> ${info.event.extendedProps.salida || info.event.extendedProps.hora_fin}</p>
-                </div>
-                `,
-                    showDenyButton: (info.event.extendedProps.id_estatus == 2) ? true : false,
-                    showCancelButton: true,
-                    confirmButtonText: '<i class="mdi mdi-plus-circle"></i> Agregar Incidencia',
-                    denyButtonText: '<i class="mdi mdi-pencil"></i> Editar',
-                    cancelButtonText: '<i class="mdi mdi-close"></i> Cerrar',
-                    customClass: {
-                        popup: 'swal-wide',
-                        confirmButton: 'btn btn-success mx-1',
-                        denyButton: 'btn btn-primary mx-1',
-                        cancelButton: 'btn btn-secondary mx-1'
-                    },
-                    buttonsStyling: false,
-                    showCloseButton: true,
-                    reverseButtons: true,
-                    focusConfirm: false
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // FUNCIÓN PARA OBTENER LA FECHA EN FORMATO CORRECTO
-                        const obtenerFechaFormateada = () => {
-                            // Intentar diferentes métodos para obtener la fecha
-                            if (info.dateStr) {
-                                return info.dateStr; // Usar dateStr si está disponible
-                            }
-
-                            if (info.event.start) {
-                                // Formatear a YYYY-MM-DD
-                                const fecha = info.event.start;
-                                const year = fecha.getFullYear();
-                                const month = String(fecha.getMonth() + 1).padStart(2, '0');
-                                const day = String(fecha.getDate()).padStart(2, '0');
-                                return `${year}-${month}-${day}`;
-                            }
-
-                            if (info.event.extendedProps.fecha) {
-                                return info.event.extendedProps.fecha;
-                            }
-
-                            // Si no se puede obtener, usar la fecha actual
-                            console.warn('Se encuentra en proceso de validación');
-                            const hoy = new Date();
-                            return hoy.toISOString().split('T')[0];
-                        };
-                        if (info.event.extendedProps.id_estatus != 1) {
-                            const dia = obtenerFechaFormateada();
-                            st.agregar.justificarFalta(dia);
-                        }
-
-
-                    } else if (result.isDenied) {
-                        st.agregar.editarRegistro(info.event.extendedProps.id_incidencia);
-                    }
-                });
+              
             },
             dateClick: function (info) {
-                console.log(info);
-                const fecha = info.date;
-                const diaSemana = fecha.getDay();
-                const fechaStr = fecha.toISOString().split('T')[0];
-                const esFestivo = diasFestivos.includes(fechaStr);
 
-                if (esFestivo) {
-                    Swal.fire("Día Festivo", "No se puede justificar faltas en días festivos.", "info");
-                    return;
-                }
-
-                if (diaSemana === 0 || diaSemana === 6) {
-                    Swal.fire("Error", "No se permite justificar faltas en sábado o domingo.", "error");
-                    return;
-                }
-
-                // Si es un día hábil, continúa
-
-                let dia = info.dateStr;
-                st.agregar.existeIncidencia(dia, function (validar) {
-                    if (validar) {
-                        Swal.fire("Atención", "En proceso de validación y/o validado", "info");
-                    } else {
-                        st.agregar.justificarFalta(dia);
-                    }
-
-                });
             },
             dayRender: function (info) {
 
-                const date = info.date;
-                const day = date.getDay();
-                const isWeekend = (day === 0 || day === 6);
-
-                // Verificar si es día festivo
-                const fechaStr = date.toISOString().split('T')[0];
-       
-                const esFestivo = diasFestivos.includes(fechaStr);
-                const esRegistro = onlyAsistencias.includes(fechaStr);
-
-                // Rango del día (00:00 – 24:00)
-                const dayStart = new Date(date);
-                dayStart.setHours(0, 0, 0, 0);
-                const dayEnd = new Date(dayStart);
-                dayEnd.setDate(dayEnd.getDate() + 1);
-
-                // Eventos del día
-                const eventsToday = calendar.getEvents().filter(function (e) {
-                    const evStart = e.start;
-                    const evEnd = e.end || evStart;
-                    return evStart < dayEnd && evEnd > dayStart;
-                });
-
-                const hasEvents = eventsToday.length > 0;
-                const esFalta = eventsToday.some(e => (e.classNames || []).includes('fc-event-falta'));
-
-                // ======= Marcado visual existente (lo conservas) =======
-                if (esFestivo) {
-                    info.el.style.backgroundColor = '#fff3cd';
-                    info.el.style.border = '2px solid #ffc107';
-                    info.el.title = 'Día Festivo';
-                } else if (isWeekend && !esFalta) {
-                    info.el.style.backgroundColor = '#c7bbbbff';
-                } else if (hasEvents) {
-                    info.el.style.backgroundColor = 'rgba(78, 115, 223, 0.05)';
-                } else {
-                    info.el.style.backgroundColor = 'rgba(58, 23, 75, 0.1)';
-                    info.el.style.border = '1px solid rgba(255, 0, 0, 0.3)';
-                }
-
-                // ======= NUEVO: Bandera para días hábiles pasados sin registros =======
-                if (!esFestivo && esHabil(date) && esPasado(date) && !hasEvents && !esRegistro) {
-                    info.el.classList.add('fc-dia-sin-chequeo');
-
-                    // Evita duplicar badge si FullCalendar re-renderiza
-                    if (!info.el.querySelector('.flag-missing')) {
-                        const badge = document.createElement('div');
-                        badge.className = 'flag-missing';
-                        badge.innerHTML = `
-                        <div class="spinner-grow text-danger"  role="status"></div>
-                          <div class="fc-event-title text-danger" style="text-align: center;">Falta Sin Justificar</div>
-                        `;
-                        info.el.appendChild(badge);
-
-                    }
-
-
-                }
             },
 
 
