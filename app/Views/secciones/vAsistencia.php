@@ -627,11 +627,11 @@
             let icon = ''; // Para el emoji
             let entrada =  item.hora_inicio;
             const esSemana = item.tipo === 2;
-            let salida =  item.hora_fin;
+            let salida =    item.hora_fin;
             let esFestivo =  item.esFestivo;
             let multiple =  item.multiple;
             let idEstatus =  item.id_estatus;
-            console.log(esSemana);
+            console.log(salida);
             const hoy = '<?= date("Y-m-d") ?>'; // Formato YYYY-MM-DD
            const fechaNormalizada = normalizarFecha(item.fecha);
 
@@ -663,8 +663,8 @@
                      item.nombre = 'Puntual';
                      icon = '🕣';
                 }
-                if (entrada >= '08:46:00' && entrada <= '09:00:00') {
-                     eventClass = 'fc-event-puntual';
+                if (entrada >= '08:46:00' && entrada <= '09:00:00' && salida > '16:00:00') {
+                     eventClass = 'fc-event-tarde';
                      item.nombre = 'Tarde';
                      icon = '⏳';
                 }
@@ -678,18 +678,18 @@
                     item.nombre = 'Puntual';
                     icon = '🕣';
                 }
-                if (entrada < '09:00:00' && salida < '16:00:00') {
-                     eventClass = 'fc-event-tarde';
+                if (entrada <= '09:00:00' && salida < '16:00:00') {
+                     eventClass = 'fc-event-declinado';
                      item.nombre = 'Salida antes';
                      icon = '🏃'; // Avance rápido (salida anticipada)
                 }
-                if (entrada < '09:00:00' && !salida) {
-                     eventClass = 'fc-event-tarde';
+                if (entrada > '07:00:00' && entrada < '09:00:00' && !salida || salida == null) {
+                     eventClass = 'fc-event-declinado';
                      item.nombre = 'Sin Salida';
                      icon = '🏃'; // Avance rápido (salida anticipada)
                 }
                  if (entrada > '09:00:00') {
-                    eventClass = 'fc-event-tarde';
+                    eventClass = 'fc-event-declinado';
                     item.nombre = 'Falta';
                     icon = '❌';
                 }if(esFestivo){
@@ -965,7 +965,6 @@
 
             },
              dayRender: function (info) {
-               console.log(info);
                 const date = info.date;
                 const fechaStr = date.toISOString().split('T')[0];
                 const esRegistro = onlyAsistencias.includes(fechaStr);
