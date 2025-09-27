@@ -29,9 +29,11 @@
 <style>
     /* Añade estos estilos al bloque de estilos existente */
     .fc-event-trabajando {
-        background-color: #4A90E2 !important; /* Azul */
+        background-color: #4A90E2 !important;
+        /* Azul */
         border-color: #357ABD !important;
-        color: #fff !important; /* Texto blanco */
+        color: #fff !important;
+        /* Texto blanco */
     }
 
     .fc-event-asistencia {
@@ -63,12 +65,14 @@
         background-color: rgba(216, 46, 23, 1);
         color: white;
     }
+
     .fc-event-aprobado {
         border-left: 4px solid #4caf50;
         background-color: rgba(76, 175, 80, 0.1);
         color: #388e3c;
         border: 1px solid rgba(76, 175, 80, 0.2);
     }
+
     .fc-event-tarde {
         border-left-color: #e74a3b;
         background-color: #f8e0df;
@@ -86,10 +90,13 @@
         background-color: #e2f1eb;
         color: #1cc88a;
     }
-   .fc-event-asueto {
-    border-left-color: #9B59B6;       /* Morado vivo */
-    background-color: #F3E8F9;        /* Morado pastel */
-    color: #9B59B6;    
+
+    .fc-event-asueto {
+        border-left-color: #9B59B6;
+        /* Morado vivo */
+        background-color: #F3E8F9;
+        /* Morado pastel */
+        color: #9B59B6;
     }
 
     .fc-event-title {
@@ -474,25 +481,48 @@
 
     function normalizarFecha(fecha) {
         if (!fecha) return '';
-        
+
         // Si ya es solo fecha (YYYY-MM-DD)
         if (typeof fecha === 'string' && fecha.match(/^\d{4}-\d{2}-\d{2}$/)) {
             return fecha;
         }
-        
+
         // Si tiene formato ISO (con T)
         if (typeof fecha === 'string' && fecha.includes('T')) {
             return fecha.split('T')[0];
         }
-        
+
         // Si es un objeto Date
         if (fecha instanceof Date) {
             return fecha.toISOString().split('T')[0];
         }
-        
+
         return '';
     }
+    function obtenerFechaFormateada(info) {
+        // Intentar diferentes métodos para obtener la fecha
+        if (info.dateStr) {
+            return info.dateStr; // Usar dateStr si está disponible
+        }
 
+        if (info.event.start) {
+            // Formatear a YYYY-MM-DD
+            const fecha = info.event.start;
+            const year = fecha.getFullYear();
+            const month = String(fecha.getMonth() + 1).padStart(2, '0');
+            const day = String(fecha.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        if (info.event.extendedProps.fecha) {
+            return info.event.extendedProps.fecha;
+        }
+
+        // Si no se puede obtener, usar la fecha actual
+        console.warn('Se encuentra en proceso de validación');
+        const hoy = new Date();
+        return hoy.toISOString().split('T')[0];
+    }
     function esHabil(date) {
         const d = date.getDay(); // 0=Dom, 6=Sáb
         return d >= 1 && d <= 5;
@@ -616,26 +646,66 @@
             const day = String(d.getDate()).padStart(2, '0');
             return `${y}-${m}-${day}`;
         }
-          function horaToSegundos(hora) {
-             if (!hora || typeof hora !== 'string' || !hora.includes(':')) return null;
+        function horaToSegundos(hora) {
+            if (!hora || typeof hora !== 'string' || !hora.includes(':')) return null;
             const [hh, mm, ss] = hora.split(':').map(x => parseInt(x, 10) || 0);
             return hh * 3600 + mm * 60 + ss;
+        }
+        function justificar(info, fechaLabel, esSemana){
+            console.log(info.event.extendedProps.observaciones);
+            console.log(info.event.extendedProps.idEstatus);
+              Swal.fire({
+                    title: info.event.title,
+                    html: `
+                ${(info.event.extendedProps.idEstatus == 3) ? '<div style="text-center">' + info.event.extendedProps.observaciones + '</div>' : ''}
+                <div style="text-align: left;">
+                    <p><strong>${esSemana ? 'Semana' : 'Fecha'}:</strong> ${fechaLabel}</p>
+                    <p><strong>${info.event.extendedProps.entrada ? 'Entrada' : 'Hora Inicio'}:</strong> ${info.event.extendedProps.entrada || info.event.extendedProps.hora_inicio}</p>
+                    <p><strong>${info.event.extendedProps.salida ? 'Salida' : 'Hora Fin'}:</strong> ${info.event.extendedProps.salida || info.event.extendedProps.hora_fin}</p>
+                </div>
+                `,
+                    showDenyButton: (info.event.extendedProps.idEstatus == 3) ? true : false,
+                    showCancelButton: true,
+                    confirmButtonText: '<i class="mdi mdi-plus-circle"></i> Agregar Incidencia',
+                    denyButtonText: '<i class="mdi mdi-pencil"></i> Editar',
+                    cancelButtonText: '<i class="mdi mdi-close"></i> Cerrar',
+                    customClass: {
+                        popup: 'swal-wide',
+                        confirmButton: 'btn btn-success mx-1',
+                        denyButton: 'btn btn-primary mx-1',
+                        cancelButton: 'btn btn-secondary mx-1'
+                    },
+                    buttonsStyling: false,
+                    showCloseButton: true,
+                    reverseButtons: true,
+                    focusConfirm: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // FUNCIÓN PARA OBTENER LA FECHA EN FORMATO CORRECTO
+
+                        const dia = obtenerFechaFormateada(info);
+                        st.agregar.justificarFalta(dia);
+
+
+                    } else if (result.isDenied) {
+                        st.agregar.editarRegistro(info.event.extendedProps.id_incidencia);
+                    }
+                });
         }
         // Procesar los datos para FullCalendar
         var eventos = eventosAsistencia.map(function (item) {
             let eventClass = 'fc-event-asistencia';
             let icon = ''; // Para el emoji
-            let entrada =  item.hora_inicio;
+            let entrada = item.hora_inicio;
             const esSemana = item.tipo === 2;
-            let salida =    item.hora_fin;
-            let esFestivo =  item.esFestivo;
-            let multiple =  item.multiple;
-            let idEstatus =  item.id_estatus;
-            console.log(salida);
+            let salida = item.hora_fin;
+            let esFestivo = item.esFestivo;
+            let multiple = item.multiple;
+            let idEstatus = item.id_estatus;;
             const hoy = '<?= date("Y-m-d") ?>'; // Formato YYYY-MM-DD
-           const fechaNormalizada = normalizarFecha(item.fecha);
+            const fechaNormalizada = normalizarFecha(item.fecha);
 
-            if(fechaNormalizada === hoy){
+            if (fechaNormalizada === hoy) {
                 if (entrada < '08:30:00') {
                     eventClass = 'fc-event-temprano';
                     item.nombre = 'Temprano';
@@ -656,22 +726,22 @@
                     item.nombre = 'Falta';
                     icon = '❌';
                 }
-            }else{
-      
+            } else {
+
                 if (entrada >= '08:30:00' && entrada <= '08:46:00' && !idEstatus) {
-                     eventClass = 'fc-event-puntual';
-                     item.nombre = 'Puntual';
-                     icon = '🕣';
+                    eventClass = 'fc-event-puntual';
+                    item.nombre = 'Puntual';
+                    icon = '🕣';
                 }
                 if (entrada >= '08:46:00' && entrada <= '09:00:00' && salida > '16:00:00') {
-                     eventClass = 'fc-event-tarde';
-                     item.nombre = 'Tarde';
-                     icon = '⏳';
+                    eventClass = 'fc-event-tarde';
+                    item.nombre = 'Tarde';
+                    icon = '⏳';
                 }
                 if (!multiple && entrada < '08:30:00' && salida > '16:00:00') {
-                     eventClass = 'fc-event-temprano';
-                     item.nombre = 'Temprano';
-                     icon = '✅';
+                    eventClass = 'fc-event-temprano';
+                    item.nombre = 'Temprano';
+                    icon = '✅';
                 }
                 if (entrada >= '08:30:00' && entrada <= '08:46:00' && salida > '16:00:00') {
                     eventClass = 'fc-event-puntual';
@@ -679,78 +749,78 @@
                     icon = '🕣';
                 }
                 if (entrada <= '09:00:00' && salida < '16:00:00') {
-                     eventClass = 'fc-event-declinado';
-                     item.nombre = 'Salida antes';
-                     icon = '🏃'; // Avance rápido (salida anticipada)
+                    eventClass = 'fc-event-declinado';
+                    item.nombre = 'Salida antes';
+                    icon = '🏃'; // Avance rápido (salida anticipada)
                 }
                 if (entrada > '07:00:00' && entrada < '09:00:00' && !salida || salida == null) {
-                     eventClass = 'fc-event-declinado';
-                     item.nombre = 'Sin Salida';
-                     icon = '🏃'; // Avance rápido (salida anticipada)
+                    eventClass = 'fc-event-declinado';
+                    item.nombre = 'Sin Salida';
+                    icon = '🚷'; // Avance rápido (salida anticipada)
                 }
-                 if (entrada > '09:00:00') {
+                if (entrada > '09:00:00') {
                     eventClass = 'fc-event-declinado';
                     item.nombre = 'Falta';
                     icon = '❌';
-                }if(esFestivo){
-                     eventClass = 'fc-event-asueto';
-                     item.nombre = item.title;
-                     icon = '🎉';
+                } if (esFestivo) {
+                    eventClass = 'fc-event-asueto';
+                    item.nombre = item.title;
+                    icon = '🎉';
                 }
-                 if(!multiple && idEstatus == 1){
-                     eventClass = 'fc-event-espera';
-                     item.nombre = 'Enviado';
-                     icon = '✈️';
+                if (!multiple && idEstatus == 1) {
+                    eventClass = 'fc-event-espera';
+                    item.nombre = 'Enviado';
+                    icon = '✈️';
                 }
-                if(multiple && idEstatus == 1){
-                     eventClass = 'fc-event-espera';
-                     item.nombre = 'Enviado';
-                     icon = '✈️';
+                if (multiple && idEstatus == 1) {
+                    eventClass = 'fc-event-espera';
+                    item.nombre = 'Enviado';
+                    icon = '✈️';
                 }
-                if(multiple && idEstatus == 3){
-                     eventClass = 'fc-event-declinado';
-                     item.nombre = 'Declinado';
-                     icon = '😢';
+                if (multiple && idEstatus == 3) {
+                    eventClass = 'fc-event-declinado';
+                    item.nombre = 'Declinado';
+                    icon = '😢';
                 }
-                if(multiple && idEstatus == 2){
-                     eventClass = 'fc-event-aprobado';
-                     item.nombre = 'Aprobado';
-                     icon = '😊';
+                if (multiple && idEstatus == 2) {
+                    eventClass = 'fc-event-aprobado';
+                    item.nombre = 'Aprobado';
+                    icon = '😊';
                 }
-                if(multiple && !idEstatus){
-                     eventClass = 'fc-event-tarde';
-                     item.nombre = 'Justificar Periodo';
-                     icon = '🔃';
+                if (multiple && !idEstatus) {
+                    eventClass = 'fc-event-tarde';
+                    item.nombre = 'Justificar Periodo';
+                    icon = '🔃';
                 }
-                 if(!multiple && idEstatus == 1){
-                      eventClass = 'fc-event-espera';
-                     item.nombre = 'Enviado';
-                     icon = '✈️';
+                if (!multiple && idEstatus == 1) {
+                    eventClass = 'fc-event-espera';
+                    item.nombre = 'Enviado';
+                    icon = '✈️';
                 }
-                 if(!multiple && idEstatus == 2){
-                     eventClass = 'fc-event-aprobado';
-                     item.nombre = 'Aprobado';
-                     icon = '😊';
+                if (!multiple && idEstatus == 2) {
+                    eventClass = 'fc-event-aprobado';
+                    item.nombre = 'Aprobado';
+                    icon = '😊';
                 }
-                 if(!multiple && idEstatus == 3){
-                     eventClass = 'fc-event-declinado';
-                     item.nombre = 'Declinado';
-                     icon = '😢';
+                if (!multiple && idEstatus == 3) {
+                    eventClass = 'fc-event-declinado';
+                    item.nombre = 'Declinado';
+                    icon = '😢';
                 }
-              
-           
+
+
 
             }
 
-             const startDate = item.fecha_inicio ? item.fecha_inicio_incidencia.split(' ')[0] : null;
+            const startDate = item.fecha_inicio ? item.fecha_inicio_incidencia.split(' ')[0] : null;
             const endDate = item.fecha_fin_incidencia ? item.fecha_fin_incidencia.split(' ')[0] : null;
 
             return {
                 id: item.id_usuario,
-                start: (esSemana)?item.fecha_inicio_incidencia:item.fecha,
-                end: (esSemana) ? 
-                new Date(new Date(item.fecha_fin_incidencia).getTime() + 24 * 60 * 60 * 1000).toISOString() : 
-                item.fecha,
+                start: (esSemana) ? item.fecha_inicio_incidencia : item.fecha,
+                end: (esSemana) ?
+                    new Date(new Date(item.fecha_fin_incidencia).getTime() + 24 * 60 * 60 * 1000).toISOString() :
+                    item.fecha,
                 allDay: true,
                 className: eventClass,
                 display: esSemana ? 'background' : 'auto',
@@ -769,6 +839,8 @@
                     esSemana: esSemana,
                     idEstatus: idEstatus,
                     horas_agrupadas: item.horas_agrupadas,
+                    observaciones:item.observaciones,
+                    id_incidencia:item.id_incidencia,
                     rango_legible: esSemana ? (startDate + ' - ' + dayBefore(endDate)) : null
                 }
             };
@@ -820,37 +892,37 @@
                 hour12: true,
                 meridiem: 'short'
             },
-             eventRender: function (info) {
+            eventRender: function (info) {
                 var eventEl = info.el;
                 const esSemana = info.event.extendedProps.esSemana;
                 const idEstatus = info.event.extendedProps.idEstatus;
                 const multiple = info.event.extendedProps.multiple;
-                if(info.event.extendedProps.esFestivo){
-                   eventEl.innerHTML = `<div class="fc-event-title">${info.event.title}</div>`;
-                   return;
+                if (info.event.extendedProps.esFestivo) {
+                    eventEl.innerHTML = `<div class="fc-event-title">${info.event.title}</div>`;
+                    return;
                 }
-                if(esSemana && idEstatus == 1){
-                   eventEl.innerHTML = `<div class="fc-event-title">${info.event.title}</div>`;
-                   return;
+                if (esSemana && idEstatus == 1) {
+                    eventEl.innerHTML = `<div class="fc-event-title">${info.event.title}</div>`;
+                    return;
                 }
-                if(multiple && idEstatus){
-                   eventEl.innerHTML = `<div class="fc-event-title">${info.event.title}</div>`;
-                   return;
+                if (multiple && idEstatus) {
+                    eventEl.innerHTML = `<div class="fc-event-title">${info.event.title}</div>`;
+                    return;
                 }
-                 if(!multiple && idEstatus){
-                   eventEl.innerHTML = `<div class="fc-event-title">${info.event.title}</div>`;
-                   return;
+                if (!multiple && idEstatus) {
+                    eventEl.innerHTML = `<div class="fc-event-title">${info.event.title}</div>`;
+                    return;
                 }
-                
-                if(info.event.extendedProps.multiple){
-                   eventEl.innerHTML = `<div class="fc-event-title">${info.event.title}</div>
+
+                if (info.event.extendedProps.multiple) {
+                    eventEl.innerHTML = `<div class="fc-event-title">${info.event.title}</div>
                     <div class="fc-event-details">
                             <div>${info.event.extendedProps.horas_agrupadas || '--:--'}</div>
                         </div>`;
-                   return;
+                    return;
                 }
-             
-                 eventEl.innerHTML = `
+
+                eventEl.innerHTML = `
                         <div class="fc-event-title">${info.event.title}</div>
                         <div class="fc-event-details">
                             <div>Entrada: ${info.event.extendedProps.entrada || '--:--'}</div>
@@ -859,120 +931,73 @@
                         `;
             },
             eventClick: function (info) {
-                const esSemana  = info.event.extendedProps.tipo === 2;
+                const esSemana = info.event.extendedProps.tipo === 2;
                 const idEstatus = info.event.extendedProps.idEstatus;
-                const entrada   = info.event.extendedProps.entrada;
-                const salida    = info.event.extendedProps.salida;
+                const entrada = info.event.extendedProps.entrada;
+                const salida = info.event.extendedProps.salida;
                 const esFestivo = info.event.extendedProps.esFestivo;
                 const multiple = info.event.extendedProps.multiple;
 
-                 if (esFestivo) {
-                    Swal.fire( 'Justificado por',info.event.title, "info");
-                    return;
-                }
-                 if (multiple && idEstatus == 1) {
-                    Swal.fire( 'Atención','Se encuentra en validación', "info");
-                    return;
-                }
-                if (multiple && idEstatus == 2) {
-                    Swal.fire( 'Aprobado','La incidencia fue aprobada', "success");
-                    return;
-                }
-
-                const fechaLabel = esSemana
+                 const fechaLabel = esSemana
                     ? `${info.event.extendedProps.rango_legible}`
                     : info.event.start.toLocaleDateString();
 
-              
+                console.log(idEstatus);
+                console.log(multiple);
 
-                if(entrada >= '07:00:00' && entrada <= '09:00:00'  && salida > '16:00:00'){
+                if (esFestivo) {
+                    Swal.fire('Justificado por', info.event.title, "info");
                     return;
                 }
+                if (multiple && idEstatus == 1) {
+                    Swal.fire('Atención', 'Se encuentra en validación', "info");
+                    return;
+                }
+                if (multiple && idEstatus == 2) {
+                    Swal.fire('Aprobado', 'La incidencia fue aprobada', "success");
+                    return;
+                }
+                if(multiple){
+                  justificar(info,fechaLabel, esSemana);
+                }
+                if(idEstatus == 3){
+                  justificar(info,fechaLabel, esSemana);
+                }
 
-                Swal.fire({
-                    title: info.event.title,
-                    html: `
-                ${(info.event.extendedProps.id_estatus == 2) ? '<div style="text-center">' + info.event.extendedProps.observaciones + '</div>' : ''}
-                <div style="text-align: left;">
-                    <p><strong>${esSemana ? 'Semana' : 'Fecha'}:</strong> ${fechaLabel}</p>
-                    <p><strong>${info.event.extendedProps.entrada ? 'Entrada' : 'Hora Inicio'}:</strong> ${info.event.extendedProps.entrada || info.event.extendedProps.hora_inicio}</p>
-                    <p><strong>${info.event.extendedProps.salida ? 'Salida' : 'Hora Fin'}:</strong> ${info.event.extendedProps.salida || info.event.extendedProps.hora_fin}</p>
-                </div>
-                `,
-                    showDenyButton: (info.event.extendedProps.id_estatus == 2) ? true : false,
-                    showCancelButton: true,
-                    confirmButtonText: '<i class="mdi mdi-plus-circle"></i> Agregar Incidencia',
-                    denyButtonText: '<i class="mdi mdi-pencil"></i> Editar',
-                    cancelButtonText: '<i class="mdi mdi-close"></i> Cerrar',
-                    customClass: {
-                        popup: 'swal-wide',
-                        confirmButton: 'btn btn-success mx-1',
-                        denyButton: 'btn btn-primary mx-1',
-                        cancelButton: 'btn btn-secondary mx-1'
-                    },
-                    buttonsStyling: false,
-                    showCloseButton: true,
-                    reverseButtons: true,
-                    focusConfirm: false
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // FUNCIÓN PARA OBTENER LA FECHA EN FORMATO CORRECTO
-                        const obtenerFechaFormateada = () => {
-                            // Intentar diferentes métodos para obtener la fecha
-                            if (info.dateStr) {
-                                return info.dateStr; // Usar dateStr si está disponible
-                            }
+                if(salida == null || salida == 'Sin salida') {
+                     justificar(info,fechaLabel, esSemana);
+                }
+                if(entrada > '09:00:00'){
+                  justificar(info,fechaLabel, esSemana);
+                }
+                if(salida < '16:00:00'){
+                   justificar(info,fechaLabel, esSemana);
+                }
+               
+               
 
-                            if (info.event.start) {
-                                // Formatear a YYYY-MM-DD
-                                const fecha = info.event.start;
-                                const year = fecha.getFullYear();
-                                const month = String(fecha.getMonth() + 1).padStart(2, '0');
-                                const day = String(fecha.getDate()).padStart(2, '0');
-                                return `${year}-${month}-${day}`;
-                            }
-
-                            if (info.event.extendedProps.fecha) {
-                                return info.event.extendedProps.fecha;
-                            }
-
-                            // Si no se puede obtener, usar la fecha actual
-                            console.warn('Se encuentra en proceso de validación');
-                            const hoy = new Date();
-                            return hoy.toISOString().split('T')[0];
-                        };
-                        if (info.event.extendedProps.id_estatus != 1) {
-                            const dia = obtenerFechaFormateada();
-                            st.agregar.justificarFalta(dia);
-                        }
-
-
-                    } else if (result.isDenied) {
-                        st.agregar.editarRegistro(info.event.extendedProps.id_incidencia);
-                    }
-                });
-              
+               
             },
             dateClick: function (info) {
-              const fecha = info.date;
+                const fecha = info.date;
                 const diaSemana = fecha.getDay();
-                 if (diaSemana === 0 || diaSemana === 6) {
+                if (diaSemana === 0 || diaSemana === 6) {
                     Swal.fire("Error", "No se permite justificar faltas en sábado o domingo.", "error");
                     return;
                 }
                 let dia = info.dateStr;
-                 st.agregar.justificarFalta(dia);
+                st.agregar.justificarFalta(dia);
 
             },
-             dayRender: function (info) {
+            dayRender: function (info) {
                 const date = info.date;
                 const fechaStr = date.toISOString().split('T')[0];
                 const esRegistro = onlyAsistencias.includes(fechaStr);
                 const esFestivo = fechaStr in diasFestivos;
 
                 info.el.style.backgroundColor = 'rgba(58, 23, 75, 0.1)';
-                    info.el.style.border = '1px solid rgba(255, 0, 0, 0.3)';
-             
+                info.el.style.border = '1px solid rgba(255, 0, 0, 0.3)';
+
                 // ======= NUEVO: Bandera para días hábiles pasados sin registros =======
                 if (esHabil(date) && esPasado(date) && !esRegistro && !esFestivo) {
                     info.el.classList.add('fc-dia-sin-chequeo');
