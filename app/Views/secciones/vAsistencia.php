@@ -42,7 +42,7 @@
 
     .fc-event-espera {
         border-left: 4px solid #4e73df;
-        background-color: #f8f9fc;
+        background-color: #f8f9fad7;
         color: #4e73df;
     }
 
@@ -63,7 +63,12 @@
         background-color: rgba(216, 46, 23, 1);
         color: white;
     }
-
+    .fc-event-aprobado {
+        border-left: 4px solid #4caf50;
+        background-color: rgba(76, 175, 80, 0.1);
+        color: #388e3c;
+        border: 1px solid rgba(76, 175, 80, 0.2);
+    }
     .fc-event-tarde {
         border-left-color: #e74a3b;
         background-color: #f8e0df;
@@ -625,8 +630,7 @@
             let esFestivo =  item.esFestivo;
             let multiple =  item.multiple;
             let idEstatus =  item.id_estatus;
-    
-           console.log(item);
+            console.log(esSemana);
             const hoy = '<?= date("Y-m-d") ?>'; // Formato YYYY-MM-DD
            const fechaNormalizada = normalizarFecha(item.fecha);
 
@@ -653,17 +657,7 @@
                 }
             }else{
       
-                if(idEstatus == 3){
-                     eventClass = 'fc-event-temprano';
-                     item.nombre = 'Aprobado';
-                     icon = '😊';
-                }
-                if(idEstatus == 2){
-                     eventClass = 'fc-event-falta';
-                     item.nombre = 'Declinado';
-                     icon = '😢';
-                }
-                if (entrada >= '08:30:00' && entrada <= '08:46:00') {
+                if (entrada >= '08:30:00' && entrada <= '08:46:00' && !idEstatus) {
                      eventClass = 'fc-event-puntual';
                      item.nombre = 'Puntual';
                      icon = '🕣';
@@ -702,6 +696,11 @@
                      item.nombre = item.title;
                      icon = '🎉';
                 }
+                 if(!multiple && idEstatus == 1){
+                     eventClass = 'fc-event-espera';
+                     item.nombre = 'Enviado';
+                     icon = '✈️';
+                }
                 if(multiple && idEstatus == 1){
                      eventClass = 'fc-event-espera';
                      item.nombre = 'Enviado';
@@ -712,10 +711,30 @@
                      item.nombre = 'Declinado';
                      icon = '😢';
                 }
+                if(multiple && idEstatus == 2){
+                     eventClass = 'fc-event-aprobado';
+                     item.nombre = 'Aprobado';
+                     icon = '😊';
+                }
                 if(multiple && !idEstatus){
                      eventClass = 'fc-event-tarde';
                      item.nombre = 'Justificar Periodo';
                      icon = '🔃';
+                }
+                 if(!multiple && idEstatus == 1){
+                      eventClass = 'fc-event-espera';
+                     item.nombre = 'Enviado';
+                     icon = '✈️';
+                }
+                 if(!multiple && idEstatus == 2){
+                     eventClass = 'fc-event-aprobado';
+                     item.nombre = 'Aprobado';
+                     icon = '😊';
+                }
+                 if(!multiple && idEstatus == 3){
+                     eventClass = 'fc-event-declinado';
+                     item.nombre = 'Declinado';
+                     icon = '😢';
                 }
               
            
@@ -728,7 +747,9 @@
             return {
                 id: item.id_usuario,
                 start: (esSemana)?item.fecha_inicio_incidencia:item.fecha,
-                end: (esSemana)?item.fecha_fin_incidencia:item.fecha,
+                end: (esSemana) ? 
+                new Date(new Date(item.fecha_fin_incidencia).getTime() + 24 * 60 * 60 * 1000).toISOString() : 
+                item.fecha,
                 allDay: true,
                 className: eventClass,
                 display: esSemana ? 'background' : 'auto',
@@ -811,14 +832,15 @@
                    eventEl.innerHTML = `<div class="fc-event-title">${info.event.title}</div>`;
                    return;
                 }
-                if(multiple && idEstatus == 1){
+                if(multiple && idEstatus){
                    eventEl.innerHTML = `<div class="fc-event-title">${info.event.title}</div>`;
                    return;
                 }
-                if(multiple && idEstatus == 3){
+                 if(!multiple && idEstatus){
                    eventEl.innerHTML = `<div class="fc-event-title">${info.event.title}</div>`;
                    return;
                 }
+                
                 if(info.event.extendedProps.multiple){
                    eventEl.innerHTML = `<div class="fc-event-title">${info.event.title}</div>
                     <div class="fc-event-details">
@@ -842,7 +864,6 @@
                 const salida    = info.event.extendedProps.salida;
                 const esFestivo = info.event.extendedProps.esFestivo;
                 const multiple = info.event.extendedProps.multiple;
-                
 
                  if (esFestivo) {
                     Swal.fire( 'Justificado por',info.event.title, "info");
@@ -852,26 +873,18 @@
                     Swal.fire( 'Atención','Se encuentra en validación', "info");
                     return;
                 }
+                if (multiple && idEstatus == 2) {
+                    Swal.fire( 'Aprobado','La incidencia fue aprobada', "success");
+                    return;
+                }
 
                 const fechaLabel = esSemana
                     ? `${info.event.extendedProps.rango_legible}`
                     : info.event.start.toLocaleDateString();
 
-                const ent = horaToSegundos(entrada);
-                const r1i = horaToSegundos('08:46:00');
-                const r1f = horaToSegundos('09:00:00');
-                const r2i = horaToSegundos('07:00:00');
-                const r2f = horaToSegundos('08:46:00');
+              
 
-                // Regla 1: 08:46:00–09:00:00 => no justificar
-                if (ent !== null && ent >= r1i && ent <= r1f && salida >= '10:00:00' && salida > '16:00:00' && idEstatus) {
-                    Swal.fire('Atención', 'Los retrasos no se pueden justificar.', 'info');
-                    return;
-                }
-
-                // Regla 2: 07:30:00–08:46:00 => mostrar mensaje de entrada/salida
-                if (ent !== null && ent >= r2i && ent <= r2f && salida >= '10:00:00' && salida > '16:00:00' && idEstatus) {
-                    Swal.fire(info.event.title, `Entrada: ${entrada} — Salida: ${salida}`, 'success');
+                if(entrada >= '07:00:00' && entrada <= '09:00:00'  && salida > '16:00:00'){
                     return;
                 }
 
@@ -950,8 +963,33 @@
                  st.agregar.justificarFalta(dia);
 
             },
-            dayRender: function (info) {
+             dayRender: function (info) {
+               console.log(info);
+                const date = info.date;
+                const fechaStr = date.toISOString().split('T')[0];
+                const esRegistro = onlyAsistencias.includes(fechaStr);
 
+                info.el.style.backgroundColor = 'rgba(58, 23, 75, 0.1)';
+                    info.el.style.border = '1px solid rgba(255, 0, 0, 0.3)';
+             
+                // ======= NUEVO: Bandera para días hábiles pasados sin registros =======
+                if (esHabil(date) && esPasado(date) && !esRegistro) {
+                    info.el.classList.add('fc-dia-sin-chequeo');
+
+                    // Evita duplicar badge si FullCalendar re-renderiza
+                    if (!info.el.querySelector('.flag-missing')) {
+                        const badge = document.createElement('div');
+                        badge.className = 'flag-missing';
+                        badge.innerHTML = `
+                        <div class="spinner-grow text-danger"  role="status"></div>
+                          <div class="fc-event-title text-danger" style="text-align: center;">Falta Sin Justificar</div>
+                        `;
+                        info.el.appendChild(badge);
+
+                    }
+
+
+                }
             },
 
 
