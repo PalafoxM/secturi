@@ -1811,7 +1811,8 @@ class Agregar extends BaseController
             $anio.'-12-25' => 'Navidad',
             $anio.'-'.$cumple => 'Mi cumpleaños'
         ];
-
+     
+        $data['diasFestivos'] = $diasFestivos;
         // Agregar días festivos al resultado
         foreach($diasFestivos as $fecha => $titulo) {
             $registrosAgrupados[] = [
@@ -1821,7 +1822,7 @@ class Agregar extends BaseController
                 'esFestivo' => true
             ];
         }
-       
+     
     
        //die( var_dump( $registrosAgrupados ) );
        //$faltas = $this->getFaltasRangoQuincena($inicio, $fin);

@@ -469,6 +469,7 @@
     ini.inicio.formIncidencia();
     var eventosAsistencia = <?= json_encode($asistencia) ?>;
     var onlyAsistencias = <?= json_encode($onlyAsistencias) ?>;
+    var diasFestivos = <?= json_encode($diasFestivos) ?>;
 
 
     function normalizarFecha(fecha) {
@@ -968,12 +969,13 @@
                 const date = info.date;
                 const fechaStr = date.toISOString().split('T')[0];
                 const esRegistro = onlyAsistencias.includes(fechaStr);
+                const esFestivo = fechaStr in diasFestivos;
 
                 info.el.style.backgroundColor = 'rgba(58, 23, 75, 0.1)';
                     info.el.style.border = '1px solid rgba(255, 0, 0, 0.3)';
              
                 // ======= NUEVO: Bandera para días hábiles pasados sin registros =======
-                if (esHabil(date) && esPasado(date) && !esRegistro) {
+                if (esHabil(date) && esPasado(date) && !esRegistro && !esFestivo) {
                     info.el.classList.add('fc-dia-sin-chequeo');
 
                     // Evita duplicar badge si FullCalendar re-renderiza
