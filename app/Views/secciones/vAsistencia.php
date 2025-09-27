@@ -657,14 +657,14 @@
               Swal.fire({
                     title: info.event.title,
                     html: `
-                ${(info.event.extendedProps.idEstatus == 3) ? '<div style="text-center">' + info.event.extendedProps.observaciones + '</div>' : ''}
+                ${(info.event.extendedProps.idEstatus == 2) ? '<div style="text-center">' + info.event.extendedProps.observaciones + '</div>' : ''}
                 <div style="text-align: left;">
                     <p><strong>${esSemana ? 'Semana' : 'Fecha'}:</strong> ${fechaLabel}</p>
                     <p><strong>${info.event.extendedProps.entrada ? 'Entrada' : 'Hora Inicio'}:</strong> ${info.event.extendedProps.entrada || info.event.extendedProps.hora_inicio}</p>
                     <p><strong>${info.event.extendedProps.salida ? 'Salida' : 'Hora Fin'}:</strong> ${info.event.extendedProps.salida || info.event.extendedProps.hora_fin}</p>
                 </div>
                 `,
-                    showDenyButton: (info.event.extendedProps.idEstatus == 3) ? true : false,
+                    showDenyButton: (info.event.extendedProps.idEstatus == 2) ? true : false,
                     showCancelButton: true,
                     confirmButtonText: '<i class="mdi mdi-plus-circle"></i> Agregar Incidencia',
                     denyButtonText: '<i class="mdi mdi-pencil"></i> Editar',
@@ -777,12 +777,12 @@
                     item.nombre = 'Enviado';
                     icon = '✈️';
                 }
-                if (multiple && idEstatus == 3) {
+                if (multiple && idEstatus == 2) {
                     eventClass = 'fc-event-declinado';
                     item.nombre = 'Declinado';
                     icon = '😢';
                 }
-                if (multiple && idEstatus == 2) {
+                if (multiple && idEstatus == 3) {
                     eventClass = 'fc-event-aprobado';
                     item.nombre = 'Aprobado';
                     icon = '😊';
@@ -797,12 +797,12 @@
                     item.nombre = 'Enviado';
                     icon = '✈️';
                 }
-                if (!multiple && idEstatus == 2) {
+                if (!multiple && idEstatus == 3) {
                     eventClass = 'fc-event-aprobado';
                     item.nombre = 'Aprobado';
                     icon = '😊';
                 }
-                if (!multiple && idEstatus == 3) {
+                if (!multiple && idEstatus == 2) {
                     eventClass = 'fc-event-declinado';
                     item.nombre = 'Declinado';
                     icon = '😢';
@@ -953,14 +953,14 @@
                     Swal.fire('Atención', 'Se encuentra en validación', "info");
                     return;
                 }
-                if (multiple && idEstatus == 2) {
+                if (multiple && idEstatus == 3) {
                     Swal.fire('Aprobado', 'La incidencia fue aprobada', "success");
                     return;
                 }
                 if(multiple){
                   justificar(info,fechaLabel, esSemana);
                 }
-                if(idEstatus == 3){
+                if(idEstatus == 2){
                   justificar(info,fechaLabel, esSemana);
                 }
 
