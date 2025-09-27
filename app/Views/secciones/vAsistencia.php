@@ -610,6 +610,11 @@
             const day = String(d.getDate()).padStart(2, '0');
             return `${y}-${m}-${day}`;
         }
+          function horaToSegundos(hora) {
+             if (!hora || typeof hora !== 'string' || !hora.includes(':')) return null;
+            const [hh, mm, ss] = hora.split(':').map(x => parseInt(x, 10) || 0);
+            return hh * 3600 + mm * 60 + ss;
+        }
         // Procesar los datos para FullCalendar
         var eventos = eventosAsistencia.map(function (item) {
             let eventClass = 'fc-event-asistencia';
@@ -620,8 +625,8 @@
             let esFestivo =  item.esFestivo;
             let multiple =  item.multiple;
             let idEstatus =  item.id_estatus;
-     
-        
+    
+           console.log(item);
             const hoy = '<?= date("Y-m-d") ?>'; // Formato YYYY-MM-DD
            const fechaNormalizada = normalizarFecha(item.fecha);
 
@@ -647,6 +652,17 @@
                     icon = '❌';
                 }
             }else{
+      
+                if(idEstatus == 3){
+                     eventClass = 'fc-event-temprano';
+                     item.nombre = 'Aprobado';
+                     icon = '😊';
+                }
+                if(idEstatus == 2){
+                     eventClass = 'fc-event-falta';
+                     item.nombre = 'Declinado';
+                     icon = '😢';
+                }
                 if (entrada >= '08:30:00' && entrada <= '08:46:00') {
                      eventClass = 'fc-event-puntual';
                      item.nombre = 'Puntual';
@@ -657,7 +673,7 @@
                      item.nombre = 'Tarde';
                      icon = '⏳';
                 }
-                if (entrada < '08:30:00' && salida > '16:00:00') {
+                if (!multiple && entrada < '08:30:00' && salida > '16:00:00') {
                      eventClass = 'fc-event-temprano';
                      item.nombre = 'Temprano';
                      icon = '✅';
@@ -686,26 +702,22 @@
                      item.nombre = item.title;
                      icon = '🎉';
                 }
-                if(multiple){
-                     eventClass = 'fc-event-tarde';
-                     item.nombre = 'Justificar Periodo';
-                     icon = '🏃';
-                }
-                if(esSemana && idEstatus == 1){
+                if(multiple && idEstatus == 1){
                      eventClass = 'fc-event-espera';
                      item.nombre = 'Enviado';
                      icon = '✈️';
                 }
-                if(esSemana && idEstatus == 3){
-                     eventClass = 'fc-event-temprano';
-                     item.nombre = 'Aprobado';
-                     icon = '😊';
-                }
-                if(esSemana && idEstatus == 2){
-                     eventClass = 'fc-event-falta';
+                if(multiple && idEstatus == 3){
+                     eventClass = 'fc-event-declinado';
                      item.nombre = 'Declinado';
                      icon = '😢';
                 }
+                if(multiple && !idEstatus){
+                     eventClass = 'fc-event-tarde';
+                     item.nombre = 'Justificar Periodo';
+                     icon = '🔃';
+                }
+              
            
 
             }
@@ -790,11 +802,20 @@
                 var eventEl = info.el;
                 const esSemana = info.event.extendedProps.esSemana;
                 const idEstatus = info.event.extendedProps.idEstatus;
+                const multiple = info.event.extendedProps.multiple;
                 if(info.event.extendedProps.esFestivo){
                    eventEl.innerHTML = `<div class="fc-event-title">${info.event.title}</div>`;
                    return;
                 }
                 if(esSemana && idEstatus == 1){
+                   eventEl.innerHTML = `<div class="fc-event-title">${info.event.title}</div>`;
+                   return;
+                }
+                if(multiple && idEstatus == 1){
+                   eventEl.innerHTML = `<div class="fc-event-title">${info.event.title}</div>`;
+                   return;
+                }
+                if(multiple && idEstatus == 3){
                    eventEl.innerHTML = `<div class="fc-event-title">${info.event.title}</div>`;
                    return;
                 }
@@ -815,9 +836,118 @@
                         `;
             },
             eventClick: function (info) {
+                const esSemana  = info.event.extendedProps.tipo === 2;
+                const idEstatus = info.event.extendedProps.idEstatus;
+                const entrada   = info.event.extendedProps.entrada;
+                const salida    = info.event.extendedProps.salida;
+                const esFestivo = info.event.extendedProps.esFestivo;
+                const multiple = info.event.extendedProps.multiple;
+                
+
+                 if (esFestivo) {
+                    Swal.fire( 'Justificado por',info.event.title, "info");
+                    return;
+                }
+                 if (multiple && idEstatus == 1) {
+                    Swal.fire( 'Atención','Se encuentra en validación', "info");
+                    return;
+                }
+
+                const fechaLabel = esSemana
+                    ? `${info.event.extendedProps.rango_legible}`
+                    : info.event.start.toLocaleDateString();
+
+                const ent = horaToSegundos(entrada);
+                const r1i = horaToSegundos('08:46:00');
+                const r1f = horaToSegundos('09:00:00');
+                const r2i = horaToSegundos('07:00:00');
+                const r2f = horaToSegundos('08:46:00');
+
+                // Regla 1: 08:46:00–09:00:00 => no justificar
+                if (ent !== null && ent >= r1i && ent <= r1f && salida >= '10:00:00' && salida > '16:00:00' && idEstatus) {
+                    Swal.fire('Atención', 'Los retrasos no se pueden justificar.', 'info');
+                    return;
+                }
+
+                // Regla 2: 07:30:00–08:46:00 => mostrar mensaje de entrada/salida
+                if (ent !== null && ent >= r2i && ent <= r2f && salida >= '10:00:00' && salida > '16:00:00' && idEstatus) {
+                    Swal.fire(info.event.title, `Entrada: ${entrada} — Salida: ${salida}`, 'success');
+                    return;
+                }
+
+                Swal.fire({
+                    title: info.event.title,
+                    html: `
+                ${(info.event.extendedProps.id_estatus == 2) ? '<div style="text-center">' + info.event.extendedProps.observaciones + '</div>' : ''}
+                <div style="text-align: left;">
+                    <p><strong>${esSemana ? 'Semana' : 'Fecha'}:</strong> ${fechaLabel}</p>
+                    <p><strong>${info.event.extendedProps.entrada ? 'Entrada' : 'Hora Inicio'}:</strong> ${info.event.extendedProps.entrada || info.event.extendedProps.hora_inicio}</p>
+                    <p><strong>${info.event.extendedProps.salida ? 'Salida' : 'Hora Fin'}:</strong> ${info.event.extendedProps.salida || info.event.extendedProps.hora_fin}</p>
+                </div>
+                `,
+                    showDenyButton: (info.event.extendedProps.id_estatus == 2) ? true : false,
+                    showCancelButton: true,
+                    confirmButtonText: '<i class="mdi mdi-plus-circle"></i> Agregar Incidencia',
+                    denyButtonText: '<i class="mdi mdi-pencil"></i> Editar',
+                    cancelButtonText: '<i class="mdi mdi-close"></i> Cerrar',
+                    customClass: {
+                        popup: 'swal-wide',
+                        confirmButton: 'btn btn-success mx-1',
+                        denyButton: 'btn btn-primary mx-1',
+                        cancelButton: 'btn btn-secondary mx-1'
+                    },
+                    buttonsStyling: false,
+                    showCloseButton: true,
+                    reverseButtons: true,
+                    focusConfirm: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // FUNCIÓN PARA OBTENER LA FECHA EN FORMATO CORRECTO
+                        const obtenerFechaFormateada = () => {
+                            // Intentar diferentes métodos para obtener la fecha
+                            if (info.dateStr) {
+                                return info.dateStr; // Usar dateStr si está disponible
+                            }
+
+                            if (info.event.start) {
+                                // Formatear a YYYY-MM-DD
+                                const fecha = info.event.start;
+                                const year = fecha.getFullYear();
+                                const month = String(fecha.getMonth() + 1).padStart(2, '0');
+                                const day = String(fecha.getDate()).padStart(2, '0');
+                                return `${year}-${month}-${day}`;
+                            }
+
+                            if (info.event.extendedProps.fecha) {
+                                return info.event.extendedProps.fecha;
+                            }
+
+                            // Si no se puede obtener, usar la fecha actual
+                            console.warn('Se encuentra en proceso de validación');
+                            const hoy = new Date();
+                            return hoy.toISOString().split('T')[0];
+                        };
+                        if (info.event.extendedProps.id_estatus != 1) {
+                            const dia = obtenerFechaFormateada();
+                            st.agregar.justificarFalta(dia);
+                        }
+
+
+                    } else if (result.isDenied) {
+                        st.agregar.editarRegistro(info.event.extendedProps.id_incidencia);
+                    }
+                });
               
             },
             dateClick: function (info) {
+              const fecha = info.date;
+                const diaSemana = fecha.getDay();
+                 if (diaSemana === 0 || diaSemana === 6) {
+                    Swal.fire("Error", "No se permite justificar faltas en sábado o domingo.", "error");
+                    return;
+                }
+                let dia = info.dateStr;
+                 st.agregar.justificarFalta(dia);
 
             },
             dayRender: function (info) {

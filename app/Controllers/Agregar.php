@@ -1581,54 +1581,81 @@ class Agregar extends BaseController
         return $faltas;
     }
 
-   private function marcarMultiples(&$asistencia) {
+    private function marcarMultiples(&$asistencia) {
         $agrupadosPorFecha = [];
         
-        // Primero agrupar todos los registros por fecha
         foreach ($asistencia as $registro) {
             $fecha = date('Y-m-d', strtotime($registro->fecha));
-            
             if (!isset($agrupadosPorFecha[$fecha])) {
                 $agrupadosPorFecha[$fecha] = [];
             }
-            
             $agrupadosPorFecha[$fecha][] = $registro;
         }
         
         $resultado = [];
         
-        // Procesar cada grupo de registros de la misma fecha
         foreach ($agrupadosPorFecha as $fecha => $registros) {
-            // Ordenar registros por hora de inicio
             usort($registros, function($a, $b) {
                 return strtotime($a->hora_inicio) - strtotime($b->hora_inicio);
             });
             
-            // Si solo hay un registro, mantenerlo como está
             if (count($registros) === 1) {
                 $registros[0]->multiple = false;
                 $registros[0]->horas_agrupadas = $registros[0]->hora_inicio . ' - ' . $registros[0]->hora_fin;
-                $resultado = array_merge($resultado, $registros);
+                $resultado[] = $registros[0];
                 continue;
             }
             
-            // Para múltiples registros, crear uno consolidado
+            // CREAR REGISTRO CONSOLIDADO COMBINANDO INFORMACIÓN
+            $registroConsolidado = new stdClass();
+            
+            // Combinar propiedades inteligentemente (priorizar valores no nulos)
+            foreach ($registros as $registro) {
+                foreach ($registro as $propiedad => $valor) {
+                    // Si la propiedad no existe o es nula en el consolidado, asignar valor
+                    if (!property_exists($registroConsolidado, $propiedad) || 
+                        $registroConsolidado->$propiedad === null) {
+                        $registroConsolidado->$propiedad = $valor;
+                    }
+                    
+                    // Casos especiales para propiedades específicas
+                    if ($propiedad === 'tipo_registro' && $valor !== 'asistencia') {
+                        // Priorizar 'incidencia' sobre 'asistencia'
+                        $registroConsolidado->tipo_registro = $valor;
+                    }
+                    
+                    if ($propiedad === 'id_estatus' && $valor !== null) {
+                        // Priorizar estatus no nulos
+                        $registroConsolidado->id_estatus = $valor;
+                    }
+                }
+            }
+            
+            // Configurar horas consolidadas
             $primerRegistro = $registros[0];
             $ultimoRegistro = end($registros);
             
-            // Crear nuevo objeto consolidado
-            $registroConsolidado = clone $primerRegistro;
             $registroConsolidado->multiple = true;
             $registroConsolidado->hora_inicio = $primerRegistro->hora_inicio;
             $registroConsolidado->hora_fin = $ultimoRegistro->hora_fin;
             
-            // Crear cadena con todas las horas agrupadas
+            // Crear cadena con todas las horas
             $horas = [];
             foreach ($registros as $reg) {
                 $horas[] = $reg->hora_inicio . ' - ' . $reg->hora_fin;
             }
             $registroConsolidado->horas_agrupadas = implode(' | ', $horas);
-            $registroConsolidado->registros_individuales = $registros; // Opcional: guardar los registros originales
+            $registroConsolidado->registros_individuales = $registros;
+            
+            // Marcar visibilidad apropiada
+            $registroConsolidado->visible = 1;
+            if ($registroConsolidado->tipo_registro === 'incidencia') {
+                $registroConsolidado->visible_incidencia = 1;
+                $registroConsolidado->visible_asistencia = null;
+            } else {
+                $registroConsolidado->visible_asistencia = 1;
+                $registroConsolidado->visible_incidencia = null;
+            }
             
             $resultado[] = $registroConsolidado;
         }
@@ -1768,6 +1795,7 @@ class Agregar extends BaseController
         
 
         $asistencia = (isset($agenda->data) && !empty($agenda->data)) ? $agenda->data : [];
+        
         $registrosAgrupados = $this->marcarMultiples($asistencia);
         //die(  var_dump( $registrosAgrupados ) );
         // Definir los días festivos
