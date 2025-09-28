@@ -79,6 +79,9 @@ saeg.principal = (function () {
                             observaciones: observaciones // ← Nuevo campo
                         },
                         dataType: 'json',
+                        beforeSend: function(){
+                           $('#btnAcepIn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                        },
                         success: function(response) {
                             if (!response.error) {
                                 Swal.fire("Correcto", response.respuesta, "success");
@@ -90,6 +93,7 @@ saeg.principal = (function () {
                             Swal.fire("Error", "Ocurrió un error en la solicitud: " + error, "error");
                         },
                         complete: function() {
+                             $('#btnAcepIn').prop('disabled', true).html('<i class="fas fa-check-circle text-success font-16"></i>');
                             setTimeout(() => {
                                 window.location.reload();
                             }, 1000);

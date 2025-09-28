@@ -138,7 +138,7 @@
                                                       <td class="text-center">
                                                             <!-- Aprobar/aceptar -->
                                                              <?php if($p->id_estatus !== 3): ?>
-                                                            <a style="cursor:pointer;" onclick="saeg.principal.aceptarIncidencia(<?=$p->id_incidencia ?>, 3, <?=$p->id_usuario ?>);" class="mr-2" title="Aprobar">
+                                                            <a id="btnAcepIn" style="cursor:pointer;" onclick="saeg.principal.aceptarIncidencia(<?=$p->id_incidencia ?>, 3, <?=$p->id_usuario ?>);" class="mr-2" title="Aprobar">
                                                                 <i class="fas fa-check-circle text-success font-16"></i>
                                                             </a>
                                                             <?php endif; ?>

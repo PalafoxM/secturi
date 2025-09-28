@@ -1477,7 +1477,7 @@ class Principal extends BaseController
             $response->error = false;
             $response->respuesta = $result->respuesta;
         }
-      // $this->envioCorreoJefeInmediato(); 
+        $this->envioCorreoJefeInmediato(); 
         return $this->respond($response);
     }
     public function bitacora()

@@ -291,7 +291,7 @@ class Usuario extends BaseController
                 // Agregar información de incidencia
                 $datosAgrupados[$usuario][$fecha]['incidencia'] = 
                 ($r->id_estatus == 1) ? 'En proceso' : 
-                (($r->id_estatus == 2) ? 'Declinada' : 'Aprobada');
+                (($r->id_estatus == 3) ? 'Declinada' : 'Aprobada');
 
                 $fechasUnicas[$fecha] = true;
             }
@@ -424,8 +424,8 @@ class Usuario extends BaseController
         // Map para estatus
         $mapEstatus = [
             1 => 'EN PROCESO',
-            2 => 'VALIDADO',
-            3 => 'DECLINADO'
+            2 => 'DECLINADO',
+            3 => 'VALIDADO'
         ];
 
         // 1) Construir lista de fechas del periodo (Y-m-d)
