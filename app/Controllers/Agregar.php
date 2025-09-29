@@ -1048,8 +1048,7 @@ class Agregar extends BaseController
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
         $file = $this->request->getFile('foto');
-
-
+ 
 
         if ($data['editar'] != 1) {
 
@@ -1098,7 +1097,7 @@ class Agregar extends BaseController
                 throw new Exception("El <strong> usuario y/o contraseña</strong> ya existe en la base de datos, favor de cambiar los datos");
             }
         }
-        if (isset($file) && !empty($file)) {
+        if (isset($file) && !empty($file) && $file->getSize() > 0) {
             $timestamp = date('Ymd_His');
             $extension = $file->getClientExtension();
             $originalName = pathinfo($file->getName(), PATHINFO_FILENAME);
@@ -1108,6 +1107,8 @@ class Agregar extends BaseController
             $ruta_relativa = 'assets/images/fotos/' . $archivo;
 
         }
+
+  
 
         $hoy = date("Y-m-d H:i:s");
 
@@ -1127,7 +1128,7 @@ class Agregar extends BaseController
             'id_area' => (int) $data['id_area'],
             'fec_reg' => $hoy
         ];
-        if(isset($ruta_relativa) && !empty($ruta_relativa)){
+        if(isset($ruta_relativa) && !empty($ruta_relativa) && $file->getSize() > 0){
             $dataInsert['ruta_foto_relativa'] = $ruta_relativa;
         }
         
