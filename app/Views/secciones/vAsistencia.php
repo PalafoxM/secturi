@@ -733,7 +733,7 @@
                     item.nombre = 'Puntual';
                     icon = '🕣';
                 }
-                if (entrada >= '08:46:00' && entrada <= '09:00:00' && salida > '16:00:00') {
+                if (entrada >= '08:46:00' && entrada <= '09:59:00' && salida > '16:00:00') {
                     eventClass = 'fc-event-tarde';
                     item.nombre = 'Tarde';
                     icon = '⏳';
@@ -758,7 +758,7 @@
                     item.nombre = 'Sin Salida';
                     icon = '🚷'; // Avance rápido (salida anticipada)
                 }
-                if (entrada > '09:00:00') {
+                if (entrada > '09:01:00') {
                     eventClass = 'fc-event-declinado';
                     item.nombre = 'Falta';
                     icon = '❌';
