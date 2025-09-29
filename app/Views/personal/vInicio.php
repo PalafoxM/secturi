@@ -353,7 +353,7 @@
                                                                         </div>
                                                                         <div class="media-body align-self-center">
                                                                             <h4 class="mt-0 mb-1 title-text text-dark">
-                                                                                Constitucionales y Legales</h4>
+                                                                                Principios</h4>
                                                                             <p class="text-muted mb-0">Ver más</p>
                                                                         </div>
                                                                     </div>
