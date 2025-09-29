@@ -705,6 +705,8 @@ class Usuario extends BaseController
         $principal = new Mglobal;
 
         $id_incidencia = $this->request->getPost('id_incidencia');
+     //   var_dump( $id_incidencia);
+      //  die();
         $dataDB = array('tabla' => 'incidencia', 'where' => ['visible' => 1, 'id_incidencia'=>$id_incidencia]);
         $response = $principal->getTabla($dataDB);
         return $this->respond($response->data[0]);
