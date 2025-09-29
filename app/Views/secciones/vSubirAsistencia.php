@@ -57,9 +57,12 @@
                                                     </div>
                                                 </div>
                                                  <div class="col-md-3">
-                                                    <button onclick="ini.inicio.cargaCsv()"
+                                                  <!--   <button onclick="ini.inicio.cargaCsv()"
                                                      class="btn btn-gradient-primary px-4 float-right mt-0 mb-3"><i
-                                                    class="mdi mdi-plus-circle-outline mr-2"></i>Subir Archivo</button>
+                                                    class="mdi mdi-plus-circle-outline mr-2"></i>Subir Archivo</button> -->
+                                                    <button id="btnCorreo" onclick="ini.inicio.EnviarCorreoIncidencias()"
+                                                     class="btn btn-gradient-primary px-4 float-right mt-0 mb-3"><i
+                                                    class="mdi mdi-plus-circle-outline mr-2"></i>Enviar Correo</button>
                                                 </div>
                                             </div>
                                             <?php endif; ?>

@@ -1810,6 +1810,102 @@ class Principal extends BaseController
         $data['contentView'] = 'secciones/vListaIncidencia';
         $this->_renderView($data);
     }
+    public function EnviarCorreoIncidencias()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error en la base de datos';
+        $globals = new Mglobal;
+        $email = \Config\Services::email();
+        $result = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_tipo_empleado' => 1]])->data;
+
+        $email->setTo([
+            'palafox.marin31@gmail.com',
+            'palafox.marin@hotmail.com.mx',
+            //'palafox.marin@guanajuato.gob.mx',
+        ]); 
+
+        $email->setSubject('Recordatorio de Revisión de Asistencias - SUSI');
+        $email->setMessage('
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <style>
+                    body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; }
+                    .container { max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+                    .header { background-color: #004080; padding: 20px; text-align: center; }
+                    .content { padding: 30px; color: #333; }
+                    .footer { background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 13px; color: #666; }
+                    .btn { display: inline-block; padding: 12px 24px; background-color: #004080; color: white; text-decoration: none; border-radius: 4px; margin: 15px 0; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <!-- Encabezado -->
+                    <div class="header">
+                        <img src="cid:logo_susi" alt="SUSI - Sistema Unificado SECTURI" style="height: 60px;">
+                    </div>
+                    
+                    <!-- Contenido principal -->
+                    <div class="content">
+                        <h1 style="color: #004080; margin-bottom: 20px;">SUSI <strong>ASISTENCIAS</strong></h1>
+                        
+                        <p style="font-size: 16px; line-height: 1.6;">Estimado usuario,</p>
+                        
+                        <p style="font-size: 16px; line-height: 1.6;">
+                            Le informamos que tiene <strong>asistencias pendientes de revisión</strong> en el sistema SUSI. 
+                            Favor de verificar y validar sus registros de asistencia correspondientes.
+                        </p>
+                        
+                        <p style="font-size: 15px; line-height: 1.6;">
+                            Es importante mantener actualizada su información para un correcto seguimiento de sus actividades laborales.
+                        </p>
+                        
+                        <div style="text-align: center; margin: 25px 0;">
+                            <a href="' . base_url('index.php/Agregar/Asistencia') . '" class="btn" style="color: white; text-decoration: none;">
+                                🔍 Revisar Asistencias
+                            </a>
+                        </div>
+                        
+                        <p style="font-size: 14px; color: #888; border-top: 1px solid #eee; padding-top: 15px; margin-top: 20px;">
+                            <strong>Nota:</strong> Este correo ha sido generado automáticamente por el sistema SUSI. 
+                            No es necesario responder a este mensaje.
+                        </p>
+                    </div>
+                    
+                    <!-- Pie de página -->
+                    <div class="footer">
+                        © ' . date('Y') . ' Sistema Unificado SECTURI (SUSI).<br>
+                        Todos los derechos reservados - SECTURI Gto.
+                    </div>
+                </div>
+            </body>
+            </html>
+        ');
+
+        // ✅ SOLUCIÓN PARA LA IMAGEN - AGREGAR COMO ADJUNTO EMBEBIDO
+        $logoPath = FCPATH . 'assets/icono_susi.webp';
+        if (file_exists($logoPath)) {
+            $email->attach($logoPath);
+            $email->setHeader('Content-ID', '<logo_susi>');
+        }
+
+        // Configuraciones adicionales recomendadas
+        $email->setMailType('html');
+
+
+        // Intentar enviar el correo
+        if ($email->send()) {
+            $response->error = false;
+            $response->respuesta = "✅ Notificación enviada correctamente a los destinatarios.";
+        } else {
+            $response->error = true;
+            $response->respuesta = '❌ Error al enviar la notificación: ' . $email->printDebugger(['headers']);
+        }
+       return $this->respond($response);
+    }
 
     public function getVehiculo()
     {

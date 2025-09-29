@@ -444,6 +444,46 @@ ini.inicio = (function () {
             }
          });
         },
+        EnviarCorreoIncidencias: function ()
+        {
+            Swal.fire({
+                title: "¿Está seguro?",
+                text: "¿Se enviar correo a todo el personal que tiene incidencias?",
+                icon: "info",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                cancelButtonText: "Cancelar",
+                confirmButtonText: "Enviar",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                   $.ajax({
+                        url: base_url + 'index.php/Principal/EnviarCorreoIncidencias',
+                        type: 'GET',
+                        dataType: 'json',
+                        beforeSend: function(){
+                           $('#btnCorreo').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Enviando...');
+                        },
+                        success: function(response) {
+                            if (!response.error) {
+                                Swal.fire('Éxito', 'Se ha enviado el correo satisfactoriamente', 'success');
+                                window.location.reload(); 
+                            } else {
+                                Swal.fire('Error', 'No se pudo enviar el correo masivo', 'error');
+                            }
+                        },
+                        complete: function(){
+                           $('#btnCorreo').prop('disabled', false).html('<i class="mdi mdi-plus-circle-outline mr-2"></i>Enviar Correo');
+                        },
+                        error: function() {
+                            Swal.fire('Error', 'Error de conexión con el servidor', 'error');
+                        }
+                    }); 
+                            
+                        }
+             });
+
+        },
         guardarBanco : function (element) {
             const row = $(element).closest('tr');
             const id = row.data('id');
@@ -486,7 +526,7 @@ ini.inicio = (function () {
                     }); 
                             
                         }
-                    });
+             });
         },
         nuevoProveedor: function () {
             Swal.fire({

@@ -411,7 +411,7 @@ class Inicio extends BaseController {
         $principal   = new Mglobal;
         $cat_usuario = $principal->getTabla([
             'tabla' => 'vw_asistencia',
-            'where' => ['visible' => 1]
+            'where' => ['visible' => 1, 'id_tipo_empleado' => 1]
         ]);
         $Periodo= ['tabla' => 'cat_periodo', 'where' => ['visible' => 1]];
         $periodo = $principal->getTabla($Periodo);
