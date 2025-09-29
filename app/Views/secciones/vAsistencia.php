@@ -721,7 +721,7 @@
                     item.nombre = 'Tarde';
                     icon = '😢';
                 }
-                if (entrada >= '09:01:00') {
+                if (entrada > '09:00:00') {
                     eventClass = 'fc-event-tarde';
                     item.nombre = 'Falta';
                     icon = '❌';
@@ -758,7 +758,7 @@
                     item.nombre = 'Sin Salida';
                     icon = '🚷'; // Avance rápido (salida anticipada)
                 }
-                if (entrada > '09:01:00') {
+                if (entrada > '09:00:00') {
                     eventClass = 'fc-event-declinado';
                     item.nombre = 'Falta';
                     icon = '❌';
