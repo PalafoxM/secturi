@@ -343,7 +343,7 @@
                                                     <div id="carousel_1" class="carousel slide" data-ride="carousel">
                                                         <div class="carousel-inner">
                                                             <div class="carousel-item">
-                                                                <a href="<?= base_url() . 'assets/pdf/plantillas/principios.pdf' ?>"
+                                                                <a href="<?= base_url() . 'assets/pdf/plantillas/principios2.pdf' ?>"
                                                                     target="_black">
                                                                     <div class="media">
                                                                         <div class="icon-info mb-3">
@@ -519,14 +519,14 @@
                                             <div class="blog-card">
                                                 <div class="ratio ratio-16x9"> <!-- BS5 -->
                                                     <iframe
-                                                        src="<?= base_url() ?>assets/pdf/plantillas/Codigo_de_Conducta_SECTUR.pdf"
+                                                        src="<?= base_url() ?>assets/pdf/plantillas/Codigo_de_Conducta_SECTUR3.pdf"
                                                         title="Código de Conducta" style="border:0" loading="lazy"
                                                         width="100%">
                                                     </iframe>
                                                 </div>
 
                                                 <h4 class="my-3">
-                                                    <a href="" class="">Código de Conducta</a>
+                                                    <a href="" class="">Código de Ética</a>
                                                 </h4>
                                                 <p class="text-muted text-truncate">PERIODICO OFICIAL DEL GOBIERNO DEL
                                                     ESTADO DE GUANAJUATO.</p>
@@ -534,7 +534,7 @@
                                                 <div class="d-flex justify-content-between">
 
                                                     <div class="align-self-center">
-                                                        <a href="<?= base_url() ?>assets/pdf/plantillas/Codigo_de_Conducta_SECTUR.pdf"
+                                                        <a href="<?= base_url() ?>assets/pdf/plantillas/Codigo_de_Conducta_SECTUR3.pdf"
                                                             target="_blank" class="text-primary">Leer más <i
                                                                 class="fas fa-long-arrow-alt-right"></i></a>
                                                     </div>
