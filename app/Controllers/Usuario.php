@@ -389,314 +389,327 @@ class Usuario extends BaseController
         $writer->save('php://output');
         exit;
     }
-   public function reporteIncidenciaExcel2($periodoInicio = null)
-{
-    $session = \Config\Services::session();
-    $globals = new Mglobal;
+    public function reporteIncidenciaExcel2($periodoInicio = null)
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
 
-    // fallback si no viene periodo
-    if (empty($periodoInicio)) {
-        $periodoInicio = date('Y-m-d');
-    }
-
-    $dia = date('d', strtotime($periodoInicio));
-    $ultimoDiaMes = date('t', strtotime($periodoInicio));
-    
-    if ($dia == '01') {
-        $fec_ini = date('Y-m-01', strtotime($periodoInicio));
-        $fec_fin = date('Y-m-15', strtotime($periodoInicio));
-    } else {
-        $fec_ini = date('Y-m-16', strtotime($periodoInicio));
-        $fec_fin = date('Y-m-' . $ultimoDiaMes, strtotime($periodoInicio));
-    }
-
-    // ✅ DEFINIR DÍAS FESTIVOS GENERALES
-    $anio = date('Y');
-    $diasFestivosGenerales = [
-        $anio.'-01-01' => 'Año Nuevo',
-        $anio.'-02-05' => 'Día de la Constitución',
-        $anio.'-03-18' => 'Natalicio de Benito Juárez',
-        $anio.'-05-01' => 'Día del Trabajo',
-        $anio.'-09-16' => 'Día de la Independencia',
-        $anio.'-11-18' => 'Día de la Revolución',
-        $anio.'-12-25' => 'Navidad'
-    ];
-
-    // Traer datos desde la vista
-    $tabla = [
-        'tabla' => 'vw_asistencia_incidencia',
-        'where' => ['visible' => 1],
-        'whereBetween' => [['fecha', $fec_ini, $fec_fin]],
-    ];
-
-    $datos = $globals->getTabla($tabla);
-    $resul = (isset($datos->data) && !empty($datos->data)) ? $datos->data : [];
-    
-    // Map para estatus
-    $mapEstatus = [
-        1 => 'EN PROCESO',
-        2 => 'DECLINADO',
-        3 => 'VALIDADO'
-    ];
-
-    // 1) Construir lista de fechas del periodo
-    $start = new \DateTime($fec_ini);
-    $end = new \DateTime($fec_fin);
-    $end->modify('+1 day');
-    $interval = new \DateInterval('P1D');
-    $period = new \DatePeriod($start, $interval, $end);
-
-    $fechasDelPeriodo = [];
-    foreach ($period as $d) {
-        $fechasDelPeriodo[] = $d->format('Y-m-d');
-    }
-
-    // 2) Agrupar por usuario y por fecha
-    $usuarios = [];
-    $cumpleanosUsuarios = []; // ✅ ALMACENAR CUMPLEAÑOS POR USUARIO
-
-    foreach ($resul as $r) {
-        $nombre = trim($r->nombre_completo ?: 'Sin nombre');
-        $fechaYmd = !empty($r->fecha) ? date('Y-m-d', strtotime($r->fecha)) : null;
-        if (!$fechaYmd) continue;
-
-        if (!in_array($fechaYmd, $fechasDelPeriodo, true)) {
-            continue;
+        // fallback si no viene periodo
+        if (empty($periodoInicio)) {
+            $periodoInicio = date('Y-m-d');
         }
 
-        // ✅ ALMACENAR FECHA DE NACIMIENTO DEL USUARIO
-        if (!empty($r->fec_nac) && !isset($cumpleanosUsuarios[$nombre])) {
-            $cumpleanosUsuarios[$nombre] = $r->fec_nac;
-        }
-
-        if (!isset($usuarios[$nombre])) {
-            $usuarios[$nombre] = [];
-        }
-        if (!isset($usuarios[$nombre][$fechaYmd])) {
-            $usuarios[$nombre][$fechaYmd] = [
-                'entrada' => '',
-                'salida' => '',
-                'incidencias' => []
-            ];
-        }
-
-        $tipoRegistro = $r->tipo_registro ?? 'asistencia';
+        $dia = date('d', strtotime($periodoInicio));
+        $ultimoDiaMes = date('t', strtotime($periodoInicio));
         
-        if ($tipoRegistro === 'asistencia' || $tipoRegistro === 'asistencia_con_incidencia') {
-            if (!empty($r->hora_inicio) && empty($usuarios[$nombre][$fechaYmd]['entrada'])) {
-                $usuarios[$nombre][$fechaYmd]['entrada'] = $r->hora_inicio;
-            }
-            if (!empty($r->hora_fin) && empty($usuarios[$nombre][$fechaYmd]['salida'])) {
-                $usuarios[$nombre][$fechaYmd]['salida'] = $r->hora_fin;
-            }
+        if ($dia == '01') {
+            $fec_ini = date('Y-m-01', strtotime($periodoInicio));
+            $fec_fin = date('Y-m-15', strtotime($periodoInicio));
+        } else {
+            $fec_ini = date('Y-m-16', strtotime($periodoInicio));
+            $fec_fin = date('Y-m-' . $ultimoDiaMes, strtotime($periodoInicio));
         }
 
-        // Incidencias
-        if (($tipoRegistro === 'incidencia' || $tipoRegistro === 'asistencia_con_incidencia') && 
-            isset($r->id_estatus) && !empty($r->id_estatus)) {
-            $texto = $mapEstatus[$r->id_estatus] ?? '';
-            if ($texto !== '' && !in_array($texto, $usuarios[$nombre][$fechaYmd]['incidencias'], true)) {
-                $usuarios[$nombre][$fechaYmd]['incidencias'][] = $texto;
-            }
-        }
+        // ✅ DEFINIR DÍAS FESTIVOS GENERALES
+        $anio = date('Y');
+        $diasFestivosGenerales = [
+            $anio.'-01-01' => 'Año Nuevo',
+            $anio.'-02-05' => 'Día de la Constitución',
+            $anio.'-03-18' => 'Natalicio de Benito Juárez',
+            $anio.'-05-01' => 'Día del Trabajo',
+            $anio.'-09-16' => 'Día de la Independencia',
+            $anio.'-11-18' => 'Día de la Revolución',
+            $anio.'-12-25' => 'Navidad'
+        ];
 
-        // ✅ AGREGAR DÍA FESTIVO GENERAL COMO INCIDENCIA
-        if (isset($diasFestivosGenerales[$fechaYmd])) {
-            $festivoTexto = 'FESTIVO: ' . $diasFestivosGenerales[$fechaYmd];
-            if (!in_array($festivoTexto, $usuarios[$nombre][$fechaYmd]['incidencias'], true)) {
-                $usuarios[$nombre][$fechaYmd]['incidencias'][] = $festivoTexto;
-            }
-        }
-    }
+        // Traer datos desde la vista
+        $tabla = [
+            'tabla' => 'vw_asistencia_incidencia',
+            'where' => ['visible' => 1],
+            'whereBetween' => [['fecha', $fec_ini, $fec_fin]],
+        ];
 
-    // ✅ AGREGAR CUMPLEAÑOS INDIVIDUALES COMO INCIDENCIAS
-    foreach ($usuarios as $nombre => $fechas) {
-        if (isset($cumpleanosUsuarios[$nombre])) {
-            $fecNac = $cumpleanosUsuarios[$nombre];
-            $cumpleAnioActual = $anio . '-' . date('m-d', strtotime($fecNac));
+        $datos = $globals->getTabla($tabla);
+        $resul = (isset($datos->data) && !empty($datos->data)) ? $datos->data : [];
+        
+        // Map para estatus
+        $mapEstatus = [
+            1 => 'EN PROCESO',
+            2 => 'DECLINADO',
+            3 => 'VALIDADO'
+        ];
+
+        // 1) Construir lista de fechas del periodo - ✅ EXCLUYENDO SÁBADOS Y DOMINGOS
+        $start = new \DateTime($fec_ini);
+        $end = new \DateTime($fec_fin);
+        $end->modify('+1 day');
+        $interval = new \DateInterval('P1D');
+        $period = new \DatePeriod($start, $interval, $end);
+
+        $fechasDelPeriodo = [];
+        foreach ($period as $d) {
+            $diaSemana = $d->format('N'); // 1=Lunes, 7=Domingo
             
-            // Verificar si el cumpleaños cae dentro del periodo
-            if (in_array($cumpleAnioActual, $fechasDelPeriodo)) {
-                if (!isset($usuarios[$nombre][$cumpleAnioActual])) {
-                    $usuarios[$nombre][$cumpleAnioActual] = [
-                        'entrada' => '',
-                        'salida' => '',
-                        'incidencias' => []
-                    ];
+            // ✅ EXCLUIR SÁBADOS (6) Y DOMINGOS (7)
+            if ($diaSemana < 6) { // Solo incluir Lunes(1) a Viernes(5)
+                $fechasDelPeriodo[] = $d->format('Y-m-d');
+            }
+        }
+
+        // 2) Agrupar por usuario y por fecha
+        $usuarios = [];
+        $cumpleanosUsuarios = [];
+
+        foreach ($resul as $r) {
+            $nombre = trim($r->nombre_completo ?: 'Sin nombre');
+            $fechaYmd = !empty($r->fecha) ? date('Y-m-d', strtotime($r->fecha)) : null;
+            if (!$fechaYmd) continue;
+
+            // ✅ EXCLUIR REGISTROS DE SÁBADOS Y DOMINGOS
+            $diaSemanaRegistro = date('N', strtotime($fechaYmd));
+            if ($diaSemanaRegistro >= 6) { // 6=Sábado, 7=Domingo
+                continue;
+            }
+
+            if (!in_array($fechaYmd, $fechasDelPeriodo, true)) {
+                continue;
+            }
+
+            // ✅ ALMACENAR FECHA DE NACIMIENTO DEL USUARIO
+            if (!empty($r->fec_nac) && !isset($cumpleanosUsuarios[$nombre])) {
+                $cumpleanosUsuarios[$nombre] = $r->fec_nac;
+            }
+
+            if (!isset($usuarios[$nombre])) {
+                $usuarios[$nombre] = [];
+            }
+            if (!isset($usuarios[$nombre][$fechaYmd])) {
+                $usuarios[$nombre][$fechaYmd] = [
+                    'entrada' => '',
+                    'salida' => '',
+                    'incidencias' => []
+                ];
+            }
+
+            $tipoRegistro = $r->tipo_registro ?? 'asistencia';
+            
+            if ($tipoRegistro === 'asistencia' || $tipoRegistro === 'asistencia_con_incidencia') {
+                if (!empty($r->hora_inicio) && empty($usuarios[$nombre][$fechaYmd]['entrada'])) {
+                    $usuarios[$nombre][$fechaYmd]['entrada'] = $r->hora_inicio;
                 }
-                $cumpleTexto = '🎂 CUMPLEAÑOS: ';
-                if (!in_array($cumpleTexto, $usuarios[$nombre][$cumpleAnioActual]['incidencias'], true)) {
-                    $usuarios[$nombre][$cumpleAnioActual]['incidencias'][] = $cumpleTexto;
+                if (!empty($r->hora_fin) && empty($usuarios[$nombre][$fechaYmd]['salida'])) {
+                    $usuarios[$nombre][$fechaYmd]['salida'] = $r->hora_fin;
+                }
+            }
+
+            // Incidencias
+            if (($tipoRegistro === 'incidencia' || $tipoRegistro === 'asistencia_con_incidencia') && 
+                isset($r->id_estatus) && !empty($r->id_estatus)) {
+                $texto = $mapEstatus[$r->id_estatus] ?? '';
+                if ($texto !== '' && !in_array($texto, $usuarios[$nombre][$fechaYmd]['incidencias'], true)) {
+                    $usuarios[$nombre][$fechaYmd]['incidencias'][] = $texto;
+                }
+            }
+
+            // ✅ AGREGAR DÍA FESTIVO GENERAL COMO INCIDENCIA
+            if (isset($diasFestivosGenerales[$fechaYmd])) {
+                $festivoTexto = 'FESTIVO: ' . $diasFestivosGenerales[$fechaYmd];
+                if (!in_array($festivoTexto, $usuarios[$nombre][$fechaYmd]['incidencias'], true)) {
+                    $usuarios[$nombre][$fechaYmd]['incidencias'][] = $festivoTexto;
                 }
             }
         }
-    }
 
-    // 3) Preparar Spreadsheet
-    $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
-    $sheet = $spreadsheet->getActiveSheet();
-
-    // Filas de encabezado
-    $sheet->setCellValue('A1', '');
-    $sheet->setCellValue('A2', 'Nombre');
-
-    // Construir cabeceras por fecha - DESTACAR FESTIVOS Y CUMPLEAÑOS
-    $colIndex = 2;
-    foreach ($fechasDelPeriodo as $fecha) {
-        $colStart = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
-        $colMid   = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 1);
-        $colEnd   = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 2);
-
-        $fechaFormateada = date('d/m/Y', strtotime($fecha));
-        
-        // ✅ DESTACAR ENCABEZADO SI ES FESTIVO GENERAL
-        $colorFondo = null;
-        if (isset($diasFestivosGenerales[$fecha])) {
-            $fechaFormateada .= ' 🎉';
-            $colorFondo = 'FFFFD700'; // Amarillo dorado para festivos
-        }
-        
-        // ✅ DESTACAR ENCABEZADO SI HAY CUMPLEAÑOS ESE DÍA
-        $hayCumpleanos = false;
-        foreach ($cumpleanosUsuarios as $nombreUsuario => $fecNac) {
-            $cumpleUsuario = $anio . '-' . date('m-d', strtotime($fecNac));
-            if ($cumpleUsuario === $fecha) {
-                $hayCumpleanos = true;
-                break;
-            }
-        }
-        
-        if ($hayCumpleanos) {
-            $fechaFormateada .= ' 🎂';
-            $colorFondo = 'FFFFB6C1'; // Rosa claro para cumpleaños
-        }
-        
-        $sheet->setCellValue($colStart . '1', $fechaFormateada);
-        $sheet->mergeCells("{$colStart}1:{$colEnd}1");
-
-        $sheet->setCellValue($colStart . '2', 'Entrada');
-        $sheet->setCellValue($colMid . '2', 'Salida');
-        $sheet->setCellValue($colEnd . '2', 'Incidencia');
-
-        // ✅ APLICAR COLOR DE FONDO SI ES FESTIVO O CUMPLEAÑOS
-        if ($colorFondo) {
-            $sheet->getStyle("{$colStart}1:{$colEnd}1")
-                ->getFill()
-                ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                ->getStartColor()->setARGB($colorFondo);
+        // ✅ AGREGAR CUMPLEAÑOS INDIVIDUALES COMO INCIDENCIAS (solo si no es fin de semana)
+        foreach ($usuarios as $nombre => $fechas) {
+            if (isset($cumpleanosUsuarios[$nombre])) {
+                $fecNac = $cumpleanosUsuarios[$nombre];
+                $cumpleAnioActual = $anio . '-' . date('m-d', strtotime($fecNac));
                 
-            $sheet->getStyle("{$colStart}1:{$colEnd}1")
-                ->getFont()->setBold(true);
+                // ✅ VERIFICAR QUE EL CUMPLEAÑOS NO SEA FIN DE SEMANA
+                $diaSemanaCumple = date('N', strtotime($cumpleAnioActual));
+                if ($diaSemanaCumple < 6 && in_array($cumpleAnioActual, $fechasDelPeriodo)) {
+                    if (!isset($usuarios[$nombre][$cumpleAnioActual])) {
+                        $usuarios[$nombre][$cumpleAnioActual] = [
+                            'entrada' => '',
+                            'salida' => '',
+                            'incidencias' => []
+                        ];
+                    }
+                    
+                    $cumpleTexto = '🎂 CUMPLEAÑOS';
+                    if (!in_array($cumpleTexto, $usuarios[$nombre][$cumpleAnioActual]['incidencias'], true)) {
+                        $usuarios[$nombre][$cumpleAnioActual]['incidencias'][] = $cumpleTexto;
+                    }
+                }
+            }
         }
 
-        $sheet->getStyle($colStart . '1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-        $colIndex += 3;
-    }
+        // 3) Preparar Spreadsheet
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
 
-    // 4) Escribir datos por usuario
-    $fila = 3;
-    ksort($usuarios, SORT_STRING);
-    foreach ($usuarios as $nombre => $fechas) {
-        $sheet->setCellValue('A' . $fila, $nombre);
+        // Filas de encabezado
+        $sheet->setCellValue('A1', '');
+        $sheet->setCellValue('A2', 'Nombre');
 
+        // Construir cabeceras por fecha - DESTACAR FESTIVOS Y CUMPLEAÑOS
         $colIndex = 2;
         foreach ($fechasDelPeriodo as $fecha) {
-            $colEntrada = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
-            $colSalida  = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 1);
-            $colInc     = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 2);
+            $colStart = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
+            $colMid   = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 1);
+            $colEnd   = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 2);
 
-            $entrada = isset($usuarios[$nombre][$fecha]) ? $usuarios[$nombre][$fecha]['entrada'] : '';
-            $salida  = isset($usuarios[$nombre][$fecha]) ? $usuarios[$nombre][$fecha]['salida'] : '';
-            $incArr  = isset($usuarios[$nombre][$fecha]) ? $usuarios[$nombre][$fecha]['incidencias'] : [];
-
-            $incidenciaTexto = !empty($incArr) ? implode('; ', $incArr) : '';
-
-            $sheet->setCellValue($colEntrada . $fila, $entrada);
-            $sheet->setCellValue($colSalida . $fila, $salida);
-            $sheet->setCellValue($colInc . $fila, $incidenciaTexto);
-
-            // ✅ APLICAR ESTILO ESPECIAL PARA CELDAS DE DÍAS FESTIVOS Y CUMPLEAÑOS
-            $colorCelda = null;
+            $fechaFormateada = date('d/m/Y', strtotime($fecha));
+            
+            // ✅ DESTACAR ENCABEZADO SI ES FESTIVO GENERAL
+            $colorFondo = null;
             if (isset($diasFestivosGenerales[$fecha])) {
-                $colorCelda = 'FFFFFFCC'; // Amarillo claro para festivos
+                $fechaFormateada .= ' 🎉';
+                $colorFondo = 'FFFFD700'; // Amarillo dorado para festivos
             }
             
-            // Verificar si es cumpleaños de este usuario específico
-            if (isset($cumpleanosUsuarios[$nombre])) {
-                $cumpleUsuario = $anio . '-' . date('m-d', strtotime($cumpleanosUsuarios[$nombre]));
+            // ✅ DESTACAR ENCABEZADO SI HAY CUMPLEAÑOS ESE DÍA
+            $hayCumpleanos = false;
+            foreach ($cumpleanosUsuarios as $nombreUsuario => $fecNac) {
+                $cumpleUsuario = $anio . '-' . date('m-d', strtotime($fecNac));
                 if ($cumpleUsuario === $fecha) {
-                    $colorCelda = 'FFFFF0F5'; // Rosa muy claro para cumpleaños
+                    $hayCumpleanos = true;
+                    break;
                 }
             }
+            
+            if ($hayCumpleanos) {
+                $fechaFormateada .= ' 🎂';
+                $colorFondo = 'FFFFB6C1'; // Rosa claro para cumpleaños
+            }
+            
+            $sheet->setCellValue($colStart . '1', $fechaFormateada);
+            $sheet->mergeCells("{$colStart}1:{$colEnd}1");
 
-            if ($colorCelda) {
-                $sheet->getStyle("{$colEntrada}{$fila}:{$colInc}{$fila}")
+            $sheet->setCellValue($colStart . '2', 'Entrada');
+            $sheet->setCellValue($colMid . '2', 'Salida');
+            $sheet->setCellValue($colEnd . '2', 'Incidencia');
+
+            // ✅ APLICAR COLOR DE FONDO SI ES FESTIVO O CUMPLEAÑOS
+            if ($colorFondo) {
+                $sheet->getStyle("{$colStart}1:{$colEnd}1")
                     ->getFill()
                     ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                    ->getStartColor()->setARGB($colorCelda);
+                    ->getStartColor()->setARGB($colorFondo);
+                    
+                $sheet->getStyle("{$colStart}1:{$colEnd}1")
+                    ->getFont()->setBold(true);
             }
 
-            // Estilos originales (tardanzas, etc.)
-            if (preg_match('/^\d{2}:\d{2}:\d{2}$/', $entrada)) {
-                list($hh, $mm, $ss) = explode(':', $entrada);
-                $seg = ($hh * 3600) + ($mm * 60) + $ss;
-                $u09 = 9 * 3600;
-                $u0845 = (8 * 3600) + (45 * 60);
-
-                if ($seg > $u09) {
-                    $sheet->getStyle($colEntrada . $fila)
-                        ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                        ->getStartColor()->setARGB('FFFF5166');
-                } elseif ($seg > $u0845) {
-                    $sheet->getStyle($colEntrada . $fila)
-                        ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                        ->getStartColor()->setARGB('FFCC3A1A');
-                }
-            } else {
-                if ($entrada === '') {
-                    $sheet->getStyle($colEntrada . $fila)
-                        ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                        ->getStartColor()->setARGB('FFFFFF00');
-                }
-            }
-
-            if (!empty($incidenciaTexto)) {
-                $sheet->getStyle($colInc . $fila)
-                    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                    ->getStartColor()->setARGB('FFFFA500');
-                $sheet->getStyle($colInc . $fila)->getAlignment()->setWrapText(true);
-            }
-
+            $sheet->getStyle($colStart . '1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $colIndex += 3;
         }
-        $fila++;
+
+        // 4) Escribir datos por usuario
+        $fila = 3;
+        ksort($usuarios, SORT_STRING);
+        foreach ($usuarios as $nombre => $fechas) {
+            $sheet->setCellValue('A' . $fila, $nombre);
+
+            $colIndex = 2;
+            foreach ($fechasDelPeriodo as $fecha) {
+                $colEntrada = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
+                $colSalida  = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 1);
+                $colInc     = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 2);
+
+                $entrada = isset($usuarios[$nombre][$fecha]) ? $usuarios[$nombre][$fecha]['entrada'] : '';
+                $salida  = isset($usuarios[$nombre][$fecha]) ? $usuarios[$nombre][$fecha]['salida'] : '';
+                $incArr  = isset($usuarios[$nombre][$fecha]) ? $usuarios[$nombre][$fecha]['incidencias'] : [];
+
+                $incidenciaTexto = !empty($incArr) ? implode('; ', $incArr) : '';
+
+                $sheet->setCellValue($colEntrada . $fila, $entrada);
+                $sheet->setCellValue($colSalida . $fila, $salida);
+                $sheet->setCellValue($colInc . $fila, $incidenciaTexto);
+
+                // ✅ APLICAR ESTILO ESPECIAL PARA CELDAS DE DÍAS FESTIVOS Y CUMPLEAÑOS
+                $colorCelda = null;
+                if (isset($diasFestivosGenerales[$fecha])) {
+                    $colorCelda = 'FFFFFFCC'; // Amarillo claro para festivos
+                }
+                
+                // Verificar si es cumpleaños de este usuario específico
+                if (isset($cumpleanosUsuarios[$nombre])) {
+                    $cumpleUsuario = $anio . '-' . date('m-d', strtotime($cumpleanosUsuarios[$nombre]));
+                    if ($cumpleUsuario === $fecha) {
+                        $colorCelda = 'FFFFF0F5'; // Rosa muy claro para cumpleaños
+                    }
+                }
+
+                if ($colorCelda) {
+                    $sheet->getStyle("{$colEntrada}{$fila}:{$colInc}{$fila}")
+                        ->getFill()
+                        ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                        ->getStartColor()->setARGB($colorCelda);
+                }
+
+                // Estilos originales (tardanzas, etc.)
+                if (preg_match('/^\d{2}:\d{2}:\d{2}$/', $entrada)) {
+                    list($hh, $mm, $ss) = explode(':', $entrada);
+                    $seg = ($hh * 3600) + ($mm * 60) + $ss;
+                    $u09 = 9 * 3600;
+                    $u0845 = (8 * 3600) + (45 * 60);
+
+                    if ($seg > $u09) {
+                        $sheet->getStyle($colEntrada . $fila)
+                            ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                            ->getStartColor()->setARGB('FFFF5166');
+                    } elseif ($seg > $u0845) {
+                        $sheet->getStyle($colEntrada . $fila)
+                            ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                            ->getStartColor()->setARGB('FFCC3A1A');
+                    }
+                } else {
+                    if ($entrada === '') {
+                        $sheet->getStyle($colEntrada . $fila)
+                            ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                            ->getStartColor()->setARGB('FFFFFF00');
+                    }
+                }
+
+                if (!empty($incidenciaTexto)) {
+                    $sheet->getStyle($colInc . $fila)
+                        ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                        ->getStartColor()->setARGB('FFFFA500');
+                    $sheet->getStyle($colInc . $fila)->getAlignment()->setWrapText(true);
+                }
+
+                $colIndex += 3;
+            }
+            $fila++;
+        }
+
+        // 5) Ajustar anchos de columna
+        $sheet->getColumnDimension('A')->setWidth(40);
+        $totalCols = 1 + (count($fechasDelPeriodo) * 3);
+        for ($i = 2; $i <= $totalCols; $i++) {
+            $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i);
+            $sheet->getColumnDimension($colLetter)->setWidth(15);
+        }
+
+        // Estilos encabezado
+        $sheet->getStyle('A1:A2')->getFont()->setBold(true);
+        $lastColLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($totalCols);
+        $sheet->getStyle("A2:{$lastColLetter}2")->getFont()->setBold(true);
+        $sheet->getStyle("A1:{$lastColLetter}1")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+        // 6) Descargar archivo
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $fileName = 'reporte_asistencias_incidencias_' . date('Ymd_His') . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"{$fileName}\"");
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        exit;
     }
-
-    // 5) Ajustar anchos de columna
-    $sheet->getColumnDimension('A')->setWidth(40);
-    $totalCols = 1 + (count($fechasDelPeriodo) * 3);
-    for ($i = 2; $i <= $totalCols; $i++) {
-        $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i);
-        $sheet->getColumnDimension($colLetter)->setWidth(15);
-    }
-
-    // Estilos encabezado
-    $sheet->getStyle('A1:A2')->getFont()->setBold(true);
-    $lastColLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($totalCols);
-    $sheet->getStyle("A2:{$lastColLetter}2")->getFont()->setBold(true);
-    $sheet->getStyle("A1:{$lastColLetter}1")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-
-    // 6) Descargar archivo
-    $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-    $fileName = 'reporte_asistencias_incidencias_' . date('Ymd_His') . '.xlsx';
-
-    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    header("Content-Disposition: attachment; filename=\"{$fileName}\"");
-    header('Cache-Control: max-age=0');
-
-    $writer->save('php://output');
-    exit;
-}
 
 
     public function getIncidencia()

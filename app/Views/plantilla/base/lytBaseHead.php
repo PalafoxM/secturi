@@ -615,14 +615,16 @@
                     <a class="nav-link dropdown-toggle arrow-none waves-light waves-effect" data-toggle="dropdown"
                         href="#" role="button" aria-haspopup="false" aria-expanded="false">
                         <i class="ti-bell noti-icon"></i>
-                        <!--  <span class="badge badge-danger badge-pill noti-icon-badge">2</span> -->
+                          <?php if($session->get('id_tipo_empleado') == 1): ?>
+                          <span class="badge badge-danger badge-pill noti-icon-badge">1</span>
+                          <?php endif; ?>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right dropdown-lg pt-0">
 
                         <h6
                             class="dropdown-item-text font-15 m-0 py-3 bg-primary text-white d-flex justify-content-between align-items-center">
-                            Sin Notificaciones
-                            <!-- <span class="badge badge-light badge-pill">2</span> -->
+                            <?= ($session->get('id_tipo_empleado') == 1)?'Notificacion':'Sin Notificaciones' ?>
+                            <span class="badge badge-light badge-pill">1</span>
                         </h6>
                         <!--        <div class="slimscroll notification-list">
                         

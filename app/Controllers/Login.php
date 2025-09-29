@@ -280,7 +280,6 @@ class Login extends BaseController {
             
             if(isset($result->data) && !empty($result->data)){
                 $session->set('logueado', 1);
-                
                 $session->set('id_usuario',$result->data[0]->id_usuario);
                 $session->set('id_sexo',$result->data[0]->id_sexo);
                 $session->set('usuario',$result->data[0]->usuario);
@@ -289,6 +288,7 @@ class Login extends BaseController {
                 $session->set('fec_nac',$result->data[0]->fec_nac);
                 $session->set('correo',$result->data[0]->correo);
                 $session->set('foto',$result->data[0]->ruta_foto_relativa);
+                $session->set('id_tipo_empleado',$result->data[0]->id_tipo_empleado);
                 $this->activarActividad($result->data[0]->id_usuario);
                 $subordinados = $catalogos->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_jefe_inmediato' => $result->data[0]->id_usuario]])->data;
                 $esJefe = (!empty($subordinados))?true:false;
