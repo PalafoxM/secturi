@@ -826,7 +826,7 @@ class Usuario extends BaseController
 
         // 3. Encabezados CORREGIDOS
         $encabezados = [
-            'ID', 'NOMBRE', 'PRIMER APELLIDO', 'SEGUNDO APELLIDO', 'RFC',
+            'ID', 'NOMBRE', 'PRIMER APELLIDO', 'SEGUNDO APELLIDO', 'CORREO',
             'AREA', 'EXTENCION'
         ];
         
@@ -846,7 +846,7 @@ class Usuario extends BaseController
             $sheet->setCellValue('B' . $fila, $row->nombre);
             $sheet->setCellValue('C' . $fila, $row->primer_apellido);
             $sheet->setCellValue('D' . $fila, $row->segundo_apellido);
-            $sheet->setCellValue('E' . $fila, $row->rfc);
+            $sheet->setCellValue('E' . $fila, $row->correo);
             $sheet->setCellValue('F' . $fila, $row->dsc_area);
             $sheet->setCellValue('G' . $fila, $row->extencion);
             $fila++;

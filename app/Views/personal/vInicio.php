@@ -339,7 +339,7 @@
                                         <div class="col-lg-6">
                                             <div class="card">
                                                 <div class="card-body dash-info-carousel">
-                                                    <h4 class="mt-0 header-title mb-4">Código de Ética</h4>
+                                                    <h4 class="mt-0  mb-4">Código de Conducta</h4>
                                                     <div id="carousel_1" class="carousel slide" data-ride="carousel">
                                                         <div class="carousel-inner">
                                                             <div class="carousel-item">
@@ -369,7 +369,7 @@
                                                                             <i class="fas fa-gavel bg-soft-success"></i>
                                                                         </div>
                                                                         <div class="media-body align-self-center">
-                                                                            <h4 class="mt-0 mb-1 title-text">Reglas de
+                                                                            <h4 class="mt-0 mb-1">Reglas de
                                                                                 Integridad</h4>
                                                                             <p class="text-muted mb-0">Saber más</p>
                                                                         </div>
