@@ -726,6 +726,16 @@
                     item.nombre = 'Falta';
                     icon = '❌';
                 }
+                 if (!multiple && idEstatus == 1) {
+                    eventClass = 'fc-event-espera';
+                    item.nombre = 'Enviado';
+                    icon = '✈️';
+                }
+                if (multiple && idEstatus == 1) {
+                    eventClass = 'fc-event-espera';
+                    item.nombre = 'Enviado';
+                    icon = '✈️';
+                }
             } else {
 
                 if (entrada >= '08:30:00' && entrada <= '08:46:00' && !idEstatus) {

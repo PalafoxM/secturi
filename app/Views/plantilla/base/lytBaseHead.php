@@ -611,11 +611,11 @@
                      <?php endif; ?>
                 </li> -->
 
-                <li class="dropdown notification-list">
+    <!--             <li class="dropdown notification-list">
                     <a class="nav-link dropdown-toggle arrow-none waves-light waves-effect" data-toggle="dropdown"
                         href="#" role="button" aria-haspopup="false" aria-expanded="false">
                         <i class="ti-bell noti-icon"></i>
-                        <?php if ($session->get('id_tipo_empleado') == 1 && !$qr): ?>
+                        <?php if ($session->get('id_tipo_empleado') == 1 && !$session->get('qr')): ?>
                             <span class="badge badge-danger badge-pill noti-icon-badge">1</span>
                         <?php endif; ?>
                     </a>
@@ -623,11 +623,11 @@
 
                         <h6
                             class="dropdown-item-text font-15 m-0 py-3 bg-primary text-white d-flex justify-content-between align-items-center">
-                            <?= ($session->get('id_tipo_empleado') == 1 && !$qr) ? 'Notificacion' : 'Sin Notificaciones' ?>
-                            <span class="badge badge-light badge-pill">1</span>
+                            <?= ($session->get('id_tipo_empleado') == 1 && !$session->get('qr')) ? 'Notificacion' : 'Sin Notificaciones' ?>
+                            <span class="badge badge-light badge-pill"> <?= ($session->get('id_tipo_empleado') == 1 && !$session->get('qr')) ? '1' : '0' ?></span>
                         </h6>
                         <div class="slimscroll notification-list">
-                        <?php if ($session->get('id_tipo_empleado') == 1 && !$qr): ?>
+                        <?php if ($session->get('id_tipo_empleado') == 1 && !$session->get('qr')): ?>
                             <a target="_blank"
                                 href="<?php echo base_url('index.php/Principal/imprimer_qr/' . $session->get('no_empleado')); ?>"
                                 class="dropdown-item py-3">
@@ -646,7 +646,7 @@
                         </div>
 
                     </div>
-                </li>
+                </li> -->
 
                 <li class="dropdown">
                     <a class="nav-link dropdown-toggle waves-effect waves-light nav-user" data-toggle="dropdown"

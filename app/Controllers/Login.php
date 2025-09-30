@@ -242,10 +242,11 @@ class Login extends BaseController {
     }
     public function activarActividad($id_usuario)
     {
+        $session = \Config\Services::session();
         $response = new \stdClass();
         $response->error = true;
+        $session->set('qr', false);
         $response->respuesta = "Error al registrar salida";
-        $session = \Config\Services::session();
         $globals = new Mglobal;
         $dataConfig = [
                 "tabla" => 'bitacora_susi',
@@ -260,6 +261,12 @@ class Login extends BaseController {
                 'activo' => 1
         ];
         $result = $globals->saveTabla($dataInsert, $dataConfig,  $dataBitacora );
+       
+        $qr = $globals->getTabla(['tabla' => 'descarga_qr', 'where' => ['visible' => 1], 'id_usuario' => $id_usuario]);
+        if(isset($qr->data) && !empty($qr->data)){
+               $session->set('qr', true);
+        }
+    
    
     }
     public function validar_usuario(){
