@@ -34,12 +34,14 @@
         text-align: center;
         color: white;
         position: relative;
+        
     }
 
     .header h1 {
         font-size: 2.5em;
         margin-bottom: 10px;
         font-weight: 300;
+        
     }
 
     .header p {
@@ -232,7 +234,7 @@
 <div id="container">
     <!-- Header -->
     <div class="header">
-        <h1>SUSI</h1>
+        <h1 >SUSI</h1>
         <p>Sistema Unificado SECTURI</p>
     </div>
 
@@ -266,9 +268,9 @@
                <div id="qr"></div> 
             </div>
            
-            <div class="qr-text">
+            <div class="qr-text" >
                 <strong>CÓDIGO PARA ASISTENCIA</strong><br>
-                Este código funciona exclusivamente en las instalaciones de SECTURI.
+                Este código funciona exclusivamente dentro de las instalaciones de SECTURI y está destinado únicamente al registro de asistencia de entrada. No permite el registro de salidas ni de comisiones, y su uso se encuentra limitado por la geocerca establecida en la sección de asistencia
             </div>
           
         </div>

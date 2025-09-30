@@ -289,6 +289,7 @@ class Login extends BaseController {
                 $session->set('correo',$result->data[0]->correo);
                 $session->set('foto',$result->data[0]->ruta_foto_relativa);
                 $session->set('id_tipo_empleado',$result->data[0]->id_tipo_empleado);
+                $session->set('no_empleado',$result->data[0]->no_empleado);
                 $this->activarActividad($result->data[0]->id_usuario);
                 $subordinados = $catalogos->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_jefe_inmediato' => $result->data[0]->id_usuario]])->data;
                 $esJefe = (!empty($subordinados))?true:false;

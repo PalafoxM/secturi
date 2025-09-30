@@ -449,11 +449,24 @@ class Principal extends BaseController
         $data = array();
         $tempQrPath = FCPATH . 'assets/images/qr_final.png';
         $usuario = $this->globals->getTabla(["tabla" => "vw_usuario", "where" => ["no_empleado" => $noEmpleado, "visible" => 1]])->data;
+        
         if (empty($usuario)) {
             echo "<center>EL USUARIO NO EXISTE, FAVOR DE LLAMAR AL ADMINISTRADOR DE SUSI</center>";
             die();
-
         }
+        $dataInsert = [
+            'id_usuario' => $usuario[0]->id_usuario,
+            'fec_reg' => date('Y-m-d H:i:s'),
+            'usu_reg' => $session->id_usuario,
+           
+        ];
+         $dataConfig = [
+                "tabla" => "descarga_qr",
+                "editar" => false
+            ];
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaDescargaQR'];
+        $result = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+        
         $data['usuario'] = $usuario[0];
         // Generar el QR
         $result = Builder::create()

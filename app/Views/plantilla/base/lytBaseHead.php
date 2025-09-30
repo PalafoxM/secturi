@@ -345,7 +345,7 @@
 </style>
 
 <body>
-   
+
     <script>
         var base_url = "<?php echo base_url(); ?>";
         var token = "<?php echo env('TOKEN_API'); ?>";
@@ -374,7 +374,7 @@
                     <i data-feather="dollar-sign" class="align-self-center menu-icon icon-dual"></i>
                 </a><!--end MetricaApps-->
 
-                <?php if (in_array($session->id_perfil, [1,3,5])): ?>
+                <?php if (in_array($session->id_perfil, [1, 3, 5])): ?>
                     <a href="#MetricaUikit" class="nav-link" data-toggle="tooltip-custom" data-placement="right"
                         data-trigger="hover" title="" data-original-title="Admin">
                         <i data-feather="user" class="align-self-center menu-icon icon-dual"></i>
@@ -481,7 +481,7 @@
                     </div>
 
                     <ul class="nav metismenu">
-                        <?php if (in_array($session->id_perfil, [1,3])): ?>
+                        <?php if (in_array($session->id_perfil, [1, 3])): ?>
                             <li class="nav-item">
                                 <a class="nav-link" href="#"><span class="w-100">Admin TI</span><span class="menu-arrow"><i
                                             class="mdi mdi-chevron-right"></i></span></a>
@@ -490,18 +490,18 @@
                                     </li>
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/altaUsuario">Alta de Usuarios</a>
                                     </li>
-                                    <?php if($session->id_perfil == 1): ?>
-                                    <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaPerfil">Lista de
-                                            Perfiles</a></li>
-                                    <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaPuesto">Lista de Puestos</a>
-                                    </li>
-                                    <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaArea">Lista de Área</a></li>
-                                    <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaTiket">Listado de Tikets</a>
-                                    </li>
-                                    <li><a href="<?php echo base_url(); ?>index.php/Principal/listadoProveedores">Lista de
-                                            Proveedores</a></li>
-                                    <li><a href="<?php echo base_url(); ?>index.php/Principal/bitacora">Bitacora</a></li>
-                                     <?php endif; ?>
+                                    <?php if ($session->id_perfil == 1): ?>
+                                        <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaPerfil">Lista de
+                                                Perfiles</a></li>
+                                        <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaPuesto">Lista de Puestos</a>
+                                        </li>
+                                        <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaArea">Lista de Área</a></li>
+                                        <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaTiket">Listado de Tikets</a>
+                                        </li>
+                                        <li><a href="<?php echo base_url(); ?>index.php/Principal/listadoProveedores">Lista de
+                                                Proveedores</a></li>
+                                        <li><a href="<?php echo base_url(); ?>index.php/Principal/bitacora">Bitacora</a></li>
+                                    <?php endif; ?>
 
                                 </ul>
                             </li><!--end nav-item-->
@@ -520,17 +520,17 @@
                             </li><!--end nav-item-->
                         <?php endif; ?>
                         <?php if (in_array($session->id_perfil, [1, 5])): ?>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#"><span class="w-100">Admin RM</span><span class="menu-arrow"><i
-                                        class="mdi mdi-chevron-right"></i></span></a>
-                            <ul class="nav-second-level" aria-expanded="false">
-                                <li><a href="<?php echo base_url(); ?>index.php/Inicio/vehiculos">Vehiculos</a></li>
-                                <li><a href="<?php echo base_url(); ?>index.php/Inicio/ListaInventario">Inventarios</a>
-                                </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#"><span class="w-100">Admin RM</span><span class="menu-arrow"><i
+                                            class="mdi mdi-chevron-right"></i></span></a>
+                                <ul class="nav-second-level" aria-expanded="false">
+                                    <li><a href="<?php echo base_url(); ?>index.php/Inicio/vehiculos">Vehiculos</a></li>
+                                    <li><a href="<?php echo base_url(); ?>index.php/Inicio/ListaInventario">Inventarios</a>
+                                    </li>
 
-                            </ul>
-                        </li><!--end nav-item-->
-                         <?php endif; ?>
+                                </ul>
+                            </li><!--end nav-item-->
+                        <?php endif; ?>
                     </ul><!--end nav-->
                 </div><!-- end Others -->
 
@@ -615,34 +615,35 @@
                     <a class="nav-link dropdown-toggle arrow-none waves-light waves-effect" data-toggle="dropdown"
                         href="#" role="button" aria-haspopup="false" aria-expanded="false">
                         <i class="ti-bell noti-icon"></i>
-                          <?php if($session->get('id_tipo_empleado') == 1): ?>
-                          <span class="badge badge-danger badge-pill noti-icon-badge">1</span>
-                          <?php endif; ?>
+                        <?php if ($session->get('id_tipo_empleado') == 1 && !$qr): ?>
+                            <span class="badge badge-danger badge-pill noti-icon-badge">1</span>
+                        <?php endif; ?>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right dropdown-lg pt-0">
 
                         <h6
                             class="dropdown-item-text font-15 m-0 py-3 bg-primary text-white d-flex justify-content-between align-items-center">
-                            <?= ($session->get('id_tipo_empleado') == 1)?'Notificacion':'Sin Notificaciones' ?>
+                            <?= ($session->get('id_tipo_empleado') == 1 && !$qr) ? 'Notificacion' : 'Sin Notificaciones' ?>
                             <span class="badge badge-light badge-pill">1</span>
                         </h6>
-                        <!--        <div class="slimscroll notification-list">
-                        
-                            <a href="#" class="dropdown-item py-3">
-                                <small class="float-right text-muted pl-2">2 min ago</small>
+                        <div class="slimscroll notification-list">
+                        <?php if ($session->get('id_tipo_empleado') == 1 && !$qr): ?>
+                            <a target="_blank"
+                                href="<?php echo base_url('index.php/Principal/imprimer_qr/' . $session->get('no_empleado')); ?>"
+                                class="dropdown-item py-3">
+                                <small class="float-right text-muted pl-2"></small>
                                 <div class="media">
                                     <div class="avatar-md bg-primary">
-                                        <i class="la la-cart-arrow-down text-white"></i>
+                                        <i class="la la-qrcode text-white"></i>
                                     </div>
                                     <div class="media-body align-self-center ml-2 text-truncate">
-                                        <h6 class="my-0 font-weight-normal text-dark">Your order is placed</h6>
-                                        <small class="text-muted mb-0">Dummy text of the printing and industry.</small>
+                                        <h6 class="my-0 font-weight-normal text-dark">Código QR</h6>
+                                        <small class="text-muted mb-0">Asistencia por QR</small>
                                     </div>
-         
                                 </div>
-
                             </a>
-                        </div> -->
+                        <?php endif; ?>
+                        </div>
 
                     </div>
                 </li>
@@ -655,7 +656,8 @@
                                 class="rounded-circle" />
                         <?php endif; ?>
                         <?php if ($session->foto): ?>
-                            <img src="<?php echo base_url() . $session->foto ?>" alt="profile-user" class="rounded-circle" />
+                            <img src="<?php echo base_url() . $session->foto ?>" alt="profile-user"
+                                class="rounded-circle" />
                         <?php endif; ?>
                         <span class="ml-1 nav-user-name hidden-sm"><?= $session->nombre_completo ?>
                             <i class="mdi mdi-chevron-down"></i>
@@ -863,114 +865,123 @@
     </div>
     <!--fin modal -->
 
-  <div class="modal modal-rightbar fade" tabindex="-1" role="dialog" aria-labelledby="MetricaRightbar" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title mt-0" id="MetricaRightbar">Accesibilidad</h5>
-                <button type="button" class="btn btn-sm btn-soft-primary btn-circle btn-square" data-dismiss="modal" aria-hidden="true">
-                    <i class="mdi mdi-close"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="tab-content">
-                    <div class="activity">
-                        <!-- Aumentar Texto -->
-                        <div class="activity-info">
-                            <div class="icon-info-activity">
-                                <i class="mdi dripicons-preview bg-soft-success"></i>
-                            </div>
-                            <div class="activity-info-text mb-2">
-                                <div class="mb-1">
-                                    <a href="javascript:void(0)" class="m-0 w-75 accessibility-option" data-action="increase-text">A++</a>
-                                </div>
-                                <p class="text-muted mb-2 text-truncate">Aumentar de Texto.</p>
-                            </div>
-                        </div>
-                        
-                        <!-- Disminuir Texto -->
-                        <div class="activity-info">
-                            <div class="icon-info-activity">
-                                <i class="mdi dripicons-preview bg-soft-pink"></i>
-                            </div>
-                            <div class="activity-info-text mb-2">
-                                <div class="mb-1">
-                                    <a href="javascript:void(0)" class="m-0 w-75 accessibility-option" data-action="decrease-text">A--</a>
-                                </div>
-                                <p class="text-muted mb-2 text-truncate">Disminuir Texto</p>
-                            </div>
-                        </div>
-                        
-                        <!-- Escala de Grises -->
-                        <div class="activity-info">
-                            <div class="icon-info-activity">
-                                <i class="mdi mdi-postage-stamp bg-soft-purple"></i>
-                            </div>
-                            <div class="activity-info-text mb-2">
-                                <div class="mb-1">
-                                    <a href="javascript:void(0)" class="m-0 w-75 accessibility-option" data-action="toggle-grayscale">Escala de Grises</a>
-                                </div>
-                                <p class="text-muted mb-2 text-truncate">Matices de gris</p>
-                            </div>
-                        </div>
-
-                        <!-- Fondo Claro -->
-                        <div class="activity-info">
-                            <div class="icon-info-activity">
-                                <i class="mdi mdi-check-network-outline"></i>
-                            </div>
-                            <div class="activity-info-text mb-2">
-                                <div class="mb-1">
-                                    <a href="javascript:void(0)" class="m-0 w-75 accessibility-option" data-action="normal-contrast">Fondo Claro</a>
-                                </div>
-                                <p class="text-muted mb-2 text-truncate">Contraste Positivo</p>
-                            </div>
-                        </div>
-                        
-                        <!-- Fondo Oscuro -->
-                        <div class="activity-info">
-                            <div class="icon-info-activity">
-                                <i class="mdi mdi-check-network"></i>
-                            </div>
-                            <div class="activity-info-text mb-2">
-                                <div class="mb-1">
-                                    <a href="javascript:void(0)" class="m-0 w-75 accessibility-option" data-action="high-contrast">Fondo Oscuro</a>
-                                </div>
-                                <p class="text-muted mb-2 text-truncate">Contraste Negativo</p>
-                            </div>
-                        </div>
-                        
-                        <!-- Fuente Legible -->
-                        <div class="activity-info">
-                            <div class="icon-info-activity">
-                                <i class="mdi dripicons-zoom-in bg-soft-success"></i>
-                            </div>
-                            <div class="activity-info-text mb-2">
-                                <div class="mb-1">
-                                    <a href="javascript:void(0)" class="m-0 w-75 accessibility-option" data-action="readable-font">Fuente Legible</a>
-                                </div>
-                                <p class="text-muted mb-2 text-truncate">Fuente strong</p>
-                            </div>
-                        </div>
-                        
-                        <!-- Restablecer -->
-                        <div class="activity-info">
-                            <div class="icon-info-activity">
-                                <i class="mdi mdi-refresh bg-soft-warning"></i>
-                            </div>
-                            <div class="activity-info-text mb-2">
-                                <div class="mb-1">
-                                    <a href="javascript:void(0)" class="m-0 w-75 accessibility-option" data-action="reset-all">Restablecer</a>
-                                </div>
-                                <p class="text-muted mb-2 text-truncate">Configuración original</p>
-                            </div>
-                        </div>
-                    </div><!--end activity-->
+    <div class="modal modal-rightbar fade" tabindex="-1" role="dialog" aria-labelledby="MetricaRightbar"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title mt-0" id="MetricaRightbar">Accesibilidad</h5>
+                    <button type="button" class="btn btn-sm btn-soft-primary btn-circle btn-square" data-dismiss="modal"
+                        aria-hidden="true">
+                        <i class="mdi mdi-close"></i>
+                    </button>
                 </div>
-            </div><!--end modal-body-->
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+                <div class="modal-body">
+                    <div class="tab-content">
+                        <div class="activity">
+                            <!-- Aumentar Texto -->
+                            <div class="activity-info">
+                                <div class="icon-info-activity">
+                                    <i class="mdi dripicons-preview bg-soft-success"></i>
+                                </div>
+                                <div class="activity-info-text mb-2">
+                                    <div class="mb-1">
+                                        <a href="javascript:void(0)" class="m-0 w-75 accessibility-option"
+                                            data-action="increase-text">A++</a>
+                                    </div>
+                                    <p class="text-muted mb-2 text-truncate">Aumentar de Texto.</p>
+                                </div>
+                            </div>
+
+                            <!-- Disminuir Texto -->
+                            <div class="activity-info">
+                                <div class="icon-info-activity">
+                                    <i class="mdi dripicons-preview bg-soft-pink"></i>
+                                </div>
+                                <div class="activity-info-text mb-2">
+                                    <div class="mb-1">
+                                        <a href="javascript:void(0)" class="m-0 w-75 accessibility-option"
+                                            data-action="decrease-text">A--</a>
+                                    </div>
+                                    <p class="text-muted mb-2 text-truncate">Disminuir Texto</p>
+                                </div>
+                            </div>
+
+                            <!-- Escala de Grises -->
+                            <div class="activity-info">
+                                <div class="icon-info-activity">
+                                    <i class="mdi mdi-postage-stamp bg-soft-purple"></i>
+                                </div>
+                                <div class="activity-info-text mb-2">
+                                    <div class="mb-1">
+                                        <a href="javascript:void(0)" class="m-0 w-75 accessibility-option"
+                                            data-action="toggle-grayscale">Escala de Grises</a>
+                                    </div>
+                                    <p class="text-muted mb-2 text-truncate">Matices de gris</p>
+                                </div>
+                            </div>
+
+                            <!-- Fondo Claro -->
+                            <div class="activity-info">
+                                <div class="icon-info-activity">
+                                    <i class="mdi mdi-check-network-outline"></i>
+                                </div>
+                                <div class="activity-info-text mb-2">
+                                    <div class="mb-1">
+                                        <a href="javascript:void(0)" class="m-0 w-75 accessibility-option"
+                                            data-action="normal-contrast">Fondo Claro</a>
+                                    </div>
+                                    <p class="text-muted mb-2 text-truncate">Contraste Positivo</p>
+                                </div>
+                            </div>
+
+                            <!-- Fondo Oscuro -->
+                            <div class="activity-info">
+                                <div class="icon-info-activity">
+                                    <i class="mdi mdi-check-network"></i>
+                                </div>
+                                <div class="activity-info-text mb-2">
+                                    <div class="mb-1">
+                                        <a href="javascript:void(0)" class="m-0 w-75 accessibility-option"
+                                            data-action="high-contrast">Fondo Oscuro</a>
+                                    </div>
+                                    <p class="text-muted mb-2 text-truncate">Contraste Negativo</p>
+                                </div>
+                            </div>
+
+                            <!-- Fuente Legible -->
+                            <div class="activity-info">
+                                <div class="icon-info-activity">
+                                    <i class="mdi dripicons-zoom-in bg-soft-success"></i>
+                                </div>
+                                <div class="activity-info-text mb-2">
+                                    <div class="mb-1">
+                                        <a href="javascript:void(0)" class="m-0 w-75 accessibility-option"
+                                            data-action="readable-font">Fuente Legible</a>
+                                    </div>
+                                    <p class="text-muted mb-2 text-truncate">Fuente strong</p>
+                                </div>
+                            </div>
+
+                            <!-- Restablecer -->
+                            <div class="activity-info">
+                                <div class="icon-info-activity">
+                                    <i class="mdi mdi-refresh bg-soft-warning"></i>
+                                </div>
+                                <div class="activity-info-text mb-2">
+                                    <div class="mb-1">
+                                        <a href="javascript:void(0)" class="m-0 w-75 accessibility-option"
+                                            data-action="reset-all">Restablecer</a>
+                                    </div>
+                                    <p class="text-muted mb-2 text-truncate">Configuración original</p>
+                                </div>
+                            </div>
+                        </div><!--end activity-->
+                    </div>
+                </div><!--end modal-body-->
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
     <!-- Top Bar End -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1"></script>
 

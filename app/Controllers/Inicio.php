@@ -44,7 +44,15 @@ class Inicio extends BaseController {
         $data    = array();
         $globas  = new Mglobal;
         $vista = null;
+        $data['qr'] = false;
         $data['eventos']  = "";
+        if($session->id_tipo_empleado ==  1){
+           $qr = $globas->getTabla(['tabla' => 'descarga_qr', 'where' => ['visible' => 1], 'id_usuario' => $session->id_usuario]);
+           if(isset($qr->data) && !empty($qr->data)){
+              $data['qr'] = true;
+           }
+        }
+        
         if(in_array( $session->get('id_perfil'), [1,2,3] )){
            $vista = 'secciones/vInicio';
         }else{
