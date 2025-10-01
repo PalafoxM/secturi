@@ -1037,23 +1037,30 @@
     });
 
     // Inicializar el mapa
-    var map = L.map('map').setView([20.956950, -101.360316], 16); // Coordenadas de Guanajuato, zoom 17
+  // Inicializar el mapa
+var map = L.map('map').setView([20.956950, -101.360316], 17);
 
-    // Añadir capa de OpenStreetMap
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+// Añadir capa de OpenStreetMap
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
 
-    // Añadir marcador
-    var marker = L.marker([20.956950, -101.360316]).addTo(map)
-        .bindPopup('SECTURI')
-        .openPopup();
+// Añadir marcador
+var marker = L.marker([20.956852, -101.359318]).addTo(map)
+    .bindPopup('SECTURI')
+    .openPopup();
 
-    var polygon = L.polygon([
-        [20.956965, -101.364241],
-        [20.958276, -101.358666],
-        [20.954891, -101.359349]
-    ]).addTo(map);
+// Polígono cuadrado con 4 puntos
+var polygon = L.polygon([
+    [20.956852, -101.359318],  // Esquina inferior izquierda
+    [20.957376, -101.359214],  // Esquina superior izquierda
+    [20.957428, -101.359639],  // Esquina superior derecha
+    [20.956904, -101.359743]   // Esquina inferior derecha (nuevo punto)
+], {
+    color: 'blue',
+    fillColor: '#3388ff',
+    fillOpacity: 0.3
+}).addTo(map);
     /* var circle = L.circle([20.956950, -101.360316], {
         color: 'red',
         fillColor: '#f03',
