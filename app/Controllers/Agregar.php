@@ -1064,6 +1064,9 @@ class Agregar extends BaseController
         if (empty($data['usuario'])) {
             throw new Exception("El campo de <strong>usuario</strong> es requerido");
         }
+        if (empty($data['id_jefe_inmediato'])) {
+            throw new Exception("El campo de <strong>Jefe inmediato es requerido</strong> es requerido");
+        }
         if ($data['id_sexo'] == 0) {
             throw new Exception("El campo sexo es requerido");
         }
@@ -1115,8 +1118,8 @@ class Agregar extends BaseController
 
         $dataInsert = [
             'id_sexo' => (int) $data['id_sexo'],
-            'id_jefe_inmediato' => (int) $data['id_jefe_inmediato'],
-            'id_tipo_empleado' => (int) $data['id_tipo_empleado'],
+            'id_jefe_inmediato' => (int)$data['id_jefe_inmediato'],
+            'id_tipo_empleado' => (int)$data['id_tipo_empleado'],
             'id_puesto' => (int) $data['id_puesto'],
             'id_perfil' => (int) $data['id_perfil'],
             'usuario' => $data['usuario'],
@@ -1967,6 +1970,7 @@ class Agregar extends BaseController
 
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaViatico'];
         $result = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+        
         if (!$result->error) {
             $response->error = false;
             $response->respuesta = $result->respuesta;
