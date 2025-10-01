@@ -361,7 +361,7 @@
                                                             </div>
 
                                                             <div class="carousel-item">
-                                                                <a href="<?= base_url() . 'assets/pdf/plantillas/reglas.pdf' ?>"
+                                                                <a href="<?= base_url() . 'assets/pdf/plantillas/reglas2.pdf' ?>"
                                                                     target="_black">
                                                                     <div class="media">
                                                                         <div class="icon-info mb-3">
@@ -409,26 +409,37 @@
                                                             <span class="sr-only">Next</span>
                                                         </a>
                                                     </div>
-                                                    <div class="row my-3">
-                                                        <div class="col-sm-6">
-                                                            <p class="mb-0 text-muted font-13"><i
-                                                                    class="mdi mdi-album mr-2 text-secondary"></i>Avance
-                                                                de SUSI</p>
-                                                        </div><!-- end col-->
-                                                        <div class="col-sm-6">
-                                                            <p class="mb-0 text-muted font-13"><i
-                                                                    class="mdi mdi-album mr-2 text-warning">Termino del
-                                                                    Sistema</i></p>
-                                                        </div><!-- end col-->
-                                                    </div><!-- end row-->
-                                                    <div class="progress bg-warning mb-3" style="height:5px;">
-                                                        <div class="progress-bar bg-secondary" role="progressbar"
-                                                            style="width: 10%" aria-valuenow="10" aria-valuemin="0"
-                                                            aria-valuemax="100"></div>
-                                                    </div>
                                                 </div><!--end card-body-->
                                             </div><!--end card-->
+                                              
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                         <h4 class="mt-0  mb-4">Código de Ética</h4>
+                                                        <div class="blog-card">
+                                                            <div class="ratio ratio-16x9"> <!-- BS5 -->
+                                                                <iframe
+                                                                    src="<?= base_url() ?>assets/pdf/plantillas/Codigo_de_Conducta_SECTUR3.pdf"
+                                                                    title="Código de Conducta" style="border:0" loading="lazy"
+                                                                    width="100%">
+                                                                </iframe>
+                                                            </div>
+                                                            <p class="text-muted text-truncate">PERIODICO OFICIAL DEL GOBIERNO DEL
+                                                                ESTADO DE GUANAJUATO.</p>
+                                                            <hr class="hr-dashed">
+                                                            <div class="d-flex justify-content-between">
+
+                                                                <div class="align-self-center">
+                                                                    <a href="<?= base_url() ?>assets/pdf/plantillas/Codigo_de_Conducta_SECTUR3.pdf"
+                                                                        target="_blank" class="text-primary">Leer más <i
+                                                                            class="fas fa-long-arrow-alt-right"></i></a>
+                                                                </div>
+                                                            </div>
+                                                        </div><!--end blog-card-->
+                                                    </div><!--end card-body-->
+                                                </div><!--end card-->
+                                       
                                         </div> <!--end col-->
+
 
                                         <div class="col-lg-6">
                                             <div class="card">
