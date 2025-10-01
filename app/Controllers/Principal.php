@@ -1875,6 +1875,8 @@ class Principal extends BaseController
             'mascencio@guanajuato.gob.mx',
             'jmazavala@guanajuato.gob.mx',
             'lebalderas@guanajuato.gob.mx',
+            'rantonio@guanajuato.gob.mx',
+            'alvarezp@guanajuato.gob.mx',
             //'palafox.marin@guanajuato.gob.mx',
         ]); 
         $email->setSubject('Recordatorio: Revisión de Asistencias - Sistema SUSI');
@@ -1948,7 +1950,7 @@ class Principal extends BaseController
         ');
 
         // ✅ SOLUCIÓN PARA LA IMAGEN - AGREGAR COMO ADJUNTO EMBEBIDO
-        $logoPath = FCPATH . 'assets/icono_susi.webp';
+        $logoPath = FCPATH . 'assets/pdf/plantillas/ManualSusi.pdf';
         if (file_exists($logoPath)) {
             $email->attach($logoPath);
             $email->setHeader('Content-ID', '<logo_susi>');
