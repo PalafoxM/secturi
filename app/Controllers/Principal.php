@@ -1834,64 +1834,113 @@ class Principal extends BaseController
         $result = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_tipo_empleado' => 1]])->data;
 
         $email->setTo([
-            'palafox.marin31@gmail.com',
-            'palafox.marin@hotmail.com.mx',
+            'alopez@guanajuato.gob.mx',
+            'cchernandezp@guanajuato.gob.mx',
+            'csoto@guanajuato.gob.mx',
+            'emartinezes@guanajuato.gob.mx',
+            'evazquezro@guanajuato.gob.mx',
+            'itzramos@guanajuato.gob.mx',
+            'jmelgar@guanajuato.gob.mx',
+            'jordaz@guanajuato.gob.mx',
+            'kporrasp@guanajuato.gob.mx',
+            'lorozcot@guanajuato.gob.mx',
+            'lsantibanezr@guanajuato.gob.mx',
+            'lvelaga@guanajuato.gob.mx',
+            'mgmena@guanajuato.gob.mx',
+            'rantonio@guanajuato.gob.mx',
+            'sbeltranl@guanajuato.gob.mx',
+            'solvera@guanajuato.gob.mx',
+            'tavaresg@guanajuato.gob.mx',
+            'ygutierrezh@guanajuato.gob.mx',
+            'amendozat@guanajuato.gob.mx',
+            'bmartinez@guanajuato.gob.mx',
+            'crismon@guanajuato.gob.mx',
+            'david.gonzalez@guanajuato.gob.mx',
+            'dhernandezq@guanajuato.gob.mx',
+            'dmontiello@guanajuato.gob.mx',
+            'e.salazarmo@guanajuato.gob.mx',
+            'jacostap@guanajuato.gob.mx',
+            'jrojas@guanajuato.gob.mx',
+            'miguel.salazarc@guanajuato.gob.mx',
+            'mrcarballo@guanajuato.gob.mx',
+            'murrutiac@guanajuato.gob.mx',
+            'negonzalez@guanajuato.gob.mx',
+            'nlandin@guanajuato.gob.mx',
+            'orosas@guanajuato.gob.mx',
+            'tmares@guanajuato.gob.mx',
+            'pcortesvi@guanajuato.gob.mx',
+            'ilianacord@guanajuato.gob.mx',
+            'luis.perez@guanajuato.gob.mx',
+            'rgonzalezva@guanajuato.gob.mx',
+            'mascencio@guanajuato.gob.mx',
+            'jmazavala@guanajuato.gob.mx',
+            'lebalderas@guanajuato.gob.mx',
             //'palafox.marin@guanajuato.gob.mx',
         ]); 
-
-        $email->setSubject('Recordatorio de Revisión de Asistencias - SUSI');
+        $email->setSubject('Recordatorio: Revisión de Asistencias - Sistema SUSI');
         $email->setMessage('
             <!DOCTYPE html>
             <html>
             <head>
                 <meta charset="utf-8">
                 <style>
-                    body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; }
-                    .container { max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-                    .header { background-color: #004080; padding: 20px; text-align: center; }
-                    .content { padding: 30px; color: #333; }
-                    .footer { background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 13px; color: #666; }
-                    .btn { display: inline-block; padding: 12px 24px; background-color: #004080; color: white; text-decoration: none; border-radius: 4px; margin: 15px 0; }
+                    body { font-family: "Segoe UI", Arial, sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px; }
+                    .container { max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+                    .header { background: linear-gradient(135deg, #004080, #0066cc); padding: 25px; text-align: center; }
+                    .content { padding: 35px; color: #333; }
+                    .footer { background-color: #e9ecef; text-align: center; padding: 20px; font-size: 13px; color: #6c757d; line-height: 1.5; }
+                    .btn { display: inline-block; padding: 12px 28px; background: linear-gradient(135deg, #004080, #0066cc); color: white; text-decoration: none; border-radius: 6px; margin: 10px 8px; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 2px 5px rgba(0,64,128,0.3); }
+                    .btn:hover { background: linear-gradient(135deg, #003366, #0052a3); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,64,128,0.4); }
+                    .highlight-box { background-color: #f0f7ff; border-left: 4px solid #004080; padding: 15px; margin: 20px 0; border-radius: 0 8px 8px 0; }
                 </style>
             </head>
             <body>
                 <div class="container">
                     <!-- Encabezado -->
                     <div class="header">
-                        <img src="cid:logo_susi" alt="SUSI - Sistema Unificado SECTURI" style="height: 60px;">
+                        <img src="cid:logo_susi" alt="SUSI - Sistema Unificado SECTURI" style="height: 65px;">
                     </div>
                     
                     <!-- Contenido principal -->
                     <div class="content">
-                        <h1 style="color: #004080; margin-bottom: 20px;">SUSI <strong>ASISTENCIAS</strong></h1>
+                        <h1 style="color: #004080; margin-bottom: 10px; text-align: center;">Recordatorio de Asistencias</h1>
+                        <p style="text-align: center; color: #666; margin-bottom: 25px; font-size: 16px;">Sistema Unificado SECTURI</p>
                         
-                        <p style="font-size: 16px; line-height: 1.6;">Estimado usuario,</p>
+                        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Estimado(a) usuario(a),</p>
                         
-                        <p style="font-size: 16px; line-height: 1.6;">
-                            Le informamos que tiene <strong>asistencias pendientes de revisión</strong> en el sistema SUSI. 
-                            Favor de verificar y validar sus registros de asistencia correspondientes.
+                        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                            Este es un recordatorio <strong>automático</strong> generado por el sistema SUSI para 
+                            solicitar la verificación y validación de sus registros de asistencia.
                         </p>
                         
-                        <p style="font-size: 15px; line-height: 1.6;">
-                            Es importante mantener actualizada su información para un correcto seguimiento de sus actividades laborales.
-                        </p>
-                        
-                        <div style="text-align: center; margin: 25px 0;">
-                            <a href="' . base_url('index.php/Agregar/Asistencia') . '" class="btn" style="color: white; text-decoration: none;">
-                                🔍 Revisar Asistencias
-                            </a>
+                        <div class="highlight-box">
+                            <p style="font-size: 15px; line-height: 1.6; margin: 0;">
+                                <strong>Importante:</strong> Si ya realizó la justificación de sus asistencias, 
+                                el proceso continuará con la validación correspondiente por parte del área competente.
+                            </p>
                         </div>
                         
-                        <p style="font-size: 14px; color: #888; border-top: 1px solid #eee; padding-top: 15px; margin-top: 20px;">
-                            <strong>Nota:</strong> Este correo ha sido generado automáticamente por el sistema SUSI. 
-                            No es necesario responder a este mensaje.
+                        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
+                            Le invitamos a revisar sus registros para asegurar que toda la información esté correcta.
+                        </p>
+                        
+                        <div style="text-align: center; margin: 30px 0;">
+                            <a href="' . base_url('index.php/Agregar/Asistencia') . '" class="btn" style="color: white; text-decoration: none;">
+                                📋 Revisar Asistencias
+                            </a>
+                          
+                        </div>
+                        
+                        <p style="font-size: 14px; color: #666; border-top: 1px solid #dee2e6; padding-top: 20px; margin-top: 25px;">
+                            <strong>Nota:</strong> Este es un mensaje automático generado por el Sistema Unificado SECTURI (SUSI). 
+                            Por favor, no responda a este correo.
                         </p>
                     </div>
                     
                     <!-- Pie de página -->
                     <div class="footer">
-                        © ' . date('Y') . ' Sistema Unificado SECTURI (SUSI).<br>
-                        Todos los derechos reservados - SECTURI Gto.
+                        <strong>© ' . date('Y') . ' Sistema Unificado SECTURI (SUSI)</strong><br>
+                        Todos los derechos reservados - Secretaría de Turismo e Identidad
                     </div>
                 </div>
             </body>

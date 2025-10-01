@@ -413,13 +413,14 @@ class Inicio extends BaseController {
             'tabla' => 'vw_asistencia',
             'where' => ['visible' => 1, 'id_tipo_empleado' => 1]
         ]);
+        //die( var_dump( $cat_usuario   )  );
         $Periodo= ['tabla' => 'cat_periodo', 'where' => ['visible' => 1]];
         $periodo = $principal->getTabla($Periodo);
         $data['periodo']     = (isset($periodo->data) && !empty($periodo->data))?$periodo->data:[];
         // Enviar datos a la vista
         $data['mes']           = date('m');
         $data['cat_usuario']   = $cat_usuario->data ?? [];  
-        //die( var_dump( $data['cat_usuario']   )  );
+        
         $data['scripts']       = ['principal', 'inicio'];
         $data['contentView']   = 'secciones/vSubirAsistencia';
         $this->_renderView($data);
