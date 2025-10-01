@@ -1753,6 +1753,19 @@ class Principal extends BaseController
         $data['contentView'] = 'personal/vPersonal';
         $this->_renderView($data);
     }
+     public function Postulacion($idSexo = null)
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $personal = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['id_sexo' => $idSexo, 'visible' => 1, 'honestidad' => 1]]);
+
+        $data['personal'] = (!empty($personal->data)) ? $personal->data : [];
+   
+        $data['scripts'] = array('inicio');
+
+        $data['contentView'] = 'personal/vPostulacion';
+        $this->_renderView($data);
+    }
     public function incidenciaSubordinado()
     {
         $session = \Config\Services::session();

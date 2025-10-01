@@ -85,6 +85,67 @@
         min-height: 140px;
         /* un poco más que la imagen para textos cortos */
     }
+.float-color-icon {
+    animation: floatAndColor 6s infinite ease-in-out;
+}
+
+@keyframes floatAndColor {
+    /* Fase 1 - Dorado */
+    0% { 
+        transform: translateY(0px);
+        color: #ffc107; /* text-warning */
+    }
+    10% { 
+        transform: translateY(-8px);
+        color: #ffc107;
+    }
+    
+    /* Fase 2 - Azul */
+    20% { 
+        transform: translateY(0px);
+        color: #007bff; /* text-primary */
+    }
+    30% { 
+        transform: translateY(-8px);
+        color: #007bff;
+    }
+    
+    /* Fase 3 - Verde */
+    40% { 
+        transform: translateY(0px);
+        color: #28a745; /* text-success */
+    }
+    50% { 
+        transform: translateY(-8px);
+        color: #28a745;
+    }
+    
+    /* Fase 4 - Rojo/Naranja */
+    60% { 
+        transform: translateY(0px);
+        color: #fd7e14; /* text-orange */
+    }
+    70% { 
+        transform: translateY(-8px);
+        color: #fd7e14;
+    }
+    
+    /* Fase 5 - Púrpura */
+    80% { 
+        transform: translateY(0px);
+        color: #6f42c1; /* text-purple */
+    }
+    90% { 
+        transform: translateY(-8px);
+        color: #6f42c1;
+    }
+    
+    /* Regreso al inicio */
+    100% { 
+        transform: translateY(0px);
+        color: #ffc107;
+    }
+}
 </style>
 <div class="page-wrapper">
 
@@ -107,6 +168,8 @@
                     </div><!--end page-title-box-->
                 </div><!--end col-->
             </div>
+
+
             <!-- end page title end breadcrumb -->
             <div class="row">
                 <div class="col-12">
@@ -131,6 +194,7 @@
                                                 <h5 class="met-user-name"><?= $session->nombre_completo ?></h5>
                                                 <p class="mb-0 met-user-name-post"><?= $datos->dsc_perfil ?></p>
                                             </div>
+                                            
                                         </div>
                                     </div><!--end col-->
                                     <div class="col-lg-4 ml-auto">
@@ -239,65 +303,85 @@
                                 </div><!--end col-->
 
                                 <div class="col-lg-8">
-
-
-
-
-                                    <div class="card dash-info-carousel">
-                                        <div class="card-body">
-                                            <h4 class="mt-0 header-title mb-4">Protocolo ALBA Guanajuato</h4>
-                                            <div id="carousel_2" class="carousel slide" data-ride="carousel">
-                                                <div class="carousel-inner">
-                                                    <?php foreach ($lista_alba as $index => $l): ?>
-                                                        <?php
-                                                        $nombreCompleto = trim(($l->nombre ?? '') . ' ' . ($l->primer_apellido ?? '') . ' ' . ($l->segundo_apellido ?? ''));
-                                                        $foto = !empty($l->foto)
-                                                            ? base_url() . $l->foto
-                                                            : base_url() . 'assets/images/placeholder-xxl.jpg'; // tu placeholder
-                                                        ?>
-                                                        <div class="carousel-item <?= $index === 0 ? 'active' : '' ?>">
-                                                            <div class="media">
-                                                                <img src="<?= $foto ?>"
-                                                                    alt="Foto de <?= htmlspecialchars($nombreCompleto, ENT_QUOTES, 'UTF-8') ?>"
-                                                                    class="thumb-xl mr-3 align-self-center" width="128"
-                                                                    height="128"
-                                                                    loading="<?= $index === 0 ? 'eager' : 'lazy' ?>"
-                                                                    onerror="this.onerror=null;this.src='<?= base_url() ?>assets/images/placeholder-xxl.jpg';">
-                                                                <div class="media-body align-self-center">
-                                                                    <h4 class="mt-0 mb-1 title-text text-dark">
-                                                                        <?= $nombreCompleto ?>
-                                                                    </h4>
-                                                                    <p class="text-muted mb-1"><?= $l->edad; ?> años</p>
-                                                                    <p class="text-muted">Nacionalidad:
-                                                                        <?= $l->nacionalidad; ?>
-                                                                    </p>
-                                                                    <span
-                                                                        class="px-2 py-1 bg-soft-pink d-inline-block">Desaparecida</span>
-                                                                    <a target="_blank" rel="noopener"
-                                                                        href="<?= base_url() . $l->protocolo; ?>"
-                                                                        class="bg-soft-purple px-2 py-1">
-                                                                        <i class="dripicons-preview"></i>
-                                                                    </a>
+                                     <div class="row">
+                                        <div class="col-lg-8">
+                                             <div class="card dash-info-carousel">
+                                                <div class="card-body">
+                                                    <h4 class="mt-0 header-title mb-4">Protocolo ALBA Guanajuato</h4>
+                                                    <div id="carousel_2" class="carousel slide" data-ride="carousel">
+                                                        <div class="carousel-inner">
+                                                            <?php foreach ($lista_alba as $index => $l): ?>
+                                                                <?php
+                                                                $nombreCompleto = trim(($l->nombre ?? '') . ' ' . ($l->primer_apellido ?? '') . ' ' . ($l->segundo_apellido ?? ''));
+                                                                $foto = !empty($l->foto)
+                                                                    ? base_url() . $l->foto
+                                                                    : base_url() . 'assets/images/placeholder-xxl.jpg'; // tu placeholder
+                                                                ?>
+                                                                <div class="carousel-item <?= $index === 0 ? 'active' : '' ?>">
+                                                                    <div class="media">
+                                                                        <img src="<?= $foto ?>"
+                                                                            alt="Foto de <?= htmlspecialchars($nombreCompleto, ENT_QUOTES, 'UTF-8') ?>"
+                                                                            class="thumb-xl mr-3 align-self-center" width="128"
+                                                                            height="128"
+                                                                            loading="<?= $index === 0 ? 'eager' : 'lazy' ?>"
+                                                                            onerror="this.onerror=null;this.src='<?= base_url() ?>assets/images/placeholder-xxl.jpg';">
+                                                                        <div class="media-body align-self-center">
+                                                                            <h4 class="mt-0 mb-1 title-text text-dark">
+                                                                                <?= $nombreCompleto ?>
+                                                                            </h4>
+                                                                            <p class="text-muted mb-1"><?= $l->edad; ?> años</p>
+                                                                            <p class="text-muted">Nacionalidad:
+                                                                                <?= $l->nacionalidad; ?>
+                                                                            </p>
+                                                                            <span
+                                                                                class="px-2 py-1 bg-soft-pink d-inline-block">Desaparecida</span>
+                                                                            <a target="_blank" rel="noopener"
+                                                                                href="<?= base_url() . $l->protocolo; ?>"
+                                                                                class="bg-soft-purple px-2 py-1">
+                                                                                <i class="dripicons-preview"></i>
+                                                                            </a>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
+
+                                                            <?php endforeach; ?>
+
                                                         </div>
-
-                                                    <?php endforeach; ?>
-
+                                                        <a class="carousel-control-prev" href="#carousel_2" role="button"
+                                                            data-slide="prev">
+                                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                            <span class="sr-only">Previous</span>
+                                                        </a>
+                                                        <a class="carousel-control-next" href="#carousel_2" role="button"
+                                                            data-slide="next">
+                                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                            <span class="sr-only">Next</span>
+                                                        </a>
+                                                    </div>
                                                 </div>
-                                                <a class="carousel-control-prev" href="#carousel_2" role="button"
-                                                    data-slide="prev">
-                                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                                    <span class="sr-only">Previous</span>
-                                                </a>
-                                                <a class="carousel-control-next" href="#carousel_2" role="button"
-                                                    data-slide="next">
-                                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                                    <span class="sr-only">Next</span>
-                                                </a>
                                             </div>
+                                        </div><!-- end col-->
+                                        <div class="col-lg-4">
+                                                <div class="card client-card">                               
+                                                    <div class="card-body text-center">                                    
+                                                        <!-- Ícono con animación de flotación y cambio de colores -->
+                                                        <div class="icon-info mb-3">
+                                                            <i class="fas fa-award float-color-icon" 
+                                                            style="font-size: 3rem;">
+                                                            </i>
+                                                        </div>
+                                                        <h5 class="client-name">Postular a la persona</h5> 
+                                                        <span class="text-muted mr-3">
+                                                            <i class="mdi dripicons-gear mr-2 text-info"></i>RECONOCIMIENTO 2025 SECTURI
+                                                        </span>
+                                                        <p class="text-muted text-center mt-3">LA PERSONA SERVIDORA PÚBLICA HONESTA</p>
+                                                        <a href="<?= base_url().'index.php/Principal/Postulacion/1' ?>" class="btn btn-sm btn-soft-secondary">Hombre</a>
+                                                        <a href="<?= base_url().'index.php/Principal/Postulacion/2' ?>"  class="btn btn-sm btn-soft-primary">Mujer</a>
+                                                    </div>
+                                                </div>
                                         </div>
-                                    </div>
+                                    </div><!--end row-->
+                                   
                                     <div class="row">
                                         <div class="col-lg-4">
                                             <div class="card dash-data-card text-center">
@@ -720,6 +804,9 @@
 <script src="<?= base_url() ?>plugins/lightpick/lightpick.js"></script>
 <script src="<?= base_url() ?>assets/pages/jquery.profile.init.js"></script>
 
+<script src="<?= base_url() ?>plugins/hopscotch/hopscotch.js"></script> 
+<script src="<?= base_url() ?>assets/pages/jquery.tour.init.js"></script> 
+
 <!-- Range slider js -->
 <script src="<?= base_url() ?>plugins/ion-rangeslider/ion.rangeSlider.min.js"></script>
 <script src="<?= base_url() ?>assets/pages/jquery.rangeslider.init.js"></script>
@@ -729,6 +816,7 @@
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1"></script>
 <script>
     ini.inicio.formConfiguracion();
+
     $(".range_actividad").each(function () {
         let $input = $(this);
         let idActividad = $input.data("id");
