@@ -1762,9 +1762,41 @@ class Principal extends BaseController
         $data['personal'] = (!empty($personal->data)) ? $personal->data : [];
    
         $data['scripts'] = array('inicio');
-
+        $data['idSexo'] = $idSexo;
         $data['contentView'] = 'personal/vPostulacion';
         $this->_renderView($data);
+    }
+    public function guardarHonestidad()
+    {
+        $session = \Config\Services::session();
+        $principal = new Mglobal;
+        $response = new \stdClass();
+        $response->error =  true;
+        $response->respuesta =  'Error! Error al guardar en la base de datos';
+        $data = $this->request->getPost();
+
+        $dataConfig = [
+            "tabla"=>"registro_honestidad",
+            "editar"=>false,
+
+        ];
+        $dataInsert = [
+            "id_usuario_seleciono" => $data['id_usuario'],
+            "id_principio"         =>  $data['principio'],
+            "id_valor_principio"   => $data['valor'],
+            "usu_reg"              => $session->get('id_usuario'),
+            "fec_reg"              => date('Y-m-d H:i:s')
+        ];
+      
+        $result = $principal->saveTabla($dataInsert,$dataConfig,['id_user' => $session->get('id_usuario'), "script"=>"registro.Honestidad"]);
+      
+        if(!$result->error){
+            $response->error = false;
+            $response->respuesta = $result->respuesta;
+
+        }
+        return $this->respond($response);
+
     }
     public function incidenciaSubordinado()
     {

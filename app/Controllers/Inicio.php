@@ -44,7 +44,17 @@ class Inicio extends BaseController {
         $data    = array();
         $globas  = new Mglobal;
         $vista = null;
+        $votoHombre = false;
+        $votoMujer = false;
         $data['eventos']  = "";
+        $votoH = $globas->getTabla(['tabla' => 'registro_honestidad', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario, 'id_sexo' => 1]]);
+        $votoM = $globas->getTabla(['tabla' => 'registro_honestidad', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario, 'id_sexo' => 2]]);
+        if(isset($votoH->data) && !empty($votoH->data)){
+              $votoHombre = true;
+        }
+        if(isset($votoM->data) && !empty($votoM->data)){
+              $votoMujer = true;
+        }
         if(in_array( $session->get('id_perfil'), [1,2,3] )){
            $vista = 'secciones/vInicio';
         }else{

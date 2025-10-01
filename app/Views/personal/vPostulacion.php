@@ -15,7 +15,7 @@
                                         <li class="breadcrumb-item active">Hombres</li>
                                     </ol>
                                 </div>
-                                <h4 class="page-title">Seleccione un hombre</h4>
+                                <h4 class="page-title">Seleccione <?= ($idSexo == 1)?'un hombre':'una mujer'?></h4>
                             </div><!--end page-title-box-->
                         </div><!--end col-->
                     </div>
@@ -29,9 +29,9 @@
                                     <h5 class=" client-name"><?= $p->nombre_completo?></h5> 
                      
                                     <p class="text-muted text-center mt-3"><?= $p->dsc_area?></p>
-                                    <button type="button" class="btn btn-sm btn-gradient-secondary">Project</button>
-                                    <button type="button" class="btn btn-sm btn-gradient-primary">Message</button>
-                                    <button type="button" class="btn btn-sm btn-gradient-info">Message</button>
+                                    <button type="button" class="btn btn-sm btn-gradient-secondary" onclick="ini.inicio.principios(<?= $p->id_usuario ?>);">Principios</button>
+                                    <button type="button" class="btn btn-sm btn-gradient-primary" onclick="ini.inicio.valores(<?= $p->id_usuario ?>);">Valores</button>
+                                    <button type="button" class="btn btn-sm btn-gradient-info" onclick="ini.inicio.reglas(<?= $p->id_usuario ?>);">Reglas</button>
                                 </div><!--end card-body-->                                                                     
                             </div><!--end card-->
                         </div><!--end col--> 

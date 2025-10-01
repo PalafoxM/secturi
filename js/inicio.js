@@ -1775,6 +1775,145 @@ ini.inicio = (function () {
         });
 
         },
+        principios: function(id_usuario)
+        {
+            Swal.fire({
+                    title: 'Selecciona un Principio',
+                    input: 'select',
+                    inputOptions: {
+                        '1': 'Legalidad',
+                        '2': 'Honradez',
+                        '3': 'Lealtad',
+                        '4': 'Imparcialidad',
+                        '5': 'Eficiencia',
+                        '6': 'Economía',
+                        '7': 'Disciplina',
+                        '8': 'Profesionalismo',
+                        '9': 'Objetividad',
+                        '10': 'Transparencia',
+                        '11': 'Rendición de Cuentas',
+                        '12': 'Competencia pormérito',
+                        '13': 'Eficacia',
+                        '14': 'Integridad',
+                        '15': 'Equidad'
+                    },
+                    inputPlaceholder: 'Selecciona...',
+                    showCancelButton: true,
+                    confirmButtonText: 'Guardar',
+                    cancelButtonText: 'Cancelar',
+                    preConfirm: (value) => {
+                        if (!value) {
+                            Swal.showValidationMessage('Por favor selecciona una opción');
+                        }
+                        return value;
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        console.log('Opción seleccionada:', result.value);
+                        ini.inicio.guardarHonestidad(id_usuario, result.value, 1);
+                    }
+                });
+        },
+        valores: function(id_usuario)
+        {
+            Swal.fire({
+                    title: 'Seleccione un valor',
+                    input: 'select',
+                    inputOptions: {
+                        '1': 'Interés Publico',
+                        '2': 'Respeto',
+                        '3': 'Respeto a los Derechos Humanos',
+                        '4': 'Igualdad y no discriminación',
+                        '5': 'Equidad de Género',
+                        '6': 'Entorno Cultural y Ecológico',
+                        '7': 'Cooperación',
+                        '8': 'Liderazgo'
+                    },
+                    inputPlaceholder: 'Selecciona...',
+                    showCancelButton: true,
+                    confirmButtonText: 'Guardar',
+                    cancelButtonText: 'Cancelar',
+                    preConfirm: (value) => {
+                        if (!value) {
+                            Swal.showValidationMessage('Por favor selecciona una opción');
+                        }
+
+                        return value;
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        console.log('Opción seleccionada:', result.value);
+                       ini.inicio.guardarHonestidad(id_usuario, result.value, 2);
+                    }
+                });
+        },
+        reglas: function(id_usuario)
+        {
+            Swal.fire({
+                    title: 'Selecciona una regla',
+                    input: 'select',
+                    inputOptions: {
+                        '1': 'Actuación pública',
+                        '2': 'Información pública',
+                        '3': 'Contrataciones públicas, Licencias, permisos, autorización y concesiones.',
+                        '4': 'Programas gubernamentales',
+                        '5': 'Trámites y servicios',
+                        '6': 'Recursos humanos',
+                        '7': 'Administración de bines muebles e inmuebles',
+                        '8': 'Procesos de evaluación',
+                        '9': 'Control Interno',
+                        '10': 'Procedimiento administrativo',
+                        '11': 'Desempeño permanente con integridad',
+                        '12': 'Cooperación con la integridad',
+                        '13': 'Comportamiento digno'
+                    },
+                    inputPlaceholder: 'Selecciona...',
+                    showCancelButton: true,
+                    confirmButtonText: 'Guardar',
+                    cancelButtonText: 'Cancelar',
+                    preConfirm: (value) => {
+                        if (!value) {
+                            Swal.showValidationMessage('Por favor selecciona una opción');
+                        }
+                        return value;
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        console.log('Opción seleccionada:', result.value);
+                        ini.inicio.guardarHonestidad(id_usuario, result.value, 3);
+                    }
+                });
+        },
+        guardarHonestidad: function(id_usuario, valor, principio)
+        {
+             $.ajax({
+                    type: "POST",
+                    url: base_url + "index.php/Principal/guardarHonestidad",
+                    data : {id_usuario, valor, principio},
+                    dataType: 'json',
+                    success: function (response) {
+                        console.log(response);
+
+                        if(response.error == false){
+                            Swal.fire("Exitó", response.respuesta, "success");
+                              setTimeout(() => {
+                                 window.location.href = `${base_url}index.php/Inicio`;
+                               }, 1500);
+                                                    
+                        }else{
+                            Swal.fire("Error", response.respuesta , "error"); 
+                            
+                        } 
+                    },
+            
+                    error: function (response,jqXHR, textStatus, errorThrown) {
+                        var res= JSON.parse (response.responseText);
+                       $('#btnComentario').prop('disabled', false).html('Guardar'); 
+                        Swal.fire("Error", '<p> '+ res.message + '</p>');  
+                   }
+                });
+
+        },
         formComentario: function()
         {
              $("#formComentario").submit(function (e) {
