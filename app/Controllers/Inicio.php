@@ -47,8 +47,8 @@ class Inicio extends BaseController {
         $votoHombre = false;
         $votoMujer = false;
         $data['eventos']  = "";
-        $votoH = $globas->getTabla(['tabla' => 'registro_honestidad', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario, 'id_sexo' => 1]]);
-        $votoM = $globas->getTabla(['tabla' => 'registro_honestidad', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario, 'id_sexo' => 2]]);
+        $votoH = $globas->getTabla(['tabla' => 'vw_honestidad', 'where' => ['visible' => 1, 'usu_reg' => $session->id_usuario, 'id_sexo' => 1]]);
+        $votoM = $globas->getTabla(['tabla' => 'vw_honestidad', 'where' => ['visible' => 1, 'usu_reg' => $session->id_usuario, 'id_sexo' => 2]]);
         if(isset($votoH->data) && !empty($votoH->data)){
               $votoHombre = true;
         }
@@ -121,6 +121,7 @@ class Inicio extends BaseController {
         }
         $data['votoHombre']      = $votoHombre;
         $data['votoMujer']       = $votoMujer;
+
         $data['tiketNuevo']      = count($tiketNuevo);
         $data['tiketConcluido']  = count($tiketConcluido);
         $data['tiketProceso']    = count($tiketProceso);
