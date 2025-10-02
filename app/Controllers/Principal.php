@@ -2015,7 +2015,7 @@ class Principal extends BaseController
         ');
 
         // ✅ SOLUCIÓN PARA LA IMAGEN - AGREGAR COMO ADJUNTO EMBEBIDO
-        $logoPath = FCPATH . 'assets/pdf/plantillas/ManualSusi.pdf';
+        $logoPath = FCPATH . 'assets/pdf/plantillas/ManualPersonaSuperior.pdf';
         if (file_exists($logoPath)) {
             $email->attach($logoPath);
             $email->setHeader('Content-ID', '<logo_susi>');
