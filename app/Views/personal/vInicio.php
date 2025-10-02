@@ -388,42 +388,7 @@
                                          <?php endif;?>
                                     </div><!--end row-->
                                    
-                                    <div class="row">
-                                        <div class="col-lg-4">
-                                            <div class="card dash-data-card text-center">
-                                                <div class="card-body">
-                                                    <div class="icon-info mb-3">
-                                                        <i class="fas fa-ticket-alt bg-soft-warning"></i>
-                                                    </div>
-                                                    <h3 class="text-dark"><?= $tiketNuevo ?></h3>
-                                                    <h6 class="font-14 text-dark">Nuevos Tickets</h6>
-                                                </div><!--end card-body-->
-                                            </div><!--end card-->
-                                        </div><!-- end col-->
-                                        <div class="col-lg-4">
-                                            <div class="card dash-data-card text-center">
-                                                <div class="card-body">
-                                                    <div class="icon-info mb-3">
-                                                        <i class="fab fa-codepen bg-soft-pink"></i>
-                                                    </div>
-                                                    <h3 class="text-dark"><?= $tiketProceso ?></h3>
-                                                    <h6 class="font-14 text-dark">Tickets En Proceso</h6>
-                                                </div><!--end card-body-->
-                                            </div><!--end card-->
-                                        </div><!-- end col-->
-                                        <div class="col-lg-4">
-                                            <div class="card dash-data-card text-center">
-                                                <div class="card-body">
-                                                    <div class="icon-info mb-3">
-                                                        <i class="fas fa-check bg-soft-success"></i>
-                                                    </div>
-                                                    <h3 class="text-dark"><?= $tiketConcluido ?></h3>
-                                                    <h6 class="font-14 text-dark">Tikets Concluidos</h6>
-                                                </div><!--end card-body-->
-                                            </div><!--end card-->
-                                        </div><!-- end col-->
-
-                                    </div><!--end row-->
+                                 
                                     <div class="row">
 
                                         <div class="col-lg-6">
@@ -645,6 +610,42 @@
                                     </div><!--end card-->
                                 </div><!--end col-->
                             </div><!--end row-->
+                               <div class="row">
+                                        <div class="col-lg-4">
+                                            <div class="card dash-data-card text-center">
+                                                <div class="card-body">
+                                                    <div class="icon-info mb-3">
+                                                        <i class="fas fa-ticket-alt bg-soft-warning"></i>
+                                                    </div>
+                                                    <h3 class="text-dark"><?= $tiketNuevo ?></h3>
+                                                    <h6 class="font-14 text-dark">Nuevos Tickets</h6>
+                                                </div><!--end card-body-->
+                                            </div><!--end card-->
+                                        </div><!-- end col-->
+                                        <div class="col-lg-4">
+                                            <div class="card dash-data-card text-center">
+                                                <div class="card-body">
+                                                    <div class="icon-info mb-3">
+                                                        <i class="fab fa-codepen bg-soft-pink"></i>
+                                                    </div>
+                                                    <h3 class="text-dark"><?= $tiketProceso ?></h3>
+                                                    <h6 class="font-14 text-dark">Tickets En Proceso</h6>
+                                                </div><!--end card-body-->
+                                            </div><!--end card-->
+                                        </div><!-- end col-->
+                                        <div class="col-lg-4">
+                                            <div class="card dash-data-card text-center">
+                                                <div class="card-body">
+                                                    <div class="icon-info mb-3">
+                                                        <i class="fas fa-check bg-soft-success"></i>
+                                                    </div>
+                                                    <h3 class="text-dark"><?= $tiketConcluido ?></h3>
+                                                    <h6 class="font-14 text-dark">Tikets Concluidos</h6>
+                                                </div><!--end card-body-->
+                                            </div><!--end card-->
+                                        </div><!-- end col-->
+
+                                    </div><!--end row-->
                         </div><!--end education detail-->
 
 
