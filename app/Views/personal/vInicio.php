@@ -304,7 +304,7 @@
 
                                 <div class="col-lg-8">
                                      <div class="row">
-                                        <div class="col-lg-8">
+                                        <div class="<?= (!$votoHombre || !$votoMujer)?'col-lg-8':'col-lg-12' ?>">
                                              <div class="card dash-info-carousel">
                                                 <div class="card-body">
                                                     <h4 class="mt-0 header-title mb-4">Protocolo ALBA Guanajuato</h4>
@@ -361,6 +361,7 @@
                                                 </div>
                                             </div>
                                         </div><!-- end col-->
+                                      <?php if(!$votoHombre || !$votoMujer): ?>
                                         <div class="col-lg-4">
                                                 <div class="card client-card">                               
                                                     <div class="card-body text-center">                                    
@@ -372,14 +373,19 @@
                                                         </div>
                                                         <h5 class="client-name">Postular a la persona</h5> 
                                                         <span class="text-muted mr-3">
-                                                            <i class="mdi dripicons-gear mr-2 text-info"></i>RECONOCIMIENTO 2025 SECTURI
+                                                            RECONOCIMIENTO 2025 SECTURI
                                                         </span>
                                                         <p class="text-muted text-center mt-3">LA PERSONA SERVIDORA PÚBLICA HONESTA</p>
+                                                        <?php if(!$votoHombre): ?>
                                                         <a href="<?= base_url().'index.php/Principal/Postulacion/1' ?>" class="btn btn-sm btn-soft-secondary">Hombre</a>
+                                                       <?php endif;?>
+                                                       <?php if(!$votoMujer): ?>
                                                         <a href="<?= base_url().'index.php/Principal/Postulacion/2' ?>"  class="btn btn-sm btn-soft-primary">Mujer</a>
+                                                       <?php endif;?>
                                                     </div>
                                                 </div>
                                         </div>
+                                         <?php endif;?>
                                     </div><!--end row-->
                                    
                                     <div class="row">

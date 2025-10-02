@@ -1877,8 +1877,29 @@ class Principal extends BaseController
         $globals = new Mglobal;
         $email = \Config\Services::email();
         $result = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_tipo_empleado' => 1]])->data;
-
+        
         $email->setTo([
+            'alopez@guanajuato.gob.mx',
+            'agascag@guanajuato.gob.mx',
+            'ccampos@guanajuato.gob.mx',
+            'cchernandezp@guanajuato.gob.mx',
+            'sandag@guanajuato.gob.mx',
+            'ztorrest@guanajuato.gob.mx',
+            'ajassome@guanajuato.gob.mx',
+            'apenriquez@guanajuato.gob.mx',
+            'crismon@guanajuato.gob.mx',
+            'csoto@guanajuato.gob.mx',
+            'hramirezd@guanajuato.gob.mx',
+            'ialvarezp@guanajuato.gob.mx',
+            'jescobarl@guanajuato.gob.mx',
+            'jpachecocan@guanajuato.gob.mx',
+            'mvallejo@guanajuato.gob.mx',
+            'rgonzalezgu@guanajuato.gob.mx',
+            'yjimenez@guanajuato.gob.mx',
+      
+        ]);  
+
+      /*   $email->setTo([
             'alopez@guanajuato.gob.mx',
             'cchernandezp@guanajuato.gob.mx',
             'csoto@guanajuato.gob.mx',
@@ -1923,7 +1944,7 @@ class Principal extends BaseController
             'rantonio@guanajuato.gob.mx',
             'alvarezp@guanajuato.gob.mx',
             //'palafox.marin@guanajuato.gob.mx',
-        ]); 
+        ]);  */
         $email->setSubject('Recordatorio: Revisión de Asistencias - Sistema SUSI');
         $email->setMessage('
             <!DOCTYPE html>
@@ -1957,23 +1978,22 @@ class Principal extends BaseController
                         
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
                             Este es un recordatorio <strong>automático</strong> generado por el sistema SUSI para 
-                            solicitar la verificación y validación de sus registros de asistencia.
+                            solicitar la verificación y validación de su personal
                         </p>
                         
                         <div class="highlight-box">
                             <p style="font-size: 15px; line-height: 1.6; margin: 0;">
-                                <strong>Importante:</strong> Si ya realizó la justificación de sus asistencias, 
-                                el proceso continuará con la validación correspondiente por parte del área competente.
+                                <strong>Importante:</strong> Recuerda que dispones de 5 días hábiles para completar las validaciones requeridas.
                             </p>
                         </div>
                         
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
-                            Le invitamos a revisar sus registros para asegurar que toda la información esté correcta.
+                            Le invitamos a revisar sus incidencias de su personal.
                         </p>
                         
                         <div style="text-align: center; margin: 30px 0;">
-                            <a href="' . base_url('index.php/Agregar/Asistencia') . '" class="btn" style="color: white; text-decoration: none;">
-                                📋 Revisar Asistencias
+                            <a href="' . base_url('index.php/Principal/incidenciaSubordinado') . '" class="btn" style="color: white; text-decoration: none;">
+                                📋 Revisar Incidencias del Personal
                             </a>
                           
                         </div>

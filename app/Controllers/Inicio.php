@@ -119,10 +119,11 @@ class Inicio extends BaseController {
                  }
 
         }
+        $data['votoHombre']      = $votoHombre;
+        $data['votoMujer']       = $votoMujer;
         $data['tiketNuevo']      = count($tiketNuevo);
         $data['tiketConcluido']  = count($tiketConcluido);
         $data['tiketProceso']    = count($tiketProceso);
-
         $data['actividad']       = (isset($actividad) && !empty($actividad))?$actividad:[];
         $data['configuracion']   = (isset($configuracion[0]) && !empty($configuracion))?$configuracion[0]:'';
         $data['personal']        = $personal;
@@ -138,7 +139,17 @@ class Inicio extends BaseController {
         $session = \Config\Services::session();
         $data    = array();
         $globas  = new Mglobal;
+        $votoHombre = false;
+        $votoMujer = false;
         $vista = 'personal/vInicio';
+         $votoH = $globas->getTabla(['tabla' => 'vw_honestidad', 'where' => ['visible' => 1, 'usu_reg' => $session->id_usuario, 'id_sexo' => 1]]);
+        $votoM = $globas->getTabla(['tabla' => 'vw_honestidad', 'where' => ['visible' => 1, 'usu_reg' => $session->id_usuario, 'id_sexo' => 2]]);
+        if(isset($votoH->data) && !empty($votoH->data)){
+              $votoHombre = true;
+        }
+        if(isset($votoM->data) && !empty($votoM->data)){
+              $votoMujer = true;
+        }
         $mes_actual = date('m');
 
 
@@ -201,13 +212,14 @@ class Inicio extends BaseController {
                  }
 
         }
+        $data['votoHombre']      = $votoHombre;
+        $data['votoMujer']       = $votoMujer;
+       
         $data['tiketNuevo']      = count($tiketNuevo);
         $data['tiketConcluido']  = count($tiketConcluido);
         $data['tiketProceso']    = count($tiketProceso);
         $data['actividad']       = (isset($actividad) && !empty($actividad))?$actividad:[];
         $data['configuracion']   = (isset($configuracion[0]) && !empty($configuracion))?$configuracion[0]:'';
-        //die( var_dump( $data['tiketNuevo']   ) );
-
         $data['personal']   = $personal;
         $data['datos']      = $globas->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario]])->data[0];
         $data['lista_alba'] = $globas->getTabla(['tabla' => 'lista_alba', 'where' => ['visible' => 1]])->data;
@@ -215,6 +227,7 @@ class Inicio extends BaseController {
         $data['edita']      = 0;
         $data['nombre_completo'] = $session->nombre_completo;
         $data['contentView'] =   $vista;
+         //die(json_encode($data));
         $this->_renderView($data);
     }
     public function ListaViaticos()
