@@ -684,8 +684,8 @@ st.agregar = (function () {
             });
         },
         guardarIncidencia: function () {
-            let hora_inicio = $('#timepicker_inicio').val();
-            let hora_fin = $('#timepicker_fin').val();
+            let hora_inicio = $('#hora_inicio').val();
+            let hora_fin = $('#hora_fin').val();
             let tipo_incidencia = $('#tipo_incidencia').val();
             let comentario = $('#comentario').val();
             let detalles = $('#detalles').val();

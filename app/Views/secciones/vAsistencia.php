@@ -216,14 +216,14 @@
                                 <div class="activity-info">
                                     <div class="activity-info-text mb-2">
                                         <label for="timepicker" class="form-label">Hora Inicio</label>
-                                        <input class="form-control" id="timepicker_inicio" name="hora_inicio"
+                                        <input class="form-control" type="time" id="hora_inicio" name="hora_inicio"
                                             placeholder="Inicio">
                                     </div>
                                 </div>
                                 <div class="activity-info">
                                     <div class="activity-info-text mb-2">
                                         <label for="timepicker" class="form-label">Hora Fin</label>
-                                        <input class="form-control" id="timepicker_fin" name="hora_fin"
+                                        <input class="form-control" type="time" id="hora_fin" name="hora_fin"
                                             placeholder="Fin">
                                     </div>
                                 </div>
@@ -608,19 +608,7 @@
 
 
 
-        $('#timepicker_inicio').bootstrapMaterialDatePicker({
-            format: 'HH:mm',
-            date: false,
-            shortTime: true,
-            switchOnClick: true
-        });
 
-        $('#timepicker_fin').bootstrapMaterialDatePicker({
-            format: 'HH:mm',
-            date: false,
-            shortTime: true,
-            switchOnClick: true
-        });
 
         var calendarEl = document.getElementById('calendar');
 
