@@ -422,7 +422,7 @@ class Usuario extends BaseController
 
         $tabla = [
             'tabla' => 'vw_asistencia_incidencia',
-            'where' => ['visible' => 1],
+            'where' => ['visible' => 1, 'id_tipo_empleado' => 1],
             'whereBetween' => [['fecha', $fec_ini, $fec_fin]],
         ];
 
@@ -611,9 +611,9 @@ class Usuario extends BaseController
                 if (preg_match('/^\d{2}:\d{2}:\d{2}$/', $entrada)) {
                     list($hh, $mm, $ss) = explode(':', $entrada);
                     if (($hh * 3600 + $mm * 60 + $ss) > (9 * 3600)) {
-                        $sheet->getStyle($colEntrada . $fila)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFFF5166'); // Rojo
+                        $sheet->getStyle($colEntrada . $fila)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFCC3A1A'); // Rojo
                     } elseif (($hh * 3600 + $mm * 60 + $ss) > (8 * 3600 + 45 * 60)) {
-                        $sheet->getStyle($colEntrada . $fila)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFCC3A1A'); // Rojo oscuro
+                        $sheet->getStyle($colEntrada . $fila)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFFF5166'); // Rojo oscuro
                     }
                 } else if (empty($entrada) && empty($incidenciaTexto)) {
                     $sheet->getStyle($colEntrada . $fila)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFFFFF00'); // Amarillo para ausencias sin justificar
