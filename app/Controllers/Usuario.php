@@ -389,6 +389,7 @@ class Usuario extends BaseController
         $writer->save('php://output');
         exit;
     }
+
     public function reporteIncidenciaExcel2($periodoInicio = null)
     {
         $session = \Config\Services::session();
@@ -429,7 +430,7 @@ class Usuario extends BaseController
         $datos = $globals->getTabla($tabla);
         $resul = (isset($datos->data) && !empty($datos->data)) ? $datos->data : [];
         
-        // 1) Construir lista de fechas del periodo (Lunes a Viernes)
+        // Fechas laborales del periodo
         $start = new \DateTime($fec_ini);
         $end = new \DateTime($fec_fin);
         $end->modify('+1 day');
@@ -443,7 +444,7 @@ class Usuario extends BaseController
             }
         }
 
-        // 2) Agrupar por usuario y por fecha
+        // Agrupar por usuario
         $usuarios = [];
         $cumpleanosUsuarios = [];
 
@@ -466,19 +467,17 @@ class Usuario extends BaseController
                     'incidencias' => []
                 ];
             }
-
-            $tipoRegistro = $r->tipo_registro ?? 'asistencia';
+           
             
-            if ($tipoRegistro === 'asistencia' || $tipoRegistro === 'asistencia_con_incidencia') {
+            if ($r->tipo_registro === 'asistencia') {
                 if (!empty($r->hora_inicio)) $usuarios[$nombre][$fechaYmd]['entrada'] = $r->hora_inicio;
                 if (!empty($r->hora_fin)) $usuarios[$nombre][$fechaYmd]['salida'] = $r->hora_fin;
             }
 
-            // <-- CAMBIO: Almacenamos un objeto con más detalle de la incidencia
-            if (($tipoRegistro === 'incidencia' || $tipoRegistro === 'asistencia_con_incidencia') && isset($r->id_estatus)) {
+            if (($r->tipo_registro === 'incidencia') && isset($r->id_estatus)) {
                 $usuarios[$nombre][$fechaYmd]['incidencias'][] = [
                     'estatus' => $r->id_estatus,
-                    'nombre' => $r->nombre_incidencia ?? 'INCIDENCIA' // Asume que tienes un campo como 'nombre_incidencia'
+                    'nombre' => $r->nombre_incidencia
                 ];
             }
 
@@ -486,7 +485,7 @@ class Usuario extends BaseController
                 $usuarios[$nombre][$fechaYmd]['incidencias'][] = ['estatus' => 3, 'nombre' => 'DÍA FESTIVO'];
             }
         }
-
+        
         foreach ($usuarios as $nombre => $fechas) {
             if (isset($cumpleanosUsuarios[$nombre])) {
                 $cumpleAnioActual = $anio . '-' . date('m-d', strtotime($cumpleanosUsuarios[$nombre]));
@@ -498,43 +497,29 @@ class Usuario extends BaseController
                 }
             }
         }
+        
 
-        // 3) Preparar Spreadsheet
+        // Crear hoja Excel
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setCellValue('A1', '');
         $sheet->setCellValue('A2', 'Nombre');
 
-        // Construir cabeceras por fecha
+        // Cabeceras
         $colIndex = 2;
         foreach ($fechasDelPeriodo as $fecha) {
-            // <-- CAMBIO: Solo 2 columnas por día, no 3
             $colStart = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
             $colEnd   = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 1);
             $fechaFormateada = date('d/m/Y', strtotime($fecha));
-            
-            $colorFondo = null;
-            if (isset($diasFestivosGenerales[$fecha])) {
-                $fechaFormateada .= ' 🎉';
-                $colorFondo = 'FFFFD700';
-            }
-            
+
             $sheet->setCellValue($colStart . '1', $fechaFormateada);
-            $sheet->mergeCells("{$colStart}1:{$colEnd}1"); // <-- CAMBIO: Merge de 2 columnas
-
+            $sheet->mergeCells("{$colStart}1:{$colEnd}1");
             $sheet->setCellValue($colStart . '2', 'Entrada');
-            $sheet->setCellValue($colEnd . '2', 'Salida'); // <-- CAMBIO: La segunda columna ahora es Salida
-
-            if ($colorFondo) {
-                $sheet->getStyle("{$colStart}1:{$colEnd}1")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB($colorFondo);
-                $sheet->getStyle("{$colStart}1:{$colEnd}1")->getFont()->setBold(true);
-            }
-
-            $sheet->getStyle($colStart . '1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-            $colIndex += 2; // <-- CAMBIO: Avanzamos de 2 en 2
+            $sheet->setCellValue($colEnd . '2', 'Salida');
+            $colIndex += 2;
         }
 
-        // 4) Escribir datos por usuario
+        // Cuerpo del reporte
         $fila = 3;
         ksort($usuarios, SORT_STRING);
         foreach ($usuarios as $nombre => $fechas) {
@@ -546,110 +531,102 @@ class Usuario extends BaseController
                 $colSalida  = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 1);
 
                 $dataDia = $usuarios[$nombre][$fecha] ?? ['entrada' => '', 'salida' => '', 'incidencias' => []];
+                
                 $entrada = $dataDia['entrada'];
                 $salida  = $dataDia['salida'];
                 $incArr  = $dataDia['incidencias'];
-                
-                // <-- CAMBIO: Lógica central para decidir qué texto mostrar
+
                 $incidenciaTexto = '';
-                if (!empty($incArr)) {
-                    $textos = [];
+                $colorTexto = null;
+                
+                if (!empty($incArr)) { 
                     foreach ($incArr as $inc) {
-                        if ($inc['estatus'] == 3) { // VALIDADO
-                            $textos[] = strtoupper($inc['nombre']);
-                        } else if ($inc['estatus'] == 1) { // EN PROCESO
-                            $textos[] = 'EN PROCESO';
+                        $nombreInc = strtoupper($inc['nombre']);
+                            var_dump( $nombreInc);
+                        switch ($inc['estatus']) {
+                            case 3: // Aprobado
+                                $incidenciaTexto = $nombreInc;
+                                $colorTexto = 'FF00B050'; // Verde
+                                break;
+                            case 2: // Rechazado
+                                $incidenciaTexto = $nombreInc;
+                                $colorTexto = 'FFFF0000'; // Rojo
+                                break;
+                            case 1: // En proceso
+                                $incidenciaTexto = $nombreInc;
+                                $colorTexto = 'FFFF9900'; // Naranja
+                                break;
                         }
-                        // Omitimos el estatus 2 (DECLINADO) o puedes agregarlo si es necesario
                     }
-                    $incidenciaTexto = implode('; ', array_unique($textos));
                 }
 
                 $valorEntrada = empty($entrada) ? $incidenciaTexto : $entrada;
                 $valorSalida  = empty($salida) ? $incidenciaTexto : $salida;
 
-                // Si ambas horas están presentes, pero hay una incidencia (ej. permiso intermedio), no se muestra la incidencia.
-                // Si quieres que se muestre en otro lado, habría que reconsiderar la lógica.
-                if (!empty($entrada) && !empty($salida)) {
-                    $valorEntrada = $entrada;
-                    $valorSalida = $salida;
-                }
-
                 $sheet->setCellValue($colEntrada . $fila, $valorEntrada);
                 $sheet->setCellValue($colSalida . $fila, $valorSalida);
 
-                // <-- CAMBIO: La lógica de estilos ahora se aplica a las celdas de Entrada/Salida
-               // --- Lógica de Estilos Mejorada ---
-                $esAprobado = false;
-                if (!empty($incArr)) {
-                    foreach ($incArr as $inc) {
-                        if ($inc['estatus'] == 3) {
-                            $esAprobado = true;
-                            break; // Si encontramos una aprobada, es suficiente
+                // Aplicar color de texto si hay incidencia
+                if ($colorTexto) {
+                    $sheet->getStyle($colEntrada . $fila)->getFont()->getColor()->setARGB($colorTexto);
+                    $sheet->getStyle($colSalida . $fila)->getFont()->getColor()->setARGB($colorTexto);
+                }
+
+                // --- Retardos ---
+                if (preg_match('/^\d{2}:\d{2}:\d{2}$/', $entrada)) {
+                    list($hh, $mm, $ss) = explode(':', $entrada);
+                    $seg = $hh * 3600 + $mm * 60 + $ss;
+
+                    // Determinar si el día tiene una incidencia aprobada
+                    $tieneAprobado = false;
+                    if (!empty($incArr)) {
+                        foreach ($incArr as $inc) {
+                            if ($inc['estatus'] == 3) {
+                                $tieneAprobado = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if ($seg >= (8 * 3600 + 46 * 60) && $seg <= (9 * 3600 + 1 * 60)) {
+                        // 08:46:00 a 09:01:00 -> Amarillo (Retardo leve)
+                        $sheet->getStyle($colEntrada . $fila)
+                            ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                            ->getStartColor()->setARGB('FFFFFF00');
+                    } elseif ($seg > (9 * 3600 + 1 * 60)) {
+                        // Después de 09:01:00 -> Rojo solo si no está aprobado
+                        if (!$tieneAprobado) {
+                            $sheet->getStyle($colEntrada . $fila)
+                                ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                ->getStartColor()->setARGB('FFFF0000');
                         }
                     }
                 }
 
-                // Estilo para la celda de ENTRADA
-                if (empty($entrada) && !empty($incidenciaTexto)) {
-                    // Si es estatus 3 (Aprobado) se pinta de VERDE, si no, de NARANJA
-                    $color = $esAprobado ? 'FFC7E8C8' : 'FFFFA500'; 
-                    $sheet->getStyle($colEntrada . $fila)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB($color);
-                    $sheet->getStyle($colEntrada . $fila)->getAlignment()->setWrapText(true);
-                }
 
-                // Estilo para la celda de SALIDA
-                if (empty($salida) && !empty($incidenciaTexto)) {
-                    // Misma lógica: VERDE para aprobado, NARANJA para los demás
-                    $color = $esAprobado ? 'FFC7E8C8' : 'FFFFA500';
-                    $sheet->getStyle($colSalida . $fila)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB($color);
-                    $sheet->getStyle($colSalida . $fila)->getAlignment()->setWrapText(true);
-                }
-
-// ... (El resto de tus estilos para retardo y ausencias se queda igual) ...
-
-                if (preg_match('/^\d{2}:\d{2}:\d{2}$/', $entrada)) {
-                    list($hh, $mm, $ss) = explode(':', $entrada);
-                    if (($hh * 3600 + $mm * 60 + $ss) > (9 * 3600)) {
-                        $sheet->getStyle($colEntrada . $fila)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFCC3A1A'); // Rojo
-                    } elseif (($hh * 3600 + $mm * 60 + $ss) > (8 * 3600 + 45 * 60)) {
-                        $sheet->getStyle($colEntrada . $fila)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFFF5166'); // Rojo oscuro
-                    }
-                } else if (empty($entrada) && empty($incidenciaTexto)) {
-                    $sheet->getStyle($colEntrada . $fila)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFFFFF00'); // Amarillo para ausencias sin justificar
-                }
-                if (empty($salida) && empty($incidenciaTexto)) {
-                    $sheet->getStyle($colSalida . $fila)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFFFFF00'); // Amarillo
-                }
-
-                $colIndex += 2; // <-- CAMBIO: Avanzamos de 2 en 2
+                $colIndex += 2;
             }
             $fila++;
         }
+        die();
 
-        // 5) Ajustar anchos de columna
         $sheet->getColumnDimension('A')->setWidth(40);
-        $totalCols = 1 + (count($fechasDelPeriodo) * 2); // <-- CAMBIO: * 2
+        $totalCols = 1 + (count($fechasDelPeriodo) * 2);
         for ($i = 2; $i <= $totalCols; $i++) {
             $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i);
-            $sheet->getColumnDimension($colLetter)->setWidth(18); // <-- CAMBIO: Un poco más anchas
+            $sheet->getColumnDimension($colLetter)->setWidth(18);
         }
 
-        $lastColLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($totalCols);
-        $sheet->getStyle("A1:{$lastColLetter}2")->getFont()->setBold(true);
-        $sheet->getStyle("A1:{$lastColLetter}1")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-
-        // 6) Descargar archivo
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
         $fileName = 'reporte_asistencias_incidencias_' . date('Ymd_His') . '.xlsx';
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment; filename=\"{$fileName}\"");
         header('Cache-Control: max-age=0');
-
         $writer->save('php://output');
         exit;
     }
+
 
 
     public function getIncidencia()

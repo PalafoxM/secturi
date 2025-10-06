@@ -178,7 +178,8 @@ saeg.principal = (function () {
                         success: function(response) {
                             console.log(response);
                             if (!response.error) {
-                                Swal.fire("Bienvenido!", "Ingresando...", "success");
+                             Swal.fire("¡Acceso correcto!", "Bienvenida, persona servidora pública.", "success");
+
                              /*    if(response.asistencia){
                                     setTimeout(() => {
                                         Swal.fire({

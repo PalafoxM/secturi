@@ -940,8 +940,7 @@
                     ? `${info.event.extendedProps.rango_legible}`
                     : info.event.start.toLocaleDateString();
 
-                console.log(idEstatus);
-                console.log(multiple);
+             
 
                 if (esFestivo) {
                     Swal.fire('Justificado por', info.event.title, "info");
@@ -988,6 +987,7 @@
 
             },
             dayRender: function (info) {
+                console.log(info);
                 const date = info.date;
                 const fechaStr = date.toISOString().split('T')[0];
                 const esRegistro = onlyAsistencias.includes(fechaStr);
@@ -996,8 +996,20 @@
                 info.el.style.backgroundColor = 'rgba(58, 23, 75, 0.1)';
                 info.el.style.border = '1px solid rgba(255, 0, 0, 0.3)';
 
+                const eventosDelDia = info.view.calendar.getEvents().filter(ev => {
+                    const inicio = moment(ev.start);
+                    const fin = ev.end ? moment(ev.end) : inicio;
+                    return moment(date).isBetween(inicio, fin, 'day', '[]'); // '[]' incluye ambos extremos
+                });
+
+
+                // --- Verificar si alguno de los eventos tiene esSemana = true y estatus = 1 ---
+                const tieneSemanaEnProceso = eventosDelDia.some(ev =>
+                    ev.extendedProps.esSemana === true && ev.extendedProps.idEstatus === 3
+                );
+
                 // ======= NUEVO: Bandera para días hábiles pasados sin registros =======
-                if (esHabil(date) && esPasado(date) && !esRegistro && !esFestivo) {
+                if (esHabil(date) && esPasado(date) && !esRegistro && !esFestivo && !tieneSemanaEnProceso) {
                     info.el.classList.add('fc-dia-sin-chequeo');
 
                     // Evita duplicar badge si FullCalendar re-renderiza
