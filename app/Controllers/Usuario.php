@@ -536,33 +536,33 @@ class Usuario extends BaseController
                 $salida  = $dataDia['salida'];
                 $incArr  = $dataDia['incidencias'];
 
-                $incidenciaTexto = '';
                 $colorTexto = null;
+
+                $valorEntrada = $entrada;
+                $valorSalida  = $salida;
                 
                 if (!empty($incArr)) { 
                     foreach ($incArr as $inc) {
                         $nombreInc = strtoupper($inc['nombre']);
-                            var_dump( $nombreInc);
+                            
                         switch ($inc['estatus']) {
                             case 3: // Aprobado
-                                $incidenciaTexto = $nombreInc;
+                                $valorEntrada = $nombreInc;
+                                $valorSalida = $nombreInc;
                                 $colorTexto = 'FF00B050'; // Verde
                                 break;
                             case 2: // Rechazado
-                                $incidenciaTexto = $nombreInc;
                                 $colorTexto = 'FFFF0000'; // Rojo
                                 break;
                             case 1: // En proceso
-                                $incidenciaTexto = $nombreInc;
-                                $colorTexto = 'FFFF9900'; // Naranja
+                                $colorTexto = 'FFFF0000'; // Naranja
                                 break;
                         }
                     }
                 }
 
-                $valorEntrada = empty($entrada) ? $incidenciaTexto : $entrada;
-                $valorSalida  = empty($salida) ? $incidenciaTexto : $salida;
-
+                
+             
                 $sheet->setCellValue($colEntrada . $fila, $valorEntrada);
                 $sheet->setCellValue($colSalida . $fila, $valorSalida);
 
@@ -608,7 +608,7 @@ class Usuario extends BaseController
             }
             $fila++;
         }
-        die();
+     
 
         $sheet->getColumnDimension('A')->setWidth(40);
         $totalCols = 1 + (count($fechasDelPeriodo) * 2);
