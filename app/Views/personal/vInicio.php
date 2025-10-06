@@ -398,7 +398,7 @@
                                                     <div id="carousel_1" class="carousel slide" data-ride="carousel">
                                                         <div class="carousel-inner">
                                                             <div class="carousel-item">
-                                                                <a href="<?= base_url() . 'assets/pdf/plantillas/principios2.pdf' ?>"
+                                                                <a href="<?= base_url() . 'assets/pdf/plantillas/principio.pdf' ?>"
                                                                     target="_black">
                                                                     <div class="media">
                                                                         <div class="icon-info mb-3">
@@ -416,7 +416,7 @@
                                                             </div>
 
                                                             <div class="carousel-item">
-                                                                <a href="<?= base_url() . 'assets/pdf/plantillas/reglas2.pdf' ?>"
+                                                                <a href="<?= base_url() . 'assets/pdf/plantillas/reglas.pdf' ?>"
                                                                     target="_black">
                                                                     <div class="media">
                                                                         <div class="icon-info mb-3">
@@ -433,7 +433,7 @@
                                                             </div>
 
                                                             <div class="carousel-item active">
-                                                                <a href="<?= base_url() . 'assets/pdf/plantillas/valores.pdf' ?>"
+                                                                <a href="<?= base_url() . 'assets/pdf/plantillas/valores2.pdf' ?>"
                                                                     target="_black">
                                                                     <div class="media">
                                                                         <div class="icon-info mb-3">
@@ -500,7 +500,7 @@
                                             <div class="card">
                                                 <div class="card-body">
                                                     <div class="blog-card">
-                                                        <img src="<?= base_url() ?>assets/images/sep3.jpg" alt=""
+                                                        <img src="<?= base_url() ?>assets/images/sep.png" alt=""
                                                             class="img-fluid" />
                                                     </div><!--end blog-card-->
 
