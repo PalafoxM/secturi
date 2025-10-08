@@ -2312,10 +2312,8 @@ class Agregar extends BaseController
             $response->respuesta = 'La hora de fin debe ser mayor a la hora de inicio';
             return $this->respond($response);
         }
-       $fecha =$data['fecha'];
-       $like = [
-                    'fecha' => "%$fecha%",
-                ];
+        $fecha =$data['fecha'];
+        $like = ['fecha' => "%$fecha%"];
         $dataDB = array('tabla' => 'sala_junta', 'where' => ['visible' => 1, 'sala'=>$data['sala'], 'hora_inicio' => $data['hora_inicio'], 'hora_fin' => $data['hora_fin'] ], 'orlike' => $like, );
         $response = $globals->getTabla($dataDB);
         if(isset( $response->data) && !empty( $response->data)){
