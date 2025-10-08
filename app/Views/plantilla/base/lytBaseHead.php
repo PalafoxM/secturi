@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <title>SUSI</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta content="Sistema de Administración de Capacitación" name="description" />
+    <meta content="Sistema Unificado SECTURI" name="description" />
     <meta content="SECTURI" name="author" />
 
     <!-- App favicon -->
