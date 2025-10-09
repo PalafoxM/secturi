@@ -556,8 +556,12 @@
                                 href="<?php echo base_url(); ?>index.php/Agregar/ListaAlba">Lista ALBA</a></li>
                         <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Agregar/Denuncia">Denuncia</a></li>
+                        <?php if(in_array($session->id_perfil, [1,6])): ?>
                         <li class="nav-item"><a class="nav-link"
-                                href="<?php echo base_url(); ?>index.php/Agregar/Inventario">Inventario</a></li>
+                                href="<?php echo base_url(); ?>index.php/Agregar/Ganadores">Ganadores</a></li>
+                        <?php endif ?>
+               <!--          <li class="nav-item"><a class="nav-link"
+                                href="<?php echo base_url(); ?>index.php/Agregar/Inventario">Inventario</a></li> -->
                         <!--   <li class="nav-item"><a class="nav-link" href="<?php echo base_url(); ?>index.php/Agregar/vTiketDisenio">Tickets Diseño</a></li> -->
                         <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Agregar/aboutSusi">sobre SUSI</a></li>

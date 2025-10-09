@@ -1192,6 +1192,18 @@ class Agregar extends BaseController
         $data['contentView'] = 'personal/vDirectorio';
         $this->_renderView($data);
     }
+    public function Ganadores()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $data = array();
+        $tabla = array('tabla' => 'vw_honestidad', 'where' => ['visible' => 1]);
+        $usuario = $globals->getTabla($tabla);
+        $data['scripts'] = array('inicio');
+        $data['usuario'] = isset($usuario->data) && !empty($usuario->data) ? $usuario->data : [];
+        $data['contentView'] = 'personal/vGanadores';
+        $this->_renderView($data);
+    }
     function validarCampo($valor, $nombreCampo)
     {
         // $pattern = "/^([a-zA-Z 0-9]+)$/";
