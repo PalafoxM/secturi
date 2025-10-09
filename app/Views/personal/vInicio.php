@@ -424,7 +424,7 @@
                                                 </div>
                                             </div>
                                         <?php endif; ?>
-                                        <?php if ($votoHombre || $votoMujer): ?>
+                                        <?php if ($votoHombre && $votoMujer): ?>
                                             <div class="col-lg-4">
                                                 <div class="card">
                                                     <div class="card-body">

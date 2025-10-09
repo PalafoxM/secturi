@@ -26,7 +26,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-lg-6">
-                                    <img src="<?= base_url()?>assets/images/products/img-7.png" alt="" class=" mx-auto  d-block"
+                                    <img src="<?= base_url()?>assets/pacheco.png" alt="" class=" mx-auto  d-block"
                                         height="400">
                                 </div><!--end col-->
                                 <div class="col-lg-6 align-self-center">
@@ -41,6 +41,12 @@
                                         <ul class="list-unstyled pro-features border-0">
                                             <li>jpachecocan@guanajuato.gob.mx</li>
                                         </ul>
+                                        <h4 >¿Qué es la figura Ombudsperson?</h4>
+                                        <p class="text-muted mb-0">
+                                            Es una figura unipersonal defensora de los derechos humanos, imparcial, apolítica y
+                                             mediadora dentro del mecanismo para prevenir, atender y sancionar las prácticas de discriminación y
+                                             violencia laboral dentro del centro de trabajo.
+                                        </p>
                                      
                                     </div>
                                 </div><!--end col-->
@@ -54,48 +60,48 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-body">
-                            <div class="row">
-                                <div class="col-lg-3">
-                                    <div class="pro-order-box">
-                                        <i class="mdi mdi-truck-fast text-success"></i>
-                                        <h4 class="header-title">Fast Delivery</h4>
-                                        <p class="text-muted mb-0">
-                                            It is a long established fact that a reader will be distracted.
-                                            Contrary to popular belief.
-                                        </p>
-                                    </div>
-                                </div><!--end col-->
-                                <div class="col-lg-3">
-                                    <div class="pro-order-box">
-                                        <i class="mdi mdi-refresh text-danger"></i>
-                                        <h4 class="header-title">Returns in 30 Days</h4>
-                                        <p class="text-muted mb-0">
-                                            It is a long established fact that a reader will be distracted.
-                                            Contrary to popular belief.
-                                        </p>
-                                    </div>
-                                </div><!--end col-->
-                                <div class="col-lg-3">
-                                    <div class="pro-order-box">
-                                        <i class="mdi mdi-headset text-warning"></i>
-                                        <h4 class="header-title">Online Support 24/7</h4>
-                                        <p class="text-muted mb-0">
-                                            It is a long established fact that a reader will be distracted.
-                                            Contrary to popular belief.
-                                        </p>
-                                    </div>
-                                </div><!--end col-->
-                                <div class="col-lg-3">
-                                    <div class="pro-order-box mb-0">
-                                        <i class="mdi mdi-wallet text-purple"></i>
-                                        <h4 class="header-title">Secure Payment</h4>
-                                        <p class="text-muted mb-0">
-                                            It is a long established fact that a reader will be distracted.
-                                            Contrary to popular belief.
-                                        </p>
-                                    </div>
-                                </div><!--end col-->
-                            </div><!--end row-->
+                           <div class="row">
+                            <div class="col-lg-3">
+                                <div class="pro-order-box">
+                                    <i class="mdi mdi-shield-account text-success"></i>
+                                    <h4 class="header-title">1</h4>
+                                    <p class="text-muted mb-0">
+                                        Proteger los derechos humanos de las personas servidoras públicas
+                                    </p>
+                                </div>
+                            </div><!--end col-->
+
+                            <div class="col-lg-3">
+                                <div class="pro-order-box">
+                                    <i class="mdi mdi-alert-circle-check text-danger"></i>
+                                    <h4 class="header-title">2</h4>
+                                    <p class="text-muted mb-0">
+                                        Hacer del conocimiento del Comité las quejas que se presenten
+                                    </p>
+                                </div>
+                            </div><!--end col-->
+
+                            <div class="col-lg-3">
+                                <div class="pro-order-box">
+                                    <i class="mdi mdi-hand-heart text-warning"></i>
+                                    <h4 class="header-title">3</h4>
+                                    <p class="text-muted mb-0">
+                                        Orientar a la víctima cuando se advierta alguna acción contraria a la Ley de Responsabilidades Administrativas
+                                    </p>
+                                </div>
+                            </div><!--end col-->
+
+                            <div class="col-lg-3">
+                                <div class="pro-order-box mb-0">
+                                    <i class="mdi mdi-gavel text-purple"></i>
+                                    <h4 class="header-title">4</h4>
+                                    <p class="text-muted mb-0">
+                                        Garantizar la adecuada implementación del Protocolo para Prevenir y Atender la Violencia Laboral, el Acoso y el Hostigamiento Sexual en la Administración Pública del Estado de Guanajuato
+                                    </p>
+                                </div>
+                            </div><!--end col-->
+                        </div><!--end row-->
+
                         </div><!--end card-body-->
                     </div><!--end card-->
                 </div><!--end col-->
