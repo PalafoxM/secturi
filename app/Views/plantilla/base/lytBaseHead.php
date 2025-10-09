@@ -561,6 +561,8 @@
                         <!--   <li class="nav-item"><a class="nav-link" href="<?php echo base_url(); ?>index.php/Agregar/vTiketDisenio">Tickets Diseño</a></li> -->
                         <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Agregar/aboutSusi">sobre SUSI</a></li>
+                        <li class="nav-item"><a class="nav-link"
+                                href="<?php echo base_url(); ?>index.php/Principal/Ombudsperson">Ombudsperson</a></li>
                     </ul>
                 </div><!-- end Pages -->
                 <div id="MetricaAuthentication" class="main-icon-menu-pane">

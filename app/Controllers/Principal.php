@@ -1511,6 +1511,14 @@ class Principal extends BaseController
         $data['contentView'] = 'personal/vBitacora';
         $this->_renderView($data);
     }
+    public function Ombudsperson()
+    {
+     
+        $data['scripts'] = array('inicio');
+        $data['contentView'] = 'personal/vOmbudsperson';
+        $this->_renderView($data);
+
+    }
     public function actualizarBanco()
     {
         $session = \Config\Services::session();

@@ -85,67 +85,79 @@
         min-height: 140px;
         /* un poco más que la imagen para textos cortos */
     }
-.float-color-icon {
-    animation: floatAndColor 6s infinite ease-in-out;
-}
 
-@keyframes floatAndColor {
-    /* Fase 1 - Dorado */
-    0% { 
-        transform: translateY(0px);
-        color: #ffc107; /* text-warning */
+    .float-color-icon {
+        animation: floatAndColor 6s infinite ease-in-out;
     }
-    10% { 
-        transform: translateY(-8px);
-        color: #ffc107;
+
+    @keyframes floatAndColor {
+
+        /* Fase 1 - Dorado */
+        0% {
+            transform: translateY(0px);
+            color: #ffc107;
+            /* text-warning */
+        }
+
+        10% {
+            transform: translateY(-8px);
+            color: #ffc107;
+        }
+
+        /* Fase 2 - Azul */
+        20% {
+            transform: translateY(0px);
+            color: #007bff;
+            /* text-primary */
+        }
+
+        30% {
+            transform: translateY(-8px);
+            color: #007bff;
+        }
+
+        /* Fase 3 - Verde */
+        40% {
+            transform: translateY(0px);
+            color: #28a745;
+            /* text-success */
+        }
+
+        50% {
+            transform: translateY(-8px);
+            color: #28a745;
+        }
+
+        /* Fase 4 - Rojo/Naranja */
+        60% {
+            transform: translateY(0px);
+            color: #fd7e14;
+            /* text-orange */
+        }
+
+        70% {
+            transform: translateY(-8px);
+            color: #fd7e14;
+        }
+
+        /* Fase 5 - Púrpura */
+        80% {
+            transform: translateY(0px);
+            color: #6f42c1;
+            /* text-purple */
+        }
+
+        90% {
+            transform: translateY(-8px);
+            color: #6f42c1;
+        }
+
+        /* Regreso al inicio */
+        100% {
+            transform: translateY(0px);
+            color: #ffc107;
+        }
     }
-    
-    /* Fase 2 - Azul */
-    20% { 
-        transform: translateY(0px);
-        color: #007bff; /* text-primary */
-    }
-    30% { 
-        transform: translateY(-8px);
-        color: #007bff;
-    }
-    
-    /* Fase 3 - Verde */
-    40% { 
-        transform: translateY(0px);
-        color: #28a745; /* text-success */
-    }
-    50% { 
-        transform: translateY(-8px);
-        color: #28a745;
-    }
-    
-    /* Fase 4 - Rojo/Naranja */
-    60% { 
-        transform: translateY(0px);
-        color: #fd7e14; /* text-orange */
-    }
-    70% { 
-        transform: translateY(-8px);
-        color: #fd7e14;
-    }
-    
-    /* Fase 5 - Púrpura */
-    80% { 
-        transform: translateY(0px);
-        color: #6f42c1; /* text-purple */
-    }
-    90% { 
-        transform: translateY(-8px);
-        color: #6f42c1;
-    }
-    
-    /* Regreso al inicio */
-    100% { 
-        transform: translateY(0px);
-        color: #ffc107;
-    }
-}
 </style>
 <div class="page-wrapper">
 
@@ -194,7 +206,7 @@
                                                 <h5 class="met-user-name"><?= $session->nombre_completo ?></h5>
                                                 <p class="mb-0 met-user-name-post"><?= $datos->dsc_perfil ?></p>
                                             </div>
-                                            
+
                                         </div>
                                     </div><!--end col-->
                                     <div class="col-lg-4 ml-auto">
@@ -303,9 +315,9 @@
                                 </div><!--end col-->
 
                                 <div class="col-lg-8">
-                                     <div class="row">
-                                        <div class="<?= (!$votoHombre || !$votoMujer)?'col-lg-8':'col-lg-12' ?>">
-                                             <div class="card dash-info-carousel">
+                                    <div class="row">
+                                        <div class="col-lg-8">
+                                            <div class="card dash-info-carousel">
                                                 <div class="card-body">
                                                     <h4 class="mt-0 header-title mb-4">Protocolo ALBA Guanajuato</h4>
                                                     <div id="carousel_2" class="carousel slide" data-ride="carousel">
@@ -317,19 +329,21 @@
                                                                     ? base_url() . $l->foto
                                                                     : base_url() . 'assets/images/placeholder-xxl.jpg'; // tu placeholder
                                                                 ?>
-                                                                <div class="carousel-item <?= $index === 0 ? 'active' : '' ?>">
+                                                                <div
+                                                                    class="carousel-item <?= $index === 0 ? 'active' : '' ?>">
                                                                     <div class="media">
                                                                         <img src="<?= $foto ?>"
                                                                             alt="Foto de <?= htmlspecialchars($nombreCompleto, ENT_QUOTES, 'UTF-8') ?>"
-                                                                            class="thumb-xl mr-3 align-self-center" width="128"
-                                                                            height="128"
+                                                                            class="thumb-xl mr-3 align-self-center"
+                                                                            width="128" height="128"
                                                                             loading="<?= $index === 0 ? 'eager' : 'lazy' ?>"
                                                                             onerror="this.onerror=null;this.src='<?= base_url() ?>assets/images/placeholder-xxl.jpg';">
                                                                         <div class="media-body align-self-center">
                                                                             <h4 class="mt-0 mb-1 title-text text-dark">
                                                                                 <?= $nombreCompleto ?>
                                                                             </h4>
-                                                                            <p class="text-muted mb-1"><?= $l->edad; ?> años</p>
+                                                                            <p class="text-muted mb-1"><?= $l->edad; ?> años
+                                                                            </p>
                                                                             <p class="text-muted">Nacionalidad:
                                                                                 <?= $l->nacionalidad; ?>
                                                                             </p>
@@ -347,48 +361,115 @@
                                                             <?php endforeach; ?>
 
                                                         </div>
-                                                        <a class="carousel-control-prev" href="#carousel_2" role="button"
-                                                            data-slide="prev">
-                                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                        <a class="carousel-control-prev" href="#carousel_2"
+                                                            role="button" data-slide="prev">
+                                                            <span class="carousel-control-prev-icon"
+                                                                aria-hidden="true"></span>
                                                             <span class="sr-only">Previous</span>
                                                         </a>
-                                                        <a class="carousel-control-next" href="#carousel_2" role="button"
-                                                            data-slide="next">
-                                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                        <a class="carousel-control-next" href="#carousel_2"
+                                                            role="button" data-slide="next">
+                                                            <span class="carousel-control-next-icon"
+                                                                aria-hidden="true"></span>
                                                             <span class="sr-only">Next</span>
                                                         </a>
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <a href="<?= base_url()?>assets/pdf/plantillas/Igualdad Laboral_y_No_Discriminación.pdf" target="_blank">
+                                                    <p class="mb-0 header-title">
+                                                        <i class="mdi mdi-charity text-primary"></i>
+                                                        Política de Igualdad Laboral y No Discriminación
+                                                    </p>
+                                                    </a>
+                                                    <a href="<?= base_url()?>assets/pdf/plantillas/Protocolo_para_prevenir.pdf" target="_blank" >
+                                                    <p class="mb-0 header-title mt-2">
+                                                        <i class="mdi mdi-shield-home-outline me-2 text-danger"></i>
+                                                        Protocolo para prevenir y atender la violencia
+                                                    </p>
+                                                    </a>
+                                                </div><!--end card-body-->
+                                            </div>
+
+
                                         </div><!-- end col-->
-                                      <?php if(!$votoHombre || !$votoMujer): ?>
-                                        <div class="col-lg-4">
-                                                <div class="card client-card">                               
-                                                    <div class="card-body text-center">                                    
+                                        <?php if (!$votoHombre || !$votoMujer): ?>
+                                            <div class="col-lg-4">
+                                                <div class="card client-card">
+                                                    <div class="card-body text-center">
                                                         <!-- Ícono con animación de flotación y cambio de colores -->
                                                         <div class="icon-info mb-3">
-                                                            <i class="fas fa-award float-color-icon" 
-                                                            style="font-size: 3rem;">
+                                                            <i class="fas fa-award float-color-icon"
+                                                                style="font-size: 3rem;">
                                                             </i>
                                                         </div>
-                                                        <h5 class="client-name">Postular a la persona</h5> 
+                                                        <h5 class="client-name">Postular a la persona</h5>
                                                         <span class="text-muted mr-3">
                                                             RECONOCIMIENTO 2025 SECTURI
                                                         </span>
-                                                        <p class="text-muted text-center mt-3">LA PERSONA SERVIDORA PÚBLICA HONESTA</p>
-                                                        <?php if(!$votoHombre): ?>
-                                                        <a href="<?= base_url().'index.php/Principal/Postulacion/1' ?>" class="btn btn-sm btn-soft-secondary">Hombre</a>
-                                                       <?php endif;?>
-                                                       <?php if(!$votoMujer): ?>
-                                                        <a href="<?= base_url().'index.php/Principal/Postulacion/2' ?>"  class="btn btn-sm btn-soft-primary">Mujer</a>
-                                                       <?php endif;?>
+                                                        <p class="text-muted text-center mt-3">LA PERSONA SERVIDORA PÚBLICA
+                                                            HONESTA</p>
+                                                        <?php if (!$votoHombre): ?>
+                                                            <a href="<?= base_url() . 'index.php/Principal/Postulacion/1' ?>"
+                                                                class="btn btn-sm btn-soft-secondary">Hombre</a>
+                                                        <?php endif; ?>
+                                                        <?php if (!$votoMujer): ?>
+                                                            <a href="<?= base_url() . 'index.php/Principal/Postulacion/2' ?>"
+                                                                class="btn btn-sm btn-soft-primary">Mujer</a>
+                                                        <?php endif; ?>
                                                     </div>
                                                 </div>
-                                        </div>
-                                         <?php endif;?>
+                                            </div>
+                                        <?php endif; ?>
+                                        <?php if ($votoHombre || $votoMujer): ?>
+                                            <div class="col-lg-4">
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <div class="ribbon4 rib4-warning">
+                                                            <span
+                                                                class="ribbon4-band ribbon4-band-warning text-white text-center">Figura</span>
+                                                        </div><!--end ribbon-->
+                                                        <img src="<?= base_url() ?>/assets/images/fotos/foto_3.png" alt=""
+                                                            class="d-block mx-auto my-4" height="170">
+                                                        <div class="d-flex justify-content-between align-items-center my-4">
+                                                            <div>
+                                                                <p class="text-muted mb-2">Ombudsperson</p>
+
+                                                            </div>
+                                                            <div>
+
+                                                                <ul
+                                                                    class="list-inline mb-0 product-review align-self-center">
+                                                                    <li class="list-inline-item"><i
+                                                                            class="la la-star text-warning font-16"></i>
+                                                                    </li>
+                                                                    <li class="list-inline-item"><i
+                                                                            class="la la-star text-warning font-16 ml-n2"></i>
+                                                                    </li>
+                                                                    <li class="list-inline-item"><i
+                                                                            class="la la-star text-warning font-16 ml-n2"></i>
+                                                                    </li>
+                                                                    <li class="list-inline-item"><i
+                                                                            class="la la-star text-warning font-16 ml-n2"></i>
+                                                                    </li>
+                                                                    <li class="list-inline-item"><i
+                                                                            class="la la-star text-warning font-16 ml-n2"></i>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                        <a href="<?= base_url()?>index.php/Principal/Ombudsperson" class="btn btn-soft-primary btn-block">Javier Pacheco
+                                                            Cano</a>
+                                                    </div><!--end card-body-->
+                                                </div><!--end card-->
+                                            </div>
+                                        <?php endif; ?>
                                     </div><!--end row-->
-                                   
-                                 
+
+
                                     <div class="row">
 
                                         <div class="col-lg-6">
@@ -466,33 +547,34 @@
                                                     </div>
                                                 </div><!--end card-body-->
                                             </div><!--end card-->
-                                              
-                                                <div class="card">
-                                                    <div class="card-body">
-                                                         <h4 class="mt-0  mb-4">Código de Ética</h4>
-                                                        <div class="blog-card">
-                                                            <div class="ratio ratio-16x9"> <!-- BS5 -->
-                                                                <iframe
-                                                                    src="<?= base_url() ?>assets/pdf/plantillas/Codigo_de_Conducta_SECTUR3.pdf"
-                                                                    title="Código de Conducta" style="border:0" loading="lazy"
-                                                                    width="100%">
-                                                                </iframe>
-                                                            </div>
-                                                            <p class="text-muted text-truncate">PERIODICO OFICIAL DEL GOBIERNO DEL
-                                                                ESTADO DE GUANAJUATO.</p>
-                                                            <hr class="hr-dashed">
-                                                            <div class="d-flex justify-content-between">
 
-                                                                <div class="align-self-center">
-                                                                    <a href="<?= base_url() ?>assets/pdf/plantillas/Codigo_de_Conducta_SECTUR3.pdf"
-                                                                        target="_blank" class="text-primary">Leer más <i
-                                                                            class="fas fa-long-arrow-alt-right"></i></a>
-                                                                </div>
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <h4 class="mt-0  mb-4">Código de Ética</h4>
+                                                    <div class="blog-card">
+                                                        <div class="ratio ratio-16x9"> <!-- BS5 -->
+                                                            <iframe
+                                                                src="<?= base_url() ?>assets/pdf/plantillas/Codigo_de_Conducta_SECTUR3.pdf"
+                                                                title="Código de Conducta" style="border:0"
+                                                                loading="lazy" width="100%">
+                                                            </iframe>
+                                                        </div>
+                                                        <p class="text-muted text-truncate">PERIODICO OFICIAL DEL
+                                                            GOBIERNO DEL
+                                                            ESTADO DE GUANAJUATO.</p>
+                                                        <hr class="hr-dashed">
+                                                        <div class="d-flex justify-content-between">
+
+                                                            <div class="align-self-center">
+                                                                <a href="<?= base_url() ?>assets/pdf/plantillas/Codigo_de_Conducta_SECTUR3.pdf"
+                                                                    target="_blank" class="text-primary">Leer más <i
+                                                                        class="fas fa-long-arrow-alt-right"></i></a>
                                                             </div>
-                                                        </div><!--end blog-card-->
-                                                    </div><!--end card-body-->
-                                                </div><!--end card-->
-                                       
+                                                        </div>
+                                                    </div><!--end blog-card-->
+                                                </div><!--end card-body-->
+                                            </div><!--end card-->
+
                                         </div> <!--end col-->
 
 
@@ -610,42 +692,42 @@
                                     </div><!--end card-->
                                 </div><!--end col-->
                             </div><!--end row-->
-                               <div class="row">
-                                        <div class="col-lg-4">
-                                            <div class="card dash-data-card text-center">
-                                                <div class="card-body">
-                                                    <div class="icon-info mb-3">
-                                                        <i class="fas fa-ticket-alt bg-soft-warning"></i>
-                                                    </div>
-                                                    <h3 class="text-dark"><?= $tiketNuevo ?></h3>
-                                                    <h6 class="font-14 text-dark">Nuevos Tickets</h6>
-                                                </div><!--end card-body-->
-                                            </div><!--end card-->
-                                        </div><!-- end col-->
-                                        <div class="col-lg-4">
-                                            <div class="card dash-data-card text-center">
-                                                <div class="card-body">
-                                                    <div class="icon-info mb-3">
-                                                        <i class="fab fa-codepen bg-soft-pink"></i>
-                                                    </div>
-                                                    <h3 class="text-dark"><?= $tiketProceso ?></h3>
-                                                    <h6 class="font-14 text-dark">Tickets En Proceso</h6>
-                                                </div><!--end card-body-->
-                                            </div><!--end card-->
-                                        </div><!-- end col-->
-                                        <div class="col-lg-4">
-                                            <div class="card dash-data-card text-center">
-                                                <div class="card-body">
-                                                    <div class="icon-info mb-3">
-                                                        <i class="fas fa-check bg-soft-success"></i>
-                                                    </div>
-                                                    <h3 class="text-dark"><?= $tiketConcluido ?></h3>
-                                                    <h6 class="font-14 text-dark">Tikets Concluidos</h6>
-                                                </div><!--end card-body-->
-                                            </div><!--end card-->
-                                        </div><!-- end col-->
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="card dash-data-card text-center">
+                                        <div class="card-body">
+                                            <div class="icon-info mb-3">
+                                                <i class="fas fa-ticket-alt bg-soft-warning"></i>
+                                            </div>
+                                            <h3 class="text-dark"><?= $tiketNuevo ?></h3>
+                                            <h6 class="font-14 text-dark">Nuevos Tickets</h6>
+                                        </div><!--end card-body-->
+                                    </div><!--end card-->
+                                </div><!-- end col-->
+                                <div class="col-lg-4">
+                                    <div class="card dash-data-card text-center">
+                                        <div class="card-body">
+                                            <div class="icon-info mb-3">
+                                                <i class="fab fa-codepen bg-soft-pink"></i>
+                                            </div>
+                                            <h3 class="text-dark"><?= $tiketProceso ?></h3>
+                                            <h6 class="font-14 text-dark">Tickets En Proceso</h6>
+                                        </div><!--end card-body-->
+                                    </div><!--end card-->
+                                </div><!-- end col-->
+                                <div class="col-lg-4">
+                                    <div class="card dash-data-card text-center">
+                                        <div class="card-body">
+                                            <div class="icon-info mb-3">
+                                                <i class="fas fa-check bg-soft-success"></i>
+                                            </div>
+                                            <h3 class="text-dark"><?= $tiketConcluido ?></h3>
+                                            <h6 class="font-14 text-dark">Tikets Concluidos</h6>
+                                        </div><!--end card-body-->
+                                    </div><!--end card-->
+                                </div><!-- end col-->
 
-                                    </div><!--end row-->
+                            </div><!--end row-->
                         </div><!--end education detail-->
 
 
@@ -718,7 +800,7 @@
 
         </div><!-- container -->
 
-     
+
     </div>
     <!-- end page content -->
 </div>
@@ -811,8 +893,8 @@
 <script src="<?= base_url() ?>plugins/lightpick/lightpick.js"></script>
 <script src="<?= base_url() ?>assets/pages/jquery.profile.init.js"></script>
 
-<script src="<?= base_url() ?>plugins/hopscotch/hopscotch.js"></script> 
-<script src="<?= base_url() ?>assets/pages/jquery.tour.init.js"></script> 
+<script src="<?= base_url() ?>plugins/hopscotch/hopscotch.js"></script>
+<script src="<?= base_url() ?>assets/pages/jquery.tour.init.js"></script>
 
 <!-- Range slider js -->
 <script src="<?= base_url() ?>plugins/ion-rangeslider/ion.rangeSlider.min.js"></script>
