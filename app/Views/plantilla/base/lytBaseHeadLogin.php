@@ -907,14 +907,14 @@ body.forest-bg #particles-js { display: none; }
   const FOREST_URL = "https://i.pinimg.com/originals/44/6e/3b/446e3b79395a287ca32f7977dd83b290.jpg";
 
   const backgrounds = [
-    base_url + "assets/images/backgrounds/IMG4.jpg",
-    base_url + "assets/images/backgrounds/IMG8.jpg",
-    base_url + "assets/images/backgrounds/IMG10.jpg",
+    base_url + "assets/images/backgrounds/sopenia.webp",
+    base_url + "assets/images/backgrounds/IMG12.JPG",
+    base_url + "assets/images/backgrounds/IMG14.jpg",
     base_url + "assets/images/backgrounds/IMG18.jpg",
     base_url + "assets/images/backgrounds/guanajuato.jpg",
     base_url + "assets/images/backgrounds/subterranea.webp",
-    base_url + "assets/images/backgrounds/leon.jpg",
-    base_url + "assets/images/backgrounds/uni.jpg",
+    base_url + "assets/images/backgrounds/IMG6.jpg",
+    base_url + "assets/images/backgrounds/uni2.jpg",
     FOREST_URL,
   ];
 
