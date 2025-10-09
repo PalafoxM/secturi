@@ -1513,11 +1513,21 @@ class Principal extends BaseController
     }
     public function Ombudsperson()
     {
-     
         $data['scripts'] = array('inicio');
         $data['contentView'] = 'personal/vOmbudsperson';
         $this->_renderView($data);
-
+    }
+    public function ControlInterno()
+    {
+        $data['scripts'] = array('inicio');
+        $data['contentView'] = 'personal/vControlInterno';
+        $this->_renderView($data);
+    }
+    public function ControlInterno2024()
+    {
+        $data['scripts'] = array('inicio');
+        $data['contentView'] = 'personal/vControlInterno2024';
+        $this->_renderView($data);
     }
     public function actualizarBanco()
     {
