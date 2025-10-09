@@ -718,7 +718,7 @@
                                 echo '<i class="mdi mdi-account-card-details font-18"></i> Admin Financieros';
                                 break;
                             case 4:
-                                echo '<i class="mdi mdi-account-card-details font-18"></i> Personal Adminitrativo';
+                                echo '<i class="mdi mdi-account-card-details font-18"></i> Personal Administrativo';
                                 break;
                             case 5:
                                 echo '<i class="mdi mdi-account-card-details font-18"></i> Enlace';
