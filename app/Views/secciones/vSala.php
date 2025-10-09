@@ -691,14 +691,12 @@
                                 //  ini.inicio.obtenerCategorias(); 
 
                             },
+                            complete: function(){
+                             window.location.reload();
+                            },
                             error: function () {
                                 Swal.fire("Error", "Error al guardar comentario.", "error")
                             }
-                        });
-                        Swal.fire({
-                            title: "¡Eliminado!",
-                            text: "El evento ha sido eliminado.",
-                            icon: "success"
                         });
                     }
                 });
