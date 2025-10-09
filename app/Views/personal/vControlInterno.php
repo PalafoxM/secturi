@@ -78,7 +78,7 @@
                   <small class="text-muted">Documento externo (PDF)</small>
                 </div>
                 <div>
-                  <a href="https://secturnet.guanajuato.gob.mx/control-interno/files/LGCI-2022.pdf" target="_blank" class="btn btn-danger"><i class="mdi mdi-open-in-new mr-1"></i> Abrir PDF</a>
+                  <a href="<?=base_url()?>assets/pdf/plantillas/LGCI-2022.pdf" target="_blank" class="btn btn-danger"><i class="mdi mdi-open-in-new mr-1"></i> Abrir PDF</a>
                 </div>
               </div>
             </div>
