@@ -37,7 +37,7 @@
                                         <p class="text-muted mb-0">Ombudsperson</p>
                                    
                                         <h2 class="pro-price">JAVIER PACHECO CANO</h2>
-                                        <h6 class="text-muted font-13">Director General Juridico</h6>
+                                        <h6 class="text-muted font-13">Director General Jurídico</h6>
                                         <ul class="list-unstyled pro-features border-0">
                                             <li>jpachecocan@guanajuato.gob.mx</li>
                                         </ul>
