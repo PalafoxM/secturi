@@ -556,7 +556,7 @@
                                 href="<?php echo base_url(); ?>index.php/Agregar/ListaAlba">Lista ALBA</a></li>
                         <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Agregar/Denuncia">Denuncia</a></li>
-                        <?php if(in_array($session->id_perfil, [1,6])): ?>
+                        <?php if(in_array($session->id_usuario, [1,75])): ?>
                         <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Agregar/Ganadores">Ganadores</a></li>
                         <?php endif ?>

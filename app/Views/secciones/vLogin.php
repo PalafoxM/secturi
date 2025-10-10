@@ -41,13 +41,13 @@
                             <div class="form-horizontal auth-form my-4">
 
                                 <div class="form-group">
-                                    <label for="usuario">Usuario</label>
+                                    <label for="usuario">Persona Usuaria</label>
                                     <div class="input-group mb-3">
                                         <span class="auth-form-icon">
                                             <i class="dripicons-user"></i>
                                         </span>
                                         <input type="text" class="form-control" id="usuario" name="usuario"
-                                            placeholder="Ingresar Usuario">
+                                            placeholder="Ingresar Clave">
                                     </div>
                                 </div>
                                 <!--end form-group-->
@@ -116,7 +116,7 @@
                 </div>
                 <!--end card-->
                 <div class="account-social text-center mt-4">
-                    <h6 class="my-4">   Version 1.5</h6>
+                    <h6 class="my-4">   Version 1.6</h6>
                     <ul class="list-inline mb-4">
                       
                         <!-- <li class="list-inline-item">

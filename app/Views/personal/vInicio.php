@@ -211,8 +211,7 @@
                                     </div><!--end col-->
                                     <div class="col-lg-4 ml-auto">
                                         <ul class="list-unstyled personal-detail">
-                                            <li class=""><i class="dripicons-user mr-2 text-info font-18"></i> <b> No.
-                                                    Emplead<?= ($session->id_sexo == 1) ? 'o' : 'a' ?> </b> :
+                                            <li class=""><i class="dripicons-user mr-2 text-info font-18"></i> <b> No. Personal </b> :
                                                 <?= (!empty($datos->no_empleado)) ? $datos->no_empleado : '' ?>
                                             </li>
                                             <li class="mt-2"><i class="dripicons-mail text-info font-18 mt-2 mr-2"></i>

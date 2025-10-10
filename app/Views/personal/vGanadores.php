@@ -106,6 +106,28 @@
                             </div><!--end card-->
                         </div><!--end col-->                            
                     </div><!--end row-->
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="header-title mt-0 mb-4">HOMBRE</h4>
+                                    <div class="">
+                                        <div id="apex_pie1" class="apex-charts"></div>
+                                    </div>                                        
+                                </div><!--end card-body-->
+                            </div><!--end card-->
+                        </div><!--end col-->
+                        <div class="col-lg-6">
+                              <div class="card">
+                                <div class="card-body">
+                                    <h4 class="header-title mt-0 mb-4">MUJER</h4>
+                                    <div class="">
+                                        <div id="apex_pie2" class="apex-charts"></div>
+                                    </div>                                        
+                                </div><!--end card-body-->
+                            </div><!--end card-->
+                        </div><!--end col-->                            
+                    </div><!--end row-->
 
 
 
@@ -168,7 +190,7 @@
     colors: ["#95a6bf"],
     yaxis: {
         axisBorder: {
-            show: true,
+            show: false,
             color: '#bec7e0',
           },  
           axisTicks: {
@@ -225,7 +247,7 @@ var options = {
     dataLabels: {
         enabled: true,
         formatter: function (val) {
-            return val + "%";
+            return val + "";
         },
         offsetY: -20,
         style: {
@@ -235,7 +257,7 @@ var options = {
     },
     colors: ["#4facfe"],
     series: [{
-        name: 'Inflation',
+        name: 'votos',
         data: [7, 5, 3, 2]
     }],
     xaxis: {
@@ -294,7 +316,7 @@ var options = {
         labels: {
             show: false,
             formatter: function (val) {
-                return val + "%";
+                return val + "";
             }
         }
 
