@@ -68,19 +68,19 @@ st.agregar = (function () {
             let sala = "";
             switch (id) {
                 case 1:
-                    img = `<img src="${base_url + 'assets/images/fotos/alba/salas/salaA'}" class="img-fluid rounded"/>`;
+                    img = `<img src="${base_url + 'assets/images/fotos/alba/salas/salaA.jpg'}" class="img-fluid rounded"/>`;
                     sala = "SALA DE JUNSTAS <strong>A</strong>";
                     break;
                 case 2:
-                    img = `<img src="${base_url + 'assets/images/fotos/alba/salas/salaB'}" class="img-fluid rounded"/>`;
+                    img = `<img src="${base_url + 'assets/images/fotos/alba/salas/salaB.jpg'}" class="img-fluid rounded"/>`;
                     sala = "SALA DE JUNSTAS <strong>B</strong>";
                     break;
                 case 3:
-                    img = `<img src="${base_url + 'assets/images/fotos/alba/salas/salaAB'}" class="img-fluid rounded"/>`;
+                    img = `<img src="${base_url + 'assets/images/fotos/alba/salas/salaAB.jpg'}" class="img-fluid rounded"/>`;
                     sala = "SALA DE JUNSTAS <strong>AB</strong>";
                     break;
                 case 4:
-                    img = `<img src="${base_url + 'assets/images/fotos/alba/salas/salaTI'}" class="img-fluid rounded"/>`;
+                    img = `<img src="${base_url + 'assets/images/fotos/alba/salas/salaTI.jpg'}" class="img-fluid rounded"/>`;
                     sala = "SALA DE JUNSTAS <strong>TI</strong>";
                     break;
 
