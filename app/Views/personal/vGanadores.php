@@ -486,7 +486,7 @@ var options = {
 
     },
     title: {
-        text: 'Monthly Inflation in Argentina, 2002',
+        text: 'Encuesta  Honestidad',
         floating: true,
         offsetY: 350,
         align: 'center',
