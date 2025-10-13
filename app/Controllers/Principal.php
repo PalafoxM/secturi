@@ -3080,12 +3080,22 @@ class Principal extends BaseController
                     'id_director' => $registro_pt->data[0]->id_reponsable_solicitud
                 ]
             ]);
+        
+      
             if (empty($direccion->data)) {
-                $area = $globals->getTabla(['tabla' => 'usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_pt->data[0]->id_reponsable_solicitud]]);
+                $jefe = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_pt->data[0]->id_reponsable_solicitud]]);
+                if(!empty($jefe->data)){
+                $idJefe = $jefe->data[0]->id_jefe_inmediato;
+                $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_director' => $idJefe]]);
+                }else{
+                $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_pt->data[0]->id_reponsable_solicitud]]);
                 $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_area' => $area->data[0]->id_area]]);
+                }
+            
             }
              //die( var_dump($registro_pt->data[0]) );
-            $folio = $direccion; //ESTO HAY QUE OREGUNTAR
+           // $folio = $direccion; //ESTO HAY QUE OREGUNTAR
+           
          
             $reserva = $globals->getTabla([
                 'tabla' => 'vw_reserva',
@@ -3110,9 +3120,9 @@ class Principal extends BaseController
             } else {
                 $zero = '';
             }
-            if (!empty($folio->data)) {
-
-                $data['registro']->folio = $folio->data[0]->folio_prefijo . $zero . $no_consecutivo . '/2025';
+            if (!empty($direccion->data)) {
+                 $folio_prefijo = $direccion->data[0]->folio_prefijo . $zero .  $no_consecutivo . '/' . date('Y'); //ESTO HAY QUE OREGUNTAR
+                $data['registro']->folio = $folio_prefijo;
             } else {
                 if ($registro_pt->data[0]->no_reserva == 4327278) {
                     $data['registro']->folio = 'SECTURI/DGDT/DCT/FIC-TA/' . $zero . $no_consecutivo . '/2028';
@@ -3128,13 +3138,13 @@ class Principal extends BaseController
             die();
         }
         $subsecretario = $area = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1, 'id_subsecretario' => $registro_pt->data[0]->id_subsecretario]]);
-        $usu_sub = $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $subsecretario->data[0]->id_usuario]]);
-        $data['usu_sub'] = $usu_sub->data[0];
+       // $usu_sub = $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $subsecretario->data[0]->id_usuario]]);
+        $data['usu_sub'] = $subsecretario->data[0];
+         
         $html = view('secciones/vFormatoPT.php', $data);
         $htmlSegundaHoja = view('secciones/vFormatoPT2.php', $data);
         $htmlTercerHoja = view('personal/vFormato702.php', $data);
-        //var_dump( $data );
-        //die();
+    
         $mpdf = new \Mpdf\Mpdf([
             'margin_top' => 0,
             'margin_left' => 1,
@@ -3165,7 +3175,7 @@ class Principal extends BaseController
 
                         if (file_exists($facturaPath)) {
                             $facturaPageCount = $mpdf->SetSourceFile($facturaPath);
-
+                             
                             for ($j = 1; $j <= $facturaPageCount; $j++) {
                                 $mpdf->AddPage();
                                 $tplFactura = $mpdf->ImportPage($j);

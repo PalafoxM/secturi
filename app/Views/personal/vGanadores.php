@@ -370,7 +370,7 @@ chart.render();
 
 var options = {
     chart: {
-        height: 380,
+        height: 380, // Aumentamos la altura para 15 barras
         type: 'bar',
         toolbar: {
             show: false
@@ -379,8 +379,6 @@ var options = {
             enabled: true,
             top: 0,
             left: 5,
-            bottom: 5,
-            right: 0,
             blur: 5,
             color: '#45404a2e',
             opacity: 0.35
@@ -388,8 +386,9 @@ var options = {
     },
     plotOptions: {
         bar: {
+            horizontal: true, // <-- CAMBIO PRINCIPAL AQUÍ
             dataLabels: {
-                position: 'top', // top, center, bottom
+                position: 'top', // Puedes probar 'center' también
             },
         }
     },
@@ -398,7 +397,7 @@ var options = {
         formatter: function (val) {
             return val + "";
         },
-        offsetY: -20,
+        offsetX: 20, // Ajustamos el offset para la vista horizontal
         style: {
             fontSize: '12px',
             colors: ["#304758"]
@@ -407,88 +406,27 @@ var options = {
     colors: ["#4facfe"],
     series: [{
         name: 'votos',
-        data: [7, 6, 6, 4,4,3,3,3,3,3,2,2,2,2]
+        data: [7, 6, 6, 4, 4, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2]
     }],
     xaxis: {
-        categories: ["IRAZEMA DEL ROCÍO ÁLVAREZ PÉREZ", 
-                      "ANGÉLICA LÓPEZ LÓPEZ",
-                      "LETICIA BALDERAS FERNÁNDEZ", 
-                      "MARÍA YOSSELÍN ASCENCIO VÁZQUEZ",
-                      "KAREN MONSERRAT ARROYO GONZÁLEZ",
-                      "MARÍA GUADALUPE MENA RENDÓN",
-                      "MARIANA ZURIZADAI TORRES TORRES",
-                      "ROCÍO ANTONIO NAVA",
-                      "PATRICIA CORTÉS VIVANCO",
-                      "DELIA ISABEL MONTIEL LÓPEZ",
-                      "CECILIA BERENICE HERNÁNDEZ AGUILERA",
-                      "MARTHA PATRICIA URRUTIA CORTÉS",
-                      "MARTHA ELISA CORNEJO RODRÍGUEZ",
-                      "TANIA LORENA MARES FUENTES",
-                      "ESTRELLA ROBERTA VÁZQUEZ ROSALES"
-                    ],
-        position: 'top',
+        categories: [
+            "IRAZEMA DEL ROCÍO ÁLVAREZ PÉREZ", "ANGÉLICA LÓPEZ LÓPEZ", "LETICIA BALDERAS FERNÁNDEZ",
+            "MARÍA YOSSELÍN ASCENCIO VÁZQUEZ", "KAREN MONSERRAT ARROYO GONZÁLEZ", "MARÍA GUADALUPE MENA RENDÓN",
+            "MARIANA ZURIZADAI TORRES TORRES", "ROCÍO ANTONIO NAVA", "PATRICIA CORTÉS VIVANCO",
+            "DELIA ISABEL MONTIEL LÓPEZ", "CECILIA BERENICE HERNÁNDEZ AGUILERA", "MARTHA PATRICIA URRUTIA CORTÉS",
+            "MARTHA ELISA CORNEJO RODRÍGUEZ", "TANIA LORENA MARES FUENTES", "ESTRELLA ROBERTA VÁZQUEZ ROSALES"
+        ],
         labels: {
-            offsetY: -18,
-
-        },
-        axisBorder: {
-            show: true,
-            color: '#28365f',
-        },
-        axisTicks: {
-            show: true,
-            color: '#28365f',
-        },
-        crosshairs: {
-            fill: {
-                type: 'gradient',
-                gradient: {
-                    colorFrom: '#D8E3F0',
-                    colorTo: '#BED1E6',
-                    stops: [0, 100],
-                    opacityFrom: 0.4,
-                    opacityTo: 0.5,
-                }
-            }
-        },
-        tooltip: {
-            enabled: true,
-            offsetY: -35,
-
+            // Ya no es necesario mover las etiquetas con offsetY
         }
-    },
-    fill: {
-        gradient: {
-            enabled: false,
-            shade: 'light',
-            type: "horizontal",
-            shadeIntensity: 0.25,
-            gradientToColors: undefined,
-            inverseColors: true,
-            opacityFrom: 1,
-            opacityTo: 1,
-            stops: [50, 0, 100, 100]
-        },
     },
     yaxis: {
-        axisBorder: {
-            show: false
-        },
-        axisTicks: {
-            show: false,
-        },
         labels: {
-            show: false,
-            formatter: function (val) {
-                return val + "";
-            }
+            show: true, // Ahora sí queremos ver las etiquetas en el eje Y
         }
-
     },
     title: {
-        text: 'Encuesta  Honestidad',
-        floating: true,
-        offsetY: 350,
+        offsetY: 0, // Ajustamos el título
         align: 'center',
         style: {
             color: '#8997bd'
@@ -496,7 +434,7 @@ var options = {
     },
     grid: {
         row: {
-            colors: ['#afb7d21a', 'transparent'], // takes an array which will be repeated on columns
+            colors: ['#afb7d21a', 'transparent'],
             opacity: 0.2
         },
         borderColor: '#f1f3fa'
@@ -507,6 +445,5 @@ var chart = new ApexCharts(
     document.querySelector("#apex_mujeres"),
     options
 );
-
 chart.render();
         </script>

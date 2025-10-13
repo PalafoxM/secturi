@@ -32,6 +32,7 @@
          <div  style="position:absolute; text-align:center; top:<?=$i?>%; left:18.8%; width:13%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "><?= $r->proyecto ?></span>
         </div>
+       
         <?php $i = $i + 1.5; ?>
         <?php endforeach; ?>
         <?php $i = 34.4;  ?>
