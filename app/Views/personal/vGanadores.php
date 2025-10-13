@@ -112,7 +112,7 @@
                                 <div class="card-body">
                                     <h4 class="header-title mt-0 mb-4">HOMBRE</h4>
                                     <div class="">
-                                        <div id="apex_pie1" class="apex-charts"></div>
+                                        <div id="apex_pie_hombre" class="apex-charts"></div>
                                     </div>                                        
                                 </div><!--end card-body-->
                             </div><!--end card-->
@@ -122,7 +122,7 @@
                                 <div class="card-body">
                                     <h4 class="header-title mt-0 mb-4">MUJER</h4>
                                     <div class="">
-                                        <div id="apex_pie2" class="apex-charts"></div>
+                                        <div id="apex_pie_mujer" class="apex-charts"></div>
                                     </div>                                        
                                 </div><!--end card-body-->
                             </div><!--end card-->
@@ -152,13 +152,147 @@
         <script src="<?= base_url() ?>plugins/apexcharts/irregular-data-series.js"></script>
         <script src="<?= base_url() ?>plugins/apexcharts/ohlc.js"></script>
         <script src="<?= base_url() ?>assets/pages/jquery.apexcharts.init.js"></script>
+        
 
         
         <!-- App js -->
         <script src="<?= base_url() ?>assets/js/app.js"></script>
 
-        <script>
-            var options = {
+<script>
+var options = {
+  chart: {
+      height: 320,
+      type: 'donut',
+      dropShadow: {
+        enabled: true,
+        top: 10,
+        left: 0,
+        bottom: 0,
+        right: 0,
+        blur: 2,
+        color: '#45404a2e',
+        opacity: 0.35
+      },
+  }, 
+  stroke: {
+    show: true,
+    width: 2,
+    colors: ['transparent']
+  },
+  series: [7, 6, 6, 4,4,3],
+  legend: {
+      show: true,
+      position: 'bottom',
+      horizontalAlign: 'center',
+      verticalAlign: 'middle',
+      floating: false,
+      fontSize: '14px',
+      offsetX: 0,
+      offsetY: 6
+  },
+  dataLabels: {
+    enabled: true,
+    formatter: function (val) {
+        // La variable 'val' ya es el porcentaje calculado por la librería
+        return val.toFixed(1) + "%"
+    }
+  },
+  labels: ["IRAZEMA DEL ROCÍO ÁLVAREZ PÉREZ", 
+                      "ANGÉLICA LÓPEZ LÓPEZ",
+                      "LETICIA BALDERAS FERNÁNDEZ", 
+                      "MARÍA YOSSELÍN ASCENCIO VÁZQUEZ",
+                      "KAREN MONSERRAT ARROYO GONZÁLEZ",
+                      "MARÍA GUADALUPE MENA RENDÓN"],
+  colors: ["#a3cae0", "#232f5b","#f06a6c", "#f1e299", "#08aeb0"],
+  responsive: [{
+      breakpoint: 600,
+      options: {
+          chart: {
+              height: 240
+          },
+          legend: {
+              show: false
+          },
+      }
+  }],
+  fill: {
+      type: 'gradient'
+  }
+}
+
+var chart = new ApexCharts(
+  document.querySelector("#apex_pie_mujer"),
+  options
+);
+chart.render();
+var options = {
+  chart: {
+      height: 320,
+      type: 'pie',
+      dropShadow: {
+        enabled: true,
+        top: 4,
+        left: 0,
+        bottom: 0,
+        right: 0,
+        blur: 2,
+        color: '#45404a2e',
+        opacity: 0.35
+      },
+  }, 
+  stroke: {
+    show: true,
+    width: 2,
+    colors: ['transparent']
+  },
+  series: [10,7,6,6,5,3,3],
+  labels: ['MILTON HUGO GRANADOS GALVÁN', 
+                     'ALEJANDRO AYALA SERRATO', 
+                     'DANIEL MICHAEL LUGO MELÉNDEZ', 
+                     'JOSÉ ANTONIO JUÁREZ RIVERA', 
+                     'SERGIO KARLO BELTRÁN LARA', 
+                     'GUSTAVO ADOLFO VÁZQUEZ LÓPEZ',
+                     'DAVID CHARLIE GONZÁLEZ IBARRA'
+                    ],
+  colors: ["#a3cae0", "#232f5b","#f06a6c", "#f1e299", "#08aeb0","#FFD3B6", "#A8E6CE"],
+  legend: {
+      show: true,
+      position: 'bottom',
+      horizontalAlign: 'center',
+      verticalAlign: 'middle',
+      floating: false,
+      fontSize: '14px',
+      offsetX: 0,
+      offsetY: 6
+  },
+  dataLabels: {
+    enabled: true,
+    formatter: function (val) {
+        // La variable 'val' ya es el porcentaje calculado por la librería
+        return val.toFixed(1) + "%"
+    }
+  },
+  responsive: [{
+      breakpoint: 600,
+      options: {
+          chart: {
+              height: 240
+          },
+          legend: {
+              show: false
+          },
+      }
+  }]
+}
+
+var chart = new ApexCharts(
+  document.querySelector("#apex_pie_hombre"),
+  options
+);
+
+chart.render();
+
+var options = {
     chart: {
         height: 380,
         type: 'bar',
@@ -185,7 +319,7 @@
         enabled: false
     },
     series: [{
-        data: [7, 5, 4, 4, 4]
+        data: [10,7,6,6,5,3,3,3,2,2,2,2,2,1,1]
     }],
     colors: ["#95a6bf"],
     yaxis: {
@@ -199,7 +333,22 @@
         }, 
     },
     xaxis: {
-        categories: ['MILTON HUGO GRANADOS GALVÁN', 'ALEJANDRO AYALA SERRATO', 'DANIEL MICHAEL LUGO MELÉNDEZ', 'SERGIO KARLO BELTRÁN LARA', 'JOSÉ ANTONIO JUÁREZ RIVERA'],        
+        categories: ['MILTON HUGO GRANADOS GALVÁN', 
+                     'ALEJANDRO AYALA SERRATO', 
+                     'DANIEL MICHAEL LUGO MELÉNDEZ', 
+                     'JOSÉ ANTONIO JUÁREZ RIVERA', 
+                     'SERGIO KARLO BELTRÁN LARA', 
+                     'GUSTAVO ADOLFO VÁZQUEZ LÓPEZ',
+                     'DAVID CHARLIE GONZÁLEZ IBARRA',
+                     'ARTURO DE JESÚS MENDOZA TORRES',
+                     'MIGUEL ÁNGEL SALAZAR CRUZ',
+                     'JORGE ROJAS RODRÍGUEZ',
+                     'DANIEL GILBERTO MARTÍNEZ MACÍAS',
+                     'ALAN DENNIS RIVERA GONZÁLEZ',
+                     'JORGE ARTURO RANGEL CARRERAS',
+                     'NESTOR OMAR GONZÁLEZ NORIEGA',
+                     'JOSÉ ALBERTO MAGAÑA PÉREZ'
+                    ],        
     },
     states: {
         hover: {
@@ -258,10 +407,25 @@ var options = {
     colors: ["#4facfe"],
     series: [{
         name: 'votos',
-        data: [7, 5, 3, 2]
+        data: [7, 6, 6, 4,4,3,3,3,3,3,2,2,2,2]
     }],
     xaxis: {
-        categories: ["IRAZEMA DEL ROCÍO ÁLVAREZ PÉREZ", "LETICIA BALDERAS FERNÁNDEZ", "KAREN MONSERRAT ARROYO GONZÁLEZ", "KAREN MONSERRAT ARROYO GONZÁLEZ"],
+        categories: ["IRAZEMA DEL ROCÍO ÁLVAREZ PÉREZ", 
+                      "ANGÉLICA LÓPEZ LÓPEZ",
+                      "LETICIA BALDERAS FERNÁNDEZ", 
+                      "MARÍA YOSSELÍN ASCENCIO VÁZQUEZ",
+                      "KAREN MONSERRAT ARROYO GONZÁLEZ",
+                      "MARÍA GUADALUPE MENA RENDÓN",
+                      "MARIANA ZURIZADAI TORRES TORRES",
+                      "ROCÍO ANTONIO NAVA",
+                      "PATRICIA CORTÉS VIVANCO",
+                      "DELIA ISABEL MONTIEL LÓPEZ",
+                      "CECILIA BERENICE HERNÁNDEZ AGUILERA",
+                      "MARTHA PATRICIA URRUTIA CORTÉS",
+                      "MARTHA ELISA CORNEJO RODRÍGUEZ",
+                      "TANIA LORENA MARES FUENTES",
+                      "ESTRELLA ROBERTA VÁZQUEZ ROSALES"
+                    ],
         position: 'top',
         labels: {
             offsetY: -18,

@@ -1131,7 +1131,7 @@ class Principal extends BaseController
             $timestamp = date('Ymd_His');
             $extension = $file->getClientExtension();
             $originalName = pathinfo($file->getName(), PATHINFO_FILENAME);
-            $archivo = $originalName . '_' . $timestamp . '.' . $extension;
+            $archivo =   'instrumento_' . $timestamp . '.' . $extension;
 
             // Ruta absoluta
             $ruta_destino = FCPATH . 'assets/pdf/';
@@ -2742,9 +2742,8 @@ class Principal extends BaseController
     {
         $response = new \stdClass();
         $id_registro_pt = $this->request->getPost('id_registro_pt');
+        $data = $this->request->getPost();
         $Mglobal = new Mglobal;
-
-
 
         if (empty($id_registro_pt)) {
             $response->error = true;
@@ -2762,15 +2761,16 @@ class Principal extends BaseController
             'tabla' => 'registro_pt',
             'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
         ])->data[0]->id_reserva;
-
+           
         // Directorio temporal
         $tempDir = sys_get_temp_dir() . '/zip_temp_' . $id_registro_pt . '/';
+  
         if (!is_dir($tempDir) && !mkdir($tempDir, 0777, true)) {
             $response->error = true;
             $response->respuesta = 'No se pudo crear directorio temporal';
             return $this->respond($response);
         }
-
+      
         $archivos = [];
         $archivosTemporales = [];
 
@@ -2780,6 +2780,7 @@ class Principal extends BaseController
         ])->data[0]->instrumento;
 
         // Archivos generados dinámicamente
+         
         if (empty($instrumento)) {
             $dynamicFiles = [
                 1 => '01 Anexos y formato de los LTPOFB.pdf'
@@ -2790,7 +2791,7 @@ class Principal extends BaseController
                 4 => '04 Contrato o Convenio (según corresponda).pdf',
             ];
         }
-
+       
         foreach ($dynamicFiles as $id => $nombre) {
             $rutaTemp = $tempDir . $nombre;
             $archivoGenerado = $this->Archivo($id_registro_pt, $id, $rutaTemp);
@@ -2800,7 +2801,7 @@ class Principal extends BaseController
             }
         }
 
-
+       
         // Archivo 07
         $rutaArchivo07 = $tempDir . '07 Formatos_diversos.pdf';
         $archivo07 = $this->ImprimirPT($id_registro_pt, $rutaArchivo07);
@@ -3060,7 +3061,9 @@ class Principal extends BaseController
             'tabla' => 'vw_pdf_reserva',
             'where' => ['visible' => 1, 'id_registro_pt' => $id_pt]
         ]);
-    
+        
+        //var_dump($formatos);
+        //die();
 
         if (!empty($registro_pt->data)) {
             $registro = $registro_pt->data[0];

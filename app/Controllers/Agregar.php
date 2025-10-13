@@ -1198,6 +1198,7 @@ class Agregar extends BaseController
         $globals = new Mglobal;
         $data = array();
         $tabla = array('tabla' => 'vw_honestidad', 'where' => ['visible' => 1]);
+        
         $usuario = $globals->getTabla($tabla);
         $data['scripts'] = array('inicio');
         $data['usuario'] = isset($usuario->data) && !empty($usuario->data) ? $usuario->data : [];
