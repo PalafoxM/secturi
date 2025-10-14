@@ -1,4 +1,4 @@
-<?php 
+<?php
 namespace App\Controllers;
 
 use CodeIgniter\Controller;
@@ -31,7 +31,7 @@ use DatePeriod;
 use DateInterval;
 
 
-class Usuario extends BaseController 
+class Usuario extends BaseController
 {
 
     use ResponseTrait;
@@ -44,34 +44,35 @@ class Usuario extends BaseController
     public function __construct()
     {
         setlocale(LC_TIME, 'es_ES.utf8', 'es_MX.UTF-8', 'es_MX', 'esp_esp', 'Spanish'); // usar solo LC_TIME para evitar que los decimales los separe con coma en lugar de punto y fallen los inserts de peso y talla
-        date_default_timezone_set('America/Mexico_City');  
+        date_default_timezone_set('America/Mexico_City');
         $session = \Config\Services::session();
         $this->globals = new Mglobal();
-        if($session->get('logueado')!= 1){
-            header('Location:'.base_url().'index.php/Login/cerrar?inactividad=1');            
+        if ($session->get('logueado') != 1) {
+            header('Location:' . base_url() . 'index.php/Login/cerrar?inactividad=1');
             die();
         }
     }
 
-    private function _renderView($data = array()) {     
+    private function _renderView($data = array())
+    {
         $data = array_merge($this->defaultData, $data);
-        echo view($data['layout'], $data); 
-                      
+        echo view($data['layout'], $data);
+
     }
 
     public function index()
-    {        
-        $session = \Config\Services::session();   
+    {
+        $session = \Config\Services::session();
         $data = array();
-        $data['unidad'] = $this->globals->getTabla(["tabla"=>"cat_clues","select"=>"id_clues, NOMBRE_UNIDAD", "where"=>["visible"=>1],'limit' => 10]); 
-        $data['perfiles'] = $this->globals->getTabla(["tabla"=>"seg_perfiles", "where"=>["visible"=>1]]); 
-        $data['cat_sexo'] = $this->globals->getTabla(["tabla"=>"cat_sexo", "where"=>["visible"=>1]]); 
-        $data['scripts'] = array('principal','inicio');
+        $data['unidad'] = $this->globals->getTabla(["tabla" => "cat_clues", "select" => "id_clues, NOMBRE_UNIDAD", "where" => ["visible" => 1], 'limit' => 10]);
+        $data['perfiles'] = $this->globals->getTabla(["tabla" => "seg_perfiles", "where" => ["visible" => 1]]);
+        $data['cat_sexo'] = $this->globals->getTabla(["tabla" => "cat_sexo", "where" => ["visible" => 1]]);
+        $data['scripts'] = array('principal', 'inicio');
         $data['edita'] = 0;
-        $data['nombre_completo'] = $session->nombre_completo; 
-        $data['contentView'] = 'secciones/vUsuarios';                
+        $data['nombre_completo'] = $session->nombre_completo;
+        $data['contentView'] = 'secciones/vUsuarios';
         $this->_renderView($data);
-        
+
     }
 
     public function enviarCorreo()
@@ -83,161 +84,161 @@ class Usuario extends BaseController
         $mail = new PHPMailer(true);
         $data = array();
         $id_participante = $this->request->getPost('id_participante');
-        $participante = $principal->getTabla(['tabla' => 'participantes', 'where' => ['visible' => 1, 'id_participante'=>$id_participante]]);
-        if(isset($participante->data) && empty($participante->data)){
+        $participante = $principal->getTabla(['tabla' => 'participantes', 'where' => ['visible' => 1, 'id_participante' => $id_participante]]);
+        if (isset($participante->data) && empty($participante->data)) {
             $response->respuesta = 'Id de usuario no encontrador favor de contactar al Administrador';
             return $this->respond($response);
         }
         $usuario = $participante->data[0];
-        $hoy = date("Y-m-d H:i:s"); 
+        $hoy = date("Y-m-d H:i:s");
         $dataInsert = [
-            'id_sexo'               => (int)$usuario->id_sexo,           
-            'id_nivel'              => (int)$usuario->id_nivel,           
-            'id_dependencia'        => (int)$usuario->id_dependencia,  
-            'id_perfil'             => 8,           
-            'id_padre'              => (int)$session->id_perfil,           
-            'usuario'               => $usuario->curp,           
-            'nombre'                => $usuario->nombre,           
-            'primer_apellido'       => $usuario->primer_apellido,           
-            'segundo_apellido'      => $usuario->segundo_apellido,             
-            'correo'                => $usuario->correo,           
-            'curp'                  => $usuario->curp, 
-            'contrasenia'           => md5($usuario->curp),
-            'rfc'                   => $usuario->rfc,             
-            'denominacion_funcional'=> $usuario->denominacion_funcional,             
-            'area'                  => $usuario->area,             
-            'jefe_inmediato'        => $usuario->jefe_inmediato,                      
-            'fec_nac'               => date("Y-m-d", strtotime($usuario->fec_nac)),             
-            'fec_registro'          => $hoy  
-        ];   
+            'id_sexo' => (int) $usuario->id_sexo,
+            'id_nivel' => (int) $usuario->id_nivel,
+            'id_dependencia' => (int) $usuario->id_dependencia,
+            'id_perfil' => 8,
+            'id_padre' => (int) $session->id_perfil,
+            'usuario' => $usuario->curp,
+            'nombre' => $usuario->nombre,
+            'primer_apellido' => $usuario->primer_apellido,
+            'segundo_apellido' => $usuario->segundo_apellido,
+            'correo' => $usuario->correo,
+            'curp' => $usuario->curp,
+            'contrasenia' => md5($usuario->curp),
+            'rfc' => $usuario->rfc,
+            'denominacion_funcional' => $usuario->denominacion_funcional,
+            'area' => $usuario->area,
+            'jefe_inmediato' => $usuario->jefe_inmediato,
+            'fec_nac' => date("Y-m-d", strtotime($usuario->fec_nac)),
+            'fec_registro' => $hoy
+        ];
         $dataBitacora = ['id_user' => $session->id_usuario, 'script' => 'Agregar.php/guardaUsuario'];
         $dataConfig = [
-            "tabla"=>"usuario",
-            "editar"=>false,
+            "tabla" => "usuario",
+            "editar" => false,
             //"idEditar"=>['id_usuario'=>$data['id_usuario']]
         ];
-        $response = $this->globals->saveTabla($dataInsert,$dataConfig,$dataBitacora);  
+        $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
         $dataConfig = [
-            "tabla"=>"participantes",
-            "editar"=>true,
-            "idEditar"=>['id_participante'=>$id_participante]
+            "tabla" => "participantes",
+            "editar" => true,
+            "idEditar" => ['id_participante' => $id_participante]
         ];
-        $response = $this->globals->saveTabla(['visible'=>0],$dataConfig,$dataBitacora);
+        $response = $this->globals->saveTabla(['visible' => 0], $dataConfig, $dataBitacora);
         $contrasenia = md5($usuario->curp);
         $response->error = false;
         $response->respuesta = "Correo enviado correctamente.";
         return $this->respond($response);
-/*         try {
-            $mail->isSMTP(); // Usar SMTP para el envío
-            $mail->SMTPDebug = 2; // Habilitar depuración (2 para mensajes de cliente y servidor)
-            $mail->Host = 'smtp.gmail.com'; // Servidor SMTP de Gmail
-            $mail->SMTPAuth = true; // Habilitar autenticación SMTP
-            $mail->Username = 'palafox.marin31@gmail.com'; // Correo electrónico del remitente
-            $mail->Password = 'vxqh wycc fsgg tzvk'; // Contraseña de aplicación o contraseña de Gmail
-            $mail->SMTPSecure = 'tls'; // Usar cifrado TLS
-            $mail->Port = 587; // Puerto SMTP para TLS
-        
-            // Configurar el correo electrónico
-            $mail->setFrom($usuario->correo, 'Sistema de Administración de Capacitación (SAC)');
-            $mail->addAddress('palafox.marin@hotmail.com'); // Correo del destinatario
-            $mail->Subject = 'Credenciales de Acceso al Sistema SAC'; // Asunto del correo
-            $mail->isHTML(true); // Habilitar contenido HTML en el cuerpo del correo
-        
-            // Cuerpo del correo
-            $mail->Body = "
-                <p>Te damos la bienvenida al <strong>Sistema de Administración de Capacitación (SAC)</strong>.</p>
-                <p>A continuación, te proporcionamos tus credenciales de acceso:</p>
-                <ul>
-                    <li><strong>Usuario:</strong> $usuario->curp</li>
-                    <li><strong>Contraseña:</strong> $contrasenia</li>
-                </ul>
-                <p>Puedes acceder al sistema a través del siguiente enlace: <a href='http://172.31.187.142/sac2/'>http://172.31.187.142/sac2/</a></p>
-                <p>Si tienes alguna duda o necesitas asistencia, no dudes en contactarnos.</p>
-                <p>¡Gracias por ser parte de SAC!</p>
-            ";
-        
-            // Enviar el correo
-            if ($mail->send()) {
-                $response->error = false;
-                $response->respuesta = "Correo enviado correctamente.";
-            } else {
-                $response->error = true;
-                $response->respuesta = "Error al enviar el correo: " . $mail->ErrorInfo;
-            }
-            return $this->respond($response); // Devolver la respuesta
-        } catch (Exception $e) {
-            // Manejar excepciones
-            $response->error = true;
-            $response->respuesta = "Error inesperado al enviar el correo: " . $e->getMessage();
-            return $this->respond($response);
-        } */
+        /*         try {
+                    $mail->isSMTP(); // Usar SMTP para el envío
+                    $mail->SMTPDebug = 2; // Habilitar depuración (2 para mensajes de cliente y servidor)
+                    $mail->Host = 'smtp.gmail.com'; // Servidor SMTP de Gmail
+                    $mail->SMTPAuth = true; // Habilitar autenticación SMTP
+                    $mail->Username = 'palafox.marin31@gmail.com'; // Correo electrónico del remitente
+                    $mail->Password = 'vxqh wycc fsgg tzvk'; // Contraseña de aplicación o contraseña de Gmail
+                    $mail->SMTPSecure = 'tls'; // Usar cifrado TLS
+                    $mail->Port = 587; // Puerto SMTP para TLS
+
+                    // Configurar el correo electrónico
+                    $mail->setFrom($usuario->correo, 'Sistema de Administración de Capacitación (SAC)');
+                    $mail->addAddress('palafox.marin@hotmail.com'); // Correo del destinatario
+                    $mail->Subject = 'Credenciales de Acceso al Sistema SAC'; // Asunto del correo
+                    $mail->isHTML(true); // Habilitar contenido HTML en el cuerpo del correo
+
+                    // Cuerpo del correo
+                    $mail->Body = "
+                        <p>Te damos la bienvenida al <strong>Sistema de Administración de Capacitación (SAC)</strong>.</p>
+                        <p>A continuación, te proporcionamos tus credenciales de acceso:</p>
+                        <ul>
+                            <li><strong>Usuario:</strong> $usuario->curp</li>
+                            <li><strong>Contraseña:</strong> $contrasenia</li>
+                        </ul>
+                        <p>Puedes acceder al sistema a través del siguiente enlace: <a href='http://172.31.187.142/sac2/'>http://172.31.187.142/sac2/</a></p>
+                        <p>Si tienes alguna duda o necesitas asistencia, no dudes en contactarnos.</p>
+                        <p>¡Gracias por ser parte de SAC!</p>
+                    ";
+
+                    // Enviar el correo
+                    if ($mail->send()) {
+                        $response->error = false;
+                        $response->respuesta = "Correo enviado correctamente.";
+                    } else {
+                        $response->error = true;
+                        $response->respuesta = "Error al enviar el correo: " . $mail->ErrorInfo;
+                    }
+                    return $this->respond($response); // Devolver la respuesta
+                } catch (Exception $e) {
+                    // Manejar excepciones
+                    $response->error = true;
+                    $response->respuesta = "Error inesperado al enviar el correo: " . $e->getMessage();
+                    return $this->respond($response);
+                } */
 
     }
-  public function validarReporteExcel2()
+    public function validarReporteExcel2()
     {
         $session = \Config\Services::session();
         $response = new \stdClass();
         $response->error = true;
-        $globals       = new Mglobal;
+        $globals = new Mglobal;
         $periodoInicio = $this->request->getPost('periodoInicio');
-        
+
         $dia = date('d', strtotime($periodoInicio));
 
         // OBTENER EL ÚLTIMO DÍA DEL MES
         $ultimoDiaMes = date('t', strtotime($periodoInicio)); // 't' devuelve el número de días del mes
-        
-        if($dia == '01'){
+
+        if ($dia == '01') {
             $fec_ini = date('Y-m-01', strtotime($periodoInicio));
             $fec_fin = date('Y-m-15', strtotime($periodoInicio));
-        }else{
+        } else {
             $fec_ini = date('Y-m-16', strtotime($periodoInicio));
             $fec_fin = date('Y-m-' . $ultimoDiaMes, strtotime($periodoInicio)); // Usar el último día real
         }
-        
+
         $tabla = [
-                'tabla' => 'vw_asistencia_incidencia', 
-                'where' => ['visible' => 1],
-                'whereBetween' => [['fecha', $fec_ini, $fec_fin]]
-                ];
-        
+            'tabla' => 'vw_asistencia_incidencia',
+            'where' => ['visible' => 1],
+            'whereBetween' => [['fecha', $fec_ini, $fec_fin]]
+        ];
+
         $incidencias = $globals->getTabla($tabla);
         $resul = (isset($incidencias->data) && !empty($incidencias->data)) ? $incidencias->data : [];
-    
+
         if (empty($resul)) {
             $response->respuesta = "No se encontrarón datos en el<strong> periodo indicado</strong>";
-        }else{
-        $response->error = false;
-        $response->respuesta = "Datos Correctos";
+        } else {
+            $response->error = false;
+            $response->respuesta = "Datos Correctos";
         }
         return $this->respond($response);
     }
     public function validarReporteExcel()
     {
- 
+
         $session = \Config\Services::session();
         $response = new \stdClass();
         $response->error = true;
-        $globals       = new Mglobal;
+        $globals = new Mglobal;
         $periodoInicio = $this->request->getPost('periodoInicio');
-        $periodoFin    = $this->request->getPost('periodoFin');
+        $periodoFin = $this->request->getPost('periodoFin');
         $fec_ini = date('Y-m-d', strtotime($periodoInicio));
         $fec_fin = date('Y-m-d', strtotime($periodoFin));
         // Obtener datos de la vista
         $tabla = [
-                 'tabla' => 'vw_asistencia_incidencia', 
-                 'where' => ['visible' => 1],
-                 'whereBetween' => [['fechas_asistencias', $fec_ini, $fec_fin]]
-                ];
-        
+            'tabla' => 'vw_asistencia_incidencia',
+            'where' => ['visible' => 1],
+            'whereBetween' => [['fechas_asistencias', $fec_ini, $fec_fin]]
+        ];
+
         $incidencias = $globals->getTabla($tabla);
         $resul = (isset($incidencias->data) && !empty($incidencias->data)) ? $incidencias->data : [];
         if (empty($resul)) {
             $response->respuesta = "No se encontrarón datos en el<strong> periodo indicado</strong>";
-        }else{
-           $response->error = false;
-           $response->respuesta = "Datos Correctos";
+        } else {
+            $response->error = false;
+            $response->respuesta = "Datos Correctos";
         }
-          return $this->respond($response);
+        return $this->respond($response);
     }
     public function reporteIncidenciaExcel($fechaInicio = null, $fechaFin = null)
     {
@@ -248,12 +249,12 @@ class Usuario extends BaseController
 
         $fec_ini = date('Y-m-d', strtotime($fechaInicio));
         $fec_fin = date('Y-m-d', strtotime($fechaFin));
-        
+
         // Obtener datos de la vista que incluye asistencias e incidencias
         $tabla = [
-        'tabla' => 'vw_asistencia_incidencia',
-        'where' => ['visible' => 1],
-        'whereBetween' => [['fechas_asistencias', $fec_ini, $fec_fin]],
+            'tabla' => 'vw_asistencia_incidencia',
+            'where' => ['visible' => 1],
+            'whereBetween' => [['fechas_asistencias', $fec_ini, $fec_fin]],
         ];
 
         $datos = $globals->getTabla($tabla);
@@ -267,7 +268,7 @@ class Usuario extends BaseController
 
         foreach ($resul as $r) {
             $usuario = $r->nombre_completo;
-            
+
             // Procesar asistencias
             if ($r->fechas_asistencias) {
                 $fecha = $r->fechas_asistencias;
@@ -278,7 +279,7 @@ class Usuario extends BaseController
                 ];
                 $fechasUnicas[$fecha] = true;
             }
-            
+
             // Procesar incidencias
             if ($r->fechas_incidencias) {
                 $fecha = $r->fechas_incidencias;
@@ -289,14 +290,14 @@ class Usuario extends BaseController
                     ];
                 }
                 // Agregar información de incidencia
-                $datosAgrupados[$usuario][$fecha]['incidencia'] = 
-                ($r->id_estatus == 1) ? 'En proceso' : 
-                (($r->id_estatus == 3) ? 'Declinada' : 'Aprobada');
+                $datosAgrupados[$usuario][$fecha]['incidencia'] =
+                    ($r->id_estatus == 1) ? 'En proceso' :
+                    (($r->id_estatus == 3) ? 'Declinada' : 'Aprobada');
 
                 $fechasUnicas[$fecha] = true;
             }
         }
-      
+
         // Ordenar fechas
         $fechasOrdenadas = array_keys($fechasUnicas);
         sort($fechasOrdenadas);
@@ -334,7 +335,7 @@ class Usuario extends BaseController
 
                 // Celda entrada
                 $sheet->setCellValue($col . $fila, $entrada);
-                
+
                 // Estilo para entrada tardía
                 if ($entrada && $entrada > '09:00:00') {
                     $sheet->getStyle($col . $fila)->getFill()->setFillType(Fill::FILL_SOLID)
@@ -345,8 +346,7 @@ class Usuario extends BaseController
                 } elseif ($entrada === '') {
                     $sheet->getStyle($col . $fila)->getFill()->setFillType(Fill::FILL_SOLID)
                         ->getStartColor()->setARGB('FFFFFF00'); // Amarillo
-                }
-               elseif (strcasecmp(trim($incidencia), 'Aprobada') === 0) {
+                } elseif (strcasecmp(trim($incidencia), 'Aprobada') === 0) {
                     $sheet->getStyle($col . $fila)->getFill()->setFillType(Fill::FILL_SOLID)
                         ->getStartColor()->setARGB('80F293'); // Verde
                 }
@@ -359,7 +359,7 @@ class Usuario extends BaseController
 
                 // Celda incidencia
                 $sheet->setCellValue($col . $fila, $incidencia);
-                
+
                 // Estilo para celdas con incidencia
                 if ($incidencia) {
                     $sheet->getStyle($col . $fila)->getFill()->setFillType(Fill::FILL_SOLID)
@@ -376,8 +376,8 @@ class Usuario extends BaseController
         for ($col = 'B'; $col <= $lastColumn; $col++) {
             $sheet->getColumnDimension($col)->setWidth(15);
         }
-       // var_dump($spreadsheet);
-       // die();
+        // var_dump($spreadsheet);
+        // die();
         // Descargar archivo
         $writer = new Xlsx($spreadsheet);
         $fileName = 'reporte_asistencias_incidencias_' . date('Ymd_His') . '.xlsx';
@@ -401,7 +401,7 @@ class Usuario extends BaseController
 
         $dia = date('d', strtotime($periodoInicio));
         $ultimoDiaMes = date('t', strtotime($periodoInicio));
-        
+
         if ($dia == '01') {
             $fec_ini = date('Y-m-01', strtotime($periodoInicio));
             $fec_fin = date('Y-m-15', strtotime($periodoInicio));
@@ -412,13 +412,13 @@ class Usuario extends BaseController
 
         $anio = date('Y');
         $diasFestivosGenerales = [
-            $anio.'-01-01' => 'Año Nuevo',
-            $anio.'-02-05' => 'Día de la Constitución',
-            $anio.'-03-18' => 'Natalicio de Benito Juárez',
-            $anio.'-05-01' => 'Día del Trabajo',
-            $anio.'-09-16' => 'Día de la Independencia',
-            $anio.'-11-18' => 'Día de la Revolución',
-            $anio.'-12-25' => 'Navidad'
+            $anio . '-01-01' => 'Año Nuevo',
+            $anio . '-02-05' => 'Día de la Constitución',
+            $anio . '-03-18' => 'Natalicio de Benito Juárez',
+            $anio . '-05-01' => 'Día del Trabajo',
+            $anio . '-09-16' => 'Día de la Independencia',
+            $anio . '-11-18' => 'Día de la Revolución',
+            $anio . '-12-25' => 'Navidad'
         ];
 
         $tabla = [
@@ -429,7 +429,7 @@ class Usuario extends BaseController
 
         $datos = $globals->getTabla($tabla);
         $resul = (isset($datos->data) && !empty($datos->data)) ? $datos->data : [];
-    
+
         // Fechas laborales del periodo
         $start = new \DateTime($fec_ini);
         $end = new \DateTime($fec_fin);
@@ -450,11 +450,13 @@ class Usuario extends BaseController
 
         foreach ($resul as $r) {
             $nombre = trim($r->nombre_completo ?: 'Sin nombre');
-            
+
             // Verificar si es una incidencia de tipo 2 (por semana)
-            if ($r->tipo_registro === 'incidencia' && $r->tipo == 2 && 
-                !empty($r->fecha_inicio_incidencia) && !empty($r->fecha_fin_incidencia)) {
-                
+            if (
+                $r->tipo_registro === 'incidencia' && $r->tipo == 2 &&
+                !empty($r->fecha_inicio_incidencia) && !empty($r->fecha_fin_incidencia)
+            ) {
+
                 // Procesar todas las fechas del rango de la incidencia
                 $startIncidencia = new \DateTime($r->fecha_inicio_incidencia);
                 $endIncidencia = new \DateTime($r->fecha_fin_incidencia);
@@ -464,16 +466,19 @@ class Usuario extends BaseController
 
                 foreach ($periodIncidencia as $fechaIncidencia) {
                     $fechaYmd = $fechaIncidencia->format('Y-m-d');
-                    
+
                     // Verificar que la fecha esté dentro del periodo del reporte y sea día laboral
-                    if (!in_array($fechaYmd, $fechasDelPeriodo, true)) continue;
-                    if (date('N', strtotime($fechaYmd)) >= 6) continue;
+                    if (!in_array($fechaYmd, $fechasDelPeriodo, true))
+                        continue;
+                    if (date('N', strtotime($fechaYmd)) >= 6)
+                        continue;
 
                     if (!empty($r->fec_nac) && !isset($cumpleanosUsuarios[$nombre])) {
                         $cumpleanosUsuarios[$nombre] = $r->fec_nac;
                     }
 
-                    if (!isset($usuarios[$nombre])) $usuarios[$nombre] = [];
+                    if (!isset($usuarios[$nombre]))
+                        $usuarios[$nombre] = [];
                     if (!isset($usuarios[$nombre][$fechaYmd])) {
                         $usuarios[$nombre][$fechaYmd] = [
                             'entrada' => '',
@@ -491,19 +496,22 @@ class Usuario extends BaseController
                         ];
                     }
                 }
-                
+
             } else {
                 // Procesamiento normal para otros registros
                 $fechaYmd = !empty($r->fecha) ? date('Y-m-d', strtotime($r->fecha)) : null;
-                if (!$fechaYmd || date('N', strtotime($fechaYmd)) >= 6) continue;
+                if (!$fechaYmd || date('N', strtotime($fechaYmd)) >= 6)
+                    continue;
 
-                if (!in_array($fechaYmd, $fechasDelPeriodo, true)) continue;
+                if (!in_array($fechaYmd, $fechasDelPeriodo, true))
+                    continue;
 
                 if (!empty($r->fec_nac) && !isset($cumpleanosUsuarios[$nombre])) {
                     $cumpleanosUsuarios[$nombre] = $r->fec_nac;
                 }
 
-                if (!isset($usuarios[$nombre])) $usuarios[$nombre] = [];
+                if (!isset($usuarios[$nombre]))
+                    $usuarios[$nombre] = [];
                 if (!isset($usuarios[$nombre][$fechaYmd])) {
                     $usuarios[$nombre][$fechaYmd] = [
                         'entrada' => '',
@@ -511,15 +519,20 @@ class Usuario extends BaseController
                         'incidencias' => []
                     ];
                 }
-            
+
                 if ($r->tipo_registro === 'asistencia') {
-                    if (!empty($r->hora_inicio)) $usuarios[$nombre][$fechaYmd]['entrada'] = $r->hora_inicio;
-                    if (!empty($r->hora_fin)) $usuarios[$nombre][$fechaYmd]['salida'] = $r->hora_fin;
+                    if (!empty($r->hora_inicio))
+                        $usuarios[$nombre][$fechaYmd]['entrada'] = $r->hora_inicio;
+                    if (!empty($r->hora_fin))
+                        $usuarios[$nombre][$fechaYmd]['salida'] = $r->hora_fin;
                 }
 
                 if (($r->tipo_registro === 'incidencia') && isset($r->id_estatus)) {
                     $usuarios[$nombre][$fechaYmd]['incidencias'][] = [
                         'estatus' => $r->id_estatus,
+                        'cat_incidencia' => $r->cat_incidencia,
+                        'hora_inicio' => $r->hora_inicio,
+                        'hora_fin' => $r->hora_fin,
                         'nombre' => $r->nombre_incidencia,
                         'tipo' => $r->tipo
                     ];
@@ -529,7 +542,8 @@ class Usuario extends BaseController
             // Agregar días festivos
             foreach ($fechasDelPeriodo as $fechaYmd) {
                 if (isset($diasFestivosGenerales[$fechaYmd])) {
-                    if (!isset($usuarios[$nombre])) $usuarios[$nombre] = [];
+                    if (!isset($usuarios[$nombre]))
+                        $usuarios[$nombre] = [];
                     if (!isset($usuarios[$nombre][$fechaYmd])) {
                         $usuarios[$nombre][$fechaYmd] = [
                             'entrada' => '',
@@ -538,14 +552,14 @@ class Usuario extends BaseController
                         ];
                     }
                     $usuarios[$nombre][$fechaYmd]['incidencias'][] = [
-                        'estatus' => 3, 
+                        'estatus' => 3,
                         'nombre' => 'DÍA FESTIVO',
                         'tipo' => null
                     ];
                 }
             }
         }
-        
+
         // Resto del código para cumpleaños y generación del Excel...
         foreach ($usuarios as $nombre => $fechas) {
             if (isset($cumpleanosUsuarios[$nombre])) {
@@ -555,7 +569,7 @@ class Usuario extends BaseController
                         $usuarios[$nombre][$cumpleAnioActual] = ['entrada' => '', 'salida' => '', 'incidencias' => []];
                     }
                     $usuarios[$nombre][$cumpleAnioActual]['incidencias'][] = [
-                        'estatus' => 3, 
+                        'estatus' => 3,
                         'nombre' => 'CUMPLEAÑOS',
                         'tipo' => null
                     ];
@@ -565,11 +579,11 @@ class Usuario extends BaseController
 
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-        
+
         // AGREGAR LOGOTIPO
         $logoPath = FCPATH . 'assets/logo-guanajuato.png'; // Ajusta la ruta según tu estructura
         // Si no existe el logo, puedes usar una imagen por defecto o omitir esta parte
-        
+
         if (file_exists($logoPath)) {
             $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
             $drawing->setName('Logo');
@@ -578,7 +592,7 @@ class Usuario extends BaseController
             $drawing->setHeight(80); // Ajusta la altura según necesites
             $drawing->setCoordinates('A1');
             $drawing->setWorksheet($sheet);
-            
+
             // Ajustar altura de las primeras filas para el logo
             $sheet->getRowDimension(1)->setRowHeight(60);
             $sheet->getRowDimension(2)->setRowHeight(20);
@@ -590,20 +604,20 @@ class Usuario extends BaseController
             $sheet->mergeCells('A1:C1');
             $sheet->getRowDimension(1)->setRowHeight(25);
         }
-        
+
         // Título del reporte (fila 2)
         $sheet->setCellValue('A2', 'REPORTE DE ASISTENCIAS E INCIDENCIAS');
         $sheet->getStyle('A2')->getFont()->setBold(true)->setSize(14);
         $sheet->mergeCells('A2:' . \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(count($fechasDelPeriodo) * 2) . '2');
         $sheet->getStyle('A2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-        
+
         // Periodo del reporte (fila 3)
         $periodoTexto = 'Periodo: ' . date('d/m/Y', strtotime($fec_ini)) . ' al ' . date('d/m/Y', strtotime($fec_fin));
         $sheet->setCellValue('A3', $periodoTexto);
         $sheet->getStyle('A3')->getFont()->setBold(true);
         $sheet->mergeCells('A3:' . \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(count($fechasDelPeriodo) * 2) . '3');
         $sheet->getStyle('A3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-        
+
         // AHORA LOS ENCABEZADOS EMPIEZAN EN LA FILA 4
         $sheet->setCellValue('A4', '');
         $sheet->setCellValue('A5', 'Nombre');
@@ -612,18 +626,18 @@ class Usuario extends BaseController
         $colIndex = 2;
         foreach ($fechasDelPeriodo as $fecha) {
             $colStart = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
-            $colEnd   = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 1);
+            $colEnd = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 1);
             $fechaFormateada = date('d/m/Y', strtotime($fecha));
 
             // Fecha en fila 4
             $sheet->setCellValue($colStart . '4', $fechaFormateada);
             $sheet->mergeCells("{$colStart}4:{$colEnd}4");
             $sheet->getStyle($colStart . '4')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-            
+
             // Encabezados "Entrada" y "Salida" en fila 5
             $sheet->setCellValue($colStart . '5', 'Entrada');
             $sheet->setCellValue($colEnd . '5', 'Salida');
-            
+
             // Estilo para encabezados
             $sheet->getStyle($colStart . '4:' . $colEnd . '5')->getFont()->setBold(true);
             $sheet->getStyle($colStart . '4:' . $colEnd . '5')->getFill()
@@ -631,88 +645,262 @@ class Usuario extends BaseController
                 ->getStartColor()->setARGB('FFD9D9D9');
             $sheet->getStyle($colStart . '4:' . $colEnd . '5')->getAlignment()
                 ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-                
+
             $colIndex += 2;
         }
 
         // Cuerpo del reporte (empieza en fila 6)
         $fila = 6;
         ksort($usuarios, SORT_STRING);
+
+
         foreach ($usuarios as $nombre => $fechas) {
+
             $sheet->setCellValue('A' . $fila, $nombre);
             $colIndex = 2;
 
             foreach ($fechasDelPeriodo as $fecha) {
                 $colEntrada = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
-                $colSalida  = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 1);
+                $colSalida = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 1);
 
+                // dentro del foreach ($fechasDelPeriodo as $fecha) { ... }
                 $dataDia = $usuarios[$nombre][$fecha] ?? ['entrada' => '', 'salida' => '', 'incidencias' => []];
-        
                 $entrada = $dataDia['entrada'];
-                $salida  = $dataDia['salida'];
-                $incArr  = $dataDia['incidencias'];
-            
-                $colorTexto = null;
+                $salida = $dataDia['salida'];
+                $incArr = $dataDia['incidencias'];
 
                 $valorEntrada = $entrada;
-                $valorSalida  = $salida;
+                $valorSalida = $salida;
                 $validado = false;
-                
-                if (!empty($incArr)) { 
+                $stopIncProcessing = false; // para no sobrescribir si ya procesamos una incidencia relevante
+
+                if (!empty($incArr)) {
                     foreach ($incArr as $inc) {
-                        $nombreInc = strtoupper($inc['nombre']);
-                            
-                        switch ($inc['estatus']) {
-                            case 3: // Aprobado
+                        if ($stopIncProcessing)
+                            break;
+
+                        $cat = isset($inc['cat_incidencia']) ? (int) $inc['cat_incidencia'] : null;
+                        $estatus = isset($inc['estatus']) ? (int) $inc['estatus'] : null;
+                        $horaInicio = isset($inc['hora_inicio']) ? $inc['hora_inicio'] : '';
+                        $horaFin = isset($inc['hora_fin']) ? $inc['hora_fin'] : '';
+                        $nombreInc = isset($inc['nombre']) ? strtoupper($inc['nombre']) : '';
+
+                        // Incidencia aprobada y NO cat 11 -> comportamiento original (marcar ambos campos con el nombre)
+                        if ($estatus === 3 && !in_array($cat,[11,1,7])) {
+                            $valorEntrada = $nombreInc;
+                            $valorSalida = $nombreInc;
+                            $sheet->getStyle($colEntrada . $fila)
+                                ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                ->getStartColor()->setARGB('FF00B050');
+                            $sheet->getStyle($colSalida . $fila)
+                                ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                ->getStartColor()->setARGB('FF00B050');
+                            $validado = true;
+                            $stopIncProcessing = true;
+                            break;
+                        }
+
+                        // Caso cat 11 (comisión / permiso personal): solo entrada O salida, usar horas aprobadas
+                        if ($cat === 11 && $estatus === 3) {
+                            // Normalizamos con DateTime (si existe)
+
+                            // Si hay hora de inicio dentro del rango de la mañana -> marcar entrada como permiso
+                            if ($horaInicio) {
+                                // compara solo la parte de tiempo: 09:01:00 - 12:00:00 (ajusta si tus rangos cambian)
+                                if ($horaInicio >= '08:00:00' && $horaFin <= '12:01:00') {
+                                    $valorEntrada = $nombreInc;
+                                    $sheet->getStyle($colEntrada . $fila)
+                                        ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                        // agregar FF al color
+                                        ->getStartColor()->setARGB('FF6EA11D');
+                                    $validado = true;
+                                    $stopIncProcessing = true;
+                                }
+                            }
+
+                            // Si hay hora fin y cae en el rango de tarde -> marcar salida como permiso
+                            if (!$stopIncProcessing && $horaFin) {
+                                if ($horaFin >= '12:01:00' && $horaFin <= '16:00:00') {
+                                    $valorSalida = $nombreInc;
+                                    $sheet->getStyle($colSalida . $fila)
+                                        ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                        ->getStartColor()->setARGB('FF6EA11D');
+                                    $validado = true;
+                                    $stopIncProcessing = true;
+                                }
+                            }
+
+                            // Si la comisión es de todo el día (inicio y fin) podrías decidir marcar ambos campos:
+                            if (!$stopIncProcessing && $horaInicio && $horaFin) {
+                                // ejemplo simple: si cubre mañana y tarde -> marcar ambos
                                 $valorEntrada = $nombreInc;
                                 $valorSalida = $nombreInc;
                                 $sheet->getStyle($colEntrada . $fila)
-                                ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                ->getStartColor()->setARGB('FF00B050');
+                                    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                    ->getStartColor()->setARGB('FF6EA11D');
                                 $sheet->getStyle($colSalida . $fila)
-                                ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                ->getStartColor()->setARGB('FF00B050');
+                                    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                    ->getStartColor()->setARGB('FF6EA11D');
                                 $validado = true;
+                                $stopIncProcessing = true;
+                            }
+
+                            // si ya procesaste, salir
+                            if ($stopIncProcessing)
                                 break;
-                            case 2: // Rechazado
+                        }
+                        if ($cat === 1 && $estatus === 3) {
+                            // Normalizamos con DateTime (si existe)
+
+                            // Si hay hora de inicio dentro del rango de la mañana -> marcar entrada como permiso
+                            if ($horaInicio) {
+                                // compara solo la parte de tiempo: 09:01:00 - 12:00:00 (ajusta si tus rangos cambian)
+                                if ($horaInicio >= '08:00:00' && $horaFin <= '12:01:00') {
+                                    $valorEntrada = $nombreInc;
+                                    $sheet->getStyle($colEntrada . $fila)
+                                        ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                        // agregar FF al color
+                                        ->getStartColor()->setARGB('FF6EA11D');
+                                    $validado = true;
+                                    $stopIncProcessing = true;
+                                }
+                            }
+
+                            // Si hay hora fin y cae en el rango de tarde -> marcar salida como permiso
+                            if (!$stopIncProcessing && $horaFin) {
+                                if ($horaInicio >= '12:01:00' && $horaFin <= '16:00:00') {
+                                    $valorSalida = $nombreInc;
+                                    $sheet->getStyle($colSalida . $fila)
+                                        ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                        ->getStartColor()->setARGB('FF6EA11D');
+                                    $validado = true;
+                                    $stopIncProcessing = true;
+                                }
+                            }
+
+                            // Si la comisión es de todo el día (inicio y fin) podrías decidir marcar ambos campos:
+                            if (!$stopIncProcessing && $horaInicio >= '08:30:00' &&  $horaFin <= '16:00:00') {
+                                // ejemplo simple: si cubre mañana y tarde -> marcar ambos
+                                $valorEntrada = $valorSalida = $nombreInc;
                                 $sheet->getStyle($colEntrada . $fila)
+                                    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                    ->getStartColor()->setARGB('FF6EA11D');
+                                $sheet->getStyle($colSalida . $fila)
+                                    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                    ->getStartColor()->setARGB('FF6EA11D');
+                                $validado = true;
+                                $stopIncProcessing = true;
+                            }
+
+                            // si ya procesaste, salir
+                            if ($stopIncProcessing)
+                                break;
+                        }
+                        if ($cat === 7 && $estatus === 3) {
+                            // Normalizamos con DateTime (si existe)
+
+                            // Si hay hora de inicio dentro del rango de la mañana -> marcar entrada como permiso
+                            if ($horaInicio) {
+                                // compara solo la parte de tiempo: 09:01:00 - 12:00:00 (ajusta si tus rangos cambian)
+                                if ($horaInicio >= '08:00:00' && $horaFin <= '12:01:00') {
+                                    $valorEntrada = 'CONSTANCIA DE TIEMPO';
+                                    $sheet->getStyle($colEntrada . $fila)
+                                        ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                        // agregar FF al color
+                                        ->getStartColor()->setARGB('FF6EA11D');
+                                    $validado = true;
+                                    $stopIncProcessing = true;
+                                }
+                            }
+
+                            // Si hay hora fin y cae en el rango de tarde -> marcar salida como permiso
+                            if (!$stopIncProcessing && $horaFin) {
+                                if ($horaInicio >= '12:01:00' && $horaFin <= '16:00:00') {
+                                    $valorSalida = 'CONSTANCIA DE TIEMPO';
+                                    $sheet->getStyle($colSalida . $fila)
+                                        ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                        ->getStartColor()->setARGB('FF6EA11D');
+                                    $validado = true;
+                                    $stopIncProcessing = true;
+                                }
+                            }
+
+                            // Si la comisión es de todo el día (inicio y fin) podrías decidir marcar ambos campos:
+                            if (!$stopIncProcessing && $horaInicio >= '08:30:00' &&  $horaFin <= '16:00:00') {
+                                // ejemplo simple: si cubre mañana y tarde -> marcar ambos
+                                $valorEntrada = $valorSalida ='CONSTANCIA DE TIEMPO';
+                                $sheet->getStyle($colEntrada . $fila)
+                                    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                    ->getStartColor()->setARGB('FF6EA11D');
+                                $sheet->getStyle($colSalida . $fila)
+                                    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                    ->getStartColor()->setARGB('FF6EA11D');
+                                $validado = true;
+                                $stopIncProcessing = true;
+                            }
+
+                            // si ya procesaste, salir
+                            if ($stopIncProcessing)
+                                break;
+                        }
+
+                        // Otros estatus (rechazado/en proceso) -> manejar aquí si lo necesitas
+                        if ($estatus === 2) {
+                            $valorEntrada = 'Declinado';
+                            $sheet->getStyle($colEntrada . $fila)
                                 ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                                 ->getStartColor()->setARGB('FFFF0000');
-                                $valorEntrada = 'Declinado';
-                                break;
-                            case 1: // En proceso
-                                $sheet->getStyle($colEntrada . $fila)
+                            $validado = true;
+                            $stopIncProcessing = true;
+                            break;
+                        }
+                        if ($estatus === 1) {
+                            $valorEntrada = 'Sin validar';
+                            $sheet->getStyle($colEntrada . $fila)
                                 ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                                 ->getStartColor()->setARGB('FFFF0000');
-                                $valorEntrada = 'Sin validar';
-                                break;
+                            $validado = true;
+                            $stopIncProcessing = true;
+                            break;
                         }
                     }
                 }
 
-                $sheet->setCellValue($colEntrada . $fila, $valorEntrada);
-                $sheet->setCellValue($colSalida . $fila, $valorSalida);
-                
+                // --- AHORA aplicar la validación de retardo/ sin registro solo si NO fue validado por incidencias ---
                 if (!$validado) {
-                    if ($entrada >= '08:46:00' && $entrada <= '09:01:00') {
-                        // Retardo leve -> Amarillo
-                        $sheet->getStyle($colEntrada . $fila)
-                            ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                            ->getStartColor()->setARGB('FFFFFF00');
-                    } elseif (empty($entrada) || !$entrada || $entrada == '') {
-                        // Sin registro -> Rojo
+                    // Si no hay entrada -> "Sin registro"
+                    if (empty($entrada) || !$entrada) {
+                        $valorEntrada = 'Sin registro';
                         $sheet->getStyle($colEntrada . $fila)
                             ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                             ->getStartColor()->setARGB('FFFF0000');
-                        $valorEntrada = 'Sin registro';
+                    } else {
+                        // Retardo leve -> Amarillo (08:46 - 09:01)
+                        try {
+                            $tEntrada = new \DateTime($entrada);
+                            $t0846 = new \DateTime('08:46:00');
+                            $t0901 = new \DateTime('09:01:00');
+                            if ($tEntrada >= $t0846 && $tEntrada <= $t0901) {
+                                $sheet->getStyle($colEntrada . $fila)
+                                    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                    ->getStartColor()->setARGB('FFFFFF00');
+                            }
+                        } catch (\Exception $e) {
+                            // si $entrada no es parseable, dejar tal cual
+                        }
                     }
                 }
-                    
+
+                // Finalmente escribimos los valores en la hoja (después de todas las validaciones)
+                $sheet->setCellValue($colEntrada . $fila, $valorEntrada);
+                $sheet->setCellValue($colSalida . $fila, $valorSalida);
+
                 $colIndex += 2;
+
             }
             $fila++;
         }
-        
+
         // Ajustar dimensiones de columnas
         $sheet->getColumnDimension('A')->setWidth(40);
         $totalCols = 1 + (count($fechasDelPeriodo) * 2);
@@ -720,7 +908,7 @@ class Usuario extends BaseController
             $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i);
             $sheet->getColumnDimension($colLetter)->setWidth(18);
         }
-        
+
         // Agregar bordes a la tabla de datos
         $lastRow = $fila - 1;
         $lastCol = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($totalCols);
@@ -736,7 +924,7 @@ class Usuario extends BaseController
         header('Cache-Control: max-age=0');
         $writer->save('php://output');
         exit;
-        }
+    }
 
 
 
@@ -746,37 +934,37 @@ class Usuario extends BaseController
         $principal = new Mglobal;
 
         $id_incidencia = $this->request->getPost('id_incidencia');
-     //   var_dump( $id_incidencia);
-      //  die();
-        $dataDB = array('tabla' => 'incidencia', 'where' => ['visible' => 1, 'id_incidencia'=>$id_incidencia]);
+        //   var_dump( $id_incidencia);
+        //  die();
+        $dataDB = array('tabla' => 'incidencia', 'where' => ['visible' => 1, 'id_incidencia' => $id_incidencia]);
         $response = $principal->getTabla($dataDB);
         return $this->respond($response->data[0]);
     }
- 
+
     public function estatusReservaGo()
     {
         $session = \Config\Services::session();
         $principal = new Mglobal;
         $response = new \stdClass();
-        $response->error =  true;
-        $response->respuesta =  'Error! Error al guardar en la base de datos';
+        $response->error = true;
+        $response->respuesta = 'Error! Error al guardar en la base de datos';
         $data = $this->request->getPost();
-    
+
         $dataConfig = [
-            "tabla"=>"reserva_go",
-            "editar"=>true,
-            "idEditar" => ['id_reserva_go'=>(int)$data['id_reserva']]
+            "tabla" => "reserva_go",
+            "editar" => true,
+            "idEditar" => ['id_reserva_go' => (int) $data['id_reserva']]
         ];
         $dataInsert = [
-            "observaciones" => (isset($data['observaciones']) && !empty($data['observaciones']))?$data['observaciones']:'',
-            "id_estatus"    => (isset($data['motivo']) && !empty($data['motivo']))?(int)$data['motivo']:'',
-            "no_reserva"    => (isset($data['numero_reserva']) && !empty($data['numero_reserva']))?(int)$data['numero_reserva']:'',
-            "usu_act"       => $session->get('id_usuario'),
+            "observaciones" => (isset($data['observaciones']) && !empty($data['observaciones'])) ? $data['observaciones'] : '',
+            "id_estatus" => (isset($data['motivo']) && !empty($data['motivo'])) ? (int) $data['motivo'] : '',
+            "no_reserva" => (isset($data['numero_reserva']) && !empty($data['numero_reserva'])) ? (int) $data['numero_reserva'] : '',
+            "usu_act" => $session->get('id_usuario'),
         ];
-      
-        $result = $principal->saveTabla($dataInsert,$dataConfig,['id_user' => $session->get('id_usuario'), "script"=>"estatus.Reserva"]);
-      
-        if(!$result->error){
+
+        $result = $principal->saveTabla($dataInsert, $dataConfig, ['id_user' => $session->get('id_usuario'), "script" => "estatus.Reserva"]);
+
+        if (!$result->error) {
             $response->error = false;
             $response->respuesta = $result->respuesta;
 
@@ -788,25 +976,25 @@ class Usuario extends BaseController
         $session = \Config\Services::session();
         $principal = new Mglobal;
         $response = new \stdClass();
-        $response->error =  true;
-        $response->respuesta =  'Error! Error al guardar en la base de datos';
+        $response->error = true;
+        $response->respuesta = 'Error! Error al guardar en la base de datos';
         $data = $this->request->getPost();
-    
+
         $dataConfig = [
-            "tabla"=>"reserva",
-            "editar"=>true,
-            "idEditar" => ['id_reserva'=>(int)$data['id_reserva']]
+            "tabla" => "reserva",
+            "editar" => true,
+            "idEditar" => ['id_reserva' => (int) $data['id_reserva']]
         ];
         $dataInsert = [
-            "observaciones" => (isset($data['observaciones']) && !empty($data['observaciones']))?$data['observaciones']:'',
-            "id_estatus"    => (isset($data['motivo']) && !empty($data['motivo']))?(int)$data['motivo']:'',
-            "no_reserva"    => (isset($data['numero_reserva']) && !empty($data['numero_reserva']))?(int)$data['numero_reserva']:'',
-            "usu_act"       => $session->get('id_usuario'),
+            "observaciones" => (isset($data['observaciones']) && !empty($data['observaciones'])) ? $data['observaciones'] : '',
+            "id_estatus" => (isset($data['motivo']) && !empty($data['motivo'])) ? (int) $data['motivo'] : '',
+            "no_reserva" => (isset($data['numero_reserva']) && !empty($data['numero_reserva'])) ? (int) $data['numero_reserva'] : '',
+            "usu_act" => $session->get('id_usuario'),
         ];
-      
-        $result = $principal->saveTabla($dataInsert,$dataConfig,['id_user' => $session->get('id_usuario'), "script"=>"estatus.Reserva"]);
-      
-        if(!$result->error){
+
+        $result = $principal->saveTabla($dataInsert, $dataConfig, ['id_user' => $session->get('id_usuario'), "script" => "estatus.Reserva"]);
+
+        if (!$result->error) {
             $response->error = false;
             $response->respuesta = $result->respuesta;
 
@@ -819,14 +1007,14 @@ class Usuario extends BaseController
         $principal = new Mglobal;
         $response = new \stdClass();
         $id_reserva = $this->request->getPost('id_reserva');
-       
+
         $dataConfig = [
-            "tabla"=>"reserva_go",
-            "editar"=>true,
-            "idEditar" => ['id_reserva_go'=>$id_reserva]
+            "tabla" => "reserva_go",
+            "editar" => true,
+            "idEditar" => ['id_reserva_go' => $id_reserva]
         ];
-        $result = $principal->saveTabla(['visible'=>0],$dataConfig,["script"=>"eliminar.Reserva"]);
-        if(!empty($resul->data)){
+        $result = $principal->saveTabla(['visible' => 0], $dataConfig, ["script" => "eliminar.Reserva"]);
+        if (!empty($resul->data)) {
             $response->error = $result->error;
             $response->respuesta = $result->respuesta;
 
@@ -840,12 +1028,12 @@ class Usuario extends BaseController
         $response = new \stdClass();
         $id_reserva = $this->request->getPost('id_reserva');
         $dataConfig = [
-            "tabla"=>"reserva",
-            "editar"=>true,
-            "idEditar" => ['id_reserva'=>$id_reserva]
+            "tabla" => "reserva",
+            "editar" => true,
+            "idEditar" => ['id_reserva' => $id_reserva]
         ];
-        $result = $principal->saveTabla(['visible'=>0],$dataConfig,["script"=>"eliminar.Reserva"]);
-        if(!empty($resul->data)){
+        $result = $principal->saveTabla(['visible' => 0], $dataConfig, ["script" => "eliminar.Reserva"]);
+        if (!empty($resul->data)) {
             $response->error = $result->error;
             $response->respuesta = $result->respuesta;
 
@@ -869,15 +1057,20 @@ class Usuario extends BaseController
 
         // 3. Encabezados CORREGIDOS
         $encabezados = [
-            'ID', 'NOMBRE', 'PRIMER APELLIDO', 'SEGUNDO APELLIDO', 'CORREO',
-            'AREA', 'EXTENCION'
+            'ID',
+            'NOMBRE',
+            'PRIMER APELLIDO',
+            'SEGUNDO APELLIDO',
+            'CORREO',
+            'AREA',
+            'EXTENCION'
         ];
-        
+
         // Colocar encabezados correctamente
         $columnas = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
         foreach ($encabezados as $index => $titulo) {
             $sheet->setCellValue($columnas[$index] . '1', $titulo);
-            
+
             // Opcional: estilo para encabezados
             $sheet->getStyle($columnas[$index] . '1')->getFont()->setBold(true);
         }
@@ -931,10 +1124,26 @@ class Usuario extends BaseController
 
         // 3. Encabezados
         $encabezados = [
-            'RESERVA', 'Sociedad', 'Ejercicio', 'Clase de Documento', 'Fecha  Contabilizacion',
-            'Fecha del Documento', 'Texto de Cabecera', 'Refencia del Documento', 'Importe de la Posicion', 'Texto Posicion',
-            'Partida', 'Centro Gestor', 'Fondo', 'Area Funcional',
-            'Cuenta de Mayor', 'Division', 'Centro de Costo', 'Numero de Orden', 'Elemento PEP', 'Acreedor',
+            'RESERVA',
+            'Sociedad',
+            'Ejercicio',
+            'Clase de Documento',
+            'Fecha  Contabilizacion',
+            'Fecha del Documento',
+            'Texto de Cabecera',
+            'Refencia del Documento',
+            'Importe de la Posicion',
+            'Texto Posicion',
+            'Partida',
+            'Centro Gestor',
+            'Fondo',
+            'Area Funcional',
+            'Cuenta de Mayor',
+            'Division',
+            'Centro de Costo',
+            'Numero de Orden',
+            'Elemento PEP',
+            'Acreedor',
             'Fecha de Vencimiento'
         ];
         $col = 'A';
@@ -949,7 +1158,7 @@ class Usuario extends BaseController
             $sheet->setCellValue('A' . $fila, '');
             $sheet->setCellValue('B' . $fila, 'GEG');
             $sheet->setCellValue('C' . $fila, $row->ejercicio);
-            $sheet->setCellValue('D' . $fila,'RF');
+            $sheet->setCellValue('D' . $fila, 'RF');
             $sheet->setCellValue('E' . $fila, date('dmY', strtotime($row->fec_reg)));
             $sheet->setCellValue('F' . $fila, date('dmY', strtotime($row->fec_reg)));
             $sheet->setCellValue('G' . $fila, $row->texto_cabecera);
@@ -966,8 +1175,8 @@ class Usuario extends BaseController
             $sheet->setCellValue('R' . $fila, '/');
             $sheet->setCellValue('S' . $fila, $row->elemento_pep);
             $sheet->setCellValue('T' . $fila, '');
-            $sheet->setCellValue('U' . $fila,  '31122025');
-            $sheet->setCellValue('V' . $fila,  $row->dsc_area);
+            $sheet->setCellValue('U' . $fila, '31122025');
+            $sheet->setCellValue('V' . $fila, $row->dsc_area);
             $fila++;
         }
 
@@ -983,7 +1192,7 @@ class Usuario extends BaseController
         $writer->save('php://output');
         exit;
     }
-   public function Descarga()
+    public function Descarga()
     {
         $session = \Config\Services::session();
         $globals = new Mglobal;
@@ -1019,18 +1228,18 @@ class Usuario extends BaseController
                 $sheet->setCellValue('I' . $fila, $row->nombre);
                 $sheet->setCellValue('J' . $fila, $row->primer_apellido);
                 $sheet->setCellValue('K' . $fila, $row->segundo_apellido);
-                $sheet->setCellValue('L' . $fila, ($row->id_sexo==2)?'HOMBRE':'MUJER');
+                $sheet->setCellValue('L' . $fila, ($row->id_sexo == 2) ? 'HOMBRE' : 'MUJER');
                 $sheet->setCellValue('M' . $fila, $row->dsc_gasto);
                 $sheet->setCellValue('N' . $fila, 'revisar');
                 $sheet->setCellValue('O' . $fila, $row->dsc_viaje);
                 $sheet->setCellValue('P' . $fila, $row->no_personas);
                 $sheet->setCellValue('Q' . $fila, $row->importe_total);
                 $sheet->setCellValue('R' . $fila, $row->dsc_pais_origen);
-                $sheet->setCellValue('S' . $fila, (empty($row->estado_origen_text))?$row->dsc_estado_origen:$row->estado_origen_text);
-                $sheet->setCellValue('T' . $fila, (empty($row->municipio_origen_text))?$row->dsc_municipio_origen:$row->municipio_origen_text);
+                $sheet->setCellValue('S' . $fila, (empty($row->estado_origen_text)) ? $row->dsc_estado_origen : $row->estado_origen_text);
+                $sheet->setCellValue('T' . $fila, (empty($row->municipio_origen_text)) ? $row->dsc_municipio_origen : $row->municipio_origen_text);
                 $sheet->setCellValue('U' . $fila, $row->dsc_pais_destino);
-                $sheet->setCellValue('V' . $fila, (empty($row->estado_destino_text))?$row->dsc_estado_destino:$row->estado_destino_text);
-                $sheet->setCellValue('W' . $fila, (empty($row->municipio_destino_text))?$row->dsc_municipio_destino:$row->municipio_destino_text);
+                $sheet->setCellValue('V' . $fila, (empty($row->estado_destino_text)) ? $row->dsc_estado_destino : $row->estado_destino_text);
+                $sheet->setCellValue('W' . $fila, (empty($row->municipio_destino_text)) ? $row->dsc_municipio_destino : $row->municipio_destino_text);
                 $sheet->setCellValue('X' . $fila, $row->motivo_encargo);
                 $sheet->setCellValue('Y' . $fila, $row->fec_salida);
                 $sheet->setCellValue('Z' . $fila, $row->fec_regreso); // corregido
@@ -1046,7 +1255,7 @@ class Usuario extends BaseController
         $writer->save("php://output");
     }
 
-   
+
     public function getUsuarios()
     {
         $session = \Config\Services::session();
@@ -1056,7 +1265,7 @@ class Usuario extends BaseController
             $dataDB = array('tabla' => 'vw_usuario', 'where' => ['visible' => 1]);
         } elseif ($session->id_perfil == 1) {
             $dataDB = array('tabla' => 'vw_usuario', 'where' => ['visible' => 1]);
-        } 
+        }
         $response = $principal->getTabla($dataDB);
         // var_dump($response);
         // die();
@@ -1064,28 +1273,30 @@ class Usuario extends BaseController
     }
     public function guardarTiket()
     {
-        $session   = \Config\Services::session();
-        $tiket     = $this->request->getPost('randomTicket');
-        $opcion    = $this->request->getPost('opcion');
-  
+        $session = \Config\Services::session();
+        $tiket = $this->request->getPost('randomTicket');
+        $opcion = $this->request->getPost('opcion');
+
         $principal = new Mglobal;
-         $hoy = date("Y-m-d H:i:s"); 
-        $dataInsert = ['no_tiket' => $tiket,
-                       'descripcion' =>$opcion,
-                       'usuario' => $session->get('id_usuario'),
-                       'fec_reg' => $hoy ];
-        $dataConfig = [
-            "tabla"=>"tiket",
-            "editar"=>false
+        $hoy = date("Y-m-d H:i:s");
+        $dataInsert = [
+            'no_tiket' => $tiket,
+            'descripcion' => $opcion,
+            'usuario' => $session->get('id_usuario'),
+            'fec_reg' => $hoy
         ];
-        $response = $principal->saveTabla($dataInsert,$dataConfig,["script"=>"Usuario.tiket"]);
+        $dataConfig = [
+            "tabla" => "tiket",
+            "editar" => false
+        ];
+        $response = $principal->saveTabla($dataInsert, $dataConfig, ["script" => "Usuario.tiket"]);
         return $this->respond($response);
     }
     public function getUsuario()
     {
         $session = \Config\Services::session();
         $id_usuario = $this->request->getPost('id_usuario');
-        
+
         // Validar que el ID de usuario esté presente y sea válido
         if (!$id_usuario) {
             return $this->fail('ID de usuario no proporcionado', 400);
@@ -1093,7 +1304,7 @@ class Usuario extends BaseController
 
         // var_dump($id_usuario);
         // die();
-        $response = $this->globals->getTabla(["tabla"=>"vw_usuario","where"=>["id_usuario" => $id_usuario, "visible" => 1]])->data;
+        $response = $this->globals->getTabla(["tabla" => "vw_usuario", "where" => ["id_usuario" => $id_usuario, "visible" => 1]])->data;
         //var_dump($response[0]);
         //die();
         return $this->respond($response[0]);
@@ -1104,17 +1315,17 @@ class Usuario extends BaseController
         $response->error = true;
         $data = $this->request->getPost();
 
-        if (!isset($data['id_participante']) || empty($data['id_participante'])){
+        if (!isset($data['id_participante']) || empty($data['id_participante'])) {
             $response->respuesta = "No se ha proporcionado un identificador válido";
             return $this->respond($response);
         }
 
         $dataConfig = [
-            "tabla"=>"participantes",
-            "editar"=>true,
-            "idEditar"=>['id_participante'=>$data['id_participante']]
+            "tabla" => "participantes",
+            "editar" => true,
+            "idEditar" => ['id_participante' => $data['id_participante']]
         ];
-        $response = $this->globals->saveTabla(["visible"=>0],$dataConfig,["script"=>"Usuario.deleteUsuario"]);
+        $response = $this->globals->saveTabla(["visible" => 0], $dataConfig, ["script" => "Usuario.deleteUsuario"]);
         return $this->respond($response);
     }
     public function deleteUsuario()
@@ -1123,17 +1334,17 @@ class Usuario extends BaseController
         $response->error = true;
         $data = $this->request->getPost();
 
-        if (!isset($data['id_usuario']) || empty($data['id_usuario'])){
+        if (!isset($data['id_usuario']) || empty($data['id_usuario'])) {
             $response->respuesta = "No se ha proporcionado un identificador válido";
             return $this->respond($response);
         }
 
         $dataConfig = [
-            "tabla"=>"usuario",
-            "editar"=>true,
-            "idEditar"=>['id_usuario'=>$data['id_usuario']]
+            "tabla" => "usuario",
+            "editar" => true,
+            "idEditar" => ['id_usuario' => $data['id_usuario']]
         ];
-        $response = $this->globals->saveTabla(["visible"=>0],$dataConfig,["script"=>"Usuario.deleteUsuario"]);
+        $response = $this->globals->saveTabla(["visible" => 0], $dataConfig, ["script" => "Usuario.deleteUsuario"]);
         return $this->respond($response);
     }
     public function estudianteCurso()
@@ -1142,17 +1353,17 @@ class Usuario extends BaseController
         $response->error = true;
         $data = $this->request->getPost();
 
-        if (!isset($data['id_estudiante_curso']) || empty($data['id_estudiante_curso'])){
+        if (!isset($data['id_estudiante_curso']) || empty($data['id_estudiante_curso'])) {
             $response->respuesta = "No se ha proporcionado un identificador válido";
             return $this->respond($response);
         }
 
         $dataConfig = [
-            "tabla"=>"estudiante_curso",
-            "editar"=>true,
-            "idEditar"=>['id_estudiante_curso'=>$data['id_estudiante_curso']]
+            "tabla" => "estudiante_curso",
+            "editar" => true,
+            "idEditar" => ['id_estudiante_curso' => $data['id_estudiante_curso']]
         ];
-        $response = $this->globals->saveTabla(["visible"=>0],$dataConfig,["script"=>"Usuario.deleteUsuario"]);
+        $response = $this->globals->saveTabla(["visible" => 0], $dataConfig, ["script" => "Usuario.deleteUsuario"]);
         return $this->respond($response);
 
     }
@@ -1163,37 +1374,37 @@ class Usuario extends BaseController
         $response->repuesta = "Error|Error al guardar en la base de datos";
         $data = $this->request->getPost();
 
-        if (!isset($data['id_detenido']) || empty($data['id_detenido'])){
+        if (!isset($data['id_detenido']) || empty($data['id_detenido'])) {
             $response->respuesta = "No se ha proporcionado un identificador válido";
             return $this->respond($response);
         }
 
         $dataConfig = [
-            "tabla"=>"detenidos",
-            "editar"=>true,
-            "idEditar"=>['id_detenido'=>$data['id_detenido']]
+            "tabla" => "detenidos",
+            "editar" => true,
+            "idEditar" => ['id_detenido' => $data['id_detenido']]
         ];
-        $result = $this->globals->saveTabla(["visible"=>0],$dataConfig,["script"=>"Usuario.deleteDetenido"]);
-        if(!$result->error){
-            $response->error     = $result->error;
+        $result = $this->globals->saveTabla(["visible" => 0], $dataConfig, ["script" => "Usuario.deleteDetenido"]);
+        if (!$result->error) {
+            $response->error = $result->error;
             $response->respuesta = $result->respuesta;
 
         }
         return $this->respond($response);
     }
-  
-   
+
+
     public function getCursos()
     {
         $session = \Config\Services::session();
         $response = new \stdClass();
         $response->error = true;
         $id_cat = $this->request->getPost('id_cat');
-        $result = $this->globals->getTabla(["tabla"=>"cursos_sac", "where"=>["visible"=>1 ]]);
-        if(!$result->error){
-            $response->error      =  false;
-            $response->respuesta  =  $result->respuesta;
-            $response->data       =  $result->data;
+        $result = $this->globals->getTabla(["tabla" => "cursos_sac", "where" => ["visible" => 1]]);
+        if (!$result->error) {
+            $response->error = false;
+            $response->respuesta = $result->respuesta;
+            $response->data = $result->data;
         }
 
         return $this->respond($response->data);
@@ -1204,11 +1415,11 @@ class Usuario extends BaseController
         $response = new \stdClass();
         $response->error = true;
         $id_perfil = $this->request->getPost('id_perfil');
-        $result = $this->globals->getTabla(["tabla"=>"perfil", "where"=>["id_perfil"=>$id_perfil ]]);
-        if(!$result->error){
-            $response->error      =  false;
-            $response->respuesta  =  $result->respuesta;
-            $response->dsc_perfil       =  $result->data[0]->dsc_perfil;
+        $result = $this->globals->getTabla(["tabla" => "perfil", "where" => ["id_perfil" => $id_perfil]]);
+        if (!$result->error) {
+            $response->error = false;
+            $response->respuesta = $result->respuesta;
+            $response->dsc_perfil = $result->data[0]->dsc_perfil;
         }
 
         return $this->respond($response);
@@ -1219,11 +1430,11 @@ class Usuario extends BaseController
         $response = new \stdClass();
         $response->error = true;
         $id_area = $this->request->getPost('id_area');
-        $result = $this->globals->getTabla(["tabla"=>"cat_area", "where"=>["id_area"=>$id_area ]]);
-        if(!$result->error){
-            $response->error      =  false;
-            $response->respuesta  =  $result->respuesta;
-            $response->data =  $result->data[0];
+        $result = $this->globals->getTabla(["tabla" => "cat_area", "where" => ["id_area" => $id_area]]);
+        if (!$result->error) {
+            $response->error = false;
+            $response->respuesta = $result->respuesta;
+            $response->data = $result->data[0];
         }
 
         return $this->respond($response);
@@ -1234,11 +1445,11 @@ class Usuario extends BaseController
         $response = new \stdClass();
         $response->error = true;
         $id_puesto = $this->request->getPost('id_puesto');
-        $result = $this->globals->getTabla(["tabla"=>"cat_puesto", "where"=>["id_puesto"=>$id_puesto ]]);
-        if(!$result->error){
-            $response->error      =  false;
-            $response->respuesta  =  $result->respuesta;
-            $response->dsc_puesto =  $result->data[0]->dsc_puesto;
+        $result = $this->globals->getTabla(["tabla" => "cat_puesto", "where" => ["id_puesto" => $id_puesto]]);
+        if (!$result->error) {
+            $response->error = false;
+            $response->respuesta = $result->respuesta;
+            $response->dsc_puesto = $result->data[0]->dsc_puesto;
         }
 
         return $this->respond($response);
@@ -1290,11 +1501,11 @@ class Usuario extends BaseController
         $session = \Config\Services::session();
         $response = new \stdClass();
         $response->error = true;
-        $result = $this->globals->getTabla(["tabla"=>"perfil", 'where' =>['visible' =>1]]);
-        if(!$result->error){
-            $response->error      =  false;
-            $response->respuesta  =  $result->respuesta;
-            $response->data       =  $result->data;
+        $result = $this->globals->getTabla(["tabla" => "perfil", 'where' => ['visible' => 1]]);
+        if (!$result->error) {
+            $response->error = false;
+            $response->respuesta = $result->respuesta;
+            $response->data = $result->data;
 
         }
         return $this->respond($response->data);
@@ -1304,11 +1515,11 @@ class Usuario extends BaseController
         $session = \Config\Services::session();
         $response = new \stdClass();
         $response->error = true;
-        $result = $this->globals->getTabla(["tabla"=>"cursos_sac", 'where' => ['visible' => 1]]);
-        if(!$result->error){
-            $response->error      =  false;
-            $response->respuesta  =  $result->respuesta;
-            $response->data       =  $result->data;
+        $result = $this->globals->getTabla(["tabla" => "cursos_sac", 'where' => ['visible' => 1]]);
+        if (!$result->error) {
+            $response->error = false;
+            $response->respuesta = $result->respuesta;
+            $response->data = $result->data;
 
         }
         return $this->respond($response->data);
@@ -1319,239 +1530,239 @@ class Usuario extends BaseController
         $response = new \stdClass();
         $response->error = true;
         $id_curso = $this->request->getPost('id_curso');
-        $cursos    = $this->globals->getTabla(["tabla"=>"cursos_sac", 'where' => ['id_cursos_sac' => $id_curso, 'visible' => 1]]);
-        $categoria = $this->globals->getTabla(["tabla"=>"vw_categoria", 'where' => ['id_curso' => $id_curso, 'visible' => 1]]);
-        $periodo   = $this->globals->getTabla(["tabla"=>"vw_periodo", 'where' => ['id_curso' => $id_curso, 'visible' => 1]]);
-        if(!$cursos->error){
-            $response->error        =  false;
-            $response->respuesta    =  $cursos->respuesta;
-            $response->data['curso']=  $cursos->data;
+        $cursos = $this->globals->getTabla(["tabla" => "cursos_sac", 'where' => ['id_cursos_sac' => $id_curso, 'visible' => 1]]);
+        $categoria = $this->globals->getTabla(["tabla" => "vw_categoria", 'where' => ['id_curso' => $id_curso, 'visible' => 1]]);
+        $periodo = $this->globals->getTabla(["tabla" => "vw_periodo", 'where' => ['id_curso' => $id_curso, 'visible' => 1]]);
+        if (!$cursos->error) {
+            $response->error = false;
+            $response->respuesta = $cursos->respuesta;
+            $response->data['curso'] = $cursos->data;
         }
-        if(!$categoria->error){
-            $response->error        =  false;
-            $response->respuesta    =  $categoria->respuesta;
-            $response->data['categoria']=  $categoria->data;
+        if (!$categoria->error) {
+            $response->error = false;
+            $response->respuesta = $categoria->respuesta;
+            $response->data['categoria'] = $categoria->data;
         }
-        if(!$periodo->error){
-            $response->error        =  false;
-            $response->respuesta    =  $periodo->respuesta;
-            $response->data['periodo']=  $periodo->data;
+        if (!$periodo->error) {
+            $response->error = false;
+            $response->respuesta = $periodo->respuesta;
+            $response->data['periodo'] = $periodo->data;
         }
         return $this->respond($response);
     }
- public function guardarArea()
-{
-    $session = \Config\Services::session();
-    $response = new \stdClass();
-    $response->error = true;
-    
-    // Validar que los datos POST existen
-    if (!$this->request->getPost()) {
-        $response->respuesta = "No se recibieron datos";
-        return $this->respond($response);
-    }
-    $data = $this->request->getPost();
-    //die( var_dump( $data ) );
-    // Preparar datos según el tipo de operación
-
-    switch ($data['editar']) {
-        case 1: // Editar perfil
-            if (empty($data['dsc_area']) || empty($data['dsc_area'])) {
-                $response->respuesta = "El Area es requerida";
-                return $this->respond($response);
-            }
-            if (empty($data['dsc_corto']) || empty($data['dsc_corto'])) {
-                $response->respuesta = "Las SIGLAS son requeridas";
-                return $this->respond($response);
-            }
-            if (empty($data['id_usuario']) || empty($data['id_usuario'])) {
-                $response->respuesta = "El titular es requerido";
-                return $this->respond($response);
-            }
-            
-            $dataInsert = [       
-                'dsc_area'  => trim($data['dsc_area']),
-                'dsc_corto' => $data['dsc_corto'],
-                'titular'=> (int)$data['id_usuario'],
-            ];
-            $dataConfig = [
-                "tabla" => "cat_area",
-                "editar" => true,
-                "idEditar" => ['id_area' => (int)$data['id_area']]
-            ];
-            break;
-            
-        case 2: // Desactivar perfil
-            if (empty($data['id_area'])) {
-                $response->respuesta = "Falta el ID del perfil";
-                return $this->respond($response);
-            }
-            
-            $dataInsert = [       
-                'visible' => 0,
-            ];
-            $dataConfig = [
-                "tabla" => "cat_area",
-                "editar" => true,
-                "idEditar" => ['id_area' => (int)$data['id_area']]
-            ];
-            break;
-            
-   
-    }
-    
-    // Intentar guardar
-     $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaCategoriasPadre'];
-    try {
-        $response = $this->globals->saveTabla($dataInsert, $dataConfig,$dataBitacora);
-        return $this->respond($response);
-    } catch (\Exception $e) {
+    public function guardarArea()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
         $response->error = true;
-        $response->message = "Error al guardar: " . $e->getMessage();
-        return $this->respond($response, 500);
-    }
-}
- public function guardarPerfil()
-{
-    $session = \Config\Services::session();
-    $response = new \stdClass();
-    $response->error = true;
-    
-    // Validar que los datos POST existen
-    if (!$this->request->getPost()) {
-        $response->message = "No se recibieron datos";
-        return $this->respond($response);
-    }
 
-    $data = $this->request->getPost();
-    
-  
-
-    // Preparar datos según el tipo de operación
-    switch ($data['editar']) {
-        case 1: // Editar perfil
-            if (empty($data['comentario']) || empty($data['id_perfil'])) {
-                $response->message = "Faltan datos requeridos para editar";
-                return $this->respond($response);
-            }
-            
-            $dataInsert = [       
-                'dsc_perfil' => trim($data['comentario']),
-            ];
-            $dataConfig = [
-                "tabla" => "perfil",
-                "editar" => true,
-                "idEditar" => ['id_perfil' => (int)$data['id_perfil']]
-            ];
-            break;
-            
-        case 2: // Desactivar perfil
-            if (empty($data['id_perfil'])) {
-                $response->message = "Falta el ID del perfil";
-                return $this->respond($response);
-            }
-            
-            $dataInsert = [       
-                'visible' => 0,
-            ];
-            $dataConfig = [
-                "tabla" => "perfil",
-                "editar" => true,
-                "idEditar" => ['id_perfil' => (int)$data['id_perfil']]
-            ];
-            break;
-            
-        default: // Nuevo perfil
-            if (empty($data['comentario'])) {
-                $response->message = "Falta la descripción del perfil";
-                return $this->respond($response);
-            }
-            
-            $dataInsert = [       
-                'dsc_perfil' => trim($data['comentario']),
-                'visible' => 1 // Asegurar que nuevos perfiles estén visibles
-            ];
-            $dataConfig = [
-                "tabla" => "perfil",
-                "editar" => false
-            ];
-    }
-    
-    // Intentar guardar
-    try {
-        $response = $this->globals->saveTabla($dataInsert, $dataConfig, ["script" => "perfil.savePerfil"]);
-        return $this->respond($response);
-    } catch (\Exception $e) {
-        $response->error = true;
-        $response->message = "Error al guardar: " . $e->getMessage();
-        return $this->respond($response, 500);
-    }
-}
- public function guardarPuesto()
-{
-    $session = \Config\Services::session();
-    $response = new \stdClass();
-    $response->error = true;
-    
-    // Validar que los datos POST existen
-    if (!$this->request->getPost()) {
-        $response->respuesta = "No se recibieron datos";
-        return $this->respond($response);
-    }
-
-    $data = $this->request->getPost();
-    
-  
-
-    // Preparar datos según el tipo de operación
-    switch ($data['editar']) {
-        case 1: // Editar perfil
-            if (empty($data['comentario']) || empty($data['id_puesto'])) {
-                $response->respuesta = "Faltan datos requeridos para editar";
-                return $this->respond($response);
-            }
-            
-            $dataInsert = [       
-                'dsc_puesto' => trim($data['comentario']),
-            ];
-            $dataConfig = [
-                "tabla" => "cat_puesto",
-                "editar" => true,
-                "idEditar" => ['id_puesto' => (int)$data['id_puesto']]
-            ];
-            break;
-            
-        case 2: // Desactivar perfil
-            if (empty($data['id_puesto'])) {
-                $response->respuesta = "Falta el ID del perfil";
-                return $this->respond($response);
-            }
-            
-            $dataInsert = [       
-                'visible' => 0,
-            ];
-            $dataConfig = [
-                "tabla" => "cat_puesto",
-                "editar" => true,
-                "idEditar" => ['id_puesto' => (int)$data['id_puesto']]
-            ];
-            break;
-            
-        default: // Nuevo perfil
-            if (empty($data['comentario'])) {
-                $response->respuesta = "Falta la descripción del puesto";
-                return $this->respond($response);
-            }
-            
-            $dataInsert = [       
-                'dsc_puesto' => trim($data['comentario']),
-            ];
-            $dataConfig = [
-                "tabla" => "cat_puesto",
-                "editar" => false
-            ];
+        // Validar que los datos POST existen
+        if (!$this->request->getPost()) {
+            $response->respuesta = "No se recibieron datos";
+            return $this->respond($response);
         }
-        
+        $data = $this->request->getPost();
+        //die( var_dump( $data ) );
+        // Preparar datos según el tipo de operación
+
+        switch ($data['editar']) {
+            case 1: // Editar perfil
+                if (empty($data['dsc_area']) || empty($data['dsc_area'])) {
+                    $response->respuesta = "El Area es requerida";
+                    return $this->respond($response);
+                }
+                if (empty($data['dsc_corto']) || empty($data['dsc_corto'])) {
+                    $response->respuesta = "Las SIGLAS son requeridas";
+                    return $this->respond($response);
+                }
+                if (empty($data['id_usuario']) || empty($data['id_usuario'])) {
+                    $response->respuesta = "El titular es requerido";
+                    return $this->respond($response);
+                }
+
+                $dataInsert = [
+                    'dsc_area' => trim($data['dsc_area']),
+                    'dsc_corto' => $data['dsc_corto'],
+                    'titular' => (int) $data['id_usuario'],
+                ];
+                $dataConfig = [
+                    "tabla" => "cat_area",
+                    "editar" => true,
+                    "idEditar" => ['id_area' => (int) $data['id_area']]
+                ];
+                break;
+
+            case 2: // Desactivar perfil
+                if (empty($data['id_area'])) {
+                    $response->respuesta = "Falta el ID del perfil";
+                    return $this->respond($response);
+                }
+
+                $dataInsert = [
+                    'visible' => 0,
+                ];
+                $dataConfig = [
+                    "tabla" => "cat_area",
+                    "editar" => true,
+                    "idEditar" => ['id_area' => (int) $data['id_area']]
+                ];
+                break;
+
+
+        }
+
+        // Intentar guardar
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaCategoriasPadre'];
+        try {
+            $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+            return $this->respond($response);
+        } catch (\Exception $e) {
+            $response->error = true;
+            $response->message = "Error al guardar: " . $e->getMessage();
+            return $this->respond($response, 500);
+        }
+    }
+    public function guardarPerfil()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+
+        // Validar que los datos POST existen
+        if (!$this->request->getPost()) {
+            $response->message = "No se recibieron datos";
+            return $this->respond($response);
+        }
+
+        $data = $this->request->getPost();
+
+
+
+        // Preparar datos según el tipo de operación
+        switch ($data['editar']) {
+            case 1: // Editar perfil
+                if (empty($data['comentario']) || empty($data['id_perfil'])) {
+                    $response->message = "Faltan datos requeridos para editar";
+                    return $this->respond($response);
+                }
+
+                $dataInsert = [
+                    'dsc_perfil' => trim($data['comentario']),
+                ];
+                $dataConfig = [
+                    "tabla" => "perfil",
+                    "editar" => true,
+                    "idEditar" => ['id_perfil' => (int) $data['id_perfil']]
+                ];
+                break;
+
+            case 2: // Desactivar perfil
+                if (empty($data['id_perfil'])) {
+                    $response->message = "Falta el ID del perfil";
+                    return $this->respond($response);
+                }
+
+                $dataInsert = [
+                    'visible' => 0,
+                ];
+                $dataConfig = [
+                    "tabla" => "perfil",
+                    "editar" => true,
+                    "idEditar" => ['id_perfil' => (int) $data['id_perfil']]
+                ];
+                break;
+
+            default: // Nuevo perfil
+                if (empty($data['comentario'])) {
+                    $response->message = "Falta la descripción del perfil";
+                    return $this->respond($response);
+                }
+
+                $dataInsert = [
+                    'dsc_perfil' => trim($data['comentario']),
+                    'visible' => 1 // Asegurar que nuevos perfiles estén visibles
+                ];
+                $dataConfig = [
+                    "tabla" => "perfil",
+                    "editar" => false
+                ];
+        }
+
+        // Intentar guardar
+        try {
+            $response = $this->globals->saveTabla($dataInsert, $dataConfig, ["script" => "perfil.savePerfil"]);
+            return $this->respond($response);
+        } catch (\Exception $e) {
+            $response->error = true;
+            $response->message = "Error al guardar: " . $e->getMessage();
+            return $this->respond($response, 500);
+        }
+    }
+    public function guardarPuesto()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+
+        // Validar que los datos POST existen
+        if (!$this->request->getPost()) {
+            $response->respuesta = "No se recibieron datos";
+            return $this->respond($response);
+        }
+
+        $data = $this->request->getPost();
+
+
+
+        // Preparar datos según el tipo de operación
+        switch ($data['editar']) {
+            case 1: // Editar perfil
+                if (empty($data['comentario']) || empty($data['id_puesto'])) {
+                    $response->respuesta = "Faltan datos requeridos para editar";
+                    return $this->respond($response);
+                }
+
+                $dataInsert = [
+                    'dsc_puesto' => trim($data['comentario']),
+                ];
+                $dataConfig = [
+                    "tabla" => "cat_puesto",
+                    "editar" => true,
+                    "idEditar" => ['id_puesto' => (int) $data['id_puesto']]
+                ];
+                break;
+
+            case 2: // Desactivar perfil
+                if (empty($data['id_puesto'])) {
+                    $response->respuesta = "Falta el ID del perfil";
+                    return $this->respond($response);
+                }
+
+                $dataInsert = [
+                    'visible' => 0,
+                ];
+                $dataConfig = [
+                    "tabla" => "cat_puesto",
+                    "editar" => true,
+                    "idEditar" => ['id_puesto' => (int) $data['id_puesto']]
+                ];
+                break;
+
+            default: // Nuevo perfil
+                if (empty($data['comentario'])) {
+                    $response->respuesta = "Falta la descripción del puesto";
+                    return $this->respond($response);
+                }
+
+                $dataInsert = [
+                    'dsc_puesto' => trim($data['comentario']),
+                ];
+                $dataConfig = [
+                    "tabla" => "cat_puesto",
+                    "editar" => false
+                ];
+        }
+
         // Intentar guardar
         try {
             $response = $this->globals->saveTabla($dataInsert, $dataConfig, ["script" => "perfil.savePerfil"]);
@@ -1568,181 +1779,181 @@ class Usuario extends BaseController
         $response = new \stdClass();
         $response->error = true;
         $response->respuesta = 'Error| Error al Generar Sala de Juntas';
-        $id_sala_juntas = $this->request->getPost('id_sala_juntas');  
-  
-            $dataInsert=[       
-                'visible' => 0,
-            ];
-            $dataConfig = [
-                    "tabla"=>"sala_junta",
-                    "editar"=>true,
-                    "idEditar"=>['id_sala'=> $id_sala_juntas]
-            ]; 
-    
-            $response = $this->globals->saveTabla($dataInsert,$dataConfig,["script"=>"sala_junta.eliminarjunta"]);
-            return $this->respond($response);
+        $id_sala_juntas = $this->request->getPost('id_sala_juntas');
+
+        $dataInsert = [
+            'visible' => 0,
+        ];
+        $dataConfig = [
+            "tabla" => "sala_junta",
+            "editar" => true,
+            "idEditar" => ['id_sala' => $id_sala_juntas]
+        ];
+
+        $response = $this->globals->saveTabla($dataInsert, $dataConfig, ["script" => "sala_junta.eliminarjunta"]);
+        return $this->respond($response);
     }
     public function activarPeriodo()
     {
         $session = \Config\Services::session();
         $response = new \stdClass();
         $response->error = true;
-        $data = $this->request->getPost();  
-        if($data['id']==1){
-            $dataInsert=[       
+        $data = $this->request->getPost();
+        if ($data['id'] == 1) {
+            $dataInsert = [
                 'activo' => 0,
             ];
             $dataConfig = [
-                    "tabla"=>"periodo_sac",
-                    "editar"=>true,
-                    "idEditar"=>['id_periodo_sac'=>$data['id_periodo']]
-            ]; 
+                "tabla" => "periodo_sac",
+                "editar" => true,
+                "idEditar" => ['id_periodo_sac' => $data['id_periodo']]
+            ];
         }
-        if($data['id']==2){
-            $dataInsert=[       
+        if ($data['id'] == 2) {
+            $dataInsert = [
                 'activo' => 1,
             ];
             $dataConfig = [
-                    "tabla"=>"periodo_sac",
-                    "editar"=>true,
-                    "idEditar"=>['id_periodo_sac'=>$data['id_periodo']]
-            ]; 
+                "tabla" => "periodo_sac",
+                "editar" => true,
+                "idEditar" => ['id_periodo_sac' => $data['id_periodo']]
+            ];
         }
-           
-        
-  
-    $response = $this->globals->saveTabla($dataInsert,$dataConfig,["script"=>"periodo_sac.eliminarPeriodo"]);
-    return $this->respond($response);
+
+
+
+        $response = $this->globals->saveTabla($dataInsert, $dataConfig, ["script" => "periodo_sac.eliminarPeriodo"]);
+        return $this->respond($response);
     }
     public function eliminarPeriodo()
     {
         $session = \Config\Services::session();
         $response = new \stdClass();
         $response->error = true;
-        $data = $this->request->getPost();  
-       
-            $dataInsert=[       
-                'visible' => 0,
-            ];
-            $dataConfig = [
-                    "tabla"=>"periodo_sac",
-                    "editar"=>true,
-                    "idEditar"=>['id_periodo_sac'=>$data['id_periodo']]
-            ]; 
-        
-  
-    $response = $this->globals->saveTabla($dataInsert,$dataConfig,["script"=>"periodo_sac.eliminarPeriodo"]);
-    return $this->respond($response);
+        $data = $this->request->getPost();
+
+        $dataInsert = [
+            'visible' => 0,
+        ];
+        $dataConfig = [
+            "tabla" => "periodo_sac",
+            "editar" => true,
+            "idEditar" => ['id_periodo_sac' => $data['id_periodo']]
+        ];
+
+
+        $response = $this->globals->saveTabla($dataInsert, $dataConfig, ["script" => "periodo_sac.eliminarPeriodo"]);
+        return $this->respond($response);
     }
     public function tiketListo()
     {
         $session = \Config\Services::session();
         $response = new \stdClass();
         $response->error = true;
-        $data = $this->request->getPost();  
-       
-            $dataInsert=[       
-                'estatus' => 1,
-            ];
-            $dataConfig = [
-                    "tabla"=>"tiket",
-                    "editar"=>true,
-                    "idEditar"=>['id_tiket'=>$data['id_tiket']]
-            ]; 
-        
-  
-    $response = $this->globals->saveTabla($dataInsert,$dataConfig,["script"=>"tiket.resulto"]);
-    return $this->respond($response);
+        $data = $this->request->getPost();
+
+        $dataInsert = [
+            'estatus' => 1,
+        ];
+        $dataConfig = [
+            "tabla" => "tiket",
+            "editar" => true,
+            "idEditar" => ['id_tiket' => $data['id_tiket']]
+        ];
+
+
+        $response = $this->globals->saveTabla($dataInsert, $dataConfig, ["script" => "tiket.resulto"]);
+        return $this->respond($response);
     }
     public function guardarPeriodo()
     {
         $session = \Config\Services::session();
         $response = new \stdClass();
         $response->error = true;
-        $data = $this->request->getPost();  
-   
-        if($data['editar_periodo'] ==1){
-            $periodo = $this->globals->getTabla(["tabla"=>"periodo_sac", 'where' => ['visible' => 1, 'periodo' => $data['periodo'] ]]);
-            if(isset($periodo->data) && !empty($periodo->data)){
-                $response->respuesta  =  'El periodo ya existe en la base de datos';
+        $data = $this->request->getPost();
+
+        if ($data['editar_periodo'] == 1) {
+            $periodo = $this->globals->getTabla(["tabla" => "periodo_sac", 'where' => ['visible' => 1, 'periodo' => $data['periodo']]]);
+            if (isset($periodo->data) && !empty($periodo->data)) {
+                $response->respuesta = 'El periodo ya existe en la base de datos';
                 return $this->respond($response);
             }
-      
-            $dataInsert=[       
-                'dia_inicio'      => $data['diaInicio'],
-                'dia_fin'         => $data['diaFin'],
-                'periodo'         => (int)$data['periodo'],
-                'mes'             => (int)$data['mes'],
-                'usu_act'         => $session->id_usuario,
-    
+
+            $dataInsert = [
+                'dia_inicio' => $data['diaInicio'],
+                'dia_fin' => $data['diaFin'],
+                'periodo' => (int) $data['periodo'],
+                'mes' => (int) $data['mes'],
+                'usu_act' => $session->id_usuario,
+
             ];
             $dataConfig = [
-                    "tabla"=>"periodo_sac",
-                    "editar"=>true,
-                    "idEditar"=>['id_periodo_sac'=>$data['id_periodo']]
-            ]; 
-        }else{
-            $periodo = $this->globals->getTabla(["tabla"=>"periodo_sac", 'where' => ['visible' => 1, 'periodo' => $data['periodo'] ]]);
-            $mes = $this->globals->getTabla(["tabla"=>"periodo_sac", 'where' => ['visible' => 1, 'mes' => $data['mes'] ]]);
-            if(isset($periodo->data) && !empty($periodo->data)){
-                $response->respuesta  =  'El periodo ya existe en la base de datos';
+                "tabla" => "periodo_sac",
+                "editar" => true,
+                "idEditar" => ['id_periodo_sac' => $data['id_periodo']]
+            ];
+        } else {
+            $periodo = $this->globals->getTabla(["tabla" => "periodo_sac", 'where' => ['visible' => 1, 'periodo' => $data['periodo']]]);
+            $mes = $this->globals->getTabla(["tabla" => "periodo_sac", 'where' => ['visible' => 1, 'mes' => $data['mes']]]);
+            if (isset($periodo->data) && !empty($periodo->data)) {
+                $response->respuesta = 'El periodo ya existe en la base de datos';
                 return $this->respond($response);
             }
-            if(isset($mes->data) && !empty($mes->data)){
-                $response->respuesta  =  'El mes ya existe en la base de datos';
+            if (isset($mes->data) && !empty($mes->data)) {
+                $response->respuesta = 'El mes ya existe en la base de datos';
                 return $this->respond($response);
             }
-            $dataInsert=[       
-                'dia_inicio'      => $data['diaInicio'],
-                'dia_fin'         => $data['diaFin'],
-                'periodo'         => (int)$data['periodo'],
-                'mes'             => (int)$data['mes'],
-                'fec_reg'         => date('Y-m-d H:i:s'),
-                'usu_reg'         => $session->id_usuario,
-    
+            $dataInsert = [
+                'dia_inicio' => $data['diaInicio'],
+                'dia_fin' => $data['diaFin'],
+                'periodo' => (int) $data['periodo'],
+                'mes' => (int) $data['mes'],
+                'fec_reg' => date('Y-m-d H:i:s'),
+                'usu_reg' => $session->id_usuario,
+
             ];
             $dataConfig = [
-                    "tabla"=>"periodo_sac",
-                    "editar"=>false,
-                    //  "idEditar"=>['id_usuario'=>$data['id_usuario']]
-            ]; 
+                "tabla" => "periodo_sac",
+                "editar" => false,
+                //  "idEditar"=>['id_usuario'=>$data['id_usuario']]
+            ];
         }
-      
-    
-  
-    $response = $this->globals->saveTabla($dataInsert,$dataConfig,["script"=>"periodo_sac.savePeriodo"]);
-    return $this->respond($response);
+
+
+
+        $response = $this->globals->saveTabla($dataInsert, $dataConfig, ["script" => "periodo_sac.savePeriodo"]);
+        return $this->respond($response);
     }
     public function optenerPeriodo()
     {
         $session = \Config\Services::session();
         $response = new \stdClass();
         $response->error = true;
-        $id_periodo = $this->request->getPost('id_periodo');  
-        if(isset($id_periodo) && !empty($id_periodo)){
-            $result = $this->globals->getTabla(["tabla"=>"vw_periodo", 'where' => ['visible' => 1, 'id_periodo_sac' => $id_periodo ]]);
-            if(!$result->error){
-                $response->error      =  false;
-                $response->respuesta  =  $result->respuesta;
-                $response->data       =  $result->data;
-    
+        $id_periodo = $this->request->getPost('id_periodo');
+        if (isset($id_periodo) && !empty($id_periodo)) {
+            $result = $this->globals->getTabla(["tabla" => "vw_periodo", 'where' => ['visible' => 1, 'id_periodo_sac' => $id_periodo]]);
+            if (!$result->error) {
+                $response->error = false;
+                $response->respuesta = $result->respuesta;
+                $response->data = $result->data;
+
             }
             return $this->respond($response->data[0]);
         }
- 
+
     }
-   
+
     public function getPeriodos()
     {
         $session = \Config\Services::session();
         $response = new \stdClass();
         $response->error = true;
-        $data = $this->request->getPost();  
-        $result = $this->globals->getTabla(["tabla"=>"periodo_sac", 'where' => ['visible' => 1]]);
-        if(!$result->error){
-            $response->error      =  false;
-            $response->respuesta  =  $result->respuesta;
-            $response->data       =  $result->data;
+        $data = $this->request->getPost();
+        $result = $this->globals->getTabla(["tabla" => "periodo_sac", 'where' => ['visible' => 1]]);
+        if (!$result->error) {
+            $response->error = false;
+            $response->respuesta = $result->respuesta;
+            $response->data = $result->data;
 
         }
         return $this->respond($response->data);
@@ -1752,19 +1963,19 @@ class Usuario extends BaseController
         $session = \Config\Services::session();
         $response = new \stdClass();
         $response->error = true;
-        $data = $this->request->getPost();  
-        $result = $this->globals->getTabla(["tabla"=>"periodo_sac", 'where' => ['visible' => 1]]);
-        if(!$result->error){
-            $response->error           =  false;
-            $response->respuesta       =  $result->respuesta;
-            $response->data['periodo'] =  $result->data;
+        $data = $this->request->getPost();
+        $result = $this->globals->getTabla(["tabla" => "periodo_sac", 'where' => ['visible' => 1]]);
+        if (!$result->error) {
+            $response->error = false;
+            $response->respuesta = $result->respuesta;
+            $response->data['periodo'] = $result->data;
 
         }
-        $result = $this->globals->getTabla(["tabla"=>"categoria_sac", 'where' => ['visible' => 1]]);
-        if(!$result->error){
-            $response->error             =  false;
-            $response->respuesta         =  $result->respuesta;
-            $response->data['categoria'] =  $result->data;
+        $result = $this->globals->getTabla(["tabla" => "categoria_sac", 'where' => ['visible' => 1]]);
+        if (!$result->error) {
+            $response->error = false;
+            $response->respuesta = $result->respuesta;
+            $response->data['categoria'] = $result->data;
 
         }
         return $this->respond($response->data);
@@ -1776,36 +1987,36 @@ class Usuario extends BaseController
         $response->error = true;
         $id_curso_sac = $this->request->getPost('id_curso_sac');
         $editar = $this->request->getPost('editar');
-        if($editar == 3){
-            $dataInsert=[       
+        if ($editar == 3) {
+            $dataInsert = [
                 'activo' => 0,
-                'usu_act'=>$session->id_usuario
+                'usu_act' => $session->id_usuario
             ];
             $dataConfig = [
-                    "tabla"=>"cursos_sac",
-                    "editar"=>true,
-                    "idEditar" =>["id_cursos_sac" => $id_curso_sac]
+                "tabla" => "cursos_sac",
+                "editar" => true,
+                "idEditar" => ["id_cursos_sac" => $id_curso_sac]
             ];
-        }else{
-            $dataInsert=[       
+        } else {
+            $dataInsert = [
                 'activo' => 1,
-                'usu_act'=>$session->id_usuario
+                'usu_act' => $session->id_usuario
             ];
             $dataConfig = [
-                    "tabla"=>"cursos_sac",
-                    "editar"=>true,
-                    "idEditar" =>["id_cursos_sac" => $id_curso_sac ]
+                "tabla" => "cursos_sac",
+                "editar" => true,
+                "idEditar" => ["id_cursos_sac" => $id_curso_sac]
             ];
         }
-        $result = $this->globals->saveTabla($dataInsert,$dataConfig,["script"=>"categoria_sac.saveCategoria"]);
-        if(!$result->error){
-            $response->error      =  false;
-            $response->respuesta  =  $result->respuesta;
+        $result = $this->globals->saveTabla($dataInsert, $dataConfig, ["script" => "categoria_sac.saveCategoria"]);
+        if (!$result->error) {
+            $response->error = false;
+            $response->respuesta = $result->respuesta;
 
         }
         return $this->respond($response);
     }
-  
+
     public function UpdateUsuario()
     {
         $response = new \stdClass();
@@ -1813,36 +2024,36 @@ class Usuario extends BaseController
         $data = $this->request->getPost();
         // var_dump(isset($data['editar']));
         // die();
-        
-        $dataInsert=[       
+
+        $dataInsert = [
             'usuario' => $data['usuario'],
             'contrasenia' => md5($data['contrasenia']),
             'correo' => $data['correo'],
             'id_perfil' => $data['perfil'],
             'id_sexo' => $data['sexo'],
-            'nombre' =>$data['nombre'],
+            'nombre' => $data['nombre'],
             'primer_apellido' => $data['primer_apellido'],
             'segundo_apellido' => $data['segundo_apellido'],
             'id_clues' => $data['id_clues'],
         ];
         // var_dump($dataInsert);
         // die();
-        if (isset($data['editar'])){
+        if (isset($data['editar'])) {
             $dataConfig = [
-                "tabla"=>"seg_usuarios",
-                "editar"=>false,
+                "tabla" => "seg_usuarios",
+                "editar" => false,
                 //  "idEditar"=>['id_usuario'=>$data['id_usuario']]
-            ];  
-        }else{
+            ];
+        } else {
             $dataConfig = [
-                "tabla"=>"seg_usuarios",
-                "editar"=>true,
-                 "idEditar"=>['id_usuario'=>$data['id_usuario']]
+                "tabla" => "seg_usuarios",
+                "editar" => true,
+                "idEditar" => ['id_usuario' => $data['id_usuario']]
             ];
         }
-        
 
-        $response = $this->globals->saveTabla($dataInsert,$dataConfig,["script"=>"Usuario.saveUsuario"]);
+
+        $response = $this->globals->saveTabla($dataInsert, $dataConfig, ["script" => "Usuario.saveUsuario"]);
         return $this->respond($response);
     }
     public function saveUsuario()
@@ -1869,15 +2080,15 @@ class Usuario extends BaseController
         // ];
 
         $dataConfig = [
-            "tabla"=>"seg_usuarios",
-            "editar"=>false,
+            "tabla" => "seg_usuarios",
+            "editar" => false,
             // "idEditar"=>['id_usuario'=>$data['id_usuario']]
         ];
-        $response = $this->globals->saveTabla($dataInsert,$dataConfig,["script"=>"Usuario.saveUsuario"]);
+        $response = $this->globals->saveTabla($dataInsert, $dataConfig, ["script" => "Usuario.saveUsuario"]);
         return $this->respond($response);
     }
-   
 
 
-    
+
+
 }
