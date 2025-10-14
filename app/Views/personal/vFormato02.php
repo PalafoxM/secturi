@@ -40,7 +40,10 @@
             <span class="proxima"><?=  (isset($GO) && !empty($GO))?$responsableGasto->dsc_area: $registro->dsc_area ?></span>
         </div>
          <div  style="position:absolute; top:56.2%; left:49.5%; width:2%; height:20px; background-color:white; font-size: 10px; ">
-            <span class="proxima">SI</span>
+            <span class="proxima"><?= ($es4000)?'NO':'SI' ?></span>
+        </div>
+         <div  style="position:absolute; top:56.2%; left:55.5%; width:2%; height:20px; background-color:white; font-size: 10px; ">
+            <span class="proxima"><?= ($es4000)?'Ayuda/Aportación económica':'' ?></span>
         </div>
         <div  style="position:absolute; top:60%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
             <span class="proxima"><?= (isset($GO) && !empty($GO))?$responsableGasto->nombre_completo:$registro->responsable ?></span>
@@ -62,10 +65,10 @@
         </div>
 
         <div  style="position:absolute; top:94.7%; left:21.2%; width:30%; height:10px; background-color:white; font-size: 10px; ">
-           <span class="proxima"><?= (isset($GO) && !empty($GO))?$responsableGasto->nombre_completo:$registro->responsable ?></span>
+           <span class="proxima">RODRIGO GONZÁLEZ GUERRERO</span>
         </div>
          <div  style="position:absolute; top:96.8%; left:21.2%; width:30%; height:10px; background-color:white; font-size: 10px; ">
-            <span class="proxima"> <?= (isset($GO) && !empty($GO))?$responsableGasto->dsc_puesto: $registro->dsc_puesto?></span>
+            <span class="proxima"> DIRECTOR GENERAL ADMINISTRATIVO</span>
         </div>
 
 

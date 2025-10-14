@@ -2337,8 +2337,8 @@ class Principal extends BaseController
         } else {
             $registro_pt = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]]);
         }
-
-
+        //var_dump($registro_pt);
+        //die();
         $data['registro_pt'] = (!empty($registro_pt->data)) ? $registro_pt->data : [];
         $data['scripts'] = array('inicio');
         $data['edita'] = 0;
@@ -2623,7 +2623,6 @@ class Principal extends BaseController
                 'tabla' => 'vw_direccion',
                 'where' => [
                     'visible' => 1,
-                    //'id_director' => 110
                     'id_director' => $registro_pt->data[0]->id_reponsable_solicitud
                 ]
             ]);
@@ -2667,6 +2666,11 @@ class Principal extends BaseController
             $importe_str = $reserva[0]->total_importe;
             $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
             $data['numero_texto'] = $this->numeroEnLetras($importe_float);
+            $data['es4000'] = false;
+            if( $reserva[0]->partida >= '4000' && $reserva[0]->partida < '5000' ){
+              $data['es4000'] = true;
+            }
+            
 
         }
 
@@ -2955,6 +2959,7 @@ class Principal extends BaseController
             
             }
         $data['responsableGasto'] = ($direccion->data)?$direccion->data[0]:'';
+       
 
         $subsecretario = $area = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1, 'id_subsecretario' => $registro_go->data[0]->id_subsecretario]]);
        // $usu_sub = $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $subsecretario->data[0]->id_usuario]]);
@@ -2966,10 +2971,7 @@ class Principal extends BaseController
             $no_consecutivo = $registro_go->data[0]->no_consecutivo;
             $data['registro'] = $registro;
 
-            $folio = $globals->getTabla([
-                'tabla' => 'direccion',
-                'where' => ['visible' => 1, 'id_area' => $registro->id_direccion_responsable]
-            ]);
+          
             $reserva = $globals->getTabla([
                 'tabla' => 'vw_reserva_go',
                 'where' => ['visible' => 1, 'id_reserva_go' => $id_reserva_go]
@@ -2985,10 +2987,17 @@ class Principal extends BaseController
                 'tabla' => 'vw_usuario',
                 'where' => ['id_usuario' => $usu_reg]
             ])->data[0];
-
-            if (!empty($folio->data)) {
-                $zero = (strlen($no_consecutivo) >= 2) ? '0' : '00';
-                $data['registro']->folio = $folio->data[0]->folio_prefijo . $zero . $no_consecutivo . '/' . $folio->data[0]->periodo_pt;
+           
+            if (strlen($no_consecutivo) == 2) {
+                $zero = '0';
+            } elseif (strlen($no_consecutivo) == 1) {
+                $zero = '00';
+            } else {
+                $zero = '';
+            }
+            if (!empty($direccion->data)) {
+                 $folio_prefijo = $direccion->data[0]->folio_prefijo . $zero .  $no_consecutivo . '/' . date('Y'); //ESTO HAY QUE OREGUNTAR
+                $data['registro']->folio = $folio_prefijo;
             } else {
                 $data['registro']->folio = ''; // O un valor por defecto
             }
