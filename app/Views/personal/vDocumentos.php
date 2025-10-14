@@ -406,6 +406,13 @@
                                                         <div class="custom-dd dd" id="nestable_list_1">
                                                             <ol class="dd-list">
                                                                 <li class="dd-item" data-id="2">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Plan_de_Trabajo_Anual_2025.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Plan de Trabajo Anual 2025
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="2">
                                                                     <a target="_blank" href="<?= base_url().'assets/documentos/1-Reglamento-Interior-SEDETUR-2007-404e.pdf' ?>">
                                                                         <div class="dd-handle">
                                                                        Reglamento-Interior-SEDETUR-2007
