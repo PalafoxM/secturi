@@ -100,7 +100,7 @@
                                             </div><!--end col-->
                                                <div class="col-md-4 mb-3">
                                                 <label for="secretario">Subsecretario(a) o Director(a) General Responsable</label><span class="text-danger">*</span>
-                                                <select type="text" class="form-control" id="secretario" placeholder="Secretario/a" name="secretario">
+                                                <select type="text" class="form-control" id="id_subsecretario" placeholder="Secretario/a" name="id_subsecretario">
                                                             <option value="0" selected >Seleccione una opcion</option>
                                                     <?php foreach($cat_subsecretario as $s): ?>
                                                         <?php if(isset($registro_pt->id_subsecretario) && !empty($registro_pt->id_subsecretario)){  ?>

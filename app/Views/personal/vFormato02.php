@@ -22,8 +22,8 @@
         </div>
         <div  style="position:absolute; text-align:justify;top:31.5%; left:7.5%; width:85%; height:35px; background-color:white; font-size:13px; ">
             <span class="proxima">Solicito que se realice trámite de pago del comprobante fiscal con <strong><?= $reserva->folio_interno;?></strong>,
-                 derivado del contrato ó convenio número <strong><?= (isset($GO) && !empty($GO))?'GO':'TP' ?> <?= $folio;?></strong> por la cantidad de <strong>$<?= $reserva->total_importe;?></strong>
-                 <strong>(<?= $numero_texto?>)</strong>, por el servicio <strong><?= $reserva->dsc_partida ?></strong> prestado por el proveedor <strong><?= $reserva->razon_social ?></strong>. Se cuenta con suficiencia presupuestal en la partida <strong><?= $reserva->partida;?></strong> correspondiente.
+                 derivado del contrato ó convenio número <strong><?= (isset($GO) && !empty($GO))?'GO':'PT' ?> <?= $folio;?></strong> por la cantidad de <strong>$<?= $reserva->total_importe;?></strong>
+                 <strong>(<?= $numero_texto?>)</strong>, por el servicio <strong><?= $reserva->dsc_partida ?></strong> prestado por el proveedor <strong><?=(isset($reserva->razon_social) && !empty($reserva->razon_social))?$reserva->razon_social:'' ?></strong>. Se cuenta con suficiencia presupuestal en la partida <strong><?= $reserva->partida;?></strong> correspondiente.
            </span>
         </div>
         
@@ -31,41 +31,41 @@
             <span class="proxima">SI</span>
         </div>
         <div  style="position:absolute; top:46.8%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
-            <span class="proxima"><?= $registro->responsable ?></span>
+            <span class="proxima"><?= (isset($GO) && !empty($GO))?$responsableGasto->nombre_completo:$registro->responsable ?></span>
         </div>
         <div  style="position:absolute; top:49.5%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
-            <span class="proxima"><?= $registro->dsc_puesto?></span>
+            <span class="proxima"> <?= (isset($GO) && !empty($GO))?$responsableGasto->dsc_puesto: $registro->dsc_puesto?></span>
         </div>
          <div  style="position:absolute; top:52.5%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
-            <span class="proxima"><?= $registro->dsc_area ?></span>
+            <span class="proxima"><?=  (isset($GO) && !empty($GO))?$responsableGasto->dsc_area: $registro->dsc_area ?></span>
         </div>
          <div  style="position:absolute; top:56.2%; left:49.5%; width:2%; height:20px; background-color:white; font-size: 10px; ">
             <span class="proxima">SI</span>
         </div>
         <div  style="position:absolute; top:60%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
-            <span class="proxima"><?= $registro->responsable ?></span>
+            <span class="proxima"><?= (isset($GO) && !empty($GO))?$responsableGasto->nombre_completo:$registro->responsable ?></span>
         </div>
          <div  style="position:absolute; top:62.5%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
-            <span class="proxima"><?= $registro->dsc_puesto?></span>
+            <span class="proxima"> <?= (isset($GO) && !empty($GO))?$responsableGasto->dsc_puesto: $registro->dsc_puesto?></span>
         </div>
          <div  style="position:absolute; top:65.5%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
-            <span class="proxima"><?= $registro->dsc_area ?></span>
+             <span class="proxima"> <?= (isset($GO) && !empty($GO))?$responsableGasto->dsc_area: $registro->dsc_area?></span>
         </div>
          <div  style="position:absolute; top:73%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
-            <span class="proxima"><?= $registro->responsable ?></span>
+            <span class="proxima"><?= (isset($GO) && !empty($GO))?$responsableGasto->nombre_completo:$registro->responsable ?></span>
         </div>
          <div  style="position:absolute; top:75.5%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
-            <span class="proxima"><?= $registro->dsc_puesto?></span>
+            <span class="proxima"> <?= (isset($GO) && !empty($GO))?$responsableGasto->dsc_puesto: $registro->dsc_puesto?></span>
         </div>
          <div  style="position:absolute; top:78%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
-            <span class="proxima"><?= $registro->dsc_area ?></span>
+             <span class="proxima"> <?= (isset($GO) && !empty($GO))?$responsableGasto->dsc_area: $registro->dsc_area?></span>
         </div>
 
         <div  style="position:absolute; top:94.7%; left:21.2%; width:30%; height:10px; background-color:white; font-size: 10px; ">
-            <span class="proxima"><?= $registro->responsable ?></span>
+           <span class="proxima"><?= (isset($GO) && !empty($GO))?$responsableGasto->nombre_completo:$registro->responsable ?></span>
         </div>
          <div  style="position:absolute; top:96.8%; left:21.2%; width:30%; height:10px; background-color:white; font-size: 10px; ">
-            <span class="proxima"><?= $registro->dsc_puesto?></span>
+            <span class="proxima"> <?= (isset($GO) && !empty($GO))?$responsableGasto->dsc_puesto: $registro->dsc_puesto?></span>
         </div>
 
 
