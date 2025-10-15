@@ -20,7 +20,7 @@ class Auth extends Controller
         $this->googleProvider = new Google([
             'clientId'     => env('GOOGLE_CLIENT_ID'),
             'clientSecret' => env('GOOGLE_CLIENT_SECRET'),
-            'redirectUri'  => 'https://secturnet.guanajuato.gob.mx/susi/index.php/Auth/callback',
+            'redirectUri'  => base_url('index.php/Auth/callback'),
         ]);
     }
 
@@ -63,12 +63,15 @@ class Auth extends Controller
 
     public function callback()
     {
-        $session = session();
+          $session = session();
 
-        // Verifica el estado CSRF
-        if ($this->request->getGet('state') !== $session->get('oauth2state')) {
+        // ✅ CORRECCIÓN: Verifica que el estado COINCIDA
+        $state = $this->request->getGet('state');
+        $storedState = $session->get('oauth2state');
+
+        if (!$state || $state !== $storedState) {
             $session->remove('oauth2state');
-            return redirect()->to('/login')
+            return redirect()->to('/Login')
                             ->with('error', 'Estado de seguridad inválido. Inténtalo de nuevo.');
         }
 
