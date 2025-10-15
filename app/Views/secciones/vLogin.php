@@ -120,9 +120,9 @@
                     <ul class="list-inline mb-4">
                       
                          <li class="list-inline-item">
-                            <a href="<?= base_url() . 'index.php/Auth/login' ?>" class="">
+                           <!--  <a href="<?= base_url() . 'index.php/Auth/login' ?>" class="">
                                 <i class="fab fa-google google"></i>
-                            </a>
+                            </a> -->
                         </li> 
                     </ul>
                 </div>
