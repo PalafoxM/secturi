@@ -119,12 +119,12 @@
                     <h6 class="my-4">   Version 2.0</h6>
                     <ul class="list-inline mb-4">
                       
-                         <li class="btn btn-soft-pink btn-round waves-effect waves-light">
-                            <a href="<?= base_url() . 'index.php/Auth/login' ?>" class="text-white">
+                       <li class="btn btn-soft-pink btn-round waves-effect waves-light" id="google-login-btn">
+                            <a href="#" class="text-white" onclick="iniciarGoogle(); return false;">
                                 <i class="fab fa-google google mr-2"></i>
-                                Ingresar con Google
+                                <span id="google-btn-text">Ingresar con Google</span>
                             </a>
-                        </li> 
+                        </li>
                       
                     </ul>
                 </div>
@@ -173,6 +173,21 @@ function showPass() {
 }
 function  losePass() {
     Swal.fire("Para restablecer la contraseña", '<p>Favor de comunicarte con el Administrador</p>', 'info'); 
+}
+function iniciarGoogle() {
+    const btn = document.getElementById('google-login-btn');
+    const text = document.getElementById('google-btn-text');
+
+    // Cambiar el texto y deshabilitar visualmente
+    text.textContent = 'Redirigiendo...';
+    btn.classList.add('disabled');
+    btn.style.opacity = '0.7';
+    btn.style.pointerEvents = 'none'; // Evita más clics
+
+    // Redirigir después de un breve delay (mejora la percepción)
+    setTimeout(() => {
+        window.location.href = '<?= base_url("index.php/Auth/login") ?>';
+    }, 300);
 }
 
 </script>
