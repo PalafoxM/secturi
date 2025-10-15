@@ -119,11 +119,13 @@
                     <h6 class="my-4">   Version 2.0</h6>
                     <ul class="list-inline mb-4">
                       
-                         <li class="list-inline-item">
-                            <a href="<?= base_url() . 'index.php/Auth/login' ?>" class="">
-                                <i class="fab fa-google google"></i>
+                         <li class="btn btn-soft-pink btn-round waves-effect waves-light">
+                            <a href="<?= base_url() . 'index.php/Auth/login' ?>" class="text-white">
+                                <i class="fab fa-google google mr-2"></i>
+                                Ingresar con Google
                             </a>
                         </li> 
+                      
                     </ul>
                 </div>
                 <?php if (session()->getFlashdata('error')): ?>
