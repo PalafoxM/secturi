@@ -36,10 +36,10 @@
         /* Texto blanco */
     }
 
-    .fc-event-asistencia {
-        border-left: 4px solid #4e73df;
-        background-color: #1950f5ff;
-        color: #4e73df;
+   .fc-event-asistencia {
+        border-left: 4px solid #3b82f6;      /* Azul medio */
+        background-color: #e0f2fe;           /* Azul muy claro */
+        color: #1e40af;                      /* Azul profundo para texto */
     }
 
     .fc-event-espera {
@@ -890,6 +890,8 @@
                 hour12: true,
                 meridiem: 'short'
             },
+            weekends: false,
+            showNonCurrentDates: false,
             eventRender: function (info) {
                 var eventEl = info.el;
                 const esSemana = info.event.extendedProps.esSemana;
@@ -992,9 +994,9 @@
                 const fechaStr = date.toISOString().split('T')[0];
                 const esRegistro = onlyAsistencias.includes(fechaStr);
                 const esFestivo = fechaStr in diasFestivos;
+                info.el.style.backgroundColor = 'rgba(37, 99, 235, 0.1)';  // Azul translúcido
+                info.el.style.border = '1px solid rgba(37, 99, 235, 0.3)';  // Azul tenue
 
-                info.el.style.backgroundColor = 'rgba(58, 23, 75, 0.1)';
-                info.el.style.border = '1px solid rgba(255, 0, 0, 0.3)';
 
                 const eventosDelDia = info.view.calendar.getEvents().filter(ev => {
                     const inicio = moment(ev.start);
