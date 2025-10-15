@@ -61,7 +61,7 @@
                                                         <th class="text-center">ENTRADA</th>
                                                         <th class="text-center">SALIADA</th>
                                              
-                                                        <th class="text-center">ACCIONES</th>
+                                                        <th class="text-center">NO EMPLEADO</th>
                                                     </tr>
                                                     <!--end tr-->
                                                 </thead>
@@ -78,11 +78,7 @@
                                                                 <?= $p->hora_fin ?> 
                                                              </td>                                                                                                     
                                                             <td class="text-center">
-                                                                <button title="Imprimir Archivo"
-                                                                    onclick="ini.inicio.editarPerfil(<?= $p->id_usuario ?>)"
-                                                                    class="btn btn-gradient-warning px-4">
-                                                                    <i class="dripicons-document-new font-21"></i>
-                                                                </button>
+                                                                  <?= $p->no_empleado ?> 
                                                             </td>
                                                         </tr>
                                                         <?php endforeach; ?>
