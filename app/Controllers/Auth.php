@@ -20,7 +20,7 @@ class Auth extends Controller
         $this->googleProvider = new Google([
             'clientId'     => env('GOOGLE_CLIENT_ID'),
             'clientSecret' => env('GOOGLE_CLIENT_SECRET'),
-            'redirectUri'  => base_url().'index.php/Auth/callback',
+            'redirectUri'  => 'https://secturnet.guanajuato.gob.mx/susi/index.php/Auth/callback',
         ]);
     }
 
