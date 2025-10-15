@@ -155,7 +155,7 @@ class Agregar extends BaseController
             $timestamp = date('Ymd_His');
             $extension = $archivo->getClientExtension();
             $originalName = pathinfo($archivo->getName(), PATHINFO_FILENAME);
-            $file = $originalName . '_' . $timestamp . '.' . $extension;
+            $file = 'Factura_go_' . $timestamp . '.' . $extension;
 
             // Ruta absoluta
             $ruta_destino = FCPATH . 'assets/pdf/';
@@ -629,6 +629,7 @@ class Agregar extends BaseController
             'id_reponsable_solicitud' => (int) $data['id_reponsable_solicitud'],
             'director_general' => 1,
             'secretario' => (int) $data['secretario'],
+            'id_subsecretario' => (int) $data['id_subsecretario'],
             'contrato_convenio' => ($data['contrato_convenio'] == 'NO') ? 2 : 1,
             'formato_establecido' => ($data['formato_establecido'] == 'SI') ? 1 : 2,
             'documentacion_comprobatoria' => $data['documentacion_comprobatoria'],

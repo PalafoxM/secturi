@@ -2337,8 +2337,8 @@ class Principal extends BaseController
         } else {
             $registro_pt = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]]);
         }
-
-
+        //var_dump($registro_pt);
+        //die();
         $data['registro_pt'] = (!empty($registro_pt->data)) ? $registro_pt->data : [];
         $data['scripts'] = array('inicio');
         $data['edita'] = 0;
@@ -2497,6 +2497,30 @@ class Principal extends BaseController
             'tabla' => 'vw_pdf_reserva_go',
             'where' => ['visible' => 1, 'id_registro_go' => $id_registro_go]
         ])->data;
+
+          $direccion = $globals->getTabla([
+                'tabla' => 'vw_direccion',
+                'where' => [
+                    'visible' => 1,
+                    //'id_director' => 110
+                    'id_director' => $registro_go->data[0]->id_reponsable_solicitud
+                ]
+            ]);
+      
+        if (empty($direccion->data)) {
+            $jefe = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_go->data[0]->id_reponsable_solicitud]]);
+            if(!empty($jefe->data)){
+            $idJefe = $jefe->data[0]->id_jefe_inmediato;
+             $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_director' => $idJefe]]);
+            }else{
+              $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_go->data[0]->id_reponsable_solicitud]]);
+             $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_area' => $area->data[0]->id_area]]);
+            }
+        }
+
+        $data['responsableGasto'] = (isset( $direccion->data) && !empty( $direccion))? $direccion->data[0]:'';
+        //var_dump($data['responsableGasto']  );
+        //die();
         $id_reserva_go = (isset($pdf[0]->id_reserva_go) && !empty($pdf[0]->id_reserva_go)) ? $pdf[0]->id_reserva_go : '';
 
         if (!empty($id_reserva_go)) {
@@ -2524,6 +2548,8 @@ class Principal extends BaseController
         }
 
         $data['GO'] = true;
+        //var_dump( var_dump( $data ) );
+        //die();
         switch ($id_archivo) {
             case 1:
                 $doc = 'assets/pdf/plantillas/anexo01.pdf';
@@ -2597,7 +2623,6 @@ class Principal extends BaseController
                 'tabla' => 'vw_direccion',
                 'where' => [
                     'visible' => 1,
-                    //'id_director' => 110
                     'id_director' => $registro_pt->data[0]->id_reponsable_solicitud
                 ]
             ]);
@@ -2611,8 +2636,8 @@ class Principal extends BaseController
               $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_pt->data[0]->id_reponsable_solicitud]]);
              $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_area' => $area->data[0]->id_area]]);
             }
-           
         }
+
         $no_consecutivo = "";
         if(strlen($registro_pt->data[0]->no_consecutivo) == 1){
               $no_consecutivo = '00'.$registro_pt->data[0]->no_consecutivo;
@@ -2642,6 +2667,11 @@ class Principal extends BaseController
             $importe_str = $reserva[0]->total_importe;
             $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
             $data['numero_texto'] = $this->numeroEnLetras($importe_float);
+            $data['es4000'] = false;
+            if( $reserva[0]->partida >= '4000' && $reserva[0]->partida < '5000' ){
+              $data['es4000'] = true;
+            }
+            
 
         }
 
@@ -2663,7 +2693,11 @@ class Principal extends BaseController
             echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
             die();
         }
+        $uudi = $globals->getTabla(['tabla'=>'factura', 'where'=>['id_registro_pt'=> $id_registro_pt, 'visible'=>1]])->data;
+        if( isset($uudi->data) && !empty($uudi->data) ){
+            $data['uudi'] = $uudi->data[0]->uudi;
 
+        }
         if (!empty($instrumento)) {
             switch ($id_archivo) {
                 case 1:
@@ -2908,6 +2942,33 @@ class Principal extends BaseController
             'tabla' => 'vw_pdf_reserva_go',
             'where' => ['visible' => 1, 'id_registro_go' => $id_pt]
         ]);
+         $direccion = $globals->getTabla([
+                'tabla' => 'vw_direccion',
+                'where' => [
+                    'visible' => 1,
+                    //'id_director' => 110
+                    'id_director' => $registro_go->data[0]->id_reponsable_solicitud
+                ]
+            ]);
+        
+      
+            if (empty($direccion->data)) {
+                $jefe = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_go->data[0]->id_reponsable_solicitud]]);
+                if(!empty($jefe->data)){
+                $idJefe = $jefe->data[0]->id_jefe_inmediato;
+                $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_director' => $idJefe]]);
+                }else{
+                $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_go->data[0]->id_reponsable_solicitud]]);
+                $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_area' => $area->data[0]->id_area]]);
+                }
+            
+            }
+        $data['responsableGasto'] = ($direccion->data)?$direccion->data[0]:'';
+       
+
+        $subsecretario = $area = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1, 'id_subsecretario' => $registro_go->data[0]->id_subsecretario]]);
+       // $usu_sub = $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $subsecretario->data[0]->id_usuario]]);
+        $data['usu_sub'] = $subsecretario->data[0];
 
         if (!empty($registro_go->data)) {
             $registro = $registro_go->data[0];
@@ -2915,10 +2976,7 @@ class Principal extends BaseController
             $no_consecutivo = $registro_go->data[0]->no_consecutivo;
             $data['registro'] = $registro;
 
-            $folio = $globals->getTabla([
-                'tabla' => 'direccion',
-                'where' => ['visible' => 1, 'id_area' => $registro->id_direccion_responsable]
-            ]);
+          
             $reserva = $globals->getTabla([
                 'tabla' => 'vw_reserva_go',
                 'where' => ['visible' => 1, 'id_reserva_go' => $id_reserva_go]
@@ -2934,10 +2992,17 @@ class Principal extends BaseController
                 'tabla' => 'vw_usuario',
                 'where' => ['id_usuario' => $usu_reg]
             ])->data[0];
-
-            if (!empty($folio->data)) {
-                $zero = (strlen($no_consecutivo) >= 2) ? '0' : '00';
-                $data['registro']->folio = $folio->data[0]->folio_prefijo . $zero . $no_consecutivo . '/' . $folio->data[0]->periodo_pt;
+           
+            if (strlen($no_consecutivo) == 2) {
+                $zero = '0';
+            } elseif (strlen($no_consecutivo) == 1) {
+                $zero = '00';
+            } else {
+                $zero = '';
+            }
+            if (!empty($direccion->data)) {
+                 $folio_prefijo = $direccion->data[0]->folio_prefijo . $zero .  $no_consecutivo . '/' . date('Y'); //ESTO HAY QUE OREGUNTAR
+                $data['registro']->folio = $folio_prefijo;
             } else {
                 $data['registro']->folio = ''; // O un valor por defecto
             }
@@ -3096,7 +3161,7 @@ class Principal extends BaseController
              //die( var_dump($registro_pt->data[0]) );
            // $folio = $direccion; //ESTO HAY QUE OREGUNTAR
            
-         
+                     $data['responsableGasto'] = (isset( $direccion->data) && !empty( $direccion))? $direccion->data[0]:'';
             $reserva = $globals->getTabla([
                 'tabla' => 'vw_reserva',
                 'where' => ['visible' => 1, 'id_reserva' => $id_reserva]

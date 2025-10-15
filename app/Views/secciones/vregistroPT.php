@@ -54,7 +54,7 @@
                                             <td  class="text-center"><?= $e->dsc_tipo?></td>
                                             <td  class="text-center"><?= date('d/m/Y', strtotime($e->fecha_tramite)); ?> </td>
                                             <td  class="text-center"><?= $e->cuenta_bancaria?></td>
-                                            <td  class="text-center"><?= $e->nombre_completo?></td>
+                                            <td  class="text-center"><?= $e->responsable?></td>
                                             <td  class="text-center"><?= $e->concepto_pago?></td>
                                             <td  class="text-center <?= ($e->fic==1)?'text-success':'text-info'?>"><strong><?= ($e->fic==1)?'FIC':'PT'?></strong></td>
                                             <td  class="text-center" class="text-center">

@@ -63,12 +63,12 @@
         </div>
          <div style="position:absolute; top:85%; left:9.5%; width:81%; height:20px; background-color:white; font-size:13px; text-align:center;">
             <span class="proxima">
-             <strong> <?= $registro->responsable ?> </strong>
+             <strong> <?= (isset($GO) && !empty($GO))?$responsableGasto->nombre_completo : $registro->responsable ?> </strong>
             </span>
         </div>
            <div style="position:absolute; top:87%; left:9.5%; width:81%; height:20px; background-color:white; font-size:13px; text-align:center;">
             <span class="proxima">
-              <strong> <?= $registro->dsc_puesto ?></strong>
+              <strong> <?= (isset($GO) && !empty($GO))?$responsableGasto->dsc_puesto : $registro->dsc_puesto ?></strong>
             </span>
         </div>
        
