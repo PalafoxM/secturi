@@ -2445,6 +2445,9 @@ ini.inicio = (function () {
                             }
           
                         },
+                        complete: function(){
+                         window.location.reload();
+                        },
                         error: function() {
                             Swal.fire("Error", "Error al guardar comentario.", "error")
                         }
@@ -4419,6 +4422,9 @@ ini.inicio = (function () {
                                 Swal.fire("Error", "Error al guardar comentario.", "error");
                             }
                      
+                        },
+                        complete: function(){
+                         window.location.reload();
                         },
                         error: function() {
                             Swal.fire("Error", "Error al guardar comentario.", "error")

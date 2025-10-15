@@ -1607,6 +1607,16 @@ class Usuario extends BaseController
                     "idEditar" => ['id_area' => (int) $data['id_area']]
                 ];
                 break;
+            default: // Nuevo perfil
+                
+
+               $dataInsert = [
+                    'dsc_area' => $data['comentario'],
+                ];
+                $dataConfig = [
+                    "tabla" => "cat_area",
+                    "editar" => false
+                ];
 
 
         }

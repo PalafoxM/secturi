@@ -490,12 +490,12 @@
                                     </li>
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/altaUsuario">Alta de Usuarios</a>
                                     </li>
-                                    <?php if ($session->id_perfil == 1): ?>
-                                        <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaPerfil">Lista de
-                                                Perfiles</a></li>
                                         <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaPuesto">Lista de Puestos</a>
                                         </li>
                                         <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaArea">Lista de Área</a></li>
+                                        <?php if ($session->id_perfil == 1): ?>
+                                              <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaPerfil">Lista de
+                                                Perfiles</a></li>
                                         <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaTiket">Listado de Tikets</a>
                                         </li>
                                         <li><a href="<?php echo base_url(); ?>index.php/Principal/listadoProveedores">Lista de
