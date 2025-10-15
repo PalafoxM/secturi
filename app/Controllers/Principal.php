@@ -2637,6 +2637,7 @@ class Principal extends BaseController
              $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_area' => $area->data[0]->id_area]]);
             }
         }
+
         $no_consecutivo = "";
         if(strlen($registro_pt->data[0]->no_consecutivo) == 1){
               $no_consecutivo = '00'.$registro_pt->data[0]->no_consecutivo;
@@ -2692,7 +2693,11 @@ class Principal extends BaseController
             echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
             die();
         }
+        $uudi = $globals->getTabla(['tabla'=>'factura', 'where'=>['id_registro_pt'=> $id_registro_pt, 'visible'=>1]])->data;
+        if( isset($uudi->data) && !empty($uudi->data) ){
+            $data['uudi'] = $uudi->data[0]->uudi;
 
+        }
         if (!empty($instrumento)) {
             switch ($id_archivo) {
                 case 1:
@@ -3156,7 +3161,7 @@ class Principal extends BaseController
              //die( var_dump($registro_pt->data[0]) );
            // $folio = $direccion; //ESTO HAY QUE OREGUNTAR
            
-         
+                     $data['responsableGasto'] = (isset( $direccion->data) && !empty( $direccion))? $direccion->data[0]:'';
             $reserva = $globals->getTabla([
                 'tabla' => 'vw_reserva',
                 'where' => ['visible' => 1, 'id_reserva' => $id_reserva]
