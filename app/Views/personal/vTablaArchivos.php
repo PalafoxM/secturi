@@ -217,9 +217,16 @@
                                                     <br>
                                                        <div class="row mb-5">
                                                             <div class="col-md-12 text-right">
+                                                                <?php if($PT): ?>
                                                                 <a id="btnZip" style="color:white" class="btn btn-info" onclick="ini.inicio.generarZip(<?= $id_registro ?>);" >
                                                                     <i class="mdi mdi-content-save"></i> Generar Zip
                                                                 </a>
+                                                                <?php endif; ?>
+                                                                <?php if($GO): ?>
+                                                                <a id="btnZip" style="color:white" class="btn btn-info" onclick="ini.inicio.generarZipGO(<?= $id_registro ?>);" >
+                                                                    <i class="mdi mdi-content-save"></i> Generar Zip
+                                                                </a>
+                                                                <?php endif; ?>
                                                             </div>
                                                         </div>
                                                 </div><!--end /tableresponsive-->

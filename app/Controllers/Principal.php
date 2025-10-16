@@ -1914,10 +1914,9 @@ class Principal extends BaseController
             'mvallejo@guanajuato.gob.mx',
             'rgonzalezgu@guanajuato.gob.mx',
             'yjimenez@guanajuato.gob.mx',
-      
         ]);  
 
-      /*   $email->setTo([
+/*          $email->setTo([
             'alopez@guanajuato.gob.mx',
             'cchernandezp@guanajuato.gob.mx',
             'csoto@guanajuato.gob.mx',
@@ -1963,7 +1962,7 @@ class Principal extends BaseController
             'alvarezp@guanajuato.gob.mx',
             //'palafox.marin@guanajuato.gob.mx',
         ]);  */
-        $email->setSubject('Recordatorio: Revisión de Asistencias - Sistema SUSI');
+       $email->setSubject('Recordatorio: Revisión de Asistencias - Sistema SUSI');
         $email->setMessage('
             <!DOCTYPE html>
             <html>
@@ -1992,30 +1991,32 @@ class Principal extends BaseController
                         <h1 style="color: #004080; margin-bottom: 10px; text-align: center;">Recordatorio de Asistencias</h1>
                         <p style="text-align: center; color: #666; margin-bottom: 25px; font-size: 16px;">Sistema Unificado SECTURI</p>
                         
-                        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Estimado(a) usuario(a),</p>
+                        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Estimado personal,</p>
                         
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-                            Este es un recordatorio <strong>automático</strong> generado por el sistema SUSI para 
-                            solicitar la verificación y validación de su personal
+                            En caso de que aún no hayas realizado las <strong>justificaciones de tus incidencias correspondientes a la quincena 19/2025</strong>, 
+                            la cual comprende el periodo del <strong>1 al 15 de octubre de 2025</strong>, 
+                            tienes hasta el día <strong>martes 22 de octubre del presente año a las 16:00 hrs</strong> para realizarlas.
                         </p>
-                        
+
                         <div class="highlight-box">
                             <p style="font-size: 15px; line-height: 1.6; margin: 0;">
-                                <strong>Importante:</strong> Recuerda que dispones de 5 días hábiles para completar las validaciones requeridas.
+                                Para cualquier duda o aclaración, favor de comunicarse a la 
+                                <strong>Coordinación de Recursos Humanos</strong> o 
+                                <strong>Coordinación de Tecnologías de la Información</strong>.
                             </p>
                         </div>
-                        
+
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
-                            Le invitamos a revisar sus incidencias de su personal.
+                            Le invitamos a revisar y validar sus incidencias correspondientes en el sistema SUSI.
                         </p>
-                        
+
                         <div style="text-align: center; margin: 30px 0;">
-                            <a href="' . base_url('index.php/Principal/incidenciaSubordinado') . '" class="btn" style="color: white; text-decoration: none;">
+                            <a href="https://secturnet.guanajuato.gob.mx/susi/index.php/Agregar/Asistencia" class="btn" style="color: white; text-decoration: none;">
                                 📋 Revisar Incidencias del Personal
                             </a>
-                          
                         </div>
-                        
+
                         <p style="font-size: 14px; color: #666; border-top: 1px solid #dee2e6; padding-top: 20px; margin-top: 25px;">
                             <strong>Nota:</strong> Este es un mensaje automático generado por el Sistema Unificado SECTURI (SUSI). 
                             Por favor, no responda a este correo.
@@ -2032,14 +2033,15 @@ class Principal extends BaseController
             </html>
         ');
 
-        // ✅ SOLUCIÓN PARA LA IMAGEN - AGREGAR COMO ADJUNTO EMBEBIDO
+
+     /*    // ✅ SOLUCIÓN PARA LA IMAGEN - AGREGAR COMO ADJUNTO EMBEBIDO
         $logoPath = FCPATH . 'assets/pdf/plantillas/ManualPersonaSuperior.pdf';
         if (file_exists($logoPath)) {
             $email->attach($logoPath);
             $email->setHeader('Content-ID', '<logo_susi>');
         }
 
-        // Configuraciones adicionales recomendadas
+        // Configuraciones adicionales recomendadas */
         $email->setMailType('html');
 
 
@@ -2522,7 +2524,7 @@ class Principal extends BaseController
         //var_dump($data['responsableGasto']  );
         //die();
         $id_reserva_go = (isset($pdf[0]->id_reserva_go) && !empty($pdf[0]->id_reserva_go)) ? $pdf[0]->id_reserva_go : '';
-
+        $data['es4000'] = false;
         if (!empty($id_reserva_go)) {
             $reserva = $globals->getTabla([
                 'tabla' => 'vw_reserva_go',
@@ -2532,6 +2534,10 @@ class Principal extends BaseController
             $importe_str = $reserva[0]->total_importe;
             $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
             $data['numero_texto'] = $this->numeroEnLetras($importe_float);
+            
+            if( $reserva[0]->partida >= '4000' && $reserva[0]->partida < '5000' ){
+              $data['es4000'] = true;
+            }
         }
 
         if (!empty($registro_go->data)) {
@@ -2923,6 +2929,143 @@ class Principal extends BaseController
         return $this->response
             ->setHeader('Content-Type', 'application/zip')
             ->setHeader('Content-Disposition', 'attachment; filename="Documentos_' . $id_registro_pt . '.zip"')
+            ->setBody(file_get_contents($zipPath));
+    }
+    public function generarZipGO()
+    {
+        $response = new \stdClass();
+        $id_registro_go = $this->request->getPost('id_registro_go');
+        $Mglobal = new Mglobal;
+
+        if (empty($id_registro_go)) {
+            $response->error = true;
+            $response->respuesta = 'ID de registro inválido';
+            return $this->respond($response);
+        }
+        // Consulta de PDFs asociados
+        $pdf_reserva = $Mglobal->getTabla([
+            'tabla' => 'vw_pdf_reserva_go',
+            'where' => ['visible' => 1, 'id_registro_go' => $id_registro_go]
+        ]);
+        
+        $id_reserva = $Mglobal->getTabla([
+            'tabla' => 'registro_go',
+            'where' => ['visible' => 1, 'id_registro_go' => $id_registro_go]
+        ])->data[0]->id_reserva_go;
+         
+        // Directorio temporal
+        $tempDir = sys_get_temp_dir() . '/zip_temp_' . $id_registro_go . '/';
+  
+        if (!is_dir($tempDir) && !mkdir($tempDir, 0777, true)) {
+            $response->error = true;
+            $response->respuesta = 'No se pudo crear directorio temporal';
+            return $this->respond($response);
+        }
+       
+        $archivos = [];
+        $archivosTemporales = [];
+
+      
+        $dynamicFiles = [
+                1 => '01 Anexos y formato de los LTPOFB.pdf'
+        ];
+    
+       
+        foreach ($dynamicFiles as $id => $nombre) {
+            $rutaTemp = $tempDir . $nombre;
+            $archivoGenerado = $this->Archivo($id_registro_go, $id, $rutaTemp);
+            if ($archivoGenerado && file_exists($archivoGenerado)) {
+                $archivos[] = $archivoGenerado;
+                $archivosTemporales[] = $archivoGenerado;
+            }
+        }
+
+       
+        // Archivo 07
+        $rutaArchivo07 = $tempDir . '07 Formatos_diversos.pdf';
+        $archivo07 = $this->ImprimirPT($id_registro_go, $rutaArchivo07);
+        if ($archivo07 && file_exists($archivo07)) {
+            $archivos[] = $archivo07;
+            $archivosTemporales[] = $archivo07;
+        }
+
+        // Archivos desde base de datos (PDFs permanentes)
+        if (!empty($pdf_reserva->data)) {
+            foreach ($pdf_reserva->data as $pdf) {
+                $source = FCPATH . $pdf->ruta_relativa;
+                if (file_exists($source)) {
+                    $archivos[] = $source;
+                    // ¡NO lo añadimos a archivosTemporales!
+                }
+            }
+        }
+
+        // Archivos subidos (05 al 09)
+        $uploadedFiles = [
+            'archivo05' => '05 Formatos de los LRADP.pdf',
+            'archivo09' => '09 Otros.pdf'
+        ];
+        foreach ($uploadedFiles as $input => $nombre) {
+            $file = $this->request->getFile($input);
+            if ($file && $file->isValid()) {
+                $newPath = $tempDir . $nombre;
+                if ($file->move($tempDir, $nombre)) {
+                    $archivos[] = $newPath;
+                    $archivosTemporales[] = $newPath;
+                }
+            }
+        }
+
+        if (empty($archivos)) {
+            array_map('unlink', glob($tempDir . '*'));
+            rmdir($tempDir);
+            $response->error = true;
+            $response->respuesta = 'No hay archivos para comprimir';
+            return $this->respond($response);
+        }
+
+        // Crear ZIP
+        $timestamp = date('Ymd_His');
+        $zipPath = WRITEPATH . "temp_zip/Documentos_{$id_registro_go}_{$timestamp}.zip";
+        if (!is_dir(dirname($zipPath))) {
+            mkdir(dirname($zipPath), 0777, true);
+        }
+
+        $zip = new \ZipArchive();
+        if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE)) {
+            foreach ($archivos as $archivo) {
+                $zip->addFile($archivo, basename($archivo));
+            }
+            $zip->close();
+        }
+
+        if (!file_exists($zipPath)) {
+            $response->error = true;
+            $response->respuesta = 'El archivo ZIP no se creó correctamente';
+            return $this->respond($response);
+        }
+
+        // Borrar solo archivos temporales
+        foreach ($archivosTemporales as $tempFile) {
+            if (file_exists($tempFile)) {
+                unlink($tempFile);
+            }
+        }
+
+        if (is_dir($tempDir)) {
+            rmdir($tempDir);
+        }
+
+        // Eliminar ZIP automáticamente al cerrar
+        register_shutdown_function(function () use ($zipPath) {
+            if (file_exists($zipPath)) {
+                unlink($zipPath);
+            }
+        });
+
+        return $this->response
+            ->setHeader('Content-Type', 'application/zip')
+            ->setHeader('Content-Disposition', 'attachment; filename="Documentos_' . $id_registro_go . '.zip"')
             ->setBody(file_get_contents($zipPath));
     }
 

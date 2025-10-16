@@ -187,6 +187,7 @@ class Agregar extends BaseController
         $data = array();
         $response = new \stdClass();
         $this->globals = new Mglobal();
+        $i = 1;
         foreach ($archivos as $archivo) {
             if (!$archivo->isValid()) {
                 continue;
@@ -194,7 +195,7 @@ class Agregar extends BaseController
             $timestamp = date('Ymd_His');
             $extension = $archivo->getClientExtension();
             $originalName = pathinfo($archivo->getName(), PATHINFO_FILENAME);
-            $file = $originalName . '_' . $timestamp . '.' . $extension;
+            $file =  '03_CFDI_' .$i.'_' . $timestamp . '.' . $extension;
 
             // Ruta absoluta
             $ruta_destino = FCPATH . 'assets/pdf/';
@@ -219,6 +220,7 @@ class Agregar extends BaseController
             $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
 
         }
+         $i++;
         return $response;
     }
     public function procesarXML(array $archivos, $id_registro_pt = null)

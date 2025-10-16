@@ -120,7 +120,7 @@
                                                 </select>
                                             </div><!--end col-->
                                             <div class="col-md-6 mb-6">
-                                                <label for="secretario">Subsecreatrio(a) o Director(a) General Responsable</label>
+                                                <label for="id_subsecretario">Subsecreatrio(a) o Director(a) General Responsable</label>
                                                 <select type="text" class="form-control" id="id_subsecretario" name="id_subsecretario">
                                                             <option value="0" selected >Seleccione una opcion</option>
                                                     <?php foreach($cat_subsecretario as $s): ?>

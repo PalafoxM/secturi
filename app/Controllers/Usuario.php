@@ -212,6 +212,31 @@ class Usuario extends BaseController
         }
         return $this->respond($response);
     }
+    public function registrarSalida()
+    {
+
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+        $globals = new Mglobal;
+     
+            $dataConfig = [
+                "tabla" => "capacitacion",
+                "editar" => false
+            ];
+            $dataInsert = [
+                'id_usuario' => $session->get('id_usuario'),
+                'fec_reg' => date('Y-m-d H:i:s'),
+
+            ];
+            $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardarCapacitacion'];
+            $response = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+            if(!$response->error){
+                $session->set('capacitacion', 1);
+
+            }
+        return $this->respond($response);
+    }
     public function validarReporteExcel()
     {
 
