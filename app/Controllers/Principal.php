@@ -1057,7 +1057,7 @@ class Principal extends BaseController
             // "idEditar"=>['id_usuario'=>$data['id_usuario']]
         ];
         $response = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
-
+       
         if (!$response->error) {
             $id_reserva = $response->idRegistro;
             $datosCombinados = [];

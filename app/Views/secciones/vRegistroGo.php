@@ -140,7 +140,7 @@
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="formato_conformidad">Formato de conformidad del producto recibido.<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" id="formato_conformidad" value="NO" name="formato_conformidad" readonly>
+                                                <input type="text" class="form-control" id="formato_conformidad" value="SI" name="formato_conformidad" readonly>
                                                 <div class="invalid-feedback">
                                                     Please provide a valid state.
                                                 </div>
@@ -259,9 +259,14 @@
                                                         <?php if(isset($p->propina) && !empty($p->propina)):?>
                                                          <div class="col-md-6 mb-3">
                                                             <p class="text-muted mb-3">Propina PDF (Máx 5MB)</p>
-                                                            <input id="propina_pdf__input_<?= $i; ?>"  type="file" name="propina_pdf_<?= $i; ?>[]" class="dropify" multiple accept=".pdf" />   
+                                                            <input id="propina_pdf_input_<?= $i; ?>"  type="file" name="propina_pdf_<?= $i; ?>[]" class="dropify" multiple accept=".pdf" />   
                                                         </div>
                                                         <?php endif; ?>
+                                                          <div class="col-md-6 mb-3">
+                                                          
+                                                            <p class="text-muted mb-3">Factura XML (Máx 5MB)</p>
+                                                            <input id="factura_xml_input_<?= $i; ?>" type="file" name="factura_xml_<?= $i; ?>[]" multiple class="dropify"  accept=".xml">
+                                                        </div>
                                                      
                                                     </div>
                                                 <?php endforeach; ?>
