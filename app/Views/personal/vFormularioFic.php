@@ -77,19 +77,23 @@
                                             </div><!--end col-->
                                         </div><!--end form-row-->
                                         <div class="form-row">
-                                            <div class="col-md-4 mb-3">
+                                            <div class="col-md-3 mb-3">
                                                 <label for="reponsable_solicitud">Responsable del Gasto<span style="color:red;">*</span></label>
                                                 <input id="id_reponsable_solicitud" class="form-control" name="id_reponsable_solicitud" value="HUGO RAMÍREZ DUARTE" readonly>
 
                                             </div><!--end col-->
-                                            <div class="col-md-4 mb-3">
+                                            <div class="col-md-3 mb-3">
                                                 <label for="director_generar">Director/a General Administrativa <span style="color:red;">*</span></label>
                                                 <input type="text" class="form-control" id="director_generar" value="<?= $dsc_director_general ?>" name="director_generar" readonly>
                                                 <div class="invalid-feedback">
                                                     Please provide a valid state.
                                                 </div>
                                             </div><!--end col-->
-                                            <div class="col-md-4 mb-3">
+                                            <div class="col-md-3 mb-3">
+                                                <label for="id_subsecretario">Subsecretario(a) que autoriza</label>
+                                                <input type="text" id="id_subsecretario"  name="id_subsecretario" class="form-control" value="ARMANDO EMMANUEL GASCA GARCÍA" readonly>
+                                            </div><!--end col-->
+                                            <div class="col-md-3 mb-3">
                                                 <label for="secretario">Secretario(a) o Director(a) que autoriza</label>
                                                 <input type="text" id="secretario"  name="secretario" class="form-control" value="DAVID AYALA SAUCEDO" readonly>
                                             </div><!--end col-->

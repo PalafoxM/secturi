@@ -3272,7 +3272,7 @@ class Principal extends BaseController
         
         //var_dump($formatos);
         //die();
-
+        $data['GO'] = false;
         if (!empty($registro_pt->data)) {
             $registro = $registro_pt->data[0];
             $id_reserva = $registro_pt->data[0]->id_reserva;
@@ -3345,6 +3345,7 @@ class Principal extends BaseController
             echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
             die();
         }
+       
         $subsecretario = $area = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1, 'id_subsecretario' => $registro_pt->data[0]->id_subsecretario]]);
        // $usu_sub = $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $subsecretario->data[0]->id_usuario]]);
         $data['usu_sub'] = $subsecretario->data[0];
@@ -3724,6 +3725,7 @@ class Principal extends BaseController
         }
         // var_dump( $hoteles);
         $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1]]);
+        $cat_subsecretario = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1]]);
         $cat_tipo = $globals->getTabla(['tabla' => 'cat_tipo', 'where' => ['visible' => 1]]);
 
         $usuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->get('id_usuario')]]);
@@ -3750,6 +3752,7 @@ class Principal extends BaseController
         $data['cat_opcion'] = (!empty($cat_opcion->data)) ? $cat_opcion->data : [];
         $data['editar'] = (!empty($id_proveedor) || $id_proveedor != 0) ? 0 : 1;
         $data['secretario'] = (!empty($secretario->data)) ? $secretario->data : [];
+        $data['subsecretario'] = (!empty($cat_subsecretario->data)) ? $cat_subsecretario->data : [];
         $data['usuario'] = (!empty($usuario->data)) ? $usuario->data[0] : [];
         $data['cat_usuario'] = (!empty($cat_usuario->data)) ? $cat_usuario->data : [];
         $data['scripts'] = array('inicio');
