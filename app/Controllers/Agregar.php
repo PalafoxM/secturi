@@ -195,7 +195,7 @@ class Agregar extends BaseController
             $timestamp = date('Ymd_His');
             $extension = $archivo->getClientExtension();
             $originalName = pathinfo($archivo->getName(), PATHINFO_FILENAME);
-            $file =  'factura' .$i.'_' . $timestamp . '.' . $extension;
+            $file =  '03_CFDI_' .$i.'_' . $timestamp . '.' . $extension;
 
             // Ruta absoluta
             $ruta_destino = FCPATH . 'assets/pdf/';

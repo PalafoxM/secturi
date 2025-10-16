@@ -1914,10 +1914,9 @@ class Principal extends BaseController
             'mvallejo@guanajuato.gob.mx',
             'rgonzalezgu@guanajuato.gob.mx',
             'yjimenez@guanajuato.gob.mx',
-      
         ]);  
 
-      /*   $email->setTo([
+/*          $email->setTo([
             'alopez@guanajuato.gob.mx',
             'cchernandezp@guanajuato.gob.mx',
             'csoto@guanajuato.gob.mx',
@@ -1963,7 +1962,7 @@ class Principal extends BaseController
             'alvarezp@guanajuato.gob.mx',
             //'palafox.marin@guanajuato.gob.mx',
         ]);  */
-        $email->setSubject('Recordatorio: Revisión de Asistencias - Sistema SUSI');
+       $email->setSubject('Recordatorio: Revisión de Asistencias - Sistema SUSI');
         $email->setMessage('
             <!DOCTYPE html>
             <html>
@@ -1992,30 +1991,32 @@ class Principal extends BaseController
                         <h1 style="color: #004080; margin-bottom: 10px; text-align: center;">Recordatorio de Asistencias</h1>
                         <p style="text-align: center; color: #666; margin-bottom: 25px; font-size: 16px;">Sistema Unificado SECTURI</p>
                         
-                        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Estimado(a) usuario(a),</p>
+                        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Estimado personal,</p>
                         
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-                            Este es un recordatorio <strong>automático</strong> generado por el sistema SUSI para 
-                            solicitar la verificación y validación de su personal
+                            En caso de que aún no hayas realizado las <strong>justificaciones de tus incidencias correspondientes a la quincena 19/2025</strong>, 
+                            la cual comprende el periodo del <strong>1 al 15 de octubre de 2025</strong>, 
+                            tienes hasta el día <strong>martes 22 de octubre del presente año a las 16:00 hrs</strong> para realizarlas.
                         </p>
-                        
+
                         <div class="highlight-box">
                             <p style="font-size: 15px; line-height: 1.6; margin: 0;">
-                                <strong>Importante:</strong> Recuerda que dispones de 5 días hábiles para completar las validaciones requeridas.
+                                Para cualquier duda o aclaración, favor de comunicarse a la 
+                                <strong>Coordinación de Recursos Humanos</strong> o 
+                                <strong>Coordinación de Tecnologías de la Información</strong>.
                             </p>
                         </div>
-                        
+
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
-                            Le invitamos a revisar sus incidencias de su personal.
+                            Le invitamos a revisar y validar sus incidencias correspondientes en el sistema SUSI.
                         </p>
-                        
+
                         <div style="text-align: center; margin: 30px 0;">
-                            <a href="' . base_url('index.php/Principal/incidenciaSubordinado') . '" class="btn" style="color: white; text-decoration: none;">
+                            <a href="https://secturnet.guanajuato.gob.mx/susi/index.php/Agregar/Asistencia" class="btn" style="color: white; text-decoration: none;">
                                 📋 Revisar Incidencias del Personal
                             </a>
-                          
                         </div>
-                        
+
                         <p style="font-size: 14px; color: #666; border-top: 1px solid #dee2e6; padding-top: 20px; margin-top: 25px;">
                             <strong>Nota:</strong> Este es un mensaje automático generado por el Sistema Unificado SECTURI (SUSI). 
                             Por favor, no responda a este correo.
@@ -2032,14 +2033,15 @@ class Principal extends BaseController
             </html>
         ');
 
-        // ✅ SOLUCIÓN PARA LA IMAGEN - AGREGAR COMO ADJUNTO EMBEBIDO
+
+     /*    // ✅ SOLUCIÓN PARA LA IMAGEN - AGREGAR COMO ADJUNTO EMBEBIDO
         $logoPath = FCPATH . 'assets/pdf/plantillas/ManualPersonaSuperior.pdf';
         if (file_exists($logoPath)) {
             $email->attach($logoPath);
             $email->setHeader('Content-ID', '<logo_susi>');
         }
 
-        // Configuraciones adicionales recomendadas
+        // Configuraciones adicionales recomendadas */
         $email->setMailType('html');
 
 

@@ -1729,7 +1729,7 @@ ini.inicio = (function () {
                formData.append('instrumento', instrumentoFile);
                formData.append('no_convenio', $('#no_convenio').val());
              }else{
-               Swal.fire("Atención", 'Sin Instrumento Jurídico', 'error');
+               Swal.fire("Atención", 'Sin Instrumento Jurídico', 'info');
                return false;
              }   
         } 
