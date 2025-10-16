@@ -18,7 +18,8 @@
         <div  style="position:absolute; top:38.5%; left:64%; width:33%; background-color:white; font-size: 9px;  height:12px;">
             <span class="proxima "><?= (isset($registro->rfc) && !empty($registro->rfc))?strtoupper($registro->rfc):'' ?></span>
         </div>
-        <div  style="position:absolute; top:43.1%; left:77.2%; width:20.5%; background-color:white; font-size: 12px;  height:12px;">
+        <div  style="position:absolute; top:43.1%; left:77.2%; width:20.5%; background-color:RED; font-size: 12px;  height:12px;">
+           
             <span class="proxima "><?= (isset($registro->dsc_proveedor) && !empty($registro->dsc_proveedor))?strtoupper($registro->dsc_proveedor):'' ?></span>
         </div>
         <div  style="position:absolute; top:44.1%; left:65.6%; width:29%; background-color:white; font-size: 12px;  height:12px;">
