@@ -9,8 +9,13 @@
         <div  style="position:absolute;text-align:center; top:18.2%; left:70.5%; width:25%; height:18px; background-color:white; font-size: 12px; ">
             <span class="proxima"><?= (isset($GO) && !empty($GO))?'GO':'PT';?> <?= strtoupper($registro->folio);?></span>
         </div>
-        <div  style="position:absolute; top:36.2%; left:66.8%; width:30%; background-color:white; font-size: 9px;  height:12px;">
-            <span ><?= (isset($registro->dsc_proveedor) && !empty($registro->dsc_proveedor))?strtoupper($registro->dsc_proveedor):'' ?></span>
+        <div  style="position:absolute; top:36.2%; left:60.7%; width:35%; background-color:white; font-size: 12px;  height:12px;">
+            <?php if($GO): ?>
+            <span class="proxima"> <strong> GOBIERNO DEL ESTADO DE GUANAJUATO SFIYA SECRETARIA DE TURISMO</strong></span>
+             <?php endif; ?>
+           <?php if(!$GO): ?>
+            <span class="proxima "><?= (isset($registro->dsc_proveedor) && !empty($registro->dsc_proveedor))?strtoupper($registro->dsc_proveedor):'' ?></span>
+             <?php endif; ?>
         </div>
          <div  style="position:absolute; top:37.4%; left:73.5%; width:20%; background-color:white; font-size: 9px;  height:12px;">
             <span ><?= (isset($registro->no_proveedor) && !empty($registro->no_proveedor))?strtoupper($registro->no_proveedor):'' ?></span>
@@ -18,9 +23,13 @@
         <div  style="position:absolute; top:38.5%; left:64%; width:33%; background-color:white; font-size: 9px;  height:12px;">
             <span class="proxima "><?= (isset($registro->rfc) && !empty($registro->rfc))?strtoupper($registro->rfc):'' ?></span>
         </div>
-        <div  style="position:absolute; top:43.1%; left:77.2%; width:20.5%; background-color:RED; font-size: 12px;  height:12px;">
-           
+        <div  style="position:absolute; top:43.1%; left:60.7%; width:36%; background-color:white; font-size: 12px;  height:12px;">
+           <?php if($GO): ?>
+            <span class="proxima"> <strong> GOBIERNO DEL ESTADO DE GUANAJUATO SFIYA SECRETARIA DE TURISMO</strong></span>
+             <?php endif; ?>
+           <?php if(!$GO): ?>
             <span class="proxima "><?= (isset($registro->dsc_proveedor) && !empty($registro->dsc_proveedor))?strtoupper($registro->dsc_proveedor):'' ?></span>
+             <?php endif; ?>
         </div>
         <div  style="position:absolute; top:44.1%; left:65.6%; width:29%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "><?= strtoupper($registro->banco); ?></span>
