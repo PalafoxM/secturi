@@ -603,6 +603,17 @@
         <!-- Navbar -->
         <nav class="navbar-custom">
             <ul class="list-unstyled topbar-nav float-right mb-0">
+                
+                    <li class="hidden-sm">
+
+                  <?php if($session->get('capacitacion') == 0): ?>
+                    <a class="nav-link waves-effect waves-light" onclick="registrarAsistencia();" data-toggle="tooltip" data-placement="left"  data-trigger="hover" data-original-title="Confirmar Asistencia"
+                        href="javascript: void(0);" role="button" aria-haspopup="false" aria-expanded="false" id="btnSalida" >
+                       <i class="em em-writing_hand"></i>
+                    </a>
+                   <?php endif; ?>
+               
+                </li> 
                 <!--    <li class="hidden-sm">
 
                     <?php if (date('H:i:s') >= '16:00' && date('H:i:s') <= '17:00' && $session->get('registro_salida') !== 1): ?>
@@ -1410,6 +1421,35 @@
                     }
                     Swal.fire("¡Hora de ir a Casa!", 'Registro de Salida Guardado con Exito', "success");
                     $('#btnSalida').prop('disabled', true).html('<i class="mdi dripicons-alarm font-20 text-success"></i>');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+
+
+                },
+
+                error: function (jqXHR, textStatus, errorThrown) {
+                    Swal.fire("Error en la conexión", textStatus, "error");
+                    console.error('Error:', textStatus, errorThrown);
+                }
+            });
+
+        }
+        function registrarAsistencia() {
+            $.ajax({
+                type: "GET",
+                url: base_url + "index.php/Usuario/registrarSalida",
+                dataType: "json",
+                beforeSend: function () {
+                    $('#btnSalida').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+                },
+                success: function (response) {
+                    if (response.error) {
+                        Swal.fire("¡Algo Salio Mal!", 'Favor de registrar la Salida en el Checador', "error");
+                        return
+                    }
+                    Swal.fire("¡Asistencia Confirmada!", 'Registro Guardado con Exito', "success");
+                    $('#btnSalida').prop('disabled', true).html('<i class="em em-writing_hand text-success"></i>');
                     setTimeout(() => {
                         window.location.reload();
                     }, 1500);
