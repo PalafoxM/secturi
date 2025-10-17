@@ -1639,6 +1639,7 @@ class Principal extends BaseController
             "banco" => $data['banco'],
             "no_cuenta" => $data['no_cuenta'],
             "clabe" => $data['clabe'],
+            "fic" => $data['fic'],
         ];
         $result = $globals->saveTabla($dataInsert, $dataConfig, ["script" => "proveedor_banco.agregarBanco"]);
         if (!$result->error) {
@@ -3886,7 +3887,7 @@ class Principal extends BaseController
         $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
         if ($id_proveedor != 0) {
             $proveedor = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1, 'id_proveedor' => $id_proveedor]]);
-            $banco = $globals->getTabla(['tabla' => 'proveedor_banco', 'where' => ['idproveedor' => $id_proveedor]]);
+            $banco = $globals->getTabla(['tabla' => 'proveedor_banco', 'where' => ['idproveedor' => $id_proveedor, 'fic' => 1]]);
             $restaurantes = $globals->getTabla(['tabla' => 'cat_restaurante_fic', 'where' => ['no_proveedor' => $proveedor->data[0]->no_proveedor]]);
             $hoteles = $globals->getTabla(['tabla' => 'cat_hoteles_fic', 'where' => ['no_proveedor' => $proveedor->data[0]->no_proveedor]]);
         }

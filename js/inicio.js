@@ -591,22 +591,28 @@ ini.inicio = (function () {
                 html:
                     '<input id="swal-banco" class="swal2-input" placeholder="Banco" autocomplete="off">' +
                     '<input id="swal-no-cuenta" class="swal2-input" placeholder="No. Cuenta" autocomplete="off">' +
+                    '<select id="fic" class="swal2-input">' +
+                        '<option value="">¿FIC?</option>' +
+                        '<option value="1">Sí</option>' +
+                        '<option value="0">No</option>' +
+                    '</select>' +
                     '<input id="swal-clabe" class="swal2-input" placeholder="Clabe" autocomplete="off">',
                 focusConfirm: false,
                 showCancelButton: true,
                 confirmButtonText: 'Guardar',
                 cancelButtonText: 'Cancelar',
                 preConfirm: () => {
-                    const banco = document.getElementById('swal-banco').value;
-                    const no_cuenta = document.getElementById('swal-no-cuenta').value;
-                    const clabe = document.getElementById('swal-clabe').value;
+                    const banco = document.getElementById('swal-banco').value.trim();
+                    const no_cuenta = document.getElementById('swal-no-cuenta').value.trim();
+                    const fic = document.getElementById('fic').value.trim();
+                    const clabe = document.getElementById('swal-clabe').value.trim();
 
-                    if (!banco || !no_cuenta || !clabe) {
+                    if (!banco || !no_cuenta || !fic || !clabe) {
                         Swal.showValidationMessage('Todos los campos son obligatorios');
                         return false;
                     }
 
-                    return { banco: banco, no_cuenta: no_cuenta, clabe: clabe };
+                    return { banco, no_cuenta, fic, clabe };
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -624,7 +630,8 @@ ini.inicio = (function () {
                             id_proveedor,
                             banco: datos.banco,
                             no_cuenta: datos.no_cuenta,
-                            clabe: datos.clabe
+                            clabe: datos.clabe,
+                            fic: datos.fic
                         },
                         success: function (response) {
                             if (!response.error) {
@@ -3859,6 +3866,9 @@ ini.inicio = (function () {
                             const tbody = $('#datatableProveedor tbody');
                             tbody.empty();
                             
+                              /*<a href="<?php echo base_url(); ?>index.php/Principal/PagoFic/${p.id_proveedor}"  data-toggle="tooltip" data-placement="left" data-original-title="Pagos FIC"
+                                                class="btn btn-gradient-dark px-4">FIC</i>
+                                            </a>*/
                             response.data.forEach(p => {
                                 tbody.append(`
                                     <tr>
@@ -3877,9 +3887,7 @@ ini.inicio = (function () {
                                                  class="btn btn-gradient-danger px-4"><i
                                                     class="mdi mdi-trash-can-outline font-21"></i>
                                             </a>
-                                            <a href="<?php echo base_url(); ?>index.php/Principal/PagoFic/${p.id_proveedor}"  data-toggle="tooltip" data-placement="left" data-original-title="Pagos FIC"
-                                                class="btn btn-gradient-dark px-4">FIC</i>
-                                            </a>
+                                          
 
                                         </td>
                                     </tr>
