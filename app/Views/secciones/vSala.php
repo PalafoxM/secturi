@@ -588,6 +588,7 @@
             editable: true, // Permite arrastrar y editar eventos
             selectable: true, // Permite seleccionar intervalos
             events: eventos,
+            weekends: false,
             dateClick: function (info) {
                 let dia = info.dateStr;
                 const fechaHoy = new Date();
@@ -648,6 +649,9 @@
                 const date = info.date;
                 const day = date.getDay(); // 0 = domingo, 6 = sábado
                 const isWeekend = (day === 0 || day === 6);
+
+                 info.el.style.backgroundColor = 'rgba(37, 99, 235, 0.1)';  // Azul translúcido
+                info.el.style.border = '1px solid rgba(37, 99, 235, 0.3)';  // Azul tenue
 
 
                 if (isWeekend) {
