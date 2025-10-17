@@ -495,6 +495,7 @@ class Agregar extends BaseController
                     'id_reserva' => $id_reserva,
                     'id_proveedor' => $data['id_proveedor'],
                     'id_direccion_responsable' => 99,
+                    'id_subsecretario' => 2,
                     'no_consecutivo' => $data['no_consecutivo'],
                     'tipo_pt' => (int) $data['tipo_pt'],
                     'fecha_tramite' => $data['fecha_tramite'],
