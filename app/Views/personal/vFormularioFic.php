@@ -155,11 +155,8 @@
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="contrato_convenio">Contrato o Convenio.<span style="color:red;">*</span></label>
-                                                <select type="text" class="form-control" id="contrato_convenio"  name="contrato_convenio" >
-                                                  <?php foreach ($cat_opcion as $o): ?>
-                                                    <option value="<?= $o->id_opcion ?>" <?= (isset($registro_pt->contrato_convenio) && $registro_pt->contrato_convenio == $o->id_opcion) ? 'selected' : '' ?> ><?= $o->des_opcion ?></option>
-                                                  <?php endforeach; ?>
-                                               </select>
+                                                <input type="text" class="form-control" id="contrato_convenio" name="contrato_convenio" value="NO APLICA" readonly>
+                                          
                                                
                                             </div><!--end col-->
                                         </div><!--end form-row-->
@@ -182,7 +179,7 @@
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="otros">Otros</label>
-                                                <input type="text" class="form-control" id="otros"  name="otros" >
+                                                <input type="text" class="form-control" id="otros"  name="otros" value="ACUERDO SECRETARIAL" >
                                                 <div class="invalid-feedback">
                                                     Please provide a valid state.
                                                 </div>

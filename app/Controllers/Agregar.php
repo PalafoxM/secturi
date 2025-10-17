@@ -511,7 +511,7 @@ class Agregar extends BaseController
                     'otros' => $data['otros'],
                     'comision' => $data['comision'],
                     'clausula_contrato' => $data['clausula_contrato'],
-                    'contrato_convenio' => (int) $data['contrato_convenio'],
+                    'contrato_convenio' => 2,
                     'concepto_pago' => $data['concepto_pago'],
                     'fec_reg' => date('Y-m-d H:i:s'),
                     'usu_reg' => $session->get('id_usuario')
