@@ -2690,10 +2690,16 @@ class Principal extends BaseController
                 'tabla' => 'direccion',
                 'where' => ['visible' => 1, 'id_area' => $data['registro']->id_direccion_responsable]
             ]);
-            if ($registro_pt->data[0]->no_reserva == '4327278' || $registro_pt->data[0]->no_reserva == '4327277') {
+            $data['fic'] = false;
+            if ($registro_pt->data[0]->no_reserva == '4327278') {
                 $data['folio'] = "SECTURI/DGDT/DCT/FIC-TH/";
+                  $data['fic'] = true;
             } else if ($registro_pt->data[0]->no_reserva == '4327279') {
+                $data['folio'] = "SECTURI/DGDT/DCT/FIC-TH/";
+               $data['fic'] = true;
+            } else if ($registro_pt->data[0]->no_reserva == '4327277') {
                 $data['folio'] = "SECTURI/DGDT/DCT/FIC-TA/";
+                 $data['fic'] = true;
             } else {
                 $data['folio'] = $folio_prefijo;
             }

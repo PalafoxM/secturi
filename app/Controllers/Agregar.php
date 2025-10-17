@@ -450,7 +450,7 @@ class Agregar extends BaseController
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaTurno'];
 
         foreach ($data['no_reserva'] as $k => $v) {
-
+      
             $insertReserva = [
                 'id_proveedor' => (int) $data['id_proveedor'],
                 'id_estatus' => 3,
@@ -468,6 +468,7 @@ class Agregar extends BaseController
                 "tabla" => "reserva",
                 "editar" => false
             ];
+            
             $response = $this->globals->saveTabla($insertReserva, $dataConfig, $dataBitacora);
 
             if (!$response->error) {
@@ -529,7 +530,7 @@ class Agregar extends BaseController
                 $id_registro_pt = $response->idRegistro;
                 $archivosXml = [];
                 $archivosPdf = [];
-               $response->idReserva = $id_reserva;
+               $response->idReserva = $id_registro_pt;
                 $this->cambiarStatusPT($id_reserva);
                 // Recorremos todas las claves de los archivos enviados
                 foreach ($archivos as $key => $fileArray) {
