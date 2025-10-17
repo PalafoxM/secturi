@@ -2351,7 +2351,7 @@ class Principal extends BaseController
     {
         $session = \Config\Services::session();
         $globals = new Mglobal;
-        if ($tipo != 'PT' && $tipo != 'GO' && $tipo != 'GRC') {
+        if ($tipo != 'PT' && $tipo != 'GO' && $tipo != 'GRC' && $tipo != 'FIC' ) {
             $data['layout'] = 'plantilla/lytVacio';
             $data['contentView'] = 'secciones/vError500';
             $this->_renderView($data);
@@ -2360,9 +2360,11 @@ class Principal extends BaseController
         $PT = ($tipo == 'PT') ? TRUE : FALSE;
         $GO = ($tipo == 'GO') ? TRUE : FALSE;
         $GRC = ($tipo == 'GRC') ? TRUE : FALSE;
+        $FIC = ($tipo == 'FIC') ? TRUE : FALSE;
         $data['PT'] = $PT;
         $data['GO'] = $GO;
         $data['GRC'] = $GRC;
+        $data['FIC'] = $FIC;
         $data['id_registro'] = $id;
         $data['tipo'] = $tipo;
         $data['scripts'] = array('inicio');
@@ -2625,6 +2627,7 @@ class Principal extends BaseController
             'tabla' => 'vw_registro_pt',
             'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
         ]);
+       
          $direccion = $globals->getTabla([
                 'tabla' => 'vw_direccion',
                 'where' => [
@@ -2680,7 +2683,7 @@ class Principal extends BaseController
             
 
         }
-
+         
         if (!empty($registro_pt->data)) {
             $data['registro'] = $registro_pt->data[0];
             $folio = $globals->getTabla([
@@ -3272,7 +3275,7 @@ class Principal extends BaseController
         
         //var_dump($formatos);
         //die();
-
+        $data['GO'] = false;
         if (!empty($registro_pt->data)) {
             $registro = $registro_pt->data[0];
             $id_reserva = $registro_pt->data[0]->id_reserva;
@@ -3345,10 +3348,175 @@ class Principal extends BaseController
             echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
             die();
         }
+       
         $subsecretario = $area = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1, 'id_subsecretario' => $registro_pt->data[0]->id_subsecretario]]);
        // $usu_sub = $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $subsecretario->data[0]->id_usuario]]);
         $data['usu_sub'] = $subsecretario->data[0];
          
+        $html = view('secciones/vFormatoPT.php', $data);
+        $htmlSegundaHoja = view('secciones/vFormatoPT2.php', $data);
+        $htmlTercerHoja = view('personal/vFormato702.php', $data);
+    
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 0,
+            'margin_left' => 1,
+            'margin_right' => 1,
+            'format' => [213, 268],
+            'mirrorMargins' => false,
+        ]);
+
+        // Importar PDF base (anexo07)
+
+        $pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/plantillas/anexo07_2.pdf');
+
+        for ($i = 1; $i <= $pagecount; $i++) {
+            $mpdf->AddPage();
+            $tplId = $mpdf->ImportPage($i);
+            $mpdf->UseTemplate($tplId);
+
+            if ($i == 1) {
+                $mpdf->WriteHTML($html);
+            }
+            if ($i == 2) {
+                $mpdf->WriteHTML($htmlSegundaHoja);
+                $facturas = $formatos->data;
+
+                if (!empty($facturas)) {
+                    foreach ($facturas as $index => $factura) {
+                        $facturaPath = FCPATH . $factura->ruta_relativa;
+
+                        if (file_exists($facturaPath)) {
+                            $facturaPageCount = $mpdf->SetSourceFile($facturaPath);
+                             
+                            for ($j = 1; $j <= $facturaPageCount; $j++) {
+                                $mpdf->AddPage();
+                                $tplFactura = $mpdf->ImportPage($j);
+
+                                // Escribir HTML solo en la primera página de la primera factura
+                                if ($index === 0 && $j === 1) {
+                                    $mpdf->WriteHTML($htmlTercerHoja);
+                                }
+
+                                // Escalar factura
+                                $templateSize = $mpdf->GetTemplateSize($tplFactura);
+                                $scaleFactor = 0.6; // ajusta si es necesario
+                                $width = $templateSize['width'] * $scaleFactor;
+                                $height = $templateSize['height'] * $scaleFactor;
+
+                                $mpdf->UseTemplate($tplFactura, 40, 55, $width, $height);
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+
+        if ($savePath) {
+            $mpdf->Output($savePath, 'F'); // F = write to file
+            return $savePath;
+        }
+
+        $mpdf->Output('Formato_pt.pdf', 'I');
+        exit();
+
+    }
+    public function ImprimirFIC($id_pt = null, $savePath = null)
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $data = [];
+        $id_reserva = null;
+
+        $registro_pt = $globals->getTabla([
+            'tabla' => 'vw_registro_pt',
+            'where' => ['visible' => 1, 'id_registro_pt' => $id_pt]
+        ]);
+        $formatos = $globals->getTabla([
+            'tabla' => 'vw_pdf_reserva',
+            'where' => ['visible' => 1, 'id_registro_pt' => $id_pt]
+        ]);
+        
+     
+        $data['FIC'] = false;
+        $data['GO'] = false;
+        if (!empty($registro_pt->data)) {
+            $registro = $registro_pt->data[0];
+            $id_reserva = $registro_pt->data[0]->id_reserva;
+            $no_consecutivo = $registro_pt->data[0]->no_consecutivo;
+            $data['registro'] = $registro;
+
+            //validar si yo tengo folio 
+            $direccion = $globals->getTabla([
+                'tabla' => 'vw_direccion',
+                'where' => [
+                    'visible' => 1,
+                    //'id_director' => 110
+                    'id_director' => $registro_pt->data[0]->id_reponsable_solicitud
+                ]
+            ]);
+        
+      
+            if (empty($direccion->data)) {
+                $jefe = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_pt->data[0]->id_reponsable_solicitud]]);
+                if(!empty($jefe->data)){
+                $idJefe = $jefe->data[0]->id_jefe_inmediato;
+                $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_director' => $idJefe]]);
+                }else{
+                $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_pt->data[0]->id_reponsable_solicitud]]);
+                $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_area' => $area->data[0]->id_area]]);
+                }
+            
+            }
+             //die( var_dump($registro_pt->data[0]) );
+           // $folio = $direccion; //ESTO HAY QUE OREGUNTAR
+           
+            $data['responsableGasto'] = (isset( $direccion->data) && !empty( $direccion))? $direccion->data[0]:'';
+            $reserva = $globals->getTabla([
+                'tabla' => 'vw_reserva',
+                'where' => ['visible' => 1, 'id_reserva' => $id_reserva]
+            ]);
+
+            if (!empty($reserva->data)) {
+                $data['reserva'] = $reserva->data;
+                $importe_str = $reserva->data[0]->total_importe;
+                $usu_reg = $reserva->data[0]->usu_reg;
+                $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
+                $data['numero_texto'] = $this->numeroEnLetras($importe_float);
+            }
+            $data['nombre_registro'] = $globals->getTabla([
+                'tabla' => 'vw_usuario',
+                'where' => ['id_usuario' => $usu_reg]
+            ])->data[0];
+            if (strlen($no_consecutivo) == 2) {
+                $zero = '0';
+            } elseif (strlen($no_consecutivo) == 1) {
+                $zero = '00';
+            } else {
+                $zero = '';
+            }
+            if (!empty($direccion->data)) {
+                 $folio_prefijo = $direccion->data[0]->folio_prefijo . $zero .  $no_consecutivo . '/' . date('Y'); //ESTO HAY QUE OREGUNTAR
+                $data['registro']->folio = $folio_prefijo;
+            } else {
+                if ($registro_pt->data[0]->no_reserva == 4327278) {
+                    $data['registro']->folio = 'SECTURI/DGDT/DCT/FIC-TA/' . $zero . $no_consecutivo . '/2028';
+                } elseif ($registro_pt->data[0]->no_reserva == 4327277 || $registro_pt->data[0]->no_reserva == 4327279) {
+                    $data['registro']->folio = 'SECTURI/DGDT/DCT/FIC-TA/' . $zero . $no_consecutivo . '/2025';
+                } else {
+                    $data['registro']->folio = '';
+                }
+            }
+
+        } else {
+            echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
+            die();
+        }
+      
+        $subsecretario = $area = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1, 'id_subsecretario' => $registro_pt->data[0]->id_subsecretario]]);
+       // $usu_sub = $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $subsecretario->data[0]->id_usuario]]);
+        $data['usu_sub'] = $subsecretario->data[0];
+       // die( var_dump( $data ) );
         $html = view('secciones/vFormatoPT.php', $data);
         $htmlSegundaHoja = view('secciones/vFormatoPT2.php', $data);
         $htmlTercerHoja = view('personal/vFormato702.php', $data);
@@ -3724,6 +3892,7 @@ class Principal extends BaseController
         }
         // var_dump( $hoteles);
         $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1]]);
+        $cat_subsecretario = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1]]);
         $cat_tipo = $globals->getTabla(['tabla' => 'cat_tipo', 'where' => ['visible' => 1]]);
 
         $usuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->get('id_usuario')]]);
@@ -3750,6 +3919,7 @@ class Principal extends BaseController
         $data['cat_opcion'] = (!empty($cat_opcion->data)) ? $cat_opcion->data : [];
         $data['editar'] = (!empty($id_proveedor) || $id_proveedor != 0) ? 0 : 1;
         $data['secretario'] = (!empty($secretario->data)) ? $secretario->data : [];
+        $data['subsecretario'] = (!empty($cat_subsecretario->data)) ? $cat_subsecretario->data : [];
         $data['usuario'] = (!empty($usuario->data)) ? $usuario->data[0] : [];
         $data['cat_usuario'] = (!empty($cat_usuario->data)) ? $cat_usuario->data : [];
         $data['scripts'] = array('inicio');

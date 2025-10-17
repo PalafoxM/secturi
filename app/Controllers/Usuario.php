@@ -996,6 +996,47 @@ class Usuario extends BaseController
         }
         return $this->respond($response);
     }
+     public function enviarCorreoPagos($correo)
+    {
+        // Inicializar servicios y objetos
+        $email = Services::email();
+        $session = Services::session();
+        $response = new \stdClass();
+
+
+        $email->setTo($correo);
+        $email->setSubject('ESTATUS DE PAGO CAMBIO');
+        $email->setMessage('
+                    <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+                        <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+                            <div style="background-color: #004080; padding: 20px; text-align: center;">
+                                <img src="' . base_url('assets/images/logo-sm.png') . '" alt="Logo" style="height: 60px;">
+                            </div>
+                            <div style="padding: 30px; color: #333;">
+                                <h1 style="color: #004080;">¡El estatus de su pago cambio!</h1>
+                                <p style="font-size: 16px;">Favor de <strong> Ingresar a SUSI</strong>.</p>
+                                <p style="font-size: 15px;"><a href="' . base_url() . 'index.php/Principal/listaReservaPT"><strong>Seguimiento Incidencia</strong></a></p>
+                            </div>
+                            <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 13px; color: #666;">
+                                © ' . date('Y') . ' Sistema de Atención SUSI. Todos los derechos reservados.
+                            </div>
+                        </div>
+                    </div>
+                ');
+
+
+        // Intentar enviar el correo
+        if ($email->send()) {
+            $response->error = false;
+            $response->respuesta = "Correo enviado correctamente.";
+        } else {
+            $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
+        }
+
+        return $this->response->setJSON($response);
+
+
+    }
     public function estatusReserva()
     {
         $session = \Config\Services::session();
@@ -1018,6 +1059,12 @@ class Usuario extends BaseController
         ];
 
         $result = $principal->saveTabla($dataInsert, $dataConfig, ['id_user' => $session->get('id_usuario'), "script" => "estatus.Reserva"]);
+         $usuReg =  $principal->getTabla(['tabla' => 'reserva', 'where' => ['id_reserva' => $data['id_reserva'], 'visible' => 1]])->data;
+         if($usuReg){
+             $id_usuario = $usuReg[0]->usu_reg;
+              $correo =  $principal->getTabla(['tabla' => 'vw_usuario', 'where' => ['id_usuario' => $id_usuario, 'visible' => 1]])->data[0]->correo;
+              $this->enviarCorreoPagos($correo);
+         }
 
         if (!$result->error) {
             $response->error = false;

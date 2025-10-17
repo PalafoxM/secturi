@@ -51,6 +51,9 @@
                                                             <?php if($GRC): ?>
                                                             <th class="text-center" scope="col">Contenido GRC</th>
                                                             <?php endif; ?>
+                                                            <?php if($FIC): ?>
+                                                            <th class="text-center" scope="col">Contenido FIC</th>
+                                                            <?php endif; ?>
                                                             <th class="text-center" scope="col">Archivo</th>
                                                             </tr>
                                                         </thead>
@@ -66,8 +69,17 @@
                                                               <?php if($GRC): ?>
                                                             <td>Anexo 2 - Reporte de Integración Documental</td>
                                                             <?php endif; ?>
+                                                             <?php if($FIC): ?>
+                                                            <td>Anexo 2 - Reporte de Integración Documental y Formato de conformidad del producto recibido.</td>
+                                                            <?php endif; ?>
                                                             <td class="text-center">
                                                                 <?php if($PT): ?>
+                                                                <a target="_blank" href="<?= base_url().'index.php/Principal/Archivo/'.$id_registro.'/1' ?>" class="text-center">
+                                                                    <i class="far fa-file-pdf text-danger"></i>
+                                                                    <h6 class="text-truncate">Archivo01.pdf</h6>
+                                                                </a> 
+                                                                <?php endif; ?> 
+                                                                <?php if($FIC): ?>
                                                                 <a target="_blank" href="<?= base_url().'index.php/Principal/Archivo/'.$id_registro.'/1' ?>" class="text-center">
                                                                     <i class="far fa-file-pdf text-danger"></i>
                                                                     <h6 class="text-truncate">Archivo01.pdf</h6>
@@ -87,6 +99,9 @@
                                                             <?php if($PT): ?>
                                                             <td>Comprobante Fiscal Digital por Internet en su representación PDF</td>
                                                             <?php endif; ?>
+                                                             <?php if($FIC): ?>
+                                                            <td>Comprobante Fiscal Digital por Internet en su representación PDF</td>
+                                                            <?php endif; ?>
                                                              <?php if($GO): ?>
                                                             <td>Comprobante Fiscal Digital por Internet en su representación PDF</td>
                                                             <?php endif; ?>
@@ -100,6 +115,12 @@
                                                                     <h6 class="text-truncate">Archivo03.pdf</h6>
                                                                 </a>  
                                                                 <?php endif; ?> 
+                                                                <?php if($FIC): ?>
+                                                                <a style="cursor:pointer;" onclick="ini.inicio.links(<?=$id_registro?>);" class="text-center">
+                                                                    <i class="far fa-file-pdf text-danger"></i>
+                                                                    <h6 class="text-truncate">Archivo03.pdf</h6>
+                                                                </a>  
+                                                                <?php endif; ?> 
                                                                  <?php if($GO): ?>
                                                                 <a style="cursor:pointer;" onclick="ini.inicio.linksGo(<?=$id_registro?>);" class="text-center">
                                                                     <i class="far fa-file-pdf text-danger"></i>
@@ -108,7 +129,7 @@
                                                                 <?php endif; ?> 
                                                             </td>
                                                         </tr>
-                                                          <?php if(!$GO): ?>
+                                                          <?php if(!$GO && !$FIC): ?>
                                                         <tr>
                                                             <th scope="row">04. Contrato o Convenio (según corresponda)</th>
                                                              <?php if($PT): ?>
@@ -135,6 +156,9 @@
                                                           <?php endif; ?>
                                                         <tr class="table-success">
                                                             <th scope="row">05. Formatos de los LRADP</th>
+                                                              <?php if($FIC): ?>
+                                                            <td>OMVE-1 (Orden de Ministración de Viáticos en el Extranjero)</td>
+                                                              <?php endif; ?>
                                                               <?php if($PT): ?>
                                                             <td>OMVE-1 (Orden de Ministración de Viáticos en el Extranjero)</td>
                                                               <?php endif; ?>
@@ -154,6 +178,9 @@
                                                              <?php if($PT): ?>
                                                             <td>Autorización de Servicios Profesionales (1330, 3330, 3340 y 3390), Validación de la Coordinación General de Comunicación Social (3611, 3612, 3630, 3660 y 3690), Validación de imagen, Autorización de partidas restringidas (3710, 3760, 3810, 3820 y 3830), Autorización de pasivos, Autorización de refrendos.</td>
                                                            <?php endif; ?>
+                                                             <?php if($FIC): ?>
+                                                            <td>Autorización de Servicios Profesionales (1330, 3330, 3340 y 3390), Validación de la Coordinación General de Comunicación Social (3611, 3612, 3630, 3660 y 3690), Validación de imagen, Autorización de partidas restringidas (3710, 3760, 3810, 3820 y 3830), Autorización de pasivos, Autorización de refrendos.</td>
+                                                           <?php endif; ?>
                                                                <?php if($GRC): ?>
                                                             <td>Autorización de Servicios Profesionales (3310, 3330, 3340 y 3390), Autorización de partidas restringidas (3710, 3760, 3810 y 3830)</td>
                                                            <?php endif; ?>
@@ -165,6 +192,9 @@
                                                              <?php if($PT): ?>
                                                             <td>Carátula de pago, Oficio(s) Delegatorio(s), Oficio de Liberación de Pago, CFDI con su respectivo encabezado de factura, Oficio de Comisión, Evidencia Fotográfica, Lista de Asistencia.</td>
                                                               <?php endif; ?>
+                                                             <?php if($FIC): ?>
+                                                            <td>Carátula de pago, Oficio(s) Delegatorio(s), Oficio de Liberación de Pago, CFDI con su respectivo encabezado de factura, Oficio de Comisión, Evidencia Fotográfica, Lista de Asistencia.</td>
+                                                              <?php endif; ?>
                                                                <?php if($GO): ?>
                                                             <td>Carátula de pago, Oficio(s) Delegatorio(s), Oficio de Liberación de Gastos, CFDI con su respectivo encabezado de factura (incluir notas de consumo, check-in/out vouchers, tickets de peajes), Formato de Desglose de Gastos (Viáticos por persona), Oficio de Comisión, Evidencia Fotográfica, Lista de Asistencia.</td>
                                                             <?php endif; ?>
@@ -172,6 +202,12 @@
                                                             <td>Formato de Desglose de Gastos (Viáticos por persona presupuestado), Oficio de Comisión.</td>
                                                             <?php endif; ?>
                                                            <td class="text-center">
+                                                               <?php if($FIC): ?>
+                                                                <a target="_blank"  href="<?= base_url().'index.php/Principal/ImprimirFIC/'.$id_registro ?>" class="text-center">
+                                                                    <i class="far fa-file-pdf text-danger"></i>
+                                                                    <h6 class="text-truncate">Archivo07.pdf</h6>
+                                                                </a> 
+                                                                <?php endif; ?> 
                                                                <?php if($PT): ?>
                                                                 <a target="_blank"  href="<?= base_url().'index.php/Principal/ImprimirPT/'.$id_registro ?>" class="text-center">
                                                                     <i class="far fa-file-pdf text-danger"></i>
@@ -189,6 +225,9 @@
                                                           <?php if(!$GO): ?>
                                                         <tr>
                                                             <th scope="row">08. Evidencia de entregable</th>
+                                                             <?php if($FIC): ?>
+                                                            <td>Entregable con sello, fecha y firma de recibido</td>
+                                                            <?php endif; ?>
                                                              <?php if($PT): ?>
                                                             <td>Entregable con sello, fecha y firma de recibido</td>
                                                             <?php endif; ?>
@@ -200,6 +239,9 @@
                                                           <?php endif; ?>
                                                         <tr class="table-warning">
                                                             <th scope="row">09. Otros</th>
+                                                             <?php if($FIC): ?>
+                                                            <td>Soporte de datos bancarios, Registro en el Padrón de Proveedores (vigente), Soporte documental inherente al trámite (Garantía, CURP; en caso de ayudas y subsidios a personas físicas: listado de beneficiarios, minutas, programas, agendas, itinerarios, etc.).</td>
+                                                            <?php endif; ?>
                                                              <?php if($PT): ?>
                                                             <td>Soporte de datos bancarios, Registro en el Padrón de Proveedores (vigente), Soporte documental inherente al trámite (Garantía, CURP; en caso de ayudas y subsidios a personas físicas: listado de beneficiarios, minutas, programas, agendas, itinerarios, etc.).</td>
                                                             <?php endif; ?>
