@@ -78,7 +78,7 @@
                                         </div><!--end form-row-->
                                         <div class="form-row">
                                             <div class="col-md-3 mb-3">
-                                                <label for="reponsable_solicitud">Responsable del Gasto<span style="color:red;">*</span></label>
+                                                <label for="id_reponsable_solicitud">Responsable del Gasto<span style="color:red;">*</span></label>
                                                 <input id="id_reponsable_solicitud" class="form-control" name="id_reponsable_solicitud" value="HUGO RAMÍREZ DUARTE" readonly>
 
                                             </div><!--end col-->
