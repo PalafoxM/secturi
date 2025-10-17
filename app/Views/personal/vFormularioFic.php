@@ -238,7 +238,7 @@
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label for="no_consecutivo">No. Consecutivo.<span style="color:red;">*</span></label>
-                                                <input type="number" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo" placeholder="001"  value="<?= (isset($reserva->no_consecutivo)) ? $reserva->no_consecutivo : '' ?>" >
+                                                <input type="number" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo" placeholder="001"  value="<?= (isset($reserva->no_consecutivo)) ? $reserva->no_consecutivo : $consecutivo ?>" >
                                                 <div class="invalid-feedback">
                                                     Campo no Valido
                                                 </div>
@@ -280,9 +280,9 @@
                                                             </td>
                                                             <td>
                                                              
-                                                                <p class="text-muted mb-3">Factura PDF (Máx 5MB)</p>
+                                                                <p class="text-muted mb-3">Factura PDF (Máx 100MB)</p>
                                                                 <input id="factura_pdf_fic"  type="file" name="factura_pdf_fic[]" class="dropify" multiple accept=".pdf" />
-                                                                <p class="text-muted mb-3">Factura XML (Máx 5MB)</p>
+                                                                <p class="text-muted mb-3">Factura XML (Máx 100MB)</p>
                                                                 <input id="factura_xml_fic" type="file" name="factura_xml_fic[]" multiple class="dropify"  accept=".xml">
                                                             </td>
                                                             <td>
@@ -461,9 +461,9 @@ $('#but_add').on('click', function () {
         <input type="text" autocomplete="off" class="form-control" name="importe[]" placeholder="0,000.00">
       </td>
       <td>
-            <p class="text-muted mb-3">Factura PDF (Máx 5MB)</p>
+            <p class="text-muted mb-3">Factura PDF (Máx 100MB)</p>
             <input id="factura_pdf_fic"  type="file" name="factura_pdf_fic[]" class="dropify" multiple accept=".pdf" />
-            <p class="text-muted mb-3">Factura XML (Máx 5MB)</p>
+            <p class="text-muted mb-3">Factura XML (Máx 100MB)</p>
             <input id="factura_xml_fic" type="file" name="factura_xml_fic[]" multiple class="dropify"  accept=".xml">
       </td>
       <td>

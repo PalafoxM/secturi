@@ -4663,7 +4663,7 @@ ini.inicio = (function () {
                 e.preventDefault(); 
                    let valido = true;
                     let mensajes = [];
-                    const MAX_BYTES = 500 * 1024;
+                    const MAX_BYTES = 100 * 1024 * 1024; 
                     // Validar archivos PDF
                     $("[id^=factura_pdf_fic]").each(function(){
                         let files = this.files;

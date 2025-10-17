@@ -938,6 +938,14 @@ class Agregar extends BaseController
             $response->respuesta = "Es requerido el no_reserva";
             return $this->respond($response);
         }
+          $consecutivo = $this->globals->getTabla(['tabla' => 'registro_pt', 'where' => ['visible' => 1], 'orderBy' => 'id_registro_pt DESC']);          
+          $conse =  (isset($consecutivo->data) && !empty($consecutivo->data))?$consecutivo->data[0]->no_consecutivo:'';
+          $no_consecutivo = '';
+          if($data['no_consecutivo'] == $conse ){
+              $no_consecutivo = $conse + 1;
+          }else{
+             $no_consecutivo = $data['no_consecutivo'];
+          }
         //var_dump($data);
         //die();
 
@@ -945,7 +953,7 @@ class Agregar extends BaseController
             'id_reserva' => (int) $data['id_reserva'],
             'id_direccion_responsable' => $data['direccion_responsable'],
             'tipo_pt' => $data['tipo_pt'],
-            'no_consecutivo' => $data['no_consecutivo'],
+            'no_consecutivo' => $no_consecutivo,
             'id_proveedor' => $data['id_proveedor'],
             'fecha_tramite' => $data['fecha_tramite'],
             'id_reponsable_solicitud' => (int) $data['id_reponsable_solicitud'],
