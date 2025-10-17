@@ -525,11 +525,11 @@ class Agregar extends BaseController
                 $response = $this->globals->saveTabla($insertRegistro, $dataConfig, $dataBitacora);
             }
             if (!$response->error) {
+                
                 $id_registro_pt = $response->idRegistro;
                 $archivosXml = [];
                 $archivosPdf = [];
-        
-                $response->idRegistro = $response->idRegistro;
+               $response->idReserva = $id_reserva;
                 $this->cambiarStatusPT($id_reserva);
                 // Recorremos todas las claves de los archivos enviados
                 foreach ($archivos as $key => $fileArray) {
@@ -556,6 +556,7 @@ class Agregar extends BaseController
                 }
 
             }
+             
         }
 
         return $this->respond($response);
