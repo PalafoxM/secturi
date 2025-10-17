@@ -79,7 +79,7 @@
                                         <div class="form-row">
                                             <div class="col-md-6 mb-6">
                                                 <label for="reponsable_solicitud">Responsable del Gasto<span style="color:red;">*</span></label>
-                                              <select name="id_reponsable_solicitud" class="form-control" required>
+                                              <select name="id_reponsable_solicitud" class="form-control select2" required>
                                                     <?php foreach ($cat_usuario as $u): ?>
                                                         <?php
                                                             // Determina el valor que debe quedar seleccionado
@@ -311,12 +311,12 @@
 
                                                     <div class="form-row">
                                                         <div class="col-md-6 mb-3">
-                                                            <p class="text-muted mb-3">Factura PDF (Máx 5MB)</p>
+                                                            <p class="text-muted mb-3">Factura PDF (Máx 100MB)</p>
                                                             <input id="factura_pdf_input_<?= $i; ?>"  type="file" name="factura_pdf_<?= $i; ?>[]" class="dropify" multiple accept=".pdf" />   
                                                         </div>
                                                         <div class="col-md-6 mb-3">
                                                           
-                                                            <p class="text-muted mb-3">Factura XML (Máx 5MB)</p>
+                                                            <p class="text-muted mb-3">Factura XML (Máx 100MB)</p>
                                                             <input id="factura_xml_input_<?= $i; ?>" type="file" name="factura_xml_<?= $i; ?>[]" multiple class="dropify"  accept=".xml">
                                                         </div>
                                                     </div>
@@ -396,5 +396,17 @@
                     format: 'YYYY-MM-DD HH:mm:ss'
                 }
             });
+            $(document).ready(function() {
+    $('.select2').select2({
+                placeholder: "Selecciona un responsable",
+                allowClear: true,
+                width: '100%', // Para que ocupe todo el ancho
+                language: {
+                    noResults: function() {
+                        return "No se encontraron resultados";
+                    }
+                }
+            });
+        });
 
         </script>
