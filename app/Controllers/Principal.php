@@ -1121,13 +1121,12 @@ class Principal extends BaseController
 
         if ($file && $file->isValid() && !$file->hasMoved()) {
 
-            $maxSize = 1 * 1024 * 1024; // 1 MB
-
+           $maxSize = 100 * 1024 * 1024; // 100 MB
+            
             if ($file->getSize() > $maxSize) {
-                $response->respuesta = "El archivo no debe exceder 1 MB.";
+                $response->respuesta = "El archivo no debe exceder 100 MB.";
                 return $this->respond($response);
             }
-
             $timestamp = date('Ymd_His');
             $extension = $file->getClientExtension();
             $originalName = pathinfo($file->getName(), PATHINFO_FILENAME);
