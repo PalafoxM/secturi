@@ -526,44 +526,36 @@ class Agregar extends BaseController
             }
             if (!$response->error) {
                 $id_registro_pt = $response->idRegistro;
-
-                //$archivo = $archivos['factura_pdf_fic'][$k];
-                foreach ($archivos['factura_pdf_fic'] as $archivo) {
-                    $timestamp = date('Ymd_His');
-                    $extension = $archivo->getClientExtension();
-                    $originalName = pathinfo($archivo->getName(), PATHINFO_FILENAME);
-                    $file = $originalName . '_' . $timestamp . '.' . $extension;
-
-                    // Ruta absoluta
-                    $ruta_destino = FCPATH . 'assets/pdf/';
-                    $archivo->move($ruta_destino, $file);
-
-                    // Rutas públicas
-                    $ruta_absoluta = base_url('assets/pdf/' . $file);
-                    $ruta_relativa = 'assets/pdf/' . $file;
-
-                    $insertFacturaPdf = [
-                        'id_registro_pt' => $id_registro_pt,
-                        'ruta_absoluta' => $ruta_absoluta,
-                        'ruta_relativa' => $ruta_relativa,
-                        'fec_reg' => date('Y-m-d H:i:s'),
-                        'usu_reg' => $session->get('id_usuario')
-
-                    ];
-
-                    $dataConfig = [
-                        "tabla" => "factura_pdf",
-                        "editar" => false
-                    ];
-
-                    $response = $this->globals->saveTabla($insertFacturaPdf, $dataConfig, $dataBitacora);
-                    $response->idReserva = $id_reserva;
-
+                $archivosXml = [];
+                $archivosPdf = [];
+        
+                $response->idRegistro = $response->idRegistro;
+                $this->cambiarStatusPT($id_reserva);
+                // Recorremos todas las claves de los archivos enviados
+                foreach ($archivos as $key => $fileArray) {
+                    if (strpos($key, 'factura_xml_fic') === 0) {
+                        $archivosXml = array_merge($archivosXml, $fileArray);
+                    } elseif (strpos($key, 'factura_pdf_fic') === 0) {
+                        $archivosPdf = array_merge($archivosPdf, $fileArray);
+                    }
                 }
 
 
-            }
+                $datosXML = $this->procesarXML($archivosXml, $id_registro_pt);
+                $datosPDF = $this->procesarPDF($archivosPdf, $id_registro_pt);
 
+
+
+                if (!$datosXML) {
+                    $response->errorXML = true;
+                    $response->respuestaXML = "XML inválido o no se encontró.";
+                }
+                if (!$datosPDF) {
+                    $response->errorPDF = true;
+                    $response->respuestaPDF = "PDF inválido o no se encontró.";
+                }
+
+            }
         }
 
         return $this->respond($response);
@@ -710,7 +702,7 @@ class Agregar extends BaseController
     {
         $session = \Config\Services::session();
         $this->globals = new Mglobal();
-        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaTurno'];
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/cambiarStatusPT'];
         $dataConfig = [
             "tabla" => "reserva",
             "editar" => true,
