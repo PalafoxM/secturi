@@ -2746,7 +2746,7 @@ class Principal extends BaseController
 
             }
         }
-
+       
         $html = view($formato, $data);
         $htmlSegundaHoja = view('personal/vFormato02.php', $data);
         //Crear instancia de mPDF

@@ -499,7 +499,7 @@ class Agregar extends BaseController
                     'no_consecutivo' => $data['no_consecutivo'],
                     'tipo_pt' => (int) $data['tipo_pt'],
                     'fecha_tramite' => $data['fecha_tramite'],
-                    'id_reponsable_solicitud' => (int) $data['id_reponsable_solicitud'],
+                    'id_reponsable_solicitud' => 18,
                     'director_general' => (int) $data['director_generar'],
                     'secretario' => 18,
                     'fic' => 1,
