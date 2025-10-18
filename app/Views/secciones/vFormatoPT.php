@@ -83,14 +83,28 @@
             <span class="proxima "><?= strtoupper($reserva[0]->no_reserva); ?></span>
         </div>
          <div  style="position:absolute;  text-align:center; top:67.7%; left:3.5%; width:30%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><?= strtoupper($registro->director); ?></span>
+            <span class="proxima "><?= ($fic)?'LIC. RODRIGO GONZÁLEZ GUERRERO':strtoupper($registro->director); ?></span>
         </div>
+        <?php if(!$fic): ?>
          <div  style="position:absolute;  text-align:center; top:67.7%; left:35.5%; width:30%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "><?= strtoupper($registro->secretario); ?></span>
         </div>
+        <?php endif; ?>
+        <?php if($fic): ?>
+         <div  style="position:absolute;  text-align:center; top:67.7%; left:35.5%; width:30%; background-color:white; font-size: 15px;  height:28px;">
+            <span class="proxima ">MTRO. DAVID AYALA SAUCEDO - DIRECTOR GENERAL DE DESARROLLO TURÍSTICO POR ACUERDO SECRETARIAL N° SECTURI-02/2025</span>
+        </div>
+        <?php endif; ?>
+         <?php if(!$fic): ?>
          <div  style="position:absolute;  text-align:center; top:67.7%; left:67.1%; width:30%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "><?= $usu_sub->dsc_subsecretario?></span>
         </div>
+         <?php endif; ?>
+         <?php if($fic): ?>
+         <div  style="position:absolute;  text-align:center; top:67.7%; left:67.1%; width:30%; background-color:white; font-size: 12px;  height:12px;">
+            <span class="proxima ">MTRO. DAVID AYALA SAUCEDO </span>
+        </div>
+         <?php endif; ?>
          <div  style="position:absolute;  text-align:center; top:69%; left:67.1%; width:30%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "><?= $usu_sub->puesto?></span>
         </div>

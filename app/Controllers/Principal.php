@@ -3674,11 +3674,14 @@ class Principal extends BaseController
                 'tabla' => 'vw_reserva',
                 'where' => ['visible' => 1, 'id_reserva' => $id_reserva]
             ]);
+           // var_dump($reserva);
+           // die();
 
             if (!empty($reserva->data)) {
                 $data['reserva'] = $reserva->data;
                 $importe_str = $reserva->data[0]->total_importe;
                 $usu_reg = $reserva->data[0]->usu_reg;
+                $data['no_convenio'] = $reserva->data[0]->no_convenio;
                 $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
                 $data['numero_texto'] = $this->numeroEnLetras($importe_float);
             }

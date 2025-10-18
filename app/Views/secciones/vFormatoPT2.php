@@ -13,7 +13,7 @@
             <span class="proxima"><?= (isset($GO) && !empty($GO))?'GO':'PT';?> <?= strtoupper($registro->folio);?></span>
             <?php endif; ?>
             <?php if($fic): ?>
-            <span class="proxima"><?= $folio;?></span>
+            <span class="proxima">PT <?= $folio;?></span>
             <?php endif; ?>
         </div>
         <div style="position:absolute; top:33.2%; left:9.5%; width:81%; height:72px; background-color:white; font-size:13px; text-align:justify;">
@@ -33,7 +33,7 @@
         </div>
          <div style="position:absolute; top:48%; left:9.5%; width:81%; height:80px; background-color:white; font-size:13px; text-align:justify;">
             <span class="proxima">
-                Hago de su conocimiento que de acuerdo a lo que establece la cláusula <strong>N/A</strong> de instrumento jurídico <strong>N/A</strong>
+                Hago de su conocimiento que de acuerdo a lo que establece la cláusula <strong>PRIMERA</strong> de instrumento jurídico <strong><?= $no_convenio?></strong>
                 recibí el producto, atendido lo que establece el marco normativo aplicable. El producto recibido se nos ha
                 entregado a entera satisfacción en tiempo y forma, quedando bajo responsabilidad el uso y/o distribución,
                 así como el resguardo y custodia de los expedientes originales y entregables correspondientes.
