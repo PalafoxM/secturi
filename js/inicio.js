@@ -4708,7 +4708,7 @@ ini.inicio = (function () {
                             Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
                             setTimeout(() => {
                                // window.location.href = base_url + "index.php/Principal/listadoEstatusPT";
-                               // window.location.href = base_url + "index.php/Principal/tablaArchivos/"+response.idReserva+'/FIC';
+                                window.location.href = base_url + "index.php/Principal/tablaArchivos/"+response.idReserva+'/FIC';
                             }, 1500);
                         }else{
                             Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  

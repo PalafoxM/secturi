@@ -9,12 +9,17 @@
             <span class="proxima"><strong>Silao de la Victoria, Gto, <?= ucfirst($fechaFormateada); ?></strong></span>
         </div>
         <div  style="position:absolute; top:24.5%; left:64.5%; width:28%; height:18px; background-color:white; font-size: 14px; ">
-            <span class="proxima"><?= (isset($GO) && !empty($GO))?'GO':'PT'?> <?= strtoupper($registro->folio);?></span>
+            <?php if(!$fic): ?>
+            <span class="proxima"><?= (isset($GO) && !empty($GO))?'GO':'PT';?> <?= strtoupper($registro->folio);?></span>
+            <?php endif; ?>
+            <?php if($fic): ?>
+            <span class="proxima"><?= $folio;?></span>
+            <?php endif; ?>
         </div>
         <div style="position:absolute; top:33.2%; left:9.5%; width:81%; height:72px; background-color:white; font-size:13px; text-align:justify;">
             <span class="proxima">
                 Por medio de la presente, me permito solicitar su apoyo para que se realice el tramite de <?= (isset($GO) && !empty($GO))?'Gasto de Operación':'Pago a Tercero'?>
-                con folio <strong><?= (isset($GO) && !empty($GO))?'GO':'PT'?> <?= strtoupper($registro->folio);?></strong> por la cantidad de 
+                con folio <strong><?= (isset($GO) && !empty($GO))?'GO':'PT'?> <?= ($fic)?$folio:strtoupper($registro->folio);?></strong> por la cantidad de 
                 <strong>$<?= ($reserva[0]->total_importe); ?> (<?= mb_strtoupper($numero_texto, 'UTF-8'); ?>)</strong>,
                 de comprobante(s) fiscale(s) No. <strong>5191</strong> por concepto de <?= $registro->concepto_pago ?> 
                 al proveedor <?= $registro->dsc_proveedor ?>.

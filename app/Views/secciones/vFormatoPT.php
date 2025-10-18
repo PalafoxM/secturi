@@ -7,7 +7,13 @@
         </div>
 
         <div  style="position:absolute;text-align:center; top:18.2%; left:70.5%; width:25%; height:18px; background-color:white; font-size: 12px; ">
+           
+            <?php if(!$fic): ?>
             <span class="proxima"><?= (isset($GO) && !empty($GO))?'GO':'PT';?> <?= strtoupper($registro->folio);?></span>
+            <?php endif; ?>
+            <?php if($fic): ?>
+            <span class="proxima"><?= $folio;?></span>
+            <?php endif; ?>
         </div>
         <div  style="position:absolute; top:36.2%; left:60.7%; width:35%; background-color:white; font-size: 12px;  height:12px;">
             <?php if($GO): ?>
@@ -61,6 +67,9 @@
             </div>
             <?php $i += 1.5; ?>
         <?php endforeach; ?>
+        <div style="position:absolute; text-align:right; top:34%; left:2.8%; width:12%; background-color:white; font-size: 12px;  height:25px;">
+            <span><?= $uuid; ?></span>
+        </div>
         <div  style="position:absolute; text-align:right; top:52.2%; left:44%; width:15%; background-color:white; font-size: 12px;  height:12px;">
             <span>$<?= ($reserva[0]->total_importe); ?></span>
         </div>

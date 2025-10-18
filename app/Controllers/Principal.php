@@ -2627,7 +2627,12 @@ class Principal extends BaseController
             'tabla' => 'vw_registro_pt',
             'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
         ]);
-       
+        
+        $xml = $globals->getTabla([
+            'tabla' => 'factura',
+            'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
+        ]);
+         
          $direccion = $globals->getTabla([
                 'tabla' => 'vw_direccion',
                 'where' => [
@@ -2708,9 +2713,187 @@ class Principal extends BaseController
             echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
             die();
         }
-        $uudi = $globals->getTabla(['tabla'=>'factura', 'where'=>['id_registro_pt'=> $id_registro_pt, 'visible'=>1]])->data;
+        $uudi = $globals->getTabla(['tabla'=>'factura', 'where'=>['id_registro_pt'=> $id_registro_pt, 'visible'=>1]]);
+       
         if( isset($uudi->data) && !empty($uudi->data) ){
-            $data['uudi'] = $uudi->data[0]->uudi;
+   
+            $data['uudi'] = $uudi->data[0]->uuid;
+
+        }
+        if (!empty($instrumento)) {
+            switch ($id_archivo) {
+                case 1:
+                    $doc = 'assets/pdf/plantillas/anexo01.pdf';
+                    $formato = 'personal/vFormato01.php';
+                    break;
+                case 4:
+                    if ($savePath) {
+                        $source = FCPATH . $instrumento;
+                        if (file_exists($source)) {
+                            copy($source, $savePath);
+                            return $savePath;
+                        }
+                        return null;
+                    } else {
+                        // Solo si se quiere mostrar directo en navegador
+                        return redirect()->to(base_url() . $instrumento);
+                    }
+                    break;
+
+
+            }
+
+        } else {
+            switch ($id_archivo) {
+                case 1:
+                    $doc = 'assets/pdf/plantillas/anexo01.pdf';
+                    $formato = 'personal/vFormato01.php';
+                    break;
+                case 4:
+                    $data['layout'] = 'plantilla/lytVacio';
+                    $data['contentView'] = 'secciones/vError500';
+                    $this->_renderView($data);
+                    die();
+                    break;
+
+
+            }
+        }
+       
+        $html = view($formato, $data);
+        $htmlSegundaHoja = view('personal/vFormato02.php', $data);
+        //Crear instancia de mPDF
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 0,
+            'margin_left' => 1,
+            'margin_right' => 1,
+            'format' => [213, 268],
+            'mirrorMargins' => false,
+        ]);
+
+        $pagecount = $mpdf->SetSourceFile(FCPATH . $doc);
+        for ($i = 1; $i <= $pagecount; $i++) {
+            $mpdf->AddPage();
+            $tplId = $mpdf->ImportPage($i);
+            $mpdf->UseTemplate($tplId);
+
+            if ($i == 1) {
+                $mpdf->WriteHTML($html);
+            }
+            if ($i == 2) {
+                $mpdf->WriteHTML($htmlSegundaHoja);
+            }
+        }
+
+
+        if ($savePath) {
+            $mpdf->Output($savePath, 'F'); // F = write to file
+            return $savePath;
+        }
+        $mpdf->Output('Formato_pt.pdf', 'I');
+        exit();
+
+    }
+    public function ArchivoFIC($id_registro_pt = null, $id_archivo = null, $savePath = null)
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $data['reserva'] = "";
+        $registro_pt = $globals->getTabla([
+            'tabla' => 'vw_registro_pt',
+            'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
+        ]);
+        
+        $xml = $globals->getTabla([
+            'tabla' => 'factura',
+            'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
+        ]);
+         
+         $direccion = $globals->getTabla([
+                'tabla' => 'vw_direccion',
+                'where' => [
+                    'visible' => 1,
+                    'id_director' => $registro_pt->data[0]->id_reponsable_solicitud
+                ]
+            ]);
+      
+        if (empty($direccion->data)) {
+            $jefe = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_pt->data[0]->id_reponsable_solicitud]]);
+            if(!empty($jefe->data)){
+            $idJefe = $jefe->data[0]->id_jefe_inmediato;
+             $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_director' => $idJefe]]);
+            }else{
+              $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_pt->data[0]->id_reponsable_solicitud]]);
+             $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_area' => $area->data[0]->id_area]]);
+            }
+        }
+
+        $no_consecutivo = "";
+        if(strlen($registro_pt->data[0]->no_consecutivo) == 1){
+              $no_consecutivo = '00'.$registro_pt->data[0]->no_consecutivo;
+        }
+        if(strlen($registro_pt->data[0]->no_consecutivo) == 2){
+             $no_consecutivo = '0'.$registro_pt->data[0]->no_consecutivo;
+        }
+        if(strlen($registro_pt->data[0]->no_consecutivo) >= 3){
+             $no_consecutivo = $registro_pt->data[0]->no_consecutivo;
+        }
+        $folio_prefijo = $direccion->data[0]->folio_prefijo . $no_consecutivo . '/' . date('Y'); //ESTO HAY QUE OREGUNTAR
+      
+        $data['direccion'] = $direccion->data[0];
+        $pdf = $globals->getTabla([
+            'tabla' => 'vw_pdf_reserva',
+            'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
+        ])->data;
+
+        $instrumento = (isset($pdf[0]->instrumento) && !empty($pdf[0]->instrumento)) ? $pdf[0]->instrumento : '';
+        $id_reserva = (isset($pdf[0]->id_reserva) && !empty($pdf[0]->id_reserva)) ? $pdf[0]->id_reserva : '';
+        if (!empty($id_reserva)) {
+            $reserva = $globals->getTabla([
+                'tabla' => 'vw_reserva',
+                'where' => ['visible' => 1, 'id_reserva' => $id_reserva]
+            ])->data;
+            $data['reserva'] = $reserva[0];
+            $importe_str = $reserva[0]->total_importe;
+            $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
+            $data['numero_texto'] = $this->numeroEnLetras($importe_float);
+            $data['es4000'] = false;
+            if( $reserva[0]->partida >= '4000' && $reserva[0]->partida < '5000' ){
+              $data['es4000'] = true;
+            }
+            
+
+        }
+         
+        if (!empty($registro_pt->data)) {
+            $data['registro'] = $registro_pt->data[0];
+            $folio = $globals->getTabla([
+                'tabla' => 'direccion',
+                'where' => ['visible' => 1, 'id_area' => $data['registro']->id_direccion_responsable]
+            ]);
+            $data['fic'] = false;
+            if ($registro_pt->data[0]->no_reserva == '4327278') {
+                $data['folio'] = "SECTURI/DGDT/DCT/FIC-TH/";
+                  $data['fic'] = true;
+            } else if ($registro_pt->data[0]->no_reserva == '4327279') {
+                $data['folio'] = "SECTURI/DGDT/DCT/FIC-TH/";
+               $data['fic'] = true;
+            } else if ($registro_pt->data[0]->no_reserva == '4327277') {
+                $data['folio'] = "SECTURI/DGDT/DCT/FIC-TA/";
+                 $data['fic'] = true;
+            } else {
+                $data['folio'] = $folio_prefijo;
+            }
+
+        } else {
+            echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
+            die();
+        }
+        $uudi = $globals->getTabla(['tabla'=>'factura', 'where'=>['id_registro_pt'=> $id_registro_pt, 'visible'=>1]]);
+       
+        if( isset($uudi->data) && !empty($uudi->data) ){
+   
+            $data['uudi'] = $uudi->data[0]->uuid;
 
         }
         if (!empty($instrumento)) {
@@ -3442,8 +3625,17 @@ class Principal extends BaseController
             'tabla' => 'vw_pdf_reserva',
             'where' => ['visible' => 1, 'id_registro_pt' => $id_pt]
         ]);
+
+        $xml = $globals->getTabla([
+            'tabla' => 'factura',
+            'where' => ['visible' => 1, 'id_registro_pt' => $id_pt]
+        ]);
         
-     
+       if(isset($xml->data) && !empty($xml->data)){
+        $data['uuid'] = $xml->data[0]->uuid;
+
+       }
+  
         $data['FIC'] = false;
         $data['GO'] = false;
         if (!empty($registro_pt->data)) {
@@ -3501,23 +3693,28 @@ class Principal extends BaseController
             } else {
                 $zero = '';
             }
-            if (!empty($direccion->data)) {
-                 $folio_prefijo = $direccion->data[0]->folio_prefijo . $zero .  $no_consecutivo . '/' . date('Y'); //ESTO HAY QUE OREGUNTAR
-                $data['registro']->folio = $folio_prefijo;
-            } else {
-                if ($registro_pt->data[0]->no_reserva == 4327278) {
-                    $data['registro']->folio = 'SECTURI/DGDT/DCT/FIC-TA/' . $zero . $no_consecutivo . '/2028';
-                } elseif ($registro_pt->data[0]->no_reserva == 4327277 || $registro_pt->data[0]->no_reserva == 4327279) {
-                    $data['registro']->folio = 'SECTURI/DGDT/DCT/FIC-TA/' . $zero . $no_consecutivo . '/2025';
-                } else {
-                    $data['registro']->folio = '';
-                }
+
+          if (!empty($registro_pt->data)) {
+            $data['registro'] = $registro_pt->data[0];
+         
+            $data['fic'] = false;
+            if ($registro_pt->data[0]->no_reserva == '4327278') {
+                $data['folio'] = "SECTURI/DGDT/DCT/FIC-TH/";
+                  $data['fic'] = true;
+            } else if ($registro_pt->data[0]->no_reserva == '4327279') {
+                $data['folio'] = "SECTURI/DGDT/DCT/FIC-TH/";
+               $data['fic'] = true;
+            } else if ($registro_pt->data[0]->no_reserva == '4327277') {
+                $data['folio'] = "SECTURI/DGDT/DCT/FIC-TA/";
+                 $data['fic'] = true;
             }
 
         } else {
             echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
             die();
+         }
         }
+        
       
         $subsecretario = $area = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1, 'id_subsecretario' => $registro_pt->data[0]->id_subsecretario]]);
        // $usu_sub = $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $subsecretario->data[0]->id_usuario]]);

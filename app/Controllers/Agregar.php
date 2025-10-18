@@ -223,17 +223,18 @@ class Agregar extends BaseController
          $i++;
         return $response;
     }
-    public function procesarXML(array $archivos, $id_registro_pt = null)
+   public function procesarXML(array $archivos, $id_registro_pt = null)
     {
         $session = \Config\Services::session();
         $data = array();
         $this->globals = new Mglobal();
+        
         foreach ($archivos as $archivo) {
             if (!$archivo->isValid()) {
                 continue;
             }
 
-            $tipo = $archivo->getMimeType(); // Detecta tipo mime
+            $tipo = $archivo->getMimeType();
 
             if (in_array($tipo, ['text/xml', 'application/xml'])) {
                 $contenido = file_get_contents($archivo->getTempName());
@@ -253,18 +254,47 @@ class Agregar extends BaseController
                 $fecha = (string) $attrs['Fecha'];
                 $total = (string) $attrs['Total'];
                 $moneda = (string) $attrs['Moneda'];
+                $Serie = (string) $attrs['Serie'];
+                $Folio = (string) $attrs['Folio'];
+                $FormaPago = (string) $attrs['FormaPago'];
+                $CondicionesDePago = (string) $attrs['CondicionesDePago'];
+                $SubTotal = (float) $attrs['SubTotal'];
+                $Descuento = isset($attrs['Descuento']) ? (float) $attrs['Descuento'] : 0;
+                $TipoCambio = isset($attrs['TipoCambio']) ? (float) $attrs['TipoCambio'] : 1;
+
+                $Certificado = (string) $attrs['Certificado'];
+                $NoCertificado = (string) $attrs['NoCertificado'];
+
                 // ✅ Emisor
                 $emisor = $cfdi->Emisor->attributes();
                 $rfcEmisor = (string) $emisor['Rfc'];
                 $nombreEmisor = (string) $emisor['Nombre'];
+                
                 // ✅ Receptor
                 $receptor = $cfdi->Receptor->attributes();
                 $rfcReceptor = (string) $receptor['Rfc'];
                 $nombreReceptor = (string) $receptor['Nombre'];
 
-                // ✅ UUID
-                $complemento = $cfdi->Complemento->children($namespaces['tfd'] ?? []);
-                $uuid = (string) $complemento->TimbreFiscalDigital['UUID'];
+                // ✅ UUID - CÓDIGO CORREGIDO
+                $uuid = '';
+                $NoCertificado = '';
+                
+                // Verificar si existe el complemento
+                if (isset($cfdi->Complemento)) {
+                    // Obtener el namespace correcto para el timbre fiscal
+                    $tfdNamespace = isset($namespaces['tfd']) ? $namespaces['tfd'] : 'http://www.sat.gob.mx/TimbreFiscalDigital';
+                    
+                    $complemento = $cfdi->Complemento->children($tfdNamespace);
+                    
+                    // Verificar si existe el TimbreFiscalDigital
+                    if (isset($complemento->TimbreFiscalDigital)) {
+                        $tfdAttributes = $complemento->TimbreFiscalDigital->attributes();
+                        $uuid = (string) $tfdAttributes['UUID'];
+                        $NoCertificado = (string) $tfdAttributes['NoCertificadoSAT'];
+                    }
+                }
+
+       
 
                 $dataConfig = [
                     "tabla" => "factura",
@@ -276,6 +306,8 @@ class Agregar extends BaseController
                     'fecha' => date('Y-m-d H:i:s', strtotime($fecha)),
                     'total' => $total,
                     'moneda' => $moneda,
+                    'folio' => $Folio,
+                    'no_certificado' => $NoCertificado, // Usar el del timbre, no del comprobante
                     'emisor_rfc' => $rfcEmisor,
                     'emisor_nombre' => $nombreEmisor,
                     'receptor_rfc' => $rfcReceptor,
@@ -283,16 +315,16 @@ class Agregar extends BaseController
                     'uuid' => $uuid,
                     'fec_reg' => date('Y-m-d H:i:s'),
                     'usu_reg' => $session->get('id_usuario')
-
                 ];
+                
                 $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardarFactura'];
                 $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
-
             }
         }
-
         // return false;
     }
+      
+    
     private function cambiarStatus($id = null)
     {
         $session = \Config\Services::session();
