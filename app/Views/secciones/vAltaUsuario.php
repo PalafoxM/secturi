@@ -161,7 +161,7 @@
                                                                 <input type="text" autocomplete="off"
                                                                     class="form-control" id="usuario" name="usuario"
                                                                     placeholder="USUARIO"
-                                                                    oninput="this.value = this.value.toUpperCase();">
+                                                                   >
                                                             </div>
                                                         </div>
                                                         <div class="col-md-3">
@@ -171,7 +171,7 @@
                                                                 <input type="password" autocomplete="off"
                                                                     class="form-control" id="contrasenia"
                                                                     name="contrasenia" placeholder="CONTRASEÑA"
-                                                                    oninput="this.value = this.value.toUpperCase();">
+                                                                    >
                                                             </div>
                                                         </div>
                                                         <div class="col-md-3">
@@ -182,7 +182,7 @@
                                                                 <input type="password" autocomplete="off"
                                                                     class="form-control" id="confirmar_contrasenia"
                                                                     name="confirmar_contrasenia" placeholder="CONFIRMAR"
-                                                                    oninput="this.value = this.value.toUpperCase();">
+                                                                   >
                                                             </div>
                                                         </div>
                                                     </div>
