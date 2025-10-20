@@ -98,7 +98,7 @@
         <?php endif; ?>
         <?php if($fic): ?>
          <div  style="position:absolute;  text-align:center; top:67.7%; left:35.5%; width:30%; background-color:white; font-size: 15px;  height:28px;">
-            <span class="proxima ">MTRO. DAVID AYALA SAUCEDO - DIRECTOR GENERAL DE DESARROLLO TURÍSTICO POR ACUERDO SECRETARIAL N° 003-02/2025</span>
+            <span class="proxima ">MTRO. DAVID AYALA SAUCEDO - DIRECTOR GENERAL DE DESARROLLO TURÍSTICO POR ACUERDO SECRETARIAL N° 003/2025</span>
         </div>
         <?php endif; ?>
          <?php if(!$fic): ?>
