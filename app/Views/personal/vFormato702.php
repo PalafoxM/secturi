@@ -251,18 +251,14 @@
 <div id="fecha">
    FECHA DEL GASTO:
 </div>
-<?php if(!$fic): ?>
+
  <div id="fecha_respuesta">
    <?php if(isset($registro->fecha_gasto_inicio) && !empty($registro->fecha_gasto_inicio)): ?>
    <span > DEL <?= date('d-m-Y', strtotime($registro->fecha_gasto_inicio));?> AL <?= date('d-m-Y',strtotime($registro->fecha_gasto_fin));?>  </span>
    <?php endif; ?>
 </div>
-<?php endif; ?>
-<?php if($fic): ?>
- <div id="fecha_respuesta">
-  DEL 10 DE OCTUBRE AL 03 DE NOVIEMBRE DEL 2025
-</div>
-  <?php endif; ?>
+
+
 <div id="importe">
    IMPORTANTE EN PESOS (MXN):
 </div>
