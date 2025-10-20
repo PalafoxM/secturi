@@ -1,6 +1,6 @@
         <?php
-        setlocale(LC_TIME, 'es_ES.UTF-8'); // Para Linux/macOS
-        // setlocale(LC_TIME, 'spanish'); // Para Windows
+        //setlocale(LC_TIME, 'es_ES.UTF-8'); // Para Linux/macOS
+        setlocale(LC_TIME, 'spanish'); // Para Windows
 
         $fecha = strtotime($registro->fecha_tramite);
         $fechaFormateada = strftime('%e de %B del %Y', $fecha);
