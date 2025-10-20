@@ -3605,6 +3605,7 @@ class Principal extends BaseController
         //var_dump($formatos);
         //die();
         $data['GO'] = false;
+        $data['fic'] = false;
         if (!empty($registro_pt->data)) {
             $registro = $registro_pt->data[0];
             $id_reserva = $registro_pt->data[0]->id_reserva;
@@ -3665,9 +3666,11 @@ class Principal extends BaseController
                 $data['registro']->folio = $folio_prefijo;
             } else {
                 if ($registro_pt->data[0]->no_reserva == 4327278) {
-                    $data['registro']->folio = 'SECTURI/DGDT/DCT/FIC-TH/' . $zero . $no_consecutivo . '/2028';
+                    $data['registro']->folio = 'SECTURI/DGDT/DCT/FIC-TH/' . $zero . $no_consecutivo . '/2025';
+                        $data['fic'] = true;
                 } elseif ($registro_pt->data[0]->no_reserva == 4327277 || $registro_pt->data[0]->no_reserva == 4327279) {
                     $data['registro']->folio = 'SECTURI/DGDT/DCT/FIC-TA/' . $zero . $no_consecutivo . '/2025';
+                        $data['fic'] = true;
                 } else {
                     $data['registro']->folio = '';
                 }

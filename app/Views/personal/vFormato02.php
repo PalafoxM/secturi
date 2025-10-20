@@ -66,10 +66,20 @@
         </div>
 
         <div  style="position:absolute; top:94.7%; left:21.2%; width:30%; height:10px; background-color:white; font-size: 10px; ">
+            <?php if(!$fic): ?>
+           <span class="proxima"><?= (isset($responsable) && !empty($responsable))?$responsable:'' ?></span>
+           <?php endif; ?>
+            <?php if($fic): ?>
            <span class="proxima">LIC. HUGO RAMÍREZ DUARTE</span>
+           <?php endif; ?>
         </div>
-         <div  style="position:absolute; top:96.8%; left:21.2%; width:30%; height:10px; background-color:white; font-size: 10px; ">
-            <span class="proxima"> DIRECTOR DE COMPETITIVIDAD TURÍSTICA</span>
+         <div  style="position:absolute; top:96.8%; left:21.2%; width:35%; height:10px; background-color:white; font-size: 10px; ">
+              <?php if(!$fic): ?>
+           <span class="proxima"><?= (isset($dsc_puesto) && !empty($dsc_puesto))?$dsc_puesto:'' ?></span>
+           <?php endif; ?>
+            <?php if($fic): ?>
+           <span class="proxima">DIRECTOR DE COMPETITIVIDAD TURÍSTICA</span>
+           <?php endif; ?>
         </div>
 
 
