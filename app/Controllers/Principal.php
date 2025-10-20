@@ -2697,13 +2697,13 @@ class Principal extends BaseController
             ]);
             $data['fic'] = false;
             if ($registro_pt->data[0]->no_reserva == '4327278') {
-                $data['folio'] = "SECTURI/DGDT/DCT/FIC-TH/";
+                $data['folio'] = "SECTURI/DGDT/DCT/FIC-TH/".$no_consecutivo. '/' . date('Y');
                   $data['fic'] = true;
             } else if ($registro_pt->data[0]->no_reserva == '4327279') {
-                $data['folio'] = "SECTURI/DGDT/DCT/FIC-TA/";
+                $data['folio'] = "SECTURI/DGDT/DCT/FIC-TA/".$no_consecutivo. '/' . date('Y');
                $data['fic'] = true;
             } else if ($registro_pt->data[0]->no_reserva == '4327277') {
-                $data['folio'] = "SECTURI/DGDT/DCT/FIC-TA/";
+                $data['folio'] = "SECTURI/DGDT/DCT/FIC-TA/".$no_consecutivo. '/' . date('Y');
                  $data['fic'] = true;
             } else {
                 $data['folio'] = $folio_prefijo;
@@ -2873,13 +2873,13 @@ class Principal extends BaseController
             ]);
             $data['fic'] = false;
             if ($registro_pt->data[0]->no_reserva == '4327278') {
-                $data['folio'] = "SECTURI/DGDT/DCT/FIC-TH/".$no_consecutivo. '/' . date('Y');;
+                $data['folio'] = "SECTURI/DGDT/DCT/FIC-TH/".$no_consecutivo. '/' . date('Y');
                   $data['fic'] = true;
             } else if ($registro_pt->data[0]->no_reserva == '4327279') {
-                $data['folio'] = "SECTURI/DGDT/DCT/FIC-TA/".$no_consecutivo. '/' . date('Y');;
+                $data['folio'] = "SECTURI/DGDT/DCT/FIC-TA/".$no_consecutivo. '/' . date('Y');
                $data['fic'] = true;
             } else if ($registro_pt->data[0]->no_reserva == '4327277') {
-                $data['folio'] = "SECTURI/DGDT/DCT/FIC-TA/".$no_consecutivo. '/' . date('Y');;
+                $data['folio'] = "SECTURI/DGDT/DCT/FIC-TA/".$no_consecutivo. '/' . date('Y');
                  $data['fic'] = true;
             } else {
                 $data['folio'] = $folio_prefijo;
