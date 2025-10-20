@@ -154,11 +154,11 @@
                                                             </td>
                                                         </tr>
                                                           <?php endif; ?>
+                                                        <?php if(!$FIC): ?>
                                                         <tr class="table-success">
                                                             <th scope="row">05. Formatos de los LRADP</th>
-                                                              <?php if($FIC): ?>
-                                                            <td>OMVE-1 (Orden de Ministración de Viáticos en el Extranjero)</td>
-                                                              <?php endif; ?>
+                                                             
+                                                     
                                                               <?php if($PT): ?>
                                                             <td>OMVE-1 (Orden de Ministración de Viáticos en el Extranjero)</td>
                                                               <?php endif; ?>
@@ -172,6 +172,7 @@
                                                              <input type="file" id="archivo05" name="archivo05[]" accept=".pdf" >
                                                             </td>
                                                         </tr>
+                                                        <?php endif; ?>
                                                           <?php if(!$GO): ?>
                                                         <tr>
                                                             <th scope="row">06. Oficios de Autorizaciones</th>
@@ -259,6 +260,11 @@
                                                     <br>
                                                        <div class="row mb-5">
                                                             <div class="col-md-12 text-right">
+                                                                <?php if($FIC): ?>
+                                                                <a id="btnZip" style="color:white" class="btn btn-info" onclick="ini.inicio.generarZipFIC(<?= $id_registro ?>);" >
+                                                                    <i class="mdi mdi-content-save"></i> Generar Zip
+                                                                </a>
+                                                                <?php endif; ?>
                                                                 <?php if($PT): ?>
                                                                 <a id="btnZip" style="color:white" class="btn btn-info" onclick="ini.inicio.generarZip(<?= $id_registro ?>);" >
                                                                     <i class="mdi mdi-content-save"></i> Generar Zip

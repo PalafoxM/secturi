@@ -4837,6 +4837,59 @@ ini.inicio = (function () {
                 }
             });
         },
+        generarZipFIC: function(id_registro_pt) {
+            var formData = new FormData();
+            formData.append('id_registro_pt', id_registro_pt);
+            
+
+            var archivo06 = $('#archivo06')[0].files[0];
+            if (archivo06) formData.append('archivo06', archivo06);
+            
+            var archivo08 = $('#archivo08')[0].files[0];
+            if (archivo08) formData.append('archivo08', archivo08);
+            
+            var archivo09 = $('#archivo09')[0].files[0];
+            if (archivo09) formData.append('archivo09', archivo09);
+            
+            $.ajax({
+                type: "POST",
+                url: base_url + "index.php/Principal/generarZipFIC",
+                data: formData,
+                processData: false,
+                contentType: false,
+                xhrFields: {
+                    responseType: 'blob' // Para manejar la respuesta como archivo
+                },
+                beforeSend: function() {
+                    $('#btnZip').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Generando...');
+                },
+                  success: function(response, status, xhr) {
+                    var filename = "documentos_" + id_registro_pt + ".zip";
+
+                    // Crear Blob y enlace de descarga
+                    var blob = new Blob([response], { type: 'application/zip' });
+                    var link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+
+                    Swal.fire("Éxito", "ZIP generado y descargado correctamente", "success");
+                },
+                complete: function() {
+                    $('#btnZip').prop('disabled', false).html('<i class="mdi mdi-content-save"></i> Generar Zip');
+                  $('#archivo05').val('');
+                  $('#archivo06').val('');
+                  $('#archivo08').val('');
+                  $('#archivo09').val('');
+                },
+                error: function(xhr, status, error) {
+                    var errorMessage = xhr.responseText || "Error al generar el archivo ZIP";
+                    Swal.fire("Error", errorMessage, "error");
+                }
+            });
+        },
          generarZipGO: function(id_registro_go) {
             var formData = new FormData();
             formData.append('id_registro_go', id_registro_go);

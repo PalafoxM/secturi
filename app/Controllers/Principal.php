@@ -2970,6 +2970,146 @@ class Principal extends BaseController
         exit();
 
     }
+    public function generarZipFIC()
+    {
+        $response = new \stdClass();
+        $id_registro_pt = $this->request->getPost('id_registro_pt');
+        $data = $this->request->getPost();
+        $Mglobal = new Mglobal;
+
+        if (empty($id_registro_pt)) {
+            $response->error = true;
+            $response->respuesta = 'ID de registro inválido';
+            return $this->respond($response);
+        }
+
+        // Consulta de PDFs asociados
+        $pdf_reserva = $Mglobal->getTabla([
+            'tabla' => 'vw_pdf_reserva',
+            'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
+        ]);
+
+        $id_reserva = $Mglobal->getTabla([
+            'tabla' => 'registro_pt',
+            'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
+        ])->data[0]->id_reserva;
+           
+        // Directorio temporal
+        $tempDir = sys_get_temp_dir() . '/zip_temp_' . $id_registro_pt . '/';
+  
+        if (!is_dir($tempDir) && !mkdir($tempDir, 0777, true)) {
+            $response->error = true;
+            $response->respuesta = 'No se pudo crear directorio temporal';
+            return $this->respond($response);
+        }
+      
+        $archivos = [];
+        $archivosTemporales = [];
+
+        
+        
+        $dynamicFiles = [
+                1 => '01 Anexos y formato de los LTPOFB.pdf',
+              
+            ];
+        foreach ($dynamicFiles as $id => $nombre) {
+            $rutaTemp = $tempDir . $nombre;
+            $archivoGenerado = $this->Archivo($id_registro_pt, $id, $rutaTemp);
+            if ($archivoGenerado && file_exists($archivoGenerado)) {
+                $archivos[] = $archivoGenerado;
+                $archivosTemporales[] = $archivoGenerado;
+            }
+        }
+
+       
+        // Archivo 07
+        $rutaArchivo07 = $tempDir . '07 Formatos_diversos.pdf';
+        $archivo07 = $this->ImprimirFIC($id_registro_pt, $rutaArchivo07);
+        if ($archivo07 && file_exists($archivo07)) {
+            $archivos[] = $archivo07;
+            $archivosTemporales[] = $archivo07;
+        }
+
+        // Archivos desde base de datos (PDFs permanentes)
+        if (!empty($pdf_reserva->data)) {
+            foreach ($pdf_reserva->data as $pdf) {
+                $source = FCPATH . $pdf->ruta_relativa;
+                if (file_exists($source)) {
+                    $archivos[] = $source;
+                    // ¡NO lo añadimos a archivosTemporales!
+                }
+            }
+        }
+
+        // Archivos subidos (05 al 09)
+        $uploadedFiles = [
+            'archivo06' => '06 Oficios de Autorizaciones.pdf',
+            'archivo08' => '08 Evidencia de entregable.pdf',
+            'archivo09' => '09 Otros.pdf'
+        ];
+        foreach ($uploadedFiles as $input => $nombre) {
+            $file = $this->request->getFile($input);
+            if ($file && $file->isValid()) {
+                $newPath = $tempDir . $nombre;
+                if ($file->move($tempDir, $nombre)) {
+                    $archivos[] = $newPath;
+                    $archivosTemporales[] = $newPath;
+                }
+            }
+        }
+
+        if (empty($archivos)) {
+            array_map('unlink', glob($tempDir . '*'));
+            rmdir($tempDir);
+            $response->error = true;
+            $response->respuesta = 'No hay archivos para comprimir';
+            return $this->respond($response);
+        }
+
+        // Crear ZIP
+        $timestamp = date('Ymd_His');
+        $zipPath = WRITEPATH . "temp_zip/Documentos_{$id_registro_pt}_{$timestamp}.zip";
+        if (!is_dir(dirname($zipPath))) {
+            mkdir(dirname($zipPath), 0777, true);
+        }
+
+        $zip = new \ZipArchive();
+        if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE)) {
+            foreach ($archivos as $archivo) {
+                $zip->addFile($archivo, basename($archivo));
+            }
+            $zip->close();
+        }
+
+        if (!file_exists($zipPath)) {
+            $response->error = true;
+            $response->respuesta = 'El archivo ZIP no se creó correctamente';
+            return $this->respond($response);
+        }
+
+        // Borrar solo archivos temporales
+        foreach ($archivosTemporales as $tempFile) {
+            if (file_exists($tempFile)) {
+                unlink($tempFile);
+            }
+        }
+
+        if (is_dir($tempDir)) {
+            rmdir($tempDir);
+        }
+
+        // Eliminar ZIP automáticamente al cerrar
+        register_shutdown_function(function () use ($zipPath) {
+            if (file_exists($zipPath)) {
+                unlink($zipPath);
+            }
+        });
+
+        return $this->response
+            ->setHeader('Content-Type', 'application/zip')
+            ->setHeader('Content-Disposition', 'attachment; filename="Documentos_' . $id_registro_pt . '.zip"')
+            ->setBody(file_get_contents($zipPath));
+    }
     public function generarZip()
     {
         $response = new \stdClass();
