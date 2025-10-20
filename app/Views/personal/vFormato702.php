@@ -212,7 +212,7 @@
    <span ><?= strtoupper($nombre_registro->nombre_completo); ?> - <?= strtoupper($nombre_registro->dsc_puesto); ?> - <?= strtoupper($nombre_registro->dsc_area); ?> </span>
     <?php endif; ?>
    <?php if($fic): ?>
-   <span > MTRO. DAVID AYALA SAUCEDO - DIRECTOR/A GENERAL DE INTELIGENCIA TURISTICA
+   <span >HUGO RAMÍREZ DUARTE - DIRECCIÓN DE COMPETITIVIDAD TURÍSTICA
  </span>
     <?php endif; ?>
 </div>

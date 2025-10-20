@@ -12,7 +12,7 @@
             <span class="proxima"><?= (isset($GO) && !empty($GO))?'GO':'PT';?> <?= strtoupper($registro->folio);?> </span>
             <?php endif; ?>
             <?php if($fic): ?>
-            <span class="proxima"><?= $folio;?></span>
+            <span class="proxima">PT <?= $folio;?></span>
             <?php endif; ?>
         </div>
         <div  style="position:absolute; top:36.2%; left:60.7%; width:35%; background-color:white; font-size: 12px;  height:12px;">
@@ -29,19 +29,25 @@
         <div  style="position:absolute; top:38.5%; left:64%; width:33%; background-color:white; font-size: 9px;  height:12px;">
             <span class="proxima "><?= (isset($registro->rfc) && !empty($registro->rfc))?strtoupper($registro->rfc):'' ?></span>
         </div>
-        <div  style="position:absolute; top:43.1%; left:60.7%; width:36%; background-color:white; font-size: 12px;  height:12px;">
+        <div  style="position:absolute; top:40.8%; left:60.8%; width:36%; background-color:white; font-size: 12px;  height:12px;">
            <?php if($GO): ?>
             <span class="proxima"> <strong> GOBIERNO DEL ESTADO DE GUANAJUATO SFIYA SECRETARIA DE TURISMO</strong></span>
              <?php endif; ?>
            <?php if(!$GO): ?>
-            <span class="proxima "><?= (isset($registro->dsc_proveedor) && !empty($registro->dsc_proveedor))?strtoupper($registro->dsc_proveedor):'' ?></span>
+            <span class="proxima "><STRONG>NOMBRE DEL PROVEEDOR :</STRONG><?= (isset($registro->dsc_proveedor) && !empty($registro->dsc_proveedor))?strtoupper($registro->dsc_proveedor):'' ?></span>
              <?php endif; ?>
         </div>
-        <div  style="position:absolute; top:44.1%; left:65.6%; width:29%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><?= strtoupper($registro->banco); ?></span>
+          <div  style="position:absolute; top:42%; left:60.8%; width:36%; background-color:white; font-size: 12px;  height:12px;">
+            <span class="proxima "><strong>NO. CUENTA :</strong><?= $registro->no_cuenta ?></span>
         </div>
-         <div  style="position:absolute; top:45.3%; left:65.2%; width:20%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><?= (isset($registro->no_cuenta) && !empty($registro->no_cuenta))?$registro->no_cuenta:$registro->clabe; ?></span>
+        <div  style="position:absolute; top:43%; left:60.8%; width:36%; background-color:white; font-size: 12px;  height:12px;">
+            <span class="proxima "><STRONG>BANCO: </STRONG><?= strtoupper($registro->banco); ?></span>
+        </div>
+         <div  style="position:absolute; top:44.3%; left:60.8%; width:36%; background-color:white; font-size: 12px;  height:12px;">
+            <span class="proxima "><STRONG>CLABE:</STRONG> <?= $registro->clabe ?></span>
+        </div>
+         <div  style="position:absolute; top:45.3%; left:60.8%; width:35%; background-color:white; font-size: 12px;  height:15px;">
+            <span class="proxima "></span>
         </div>
         <?php $i = 34;  ?>
         <?php foreach($reserva as $r): ?>
@@ -92,7 +98,7 @@
         <?php endif; ?>
         <?php if($fic): ?>
          <div  style="position:absolute;  text-align:center; top:67.7%; left:35.5%; width:30%; background-color:white; font-size: 15px;  height:28px;">
-            <span class="proxima ">MTRO. DAVID AYALA SAUCEDO - DIRECTOR GENERAL DE DESARROLLO TURÍSTICO POR ACUERDO SECRETARIAL N° SECTURI-02/2025</span>
+            <span class="proxima ">MTRO. DAVID AYALA SAUCEDO - DIRECTOR GENERAL DE DESARROLLO TURÍSTICO POR ACUERDO SECRETARIAL N° 003-02/2025</span>
         </div>
         <?php endif; ?>
          <?php if(!$fic): ?>
@@ -102,11 +108,11 @@
          <?php endif; ?>
          <?php if($fic): ?>
          <div  style="position:absolute;  text-align:center; top:67.7%; left:67.1%; width:30%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima ">MTRO. DAVID AYALA SAUCEDO </span>
+            <span class="proxima">MTRO. DAVID AYALA SAUCEDO  </span>
         </div>
          <?php endif; ?>
          <div  style="position:absolute;  text-align:center; top:69%; left:67.1%; width:30%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><?= $usu_sub->puesto?></span>
+            <span class="proxima ">DIRECTOR GENERAL DE DESARROLLO TURÍSTICO </span>
         </div>
          <div  style="position:absolute;  text-align:center; top:79%; left:67.1%; width:30%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "> <?= $responsableGasto->nombre_completo ?> </span>
