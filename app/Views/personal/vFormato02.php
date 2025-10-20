@@ -66,7 +66,7 @@
         </div>
 
         <div  style="position:absolute; top:94.7%; left:21.2%; width:30%; height:10px; background-color:white; font-size: 10px; ">
-           <span class="proxima">RODRIGO GONZÁLEZ GUERRERO</span>
+           <span class="proxima">LIC. HUGO RAMÍREZ DUARTE</span>
         </div>
          <div  style="position:absolute; top:96.8%; left:21.2%; width:30%; height:10px; background-color:white; font-size: 10px; ">
             <span class="proxima"> DIRECTOR GENERAL ADMINISTRATIVO</span>
