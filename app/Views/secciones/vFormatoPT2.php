@@ -1,13 +1,18 @@
-        <?php
-        //setlocale(LC_TIME, 'es_ES.UTF-8'); // Para Linux/macOS
-        setlocale(LC_TIME, 'spanish'); // Para Windows
+<?php
+// Detectar sistema operativo
+if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+    setlocale(LC_TIME, 'spanish');
+} else {
+    // Linux (Ubuntu) o macOS
+    setlocale(LC_TIME, 'es_ES.UTF-8', 'es_ES', 'es_MX.UTF-8', 'es_MX');
+}
 
-        $fecha = strtotime($registro->fecha_tramite);
-        $fechaFormateada = strftime('%e de %B del %Y', $fecha);
-        ?>
-        <div  style="position:absolute; text-align:right;  top:21.2%; left:45.5%; width:45%; height:18px; background-color:white; font-size: 16px; ">
-            <span class="proxima"><strong>Silao de la Victoria, Gto, <?= ucfirst($fechaFormateada); ?></strong></span>
-        </div>
+$fecha = strtotime($registro->fecha_tramite);
+$fechaFormateada = strftime('%e de %B del %Y', $fecha);
+?>
+<div style="position:absolute; text-align:right; top:21.2%; left:45.5%; width:45%; height:18px; background-color:white; font-size: 16px;">
+    <span class="proxima"><strong>Silao de la Victoria, Gto, <?= ucfirst($fechaFormateada); ?></strong></span>
+</div>
         <div  style="position:absolute; top:24.5%; left:64.5%; width:28%; height:18px; background-color:white; font-size: 14px; ">
             <?php if(!$fic): ?>
             <span class="proxima"><?= (isset($GO) && !empty($GO))?'GO':'PT';?> <?= strtoupper($registro->folio);?></span>
