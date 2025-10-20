@@ -104,7 +104,7 @@
                                                 
                                                 <select class="form-control" id="id_proveedor_banco" name="id_proveedor_banco" >
                                                     <?php foreach ($banco as $b): ?>
-                                                    <option value="<?= $b->id_proveedor_banco ?>" ><?= $b->banco . ' / ' . $b->no_cuenta ?></option>
+                                                    <option value="<?= $b->id_proveedor_banco ?>" ><?= $b->banco . ' / ' . $b->no_cuenta . ' / ' . $b->clabe ?></option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div><!--end col-->

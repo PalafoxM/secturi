@@ -9,7 +9,7 @@
         <div  style="position:absolute;text-align:center; top:18.2%; left:70.5%; width:25%; height:18px; background-color:white; font-size: 12px; ">
            
             <?php if(!$fic): ?>
-            <span class="proxima"><?= (isset($GO) && !empty($GO))?'GO':'PT';?> <?= strtoupper($registro->folio);?></span>
+            <span class="proxima"><?= (isset($GO) && !empty($GO))?'GO':'PT';?> <?= strtoupper($registro->folio);?> </span>
             <?php endif; ?>
             <?php if($fic): ?>
             <span class="proxima"><?= $folio;?></span>
@@ -41,7 +41,7 @@
             <span class="proxima "><?= strtoupper($registro->banco); ?></span>
         </div>
          <div  style="position:absolute; top:45.3%; left:65.2%; width:20%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><?= strtoupper($registro->no_cuenta); ?></span>
+            <span class="proxima "><?= (isset($registro->no_cuenta) && !empty($registro->no_cuenta))?$registro->no_cuenta:$registro->clabe; ?></span>
         </div>
         <?php $i = 34;  ?>
         <?php foreach($reserva as $r): ?>
