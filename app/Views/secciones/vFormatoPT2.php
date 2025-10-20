@@ -1,14 +1,30 @@
 <?php
-// Detectar sistema operativo
-if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-    setlocale(LC_TIME, 'spanish');
-} else {
-    // Linux (Ubuntu) o macOS
-    setlocale(LC_TIME, 'es_ES.UTF-8', 'es_ES', 'es_MX.UTF-8', 'es_MX');
+// Obtener la fecha
+$fecha = strtotime($registro->fecha_tramite);
+$dia = date('j', $fecha);      // día sin ceros iniciales (1-31)
+$anio = date('Y', $fecha);     // año
+
+// Obtener el número del mes (1-12)
+$mes_numero = (int) date('n', $fecha);
+
+// Traducir mes a español con switch
+switch ($mes_numero) {
+    case 1:  $mes = 'enero'; break;
+    case 2:  $mes = 'febrero'; break;
+    case 3:  $mes = 'marzo'; break;
+    case 4:  $mes = 'abril'; break;
+    case 5:  $mes = 'mayo'; break;
+    case 6:  $mes = 'junio'; break;
+    case 7:  $mes = 'julio'; break;
+    case 8:  $mes = 'agosto'; break;
+    case 9:  $mes = 'septiembre'; break;
+    case 10: $mes = 'octubre'; break;
+    case 11: $mes = 'noviembre'; break;
+    case 12: $mes = 'diciembre'; break;
+    default: $mes = 'mes desconocido';
 }
 
-$fecha = strtotime($registro->fecha_tramite);
-$fechaFormateada = strftime('%e de %B del %Y', $fecha);
+$fechaFormateada = $dia . ' de ' . $mes . ' del ' . $anio;
 ?>
 <div style="position:absolute; text-align:right; top:21.2%; left:45.5%; width:45%; height:18px; background-color:white; font-size: 16px;">
     <span class="proxima"><strong>Silao de la Victoria, Gto, <?= ucfirst($fechaFormateada); ?></strong></span>
