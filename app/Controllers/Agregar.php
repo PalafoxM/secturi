@@ -475,6 +475,11 @@ class Agregar extends BaseController
             $response->respuesta = "Es requerido el tipo de consumo";
             return $this->respond($response);
         }
+        if (isset($data['id_proveedor_banco']) && empty($data['id_proveedor_banco'])) {
+            $response->error = true;
+            $response->respuesta = "Es requerido el banco del proveedor";
+            return $this->respond($response);
+        }
         if (isset($data['fecha_tramite']) && empty($data['fecha_tramite'])) {
             $data['fecha_tramite'] = date('Y-m-d');
         }

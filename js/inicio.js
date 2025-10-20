@@ -3956,11 +3956,8 @@ ini.inicio = (function () {
                                         <td class="text-center">${p.id_proveedor}</td>
                                         <td class="text-center">${p.razon_social}</td>
                                         <td class="text-center">${p.rfc}</td>
-                                        <td class="text-center">
-                                            ${p.visible == 1 ? 
-                                                '<i class="mdi mdi-eye text-success font-18"></i>' : 
-                                                '<i class="mdi mdi-eye-off text-danger font-18"></i>'}
-                                        </td>
+                                        <td class="text-center">${p.no_proveedor}</td>
+                                     
                                         <td class="text-center">
                                             ${btn}
                                         </td>

@@ -168,6 +168,8 @@
       font-size: 7px;
         height:18px; 
         text-align:left;
+         padding-left: 4px;
+        
     }
     #fecha_respuesta{
       position:absolute; 
@@ -204,7 +206,13 @@
    RESPONSABLE / CARGO / AREA:
 </div>
  <div id="nombre">
+   <?php if(!$fic): ?>
    <span ><?= strtoupper($nombre_registro->nombre_completo); ?> - <?= strtoupper($nombre_registro->dsc_puesto); ?> - <?= strtoupper($nombre_registro->dsc_area); ?> </span>
+    <?php endif; ?>
+   <?php if($fic): ?>
+   <span > MTRO. DAVID AYALA SAUCEDO - DIRECTOR/A GENERAL DE INTELIGENCIA TURISTICA
+ </span>
+    <?php endif; ?>
 </div>
 <div id="comision">
    COMISION / REUNION / EVENTO:
@@ -236,7 +244,7 @@
    FACTURA / RECIBO No: 
 </div>
 <div id="factura_respuesta">
-
+<?= $uuid ?>
 </div>
 <div id="fecha">
    FECHA DEL GASTO:
