@@ -3601,6 +3601,15 @@ class Principal extends BaseController
             'tabla' => 'vw_pdf_reserva',
             'where' => ['visible' => 1, 'id_registro_pt' => $id_pt]
         ]);
+          $xml = $globals->getTabla([
+            'tabla' => 'factura',
+            'where' => ['visible' => 1, 'id_registro_pt' => $id_pt]
+        ]);
+        
+       if(isset($xml->data) && !empty($xml->data)){
+        $data['uuid'] = $xml->data[0]->uuid;
+
+       }
         
         //var_dump($formatos);
         //die();
@@ -3645,6 +3654,7 @@ class Principal extends BaseController
 
             if (!empty($reserva->data)) {
                 $data['reserva'] = $reserva->data;
+                $data['no_convenio'] = $reserva->data[0]->no_convenio;
                 $importe_str = $reserva->data[0]->total_importe;
                 $usu_reg = $reserva->data[0]->usu_reg;
                 $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
