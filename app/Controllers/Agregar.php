@@ -1214,10 +1214,7 @@ class Agregar extends BaseController
             "idEditar" => ['id_inventario' => (int) $data['id_inventario']]
         ];
         $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
-        if (!$response->error) {
-            $this->enviarCorreoDenuncia();
-
-        }
+       
         return $this->respond($response);
     }
     public function getInventario()
@@ -1247,11 +1244,7 @@ class Agregar extends BaseController
             $response->respuesta = "Es requerido el Secretario o Director";
             return $this->respond($response);
         }
-        if ($data['no_consecutivo'] == '') {
-            $response->error = true;
-            $response->respuesta = "Es requerido el No. Concecutivo";
-            return $this->respond($response);
-        }
+   
         if (($data['direccion_responsable']) == 0) {
             $response->error = true;
             $response->respuesta = "Es requerido el Dirección Responsable";
@@ -1312,14 +1305,11 @@ class Agregar extends BaseController
             $response->respuesta = "Es requerido el no_reserva";
             return $this->respond($response);
         }
-          $consecutivo = $this->globals->getTabla(['tabla' => 'registro_pt', 'where' => ['visible' => 1], 'orderBy' => 'id_registro_pt DESC']);          
+          $consecutivo = $this->globals->getTabla(['tabla' => 'consecutivo', 'where' => ['visible' => 1, 'id_responsable' => $data['id_reponsable_solicitud'] ], 'orderBy' => 'id_consecutivo DESC']);          
           $conse =  (isset($consecutivo->data) && !empty($consecutivo->data))?$consecutivo->data[0]->no_consecutivo:'';
-          $no_consecutivo = '';
-          if($data['no_consecutivo'] == $conse ){
-              $no_consecutivo = $conse + 1;
-          }else{
-             $no_consecutivo = $data['no_consecutivo'];
-          }
+        
+          $no_consecutivo = $conse + 1;
+        
         //var_dump($data);
         //die();
 

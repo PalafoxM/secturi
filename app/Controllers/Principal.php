@@ -3621,7 +3621,7 @@ class Principal extends BaseController
             $registro = $registro_pt->data[0];
             $id_reserva = $registro_pt->data[0]->id_reserva;
             $no_consecutivo = $registro_pt->data[0]->no_consecutivo;
-            $id_proveedor_banco = $registro_pt->data[0]->id_proveedor_banco;
+            $id_proveedor_banco = $registro_pt->data[0]->id_proveedor_banco; 
             $banco = $globals->getTabla([
                 'tabla' => 'proveedor_banco',
                 'where' => ['visible' => 1, 'id_proveedor_banco' => $id_proveedor_banco]
@@ -4187,6 +4187,56 @@ class Principal extends BaseController
 
     }
 
+    public function continuarPago($id_registro_pt = null)
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error|Error al traer los proveedor';
+        $globals = new Mglobal;
+  
+        if (!empty($id_registro_pt)) {
+            $registro_pt = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]]);
+        }
+
+        $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1]]);
+        $cat_tipo = $globals->getTabla(['tabla' => 'cat_tipo', 'where' => ['visible' => 1]]);
+
+        $usuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->get('id_usuario')]]);
+        $cat_usuario = $globals->getTabla(['tabla' => 'usuario', 'where' => ['visible' => 1]]);
+        $cat_director_general = $globals->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1]]);
+        $cat_opcion = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1]]);
+        $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+       
+    
+        if (!empty($id_registro_pt)) {
+            $data['registro_pt'] = (!empty($registro_pt->data)) ? $registro_pt->data[0] : '';
+             $cat_subsecretario = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1, 'id_subsecretario' => $data['registro_pt']->id_subsecretario]]);
+             $direccion_responsable = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1, 'id_area' => $data['registro_pt']->id_direccion_responsable]]);
+             $data['subsecretario'] = (!empty($cat_subsecretario->data)) ? $cat_subsecretario->data[0]->dsc_subsecretario : '';
+             $data['direccion_responsable'] = (!empty($direccion_responsable->data)) ? $direccion_responsable->data[0]->dsc_area : '';
+            $presupuesto = $globals->getTabla(['tabla' => 'vw_presupuesto', 'where' => ['id_reserva' => $data['registro_pt']->id_reserva]]);
+             $data['presupuesto'] = (!empty($presupuesto->data)) ? $presupuesto->data : [];
+        }
+        
+   
+       // die( var_dump(  $data ) );
+        $data['dsc_director_general'] = (!empty($cat_director_general->data)) ? $cat_director_general->data[0]->dsc_director_general : [];
+        $data['cat_area'] = (!empty($cat_area->data)) ? $cat_area->data : [];
+        $data['cat_tipo'] = (!empty($cat_tipo->data)) ? $cat_tipo->data : [];
+        $data['cat_opcion'] = (!empty($cat_opcion->data)) ? $cat_opcion->data : [];
+        
+        $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+        $data['secretario'] = (!empty($secretario->data)) ? $secretario->data : [];
+        $data['usuario'] = (!empty($usuario->data)) ? $usuario->data[0] : [];
+        $data['cat_usuario'] = (!empty($cat_usuario->data)) ? $cat_usuario->data : [];
+        $data['id_reserva'] = (!empty($id_reserva)) ? $id_reserva : 0;
+        $data['scripts'] = array('inicio');
+        $data['editar'] = 1;
+        $data['contentView'] = 'secciones/vContinuarPT';
+        $this->_renderView($data);
+
+    }
     public function generarTramitePago($id_reserva = null, $id_registro_pt = null)
     {
         $session = \Config\Services::session();
@@ -4200,9 +4250,9 @@ class Principal extends BaseController
         $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
         if ($id_reserva != 0) {
             $reserva = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['id_reserva' => $id_reserva]]);
-            $consecutivo = $globals->getTabla(['tabla' => 'registro_pt', 'where' => ['visible' => 1], 'orderBy' => 'id_registro_pt DESC']);
+           /*  $consecutivo = $globals->getTabla(['tabla' => 'registro_pt', 'where' => ['visible' => 1], 'orderBy' => 'id_registro_pt DESC']);
             $conse = (isset($consecutivo->data) && !empty($consecutivo->data)) ? $consecutivo->data[0]->no_consecutivo : '';
-            $data['consecutivo'] = $conse + 1;
+            $data['consecutivo'] = $conse + 1; */
             $presupuesto = $globals->getTabla(['tabla' => 'vw_presupuesto', 'where' => ['id_reserva' => $id_reserva]]);
             foreach ($presupuesto->data as $i => $p) {
                 if ($p->id_partida >= 149 && $p->id_partida <= 248) {

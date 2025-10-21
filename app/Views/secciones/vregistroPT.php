@@ -38,7 +38,7 @@
                                             <th class="text-center">PREVEEDOR</th>
                                             <th class="text-center">TIPO</th>
                                             <th class="text-center">FECHA</th>
-                                            <th class="text-center">CUENTA</th>
+                                            <th class="text-center">RESERVA</th>
                                             <th class="text-center">RESPONSABLE</th>
                                             <th class="text-center">CONCEPTO</th>
                                             <th class="text-center">PAGO</th>
@@ -53,7 +53,7 @@
                                             <td  class="text-center"><?= $e->dsc_proveedor?></td>
                                             <td  class="text-center"><?= $e->dsc_tipo?></td>
                                             <td  class="text-center"><?= date('d/m/Y', strtotime($e->fecha_tramite)); ?> </td>
-                                            <td  class="text-center"><?= $e->cuenta_bancaria?></td>
+                                            <td  class="text-center"><?= $e->no_reserva?></td>
                                             <td  class="text-center"><?= $e->responsable?></td>
                                             <td  class="text-center"><?= $e->concepto_pago?></td>
                                             <td  class="text-center <?= ($e->fic==1)?'text-success':'text-info'?>"><strong><?= ($e->fic==1)?'FIC':'PT'?></strong></td>
@@ -72,8 +72,11 @@
                                                         class="mdi dripicons-pencil text-warning font-18"></i></a> 
                                                 <?php endif; ?>
                                                 <?php if($e->fic!=1): ?>
-                                                <a class="btn btn-outline-info btn-round" href="<?php echo base_url().'index.php/Inicio/EditarPT/'.$e->id_registro_pt?>"  ><i
+                                                <a title="editar" class="btn btn-outline-info btn-round" href="<?php echo base_url().'index.php/Inicio/EditarPT/'.$e->id_registro_pt?>"  ><i
                                                         class="mdi dripicons-pencil text-warning font-18"></i></a> 
+
+                                                <a title="Continuar Pago" class="btn btn-outline-info btn-round" href="<?php echo base_url().'index.php/Principal/continuarPago/'.$e->id_registro_pt ?>"  ><i
+                                                        class="mdi dripicons-media-next text-danger font-18"></i></a> 
                                                 <?php endif; ?>
                                             </td>
                                         </tr>

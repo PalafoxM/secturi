@@ -42,29 +42,14 @@
                                             <!-- Dirección Responsable -->
                                             <div class="col-md-4 mb-3">
                                                 <label for="direccion_responsable">Dirección Responsable <span class="text-danger">*</span></label>
-                                                <select class="form-control" id="direccion_responsable" name="direccion_responsable" required>
-                                                    <?php foreach($cat_area as $a): ?>
-                                                    <option value="<?=$a->id_area?>" <?php echo ($a->id_area == $usuario->id_area) ? 'selected' : ''; ?>>
-                                                        <?=$a->dsc_area?>
-                                                    </option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                                <div class="invalid-feedback">
-                                                    Por favor ingrese la dirección responsable
-                                                </div>
+                                                <input type="text" id="direccion_responsable" name="direccion_responsable" class="form-control" value="<?= $direccion_responsable ?>" readonly>
+                                              
                                             </div><!--end col-->
                                             
                                             <!-- Tipo de PT -->
                                             <div class="col-md-4 mb-3">
                                                 <label for="tipo_pt">Tipo de PT <span class="text-danger">*</span></label>
-                                                <select class="form-control" id="tipo_pt" name="tipo_pt" >
-                                                    <?php foreach($cat_tipo as $p): ?>
-                                                        <option value="<?=$p->id_tipo?>" <?=(isset($registro_pt->id_tipo) && $registro_pt->id_tipo == $p->id_tipo )?'selected':''?> ><?= $p->des_tipo ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                                <div class="invalid-feedback">
-                                                    Por favor seleccione el tipo de PT
-                                                </div>
+                                                  <input type="text" id="tipo_pt" name="tipo_pt" class="form-control" value="<?= $registro_pt->dsc_tipo ?>" readonly>
                                             </div><!--end col-->
                                             
                                             <!-- Fecha de Trámite -->
@@ -79,58 +64,23 @@
                                         <div class="form-row">
                                             <div class="col-md-6 mb-6">
                                                 <label for="reponsable_solicitud">Responsable del Gasto<span style="color:red;">*</span></label>
-                                              <select name="id_reponsable_solicitud" class="form-control select2" required>
-                                                    <?php foreach ($cat_usuario as $u): ?>
-                                                        <?php
-                                                            // Determina el valor que debe quedar seleccionado
-                                                            $selected = '';
-                                                            if (isset($registro_pt->id_reponsable_solicitud) && $registro_pt->id_reponsable_solicitud == $u->id_usuario) {
-                                                                $selected = 'selected';
-                                                            } elseif (!isset($registro_pt->id_reponsable_solicitud) && isset($usuario) && $usuario->id_usuario == $u->id_usuario) {
-                                                                $selected = 'selected';
-                                                            }
-                                                        ?>
-                                                        <option value="<?= $u->id_usuario ?>" <?= $selected ?>>
-                                                            <?= $u->nombre . ' ' . $u->primer_apellido . ' ' . $u->segundo_apellido ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                </select>
+                                                 <input type="text" id="reponsable_solicitud" name="reponsable_solicitud" class="form-control" value="<?= $registro_pt->responsable ?>" readonly>
 
                                             </div><!--end col-->
                                             <div class="col-md-6 mb-6">
                                                 <label for="director_generar">Director/a General Administrativa <span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" id="director_generar" value="<?= $dsc_director_general ?>" name="director_generar" >
-                                                <div class="invalid-feedback">
-                                                    Please provide a valid state.
-                                                </div>
+                                                <input type="text" class="form-control" id="director_generar" value="<?= $dsc_director_general ?>" name="director_generar" readonly>
+                                           
                                             </div><!--end col-->
                                         </div><!--end form-row-->
                                         <div class="form-row">
                                            <div class="col-md-6 mb-6">
                                                 <label for="secretario">Secretario(a) o Director(a) que autoriza</label>
-                                                <select type="text" class="form-control" id="secretario"  name="secretario">
-                                                            <option value="0" selected >Seleccione una opcion</option>
-                                                    <?php foreach($secretario as $s): ?>
-                                                        <?php if(isset($registro_pt->secretario) && !empty($registro_pt->secretario)){  ?>
-                                                        <option value="<?= $s->id_secretario?>" <?= ($s->id_secretario == $registro_pt->secretario)?'selected':'' ?> ><?= $s->dsc_secretario?></option>
-                                                         <?php }else{ ?>
-                                                              <option value="<?= $s->id_secretario?>" ><?= $s->dsc_secretario?></option>
-                                                         <?php } ?>
-                                                    <?php endforeach; ?>
-                                                </select>
+                                               <input type="text" class="form-control" id="secretario" value="<?= $registro_pt->secretario ?>" name="secretario" readonly>
                                             </div><!--end col-->
                                             <div class="col-md-6 mb-6">
                                                 <label for="id_subsecretario">Subsecreatrio(a) o Director(a) General Responsable</label>
-                                                <select type="text" class="form-control" id="id_subsecretario" name="id_subsecretario">
-                                                            <option value="0" selected >Seleccione una opcion</option>
-                                                    <?php foreach($cat_subsecretario as $s): ?>
-                                                        <?php if(isset($registro_pt->id_subsecretario) && !empty($registro_pt->id_subsecretario)){  ?>
-                                                        <option value="<?= $s->id_subsecretario?>" <?= ($s->id_subsecretario == $registro_pt->id_subsecretario)?'selected':'' ?> ><?= $s->dsc_secretario?></option>
-                                                         <?php }else{ ?>
-                                                              <option value="<?= $s->id_subsecretario?>" ><?= $s->dsc_subsecretario?></option>
-                                                         <?php } ?>
-                                                    <?php endforeach; ?>
-                                                </select>
+                                                 <input type="text" class="form-control" value="<?= $subsecretario?>" readonly>
                                             </div><!--end col-->
                                         </div><!--end form-row-->
                                         <div class="form-row">
@@ -181,7 +131,7 @@
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="formato_conformidad">Formato de conformidad del producto recibido.<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" id="formato_conformidad" value="<?=($partida4000)?'NO':'SI'?>" name="formato_conformidad" readonly>
+                                                <input type="text" class="form-control" id="formato_conformidad" value="<?=($registro_pt->formato_conformidad == 1)?'SI':'NO'?>" name="formato_conformidad" readonly>
                                                 <div class="invalid-feedback">
                                                     Please provide a valid state.
                                                 </div>
@@ -321,9 +271,9 @@
                                         
 
                                             <a class="btn btn-gradient-danger" style="color:white" onclick="window.history.back()">Atrás</a>
-                                            <?php if(!$edita): ?>
+                                         
                                              <button class="btn btn-gradient-primary" id="btnGuardatPT" type="submit">Guardar</button>
-                                            <?php endif; ?>
+                                      
                                     </form> <!--end form-->                                          
                                 </div><!--end card-body-->
                             </div><!--end card-->

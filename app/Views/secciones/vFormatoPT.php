@@ -105,6 +105,9 @@
          <div  style="position:absolute;  text-align:center; top:67.7%; left:35.5%; width:30%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "><?= strtoupper($registro->secretario); ?></span>
         </div>
+         <div  style="position:absolute;  text-align:center; top:68.9%; left:35.5%; width:30%; background-color:white; font-size: 12px;  height:12px;">
+            <span class="proxima "><?= strtoupper($registro->dsc_puesto_secretario); ?></span>
+        </div>
         <?php endif; ?>
         <?php if($fic): ?>
          <div  style="position:absolute;  text-align:center; top:67.7%; left:35.5%; width:30%; background-color:white; font-size: 15px;  height:28px;">
