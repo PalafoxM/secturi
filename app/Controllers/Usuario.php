@@ -892,29 +892,42 @@ class Usuario extends BaseController
                 }
 
                 // --- AHORA aplicar la validación de retardo/ sin registro solo si NO fue validado por incidencias ---
+              // --- Validación de salida (ejemplo) ---
                 if (!$validado) {
-                    // Si no hay entrada -> "Sin registro"
-                    if (empty($entrada) || !$entrada) {
-                        $valorEntrada = 'Sin registro';
-                        $sheet->getStyle($colEntrada . $fila)
+                    // Si no hay salida -> marcar rojo (sin registro de salida)
+                    if (empty($salida) || !$salida) {
+                        $valorSalida = 'Sin registro';
+                        $sheet->getStyle($colSalida . $fila)
                             ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                             ->getStartColor()->setARGB('FFFF0000');
                     } else {
-                        // Retardo leve -> Amarillo (08:46 - 09:01)
-                        try {
-                            $tEntrada = new \DateTime($entrada);
-                            $t0846 = new \DateTime('08:46:00');
-                            $t0901 = new \DateTime('09:01:00');
-                            if ($tEntrada >= $t0846 && $tEntrada <= $t0901) {
+                        // Ejemplo: marcar rojo si la salida es antes de la hora mínima permitida
+                        // o si es demasiado tarde (ajusta $minSalida / $maxSalida a tus reglas)
+                        try {    
+
+                            // Si quieres marcar salida temprana (salió antes de la hora mínima)
+                            if ($salida > '12:00:00' && $salida < '16:00:00') {
+                                $sheet->getStyle($colSalida . $fila)
+                                    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                    ->getStartColor()->setARGB('FFFFA500'); // rojo
+                            }
+                            if ($entrada > '08:46:00' && $entrada < '09:00:00') {
                                 $sheet->getStyle($colEntrada . $fila)
                                     ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                    ->getStartColor()->setARGB('FFFFFF00');
+                                    ->getStartColor()->setARGB('FFFFFF00'); // naranja
                             }
+                            if ($entrada > '09:01:00' && $entrada < '12:00:00') {
+                                $sheet->getStyle($colEntrada . $fila)
+                                    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                    ->getStartColor()->setARGB('FFFFA500'); // rojo
+                            }
+
                         } catch (\Exception $e) {
-                            // si $entrada no es parseable, dejar tal cual
+                            // si $salida no es parseable, no hacer nada (o registrar)
                         }
                     }
                 }
+
 
                 // Finalmente escribimos los valores en la hoja (después de todas las validaciones)
                 $sheet->setCellValue($colEntrada . $fila, $valorEntrada);
