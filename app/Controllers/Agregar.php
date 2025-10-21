@@ -1409,6 +1409,142 @@ class Agregar extends BaseController
         }
         return $this->respond($response);
     }
+    public function guardaPT2()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = "Error|Error al guardar PT";
+        $this->globals = new Mglobal();
+        $data = $this->request->getPost();
+        $archivos = $this->request->getFiles();
+
+  
+        if (isset($data['cuenta_bancaria']) && empty($data['cuenta_bancaria'])) {
+            $response->error = true;
+            $response->respuesta = "Es requerido el Cuenta Bancaria";
+            return $this->respond($response);
+        }
+        if (isset($data['fecha_gasto_inicio']) && empty($data['fecha_gasto_inicio'])) {
+            $response->error = true;
+            $response->respuesta = "Es requerido el fecha gasto inicio";
+            return $this->respond($response);
+        }
+        if (isset($data['fecha_gasto_fin']) && empty($data['fecha_gasto_fin'])) {
+            $response->error = true;
+            $response->respuesta = "Es requerido el fecha gasto fin";
+            return $this->respond($response);
+        }
+        if (isset($data['documentacion_comprobatoria']) && empty($data['documentacion_comprobatoria'])) {
+            $response->error = true;
+            $response->respuesta = "Es requerido el documentacion_comprobatorian";
+            return $this->respond($response);
+        }
+      
+          $consecutivo = $this->globals->getTabla(['tabla' => 'consecutivo', 'where' => ['visible' => 1, 'id_responsable' => $data['id_reponsable_solicitud'] ], 'orderBy' => 'id_consecutivo DESC']);          
+          $conse =  (isset($consecutivo->data) && !empty($consecutivo->data))?$consecutivo->data[0]->no_consecutivo:'';
+        
+          $no_consecutivo = $conse + 1;
+        
+        //var_dump($data);
+        //die();
+
+        $dataInsert = [
+            'id_reserva' => (int) $data['id_reserva'],
+            'id_direccion_responsable' => $data['direccion_responsable'],
+            'tipo_pt' => $data['tipo_pt'],
+            'no_consecutivo' => $no_consecutivo,
+            'id_proveedor' => $data['id_proveedor'],
+            'fecha_tramite' => $data['fecha_tramite'],
+            'id_reponsable_solicitud' => (int) $data['id_reponsable_solicitud'],
+            'director_general' => 1,
+            'secretario' => $data['secretario'],
+            'id_subsecretario' => $data['id_subsecretario'],
+            'cuenta_bancaria' => $data['cuenta_bancaria'],
+            'fecha_gasto_inicio' => $data['fecha_gasto_inicio'],
+            'fecha_gasto_fin' => $data['fecha_gasto_fin'],
+            'formato_establecido' => ($data['formato_establecido'] == 'SI') ? 1 : 2,
+            'documentacion_comprobatoria' => $data['documentacion_comprobatoria'],
+            'poliza' => ($data['poliza'] == 'SI') ? 1 : 2,
+            'formato_conformidad' => ($data['formato_conformidad'] == 'SI') ? 1 : 2,
+            'contrato_convenio' => $data['contrato_convenio'],
+            'documentacion_requerida' => $data['documentacion_requerida'],
+            'evidencia_entrega' => $data['evidencia_entrega'],
+            'otros' => $data['otros'],
+            'clausula_contrato' => $data['clausula_contrato'],
+            'concepto_pago' => $data['concepto_pago'],
+            'comision' => $data['comision'],
+            'no_reserva' => $data['no_reserva']
+        ];
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaTurno'];
+        if ($data['editar'] == 0) {
+            $dataInsert['usu_reg'] = $session->get('id_usuario');
+            $dataInsert['fec_reg'] = date('Y-m-d H:i:s');
+            $dataConfig = [
+                "tabla" => "registro_pt",
+                "editar" => false
+            ];
+        } else {
+            $dataConfig = [
+                "tabla" => "registro_pt",
+                "editar" => true,
+                'idEditar' => ['id_registro_pt' => $data['id_registro_pt']]
+            ];
+            $dataInsert['usu_act'] = $session->get('id_usuario');
+        }
+
+
+        $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+
+        if (!$response->error) {
+            $id_registro_pt = $response->idRegistro;
+            $archivosXml = [];
+            $archivosPdf = [];
+            $periodo = [];
+            $response->idRegistro = $response->idRegistro;
+            $this->cambiarStatusPT($data['id_reserva']);
+            foreach ($data as $key => $p) {
+                if (strpos($key, 'encabezado') === 0) {
+                    $index = str_replace('encabezado', '', $key); // ej. encabezado1 → 1
+                    $periodo[$index]['encabezado'] = $p;
+                }
+                if (strpos($key, 'periodo_inicio') === 0) {
+                    $index = str_replace('periodo_inicio', '', $key); // ej. periodo1 → 1
+                    $periodo[$index]['periodo_inicio'] = $p;
+                }
+                if (strpos($key, 'periodo_fin') === 0) {
+                    $index = str_replace('periodo_fin', '', $key); // ej. periodo1 → 1
+                    $periodo[$index]['periodo_fin'] = $p;
+                }
+            }
+
+            // Recorremos todas las claves de los archivos enviados
+            foreach ($archivos as $key => $fileArray) {
+                if (strpos($key, 'factura_xml_') === 0) {
+                    $archivosXml = array_merge($archivosXml, $fileArray);
+                } elseif (strpos($key, 'factura_pdf_') === 0) {
+                    $archivosPdf = array_merge($archivosPdf, $fileArray);
+                }
+            }
+
+
+            $datosXML = $this->procesarXML($archivosXml, $id_registro_pt);
+            $datosPDF = $this->procesarPDF($archivosPdf, $id_registro_pt);
+            $datosP = $this->procesarPediodo($periodo, $id_registro_pt);
+
+
+            if (!$datosXML) {
+                $response->errorXML = true;
+                $response->respuestaXML = "XML inválido o no se encontró.";
+            }
+            if (!$datosPDF) {
+                $response->errorPDF = true;
+                $response->respuestaPDF = "PDF inválido o no se encontró.";
+            }
+
+        }
+        return $this->respond($response);
+    }
     public function guardaUsuarioSti()
     {
         $session = \Config\Services::session();

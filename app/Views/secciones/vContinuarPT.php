@@ -31,7 +31,7 @@
                                     <p class="text-muted mb-3" >
                                         <?= (isset($proveedor->no_proveedor) && !empty($proveedor->no_proveedor))?'No. Proveedor '.$proveedor->no_proveedor:'' ?>
                                     </p>
-                                   <form id="form_proveedor" enctype="multipart/form-data">
+                                   <form id="form_next_pt" enctype="multipart/form-data">
                                         <input type="hidden" name="id_proveedor" id="id_proveedor" value="<?= (isset($reserva->id_proveedor) && !empty($reserva->id_proveedor))?$reserva->id_proveedor:$registro_pt->id_proveedor?>" >
                                         <input type="hidden" name="editar" id="editar" value="<?= $editar?>">
                                         <input type="hidden" name="id_reserva" id="id_reserva" value="<?= $id_reserva?>">
@@ -86,10 +86,11 @@
                                         <div class="form-row">
                                             <div class="col-md-4 mb-3">
                                                 <label for="cuenta_bancaria">Cuenta Bancaria del Proveedor <span style="color:red;">*</span></label>
-                                                <input readonly type="text" class="form-control" id="cuenta_bancaria" name="cuenta_bancaria" value="<?= (isset($reserva->banco_completo) && !empty($reserva->banco_completo))?$reserva->banco_completo:''?>">
-                                                <div class="invalid-feedback">
-                                                    Campo no Valido
-                                                </div>
+                                                 <select type="text" class="form-control" id="cuenta_bancaria"  name="cuenta_bancaria" >
+                                                  <?php foreach( $idproveedor as $o ): ?>
+                                                    <option value="<?=$o->id_proveedor_banco ?>" <?= (isset($registro_pt->id_proveedor_banco) && $registro_pt->id_proveedor_banco == $o->id_proveedor_banco)?'selected':'' ?> ><?=$o->banco.'/'.$o->no_cuenta.'/'.$o->clabe ?></option>
+                                                  <?php endforeach; ?>
+                                               </select>
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="fecha_gasto_inicio">Fecha de gasto inicio <span style="color:red;">*</span></label>
@@ -165,7 +166,7 @@
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="otros">Otros</label>
-                                                <input type="text" class="form-control" id="otros"  name="otros" >
+                                                <input type="text" class="form-control" id="otros"  name="otros" value="<?= $registro_pt->otros ?>" readonly>
                                                 <div class="invalid-feedback">
                                                     Please provide a valid state.
                                                 </div>
@@ -174,21 +175,21 @@
                                         <div class="form-row">
                                             <div class="col-md-4 mb-3">
                                                 <label for="clausula_contrato">Claúsula del contrato.<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" id="clausula_contrato" name="clausula_contrato" value="<?=(isset($registro_pt->clausula_contrato))?$registro_pt->clausula_contrato:'TERCERA'?>">
+                                                <input type="text" class="form-control" readonly id="clausula_contrato" name="clausula_contrato" value="<?=(isset($registro_pt->clausula_contrato))?$registro_pt->clausula_contrato:'TERCERA'?>">
                                                 <div class="invalid-feedback">
                                                     Campo no Valido
                                                 </div>
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="concepto_pago">Concepto del pago.<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control"  autocomplete="off" id="concepto_pago" name="concepto_pago" value="<?= (isset($registro_pt->concepto_pago))?$registro_pt->concepto_pago:'' ?>" >
+                                                <input type="text" class="form-control" readonly  autocomplete="off" id="concepto_pago" name="concepto_pago" value="<?= (isset($registro_pt->concepto_pago))?$registro_pt->concepto_pago:'' ?>" >
                                                 <div class="invalid-feedback">
                                                     Please provide a valid state.
                                                 </div>
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="comision">Comisión / Reunión / Evento / Programa</label>
-                                                <input type="text" class="form-control" id="comision"  name="comision" value="<?= (isset($registro_pt->comision))?$registro_pt->comision:'Comisión / Reunión / Evento / Programa' ?>" >
+                                                <input type="text" class="form-control" readonly id="comision"  name="comision" value="<?= (isset($registro_pt->comision))?$registro_pt->comision:'Comisión / Reunión / Evento / Programa' ?>" >
                                                 <div class="invalid-feedback">
                                                     Please provide a valid state.
                                                 </div>
@@ -197,7 +198,7 @@
                                         <div class="form-row">
                                             <div class="col-md-4 mb-3">
                                                 <label for="no_reserva">No. de Reserva.<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" autocomplete="off" id="no_reserva" name="no_reserva"  value="<?= (isset($reserva->no_reserva))?$reserva->no_reserva:'' ?>" readonly>
+                                                <input type="text" class="form-control" autocomplete="off" id="no_reserva" name="no_reserva"  value="<?= (isset($registro_pt->no_reserva))?$registro_pt->no_reserva:'' ?>" readonly>
                                                 <div class="invalid-feedback">
                                                     Campo no Valido
                                                 </div>
@@ -235,7 +236,7 @@
                                                         <!-- Encabezado y XML -->
                                                         <div class="col-md-4 mb-3">
                                                             <label for="encabezado_<?= $i ?>">Encabezado<span style="color:red;">*</span></label>
-                                                            <input type="text" class="form-control" autocomplete="off" id="encabezado_<?= $i ?>" name="encabezado[]" value="<?= (isset($p->encabezado) && !empty($p->encabezado)?$p->encabezado:'') ?>" >
+                                                            <input type="text" class="form-control" readonly autocomplete="off" id="encabezado_<?= $i ?>" name="encabezado[]" value="<?= (isset($p->encabezado) && !empty($p->encabezado)?$p->encabezado:'') ?>" >
                                                         </div>
 
                                                         <!-- Periodo -->
@@ -329,7 +330,7 @@
         <script src="<?= base_url()?>plugins/bootstrap-touchspin/js/jquery.bootstrap-touchspin.min.js"></script>
 
         <script>
-            ini.inicio.formPT();
+            ini.inicio.nextFormPT();
              $('.add-file').on('click', function(e) {
                 e.preventDefault();
                 const inputId = $(this).data('target');

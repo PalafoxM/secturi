@@ -4216,7 +4216,9 @@ class Principal extends BaseController
              $data['subsecretario'] = (!empty($cat_subsecretario->data)) ? $cat_subsecretario->data[0]->dsc_subsecretario : '';
              $data['direccion_responsable'] = (!empty($direccion_responsable->data)) ? $direccion_responsable->data[0]->dsc_area : '';
             $presupuesto = $globals->getTabla(['tabla' => 'vw_presupuesto', 'where' => ['id_reserva' => $data['registro_pt']->id_reserva]]);
+            $idproveedor = $globals->getTabla(['tabla' => 'proveedor_banco', 'where' => ['idproveedor' => $data['registro_pt']->id_proveedor_banco]]);
              $data['presupuesto'] = (!empty($presupuesto->data)) ? $presupuesto->data : [];
+             $data['idproveedor'] = (!empty($idproveedor->data)) ? $idproveedor->data : '';
         }
         
    

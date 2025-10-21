@@ -4649,6 +4649,92 @@ ini.inicio = (function () {
                 });
             });
         },
+       nextFormPT: function(){
+            $("#form_next_pt").submit(function (e) {
+                e.preventDefault(); 
+                   let valido = true;
+                    let mensajes = [];
+
+                    // Validar cada partida
+                    $("[id^=encabezado_]").each(function(){
+                        if($(this).val().trim() === ""){
+                            valido = false;
+                            mensajes.push("El campo Encabezado es obligatorio.");
+                        }
+                    });
+
+                    $("[id^=periodo_inicio]").each(function(){
+                        if($(this).val().trim() === ""){
+                            valido = false;
+                            mensajes.push("El campo Periodo termino es obligatorio.");
+                        }
+                    });
+                    $("[id^=periodo_fin]").each(function(){
+                        if($(this).val().trim() === ""){
+                            valido = false;
+                            mensajes.push("El campo Periodo fin es obligatorio.");
+                        }
+                    });
+
+                    // Validar archivos PDF
+                    $("[id^=factura_pdf_input_]").each(function(){
+                        let files = this.files;
+                        if(files.length === 0){
+                            valido = false;
+                            mensajes.push("Debe subir al menos un archivo PDF.");
+                        }
+                    });
+
+                    // Validar archivos XML
+                    $("[id^=factura_xml_input_]").each(function(){
+                        let files = this.files;
+                        if(files.length === 0){
+                            valido = false;
+                            mensajes.push("Debe subir al menos un archivo XML.");
+                        }
+                    });
+
+                    if(!valido){
+                        Swal.fire("Atención", "<p>"+mensajes.join("<br>")+"</p>", "warning");
+                        return;
+                    }
+
+
+
+                var formData = new FormData(this); // Usar FormData en lugar de serialize
+               
+                $.ajax({
+                    type: "POST",
+                    url: base_url + "index.php/Agregar/guardaPT2",
+                    data: formData,
+                    processData: false,  // Importante para FormData
+                    contentType: false,  // Importante para FormData
+                    dataType: "json",
+                    success: function (response) {
+                        console.log(response);
+                        if(!response.error){
+                            Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
+                            setTimeout(() => {
+                               // window.location.href = base_url + "index.php/Principal/listadoEstatusPT";
+                                window.location.href = base_url + "index.php/Principal/tablaArchivos/"+response.idRegistro+'/PT';
+                            }, 1500);
+                        }else{
+                            Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
+                        }
+                    },
+                    beforeSend: function (info){
+                         $('#btnGuardatPT').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                    },
+                    complete: function (info){
+                        $('#btnGuardatPT').prop('disabled', false).html('Guardar');
+                    },
+                    error: function (response,jqXHR, textStatus, errorThrown) {
+                        var res= JSON.parse(response.responseText);
+                        Swal.fire("Error", '<p> '+ res.message + '</p>');  
+                    }
+                });
+            });
+        },
         formatBytes :function(bytes) {
         const units = ['B','KB','MB','GB'];
         let i = 0, num = bytes;
