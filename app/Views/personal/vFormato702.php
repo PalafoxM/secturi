@@ -262,6 +262,29 @@
 <div id="importe">
    IMPORTANTE EN PESOS (MXN):
 </div>
+<?php
+function formatearImporteSeguro($valor) {
+    try {
+        if (is_numeric($valor)) {
+            return number_format(floatval($valor), 2);
+        }
+        
+        $limpio = preg_replace('/[^\d\.\-]/', '', (string)$valor);
+        return is_numeric($limpio) ? number_format(floatval($limpio), 2) : '0.00';
+        
+    } catch (Exception $e) {
+        return '0.00';
+    }
+}
+
+function obtenerTotalImporte($reserva) {
+    if (!empty($reserva) && isset($reserva[0]->total_importe)) {
+        return formatearImporteSeguro($reserva[0]->total_importe);
+    }
+    return '0.00';
+}
+?>
+
 <div id="importe_respuesta">
 <?php
 if (!empty($reserva)) {
@@ -271,18 +294,18 @@ if (!empty($reserva)) {
     foreach ($reserva as $r) {
         $i++;
         if ($i <= $total) {
-            echo '&nbsp;$' . number_format($r->importe, 2);
+            echo '&nbsp;$' . formatearImporteSeguro($r->importe);
             if ($i < $total) {
                 echo ' / ';
-            }else{
-                    echo '';
+            } else {
+                echo '';
             }
         }
     }
 
     // Mostrar total y texto
-    echo  ($total >= 2 )?'&nbsp;<br>$'.$reserva[0]->total_importe:'';
-    echo  ' (' . mb_strtoupper($numero_texto, 'UTF-8').')';
+    echo ($total >= 2) ? '&nbsp;<br>$' . obtenerTotalImporte($reserva) : '';
+    echo ' (' . mb_strtoupper($numero_texto, 'UTF-8') . ')';
 }
 ?>
 </div>

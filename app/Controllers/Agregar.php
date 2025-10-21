@@ -181,6 +181,48 @@ class Agregar extends BaseController
         }
         return $response;
     }
+    public function procesarPDFeditar(array $archivos, $id_registro_pt = null)
+    {
+        $session = \Config\Services::session();
+        $data = array();
+        $response = new \stdClass();
+        $this->globals = new Mglobal();
+        $i = 1;
+        foreach ($archivos as $archivo) {
+            if (!$archivo->isValid()) {
+                continue;
+            }
+            $timestamp = date('Ymd_His');
+            $extension = $archivo->getClientExtension();
+            $originalName = pathinfo($archivo->getName(), PATHINFO_FILENAME);
+            $file =  '03_CFDI_' .$i.'_' . $timestamp . '.' . $extension;
+
+            // Ruta absoluta
+            $ruta_destino = FCPATH . 'assets/pdf/';
+            $archivo->move($ruta_destino, $file);
+
+            // Rutas públicas
+            $ruta_absoluta = base_url('assets/pdf/' . $file);
+            $ruta_relativa = 'assets/pdf/' . $file;
+            $dataConfig = [
+                "tabla" => "factura_pdf",
+                "editar" => true,
+                "idEditar" => ['id_registro_pt' => $id_registro_pt]
+            ];
+            $dataInsert = [
+
+                'ruta_relativa' => $ruta_relativa,
+                'ruta_absoluta' => $ruta_absoluta,
+                'usu_act' => $session->get('id_usuario')
+
+            ];
+            $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/editarFacturaPDF_FIC'];
+            $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+
+        }
+         $i++;
+        return $response;
+    }
     public function procesarPDF(array $archivos, $id_registro_pt = null)
     {
         $session = \Config\Services::session();
@@ -222,6 +264,107 @@ class Agregar extends BaseController
         }
          $i++;
         return $response;
+    }
+   public function procesarXMLeditar(array $archivos, $id_registro_pt = null)
+    {
+        $session = \Config\Services::session();
+        $data = array();
+        $this->globals = new Mglobal();
+        
+        foreach ($archivos as $archivo) {
+            if (!$archivo->isValid()) {
+                continue;
+            }
+
+            $tipo = $archivo->getMimeType();
+
+            if (in_array($tipo, ['text/xml', 'application/xml'])) {
+                $contenido = file_get_contents($archivo->getTempName());
+
+                libxml_use_internal_errors(true);
+                $xml = simplexml_load_string($contenido);
+
+                if ($xml === false) {
+                    return false;
+                }
+
+                $namespaces = $xml->getNamespaces(true);
+                $cfdi = $xml->children($namespaces['cfdi']);
+
+                $attrs = $xml->attributes();
+                $version = (string) $attrs['Version'];
+                $fecha = (string) $attrs['Fecha'];
+                $total = (string) $attrs['Total'];
+                $moneda = (string) $attrs['Moneda'];
+                $Serie = (string) $attrs['Serie'];
+                $Folio = (string) $attrs['Folio'];
+                $FormaPago = (string) $attrs['FormaPago'];
+                $CondicionesDePago = (string) $attrs['CondicionesDePago'];
+                $SubTotal = (float) $attrs['SubTotal'];
+                $Descuento = isset($attrs['Descuento']) ? (float) $attrs['Descuento'] : 0;
+                $TipoCambio = isset($attrs['TipoCambio']) ? (float) $attrs['TipoCambio'] : 1;
+
+                $Certificado = (string) $attrs['Certificado'];
+                $NoCertificado = (string) $attrs['NoCertificado'];
+
+                // ✅ Emisor
+                $emisor = $cfdi->Emisor->attributes();
+                $rfcEmisor = (string) $emisor['Rfc'];
+                $nombreEmisor = (string) $emisor['Nombre'];
+                
+                // ✅ Receptor
+                $receptor = $cfdi->Receptor->attributes();
+                $rfcReceptor = (string) $receptor['Rfc'];
+                $nombreReceptor = (string) $receptor['Nombre'];
+
+                // ✅ UUID - CÓDIGO CORREGIDO
+                $uuid = '';
+                $NoCertificado = '';
+                
+                // Verificar si existe el complemento
+                if (isset($cfdi->Complemento)) {
+                    // Obtener el namespace correcto para el timbre fiscal
+                    $tfdNamespace = isset($namespaces['tfd']) ? $namespaces['tfd'] : 'http://www.sat.gob.mx/TimbreFiscalDigital';
+                    
+                    $complemento = $cfdi->Complemento->children($tfdNamespace);
+                    
+                    // Verificar si existe el TimbreFiscalDigital
+                    if (isset($complemento->TimbreFiscalDigital)) {
+                        $tfdAttributes = $complemento->TimbreFiscalDigital->attributes();
+                        $uuid = (string) $tfdAttributes['UUID'];
+                        $NoCertificado = (string) $tfdAttributes['NoCertificadoSAT'];
+                    }
+                }
+
+       
+
+                $dataConfig = [
+                    "tabla" => "factura",
+                    "editar" => true,
+                    "idEditar" => ['id_registro_pt' => $id_registro_pt]
+                ];
+                $dataInsert = [
+                    'id_registro_pt' => (int) $id_registro_pt,
+                    'version' => $version,
+                    'fecha' => date('Y-m-d H:i:s', strtotime($fecha)),
+                    'total' => $total,
+                    'moneda' => $moneda,
+                    'folio' => $Folio,
+                    'no_certificado' => $NoCertificado, // Usar el del timbre, no del comprobante
+                    'emisor_rfc' => $rfcEmisor,
+                    'emisor_nombre' => $nombreEmisor,
+                    'receptor_rfc' => $rfcReceptor,
+                    'receptor_nombre' => $nombreReceptor,
+                    'uuid' => $uuid,
+                    'fec_reg' => date('Y-m-d H:i:s'),
+                    'usu_reg' => $session->get('id_usuario')
+                ];
+                
+                $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/editarFacturaFIC'];
+                $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+            }
+        }
+        // return false;
     }
    public function procesarXML(array $archivos, $id_registro_pt = null)
     {
@@ -427,6 +570,199 @@ class Agregar extends BaseController
         $data['scripts'] = array('inicio');
         $data['contentView'] = 'personal/vTiketDisenio';
         $this->_renderView($data);
+    }
+    public function guardaEditarFIC()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = "Error|Error al guardar PT";
+        $this->globals = new Mglobal();
+        $data = $this->request->getPost();
+        $archivos = $this->request->getFiles();
+        $response->idReserva = "";
+
+        if ($data['no_consecutivo'] == '') {
+            $response->error = true;
+            $response->respuesta = "Es requerido el No. Concecutivo";
+            return $this->respond($response);
+        }
+        if (($data['direccion_responsable']) == 0) {
+            $response->error = true;
+            $response->respuesta = "Es requerido el Dirección Responsable";
+            return $this->respond($response);
+        }
+        if (isset($data['documentacion_comprobatoria']) && empty($data['documentacion_comprobatoria'])) {
+            $response->error = true;
+            $response->respuesta = "Es requerido el documentacion_comprobatorian";
+            return $this->respond($response);
+        }
+       
+       
+        if (isset($data['concepto_gasto']) && empty($data['concepto_gasto'])) {
+            $response->error = true;
+            $response->respuesta = "Es requerido el concepto gasto";
+            return $this->respond($response);
+        }
+
+        if (isset($data['no_reserva']) && empty($data['no_reserva'])) {
+            $response->error = true;
+            $response->respuesta = "Es requerido el tipo de consumo";
+            return $this->respond($response);
+        }
+        if (isset($data['id_proveedor_banco']) && empty($data['id_proveedor_banco'])) {
+            $response->error = true;
+            $response->respuesta = "Es requerido el banco del proveedor";
+            return $this->respond($response);
+        }
+        if (isset($data['fecha_tramite']) && empty($data['fecha_tramite'])) {
+            $data['fecha_tramite'] = date('Y-m-d');
+        }
+        
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/editarFic'];
+         
+      
+            $insertReserva = [
+                'id_proveedor'       => (int) $data['id_proveedor'],
+                'id_estatus'         => 3,
+                'id_proveedor_banco' => (int) $data['id_proveedor_banco'],
+                'folio'              => 'PT - ' . date('YmdHis') . substr((string) microtime(), 1, 4),
+                'no_reserva'         => $data['no_reserva'],
+                'no_convenio'        => $data['no_convenio'],
+                'total_importe'      => $data['total_importe'],
+                'observaciones'      => 'PAGOS FIC',
+                'usu_act'            => $session->get('id_usuario')
+            ];
+
+            $dataConfig = [
+                "tabla"   => "reserva",
+                "editar"  => true,
+                "idEditar"=> ['id_reserva' => $data['id_reserva']]
+            ];
+            
+            $response = $this->globals->saveTabla($insertReserva, $dataConfig, $dataBitacora);
+       
+            if (!$response->error) {
+                $id_reserva = $response->idRegistro;
+                $insertPresupuesto = [
+                    'id_reserva' => $id_reserva,
+                    'id_proyecto' => 34,
+                    'id_partida' => $data['no_reserva'] == 4327279 ? 10 : 94,
+                    'importe' => $data['total_importe'],
+                    'usu_act' => $session->get('id_usuario')
+
+                ];
+
+                $dataConfig = [
+                    "tabla"   => "presupuesto",
+                    "editar"  => true,
+                    'idEditar'=> ['id_presupuesto' => $id_reserva ]
+
+                ];
+
+                $response = $this->globals->saveTabla($insertPresupuesto, $dataConfig, $dataBitacora);
+
+            }
+            if (!$response->error) {
+                $id_presupuesto = $response->idRegistro;
+                $insertRegistro = [
+                    'id_reserva' => $id_reserva,
+                    'id_proveedor' => $data['id_proveedor'],
+                    'id_direccion_responsable' => 99,
+                    'id_subsecretario' => 2,
+                    'no_consecutivo' => $data['no_consecutivo'],
+                    'tipo_pt' => (int) $data['tipo_pt'],
+                    'fecha_tramite' => $data['fecha_tramite'],
+                    'id_reponsable_solicitud' => 99,
+                    'director_general' => (int) $data['director_generar'],
+                    'secretario' => 18,
+                    'fic' => 1,
+                    'fecha_gasto_inicio' => $data['fecha_gasto_inicio'],
+                    'fecha_gasto_fin' => $data['fecha_gasto_fin'],
+                    'formato_establecido' => ($data['formato_establecido'] == 'SI') ? 1 : 2,
+                    'documentacion_comprobatoria' => (int) $data['documentacion_comprobatoria'],
+                    'evidencia_entrega' => (int) $data['evidencia_entrega'],
+                    'otros' => $data['otros'],
+                    'comision' => $data['comision'],
+                    'clausula_contrato' => $data['clausula_contrato'],
+                    'contrato_convenio' => 2,
+                    'concepto_pago' => $data['concepto_pago'],
+                    'usu_act' => $session->get('id_usuario')
+                ];
+
+                $dataConfig = [
+                    "tabla" => "registro_pt",
+                    "editar" => true,
+                    "idEditar" => ['id_registro_pt' => $data['id_registro_pt']]
+                ];
+
+                $response = $this->globals->saveTabla($insertRegistro, $dataConfig, $dataBitacora);
+         
+            }
+            if (!$response->error) {
+                
+                $id_registro_pt = $response->idRegistro;
+                $archivosXml = [];
+                $archivosPdf = [];
+                $response->idReserva = $id_registro_pt;
+
+                // inicializar arrays
+                $archivosXml = [];
+                $archivosPdf = [];
+
+                // foreach sobre los archivos recibidos
+                foreach ($archivos as $key => $fileEntry) {
+                    // normalizar clave a minúsculas por si acaso
+                    $k = strtolower($key);
+
+                    // Si es un array de UploadedFile (varios archivos), iteramos
+                    if (is_array($fileEntry)) {
+                        foreach ($fileEntry as $singleFile) {
+                            if (! $singleFile) continue;
+                            // comprobar que sea un objeto con getSize (UploadedFileInterface)
+                            $size = method_exists($singleFile, 'getSize') ? $singleFile->getSize() : null;
+
+                            if (strpos($k, 'factura_xml_fic') === 0 && $size > 0) {
+                                $archivosXml[] = $singleFile;
+                            } elseif (strpos($k, 'factura_pdf_fic') === 0 && $size > 0) {
+                                $archivosPdf[] = $singleFile;
+                            }
+                        }
+                    } else {
+                        // caso archivo único
+                        $singleFile = $fileEntry;
+                        if (! $singleFile) continue;
+                        $size = method_exists($singleFile, 'getSize') ? $singleFile->getSize() : null;
+
+                        if (strpos($k, 'factura_xml_fic') === 0 && $size > 0) {
+                            $archivosXml[] = $singleFile;
+                        } elseif (strpos($k, 'factura_pdf_fic') === 0 && $size > 0) {
+                            $archivosPdf[] = $singleFile;
+                        }
+                    }
+                }
+
+ 
+                if (!empty($archivosXml)) {
+                    $datosXML = $this->procesarXMLeditar($archivosXml, $id_registro_pt);
+                } else {
+                    $response->errorXML = true;
+                    $response->respuestaXML = "No se encontraron archivos XML para procesar.";
+                }
+
+                if (!empty($archivosPdf)) {
+                    $datosPDF = $this->procesarPDFeditar($archivosPdf, $id_registro_pt);
+                  
+                } else {
+                    $response->errorPDF = true;
+                    $response->respuestaPDF = "No se encontraron archivos PDF para procesar.";
+                }
+
+            }
+             
+        
+
+        return $this->respond($response);
     }
     public function guardaFIC()
     {

@@ -68,8 +68,8 @@
                                                         class="mdi mdi-check text-success font-18"></i></a> 
                                                 <?php endif; ?>
                                                 <?php if($e->fic==1): ?>
-                                              <!--   <a class="btn btn-outline-info btn-round" href="<?php echo base_url().'index.php/Inicio/EditarFIC/'.$e->id_registro_pt?>"  ><i
-                                                        class="mdi dripicons-pencil text-warning font-18"></i></a>  -->
+                                                <a class="btn btn-outline-info btn-round" href="<?php echo base_url().'index.php/Inicio/EditarFIC/'.$e->id_registro_pt?>"  ><i
+                                                        class="mdi dripicons-pencil text-warning font-18"></i></a> 
                                                 <?php endif; ?>
                                                 <?php if($e->fic!=1): ?>
                                                 <a class="btn btn-outline-info btn-round" href="<?php echo base_url().'index.php/Inicio/EditarPT/'.$e->id_registro_pt?>"  ><i

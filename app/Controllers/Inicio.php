@@ -545,9 +545,20 @@ class Inicio extends BaseController {
         $registro_pt = $globals->getTabla(['tabla' => 'registro_pt', 'where' => ['visible' => 1, 'id_registro_pt' => $idRegistroPT]]);
         if(isset($registro_pt) && !empty($registro_pt)){
             $data['datos'] = $registro_pt->data[0];
-            $data['editar'] = 1;
+            $id_proveedor = $registro_pt->data[0]->id_proveedor;
+            $id_reserva = $registro_pt->data[0]->id_reserva;
+            $banco = $globals->getTabla(['tabla' => 'proveedor_banco', 'where' => ['visible' => 1, 'idproveedor' => $id_proveedor, 'fic' => 1]]);
+            $reserva = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['visible' => 1, 'id_reserva' => $id_reserva]]);
+
+            $data['banco'] = (isset( $banco) && !empty($banco))? $banco->data:'';
+            $data['edita'] = 1;
+            if( isset($reserva->data) && !empty($reserva->data)){
+                $data['reserva'] = $reserva->data[0];
+
+            }
         }
-         $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
+       
+        $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
         $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1]]);
         $cat_subsecretario = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1]]);
         $cat_tipo = $globals->getTabla(['tabla' => 'cat_tipo', 'where' => ['visible' => 1]]);

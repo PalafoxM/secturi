@@ -4655,6 +4655,81 @@ ini.inicio = (function () {
         while (num >= 1024 && i < units.length - 1) { num /= 1024; i++; }
         return `${num.toFixed(1)} ${units[i]}`;
         },
+        formEditarFIC: function(){
+            $("#form_fic_editar").submit(function (e) {
+                e.preventDefault(); 
+                   let valido = true;
+                    let mensajes = [];
+                    const MAX_BYTES = 100 * 1024 * 1024; 
+
+                // Validar solo si se seleccionó algún archivo
+                $("[id^=factura_pdf_fic]").each(function(){
+                    let files = this.files;
+                    if(files.length > 0){ // Solo validar si hay archivos
+                        for (const f of files) {
+                            if (f.size > MAX_BYTES) {
+                                valido = false;
+                                mensajes.push(`"${f.name}" pesa ${ini.inicio.formatBytes(f.size)}; el límite es 500 KB por archivo.`);
+                            }
+                        }
+                    }
+
+                });
+
+                $("[id^=factura_xml_fic]").each(function(){
+                    let files = this.files;
+                    if(files.length > 0){ // Solo validar si hay archivos
+                        // Aquí puedes agregar validaciones específicas para XML si necesitas
+                        for (const f of files) {
+                            if (f.size > MAX_BYTES) {
+                                valido = false;
+                                mensajes.push(`"${f.name}" pesa ${ini.inicio.formatBytes(f.size)}; el límite es 500 KB por archivo.`);
+                            }
+                        }
+                    }
+                });
+
+                if(!valido){
+                    Swal.fire("Atención", "<p>"+mensajes.join("<br>")+"</p>", "warning");
+                    return;
+                }
+
+                var formData = new FormData(this); // Usar FormData en lugar de serialize
+
+               
+                $.ajax({
+                    type: "POST",
+                    url: base_url + "index.php/Agregar/guardaEditarFIC",
+                    data: formData,
+                    processData: false,  // Importante para FormData
+                    contentType: false,  // Importante para FormData
+                    dataType: "json",
+                    success: function (response) {
+                        console.log(response);
+                        if(!response.error){
+                            Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
+                            setTimeout(() => {
+                               // window.location.href = base_url + "index.php/Principal/listadoEstatusPT";
+                                window.location.href = base_url + "index.php/Principal/tablaArchivos/"+response.idReserva+'/FIC';
+                            }, 1500);
+                        }else{
+                            Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
+                        }
+                    },
+                    beforeSend: function (info){
+                         $('#btnGuardaFIC').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                    },
+                    complete: function (info){
+                        $('#btnGuardaFIC').prop('disabled', false).html('Guardar');
+                    },
+                    error: function (response,jqXHR, textStatus, errorThrown) {
+                        var res= JSON.parse(response.responseText);
+                        Swal.fire("Error", '<p> '+ res.message + '</p>');  
+                         $('#btnGuardaFIC').prop('disabled', false).html('Guardar');
+                    }
+                });
+            });
+        },
         formFIC: function(){
             $("#form_fic").submit(function (e) {
                 e.preventDefault(); 
