@@ -2627,7 +2627,7 @@ class Principal extends BaseController
             'tabla' => 'vw_registro_pt',
             'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
         ]);
-        
+     
         $xml = $globals->getTabla([
             'tabla' => 'factura',
             'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
@@ -2691,6 +2691,8 @@ class Principal extends BaseController
          
         if (!empty($registro_pt->data)) {
             $data['registro'] = $registro_pt->data[0];
+            $data['responsable'] = $registro_pt->data[0]->responsable;
+            $data['dsc_puesto'] = $registro_pt->data[0]->dsc_puesto;
             $folio = $globals->getTabla([
                 'tabla' => 'direccion',
                 'where' => ['visible' => 1, 'id_area' => $data['registro']->id_direccion_responsable]
