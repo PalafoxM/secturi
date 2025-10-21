@@ -537,6 +537,44 @@ class Inicio extends BaseController {
         $data['contentView'] = 'secciones/vlistaPuesto';
         $this->_renderView($data);   
     }
+    public function EditarFIC($id_registro_pt = null)
+    {
+        $globals  = new Mglobal;
+        $session = \Config\Services::session();
+        $idRegistroPT = $id_registro_pt;
+        $registro_pt = $globals->getTabla(['tabla' => 'registro_pt', 'where' => ['visible' => 1, 'id_registro_pt' => $idRegistroPT]]);
+        if(isset($registro_pt) && !empty($registro_pt)){
+            $data['datos'] = $registro_pt->data[0];
+            $data['editar'] = 1;
+        }
+         $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
+        $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1]]);
+        $cat_subsecretario = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1]]);
+        $cat_tipo = $globals->getTabla(['tabla' => 'cat_tipo', 'where' => ['visible' => 1]]);
+
+        $usuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->get('id_usuario')]]);
+        $cat_usuario = $globals->getTabla(['tabla' => 'usuario', 'where' => ['visible' => 1]]);
+        $cat_director_general = $globals->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1]]);
+        $cat_opcion = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1]]);
+
+      
+        $data['FIC'] = true;
+        $data['dsc_director_general'] = (!empty($cat_director_general->data)) ? $cat_director_general->data[0]->dsc_director_general : [];
+        $data['cat_area'] = (!empty($cat_area->data)) ? $cat_area->data : [];
+        $data['cat_tipo'] = (!empty($cat_tipo->data)) ? $cat_tipo->data : [];
+        $data['cat_opcion'] = (!empty($cat_opcion->data)) ? $cat_opcion->data : [];
+        $data['secretario'] = (!empty($secretario->data)) ? $secretario->data : [];
+        $data['subsecretario'] = (!empty($cat_subsecretario->data)) ? $cat_subsecretario->data : [];
+        $data['usuario'] = (!empty($usuario->data)) ? $usuario->data[0] : [];
+        $data['cat_usuario'] = (!empty($cat_usuario->data)) ? $cat_usuario->data : [];
+        $data['scripts'] = array('inicio');
+        //die( var_dump( $data['datos'] ) );
+        $data['scripts']     = ['principal', 'inicio'];
+        $data['contentView'] = 'personal/vFormularioEditarFic';
+        $this->_renderView($data);   
+        
+
+    }
     public function listaTiket()
     {
         $session = \Config\Services::session();

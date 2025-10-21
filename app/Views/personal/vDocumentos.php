@@ -496,13 +496,7 @@
                                                                         </div>
                                                                     </a>
                                                                 </li>
-                                                                <li class="dd-item" data-id="2">
-                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Manual_de_Procesos_y_Procedimientos-c3eb.pdf' ?>">
-                                                                        <div class="dd-handle">
-                                                                       Manual de Procesos y Procedimientos
-                                                                        </div>
-                                                                    </a>
-                                                                </li>
+                                                             
                                                                 <li class="dd-item" data-id="2">
                                                                     <a target="_blank" href="<?= base_url().'assets/documentos/Manual_de_Procesos_y_Procedimientos_2024-1086.pdf' ?>">
                                                                         <div class="dd-handle">
@@ -517,13 +511,7 @@
                                                                         </div>
                                                                     </a>
                                                                 </li>
-                                                                <li class="dd-item" data-id="2">
-                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Plan_de_Trabajo_Anual_2022-93b6.pdf' ?>">
-                                                                        <div class="dd-handle">
-                                                                       Plan de Trabajo Anual 2022
-                                                                        </div>
-                                                                    </a>
-                                                                </li>
+                                                             
                                                               
                                                               
                                                             </ol>
