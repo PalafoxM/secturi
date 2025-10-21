@@ -38,13 +38,13 @@
              <?php endif; ?>
         </div>
           <div  style="position:absolute; top:42%; left:60.8%; width:36%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><strong>NO. CUENTA :</strong><?= $registro->no_cuenta ?></span>
+            <span class="proxima "><strong>NO. CUENTA :</strong><?= ($fic)?$registro->no_cuenta: $no_cuenta ?></span>
         </div>
         <div  style="position:absolute; top:43%; left:60.8%; width:36%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><STRONG>BANCO: </STRONG><?= strtoupper($registro->banco); ?></span>
+            <span class="proxima "><STRONG>BANCO: </STRONG><?= ($fic)?$registro->banco:$banco ?></span>
         </div>
          <div  style="position:absolute; top:44.3%; left:60.8%; width:36%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><STRONG>CLABE:</STRONG> <?= $registro->clabe ?></span>
+            <span class="proxima "><STRONG>CLABE:</STRONG> <?= ($fic)?$registro->clabe:$clabe ?></span>
         </div>
          <div  style="position:absolute; top:45.3%; left:60.8%; width:35%; background-color:white; font-size: 12px;  height:15px;">
             <span class="proxima "></span>
