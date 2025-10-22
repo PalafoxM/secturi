@@ -362,19 +362,19 @@
             });
         });
      function formatearSimple(input) {
-    // Limpiar y convertir
-    let valor = input.value.replace(/[^\d.]/g, '');
-    let numero = parseFloat(valor);
-    
-    if (!isNaN(numero)) {
-        // Formatear con separadores de miles y 2 decimales
-        input.value = numero.toLocaleString('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        });
-    } else {
-        input.value = '0.00';
-    }
-}
+            // Limpiar y convertir
+            let valor = input.value.replace(/[^\d.]/g, '');
+            let numero = parseFloat(valor);
+            
+            if (!isNaN(numero)) {
+                // Formatear con separadores de miles y 2 decimales
+                input.value = numero.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            } else {
+                input.value = '0.00';
+            }
+        }
 
         </script>

@@ -1316,40 +1316,48 @@ class Agregar extends BaseController
             $response->respuesta = "Es requerido el no_reserva";
             return $this->respond($response);
         }
+        if (isset($data['total_importe']) && empty($data['total_importe'])) {
+            $response->error = true;
+            $response->respuesta = "Es requerido el total_importe";
+            return $this->respond($response);
+        }
+
           $consecutivo = $this->globals->getTabla(['tabla' => 'consecutivo', 'where' => ['visible' => 1, 'id_responsable' => $data['id_reponsable_solicitud'] ], 'orderBy' => 'id_consecutivo DESC']);          
           $conse =  (isset($consecutivo->data) && !empty($consecutivo->data))?$consecutivo->data[0]->no_consecutivo:'';
         
           $no_consecutivo = $conse + 1;
+          $this->globals->saveTabla(['no_consecutivo' => $no_consecutivo, 'id_responsable' => $data['id_reponsable_solicitud'] ], [ 'tabla' => 'consecutivo', 'editar' => false ], ['id_user' => $session->get('id_usuario'), "script" => "estatus.Reserva"]);
         
         //var_dump($data);
         //die();
 
         $dataInsert = [
-            'id_reserva' => (int) $data['id_reserva'],
+            'id_reserva'               => (int) $data['id_reserva'],
             'id_direccion_responsable' => $data['direccion_responsable'],
-            'tipo_pt' => $data['tipo_pt'],
-            'no_consecutivo' => $no_consecutivo,
-            'id_proveedor' => $data['id_proveedor'],
-            'fecha_tramite' => $data['fecha_tramite'],
-            'id_reponsable_solicitud' => (int) $data['id_reponsable_solicitud'],
-            'director_general' => 1,
-            'secretario' => $data['secretario'],
-            'id_subsecretario' => $data['id_subsecretario'],
-            'cuenta_bancaria' => $data['cuenta_bancaria'],
-            'fecha_gasto_inicio' => $data['fecha_gasto_inicio'],
-            'fecha_gasto_fin' => $data['fecha_gasto_fin'],
-            'formato_establecido' => ($data['formato_establecido'] == 'SI') ? 1 : 2,
+            'tipo_pt'                  => $data['tipo_pt'],
+            'no_consecutivo'           => $no_consecutivo,
+            'id_proveedor'             => $data['id_proveedor'],
+            'fecha_tramite'            => $data['fecha_tramite'],
+            'id_reponsable_solicitud'  => (int) $data['id_reponsable_solicitud'],
+            'director_general'         => 1,
+            'importe'                  => $data['total_importe'],
+            'secretario'               => $data['secretario'],
+            'id_subsecretario'         => $data['id_subsecretario'],
+            'cuenta_bancaria'          => $data['cuenta_bancaria'],
+            'fecha_gasto_inicio'       => $data['fecha_gasto_inicio'],
+            'fecha_gasto_fin'          => $data['fecha_gasto_fin'],
+            'formato_establecido'      => ($data['formato_establecido'] == 'SI') ? 1 : 2,
             'documentacion_comprobatoria' => $data['documentacion_comprobatoria'],
-            'poliza' => ($data['poliza'] == 'SI') ? 1 : 2,
-            'formato_conformidad' => ($data['formato_conformidad'] == 'SI') ? 1 : 2,
-            'contrato_convenio' => $data['contrato_convenio'],
-            'documentacion_requerida' => $data['documentacion_requerida'],
-            'evidencia_entrega' => $data['evidencia_entrega'],
-            'otros' => $data['otros'],
-            'clausula_contrato' => $data['clausula_contrato'],
-            'concepto_pago' => $data['concepto_pago'],
-            'comision' => $data['comision'],
-            'no_reserva' => $data['no_reserva']
+            'poliza'                   => ($data['poliza'] == 'SI') ? 1 : 2,
+            'formato_conformidad'      => ($data['formato_conformidad'] == 'SI') ? 1 : 2,
+            'contrato_convenio'        => $data['contrato_convenio'],
+            'documentacion_requerida'  => $data['documentacion_requerida'],
+            'evidencia_entrega'        => $data['evidencia_entrega'],
+            'otros'                    => $data['otros'],
+            'clausula_contrato'        => $data['clausula_contrato'],
+            'concepto_pago'            => $data['concepto_pago'],
+            'comision'                 => $data['comision'],
+            'no_reserva'               => $data['no_reserva']
         ];
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaTurno'];
         if ($data['editar'] == 0) {
@@ -1463,18 +1471,18 @@ class Agregar extends BaseController
 
 
        
-          $consecutivo = $this->globals->getTabla(['tabla' => 'consecutivo', 'where' => ['visible' => 1, 'id_responsable' => $datos->id_reponsable_solicitud], 'orderBy' => 'id_consecutivo DESC']);          
+         /*  $consecutivo = $this->globals->getTabla(['tabla' => 'consecutivo', 'where' => ['visible' => 1, 'id_responsable' => $datos->id_reponsable_solicitud], 'orderBy' => 'id_consecutivo DESC']);          
           $conse =  (isset($consecutivo->data) && !empty($consecutivo->data))?$consecutivo->data[0]->no_consecutivo:'';
         
           $no_consecutivo = $conse + 1;
         
          $this->globals->saveTabla(['no_consecutivo' => $no_consecutivo ], ['tabla' => 'consecutivo', 'editar' => false], ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaReserva']);
-
+ */
         $dataInsert = [
             'id_reserva' => (int) $datos->id_reserva,
             'id_direccion_responsable' => $datos->id_direccion_responsable,
             'tipo_pt' => $datos->tipo_pt,
-            'no_consecutivo' => $no_consecutivo,
+            'no_consecutivo' => $data['no_consecutivo'],
             'id_proveedor' => $datos->id_proveedor,
             'fecha_tramite' => date('Y-m-d', strtotime($data['fecha_tramite'])),
             'id_reponsable_solicitud' => (int) $datos->id_reponsable_solicitud,

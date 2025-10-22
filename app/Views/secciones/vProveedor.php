@@ -306,18 +306,29 @@
                                                     </div>
 
                                                     <div class="form-row">
-                                                        <div class="col-md-6 mb-3">
+                                                        <div class="col-md-4 mb-3">
                                                             <p class="text-muted mb-3">Factura PDF (Máx 100MB)</p>
                                                             <input id="factura_pdf_input_<?= $i; ?>"  type="file" name="factura_pdf_<?= $i; ?>[]" class="dropify" multiple accept=".pdf" />   
                                                         </div>
-                                                        <div class="col-md-6 mb-3">
+                                                        <div class="col-md-4 mb-3">
                                                           
                                                             <p class="text-muted mb-3">Factura XML (Máx 100MB)</p>
                                                             <input id="factura_xml_input_<?= $i; ?>" type="file" name="factura_xml_<?= $i; ?>[]" multiple class="dropify"  accept=".xml">
                                                         </div>
+                                                        <div class="col-md-4 mb-3">
+                                                            <p class="text-muted mb-3">Importe</p>
+                                                            <input id="importe[]" type="text" name="importe[]" class="form-control" placeholder="importe" >
+                                                        </div>
                                                     </div>
                                                 <?php endforeach; ?>
-                                                    
+                                                    <div class="form-row">
+                                                        <div class="col-md-4 mb-3"></div>
+                                                        <div class="col-md-4 mb-3"></div>
+                                                        <div class="col-md-4 mb-3">
+                                                            <p class="text-muted mb-3">Total</p>
+                                                            <input id="total_importe" type="text" name="total_importe" class="form-control" placeholder="0,000.00" readonly>
+                                                        </div>
+                                                    </div>
                                         
 
                                             <a class="btn btn-gradient-danger" style="color:white" onclick="window.history.back()">Atrás</a>
@@ -404,5 +415,24 @@
                 }
             });
         });
+                    // Escuchar cambios en cualquier input con clase 'input-importe'
+        $(document).on('input', 'input[name="importe[]"]', function() {
+            calcularTotal();
+        });
+        function calcularTotal() {
+            let total = 0;
+            
+            $('input[name="importe[]"]').each(function() {
+                // Elimina comas y convierte a número
+                const valor = parseFloat($(this).val().replace(/,/g, '')) || 0;
+                total += valor;
+            });
+            
+            // Formatea el total con separadores de miles
+            $('#total_importe').val(formatNumber(total.toFixed(2)));
+        }
+        function formatNumber(num) {
+            return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+        }
 
         </script>

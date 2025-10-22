@@ -2672,27 +2672,13 @@ class Principal extends BaseController
 
         $instrumento = (isset($pdf[0]->instrumento) && !empty($pdf[0]->instrumento)) ? $pdf[0]->instrumento : '';
         $id_reserva = (isset($pdf[0]->id_reserva) && !empty($pdf[0]->id_reserva)) ? $pdf[0]->id_reserva : '';
-        if (!empty($id_reserva)) {
-            $reserva = $globals->getTabla([
-                'tabla' => 'vw_reserva',
-                'where' => ['visible' => 1, 'id_reserva' => $id_reserva]
-            ])->data;
-            $data['reserva'] = $reserva[0];
-            $importe_str = $reserva[0]->total_importe;
-            $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
-            $data['numero_texto'] = $this->numeroEnLetras($importe_float);
-            $data['es4000'] = false;
-            if ($reserva[0]->partida >= '4000' && $reserva[0]->partida < '5000') {
-                $data['es4000'] = true;
-            }
-
-
-        }
-
+       
+         $importe = "";
         if (!empty($registro_pt->data)) {
             $data['registro'] = $registro_pt->data[0];
             $data['responsable'] = $registro_pt->data[0]->responsable;
             $data['dsc_puesto'] = $registro_pt->data[0]->dsc_puesto;
+            $importe = $registro_pt->data[0]->importe;
             $folio = $globals->getTabla([
                 'tabla' => 'direccion',
                 'where' => ['visible' => 1, 'id_area' => $data['registro']->id_direccion_responsable]
@@ -2715,6 +2701,24 @@ class Principal extends BaseController
             echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
             die();
         }
+         if (!empty($id_reserva)) {
+            $reserva = $globals->getTabla([
+                'tabla' => 'vw_reserva',
+                'where' => ['visible' => 1, 'id_reserva' => $id_reserva]
+            ])->data;
+            $data['reserva'] = $reserva[0];
+           
+            $importe_str = ($data['fic'])?$reserva[0]->total_importe:$importe;
+            $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
+            $data['numero_texto'] = $this->numeroEnLetras($importe_float);
+            $data['es4000'] = false;
+            if ($reserva[0]->partida >= '4000' && $reserva[0]->partida < '5000') {
+                $data['es4000'] = true;
+            }
+
+
+        }
+  
         $uudi = $globals->getTabla(['tabla' => 'factura', 'where' => ['id_registro_pt' => $id_registro_pt, 'visible' => 1]]);
 
         if (isset($uudi->data) && !empty($uudi->data)) {
@@ -3617,11 +3621,13 @@ class Principal extends BaseController
         //die();
         $data['GO'] = false;
         $data['fic'] = false;
+        $importe = "";
         if (!empty($registro_pt->data)) {
             $registro = $registro_pt->data[0];
             $id_reserva = $registro_pt->data[0]->id_reserva;
             $no_consecutivo = $registro_pt->data[0]->no_consecutivo;
             $id_proveedor_banco = $registro_pt->data[0]->id_proveedor_banco; 
+            $importe = $registro_pt->data[0]->importe; 
             $banco = $globals->getTabla([
                 'tabla' => 'proveedor_banco',
                 'where' => ['visible' => 1, 'id_proveedor_banco' => $id_proveedor_banco]
@@ -3666,18 +3672,8 @@ class Principal extends BaseController
                 'where' => ['visible' => 1, 'id_reserva' => $id_reserva]
             ]);
 
-            if (!empty($reserva->data)) {
-                $data['reserva'] = $reserva->data;
-                $data['no_convenio'] = $reserva->data[0]->no_convenio;
-                $importe_str = $reserva->data[0]->total_importe;
-                $usu_reg = $reserva->data[0]->usu_reg;
-                $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
-                $data['numero_texto'] = $this->numeroEnLetras($importe_float);
-            }
-            $data['nombre_registro'] = $globals->getTabla([
-                'tabla' => 'vw_usuario',
-                'where' => ['id_usuario' => $usu_reg]
-            ])->data[0];
+          
+           
             if (strlen($no_consecutivo) == 2) {
                 $zero = '0';
             } elseif (strlen($no_consecutivo) == 1) {
@@ -3704,6 +3700,18 @@ class Principal extends BaseController
             echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
             die();
         }
+          if (!empty($reserva->data)) {
+                $data['reserva'] = $reserva->data;
+                $data['no_convenio'] = $reserva->data[0]->no_convenio;
+                $importe_str = ( $data['fic'] )?$reserva->data[0]->total_importe:$importe;
+                $usu_reg = $reserva->data[0]->usu_reg;
+                $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
+                $data['numero_texto'] = $this->numeroEnLetras($importe_float);
+            }
+           $data['nombre_registro'] = $globals->getTabla([
+                'tabla' => 'vw_usuario',
+                'where' => ['id_usuario' => $usu_reg]
+            ])->data[0];
 
         $subsecretario = $area = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1, 'id_subsecretario' => $registro_pt->data[0]->id_subsecretario]]);
         // $usu_sub = $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $subsecretario->data[0]->id_usuario]]);
