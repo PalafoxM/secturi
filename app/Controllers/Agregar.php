@@ -1440,59 +1440,60 @@ class Agregar extends BaseController
             $response->respuesta = "Es requerido el documentacion_comprobatorian";
             return $this->respond($response);
         }
-      
-          $consecutivo = $this->globals->getTabla(['tabla' => 'consecutivo', 'where' => ['visible' => 1, 'id_responsable' => $data['id_reponsable_solicitud'] ], 'orderBy' => 'id_consecutivo DESC']);          
+
+          $registro_pt = $this->globals->getTabla([
+            'tabla' => 'registro_pt', 
+            'where' => ['visible' => 1, 'id_registro_pt' => $data['id_registro_pt'] ]
+            ]);    
+        
+        if(isset($registro_pt->data) && !empty($registro_pt->data)) {
+            $datos = $registro_pt->data[0];
+        }
+
+
+       
+          $consecutivo = $this->globals->getTabla(['tabla' => 'consecutivo', 'where' => ['visible' => 1, 'id_responsable' => $datos->id_reponsable_solicitud], 'orderBy' => 'id_consecutivo DESC']);          
           $conse =  (isset($consecutivo->data) && !empty($consecutivo->data))?$consecutivo->data[0]->no_consecutivo:'';
         
           $no_consecutivo = $conse + 1;
         
-        //var_dump($data);
-        //die();
+         $this->globals->saveTabla(['no_consecutivo' => $no_consecutivo ], ['tabla' => 'consecutivo', 'editar' => false], ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaReserva']);
 
         $dataInsert = [
-            'id_reserva' => (int) $data['id_reserva'],
-            'id_direccion_responsable' => $data['direccion_responsable'],
-            'tipo_pt' => $data['tipo_pt'],
+            'id_reserva' => (int) $datos->id_reserva,
+            'id_direccion_responsable' => $datos->id_direccion_responsable,
+            'tipo_pt' => $datos->tipo_pt,
             'no_consecutivo' => $no_consecutivo,
-            'id_proveedor' => $data['id_proveedor'],
-            'fecha_tramite' => $data['fecha_tramite'],
-            'id_reponsable_solicitud' => (int) $data['id_reponsable_solicitud'],
-            'director_general' => 1,
-            'secretario' => $data['secretario'],
-            'id_subsecretario' => $data['id_subsecretario'],
+            'id_proveedor' => $datos->id_proveedor,
+            'fecha_tramite' => date('Y-m-d', strtotime($data['fecha_tramite'])),
+            'id_reponsable_solicitud' => (int) $datos->id_reponsable_solicitud,
+            'director_general' => $datos->director_general,
+            'secretario' => $datos->secretario,
+            'id_subsecretario' => $datos->id_subsecretario,
             'cuenta_bancaria' => $data['cuenta_bancaria'],
-            'fecha_gasto_inicio' => $data['fecha_gasto_inicio'],
-            'fecha_gasto_fin' => $data['fecha_gasto_fin'],
-            'formato_establecido' => ($data['formato_establecido'] == 'SI') ? 1 : 2,
-            'documentacion_comprobatoria' => $data['documentacion_comprobatoria'],
-            'poliza' => ($data['poliza'] == 'SI') ? 1 : 2,
-            'formato_conformidad' => ($data['formato_conformidad'] == 'SI') ? 1 : 2,
-            'contrato_convenio' => $data['contrato_convenio'],
-            'documentacion_requerida' => $data['documentacion_requerida'],
-            'evidencia_entrega' => $data['evidencia_entrega'],
-            'otros' => $data['otros'],
-            'clausula_contrato' => $data['clausula_contrato'],
-            'concepto_pago' => $data['concepto_pago'],
-            'comision' => $data['comision'],
-            'no_reserva' => $data['no_reserva']
+            'importe' => $data['importe'],
+            'fecha_gasto_inicio' => date('Y-m-d', strtotime($data['fecha_gasto_inicio'])),
+            'fecha_gasto_fin' => date('Y-m-d', strtotime($data['fecha_gasto_fin'])),
+            'formato_establecido' => $datos->formato_establecido,
+            'documentacion_comprobatoria' => $datos->documentacion_comprobatoria,
+            'poliza' => $datos->poliza,
+            'formato_conformidad' => $datos->formato_conformidad,
+            'contrato_convenio' => $datos->contrato_convenio,
+            'documentacion_requerida' => $datos->documentacion_requerida,
+            'evidencia_entrega' => $datos->evidencia_entrega,
+            'otros' => $datos->otros,
+            'clausula_contrato' => $datos->clausula_contrato,
+            'concepto_pago' => $datos->concepto_pago,
+            'comision' => $datos->comision,
+            'no_reserva' => $datos->no_reserva,
+            'usu_reg' => $session->get('id_usuario'),
+            'fec_reg' => date('Y-m-d H:i:s'),
         ];
-        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaTurno'];
-        if ($data['editar'] == 0) {
-            $dataInsert['usu_reg'] = $session->get('id_usuario');
-            $dataInsert['fec_reg'] = date('Y-m-d H:i:s');
-            $dataConfig = [
-                "tabla" => "registro_pt",
-                "editar" => false
-            ];
-        } else {
-            $dataConfig = [
-                "tabla" => "registro_pt",
-                "editar" => true,
-                'idEditar' => ['id_registro_pt' => $data['id_registro_pt']]
-            ];
-            $dataInsert['usu_act'] = $session->get('id_usuario');
-        }
-
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaReserva'];
+        $dataConfig = [
+            "tabla" => "registro_pt",
+            "editar" => false
+        ];
 
         $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
 
@@ -1502,7 +1503,7 @@ class Agregar extends BaseController
             $archivosPdf = [];
             $periodo = [];
             $response->idRegistro = $response->idRegistro;
-            $this->cambiarStatusPT($data['id_reserva']);
+          
             foreach ($data as $key => $p) {
                 if (strpos($key, 'encabezado') === 0) {
                     $index = str_replace('encabezado', '', $key); // ej. encabezado1 → 1

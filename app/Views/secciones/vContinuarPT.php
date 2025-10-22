@@ -257,16 +257,22 @@
                                                     </div>
 
                                                     <div class="form-row">
-                                                        <div class="col-md-6 mb-3">
+                                                        <div class="col-md-4 mb-3">
                                                             <p class="text-muted mb-3">Factura PDF (Máx 100MB)</p>
                                                             <input id="factura_pdf_input_<?= $i; ?>"  type="file" name="factura_pdf_<?= $i; ?>[]" class="dropify" multiple accept=".pdf" />   
                                                         </div>
-                                                        <div class="col-md-6 mb-3">
+                                                        <div class="col-md-4 mb-3">
                                                           
                                                             <p class="text-muted mb-3">Factura XML (Máx 100MB)</p>
                                                             <input id="factura_xml_input_<?= $i; ?>" type="file" name="factura_xml_<?= $i; ?>[]" multiple class="dropify"  accept=".xml">
                                                         </div>
+                                                        <div class="col-md-4 mb-3">
+                                                          
+                                                            <p class="text-muted mb-3">Importe</p>
+                                                    <input class="form-control" type="text" id="importe" name="importe" placeholder="0,000.00" onblur="formatearSimple(this)">
+                                                        </div>
                                                     </div>
+                                                    
                                                 <?php endforeach; ?>
                                                     
                                         
@@ -355,5 +361,20 @@
                 }
             });
         });
+     function formatearSimple(input) {
+    // Limpiar y convertir
+    let valor = input.value.replace(/[^\d.]/g, '');
+    let numero = parseFloat(valor);
+    
+    if (!isNaN(numero)) {
+        // Formatear con separadores de miles y 2 decimales
+        input.value = numero.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    } else {
+        input.value = '0.00';
+    }
+}
 
         </script>
