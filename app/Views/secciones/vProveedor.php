@@ -40,6 +40,7 @@
                                         <?php endif; ?>
                                        <div class="form-row">
                                             <!-- Dirección Responsable -->
+                                             <?php if($editar != 1): ?>
                                             <div class="col-md-4 mb-3">
                                                 <label for="direccion_responsable">Dirección Responsable <span class="text-danger">*</span></label>
                                                 <select class="form-control" id="direccion_responsable" name="direccion_responsable" required>
@@ -49,10 +50,20 @@
                                                     </option>
                                                     <?php endforeach; ?>
                                                 </select>
-                                                <div class="invalid-feedback">
-                                                    Por favor ingrese la dirección responsable
-                                                </div>
                                             </div><!--end col-->
+                                             <?php endif; ?>
+                                             <?php if($editar == 1): ?>
+                                            <div class="col-md-4 mb-3">
+                                                <label for="direccion_responsable">Dirección Responsable <span class="text-danger">*</span></label>
+                                                <select class="form-control" id="direccion_responsable" name="direccion_responsable" required>
+                                                    <?php foreach($cat_area as $a): ?>
+                                                    <option value="<?=$a->id_area?>" <?php echo ($a->id_area == $registro_pt->id_direccion_responsable) ? 'selected' : ''; ?>>
+                                                        <?=$a->dsc_area?>
+                                                    </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div><!--end col-->
+                                             <?php endif; ?>
                                             
                                             <!-- Tipo de PT -->
                                             <div class="col-md-4 mb-3">
@@ -111,8 +122,8 @@
                                                 <select type="text" class="form-control" id="secretario"  name="secretario">
                                                             <option value="0" selected >Seleccione una opcion</option>
                                                     <?php foreach($secretario as $s): ?>
-                                                        <?php if(isset($registro_pt->secretario) && !empty($registro_pt->secretario)){  ?>
-                                                        <option value="<?= $s->id_secretario?>" <?= ($s->id_secretario == $registro_pt->secretario)?'selected':'' ?> ><?= $s->dsc_secretario?></option>
+                                                        <?php if(isset($registro_pt->id_secretario) && !empty($registro_pt->id_secretario)){  ?>
+                                                        <option value="<?= $s->id_secretario?>" <?= ($s->id_secretario == $registro_pt->id_secretario)?'selected':'' ?> ><?= $s->dsc_secretario?></option>
                                                          <?php }else{ ?>
                                                               <option value="<?= $s->id_secretario?>" ><?= $s->dsc_secretario?></option>
                                                          <?php } ?>
@@ -125,7 +136,7 @@
                                                             <option value="0" selected >Seleccione una opcion</option>
                                                     <?php foreach($cat_subsecretario as $s): ?>
                                                         <?php if(isset($registro_pt->id_subsecretario) && !empty($registro_pt->id_subsecretario)){  ?>
-                                                        <option value="<?= $s->id_subsecretario?>" <?= ($s->id_subsecretario == $registro_pt->id_subsecretario)?'selected':'' ?> ><?= $s->dsc_secretario?></option>
+                                                        <option value="<?= $s->id_subsecretario?>" <?= ($s->id_subsecretario == $registro_pt->id_subsecretario)?'selected':'' ?> ><?= $s->dsc_subsecretario?></option>
                                                          <?php }else{ ?>
                                                               <option value="<?= $s->id_subsecretario?>" ><?= $s->dsc_subsecretario?></option>
                                                          <?php } ?>
@@ -215,7 +226,7 @@
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="otros">Otros</label>
-                                                <input type="text" class="form-control" id="otros"  name="otros" >
+                                                <input type="text" class="form-control" id="otros"  name="otros"  value="<?= (isset($registro_pt->otros))?$registro_pt->otros:''?>">
                                                 <div class="invalid-feedback">
                                                     Please provide a valid state.
                                                 </div>
@@ -253,12 +264,14 @@
                                                 </div>
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
-                                              
+                                                <label for="no_reserva">No. Consecutivo.</label>
+                                                <input type="text" class="form-control" autocomplete="off" id="no_reserva" name="no_reserva"  value="<?= $consecutivo ?>" readonly>
                                             </div><!--end col-->
+                                            
                                         </div><!--end form-row-->
                                         
                                        
-                                           <?php
+                                       <?php
                                                 $partidas_mostradas = [];
                                                 foreach($presupuesto as $i => $p):
                                                     // Evita duplicados por id_partida
@@ -266,12 +279,15 @@
                                                         continue;
                                                     }
                                                     $partidas_mostradas[] = $p->id_partida;
+
+                                                    // Generamos un ID único para la sección de factura
+                                                    $section_id = "factura-section-" . $i;
                                                 ?>
-                                                    <p class="text-muted mb-4 text-center">Agregar Factura PT.</p>
+                                                    <p class="text-muted mb-4 text-center">Agregar Factura PT.
+                                                        
+                                                    </p>
                                                     <hr>
-                                                    <div class="form-row"> <!-- presupuesto -->
-                                                        <!-- Partida y Factura PDF -->
-                                                        <div class="col-md-4 mb-3">
+                                                    <div class="form-row"> <div class="col-md-4 mb-3">
                                                             <label for="partida_<?= $i ?>">Partida<span style="color:red;">*</span></label>
                                                             <select class="form-control" id="partida_<?= $i ?>" name="partida[]" disabled>
                                                                 <?php foreach($cat_partida as $o): ?>
@@ -282,42 +298,37 @@
                                                             </select>
                                                         </div>
 
-                                                        <!-- Encabezado y XML -->
-                                                        <div class="col-md-4 mb-3">
+                                                        <div class="col-md-6 mb-3">
                                                             <label for="encabezado_<?= $i ?>">Encabezado<span style="color:red;">*</span></label>
                                                             <input type="text" class="form-control" autocomplete="off" id="encabezado_<?= $i ?>" name="encabezado[]" value="<?= (isset($p->encabezado) && !empty($p->encabezado)?$p->encabezado:'') ?>" >
                                                         </div>
-
-                                                        <!-- Periodo -->
                                                         <div class="col-md-2 mb-3">
-                                                            <label for="periodo_inicio<?= $i ?>">Inicio<span style="color:red;">*</span></label>
-                                                            <div class="input-group">                                            
-                                                                <input type="date" class="form-control"  id="periodo_inicio<?= $i ?>" name="periodo_inicio[]">
-                                                                
+                                                            <div class="checkbox checkbox-primary">
+                                                                <input id="checkbox_<?= $i ?>" type="checkbox" name="checkbox_<?= $i ?>" 
+                                                                    class="toggle-factura-section" data-target="#<?= $section_id ?>">
+                                                                <label for="checkbox_<?= $i ?>">
+                                                                    Pagar en otro periodo
+                                                                </label>
                                                             </div>
                                                         </div>
-                                                         <div class="col-md-2 mb-3">
-                                                            <label for="periodo_fin<?= $i ?>">Termino<span style="color:red;">*</span></label>
-                                                            <div class="input-group">                                            
-                                                                <input type="date" class="form-control"  id="periodo_fin<?= $i ?>" name="periodo_fin[]">
-                                                                
-                                                            </div>
-                                                        </div>
+
                                                     </div>
 
-                                                    <div class="form-row">
-                                                        <div class="col-md-4 mb-3">
-                                                            <p class="text-muted mb-3">Factura PDF (Máx 100MB)</p>
-                                                            <input id="factura_pdf_input_<?= $i; ?>"  type="file" name="factura_pdf_<?= $i; ?>[]" class="dropify" multiple accept=".pdf" />   
-                                                        </div>
-                                                        <div class="col-md-4 mb-3">
-                                                          
-                                                            <p class="text-muted mb-3">Factura XML (Máx 100MB)</p>
-                                                            <input id="factura_xml_input_<?= $i; ?>" type="file" name="factura_xml_<?= $i; ?>[]" multiple class="dropify"  accept=".xml">
-                                                        </div>
-                                                        <div class="col-md-4 mb-3">
-                                                            <p class="text-muted mb-3">Importe</p>
-                                                            <input id="importe[]" type="text" name="importe[]" class="form-control" placeholder="importe" >
+                                                    <div id="<?= $section_id ?>">
+                                                        <div class="form-row">
+                                                            <div class="col-md-4 mb-3">
+                                                                <p class="text-muted mb-3">Factura PDF (Máx 100MB)</p>
+                                                                <input id="factura_pdf_input_<?= $i; ?>"  type="file" name="factura_pdf_<?= $i; ?>[]" class="dropify" multiple accept=".pdf" />   
+                                                            </div>
+                                                            <div class="col-md-4 mb-3">
+                                                                
+                                                                <p class="text-muted mb-3">Factura XML (Máx 100MB)</p>
+                                                                <input id="factura_xml_input_<?= $i; ?>" type="file" name="factura_xml_<?= $i; ?>[]" multiple class="dropify"  accept=".xml">
+                                                            </div>
+                                                            <div class="col-md-4 mb-3">
+                                                                <p class="text-muted mb-3">Importe</p>
+                                                                <input id="importe[]" type="text" name="importe[]" class="form-control" placeholder="importe"  value="<?= (isset($registro_pt->importe))?$registro_pt->importe:'' ?>" >
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 <?php endforeach; ?>
@@ -326,7 +337,7 @@
                                                         <div class="col-md-4 mb-3"></div>
                                                         <div class="col-md-4 mb-3">
                                                             <p class="text-muted mb-3">Total</p>
-                                                            <input id="total_importe" type="text" name="total_importe" class="form-control" placeholder="0,000.00" readonly>
+                                                            <input id="total_importe" type="text" name="total_importe" class="form-control" placeholder="0,000.00" value="<?= (isset($registro_pt->importe))?$registro_pt->importe:'' ?>" readonly>
                                                         </div>
                                                     </div>
                                         
@@ -434,5 +445,38 @@
         function formatNumber(num) {
             return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
         }
+   
+        $(document).ready(function() {
+        
+        // Función para actualizar la visibilidad de la sección de factura
+        function actualizarVisibilidadFactura(checkbox) {
+            // Obtiene el selector del data-target (ej: "#factura-section-0")
+            var targetSelector = $(checkbox).data('target');
+            var $targetSection = $(targetSelector);
+             var $encabezadoInput = $(checkbox).closest('.form-row').find('input[name="encabezado[]"]');
+            // Si el checkbox está MARCADO ("No Agregar Factura")...
+            if ($(checkbox).is(':checked')) {
+                $targetSection.hide(); // ...oculta la sección
+                $encabezadoInput.prop('readonly', true); 
+            } else {
+                $targetSection.show(); // ...muestra la sección
+                $encabezadoInput.prop('readonly', false);
+            }
+        }
+      
+        // 1. Ejecuta la función para cada checkbox cuando la página carga
+        //    (Esto oculta las secciones de los checkboxes que ya vienen marcados)
+        $('.toggle-factura-section').each(function() {
+            actualizarVisibilidadFactura(this);
+        });
+
+        // 2. Asigna el evento 'change' a todos los checkboxes con esa clase
+        //    Usamos 'on()' para que funcione incluso si se añaden filas dinámicamente
+        $(document).on('change', '.toggle-factura-section', function() {
+            actualizarVisibilidadFactura(this);
+        });
+
+    });
+
 
         </script>

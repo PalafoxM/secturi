@@ -67,6 +67,7 @@
         <?php $i = $i + 1.5; ?>
         <?php endforeach; ?>
          <?php $i = 34;  ?>
+         <?php if($fic): ?>
         <?php foreach($reserva as $r): ?>
               <div style="position:absolute; text-align:center; top:<?=$i?>%; left:46.4%; width:13%; background-color:white; font-size:10px; height:12px; line-height:12px;">
                     <span class="proxima">
@@ -83,6 +84,25 @@
                 </div>
             <?php $i += 1.5; ?>
         <?php endforeach; ?>
+        <?php endif; ?>
+         <?php if(!$fic): ?>
+        <?php foreach($total as $r): ?>
+              <div style="position:absolute; text-align:center; top:<?=$i?>%; left:46.4%; width:13%; background-color:white; font-size:10px; height:12px; line-height:12px;">
+                    <span class="proxima">
+                        <?php 
+                        $importe = $r->importe;
+                        if (is_numeric($importe)) {
+                            echo '$' . number_format(floatval($importe), 2);
+                        } else {
+                            $limpio = preg_replace('/[^\d\.\-]/', '', (string)$importe);
+                            echo '$' . (is_numeric($limpio) ? number_format(floatval($limpio), 2) : '0.00');
+                        }
+                        ?>
+                    </span>
+                </div>
+            <?php $i += 1.5; ?>
+        <?php endforeach; ?>
+        <?php endif; ?>
         <div style="position:absolute; text-align:right; top:34%; left:2.8%; width:12%; background-color:white; font-size: 12px;  height:25px;">
             <span><?= $uuid; ?></span>
         </div>

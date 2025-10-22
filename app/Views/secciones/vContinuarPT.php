@@ -269,11 +269,19 @@
                                                         <div class="col-md-4 mb-3">
                                                           
                                                             <p class="text-muted mb-3">Importe</p>
-                                                    <input class="form-control" type="text" id="importe" name="importe" placeholder="0,000.00" onblur="formatearSimple(this)">
+                                                            <input id="importe[]" type="text" name="importe[]" class="form-control" placeholder="importe" autocomplete="off" >
                                                         </div>
                                                     </div>
                                                     
                                                 <?php endforeach; ?>
+                                                 <div class="form-row">
+                                                        <div class="col-md-4 mb-3"></div>
+                                                        <div class="col-md-4 mb-3"></div>
+                                                        <div class="col-md-4 mb-3">
+                                                            <p class="text-muted mb-3">Total</p>
+                                                            <input id="total_importe" type="text" name="total_importe" class="form-control" placeholder="0,000.00" readonly>
+                                                        </div>
+                                                    </div>
                                                     
                                         
 
@@ -361,20 +369,23 @@
                 }
             });
         });
-     function formatearSimple(input) {
-            // Limpiar y convertir
-            let valor = input.value.replace(/[^\d.]/g, '');
-            let numero = parseFloat(valor);
+      $(document).on('input', 'input[name="importe[]"]', function() {
+            calcularTotal();
+        });
+        function calcularTotal() {
+            let total = 0;
             
-            if (!isNaN(numero)) {
-                // Formatear con separadores de miles y 2 decimales
-                input.value = numero.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                });
-            } else {
-                input.value = '0.00';
-            }
+            $('input[name="importe[]"]').each(function() {
+                // Elimina comas y convierte a número
+                const valor = parseFloat($(this).val().replace(/,/g, '')) || 0;
+                total += valor;
+            });
+            
+            // Formatea el total con separadores de miles
+            $('#total_importe').val(formatNumber(total.toFixed(2)));
+        }
+        function formatNumber(num) {
+            return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
         }
 
         </script>

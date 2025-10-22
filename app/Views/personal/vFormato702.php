@@ -209,7 +209,7 @@
 </div>
  <div id="nombre">
    <?php if(!$fic): ?>
-   <span ><?= strtoupper($nombre_registro->nombre_completo); ?> - <?= strtoupper($nombre_registro->dsc_puesto); ?> - <?= strtoupper($nombre_registro->dsc_area); ?> </span>
+   <span ><?= strtoupper($responsableGasto->nombre_completo); ?> - <?= strtoupper($responsableGasto->dsc_puesto); ?> - <?= strtoupper($responsableGasto->dsc_area); ?> </span>
     <?php endif; ?>
    <?php if($fic): ?>
    <span >HUGO RAMÍREZ DUARTE - DIRECCIÓN DE COMPETITIVIDAD TURÍSTICA

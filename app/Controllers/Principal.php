@@ -1900,7 +1900,6 @@ class Principal extends BaseController
             'alopez@guanajuato.gob.mx',
             'agascag@guanajuato.gob.mx',
             'ccampos@guanajuato.gob.mx',
-            'cchernandezp@guanajuato.gob.mx',
             'sandag@guanajuato.gob.mx',
             'ztorrest@guanajuato.gob.mx',
             'ajassome@guanajuato.gob.mx',
@@ -1996,7 +1995,7 @@ class Principal extends BaseController
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
                             En caso de que aún no hayas realizado las <strong>justificaciones de tus incidencias correspondientes a la quincena 19/2025</strong>, 
                             la cual comprende el periodo del <strong>1 al 15 de octubre de 2025</strong>, 
-                            tienes hasta el día <strong>martes 22 de octubre del presente año a las 16:00 hrs</strong> para realizarlas.
+                            tienes hasta el día <strong> de hoy hasta las 16:00 hrs</strong> para realizarlas.
                         </p>
 
                         <div class="highlight-box">
@@ -3623,11 +3622,13 @@ class Principal extends BaseController
         $data['fic'] = false;
         $importe = "";
         if (!empty($registro_pt->data)) {
+            $data['total'] = $registro_pt->data;
             $registro = $registro_pt->data[0];
             $id_reserva = $registro_pt->data[0]->id_reserva;
             $no_consecutivo = $registro_pt->data[0]->no_consecutivo;
             $id_proveedor_banco = $registro_pt->data[0]->id_proveedor_banco; 
-            $importe = $registro_pt->data[0]->importe; 
+            $data['importe'] = $importe = $registro_pt->data[0]->importe; 
+          
             $banco = $globals->getTabla([
                 'tabla' => 'proveedor_banco',
                 'where' => ['visible' => 1, 'id_proveedor_banco' => $id_proveedor_banco]
@@ -4255,14 +4256,14 @@ class Principal extends BaseController
         $response->respuesta = 'Error|Error al traer los proveedor';
         $globals = new Mglobal;
         $siExisteIdReserva = $globals->getTabla(['tabla' => 'registro_pt', 'where' => ['visible' => 1, 'id_reserva' => $id_reserva]]);
-        $btn = (!empty($siExisteIdReserva->data)) ? true : false;
+        $btn = false;
         $partida4000 = false;
         $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
         if ($id_reserva != 0) {
             $reserva = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['id_reserva' => $id_reserva]]);
-           /*  $consecutivo = $globals->getTabla(['tabla' => 'registro_pt', 'where' => ['visible' => 1], 'orderBy' => 'id_registro_pt DESC']);
+            $consecutivo = $globals->getTabla(['tabla' => 'consecutivo', 'where' => ['visible' => 1], 'orderBy' => 'id_consecutivo DESC']);
             $conse = (isset($consecutivo->data) && !empty($consecutivo->data)) ? $consecutivo->data[0]->no_consecutivo : '';
-            $data['consecutivo'] = $conse + 1; */
+            $data['consecutivo'] = $conse + 1; 
             $presupuesto = $globals->getTabla(['tabla' => 'vw_presupuesto', 'where' => ['id_reserva' => $id_reserva]]);
             foreach ($presupuesto->data as $i => $p) {
                 if ($p->id_partida >= 149 && $p->id_partida <= 248) {

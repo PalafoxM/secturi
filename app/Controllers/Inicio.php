@@ -537,6 +537,72 @@ class Inicio extends BaseController {
         $data['contentView'] = 'secciones/vlistaPuesto';
         $this->_renderView($data);   
     }
+    public function EditarPT($id_registro_pt)
+    {
+          $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error|Error al traer los proveedor';
+        $globals = new Mglobal;
+        $siExisteIdReserva = $globals->getTabla(['tabla' => 'registro_pt', 'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]]);
+        $btn =  false;
+        $partida4000 = false;
+        $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
+        $id_reserva = (isset($siExisteIdReserva->data) && !empty($siExisteIdReserva->data))? $siExisteIdReserva->data[0]->id_reserva:'';
+        if ($id_reserva) {
+            $reserva = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['id_reserva' => $id_reserva]]);
+            $consecutivo = $globals->getTabla(['tabla' => 'consecutivo', 'where' => ['visible' => 1], 'orderBy' => 'id_consecutivo DESC']);
+            $conse = (isset($consecutivo->data) && !empty($consecutivo->data)) ? $consecutivo->data[0]->no_consecutivo : '';
+            $data['consecutivo'] = $conse + 1; 
+            $presupuesto = $globals->getTabla(['tabla' => 'vw_presupuesto', 'where' => ['id_reserva' => $id_reserva]]);
+            foreach ($presupuesto->data as $i => $p) {
+                if ($p->id_partida >= 149 && $p->id_partida <= 248) {
+                    $partida4000 = true;
+                }
+            }
+
+        }
+        if (!empty($id_registro_pt)) {
+            $registro_pt = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]]);
+        }
+
+        $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1]]);
+        $cat_tipo = $globals->getTabla(['tabla' => 'cat_tipo', 'where' => ['visible' => 1]]);
+
+        $usuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->get('id_usuario')]]);
+        $cat_usuario = $globals->getTabla(['tabla' => 'usuario', 'where' => ['visible' => 1]]);
+        $cat_director_general = $globals->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1]]);
+        $cat_opcion = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1]]);
+        $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $cat_subsecretario = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1]]);
+        if ($id_reserva != 0) {
+            $data['reserva'] = (!empty($reserva->data)) ? $reserva->data[0] : [];
+            $data['presupuesto'] = (!empty($presupuesto->data)) ? $presupuesto->data : [];
+        }
+        if (!empty($id_registro_pt)) {
+            $data['registro_pt'] = (!empty($registro_pt->data)) ? $registro_pt->data[0] : [];
+        }
+
+
+        // die( var_dump(  $data['registro_pt'] ) );
+        $data['dsc_director_general'] = (!empty($cat_director_general->data)) ? $cat_director_general->data[0]->dsc_director_general : [];
+        $data['cat_area'] = (!empty($cat_area->data)) ? $cat_area->data : [];
+        $data['cat_tipo'] = (!empty($cat_tipo->data)) ? $cat_tipo->data : [];
+        $data['cat_opcion'] = (!empty($cat_opcion->data)) ? $cat_opcion->data : [];
+        $data['cat_subsecretario'] = (!empty($cat_subsecretario->data)) ? $cat_subsecretario->data : [];
+        $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+        $data['editar'] =  1;
+        $data['secretario'] = (!empty($secretario->data)) ? $secretario->data : [];
+        $data['usuario'] = (!empty($usuario->data)) ? $usuario->data[0] : [];
+        $data['cat_usuario'] = (!empty($cat_usuario->data)) ? $cat_usuario->data : [];
+        $data['id_reserva'] = (!empty($id_reserva)) ? $id_reserva : 0;
+        $data['scripts'] = array('inicio');
+        $data['edita'] = $btn;
+        $data['partida4000'] = $partida4000;
+        $data['contentView'] = 'secciones/vProveedor';
+        //die( var_dump( $data)  );
+        $this->_renderView($data); 
+    }
     public function EditarFIC($id_registro_pt = null)
     {
         $globals  = new Mglobal;

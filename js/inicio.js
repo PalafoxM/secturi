@@ -4568,7 +4568,7 @@ ini.inicio = (function () {
                 e.preventDefault(); 
                    let valido = true;
                     let mensajes = [];
-
+                    let editar = $("#editar").val();
                     // Validar cada partida
                     $("[id^=encabezado_]").each(function(){
                         if($(this).val().trim() === ""){
@@ -4577,7 +4577,7 @@ ini.inicio = (function () {
                         }
                     });
 
-                    $("[id^=periodo_inicio]").each(function(){
+              /*       $("[id^=periodo_inicio]").each(function(){
                         if($(this).val().trim() === ""){
                             valido = false;
                             mensajes.push("El campo Periodo termino es obligatorio.");
@@ -4588,25 +4588,30 @@ ini.inicio = (function () {
                             valido = false;
                             mensajes.push("El campo Periodo fin es obligatorio.");
                         }
-                    });
+                    }); */
 
                     // Validar archivos PDF
-                    $("[id^=factura_pdf_input_]").each(function(){
-                        let files = this.files;
-                        if(files.length === 0){
-                            valido = false;
-                            mensajes.push("Debe subir al menos un archivo PDF.");
-                        }
-                    });
+                    if(editar != 1){
+                        $("[id^=factura_pdf_input_]").each(function(){
+                            let files = this.files;
+                            if(files.length === 0){
+                                valido = false;
+                                mensajes.push("Debe subir al menos un archivo PDF.");
+                            }
+                        });
+                    }
 
-                    // Validar archivos XML
-                    $("[id^=factura_xml_input_]").each(function(){
-                        let files = this.files;
-                        if(files.length === 0){
-                            valido = false;
-                            mensajes.push("Debe subir al menos un archivo XML.");
-                        }
-                    });
+                     if(editar != 1){
+                      // Validar archivos XML
+                        $("[id^=factura_xml_input_]").each(function(){
+                            let files = this.files;
+                            if(files.length === 0){
+                                valido = false;
+                                mensajes.push("Debe subir al menos un archivo XML.");
+                            }
+                        });
+                    }
+                   
 
                     if(!valido){
                         Swal.fire("Atención", "<p>"+mensajes.join("<br>")+"</p>", "warning");

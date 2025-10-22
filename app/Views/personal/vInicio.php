@@ -395,11 +395,11 @@
 
 
                                         </div><!-- end col-->
-                                        <?php if (!$votoHombre || !$votoMujer): ?>
+                                   <!--      <?php if (!$votoHombre || !$votoMujer): ?>
                                             <div class="col-lg-4">
                                                 <div class="card client-card">
                                                     <div class="card-body text-center">
-                                                        <!-- Ícono con animación de flotación y cambio de colores -->
+                                         
                                                         <div class="icon-info mb-3">
                                                             <i class="fas fa-award float-color-icon"
                                                                 style="font-size: 3rem;">
@@ -422,8 +422,8 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        <?php endif; ?>
-                                        <?php if ($votoHombre && $votoMujer): ?>
+                                        <?php endif; ?> -->
+                                        
                                             <div class="col-lg-4">
                                                 <div class="card">
                                                     <div class="card-body">
@@ -465,7 +465,7 @@
                                                     </div><!--end card-body-->
                                                 </div><!--end card-->
                                             </div>
-                                        <?php endif; ?>
+                                     
                                     </div><!--end row-->
 
 
