@@ -119,16 +119,16 @@
                                                         <div class="custom-dd dd" id="nestable_list_1">
                                                             <ol class="dd-list">
                                                                 <li class="dd-item" data-id="1">
-                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Programa_de_Gobierno_2018-2024-9c20.pdf' ?>">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Programa de Gobierno 2024-2030.pdf' ?>">
                                                                         <div class="dd-handle">
-                                                                        Programa de Gobierno 2018-2024
+                                                                        Programa de Gobierno 2024-2030
                                                                         </div>
                                                                     </a>
                                                                 </li>
                                                                 <li class="dd-item" data-id="1">
-                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Actualizacion_Programa_de_Gobierno_2018-2024-db52.pdf' ?>">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/PROSECTUR__2025_2030.pdf' ?>">
                                                                         <div class="dd-handle">
-                                                                        Programa de Gobierno 2018 - 2024_Actualización
+                                                                        Programa Sectorial de Turismo Federal 2025-2030
                                                                         </div>
                                                                     </a>
                                                                 </li>

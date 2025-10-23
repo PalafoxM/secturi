@@ -269,83 +269,94 @@
                                             </div><!--end col-->
                                             
                                         </div><!--end form-row-->
-                                        
-                                       
-                                       <?php
-                                                $partidas_mostradas = [];
-                                                foreach($presupuesto as $i => $p):
-                                                    // Evita duplicados por id_partida
-                                                    if (in_array($p->id_partida, $partidas_mostradas)) {
-                                                        continue;
-                                                    }
-                                                    $partidas_mostradas[] = $p->id_partida;
+                                        <?php
+                                            $partidas_mostradas = [];
+                                            $total_partidas = count($presupuesto);
+                                            foreach($presupuesto as $i => $p):
+                                                // Evita duplicados por id_partida
+                                                if (in_array($p->id_partida, $partidas_mostradas)) {
+                                                    continue;
+                                                }
+                                                $partidas_mostradas[] = $p->id_partida;
 
-                                                    // Generamos un ID único para la sección de factura
-                                                    $section_id = "factura-section-" . $i;
-                                                ?>
-                                                    <p class="text-muted mb-4 text-center">Agregar Factura PT.
-                                                        
-                                                    </p>
-                                                    <hr>
-                                                    <div class="form-row"> <div class="col-md-4 mb-3">
-                                                            <label for="partida_<?= $i ?>">Partida<span style="color:red;">*</span></label>
-                                                            <select class="form-control" id="partida_<?= $i ?>" name="partida[]" disabled>
-                                                                <?php foreach($cat_partida as $o): ?>
-                                                                    <option value="<?= $o->id_partida ?>" <?= (isset($p->id_partida) && $p->id_partida == $o->id_partida) ? 'selected' : '' ?>>
-                                                                        <?= $o->cuenta_cable ?>
-                                                                    </option>
-                                                                <?php endforeach; ?>
-                                                            </select>
-                                                        </div>
-
-                                                        <div class="col-md-6 mb-3">
-                                                            <label for="encabezado_<?= $i ?>">Encabezado<span style="color:red;">*</span></label>
-                                                            <input type="text" class="form-control" autocomplete="off" id="encabezado_<?= $i ?>" name="encabezado[]" value="<?= (isset($p->encabezado) && !empty($p->encabezado)?$p->encabezado:'') ?>" >
-                                                        </div>
-                                                          <?php if( $i >= 1): ?>
-                                                        <div class="col-md-2 mb-3">
-                                                            <div class="checkbox checkbox-primary">
-                                                                <input id="checkbox_<?= $i ?>" type="checkbox" name="checkbox_<?= $i ?>" 
-                                                                    class="toggle-factura-section" data-target="#<?= $section_id ?>">
-                                                                <label for="checkbox_<?= $i ?>">
-                                                                    Pagar en otro periodo
-                                                                </label>
-                                                            </div>
-                                                        </div>
-                                                         <?php endif; ?>
+                                                // Generamos un ID único para la sección de factura
+                                                $section_id = "factura-section-" . $i;
+                                            ?>
+                                                <p class="text-muted mb-4 text-center">Agregar Factura PT.</p>
+                                                <hr>
+                                                <div class="form-row">
+                                                    <div class="col-md-4 mb-3">
+                                                        <label for="partida_<?= $i ?>">Partida<span style="color:red;">*</span></label>
+                                                        <select class="form-control" id="partida_<?= $i ?>" name="partida[]" disabled>
+                                                            <?php foreach($cat_partida as $o): ?>
+                                                                <option value="<?= $o->id_partida ?>" <?= (isset($p->id_partida) && $p->id_partida == $o->id_partida) ? 'selected' : '' ?>>
+                                                                    <?= $o->cuenta_cable ?>
+                                                                </option>
+                                                            <?php endforeach; ?>
+                                                        </select>
                                                     </div>
-
-                                                    <div id="<?= $section_id ?>">
-                                                        <div class="form-row">
-                                                            <div class="col-md-4 mb-3">
-                                                                <p class="text-muted mb-3">Factura PDF (Máx 100MB)</p>
-                                                                <input id="factura_pdf_input_<?= $i; ?>"  type="file" name="factura_pdf_<?= $i; ?>[]" class="dropify" multiple accept=".pdf" />   
-                                                            </div>
-                                                            <div class="col-md-4 mb-3">
-                                                                
-                                                                <p class="text-muted mb-3">Factura XML (Máx 100MB)</p>
-                                                                <input id="factura_xml_input_<?= $i; ?>" type="file" name="factura_xml_<?= $i; ?>[]" multiple class="dropify"  accept=".xml">
-                                                            </div>
-                                                            <div class="col-md-4 mb-3">
-                                                                <p class="text-muted mb-3">Importe</p>
-                                                                <input id="importe[]" type="text" name="importe[]" class="form-control" placeholder="importe"  value="<?= (isset($registro_pt->importe))?$registro_pt->importe:'' ?>" >
-                                                            </div>
+                                                    
+                                                    <div class="col-md-6 mb-3">
+                                                        <label for="encabezado_<?= $i ?>">Encabezado<span style="color:red;">*</span></label>
+                                                        <input type="text" class="form-control" autocomplete="off" id="encabezado_<?= $i ?>" name="encabezado[]" value="<?= (isset($p->encabezado) && !empty($p->encabezado)?$p->encabezado:'') ?>" >
+                                                    </div>
+                                                    
+                                                    <!-- CHECKBOX CORREGIDO: Aparece en todos menos el primero cuando hay más de un elemento -->
+                                                    <?php if(isset($num) && $num): ?>
+                                                    <div class="col-md-2 mb-3">
+                                                        <div class="checkbox checkbox-primary">
+                                                            <input id="checkbox_<?= $i ?>" type="checkbox" name="checkbox_<?= $i ?>" 
+                                                                class="toggle-factura-section" data-target="#<?= $section_id ?>">
+                                                            <label for="checkbox_<?= $i ?>">
+                                                                Pagar en otro periodo
+                                                            </label>
                                                         </div>
                                                     </div>
-                                                <?php endforeach; ?>
+                                                    <?php endif; ?>
+                                                </div>
+
+                                                <!-- SECCIÓN DE FACTURA UNIFICADA -->
+                                                <div id="<?= $section_id ?>">
                                                     <div class="form-row">
-                                                        <div class="col-md-4 mb-3"></div>
-                                                        <div class="col-md-4 mb-3"></div>
                                                         <div class="col-md-4 mb-3">
-                                                            <p class="text-muted mb-3">Total</p>
-                                                            <input id="total_importe" type="text" name="total_importe" class="form-control" placeholder="0,000.00" value="<?= (isset($registro_pt->importe))?$registro_pt->importe:'' ?>" readonly>
+                                                            <p class="text-muted mb-3">Factura PDF (Máx 100MB)</p>
+                                                            <input id="factura_pdf_input_<?= $i; ?>" type="file" name="factura_pdf_<?= $i; ?>[]" class="dropify" multiple accept=".pdf" />   
+                                                        </div>
+                                                        <div class="col-md-4 mb-3">
+                                                            <p class="text-muted mb-3">Factura XML (Máx 100MB)</p>
+                                                            <input id="factura_xml_input_<?= $i; ?>" type="file" name="factura_xml_<?= $i; ?>[]" multiple class="dropify" accept=".xml">
+                                                        </div>
+                                                        <div class="col-md-4 mb-3">
+                                                            <p class="text-muted mb-3">Importe</p>
+                                                            <?php if($editar != 1): ?>
+                                                                <input id="importe[]" type="text" autocomplete="off" name="importe[]" class="form-control" placeholder="importe" value="<?= (isset($registro_pt->importe))?$registro_pt->importe:'' ?>">
+                                                            <?php else: ?>
+                                                                <!-- Si estás editando, muestra el importe correspondiente -->
+                                                                <?php 
+                                                                $importe_valor = '';
+                                                                if(isset($importe[$i])) {
+                                                                    $importe_valor = $importe[$i]->importe;
+                                                                }
+                                                                ?>
+                                                                <input id="importe[]" type="text" autocomplete="off" name="importe[]" class="form-control" placeholder="importe" value="<?= $importe_valor ?>">
+                                                            <?php endif; ?>
                                                         </div>
                                                     </div>
-                                        
+                                                </div>
+                                            <?php endforeach; ?>
+
+                                            <div class="form-row">
+                                                <div class="col-md-4 mb-3"></div>
+                                                <div class="col-md-4 mb-3"></div>
+                                                <div class="col-md-4 mb-3">
+                                                    <p class="text-muted mb-3">Total</p>
+                                                    <input autocomplete="off" id="total_importe" type="text" name="total_importe" class="form-control" placeholder="0,000.00" value="<?= (isset($registro_pt->total_importe))?$registro_pt->total_importe:'' ?>" readonly>
+                                                </div>
+                                            </div>
 
                                             <a class="btn btn-gradient-danger" style="color:white" onclick="window.history.back()">Atrás</a>
-                                            <?php if(!$edita): ?>
-                                             <button class="btn btn-gradient-primary" id="btnGuardatPT" type="submit">Guardar</button>
+                                            <?php if(!$edita): ?>  <!-- Corregí $edita por $editar para consistencia -->
+                                                <button class="btn btn-gradient-primary" id="btnGuardatPT" type="submit">Guardar</button>
                                             <?php endif; ?>
                                     </form> <!--end form-->                                          
                                 </div><!--end card-body-->

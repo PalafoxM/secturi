@@ -61,7 +61,7 @@
 
                                                 <tbody>
                                                     <?php foreach($reserva as $p): ?>
-                                                        <?php if($p->id_estatus != 4): ?>
+                                                        <?php if(!in_array($p->id_estatus, [4,5])): ?>
                                                     <tr>
                                                
                                                         <td class="text-center"><?= $p->razon_social?></td>

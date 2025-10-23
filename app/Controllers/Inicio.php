@@ -564,6 +564,10 @@ class Inicio extends BaseController {
         }
         if (!empty($id_registro_pt)) {
             $registro_pt = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]]);
+            $importe = $globals->getTabla(['tabla' => 'periodo_factura', 'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]]);
+            if(isset($importe->data) && !empty($importe->data)){
+                $data['importe'] = $importe->data;
+            }
         }
 
         $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1]]);

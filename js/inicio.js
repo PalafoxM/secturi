@@ -1433,6 +1433,7 @@ ini.inicio = (function () {
                     complete: function () {
                     $('#modalEstatusReserva').modal('hide');
                     $('#btnConfirmarReserva').prop('disabled', false).html('Guardar');
+                     Swal.fire("Correcto",'se guardo correctamente', "success");
                      setTimeout(() => window.location.reload(), 1500);
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
@@ -1493,6 +1494,43 @@ ini.inicio = (function () {
                 });
             });
 
+        },
+        finalizarPago: function(id)
+        {
+        Swal.fire({
+                        title: "¿Está seguro?",
+                        text: "¿Se Finalizara el Pago?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        cancelButtonText: "Cancelar",
+                        confirmButtonText: "Eliminar",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: base_url + "index.php/Usuario/finalizarPago",
+                                type: "post",
+                                dataType: "json", //expect return data as html from server
+                                data: { id_reserva: id },
+                                success: function (response, textStatus, jqXHR) {
+                               
+                                    if (response.error) {
+                                        Swal.fire("Atención", response.respuesta, "warning");
+                                    }else{
+                                         Swal.fire("Eliminado", response.respuesta, "success");
+                                    }
+                                },
+                                complete: function(){
+                                 // window.location.reload();
+                                  window.location.href = base_url + "index.php/Inicio";
+                                },
+                                error: function (jqXHR, textStatus, errorThrown) {
+                                  Swal.fire("Error",textStatus, "error");
+                                },
+                            });
+                        }
+                    });
         },
         eliminarReservaGo: function(id)
         {

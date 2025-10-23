@@ -1106,6 +1106,26 @@ class Usuario extends BaseController
         }
         return $this->respond($response);
     }
+    public function finalizarPago()
+    {
+        $session = \Config\Services::session();
+        $principal = new Mglobal;
+        $response = new \stdClass();
+        $id_reserva = $this->request->getPost('id_reserva');
+
+        $dataConfig = [
+            "tabla" => "reserva",
+            "editar" => true,
+            "idEditar" => ['id_reserva' => $id_reserva]
+        ];
+        $result = $principal->saveTabla(['id_estatus' => 5], $dataConfig, ["script" => "finalizo.Reserva"]);
+        if (!empty($resul->data)) {
+            $response->error = $result->error;
+            $response->respuesta = $result->respuesta;
+
+        }
+        return $this->respond($response);
+    }
     public function deleteReserva()
     {
         $session = \Config\Services::session();

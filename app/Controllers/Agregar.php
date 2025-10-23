@@ -111,7 +111,7 @@ class Agregar extends BaseController
 
         //return false;
     }
-    public function procesarPediodo(array $periodo, $id_registro_pt = null)
+    public function procesarPediodoEditar(array $periodo, $id_registro_pt = null)
     {
         $session = \Config\Services::session();
         $data = array();
@@ -120,19 +120,18 @@ class Agregar extends BaseController
         foreach ($periodo as $p) {
             $dataConfig = [
                 "tabla" => "periodo_factura",
-                "editar" => false
+                "editar" => true,
+                "idEditar" => ['id_registro_pt' =>  $id_registro_pt]
             ];
 
             $dataInsert = [
-                'id_registro_pt' => (int) $id_registro_pt,
                 'encabezado' => $p['encabezado'],  // ahora sí existe
-                'periodo_inicio' => $p['periodo_inicio'],
-                'periodo_fin' => $p['periodo_fin'],
+                'importe' => $p['importe'],
             ];
 
             $dataBitacora = [
                 'id_user' => $session->get('id_usuario'),
-                'script' => 'Agregar.php/guardarFacturaPDF'
+                'script' => 'Agregar.php/guardarPeriodo'
             ];
 
             $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
@@ -142,12 +141,82 @@ class Agregar extends BaseController
         return $response;
         //return false;
     }
+    public function procesarPediodo(array $periodo, $id_registro_pt = null)
+    {
+        $session = \Config\Services::session();
+        $this->globals = new Mglobal();
+        $responses = [];
+    
+        foreach ($periodo as $p) {
+            // DETECTAR TIPO DE ESTRUCTURA
+            $esAnidado = (is_array($p['encabezado']) && is_array($p['importe']));
+            $esNormal = (is_string($p['encabezado']) && is_string($p['importe']));
+            
+            if ($esAnidado) {
+                // Estructura anidada: múltiples registros
+                foreach ($p['encabezado'] as $index => $encabezado) {
+                    if (isset($p['importe'][$index])) {
+                        $this->procesarRegistroIndividual(
+                            $id_registro_pt, 
+                            $encabezado, 
+                            $p['importe'][$index], 
+                            $session, 
+                            $responses
+                        );
+                    }
+                }
+            } else if ($esNormal) {
+                // Estructura normal: un solo registro
+                $this->procesarRegistroIndividual(
+                    $id_registro_pt, 
+                    $p['encabezado'], 
+                    $p['importe'], 
+                    $session, 
+                    $responses
+                );
+            }
+        }
+
+        return $responses;
+    }
+
+    private function procesarRegistroIndividual($id_registro_pt, $encabezado, $importe, $session, &$responses)
+    {
+        // Validar que no estén vacíos
+        if (empty(trim($encabezado)) || empty(trim($importe))) {
+            return;
+        }
+        
+        // Limpiar importe
+        $importe_limpio = floatval(str_replace(['$', ',', ' '], '', $importe));
+        
+        $dataInsert = [
+            'id_registro_pt' => (int) $id_registro_pt,
+            'encabezado' => trim($encabezado),
+            'importe' => $importe_limpio,
+            'fec_reg' => date('Y-m-d H:i:s'),
+        ];
+
+        $dataConfig = [
+            "tabla" => "periodo_factura",
+            "editar" => false
+        ];
+
+        $dataBitacora = [
+            'id_user' => $session->get('id_usuario'),
+            'script' => 'Agregar.php/guardarPeriodo'
+        ];
+
+        $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+        $responses[] = $response;
+    }
     public function procesarPDFgo(array $archivos, $id_registro_go = null)
     {
         $session = \Config\Services::session();
         $data = array();
         $response = new \stdClass();
         $this->globals = new Mglobal();
+      
         foreach ($archivos as $archivo) {
             if (!$archivo->isValid()) {
                 continue;
@@ -230,6 +299,7 @@ class Agregar extends BaseController
         $response = new \stdClass();
         $this->globals = new Mglobal();
         $i = 1;
+        
         foreach ($archivos as $archivo) {
             if (!$archivo->isValid()) {
                 continue;
@@ -263,6 +333,7 @@ class Agregar extends BaseController
 
         }
          $i++;
+   
         return $response;
     }
    public function procesarXMLeditar(array $archivos, $id_registro_pt = null)
@@ -371,7 +442,7 @@ class Agregar extends BaseController
         $session = \Config\Services::session();
         $data = array();
         $this->globals = new Mglobal();
-        
+       
         foreach ($archivos as $archivo) {
             if (!$archivo->isValid()) {
                 continue;
@@ -462,9 +533,10 @@ class Agregar extends BaseController
                 
                 $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardarFactura'];
                 $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+        
             }
         }
-        // return false;
+        return $this->respond($response);
     }
       
     
@@ -705,10 +777,6 @@ class Agregar extends BaseController
                 $archivosXml = [];
                 $archivosPdf = [];
                 $response->idReserva = $id_registro_pt;
-
-                // inicializar arrays
-                $archivosXml = [];
-                $archivosPdf = [];
 
                 // foreach sobre los archivos recibidos
                 foreach ($archivos as $key => $fileEntry) {
@@ -1316,12 +1384,19 @@ class Agregar extends BaseController
 
           $consecutivo = $this->globals->getTabla(['tabla' => 'consecutivo', 'where' => ['visible' => 1, 'id_responsable' => $data['id_reponsable_solicitud'] ], 'orderBy' => 'id_consecutivo DESC']);          
           $conse =  (isset($consecutivo->data) && !empty($consecutivo->data))?$consecutivo->data[0]->no_consecutivo:'';
-        
+       
+            if (empty($conse)) {
+                $jefe = $this->globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $data['id_reponsable_solicitud']]]);
+                $idJefe = $jefe->data[0]->id_jefe_inmediato;
+                $consecutivo = $this->globals->getTabla(['tabla' => 'consecutivo', 'where' => ['visible' => 1, 'id_responsable' => $idJefe], 'orderBy' => 'id_consecutivo DESC']);          
+                $conse =  (isset($consecutivo->data) && !empty($consecutivo->data))?$consecutivo->data[0]->no_consecutivo:'';
+            } 
+    
+       
           $no_consecutivo = $conse + 1;
-          $this->globals->saveTabla(['no_consecutivo' => $no_consecutivo, 'id_responsable' => $data['id_reponsable_solicitud'] ], [ 'tabla' => 'consecutivo', 'editar' => false ], ['id_user' => $session->get('id_usuario'), "script" => "estatus.Reserva"]);
-        
-        //var_dump($data);
-        //die();
+         $res =  $this->globals->saveTabla(['no_consecutivo' => $no_consecutivo, 'id_responsable' => $data['id_reponsable_solicitud'] ], [ 'tabla' => 'consecutivo', 'editar' => false ], ['id_user' => $session->get('id_usuario'), "script" => "estatus.Reserva"]);
+       
+       
 
         $dataInsert = [
             'id_reserva'               => (int) $data['id_reserva'],
@@ -1332,7 +1407,7 @@ class Agregar extends BaseController
             'fecha_tramite'            => $data['fecha_tramite'],
             'id_reponsable_solicitud'  => (int) $data['id_reponsable_solicitud'],
             'director_general'         => 1,
-            'importe'                  => $data['total_importe'],
+            'total_importe'            => $data['total_importe'],
             'secretario'               => $data['secretario'],
             'id_subsecretario'         => $data['id_subsecretario'],
             'cuenta_bancaria'          => $data['cuenta_bancaria'],
@@ -1383,14 +1458,11 @@ class Agregar extends BaseController
                     $index = str_replace('encabezado', '', $key); // ej. encabezado1 → 1
                     $periodo[$index]['encabezado'] = $p;
                 }
-                if (strpos($key, 'periodo_inicio') === 0) {
-                    $index = str_replace('periodo_inicio', '', $key); // ej. periodo1 → 1
-                    $periodo[$index]['periodo_inicio'] = $p;
+                if (strpos($key, 'importe') === 0) {
+                    $index = str_replace('importe', '', $key); // ej. encabezado1 → 1
+                    $periodo[$index]['importe'] = $p;
                 }
-                if (strpos($key, 'periodo_fin') === 0) {
-                    $index = str_replace('periodo_fin', '', $key); // ej. periodo1 → 1
-                    $periodo[$index]['periodo_fin'] = $p;
-                }
+              
             }
 
             // Recorremos todas las claves de los archivos enviados
@@ -1401,11 +1473,16 @@ class Agregar extends BaseController
                     $archivosPdf = array_merge($archivosPdf, $fileArray);
                 }
             }
-
-
-            $datosXML = $this->procesarXML($archivosXml, $id_registro_pt);
-            $datosPDF = $this->procesarPDF($archivosPdf, $id_registro_pt);
-            $datosP = $this->procesarPediodo($periodo, $id_registro_pt);
+          
+           
+        
+            $datosXML = ($data['editar'] == 1 && !empty($archivosXml))?$this->procesarXMLeditar($archivosXml, $id_registro_pt):$this->procesarXML($archivosXml, $id_registro_pt);
+             
+            $datosPDF = ($data['editar'] == 1 && !empty($archivosPdf))? $this->procesarPDFeditar($archivosPdf, $id_registro_pt):$this->procesarPDF($archivosPdf, $id_registro_pt);
+            
+            $datosP = ($data['editar'] == 1 && !empty($periodo))? $this->procesarPediodoEditar($periodo, $id_registro_pt):$this->procesarPediodo($periodo, $id_registro_pt);
+          
+           // $datosP = $this->procesarPediodo($periodo, $id_registro_pt, $data['editar']);
 
 
             if (!$datosXML) {
@@ -1452,6 +1529,12 @@ class Agregar extends BaseController
             return $this->respond($response);
         }
 
+         if (isset($data['total_importe']) && empty($data['total_importe'])) {
+            $response->error = true;
+            $response->respuesta = "Es requerido el total_importe";
+            return $this->respond($response);
+        }
+
           $registro_pt = $this->globals->getTabla([
             'tabla' => 'registro_pt', 
             'where' => ['visible' => 1, 'id_registro_pt' => $data['id_registro_pt'] ]
@@ -1463,18 +1546,25 @@ class Agregar extends BaseController
 
 
        
-         /*  $consecutivo = $this->globals->getTabla(['tabla' => 'consecutivo', 'where' => ['visible' => 1, 'id_responsable' => $datos->id_reponsable_solicitud], 'orderBy' => 'id_consecutivo DESC']);          
-          $conse =  (isset($consecutivo->data) && !empty($consecutivo->data))?$consecutivo->data[0]->no_consecutivo:'';
+           $consecutivo = $this->globals->getTabla(['tabla' => 'consecutivo', 'where' => ['visible' => 1, 'id_responsable' => $datos->id_reponsable_solicitud], 'orderBy' => 'id_consecutivo DESC']);          
+           $conse =  (isset($consecutivo->data) && !empty($consecutivo->data))?$consecutivo->data[0]->no_consecutivo:'';
         
+            if (empty($conse)) {
+                $jefe = $this->globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $datos->id_reponsable_solicitud]]);
+                $idJefe = $jefe->data[0]->id_jefe_inmediato;
+                $consecutivo = $this->globals->getTabla(['tabla' => 'consecutivo', 'where' => ['visible' => 1, 'id_responsable' => $idJefe], 'orderBy' => 'id_consecutivo DESC']);          
+                $conse =  (isset($consecutivo->data) && !empty($consecutivo->data))?$consecutivo->data[0]->no_consecutivo:'';
+            } 
+          
           $no_consecutivo = $conse + 1;
         
          $this->globals->saveTabla(['no_consecutivo' => $no_consecutivo ], ['tabla' => 'consecutivo', 'editar' => false], ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaReserva']);
- */
+ 
         $dataInsert = [
             'id_reserva' => (int) $datos->id_reserva,
             'id_direccion_responsable' => $datos->id_direccion_responsable,
             'tipo_pt' => $datos->tipo_pt,
-            'no_consecutivo' => $data['no_consecutivo'],
+            'no_consecutivo' => $no_consecutivo,
             'id_proveedor' => $datos->id_proveedor,
             'fecha_tramite' => date('Y-m-d', strtotime($data['fecha_tramite'])),
             'id_reponsable_solicitud' => (int) $datos->id_reponsable_solicitud,
@@ -1482,7 +1572,7 @@ class Agregar extends BaseController
             'secretario' => $datos->secretario,
             'id_subsecretario' => $datos->id_subsecretario,
             'cuenta_bancaria' => $data['cuenta_bancaria'],
-            'importe' => $data['importe'],
+            'total_importe' => $data['total_importe'],
             'fecha_gasto_inicio' => date('Y-m-d', strtotime($data['fecha_gasto_inicio'])),
             'fecha_gasto_fin' => date('Y-m-d', strtotime($data['fecha_gasto_fin'])),
             'formato_establecido' => $datos->formato_establecido,
@@ -1520,14 +1610,11 @@ class Agregar extends BaseController
                     $index = str_replace('encabezado', '', $key); // ej. encabezado1 → 1
                     $periodo[$index]['encabezado'] = $p;
                 }
-                if (strpos($key, 'periodo_inicio') === 0) {
-                    $index = str_replace('periodo_inicio', '', $key); // ej. periodo1 → 1
-                    $periodo[$index]['periodo_inicio'] = $p;
+                if (strpos($key, 'importe') === 0) {
+                    $index = str_replace('importe', '', $key); // ej. periodo1 → 1
+                    $periodo[$index]['importe'] = $p;
                 }
-                if (strpos($key, 'periodo_fin') === 0) {
-                    $index = str_replace('periodo_fin', '', $key); // ej. periodo1 → 1
-                    $periodo[$index]['periodo_fin'] = $p;
-                }
+              
             }
 
             // Recorremos todas las claves de los archivos enviados

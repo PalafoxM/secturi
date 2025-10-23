@@ -42,7 +42,12 @@ $fechaFormateada = $dia . ' de ' . $mes . ' del ' . $anio;
                 Por medio de la presente, me permito solicitar su apoyo para que se realice el tramite de <?= (isset($GO) && !empty($GO))?'Gasto de Operación':'Pago a Tercero'?>
                 con folio <strong><?= (isset($GO) && !empty($GO))?'GO':'PT'?> <?= ($fic)?$folio:strtoupper($registro->folio);?></strong> por la cantidad de 
                 <strong>$<?= ($fic)?$reserva[0]->total_importe: $registro->total_importe; ?> (<?= mb_strtoupper($numero_texto, 'UTF-8'); ?>)</strong>,
-                de comprobante(s) fiscale(s) No. <strong><?= $uuid?></strong> por concepto de <?= $registro->concepto_pago ?> 
+                de comprobante(s) fiscale(s) No. 
+                <strong>
+                    <?php foreach($uuid as $u):?>
+                        <?= $u->uuid; ?>
+                    <?php endforeach; ?>
+                </strong> por concepto de <?= $registro->concepto_pago ?> 
                 al proveedor <?= $registro->dsc_proveedor ?>.
             </span>
         </div>
@@ -89,12 +94,12 @@ $fechaFormateada = $dia . ' de ' . $mes . ' del ' . $anio;
         </div>
          <div style="position:absolute; top:85%; left:9.5%; width:81%; height:20px; background-color:white; font-size:13px; text-align:center;">
             <span class="proxima">
-             <strong> <?= (isset($GO) && !empty($GO))?$responsableGasto->nombre_completo : $registro->responsable ?> </strong>
+             <strong> <?= $responsableGasto->nombre_completo  ?> </strong>
             </span>
         </div>
            <div style="position:absolute; top:87%; left:9.5%; width:81%; height:20px; background-color:white; font-size:13px; text-align:center;">
             <span class="proxima">
-              <strong> <?= (isset($GO) && !empty($GO))?$responsableGasto->dsc_puesto : $registro->dsc_puesto ?></strong>
+              <strong> <?= $responsableGasto->dsc_puesto ?></strong>
             </span>
         </div>
        

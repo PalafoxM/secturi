@@ -266,7 +266,12 @@
                                                         <div class="col-md-4 mb-3"></div>
                                                         <div class="col-md-4 mb-3">
                                                             <p class="text-muted mb-3">Total</p>
-                                                            <input id="total_importe" type="text" name="total_importe" class="form-control" placeholder="0,000.00" readonly>
+                                                             <div class="input-group">
+                                                                 <input id="total_importe" type="text" name="total_importe" class="form-control" placeholder="0,000.00" readonly>
+                                                                  <span class="input-group-append">
+                                                                       <a  href="<?= base_url()?>index.php/Principal/TablaPagos/<?= $id_reserva?>" class="btn btn-gradient-primary" type="button">ver pagos</a>
+                                                                   </span>
+                                                              </div>    
                                                         </div>
                                                     </div>
                                                     

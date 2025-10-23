@@ -34,14 +34,14 @@
                                        <div class="row">
                                             <!-- Dirección Responsable -->
                                             <div class="col-md-6 mb-6">
-                                                <label for="nombre">Indicar su Nombre completo o "Anónimo"</label>
+                                                <label for="nombre">Indicar su Nombre completo</label>
                                                 <input id="nombre" class="form-control" name="nombre" value="<?= $session->nombre_completo ?>" >
                                              
                                             </div><!--end col-->
                                             
                                             <!-- Tipo de PT -->
                                             <div class="col-md-6 mb-6">
-                                                <label for="domicilio">Domicilio con código postal<span class="text-danger">*</span></label>
+                                                <label for="domicilio">Domicilio personal</label>
                                                 <input id="domicilio" class="form-control" name="domicilio" placeholder="Col. la joya, calle florida #12"  >
                                                
                                             </div><!--end col-->
@@ -49,12 +49,12 @@
                                         </div><!--end form-row-->
                                         <div class="row">
                                             <div class="col-md-6 mb-6">
-                                                <label for="correo">Correo electrónico para recibir informes o notificaciones del seguimiento.<span style="color:red;">*</span></label>
+                                                <label for="correo">Correo electrónico para recibir informes o notificaciones del seguimiento<span style="color:red;">*</span></label>
                                                 <input type="text" class="form-control" id="correo" value="<?= $session->correo ?>"  name="correo" >
                                         
                                             </div><!--end col-->
                                             <div class="col-md-6 mb-6">
-                                                <label for="telefono">Número Telefónico.<span style="color:red;">*</span></label>
+                                                <label for="telefono">Número Telefónico</label>
                                                 <input type="text" class="form-control" id="telefono" placeholder="XXX-XXX-XX-XX" name="telefono" >
                                             </div><!--end col-->
                                         </div><!--end form-row-->
