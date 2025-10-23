@@ -23,7 +23,7 @@
         </div>
         <div  style="position:absolute; text-align:justify;top:31.5%; left:7.5%; width:85%; height:35px; background-color:white; font-size:13px; ">
             <span class="proxima">Solicito que se realice trámite de pago del comprobante fiscal con <strong><?= (isset($uudi) && !empty($uudi))?$uudi:'S/N'?></strong>,
-                 derivado del contrato ó convenio número <strong> <?= $reserva->no_convenio;?></strong> por la cantidad de <strong>$<?= ($fic)?$reserva->total_importe:$registro->importe ;?></strong>
+                 derivado del contrato ó convenio número <strong> <?= $reserva->no_convenio;?></strong> por la cantidad de <strong>$<?= ($fic)?$reserva->total_importe:$registro->total_importe ;?></strong>
                  <strong>(<?= $numero_texto?>)</strong>, por el servicio <strong><?= $reserva->dsc_partida ?></strong> prestado por el proveedor <strong><?=(isset($reserva->razon_social) && !empty($reserva->razon_social))?$reserva->razon_social:'' ?></strong>. Se cuenta con suficiencia presupuestal en la partida <strong><?= $reserva->partida;?></strong> correspondiente.
            </span>
         </div>

@@ -302,6 +302,7 @@
                                                             <label for="encabezado_<?= $i ?>">Encabezado<span style="color:red;">*</span></label>
                                                             <input type="text" class="form-control" autocomplete="off" id="encabezado_<?= $i ?>" name="encabezado[]" value="<?= (isset($p->encabezado) && !empty($p->encabezado)?$p->encabezado:'') ?>" >
                                                         </div>
+                                                          <?php if( $i >= 1): ?>
                                                         <div class="col-md-2 mb-3">
                                                             <div class="checkbox checkbox-primary">
                                                                 <input id="checkbox_<?= $i ?>" type="checkbox" name="checkbox_<?= $i ?>" 
@@ -311,7 +312,7 @@
                                                                 </label>
                                                             </div>
                                                         </div>
-
+                                                         <?php endif; ?>
                                                     </div>
 
                                                     <div id="<?= $section_id ?>">

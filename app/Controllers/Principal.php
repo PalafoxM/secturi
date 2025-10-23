@@ -2631,7 +2631,7 @@ class Principal extends BaseController
             'tabla' => 'factura',
             'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
         ]);
-
+       
         $direccion = $globals->getTabla([
             'tabla' => 'vw_direccion',
             'where' => [
@@ -2677,7 +2677,7 @@ class Principal extends BaseController
             $data['registro'] = $registro_pt->data[0];
             $data['responsable'] = $registro_pt->data[0]->responsable;
             $data['dsc_puesto'] = $registro_pt->data[0]->dsc_puesto;
-            $importe = $registro_pt->data[0]->importe;
+            $importe = $registro_pt->data[0]->total_importe;
             $folio = $globals->getTabla([
                 'tabla' => 'direccion',
                 'where' => ['visible' => 1, 'id_area' => $data['registro']->id_direccion_responsable]
@@ -3611,23 +3611,28 @@ class Principal extends BaseController
             'tabla' => 'factura',
             'where' => ['visible' => 1, 'id_registro_pt' => $id_pt]
         ]);
+        $periodo_factura = $globals->getTabla([
+            'tabla' => 'periodo_factura',
+            'where' => ['visible' => 1, 'id_registro_pt' => $id_pt]
+        ]);
 
         if (isset($xml->data) && !empty($xml->data)) {
             $data['uuid'] = $xml->data[0]->uuid;
         }
-
-        //var_dump($formatos);
-        //die();
+        $importe = '';
+        if(isset($periodo_factura->data) && !empty($periodo_factura->data)){
+        $data['importe'] =  $periodo_factura->data;
+        }
+      
         $data['GO'] = false;
         $data['fic'] = false;
-        $importe = "";
         if (!empty($registro_pt->data)) {
             $data['total'] = $registro_pt->data;
             $registro = $registro_pt->data[0];
             $id_reserva = $registro_pt->data[0]->id_reserva;
             $no_consecutivo = $registro_pt->data[0]->no_consecutivo;
             $id_proveedor_banco = $registro_pt->data[0]->id_proveedor_banco; 
-            $data['importe'] = $importe = $registro_pt->data[0]->importe; 
+            $importe = $registro_pt->data[0]->total_importe; 
           
             $banco = $globals->getTabla([
                 'tabla' => 'proveedor_banco',
@@ -3717,6 +3722,7 @@ class Principal extends BaseController
         $subsecretario = $area = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1, 'id_subsecretario' => $registro_pt->data[0]->id_subsecretario]]);
         // $usu_sub = $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $subsecretario->data[0]->id_usuario]]);
         $data['usu_sub'] = $subsecretario->data[0];
+    
 
         $html = view('secciones/vFormatoPT.php', $data);
         $htmlSegundaHoja = view('secciones/vFormatoPT2.php', $data);

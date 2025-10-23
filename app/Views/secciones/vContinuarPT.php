@@ -234,26 +234,13 @@
                                                         </div>
 
                                                         <!-- Encabezado y XML -->
-                                                        <div class="col-md-4 mb-3">
+                                                        <div class="col-md-6 mb-3">
                                                             <label for="encabezado_<?= $i ?>">Encabezado<span style="color:red;">*</span></label>
                                                             <input type="text" class="form-control" readonly autocomplete="off" id="encabezado_<?= $i ?>" name="encabezado[]" value="<?= (isset($p->encabezado) && !empty($p->encabezado)?$p->encabezado:'') ?>" >
                                                         </div>
 
-                                                        <!-- Periodo -->
-                                                        <div class="col-md-2 mb-3">
-                                                            <label for="periodo_inicio<?= $i ?>">Inicio<span style="color:red;">*</span></label>
-                                                            <div class="input-group">                                            
-                                                                <input type="date" class="form-control"  id="periodo_inicio<?= $i ?>" name="periodo_inicio[]">
-                                                                
-                                                            </div>
-                                                        </div>
-                                                         <div class="col-md-2 mb-3">
-                                                            <label for="periodo_fin<?= $i ?>">Termino<span style="color:red;">*</span></label>
-                                                            <div class="input-group">                                            
-                                                                <input type="date" class="form-control"  id="periodo_fin<?= $i ?>" name="periodo_fin[]">
-                                                                
-                                                            </div>
-                                                        </div>
+                                                    
+                                                       
                                                     </div>
 
                                                     <div class="form-row">

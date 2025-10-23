@@ -68,7 +68,7 @@
         <?php endforeach; ?>
          <?php $i = 34;  ?>
          <?php if($fic): ?>
-        <?php foreach($reserva as $r): ?>
+        <?php foreach($importe as $r): ?>
               <div style="position:absolute; text-align:center; top:<?=$i?>%; left:46.4%; width:13%; background-color:white; font-size:10px; height:12px; line-height:12px;">
                     <span class="proxima">
                         <?php 
@@ -86,7 +86,7 @@
         <?php endforeach; ?>
         <?php endif; ?>
          <?php if(!$fic): ?>
-        <?php foreach($total as $r): ?>
+        <?php foreach($importe as $r): ?>
               <div style="position:absolute; text-align:center; top:<?=$i?>%; left:46.4%; width:13%; background-color:white; font-size:10px; height:12px; line-height:12px;">
                     <span class="proxima">
                         <?php 
@@ -107,7 +107,7 @@
             <span><?= $uuid; ?></span>
         </div>
         <div  style="position:absolute; text-align:right; top:52.2%; left:44%; width:15%; background-color:white; font-size: 12px;  height:12px;">
-            <span>$<?= ($fic)?$reserva[0]->total_importe:$registro->importe; ?></span>
+            <span>$<?= ($fic)?$reserva[0]->total_importe:$registro->total_importe; ?></span>
         </div>
         <div  style="position:absolute; text-align:center; top:51.8%; left:60%; width:37.5%; background-color:white; font-size: 12px;  height:20px;">
             <span class="proxima "><strong><?= ($numero_texto); ?></strong></span>

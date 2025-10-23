@@ -4668,7 +4668,7 @@ ini.inicio = (function () {
                         }
                     });
 
-                    $("[id^=periodo_inicio]").each(function(){
+           /*          $("[id^=periodo_inicio]").each(function(){
                         if($(this).val().trim() === ""){
                             valido = false;
                             mensajes.push("El campo Periodo termino es obligatorio.");
@@ -4679,7 +4679,7 @@ ini.inicio = (function () {
                             valido = false;
                             mensajes.push("El campo Periodo fin es obligatorio.");
                         }
-                    });
+                    }); */
 
                     // Validar archivos PDF
                     $("[id^=factura_pdf_input_]").each(function(){
