@@ -274,6 +274,11 @@
 </div>
 
 <div id="importe_respuesta">
-<?= $numero_texto ?>
+<?php if(!$fic): ?>
+<?= $reserva[0]->total_importe.' ('.$numero_texto.')' ?>
+<?php endif; ?>
+<?php if($fic): ?>
+<?= $reserva[0]->total_importe.' ('.$numero_texto.')' ?>
+<?php endif; ?>
 </div>
 
