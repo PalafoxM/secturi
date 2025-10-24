@@ -217,6 +217,7 @@
                                                         continue;
                                                     }
                                                     $partidas_mostradas[] = $p->id_partida;
+                                                       $section_id = "factura-section-" . $i;
                                                 ?>
                                                     <p class="text-muted mb-4 text-center">Agregar Factura PT.</p>
                                                     <hr>
@@ -238,11 +239,22 @@
                                                             <label for="encabezado_<?= $i ?>">Encabezado<span style="color:red;">*</span></label>
                                                             <input type="text" class="form-control" readonly autocomplete="off" id="encabezado_<?= $i ?>" name="encabezado[]" value="<?= (isset($p->encabezado) && !empty($p->encabezado)?$p->encabezado:'') ?>" >
                                                         </div>
-
+  <!-- CHECKBOX CORREGIDO: Aparece en todos menos el primero cuando hay más de un elemento -->
+                                                        <?php if(isset($num) && $num): ?>
+                                                        <div class="col-md-2 mb-3">
+                                                            <div class="checkbox checkbox-primary">
+                                                                <input id="checkbox_<?= $i ?>" type="checkbox" name="checkbox_<?= $i ?>" 
+                                                                    class="toggle-factura-section" data-target="#<?= $section_id ?>">
+                                                                <label for="checkbox_<?= $i ?>">
+                                                                    Pagar en otro periodo
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        <?php endif; ?>
                                                     
                                                        
                                                     </div>
-
+                                                <div id="<?= $section_id ?>">
                                                     <div class="form-row">
                                                         <div class="col-md-4 mb-3">
                                                             <p class="text-muted mb-3">Factura PDF (Máx 100MB)</p>
@@ -259,7 +271,7 @@
                                                             <input id="importe[]" type="text" name="importe[]" class="form-control" placeholder="importe" autocomplete="off" >
                                                         </div>
                                                     </div>
-                                                    
+                                                </div>    
                                                 <?php endforeach; ?>
                                                  <div class="form-row">
                                                         <div class="col-md-4 mb-3"></div>
@@ -379,5 +391,38 @@
         function formatNumber(num) {
             return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
         }
+
+
+        $(document).ready(function() {
+        
+            // Función para actualizar la visibilidad de la sección de factura
+            function actualizarVisibilidadFactura(checkbox) {
+                    // Obtiene el selector del data-target (ej: "#factura-section-0")
+                    var targetSelector = $(checkbox).data('target');
+                    var $targetSection = $(targetSelector);
+                    var $encabezadoInput = $(checkbox).closest('.form-row').find('input[name="encabezado[]"]');
+                    // Si el checkbox está MARCADO ("No Agregar Factura")...
+                    if ($(checkbox).is(':checked')) {
+                        $targetSection.hide(); // ...oculta la sección
+                      $encabezadoInput.prop('readonly', true).prop('disabled', true); // ← IMPORTANTE: deshabilita
+                    } else {
+                        $targetSection.show(); // ...muestra la sección
+                        $encabezadoInput.prop('readonly', false).prop('disabled', false); // ← IMPORTANTE: habilitar
+                    }
+                }
+            
+                // 1. Ejecuta la función para cada checkbox cuando la página carga
+                //    (Esto oculta las secciones de los checkboxes que ya vienen marcados)
+                $('.toggle-factura-section').each(function() {
+                    actualizarVisibilidadFactura(this);
+                });
+
+                // 2. Asigna el evento 'change' a todos los checkboxes con esa clase
+                //    Usamos 'on()' para que funcione incluso si se añaden filas dinámicamente
+                $(document).on('change', '.toggle-factura-section', function() {
+                    actualizarVisibilidadFactura(this);
+                });
+
+        });
 
         </script>

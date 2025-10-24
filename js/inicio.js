@@ -4692,73 +4692,68 @@ ini.inicio = (function () {
                 });
             });
         },
-       nextFormPT: function(){
+      nextFormPT: function(){
             $("#form_next_pt").submit(function (e) {
                 e.preventDefault(); 
-                   let valido = true;
-                    let mensajes = [];
+                let valido = true;
+                let mensajes = [];
+                let partidasActivas = 0;
 
-                    // Validar cada partida
-                    $("[id^=encabezado_]").each(function(){
+                // Recorrer cada partida
+                $("[id^=encabezado_]").each(function(index){
+                    let $checkbox = $('#checkbox_' + index);
+                    
+                    // Si la partida está activa (checkbox no marcado)
+                    if($checkbox.length === 0 || !$checkbox.is(':checked')) {
+                        partidasActivas++;
+                        
+                        // Validar encabezado
                         if($(this).val().trim() === ""){
                             valido = false;
-                            mensajes.push("El campo Encabezado es obligatorio.");
+                            mensajes.push("El campo Encabezado es obligatorio en la partida " + (index + 1));
                         }
-                    });
 
-           /*          $("[id^=periodo_inicio]").each(function(){
-                        if($(this).val().trim() === ""){
+                        // Validar archivos
+                        let hasPDF = $('#factura_pdf_input_' + index)[0]?.files.length > 0;
+                        let hasXML = $('#factura_xml_input_' + index)[0]?.files.length > 0;
+                        
+                        if(!hasPDF){
                             valido = false;
-                            mensajes.push("El campo Periodo termino es obligatorio.");
+                            mensajes.push("Debe subir al menos un archivo PDF en la partida " + (index + 1));
                         }
-                    });
-                    $("[id^=periodo_fin]").each(function(){
-                        if($(this).val().trim() === ""){
+                        
+                        if(!hasXML){
                             valido = false;
-                            mensajes.push("El campo Periodo fin es obligatorio.");
+                            mensajes.push("Debe subir al menos un archivo XML en la partida " + (index + 1));
                         }
-                    }); */
-
-                    // Validar archivos PDF
-                    $("[id^=factura_pdf_input_]").each(function(){
-                        let files = this.files;
-                        if(files.length === 0){
-                            valido = false;
-                            mensajes.push("Debe subir al menos un archivo PDF.");
-                        }
-                    });
-
-                    // Validar archivos XML
-                    $("[id^=factura_xml_input_]").each(function(){
-                        let files = this.files;
-                        if(files.length === 0){
-                            valido = false;
-                            mensajes.push("Debe subir al menos un archivo XML.");
-                        }
-                    });
-
-                    if(!valido){
-                        Swal.fire("Atención", "<p>"+mensajes.join("<br>")+"</p>", "warning");
-                        return;
                     }
+                });
 
+                // Verificar que al menos una partida esté activa
+                if(partidasActivas === 0){
+                    valido = false;
+                    mensajes.push("Debe tener al menos una partida activa para guardar.");
+                }
 
+                if(!valido){
+                    Swal.fire("Atención", "<p>"+mensajes.join("<br>")+"</p>", "warning");
+                    return;
+                }
 
-                var formData = new FormData(this); // Usar FormData en lugar de serialize
-               
+                // Continuar con el envío del formulario...
+                var formData = new FormData(this);
                 $.ajax({
                     type: "POST",
                     url: base_url + "index.php/Agregar/guardaPT2",
                     data: formData,
-                    processData: false,  // Importante para FormData
-                    contentType: false,  // Importante para FormData
+                    processData: false,
+                    contentType: false,
                     dataType: "json",
                     success: function (response) {
                         console.log(response);
                         if(!response.error){
                             Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
                             setTimeout(() => {
-                               // window.location.href = base_url + "index.php/Principal/listadoEstatusPT";
                                 window.location.href = base_url + "index.php/Principal/tablaArchivos/"+response.idRegistro+'/PT';
                             }, 1500);
                         }else{
@@ -4766,14 +4761,18 @@ ini.inicio = (function () {
                         }
                     },
                     beforeSend: function (info){
-                         $('#btnGuardatPT').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                        $('#btnGuardatPT').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
                     },
                     complete: function (info){
                         $('#btnGuardatPT').prop('disabled', false).html('Guardar');
+                        // Rehabilitar todos los campos después del envío
+                        $('input, select, textarea').prop('disabled', false);
                     },
                     error: function (response,jqXHR, textStatus, errorThrown) {
                         var res= JSON.parse(response.responseText);
                         Swal.fire("Error", '<p> '+ res.message + '</p>');  
+                        // Rehabilitar todos los campos en caso de error
+                        $('input, select, textarea').prop('disabled', false);
                     }
                 });
             });

@@ -4248,8 +4248,7 @@ class Principal extends BaseController
         $cat_director_general = $globals->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1]]);
         $cat_opcion = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1]]);
         $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
-       
-    
+      
         if (!empty($id_registro_pt)) {
             $data['registro_pt'] = (!empty($registro_pt->data)) ? $registro_pt->data[0] : '';
             $data['id_reserva'] = (!empty($registro_pt->data)) ? $registro_pt->data[0]->id_reserva : '';
@@ -4258,9 +4257,21 @@ class Principal extends BaseController
              $data['subsecretario'] = (!empty($cat_subsecretario->data)) ? $cat_subsecretario->data[0]->dsc_subsecretario : '';
              $data['direccion_responsable'] = (!empty($direccion_responsable->data)) ? $direccion_responsable->data[0]->dsc_area : '';
             $presupuesto = $globals->getTabla(['tabla' => 'vw_presupuesto', 'where' => ['id_reserva' => $data['registro_pt']->id_reserva]]);
-            $idproveedor = $globals->getTabla(['tabla' => 'proveedor_banco', 'where' => ['idproveedor' => $data['registro_pt']->id_proveedor_banco]]);
+        
+            foreach ($presupuesto->data as $i => $p) {
+                $num = count($presupuesto->data);
+                $data['num'] =  ($num >= 2)?true:false;
+                
+                if ($p->id_partida >= 149 && $p->id_partida <= 248) {
+                    $partida4000 = true;
+                }
+            }
+       
+            $idproveedor = $globals->getTabla(['tabla' => 'proveedor_banco', 'where' => ['idproveedor' => $data['registro_pt']->id_proveedor]]);
+            
              $data['presupuesto'] = (!empty($presupuesto->data)) ? $presupuesto->data : [];
              $data['idproveedor'] = (!empty($idproveedor->data)) ? $idproveedor->data : '';
+
         }
         
    

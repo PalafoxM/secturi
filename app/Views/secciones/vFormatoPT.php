@@ -103,10 +103,10 @@
             <?php $i += 1.5; ?>
         <?php endforeach; ?>
         <?php endif; ?>
-        <div style="position:absolute; text-align:right; top:34%; left:2.8%; width:12%; background-color:white; font-size: 12px;  height:25px;">
+        <div style="position:absolute; text-align:right; top:34%; left:2.7%; width:13.8%; background-color:white; font-size: 12px;  height:25px;">
            
             <?php foreach( $uuid as $u ): ?>
-                 <span><?= $u->uuid; ?></span>
+                 <p><?= $u->uuid; ?></p>
             <?php endforeach; ?>
         </div>
         <div  style="position:absolute; text-align:right; top:52.2%; left:44%; width:15%; background-color:white; font-size: 12px;  height:12px;">

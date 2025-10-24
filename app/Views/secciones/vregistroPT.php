@@ -58,11 +58,18 @@
                                             <td  class="text-center"><?= $e->concepto_pago?></td>
                                             <td  class="text-center <?= ($e->fic==1)?'text-success':'text-info'?>"><strong><?= ($e->fic==1)?'FIC':'PT'?></strong></td>
                                             <td  class="text-center" class="text-center">
-                                                              
+                                            <?php if($e->fic==1): ?>            
                                                 <a title="formateria" href="<?php echo base_url().'index.php/Principal/tablaArchivos/'.$e->id_registro_pt.'/FIC' ?>" target="_blank">
                                                       <button type="button"  class="btn btn-outline-info btn-round">   
                                                         <i class="mdi mdi-file-document text-success font-18"></i></button>
                                                 </a>
+                                                <?php endif; ?>
+                                            <?php if(!$e->fic==1): ?>            
+                                                <a title="formateria" href="<?php echo base_url().'index.php/Principal/tablaArchivos/'.$e->id_registro_pt.'/PT' ?>" target="_blank">
+                                                      <button type="button"  class="btn btn-outline-info btn-round">   
+                                                        <i class="mdi mdi-file-document text-success font-18"></i></button>
+                                                </a>
+                                                <?php endif; ?>
                                                 <?php if(in_array($session->get('id_perfil'),[1,7] )): ?>
                                                 <a class="btn btn-outline-info btn-round" href="<?php echo base_url().'index.php/Inicio/Viaticos/'.$e->id_registro_pt?>"  ><i
                                                         class="mdi mdi-check text-success font-18"></i></a> 
