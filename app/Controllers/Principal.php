@@ -1003,7 +1003,9 @@ class Principal extends BaseController
         $foto = $this->request->getFile('foto');
         $extension = $foto->getClientExtension();
         //$originalName = pathinfo($foto->getName(), PATHINFO_FILENAME);
-        $archivo = $session->usuario . '.' . $extension;
+       $exten = date('Ymd_His'); // "20241210_143025"
+       $archivo = $session->usuario.'_'.$exten.'.' . $extension;
+
         $ruta_destino = FCPATH . 'assets/images/fotos/';
 
         $foto->move($ruta_destino, $archivo);
@@ -4273,7 +4275,6 @@ class Principal extends BaseController
              $data['idproveedor'] = (!empty($idproveedor->data)) ? $idproveedor->data : '';
 
         }
-        
    
        // die( var_dump(  $data ) );
         $data['dsc_director_general'] = (!empty($cat_director_general->data)) ? $cat_director_general->data[0]->dsc_director_general : [];

@@ -146,15 +146,17 @@ class Agregar extends BaseController
         $session = \Config\Services::session();
         $this->globals = new Mglobal();
         $responses = [];
-    
+       
+      
         foreach ($periodo as $p) {
             // DETECTAR TIPO DE ESTRUCTURA
             $esAnidado = (is_array($p['encabezado']) && is_array($p['importe']));
             $esNormal = (is_string($p['encabezado']) && is_string($p['importe']));
-            
+          
             if ($esAnidado) {
                 // Estructura anidada: múltiples registros
                 foreach ($p['encabezado'] as $index => $encabezado) {
+                  
                     if (isset($p['importe'][$index])) {
                         $this->procesarRegistroIndividual(
                             $id_registro_pt, 
@@ -180,35 +182,36 @@ class Agregar extends BaseController
         return $responses;
     }
 
-    private function procesarRegistroIndividual($id_registro_pt, $encabezado, $importe, $session, &$responses)
+  private function procesarRegistroIndividual($id_registro_pt, $encabezado, $importe, $session, &$responses)
     {
-        // Validar que no estén vacíos
-        if (empty(trim($encabezado)) || empty(trim($importe))) {
-            return;
+    
+        if (!empty(trim($encabezado)) && !empty(trim($importe))) {
+            
+            // Limpiar importe
+            $importe_limpio = floatval(str_replace(['$', ',', ' '], '', $importe));
+            
+            $dataInsert = [
+                'id_registro_pt' => (int) $id_registro_pt,
+                'encabezado' => trim($encabezado),
+                'importe' => $importe_limpio,
+                'fec_reg' => date('Y-m-d H:i:s'),
+            ];
+
+            $dataConfig = [
+                "tabla" => "periodo_factura",
+                "editar" => false
+            ];
+
+            $dataBitacora = [
+                'id_user' => $session->get('id_usuario'),
+                'script' => 'Agregar.php/guardarPeriodo'
+            ];
+
+            $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+        
+            $responses[] = $response;
         }
-        
-        // Limpiar importe
-        $importe_limpio = floatval(str_replace(['$', ',', ' '], '', $importe));
-        
-        $dataInsert = [
-            'id_registro_pt' => (int) $id_registro_pt,
-            'encabezado' => trim($encabezado),
-            'importe' => $importe_limpio,
-            'fec_reg' => date('Y-m-d H:i:s'),
-        ];
-
-        $dataConfig = [
-            "tabla" => "periodo_factura",
-            "editar" => false
-        ];
-
-        $dataBitacora = [
-            'id_user' => $session->get('id_usuario'),
-            'script' => 'Agregar.php/guardarPeriodo'
-        ];
-
-        $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
-        $responses[] = $response;
+        // Si no cumple la condición, simplemente no hace nada (no inserta)
     }
     public function procesarPDFgo(array $archivos, $id_registro_go = null)
     {

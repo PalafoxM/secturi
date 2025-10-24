@@ -4692,55 +4692,51 @@ ini.inicio = (function () {
                 });
             });
         },
-      nextFormPT: function(){
+        nextFormPT: function(){
             $("#form_next_pt").submit(function (e) {
                 e.preventDefault(); 
+                
+                // 1. Deshabilitar campos de partidas marcadas ANTES de validar y enviar
+                $('.toggle-factura-section:checked').each(function() {
+                    let i = $(this).attr('id').replace('checkbox_', '');
+                    $('#encabezado_' + i).prop('disabled', true);
+                    $('input[name="importe[]"]').eq(i).prop('disabled', true);
+                    $('#factura_pdf_input_' + i).prop('disabled', true);
+                    $('#factura_xml_input_' + i).prop('disabled', true);
+                });
+
+                // 2. Validación normal (solo campos habilitados)
                 let valido = true;
                 let mensajes = [];
-                let partidasActivas = 0;
-
-                // Recorrer cada partida
-                $("[id^=encabezado_]").each(function(index){
-                    let $checkbox = $('#checkbox_' + index);
-                    
-                    // Si la partida está activa (checkbox no marcado)
-                    if($checkbox.length === 0 || !$checkbox.is(':checked')) {
-                        partidasActivas++;
-                        
-                        // Validar encabezado
-                        if($(this).val().trim() === ""){
-                            valido = false;
-                            mensajes.push("El campo Encabezado es obligatorio en la partida " + (index + 1));
-                        }
-
-                        // Validar archivos
-                        let hasPDF = $('#factura_pdf_input_' + index)[0]?.files.length > 0;
-                        let hasXML = $('#factura_xml_input_' + index)[0]?.files.length > 0;
-                        
-                        if(!hasPDF){
-                            valido = false;
-                            mensajes.push("Debe subir al menos un archivo PDF en la partida " + (index + 1));
-                        }
-                        
-                        if(!hasXML){
-                            valido = false;
-                            mensajes.push("Debe subir al menos un archivo XML en la partida " + (index + 1));
-                        }
+                
+                $("[id^=encabezado_]:not(:disabled)").each(function(index){
+                    if($(this).val().trim() === ""){
+                        valido = false;
+                        mensajes.push("El campo Encabezado es obligatorio en la partida " + (index + 1));
                     }
                 });
 
-                // Verificar que al menos una partida esté activa
-                if(partidasActivas === 0){
-                    valido = false;
-                    mensajes.push("Debe tener al menos una partida activa para guardar.");
-                }
+                $("[id^=factura_pdf_input_]:not(:disabled)").each(function(index){
+                    if(this.files.length === 0){
+                        valido = false;
+                        mensajes.push("Debe subir al menos un archivo PDF en la partida " + (index + 1));
+                    }
+                });
+
+                $("[id^=factura_xml_input_]:not(:disabled)").each(function(index){
+                    if(this.files.length === 0){
+                        valido = false;
+                        mensajes.push("Debe subir al menos un archivo XML en la partida " + (index + 1));
+                    }
+                });
 
                 if(!valido){
+                    $('input, select, textarea').prop('disabled', false);
                     Swal.fire("Atención", "<p>"+mensajes.join("<br>")+"</p>", "warning");
                     return;
                 }
 
-                // Continuar con el envío del formulario...
+                // 3. Enviar formulario
                 var formData = new FormData(this);
                 $.ajax({
                     type: "POST",
@@ -4754,7 +4750,7 @@ ini.inicio = (function () {
                         if(!response.error){
                             Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
                             setTimeout(() => {
-                            //    window.location.href = base_url + "index.php/Principal/tablaArchivos/"+response.idRegistro+'/PT';
+                                window.location.href = base_url + "index.php/Principal/tablaArchivos/"+response.idRegistro+'/PT';
                             }, 1500);
                         }else{
                             Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
