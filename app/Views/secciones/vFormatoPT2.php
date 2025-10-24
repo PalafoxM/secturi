@@ -43,11 +43,20 @@ $fechaFormateada = $dia . ' de ' . $mes . ' del ' . $anio;
                 con folio <strong><?= (isset($GO) && !empty($GO))?'GO':'PT'?> <?= ($fic)?$folio:strtoupper($registro->folio);?></strong> por la cantidad de 
                 <strong>$<?= ($fic)?$reserva[0]->total_importe: $registro->total_importe; ?> (<?= mb_strtoupper($numero_texto, 'UTF-8'); ?>)</strong>,
                 de comprobante(s) fiscale(s) No. 
+                <?php if($fic): ?>
+                <strong>
+                        <?= $uuid; ?>
+                </strong> 
+                <?php endif; ?>
+                <?php if(!$fic): ?>
                 <strong>
                     <?php foreach($uuid as $u):?>
                         <?= $u->uuid; ?>
                     <?php endforeach; ?>
-                </strong> por concepto de <?= $registro->concepto_pago ?> 
+
+                </strong> 
+                <?php endif; ?>
+                por concepto de <?= $registro->concepto_pago ?> 
                 al proveedor <?= $registro->dsc_proveedor ?>.
             </span>
         </div>

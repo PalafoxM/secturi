@@ -3626,7 +3626,7 @@ class Principal extends BaseController
         if(isset($periodo_factura->data) && !empty($periodo_factura->data)){
         $data['importe'] =  $periodo_factura->data;
         }
-       
+      
         $data['GO'] = false;
         $data['fic'] = false;
         if (!empty($registro_pt->data)) {

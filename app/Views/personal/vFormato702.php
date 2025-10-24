@@ -246,13 +246,17 @@
    FACTURA / RECIBO No: 
 </div>
 <div id="factura_respuesta">
-
-<?php 
-$keys = array_keys($uuid);
-$lastKey = end($keys);
-foreach($uuid as $key => $u): ?>
-    <?= $u->uuid ?><?= $key !== $lastKey ? ',' : '' ?>
-<?php endforeach; ?>
+    <?php if(!$fic): ?>
+   <?php 
+   $keys = array_keys($uuid);
+   $lastKey = end($keys);
+   foreach($uuid as $key => $u): ?>
+      <?= $u->uuid ?><?= $key !== $lastKey ? ',' : '' ?>
+   <?php endforeach; ?>
+     <?php endif; ?>
+    <?php if($fic): ?>
+      <?= $uuid ?>
+     <?php endif; ?>
 </div>
 <div id="fecha">
    FECHA DEL GASTO:

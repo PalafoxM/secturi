@@ -4754,7 +4754,7 @@ ini.inicio = (function () {
                         if(!response.error){
                             Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
                             setTimeout(() => {
-                                window.location.href = base_url + "index.php/Principal/tablaArchivos/"+response.idRegistro+'/PT';
+                            //    window.location.href = base_url + "index.php/Principal/tablaArchivos/"+response.idRegistro+'/PT';
                             }, 1500);
                         }else{
                             Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
