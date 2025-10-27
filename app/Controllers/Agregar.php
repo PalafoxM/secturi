@@ -162,7 +162,8 @@ class Agregar extends BaseController
                             $id_registro_pt, 
                             $encabezado, 
                             $p['importe'][$index], 
-                            $session, 
+                            $p['partida'][$index],
+                            $p['proyecto'][$index],
                             $responses
                         );
                     }
@@ -173,7 +174,8 @@ class Agregar extends BaseController
                     $id_registro_pt, 
                     $p['encabezado'], 
                     $p['importe'], 
-                    $session, 
+                    $p['partida'], 
+                    $p['proyecto'], 
                     $responses
                 );
             }
@@ -182,8 +184,9 @@ class Agregar extends BaseController
         return $responses;
     }
 
-  private function procesarRegistroIndividual($id_registro_pt, $encabezado, $importe, $session, &$responses)
+  private function procesarRegistroIndividual($id_registro_pt, $encabezado, $importe, $partida,$proyecto,&$responses)
     {
+          $session = \Config\Services::session();
     
         if (!empty(trim($encabezado)) && !empty(trim($importe))) {
             
@@ -194,6 +197,8 @@ class Agregar extends BaseController
                 'id_registro_pt' => (int) $id_registro_pt,
                 'encabezado' => trim($encabezado),
                 'importe' => $importe_limpio,
+                'id_partida' => (int)$partida,
+                'id_proyecto' => (int)$proyecto,
                 'fec_reg' => date('Y-m-d H:i:s'),
             ];
 
@@ -1514,8 +1519,9 @@ class Agregar extends BaseController
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
         $archivos = $this->request->getFiles();
-
-  
+       
+      
+       
         if (isset($data['cuenta_bancaria']) && empty($data['cuenta_bancaria'])) {
             $response->error = true;
             $response->respuesta = "Es requerido el Cuenta Bancaria";
@@ -1622,6 +1628,14 @@ class Agregar extends BaseController
                     $index = str_replace('importe', '', $key); // ej. periodo1 → 1
                     $periodo[$index]['importe'] = $p;
                 }
+                if (strpos($key, 'partida') === 0) {
+                    $index = str_replace('partida', '', $key); // ej. periodo1 → 1
+                    $periodo[$index]['partida'] = $p;
+                }
+                if (strpos($key, 'proyecto') === 0) {
+                    $index = str_replace('proyecto', '', $key); // ej. periodo1 → 1
+                    $periodo[$index]['proyecto'] = $p;
+                }
               
             }
 
@@ -1634,6 +1648,7 @@ class Agregar extends BaseController
                 }
             }
 
+      
 
             $datosXML = $this->procesarXML($archivosXml, $id_registro_pt);
             $datosPDF = $this->procesarPDF($archivosPdf, $id_registro_pt);

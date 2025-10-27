@@ -223,12 +223,22 @@
                                                     <hr>
                                                     <div class="form-row"> <!-- presupuesto -->
                                                         <!-- Partida y Factura PDF -->
-                                                        <div class="col-md-4 mb-3">
+                                                        <div class="col-md-2 mb-3">
                                                             <label for="partida_<?= $i ?>">Partida<span style="color:red;">*</span></label>
                                                             <select class="form-control" id="partida_<?= $i ?>" name="partida[]" disabled>
                                                                 <?php foreach($cat_partida as $o): ?>
                                                                     <option value="<?= $o->id_partida ?>" <?= (isset($p->id_partida) && $p->id_partida == $o->id_partida) ? 'selected' : '' ?>>
                                                                         <?= $o->cuenta_cable ?>
+                                                                    </option>
+                                                                <?php endforeach; ?>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-2 mb-3">
+                                                            <label for="proyecto_<?= $i ?>">Proyecto<span style="color:red;">*</span></label>
+                                                            <select class="form-control" id="proyecto_<?= $i ?>" name="proyecto[]" disabled>
+                                                                <?php foreach($cat_proyecto as $o): ?>
+                                                                    <option value="<?= $o->id_proyecto ?>" <?= (isset($p->id_proyecto) && $p->id_proyecto == $o->id_proyecto) ? 'selected' : '' ?>>
+                                                                        <?= $o->proyecto ?>
                                                                     </option>
                                                                 <?php endforeach; ?>
                                                             </select>

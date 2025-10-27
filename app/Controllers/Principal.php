@@ -4257,6 +4257,7 @@ class Principal extends BaseController
         $cat_director_general = $globals->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1]]);
         $cat_opcion = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1]]);
         $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
       
         if (!empty($id_registro_pt)) {
             $data['registro_pt'] = (!empty($registro_pt->data)) ? $registro_pt->data[0] : '';
@@ -4290,6 +4291,7 @@ class Principal extends BaseController
         $data['cat_opcion'] = (!empty($cat_opcion->data)) ? $cat_opcion->data : [];
         
         $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+        $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
         $data['secretario'] = (!empty($secretario->data)) ? $secretario->data : [];
         $data['usuario'] = (!empty($usuario->data)) ? $usuario->data[0] : [];
         $data['cat_usuario'] = (!empty($cat_usuario->data)) ? $cat_usuario->data : [];

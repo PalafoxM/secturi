@@ -4695,6 +4695,9 @@ ini.inicio = (function () {
         nextFormPT: function(){
             $("#form_next_pt").submit(function (e) {
                 e.preventDefault(); 
+                $('select[name="partida[]"]').prop('disabled', false);
+                $('select[name="proyecto[]"]').prop('disabled', false);
+
                 
                 // 1. Deshabilitar campos de partidas marcadas ANTES de validar y enviar
                 $('.toggle-factura-section:checked').each(function() {
@@ -4703,6 +4706,8 @@ ini.inicio = (function () {
                     $('input[name="importe[]"]').eq(i).prop('disabled', true);
                     $('#factura_pdf_input_' + i).prop('disabled', true);
                     $('#factura_xml_input_' + i).prop('disabled', true);
+                     $('#partida_' + i).prop('disabled', true);
+                     $('#proyecto_' + i).prop('disabled', true);
                 });
 
                 // 2. Validación normal (solo campos habilitados)
@@ -4730,8 +4735,10 @@ ini.inicio = (function () {
                     }
                 });
 
-                if(!valido){
+               if(!valido){
                     $('input, select, textarea').prop('disabled', false);
+                    // Volver a dejar los selects de partida como disabled
+                    $('select[name="partida[]"]').prop('disabled', true);
                     Swal.fire("Atención", "<p>"+mensajes.join("<br>")+"</p>", "warning");
                     return;
                 }
@@ -4763,6 +4770,8 @@ ini.inicio = (function () {
                         $('#btnGuardatPT').prop('disabled', false).html('Guardar');
                         // Rehabilitar todos los campos después del envío
                         $('input, select, textarea').prop('disabled', false);
+                         $('select[name="partida[]"]').prop('disabled', true);
+                         $('select[name="proyecto[]"]').prop('disabled', true);
                     },
                     error: function (response,jqXHR, textStatus, errorThrown) {
                         var res= JSON.parse(response.responseText);
