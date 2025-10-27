@@ -565,7 +565,7 @@ class Inicio extends BaseController {
             $consecutivo = $globals->getTabla(['tabla' => 'consecutivo', 'where' => ['visible' => 1], 'orderBy' => 'id_consecutivo DESC']);
             $conse = (isset($consecutivo->data) && !empty($consecutivo->data)) ? $consecutivo->data[0]->no_consecutivo : '';
             $data['consecutivo'] = $conse + 1; 
-            $presupuesto = $globals->getTabla(['tabla' => 'vw_presupuesto', 'where' => ['id_reserva' => $id_reserva]]);
+            $presupuesto = $globals->getTabla(['tabla' => 'vw_pagos', 'where' => ['id_registro_pt' => $id_registro_pt]]);
             foreach ($presupuesto->data as $i => $p) {
                 if ($p->id_partida >= 149 && $p->id_partida <= 248) {
                     $partida4000 = true;

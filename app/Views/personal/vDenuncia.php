@@ -34,31 +34,35 @@
                                        <div class="row">
                                             <!-- Dirección Responsable -->
                                             <div class="col-md-6 mb-6">
-                                                <label for="nombre">Indicar su Nombre completo</label>
+                                                <label for="nombre">Nombre</label>
                                                 <input id="nombre" class="form-control" name="nombre" value="<?= $session->nombre_completo ?>" >
                                              
                                             </div><!--end col-->
                                             
-                                            <!-- Tipo de PT -->
                                             <div class="col-md-6 mb-6">
-                                                <label for="domicilio">Domicilio personal</label>
-                                                <input id="domicilio" class="form-control" name="domicilio" placeholder="Col. la joya, calle florida #12"  >
-                                               
+                                               <label for="correo">Correo electrónico para recibir informes o notificaciones del seguimiento</label>
+                                                <input type="text" class="form-control" id="correo" value="<?= $session->correo ?>"  name="correo" >
+                                        
                                             </div><!--end col-->
                                          
                                         </div><!--end form-row-->
                                         <div class="row">
                                             <div class="col-md-6 mb-6">
-                                                <label for="correo">Correo electrónico para recibir informes o notificaciones del seguimiento<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" id="correo" value="<?= $session->correo ?>"  name="correo" >
+                                                <label for="correo">¿Deseas que tu denuncia sea anónima?</label><span style="color:red;">*</span>
+                                                <select class="form-control">
+                                                    <option>NO</option>
+                                                    <option>SI</option>
+                                                </select>
                                         
                                             </div><!--end col-->
                                             <div class="col-md-6 mb-6">
-                                                <label for="telefono">Número Telefónico</label>
-                                                <input type="text" class="form-control" id="telefono" placeholder="XXX-XXX-XX-XX" name="telefono" >
+                                                
                                             </div><!--end col-->
+                                           
                                         </div><!--end form-row-->
-                                        <div class="row">
+                                    
+                                          <h3 class="mt-0 header-title">NARRACIÓN DE LOS HECHOS<strong></strong></h3>
+                                              <div class="row">
                                             <div class="col-md-6 mb-6">
                                                 <label for="donde_ocurrieron">¿Dónde ocurrieron los hechos?<span style="color:red;">*</span></label>
                                                 <input type="text" class="form-control" id="donde_ocurrieron" name="donde_ocurrieron" >
@@ -100,18 +104,24 @@
                                                 <input type="text" class="form-control" id="denunciando_text" name="denunciando_text" placeholder="Ingrese nombre">
                                             </div><!--end col-->
                                         </div><!--end form-row-->
-
                                         <div class="row">
-                                           
-                                            <div class="col-md-12 mb-6">
+                                            <div class="col-md-6 mb-6">
                                                 <label for="como_ocurrieron">¿Cómo ocurrieron los hechos?<span style="color:red;">*</span></label>
                                                 <textarea class="form-control" id="como_ocurrieron" name="como_ocurrieron" ></textarea>
                                             </div><!--end col-->
+                                            <div class="col-md-6 mb-6">
+                                                <label for="como_ocurrieron">Evidencia en caso de contar con ella</label>
+                                                <input type="file" class="form-control" id="como_ocurrieron" name="como_ocurrieron" ></textinputarea>
+                                            </div><!--end col-->
                                         </div><!--end form-row-->
+                                        <br>
+                                        <center>
+                                        <h6 class="mt-0">Todas las denuncias serán tratadas con confidencialidad, respeto y seriedad.<br>
+Tu participación contribuye a fortalecer una cultura de ética, integridad y confianza en la Secretaría de Turismo e Identidad.</h6>  </center>
                                
                                <a class="btn btn-gradient-danger" style="color:white" onclick="window.history.back()">Atrás</a>
                       
-                                <a href="javascript:void(0)" class="btn btn-gradient-primary text-white" id="btnDenuncia" onclick="ini.inicio.formDenuncia();">Guardar</a>
+                                <a href="javascript:void(0)" class="btn btn-gradient-primary text-white" id="btnDenuncia" onclick="ini.inicio.formDenuncia();">Enviar</a>
                          
                             </form> <!--end form-->                                          
                         </div><!--end card-body-->
