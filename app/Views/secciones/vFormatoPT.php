@@ -126,10 +126,14 @@
             <?php $i += 1.5; ?>
         <?php endforeach; ?>
         <?php endif; ?>
-        <div style="position:absolute; text-align:right; top:34%; left:2.7%; width:13.8%; background-color:white; font-size: 12px;  height:25px;">
+        
            <?php if(!$fic): ?>
+             <?php $i = 34;  ?>
             <?php foreach( $uuid as $u ): ?>
-                 <p><?= $u->uuid; ?></p>
+                <div style="position:absolute; text-align:center; top:<?=$i?>%; left:2.7%; width:13.8%; background-color:white; font-size: 12px;  height:12px;">
+                  <p><?= $u->uuid; ?></p>
+                 </div>
+            <?php $i += 1.5; ?>
             <?php endforeach; ?>
          <?php endif; ?>
            <?php if($fic): ?>
@@ -137,7 +141,7 @@
                  <p><?= $uuid; ?></p>
 
          <?php endif; ?>
-        </div>
+   
         <div  style="position:absolute; text-align:right; top:52.2%; left:44%; width:15%; background-color:white; font-size: 12px;  height:12px;">
             <span>$<?= ($fic)?$reserva[0]->total_importe:$registro->total_importe; ?></span>
         </div>

@@ -330,6 +330,10 @@
                                                 <div id="<?= $section_id ?>">
                                                     <div class="form-row">
                                                         <div class="col-md-4 mb-3">
+                                                            <?php if( isset($factura_pdf[$i]) && !empty($factura_pdf[$i])): ?>
+                                                                <input type="hidden" id="editarPDF_<?= $i; ?>"  name="editarPDF[]" value="<?= $factura_pdf[$i]->id_factura_pdf ?>"  >
+                                                                <input type="hidden" id="editarXML_<?= $i; ?>" name="editarXML[]" value="<?= $factura[$i]->id_factura ?>"  >
+                                                            <?php endif; ?>
                                                             <p class="text-muted mb-3">Factura PDF (Máx 100MB)</p> <?= (isset($factura_pdf) && !empty($factura_pdf))? '<a target="_blank" href='.base_url().$factura_pdf[$i]->ruta_relativa.'><i class="mdi dripicons-preview"></i></a>':'' ?>
                                                             <input id="factura_pdf_input_<?= $i; ?>" type="file" name="factura_pdf_<?= $i; ?>[]" class="dropify" multiple accept=".pdf" />   
                                                         </div>

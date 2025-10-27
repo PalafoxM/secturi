@@ -4613,7 +4613,37 @@ ini.inicio = (function () {
                 let mensajes = [];
                 let editar = $("#editar").val();
                 
-                // ... resto de tu validación ...
+
+                    // Validar cada partida
+                    $("[id^=encabezado_]").each(function(){
+                        if($(this).val().trim() === ""){
+                            valido = false;
+                            mensajes.push("El campo Encabezado es obligatorio.");
+                        }
+                    });
+
+
+                    // Validar archivos PDF
+                    if(editar != 1){
+                        $("[id^=factura_pdf_input_]").each(function(){
+                            let files = this.files;
+                            if(files.length === 0){
+                                valido = false;
+                                mensajes.push("Debe subir al menos un archivo PDF.");
+                            }
+                        });
+                    }
+
+                     if(editar != 1){
+                      // Validar archivos XML
+                        $("[id^=factura_xml_input_]").each(function(){
+                            let files = this.files;
+                            if(files.length === 0){
+                                valido = false;
+                                mensajes.push("Debe subir al menos un archivo XML.");
+                            }
+                        });
+                    }
                 
                 if(!valido){
                     Swal.fire("Atención", "<p>"+mensajes.join("<br>")+"</p>", "warning");
