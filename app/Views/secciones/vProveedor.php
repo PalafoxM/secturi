@@ -297,8 +297,8 @@
                                                         </select>
                                                     </div>
                                                     <div class="col-md-2 mb-3">
-                                                        <label for="partida_<?= $i ?>">Partida<span style="color:red;">*</span></label>
-                                                        <select class="form-control" id="partida_<?= $i ?>" name="partida[]" disabled>
+                                                        <label for="proyecto_<?= $i ?>">Partida<span style="color:red;">*</span></label>
+                                                        <select class="form-control" id="proyecto_<?= $i ?>" name="proyecto[]" disabled>
                                                             <?php foreach($cat_proyecto as $o): ?>
                                                                 <option value="<?= $o->id_proyecto ?>" <?= (isset($p->id_proyecto) && $p->id_proyecto == $o->id_proyecto) ? 'selected' : '' ?>>
                                                                     <?= $o->proyecto ?>
@@ -330,11 +330,11 @@
                                                 <div id="<?= $section_id ?>">
                                                     <div class="form-row">
                                                         <div class="col-md-4 mb-3">
-                                                            <p class="text-muted mb-3">Factura PDF (Máx 100MB)</p>
+                                                            <p class="text-muted mb-3">Factura PDF (Máx 100MB)</p> <?= (isset($factura_pdf) && !empty($factura_pdf))? '<a target="_blank" href='.base_url().$factura_pdf[$i]->ruta_relativa.'><i class="mdi dripicons-preview"></i></a>':'' ?>
                                                             <input id="factura_pdf_input_<?= $i; ?>" type="file" name="factura_pdf_<?= $i; ?>[]" class="dropify" multiple accept=".pdf" />   
                                                         </div>
                                                         <div class="col-md-4 mb-3">
-                                                            <p class="text-muted mb-3">Factura XML (Máx 100MB)</p>
+                                                            <p class="text-muted mb-3">Factura XML (Máx 100MB)</p> <?= (isset($factura) && !empty($factura))? '<a target="_blank" href='.base_url().'index.php/Inicio/VerXML/'.$factura[$i]->id_factura.'><i class="mdi dripicons-preview"></i></a>':'' ?>
                                                             <input id="factura_xml_input_<?= $i; ?>" type="file" name="factura_xml_<?= $i; ?>[]" multiple class="dropify" accept=".xml">
                                                         </div>
                                                         <div class="col-md-4 mb-3">

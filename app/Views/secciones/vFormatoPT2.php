@@ -76,9 +76,9 @@ $fechaFormateada = $dia . ' de ' . $mes . ' del ' . $anio;
                    <?php endif; ?>
                      <?php if(!$fic): ?>
                         <?php 
-                        $total = count($reserva);
+                        $total = count($presupuesto);
                         $current = 0;
-                        foreach($reserva as $r):
+                        foreach($presupuesto as $r):
                             $current++;
                             echo $r->proyecto;
                             if ($current < $total) {
@@ -87,16 +87,16 @@ $fechaFormateada = $dia . ' de ' . $mes . ' del ' . $anio;
                         endforeach; 
                         ?>
                    <?php endif; ?>
-                </strong> a las partida(s) presepuestal(es) 
+                </strong> a las partida(s) presupuestal(es) 
                 <strong>
                  <?php if($fic): ?>
                    "<?= ($reserva[0]->partida);?> <?= ($reserva[0]->dsc_partida);?>".
                    <?php endif; ?>  
                      <?php if(!$fic): ?>
                         <?php 
-                        $total = count($reserva);
+                        $total = count($presupuesto);
                         $current = 0;
-                        foreach($reserva as $r):
+                        foreach($presupuesto as $r):
                             $current++;
                             echo $r->partida;
                             if ($current < $total) {

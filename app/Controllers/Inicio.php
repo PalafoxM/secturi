@@ -537,6 +537,17 @@ class Inicio extends BaseController {
         $data['contentView'] = 'secciones/vlistaPuesto';
         $this->_renderView($data);   
     }
+    public function verXML($idFactura =  null)
+    {
+        $session = \Config\Services::session();
+        $principal            = new Mglobal;
+      
+        $factura           = $principal->getTabla(['tabla' => 'factura', 'where'=>['visible' => 1, 'id_factura' => $idFactura]]); 
+        $data['factura']   = (isset($factura->data) && !empty($factura->data))?$factura->data[0]:[];
+        $data['scripts']     = ['principal', 'inicio'];
+        $data['contentView'] = 'secciones/vFactura';
+        $this->_renderView($data);   
+    }
     public function EditarPT($id_registro_pt)
     {
           $session = \Config\Services::session();
@@ -562,14 +573,26 @@ class Inicio extends BaseController {
             }
 
         }
+         
         if (!empty($id_registro_pt)) {
+          
             $registro_pt = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]]);
             $importe = $globals->getTabla(['tabla' => 'periodo_factura', 'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]]);
+            $factura_pdf = $globals->getTabla(['tabla' => 'factura_pdf', 'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]]);
+            $factura = $globals->getTabla(['tabla' => 'factura', 'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]]);
             if(isset($importe->data) && !empty($importe->data)){
                 $data['importe'] = $importe->data;
             }
+            if(isset($factura_pdf->data) && !empty($factura_pdf->data)){
+                $data['factura_pdf'] = $factura_pdf->data;
+            }
+            
+            if(isset($factura->data) && !empty($factura->data)){
+                $data['factura'] = $factura->data;
+            }
+            
         }
-
+       
         $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1]]);
         $cat_tipo = $globals->getTabla(['tabla' => 'cat_tipo', 'where' => ['visible' => 1]]);
 
@@ -578,6 +601,7 @@ class Inicio extends BaseController {
         $cat_director_general = $globals->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1]]);
         $cat_opcion = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1]]);
         $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
         $cat_subsecretario = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1]]);
         if ($id_reserva != 0) {
             $data['reserva'] = (!empty($reserva->data)) ? $reserva->data[0] : [];
@@ -590,20 +614,21 @@ class Inicio extends BaseController {
 
         // die( var_dump(  $data['registro_pt'] ) );
         $data['dsc_director_general'] = (!empty($cat_director_general->data)) ? $cat_director_general->data[0]->dsc_director_general : [];
-        $data['cat_area'] = (!empty($cat_area->data)) ? $cat_area->data : [];
-        $data['cat_tipo'] = (!empty($cat_tipo->data)) ? $cat_tipo->data : [];
-        $data['cat_opcion'] = (!empty($cat_opcion->data)) ? $cat_opcion->data : [];
-        $data['cat_subsecretario'] = (!empty($cat_subsecretario->data)) ? $cat_subsecretario->data : [];
-        $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
-        $data['editar'] =  1;
-        $data['secretario'] = (!empty($secretario->data)) ? $secretario->data : [];
-        $data['usuario'] = (!empty($usuario->data)) ? $usuario->data[0] : [];
-        $data['cat_usuario'] = (!empty($cat_usuario->data)) ? $cat_usuario->data : [];
-        $data['id_reserva'] = (!empty($id_reserva)) ? $id_reserva : 0;
-        $data['scripts'] = array('inicio');
-        $data['edita'] = $btn;
-        $data['partida4000'] = $partida4000;
-        $data['contentView'] = 'secciones/vProveedor';
+        $data['cat_area']             = (!empty($cat_area->data)) ? $cat_area->data : [];
+        $data['cat_tipo']             = (!empty($cat_tipo->data)) ? $cat_tipo->data : [];
+        $data['cat_opcion']           = (!empty($cat_opcion->data)) ? $cat_opcion->data : [];
+        $data['cat_subsecretario']    = (!empty($cat_subsecretario->data)) ? $cat_subsecretario->data : [];
+        $data['cat_partida']          = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+        $data['cat_proyecto']         = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
+        $data['editar']               =  1;
+        $data['secretario']           = (!empty($secretario->data)) ? $secretario->data : [];
+        $data['usuario']              = (!empty($usuario->data)) ? $usuario->data[0] : [];
+        $data['cat_usuario']          = (!empty($cat_usuario->data)) ? $cat_usuario->data : [];
+        $data['id_reserva']           = (!empty($id_reserva)) ? $id_reserva : 0;
+        $data['scripts']              = array('inicio');
+        $data['edita']                = $btn;
+        $data['partida4000']          = $partida4000;
+        $data['contentView']          = 'secciones/vProveedor';
         //die( var_dump( $data)  );
         $this->_renderView($data); 
     }

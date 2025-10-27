@@ -2629,8 +2629,9 @@ class Principal extends BaseController
             'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
         ]);
 
-        $xml = $globals->getTabla([
-            'tabla' => 'factura',
+    
+        $presupuesto = $globals->getTabla([
+            'tabla' => 'vw_pagos',
             'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
         ]);
         
@@ -2641,8 +2642,10 @@ class Principal extends BaseController
                 'id_director' => $registro_pt->data[0]->id_reponsable_solicitud
             ]
         ]);
+        if( isset($presupuesto->data) && !empty($presupuesto->data)){
+             $data['presupuesto'] = $presupuesto->data;
+        }
       
-       
         if (empty($direccion->data)) {
         
             $jefe = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_pt->data[0]->id_reponsable_solicitud]]);
@@ -2727,13 +2730,12 @@ class Principal extends BaseController
 
         }
   
-        $uudi = $globals->getTabla(['tabla' => 'factura', 'where' => ['id_registro_pt' => $id_registro_pt, 'visible' => 1]]);
-
-        if (isset($uudi->data) && !empty($uudi->data)) {
-
-            $data['uudi'] = $uudi->data[0]->uuid;
-
+        $uuid = $globals->getTabla(['tabla' => 'factura', 'where' => ['id_registro_pt' => $id_registro_pt, 'visible' => 1]]);
+      
+        if(isset($uuid->data) && !empty($uuid->data)) {
+            $data['uuid'] = ($data['fic'])?$uuid->data[0]->uuid:$uuid->data;
         }
+       
         if (!empty($instrumento)) {
             switch ($id_archivo) {
                 case 1:
@@ -3620,6 +3622,10 @@ class Principal extends BaseController
             'tabla' => 'factura',
             'where' => ['visible' => 1, 'id_registro_pt' => $id_pt]
         ]);
+        $presupuesto = $globals->getTabla([
+            'tabla' => 'vw_pagos',
+            'where' => ['visible' => 1, 'id_registro_pt' => $id_pt]
+        ]);
         $periodo_factura = $globals->getTabla([
             'tabla' => 'periodo_factura',
             'where' => ['visible' => 1, 'id_registro_pt' => $id_pt]
@@ -3627,6 +3633,10 @@ class Principal extends BaseController
 
         if (isset($xml->data) && !empty($xml->data)) {
             $data['uuid'] = $xml->data;
+        }
+        
+        if (isset($presupuesto->data) && !empty($presupuesto->data)) {
+            $data['presupuesto'] = $presupuesto->data;
         }
         $importe = '';
         if(isset($periodo_factura->data) && !empty($periodo_factura->data)){
@@ -4341,6 +4351,7 @@ class Principal extends BaseController
         $cat_director_general = $globals->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1]]);
         $cat_opcion = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1]]);
         $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
         $cat_subsecretario = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1]]);
         if ($id_reserva != 0) {
             $data['reserva'] = (!empty($reserva->data)) ? $reserva->data[0] : [];
@@ -4358,6 +4369,7 @@ class Principal extends BaseController
         $data['cat_opcion'] = (!empty($cat_opcion->data)) ? $cat_opcion->data : [];
         $data['cat_subsecretario'] = (!empty($cat_subsecretario->data)) ? $cat_subsecretario->data : [];
         $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+        $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
         $data['editar'] = (!empty($id_reserva) || $id_reserva != 0) ? 0 : 1;
         $data['secretario'] = (!empty($secretario->data)) ? $secretario->data : [];
         $data['usuario'] = (!empty($usuario->data)) ? $usuario->data[0] : [];

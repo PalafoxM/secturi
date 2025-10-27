@@ -233,6 +233,7 @@
 <div id="partida">
    PARTIDA:
 </div>
+<?php if($fic): ?>
 <div id="partida_respuesta">
    <?php
    $total = count($reserva);
@@ -243,7 +244,19 @@
        &nbsp;<?= $r->partida ?> <?= $r->dsc_partida ?><?= ($i < $total) ? ' /' : '' ?>
    <?php endforeach; ?>
 </div>
-
+<?php endif; ?>
+<?php if(!$fic): ?>
+<div id="partida_respuesta">
+   <?php
+   $total = count($presupuesto);
+   $i = 0;
+   foreach($presupuesto as $r):
+       $i++;
+   ?>
+       &nbsp;<?= $r->partida ?> <?= $r->dsc_partida ?><?= ($i < $total) ? ' /' : '' ?>
+   <?php endforeach; ?>
+</div>
+<?php endif; ?>
 <div id="factura">
    FACTURA / RECIBO No: 
 </div>

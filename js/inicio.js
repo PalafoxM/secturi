@@ -4601,78 +4601,42 @@ ini.inicio = (function () {
                 });
           })
        },
-       formPT: function(){
+      formPT: function(){
             $("#form_proveedor").submit(function (e) {
                 e.preventDefault(); 
-                   let valido = true;
-                    let mensajes = [];
-                    let editar = $("#editar").val();
-                    // Validar cada partida
-                    $("[id^=encabezado_]").each(function(){
-                        if($(this).val().trim() === ""){
-                            valido = false;
-                            mensajes.push("El campo Encabezado es obligatorio.");
-                        }
-                    });
+                
+                // Remover completamente el atributo disabled en lugar de solo cambiar la propiedad
+                $('select[name="partida[]"]').removeAttr('disabled');
+                $('select[name="proyecto[]"]').removeAttr('disabled');
+                
+                let valido = true;
+                let mensajes = [];
+                let editar = $("#editar").val();
+                
+                // ... resto de tu validación ...
+                
+                if(!valido){
+                    Swal.fire("Atención", "<p>"+mensajes.join("<br>")+"</p>", "warning");
+                    // Volver a deshabilitar si la validación falla
+                    $('select[name="partida[]"]').prop('disabled', true);
+                    $('select[name="proyecto[]"]').prop('disabled', true);
+                    return;
+                }
 
-              /*       $("[id^=periodo_inicio]").each(function(){
-                        if($(this).val().trim() === ""){
-                            valido = false;
-                            mensajes.push("El campo Periodo termino es obligatorio.");
-                        }
-                    });
-                    $("[id^=periodo_fin]").each(function(){
-                        if($(this).val().trim() === ""){
-                            valido = false;
-                            mensajes.push("El campo Periodo fin es obligatorio.");
-                        }
-                    }); */
-
-                    // Validar archivos PDF
-                    if(editar != 1){
-                        $("[id^=factura_pdf_input_]").each(function(){
-                            let files = this.files;
-                            if(files.length === 0){
-                                valido = false;
-                                mensajes.push("Debe subir al menos un archivo PDF.");
-                            }
-                        });
-                    }
-
-                     if(editar != 1){
-                      // Validar archivos XML
-                        $("[id^=factura_xml_input_]").each(function(){
-                            let files = this.files;
-                            if(files.length === 0){
-                                valido = false;
-                                mensajes.push("Debe subir al menos un archivo XML.");
-                            }
-                        });
-                    }
-                   
-
-                    if(!valido){
-                        Swal.fire("Atención", "<p>"+mensajes.join("<br>")+"</p>", "warning");
-                        return;
-                    }
-
-
-
-                var formData = new FormData(this); // Usar FormData en lugar de serialize
-               
+                var formData = new FormData(this);
+                
                 $.ajax({
                     type: "POST",
                     url: base_url + "index.php/Agregar/guardaPT",
                     data: formData,
-                    processData: false,  // Importante para FormData
-                    contentType: false,  // Importante para FormData
+                    processData: false,
+                    contentType: false,
                     dataType: "json",
                     success: function (response) {
                         console.log(response);
                         if(!response.error){
                             Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
                             setTimeout(() => {
-                               // window.location.href = base_url + "index.php/Principal/listadoEstatusPT";
                                 window.location.href = base_url + "index.php/Principal/tablaArchivos/"+response.idRegistro+'/PT';
                             }, 1500);
                         }else{
@@ -4680,14 +4644,18 @@ ini.inicio = (function () {
                         }
                     },
                     beforeSend: function (info){
-                         $('#btnGuardatPT').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                        $('#btnGuardatPT').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
                     },
                     complete: function (info){
+                        // No es necesario volver a deshabilitar si rediriges
                         $('#btnGuardatPT').prop('disabled', false).html('Guardar');
                     },
                     error: function (response,jqXHR, textStatus, errorThrown) {
                         var res= JSON.parse(response.responseText);
                         Swal.fire("Error", '<p> '+ res.message + '</p>');  
+                        // Volver a deshabilitar en caso de error
+                        $('select[name="partida[]"]').prop('disabled', true);
+                        $('select[name="proyecto[]"]').prop('disabled', true);
                     }
                 });
             });

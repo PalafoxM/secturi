@@ -50,6 +50,7 @@
             <span class="proxima "></span>
         </div>
         <?php $i = 34;  ?>
+        <?php if($fic): ?>
         <?php foreach($reserva as $r): ?>
          <div  style="position:absolute; text-align:center; top:<?=$i?>%; left:17.5%; width:13%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "><?= $r->proyecto ?></span>
@@ -59,13 +60,35 @@
         </div>
         <?php $i = $i + 1.5; ?>
         <?php endforeach; ?>
+         <?php endif; ?>
+        <?php if(!$fic): ?>
+        <?php foreach($presupuesto as $r): ?>
+         <div  style="position:absolute; text-align:center; top:<?=$i?>%; left:17.5%; width:13%; background-color:white; font-size: 12px;  height:12px;">
+            <span class="proxima "><?= $r->proyecto ?></span>
+        </div>
+         <div  style="position:absolute; text-align:center; top:<?=$i?>%; left:3%; width:13%; background-color:white; font-size: 12px;  height:12px;">
+            <span class="proxima "></span>
+        </div>
+        <?php $i = $i + 1.5; ?>
+        <?php endforeach; ?>
+        <?php endif; ?>
         <?php $i = 34;  ?>
+        <?php if($fic): ?>
         <?php foreach($reserva as $r): ?>
          <div  style="position:absolute; text-align:center; top:<?=$i?>%; left:31.7%; width:13%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "><?= $r->partida ?></span>
         </div>
         <?php $i = $i + 1.5; ?>
         <?php endforeach; ?>
+         <?php endif; ?>
+        <?php if(!$fic): ?>
+        <?php foreach($presupuesto as $r): ?>
+         <div  style="position:absolute; text-align:center; top:<?=$i?>%; left:31.7%; width:13%; background-color:white; font-size: 12px;  height:12px;">
+            <span class="proxima "><?= $r->partida ?></span>
+        </div>
+        <?php $i = $i + 1.5; ?>
+        <?php endforeach; ?>
+         <?php endif; ?>
          <?php $i = 34;  ?>
          <?php if($fic): ?>
         <?php foreach($reserva as $r): ?>
