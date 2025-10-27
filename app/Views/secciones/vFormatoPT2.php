@@ -50,10 +50,17 @@ $fechaFormateada = $dia . ' de ' . $mes . ' del ' . $anio;
                 <?php endif; ?>
                 <?php if(!$fic): ?>
                 <strong>
-                    <?php foreach($uuid as $u):?>
-                        <?= $u->uuid; ?>
-                    <?php endforeach; ?>
-
+                    <?php 
+                    $total = count($uuid);
+                    $current = 0;
+                    foreach($uuid as $u):
+                        $current++;
+                        echo $u->uuid;
+                        if ($current < $total) {
+                            echo ', ';
+                        }
+                    endforeach; 
+                    ?>
                 </strong> 
                 <?php endif; ?>
                 por concepto de <?= $registro->concepto_pago ?> 
@@ -62,8 +69,43 @@ $fechaFormateada = $dia . ' de ' . $mes . ' del ' . $anio;
         </div>
         <div style="position:absolute; top:42.5%; left:9.5%; width:81%; height:42px; background-color:white; font-size:13px; text-align:justify;">
             <span class="proxima">
-                Lo anterior con cargo al proyecto(s) <strong><?= strtoupper($reserva[0]->proyecto);?></strong> a las partida(s) presepuestal(es) 
-                <strong>"<?= ($reserva[0]->partida);?> <?= ($reserva[0]->dsc_partida);?>".</strong>
+                Lo anterior con cargo al proyecto(s) 
+                <strong>
+                    <?php if($fic): ?>
+                    <?= strtoupper($reserva[0]->proyecto);?>
+                   <?php endif; ?>
+                     <?php if(!$fic): ?>
+                        <?php 
+                        $total = count($reserva);
+                        $current = 0;
+                        foreach($reserva as $r):
+                            $current++;
+                            echo $r->proyecto;
+                            if ($current < $total) {
+                                echo ', ';
+                            }
+                        endforeach; 
+                        ?>
+                   <?php endif; ?>
+                </strong> a las partida(s) presepuestal(es) 
+                <strong>
+                 <?php if($fic): ?>
+                   "<?= ($reserva[0]->partida);?> <?= ($reserva[0]->dsc_partida);?>".
+                   <?php endif; ?>  
+                     <?php if(!$fic): ?>
+                        <?php 
+                        $total = count($reserva);
+                        $current = 0;
+                        foreach($reserva as $r):
+                            $current++;
+                            echo $r->partida;
+                            if ($current < $total) {
+                                echo ', ';
+                            }
+                        endforeach; 
+                        ?>
+                   <?php endif; ?>  
+               </strong>
             </span>
         </div>
          <div style="position:absolute; top:48%; left:9.5%; width:81%; height:80px; background-color:white; font-size:13px; text-align:justify;">
@@ -103,12 +145,12 @@ $fechaFormateada = $dia . ' de ' . $mes . ' del ' . $anio;
         </div>
          <div style="position:absolute; top:85%; left:9.5%; width:81%; height:20px; background-color:white; font-size:13px; text-align:center;">
             <span class="proxima">
-             <strong> <?= $responsableGasto->nombre_completo  ?> </strong>
+             <strong> <?= (isset($responsableGasto->nombre_completo) && !empty($responsableGasto->nombre_completo))?$responsableGasto->nombre_completo:''  ?> </strong>
             </span>
         </div>
            <div style="position:absolute; top:87%; left:9.5%; width:81%; height:20px; background-color:white; font-size:13px; text-align:center;">
             <span class="proxima">
-              <strong> <?= $responsableGasto->dsc_puesto ?></strong>
+              <strong> <?= (isset($responsableGasto->dsc_puesto) && !empty($responsableGasto->dsc_puesto))?$responsableGasto->dsc_puesto:'' ?></strong>
             </span>
         </div>
        

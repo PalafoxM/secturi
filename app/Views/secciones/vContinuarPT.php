@@ -199,13 +199,13 @@
                                             <div class="col-md-4 mb-3">
                                                 <label for="no_reserva">No. de Reserva.<span style="color:red;">*</span></label>
                                                 <input type="text" class="form-control" autocomplete="off" id="no_reserva" name="no_reserva"  value="<?= (isset($registro_pt->no_reserva))?$registro_pt->no_reserva:'' ?>" readonly>
-                                                <div class="invalid-feedback">
-                                                    Campo no Valido
-                                                </div>
-                                            </div><!--end col-->
+                                               
+                                            </div>
                                             <div class="col-md-4 mb-3">
-                                              
-                                            </div><!--end col-->
+                                                <label for="no_consecutivo">No. consecutivo.<span style="color:red;">*</span></label>
+                                                <input type="text" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo"  value="<?= (isset($registro_pt->no_consecutivo))?$registro_pt->no_consecutivo:'' ?>">
+                                               
+                                            </div>
                                         </div><!--end form-row-->
                                         
                                        

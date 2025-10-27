@@ -2633,7 +2633,7 @@ class Principal extends BaseController
             'tabla' => 'factura',
             'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
         ]);
-       
+        
         $direccion = $globals->getTabla([
             'tabla' => 'vw_direccion',
             'where' => [
@@ -2642,13 +2642,15 @@ class Principal extends BaseController
             ]
         ]);
       
+       
         if (empty($direccion->data)) {
-          
+        
             $jefe = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_pt->data[0]->id_reponsable_solicitud]]);
-         
+       
             if (!empty($jefe->data)) {
                 $idJefe = $jefe->data[0]->id_jefe_inmediato;
                 $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_director' => $idJefe]]);
+           
             } else {
                 $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_pt->data[0]->id_reponsable_solicitud]]);
                 $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_area' => $area->data[0]->id_area]]);
@@ -2665,10 +2667,12 @@ class Principal extends BaseController
         if (strlen($registro_pt->data[0]->no_consecutivo) >= 3) {
             $no_consecutivo = $registro_pt->data[0]->no_consecutivo;
         }
+        
+         $folio =(isset( $direccion->data) && !empty( $direccion->data))? $direccion->data[0]->folio_prefijo:'S/N/';
       
-        $folio_prefijo = $direccion->data[0]->folio_prefijo . $no_consecutivo . '/' . date('Y'); //ESTO HAY QUE OREGUNTAR
+        $folio_prefijo = $folio . $no_consecutivo . '/' . date('Y'); //ESTO HAY QUE OREGUNTAR
 
-        $data['direccion'] = $direccion->data[0];
+        $data['direccion'] = (isset( $direccion->data[0]) && !empty( $direccion->data[0]))? $direccion->data[0]:[];
         $pdf = $globals->getTabla([
             'tabla' => 'vw_pdf_reserva',
             'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
@@ -3638,11 +3642,13 @@ class Principal extends BaseController
             $no_consecutivo = $registro_pt->data[0]->no_consecutivo;
             $id_proveedor_banco = $registro_pt->data[0]->id_proveedor_banco; 
             $importe = $registro_pt->data[0]->total_importe; 
-          
             $banco = $globals->getTabla([
                 'tabla' => 'proveedor_banco',
-                'where' => ['visible' => 1, 'id_proveedor_banco' => $id_proveedor_banco]
+                'where' => [
+                    'id_proveedor_banco' => $id_proveedor_banco
+                ]
             ]);
+  
             if (isset($banco->data) && !empty($banco->data)) {
                 $data['no_cuenta'] = $banco->data[0]->no_cuenta;
                 $data['clabe'] = $banco->data[0]->clabe;
@@ -3661,6 +3667,7 @@ class Principal extends BaseController
                     'id_director' => $registro_pt->data[0]->id_reponsable_solicitud
                 ]
             ]);
+          
 
 
             if (empty($direccion->data)) {
@@ -3677,7 +3684,7 @@ class Principal extends BaseController
             //die( var_dump($registro_pt->data[0]) );
             // $folio = $direccion; //ESTO HAY QUE OREGUNTAR
 
-            $data['responsableGasto'] = (isset($direccion->data) && !empty($direccion)) ? $direccion->data[0] : '';
+            $data['responsableGasto'] = (isset($direccion->data) && !empty($direccion->data)) ? $direccion->data[0] : '';
             $reserva = $globals->getTabla([
                 'tabla' => 'vw_reserva',
                 'where' => ['visible' => 1, 'id_reserva' => $id_reserva]
@@ -4278,7 +4285,7 @@ class Principal extends BaseController
    
        // die( var_dump(  $data ) );
         $data['dsc_director_general'] = (!empty($cat_director_general->data)) ? $cat_director_general->data[0]->dsc_director_general : [];
-        $data['cat_area'] = (!empty($cat_area->data)) ? $cat_area->data : [];
+  
         $data['cat_tipo'] = (!empty($cat_tipo->data)) ? $cat_tipo->data : [];
         $data['cat_opcion'] = (!empty($cat_opcion->data)) ? $cat_opcion->data : [];
         

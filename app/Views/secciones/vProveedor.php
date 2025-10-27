@@ -264,8 +264,8 @@
                                                 </div>
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
-                                                <label for="no_reserva">No. Consecutivo.</label>
-                                                <input type="text" class="form-control" autocomplete="off" id="no_reserva" name="no_reserva"  value="<?= $consecutivo ?>" readonly>
+                                                <label for="no_consecutivo">No. Consecutivo.</label>
+                                                <input type="text" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo" value="<?= (isset($registro_pt->no_consecutivo))?$registro_pt->no_consecutivo:''?>"  >
                                             </div><!--end col-->
                                             
                                         </div><!--end form-row-->

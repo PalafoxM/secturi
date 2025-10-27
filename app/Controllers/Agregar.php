@@ -1384,8 +1384,13 @@ class Agregar extends BaseController
             $response->respuesta = "Es requerido el total_importe";
             return $this->respond($response);
         }
+        if (isset($data['no_consecutivo']) && empty($data['no_consecutivo'])) {
+            $response->error = true;
+            $response->respuesta = "Es requerido el no_consecutivo";
+            return $this->respond($response);
+        }
 
-          $consecutivo = $this->globals->getTabla(['tabla' => 'consecutivo', 'where' => ['visible' => 1, 'id_responsable' => $data['id_reponsable_solicitud'] ], 'orderBy' => 'id_consecutivo DESC']);          
+    /*       $consecutivo = $this->globals->getTabla(['tabla' => 'consecutivo', 'where' => ['visible' => 1, 'id_responsable' => $data['id_reponsable_solicitud'] ], 'orderBy' => 'id_consecutivo DESC']);          
           $conse =  (isset($consecutivo->data) && !empty($consecutivo->data))?$consecutivo->data[0]->no_consecutivo:'';
        
             if (empty($conse)) {
@@ -1399,13 +1404,13 @@ class Agregar extends BaseController
           $no_consecutivo = $conse + 1;
          $res =  $this->globals->saveTabla(['no_consecutivo' => $no_consecutivo, 'id_responsable' => $data['id_reponsable_solicitud'] ], [ 'tabla' => 'consecutivo', 'editar' => false ], ['id_user' => $session->get('id_usuario'), "script" => "estatus.Reserva"]);
        
-       
+        */
 
         $dataInsert = [
             'id_reserva'               => (int) $data['id_reserva'],
             'id_direccion_responsable' => $data['direccion_responsable'],
             'tipo_pt'                  => $data['tipo_pt'],
-            'no_consecutivo'           => $no_consecutivo,
+            'no_consecutivo'           => $data['no_consecutivo'],
             'id_proveedor'             => $data['id_proveedor'],
             'fecha_tramite'            => $data['fecha_tramite'],
             'id_reponsable_solicitud'  => (int) $data['id_reponsable_solicitud'],
@@ -1549,7 +1554,7 @@ class Agregar extends BaseController
 
 
        
-           $consecutivo = $this->globals->getTabla(['tabla' => 'consecutivo', 'where' => ['visible' => 1, 'id_responsable' => $datos->id_reponsable_solicitud], 'orderBy' => 'id_consecutivo DESC']);          
+        /*    $consecutivo = $this->globals->getTabla(['tabla' => 'consecutivo', 'where' => ['visible' => 1, 'id_responsable' => $datos->id_reponsable_solicitud], 'orderBy' => 'id_consecutivo DESC']);          
            $conse =  (isset($consecutivo->data) && !empty($consecutivo->data))?$consecutivo->data[0]->no_consecutivo:'';
         
             if (empty($conse)) {
@@ -1559,15 +1564,15 @@ class Agregar extends BaseController
                 $conse =  (isset($consecutivo->data) && !empty($consecutivo->data))?$consecutivo->data[0]->no_consecutivo:'';
             } 
           
-          $no_consecutivo = $conse + 1;
+          $no_consecutivo = $conse + 1; */
         
-         $this->globals->saveTabla(['no_consecutivo' => $no_consecutivo ], ['tabla' => 'consecutivo', 'editar' => false], ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaReserva']);
+        // $this->globals->saveTabla(['no_consecutivo' => $no_consecutivo ], ['tabla' => 'consecutivo', 'editar' => false], ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaReserva']);
  
         $dataInsert = [
             'id_reserva' => (int) $datos->id_reserva,
             'id_direccion_responsable' => $datos->id_direccion_responsable,
             'tipo_pt' => $datos->tipo_pt,
-            'no_consecutivo' => $no_consecutivo,
+            'no_consecutivo' => $data['no_consecutivo'],
             'id_proveedor' => $datos->id_proveedor,
             'fecha_tramite' => date('Y-m-d', strtotime($data['fecha_tramite'])),
             'id_reponsable_solicitud' => (int) $datos->id_reponsable_solicitud,

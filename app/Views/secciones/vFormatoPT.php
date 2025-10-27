@@ -157,10 +157,10 @@
             <span class="proxima ">DIRECTOR GENERAL DE DESARROLLO TURÍSTICO </span>
         </div>
          <div  style="position:absolute;  text-align:center; top:79%; left:67.1%; width:30%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "> <?= $responsableGasto->nombre_completo ?> </span>
+            <span class="proxima "> <?= (isset($responsableGasto->nombre_completo) && !empty($responsableGasto->nombre_completo))?$responsableGasto->nombre_completo:'' ?> </span>
         </div>
          <div  style="position:absolute;  text-align:center; top:80.4%; left:67.1%; width:30%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "> <?= $responsableGasto->dsc_puesto ?> </span>
+            <span class="proxima "> <?= (isset($responsableGasto->dsc_puesto) && $responsableGasto->dsc_puesto)?$responsableGasto->dsc_puesto:'' ?> </span>
         </div>
 
         
