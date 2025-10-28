@@ -111,22 +111,21 @@ class Agregar extends BaseController
 
         //return false;
     }
-    public function procesarPediodoEditar(array $periodo, $id_registro_pt = null)
+
+    public function periodoIndividual($encabezado, $importe, $idPeriodoFactura)
     {
         $session = \Config\Services::session();
-        $data = array();
-        $this->globals = new Mglobal();
-        $response = new \stdClass();
-        foreach ($periodo as $p) {
+      
+       
             $dataConfig = [
                 "tabla" => "periodo_factura",
                 "editar" => true,
-                "idEditar" => ['id_registro_pt' =>  $id_registro_pt]
+                "idEditar" => ['id_periodo_factura' => $idPeriodoFactura ]
             ];
 
             $dataInsert = [
-                'encabezado' => $p['encabezado'],  // ahora sí existe
-                'importe' => $p['importe'],
+                'encabezado' => $encabezado,  // ahora sí existe
+                'importe' => $importe,
             ];
 
             $dataBitacora = [
@@ -135,10 +134,44 @@ class Agregar extends BaseController
             ];
 
             $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+        
+    }
+    public function procesarPediodoEditar(array $periodo, $id_registro_pt = null)
+    {
+       
+        $this->globals = new Mglobal();
+        
+        foreach ($periodo as $p) {
+            // DETECTAR TIPO DE ESTRUCTURA
+            $esAnidado = (is_array($p['editarPe']));
+            $esNormal = (is_string($p['editarPe']));
+          
+            if ($esAnidado) {
+                // Estructura anidada: múltiples registros
+                foreach ($p['editarPe'] as $index => $editarPe) {
+                  
+                    if (isset($p['importe'][$index])) {
+                        $this->periodoIndividual(
+                        $p['encabezado'][$index], 
+                        $p['importe'][$index], 
+                        $p['editarPe'][$index]
+                     
+                        );
+                    }
+                }
+            } else if ($esNormal) {
+                // Estructura normal: un solo registro
+                $this->periodoIndividual(
+                    $p['encabezado'], 
+                    $p['importe'], 
+                    $p['partida'], 
+                    $p['proyecto'], 
+                    
+                );
+            }
         }
 
-
-        return $response;
+    
         //return false;
     }
     public function procesarPediodo(array $periodo, $id_registro_pt = null)
@@ -1316,7 +1349,7 @@ class Agregar extends BaseController
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
         $archivos = $this->request->getFiles();
-
+       
 
         if ($data['secretario'] == 0) {
             $response->error = true;
@@ -1475,6 +1508,18 @@ class Agregar extends BaseController
                     $index = str_replace('importe', '', $key); // ej. encabezado1 → 1
                     $periodo[$index]['importe'] = $p;
                 }
+                if (strpos($key, 'partida') === 0) {
+                    $index = str_replace('partida', '', $key); // ej. encabezado1 → 1
+                    $periodo[$index]['partida'] = $p;
+                }
+                if (strpos($key, 'proyecto') === 0) {
+                    $index = str_replace('proyecto', '', $key); // ej. encabezado1 → 1
+                    $periodo[$index]['proyecto'] = $p;
+                }
+                if (strpos($key, 'editarPe') === 0) {
+                    $index = str_replace('editarPe', '', $key); // ej. encabezado1 → 1
+                    $periodo[$index]['editarPe'] = $p;
+                }
               
             }
 
@@ -1506,6 +1551,7 @@ class Agregar extends BaseController
                 $response->errorPDF = true;
                 $response->respuestaPDF = "PDF inválido o no se encontró.";
             }
+        
 
         }
         return $this->respond($response);

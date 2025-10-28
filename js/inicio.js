@@ -4608,6 +4608,7 @@ ini.inicio = (function () {
                 // Remover completamente el atributo disabled en lugar de solo cambiar la propiedad
                 $('select[name="partida[]"]').removeAttr('disabled');
                 $('select[name="proyecto[]"]').removeAttr('disabled');
+              
                 
                 let valido = true;
                 let mensajes = [];
@@ -4650,6 +4651,7 @@ ini.inicio = (function () {
                     // Volver a deshabilitar si la validación falla
                     $('select[name="partida[]"]').prop('disabled', true);
                     $('select[name="proyecto[]"]').prop('disabled', true);
+                
                     return;
                 }
 
