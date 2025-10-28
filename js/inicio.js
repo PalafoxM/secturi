@@ -4602,56 +4602,70 @@ ini.inicio = (function () {
           })
        },
       formPT: function(){
-            $("#form_proveedor").submit(function (e) {
+        $("#form_proveedor").submit(function (e) {
                 e.preventDefault(); 
                 
                 // Remover completamente el atributo disabled en lugar de solo cambiar la propiedad
                 $('select[name="partida[]"]').removeAttr('disabled');
                 $('select[name="proyecto[]"]').removeAttr('disabled');
-              
-                
+
+                // 1. Deshabilitar campos de partidas marcadas ANTES de validar y enviar
+                $('.toggle-factura-section:checked').each(function() {
+                    let i = $(this).attr('id').replace('checkbox_', '');
+                    $('#encabezado_' + i).prop('disabled', true);
+                    $('input[name="importe[]"]').eq(i).prop('disabled', true);
+                    $('#factura_pdf_input_' + i).prop('disabled', true);
+                    $('#factura_xml_input_' + i).prop('disabled', true);
+                    $('#partida_' + i).prop('disabled', true);
+                    $('#proyecto_' + i).prop('disabled', true);
+                });
+            
                 let valido = true;
                 let mensajes = [];
                 let editar = $("#editar").val();
                 
+                // Validar solo campos NO deshabilitados
+                $("[id^=encabezado_]:not(:disabled)").each(function(){
+                    if($(this).val().trim() === ""){
+                        valido = false;
+                        let index = $(this).attr('id').replace('encabezado_', '');
+                        mensajes.push("El campo Encabezado en la partida " + (parseInt(index) + 1) + " es obligatorio.");
+                    }
+                });
 
-                    // Validar cada partida
-                    $("[id^=encabezado_]").each(function(){
-                        if($(this).val().trim() === ""){
+                // Validar archivos PDF solo en campos NO deshabilitados
+                if(editar != 1){
+                    $("[id^=factura_pdf_input_]:not(:disabled)").each(function(){
+                        let files = this.files;
+                        if(files.length === 0){
                             valido = false;
-                            mensajes.push("El campo Encabezado es obligatorio.");
+                            let index = $(this).attr('id').replace('factura_pdf_input_', '');
+                            mensajes.push("Debe subir un archivo PDF en la partida " + (parseInt(index) + 1) + ".");
                         }
                     });
+                }
 
-
-                    // Validar archivos PDF
-                    if(editar != 1){
-                        $("[id^=factura_pdf_input_]").each(function(){
-                            let files = this.files;
-                            if(files.length === 0){
-                                valido = false;
-                                mensajes.push("Debe subir al menos un archivo PDF.");
-                            }
-                        });
-                    }
-
-                     if(editar != 1){
-                      // Validar archivos XML
-                        $("[id^=factura_xml_input_]").each(function(){
-                            let files = this.files;
-                            if(files.length === 0){
-                                valido = false;
-                                mensajes.push("Debe subir al menos un archivo XML.");
-                            }
-                        });
-                    }
-                
+                // Validar archivos XML solo en campos NO deshabilitados
+                if(editar != 1){
+                    $("[id^=factura_xml_input_]:not(:disabled)").each(function(){
+                        let files = this.files;
+                        if(files.length === 0){
+                            valido = false;
+                            let index = $(this).attr('id').replace('factura_xml_input_', '');
+                            mensajes.push("Debe subir un archivo XML en la partida " + (parseInt(index) + 1) + ".");
+                        }
+                    });
+                }
+            
                 if(!valido){
                     Swal.fire("Atención", "<p>"+mensajes.join("<br>")+"</p>", "warning");
-                    // Volver a deshabilitar si la validación falla
+                    // Re-habilitar todos los campos antes de retornar
                     $('select[name="partida[]"]').prop('disabled', true);
                     $('select[name="proyecto[]"]').prop('disabled', true);
-                
+                    $('[id^=encabezado_]').prop('disabled', false);
+                    $('input[name="importe[]"]').prop('disabled', false);
+                    $('[id^=factura_pdf_input_]').prop('disabled', false);
+                    $('[id^=factura_xml_input_]').prop('disabled', false);
                     return;
                 }
 
@@ -4679,15 +4693,18 @@ ini.inicio = (function () {
                         $('#btnGuardatPT').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
                     },
                     complete: function (info){
-                        // No es necesario volver a deshabilitar si rediriges
                         $('#btnGuardatPT').prop('disabled', false).html('Guardar');
                     },
                     error: function (response,jqXHR, textStatus, errorThrown) {
                         var res= JSON.parse(response.responseText);
                         Swal.fire("Error", '<p> '+ res.message + '</p>');  
-                        // Volver a deshabilitar en caso de error
+                        // Re-habilitar todos los campos en caso de error
                         $('select[name="partida[]"]').prop('disabled', true);
                         $('select[name="proyecto[]"]').prop('disabled', true);
+                        $('[id^=encabezado_]').prop('disabled', false);
+                        $('input[name="importe[]"]').prop('disabled', false);
+                        $('[id^=factura_pdf_input_]').prop('disabled', false);
+                        $('[id^=factura_xml_input_]').prop('disabled', false);
                     }
                 });
             });
