@@ -84,11 +84,17 @@
         background-color: #fbf3d9;
         color: #f6c23e;
     }
+  
 
     .fc-event-puntual {
         border-left-color: #1cc88a;
         background-color: #e2f1eb;
         color: #1cc88a;
+    }
+    .fc-event-tolerancia {
+        border-left-color: #ffc107;
+        background-color: #fff3cd;
+        color: #856404;
     }
 
     .fc-event-asueto {
@@ -695,13 +701,13 @@
 
             if (fechaNormalizada === hoy) {
                 if (entrada < '08:30:00') {
-                    eventClass = 'fc-event-temprano';
+                    eventClass = 'fc-event-puntual';
                     item.nombre = 'Temprano';
                     icon = '😀';
                 }
                 if (entrada >= '08:30:00' && entrada <= '08:46:00') {
-                    eventClass = 'fc-event-puntual';
-                    item.nombre = 'Puntual';
+                    eventClass = 'fc-event-tolerancia';
+                    item.nombre = 'Tolerancia';
                     icon = '😊';
                 }
                 if (entrada > '08:46:00') {
@@ -726,24 +732,30 @@
                 }
             } else {
 
-                if (entrada >= '08:30:00' && entrada <= '08:46:00' && !idEstatus) {
-                    eventClass = 'fc-event-puntual';
-                    item.nombre = 'Puntual';
+                if (entrada >= '08:31:00' && entrada <= '08:45:00' && !idEstatus) {
+                    eventClass = 'fc-event-tolerancia';
+                    item.nombre = 'Tolerancia';
                     icon = '🕣';
                 }
-                if (entrada >= '08:46:00' && entrada <= '09:59:00' && salida > '16:00:00') {
+                if (entrada >= '08:46:00' && entrada <= '09:01:00' && salida > '16:00:00') {
                     eventClass = 'fc-event-tarde';
                     item.nombre = 'Tarde';
                     icon = '⏳';
                 }
-                if (!multiple && entrada < '08:30:00' && salida > '16:00:00') {
-                    eventClass = 'fc-event-temprano';
+                if (!multiple && entrada < '08:30:59' && salida > '16:00:00') {
+                    eventClass = 'fc-event-puntual';
                     item.nombre = 'Temprano';
                     icon = '✅';
                 }
-                if (entrada >= '08:30:00' && entrada <= '08:46:00' && salida > '16:00:00') {
-                    eventClass = 'fc-event-puntual';
-                    item.nombre = 'Puntual';
+                if (!multiple && entrada > '08:46:00' && salida > '16:00:00') {
+                    eventClass = 'fc-event-tarde';
+                    item.nombre = 'Tarde';
+                    icon = '⏳';
+                }
+               
+                if (entrada >= '08:31:00' && entrada <= '08:45:59' && salida > '16:00:00') {
+                    eventClass = 'fc-event-tolerancia';
+                    item.nombre = 'Tolerancia';
                     icon = '🕣';
                 }
                 if (entrada <= '09:00:00' && salida < '16:00:00') {
