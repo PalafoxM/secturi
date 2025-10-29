@@ -38,7 +38,7 @@
              <?php endif; ?>
         </div>
           <div  style="position:absolute; top:42%; left:60.8%; width:36%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><strong>NO. CUENTA :</strong><?= ($fic)?$registro->no_cuenta: $no_cuenta ?></span>
+            <span class="proxima "><strong>NO. CUENTA :</strong><?= ($fic)?$registro->no_cuenta: (isset($no_cuenta) && !empty($no_cuenta)?$no_cuenta:'') ?></span>
         </div>
         <div  style="position:absolute; top:43%; left:60.8%; width:36%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "><STRONG>BANCO: </STRONG><?= ($fic)?$registro->banco:$banco ?></span>

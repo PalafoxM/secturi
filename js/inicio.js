@@ -1728,7 +1728,7 @@ ini.inicio = (function () {
                 } else {
                      Swal.fire("Correcto", response.respuesta, "success");
                        setTimeout(() => {
-                                 window.location.href = base_url + "index.php/Principal/listaReservaGO";
+                                window.location.href = base_url + "index.php/Principal/listaReservaGO";
 
                         }, 1000);
                     

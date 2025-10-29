@@ -1103,7 +1103,9 @@ class Principal extends BaseController
                 }
             }
         }
-        // $this->enviarEmail();
+        $res = $this->enviarEmail(1);
+        var_dump( $res );
+        die();
 
         return $this->respond($response);
     }
@@ -1215,12 +1217,13 @@ class Principal extends BaseController
                 }
             }
         }
-       //$this->enviarEmail();
+        $this->enviarEmail(0);
+       
 
         return $this->respond($response);
     }
 
-    private function enviarEmail()
+    private function enviarEmail($id = null)
     {
         $session = \Config\Services::session();
         $email = \Config\Services::email();
@@ -1229,17 +1232,21 @@ class Principal extends BaseController
         $response->error = true;
         $response->respuesta = 'Error al enviar el correo';
 
+        
+
+
         /*  $email->setTo([
            'alopez@guanajuato.gob.mx',
            'negonzalez@guanajuato.gob.mx',
            'dhernandezq@guanajuato.gob.mx'
          ]);  */
 
-        $email->setTo('palafox.marin31@gmail.com'); // destinatario principal
+   /*      $email->setTo('palafox.marin31@gmail.com'); // destinatario principal
         // $email->setCC(['palafox.marin@hotmail.com', 'palafox.marin31@gmail.com']); // copia visible
         //$email->setCC(['negonzalez@guanajuato.gob.mx ', 'dhernandezq@guanajuato.gob.mx']); // copia visible
         //   $email->setBCC(['a.palafoxm@guanajuato.gob.com']); // copia oculta
         $email->setSubject('Carga de Reserva');
+        $tipo = ($id==1)?'PT':'GO';
         $email->setMessage('
             <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
                 <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
@@ -1253,7 +1260,7 @@ class Principal extends BaseController
                         <p style="font-size: 16px;">ha registrado una <strong>RESERVA</strong> en el sistema SUSI.</p>
                         <p style="font-size: 15px;">Para los labores correspondientes.</p>
                         <p style="font-size: 15px; color: #888;">Este correo ha sido generado automáticamente por el sistema SUSI. No es necesario responder a este mensaje.</p>
-                        <p style="font-size: 15px; color: #888;">Link: ' . base_url() . 'index.php/Principal/listaReservaPT</p>
+                        <p style="font-size: 15px; color: #888;">Link: ' . base_url() . 'index.php/Principal/listaReserva'.$tipo.'</p>
                     </div>
                     <!-- Pie de página -->
                     <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 13px; color: #666;">
@@ -1267,7 +1274,9 @@ class Principal extends BaseController
             $response->respuesta = "Correo enviado correctamente.";
         } else {
             $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
-        }
+        } */
+
+         return $this->respond($response);
     }
     private function envioCorreoJefeInmediato()
     {
@@ -1289,7 +1298,7 @@ class Principal extends BaseController
                 <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
                     <!-- Encabezado con logotipo -->
                     <div style="background-color: #004080; padding: 20px; text-align: center;">
-                        <img src="' . base_url('assets/images/logo.png') . '" alt="Logo" style="height: 60px;">
+                        <img src="' . base_url('assets/images/logo-sm.png') . '" alt="Logo" style="height: 60px;">
                     </div>
                     <!-- Contenido principal -->
                     <div style="padding: 30px; color: #333;">
@@ -2512,6 +2521,8 @@ class Principal extends BaseController
             ]
         ]);
 
+     
+
         if (empty($direccion->data)) {
             $jefe = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_go->data[0]->id_reponsable_solicitud]]);
             if (!empty($jefe->data)) {
@@ -2533,6 +2544,8 @@ class Principal extends BaseController
                 'tabla' => 'vw_reserva_go',
                 'where' => ['visible' => 1, 'id_reserva_go' => $id_reserva_go]
             ])->data;
+            //var_dump($reserva);
+            //die();
             $data['reserva'] = $reserva[0];
             $importe_str = $reserva[0]->total_importe;
             $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
@@ -2541,6 +2554,14 @@ class Principal extends BaseController
             if ($reserva[0]->partida >= '4000' && $reserva[0]->partida < '5000') {
                 $data['es4000'] = true;
             }
+            $presupuesto = $globals->getTabla([
+             'tabla' => 'vw_presupuesto_go',
+             'where' => ['visible' => 1, 'id_reserva' => $reserva[0]->id_reserva]
+            ]);
+                
+                if( isset($presupuesto->data) && !empty($presupuesto->data)){
+                    $data['presupuesto'] = $presupuesto->data;
+                }
         }
 
         if (!empty($registro_go->data)) {
@@ -2549,7 +2570,38 @@ class Principal extends BaseController
                 'tabla' => 'vw_direccion',
                 'where' => ['visible' => 1, 'id_area' => $data['registro']->id_direccion_responsable]
             ]);
-            $data['folio'] = $folio->data[0]->folio_prefijo;
+
+            //==================================
+              if (empty($direccion->data)) {
+            
+                $jefe = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_pt->data[0]->id_reponsable_solicitud]]);
+        
+                if (!empty($jefe->data)) {
+                    $idJefe = $jefe->data[0]->id_jefe_inmediato;
+                    $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_director' => $idJefe]]);
+            
+                } else {
+                    $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_pt->data[0]->id_reponsable_solicitud]]);
+                    $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_area' => $area->data[0]->id_area]]);
+                }
+            }
+
+            $no_consecutivo = "";
+            if (strlen($registro_go->data[0]->no_consecutivo) == 1) {
+                $no_consecutivo = '00' . $registro_go->data[0]->no_consecutivo;
+            }
+            if (strlen($registro_go->data[0]->no_consecutivo) == 2) {
+                $no_consecutivo = '0' . $registro_go->data[0]->no_consecutivo;
+            }
+            if (strlen($registro_go->data[0]->no_consecutivo) >= 3) {
+                $no_consecutivo = $registro_go->data[0]->no_consecutivo;
+            }
+            
+            $folio =(isset( $direccion->data) && !empty( $direccion->data))? $direccion->data[0]->folio_prefijo:'S/N/';
+        
+            $folio_prefijo = $folio . $no_consecutivo . '/' . date('Y'); //ESTO HAY QUE OREGUNTAR
+            //==================================
+            $data['folio'] = $folio_prefijo;
 
         } else {
             echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
@@ -2557,8 +2609,17 @@ class Principal extends BaseController
         }
 
         $data['GO'] = true;
+        $data['fic'] = FALSE;
         //var_dump( var_dump( $data ) );
         //die();
+        $uuid = $globals->getTabla(['tabla' => 'xml_go', 'where' => ['id_registro_go' => $id_registro_go, 'visible' => 1]]);
+      
+        if(isset($uuid->data) && !empty($uuid->data)) {
+            $data['uuid'] = ($data['fic'])?$uuid->data[0]->uuid:$uuid->data;
+        }
+
+        
+       
         switch ($id_archivo) {
             case 1:
                 $doc = 'assets/pdf/plantillas/anexo01.pdf';
@@ -2584,7 +2645,6 @@ class Principal extends BaseController
         //die();
 
         $html = view($formato, $data);
-        $htmlSegundaHoja = view('personal/vFormato02.php', $data);
         // Crear instancia de mPDF
         $mpdf = new \Mpdf\Mpdf([
             'margin_top' => 0,
@@ -2597,18 +2657,14 @@ class Principal extends BaseController
         //die( var_dump($doc) );
         $pagecount = $mpdf->SetSourceFile(FCPATH . $doc);
 
-        for ($i = 1; $i <= $pagecount; $i++) {
-            $mpdf->AddPage();
-            $tplId = $mpdf->ImportPage($i);
-            $mpdf->UseTemplate($tplId);
 
-            if ($i == 1) {
-                $mpdf->WriteHTML($html);
-            }
-            if ($i == 2) {
-                $mpdf->WriteHTML($htmlSegundaHoja);
-            }
-        }
+            $mpdf->AddPage();
+            $tplId = $mpdf->ImportPage(1);
+            $mpdf->UseTemplate($tplId);
+           $mpdf->WriteHTML($html);
+          
+          
+        
 
 
         if ($savePath) {
@@ -3443,6 +3499,28 @@ class Principal extends BaseController
         ]);
 
 
+        $periodo_factura = $globals->getTabla([
+            'tabla' => 'periodo_factura_go',
+            'where' => ['visible' => 1, 'id_registro_go' => $id_pt]
+        ]);
+        
+        $importe = '';
+        if(isset($periodo_factura->data) && !empty($periodo_factura->data)){
+            $data['importe'] =  $periodo_factura->data;
+        }
+        //==============================
+         $xml = $globals->getTabla([
+            'tabla' => 'xml_go',
+            'where' => ['visible' => 1, 'id_registro_go' => $id_pt]
+        ]);
+
+        if (isset($xml->data) && !empty($xml->data)) {
+            $data['uuid'] = $xml->data;
+        }
+        //==============================
+        
+
+
         if (empty($direccion->data)) {
             $jefe = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_go->data[0]->id_reponsable_solicitud]]);
             if (!empty($jefe->data)) {
@@ -3455,18 +3533,32 @@ class Principal extends BaseController
 
         }
         $data['responsableGasto'] = ($direccion->data) ? $direccion->data[0] : '';
-
-
+      // var_dump($registro_go->data[0]);
+       //die();
         $subsecretario = $area = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1, 'id_subsecretario' => $registro_go->data[0]->id_subsecretario]]);
         // $usu_sub = $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $subsecretario->data[0]->id_usuario]]);
         $data['usu_sub'] = $subsecretario->data[0];
 
         if (!empty($registro_go->data)) {
-            $registro = $registro_go->data[0];
-            $id_reserva_go = $registro_go->data[0]->id_reserva_go;
-            $no_consecutivo = $registro_go->data[0]->no_consecutivo;
-            $data['registro'] = $registro;
+            $registro              = $registro_go->data[0];
+            $id_reserva_go         = $registro_go->data[0]->id_reserva_go;
+            $no_consecutivo        = $registro_go->data[0]->no_consecutivo;
+            $data['registro']      = $registro;
+            $data['no_cuenta']     = $registro->no_cuenta;
+            $data['banco']         = $registro->banco;;
+            $data['dsc_proveedor'] = $registro->dsc_proveedor;
+            $data['clabe'] = '';
+            
+             $presupuesto = $globals->getTabla([
+                'tabla' => 'vw_presupuesto_go',
+                'where' => ['visible' => 1, 'id_reserva' => $id_reserva_go]
+            ]);
 
+      
+            if (isset($presupuesto->data) && !empty($presupuesto->data)) {
+                $data['presupuesto'] = $presupuesto->data;
+            }
+        
 
             $reserva = $globals->getTabla([
                 'tabla' => 'vw_reserva_go',
@@ -3503,7 +3595,9 @@ class Principal extends BaseController
             die();
         }
         $data['GO'] = TRUE;
-        $html = view('secciones/vFormatoPT.php', $data);
+        $data['fic'] = false;
+    //    $html = view('secciones/vFormatoPT.php', $data);
+        $html = view('secciones/vFormatoGO.php', $data);
         $htmlSegundaHoja = view('secciones/vFormatoPT2.php', $data);
         $htmlTercerHoja = view('personal/vFormato702.php', $data);
 
@@ -3517,7 +3611,7 @@ class Principal extends BaseController
 
         // Importar PDF base (anexo07)
 
-        $pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/plantillas/anexo07_2.pdf');
+        $pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/plantillas/formatoGO2.pdf');
 
         for ($i = 1; $i <= $pagecount; $i++) {
             $mpdf->AddPage();
@@ -4042,7 +4136,9 @@ class Principal extends BaseController
         $data = [];
         if (!empty($id_proveedor)) {
             $proveedor = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1, 'id_proveedor' => $id_proveedor]]);
-            $banco = $globals->getTabla(['tabla' => 'proveedor_banco', 'where' => ['idproveedor' => $id_proveedor]]);
+            $banco = $globals->getTabla(['tabla' => 'proveedor_banco', 'where' => ['idproveedor' => $id_proveedor, 'visible' => 1]]);
+           // var_dump($banco);
+            //die();
             if (isset($banco->data[0]) && !empty($banco->data[0])) {
                 if ($session->get('id_perfil') != 1) {
                     if (empty($banco->data[0]->no_cuenta) || empty($banco->data[0]->clabe)) {
@@ -4378,7 +4474,7 @@ class Principal extends BaseController
         $data['scripts'] = array('inicio');
         $data['edita'] = $btn;
         $data['partida4000'] = $partida4000;
-          if($data['reserva']->no_proveedor == 44005){
+          if( in_array($data['reserva']->no_proveedor, [103167, 106379, 104456, 104103])){
                    $data['contentView'] = 'secciones/vExtranjero';
                    $this->_renderView($data);
                    die();

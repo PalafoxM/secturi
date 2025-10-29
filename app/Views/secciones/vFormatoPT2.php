@@ -110,7 +110,7 @@ $fechaFormateada = $dia . ' de ' . $mes . ' del ' . $anio;
         </div>
          <div style="position:absolute; top:48%; left:9.5%; width:81%; height:80px; background-color:white; font-size:13px; text-align:justify;">
             <span class="proxima">
-                Hago de su conocimiento que de acuerdo a lo que establece la cláusula <strong><?= $registro->clausula_contrato ?></strong> de instrumento jurídico <strong><?= $no_convenio?></strong>
+                Hago de su conocimiento que de acuerdo a lo que establece la cláusula <strong><?= isset($registro->clausula_contrato) && !empty($registro->clausula_contrato)?$registro->clausula_contrato:'' ?></strong> de instrumento jurídico <strong><?=  isset($no_convenio) && !empty($no_convenio) ?$no_convenio:'' ?></strong>
                 recibí el producto, atendido lo que establece el marco normativo aplicable. El producto recibido se nos ha
                 entregado a entera satisfacción en tiempo y forma, quedando bajo responsabilidad el uso y/o distribución,
                 así como el resguardo y custodia de los expedientes originales y entregables correspondientes.

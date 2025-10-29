@@ -1012,10 +1012,11 @@ class Usuario extends BaseController
      public function enviarCorreoPagos($correo)
     {
         // Inicializar servicios y objetos
-        $email = Services::email();
-        $session = Services::session();
+        $email = \Config\Services::email();
+
         $response = new \stdClass();
 
+ 
 
         $email->setTo($correo);
         $email->setSubject('ESTATUS DE PAGO CAMBIO');
@@ -1028,7 +1029,7 @@ class Usuario extends BaseController
                             <div style="padding: 30px; color: #333;">
                                 <h1 style="color: #004080;">¡El estatus de su pago cambio!</h1>
                                 <p style="font-size: 16px;">Favor de <strong> Ingresar a SUSI</strong>.</p>
-                                <p style="font-size: 15px;"><a href="' . base_url() . 'index.php/Principal/listaReservaPT"><strong>Seguimiento Incidencia</strong></a></p>
+                                <p style="font-size: 15px;"><a href="' . base_url() . 'index.php/Principal/listaReservaPT"><strong>Seguimiento Pago</strong></a></p>
                             </div>
                             <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 13px; color: #666;">
                                 © ' . date('Y') . ' Sistema de Atención SUSI. Todos los derechos reservados.
