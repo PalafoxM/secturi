@@ -1411,8 +1411,7 @@ class Agregar extends BaseController
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
         $archivos = $this->request->getFiles();
-
-
+    
         if ($data['secretario'] == 0) {
             $response->error = true;
             $response->respuesta = "Es requerido el Secretario o Director";
@@ -1593,6 +1592,8 @@ class Agregar extends BaseController
 
             }
 
+          
+
             // Recorremos todas las claves de los archivos enviados
             foreach ($archivos as $key => $fileArray) {
                 if (strpos($key, 'factura_xml_') === 0) {
@@ -1601,7 +1602,7 @@ class Agregar extends BaseController
                     $archivosPdf = array_merge($archivosPdf, $fileArray);
                 }
             }
-
+           
 
             $datosXML = ($data['editar'] == 1 && !empty($archivosXml)) ? $this->procesarXMLeditar($archivosXml, $id_registro_pt) : $this->procesarXML($archivosXml, $id_registro_pt);
 

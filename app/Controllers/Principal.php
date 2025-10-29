@@ -4325,9 +4325,7 @@ class Principal extends BaseController
         $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
         if ($id_reserva != 0) {
             $reserva = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['id_reserva' => $id_reserva]]);
-            $consecutivo = $globals->getTabla(['tabla' => 'consecutivo', 'where' => ['visible' => 1], 'orderBy' => 'id_consecutivo DESC']);
-            $conse = (isset($consecutivo->data) && !empty($consecutivo->data)) ? $consecutivo->data[0]->no_consecutivo : '';
-            $data['consecutivo'] = $conse + 1; 
+          
             $presupuesto = $globals->getTabla(['tabla' => 'vw_presupuesto', 'where' => ['id_reserva' => $id_reserva]]);
             foreach ($presupuesto->data as $i => $p) {
                 $num = count($presupuesto->data);
@@ -4354,8 +4352,10 @@ class Principal extends BaseController
         $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
         $cat_subsecretario = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1]]);
         if ($id_reserva != 0) {
+
             $data['reserva'] = (!empty($reserva->data)) ? $reserva->data[0] : [];
             $data['presupuesto'] = (!empty($presupuesto->data)) ? $presupuesto->data : [];
+          
         }
         if (!empty($id_registro_pt)) {
             $data['registro_pt'] = (!empty($registro_pt->data)) ? $registro_pt->data[0] : [];
@@ -4378,6 +4378,12 @@ class Principal extends BaseController
         $data['scripts'] = array('inicio');
         $data['edita'] = $btn;
         $data['partida4000'] = $partida4000;
+          if($data['reserva']->no_proveedor == 44005){
+                   $data['contentView'] = 'secciones/vExtranjero';
+                   $this->_renderView($data);
+                   die();
+
+            }
         $data['contentView'] = 'secciones/vProveedor';
         $this->_renderView($data);
 

@@ -592,7 +592,7 @@ class Inicio extends BaseController {
             }
             
         }
-      
+       
         $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1]]);
         $cat_tipo = $globals->getTabla(['tabla' => 'cat_tipo', 'where' => ['visible' => 1]]);
 
