@@ -261,45 +261,57 @@ class Agregar extends BaseController
         }
         // Si no cumple la condición, simplemente no hace nada (no inserta)
     }
-    public function procesarPDFgo(array $archivos, $id_registro_go = null)
+    public function procesarPDFgo(array $archivosData, $id_registro_go = null)
     {
         $session = \Config\Services::session();
         $data = array();
         $response = new \stdClass();
         $this->globals = new Mglobal();
-        $i = 0;
-        foreach ($archivos as $archivo) {
-            if (!$archivo->isValid()) {
-                continue;
+        foreach($archivosData as $key => $archivos){
+            foreach($archivos as $archivo){
+                if (!$archivo->isValid()) {
+                    continue;
+                }
+
+                $timestamp = date('Ymd_His');
+                $extension = $archivo->getClientExtension();
+                $uniqueId = uniqid('', true); // genera ID único basado en microsegundos
+                $originalName = pathinfo($archivo->getName(), PATHINFO_FILENAME);
+
+                // Nombre único garantizado
+                $file = 'Factura_go_' . $key . '_' . $timestamp . '_' . md5($uniqueId) . '.' . $extension;
+
+                // Ruta absoluta
+                $ruta_destino = FCPATH . 'assets/pdf/';
+                $archivo->move($ruta_destino, $file);
+
+                // Rutas públicas
+                $ruta_absoluta = base_url('assets/pdf/' . $file);
+                $ruta_relativa = 'assets/pdf/' . $file;
+
+                $dataConfig = [
+                    "tabla" => "factura_pdf_go",
+                    "editar" => false
+                ];
+
+                $dataInsert = [
+                    'id_registro_go' => (int) $id_registro_go,
+                    'id_identificador' => (int)$key,
+                    'ruta_relativa' => $ruta_relativa,
+                    'ruta_absoluta' => $ruta_absoluta,
+                    'fec_reg' => date('Y-m-d H:i:s'),
+                    'usu_reg' => $session->get('id_usuario')
+                ];
+
+                $dataBitacora = [
+                    'id_user' => $session->get('id_usuario'),
+                    'script' => 'Agregar.php/guardarFacturaPDF'
+                ];
+
+                $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
             }
-            $timestamp = date('Ymd_His');
-            $extension = $archivo->getClientExtension();
-            $originalName = pathinfo($archivo->getName(), PATHINFO_FILENAME);
-            $file = 'Factura_go_'. $i . $timestamp . '.' . $extension;
-
-            // Ruta absoluta
-            $ruta_destino = FCPATH . 'assets/pdf/';
-            $archivo->move($ruta_destino, $file);
-
-            // Rutas públicas
-            $ruta_absoluta = base_url('assets/pdf/' . $file);
-            $ruta_relativa = 'assets/pdf/' . $file;
-            $dataConfig = [
-                "tabla" => "factura_pdf_go",
-                "editar" => false
-            ];
-            $dataInsert = [
-                'id_registro_go' => (int) $id_registro_go,
-                'ruta_relativa' => $ruta_relativa,
-                'ruta_absoluta' => $ruta_absoluta,
-                'fec_reg' => date('Y-m-d H:i:s'),
-                'usu_reg' => $session->get('id_usuario')
-
-            ];
-            $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardarFacturaPDF'];
-            $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
-            $i++;
         }
+    
         return $response;
     }
    public function procesarPDFeditar(array $archivos, $id_registro_pt = null)
@@ -1237,6 +1249,7 @@ class Agregar extends BaseController
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
         $archivos = $this->request->getFiles();
+      
      
 
         if ($data['secretario'] == 0) {
@@ -1342,31 +1355,26 @@ class Agregar extends BaseController
 
             //==================================================
 
-        foreach ($archivos['archivos'] as $index => $tipos) {
-            // Manejar PDF
-                if (isset($tipos['pdf'])) {
-                    foreach ($tipos['pdf'] as $pdf) {
-                        if ($pdf->isValid() && !$pdf->hasMoved()) {
-                           $archivosPdf[] = $pdf;
-                        // $pdf->move(WRITEPATH . 'uploads/pdf/', $pdf->getRandomName());
+            foreach ($archivos['archivos'] as $index => $tipos) {
+                    // Manejar PDF
+                    if (isset($tipos['pdf'])) {
+                        foreach ($tipos['pdf'] as $pdf) {
+                            if ($pdf->isValid() && !$pdf->hasMoved()) {
+                                // Agrupamos por índice
+                                $archivosPdf[$index][] = $pdf;
+                            }
+                        }
+                    }
+
+                    // Manejar XML
+                    if (isset($tipos['xml'])) {
+                        foreach ($tipos['xml'] as $xml) {
+                            if ($xml->isValid() && !$xml->hasMoved()) {
+                                $archivosXml[$index][] = $xml;
+                            }
                         }
                     }
                 }
-
-                // Manejar XML
-                if (isset($tipos['xml'])) {
-                    foreach ($tipos['xml'] as $xml) {
-                        if ($xml->isValid() && !$xml->hasMoved()) {
-                           // var_dump($xml);
-                             $archivosXml[] = $xml;
-                        //  $xml->move(WRITEPATH . 'uploads/xml/', $xml->getRandomName());
-                        }
-                    }
-                }
-            }
-
-
-           
             //==================================================
 
            
@@ -1399,7 +1407,10 @@ class Agregar extends BaseController
                 }
             }
 
-        
+       
+
+            
+          
             $datosPDF = $this->procesarPDFgo($archivosPdf, $id_registro_go);
             $datosXML = $this->procesarXMLGo($archivosXml, $id_registro_go);
             $datosP = $this->procesarPediodoGo($periodo, $id_registro_go);

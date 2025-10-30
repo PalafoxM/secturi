@@ -3499,13 +3499,13 @@ class Principal extends BaseController
 
 
         $periodo_factura = $globals->getTabla([
-            'tabla' => 'periodo_factura_go',
+            'tabla' => 'vw_formato_go',
             'where' => ['visible' => 1, 'id_registro_go' => $id_pt]
         ]);
         
         $importe = '';
         if(isset($periodo_factura->data) && !empty($periodo_factura->data)){
-            $data['importe'] =  $periodo_factura->data;
+            $itemFactura = $data['importe'] =  $periodo_factura->data;
             $data['documentos'] = count($periodo_factura->data);
         }
         //==============================
@@ -3566,8 +3566,8 @@ class Principal extends BaseController
             ]);
             if (!empty($reserva->data)) {
                 $data['reserva'] = $reserva->data;
-                $importe_str = $reserva->data[0]->total_importe;
                 $usu_reg = $reserva->data[0]->usu_reg;
+                $importe_str = $reserva->data[0]->total_importe;
                 $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
                 $data['numero_texto'] = $this->numeroEnLetras($importe_float);
             }
@@ -3596,10 +3596,11 @@ class Principal extends BaseController
         }
         $data['GO'] = TRUE;
         $data['fic'] = false;
+  
     //    $html = view('secciones/vFormatoPT.php', $data);
         $html = view('secciones/vFormatoGO.php', $data);
         $htmlSegundaHoja = view('secciones/vFormatoGO2.php', $data);
-        $htmlTercerHoja = view('personal/vFormato702GO.php', $data);
+   //     $htmlTercerHoja = view('personal/vFormato702GO.php', $data);
 
         $mpdf = new \Mpdf\Mpdf([
             'margin_top' => 0,
@@ -3608,8 +3609,6 @@ class Principal extends BaseController
             'format' => [213, 268],
             'mirrorMargins' => false,
         ]);
-
-        // Importar PDF base (anexo07)
 
         $pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/plantillas/formatoGO2.pdf');
 
@@ -3621,40 +3620,85 @@ class Principal extends BaseController
             if ($i == 1) {
                 $mpdf->WriteHTML($html);
             }
+
             if ($i == 2) {
                 $mpdf->WriteHTML($htmlSegundaHoja);
-                $facturas = $formatos->data;
+        
+               
+                // 🧩 Agregamos aquí la repetición de la hoja 3
+                 if (!empty($itemFactura)) {
+                    foreach ($itemFactura as $index => $facturaItem) {
+                        $importe_str = $facturaItem->importe;
+                        $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
+                        $data['numero_texto2'] = $this->numeroEnLetras($importe_float);
+                        $data['facturaItem'] = $facturaItem;
+                       //die( var_dump( $data['facturaItem'] ) );
+                        $htmlTercerHoja = view('personal/vFormato702GO.php', $data);
 
-                if (!empty($facturas)) {
-                    foreach ($facturas as $index => $factura) {
-                        $facturaPath = FCPATH . $factura->ruta_relativa;
+                        // Nueva página por cada itemFactura
+                        $mpdf->AddPage();
+                        $mpdf->WriteHTML($htmlTercerHoja);
 
-                        if (file_exists($facturaPath)) {
-                            $facturaPageCount = $mpdf->SetSourceFile($facturaPath);
+                        // Obtener las facturas asociadas a este item
+                        $factura_pdf_go = $globals->getTabla([
+                            'tabla' => 'factura_pdf_go',
+                            'where' => [
+                                'visible' => 1,
+                                'id_registro_go' => $id_pt,
+                                'id_identificador' => $index
+                            ]
+                        ]);
 
-                            for ($j = 1; $j <= $facturaPageCount; $j++) {
-                                $mpdf->AddPage();
-                                $tplFactura = $mpdf->ImportPage($j);
+                        $facturas = isset($factura_pdf_go->data) && !empty($factura_pdf_go->data)
+                            ? $factura_pdf_go->data
+                            : [];
 
-                                // Escribir HTML solo en la primera página de la primera factura
-                                if ($index === 0 && $j === 1) {
-                                    $mpdf->WriteHTML($htmlTercerHoja);
+                        foreach ($facturas as $factura) {
+                            $facturaPath = FCPATH . $factura->ruta_relativa;
+
+                            if (file_exists($facturaPath)) {
+                                $facturaPageCount = $mpdf->SetSourceFile($facturaPath);
+
+                                // 📌 Ya no agregamos nueva página aquí
+                                $posY = 55; // posición inicial vertical
+                                $firstFactura = true;
+
+                                foreach ($facturas as $index => $factura) {
+                                    $facturaPath = FCPATH . $factura->ruta_relativa;
+
+                                    if (file_exists($facturaPath)) {
+                                        $facturaPageCount = $mpdf->SetSourceFile($facturaPath);
+
+                                        for ($j = 1; $j <= $facturaPageCount; $j++) {
+                                            // Si ya hubo una factura, agrega nueva hoja
+                                            if (!$firstFactura) {
+                                                $mpdf->AddPage();
+                                                $posY = 55; // reinicia la posición vertical
+                                            }
+
+                                            $tplFactura = $mpdf->ImportPage($j);
+                                            $templateSize = $mpdf->GetTemplateSize($tplFactura);
+
+                                            $scaleFactor = 0.6;
+                                            $width = $templateSize['width'] * $scaleFactor;
+                                            $height = $templateSize['height'] * $scaleFactor;
+
+                                            $mpdf->UseTemplate($tplFactura, 40, $posY, $width, $height);
+
+                                            $firstFactura = false;
+                                        }
+                                    }
                                 }
 
-                                // Escalar factura
-                                $templateSize = $mpdf->GetTemplateSize($tplFactura);
-                                $scaleFactor = 0.6; // ajusta si es necesario
-                                $width = $templateSize['width'] * $scaleFactor;
-                                $height = $templateSize['height'] * $scaleFactor;
-
-                                $mpdf->UseTemplate($tplFactura, 40, 55, $width, $height);
                             }
                         }
                     }
                 }
 
+
             }
         }
+
 
         if ($savePath) {
             $mpdf->Output($savePath, 'F'); // F = write to file
