@@ -80,6 +80,7 @@
 															<th>PROYECTO-META</th>
 															<th>PARTIDA</th>
 															<th>IMPORTE</th>
+															<th>PROPINA</th>
 															<th>ACCIONES</th>
 														</tr>
 													</thead>
@@ -102,7 +103,7 @@
                                                                 </select>
 															</td>
 															<td><input type="text" autocomplete="off" class="form-control" name="importe[]" placeholder="0,000.00"></td>
-															
+															<td><input type="text" autocomplete="off" class="form-control" name="propina[]" placeholder="0,000.00"></td>
 															<td>
 																<button type="button" class="btn btn-sm btn-danger remove-row">
                                                                     <i class="fas fa-trash"></i>

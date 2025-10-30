@@ -25,7 +25,7 @@
         <?php $i = 27.5;  ?>
         <?php foreach($presupuesto as $r): ?>
          <div  style="position:absolute; text-align:center; top:<?=$i?>%; left:33%; width:16%; background-color:white; font-size: 10px;  height:12px;">
-            <span class="proxima "><?= $r->partida ?></span>
+            <span class="proxima "><?= $r->dsc_partida ?></span>
         </div>
         <?php $i = $i + 1.5; ?>
         <?php endforeach; ?>

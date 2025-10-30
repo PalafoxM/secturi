@@ -1221,6 +1221,26 @@ class Agregar extends BaseController
         $data = $this->request->getPost();
         $archivos = $this->request->getFiles();
 
+       foreach ($archivos['archivos'] as $index => $tipos) {
+    // Manejar PDF
+    if (isset($tipos['pdf'])) {
+        foreach ($tipos['pdf'] as $pdf) {
+            if ($pdf->isValid() && !$pdf->hasMoved()) {
+                $pdf->move(WRITEPATH . 'uploads/pdf/', $pdf->getRandomName());
+            }
+        }
+    }
+
+    // Manejar XML
+    if (isset($tipos['xml'])) {
+        foreach ($tipos['xml'] as $xml) {
+            if ($xml->isValid() && !$xml->hasMoved()) {
+                $xml->move(WRITEPATH . 'uploads/xml/', $xml->getRandomName());
+            }
+        }
+    }
+}
+
         if ($data['secretario'] == 0) {
             $response->error = true;
             $response->respuesta = "Es requerido el Secretario o Director";

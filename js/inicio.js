@@ -4953,6 +4953,8 @@ ini.inicio = (function () {
        formGo: function(){
             $("#form_go").submit(function (e) {
                 e.preventDefault(); 
+
+                
                 var formData = new FormData(this); // Usar FormData en lugar de serialize
                      let valido = true;
                     let mensajes = [];

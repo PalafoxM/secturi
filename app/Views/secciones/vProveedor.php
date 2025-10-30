@@ -297,7 +297,7 @@
                                                         </select>
                                                     </div>
                                                     <div class="col-md-2 mb-3">
-                                                        <label for="proyecto_<?= $i ?>">Partida<span style="color:red;">*</span></label>
+                                                        <label for="proyecto_<?= $i ?>">Proyecto<span style="color:red;">*</span></label>
                                                         <select class="form-control" id="proyecto_<?= $i ?>" name="proyecto[]" disabled>
                                                             <?php foreach($cat_proyecto as $o): ?>
                                                                 <option value="<?= $o->id_proyecto ?>" <?= (isset($p->id_proyecto) && $p->id_proyecto == $o->id_proyecto) ? 'selected' : '' ?>>

@@ -4292,6 +4292,7 @@ class Principal extends BaseController
         $cat_director_general = $globals->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1]]);
         $cat_opcion = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1]]);
         $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $cat_proyecto  = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
         $cat_subsecretario = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1]]);
         if ($id_reserva_go != 0) {
             $data['reserva'] = (!empty($reserva->data)) ? $reserva->data[0] : [];
@@ -4307,6 +4308,7 @@ class Principal extends BaseController
         $data['cat_tipo'] = (!empty($cat_tipo->data)) ? $cat_tipo->data : [];
         $data['cat_opcion'] = (!empty($cat_opcion->data)) ? $cat_opcion->data : [];
         $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+        $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
         $data['cat_subsecretario'] = (!empty($cat_subsecretario->data)) ? $cat_subsecretario->data : [];
         //$data['editar']               = (!empty($id_reserva_go) || $id_reserva_go != 0)?1:0;
 
