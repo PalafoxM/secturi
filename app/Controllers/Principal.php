@@ -3493,7 +3493,6 @@ class Principal extends BaseController
             'tabla' => 'vw_direccion',
             'where' => [
                 'visible' => 1,
-                //'id_director' => 110
                 'id_director' => $registro_go->data[0]->id_reponsable_solicitud
             ]
         ]);
@@ -3507,6 +3506,7 @@ class Principal extends BaseController
         $importe = '';
         if(isset($periodo_factura->data) && !empty($periodo_factura->data)){
             $data['importe'] =  $periodo_factura->data;
+            $data['documentos'] = count($periodo_factura->data);
         }
         //==============================
          $xml = $globals->getTabla([
@@ -3550,8 +3550,8 @@ class Principal extends BaseController
             $data['clabe'] = '';
             
              $presupuesto = $globals->getTabla([
-                'tabla' => 'vw_presupuesto_go',
-                'where' => ['visible' => 1, 'id_reserva' => $id_reserva_go]
+                'tabla' => 'vw_formato_go',
+                'where' => ['visible' => 1, 'id_reserva_go' => $id_reserva_go]
             ]);
 
       
@@ -3598,8 +3598,8 @@ class Principal extends BaseController
         $data['fic'] = false;
     //    $html = view('secciones/vFormatoPT.php', $data);
         $html = view('secciones/vFormatoGO.php', $data);
-        $htmlSegundaHoja = view('secciones/vFormatoPT2.php', $data);
-        $htmlTercerHoja = view('personal/vFormato702.php', $data);
+        $htmlSegundaHoja = view('secciones/vFormatoGO2.php', $data);
+        $htmlTercerHoja = view('personal/vFormato702GO.php', $data);
 
         $mpdf = new \Mpdf\Mpdf([
             'margin_top' => 0,

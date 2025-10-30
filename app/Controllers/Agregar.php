@@ -86,30 +86,40 @@ class Agregar extends BaseController
         $response = new \stdClass();
         $this->globals = new Mglobal();
 
-        foreach ($periodo as $p) {
-            $dataConfig = [
-                "tabla" => "periodo_factura_go",
-                "editar" => false
-            ];
+        foreach ($periodo as $key => $p) {
+            // Verificar si tenemos datos de comprobantes
+            if (isset($p['comprobante']) && is_array($p['comprobante'])) {
+                
+                // Iterar sobre cada conjunto de datos
+                $count = count($p['comprobante']);
+                
+                for ($i = 0; $i < $count; $i++) {
+                    $dataConfig = [
+                        "tabla" => "periodo_factura_go",
+                        "editar" => false
+                    ];
 
-            $dataInsert = [
-                'id_registro_go' => (int) $id_registro_go,
-                'encabezado' => $p['encabezado'],  // ahora sí existe
-                'periodo_inicio' => $p['periodo_inicio'],
-                'periodo_fin' => $p['periodo_fin'],
-            ];
+                    $dataInsert = [
+                        'id_registro_go' => (int) $id_registro_go,
+                        'encabezado'     => $p['encabezado'][$i] ?? $p['encabezado'][0] ?? null,  
+                        'comprobante'    => $p['comprobante'][$i] ?? null,
+                        'importe'        => $p['importe'][$i] ?? null,
+                        'propina'        => $p['propina'][$i] ?? null,
+                        'contribuyente'  => $p['contribuyente'][$i] ?? null,
+                        'rfc'            => $p['rfc'][$i] ?? null,
+                    ];
 
-            $dataBitacora = [
-                'id_user' => $session->get('id_usuario'),
-                'script' => 'Agregar.php/guardarFacturaPDF'
-            ];
+                    $dataBitacora = [
+                        'id_user' => $session->get('id_usuario'),
+                        'script' => 'Agregar.php/guardarFacturaPDF'
+                    ];
 
-            $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+                    $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+                }
+            }
         }
 
         return $response;
-
-        //return false;
     }
 
     public function periodoIndividual($encabezado, $importe, $idPeriodoFactura)
@@ -257,7 +267,7 @@ class Agregar extends BaseController
         $data = array();
         $response = new \stdClass();
         $this->globals = new Mglobal();
-
+        $i = 0;
         foreach ($archivos as $archivo) {
             if (!$archivo->isValid()) {
                 continue;
@@ -265,7 +275,7 @@ class Agregar extends BaseController
             $timestamp = date('Ymd_His');
             $extension = $archivo->getClientExtension();
             $originalName = pathinfo($archivo->getName(), PATHINFO_FILENAME);
-            $file = 'Factura_go_' . $timestamp . '.' . $extension;
+            $file = 'Factura_go_'. $i . $timestamp . '.' . $extension;
 
             // Ruta absoluta
             $ruta_destino = FCPATH . 'assets/pdf/';
@@ -288,6 +298,7 @@ class Agregar extends BaseController
             ];
             $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardarFacturaPDF'];
             $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+            $i++;
         }
         return $response;
     }
@@ -542,6 +553,7 @@ class Agregar extends BaseController
         $session = \Config\Services::session();
         $data = array();
         $this->globals = new Mglobal();
+        $response = new \stdClass();
 
         foreach ($archivos as $archivo) {
             if (!$archivo->isValid()) {
@@ -633,10 +645,15 @@ class Agregar extends BaseController
 
                 $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardarFacturaGO'];
                 $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+                if(!$response->error){
+                    $response->error = false;
+                    $response->respuesta = 'XML guardado correctamente';
+
+                }
 
             }
         }
-        return $this->respond($response);
+        return $response;
     }
 
   
@@ -1220,26 +1237,7 @@ class Agregar extends BaseController
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
         $archivos = $this->request->getFiles();
-
-       foreach ($archivos['archivos'] as $index => $tipos) {
-    // Manejar PDF
-    if (isset($tipos['pdf'])) {
-        foreach ($tipos['pdf'] as $pdf) {
-            if ($pdf->isValid() && !$pdf->hasMoved()) {
-                $pdf->move(WRITEPATH . 'uploads/pdf/', $pdf->getRandomName());
-            }
-        }
-    }
-
-    // Manejar XML
-    if (isset($tipos['xml'])) {
-        foreach ($tipos['xml'] as $xml) {
-            if ($xml->isValid() && !$xml->hasMoved()) {
-                $xml->move(WRITEPATH . 'uploads/xml/', $xml->getRandomName());
-            }
-        }
-    }
-}
+     
 
         if ($data['secretario'] == 0) {
             $response->error = true;
@@ -1293,25 +1291,26 @@ class Agregar extends BaseController
 
 
         $dataInsert = [
-            'id_reserva_go' => $data['id_reserva_go'],
+            'id_reserva_go'            => $data['id_reserva_go'],
             'id_direccion_responsable' => $data['direccion_responsable'],
-            'fecha_tramite' => $data['fecha_tramite'],
-            'no_consecutivo' => (int) $data['no_consecutivo'],
-            'id_reponsable_solicitud' => (int) $data['id_reponsable_solicitud'],
-            'director_general' => 1,
-            'secretario' => (int) $data['secretario'],
-            'id_subsecretario' => (int) $data['id_subsecretario'],
-            'contrato_convenio' => ($data['contrato_convenio'] == 'NO') ? 2 : 1,
-            'formato_establecido' => ($data['formato_establecido'] == 'SI') ? 1 : 2,
+            'fecha_tramite'            => $data['fecha_tramite'],
+            'no_consecutivo'           => (int) $data['no_consecutivo'],
+            'id_reponsable_solicitud'  => (int) $data['id_reponsable_solicitud'],
+            'director_general'         => 1,
+            'secretario'               => (int) $data['secretario'],
+            'id_subsecretario'         => (int) $data['id_subsecretario'],
+            'contrato_convenio'        => ($data['contrato_convenio'] == 'NO') ? 2 : 1,
+            'formato_establecido'      => ($data['formato_establecido'] == 'SI') ? 1 : 2,
             'documentacion_comprobatoria' => $data['documentacion_comprobatoria'],
-            'poliza' => ($data['poliza'] == 'SI') ? 1 : 2,
-            'formato_conformidad' => ($data['formato_conformidad'] == 'SI') ? 1 : 2,
-            'documentacion_requerida' => ($data['documentacion_requerida'] == 'SI') ? 1 : 2,
-            'evidencia_entrega' => (int) $data['evidencia_entrega'],
-            'concepto_gasto' => $data['concepto_gasto'],
-            'comision' => $data['comision'],
-            'no_reserva' => $data['no_reserva'],
-            'lugar' => $data['lugar']
+            'poliza'                   => ($data['poliza'] == 'SI') ? 1 : 2,
+            'formato_conformidad'      => ($data['formato_conformidad'] == 'SI') ? 1 : 2,
+            'documentacion_requerida'  => ($data['documentacion_requerida'] == 'SI') ? 1 : 2,
+            'evidencia_entrega'        => (int) $data['evidencia_entrega'],
+            'concepto_gasto'           => $data['concepto_gasto'],
+            'total_importe'            => $data['total_importe'],
+            'comision'                 => $data['comision'],
+            'no_reserva'               => $data['no_reserva'],
+            'lugar'                    => $data['lugar']
         ];
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaTurno'];
         if ($data['editar'] == 1) {
@@ -1341,36 +1340,70 @@ class Agregar extends BaseController
             $archivosXml = [];
             $periodo = [];
 
+            //==================================================
+
+        foreach ($archivos['archivos'] as $index => $tipos) {
+            // Manejar PDF
+                if (isset($tipos['pdf'])) {
+                    foreach ($tipos['pdf'] as $pdf) {
+                        if ($pdf->isValid() && !$pdf->hasMoved()) {
+                           $archivosPdf[] = $pdf;
+                        // $pdf->move(WRITEPATH . 'uploads/pdf/', $pdf->getRandomName());
+                        }
+                    }
+                }
+
+                // Manejar XML
+                if (isset($tipos['xml'])) {
+                    foreach ($tipos['xml'] as $xml) {
+                        if ($xml->isValid() && !$xml->hasMoved()) {
+                           // var_dump($xml);
+                             $archivosXml[] = $xml;
+                        //  $xml->move(WRITEPATH . 'uploads/xml/', $xml->getRandomName());
+                        }
+                    }
+                }
+            }
+
+
+           
+            //==================================================
+
+           
+ 
+
             foreach ($data as $key => $p) {
                 if (strpos($key, 'encabezado') === 0) {
                     $index = str_replace('encabezado', '', $key); // ej. encabezado1 → 1
                     $periodo[$index]['encabezado'] = $p;
                 }
-                if (strpos($key, 'periodo_inicio') === 0) {
-                    $index = str_replace('periodo_inicio', '', $key); // ej. periodo1 → 1
-                    $periodo[$index]['periodo_inicio'] = $p;
+                if (strpos($key, 'comprobante') === 0) {
+                    $index = str_replace('comprobante', '', $key); // ej. encabezado1 → 1
+                    $periodo[$index]['comprobante'] = $p;
                 }
-                if (strpos($key, 'periodo_fin') === 0) {
-                    $index = str_replace('periodo_fin', '', $key); // ej. periodo1 → 1
-                    $periodo[$index]['periodo_fin'] = $p;
+                if (strpos($key, 'importe') === 0) {
+                    $index = str_replace('importe', '', $key); // ej. encabezado1 → 1
+                    $periodo[$index]['importe'] = $p;
+                }
+                if (strpos($key, 'propina') === 0) {
+                    $index = str_replace('propina', '', $key); // ej. encabezado1 → 1
+                    $periodo[$index]['propina'] = $p;
+                }
+                if (strpos($key, 'contribuyente') === 0) {
+                    $index = str_replace('contribuyente', '', $key); // ej. encabezado1 → 1
+                    $periodo[$index]['contribuyente'] = $p;
+                }
+                if (strpos($key, 'rfc') === 0) {
+                    $index = str_replace('rfc', '', $key); // ej. encabezado1 → 1
+                    $periodo[$index]['rfc'] = $p;
                 }
             }
 
-
-            // Recorremos todas las claves de los archivos enviados
-            foreach ($archivos as $key => $fileArray) {
-              
-                 if (strpos($key, 'factura_xml_') === 0) {
-                    $archivosXml = array_merge($archivosXml, $fileArray);
-                } elseif (strpos($key, 'factura_pdf_') === 0) {
-                    $archivosPdf = array_merge($archivosPdf, $fileArray);
-                }
-            }
-
-            $datosPDF = $this->procesarXMLGo($archivosXml, $id_registro_go);
+        
             $datosPDF = $this->procesarPDFgo($archivosPdf, $id_registro_go);
+            $datosXML = $this->procesarXMLGo($archivosXml, $id_registro_go);
             $datosP = $this->procesarPediodoGo($periodo, $id_registro_go);
-
+            
             if (!$datosPDF) {
                 $response->errorPDF = true;
                 $response->respuestaPDF = "PDF inválido o no se encontró.";

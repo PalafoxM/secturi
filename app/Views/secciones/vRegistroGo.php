@@ -368,6 +368,7 @@
                                                                 <div class="form-group">
                                                                     <label>TOTAL:</label>
                                                                     <input type="text"
+                                                                        name="total_importe"
                                                                         class="form-control font-weight-bold text-right"
                                                                         id="total_importe" value="0.00" readonly>
                                                                 </div>
@@ -728,7 +729,16 @@ function actualizarVistaArchivos(rowIndex) {
 function prepararFormData() {
     const formData = new FormData();
     
-    // Agregar datos de los comprobantes
+    // INCLUIR TODOS LOS CAMPOS DEL FORMULARIO PRIMERO
+    const form = $('#form_go')[0];
+    const formElements = new FormData(form);
+    
+    // Copiar todos los campos del formulario
+    for (let [key, value] of formElements) {
+        formData.append(key, value);
+    }
+    
+    // LUEGO AGREGAR TUS CAMPOS ESPECÍFICOS DE COMPROBANTES
     $('input[name="comprobante[]"]').each(function(index) {
         formData.append(`comprobante[${index}]`, $(this).val());
     });
@@ -749,7 +759,7 @@ function prepararFormData() {
         formData.append(`rfc[${index}]`, $(this).val());
     });
     
-    // Agregar archivos
+    // FINALMENTE AGREGAR ARCHIVOS
     Object.keys(archivosPorFila).forEach(rowIndex => {
         const archivos = archivosPorFila[rowIndex];
         
@@ -768,7 +778,6 @@ function prepararFormData() {
 
     return formData;
 }
-
 // Ejemplo de envío al backend
 $('#form_go').on('submit', function(e) {
     e.preventDefault();

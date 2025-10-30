@@ -1,6 +1,12 @@
 
      
        
+        <div  style="position:absolute; text-align:center; top:10.8%; left:75%; width:15%; height:10px; background-color:white; font-size: 8px; ">
+           <?= "$".$registro->total_importe; ?>
+        </div>
+        <div  style="position:absolute; text-align:center; top:10.8%; left:49.5%; width:4%; height:10px; background-color:white; font-size: 8px; ">
+           <?= isset( $documentos) && !empty( $documentos)? $documentos:'' ?>
+        </div>
         <div  style="position:absolute;text-align:center; top:14.75%; left:53.5%; width:40.5%; height:15px; background-color:black; color:white; font-size: 12px; ">
            21 SECRETARIA DE TURISMO E IDENTIDAD
         </div>
@@ -30,11 +36,11 @@
         <?php $i = $i + 1.5; ?>
         <?php endforeach; ?>
          <?php $i = 27.5; ?>
-        <?php foreach($importe as $r): ?>
+        <?php foreach($presupuesto as $r): ?>
               <div style="position:absolute; text-align:center; top:<?=$i?>%; left:50%; width:11%; background-color:white; font-size:10px; height:12px; line-height:12px;">
                     <span class="proxima">
                         <?php 
-                        $importe = $r->importe;
+                        $importe = $r->importe + $r->propina;
                         if (is_numeric($importe)) {
                             echo '$' . number_format(floatval($importe), 2);
                         } else {
@@ -48,14 +54,28 @@
         <?php endforeach; ?>
         
         <?php $i = 27.5;  ?>
-            <?php foreach( $uuid as $u ): ?>
-                <div style="position:absolute; text-align:center; top:<?=$i?>%; left:11.8%; width:10%; background-color:white; font-size: 12px;  height:12px;">
-                  <p><?= $u->uuid; ?></p>
+            <?php foreach( $presupuesto as $u ): ?>
+                <div style="position:absolute; text-align:center; top:<?=$i?>%; left:11.8%; width:11%; background-color:white; font-size: 10px;  height:12px; line-height:12px;">
+                   <span class="proxima"> <strong> <?= $u->comprobante; ?></strong> </span>
+                 </div>
+            <?php $i += 1.5; ?>
+        <?php endforeach; ?>
+        <?php $i = 27.5;  ?>
+            <?php foreach( $presupuesto as $u ): ?>
+                <div style="position:absolute; text-align:center; top:<?=$i?>%; left:61.35%; width:18%; background-color:white; font-size: 10px;  height:12px;">
+                  <span class="proxima"> <strong> <?= $u->contribuyente; ?> </strong></span>
+                 </div>
+            <?php $i += 1.5; ?>
+        <?php endforeach; ?>
+        <?php $i = 27.5;  ?>
+            <?php foreach( $presupuesto as $u ): ?>
+                <div style="position:absolute; text-align:center; top:<?=$i?>%; left:81%; width:11%; background-color:white; font-size: 10px;  height:12px;">
+                  <span><?= $u->rfc; ?></span>
                  </div>
             <?php $i += 1.5; ?>
         <?php endforeach; ?>
    
-        <div  style="position:absolute; text-align:right; top:69.5%; left:50.5%; width:10%; background-color:red; font-size: 12px;  height:12px;">
+        <div  style="position:absolute; text-align:right; top:69.5%; left:50.5%; width:10%; background-color:white; font-size: 12px;  height:12px;">
             <span><?= $registro->total_importe; ?></span>
         </div>
         <div  style="position:absolute; text-align:center; top:69.5%; left:63%; width:30%; background-color:white; font-size: 12px;  height:12px;">
