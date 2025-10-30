@@ -707,7 +707,7 @@
                 }
                 if (entrada >= '08:30:00' && entrada <= '08:46:00') {
                     eventClass = 'fc-event-tolerancia';
-                    item.nombre = 'Tolerancia';
+                    item.nombre = '';
                     icon = '😊';
                 }
                 if (entrada > '08:46:00') {
@@ -734,7 +734,7 @@
 
                 if (entrada >= '08:31:00' && entrada <= '08:45:00' && !idEstatus) {
                     eventClass = 'fc-event-tolerancia';
-                    item.nombre = 'Tolerancia';
+                    item.nombre = '';
                     icon = '🕣';
                 }
                 if (entrada >= '08:46:00' && entrada <= '09:01:00' && salida > '16:00:00') {
@@ -755,7 +755,7 @@
                
                 if (entrada >= '08:31:00' && entrada <= '08:45:59' && salida > '16:00:00') {
                     eventClass = 'fc-event-tolerancia';
-                    item.nombre = 'Tolerancia';
+                    item.nombre = '';
                     icon = '🕣';
                 }
                 if (entrada <= '09:00:00' && salida < '16:00:00') {

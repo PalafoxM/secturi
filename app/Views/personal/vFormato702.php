@@ -210,7 +210,7 @@
  <div id="nombre">
    <?php if(!$fic): ?>
    <?php if(isset($responsableGasto->nombre_completo) && !empty($responsableGasto->nombre_completo)):  ?>
-   <span ><?= strtoupper(string: $responsableGasto->nombre_completo); ?> - <?= strtoupper($responsableGasto->dsc_puesto); ?> - <?= strtoupper($responsableGasto->dsc_area); ?> </span>
+   <span ><?= $responsableGasto->nombre_completo; ?> - <?= $responsableGasto->dsc_puesto ?> - <?= $responsableGasto->dsc_area ?> </span>
     <?php endif; ?>
    <?php endif; ?>
    <?php if($fic): ?>

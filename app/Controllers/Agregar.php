@@ -103,8 +103,8 @@ class Agregar extends BaseController
                         'id_registro_go' => (int) $id_registro_go,
                         'encabezado'     => $p['encabezado'][$i] ?? $p['encabezado'][0] ?? null,  
                         'comprobante'    => $p['comprobante'][$i] ?? null,
-                        'importe'        => $p['importe'][$i] ?? null,
-                        'propina'        => $p['propina'][$i] ?? null,
+                        'importe'        => (int)$p['importe'][$i] ?? null,
+                        'propina'        => (int)$p['propina'][$i] ?? null,
                         'contribuyente'  => $p['contribuyente'][$i] ?? null,
                         'rfc'            => $p['rfc'][$i] ?? null,
                     ];
@@ -560,109 +560,115 @@ class Agregar extends BaseController
 
         return $responses;
     }
-     public function procesarXMLGo(array $archivos, $id_registro_go = null)
+     public function procesarXMLGo(array $archivosData, $id_registro_go = null)
     {
         $session = \Config\Services::session();
         $data = array();
         $this->globals = new Mglobal();
         $response = new \stdClass();
-
-        foreach ($archivos as $archivo) {
-            if (!$archivo->isValid()) {
-                continue;
-            }
-
-            $tipo = $archivo->getMimeType();
-
-            if (in_array($tipo, ['text/xml', 'application/xml'])) {
-                $contenido = file_get_contents($archivo->getTempName());
-
-                libxml_use_internal_errors(true);
-                $xml = simplexml_load_string($contenido);
-
-                if ($xml === false) {
-                    return false;
+       
+        foreach($archivosData as $key => $archivos){
+              
+            foreach ($archivos as $archivo) {
+                if (!$archivo->isValid()) {
+                    continue;
                 }
 
-                $namespaces = $xml->getNamespaces(true);
-                $cfdi = $xml->children($namespaces['cfdi']);
+            
 
-                $attrs = $xml->attributes();
-                $version = (string) $attrs['Version'];
-                $fecha = (string) $attrs['Fecha'];
-                $total = (string) $attrs['Total'];
-                $moneda = (string) $attrs['Moneda'];
-                $Serie = (string) $attrs['Serie'];
-                $Folio = (string) $attrs['Folio'];
-                $FormaPago = (string) $attrs['FormaPago'];
-                $CondicionesDePago = (string) $attrs['CondicionesDePago'];
-                $SubTotal = (float) $attrs['SubTotal'];
-                $Descuento = isset($attrs['Descuento']) ? (float) $attrs['Descuento'] : 0;
-                $TipoCambio = isset($attrs['TipoCambio']) ? (float) $attrs['TipoCambio'] : 1;
+                $tipo = $archivo->getMimeType();
 
-                $Certificado = (string) $attrs['Certificado'];
-                $NoCertificado = (string) $attrs['NoCertificado'];
+                if (in_array($tipo, ['text/xml', 'application/xml'])) {
+                    $contenido = file_get_contents($archivo->getTempName());
 
-                // ✅ Emisor
-                $emisor = $cfdi->Emisor->attributes();
-                $rfcEmisor = (string) $emisor['Rfc'];
-                $nombreEmisor = (string) $emisor['Nombre'];
+                    libxml_use_internal_errors(true);
+                    $xml = simplexml_load_string($contenido);
 
-                // ✅ Receptor
-                $receptor = $cfdi->Receptor->attributes();
-                $rfcReceptor = (string) $receptor['Rfc'];
-                $nombreReceptor = (string) $receptor['Nombre'];
-
-                // ✅ UUID - CÓDIGO CORREGIDO
-                $uuid = '';
-                $NoCertificado = '';
-
-                // Verificar si existe el complemento
-                if (isset($cfdi->Complemento)) {
-                    // Obtener el namespace correcto para el timbre fiscal
-                    $tfdNamespace = isset($namespaces['tfd']) ? $namespaces['tfd'] : 'http://www.sat.gob.mx/TimbreFiscalDigital';
-
-                    $complemento = $cfdi->Complemento->children($tfdNamespace);
-
-                    // Verificar si existe el TimbreFiscalDigital
-                    if (isset($complemento->TimbreFiscalDigital)) {
-                        $tfdAttributes = $complemento->TimbreFiscalDigital->attributes();
-                        $uuid = (string) $tfdAttributes['UUID'];
-                        $NoCertificado = (string) $tfdAttributes['NoCertificadoSAT'];
+                    if ($xml === false) {
+                        return false;
                     }
+
+                    $namespaces = $xml->getNamespaces(true);
+                    $cfdi = $xml->children($namespaces['cfdi']);
+
+                    $attrs = $xml->attributes();
+                    $version = (string) $attrs['Version'];
+                    $fecha = (string) $attrs['Fecha'];
+                    $total = (string) $attrs['Total'];
+                    $moneda = (string) $attrs['Moneda'];
+                    $Serie = (string) $attrs['Serie'];
+                    $Folio = (string) $attrs['Folio'];
+                    $FormaPago = (string) $attrs['FormaPago'];
+                    $CondicionesDePago = (string) $attrs['CondicionesDePago'];
+                    $SubTotal = (float) $attrs['SubTotal'];
+                    $Descuento = isset($attrs['Descuento']) ? (float) $attrs['Descuento'] : 0;
+                    $TipoCambio = isset($attrs['TipoCambio']) ? (float) $attrs['TipoCambio'] : 1;
+
+                    $Certificado = (string) $attrs['Certificado'];
+                    $NoCertificado = (string) $attrs['NoCertificado'];
+
+                    // ✅ Emisor
+                    $emisor = $cfdi->Emisor->attributes();
+                    $rfcEmisor = (string) $emisor['Rfc'];
+                    $nombreEmisor = (string) $emisor['Nombre'];
+
+                    // ✅ Receptor
+                    $receptor = $cfdi->Receptor->attributes();
+                    $rfcReceptor = (string) $receptor['Rfc'];
+                    $nombreReceptor = (string) $receptor['Nombre'];
+
+                    // ✅ UUID - CÓDIGO CORREGIDO
+                    $uuid = '';
+                    $NoCertificado = '';
+
+                    // Verificar si existe el complemento
+                    if (isset($cfdi->Complemento)) {
+                        // Obtener el namespace correcto para el timbre fiscal
+                        $tfdNamespace = isset($namespaces['tfd']) ? $namespaces['tfd'] : 'http://www.sat.gob.mx/TimbreFiscalDigital';
+
+                        $complemento = $cfdi->Complemento->children($tfdNamespace);
+
+                        // Verificar si existe el TimbreFiscalDigital
+                        if (isset($complemento->TimbreFiscalDigital)) {
+                            $tfdAttributes = $complemento->TimbreFiscalDigital->attributes();
+                            $uuid = (string) $tfdAttributes['UUID'];
+                            $NoCertificado = (string) $tfdAttributes['NoCertificadoSAT'];
+                        }
+                    }
+
+
+
+                    $dataConfig = [
+                        "tabla" => "xml_go",
+                        "editar" => false
+                    ];
+                    $dataInsert = [
+                        'id_registro_go' => (int) $id_registro_go,
+                        'version' => $version,
+                        'fecha' => date('Y-m-d H:i:s', strtotime($fecha)),
+                        'total' => $total,
+                        'moneda' => $moneda,
+                        'id_identificador' => $key,
+                        'folio' => $Folio,
+                        'no_certificado' => $NoCertificado, // Usar el del timbre, no del comprobante
+                        'emisor_rfc' => $rfcEmisor,
+                        'emisor_nombre' => $nombreEmisor,
+                        'receptor_rfc' => $rfcReceptor,
+                        'receptor_nombre' => $nombreReceptor,
+                        'uuid' => $uuid,
+                        'fec_reg' => date('Y-m-d H:i:s'),
+                        'usu_reg' => $session->get('id_usuario')
+                    ];
+
+                    $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardarFacturaGO'];
+                    $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+                    if(!$response->error){
+                        $response->error = false;
+                        $response->respuesta = 'XML guardado correctamente';
+
+                    }
+
                 }
-
-
-
-                $dataConfig = [
-                    "tabla" => "xml_go",
-                    "editar" => false
-                ];
-                $dataInsert = [
-                    'id_registro_go' => (int) $id_registro_go,
-                    'version' => $version,
-                    'fecha' => date('Y-m-d H:i:s', strtotime($fecha)),
-                    'total' => $total,
-                    'moneda' => $moneda,
-                    'folio' => $Folio,
-                    'no_certificado' => $NoCertificado, // Usar el del timbre, no del comprobante
-                    'emisor_rfc' => $rfcEmisor,
-                    'emisor_nombre' => $nombreEmisor,
-                    'receptor_rfc' => $rfcReceptor,
-                    'receptor_nombre' => $nombreReceptor,
-                    'uuid' => $uuid,
-                    'fec_reg' => date('Y-m-d H:i:s'),
-                    'usu_reg' => $session->get('id_usuario')
-                ];
-
-                $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardarFacturaGO'];
-                $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
-                if(!$response->error){
-                    $response->error = false;
-                    $response->respuesta = 'XML guardado correctamente';
-
-                }
-
             }
         }
         return $response;

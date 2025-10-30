@@ -40,7 +40,7 @@
               <div style="position:absolute; text-align:center; top:<?=$i?>%; left:50%; width:11%; background-color:white; font-size:10px; height:12px; line-height:12px;">
                     <span class="proxima">
                         <?php 
-                        $importe = $r->importe + $r->propina;
+                        $importe = (int)$r->importe + (int)$r->propina;
                         if (is_numeric($importe)) {
                             echo '$' . number_format(floatval($importe), 2);
                         } else {
