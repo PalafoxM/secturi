@@ -251,9 +251,6 @@
 	            <td>
 	                <input autocomplete="off" type="text" class="form-control" name="importe[]" placeholder="0,000.000">
 	            </td>
-				<td>
-	                <input autocomplete="off" type="text" class="form-control" name="propina[]" placeholder="0,000.000">
-	            </td>
 	            <td>
 	                <button type="button" class="btn btn-sm btn-danger remove-row">
 	                    <i class="fas fa-trash"></i>
