@@ -1907,8 +1907,7 @@ class Principal extends BaseController
         $email = \Config\Services::email();
         $result = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_tipo_empleado' => 1]])->data;
 
-        $email->setTo([
-            'alopez@guanajuato.gob.mx',
+       $email->setTo([
             'agascag@guanajuato.gob.mx',
             'ccampos@guanajuato.gob.mx',
             'sandag@guanajuato.gob.mx',
@@ -1925,7 +1924,7 @@ class Principal extends BaseController
             'rgonzalezgu@guanajuato.gob.mx',
             'yjimenez@guanajuato.gob.mx',
         ]);
-
+ 
         /*          $email->setTo([
                     'alopez@guanajuato.gob.mx',
                     'cchernandezp@guanajuato.gob.mx',
@@ -2004,9 +2003,9 @@ class Principal extends BaseController
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Estimado personal,</p>
                         
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-                            En caso de que aún no hayas realizado las <strong>justificaciones de tus incidencias correspondientes a la quincena 19/2025</strong>, 
-                            la cual comprende el periodo del <strong>1 al 15 de octubre de 2025</strong>, 
-                            tienes hasta el día <strong> de hoy hasta las 16:00 hrs</strong> para realizarlas.
+                            En caso de que aún no hayas realizado las <strong>justificaciones de tu personal correspondientes a la quincena 20/2025</strong>, 
+                            la cual comprende el periodo del <strong>16 al 31 de octubre de 2025</strong>, 
+                            tienes hasta el día <strong> viernes 10 de noviembre hasta las 16:00 hrs</strong> para realizarlas.
                         </p>
 
                         <div class="highlight-box">

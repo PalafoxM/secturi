@@ -303,20 +303,17 @@
                                                         <table class="table table-bordered" id="makeEditable3">
                                                             <thead>
                                                                 <tr>
-                                                                    <th>No. COMPROBANTE</th>
                                                                     <th>IMPORTE</th>
                                                                     <th>PROPINA</th>
-                                                                    <th>CONTRIBUYENTE</th>
-                                                                    <th>RFC</th>
+                                                                    <th>INICIO</th>
+                                                                    <th>FIN</th>
                                                                     <th>ARCHIVOS</th>
                                                                     <th>ACCIONES</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
                                                                 <tr>
-                                                                    <td><input type="text" autocomplete="off"
-                                                                            class="form-control" name="comprobante[]"
-                                                                            placeholder="A129324"></td>
+                                                                 
                                                                     <td><input type="text" autocomplete="off"
                                                                             class="form-control" name="importe[]"
                                                                             placeholder="Importe"></td>
@@ -326,14 +323,12 @@
                                                                             placeholder="Propina">
                                                                     </td>
                                                                     <td>
-                                                                        <input autocomplete="off" type="text"
-                                                                            class="form-control" name="contribuyente[]"
-                                                                            placeholder="Contribuyente">
+                                                                        <input autocomplete="off" type="date"
+                                                                            class="form-control" name="periodo_inicio[]" >
                                                                     </td>
                                                                     <td>
-                                                                        <input autocomplete="off" type="text"
-                                                                            class="form-control" name="rfc[]"
-                                                                            placeholder="RFC">
+                                                                           <input autocomplete="off" type="date"
+                                                                            class="form-control" name="periodo_fin[]">
                                                                     </td>
                                                                      <td>
      
@@ -343,14 +338,15 @@
                                                                     </td>
                                                                     <td>
                                          
-                                                                         <button type="button" class="btn btn-sm btn-danger remove-row">
-                                                                            <i class="fas fa-trash"></i>
-                                                                        </button>
                                                                         <button type="button" class="btn btn-sm btn-success btn-seleccionar-pdf" data-row="<?= $i?>">
                                                                             <i class="fas fa-file-pdf"></i> PDF
                                                                         </button>
                                                                         <button type="button" class="btn btn-sm btn-warning btn-seleccionar-xml" data-row="<?= $i?>">
                                                                             <i class="mdi mdi-code-tags"></i> XML
+                                                                        </button>
+                                                                        
+                                                                         <button type="button" class="btn btn-sm btn-danger remove-row">
+                                                                            <i class="fas fa-trash"></i>
                                                                         </button>
                                                                     </td>
                                                                 </tr>
@@ -430,9 +426,6 @@
 
 <script src="<?= base_url() ?>plugins/jquery-steps/jquery.steps.min.js"></script>
 <script src="<?= base_url() ?>assets/pages/jquery.form-wizard.init.js"></script>
-
-<!-- App js -->
-<script src="<?= base_url() ?>assets/js/app.js"></script>
 
 
 
@@ -724,9 +717,56 @@ function actualizarVistaArchivos(rowIndex) {
 
     container.html(html);
 }
+function validarArchivos() {
+    let archivosValidos = true;
+    const mensajesError = [];
 
+    Object.keys(archivosPorFila).forEach(rowIndex => {
+        const archivos = archivosPorFila[rowIndex];
+        
+        // Validar que cada fila tenga al menos un XML
+        if (!archivos.xml || archivos.xml.length === 0) {
+            archivosValidos = false;
+            mensajesError.push(`Fila ${parseInt(rowIndex) + 1}: El archivo XML es requerido`);
+        }
+        
+        // Validar que cada fila tenga al menos un PDF
+        if (!archivos.pdf || archivos.pdf.length === 0) {
+            archivosValidos = false;
+            mensajesError.push(`Fila ${parseInt(rowIndex) + 1}: El archivo PDF es requerido`);
+        }
+        
+        // Validar tipos de archivo si es necesario
+        if (archivos.xml && archivos.xml.length > 0) {
+            archivos.xml.forEach(file => {
+                if (file.type !== 'text/xml' && !file.name.toLowerCase().endsWith('.xml')) {
+                    archivosValidos = false;
+                    mensajesError.push(`Fila ${parseInt(rowIndex) + 1}: El archivo ${file.name} debe ser XML`);
+                }
+            });
+        }
+        
+        if (archivos.pdf && archivos.pdf.length > 0) {
+            archivos.pdf.forEach(file => {
+                if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+                    archivosValidos = false;
+                    mensajesError.push(`Fila ${parseInt(rowIndex) + 1}: El archivo ${file.name} debe ser PDF`);
+                }
+            });
+        }
+    });
+
+    return { archivosValidos, mensajesError };
+}
 // Función para preparar el FormData para el envío al backend
 function prepararFormData() {
+
+    const validacion = validarArchivos();
+    if (!validacion.archivosValidos) {
+       // alert('Errores en los archivos:\n' + validacion.mensajesError.join('\n'));
+          Swal.fire("Atención", "<p>Es requerido subir XML/PDF</p>", "warning");
+        return;
+    }
     const formData = new FormData();
     
     // INCLUIR TODOS LOS CAMPOS DEL FORMULARIO PRIMERO
@@ -738,10 +778,7 @@ function prepararFormData() {
         formData.append(key, value);
     }
     
-    // LUEGO AGREGAR TUS CAMPOS ESPECÍFICOS DE COMPROBANTES
-    $('input[name="comprobante[]"]').each(function(index) {
-        formData.append(`comprobante[${index}]`, $(this).val());
-    });
+
     
     $('input[name="importe[]"]').each(function(index) {
         formData.append(`importe[${index}]`, $(this).val());
@@ -750,14 +787,15 @@ function prepararFormData() {
     $('input[name="propina[]"]').each(function(index) {
         formData.append(`propina[${index}]`, $(this).val());
     });
-    
-    $('input[name="contribuyente[]"]').each(function(index) {
-        formData.append(`contribuyente[${index}]`, $(this).val());
+    $('input[name="periodo_inicio[]"]').each(function(index) {
+        formData.append(`periodo_inicio[${index}]`, $(this).val());
+    });
+    $('input[name="periodo_fin[]"]').each(function(index) {
+        formData.append(`periodo_fin[${index}]`, $(this).val());
     });
     
-    $('input[name="rfc[]"]').each(function(index) {
-        formData.append(`rfc[${index}]`, $(this).val());
-    });
+
+    
     
     // FINALMENTE AGREGAR ARCHIVOS
     Object.keys(archivosPorFila).forEach(rowIndex => {
