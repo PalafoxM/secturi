@@ -460,16 +460,16 @@ let rowCounter = 0;
 $('#but_add').click(function () {
     rowCounter++;
     var newRow = `<tr data-row-index="${rowCounter}">
-        <td><input type="text" autocomplete="off" class="form-control" name="comprobante[]" placeholder="A129324"></td>
+    
         <td><input type="text" autocomplete="off" class="form-control importe-input" name="importe[]" placeholder="Importe"></td>
         <td>
             <input autocomplete="off" type="text" class="form-control propina-input" name="propina[]" placeholder="Propina">
         </td>
         <td>
-            <input autocomplete="off" type="text" class="form-control" name="contribuyente[]" placeholder="Contribuyente">
+            <input autocomplete="off" type="date" class="form-control" name="periodo_inicio[]" placeholder="Contribuyente">
         </td>
         <td>
-            <input autocomplete="off" type="text" class="form-control" name="rfc[]" placeholder="RFC">
+            <input autocomplete="off" type="date" class="form-control" name="periodo_fin[]" placeholder="RFC">
         </td>
         <td>
             <!-- Contenedor para mostrar archivos seleccionados -->
@@ -478,14 +478,15 @@ $('#but_add').click(function () {
             </div>
         </td>
         <td>
-            <button type="button" class="btn btn-sm btn-danger remove-row">
-                <i class="fas fa-trash"></i>
-            </button>
+       
             <button type="button" class="btn btn-sm btn-success btn-seleccionar-pdf" data-row="${rowCounter}">
                 <i class="fas fa-file-pdf"></i> PDF
             </button>
             <button type="button" class="btn btn-sm btn-warning btn-seleccionar-xml" data-row="${rowCounter}">
                 <i class="mdi mdi-code-tags"></i> XML
+            </button>
+            <button type="button" class="btn btn-sm btn-danger remove-row">
+                <i class="fas fa-trash"></i>
             </button>
         </td>
     </tr>`;
@@ -717,56 +718,12 @@ function actualizarVistaArchivos(rowIndex) {
 
     container.html(html);
 }
-function validarArchivos() {
-    let archivosValidos = true;
-    const mensajesError = [];
 
-    Object.keys(archivosPorFila).forEach(rowIndex => {
-        const archivos = archivosPorFila[rowIndex];
-        
-        // Validar que cada fila tenga al menos un XML
-        if (!archivos.xml || archivos.xml.length === 0) {
-            archivosValidos = false;
-            mensajesError.push(`Fila ${parseInt(rowIndex) + 1}: El archivo XML es requerido`);
-        }
-        
-        // Validar que cada fila tenga al menos un PDF
-        if (!archivos.pdf || archivos.pdf.length === 0) {
-            archivosValidos = false;
-            mensajesError.push(`Fila ${parseInt(rowIndex) + 1}: El archivo PDF es requerido`);
-        }
-        
-        // Validar tipos de archivo si es necesario
-        if (archivos.xml && archivos.xml.length > 0) {
-            archivos.xml.forEach(file => {
-                if (file.type !== 'text/xml' && !file.name.toLowerCase().endsWith('.xml')) {
-                    archivosValidos = false;
-                    mensajesError.push(`Fila ${parseInt(rowIndex) + 1}: El archivo ${file.name} debe ser XML`);
-                }
-            });
-        }
-        
-        if (archivos.pdf && archivos.pdf.length > 0) {
-            archivos.pdf.forEach(file => {
-                if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
-                    archivosValidos = false;
-                    mensajesError.push(`Fila ${parseInt(rowIndex) + 1}: El archivo ${file.name} debe ser PDF`);
-                }
-            });
-        }
-    });
 
-    return { archivosValidos, mensajesError };
-}
 // Función para preparar el FormData para el envío al backend
 function prepararFormData() {
 
-    const validacion = validarArchivos();
-    if (!validacion.archivosValidos) {
-       // alert('Errores en los archivos:\n' + validacion.mensajesError.join('\n'));
-          Swal.fire("Atención", "<p>Es requerido subir XML/PDF</p>", "warning");
-        return;
-    }
+  
     const formData = new FormData();
     
     // INCLUIR TODOS LOS CAMPOS DEL FORMULARIO PRIMERO

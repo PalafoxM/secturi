@@ -236,7 +236,7 @@
    FACTURA / RECIBO No: 
 </div>
 <div id="factura_respuesta">
-      <?= $facturaItem->comprobante ?>
+      <?= $facturaItem->uuid ?>
 </div>
 <div id="fecha">
    FECHA DEL GASTO:
@@ -254,7 +254,6 @@
 </div>
 
 <div id="importe_respuesta">
-
-<?= '$' . number_format((int)$facturaItem->importe + (int)$facturaItem->propina, 2)  . ' ('.$numero_texto2.')' ?>
+   
 </div>
 

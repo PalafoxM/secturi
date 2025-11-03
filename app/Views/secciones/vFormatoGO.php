@@ -24,7 +24,7 @@
         <?php $i = 27.5;  ?>
         <?php foreach($presupuesto as $r): ?>
          <div  style="position:absolute; text-align:center; top:<?=$i?>%; left:22%; width:10%; background-color:white; font-size: 10px;  height:12px;">
-            <span class="proxima "><?= $r->proyecto ?></span>
+            <span class="proxima "><?= $r->dsc_proyecto ?></span>
         </div>
         <?php $i = $i + 1.5; ?>
         <?php endforeach; ?>
@@ -35,34 +35,26 @@
         </div>
         <?php $i = $i + 1.5; ?>
         <?php endforeach; ?>
-         <?php $i = 27.5; ?>
-        <?php foreach($presupuesto as $r): ?>
-              <div style="position:absolute; text-align:center; top:<?=$i?>%; left:50%; width:11%; background-color:white; font-size:10px; height:12px; line-height:12px;">
-                    <span class="proxima">
-                        <?php 
-                        $importe = (int)$r->importe + (int)$r->propina;
-                        if (is_numeric($importe)) {
-                            echo '$' . number_format(floatval($importe), 2);
-                        } else {
-                            $limpio = preg_replace('/[^\d\.\-]/', '', (string)$importe);
-                            echo '$' . (is_numeric($limpio) ? number_format(floatval($limpio), 2) : '0.00');
-                        }
-                        ?>
-                    </span>
-                </div>
-            <?php $i += 1.5; ?>
+
+        <?php $i = 27.5;  ?>
+        <?php foreach($importe as $im): ?>
+         <div  style="position:absolute; text-align:center; top:<?=$i?>%; left:50%; width:11%; background-color:white; font-size: 10px;  height:12px;">
+            <span class="proxima "><?= (int)$im->importe + (int)$im->propina ?></span>
+        </div>
+        <?php $i = $i + 1.5; ?>
         <?php endforeach; ?>
+
         
         <?php $i = 27.5;  ?>
             <?php foreach( $presupuesto as $u ): ?>
                 <div style="position:absolute; text-align:center; top:<?=$i?>%; left:11.8%; width:11%; background-color:white; font-size: 10px;  height:12px; line-height:12px;">
-                   <span class="proxima"> <strong> <?= $u->comprobante; ?></strong> </span>
+                   <span class="proxima"> <strong> <?= $u->uuid; ?></strong> </span>
                  </div>
             <?php $i += 1.5; ?>
         <?php endforeach; ?>
         <?php $i = 27.5;  ?>
             <?php foreach( $presupuesto as $u ): ?>
-                <div style="position:absolute; text-align:center; top:<?=$i?>%; left:61.35%; width:18%; background-color:white; font-size: 10px;  height:12px;">
+                <div style="position:absolute; text-align:center; top:<?=$i?>%; left:61.35%; width:18%; background-color:white; font-size: 10px;  height:11px;">
                   <span class="proxima"> <strong> <?= $u->contribuyente; ?> </strong></span>
                  </div>
             <?php $i += 1.5; ?>
@@ -70,7 +62,7 @@
         <?php $i = 27.5;  ?>
             <?php foreach( $presupuesto as $u ): ?>
                 <div style="position:absolute; text-align:center; top:<?=$i?>%; left:81%; width:11%; background-color:white; font-size: 10px;  height:12px;">
-                  <span><?= $u->rfc; ?></span>
+                  <span class="proxima"><?= $u->rfc; ?></span>
                  </div>
             <?php $i += 1.5; ?>
         <?php endforeach; ?>

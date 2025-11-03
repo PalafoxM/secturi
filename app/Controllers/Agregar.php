@@ -85,13 +85,45 @@ class Agregar extends BaseController
         $data = array();
         $response = new \stdClass();
         $this->globals = new Mglobal();
+     
+        foreach ($periodo as $p) {
+            // DETECTAR TIPO DE ESTRUCTURA
+            $esAnidado = (is_array($p['importe']) && is_array($p['propina']));
+            $esNormal = (is_string($p['importe']) && is_string($p['propina']));
+           
+            if ($esAnidado) {
+                // Estructura anidada: múltiples registros
+                foreach ($p['importe'] as $index => $encabezado) {
+                     // Iterar sobre cada conjunto de datos
+         
+                    $dataConfig = [
+                        "tabla" => "periodo_factura_go",
+                        "editar" => false
+                    ];
 
-        foreach ($periodo as $key => $p) {
-            // Verificar si tenemos datos de comprobantes
-            if (isset($p['comprobante']) && is_array($p['comprobante'])) {
+                    $dataInsert = [
+                        'id_registro_go' => (int) $id_registro_go,
+                        'encabezado'     => $p['encabezado'][$index] ?? $p['encabezado'][0] ?? null,  
+                        'importe'        => (int)$p['importe'][$index] ?? null,
+                        'periodo_inicio' => date('Y-m-d', strtotime($p['periodo_inicio'][$index])) ?? null,
+                        'periodo_fin'    =>date('Y-m-d', strtotime($p['periodo_fin'][$index])) ?? null,
+                        'propina'        => (int)$p['propina'][$index] ?? null,
+                   
+                    ];
+
+                    $dataBitacora = [
+                        'id_user' => $session->get('id_usuario'),
+                        'script' => 'Agregar.php/guardarFacturaPDF'
+                    ];
+
+                    $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+               
                 
-                // Iterar sobre cada conjunto de datos
-                $count = count($p['comprobante']);
+              }
+            } else if ($esNormal) {
+                // Estructura normal: un solo registro
+                 // Iterar sobre cada conjunto de datos
+                $count = count($p['encabezado']);
                 
                 for ($i = 0; $i < $count; $i++) {
                     $dataConfig = [
@@ -102,11 +134,11 @@ class Agregar extends BaseController
                     $dataInsert = [
                         'id_registro_go' => (int) $id_registro_go,
                         'encabezado'     => $p['encabezado'][$i] ?? $p['encabezado'][0] ?? null,  
-                        'comprobante'    => $p['comprobante'][$i] ?? null,
                         'importe'        => (int)$p['importe'][$i] ?? null,
+                        'periodo_inicio' => date('Y-m-d', strtotime($p['periodo_inicio'][$i])) ?? null,
+                        'periodo_fin'    =>date('Y-m-d', strtotime($p['periodo_fin'][$i])) ?? null,
                         'propina'        => (int)$p['propina'][$i] ?? null,
-                        'contribuyente'  => $p['contribuyente'][$i] ?? null,
-                        'rfc'            => $p['rfc'][$i] ?? null,
+                   
                     ];
 
                     $dataBitacora = [
@@ -115,10 +147,12 @@ class Agregar extends BaseController
                     ];
 
                     $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
-                }
+               
             }
+         }
         }
 
+       
         return $response;
     }
 
@@ -566,9 +600,10 @@ class Agregar extends BaseController
         $data = array();
         $this->globals = new Mglobal();
         $response = new \stdClass();
-       
+   
+      
         foreach($archivosData as $key => $archivos){
-              
+ 
             foreach ($archivos as $archivo) {
                 if (!$archivo->isValid()) {
                     continue;
@@ -671,6 +706,7 @@ class Agregar extends BaseController
                 }
             }
         }
+       
         return $response;
     }
 
@@ -1255,8 +1291,38 @@ class Agregar extends BaseController
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
         $archivos = $this->request->getFiles();
-      
-     
+        $vacioXML = false;
+        $vacioPDF = false;
+   
+        // Validar que existan archivos
+       
+        foreach( $data['periodo_inicio'] as $p){
+            if(empty($p)){
+            $response->error = true;
+            $response->respuesta = "No se han subido periodo_inicio";
+            return $this->respond($response);
+            }
+            
+        }
+        foreach( $data['periodo_fin'] as $p){
+            if(empty($p)){
+            $response->error = true;
+            $response->respuesta = "No se han subido periodo_fin";
+            return $this->respond($response);
+            }
+        }
+        
+        if (empty($archivos)) {
+            $response->error = true;
+            $response->respuesta = "No se han subido archivos";
+            return $this->respond($response);
+        }
+
+        if (empty($archivos)) {
+            $response->error = true;
+            $response->respuesta = "No se han subido archivos";
+            return $this->respond($response);
+        }
 
         if ($data['secretario'] == 0) {
             $response->error = true;
@@ -1347,8 +1413,7 @@ class Agregar extends BaseController
             ];
             $dataInsert['usu_act'] = $session->get('id_usuario');
         }
-
-
+       
         $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
 
         if (!$response->error) {
@@ -1403,13 +1468,13 @@ class Agregar extends BaseController
                     $index = str_replace('propina', '', $key); // ej. encabezado1 → 1
                     $periodo[$index]['propina'] = $p;
                 }
-                if (strpos($key, 'contribuyente') === 0) {
-                    $index = str_replace('contribuyente', '', $key); // ej. encabezado1 → 1
-                    $periodo[$index]['contribuyente'] = $p;
+                if (strpos($key, 'periodo_inicio') === 0) {
+                    $index = str_replace('periodo_inicio', '', $key); // ej. encabezado1 → 1
+                    $periodo[$index]['periodo_inicio'] = $p;
                 }
-                if (strpos($key, 'rfc') === 0) {
-                    $index = str_replace('rfc', '', $key); // ej. encabezado1 → 1
-                    $periodo[$index]['rfc'] = $p;
+                if (strpos($key, 'periodo_fin') === 0) {
+                    $index = str_replace('periodo_fin', '', $key); // ej. encabezado1 → 1
+                    $periodo[$index]['periodo_fin'] = $p;
                 }
             }
 
@@ -1419,7 +1484,9 @@ class Agregar extends BaseController
           
             $datosPDF = $this->procesarPDFgo($archivosPdf, $id_registro_go);
             $datosXML = $this->procesarXMLGo($archivosXml, $id_registro_go);
+           
             $datosP = $this->procesarPediodoGo($periodo, $id_registro_go);
+           
             
             if (!$datosPDF) {
                 $response->errorPDF = true;

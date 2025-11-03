@@ -3517,6 +3517,16 @@ class Principal extends BaseController
             $data['uuid'] = $xml->data;
         }
         //==============================
+        //==============================
+         $importe = $globals->getTabla([
+            'tabla' => 'periodo_factura_go',
+            'where' => ['visible' => 1, 'id_registro_go' => $id_pt]
+        ]);
+
+        if (isset($importe->data) && !empty($importe->data)) {
+            $data['importe'] = $importe->data;
+        }
+        //==============================
         
 
 
