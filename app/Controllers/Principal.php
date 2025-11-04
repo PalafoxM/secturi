@@ -3640,7 +3640,7 @@ class Principal extends BaseController
                             $importe_float = (float) str_replace(',', '', $importe_str);
                             $data['numero_texto2'] = $this->numeroEnLetras($importe_float);
                             $data['facturaItem'] = $facturaItem;
-                             $data['importePartida'] = $facturaItem->importe;
+                            $data['importePartida'] = $facturaItem->importe;
                             $data['propinaPartida'] = $facturaItem->propina;
                             $data['periodo_inicio'] = $facturaItem->periodo_inicio;
                             $data['periodo_fin']    = $facturaItem->periodo_fin;
