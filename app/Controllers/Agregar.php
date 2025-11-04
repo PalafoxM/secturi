@@ -1118,6 +1118,8 @@ class Agregar extends BaseController
         $data = $this->request->getPost();
         $archivos = $this->request->getFiles();
         $response->idReserva = "";
+        
+   
 
         if ($data['no_consecutivo'] == '') {
             $response->error = true;
@@ -1265,7 +1267,7 @@ class Agregar extends BaseController
                 $datosXML = $this->procesarXML($archivosXml, $id_registro_pt);
                 $datosPDF = $this->procesarPDF($archivosPdf, $id_registro_pt);
 
-
+   
 
                 if (!$datosXML) {
                     $response->errorXML = true;
@@ -3321,14 +3323,24 @@ class Agregar extends BaseController
         }
         $fecha = $data['fecha'];
         $like = ['fecha' => "%$fecha%"];
-        $dataDB = array('tabla' => 'sala_junta', 'where' => ['visible' => 1, 'sala' => $data['sala'], 'hora_inicio' => $data['hora_inicio'], 'hora_fin' => $data['hora_fin']], 'orlike' => $like, );
+        $dataDB = array('tabla' => 'sala_junta', 'where' => ['visible' => 1, 'sala' => $data['sala']], 'orlike' => $like, );
         $response = $globals->getTabla($dataDB);
-        if (isset($response->data) && !empty($response->data)) {
-            $response->error = true;
-            $response->respuesta = "La Sala " . $data['sala'] . " ya esta reservada de " . $data['hora_inicio'] . " - " . $data['hora_fin'] . "";
-            return $this->respond($response);
-        }
 
+        if (isset($response->data) && !empty($response->data)) {
+            foreach($response->data as $f){
+                if(strtotime($f->hora_inicio) >= $inicio  || strtotime($f->hora_inicio) <= $fin ){
+                     
+                        $response->error = true;
+                        $response->respuesta = "La Sala " . $data['sala'] . " ya esta reservada de " . $data['hora_inicio'] . " - " . $data['hora_fin'] . "";
+                        return $this->respond($response);
+
+                }
+
+            }
+
+        
+        }
+       
         $dataInsert = [
             'sala' => $data['sala'],
             'fecha' => $data['fecha'] . ' ' . $data['hora_inicio'],

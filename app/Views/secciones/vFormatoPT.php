@@ -137,9 +137,11 @@
             <?php endforeach; ?>
          <?php endif; ?>
            <?php if($fic): ?>
-
+                  <?php $i = 34;  ?>
+            <div style="position:absolute; text-align:center; top:<?=$i?>%; left:2.7%; width:13.8%; background-color:white; font-size: 12px;  height:12px;">
                  <p><?= $uuid; ?></p>
-
+            </div>
+            <?php $i += 1.5; ?>
          <?php endif; ?>
    
         <div  style="position:absolute; text-align:right; top:52.2%; left:44%; width:15%; background-color:white; font-size: 12px;  height:12px;">

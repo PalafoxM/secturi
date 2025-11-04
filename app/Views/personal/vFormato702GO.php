@@ -243,8 +243,8 @@
 </div>
 
  <div id="fecha_respuesta">
-   <?php if(isset($facturaItem->periodo_inicio) && !empty($facturaItem->periodo_inicio)): ?>
-   <span > DEL <?= date('d-m-Y', strtotime($facturaItem->periodo_inicio));?> AL <?= date('d-m-Y',strtotime($facturaItem->periodo_fin));?>  </span>
+   <?php if(isset($inicio) && !empty($fin)): ?>
+   <span > DEL <?= date('d-m-Y', strtotime($inicio));?> AL <?= date('d-m-Y',strtotime($fin));?>  </span>
    <?php endif; ?>
 </div>
 

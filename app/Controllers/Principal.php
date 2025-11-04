@@ -2964,9 +2964,10 @@ class Principal extends BaseController
 
         if (isset($uudi->data) && !empty($uudi->data)) {
 
-            $data['uudi'] = $uudi->data[0]->uuid;
+            $data['uuid'] = $uudi->data[0]->uuid;
 
         }
+       
         if (!empty($instrumento)) {
             switch ($id_archivo) {
                 case 1:
@@ -3006,7 +3007,7 @@ class Principal extends BaseController
 
             }
         }
-
+       
         $html = view($formato, $data);
         $htmlSegundaHoja = view('personal/vFormato02.php', $data);
         //Crear instancia de mPDF
@@ -3641,9 +3642,23 @@ class Principal extends BaseController
                             $data['numero_texto2'] = $this->numeroEnLetras($importe_float);
                             $data['facturaItem'] = $facturaItem;
                             $data['importePartida'] = $facturaItem->importe;
-                            $data['propinaPartida'] = $facturaItem->propina;
-                            $data['periodo_inicio'] = $facturaItem->periodo_inicio;
-                            $data['periodo_fin']    = $facturaItem->periodo_fin;
+
+                            $periodo_factura_go = $globals->getTabla([
+                                'tabla' => 'periodo_factura_go',
+                                'where' => [
+                                    'visible' => 1,
+                                    'id_registro_go' => $id_pt,
+                                ]
+                            ]);
+
+                              $periodo = isset($periodo_factura_go->data) && !empty($periodo_factura_go->data)
+                                ? $periodo_factura_go->data
+                                : [];
+                            
+                           $data['inicio'] = $periodo[$index]->periodo_inicio;
+                           $data['fin'] = $periodo[$index]->periodo_fin;
+                      
+                       
                             
                             // 1️⃣ Agregamos una sola página con el formato 702GO
                             $htmlTercerHoja = view('personal/vFormato702GO.php', $data);
@@ -3659,11 +3674,13 @@ class Principal extends BaseController
                                     'id_identificador' => $index
                                 ]
                             ]);
+                     
 
                             $facturas = isset($factura_pdf_go->data) && !empty($factura_pdf_go->data)
                                 ? $factura_pdf_go->data
                                 : [];
-
+                            
+                          
                             // 3️⃣ Posición inicial (debajo del contenido del formato)
                            $currentY = $mpdf->y + 60;
 

@@ -37,7 +37,7 @@
                 <?php endif; ?>
             </strong>
                  derivado del contrato ó convenio número <strong> <?= (isset($reserva->no_convenio) && !empty($reserva->no_convenio))?$reserva->no_convenio:'S/N' ;?></strong> por la cantidad de <strong>$<?= ($fic)?$reserva->total_importe:( isset($registro->total_importe) && !empty($registro->total_importe)?$registro->total_importe:'' ) ;?></strong>
-                 <strong>(<?= $numero_texto?>)</strong>, <?= ($lastKey)?'por los servicios':'por el servicio' ?>
+                 <strong>(<?= $numero_texto?>)</strong>, por el servicio
                  <strong>
                       <?php if(!$fic): ?>
             <?php foreach($presupuesto as $key => $p): ?>
