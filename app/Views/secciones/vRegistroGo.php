@@ -300,7 +300,7 @@
 
                                                     <h4 class="mt-0 header-title">REFERENCIA</h4>
                                                     <div class="table-responsive">
-                                                        <table class="table table-bordered" id="makeEditable3">
+                                                        <table class="table table-bordered" id="makeEditable<?= $i?>">
                                                             <thead>
                                                                 <tr>
                                                                     <th>IMPORTE</th>
@@ -315,20 +315,20 @@
                                                                 <tr>
                                                                  
                                                                     <td><input type="text" autocomplete="off"
-                                                                            class="form-control" name="importe[]"
+                                                                            class="form-control" name="importe_<?= $i?>[]"
                                                                             placeholder="Importe"></td>
                                                                     <td>
                                                                         <input autocomplete="off" type="text"
-                                                                            class="form-control" name="propina[]"
+                                                                            class="form-control" name="propina_<?= $i?>[]"
                                                                             placeholder="Propina">
                                                                     </td>
                                                                     <td>
                                                                         <input autocomplete="off" type="date"
-                                                                            class="form-control" name="periodo_inicio[]" >
+                                                                            class="form-control" name="periodo_inicio_<?= $i?>[]" >
                                                                     </td>
                                                                     <td>
                                                                            <input autocomplete="off" type="date"
-                                                                            class="form-control" name="periodo_fin[]">
+                                                                            class="form-control" name="periodo_fin_<?= $i?>[]">
                                                                     </td>
                                                                      <td>
      
@@ -354,8 +354,9 @@
                                                         </table>
                                                         <div class="text-right mt-2">
                                                             <!-- Contenedor mejorado para el botón -->
-                                                            <a id="but_add" class="btn btn-primary text-white">
-                                                                <i class="fas fa-plus"></i> Agregar Fila
+                                                            <a onclick="addRow(<?= $i?>)"  class="btn btn-primary text-white" >
+                                                              
+                                                                <i class="fas fa-plus"></i> Agregar Fila 
                                                             </a>
                                                         </div>
                                                         <div class="row mt-3">
@@ -454,24 +455,24 @@
     });
 
    // Objeto global para almacenar archivos por fila
+
 const archivosPorFila = {};
 let rowCounter = 0;
-
-$('#but_add').click(function () {
+function addRow(i){
     rowCounter++;
-    var newRow = `<tr data-row-index="${rowCounter}">
-    
+    var newRow = `
+    <tr data-row-index="${rowCounter}">
         <td>
-        <input type="text" autocomplete="off" class="form-control" importe-input" name="importe[]" placeholder="Importe">
+        <input type="text" autocomplete="off" class="form-control" importe-input" name="importe_${i}[]" placeholder="Importe">
         </td>
         <td>
-            <input autocomplete="off" type="text" class="form-control propina-input" name="propina[]" placeholder="Propina">
+            <input autocomplete="off" type="text" class="form-control propina-input" name="propina_${i}[]" placeholder="Propina">
         </td>
         <td>
-            <input autocomplete="off" type="date" class="form-control" name="periodo_inicio[]" placeholder="Contribuyente">
+            <input autocomplete="off" type="date" class="form-control" name="periodo_inicio_${i}[]" placeholder="Contribuyente">
         </td>
         <td>
-            <input autocomplete="off" type="date" class="form-control" name="periodo_fin[]" placeholder="RFC">
+            <input autocomplete="off" type="date" class="form-control" name="periodo_fin_${i}[]" placeholder="RFC">
         </td>
         <td>
             <!-- Contenedor para mostrar archivos seleccionados -->
@@ -493,7 +494,7 @@ $('#but_add').click(function () {
         </td>
     </tr>`;
 
-    $('#makeEditable3 tbody').append(newRow);
+    $(`#makeEditable${i} tbody`).append(newRow);
 
     // Inicializar almacenamiento para esta fila
     archivosPorFila[rowCounter] = {
@@ -502,10 +503,10 @@ $('#but_add').click(function () {
     };
 
     // Inicializar Select2 en la nueva fila (si aplica)
-    $('#makeEditable3 tbody tr:last .select2').select2();
+    $(`#makeEditable${i} tbody tr:last .select2`).select2();
 
     // Inicializar máscara para los campos numéricos
-    $('#makeEditable3 tbody tr:last input[name="importe[]"]').inputmask('numeric', {
+    $(`#makeEditable${i} tbody tr:last input[name="importe_${i}[]"]`).inputmask('numeric', {
         radixPoint: ".",
         groupSeparator: ",",
         digits: 2,
@@ -513,7 +514,7 @@ $('#but_add').click(function () {
         prefix: '$ ',
         rightAlign: false
     });
-    $('#makeEditable3 tbody tr:last input[name="propina[]"]').inputmask('numeric', {
+    $(`#makeEditable${i} tbody tr:last input[name="propina_${i}[]"]`).inputmask('numeric', {
         radixPoint: ".",
         groupSeparator: ",",
         digits: 2,
@@ -522,8 +523,9 @@ $('#but_add').click(function () {
         rightAlign: false
     });
     
-    calcularTotal();
-});
+    calcularTotal(i);
+    i++;
+}
 
 // Eliminar fila con SweetAlert de confirmación
 $(document).on('click', '.remove-row', function () {
@@ -855,15 +857,15 @@ $(document).ready(function() {
 		$(document).on('input', 'input[name="propina[]"]', function() {
 	    calcularTotal();
 	});
-	function calcularTotal() {
+	function calcularTotal(i) {
 	    let total = 0;
 	    
-	    $('input[name="importe[]"]').each(function() {
+	    $('input[name="importe_'+i+'[]"]').each(function() {
 	        // Elimina comas y convierte a número
 	        const valor = parseFloat($(this).val().replace(/,/g, '')) || 0;
 	        total += valor;
 	    });
-		 $('input[name="propina[]"]').each(function() {
+		 $('input[name="propina'+i+'[]"]').each(function() {
 	        // Elimina comas y convierte a número
 	        const valor = parseFloat($(this).val().replace(/,/g, '')) || 0;
 	        total += valor;
