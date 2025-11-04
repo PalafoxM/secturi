@@ -243,8 +243,8 @@
 </div>
 
  <div id="fecha_respuesta">
-   <?php if(isset($registro->fecha_gasto_inicio) && !empty($registro->fecha_gasto_inicio)): ?>
-   <span > DEL <?= date('d-m-Y', strtotime($registro->fecha_gasto_inicio));?> AL <?= date('d-m-Y',strtotime($registro->fecha_gasto_fin));?>  </span>
+   <?php if(isset($facturaItem->periodo_inicio) && !empty($facturaItem->periodo_inicio)): ?>
+   <span > DEL <?= date('d-m-Y', strtotime($facturaItem->periodo_inicio));?> AL <?= date('d-m-Y',strtotime($facturaItem->periodo_fin));?>  </span>
    <?php endif; ?>
 </div>
 
@@ -254,6 +254,8 @@
 </div>
 
 <div id="importe_respuesta">
-   
+    <?php if(isset($facturaItem->periodo_inicio) && !empty($facturaItem->periodo_inicio)): ?>
+   <span > <?= $facturaItem->importe.' ('.$numero_texto.')' ?>  </span>
+   <?php endif; ?>
 </div>
 

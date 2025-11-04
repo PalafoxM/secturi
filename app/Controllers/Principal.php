@@ -3633,13 +3633,17 @@ class Principal extends BaseController
             if ($i == 2) {
                 $mpdf->WriteHTML($htmlSegundaHoja);
         
-               
+              
                 if (!empty($itemFactura)) {
                         foreach ($itemFactura as $index => $facturaItem) {
                             $importe_str = $facturaItem->importe;
                             $importe_float = (float) str_replace(',', '', $importe_str);
                             $data['numero_texto2'] = $this->numeroEnLetras($importe_float);
                             $data['facturaItem'] = $facturaItem;
+                             $data['importePartida'] = $facturaItem->importe;
+                            $data['propinaPartida'] = $facturaItem->propina;
+                            $data['periodo_inicio'] = $facturaItem->periodo_inicio;
+                            $data['periodo_fin']    = $facturaItem->periodo_fin;
                             
                             // 1️⃣ Agregamos una sola página con el formato 702GO
                             $htmlTercerHoja = view('personal/vFormato702GO.php', $data);
