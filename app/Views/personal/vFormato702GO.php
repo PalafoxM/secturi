@@ -254,8 +254,8 @@
 </div>
 
 <div id="importe_respuesta">
-    <?php if(isset($facturaItem->periodo_inicio) && !empty($facturaItem->periodo_inicio)): ?>
-   <span > <?= $facturaItem->importe.' ('.$numero_texto.')' ?>  </span>
+    <?php if(isset($monto) && !empty($monto)): ?>
+   <span > <?= '$' . number_format($total, 2) .' ('.$monto.')' ?>  </span>
    <?php endif; ?>
 </div>
 

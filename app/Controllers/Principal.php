@@ -3657,7 +3657,9 @@ class Principal extends BaseController
                             
                            $data['inicio'] = $periodo[$index]->periodo_inicio;
                            $data['fin'] = $periodo[$index]->periodo_fin;
-                      
+                           $monto = (int)$periodo[$index]->importe + (int)$periodo[$index]->propina ;
+                           $data['total'] = $monto;
+                           $data['monto'] = $this->numeroEnLetras($monto);
                        
                             
                             // 1️⃣ Agregamos una sola página con el formato 702GO

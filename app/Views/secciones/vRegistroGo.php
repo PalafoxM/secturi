@@ -461,7 +461,9 @@ $('#but_add').click(function () {
     rowCounter++;
     var newRow = `<tr data-row-index="${rowCounter}">
     
-        <td><input type="text" autocomplete="off" class="form-control importe-input" name="importe[]" placeholder="Importe"></td>
+        <td>
+        <input type="text" autocomplete="off" class="form-control" importe-input" name="importe[]" placeholder="Importe">
+        </td>
         <td>
             <input autocomplete="off" type="text" class="form-control propina-input" name="propina[]" placeholder="Propina">
         </td>
