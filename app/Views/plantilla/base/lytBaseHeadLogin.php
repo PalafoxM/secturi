@@ -908,14 +908,14 @@ body.forest-bg #particles-js { display: none; }
 
   const backgrounds = [
     base_url + "assets/images/backgrounds/gto5.webp",
-    base_url + "assets/images/backgrounds/muertos-02.jpg",
-    base_url + "assets/images/backgrounds/muertos-03.jpg",
-    base_url + "assets/images/backgrounds/muertos-06.jpg",
-    base_url + "assets/images/backgrounds/guanajuato.jpg",
-    base_url + "assets/images/backgrounds/subterranea.webp",
-    base_url + "assets/images/backgrounds/muertos-08.jpg",
+    base_url + "assets/images/backgrounds/uni2.jpg",
+    base_url + "assets/images/backgrounds/uni.jpg",
+    base_url + "assets/images/backgrounds/leon.jpg",
     base_url + "assets/images/backgrounds/IMG8.jpg",
-    base_url + "assets/images/backgrounds/muertos_01.jpeg",
+    base_url + "assets/images/backgrounds/subterranea.webp",
+    base_url + "assets/images/backgrounds/IMG10.jpg",
+    base_url + "assets/images/backgrounds/gto2.jpg",
+    base_url + "assets/images/backgrounds/bg3.jpg",
     FOREST_URL,
   ];
 

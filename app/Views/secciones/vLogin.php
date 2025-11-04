@@ -116,7 +116,7 @@
                 </div>
                 <!--end card-->
                 <div class="account-social text-center mt-4">
-                    <h6 class="my-4">   Version 2.2</h6>
+                    <h6 class="my-4">   Version 2.4</h6>
                     <ul class="list-inline mb-4">
                       
                        <li class="btn btn-soft-pink btn-round waves-effect waves-light" id="google-login-btn">
