@@ -432,11 +432,16 @@ class Agregar extends BaseController
         $response = new \stdClass();
         $this->globals = new Mglobal();
         $i = 1;
-
+    
+    
         foreach ($archivos as $archivo) {
-            if (!$archivo->isValid()) {
+             if (!$archivo || !$archivo->isValid()) {
+                $errorMsg = $archivo->getErrorString() ?: 'Archivo inválido';
+                $response->errores[] = "Archivo {$i}: {$errorMsg}";
+                $i++;
                 continue;
             }
+
             $timestamp = date('Ymd_His');
             $extension = $archivo->getClientExtension();
             $originalName = pathinfo($archivo->getName(), PATHINFO_FILENAME);
@@ -463,10 +468,10 @@ class Agregar extends BaseController
             ];
             $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardarFacturaPDF'];
             $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+            
          $i++;
         }
-      
-
+    
         return $response;
     }
    public function procesarXMLeditar(array $archivos, $id_registro_pt = null)
@@ -810,7 +815,7 @@ class Agregar extends BaseController
 
             }
         }
-        return $this->respond($response);
+        return $response;
     }
 
 
@@ -1110,15 +1115,15 @@ class Agregar extends BaseController
     }
     public function guardaFIC()
     {
-        $session = \Config\Services::session();
-        $response = new \stdClass();
-        $response->error = true;
-        $response->respuesta = "Error|Error al guardar PT";
-        $this->globals = new Mglobal();
-        $data = $this->request->getPost();
-        $archivos = $this->request->getFiles();
-        $response->idReserva = "";
-        
+            $session = \Config\Services::session();
+            $response = new \stdClass();
+            $response->error = true;
+            $response->respuesta = "Error|Error al guardar PT";
+            $this->globals = new Mglobal();
+            $data = $this->request->getPost();
+            $archivos = $this->request->getFiles();
+            $response->idReserva = "";
+    
    
 
         if ($data['no_consecutivo'] == '') {
@@ -1165,55 +1170,77 @@ class Agregar extends BaseController
         if (isset($data['fecha_tramite']) && empty($data['fecha_tramite'])) {
             $data['fecha_tramite'] = date('Y-m-d');
         }
-
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaTurno'];
 
-        foreach ($data['no_reserva'] as $k => $v) {
+            // Pre-procesar archivos UNA SOLA VEZ fuera del loop
+            $archivosXml = [];
+            $archivosPdf = [];
+            
+            foreach ($archivos as $key => $fileArray) {
+                if (strpos($key, 'factura_xml_fic') === 0) {
+                    $archivosXml = array_merge($archivosXml, is_array($fileArray) ? $fileArray : [$fileArray]);
+                } elseif (strpos($key, 'factura_pdf_fic') === 0) {
+                    $archivosPdf = array_merge($archivosPdf, is_array($fileArray) ? $fileArray : [$fileArray]);
+                }
+            }
 
-            $insertReserva = [
-                'id_proveedor' => (int) $data['id_proveedor'],
-                'id_estatus' => 3,
-                'id_proveedor_banco' => (int) $data['id_proveedor_banco'],
-                'folio' => 'PT - ' . date('YmdHis') . substr((string) microtime(), 1, 4),
-                'no_reserva' => ($v == 'hoteles') ? 4327278 : ($v == 'restaurantes' ? 4327277 : 4327279),
-                'no_convenio' => $data['no_convenio'],
-                'total_importe' => $data['total_importe'],
-                'observaciones' => 'PAGOS FIC',
-                'fec_reg' => date('Y-m-d H:i:s'),
-                'usu_reg' => $session->get('id_usuario')
-            ];
+            $resultados = [];
+            $successCount = 0;
 
-            $dataConfig = [
-                "tabla" => "reserva",
-                "editar" => false
-            ];
+            foreach ($data['no_reserva'] as $k => $v) {
+                $iteracionResponse = new \stdClass();
+                $iteracionResponse->error = false;
+                $iteracionResponse->idRegistro = null;
 
-            $response = $this->globals->saveTabla($insertReserva, $dataConfig, $dataBitacora);
+                // 1. Insertar Reserva
+                $insertReserva = [
+                    'id_proveedor' => (int) $data['id_proveedor'],
+                    'id_estatus' => 3,
+                    'id_proveedor_banco' => (int) $data['id_proveedor_banco'],
+                    'folio' => 'PT - ' . date('YmdHis') . substr((string) microtime(), 1, 4) . '_' . $k,
+                    'no_reserva' => ($v == 'hoteles') ? 4327278 : 4327277,
+                    'no_convenio' => $data['no_convenio'],
+                    'total_importe' => $data['total_importe'],
+                    'observaciones' => 'PAGOS FIC',
+                    'fec_reg' => date('Y-m-d H:i:s'),
+                    'usu_reg' => $session->get('id_usuario')
+                ];
 
-            if (!$response->error) {
-                $id_reserva = $response->idRegistro;
+                $dataConfig = ["tabla" => "reserva", "editar" => false];
+                $reservaResult = $this->globals->saveTabla($insertReserva, $dataConfig, $dataBitacora);
+
+                if ($reservaResult->error) {
+                    $iteracionResponse->error = true;
+                    $iteracionResponse->respuesta = "Error al guardar reserva: " . $reservaResult->respuesta;
+                    $resultados[] = $iteracionResponse;
+                    continue;
+                }
+
+                $id_reserva = $reservaResult->idRegistro;
+
+                // 2. Insertar Presupuesto
                 $insertPresupuesto = [
                     'id_reserva' => $id_reserva,
                     'id_proyecto' => 34,
-                    'id_partida' => ($insertReserva['no_reserva'] == 4327279) ? 10 : 94,
+                    'id_partida' => 94,
                     'importe' => $data['importe'][$k],
                     'fec_reg' => date('Y-m-d H:i:s'),
                     'usu_reg' => $session->get('id_usuario')
-
                 ];
 
-                $dataConfig = [
-                    "tabla" => "presupuesto",
-                    "editar" => false
-                ];
+                $dataConfig = ["tabla" => "presupuesto", "editar" => false];
+                $presupuestoResult = $this->globals->saveTabla($insertPresupuesto, $dataConfig, $dataBitacora);
 
-                $response = $this->globals->saveTabla($insertPresupuesto, $dataConfig, $dataBitacora);
-                // Obtener el último consecutivo usado
+                if ($presupuestoResult->error) {
+                    $iteracionResponse->error = true;
+                    $iteracionResponse->respuesta = "Error al guardar presupuesto: " . $presupuestoResult->respuesta;
+                    $resultados[] = $iteracionResponse;
+                    continue;
+                }
 
+                $id_presupuesto = $presupuestoResult->idRegistro;
 
-            }
-            if (!$response->error) {
-                $id_presupuesto = $response->idRegistro;
+                // 3. Insertar Registro PT
                 $insertRegistro = [
                     'id_reserva' => $id_reserva,
                     'id_proveedor' => $data['id_proveedor'],
@@ -1240,49 +1267,82 @@ class Agregar extends BaseController
                     'usu_reg' => $session->get('id_usuario')
                 ];
 
-                $dataConfig = [
-                    "tabla" => "registro_pt",
-                    "editar" => false
-                ];
+                $dataConfig = ["tabla" => "registro_pt", "editar" => false];
+                $registroResult = $this->globals->saveTabla($insertRegistro, $dataConfig, $dataBitacora);
 
-                $response = $this->globals->saveTabla($insertRegistro, $dataConfig, $dataBitacora);
-            }
-            if (!$response->error) {
+                if ($registroResult->error) {
+                    $iteracionResponse->error = true;
+                    $iteracionResponse->respuesta = "Error al guardar registro PT: " . $registroResult->respuesta;
+                    $resultados[] = $iteracionResponse;
+                    continue;
+                }
 
-                $id_registro_pt = $response->idRegistro;
-                $archivosXml = [];
-                $archivosPdf = [];
-                $response->idReserva = $id_registro_pt;
-                $this->cambiarStatusPT($id_reserva);
-                // Recorremos todas las claves de los archivos enviados
-                foreach ($archivos as $key => $fileArray) {
-                    if (strpos($key, 'factura_xml_fic') === 0) {
-                        $archivosXml = array_merge($archivosXml, $fileArray);
-                    } elseif (strpos($key, 'factura_pdf_fic') === 0) {
-                        $archivosPdf = array_merge($archivosPdf, $fileArray);
+                $id_registro_pt = $registroResult->idRegistro;
+
+                // 4. Procesar archivos SOLO para el primer registro exitoso
+                if ($successCount === 0) {
+                    $this->cambiarStatusPT($id_reserva);
+                    
+                    // Procesar XML
+                    if (!empty($archivosXml)) {
+                        $datosXML = $this->procesarXML($archivosXml, $id_registro_pt);
+                        if ($datosXML && $datosXML->error) {
+                            $iteracionResponse->errorXML = true;
+                            $iteracionResponse->respuestaXML = "Error en XML: " . ($datosXML->respuesta ?? 'Desconocido');
+                        }
                     }
+
+                    // Procesar PDF
+                    if (!empty($archivosPdf)) {
+                        foreach ($archivosPdf as $archivo) {
+                            if (!$archivo || !$archivo->isValid()) {
+                                continue;
+                            }
+
+                            $microtime = microtime(true);
+                            $timestamp = date('Ymd_His', $microtime) . sprintf('%03d', ($microtime - floor($microtime)) * 1000);
+                            $extension = $archivo->getClientExtension();
+                            $file = '03_CFDI_' . $timestamp . '.' . $extension;
+
+                            $ruta_destino = FCPATH . 'assets/pdf/';
+                            if ($archivo->move($ruta_destino, $file)) {
+                                $ruta_absoluta = base_url('assets/pdf/' . $file);
+                                $ruta_relativa = 'assets/pdf/' . $file;
+                                
+                                $dataConfig = ["tabla" => "factura_pdf", "editar" => false];
+                                $dataInsert = [
+                                    'id_registro_pt' => $id_registro_pt,
+                                    'ruta_relativa' => $ruta_relativa,
+                                    'ruta_absoluta' => $ruta_absoluta,
+                                    'fec_reg' => date('Y-m-d H:i:s'),
+                                    'usu_reg' => $session->get('id_usuario')
+                                ];
+                                
+                                $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+                            }
+                        }
+                    }
+
+                    $response->idReserva = $id_registro_pt;
                 }
 
-
-                $datosXML = $this->procesarXML($archivosXml, $id_registro_pt);
-                $datosPDF = $this->procesarPDF($archivosPdf, $id_registro_pt);
-
-   
-
-                if (!$datosXML) {
-                    $response->errorXML = true;
-                    $response->respuestaXML = "XML inválido o no se encontró.";
-                }
-                if (!$datosPDF) {
-                    $response->errorPDF = true;
-                    $response->respuestaPDF = "PDF inválido o no se encontró.";
-                }
-
+                $successCount++;
+                $iteracionResponse->idRegistro = $id_registro_pt;
+                $resultados[] = $iteracionResponse;
             }
 
-        }
+            // Determinar respuesta final
+            if ($successCount > 0) {
+                $response->error = false;
+                $response->respuesta = "Se procesaron {$successCount} de " . count($data['no_reserva']) . " registros correctamente";
+                $response->detalles = $resultados;
+            } else {
+                $response->error = true;
+                $response->respuesta = "No se pudo procesar ningún registro";
+                $response->detalles = $resultados;
+            }
 
-        return $this->respond($response);
+            return $this->respond($response);
     }
     public function guardaGO()
     {
