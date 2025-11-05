@@ -147,7 +147,20 @@
             <span class="proxima "><?= (isset($reserva[0]->no_convenio) && !empty($reserva[0]->no_convenio))?strtoupper($reserva[0]->no_convenio):'' ?></span>
         </div>
          <div  style="position:absolute; top:49.4%; left:12%; width:25%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><?= strtoupper($reserva[0]->no_reserva); ?></span>
+            <span class="proxima ">
+                 <?php 
+                        $total = count($presupuesto);
+                        $current = 0;
+                        foreach($presupuesto as $r):
+                            $current++;
+                            echo $r->no_reserva;
+                            if ($current < $total) {
+                                echo ', ';
+                            }
+                        endforeach; 
+                        ?>
+                
+            </span>
         </div>
          <div  style="position:absolute;  text-align:center; top:67.7%; left:3.5%; width:30%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "><?= ($fic)?'LIC. RODRIGO GONZÁLEZ GUERRERO':strtoupper($registro->director); ?></span>
