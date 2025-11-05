@@ -1355,7 +1355,9 @@ class Agregar extends BaseController
         $archivos = $this->request->getFiles();
         $vacioXML = false;
         $vacioPDF = false;
-   
+        var_dump($archivos);
+        var_dump($data);
+        die();
         // Validar que existan archivos
        
         foreach( $data['periodo_inicio'] as $p){

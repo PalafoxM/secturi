@@ -315,11 +315,11 @@
                                                                 <tr>
                                                                  
                                                                     <td><input type="text" autocomplete="off"
-                                                                            class="form-control" name="importe_<?= $i?>[]"
-                                                                            placeholder="Importe"></td>
+                                                                            class="form-control importe-input" name="importe_<?= $i?>[]"
+                                                                            placeholder="Importe_<?= $i?>"></td>
                                                                     <td>
                                                                         <input autocomplete="off" type="text"
-                                                                            class="form-control" name="propina_<?= $i?>[]"
+                                                                            class="form-control propina-input" name="propina_<?= $i?>[]"
                                                                             placeholder="Propina">
                                                                     </td>
                                                                     <td>
@@ -367,7 +367,7 @@
                                                                     <input type="text"
                                                                         name="total_importe"
                                                                         class="form-control font-weight-bold text-right"
-                                                                        id="total_importe" value="0.00" readonly>
+                                                                        id="total_importe_<?=$i?>" value="0.00" readonly>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -442,50 +442,53 @@
 <script src="<?= base_url() ?>assets/pages/jquery.forms-advanced.js"></script>
 
 
-
-
-
-
 <script>
-   // ini.inicio.formGo();
-    $('.add-file').on('click', function (e) {
-        e.preventDefault();
-        const inputId = $(this).data('target');
-        $(inputId).click();
-    });
+$('.add-file').on('click', function (e) {
+    e.preventDefault();
+    const inputId = $(this).data('target');
+    $(inputId).click();
+});
 
-   // Objeto global para almacenar archivos por fila
-
+// Objeto global para almacenar archivos por fila
 const archivosPorFila = {};
-let rowCounter = 0;
-function addRow(i){
-    rowCounter++;
+
+// Función para inicializar una fila en archivosPorFila
+function inicializarFilaEnArchivos(rowIndex) {
+    if (!archivosPorFila[rowIndex]) {
+        archivosPorFila[rowIndex] = {
+            pdf: null,
+            xml: null
+        };
+    }
+}
+
+function addRow(i) {
+    const rowIndex = 'table_' + i + '_row_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    
     var newRow = `
-    <tr data-row-index="${rowCounter}">
+    <tr data-row-index="${rowIndex}">
         <td>
-        <input type="text" autocomplete="off" class="form-control" importe-input" name="importe_${i}[]" placeholder="Importe">
+            <input type="text" autocomplete="off" class="form-control importe-input" name="importe_${i}[]" placeholder="Importe">
         </td>
         <td>
             <input autocomplete="off" type="text" class="form-control propina-input" name="propina_${i}[]" placeholder="Propina">
         </td>
         <td>
-            <input autocomplete="off" type="date" class="form-control" name="periodo_inicio_${i}[]" placeholder="Contribuyente">
+            <input autocomplete="off" type="date" class="form-control" name="periodo_inicio_${i}[]">
         </td>
         <td>
-            <input autocomplete="off" type="date" class="form-control" name="periodo_fin_${i}[]" placeholder="RFC">
+            <input autocomplete="off" type="date" class="form-control" name="periodo_fin_${i}[]">
         </td>
         <td>
-            <!-- Contenedor para mostrar archivos seleccionados -->
-            <div class="archivos-seleccionados" id="archivos_${rowCounter}">
+            <div class="archivos-seleccionados" id="archivos_${rowIndex}">
                 <small class="text-muted">No hay archivos</small>
             </div>
         </td>
         <td>
-       
-            <button type="button" class="btn btn-sm btn-success btn-seleccionar-pdf" data-row="${rowCounter}">
+            <button type="button" class="btn btn-sm btn-success btn-seleccionar-pdf" data-row="${rowIndex}">
                 <i class="fas fa-file-pdf"></i> PDF
             </button>
-            <button type="button" class="btn btn-sm btn-warning btn-seleccionar-xml" data-row="${rowCounter}">
+            <button type="button" class="btn btn-sm btn-warning btn-seleccionar-xml" data-row="${rowIndex}">
                 <i class="mdi mdi-code-tags"></i> XML
             </button>
             <button type="button" class="btn btn-sm btn-danger remove-row">
@@ -496,17 +499,11 @@ function addRow(i){
 
     $(`#makeEditable${i} tbody`).append(newRow);
 
-    // Inicializar almacenamiento para esta fila
-    archivosPorFila[rowCounter] = {
-        pdf: null,
-        xml: null
-    };
+    // INICIALIZAR LA FILA EN EL OBJETO
+    inicializarFilaEnArchivos(rowIndex);
 
-    // Inicializar Select2 en la nueva fila (si aplica)
-    $(`#makeEditable${i} tbody tr:last .select2`).select2();
-
-    // Inicializar máscara para los campos numéricos
-    $(`#makeEditable${i} tbody tr:last input[name="importe_${i}[]"]`).inputmask('numeric', {
+    // Inicializar máscaras para campos numéricos
+    $(`#makeEditable${i} tbody tr[data-row-index="${rowIndex}"] input[name="importe_${i}[]"]`).inputmask('numeric', {
         radixPoint: ".",
         groupSeparator: ",",
         digits: 2,
@@ -514,7 +511,8 @@ function addRow(i){
         prefix: '$ ',
         rightAlign: false
     });
-    $(`#makeEditable${i} tbody tr:last input[name="propina_${i}[]"]`).inputmask('numeric', {
+    
+    $(`#makeEditable${i} tbody tr[data-row-index="${rowIndex}"] input[name="propina_${i}[]"]`).inputmask('numeric', {
         radixPoint: ".",
         groupSeparator: ",",
         digits: 2,
@@ -524,10 +522,10 @@ function addRow(i){
     });
     
     calcularTotal(i);
-    i++;
 }
 
-// Eliminar fila con SweetAlert de confirmación
+
+// Eliminar fila
 $(document).on('click', '.remove-row', function () {
     const row = $(this).closest('tr');
     const rowIndex = row.data('row-index');
@@ -543,28 +541,28 @@ $(document).on('click', '.remove-row', function () {
         cancelButtonText: 'Cancelar'
     }).then((result) => {
         if (result.isConfirmed) {
-            // Eliminar del objeto de archivos
             if (archivosPorFila[rowIndex]) {
                 delete archivosPorFila[rowIndex];
             }
             
             row.remove();
-            calcularTotal();
+            // Recalcular total para todas las tablas
+            <?php foreach ($presupuesto as $i => $p): ?>
+            calcularTotal(<?= $i ?>);
+            <?php endforeach; ?>
             
-            Swal.fire(
-                'Eliminado!',
-                'La fila ha sido eliminada.',
-                'success'
-            );
+            Swal.fire('Eliminado!', 'La fila ha sido eliminada.', 'success');
         }
     });
 });
 
-// SweetAlert para seleccionar PDF
+// SweetAlert para seleccionar PDF - CORREGIDO
 $(document).on('click', '.btn-seleccionar-pdf', function() {
     const rowIndex = $(this).data('row');
-    const key = rowIndex;
-
+    
+    // VERIFICAR E INICIALIZAR SI NO EXISTE
+    inicializarFilaEnArchivos(rowIndex);
+    
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.pdf';
@@ -572,16 +570,14 @@ $(document).on('click', '.btn-seleccionar-pdf', function() {
 
     input.onchange = e => {
         const files = Array.from(e.target.files);
-        
-        // Validar tamaño máximo (5MB)
-        const maxSize = 5 * 1024 * 1024;
+        const maxSize = 100 * 1024 * 1024;
         const archivosValidos = files.filter(file => file.size <= maxSize);
         const archivosInvalidos = files.filter(file => file.size > maxSize);
         
         if (archivosInvalidos.length > 0) {
             Swal.fire({
                 title: 'Archivos muy grandes',
-                text: `${archivosInvalidos.length} archivo(s) exceden el tamaño máximo de 5MB`,
+                text: `${archivosInvalidos.length} archivo(s) exceden el tamaño máximo de 100MB`,
                 icon: 'error'
             });
         }
@@ -603,16 +599,12 @@ $(document).on('click', '.btn-seleccionar-pdf', function() {
             icon: 'info',
             showCancelButton: true,
             confirmButtonText: 'Confirmar PDF',
-            cancelButtonText: 'Cancelar',
-            customClass: {
-                popup: 'custom-swal-popup'
-            }
+            cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-                // Guardar archivos
-                archivosPorFila[key].pdf = archivosValidos;
-                
-                // Actualizar vista
+                // VERIFICAR NUEVAMENTE ANTES DE ASIGNAR
+                inicializarFilaEnArchivos(rowIndex);
+                archivosPorFila[rowIndex].pdf = archivosValidos;
                 actualizarVistaArchivos(rowIndex);
                 
                 Swal.fire({
@@ -624,14 +616,15 @@ $(document).on('click', '.btn-seleccionar-pdf', function() {
             }
         });
     };
-
     input.click();
 });
 
-// SweetAlert para seleccionar XML
+// SweetAlert para seleccionar XML - CORREGIDO
 $(document).on('click', '.btn-seleccionar-xml', function() {
     const rowIndex = $(this).data('row');
-    const key = rowIndex;
+    
+    // VERIFICAR E INICIALIZAR SI NO EXISTE
+    inicializarFilaEnArchivos(rowIndex);
 
     const input = document.createElement('input');
     input.type = 'file';
@@ -640,16 +633,14 @@ $(document).on('click', '.btn-seleccionar-xml', function() {
 
     input.onchange = e => {
         const files = Array.from(e.target.files);
-        
-        // Validar tamaño máximo (5MB)
-        const maxSize = 5 * 1024 * 1024;
+        const maxSize = 100 * 1024 * 1024;
         const archivosValidos = files.filter(file => file.size <= maxSize);
         const archivosInvalidos = files.filter(file => file.size > maxSize);
         
         if (archivosInvalidos.length > 0) {
             Swal.fire({
                 title: 'Archivos muy grandes',
-                text: `${archivosInvalidos.length} archivo(s) exceden el tamaño máximo de 5MB`,
+                text: `${archivosInvalidos.length} archivo(s) exceden el tamaño máximo de 100MB`,
                 icon: 'error'
             });
         }
@@ -671,16 +662,12 @@ $(document).on('click', '.btn-seleccionar-xml', function() {
             icon: 'info',
             showCancelButton: true,
             confirmButtonText: 'Confirmar XML',
-            cancelButtonText: 'Cancelar',
-            customClass: {
-                popup: 'custom-swal-popup'
-            }
+            cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-                // Guardar archivos
-                archivosPorFila[key].xml = archivosValidos;
-                
-                // Actualizar vista
+                // VERIFICAR NUEVAMENTE ANTES DE ASIGNAR
+                inicializarFilaEnArchivos(rowIndex);
+                archivosPorFila[rowIndex].xml = archivosValidos;
                 actualizarVistaArchivos(rowIndex);
                 
                 Swal.fire({
@@ -692,15 +679,20 @@ $(document).on('click', '.btn-seleccionar-xml', function() {
             }
         });
     };
-
     input.click();
 });
 
-// Función para actualizar la vista de archivos
+// Función para actualizar vista de archivos
 function actualizarVistaArchivos(rowIndex) {
     const container = $(`#archivos_${rowIndex}`);
-    const archivos = archivosPorFila[rowIndex];
     
+    // Verificar que la fila existe en el objeto
+    if (!archivosPorFila[rowIndex]) {
+        container.html('<small class="text-muted">No hay archivos</small>');
+        return;
+    }
+    
+    const archivos = archivosPorFila[rowIndex];
     let html = '';
     let count = 0;
 
@@ -723,159 +715,129 @@ function actualizarVistaArchivos(rowIndex) {
     container.html(html);
 }
 
-
-// Función para preparar el FormData para el envío al backend
-function prepararFormData() {
-
-  
-    const formData = new FormData();
+// Cálculo de totales corregido
+function calcularTotal(i) {
+    let total = 0;
     
-    // INCLUIR TODOS LOS CAMPOS DEL FORMULARIO PRIMERO
+    $(`input[name="importe_${i}[]"]`).each(function() {
+        let valor = $(this).val().replace(/[$,]/g, '') || 0;
+        total += parseFloat(valor);
+    });
+    
+    $(`input[name="propina_${i}[]"]`).each(function() {
+        let valor = $(this).val().replace(/[$,]/g, '') || 0;
+        total += parseFloat(valor);
+    });
+    
+    $(`#total_importe_${i}`).val('$ ' + total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'));
+}
+
+// Eventos para cálculos en tiempo real
+$(document).on('input', 'input[class*="importe-input"], input[class*="propina-input"]', function() {
+    // Encontrar el índice i de la tabla padre
+    const table = $(this).closest('table');
+    const tableId = table.attr('id');
+    const i = tableId.replace('makeEditable', '');
+    calcularTotal(i);
+});
+
+// Preparar FormData corregido
+function prepararFormData() {
+    const formData = new FormData();
     const form = $('#form_go')[0];
     const formElements = new FormData(form);
     
-    // Copiar todos los campos del formulario
     for (let [key, value] of formElements) {
         formData.append(key, value);
     }
     
-
-    
-    $('input[name="importe[]"]').each(function(index) {
-        formData.append(`importe[${index}]`, $(this).val());
-    });
-    
-    $('input[name="propina[]"]').each(function(index) {
-        formData.append(`propina[${index}]`, $(this).val());
-    });
-    $('input[name="periodo_inicio[]"]').each(function(index) {
-        formData.append(`periodo_inicio[${index}]`, $(this).val());
-    });
-    $('input[name="periodo_fin[]"]').each(function(index) {
-        formData.append(`periodo_fin[${index}]`, $(this).val());
-    });
-    
-
-    
-    
-    // FINALMENTE AGREGAR ARCHIVOS
+    // Agregar archivos - SOLO FILAS QUE EXISTEN
     Object.keys(archivosPorFila).forEach(rowIndex => {
         const archivos = archivosPorFila[rowIndex];
         
-        if (archivos.pdf) {
+        if (archivos && archivos.pdf) {
             archivos.pdf.forEach((file, fileIndex) => {
-                formData.append(`archivos[${rowIndex}][pdf][${fileIndex}]`, file);
+                formData.append(`archivos[pdf_${rowIndex}][pdf][${fileIndex}]`, file);
             });
         }
         
-        if (archivos.xml) {
+        if (archivos && archivos.xml) {
             archivos.xml.forEach((file, fileIndex) => {
-                formData.append(`archivos[${rowIndex}][xml][${fileIndex}]`, file);
+                formData.append(`archivos[xml_${rowIndex}][xml][${fileIndex}]`, file);
             });
         }
     });
 
     return formData;
 }
-// Ejemplo de envío al backend
+
+// Envío del formulario
 $('#form_go').on('submit', function(e) {
     e.preventDefault();
-
     const formData = prepararFormData();
 
-    Swal.fire({
-        title: 'Enviando archivos...',
-        text: 'Por favor espere',
-        allowOutsideClick: false,
-        didOpen: () => {
-            Swal.showLoading();
+
+
+    $.ajax({
+        type: "POST",
+        url: "<?= base_url()?>index.php/Agregar/guardaGO",
+        data: formData,
+        processData: false,
+        contentType: false,
+        dataType: "json",
+        success: function (response) {
+            console.log(response);
+            if(!response.error){
+                Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
+                setTimeout(() => {
+                    window.location.href = base_url + "index.php/Principal/tablaArchivos/"+response.idRegistro+'/GO';
+                }, 1500);
+            }else{
+                Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
+            }
+        },
+        beforeSend: function (info){
+            $('#btnGuardaGo').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+        },
+        complete: function (info){
+            $('#btnGuardaGo').prop('disabled', false).html('Guardar');
+        },
+        error: function (response,jqXHR, textStatus, errorThrown) {
+            var res= JSON.parse(response.responseText);
+            Swal.fire("Error", '<p> '+ res.message + '</p>');  
         }
     });
-
-     $.ajax({
-                    type: "POST",
-                    url: "<?= base_url()?>index.php/Agregar/guardaGO",
-                    data: formData,
-                    processData: false,  // Importante para FormData
-                    contentType: false,  // Importante para FormData
-                    dataType: "json",
-                    success: function (response) {
-                        console.log(response);
-                        if(!response.error){
-                            Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
-                            setTimeout(() => {
-                               // window.location.href = base_url + "index.php/Principal/listadoEstatusPT";
-                                window.location.href = base_url + "index.php/Principal/tablaArchivos/"+response.idRegistro+'/GO';
-                            }, 1500);
-                        }else{
-                            Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
-                        }
-                    },
-                    beforeSend: function (info){
-                         $('#btnGuardaGo').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
-                    },
-                    complete: function (info){
-                        $('#btnGuardaGo').prop('disabled', false).html('Guardar');
-                    },
-                    error: function (response,jqXHR, textStatus, errorThrown) {
-                        var res= JSON.parse(response.responseText);
-                        Swal.fire("Error", '<p> '+ res.message + '</p>');  
-                    }
-                });
 });
 
-
-// Inicializar la primera fila
+// Inicialización CORREGIDA
 $(document).ready(function() {
-    // Inicializar la fila 0 si existe
-    if ($('#makeEditable3 tbody tr').length > 0) {
-        $('tr').first().attr('data-row-index', '0');
-        archivosPorFila[0] = {
-            pdf: null,
-            xml: null
-        };
-    }
+    // Inicializar filas existentes
+    <?php foreach ($presupuesto as $i => $p): ?>
+    const initialRowIndex<?= $i ?> = 'initial_<?= $i ?>_' + Date.now();
+    $(`#makeEditable<?= $i ?> tbody tr`).first().attr('data-row-index', initialRowIndex<?= $i ?>);
     
-    // Agregar estilos CSS para SweetAlert
-    const style = document.createElement('style');
-    style.textContent = `
-        .custom-swal-popup {
-            font-size: 14px;
-        }
-        .swal2-popup .swal2-html-container {
-            text-align: left !important;
-        }
-    `;
-    document.head.appendChild(style);
-});
-    $(document).on('click', '.remove-row', function () {
-        $(this).closest('tr').remove();
+    // INICIALIZAR LA FILA EN EL OBJETO
+    inicializarFilaEnArchivos(initialRowIndex<?= $i ?>);
+    
+    // Aplicar inputmask a campos existentes
+    $(`input[name="importe_<?= $i ?>[]"]`).inputmask('numeric', {
+        radixPoint: ".",
+        groupSeparator: ",",
+        digits: 2,
+        autoGroup: true,
+        prefix: '$ ',
+        rightAlign: false
     });
-    $(document).on('input', 'input[name="importe[]"]', function() {
-	    calcularTotal();
-	});
-		$(document).on('input', 'input[name="propina[]"]', function() {
-	    calcularTotal();
-	});
-	function calcularTotal(i) {
-	    let total = 0;
-	    
-	    $('input[name="importe_'+i+'[]"]').each(function() {
-	        // Elimina comas y convierte a número
-	        const valor = parseFloat($(this).val().replace(/,/g, '')) || 0;
-	        total += valor;
-	    });
-		 $('input[name="propina'+i+'[]"]').each(function() {
-	        // Elimina comas y convierte a número
-	        const valor = parseFloat($(this).val().replace(/,/g, '')) || 0;
-	        total += valor;
-	    });
-	    
-	    // Formatea el total con separadores de miles
-	    $('#total_importe').val(formatNumber(total.toFixed(2)));
-	}
-	function formatNumber(num) {
-	    return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
-	}
-
+    $(`input[name="propina_<?= $i ?>[]"]`).inputmask('numeric', {
+        radixPoint: ".",
+        groupSeparator: ",",
+        digits: 2,
+        autoGroup: true,
+        prefix: '$ ',
+        rightAlign: false
+    });
+    <?php endforeach; ?>
+    
+    console.log('Filas inicializadas:', archivosPorFila);
+});
 </script>

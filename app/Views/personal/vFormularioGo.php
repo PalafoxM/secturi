@@ -233,7 +233,7 @@
 	   $('#but_add').click(function() {
 	    var newRow = `<tr>
 	            <td>
-	                <select class="select2 form-control" name="proyecto[]">
+	                <select class="form-control select2" name="proyecto[]">
 	                    <option value="">Seleccione</option>
 	                    <?php foreach($cat_proyecto as $c): ?>
 	                    <option value="<?= $c->id_proyecto?>"><?= $c->proyecto ?></option>
@@ -241,7 +241,7 @@
 	                </select>
 	            </td>
 	            <td>
-	                <select class="select2 form-control" name="partida[]">
+	                <select class="form-control select2" name="partida[]">
 	                    <option value="">Seleccione</option>
 	                    <?php foreach($cat_partida as $p): ?>
 	                    <option value="<?= $p->id_partida?>"><?= $p->cuenta_cable ?></option>
