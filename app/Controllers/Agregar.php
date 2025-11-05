@@ -1189,8 +1189,8 @@ class Agregar extends BaseController
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
         $archivos_post = $this->request->getFiles();
-        $vacioXML = false;
-        $vacioPDF = false;
+       
+
         $archivos_por_tabla = [];
         if (isset($archivos_post['archivos'])) {
             
@@ -1235,13 +1235,13 @@ class Agregar extends BaseController
                 }
             }
         }
-        
+      
         // 2. Iterar por las tablas usando los datos de $data (getPost)
         $tablas_procesadas = [];
         if (isset($data['encabezado'])) { // Usamos 'encabezado' como guía
             
             foreach ($data['encabezado'] as $i => $encabezado_texto) {
-                
+                  
                 $tablas_procesadas[$i] = [
                     'encabezado' => $encabezado_texto,
                     'partida'    => $data['partida'][$i] ?? null, // Capturamos la partida de la tabla
@@ -1259,16 +1259,16 @@ class Agregar extends BaseController
                 if (isset($archivos_por_tabla[$i])) {
                     $file_keys_para_tabla_i = array_keys($archivos_por_tabla[$i]);
                 }
-
+ 
                 // 3. Iterar por cada fila ($j) dentro de la tabla ($i)
                 foreach ($data['importe_' . $i] as $j => $importe_valor) {
                     // $j es el índice de la fila (0, 1, 2...)
-                    
+                   
                     // Usamos $j para obtener la clave de archivo correspondiente por orden
                     $rowIndex_de_archivos = $file_keys_para_tabla_i[$j] ?? null;
-                    
+  
                     $archivos_de_la_fila = null;
-                    if ($rowIndex_de_archivos && isset($archivos_por_tabla[$i][$rowIndex_de_archivos])) {
+                    if ($rowIndex_de_archivos !== null && isset($archivos_por_tabla[$i][$rowIndex_de_archivos])) {
                         $archivos_de_la_fila = $archivos_por_tabla[$i][$rowIndex_de_archivos];
                     }
 
@@ -1288,8 +1288,7 @@ class Agregar extends BaseController
             }
         }
         
-      
-    
+
         if ($data['secretario'] == 0) {
             $response->error = true;
             $response->respuesta = "Es requerido el Secretario o Director";
@@ -1387,11 +1386,12 @@ class Agregar extends BaseController
         if (!$responsePrincipal->error) {
             $id_registro_go = $responsePrincipal->idRegistro;
             $this->cambiarStatus($data['id_reserva_go']);
-            
+             
             foreach ($tablas_procesadas as $i => $tabla) {
+              
                 
                 foreach ($tabla['filas'] as $j => $fila) {
-                       
+                 
                     // OBTENEMOS EL IDENTIFICADOR ÚNICO DE LA FILA
                     $identificador_fila_unica = $fila['js_rowIndex'];
 
