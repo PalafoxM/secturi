@@ -43,12 +43,8 @@ $fechaFormateada = $dia . ' de ' . $mes . ' del ' . $anio;
                 con folio <strong><?= (isset($GO) && !empty($GO))?'GO':'PT'?> <?= ($fic)?$folio:strtoupper($registro->folio);?></strong> por la cantidad de 
                 <strong>$<?= ($fic)?$reserva[0]->total_importe: $registro->total_importe; ?> (<?= mb_strtoupper($numero_texto, 'UTF-8'); ?>)</strong>,
                 de comprobante(s) fiscale(s) No. 
-                <?php if($fic): ?>
-                <strong>
-                        <?= $uuid; ?>
-                </strong> 
-                <?php endif; ?>
-                <?php if(!$fic): ?>
+             
+           
                 <strong>
                     <?php 
                     $total = count($uuid);
@@ -62,7 +58,7 @@ $fechaFormateada = $dia . ' de ' . $mes . ' del ' . $anio;
                     endforeach; 
                     ?>
                 </strong> 
-                <?php endif; ?>
+    
                 por concepto de <?= $registro->concepto_pago ?> 
                 al proveedor <?= $registro->dsc_proveedor ?>.
             </span>
@@ -71,10 +67,7 @@ $fechaFormateada = $dia . ' de ' . $mes . ' del ' . $anio;
             <span class="proxima">
                 Lo anterior con cargo al proyecto(s) 
                 <strong>
-                    <?php if($fic): ?>
-                    <?= strtoupper($reserva[0]->proyecto);?>
-                   <?php endif; ?>
-                     <?php if(!$fic): ?>
+                
                         <?php 
                         $total = count($presupuesto);
                         $current = 0;
@@ -86,13 +79,10 @@ $fechaFormateada = $dia . ' de ' . $mes . ' del ' . $anio;
                             }
                         endforeach; 
                         ?>
-                   <?php endif; ?>
+               
                 </strong> a las partida(s) presupuestal(es) 
                 <strong>
-                 <?php if($fic): ?>
-                   "<?= ($reserva[0]->partida);?> <?= ($reserva[0]->dsc_partida);?>".
-                   <?php endif; ?>  
-                     <?php if(!$fic): ?>
+               
                         <?php 
                         $total = count($presupuesto);
                         $current = 0;
@@ -104,7 +94,7 @@ $fechaFormateada = $dia . ' de ' . $mes . ' del ' . $anio;
                             }
                         endforeach; 
                         ?>
-                   <?php endif; ?>  
+           
                </strong>
             </span>
         </div>

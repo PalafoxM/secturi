@@ -3999,11 +3999,13 @@ class Principal extends BaseController
             'tabla' => 'factura',
             'where' => ['visible' => 1, 'id_registro_pt' => $id_pt]
         ]);
+        
 
         if (isset($xml->data) && !empty($xml->data)) {
-            $data['uuid'] = $xml->data[0]->uuid;
+            $data['uuid'] = $xml->data;
 
         }
+        
       
         $data['FIC'] = false;
         $data['GO'] = false;
@@ -4048,6 +4050,8 @@ class Principal extends BaseController
 
             if (!empty($reserva->data)) {
                 $data['reserva'] = $reserva->data;
+                $data['presupuesto'] = $reserva->data;
+       
                 $importe_str = $reserva->data[0]->total_importe;
                 $usu_reg = $reserva->data[0]->usu_reg;
                 $data['no_convenio'] = $reserva->data[0]->no_convenio;
