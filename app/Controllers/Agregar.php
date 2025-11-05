@@ -1391,7 +1391,7 @@ class Agregar extends BaseController
             foreach ($tablas_procesadas as $i => $tabla) {
                 
                 foreach ($tabla['filas'] as $j => $fila) {
-                       var_dump( $fila );
+                       
                     // OBTENEMOS EL IDENTIFICADOR ÚNICO DE LA FILA
                     $identificador_fila_unica = $fila['js_rowIndex'];
 
@@ -1429,7 +1429,7 @@ class Agregar extends BaseController
 
                     $archivos_pdf_fila = [];
                     $archivos_xml_fila = [];
-
+                    
                     // Validar y recolectar PDFs de la fila
                     if (!empty($fila['archivos']['pdf'])) {
                         foreach($fila['archivos']['pdf'] as $pdf) {
@@ -1447,12 +1447,15 @@ class Agregar extends BaseController
                             }
                         }
                     }
+                    
 
+          
                     // 3. GUARDAR PDFS (CORREGIDO)
                     if (!empty($archivos_pdf_fila)) {
                         
                         // Iteramos sobre los archivos PDF de ESTA fila
                         foreach($archivos_pdf_fila as $archivo_pdf) { // Cambié $archivo por $archivo_pdf
+                  
                             if (!$archivo_pdf->isValid()) {
                                 continue;
                             }
@@ -1581,7 +1584,7 @@ class Agregar extends BaseController
                     }
                 }
             }
-                die();
+      
             // === FIN NUEVO CÓDIGO DE PROCESAMIENTO ===
 
         } // Fin de if (!$response->error)
