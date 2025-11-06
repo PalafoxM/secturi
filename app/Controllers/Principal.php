@@ -3554,6 +3554,11 @@ class Principal extends BaseController
             $id_reserva_go         = $registro_go->data[0]->id_reserva_go;
             $no_consecutivo        = $registro_go->data[0]->no_consecutivo;
             $data['registro']      = $registro;
+        
+            $importe_str          =  $registro->total_importe;    
+            $importe_limpio = str_replace(['$', ' ', ','], '', $importe_str); 
+            $importe_float = (float) $importe_limpio;// quita coma y convierte
+            $data['numero_texto'] = $this->numeroEnLetras($importe_float);
             $data['no_cuenta']     = $registro->no_cuenta;
             $data['banco']         = $registro->banco;;
             $data['dsc_proveedor'] = $registro->dsc_proveedor;
@@ -3577,9 +3582,10 @@ class Principal extends BaseController
             if (!empty($reserva->data)) {
                 $data['reserva'] = $reserva->data;
                 $usu_reg = $reserva->data[0]->usu_reg;
-                $importe_str = $reserva->data[0]->total_importe;
+              /*   $importe_str = $reserva->data[0]->total_importe;
+                
                 $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
-                $data['numero_texto'] = $this->numeroEnLetras($importe_float);
+                $data['numero_texto'] = $this->numeroEnLetras($importe_float); */
             }
             $data['nombre_registro'] = $globals->getTabla([
                 'tabla' => 'vw_usuario',
@@ -3637,6 +3643,7 @@ class Principal extends BaseController
               
                 if (!empty($itemFactura)) {
                         foreach ($itemFactura as $index => $facturaItem) {
+                            //die( var_dump($facturaItem) );
                             $importe_str = $facturaItem->importe;
                             $importe_float = (float) str_replace(',', '', $importe_str);
                             $data['numero_texto2'] = $this->numeroEnLetras($importe_float);
@@ -3673,7 +3680,7 @@ class Principal extends BaseController
                                 'where' => [
                                     'visible' => 1,
                                     'id_registro_go' => $id_pt,
-                                    'id_identificador' => $index
+                                    'id_identificador' => $facturaItem->id_identificador
                                 ]
                             ]);
                      
