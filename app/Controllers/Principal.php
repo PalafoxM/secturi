@@ -3670,7 +3670,7 @@ class Principal extends BaseController
                 if (!empty($itemFactura)) {
                     var_dump($itemFactura);
                         foreach ($itemFactura as $index => $facturaItem) {
-                            die( var_dump($facturaItem) );
+                            //die( var_dump($facturaItem) );
                             $importe_str = $facturaItem->importe;
                             $importe_float = (float) str_replace(',', '', $importe_str);
                             $data['numero_texto2'] = $this->numeroEnLetras($importe_float);

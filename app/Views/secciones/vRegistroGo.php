@@ -316,7 +316,7 @@
                                                                  
                                                                     <td><input type="text" autocomplete="off"
                                                                             class="form-control importe-input" name="importe_<?= $i?>[]"
-                                                                            placeholder="Importe_<?= $i?>"></td>
+                                                                            placeholder="Importe"></td>
                                                                     <td>
                                                                         <input autocomplete="off" type="text"
                                                                             class="form-control propina-input" name="propina_<?= $i?>[]"

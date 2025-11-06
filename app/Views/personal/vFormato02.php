@@ -6,7 +6,16 @@
             <span class="proxima"><?= (isset($GO) && !empty($GO))?'GO':'PT' ?> <?= $folio;?></span>
         </div>
         <div  style="position:absolute; text-align:center; top:18.5%; left:70%; width:22%; height:10px; background-color:white; font-size: 7px; ">
-            <span class="proxima"><?= (isset($reserva->partida) && !empty($reserva->partida))?$reserva->partida:''; ?></span>
+            <span class="proxima">
+               
+            <?php 
+            $keys = array_keys($presupuesto);
+            $lastKey = end($keys);
+             ?>
+                     <?php foreach($presupuesto as $key => $p): ?>
+                    <?= $p->partida ?><?= $key !== $lastKey ? ',' : '' ?>
+                    <?php endforeach; ?>
+            </span>
         </div>
          <div  style="position:absolute; text-align:center; top:15.5%; left:22%; width:36%; height:30px; background-color:white; font-size: 7px; ">
             <span class="proxima"><?= (isset($reserva->razon_social) && !empty($reserva->razon_social))?$reserva->razon_social:'';?></span>
