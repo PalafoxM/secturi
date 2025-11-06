@@ -2686,7 +2686,7 @@ class Principal extends BaseController
 
     
         $presupuesto = $globals->getTabla([
-            'tabla' => 'vw_pagos',
+            'tabla' => 'vw_reserva',
             'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
         ]);
         
@@ -2697,6 +2697,7 @@ class Principal extends BaseController
                 'id_director' => $registro_pt->data[0]->id_reponsable_solicitud
             ]
         ]);
+       
         if( isset($presupuesto->data) && !empty($presupuesto->data)){
              $data['presupuesto'] = $presupuesto->data;
         }
@@ -3089,7 +3090,9 @@ class Principal extends BaseController
         ];
         foreach ($dynamicFiles as $id => $nombre) {
             $rutaTemp = $tempDir . $nombre;
-            $archivoGenerado = $this->Archivo($id_registro_pt, $id, $rutaTemp);
+     
+            $archivoGenerado = $this->ArchivoFIC($id_registro_pt, $id, $rutaTemp);
+      
             if ($archivoGenerado && file_exists($archivoGenerado)) {
                 $archivos[] = $archivoGenerado;
                 $archivosTemporales[] = $archivoGenerado;
@@ -3100,6 +3103,7 @@ class Principal extends BaseController
         // Archivo 07
         $rutaArchivo07 = $tempDir . '07 Formatos_diversos.pdf';
         $archivo07 = $this->ImprimirFIC($id_registro_pt, $rutaArchivo07);
+     
         if ($archivo07 && file_exists($archivo07)) {
             $archivos[] = $archivo07;
             $archivosTemporales[] = $archivo07;
@@ -3600,7 +3604,7 @@ class Principal extends BaseController
                 $data['presupuesto'] = $presupuesto->data;
             }
         
-
+           // die( var_dump(  $data['presupuesto'] ) );
             $reserva = $globals->getTabla([
                 'tabla' => 'vw_reserva_go',
                 'where' => ['visible' => 1, 'id_reserva_go' => $id_reserva_go]
@@ -3668,7 +3672,8 @@ class Principal extends BaseController
         
               
                 if (!empty($itemFactura)) {
-                    var_dump($itemFactura);
+                   
+                   
                         foreach ($itemFactura as $index => $facturaItem) {
                             //die( var_dump($facturaItem) );
                             $importe_str = $facturaItem->importe;
@@ -3684,16 +3689,20 @@ class Principal extends BaseController
                                     'id_registro_go' => $id_pt,
                                 ]
                             ]);
-
+                           
                               $periodo = isset($periodo_factura_go->data) && !empty($periodo_factura_go->data)
                                 ? $periodo_factura_go->data
                                 : [];
                             
-                           $data['inicio'] = $periodo[$index]->periodo_inicio;
-                           $data['fin'] = $periodo[$index]->periodo_fin;
-                           $monto = (int)$periodo[$index]->importe + (int)$periodo[$index]->propina ;
-                           $data['total'] = $monto;
-                           $data['monto'] = $this->numeroEnLetras($monto);
+                           
+                            foreach($periodo  as $p){
+                                $data['inicio'] = $p->periodo_inicio;
+                                $data['fin'] = $p->periodo_fin;
+                                $monto = (int)$p->importe + (int)$p->propina ;
+                                $data['total'] = $monto;
+                                $data['monto'] = $this->numeroEnLetras($monto);
+                            }
+                          
                        
                             
                             // 1️⃣ Agregamos una sola página con el formato 702GO
@@ -4019,7 +4028,7 @@ class Principal extends BaseController
         $globals = new Mglobal;
         $data = [];
         $id_reserva = null;
-
+       
         $registro_pt = $globals->getTabla([
             'tabla' => 'vw_registro_pt',
             'where' => ['visible' => 1, 'id_registro_pt' => $id_pt]
@@ -4078,8 +4087,7 @@ class Principal extends BaseController
                 'tabla' => 'vw_reserva',
                 'where' => ['visible' => 1, 'id_reserva' => $id_reserva]
             ]);
-            // var_dump($reserva);
-            // die();
+            
 
             if (!empty($reserva->data)) {
                 $data['reserva'] = $reserva->data;

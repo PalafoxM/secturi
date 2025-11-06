@@ -28,7 +28,7 @@
             <span class="proxima "><?= strtoupper($registro->no_cuenta); ?></span>
         </div>
         <?php $i = 34.4;  ?>
-        <?php foreach($reserva as $r): ?>
+        <?php foreach($presupuesto as $r): ?>
          <div  style="position:absolute; text-align:center; top:<?=$i?>%; left:18.8%; width:13%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "><?= $r->proyecto ?></span>
         </div>
@@ -36,7 +36,7 @@
         <?php $i = $i + 1.5; ?>
         <?php endforeach; ?>
         <?php $i = 34.4;  ?>
-        <?php foreach($reserva as $r): ?>
+        <?php foreach($presupuesto as $r): ?>
          <div  style="position:absolute; text-align:center; top:<?=$i?>%; left:32.8%; width:13%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "><?= $r->partida ?></span>
         </div>
