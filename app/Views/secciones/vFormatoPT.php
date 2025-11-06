@@ -148,17 +148,19 @@
         </div>
          <div  style="position:absolute; top:49.4%; left:12%; width:25%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima ">
-                 <?php 
-                        $total = count($presupuesto);
-                        $current = 0;
-                        foreach($presupuesto as $r):
-                            $current++;
-                            echo $r->no_reserva;
-                            if ($current < $total) {
-                                echo ', ';
-                            }
-                        endforeach; 
-                        ?>
+                <?php 
+                $valores_unicos = array_unique(array_column($presupuesto, 'no_reserva'));
+                $total = count($valores_unicos);
+                $current = 0;
+
+                foreach($valores_unicos as $no_reserva):
+                    $current++;
+                    echo $no_reserva;
+                    if ($current < $total) {
+                        echo ', ';
+                    }
+                endforeach;
+                ?>
                 
             </span>
         </div>

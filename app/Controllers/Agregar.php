@@ -1053,12 +1053,12 @@ class Agregar extends BaseController
                 }
 
                 $id_reserva = $reservaResult->idRegistro;
-
+           
                 // 2. Insertar Presupuesto
                 $insertPresupuesto = [
                     'id_reserva' => $id_reserva,
                     'id_proyecto' => 34,
-                    'id_partida' => 94,
+                    'id_partida' => ($insertReserva['no_reserva'])?10:94,
                     'importe' => $data['importe'][$k],
                     'fec_reg' => date('Y-m-d H:i:s'),
                     'usu_reg' => $session->get('id_usuario')

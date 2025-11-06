@@ -85,7 +85,7 @@ $fechaFormateada = $dia . ' de ' . $mes . ' del ' . $anio;
                     <?php endif; ?>
                 </strong> a las partida(s) presupuestal(es) 
                 <strong>
-                      <?php if(!$fic): ?>
+                    
                         <?php 
                         $total = count($presupuesto);
                         $current = 0;
@@ -97,10 +97,7 @@ $fechaFormateada = $dia . ' de ' . $mes . ' del ' . $anio;
                             }
                         endforeach; 
                         ?>
-                    <?php endif; ?>
-                      <?php if($fic): ?>
-                        3390
-                    <?php endif; ?>
+                  
                </strong>
             </span>
         </div>
