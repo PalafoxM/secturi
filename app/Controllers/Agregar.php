@@ -1029,6 +1029,7 @@ class Agregar extends BaseController
                 $iteracionResponse->idRegistro = null;
 
                 // 1. Insertar Reserva
+    
                 $insertReserva = [
                     'id_proveedor' => (int) $data['id_proveedor'],
                     'id_estatus' => 3,
@@ -1058,7 +1059,7 @@ class Agregar extends BaseController
                 $insertPresupuesto = [
                     'id_reserva' => $id_reserva,
                     'id_proyecto' => 34,
-                    'id_partida' => ($insertReserva['no_reserva'])?10:94,
+                    'id_partida' => (($v == 'restaurantes_geg') )?10:94,
                     'importe' => $data['importe'][$k],
                     'fec_reg' => date('Y-m-d H:i:s'),
                     'usu_reg' => $session->get('id_usuario')

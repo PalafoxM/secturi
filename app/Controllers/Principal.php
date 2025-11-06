@@ -4036,8 +4036,8 @@ class Principal extends BaseController
             $data['uuid'] = $xml->data;
 
         }
-        
-      
+      //  var_dump( $registro_pt );
+       // die();
         $data['FIC'] = false;
         $data['GO'] = false;
         if (!empty($registro_pt->data)) {
