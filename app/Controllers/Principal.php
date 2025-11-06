@@ -4036,8 +4036,7 @@ class Principal extends BaseController
             $data['uuid'] = $xml->data;
 
         }
-      //  var_dump( $registro_pt );
-       // die();
+      
         $data['FIC'] = false;
         $data['GO'] = false;
         if (!empty($registro_pt->data)) {
@@ -4045,7 +4044,7 @@ class Principal extends BaseController
             $id_reserva = $registro_pt->data[0]->id_reserva;
             $no_consecutivo = $registro_pt->data[0]->no_consecutivo;
             $data['registro'] = $registro;
-
+         
             //validar si yo tengo folio 
             $direccion = $globals->getTabla([
                 'tabla' => 'vw_direccion',
@@ -4103,14 +4102,12 @@ class Principal extends BaseController
             }
 
             if (!empty($registro_pt->data)) {
+              
                 $data['registro'] = $registro_pt->data[0];
-
+              //  die( var_dump(  $data['registro'] ) );
                 $data['fic'] = false;
                 if ($registro_pt->data[0]->no_reserva == '4327278') {
                     $data['folio'] = "SECTURI/DGDT/DCT/FIC-TH/" . $zero . $no_consecutivo . '/2025';
-                    $data['fic'] = true;
-                } else if ($registro_pt->data[0]->no_reserva == '4327279') {
-                    $data['folio'] = "SECTURI/DGDT/DCT/FIC-TA/" . $zero . $no_consecutivo . '/2025';
                     $data['fic'] = true;
                 } else if ($registro_pt->data[0]->no_reserva == '4327277') {
                     $data['folio'] = "SECTURI/DGDT/DCT/FIC-TA/" . $zero . $no_consecutivo . '/2025';
@@ -4127,7 +4124,7 @@ class Principal extends BaseController
         $subsecretario = $area = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1, 'id_subsecretario' => $registro_pt->data[0]->id_subsecretario]]);
         // $usu_sub = $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $subsecretario->data[0]->id_usuario]]);
         $data['usu_sub'] = $subsecretario->data[0];
-
+        //die( var_dump( $data ) );
         $html = view('secciones/vFormatoPT.php', $data);
         $htmlSegundaHoja = view('secciones/vFormatoPT2.php', $data);
         $htmlTercerHoja = view('personal/vFormato702.php', $data);

@@ -1020,22 +1020,24 @@ class Agregar extends BaseController
                 }
             }
 
-            $resultados = [];
-            $successCount = 0;
 
-            foreach ($data['no_reserva'] as $k => $v) {
+        
                 $iteracionResponse = new \stdClass();
                 $iteracionResponse->error = false;
                 $iteracionResponse->idRegistro = null;
 
                 // 1. Insertar Reserva
+                foreach ($data['no_reserva'] as $k => $v) 
+                {
+                 $noReserva = (($v == 'hoteles') )?4327278:4327277;
+                }
     
                 $insertReserva = [
                     'id_proveedor' => (int) $data['id_proveedor'],
                     'id_estatus' => 3,
                     'id_proveedor_banco' => (int) $data['id_proveedor_banco'],
-                    'folio' => 'PT - ' . date('YmdHis') . substr((string) microtime(), 1, 4) . '_' . $k,
-                    'no_reserva' => ($v == 'hoteles') ? 4327278 : 4327277,
+                    'folio' => 'PT - ' . date('YmdHis') . substr((string) microtime(), 1, 4),
+                    'no_reserva' => $noReserva,
                     'no_convenio' => $data['no_convenio'],
                     'total_importe' => $data['total_importe'],
                     'observaciones' => 'PAGOS FIC',
@@ -1049,35 +1051,12 @@ class Agregar extends BaseController
                 if ($reservaResult->error) {
                     $iteracionResponse->error = true;
                     $iteracionResponse->respuesta = "Error al guardar reserva: " . $reservaResult->respuesta;
-                    $resultados[] = $iteracionResponse;
-                    continue;
+                  
                 }
 
                 $id_reserva = $reservaResult->idRegistro;
-           
-                // 2. Insertar Presupuesto
-                $insertPresupuesto = [
-                    'id_reserva' => $id_reserva,
-                    'id_proyecto' => 34,
-                    'id_partida' => (($v == 'restaurantes_geg') )?10:94,
-                    'importe' => $data['importe'][$k],
-                    'fec_reg' => date('Y-m-d H:i:s'),
-                    'usu_reg' => $session->get('id_usuario')
-                ];
 
-                $dataConfig = ["tabla" => "presupuesto", "editar" => false];
-                $presupuestoResult = $this->globals->saveTabla($insertPresupuesto, $dataConfig, $dataBitacora);
-
-                if ($presupuestoResult->error) {
-                    $iteracionResponse->error = true;
-                    $iteracionResponse->respuesta = "Error al guardar presupuesto: " . $presupuestoResult->respuesta;
-                    $resultados[] = $iteracionResponse;
-                    continue;
-                }
-
-                $id_presupuesto = $presupuestoResult->idRegistro;
-
-                // 3. Insertar Registro PT
+                  // 3. Insertar Registro PT
                 $insertRegistro = [
                     'id_reserva' => $id_reserva,
                     'id_proveedor' => $data['id_proveedor'],
@@ -1110,14 +1089,36 @@ class Agregar extends BaseController
                 if ($registroResult->error) {
                     $iteracionResponse->error = true;
                     $iteracionResponse->respuesta = "Error al guardar registro PT: " . $registroResult->respuesta;
-                    $resultados[] = $iteracionResponse;
-                    continue;
+                 
                 }
 
                 $id_registro_pt = $registroResult->idRegistro;
+                foreach ($data['no_reserva'] as $k => $v) 
+                {
 
+                    // 2. Insertar Presupuesto
+                    $insertPresupuesto = [
+                        'id_reserva' => $id_reserva,
+                        'id_proyecto' => 34,
+                        'id_partida' => (($v == 'restaurantes_geg') )?10:94,
+                        'importe' => $data['importe'][$k],
+                        'fec_reg' => date('Y-m-d H:i:s'),
+                        'usu_reg' => $session->get('id_usuario')
+                    ];
+
+                    $dataConfig = ["tabla" => "presupuesto", "editar" => false];
+                    $presupuestoResult = $this->globals->saveTabla($insertPresupuesto, $dataConfig, $dataBitacora);
+
+                    if ($presupuestoResult->error) {
+                        $iteracionResponse->error = true;
+                        $iteracionResponse->respuesta = "Error al guardar presupuesto: " . $presupuestoResult->respuesta;
+                       
+                    }
+                    $id_presupuesto = $presupuestoResult->idRegistro;
+            
+                }
                 // 4. Procesar archivos SOLO para el primer registro exitoso
-                if ($successCount === 0) {
+         
                     $this->cambiarStatusPT($id_reserva);
                     
                     // Procesar XML
@@ -1161,24 +1162,19 @@ class Agregar extends BaseController
                     }
 
                     $response->idReserva = $id_registro_pt;
-                }
+                
 
-                $successCount++;
+              
                 $iteracionResponse->idRegistro = $id_registro_pt;
-                $resultados[] = $iteracionResponse;
-            }
+              
+            
 
             // Determinar respuesta final
-            if ($successCount > 0) {
+     
                 $response->error = false;
-                $response->respuesta = "Se procesaron {$successCount} de " . count($data['no_reserva']) . " registros correctamente";
-                $response->detalles = $resultados;
-            } else {
-                $response->error = true;
-                $response->respuesta = "No se pudo procesar ningún registro";
-                $response->detalles = $resultados;
-            }
-
+                $response->respuesta = "registros guardados correctamente";
+                
+          
             return $this->respond($response);
     }
     public function guardaGO()
