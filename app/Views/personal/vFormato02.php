@@ -45,7 +45,7 @@
            
             </strong>
                  derivado del contrato ó convenio número <strong> <?= (isset($reserva->no_convenio) && !empty($reserva->no_convenio))?$reserva->no_convenio:'S/N' ;?></strong> por la cantidad de <strong>$<?= ($fic)?$reserva->total_importe:( isset($registro->total_importe) && !empty($registro->total_importe)?$registro->total_importe:'' ) ;?></strong>
-                 <strong>(<?= $numero_texto?>)</strong>, por el servicio
+                 <strong>(<?= $numero_texto?>)</strong>, por el servicio de
                  <strong>
                       <?php if(!$fic): ?>
             <?php foreach($presupuesto as $key => $p): ?>
@@ -53,7 +53,7 @@
             <?php endforeach; ?>
                 <?php endif; ?>
                 <?php if($fic): ?>
-                <?= $reserva->dsc_partida ?>
+                <?= $registro->concepto_pago ?>
                 <?php endif; ?>
                   
                 </strong> prestado por el proveedor <strong><?=(isset($reserva->razon_social) && !empty($reserva->razon_social))?$reserva->razon_social:'' ?></strong>. Se cuenta con suficiencia presupuestal en la(s) partida(s) 

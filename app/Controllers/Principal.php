@@ -2971,7 +2971,7 @@ class Principal extends BaseController
             $data['uuid'] = $uudi->data;
 
         }
-       
+        //die( var_dump( $data ) );
         if (!empty($instrumento)) {
             switch ($id_archivo) {
                 case 1:
