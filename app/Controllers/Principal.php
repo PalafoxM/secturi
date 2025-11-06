@@ -3505,6 +3505,29 @@ class Principal extends BaseController
         
         $importe = '';
         if(isset($periodo_factura->data) && !empty($periodo_factura->data)){
+
+            $presupuestoGO = $globals->getTabla([
+                    'tabla' => 'presupuesto_go',
+                    'where' => ['visible' => 1, 'id_reserva' => $periodo_factura->data[0]->id_reserva_go]
+            ]);
+            if(isset($presupuestoGO) && !empty($presupuestoGO)){
+                foreach ($presupuestoGO->data as $key => $value) {
+                 $query = [
+                    'tabla' => 'cat_partida',
+                    'where' => ['visible' => 1, 'id_partida' => $value->id_partida]
+                  ];  
+                 $data['dsc_partida'][] =$globals->getTabla($query)->data[0]->cuenta_cable; 
+                 $query = [
+                    'tabla' => 'cat_proyecto',
+                    'where' => ['visible' => 1, 'id_proyecto' => $value->id_proyecto]
+                  ];  
+                 $data['dsc_proyecto'][] =$globals->getTabla($query)->data[0]->proyecto; 
+               
+                }
+
+            }
+          
+          
             $itemFactura = $data['importe'] =  $periodo_factura->data;
             $data['documentos'] = count($periodo_factura->data);
         }
@@ -3642,8 +3665,9 @@ class Principal extends BaseController
         
               
                 if (!empty($itemFactura)) {
+                    var_dump($itemFactura);
                         foreach ($itemFactura as $index => $facturaItem) {
-                            //die( var_dump($facturaItem) );
+                            die( var_dump($facturaItem) );
                             $importe_str = $facturaItem->importe;
                             $importe_float = (float) str_replace(',', '', $importe_str);
                             $data['numero_texto2'] = $this->numeroEnLetras($importe_float);
