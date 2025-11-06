@@ -2925,6 +2925,9 @@ class Principal extends BaseController
                 'where' => ['visible' => 1, 'id_reserva' => $id_reserva]
             ])->data;
             $data['reserva'] = $reserva[0];
+            $data['presupuesto'] = $reserva;
+
+        
             $importe_str = $reserva[0]->total_importe;
             $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
             $data['numero_texto'] = $this->numeroEnLetras($importe_float);
@@ -2964,7 +2967,7 @@ class Principal extends BaseController
 
         if (isset($uudi->data) && !empty($uudi->data)) {
 
-            $data['uuid'] = $uudi->data[0]->uuid;
+            $data['uuid'] = $uudi->data;
 
         }
        
