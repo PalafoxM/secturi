@@ -64,7 +64,7 @@
                                                 <a class="btn btn-outline-info btn-round" title="editar" onclick="ini.inicio.getVehiculo(<?= $e->id_vehiculo?>)" >
                                                     <i class="mdi dripicons-pencil font-18"></i></a>
                                                    <button type="button"  class="btn btn-outline-info btn-round">                       
-                                                <a href="<?php echo base_url().'index.php/Principal/ImprimirPT/'.$e->id_vehiculo ?>" target="_blank"><i
+                                                <a href="<?php echo base_url().'index.php/Usuario/VehiculoTP/'.$e->id_vehiculo ?>" target="_blank"><i
                                                         class="mdi mdi-file-document text-success font-18"></i></a></button>
                                                 <a class="btn btn-outline-info btn-round" href="javascript:void(0);"  onclick="ini.inicio.deletePT(<?= $e->id_vehiculo?>)" ><i
                                                         class="mdi mdi-delete-forever text-danger font-18"></i></a>

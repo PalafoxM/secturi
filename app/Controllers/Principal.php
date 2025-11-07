@@ -4233,6 +4233,60 @@ class Principal extends BaseController
 
 
     }
+  public function buscarProveedor2()
+    {
+        // 1. Select2 envía el término de búsqueda en un parámetro llamado 'q' (query)
+        $termino = $this->request->getPost('q'); 
+        
+        // Si no hay término, devolvemos una lista vacía para evitar errores
+        if (empty($termino)) {
+            return $this->respond(['results' => []]);
+        }
+
+        $globals = new Mglobal;
+
+        // Ajustamos la búsqueda a solo el término, usando la función like de tu modelo
+        // Opcional: mantienes la búsqueda en múltiples campos como lo tenías, lo cual es bueno.
+        $like = [
+            'razon_social' => "%$termino%",
+            'rfc' => "%$termino%",
+            'no_proveedor' => "%$termino%"
+        ];
+
+        $proveedor = $globals->getTabla([
+            'tabla' => 'proveedor',
+            'where' => ['visible' => 1],
+            'orlike' => $like,
+            'limit' => 20 // ¡RECOMENDADO! Un límite más bajo (10-20) mejora la UX.
+        ]);
+
+        // Inicializamos el array de resultados para Select2
+        $resultados_select2 = [];
+
+        // Verificamos si la consulta fue exitosa
+        if (isset($proveedor->data) && !empty($proveedor->data)) {
+            
+            // 2. Mapear al formato que Select2 necesita: {id: valor, text: texto_a_mostrar}
+            foreach ($proveedor->data as $a) {
+                $resultados_select2[] = [
+                    // 'id' debe ser el valor que guardas (el ID del proveedor)
+                    'id' => $a->id_proveedor, 
+                    // 'text' es lo que el usuario ve (la razón social)
+                    'text' => $a->razon_social 
+                ];
+            }
+        }
+        
+        // 3. Devolver la respuesta en la estructura final: {results: [..., ...]}
+        // Si hubo un error o no se encontraron datos, 'results' será un array vacío: []
+        $final_response = [
+            'results' => $resultados_select2
+        ];
+
+        // Devolvemos la respuesta JSON
+        // Asegúrate de que $this->respond() devuelva una respuesta JSON correcta.
+        return $this->respond($final_response); 
+    }
     public function Proveedor()
     {
         $session = \Config\Services::session();
