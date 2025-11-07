@@ -254,6 +254,7 @@
                                     }
                                     $partidas_mostradas[] = $p->id_partida;
                                     ?>
+                                    <input type="hidden" id="id_presupuesto" name="id_presupuesto[]" value="<?= $p->id_presupuesto_go ;?>" >
                                     <p class="text-muted mb-4 text-center">Agregar Factura GO.</p>
                                     <hr>
                                     <div class="form-row"> <!-- presupuesto -->

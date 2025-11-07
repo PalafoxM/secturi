@@ -1243,6 +1243,7 @@ class Agregar extends BaseController
                     'encabezado' => $encabezado_texto,
                     'partida'    => $data['partida'][$i] ?? null, // Capturamos la partida de la tabla
                     'proyecto'   => $data['proyecto'][$i] ?? null, // Capturamos el proyecto de la tabla
+                    'id_presupuesto'=> $data['id_presupuesto'][$i] ?? null, // Capturamos el proyecto de la tabla
                     'filas'      => []
                 ];
                 
@@ -1397,6 +1398,7 @@ class Agregar extends BaseController
                     $datos_fila_para_guardar = [
                         'id_registro_go' => $id_registro_go, // Se vincula al registro principal
                         'encabezado'     => $tabla['encabezado'], // Dato de la tabla
+                        'id_presupuesto' => $tabla['id_presupuesto'], // Dato de la tabla
                         'importe'        => str_replace(['$', ','], '', $fila['importe']), // Limpiamos el importe
                         'propina'        => str_replace(['$', ','], '', $fila['propina']), // Limpiamos la propina
                         'periodo_inicio' => $fila['periodo_inicio'],

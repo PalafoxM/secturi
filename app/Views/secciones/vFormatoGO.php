@@ -2,7 +2,7 @@
      
        
         <div  style="position:absolute; text-align:center; top:10.8%; left:75%; width:15%; height:10px; background-color:white; font-size: 8px; ">
-           <?= "$".$registro->total_importe; ?>
+           <?= $registro->total_importe; ?>
         </div>
         <div  style="position:absolute; text-align:center; top:10.8%; left:49.5%; width:4%; height:10px; background-color:white; font-size: 8px; ">
            <?= isset( $documentos) && !empty( $documentos)? $documentos:'' ?>
@@ -15,21 +15,18 @@
         </div>
         <div  style="position:absolute;text-align:center; top:19.5%; left:70%; width:23%; height:10px; background-color:white; font-size: 12px; ">
             <?php if(!$fic): ?>
-            <span class="proxima"><?= (isset($GO) && !empty($GO))?'GO':'PT';?> <?= strtoupper($registro->folio);?> </span>
+            <span class="proxima"><?=  strtoupper($registro->folio); ?></span>
             <?php endif; ?>
         </div>
   
      
         
         <?php $i = 27.5;  ?>
-        <?php foreach($presupuesto as $r): ?>
+        <?php foreach($presupuestoGO as $r): ?>
          <div  style="position:absolute; text-align:center; top:<?=$i?>%; left:22%; width:10%; background-color:white; font-size: 10px;  height:12px;">
             <span class="proxima "><?= $r->dsc_partida ?></span>
         </div>
-        <?php $i = $i + 1.5; ?>
-        <?php endforeach; ?>
-        <?php $i = 27.5;  ?>
-        <?php foreach($presupuesto as $r): ?>
+
          <div  style="position:absolute; text-align:center; top:<?=$i?>%; left:33%; width:16%; background-color:white; font-size: 10px;  height:12px;">
             <span class="proxima "><?= $r->dsc_proyecto ?></span>
         </div>
@@ -46,23 +43,18 @@
 
         
         <?php $i = 27.5;  ?>
-            <?php foreach( $presupuesto as $u ): ?>
+            <?php foreach( $uuid as $u ): ?>
                 <div style="position:absolute; text-align:center; top:<?=$i?>%; left:11.8%; width:11%; background-color:white; font-size: 10px;  height:12px; line-height:12px;">
                    <span class="proxima"> <strong> <?= $u->uuid; ?></strong> </span>
                  </div>
-            <?php $i += 1.5; ?>
-        <?php endforeach; ?>
-        <?php $i = 27.5;  ?>
-            <?php foreach( $presupuesto as $u ): ?>
+      
+
                 <div style="position:absolute; text-align:center; top:<?=$i?>%; left:61.35%; width:18%; background-color:white; font-size: 10px;  height:11px;">
-                  <span class="proxima"> <strong> <?= $u->contribuyente; ?> </strong></span>
+                  <span class="proxima"> <strong> <?= $u->emisor_nombre; ?> </strong></span>
                  </div>
-            <?php $i += 1.5; ?>
-        <?php endforeach; ?>
-        <?php $i = 27.5;  ?>
-            <?php foreach( $presupuesto as $u ): ?>
+
                 <div style="position:absolute; text-align:center; top:<?=$i?>%; left:81%; width:11%; background-color:white; font-size: 10px;  height:12px;">
-                  <span class="proxima"><?= $u->rfc; ?></span>
+                  <span class="proxima"><?= $u->emisor_rfc; ?></span>
                  </div>
             <?php $i += 1.5; ?>
         <?php endforeach; ?>

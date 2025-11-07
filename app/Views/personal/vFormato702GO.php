@@ -229,14 +229,14 @@
 </div>
 <div id="partida_respuesta">
  
-   <?= $facturaItem->dsc_partida ?> 
+  <?= (isset($partida) && !empty($partida))?$partida:''; ?>
 
 </div>
 <div id="factura">
    FACTURA / RECIBO No: 
 </div>
 <div id="factura_respuesta">
-      <?= $facturaItem->uuid ?>
+   <?= (isset($uuid) && !empty($uuid))?$uuid:''; ?>
 </div>
 <div id="fecha">
    FECHA DEL GASTO:

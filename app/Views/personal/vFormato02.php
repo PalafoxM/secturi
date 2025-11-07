@@ -62,9 +62,6 @@
                      <?php foreach($presupuesto as $key => $p): ?>
                     <?= $p->partida ?><?= $key !== $lastKey ? ',' : '' ?>
                     <?php endforeach; ?>
-                   
-                     
-                   
                 </strong> correspondiente.
            </span>
         </div>

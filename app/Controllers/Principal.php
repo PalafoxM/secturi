@@ -3514,28 +3514,19 @@ class Principal extends BaseController
         if(isset($periodo_factura->data) && !empty($periodo_factura->data)){
 
             $presupuestoGO = $globals->getTabla([
-                    'tabla' => 'presupuesto_go',
+                    'tabla' => 'vw_periodo_factura_go',
                     'where' => ['visible' => 1, 'id_reserva' => $periodo_factura->data[0]->id_reserva_go]
             ]);
             if(isset($presupuestoGO) && !empty($presupuestoGO)){
-                foreach ($presupuestoGO->data as $key => $value) {
-                 $query = [
-                    'tabla' => 'cat_partida',
-                    'where' => ['visible' => 1, 'id_partida' => $value->id_partida]
-                  ];  
-                 $data['dsc_partida'][] =$globals->getTabla($query)->data[0]->cuenta_cable; 
-                 $query = [
-                    'tabla' => 'cat_proyecto',
-                    'where' => ['visible' => 1, 'id_proyecto' => $value->id_proyecto]
-                  ];  
-                 $data['dsc_proyecto'][] =$globals->getTabla($query)->data[0]->proyecto; 
+
                
-                }
+              $data['presupuestoGO'] = $presupuestoGO->data;
 
             }
+            
           
           
-            $itemFactura = $data['importe'] =  $periodo_factura->data;
+            $itemFactura  =  $periodo_factura->data;
             $data['documentos'] = count($periodo_factura->data);
         }
         //==============================
@@ -3557,6 +3548,7 @@ class Principal extends BaseController
         if (isset($importe->data) && !empty($importe->data)) {
             $data['importe'] = $importe->data;
         }
+       
         //==============================
         
 
@@ -3594,17 +3586,19 @@ class Principal extends BaseController
             $data['dsc_proveedor'] = $registro->dsc_proveedor;
             $data['clabe'] = '';
             
-             $presupuesto = $globals->getTabla([
+            $presupuesto = $globals->getTabla([
                 'tabla' => 'vw_formato_go',
                 'where' => ['visible' => 1, 'id_reserva_go' => $id_reserva_go]
             ]);
 
-      
             if (isset($presupuesto->data) && !empty($presupuesto->data)) {
-                $data['presupuesto'] = $presupuesto->data;
+                // Eliminar duplicados completos
+                $serialized = array_map('serialize', $presupuesto->data);
+                $uniqueSerialized = array_unique($serialized);
+                $data['presupuesto'] = array_map('unserialize', $uniqueSerialized);
             }
         
-           // die( var_dump(  $data['presupuesto'] ) );
+           //die( var_dump(  $data['presupuesto'] ) );
             $reserva = $globals->getTabla([
                 'tabla' => 'vw_reserva_go',
                 'where' => ['visible' => 1, 'id_reserva_go' => $id_reserva_go]
@@ -3673,15 +3667,13 @@ class Principal extends BaseController
               
                 if (!empty($itemFactura)) {
                    
-                   
+                    // var_dump( $presupuestoGO->data );
                         foreach ($itemFactura as $index => $facturaItem) {
-                            //die( var_dump($facturaItem) );
-                            $importe_str = $facturaItem->importe;
-                            $importe_float = (float) str_replace(',', '', $importe_str);
-                            $data['numero_texto2'] = $this->numeroEnLetras($importe_float);
+                      //   die( var_dump( $facturaItem ) );
+                          $data['partida'] =  $presupuestoGO->data[$index]->dsc_partida;
+                          $data['uuid'] =   $xml->data[$index]->uuid;
+                            
                             $data['facturaItem'] = $facturaItem;
-                            $data['importePartida'] = $facturaItem->importe;
-
                             $periodo_factura_go = $globals->getTabla([
                                 'tabla' => 'periodo_factura_go',
                                 'where' => [
@@ -3694,8 +3686,13 @@ class Principal extends BaseController
                                 ? $periodo_factura_go->data
                                 : [];
                             
-                           
+                            
                             foreach($periodo  as $p){
+                                $importe_str = $p->importe;
+                                $importe_float = (float) str_replace(',', '', $importe_str);
+                                $data['numero_texto2'] = $this->numeroEnLetras($importe_float);
+                                $data['importePartida'] = $p->importe;
+
                                 $data['inicio'] = $p->periodo_inicio;
                                 $data['fin'] = $p->periodo_fin;
                                 $monto = (int)$p->importe + (int)$p->propina ;
@@ -4415,8 +4412,7 @@ class Principal extends BaseController
         if (!empty($id_registro_go)) {
             $data['registro_pt'] = (!empty($registro_pt->data)) ? $registro_pt->data[0] : [];
         }
-        //  var_dump( $cat_subsecretario   );
-        // die();
+      
         $data['dsc_director_general'] = (!empty($cat_director_general->data)) ? $cat_director_general->data[0]->dsc_director_general : [];
         $data['cat_area'] = (!empty($cat_area->data)) ? $cat_area->data : [];
         $data['cat_tipo'] = (!empty($cat_tipo->data)) ? $cat_tipo->data : [];
