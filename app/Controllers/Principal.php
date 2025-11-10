@@ -2946,7 +2946,7 @@ class Principal extends BaseController
             $data['presupuesto'] = $reserva;
 
         
-            $importe_str = $reserva[0]->importe;
+            $importe_str = $reserva[0]->total_importe;
             $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
             $data['numero_texto'] = $this->numeroEnLetras($importe_float);
             $data['es4000'] = false;
@@ -4106,8 +4106,8 @@ class Principal extends BaseController
             if (!empty($reserva->data)) {
                 $data['reserva'] = $reserva->data;
                 $data['presupuesto'] = $reserva->data;
-              
-                $importe_str = $reserva->data[0]->importe;
+       
+                $importe_str = $reserva->data[0]->total_importe;
                 $usu_reg = $reserva->data[0]->usu_reg;
                 $data['no_convenio'] = $reserva->data[0]->no_convenio;
                 $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
@@ -4235,7 +4235,6 @@ class Principal extends BaseController
       
         if (isset($vehiculo->data) && !empty($vehiculo->data)) {
             $data['vehiculo'] = $vehiculo->data[0];
-            $data['vehiculo'] = $vehiculo->data[0]->xml_monto;
             $folio = $globals->getTabla([
                 'tabla' => 'vw_direccion',
                 'where' => ['visible' => 1, 'id_area' =>  $vehiculo->data[0]->id_direccion_responsable]
@@ -4266,7 +4265,7 @@ class Principal extends BaseController
             $data['direccion'] = (isset( $direccion->data) && !empty( $direccion->data))? $direccion->data[0]:'';
             $data['proyecto'] = (isset( $proyecto->data) && !empty( $proyecto->data))? $proyecto->data[0]:'';
         }
-        //die( var_dump( $data['proyecto']  ) );
+        die( var_dump( $data['direccion']  ) );
         $html = view('secciones/vFormatoVI.php', $data);
         $htmlSegundaHoja = view('secciones/vFormatoVI2.php', $data);
         $htmlTercerHoja = view('personal/vFormatoVI702.php', $data);

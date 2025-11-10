@@ -138,7 +138,7 @@
 
    
         <div  style="position:absolute; text-align:right; top:52.2%; left:44%; width:15%; background-color:white; font-size: 12px;  height:12px;">
-            <span>$<?= ($fic)?number_format($presupuesto[0]->importe, 2 ):$registro->total_importe; ?></span>
+            <span>$<?= ($fic)?$reserva[0]->total_importe:$registro->total_importe; ?></span>
         </div>
         <div  style="position:absolute; text-align:center; top:51.8%; left:60%; width:37.5%; background-color:white; font-size: 12px;  height:20px;">
             <span class="proxima "><strong><?= ($numero_texto); ?></strong></span>
