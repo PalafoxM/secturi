@@ -475,7 +475,6 @@ class Usuario extends BaseController
 
         foreach ($resul as $r) {
             $nombre = trim($r->nombre_completo ?: 'Sin nombre');
-            $numeroEmpleado = isset($r->no_empleado) ? $r->no_empleado : ''; 
         
            
             // Verificar si es una incidencia de tipo 2 (por semana)
@@ -648,10 +647,12 @@ class Usuario extends BaseController
 
         // AHORA LOS ENCABEZADOS EMPIEZAN EN LA FILA 4
         $sheet->setCellValue('A4', '');
-        $sheet->setCellValue('A5', 'Nombre');
+        $sheet->setCellValue('A5', 'No. Empleado'); // ← NUEVA COLUMNA
+        $sheet->setCellValue('B4', '');
+        $sheet->setCellValue('B5', 'Nombre'); // ← Nombre movido a columna B
 
         // Cabeceras (empiezan en fila 4)
-        $colIndex = 2;
+        $colIndex = 3; // ← Cambiar de 2 a 3 porque ahora hay 2 columnas antes
         foreach ($fechasDelPeriodo as $fecha) {
             $colStart = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
             $colEnd = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 1);
@@ -683,9 +684,21 @@ class Usuario extends BaseController
 
 
         foreach ($usuarios as $nombre => $fechas) {
-      
-            $sheet->setCellValue('A' . $fila, $nombre);
-            $colIndex = 2;
+
+              $numeroEmpleado = '';
+                foreach ($resul as $r) {
+                    if (trim($r->nombre_completo ?: 'Sin nombre') === $nombre) {
+                        $numeroEmpleado = isset($r->no_empleado) ? $r->no_empleado : 'N/A';
+                        break;
+                    }
+                }
+                
+            $sheet->setCellValue('A' . $fila, $numeroEmpleado);
+    
+            // NOMBRE AHORA VA EN COLUMNA B (antes era A)
+            $sheet->setCellValue('B' . $fila, $nombre);
+            
+            $colIndex = 3; // ← Cambiar de 2 a 3
 
             foreach ($fechasDelPeriodo as $fecha) {
                 $colEntrada = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
@@ -953,12 +966,13 @@ class Usuario extends BaseController
            
         }
 
-       
+      
 
         // Ajustar dimensiones de columnas
-        $sheet->getColumnDimension('A')->setWidth(40);
-        $totalCols = 1 + (count($fechasDelPeriodo) * 2);
-        for ($i = 2; $i <= $totalCols; $i++) {
+        $sheet->getColumnDimension('A')->setWidth(15); // ← No. Empleado
+        $sheet->getColumnDimension('B')->setWidth(40); // ← Nombre
+        $totalCols = 2 + (count($fechasDelPeriodo) * 2); // ← Cambiar de 1 a 2
+        for ($i = 3; $i <= $totalCols; $i++) {
             $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i);
             $sheet->getColumnDimension($colLetter)->setWidth(18);
         }
