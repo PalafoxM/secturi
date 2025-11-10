@@ -4235,7 +4235,11 @@ class Principal extends BaseController
       
         if (isset($vehiculo->data) && !empty($vehiculo->data)) {
             $data['vehiculo'] = $vehiculo->data[0];
-            $folio = $globals->getTabla([
+            $importe_str = $vehiculo->data[0]->xml_monto;
+            $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
+            $data['numero_texto'] = $this->numeroEnLetras($importe_float);
+            
+            $resposableGasto = $globals->getTabla([
                 'tabla' => 'vw_direccion',
                 'where' => ['visible' => 1, 'id_area' =>  $vehiculo->data[0]->id_direccion_responsable]
             ]);
@@ -4247,25 +4251,36 @@ class Principal extends BaseController
                 'tabla' => 'proveedor_banco',
                 'where' => ['visible' => 1, 'idproveedor' =>  $vehiculo->data[0]->id_banco_proveedor]
             ]);
-            $direccion = $globals->getTabla([
-                'tabla' => 'direccion',
-                'where' => ['visible' => 1, 'id_direccion' =>  $vehiculo->data[0]->id_direccion_responsable]
-            ]);
+           
             $proyecto = $globals->getTabla([
                 'tabla' => 'cat_proyecto',
                 'where' => ['visible' => 1, 'id_proyecto' =>  $vehiculo->data[0]->id_proyecto]
             ]);
+            $secretario = $globals->getTabla([
+                'tabla' => 'cat_secretario',
+                'where' => ['visible' => 1, 'id_secretario' =>  $vehiculo->data[0]->id_secretario]
+            ]);
+            $subsecretario = $globals->getTabla([
+                'tabla' => 'cat_subsecretario',
+                'where' => ['visible' => 1, 'id_subsecretario' =>  $vehiculo->data[0]->id_subsecretario]
+            ]);
+            
+         
+    
            
             
-            $folio =(isset( $direccion->data) && !empty( $direccion->data))? $direccion->data[0]->folio_prefijo:'S/N/';
-            $folio_prefijo = $folio . 'FALTA' . '/' . date('Y'); //ESTO HAY QUE OREGUNTAR
+            $folio =(isset( $resposableGasto->data) && !empty( $resposableGasto->data))? $resposableGasto->data[0]->folio_prefijo:'S/N/';
+            $folio_prefijo = $folio . 'FALTA' . '/' . date('Y').'-V';
             $data['folio'] = $folio_prefijo;
             $data['proveedor'] = (isset( $proveedor->data) && !empty( $proveedor->data))? $proveedor->data[0]:'';
             $data['proveedorBanco'] = (isset( $proveedorBanco->data) && !empty( $proveedorBanco->data))? $proveedorBanco->data[0]:'';
             $data['direccion'] = (isset( $direccion->data) && !empty( $direccion->data))? $direccion->data[0]:'';
             $data['proyecto'] = (isset( $proyecto->data) && !empty( $proyecto->data))? $proyecto->data[0]:'';
+            $data['secretario'] = (isset( $secretario->data) && !empty( $secretario->data))? $secretario->data[0]:'';
+            $data['subsecretario'] = (isset( $subsecretario->data) && !empty( $subsecretario->data))? $subsecretario->data[0]:'';
+            $data['resposableGasto'] = (isset( $resposableGasto->data) && !empty( $resposableGasto->data))? $resposableGasto->data[0]:'';
         }
-        die( var_dump( $data['direccion']  ) );
+       // die( var_dump( $resposableGasto ) );
         $html = view('secciones/vFormatoVI.php', $data);
         $htmlSegundaHoja = view('secciones/vFormatoVI2.php', $data);
         $htmlTercerHoja = view('personal/vFormatoVI702.php', $data);
@@ -4292,11 +4307,12 @@ class Principal extends BaseController
             }
             if ($i == 2) {
                 $mpdf->WriteHTML($htmlSegundaHoja);
-                $facturas = $formatos->data;
+                $facturas = $vehiculo->data;
 
                 if (!empty($facturas)) {
+                   
                     foreach ($facturas as $index => $factura) {
-                        $facturaPath = FCPATH . $factura->ruta_relativa;
+                        $facturaPath = FCPATH . $factura->pdf;
 
                         if (file_exists($facturaPath)) {
                             $facturaPageCount = $mpdf->SetSourceFile($facturaPath);

@@ -1,6 +1,6 @@
 <?php
 // Obtener la fecha
-$fecha = strtotime($registro->fecha_tramite);
+$fecha = strtotime($vehiculo->fecha_tramite);
 $dia = date('j', $fecha);      // día sin ceros iniciales (1-31)
 $anio = date('Y', $fecha);     // año
 
@@ -30,80 +30,30 @@ $fechaFormateada = $dia . ' de ' . $mes . ' del ' . $anio;
     <span class="proxima"><strong>Silao de la Victoria, Gto, <?= ucfirst($fechaFormateada); ?></strong></span>
 </div>
         <div  style="position:absolute; top:24.5%; left:64.5%; width:28%; height:18px; background-color:white; font-size: 14px; ">
-            <?php if(!$fic): ?>
-            <span class="proxima"><?= (isset($GO) && !empty($GO))?'GO':'PT';?> <?= strtoupper($registro->folio);?></span>
-            <?php endif; ?>
-            <?php if($fic): ?>
+      
+         
             <span class="proxima">PT <?= $folio;?></span>
-            <?php endif; ?>
+       
         </div>
         <div style="position:absolute; top:33.2%; left:9.5%; width:81%; height:72px; background-color:white; font-size:13px; text-align:justify;">
             <span class="proxima">
-                Por medio de la presente, me permito solicitar su apoyo para que se realice el tramite de <?= (isset($GO) && !empty($GO))?'Gasto de Operación':'Pago a Tercero'?>
-                con folio <strong><?= (isset($GO) && !empty($GO))?'GO':'PT'?> <?= ($fic)?$folio:strtoupper($registro->folio);?></strong> por la cantidad de 
-                <strong>$<?= ($fic)?$reserva[0]->total_importe: $registro->total_importe; ?> (<?= mb_strtoupper($numero_texto, 'UTF-8'); ?>)</strong>,
-                de comprobante(s) fiscale(s) No. 
-             
-           
-                <strong>
-                    <?php 
-                    $total = count($uuid);
-                    $current = 0;
-                    foreach($uuid as $u):
-                        $current++;
-                        echo $u->uuid;
-                        if ($current < $total) {
-                            echo ', ';
-                        }
-                    endforeach; 
-                    ?>
-                </strong> 
+                Por medio de la presente, me permito solicitar su apoyo para que se realice el tramite de Pago a Tercero
+                con folio PT <strong> <?= $folio ?></strong> por la cantidad de 
+                <strong>$<?= $vehiculo->xml_monto; ?> (<?= mb_strtoupper($numero_texto, 'UTF-8'); ?>)</strong>,
+                de comprobante(s) fiscale(s) No. <strong><?= $vehiculo->xml_monto; ?></strong> 
     
-                por concepto de <?= $registro->concepto_pago ?> 
-                al proveedor <?= $registro->dsc_proveedor ?>.
+                por concepto de <?= $vehiculo->concepto ?> 
+                al proveedor <?= $proveedor->razon_social ?>.
             </span>
         </div>
         <div style="position:absolute; top:42.5%; left:9.5%; width:81%; height:42px; background-color:white; font-size:13px; text-align:justify;">
             <span class="proxima">
-                Lo anterior con cargo al proyecto(s) 
-                <strong>
-                <?php if(!$fic): ?>
-                        <?php 
-                        $total = count($presupuesto);
-                        $current = 0;
-                        foreach($presupuesto as $r):
-                            $current++;
-                            echo $r->proyecto;
-                            if ($current < $total) {
-                                echo ', ';
-                            }
-                        endforeach; 
-                        ?>
-                  <?php endif; ?>
-                   <?php if($fic): ?>
-                       E027QC04182501
-                    <?php endif; ?>
-                </strong> a las partida(s) presupuestal(es) 
-                <strong>
-                    
-                        <?php 
-                        $total = count($presupuesto);
-                        $current = 0;
-                        foreach($presupuesto as $r):
-                            $current++;
-                            echo $r->partida;
-                            if ($current < $total) {
-                                echo ', ';
-                            }
-                        endforeach; 
-                        ?>
-                  
-               </strong>
+                Lo anterior con cargo al proyecto <strong><?= $proyecto->proyecto ?></strong> a las partida(s) presupuestal(es) <strong>3550</strong>
             </span>
         </div>
          <div style="position:absolute; top:48%; left:9.5%; width:81%; height:80px; background-color:white; font-size:13px; text-align:justify;">
             <span class="proxima">
-                Hago de su conocimiento que de acuerdo a lo que establece la cláusula <strong><?= isset($registro->clausula_contrato) && !empty($registro->clausula_contrato)?$registro->clausula_contrato:'' ?></strong> de instrumento jurídico <strong><?=  isset($no_convenio) && !empty($no_convenio) ?$no_convenio:'' ?></strong>
+                Hago de su conocimiento que de acuerdo a lo que establece la cláusula <strong><?= isset($vehiculo->clausula) && !empty($vehiculo->clausula)?$vehiculo->clausula:'' ?></strong> de instrumento jurídico <strong><?=  isset($no_convenio) && !empty($no_convenio) ?$no_convenio:'' ?></strong>
                 recibí el producto, atendido lo que establece el marco normativo aplicable. El producto recibido se nos ha
                 entregado a entera satisfacción en tiempo y forma, quedando bajo responsabilidad el uso y/o distribución,
                 así como el resguardo y custodia de los expedientes originales y entregables correspondientes.
@@ -138,12 +88,12 @@ $fechaFormateada = $dia . ' de ' . $mes . ' del ' . $anio;
         </div>
          <div style="position:absolute; top:85%; left:9.5%; width:81%; height:20px; background-color:white; font-size:13px; text-align:center;">
             <span class="proxima">
-             <strong> <?= (isset($responsableGasto->nombre_completo) && !empty($responsableGasto->nombre_completo))?$responsableGasto->nombre_completo:''  ?> </strong>
+             <strong> <?= (isset($resposableGasto->nombre_completo) && !empty($resposableGasto->nombre_completo))?$resposableGasto->nombre_completo:''  ?> </strong>
             </span>
         </div>
            <div style="position:absolute; top:87%; left:9.5%; width:81%; height:20px; background-color:white; font-size:13px; text-align:center;">
             <span class="proxima">
-              <strong> <?= (isset($responsableGasto->dsc_puesto) && !empty($responsableGasto->dsc_puesto))?$responsableGasto->dsc_puesto:'' ?></strong>
+              <strong> <?= (isset($resposableGasto->dsc_puesto) && !empty($resposableGasto->dsc_puesto))?$resposableGasto->dsc_puesto:'' ?></strong>
             </span>
         </div>
        

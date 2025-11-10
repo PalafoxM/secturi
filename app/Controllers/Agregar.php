@@ -2127,6 +2127,7 @@ class Agregar extends BaseController
             'id_proyecto' => $data['id_proyecto'],
             'pdf' => $ruta_relativa,
             'xml_monto' => $total,
+            'xml_uuid' => $uuid,
             'xml_rfc' => $rfcEmisor,
             'xml_razon_social' => $nombreReceptor
         ];

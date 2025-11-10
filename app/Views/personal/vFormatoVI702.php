@@ -208,76 +208,47 @@
    RESPONSABLE / CARGO / AREA:
 </div>
  <div id="nombre">
-   <?php if(!$fic): ?>
-   <?php if(isset($responsableGasto->nombre_completo) && !empty($responsableGasto->nombre_completo)):  ?>
-   <span ><?= $responsableGasto->nombre_completo; ?> - <?= $responsableGasto->dsc_puesto ?> - <?= $responsableGasto->dsc_area ?> </span>
+
+   <?php if(isset($resposableGasto->nombre_completo) && !empty($resposableGasto->nombre_completo)):  ?>
+   <span ><?= $resposableGasto->nombre_completo; ?> - <?= $resposableGasto->dsc_puesto ?> - <?= $resposableGasto->dsc_area ?> </span>
     <?php endif; ?>
-   <?php endif; ?>
-   <?php if($fic): ?>
-   <span >HUGO RAMÍREZ DUARTE - DIRECCIÓN DE COMPETITIVIDAD TURÍSTICA
- </span>
-    <?php endif; ?>
+
+
 </div>
 <div id="comision">
    COMISION / REUNION / EVENTO:
 </div>
  <div id="comision_respuesta">
-   <span > &nbsp;<?= ($registro->comision); ?>  </span>
+   <span > &nbsp;<?= ($vehiculo->comision); ?>  </span>
 </div>
 <div id="concepto">
    CONCEPTO DEL PAGO:
 </div>
  <div id="concepto_respuesta">
-   <span> &nbsp;<?= ($registro->concepto_pago); ?>  </span>
+   <span> &nbsp;<?= ($vehiculo->concepto); ?>  </span>
 </div>
 <div id="partida">
    PARTIDA:
 </div>
-<?php if($fic): ?>
+
+
 <div id="partida_respuesta">
-   <?php
-   $total = count($reserva);
-   $i = 0;
-   foreach($reserva as $r):
-       $i++;
-   ?>
-       &nbsp;<?= $r->partida ?> <?= $r->dsc_partida ?><?= ($i < $total) ? ' /' : '' ?>
-   <?php endforeach; ?>
+   3550
 </div>
-<?php endif; ?>
-<?php if(!$fic): ?>
-<div id="partida_respuesta">
-   <?php
-   $total = count($presupuesto);
-   $i = 0;
-   foreach($presupuesto as $r):
-       $i++;
-   ?>
-       &nbsp;<?= $r->partida ?> <?= $r->dsc_partida ?><?= ($i < $total) ? ' /' : '' ?>
-   <?php endforeach; ?>
-</div>
-<?php endif; ?>
+
 <div id="factura">
    FACTURA / RECIBO No: 
 </div>
 <div id="factura_respuesta">
-
-   <?php 
-   $keys = array_keys($uuid);
-   $lastKey = end($keys);
-   foreach($uuid as $key => $u): ?>
-      <?= $u->uuid ?><?= $key !== $lastKey ? ',' : '' ?>
-   <?php endforeach; ?>
-
-
+<?= $vehiculo->xml_uuid ?>
 </div>
 <div id="fecha">
    FECHA DEL GASTO:
 </div>
 
  <div id="fecha_respuesta">
-   <?php if(isset($registro->fecha_gasto_inicio) && !empty($registro->fecha_gasto_inicio)): ?>
-   <span > DEL <?= date('d-m-Y', strtotime($registro->fecha_gasto_inicio));?> AL <?= date('d-m-Y',strtotime($registro->fecha_gasto_fin));?>  </span>
+   <?php if(isset($vehiculo->fec_inicio) && !empty($vehiculo->fec_fin)): ?>
+   <span > DEL <?= date('d-m-Y', strtotime($vehiculo->fec_inicio));?> AL <?= date('d-m-Y',strtotime($vehiculo->fec_fin));?>  </span>
    <?php endif; ?>
 </div>
 
@@ -287,11 +258,6 @@
 </div>
 
 <div id="importe_respuesta">
-<?php if(!$fic): ?>
-<?= $registro->total_importe.' ('.$numero_texto.')' ?>
-<?php endif; ?>
-<?php if($fic): ?>
-<?= $reserva[0]->total_importe.' ('.$numero_texto.')' ?>
-<?php endif; ?>
+<?= $vehiculo->xml_monto.' ('.$numero_texto.')' ?>
 </div>
 
