@@ -2883,6 +2883,83 @@ class Principal extends BaseController
         exit();
 
     }
+    public function ArchivoVe($id_registro_pt = null, $id_archivo = null, $savePath = null)
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $data['reserva'] = "";
+        $vehiculo = $globals->getTabla([
+            'tabla' => 'pt_vehiculo',
+            'where' => ['visible' => 1, 'id_vehiculo' => $id_registro_pt]
+        ]);
+        if(isset($vehiculo->data) && !empty($vehiculo->data)){
+            $data['vehiculo'] = (isset($vehiculo->data) && !empty($vehiculo))?$vehiculo->data:[];
+            $direccion = $globals->getTabla([
+                'tabla' => 'vw_direccion',
+                'where' => ['visible' => 1, 'id_director' => $vehiculo->data[0]->id_director ]
+            ]);
+        }
+    
+      
+
+        
+         $folio =(isset( $direccion->data) && !empty( $direccion->data))? $direccion->data[0]->folio_prefijo:'S/N/';
+      
+         $folio_prefijo = $folio . 'FALTA' . '/' . date('Y'); //ESTO HAY QUE OREGUNTAR
+         $data['folio'] = $folio_prefijo;
+     
+      
+    
+            switch ($id_archivo) {
+                case 1:
+                    $doc = 'assets/pdf/plantillas/anexo01.pdf';
+                    $formato = 'personal/vFormato01.php';
+                    break;
+                case 4:
+                    $data['layout'] = 'plantilla/lytVacio';
+                    $data['contentView'] = 'secciones/vError500';
+                    $this->_renderView($data);
+                    die();
+                    break;
+
+
+            }
+        
+
+        $html = view($formato, $data);
+        $htmlSegundaHoja = view('personal/vFormato02Ve.php', $data);
+        //Crear instancia de mPDF
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 0,
+            'margin_left' => 1,
+            'margin_right' => 1,
+            'format' => [213, 268],
+            'mirrorMargins' => false,
+        ]);
+
+        $pagecount = $mpdf->SetSourceFile(FCPATH . $doc);
+        for ($i = 1; $i <= $pagecount; $i++) {
+            $mpdf->AddPage();
+            $tplId = $mpdf->ImportPage($i);
+            $mpdf->UseTemplate($tplId);
+
+            if ($i == 1) {
+                $mpdf->WriteHTML($html);
+            }
+            if ($i == 2) {
+                $mpdf->WriteHTML($htmlSegundaHoja);
+            }
+        }
+
+
+        if ($savePath) {
+            $mpdf->Output($savePath, 'F'); // F = write to file
+            return $savePath;
+        }
+        $mpdf->Output('Formato_pt.pdf', 'I');
+        exit();
+
+    }
     public function ArchivoFIC($id_registro_pt = null, $id_archivo = null, $savePath = null)
     {
         $session = \Config\Services::session();

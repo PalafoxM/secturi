@@ -57,7 +57,7 @@
                                                      
                                                             <td class="text-center">
                                                         
-                                                                <a target="_blank" href="<?= base_url().'index.php/Principal/Archivo/'.$id_registro.'/1' ?>" class="text-center">
+                                                                <a target="_blank" href="<?= base_url().'index.php/Principal/ArchivoVe/'.$id_registro.'/1' ?>" class="text-center">
                                                                     <i class="far fa-file-pdf text-danger"></i>
                                                                     <h6 class="text-truncate">Archivo01.pdf</h6>
                                                                 </a> 
