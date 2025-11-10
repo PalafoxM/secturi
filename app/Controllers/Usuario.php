@@ -445,7 +445,7 @@ class Usuario extends BaseController
             $anio . '-11-18' => 'Día de la Revolución',
             $anio . '-12-25' => 'Navidad'
         ];
-
+   
         $tabla = [
             'tabla' => 'vw_asistencia_incidencia',
             'where' => ['visible' => 1, 'id_tipo_empleado' => 1],
@@ -454,7 +454,7 @@ class Usuario extends BaseController
 
         $datos = $globals->getTabla($tabla);
         $resul = (isset($datos->data) && !empty($datos->data)) ? $datos->data : [];
-
+      
         // Fechas laborales del periodo
         $start = new \DateTime($fec_ini);
         $end = new \DateTime($fec_fin);
@@ -475,13 +475,12 @@ class Usuario extends BaseController
 
         foreach ($resul as $r) {
             $nombre = trim($r->nombre_completo ?: 'Sin nombre');
-
+            $numeroEmpleado = isset($r->no_empleado) ? $r->no_empleado : ''; 
+        
+           
             // Verificar si es una incidencia de tipo 2 (por semana)
-            if (
-                $r->tipo_registro === 'incidencia' && $r->tipo == 2 &&
-                !empty($r->fecha_inicio_incidencia) && !empty($r->fecha_fin_incidencia)
-            ) {
-
+            if (!empty($r->tipo) && $r->tipo == 2) {
+           
                 // Procesar todas las fechas del rango de la incidencia
                 $startIncidencia = new \DateTime($r->fecha_inicio_incidencia);
                 $endIncidencia = new \DateTime($r->fecha_fin_incidencia);
@@ -524,6 +523,7 @@ class Usuario extends BaseController
 
             } else {
                 // Procesamiento normal para otros registros
+              
                 $fechaYmd = !empty($r->fecha) ? date('Y-m-d', strtotime($r->fecha)) : null;
                 if (!$fechaYmd || date('N', strtotime($fechaYmd)) >= 6)
                     continue;
@@ -583,10 +583,13 @@ class Usuario extends BaseController
                     ];
                 }
             }
+
+            
         }
 
         // Resto del código para cumpleaños y generación del Excel...
         foreach ($usuarios as $nombre => $fechas) {
+
             if (isset($cumpleanosUsuarios[$nombre])) {
                 $cumpleAnioActual = $anio . '-' . date('m-d', strtotime($cumpleanosUsuarios[$nombre]));
                 if (date('N', strtotime($cumpleAnioActual)) < 6 && in_array($cumpleAnioActual, $fechasDelPeriodo)) {
@@ -601,7 +604,7 @@ class Usuario extends BaseController
                 }
             }
         }
-
+ 
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
@@ -680,7 +683,7 @@ class Usuario extends BaseController
 
 
         foreach ($usuarios as $nombre => $fechas) {
-
+      
             $sheet->setCellValue('A' . $fila, $nombre);
             $colIndex = 2;
 
@@ -700,7 +703,9 @@ class Usuario extends BaseController
                 $stopIncProcessing = false; // para no sobrescribir si ya procesamos una incidencia relevante
 
                 if (!empty($incArr)) {
+                  
                     foreach ($incArr as $inc) {
+                       
                         if ($stopIncProcessing)
                             break;
 
@@ -712,6 +717,7 @@ class Usuario extends BaseController
 
                         // Incidencia aprobada y NO cat 11 -> comportamiento original (marcar ambos campos con el nombre)
                         if ($estatus === 3 && !in_array($cat,[11,1,7])) {
+                          
                             $valorEntrada = $nombreInc;
                             $valorSalida = $nombreInc;
                             $sheet->getStyle($colEntrada . $fila)
@@ -728,7 +734,8 @@ class Usuario extends BaseController
                         // Caso cat 11 (comisión / permiso personal): solo entrada O salida, usar horas aprobadas
                         if ($cat === 11 && $estatus === 3) {
                             // Normalizamos con DateTime (si existe)
-
+             
+                              
                             // Si hay hora de inicio dentro del rango de la mañana -> marcar entrada como permiso
                             if ($horaInicio) {
                                 // compara solo la parte de tiempo: 09:01:00 - 12:00:00 (ajusta si tus rangos cambian)
@@ -793,6 +800,7 @@ class Usuario extends BaseController
 
                             // Si hay hora fin y cae en el rango de tarde -> marcar salida como permiso
                             if (!$stopIncProcessing && $horaFin) {
+                             
                                 if ($horaInicio >= '12:01:00' && $horaFin <= '16:00:00') {
                                     $valorSalida = $nombreInc;
                                     $sheet->getStyle($colSalida . $fila)
@@ -804,8 +812,9 @@ class Usuario extends BaseController
                             }
 
                             // Si la comisión es de todo el día (inicio y fin) podrías decidir marcar ambos campos:
-                            if (!$stopIncProcessing && $horaInicio >= '08:30:00' &&  $horaFin <= '16:00:00') {
-                                // ejemplo simple: si cubre mañana y tarde -> marcar ambos
+                            if (!$stopIncProcessing && $horaInicio >= '08:00:00' &&  $horaFin <= '16:00:00') {
+                                // ejemplo simple: si cubre mañana y tarde -> marcar ambos   
+                            
                                 $valorEntrada = $valorSalida = $nombreInc;
                                 $sheet->getStyle($colEntrada . $fila)
                                     ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
@@ -816,6 +825,8 @@ class Usuario extends BaseController
                                 $validado = true;
                                 $stopIncProcessing = true;
                             }
+                          
+                           
 
                             // si ya procesaste, salir
                             if ($stopIncProcessing)
@@ -888,6 +899,7 @@ class Usuario extends BaseController
                             $stopIncProcessing = true;
                             break;
                         }
+                   
                     }
                 }
 
@@ -937,7 +949,11 @@ class Usuario extends BaseController
 
             }
             $fila++;
+
+           
         }
+
+       
 
         // Ajustar dimensiones de columnas
         $sheet->getColumnDimension('A')->setWidth(40);

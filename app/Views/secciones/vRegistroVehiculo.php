@@ -26,17 +26,20 @@
                     <div class="card">
                         <div class="card-body">
                    
-                            <form id="form_go" enctype="multipart/form-data">
+                            <form id="form_vehiculo" enctype="multipart/form-data">
                                 <input type="hidden" name="editar" value="0">
                                 <div class="form-row">
                                     <!-- Dirección Responsable -->
-                                    <div class="col-md-12 mb-12">
+                                    <div class="col-md-6 mb-6">
                                         <label for="id_proveedor">Proveedor<span class="text-danger">*</span></label>
                                         <select class="form-control select2-ajax" id="id_proveedor" name="id_proveedor" required>
                                             </select>
                                     </div>
-
-                              
+                                    <div class="col-md-6 mb-6">
+                                        <label for="id_proveedor_banco">Proveedor Banco<span class="text-danger">*</span></label>
+                                        <select class="form-control select2-ajax" id="id_proveedor_banco" name="id_proveedor_banco" required>
+                                            </select>
+                                    </div>
                                 </div><!--end form-row-->
                                 <div class="form-row">
                                     <!-- Dirección Responsable -->
@@ -191,7 +194,7 @@
                                 <div id="hidden-file-inputs-container"></div>
                               
                              
-                                    <button class="btn btn-gradient-primary" id="btnGuardaGo" type="submit">Guardar</button>
+                                    <button class="btn btn-gradient-primary" id="btnGuardaVi" type="submit">Guardar</button>
                            
                             </form> <!--end form-->
                         </div><!--end card-body-->
@@ -254,23 +257,107 @@
 $(document).ready(function() {
     $('#id_proveedor').select2({
         placeholder: 'Escribe para buscar un proveedor...',
-        minimumInputLength: 3, // Opcional: solo busca después de 3 caracteres
-        allowClear: true,
-        ajax: {
-           url: base_url + "index.php/Principal/buscarProveedor2",
+            minimumInputLength: 3,
+            allowClear: true,
+            ajax: {
+                url: base_url + "index.php/Principal/buscarProveedor2",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    console.log('Término buscado:', params.term); // Debug
+                    return {
+                        q: params.term // Asegúrate que esto se envía
+                    };
+                },
+                processResults: function (data) {
+                    console.log('Respuesta recibida:', data); // Debug
+                    return data;
+                },
+                cache: true
+            }
+        });
+    });
+
+    $('#id_proveedor').on('change', function() {
+        var idProveedor = $(this).val();
+        
+        if (idProveedor) {
+            cargarBancosProveedor(idProveedor);
+        } else {
+            // Limpiar el select de bancos si no hay proveedor seleccionado
+            $('#id_proveedor_banco').empty().append('<option value="">Seleccione un banco</option>');
+        }
+    });
+
+      function cargarBancosProveedor(idProveedor) {
+        $.ajax({
+            url: base_url + "index.php/Principal/obtenerBancosProveedor",
+            type: 'GET',
             dataType: 'json',
-            delay: 250, // Esperar 250ms después de que el usuario deja de escribir
-            data: function (params) {
-               console.log();
-                return {
-                    q: params.term // Término de búsqueda
-                };
+            data: {
+                id_proveedor: idProveedor
             },
-            processResults: function (data) {
-                //El backend ya devuelve el formato correcto {results: [...]}, así que solo lo retornamos
-                return data; 
+            beforeSend: function() {
+                // Mostrar loading
+                $('#id_proveedor_banco').empty().append('<option value="">Cargando bancos...</option>');
             },
-            cache: true // Mejorar el rendimiento para búsquedas repetidas
+            success: function(response) {
+                console.log(response  );
+                $('#id_proveedor_banco').empty();
+                
+                if (response && response.length > 0) {
+                    // Agregar opción por defecto
+                    $('#id_proveedor_banco').append('<option value="">Seleccione un banco</option>');
+                    
+                    $.each(response, function(index, banco) {    
+                        $('#id_proveedor_banco').append(
+                            $('<option>', {
+                                value: banco.id_proveedor_banco,
+                                text: banco.banco + ' - ' + banco.no_cuenta + ' - ' + banco.clabe
+                            })
+                        );
+                    });
+                } else {
+                    $('#id_proveedor_banco').append('<option value="">No hay bancos registrados</option>');
+                }
+            },
+            error: function() {
+                $('#id_proveedor_banco').empty().append('<option value="">Error al cargar bancos</option>');
+            }
+        });
+     }
+
+$('#form_vehiculo').on('submit', function(e) {
+    e.preventDefault();
+
+    var formData = new FormData(this);
+    $.ajax({
+        type: "POST",
+        url: "<?= base_url()?>index.php/Agregar/guardaVe",
+        data: formData,
+        processData: false,
+        contentType: false,
+        dataType: "json",
+        success: function (response) {
+            console.log(response);
+            if(!response.error){
+                Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
+                setTimeout(() => {
+                    window.location.href = base_url + "index.php/Principal/tablaArchivosVehiculos/"+response.idRegistro+'/PT';
+                }, 1500);
+            }else{
+                Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
+            }
+        },
+        beforeSend: function (info){
+            $('#btnGuardaGo').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+        },
+        complete: function (info){
+            $('#btnGuardaGo').prop('disabled', false).html('Guardar');
+        },
+        error: function (response,jqXHR, textStatus, errorThrown) {
+            var res= JSON.parse(response.responseText);
+            Swal.fire("Error", '<p> '+ res.message + '</p>');  
         }
     });
 });

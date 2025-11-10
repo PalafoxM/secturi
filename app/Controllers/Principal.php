@@ -2380,6 +2380,23 @@ class Principal extends BaseController
         $data['contentView'] = 'personal/vTablaArchivos';
         $this->_renderView($data);
     }
+    public function tablaArchivosVehiculos($id = null, $tipo = null)
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        if ($tipo != 'PT') {
+            $data['layout'] = 'plantilla/lytVacio';
+            $data['contentView'] = 'secciones/vError500';
+            $this->_renderView($data);
+            die();
+        }
+    
+        $data['id_registro'] = $id;
+        $data['tipo'] = $tipo;
+        $data['scripts'] = array('inicio');
+        $data['contentView'] = 'personal/vTablaArchivosVehiculo';
+        $this->_renderView($data);
+    }
 
     public function familiaSecturi()
     {
@@ -4201,6 +4218,128 @@ class Principal extends BaseController
         exit();
 
     }
+    public function ImprimirVPT($id_pt = null, $savePath = null)
+    {
+      $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $data = [];
+        $id_reserva = null;
+
+   
+
+        $vehiculo = $globals->getTabla([
+            'tabla' => 'pt_vehiculo',
+            'where' => ['visible' => 1, 'id_vehiculo' => $id_pt]
+        ]);
+
+      
+        if (isset($vehiculo->data) && !empty($vehiculo->data)) {
+            $data['vehiculo'] = $vehiculo->data[0];
+            $folio = $globals->getTabla([
+                'tabla' => 'vw_direccion',
+                'where' => ['visible' => 1, 'id_area' =>  $vehiculo->data[0]->id_direccion_responsable]
+            ]);
+            $proveedor = $globals->getTabla([
+                'tabla' => 'proveedor',
+                'where' => ['visible' => 1, 'id_proveedor' =>  $vehiculo->data[0]->id_proveedor]
+            ]);
+
+            
+            $folio =(isset( $direccion->data) && !empty( $direccion->data))? $direccion->data[0]->folio_prefijo:'S/N/';
+            $folio_prefijo = $folio . 'FALTA' . '/' . date('Y'); //ESTO HAY QUE OREGUNTAR
+            $data['folio'] = $folio_prefijo;
+            $data['proveedor'] = (isset( $proveedor->data) && !empty( $proveedor->data))? $proveedor->data[0]:'';
+        }
+        
+        $html = view('secciones/vFormatoVI.php', $data);
+        $htmlSegundaHoja = view('secciones/vFormatoVI2.php', $data);
+        $htmlTercerHoja = view('personal/vFormatoVI702.php', $data);
+
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 0,
+            'margin_left' => 1,
+            'margin_right' => 1,
+            'format' => [213, 268],
+            'mirrorMargins' => false,
+        ]);
+
+        // Importar PDF base (anexo07)
+
+        $pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/plantillas/anexo07_2.pdf');
+
+        for ($i = 1; $i <= $pagecount; $i++) {
+            $mpdf->AddPage();
+            $tplId = $mpdf->ImportPage($i);
+            $mpdf->UseTemplate($tplId);
+
+            if ($i == 1) {
+                $mpdf->WriteHTML($html);
+            }
+            if ($i == 2) {
+                $mpdf->WriteHTML($htmlSegundaHoja);
+                $facturas = $formatos->data;
+
+                if (!empty($facturas)) {
+                    foreach ($facturas as $index => $factura) {
+                        $facturaPath = FCPATH . $factura->ruta_relativa;
+
+                        if (file_exists($facturaPath)) {
+                            $facturaPageCount = $mpdf->SetSourceFile($facturaPath);
+
+                            for ($j = 1; $j <= $facturaPageCount; $j++) {
+                                $mpdf->AddPage();
+                                $tplFactura = $mpdf->ImportPage($j);
+
+                                // Escribir HTML solo en la primera página de la primera factura
+                                if ($index === 0 && $j === 1) {
+                                    $mpdf->WriteHTML($htmlTercerHoja);
+                                }
+
+                                // Escalar factura
+                                $templateSize = $mpdf->GetTemplateSize($tplFactura);
+                                $scaleFactor = 0.6; // ajusta si es necesario
+                                $width = $templateSize['width'] * $scaleFactor;
+                                $height = $templateSize['height'] * $scaleFactor;
+
+                                $mpdf->UseTemplate($tplFactura, 40, 55, $width, $height);
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+
+        if ($savePath) {
+            $mpdf->Output($savePath, 'F'); // F = write to file
+            return $savePath;
+        }
+
+        $mpdf->Output('Formato_pt.pdf', 'I');
+        exit();
+
+    }
+
+    public function obtenerBancosProveedor()
+    {
+        $idProveedor = $this->request->getGet('id_proveedor');
+        $globals = new Mglobal;
+        $response = new \stdClass();
+
+        if (empty($idProveedor)) {
+            return $this->respond(['bancos' => []]);
+        }  
+        $proveedorBanco = $globals->getTabla([
+            'tabla' => 'proveedor_banco',
+            'where' => ['visible' => 1, 'id_proveedor_banco' => $idProveedor],
+        ]);
+             
+        // Tu modelo para obtener bancos
+        $bancos = (isset($proveedorBanco->data) && !empty( $proveedorBanco->data))?$proveedorBanco->data:'';
+    
+        
+        return $this->respond($bancos);
+    }
 
     public function buscarProveedor()
     {
@@ -4235,9 +4374,7 @@ class Principal extends BaseController
     }
   public function buscarProveedor2()
     {
-        // 1. Select2 envía el término de búsqueda en un parámetro llamado 'q' (query)
-        $termino = $this->request->getPost('q'); 
-        
+       $termino = $this->request->getGet('q'); // Cambia a 'term'
         // Si no hay término, devolvemos una lista vacía para evitar errores
         if (empty($termino)) {
             return $this->respond(['results' => []]);
@@ -4259,7 +4396,7 @@ class Principal extends BaseController
             'orlike' => $like,
             'limit' => 20 // ¡RECOMENDADO! Un límite más bajo (10-20) mejora la UX.
         ]);
-
+       
         // Inicializamos el array de resultados para Select2
         $resultados_select2 = [];
 
@@ -4272,7 +4409,7 @@ class Principal extends BaseController
                     // 'id' debe ser el valor que guardas (el ID del proveedor)
                     'id' => $a->id_proveedor, 
                     // 'text' es lo que el usuario ve (la razón social)
-                    'text' => $a->razon_social 
+                    'text' => $a->razon_social .' / '.$a->rfc .' / '.$a->no_proveedor
                 ];
             }
         }

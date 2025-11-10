@@ -1876,7 +1876,7 @@ class Agregar extends BaseController
             'comision' => $data['comision'],
             'no_reserva' => $data['no_reserva']
         ];
-        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaTurno'];
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaPT'];
         if ($data['editar'] == 0) {
             $dataInsert['usu_reg'] = $session->get('id_usuario');
             $dataInsert['fec_reg'] = date('Y-m-d H:i:s');
@@ -1967,6 +1967,190 @@ class Agregar extends BaseController
 
 
         }
+        return $this->respond($response);
+    }
+    public function guardaVe()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = "Error|Error al guardar PT";
+        $this->globals = new Mglobal();
+        $data = $this->request->getPost();
+        $archivos = $this->request->getFiles();
+   
+        if (empty($data['id_proveedor'])) {
+            $response->error = true;
+            $response->respuesta = "Es requerido el Secretario o Director";
+            return $this->respond($response);
+        }
+        if (isset($data['id_proveedor_banco']) && empty($data['id_proveedor_banco'])) {
+            $response->error = true;
+            $response->respuesta = "Es requerido el Cuenta Bancaria";
+            return $this->respond($response);
+        }
+        
+        if (($data['direccion_responsable']) == 0) {
+            $response->error = true;
+            $response->respuesta = "Es requerido el Dirección Responsable";
+            return $this->respond($response);
+        }
+        if ($data['secretario'] == 0) {
+            $response->error = true;
+            $response->respuesta = "Es requerido el Secretario o Director";
+            return $this->respond($response);
+        }
+
+        if (($data['id_reponsable_solicitud']) == 0) {
+            $response->error = true;
+            $response->respuesta = "Es requerido el Responsable de la Solicitud";
+            return $this->respond($response);
+        }
+     
+     
+        if (isset($data['fecha_inicio']) && empty($data['fecha_inicio'])) {
+            $response->error = true;
+            $response->respuesta = "Es requerido el fecha gasto inicio";
+            return $this->respond($response);
+        }
+        if (isset($data['fecha_fin']) && empty($data['fecha_fin'])) {
+            $response->error = true;
+            $response->respuesta = "Es requerido el fecha gasto fin";
+            return $this->respond($response);
+        }
+
+
+        if (isset($data['concepto_pago']) && empty($data['concepto_pago'])) {
+            $response->error = true;
+            $response->respuesta = "Es requerido el concepto_pago";
+            return $this->respond($response);
+        }
+        if (isset($data['id_subsecretario']) && empty($data['id_subsecretario'])) {
+            $response->error = true;
+            $response->respuesta = "Es requerido el id_subsecretario";
+            return $this->respond($response);
+        }
+
+        foreach($archivos as $key =>$archivo){
+            $tipo = $archivo->getMimeType();
+            if (in_array($tipo, ['text/pdf', 'application/pdf'])) {
+                $timestamp = date('Ymd_His');
+                $extension = $archivo->getClientExtension();
+                $originalName = pathinfo($archivo->getName(), PATHINFO_FILENAME);
+                $file = '03_CFDI_' . $key . '_' . $timestamp . '.' . $extension;
+                // Ruta absoluta
+                $ruta_destino = FCPATH . 'assets/pdf/';
+                $archivo->move($ruta_destino, $file);
+                $ruta_relativa = 'assets/pdf/' . $file;
+             
+            }
+
+
+            if (in_array($tipo, ['text/xml', 'application/xml'])) {
+                $contenido = file_get_contents($archivo->getTempName());
+
+                libxml_use_internal_errors(true);
+                $xml = simplexml_load_string($contenido);
+
+                if ($xml === false) {
+                    return false;
+                }
+
+                $namespaces = $xml->getNamespaces(true);
+                $cfdi = $xml->children($namespaces['cfdi']);
+
+                $attrs = $xml->attributes();
+                $version = (string) $attrs['Version'];
+                $fecha = (string) $attrs['Fecha'];
+                $total = (string) $attrs['Total'];
+                $moneda = (string) $attrs['Moneda'];
+                $Serie = (string) $attrs['Serie'];
+                $Folio = (string) $attrs['Folio'];
+                $FormaPago = (string) $attrs['FormaPago'];
+                $CondicionesDePago = (string) $attrs['CondicionesDePago'];
+                $SubTotal = (float) $attrs['SubTotal'];
+                $Descuento = isset($attrs['Descuento']) ? (float) $attrs['Descuento'] : 0;
+                $TipoCambio = isset($attrs['TipoCambio']) ? (float) $attrs['TipoCambio'] : 1;
+
+                $Certificado = (string) $attrs['Certificado'];
+                $NoCertificado = (string) $attrs['NoCertificado'];
+
+                // ✅ Emisor
+                $emisor = $cfdi->Emisor->attributes();
+                $rfcEmisor = (string) $emisor['Rfc'];
+                $nombreEmisor = (string) $emisor['Nombre'];
+
+                // ✅ Receptor
+                $receptor = $cfdi->Receptor->attributes();
+                $rfcReceptor = (string) $receptor['Rfc'];
+                $nombreReceptor = (string) $receptor['Nombre'];
+
+                // ✅ UUID - CÓDIGO CORREGIDO
+                $uuid = '';
+                $NoCertificado = '';
+
+                // Verificar si existe el complemento
+                if (isset($cfdi->Complemento)) {
+                    // Obtener el namespace correcto para el timbre fiscal
+                    $tfdNamespace = isset($namespaces['tfd']) ? $namespaces['tfd'] : 'http://www.sat.gob.mx/TimbreFiscalDigital';
+
+                    $complemento = $cfdi->Complemento->children($tfdNamespace);
+
+                    // Verificar si existe el TimbreFiscalDigital
+                    if (isset($complemento->TimbreFiscalDigital)) {
+                        $tfdAttributes = $complemento->TimbreFiscalDigital->attributes();
+                        $uuid = (string) $tfdAttributes['UUID'];
+                        $NoCertificado = (string) $tfdAttributes['NoCertificadoSAT'];
+                    }
+                }
+
+            }
+
+        }
+        
+            
+        
+        $dataInsert = [
+
+            'id_direccion_responsable' => $data['direccion_responsable'],
+            'id_proveedor' => $data['id_proveedor'],
+            'fecha_tramite' => $data['fecha_tramite'],
+            'id_responsable' => (int) $data['id_reponsable_solicitud'],
+            'id_director' => 1,
+            'id_secretario' => $data['secretario'],
+            'id_subsecretario' => $data['id_subsecretario'],
+            'id_banco_proveedor' => $data['id_proveedor_banco'],
+            'fec_inicio' => $data['fecha_inicio'],
+            'fec_fin' => $data['fecha_inicio'],
+            'concepto' => $data['concepto_gasto'],
+            'comision' => $data['comision'],
+            'pdf' => $ruta_relativa,
+            'xml_monto' => $total,
+            'xml_rfc' => $rfcEmisor,
+            'xml_razon_social' => $nombreReceptor
+        ];
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaPTVehiculos'];
+        if ($data['editar'] == 0) {
+            $dataInsert['usu_reg'] = $session->get('id_usuario');
+            $dataInsert['fec_reg'] = date('Y-m-d H:i:s');
+            $dataConfig = [
+                "tabla" => "pt_vehiculo",
+                "editar" => false
+            ];
+        } else {
+            $dataConfig = [
+                "tabla" => "pt_vehiculo",
+                "editar" => true,
+                'idEditar' => ['id_vehiculo' => $data['id_registro_pt']]
+            ];
+            $dataInsert['usu_act'] = $session->get('id_usuario');
+        }
+
+
+        $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+
+
+        
         return $this->respond($response);
     }
     public function guardaPT2()
