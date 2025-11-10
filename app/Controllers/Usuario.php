@@ -1061,6 +1061,7 @@ class Usuario extends BaseController
         
         if( isset($vehiculo->data) && !empty($vehiculo->data)){
             $idUser =  $vehiculo->data[0]->id_usuario;
+            $data['id_proyecto'] =  $vehiculo->data[0]->id_proyecto;
             $usuario = $Mglobal->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $idUser]]);
             $data['usuario'] = (isset($usuario->data) && !empty( $usuario->data))?$usuario->data[0]:'';
 

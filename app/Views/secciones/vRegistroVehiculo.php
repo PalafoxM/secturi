@@ -28,6 +28,7 @@
                    
                             <form id="form_vehiculo" enctype="multipart/form-data">
                                 <input type="hidden" name="editar" value="0">
+                                <input type="hidden" name="id_proyecto" value="<?= $id_proyecto?>">
                                 <div class="form-row">
                                     <!-- Dirección Responsable -->
                                     <div class="col-md-6 mb-6">

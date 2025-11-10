@@ -291,7 +291,7 @@
 <?= $registro->total_importe.' ('.$numero_texto.')' ?>
 <?php endif; ?>
 <?php if($fic): ?>
-<?= $reserva[0]->total_importe.' ('.$numero_texto.')' ?>
+<?= $presupuesto[0]->importe.' ('.$numero_texto.')' ?>
 <?php endif; ?>
 </div>
 

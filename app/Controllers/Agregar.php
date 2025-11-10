@@ -2124,6 +2124,7 @@ class Agregar extends BaseController
             'fec_fin' => $data['fecha_inicio'],
             'concepto' => $data['concepto_gasto'],
             'comision' => $data['comision'],
+            'id_proyecto' => $data['id_proyecto'],
             'pdf' => $ruta_relativa,
             'xml_monto' => $total,
             'xml_rfc' => $rfcEmisor,

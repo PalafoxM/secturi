@@ -19,116 +19,48 @@
             <span > </span>
         </div>
         <div  style="position:absolute; top:38.5%; left:64%; width:33%; background-color:white; font-size: 9px;  height:12px;">
-            <span class="proxima ">rfc</span>
+            <span class="proxima "> <?= $proveedor->rfc ?> </span>
         </div>
         <div  style="position:absolute; top:40.8%; left:60.8%; width:36%; background-color:white; font-size: 12px;  height:12px;">
-
-      
-            <span class="proxima "><STRONG>NOMBRE DEL PROVEEDOR :</STRONG><?= (isset($registro->dsc_proveedor) && !empty($registro->dsc_proveedor))?strtoupper($registro->dsc_proveedor):'' ?></span>
+            <span class="proxima "><STRONG>NOMBRE DEL PROVEEDOR :</STRONG> <?= $proveedor->razon_social;?> </span>
         
         </div>
           <div  style="position:absolute; top:42%; left:60.8%; width:36%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><strong>NO. CUENTA :</strong><?= ($fic)?$registro->no_cuenta: (isset($no_cuenta) && !empty($no_cuenta)?$no_cuenta:'') ?></span>
+            <span class="proxima "><strong>NO. CUENTA : <?= $proveedorBanco->no_cuenta ?> </span>
         </div>
         <div  style="position:absolute; top:43%; left:60.8%; width:36%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><STRONG>BANCO: </STRONG><?= ($fic)?$registro->banco:$banco ?></span>
+            <span class="proxima "><STRONG>BANCO: </STRONG><?= $proveedorBanco->banco?></span>
         </div>
          <div  style="position:absolute; top:44.3%; left:60.8%; width:36%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><STRONG>CLABE:</STRONG> <?= ($fic)?$registro->clabe:$clabe ?></span>
+            <span class="proxima "><STRONG>CLABE:</STRONG> <?= $proveedorBanco->clabe ?></span>
         </div>
          <div  style="position:absolute; top:45.3%; left:60.8%; width:35%; background-color:white; font-size: 12px;  height:15px;">
             <span class="proxima "></span>
         </div>
-        <?php $i = 34;  ?>
-        <?php if($fic): ?>
-        <?php foreach($reserva as $r): ?>
-         <div  style="position:absolute; text-align:center; top:<?=$i?>%; left:17.5%; width:13%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><?= $r->proyecto ?></span>
+
+         <div  style="position:absolute; text-align:center; top:34%; left:17.5%; width:13%; background-color:white; font-size: 12px;  height:12px;">
+            <span class="proxima "><?= $proyecto->proyecto ?></span>
         </div>
-         <div  style="position:absolute; text-align:center; top:<?=$i?>%; left:3%; width:13%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "></span>
+
+         <div  style="position:absolute; text-align:center; top:34%; left:31.7%; width:13%; background-color:white; font-size: 12px;  height:12px;">
+            <span class="proxima "> 3550 </span>
         </div>
-        <?php $i = $i + 1.5; ?>
-        <?php endforeach; ?>
-         <?php endif; ?>
-        <?php if(!$fic): ?>
-        <?php foreach($presupuesto as $r): ?>
-         <div  style="position:absolute; text-align:center; top:<?=$i?>%; left:17.5%; width:13%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><?= $r->proyecto ?></span>
-        </div>
-         <div  style="position:absolute; text-align:center; top:<?=$i?>%; left:3%; width:13%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "></span>
-        </div>
-        <?php $i = $i + 1.5; ?>
-        <?php endforeach; ?>
-        <?php endif; ?>
-        <?php $i = 34;  ?>
-        <?php if($fic): ?>
-        <?php foreach($reserva as $r): ?>
-         <div  style="position:absolute; text-align:center; top:<?=$i?>%; left:31.7%; width:13%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><?= $r->partida ?></span>
-        </div>
-        <?php $i = $i + 1.5; ?>
-        <?php endforeach; ?>
-         <?php endif; ?>
-        <?php if(!$fic): ?>
-        <?php foreach($presupuesto as $r): ?>
-         <div  style="position:absolute; text-align:center; top:<?=$i?>%; left:31.7%; width:13%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><?= $r->partida ?></span>
-        </div>
-        <?php $i = $i + 1.5; ?>
-        <?php endforeach; ?>
-         <?php endif; ?>
-         <?php $i = 34;  ?>
-         <?php if($fic): ?>
-        <?php foreach($reserva as $r): ?>
-              <div style="position:absolute; text-align:center; top:<?=$i?>%; left:46.4%; width:13%; background-color:white; font-size:10px; height:12px; line-height:12px;">
+  
+              <div style="position:absolute; text-align:center; top:34%; left:46.4%; width:13%; background-color:white; font-size:10px; height:12px; line-height:12px;">
                     <span class="proxima">
-                        <?php 
-                        $importe = $r->importe;
-                        if (is_numeric($importe)) {
-                            echo '$' . number_format(floatval($importe), 2);
-                        } else {
-                            $limpio = preg_replace('/[^\d\.\-]/', '', (string)$importe);
-                            echo '$' . (is_numeric($limpio) ? number_format(floatval($limpio), 2) : '0.00');
-                        }
-                        ?>
+                       importe4
                     </span>
                 </div>
-            <?php $i += 1.5; ?>
-        <?php endforeach; ?>
-        <?php endif; ?>
-         <?php if(!$fic): ?>
-        <?php foreach($importe as $r): ?>
-              <div style="position:absolute; text-align:center; top:<?=$i?>%; left:46.4%; width:13%; background-color:white; font-size:10px; height:12px; line-height:12px;">
-                    <span class="proxima">
-                        <?php 
-                        $importe = $r->importe;
-                        if (is_numeric($importe)) {
-                            echo '$' . number_format(floatval($importe), 2);
-                        } else {
-                            $limpio = preg_replace('/[^\d\.\-]/', '', (string)$importe);
-                            echo '$' . (is_numeric($limpio) ? number_format(floatval($limpio), 2) : '0.00');
-                        }
-                        ?>
-                    </span>
-                </div>
-            <?php $i += 1.5; ?>
-        <?php endforeach; ?>
-        <?php endif; ?>
-        
     
-             <?php $i = 34;  ?>
-            <?php foreach( $uuid as $u ): ?>
-                <div style="position:absolute; text-align:center; top:<?=$i?>%; left:2.7%; width:13.8%; background-color:white; font-size: 12px;  height:12px;">
-                  <p><?= $u->uuid; ?></p>
+
+                <div style="position:absolute; text-align:center; top:34%; left:2.7%; width:13.8%; background-color:white; font-size: 12px;  height:12px;">
+                  <p>uuid</p>
                  </div>
-            <?php $i += 1.5; ?>
-            <?php endforeach; ?>
+    
 
    
         <div  style="position:absolute; text-align:right; top:52.2%; left:44%; width:15%; background-color:white; font-size: 12px;  height:12px;">
-            <span>$<?= ($fic)?$reserva[0]->total_importe:$registro->total_importe; ?></span>
+            <span>$importe</span>
         </div>
         <div  style="position:absolute; text-align:center; top:51.8%; left:60%; width:37.5%; background-color:white; font-size: 12px;  height:20px;">
             <span class="proxima "><strong><?= ($numero_texto); ?></strong></span>
