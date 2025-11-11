@@ -300,6 +300,7 @@ $(document).ready(function() {
             },
             beforeSend: function() {
                 // Mostrar loading
+               
                 $('#id_proveedor_banco').empty().append('<option value="">Cargando bancos...</option>');
             },
             success: function(response) {
@@ -322,6 +323,7 @@ $(document).ready(function() {
                     $('#id_proveedor_banco').append('<option value="">No hay bancos registrados</option>');
                 }
             },
+
             error: function() {
                 $('#id_proveedor_banco').empty().append('<option value="">Error al cargar bancos</option>');
             }
@@ -351,10 +353,11 @@ $('#form_vehiculo').on('submit', function(e) {
             }
         },
         beforeSend: function (info){
-            $('#btnGuardaGo').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+            //$('#btnGuardaVi').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+            $('#btnGuardaVi').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
         },
         complete: function (info){
-            $('#btnGuardaGo').prop('disabled', false).html('Guardar');
+            $('#btnGuardaVi').prop('disabled', false).html('Guardar');
         },
         error: function (response,jqXHR, textStatus, errorThrown) {
             var res= JSON.parse(response.responseText);

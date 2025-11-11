@@ -2893,11 +2893,25 @@ class Principal extends BaseController
             'where' => ['visible' => 1, 'id_vehiculo' => $id_registro_pt]
         ]);
         if(isset($vehiculo->data) && !empty($vehiculo->data)){
-            $data['vehiculo'] = (isset($vehiculo->data) && !empty($vehiculo))?$vehiculo->data:[];
+            $data['vehiculo'] = (isset($vehiculo->data) && !empty($vehiculo))?$vehiculo->data[0]:[];
+            $importe_str= $vehiculo->data[0]->xml_monto;
+            $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
+            $data['numero_texto'] = $this->numeroEnLetras($importe_float);
             $direccion = $globals->getTabla([
                 'tabla' => 'vw_direccion',
                 'where' => ['visible' => 1, 'id_director' => $vehiculo->data[0]->id_director ]
             ]);
+            $proyecto = $globals->getTabla([
+                'tabla' => 'cat_proyecto',
+                'where' => ['visible' => 1, 'id_proyecto' => $vehiculo->data[0]->id_proyecto ]
+            ]);
+            $data['proyecto'] = isset($proyecto->data) && !empty($proyecto->data)?$proyecto->data[0]:[];
+            $responsableGasto = $globals->getTabla([
+                'tabla' => 'vw_direccion',
+                'where' => ['visible' => 1, 'id_direccion' => $vehiculo->data[0]->id_direccion_responsable ]
+            ]);
+        
+            $data['responsableGasto'] = isset($responsableGasto->data) && !empty($responsableGasto->data)?$responsableGasto->data[0]:[];
         }
     
       
@@ -2913,7 +2927,7 @@ class Principal extends BaseController
             switch ($id_archivo) {
                 case 1:
                     $doc = 'assets/pdf/plantillas/anexo01.pdf';
-                    $formato = 'personal/vFormato01.php';
+                    $formato = 'personal/vFormato01Ve.php';
                     break;
                 case 4:
                     $data['layout'] = 'plantilla/lytVacio';
@@ -2925,6 +2939,7 @@ class Principal extends BaseController
 
             }
         
+           // die( var_dump($data) );
 
         $html = view($formato, $data);
         $htmlSegundaHoja = view('personal/vFormato02Ve.php', $data);

@@ -28,34 +28,18 @@
         <div  style="position:absolute; text-align:justify;top:31.5%; left:7.5%; width:85%; height:35px; background-color:white; font-size:13px; ">
             <span class="proxima">Solicito que se realice trámite de pago del comprobante(s) fiscal con
             <strong>
-
-            <?php 
-            $keys = array_keys($uuid);
-            $lastKey = end($keys);
-            foreach($uuid as $key => $u): ?>
-                <?= $u->uuid ?><?= $key !== $lastKey ? ',' : '' ?>
-            <?php endforeach; ?>
-
-           
+           <?= $vehiculo->xml_uuid ?>
             </strong>
-                 derivado del contrato ó convenio número <strong> <?= (isset($reserva->no_convenio) && !empty($reserva->no_convenio))?$reserva->no_convenio:'S/N' ;?></strong> por la cantidad de <strong>$<?= ($fic)?$reserva->total_importe:( isset($registro->total_importe) && !empty($registro->total_importe)?$registro->total_importe:'' ) ;?></strong>
+                 derivado del contrato ó convenio número <strong> <?= (isset($reserva->no_convenio) && !empty($reserva->no_convenio))?$reserva->no_convenio:'S/N' ;?></strong> por la cantidad de <strong>$<?= $vehiculo->xml_monto ;?></strong>
                  <strong>(<?= $numero_texto?>)</strong>, por el servicio de
                  <strong>
-            <?php if(!$fic): ?>
-            <?php foreach($presupuesto as $key => $p): ?>
-                <?= $p->dsc_partida ?><?= $key !== $lastKey ? ',' : '' ?>
-            <?php endforeach; ?>
-                <?php endif; ?>
-                <?php if($fic): ?>
-                <?= $registro->concepto_pago ?>
-                <?php endif; ?>
-                  
+                  3550
                 </strong> prestado por el proveedor <strong><?=(isset($reserva->razon_social) && !empty($reserva->razon_social))?$reserva->razon_social:'' ?></strong>. Se cuenta con suficiencia presupuestal en la(s) partida(s) 
                 <strong>
                  
-                     <?php foreach($presupuesto as $key => $p): ?>
-                    <?= $p->partida ?><?= $key !== $lastKey ? ',' : '' ?>
-                    <?php endforeach; ?>
+             
+                    <?= $proyecto->proyecto ?>
+         
                 </strong> correspondiente.
            </span>
         </div>
@@ -64,54 +48,45 @@
             <span class="proxima">SI</span>
         </div>
         <div  style="position:absolute; top:46.8%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
-            <span class="proxima"><?= (isset($GO) && !empty($GO))?$responsableGasto->nombre_completo:$registro->responsable ?></span>
+            <span class="proxima"><?= $responsableGasto->nombre_completo ?></span>
         </div>
         <div  style="position:absolute; top:49.5%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
-            <span class="proxima"> <?= (isset($GO) && !empty($GO))?$responsableGasto->dsc_puesto: $registro->dsc_puesto?></span>
+            <span class="proxima"> <?=$responsableGasto->dsc_puesto?></span>
         </div>
          <div  style="position:absolute; top:52.5%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
-            <span class="proxima"><?=  (isset($GO) && !empty($GO))?$responsableGasto->dsc_area: $registro->dsc_area ?></span>
+            <span class="proxima"><?=  $responsableGasto->dsc_area ?></span>
         </div>
-         <div  style="position:absolute; top:56.2%; left:49.5%; width:2%; height:20px; background-color:white; font-size: 10px; ">
-            <span class="proxima"><?= ($es4000)?'NO':'SI' ?></span>
-        </div>
-         <div  style="position:absolute; top:56.2%; left:55.5%; width:30%; height:20px; background-color:white; font-size: 10px; ">
-            <span class="proxima"><?= ($es4000)?'Ayuda/Aportación económica':'' ?></span>
-        </div>
+      
         <div  style="position:absolute; top:60%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
-            <span class="proxima"><?= (isset($GO) && !empty($GO))?$responsableGasto->nombre_completo:$registro->responsable ?></span>
+            <span class="proxima"><?= $responsableGasto->nombre_completo ?></span>
         </div>
          <div  style="position:absolute; top:62.5%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
-            <span class="proxima"> <?= (isset($GO) && !empty($GO))?$responsableGasto->dsc_puesto: $registro->dsc_puesto?></span>
+            <span class="proxima"> <?= $responsableGasto->dsc_puesto?></span>
         </div>
          <div  style="position:absolute; top:65.5%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
-             <span class="proxima"> <?= (isset($GO) && !empty($GO))?$responsableGasto->dsc_area: $registro->dsc_area?></span>
+             <span class="proxima"> <?= $responsableGasto->dsc_area?></span>
         </div>
          <div  style="position:absolute; top:73%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
-            <span class="proxima"><?= (isset($GO) && !empty($GO))?$responsableGasto->nombre_completo:$registro->responsable ?></span>
+            <span class="proxima"><?= $responsableGasto->nombre_completo ?></span>
         </div>
          <div  style="position:absolute; top:75.5%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
-            <span class="proxima"> <?= (isset($GO) && !empty($GO))?$responsableGasto->dsc_puesto: $registro->dsc_puesto?></span>
+            <span class="proxima"> <?= $responsableGasto->dsc_puesto?></span>
         </div>
          <div  style="position:absolute; top:78%; left:21.2%; width:30%; height:12px; background-color:white; font-size: 12px; ">
-             <span class="proxima"> <?= (isset($GO) && !empty($GO))?$responsableGasto->dsc_area: $registro->dsc_area?></span>
+             <span class="proxima"> <?= $responsableGasto->dsc_area ?></span>
         </div>
 
         <div  style="position:absolute; top:94.7%; left:21.2%; width:30%; height:10px; background-color:white; font-size: 10px; ">
-            <?php if(!$fic): ?>
-           <span class="proxima"><?= (isset($responsable) && !empty($responsable))?$responsable:'' ?></span>
-           <?php endif; ?>
-            <?php if($fic): ?>
-           <span class="proxima">LIC. HUGO RAMÍREZ DUARTE</span>
-           <?php endif; ?>
+          
+           <span class="proxima"><?= $responsableGasto->nombre_completo ?></span>
+          
+          
         </div>
          <div  style="position:absolute; top:96.8%; left:21.2%; width:35%; height:10px; background-color:white; font-size: 10px; ">
-              <?php if(!$fic): ?>
-           <span class="proxima"><?= (isset($dsc_puesto) && !empty($dsc_puesto))?$dsc_puesto:'' ?></span>
-           <?php endif; ?>
-            <?php if($fic): ?>
-           <span class="proxima">DIRECTOR DE COMPETITIVIDAD TURÍSTICA</span>
-           <?php endif; ?>
+          
+           <span class="proxima"><?= $responsableGasto->dsc_puesto ?></span>
+        
+       
         </div>
 
 
