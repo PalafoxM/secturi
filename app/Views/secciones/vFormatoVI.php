@@ -10,7 +10,7 @@
             <span class="proxima">PT <?= $folio;?></span>
         </div>
         <div  style="position:absolute;text-align:center; top:10%; left:92%; width:5%; height:18px; background-color:black; color:white; font-size: 12px; ">
-            <span class="proxima"><strong>V</strong></span>
+            <span class="proxima"><strong>V</span>
         </div>
         <div  style="position:absolute; top:36.2%; left:60.7%; width:35%; background-color:white; font-size: 12px;  height:12px;">
       
@@ -71,10 +71,7 @@
             <span class="proxima "><?= (isset($reserva[0]->no_convenio) && !empty($reserva[0]->no_convenio))?strtoupper($reserva[0]->no_convenio):'' ?></span>
         </div>
          <div  style="position:absolute; top:49.4%; left:12%; width:25%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima ">
-           
-                
-            </span>
+            <span class="proxima ">S/N</span>
         </div>
          <div  style="position:absolute;  text-align:center; top:67.7%; left:3.5%; width:30%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "><?= 'LIC. RODRIGO GONZÁLEZ GUERRERO' ?></span>

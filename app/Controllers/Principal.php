@@ -3088,9 +3088,7 @@ class Principal extends BaseController
         $uudi = $globals->getTabla(['tabla' => 'factura', 'where' => ['id_registro_pt' => $id_registro_pt, 'visible' => 1]]);
 
         if (isset($uudi->data) && !empty($uudi->data)) {
-
             $data['uuid'] = $uudi->data;
-
         }
         //die( var_dump(  $uudi ) );
         if (!empty($instrumento)) {

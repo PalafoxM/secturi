@@ -209,8 +209,8 @@
 </div>
  <div id="nombre">
 
-   <?php if(isset($resposableGasto->nombre_completo) && !empty($resposableGasto->nombre_completo)):  ?>
-   <span ><?= $resposableGasto->nombre_completo; ?> - <?= $resposableGasto->dsc_puesto ?> - <?= $resposableGasto->dsc_area ?> </span>
+   <?php if(isset($solicitud->nombre_completo) && !empty($solicitud->nombre_completo)):  ?>
+   <span ><?= $solicitud->nombre_completo; ?> - <?= $solicitud->dsc_puesto ?> - <?= $solicitud->dsc_area ?> </span>
     <?php endif; ?>
 
 
