@@ -27,7 +27,7 @@
                         <div class="card-body">
                    
                             <form id="form_vehiculo" enctype="multipart/form-data">
-                                <input type="hidden" name="editar" value="0">
+                                <input type="hidden" name="editar" value="<?= $editar ?>">
                                 <input type="hidden" name="id_proyecto" value="<?= $id_proyecto?>">
                                 <input type="hidden" name="no_consecutivo" value="<?= $no_consecutivo?>">
                                 <div class="form-row">

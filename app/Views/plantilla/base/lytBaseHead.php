@@ -525,6 +525,7 @@
                                             class="mdi mdi-chevron-right"></i></span></a>
                                 <ul class="nav-second-level" aria-expanded="false">
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/vehiculos">Vehiculos</a></li>
+                                    <li><a href="<?php echo base_url(); ?>index.php/Inicio/vehiculosPT">Vehiculos PT</a></li>
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/ListaInventario">Inventarios</a>
                                     </li>
 

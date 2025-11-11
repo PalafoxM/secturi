@@ -119,6 +119,13 @@
                                                         <div class="custom-dd dd" id="nestable_list_1">
                                                             <ol class="dd-list">
                                                                 <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Acuerdo Secretarial-004-2025.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                        Acuerdo Secretarial-004-2025
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
                                                                     <a target="_blank" href="<?= base_url().'assets/documentos/Programa de Gobierno 2024-2030.pdf' ?>">
                                                                         <div class="dd-handle">
                                                                         Programa de Gobierno 2024-2030

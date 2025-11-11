@@ -1040,7 +1040,7 @@ class Usuario extends BaseController
         return $this->respond($response);
     }
 
-    public function VehiculoTP($idVehiculo)
+    public function VehiculoTP($idVehiculo, $editar=null)
     {
         $response = new \stdClass();
         $data = $this->request->getPost();
@@ -1067,9 +1067,41 @@ class Usuario extends BaseController
 
         }
         $noConsecutivo = $Mglobal->getTabla(['tabla' => 'pt_vehiculo', 'where' => ['visible' => 1]]);
-       
+        $data['editar'] = 0;
         $data['no_consecutivo'] = count($noConsecutivo->data) +1;
    
+        $data['scripts'] = array('principal', 'inicio');
+        $data['contentView'] = 'secciones/vRegistroVehiculo';
+        $this->_renderView($data);
+
+    }
+    public function editarVehiculoTP($idVehiculo)
+    {
+        $response = new \stdClass();
+     
+        $Mglobal = new Mglobal;
+        $vehiculo = $Mglobal->getTabla(['tabla' => 'pt_vehiculo', 'where' => ['visible' => 1, 'id_vehiculo' => $idVehiculo]]);
+        if($vehiculo->data){
+            $data['id_proyecto'] = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->id_proyecto:'';
+            $data['no_consecutivo'] = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->no_consecutivo:'';
+
+        }
+      //  var_dump( $vehiculo );
+       // die();
+        $cat_area = $Mglobal->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
+        $cat_secretario = $Mglobal->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1]]);
+        $cat_subsecretario = $Mglobal->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1]]);
+        $cat_usuario = $Mglobal->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
+        $cat_director_general = $Mglobal->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1]]);
+        $proveedor = $Mglobal->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit' => 10]);
+        $data['cat_area'] = (isset( $cat_area->data) && !empty( $cat_area->data))? $cat_area->data:[];
+        $data['secretario'] = (isset( $cat_secretario->data) && !empty( $cat_secretario->data))? $cat_secretario->data:[];
+        $data['cat_subsecretario'] = (isset( $cat_subsecretario->data) && !empty( $cat_subsecretario->data))? $cat_subsecretario->data:[];
+        $data['cat_usuario'] = (isset( $cat_usuario->data) && !empty( $cat_usuario->data))? $cat_usuario->data:[];
+        $data['dsc_director_general'] = (isset( $cat_director_general->data) && !empty( $cat_director_general->data))? $cat_director_general->data[0]->dsc_director_general:[];
+        $data['proveedor'] = (!empty($proveedor->data)) ? $proveedor->data : [];
+  
+        $data['editar'] = 1;
         $data['scripts'] = array('principal', 'inicio');
         $data['contentView'] = 'secciones/vRegistroVehiculo';
         $this->_renderView($data);
