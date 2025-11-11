@@ -1995,9 +1995,9 @@ class Agregar extends BaseController
             $response->respuesta = "Es requerido el Dirección Responsable";
             return $this->respond($response);
         }
-        if ($data['secretario'] == 0) {
+        if ($data['id_secretario'] == 0) {
             $response->error = true;
-            $response->respuesta = "Es requerido el Secretario o Director";
+            $response->respuesta = "Es requerido el id_secretario ";
             return $this->respond($response);
         }
 
@@ -2025,9 +2025,9 @@ class Agregar extends BaseController
             $response->respuesta = "Es requerido el concepto_pago";
             return $this->respond($response);
         }
-        if (isset($data['id_subsecretario']) && empty($data['id_subsecretario'])) {
+        if (isset($data['id_responsable_gasto']) && empty($data['id_responsable_gasto'])) {
             $response->error = true;
-            $response->respuesta = "Es requerido el id_subsecretario";
+            $response->respuesta = "Es requerido el id_responsable_gasto";
             return $this->respond($response);
         }
 
@@ -2108,8 +2108,6 @@ class Agregar extends BaseController
 
         }
         
-            
-        
         $dataInsert = [
 
             'id_direccion_responsable' => $data['direccion_responsable'],
@@ -2117,8 +2115,8 @@ class Agregar extends BaseController
             'fecha_tramite' => $data['fecha_tramite'],
             'id_responsable' => (int) $data['id_reponsable_solicitud'],
             'id_director' => 1,
-            'id_secretario' => $data['secretario'],
-            'id_subsecretario' => $data['id_subsecretario'],
+            'id_secretario' => $data['id_secretario'],
+            'id_responsable_gasto' => $data['id_responsable_gasto'],
             'id_banco_proveedor' => $data['id_proveedor_banco'],
             'fec_inicio' => $data['fecha_inicio'],
             'fec_fin' => $data['fecha_inicio'],

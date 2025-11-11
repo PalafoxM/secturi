@@ -88,12 +88,12 @@ $fechaFormateada = $dia . ' de ' . $mes . ' del ' . $anio;
         </div>
          <div style="position:absolute; top:85%; left:9.5%; width:81%; height:20px; background-color:white; font-size:13px; text-align:center;">
             <span class="proxima">
-             <strong> <?= (isset($resposableGasto->nombre_completo) && !empty($resposableGasto->nombre_completo))?$resposableGasto->nombre_completo:''  ?> </strong>
+             <strong> <?= (isset($solicitud->nombre_completo) && !empty($solicitud->nombre_completo))?$solicitud->nombre_completo:''  ?> </strong>
             </span>
         </div>
            <div style="position:absolute; top:87%; left:9.5%; width:81%; height:20px; background-color:white; font-size:13px; text-align:center;">
             <span class="proxima">
-              <strong> <?= (isset($resposableGasto->dsc_puesto) && !empty($resposableGasto->dsc_puesto))?$resposableGasto->dsc_puesto:'' ?></strong>
+              <strong> <?= (isset($solicitud->dsc_puesto) && !empty($solicitud->dsc_puesto))?$solicitud->dsc_puesto:'' ?></strong>
             </span>
         </div>
        

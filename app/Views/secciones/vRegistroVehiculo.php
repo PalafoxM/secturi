@@ -69,9 +69,9 @@
                                             required>
                                     </div><!--end col-->
                                     <div class="col-md-4 mb-3">
-                                        <label for="reponsable_solicitud">Responsable de la Solicitud <span
+                                        <label for="id_reponsable_solicitud">Responsable de la Solicitud <span
                                                 style="color:red;">*</span></label>
-                                        <select name="id_reponsable_solicitud" class="form-control" required>
+                                        <select name="id_reponsable_solicitud" class="form-control select2" required>
                                             <?php foreach ($cat_usuario as $u): ?>
                                                 <?php
                                                 // Determina el valor que debe quedar seleccionado
@@ -101,9 +101,9 @@
                                         </div>
                                     </div><!--end col-->
                                     <div class="col-md-4 mb-3">
-                                        <label for="secretario">Secretario(a) o Director(a) que autoriza</label>
-                                        <select type="text" class="form-control" id="secretario"
-                                            placeholder="Secretario/a" name="secretario">
+                                        <label for="id_secretario">Secretario(a) o Director(a) que autoriza</label>
+                                        <select type="text" class="form-control " id="id_secretario"
+                                            placeholder="Secretario/a" name="id_secretario">
                                             <option value="0" selected>Seleccione una opcion</option>
                                             <?php foreach ($secretario as $s): ?>
                                                 <?php if (isset($registro_pt->secretario) && !empty($registro_pt->secretario)) { ?>
@@ -117,19 +117,16 @@
                                         </select>
                                     </div><!--end col-->
                                     <div class="col-md-4 mb-3">
-                                        <label for="secretario">Subsecretario(a) o Director(a) General
+                                        <label for="id_responsable_gasto">Responsable del Gasto
                                             Responsable</label><span class="text-danger">*</span>
-                                        <select type="text" class="form-control" id="id_subsecretario"
-                                            placeholder="Secretario/a" name="id_subsecretario">
+                                        <select type="text" class="form-control select2" id="id_responsable_gasto"
+                                            placeholder="Responsable" name="id_responsable_gasto">
                                             <option value="0" selected>Seleccione una opcion</option>
-                                            <?php foreach ($cat_subsecretario as $s): ?>
-                                                <?php if (isset($registro_pt->id_subsecretario) && !empty($registro_pt->id_subsecretario)) { ?>
-                                                    <option value="<?= $s->id_subsecretario ?>"
-                                                        <?= ($s->id_subsecretario == $registro_pt->id_subsecretario) ? 'selected' : '' ?>><?= $s->dsc_subsecretario ?></option>
-                                                <?php } else { ?>
-                                                    <option value="<?= $s->id_subsecretario ?>"><?= $s->dsc_subsecretario ?>
-                                                    </option>
-                                                <?php } ?>
+                                               <?php foreach ($cat_usuario as $u): ?>
+                                             
+                                                <option value="<?= $u->id_usuario ?>">
+                                                    <?= $u->nombre . ' ' . $u->primer_apellido . ' ' . $u->segundo_apellido ?>
+                                                </option>
                                             <?php endforeach; ?>
                                         </select>
                                     </div><!--end col-->

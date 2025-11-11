@@ -2897,9 +2897,9 @@ class Principal extends BaseController
             $importe_str= $vehiculo->data[0]->xml_monto;
             $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
             $data['numero_texto'] = $this->numeroEnLetras($importe_float);
-            $direccion = $globals->getTabla([
-                'tabla' => 'vw_direccion',
-                'where' => ['visible' => 1, 'id_area' => $vehiculo->data[0]->id_director ]
+            $responsable = $globals->getTabla([
+                'tabla' => 'vw_usuario',
+                'where' => ['visible' => 1, 'id_usuario' => $vehiculo->data[0]->id_responsable ]
             ]);
             $proyecto = $globals->getTabla([
                 'tabla' => 'cat_proyecto',
@@ -2908,17 +2908,18 @@ class Principal extends BaseController
             $data['proyecto'] = isset($proyecto->data) && !empty($proyecto->data)?$proyecto->data[0]:[];
             $responsableGasto = $globals->getTabla([
                 'tabla' => 'vw_direccion',
-                'where' => ['visible' => 1, 'id_area' => $vehiculo->data[0]->id_direccion_responsable ]
+                'where' => ['visible' => 1, 'id_director' => $vehiculo->data[0]->id_responsable_gasto ]
             ]);
         
             $data['responsableGasto'] = isset($responsableGasto->data) && !empty($responsableGasto->data)?$responsableGasto->data[0]:[];
+            $data['responsable'] = isset($responsable->data) && !empty($responsable->data)?$responsable->data[0]:[];
             $proveedor = $globals->getTabla([
                 'tabla' => 'proveedor',
                 'where' => ['visible' => 1, 'id_proveedor' => $vehiculo->data[0]->id_proveedor ]
             ]);
             $data['proveedor'] = isset($proveedor->data) && !empty($proveedor->data)?$proveedor->data[0]:[];
         }
-        // die( var_dump($data['proveedor'] ) );
+        //die( var_dump($data['responsable'] ) );
          $folio =(isset( $responsableGasto->data) && !empty( $responsableGasto->data))? $responsableGasto->data[0]->folio_prefijo:'S/N/';
           $no_consecutivo = "";
             if (strlen($vehiculo->data[0]->no_consecutivo) == 1) {
@@ -3091,7 +3092,7 @@ class Principal extends BaseController
             $data['uuid'] = $uudi->data;
 
         }
-        //die( var_dump( $data ) );
+        die( var_dump(  $uudi ) );
         if (!empty($instrumento)) {
             switch ($id_archivo) {
                 case 1:
@@ -4439,9 +4440,9 @@ class Principal extends BaseController
             $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
             $data['numero_texto'] = $this->numeroEnLetras($importe_float);
             
-            $resposableGasto = $globals->getTabla([
-                'tabla' => 'vw_direccion',
-                'where' => ['visible' => 1, 'id_area' =>  $vehiculo->data[0]->id_direccion_responsable]
+            $solicitud = $globals->getTabla([
+                'tabla' => 'vw_usuario',
+                'where' => ['visible' => 1, 'id_usuario' =>  $vehiculo->data[0]->id_responsable]
             ]);
             $proveedor = $globals->getTabla([
                 'tabla' => 'proveedor',
@@ -4460,13 +4461,13 @@ class Principal extends BaseController
                 'tabla' => 'cat_secretario',
                 'where' => ['visible' => 1, 'id_secretario' =>  $vehiculo->data[0]->id_secretario]
             ]);
-            $subsecretario = $globals->getTabla([
-                'tabla' => 'cat_subsecretario',
-                'where' => ['visible' => 1, 'id_subsecretario' =>  $vehiculo->data[0]->id_subsecretario]
+            $resposableGasto = $globals->getTabla([
+                'tabla' => 'vw_direccion',
+                'where' => ['visible' => 1, 'id_director' =>  $vehiculo->data[0]->id_responsable_gasto]
             ]);
-            
-         
     
+     
+         
                $no_consecutivo = "";
             if (strlen($vehiculo->data[0]->no_consecutivo) == 1) {
                 $no_consecutivo = '00' . $vehiculo->data[0]->no_consecutivo;
@@ -4479,17 +4480,17 @@ class Principal extends BaseController
             }
             
             $folio =(isset( $resposableGasto->data) && !empty( $resposableGasto->data))? $resposableGasto->data[0]->folio_prefijo:'S/N/';
-            $folio_prefijo = $folio . $no_consecutivo . '/' . date('Y').'-V';
+            $folio_prefijo = $folio . $no_consecutivo . '/' . date('Y');
             $data['folio'] = $folio_prefijo;
             $data['proveedor'] = (isset( $proveedor->data) && !empty( $proveedor->data))? $proveedor->data[0]:'';
             $data['proveedorBanco'] = (isset( $proveedorBanco->data) && !empty( $proveedorBanco->data))? $proveedorBanco->data[0]:'';
             $data['direccion'] = (isset( $direccion->data) && !empty( $direccion->data))? $direccion->data[0]:'';
             $data['proyecto'] = (isset( $proyecto->data) && !empty( $proyecto->data))? $proyecto->data[0]:'';
             $data['secretario'] = (isset( $secretario->data) && !empty( $secretario->data))? $secretario->data[0]:'';
-            $data['subsecretario'] = (isset( $subsecretario->data) && !empty( $subsecretario->data))? $subsecretario->data[0]:'';
+            $data['solicitud'] = (isset( $solicitud->data) && !empty( $solicitud->data))? $solicitud->data[0]:'';
             $data['resposableGasto'] = (isset( $resposableGasto->data) && !empty( $resposableGasto->data))? $resposableGasto->data[0]:'';
         }
-       // die( var_dump( $resposableGasto ) );
+
         $html = view('secciones/vFormatoVI.php', $data);
         $htmlSegundaHoja = view('secciones/vFormatoVI2.php', $data);
         $htmlTercerHoja = view('personal/vFormatoVI702.php', $data);

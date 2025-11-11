@@ -7,8 +7,10 @@
         </div>
 
         <div  style="position:absolute;text-align:center; top:18.2%; left:70.5%; width:25%; height:18px; background-color:white; font-size: 12px; ">
-           
             <span class="proxima">PT <?= $folio;?></span>
+        </div>
+        <div  style="position:absolute;text-align:center; top:10%; left:92%; width:5%; height:18px; background-color:black; color:white; font-size: 12px; ">
+            <span class="proxima"><strong>V</strong></span>
         </div>
         <div  style="position:absolute; top:36.2%; left:60.7%; width:35%; background-color:white; font-size: 12px;  height:12px;">
       
@@ -79,14 +81,14 @@
         </div>
   
          <div  style="position:absolute;  text-align:center; top:67.7%; left:35.5%; width:30%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><?= strtoupper($secretario->dsc_secretario); ?></span>
+            <span class="proxima "> <?= $secretario->dsc_secretario ?></span>
         </div>
          <div  style="position:absolute;  text-align:center; top:68.9%; left:35.5%; width:30%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><strong><?= strtoupper($secretario->dsc_puesto); ?></strong></span>
+            <span class="proxima "><strong> <?= $secretario->dsc_puesto ?></strong></span>
         </div>
        
-         <div  style="position:absolute;  text-align:center; top:67.7%; left:67.1%; width:30%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><?= $subsecretario->dsc_subsecretario?></span>
+         <div  style="position:absolute;  text-align:center; top:67.7%; left:67.1%; width:30%; background-color:white; font-size: 12px;  height:25px;">
+            <span class="proxima "> </span>
         </div>
  
 

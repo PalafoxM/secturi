@@ -4,7 +4,7 @@
   
 
         <div  style="position:absolute; text-align:center; top:21.5%; left:72%; width:25%; height:18px; background-color:white; font-size: 11px; ">
-            <span class="proxima">PT <?= strtoupper($folio);?></span>
+            <span class="proxima">PT <?= strtoupper($folio).'-V'?></span>
         </div>
         
         <div  style="position:absolute; text-align:center; top:47.6%; left:84.5%; width:7%; height:18px; background-color:white; font-size: 10px; ">
@@ -16,7 +16,7 @@
         <div  style="position:absolute; text-align:center; top:42.3%; left:84.5%; width:7%; height:18px; background-color:white; font-size: 10px; ">
    
       
-            <span class="proxima">N/A</span>
+            <span class="proxima">SI</span>
           
         </div>
         <div  style="position:absolute; text-align:center; top:29.5%; left:84.5%; width:7%; height:18px; background-color:white; font-size: 10px;">
