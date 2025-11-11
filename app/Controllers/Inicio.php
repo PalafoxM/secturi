@@ -336,7 +336,7 @@ class Inicio extends BaseController {
         $session = \Config\Services::session();
         $principal = new Mglobal;
    
-    if (!in_array($session->get('id_perfil'), [1, 3])) {
+        if (!in_array($session->get('id_perfil'), [1, 3])) {
             $data['contentView'] = 'secciones/vError500';
             $data['layout'] = 'plantilla/lytVacio';
             $this->_renderView($data);

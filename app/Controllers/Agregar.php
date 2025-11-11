@@ -3458,15 +3458,28 @@ class Agregar extends BaseController
         $fechaFin = date('Y-m-d', strtotime($fec_fin));
 
         $data = array();
-        $incidencia = $globals->getTabla([
-            'tabla' => 'vw_incidenica',
-            'where' => ['id_usuario' => $usuario, 'id_estatus' => 3],
-            'whereBetween' => [['fecha_inicio', $fechaInicio, $fechaFin]]
-        ]);
+        if($usuario == 'todos'){
+            $incidencia = $globals->getTabla([
+                'tabla' => 'vw_incidenica',
+                'where' => ['id_estatus' => 3],
+                'whereBetween' => [['fecha_inicio', $fechaInicio, $fechaFin]]
+            ]);
+        }else{
+             $incidencia = $globals->getTabla([
+                'tabla' => 'vw_incidenica',
+                'where' => ['id_usuario' => $usuario, 'id_estatus' => 3],
+                'whereBetween' => [['fecha_inicio', $fechaInicio, $fechaFin]]
+            ]);
 
+        }
+        //die( var_dump( $incidencia->data ) );
         $data['incidencia'] = (isset($incidencia->data) && !empty($incidencia->data)) ? $incidencia->data : '';
-        $data['usuario'] = (isset($incidencia->data) && !empty($incidencia->data)) ? $incidencia->data[0] : '';
-
+              if($usuario == 'todos'){
+                $data['usuario'] = (isset($incidencia->data) && !empty($incidencia->data)) ? $incidencia->data : '';
+              }else{
+                $data['usuario'] = (isset($incidencia->data) && !empty($incidencia->data)) ? $incidencia->data[0] : '';
+              }
+       
         $tempQrPath = FCPATH . 'assets/images/qr_final.png';
         $folio = 'GTO - ' . date('YmdHis') . substr((string) microtime(), 1, 4);
         // Generar el QR
@@ -3488,8 +3501,10 @@ class Agregar extends BaseController
         $data['dataImagen'] = $dataImagen;
         $data['folio'] = $folio;
 
+        $vista = ($usuario == 'todos')?'personal/vFormatoAsistenciaAll.php':'personal/vFormatoAsistenciaUser.php';
+
         $doc = 'assets/pdf/plantillas/asistencia.pdf';
-        $formato = 'personal/vFormatoAsistenciaUser.php';
+        $formato = $vista;
         $html = view($formato, $data);
         // Crear instancia de mPDF
         $mpdf = new \Mpdf\Mpdf([
@@ -3536,6 +3551,11 @@ class Agregar extends BaseController
         $id_usuario = $this->request->getPost('usuario');
         $fec_ini = date('Y-m-d', strtotime($periodoInicio));
         $fec_fin = date('Y-m-d', strtotime($periodoFin));
+        if($id_usuario == 'todos'){
+            $response->error = false;
+            $response->respuesta = 'Si existen incidencia del usuario';
+            return $this->respond($response);
+        }
         $tabla = [
             'tabla' => 'incidencia',
             'where' => ['id_usuario' => $id_usuario],

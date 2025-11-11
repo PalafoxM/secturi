@@ -71,6 +71,7 @@
                                                             <?php foreach($usuario as $p): ?>
                                                             <option value="<?= $p->id_usuario ?>" > <?= $p->nombre_completo ?> </option>
                                                             <?php endforeach; ?>
+                                                              <option value="todos" > TODO EL PERSONAL </option>
                                                         </select>
                                                 </div>
                                                   <div class="col-md-3">
@@ -319,7 +320,7 @@ $(document).ready(function() {
         // Agregar solo las opciones con id >= idInicio
         todasLasOpciones.forEach(option => {
             const idOpcion = parseInt(option.getAttribute('data-id'));
-            if (idOpcion >= idInicio+1) {
+            if (idOpcion >= idInicio) {
                 fin.appendChild(option.cloneNode(true));
             }
         });
