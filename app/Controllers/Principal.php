@@ -4165,7 +4165,8 @@ class Principal extends BaseController
             $data['uuid'] = $xml->data;
 
         }
-      
+         
+     // die( var_dump( $registro_pt ) );
         $data['FIC'] = false;
         $data['GO'] = false;
         if (!empty($registro_pt->data)) {
@@ -4173,6 +4174,10 @@ class Principal extends BaseController
             $id_reserva = $registro_pt->data[0]->id_reserva;
             $no_consecutivo = $registro_pt->data[0]->no_consecutivo;
             $data['registro'] = $registro;
+            $presupuestoPT = $globals->getTabla([
+                    'tabla' => 'vw_presupuesto',
+                    'where' => ['visible' => 1, 'id_reserva' => $registro_pt->data[0]->id_reserva]
+            ]);
          
             //validar si yo tengo folio 
             $direccion = $globals->getTabla([
@@ -4205,7 +4210,7 @@ class Principal extends BaseController
                 'where' => ['visible' => 1, 'id_reserva' => $id_reserva]
             ]);
             
-
+             
             if (!empty($reserva->data)) {
                 $data['reserva'] = $reserva->data;
                 $data['presupuesto'] = $reserva->data;
@@ -4268,8 +4273,100 @@ class Principal extends BaseController
         // Importar PDF base (anexo07)
 
         $pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/plantillas/anexo07_2.pdf');
+         for ($i = 1; $i <= $pagecount; $i++) {
+            $mpdf->AddPage();
+            $tplId = $mpdf->ImportPage($i);
+            $mpdf->UseTemplate($tplId);
 
-        for ($i = 1; $i <= $pagecount; $i++) {
+            if ($i == 1) {
+                $mpdf->WriteHTML($html);
+            }
+
+            if ($i == 2) {
+                $mpdf->WriteHTML($htmlSegundaHoja);
+                $facturas = $formatos->data;
+             
+                if (!empty($facturas)) {
+                   
+                   
+                        foreach ($facturas as $index => $facturaItem) {
+                      //   die( var_dump( $facturaItem ) );
+                          $data['partida'] =  $presupuestoPT->data[$index]->dsc_partida;
+                          $data['uuid'] =   $xml->data[$index]->uuid;
+                            
+                            $data['facturaItem'] = $facturaItem;
+                          
+                            $importe_str = $presupuestoPT->data[$index]->importe;
+                            $importe_float = (float) str_replace(',', '', $importe_str);
+                            $data['numero_texto2'] = $this->numeroEnLetras($importe_float);
+                            $data['importePartida'] = $presupuestoPT->data[$index]->importe;
+
+                            
+                            // 1️⃣ Agregamos una sola página con el formato 702GO
+                            $htmlTercerHoja = view('personal/vFormato702FIC.php', $data);
+                            $mpdf->AddPage();
+                            $mpdf->WriteHTML($htmlTercerHoja);
+
+                            // 2️⃣ Obtenemos las facturas relacionadas
+                            $factura_pdf = $globals->getTabla([
+                                'tabla' => 'factura_pdf',
+                                'where' => [
+                                    'visible' => 1,
+                                    'id_registro_pt' => $id_pt
+                                ]
+                            ]);
+                     
+                        
+                            //die();
+                            $facturas = isset($factura_pdf->data) && !empty($factura_pdf->data)
+                                ? $factura_pdf->data
+                                : [];
+                            
+                          
+                            // 3️⃣ Posición inicial (debajo del contenido del formato)
+                           $currentY = $mpdf->y + 60;
+
+                            // 4️⃣ Insertamos las facturas una debajo de otra
+                                
+                                $facturaPath = FCPATH . $facturas[$index]->ruta_relativa;
+
+                                if (file_exists($facturaPath)) {
+                                    $facturaPageCount = $mpdf->SetSourceFile($facturaPath);
+
+                                    for ($pageNum = 1; $pageNum <= $facturaPageCount; $pageNum++) {
+                                        $tplFactura = $mpdf->ImportPage($pageNum);
+                                        $templateSize = $mpdf->GetTemplateSize($tplFactura);
+
+                                        $scaleFactor = 0.6;
+                                        $width = $templateSize['width'] * $scaleFactor;
+                                        $height = $templateSize['height'] * $scaleFactor;
+
+                                        // 📍 Si no cabe en la hoja actual, saltamos a una nueva
+                                        if ($currentY + $height > $mpdf->h - 10) {
+                                            $mpdf->AddPage();
+                                            $currentY = 10;
+                                        }
+
+                                        // Centrar horizontalmente
+                                        $xPos = ($mpdf->w - $width) / 2;
+
+                                        // Insertamos la página de factura
+                                        $mpdf->UseTemplate($tplFactura, $xPos, $currentY, $width, $height);
+
+                                        // Avanzamos la posición Y para la siguiente
+                                        $currentY += $height + 10;
+                                    }
+                                }
+                            
+                        }
+                    }
+
+
+
+            }
+        }
+
+      /*   for ($i = 1; $i <= $pagecount; $i++) {
             $mpdf->AddPage();
             $tplId = $mpdf->ImportPage($i);
             $mpdf->UseTemplate($tplId);
@@ -4310,7 +4407,7 @@ class Principal extends BaseController
                 }
 
             }
-        }
+        } */
 
         if ($savePath) {
             $mpdf->Output($savePath, 'F'); // F = write to file
