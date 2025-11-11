@@ -30,12 +30,13 @@
                                 <input type="hidden" name="editar" value="<?= $editar ?>">
                                 <input type="hidden" name="id_proyecto" value="<?= $id_proyecto?>">
                                 <input type="hidden" name="no_consecutivo" value="<?= $no_consecutivo?>">
+                                <input type="hidden" name="id_vehiculo" value="<?= $id_vehiculo?>">
                                 <div class="form-row">
                                     <!-- Dirección Responsable -->
                                     <div class="col-md-6 mb-6">
                                         <label for="id_proveedor">Proveedor<span class="text-danger">*</span></label>
                                         <select class="form-control select2-ajax" id="id_proveedor" name="id_proveedor" required>
-                                            </select>
+                                        </select>
                                     </div>
                                     <div class="col-md-6 mb-6">
                                         <label for="id_proveedor_banco">Proveedor Banco<span class="text-danger">*</span></label>
@@ -51,9 +52,16 @@
                                         <select class="form-control" id="direccion_responsable"
                                             name="direccion_responsable" required>
                                             <?php foreach ($cat_area as $a): ?>
+                                                <?php if($editar == 0): ?>
                                                 <option value="<?= $a->id_area ?>" <?php echo ($a->id_area == $usuario->id_area) ? 'selected' : ''; ?>>
                                                     <?= $a->dsc_area ?>
                                                 </option>
+                                                <?php endif; ?>
+                                                <?php if($editar == 1): ?>
+                                                <option value="<?= $a->id_area ?>" <?php echo ($a->id_area == $id_direccion_responsable) ? 'selected' : ''; ?>>
+                                                    <?= $a->dsc_area ?>
+                                                </option>
+                                                <?php endif; ?>
                                             <?php endforeach; ?>
                                         </select>
                                         <div class="invalid-feedback">
@@ -76,11 +84,18 @@
                                                 <?php
                                                 // Determina el valor que debe quedar seleccionado
                                                 $selected = '';
+                                              if($editar == 0):
                                                 if (isset($registro_pt->id_reponsable_solicitud) && $registro_pt->id_reponsable_solicitud == $u->id_usuario) {
                                                     $selected = 'selected';
                                                 } elseif (!isset($registro_pt->id_reponsable_solicitud) && isset($usuario) && $usuario->id_usuario == $u->id_usuario) {
                                                     $selected = 'selected';
                                                 }
+                                                endif; 
+                                               if($editar == 1):
+                                                if (isset($id_responsable) && $id_responsable == $u->id_usuario) {
+                                                    $selected = 'selected';
+                                                } 
+                                                endif; 
                                                 ?>
                                                 <option value="<?= $u->id_usuario ?>" <?= $selected ?>>
                                                     <?= $u->nombre . ' ' . $u->primer_apellido . ' ' . $u->segundo_apellido ?>
@@ -96,9 +111,7 @@
                                                 style="color:red;">*</span></label>
                                         <input type="text" class="form-control" id="director_generar"
                                             value="<?= $dsc_director_general ?>" name="director_generar">
-                                        <div class="invalid-feedback">
-                                            Please provide a valid state.
-                                        </div>
+                                   
                                     </div><!--end col-->
                                     <div class="col-md-4 mb-3">
                                         <label for="id_secretario">Secretario(a) o Director(a) que autoriza</label>
@@ -106,6 +119,7 @@
                                             placeholder="Secretario/a" name="id_secretario">
                                             <option value="0" selected>Seleccione una opcion</option>
                                             <?php foreach ($secretario as $s): ?>
+                                                <?php if( $editar == 0 ): ?>
                                                 <?php if (isset($registro_pt->secretario) && !empty($registro_pt->secretario)) { ?>
                                                     <option value="<?= $s->id_secretario ?>"
                                                         <?= ($s->id_secretario == $registro_pt->secretario) ? 'selected' : '' ?>>
@@ -113,6 +127,14 @@
                                                 <?php } else { ?>
                                                     <option value="<?= $s->id_secretario ?>"><?= $s->dsc_secretario ?></option>
                                                 <?php } ?>
+                                                <?php endif; ?>
+                                                <?php if( $editar == 1 ): ?>
+                                                    <option value="<?= $s->id_secretario ?>"
+                                                        <?= ($s->id_secretario == $id_secretario) ? 'selected' : '' ?>>
+                                                        <?= $s->dsc_secretario ?>
+                                                    </option>
+                                              
+                                                <?php endif; ?>
                                             <?php endforeach; ?>
                                         </select>
                                     </div><!--end col-->
@@ -123,10 +145,17 @@
                                             placeholder="Responsable" name="id_responsable_gasto">
                                             <option value="0" selected>Seleccione una opcion</option>
                                                <?php foreach ($cat_usuario as $u): ?>
-                                             
+                                                 <?php if( $editar == 0 ): ?>
                                                 <option value="<?= $u->id_usuario ?>">
                                                     <?= $u->nombre . ' ' . $u->primer_apellido . ' ' . $u->segundo_apellido ?>
                                                 </option>
+                                                  <?php endif; ?>
+                                                 <?php if( $editar == 1 ): ?>
+                                                <option value="<?= $u->id_usuario ?>"
+                                                 <?= ($u->id_usuario == $id_responsable_gasto) ? 'selected' : '' ?>>
+                                                    <?= $u->nombre . ' ' . $u->primer_apellido . ' ' . $u->segundo_apellido ?>
+                                                </option>
+                                                  <?php endif; ?>
                                             <?php endforeach; ?>
                                         </select>
                                     </div><!--end col-->
@@ -138,7 +167,7 @@
                                     <div class="col-md-6 mb-3">
                                         <label for="comision">Comisión / Reunión / Evento / Programa</label>
                                         <input type="text" class="form-control" id="comision" name="comision"
-                                            value="<?= (isset($registro_pt->comision)) ? $registro_pt->comision : 'Comisión / Reunión / Evento / Programa' ?>">
+                                            value="<?= (isset($comision)) ? $comision : 'Comisión / Reunión / Evento / Programa' ?>">
                                         <div class="invalid-feedback">
                                             Please provide a valid state.
                                         </div>
@@ -148,6 +177,7 @@
                                         <label for="concepto_gasto">Concepto del gasto<span
                                                 style="color:red;">*</span></label>
                                         <input type="text" class="form-control" id="concepto_gasto" autocomplete="off"
+                                        value="<?= (isset($concepto)) ? $concepto : '' ?>"
                                             placeholder="Concepto del gasto" name="concepto_gasto">
                                     </div><!--end col-->
                                 </div><!--end form-row-->
@@ -157,13 +187,13 @@
                                     <div class="col-md-6 mb-3">
                                         <label for="fecha_inicio">Fecha Inicio.<span
                                                 style="color:red;">*</span></label>
-                                           <input id="fecha_inicio"  type="date" name="fecha_inicio" class="form-control" multiple accept=".pdf" />
+                                           <input id="fecha_inicio" value="<?= (isset($fec_inicio)) ? date('Y-m-d', strtotime($fec_inicio)) : '' ?>"  type="date" name="fecha_inicio" class="form-control" multiple accept=".pdf" />
                                 
                                     </div><!--end col-->
                                     <div class="col-md-6 mb-3">
                                         <label for="fecha_fin">Facha Fin.<span
                                                 style="color:red;">*</span></label>
-                                       <input id="fecha_fin" type="date" name="fecha_fin" multiple class="form-control"  accept=".xml">
+                                       <input id="fecha_fin" value="<?= (isset($fec_fin)) ? date('Y-m-d', strtotime($fec_fin)) : '' ?>"  type="date" name="fecha_fin" multiple class="form-control"  accept=".xml">
                                     </div><!--end col-->
 
                                                                 

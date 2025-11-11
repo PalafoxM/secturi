@@ -1082,12 +1082,19 @@ class Usuario extends BaseController
         $Mglobal = new Mglobal;
         $vehiculo = $Mglobal->getTabla(['tabla' => 'pt_vehiculo', 'where' => ['visible' => 1, 'id_vehiculo' => $idVehiculo]]);
         if($vehiculo->data){
-            $data['id_proyecto'] = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->id_proyecto:'';
+            $data['id_proyecto']    = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->id_proyecto:'';
             $data['no_consecutivo'] = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->no_consecutivo:'';
+            $data['id_direccion_responsable'] = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->id_direccion_responsable:'';
+            $data['id_responsable'] = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->id_responsable:'';
+            $data['id_secretario']  = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->id_secretario:'';
+            $data['id_responsable_gasto'] = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->id_responsable_gasto:'';
+            $data['comision']       = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->comision:'';
+            $data['concepto']       = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->concepto:'';
+            $data['fec_inicio']       = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->fec_inicio:'';
+            $data['fec_fin']       = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->fec_fin:'';
 
         }
-      //  var_dump( $vehiculo );
-       // die();
+
         $cat_area = $Mglobal->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
         $cat_secretario = $Mglobal->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1]]);
         $cat_subsecretario = $Mglobal->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1]]);
@@ -1102,6 +1109,7 @@ class Usuario extends BaseController
         $data['proveedor'] = (!empty($proveedor->data)) ? $proveedor->data : [];
   
         $data['editar'] = 1;
+        $data['id_vehiculo'] = $idVehiculo;
         $data['scripts'] = array('principal', 'inicio');
         $data['contentView'] = 'secciones/vRegistroVehiculo';
         $this->_renderView($data);

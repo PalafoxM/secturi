@@ -1978,6 +1978,8 @@ class Agregar extends BaseController
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
         $archivos = $this->request->getFiles();
+       
+      
    
         if (empty($data['id_proveedor'])) {
             $response->error = true;
@@ -2030,7 +2032,18 @@ class Agregar extends BaseController
             $response->respuesta = "Es requerido el id_responsable_gasto";
             return $this->respond($response);
         }
+        if($data['editar'] == 0){
+               if (is_array($archivos) && !empty($archivos)) {
+                $response->error = true;
+                $response->respuesta = "Es requerido los archivos XML and PDF";
+                return $this->respond($response);
+                
+               }
 
+        }
+
+
+        if (is_array($archivos) && !empty($archivos)) {
         foreach($archivos as $key =>$archivo){
             $tipo = $archivo->getMimeType();
             if (in_array($tipo, ['text/pdf', 'application/pdf'])) {
@@ -2106,10 +2119,10 @@ class Agregar extends BaseController
 
             }
 
+          }
         }
         
         $dataInsert = [
-
             'id_direccion_responsable' => $data['direccion_responsable'],
             'id_proveedor' => $data['id_proveedor'],
             'fecha_tramite' => $data['fecha_tramite'],
@@ -2124,12 +2137,20 @@ class Agregar extends BaseController
             'comision' => $data['comision'],
             'id_proyecto' => $data['id_proyecto'],
             'no_consecutivo' => $data['no_consecutivo'],
-            'pdf' => $ruta_relativa,
-            'xml_monto' => $total,
-            'xml_uuid' => $uuid,
-            'xml_rfc' => $rfcEmisor,
-            'xml_razon_social' => $nombreReceptor
+          
         ];
+
+        if(isset($ruta_relativa) && !empty($ruta_relativa )){
+            $dataInsert[] = [
+                'pdf' => $ruta_relativa,
+                'xml_monto' => $total,
+                'xml_uuid' => $uuid,
+                'xml_rfc' => $rfcEmisor,
+                'xml_razon_social' => $nombreReceptor,
+            ];
+       
+
+        }
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaPTVehiculos'];
         if ($data['editar'] == 0) {
             $dataInsert['usu_reg'] = $session->get('id_usuario');
@@ -2142,7 +2163,7 @@ class Agregar extends BaseController
             $dataConfig = [
                 "tabla" => "pt_vehiculo",
                 "editar" => true,
-                'idEditar' => ['id_vehiculo' => $data['id_registro_pt']]
+                'idEditar' => ['id_vehiculo' => $data['id_vehiculo']]
             ];
             $dataInsert['usu_act'] = $session->get('id_usuario');
         }

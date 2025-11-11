@@ -143,7 +143,7 @@
                                                             <div class="col-md-12 text-right">
                                                             
                                                           
-                                                                <a id="btnZip" style="color:white" class="btn btn-info" onclick="ini.inicio.generarZip(<?= $id_registro ?>);" >
+                                                                <a id="btnZip" style="color:white" class="btn btn-info" onclick="ini.inicio.generarZipV(<?= $id_registro ?>);" >
                                                                     <i class="mdi mdi-content-save"></i> Generar Zip
                                                                 </a>
                                                       
