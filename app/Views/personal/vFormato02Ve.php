@@ -3,20 +3,17 @@
         </div>
 
         <div  style="position:absolute; text-align:center; top:16.2%; left:70%; width:22%; height:10px; background-color:white; font-size: 7px; ">
-            <span class="proxima"><?= (isset($GO) && !empty($GO))?'GO':'PT' ?> <?= $folio;?></span>
+            <span class="proxima">PT <?= $folio;?></span>
         </div>
         <div  style="position:absolute; text-align:center; top:18.5%; left:70%; width:22%; height:10px; background-color:white; font-size: 7px; ">
-            <span class="proxima">
-
-      
-               
+            <span class="proxima">3550
             </span>
         </div>
          <div  style="position:absolute; text-align:center; top:15.5%; left:22%; width:36%; height:30px; background-color:white; font-size: 7px; ">
-            <span class="proxima"><?= (isset($reserva->razon_social) && !empty($reserva->razon_social))?$reserva->razon_social:'';?></span>
+            <span class="proxima"><?= (isset($proveedor->razon_social) && !empty($proveedor->razon_social))?$proveedor->razon_social:'';?></span>
         </div>
       <div  style="position:absolute; text-align:center; top:20.7%; left:22%; width:66%; height:30px; background-color:white; font-size: 7px; ">
-            <span class="proxima"><?= (isset($registro->concepto_pago) && !empty($registro->concepto_pago))?$registro->concepto_pago:''; ?></span>
+            <span class="proxima"><?= (isset($vehiculo->concepto) && !empty($vehiculo->concepto))?$vehiculo->concepto:''; ?></span>
         </div>
        <div  style="position:absolute; top:27.6%; left:22%; width:35%; height:10px; background-color:white; font-size: 7px; ">
             <span class="proxima">RODRIGO GONZÁLEZ GUERRERO</span>

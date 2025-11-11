@@ -2125,6 +2125,7 @@ class Agregar extends BaseController
             'concepto' => $data['concepto_gasto'],
             'comision' => $data['comision'],
             'id_proyecto' => $data['id_proyecto'],
+            'no_consecutivo' => $data['no_consecutivo'],
             'pdf' => $ruta_relativa,
             'xml_monto' => $total,
             'xml_uuid' => $uuid,

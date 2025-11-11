@@ -2899,7 +2899,7 @@ class Principal extends BaseController
             $data['numero_texto'] = $this->numeroEnLetras($importe_float);
             $direccion = $globals->getTabla([
                 'tabla' => 'vw_direccion',
-                'where' => ['visible' => 1, 'id_director' => $vehiculo->data[0]->id_director ]
+                'where' => ['visible' => 1, 'id_area' => $vehiculo->data[0]->id_director ]
             ]);
             $proyecto = $globals->getTabla([
                 'tabla' => 'cat_proyecto',
@@ -2908,18 +2908,29 @@ class Principal extends BaseController
             $data['proyecto'] = isset($proyecto->data) && !empty($proyecto->data)?$proyecto->data[0]:[];
             $responsableGasto = $globals->getTabla([
                 'tabla' => 'vw_direccion',
-                'where' => ['visible' => 1, 'id_direccion' => $vehiculo->data[0]->id_direccion_responsable ]
+                'where' => ['visible' => 1, 'id_area' => $vehiculo->data[0]->id_direccion_responsable ]
             ]);
         
             $data['responsableGasto'] = isset($responsableGasto->data) && !empty($responsableGasto->data)?$responsableGasto->data[0]:[];
+            $proveedor = $globals->getTabla([
+                'tabla' => 'proveedor',
+                'where' => ['visible' => 1, 'id_proveedor' => $vehiculo->data[0]->id_proveedor ]
+            ]);
+            $data['proveedor'] = isset($proveedor->data) && !empty($proveedor->data)?$proveedor->data[0]:[];
         }
-    
-      
-
-        
-         $folio =(isset( $direccion->data) && !empty( $direccion->data))? $direccion->data[0]->folio_prefijo:'S/N/';
-      
-         $folio_prefijo = $folio . 'FALTA' . '/' . date('Y'); //ESTO HAY QUE OREGUNTAR
+        // die( var_dump($data['proveedor'] ) );
+         $folio =(isset( $responsableGasto->data) && !empty( $responsableGasto->data))? $responsableGasto->data[0]->folio_prefijo:'S/N/';
+          $no_consecutivo = "";
+            if (strlen($vehiculo->data[0]->no_consecutivo) == 1) {
+                $no_consecutivo = '00' . $vehiculo->data[0]->no_consecutivo;
+            }
+            if (strlen($vehiculo->data[0]->no_consecutivo) == 2) {
+                $no_consecutivo = '0' . $vehiculo->data[0]->no_consecutivo;
+            }
+            if (strlen($vehiculo->data[0]->no_consecutivo) >= 3) {
+                $no_consecutivo = $vehiculo->data[0]->no_consecutivo;
+            }
+         $folio_prefijo = $folio . $no_consecutivo . '/' . date('Y'); //ESTO HAY QUE OREGUNTAR
          $data['folio'] = $folio_prefijo;
      
       
@@ -4359,10 +4370,19 @@ class Principal extends BaseController
             
          
     
-           
+               $no_consecutivo = "";
+            if (strlen($vehiculo->data[0]->no_consecutivo) == 1) {
+                $no_consecutivo = '00' . $vehiculo->data[0]->no_consecutivo;
+            }
+            if (strlen($vehiculo->data[0]->no_consecutivo) == 2) {
+                $no_consecutivo = '0' . $vehiculo->data[0]->no_consecutivo;
+            }
+            if (strlen($vehiculo->data[0]->no_consecutivo) >= 3) {
+                $no_consecutivo = $vehiculo->data[0]->no_consecutivo;
+            }
             
             $folio =(isset( $resposableGasto->data) && !empty( $resposableGasto->data))? $resposableGasto->data[0]->folio_prefijo:'S/N/';
-            $folio_prefijo = $folio . 'FALTA' . '/' . date('Y').'-V';
+            $folio_prefijo = $folio . $no_consecutivo . '/' . date('Y').'-V';
             $data['folio'] = $folio_prefijo;
             $data['proveedor'] = (isset( $proveedor->data) && !empty( $proveedor->data))? $proveedor->data[0]:'';
             $data['proveedorBanco'] = (isset( $proveedorBanco->data) && !empty( $proveedorBanco->data))? $proveedorBanco->data[0]:'';

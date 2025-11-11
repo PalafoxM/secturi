@@ -1066,8 +1066,10 @@ class Usuario extends BaseController
             $data['usuario'] = (isset($usuario->data) && !empty( $usuario->data))?$usuario->data[0]:'';
 
         }
-        //var_dump( $cat_usuario );
-        //die();
+        $noConsecutivo = $Mglobal->getTabla(['tabla' => 'pt_vehiculo', 'where' => ['visible' => 1]]);
+       
+        $data['no_consecutivo'] = count($noConsecutivo->data) +1;
+   
         $data['scripts'] = array('principal', 'inicio');
         $data['contentView'] = 'secciones/vRegistroVehiculo';
         $this->_renderView($data);
