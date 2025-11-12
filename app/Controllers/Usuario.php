@@ -1067,6 +1067,7 @@ class Usuario extends BaseController
 
         }
         $noConsecutivo = $Mglobal->getTabla(['tabla' => 'pt_vehiculo', 'where' => ['visible' => 1]]);
+        $data['id_vehiculo'] = $idVehiculo;
         $data['editar'] = 0;
         $data['no_consecutivo'] = count($noConsecutivo->data) +1;
    
