@@ -1217,7 +1217,7 @@ class Principal extends BaseController
                 }
             }
         }
-        $this->enviarEmail(0);
+        //$this->enviarEmail(0);
        
 
         return $this->respond($response);
@@ -2704,7 +2704,7 @@ class Principal extends BaseController
     
         $presupuesto = $globals->getTabla([
             'tabla' => 'vw_reserva',
-            'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
+            'where' => ['visible' => 1, 'id_reserva' => $registro_pt->data[0]->id_reserva]
         ]);
         
         $direccion = $globals->getTabla([
@@ -2714,7 +2714,7 @@ class Principal extends BaseController
                 'id_director' => $registro_pt->data[0]->id_reponsable_solicitud
             ]
         ]);
-       
+        
         if( isset($presupuesto->data) && !empty($presupuesto->data)){
              $data['presupuesto'] = $presupuesto->data;
         }
@@ -4965,7 +4965,9 @@ class Principal extends BaseController
         $response->error = true;
         $response->respuesta = 'Error|Error al traer los proveedor';
         $globals = new Mglobal;
+       
         $siExisteIdReserva = $globals->getTabla(['tabla' => 'registro_go', 'where' => ['visible' => 1, 'id_reserva_go' => $id_reserva_go]]);
+
         $btn = (!empty($siExisteIdReserva->data)) ? true : false;
 
         $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
@@ -5110,6 +5112,10 @@ class Principal extends BaseController
         $response->error = true;
         $response->respuesta = 'Error|Error al traer los proveedor';
         $globals = new Mglobal;
+        $noConsecutivo = $globals->getTabla(['tabla' => 'folio_direccion', 'where' => ['visible' => 1, 'id_area' => $session->id_area]]);
+        $no_consecutivo = (isset($noConsecutivo->data) && !empty($noConsecutivo->data))?$$noConsecutivo->data[0]->no_consecutivo:0;
+        $data['no_consecutivo'] = (int)$no_consecutivo + 1;
+        
         $siExisteIdReserva = $globals->getTabla(['tabla' => 'registro_pt', 'where' => ['visible' => 1, 'id_reserva' => $id_reserva]]);
         $btn = false;
         $partida4000 = false;

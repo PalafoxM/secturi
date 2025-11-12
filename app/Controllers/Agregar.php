@@ -1831,6 +1831,18 @@ class Agregar extends BaseController
             $response->respuesta = "Es requerido el no_consecutivo";
             return $this->respond($response);
         }
+        $dataInsert = [
+                    'no_consecutivo' => $data['no_consecutivo'],
+                    'id_area'         => $session->get('id_area'),
+                    'fec_reg'         => date('Y-m-d H:i:s'),
+                    'usu_reg'         => $session->id_usuario
+                     ];
+        $dataConfig = [
+                "tabla" => "folio_direccion",
+                "editar" => false
+            ];
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFolio'];
+        $no_consecutivo = $this->globals->saveTabla($dataInsert,$dataConfig, $dataBitacora);
 
         /*       $consecutivo = $this->globals->getTabla(['tabla' => 'consecutivo', 'where' => ['visible' => 1, 'id_responsable' => $data['id_reponsable_solicitud'] ], 'orderBy' => 'id_consecutivo DESC']);          
               $conse =  (isset($consecutivo->data) && !empty($consecutivo->data))?$consecutivo->data[0]->no_consecutivo:'';
@@ -2033,7 +2045,7 @@ class Agregar extends BaseController
             return $this->respond($response);
         }
         if($data['editar'] == 0){
-               if (is_array($archivos) && !empty($archivos)) {
+               if (empty($archivos)) {
                 $response->error = true;
                 $response->respuesta = "Es requerido los archivos XML and PDF";
                 return $this->respond($response);
@@ -2140,15 +2152,12 @@ class Agregar extends BaseController
           
         ];
 
-        if(isset($ruta_relativa) && !empty($ruta_relativa )){
-            $dataInsert[] = [
-                'pdf' => $ruta_relativa,
-                'xml_monto' => $total,
-                'xml_uuid' => $uuid,
-                'xml_rfc' => $rfcEmisor,
-                'xml_razon_social' => $nombreReceptor,
-            ];
-       
+        if(isset($ruta_relativa) && !empty($ruta_relativa )){  
+                $dataInsert['pdf']              = $ruta_relativa;
+                $dataInsert['xml_monto']        = $total;
+                $dataInsert['xml_uuid']         = $uuid;
+                $dataInsert['xml_rfc']          = $rfcEmisor;
+                $dataInsert['xml_razon_social'] = $nombreReceptor;
 
         }
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaPTVehiculos'];
@@ -2167,8 +2176,7 @@ class Agregar extends BaseController
             ];
             $dataInsert['usu_act'] = $session->get('id_usuario');
         }
-
-
+     
         $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
 
 
