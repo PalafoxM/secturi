@@ -62,13 +62,13 @@ foreach ($incidencia as $i):
 
 <?php 
 $top += 1.5;
-
 $contador++;
-
 // 👉 Cada 6 registros, fuerza salto de página y reinicia el top
 if ($contador % 6 == 0) {
     echo '<div style="page-break-after: always;"></div>';
     $top = 21; // Reinicia altura
+    $nombre = 15; // Reinicia altura
+    $dsc = 17; // Reinicia altura
 }
 endforeach; 
 ?>
