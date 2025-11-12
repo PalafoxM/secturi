@@ -3476,9 +3476,41 @@ class Agregar extends BaseController
         $data['incidencia'] = (isset($incidencia->data) && !empty($incidencia->data)) ? $incidencia->data : '';
               if($usuario == 'todos'){
                 $data['usuario'] = (isset($incidencia->data) && !empty($incidencia->data)) ? $incidencia->data : '';
+                $usuariosAgrupados = [];
+
+                    foreach($data['incidencia'] as $key => $i) {
+                        $nombreUsuario = $i->nombre_completo;
+                        
+                        if(!isset($usuariosAgrupados[$nombreUsuario])) {
+                            $usuariosAgrupados[$nombreUsuario] = [
+                                'nombre_completo' => $nombreUsuario,
+                                'dsc_area' => $i->dsc_area,
+                                'incidencias' => []
+                            ];
+                        }
+                        
+                        $usuariosAgrupados[$nombreUsuario]['incidencias'][] = [
+                            'dsc_incidencia' => $i->dsc_incidencia,
+                            'fecha_inicio' => $i->fecha_inicio,
+                            'hora_inicio' => $i->hora_inicio,
+                            'fecha_fin' => $i->fecha_fin,
+                            'hora_fin' => $i->hora_fin,
+                            'detalles' => $i->detalles,
+                            'tipo' => $i->tipo
+                        ];
+                    }
+
+                    // Convertir a array indexado si lo prefieres
+                    $usuariosAgrupados = array_values($usuariosAgrupados);
+                    $data['usuariosAgrupados'] = $usuariosAgrupados;
+                    //die( var_dump(  $data['usuariosAgrupados']  ) );
+
+                      
+
               }else{
                 $data['usuario'] = (isset($incidencia->data) && !empty($incidencia->data)) ? $incidencia->data[0] : '';
               }
+     
        
         $tempQrPath = FCPATH . 'assets/images/qr_final.png';
         $folio = 'GTO - ' . date('YmdHis') . substr((string) microtime(), 1, 4);
