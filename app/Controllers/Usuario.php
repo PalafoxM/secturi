@@ -442,7 +442,7 @@ class Usuario extends BaseController
             $anio . '-03-18' => 'Natalicio de Benito Juárez',
             $anio . '-05-01' => 'Día del Trabajo',
             $anio . '-09-16' => 'Día de la Independencia',
-            $anio . '-11-18' => 'Día de la Revolución',
+            $anio . '-11-17' => 'Asueto',
             $anio . '-12-25' => 'Navidad'
         ];
    
