@@ -126,10 +126,18 @@
                                                                         </div>
                                                                     </a>
                                                                 </li>
+                                                              
                                                                 <li class="dd-item" data-id="1">
                                                                     <a target="_blank" href="<?= base_url().'assets/documentos/Programa de Gobierno 2024-2030.pdf' ?>">
                                                                         <div class="dd-handle">
                                                                         Programa de Gobierno 2024-2030
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                  <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Programa Estatal de Turismo 2025-2030.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                        Programa Estatal de Turismo 2025-2030
                                                                         </div>
                                                                     </a>
                                                                 </li>
@@ -147,34 +155,8 @@
                                                                         </div>
                                                                     </a>
                                                                 </li>
-                                                                <li class="dd-item" data-id="1">
-                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Programa_Sectorial_Economia_para_Todos_2019-2024-fa05.pdf' ?>">
-                                                                        <div class="dd-handle">
-                                                                        Programa Sectorial Economía para Todos 2019-2024
-                                                                        </div>
-                                                                    </a>
-                                                                </li>
-                                                                <li class="dd-item" data-id="1">
-                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Actualizacion_Programa_Sectorial_Eje_Economia_para_Todos_2019-2024-48e5.pdf' ?>">
-                                                                        <div class="dd-handle">
-                                                                        Actualización Programa Sectorial Eje Economía para Todos 2019-2024
-                                                                        </div>
-                                                                    </a>
-                                                                </li>
-                                                                <li class="dd-item" data-id="1">
-                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Actualizacion_Programa_Sectorial_Eje_Economia_para_Todos_2019-2024__fe_de_erratas-2b4d.pdf' ?>">
-                                                                        <div class="dd-handle">
-                                                                        Actualización Programa Sectorial Eje Economía para Todos 2019-2024 fe de erratas
-                                                                        </div>
-                                                                    </a>
-                                                                </li>
-                                                                <li class="dd-item" data-id="1">
-                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Programa_Estatal_de_Turismo_2021_-_2024-2ad3.pdf' ?>">
-                                                                        <div class="dd-handle">
-                                                                        Programa Estatal de Turismo 2021 - 2024
-                                                                        </div>
-                                                                    </a>
-                                                                </li>
+                                                            
+                                                           
                                                                 <li class="dd-item" data-id="1">
                                                                     <a target="_blank" href="<?= base_url().'assets/documentos/Actualizacion_Programa_de_Gobierno_2018-2024-db52.pdf' ?>">
                                                                         <div class="dd-handle">
