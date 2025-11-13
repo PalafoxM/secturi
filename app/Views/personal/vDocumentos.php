@@ -382,6 +382,13 @@
                                                                         </div>
                                                                     </a>
                                                                 </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/02-Lineamientos-Inversión.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                         Lineamientos Generales para la Aplicación de Recursos en Materia de Proyectos de Inversión 2025
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
                                                             </ol>
                                                         </div><!--nastable-list-1-->    
                                                     </div><!--end card-body-->
