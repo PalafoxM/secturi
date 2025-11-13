@@ -141,10 +141,18 @@
                                                                         </div>
                                                                     </a>
                                                                 </li>
+                                                               
                                                                 <li class="dd-item" data-id="1">
                                                                     <a target="_blank" href="<?= base_url().'assets/documentos/PROSECTUR__2025_2030.pdf' ?>">
                                                                         <div class="dd-handle">
                                                                         Programa Sectorial de Turismo Federal 2025-2030
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                 <li class="dd-item" data-id="2">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Plan_de_Trabajo_Anual_2025.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Plan de Trabajo Anual 2025
                                                                         </div>
                                                                     </a>
                                                                 </li>
@@ -361,13 +369,6 @@
                                                                     </a>
                                                                 </li>
                                                                 <li class="dd-item" data-id="1">
-                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Plan_Anual_de_Trabajo_2024%C2%A0-6b1b.pdf' ?>">
-                                                                        <div class="dd-handle">
-                                                                       Plan Anual de Trabajo 2024 
-                                                                        </div>
-                                                                    </a>
-                                                                </li>
-                                                                <li class="dd-item" data-id="1">
                                                                     <a target="_blank" href="<?= base_url().'assets/documentos/Reglamento_de_la_Ley_de_Turismo_para_el_Estado_de_Guanajuato_y_sus_Municipios-501c.pdf' ?>">
                                                                         <div class="dd-handle">
                                                                        Reglamento de la Ley de Turismo para el Estado de Guanajuato y sus Municipios
@@ -402,13 +403,7 @@
 
                                                         <div class="custom-dd dd" id="nestable_list_1">
                                                             <ol class="dd-list">
-                                                                <li class="dd-item" data-id="2">
-                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Plan_de_Trabajo_Anual_2025.pdf' ?>">
-                                                                        <div class="dd-handle">
-                                                                       Plan de Trabajo Anual 2025
-                                                                        </div>
-                                                                    </a>
-                                                                </li>
+                                                               
                                                                 <li class="dd-item" data-id="2">
                                                                     <a target="_blank" href="<?= base_url().'assets/documentos/1-Reglamento-Interior-SEDETUR-2007-404e.pdf' ?>">
                                                                         <div class="dd-handle">
