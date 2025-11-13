@@ -17,7 +17,7 @@
                                         <li class="breadcrumb-item active">Denuncia</li>
                                     </ol>
                                 </div>
-                                <h4 class="page-title">Denuncia por incumplimiento al Código de Ética del Poder Ejecutivo del Estado de Guanajuato y/o Código de Conducta de la SECTURI </h4>
+                                <h4 class="page-title">RECEPCIÓN DE DENUNCIAS</h4>
                             </div><!--end page-title-box-->
                         </div><!--end col-->
                     </div>
@@ -27,9 +27,42 @@
                         <div class="col-lg-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <h3 class="mt-0 header-title">DATOS DEL DENUNCIANTE<strong></strong></h3>
+                                    <h3 class="mt-0 header-title">TIPO DE DENUNCIA<strong></strong></h3>
                                     
-                                   <form id="form_denuncia" >
+                                     <div class="row">
+                                        <div class="col-lg-6">
+                                            <div class="card text-white bg-primary">
+                                                <a href="javascript:void(0)" onclick="mostrarForm();">
+                                                <div class="card-body">
+                                                    <blockquote class="card-bodyquote mb-0">
+                                                         <center><h4 class="text-white">Por incumplimiento al Código de Ética y/o Código de Conducta.</h4> </center>
+                                                       
+                                                    </blockquote>
+                                                </div><!--end card-body-->
+                                                </a>
+                                            </div><!--end card-->
+                                        </div><!--end col-->
+                                                
+                                        <div class="col-lg-6">
+                                            <div class="card text-white bg-warning">
+                                                <a href="javascript:void(0)" onclick="mostrarForm();">
+                                                <div class="card-body">
+                                                    <blockquote class="card-bodyquote mb-0">
+                                                        <center> <h4 class="text-white">Por violencia laboral, acoso u hostigamiento sexual.</h4> </center>
+                                                       
+                                                    </blockquote>
+                                                </div><!--end card-body-->
+                                                </a>
+                                            </div><!--end card-->
+                                        </div><!--end col-->
+                                    </div><!--end row-->                                      
+                        </div><!--end card-body-->
+                    </div><!--end card-->
+                    <div class="row" id="formulario_denuncia" style="display:none;" >
+                         <div class="col-lg-12">
+                            <div class="card">
+                                <div class="card-body">
+                                      <form id="form_denuncia" >
 
                                        <div class="row">
                                             <!-- Dirección Responsable -->
@@ -89,8 +122,8 @@
                                                 Persona a la que se le está denunciando<span style="color:red;">*</span>
                                                 </label>
                                                 <select class="form-control select2" name="denunciando" id="denunciando">
-                                                <?php foreach($usuario as $u): ?>
-                                                    <option value="<?=$u->id_usuario ?>"><?= $u->nombre_completo ?></option>
+                                                <?php foreach ($usuario as $u): ?>
+                                                    <option value="<?= $u->id_usuario ?>"><?= $u->nombre_completo ?></option>
                                                 <?php endforeach; ?>
                                                 <option value="0">NO APLICA</option>
                                                 </select>
@@ -117,15 +150,17 @@
                                         <br>
                                         <center>
                                         <h6 class="mt-0">Todas las denuncias serán tratadas con confidencialidad, respeto y seriedad.<br>
-Tu participación contribuye a fortalecer una cultura de ética, integridad y confianza en la Secretaría de Turismo e Identidad.</h6>  </center>
+                              Tu participación contribuye a fortalecer una cultura de ética, integridad y confianza en la Secretaría de Turismo e Identidad.</h6>  </center>
                                
                                <a class="btn btn-gradient-danger" style="color:white" onclick="window.history.back()">Atrás</a>
                       
                                 <a href="javascript:void(0)" class="btn btn-gradient-primary text-white" id="btnDenuncia" onclick="ini.inicio.formDenuncia();">Enviar</a>
                          
-                            </form> <!--end form-->                                          
-                        </div><!--end card-body-->
-                    </div><!--end card-->
+                            </form>
+                         </div>
+                        </div>
+                      </div>
+                    </div>
                 </div><!--end col-->
              </div><!--end row-->
          </div><!-- container -->
@@ -139,8 +174,8 @@ Tu participación contribuye a fortalecer una cultura de ética, integridad y co
 <link href="<?php echo base_url(); ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 <link href="<?php echo base_url(); ?>assets/css/jquery-ui.min.css" rel="stylesheet">
 <link href="<?php echo base_url(); ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
-<link href="<?= base_url()?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
-<link href="<?= base_url()?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
+<link href="<?= base_url() ?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+<link href="<?= base_url() ?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
 <!-- jQuery  -->
  
 <script src="<?php echo base_url(); ?>assets/js/jquery.min.js"></script>
@@ -154,11 +189,11 @@ Tu participación contribuye a fortalecer una cultura de ética, integridad y co
 <script src="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.js"></script>
 
 
-<script src="<?= base_url()?>assets/js/feather.min.js"></script>
+<script src="<?= base_url() ?>assets/js/feather.min.js"></script>
 
-<script src="<?= base_url()?>plugins/tiny-editable/mindmup-editabletable.js"></script>
-<script src="<?= base_url()?>plugins/tiny-editable/numeric-input-example.js"></script>
-<script src="<?= base_url()?>plugins/bootable/bootstable.js"></script> 
+<script src="<?= base_url() ?>plugins/tiny-editable/mindmup-editabletable.js"></script>
+<script src="<?= base_url() ?>plugins/tiny-editable/numeric-input-example.js"></script>
+<script src="<?= base_url() ?>plugins/bootable/bootstable.js"></script> 
 <link href="<?php echo base_url(); ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
 
 <script src="<?= base_url(); ?>plugins/select2/select2.min.js"></script>
@@ -181,5 +216,8 @@ $(document).on('change', '#denunciando', function () {
     $("#div_input_manual").hide();       // ocultar input
   }
 });
+function mostrarForm() {
+    $('#formulario_denuncia').fadeIn(400); // 400 ms = 0.4 segundos
+}
 
 </script>
