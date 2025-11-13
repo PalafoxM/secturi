@@ -113,7 +113,7 @@
                                                             <?php endif; ?>
                                                         </td>
                                                          <td class="text-center"><?= $p->detalles?></td>
-                                                         <td class="text-center"><?= $p->comentarios?></td>
+                                                         <td class="text-center"><?= $p->comentario?></td>
                                                          <td class="text-center"><?= $p->observaciones?></td>
                                                        <?php
                                                         switch ($p->id_estatus) {
