@@ -49,8 +49,6 @@ class Login extends BaseController {
         $this->_renderView($data); 
         die();
     }
-
-
     public function index()
     {        
         $session = \Config\Services::session();

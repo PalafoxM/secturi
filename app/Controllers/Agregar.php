@@ -1745,6 +1745,44 @@ class Agregar extends BaseController
         return $this->respond($response->data[0]);
 
     }
+    private function registrarFolio($no_consecutivo,$responsableGasto)
+    {
+      $session = \Config\Services::session();
+       $response = new \stdClass();
+        $response->error = true;
+       $globals = new Mglobal;
+       $idRegistro = 0;
+       $dataDB = array('tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario]);
+        $user = $globals->getTabla($dataDB); 
+        //vemos si el usuario tiene id_area
+        if(isset($user->data) && !empty($user->data)){
+            $id_area = $user->data[0]->id_area;
+            $dataInsert = [
+                    'no_consecutivo' => $no_consecutivo,
+                    'id_area'        => $id_area,
+                    'id_direccion'   => $responsableGasto,
+                    'fec_reg'        => date('Y-m-d H:i:s'),
+                    'usu_reg'        => $session->id_usuario
+                     ];
+            $dataConfig = [
+                "tabla" => "folio_direccion",
+                "editar" => false
+            ];
+  
+
+        }
+      
+        
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFolio'];
+        $no_consecutivo = $globals->saveTabla($dataInsert,$dataConfig, $dataBitacora);
+        if(!$no_consecutivo->error){
+         $idRegistro=  $no_consecutivo->idRegistro;
+
+        }
+        
+        return $idRegistro;
+
+    }
     public function guardaPT()
     {
         $session = \Config\Services::session();
@@ -1831,19 +1869,9 @@ class Agregar extends BaseController
             $response->respuesta = "Es requerido el no_consecutivo";
             return $this->respond($response);
         }
-        $dataInsert = [
-                    'no_consecutivo' => $data['no_consecutivo'],
-                    'id_area'         => $session->get('id_area'),
-                    'fec_reg'         => date('Y-m-d H:i:s'),
-                    'usu_reg'         => $session->id_usuario
-                     ];
-        $dataConfig = [
-                "tabla" => "folio_direccion",
-                "editar" => false
-            ];
-        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFolio'];
-        $no_consecutivo = $this->globals->saveTabla($dataInsert,$dataConfig, $dataBitacora);
 
+        $no_consecutivo = $this->registrarFolio($data['no_consecutivo'], $data['id_reponsable_solicitud']);
+       
         /*       $consecutivo = $this->globals->getTabla(['tabla' => 'consecutivo', 'where' => ['visible' => 1, 'id_responsable' => $data['id_reponsable_solicitud'] ], 'orderBy' => 'id_consecutivo DESC']);          
               $conse =  (isset($consecutivo->data) && !empty($consecutivo->data))?$consecutivo->data[0]->no_consecutivo:'';
 
@@ -1859,12 +1887,12 @@ class Agregar extends BaseController
              $res =  $this->globals->saveTabla(['no_consecutivo' => $no_consecutivo, 'id_responsable' => $data['id_reponsable_solicitud'] ], [ 'tabla' => 'consecutivo', 'editar' => false ], ['id_user' => $session->get('id_usuario'), "script" => "estatus.Reserva"]);
 
             */
-
+        //die( var_dump($data['id_reponsable_solicitud']  ) );
         $dataInsert = [
             'id_reserva' => (int) $data['id_reserva'],
             'id_direccion_responsable' => $data['direccion_responsable'],
             'tipo_pt' => $data['tipo_pt'],
-            'no_consecutivo' => $data['no_consecutivo'],
+            'no_consecutivo' => $no_consecutivo,
             'id_proveedor' => $data['id_proveedor'],
             'fecha_tramite' => $data['fecha_tramite'],
             'id_reponsable_solicitud' => (int) $data['id_reponsable_solicitud'],
