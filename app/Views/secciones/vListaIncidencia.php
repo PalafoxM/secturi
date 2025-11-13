@@ -91,6 +91,7 @@
                                                         <th class="text-center">NOMBRE COMPLETO</th>
                                                         <th class="text-center">FECHA</th>
                                                         <th class="text-center">DETALLES</th>
+                                                        <th class="text-center">COMENTARIO ADICIONAL</th>
                                                         <th class="text-center">OBSERVACIONES</th>
                                                         <th class="text-center">ESTATUS</th>
                                                         <th class="text-center">ACCIONES</th>
@@ -112,6 +113,7 @@
                                                             <?php endif; ?>
                                                         </td>
                                                          <td class="text-center"><?= $p->detalles?></td>
+                                                         <td class="text-center"><?= $p->comentarios?></td>
                                                          <td class="text-center"><?= $p->observaciones?></td>
                                                        <?php
                                                         switch ($p->id_estatus) {
