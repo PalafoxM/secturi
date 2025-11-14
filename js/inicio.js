@@ -5384,6 +5384,44 @@ ini.inicio = (function () {
 
          
        },  
+        deletePTVe: function(id_pt){
+                Swal.fire({
+                    title: "Estas seguro de eliminar el registro",
+                    text: "El registro se eliminará de la base de datos",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "SI, eliminar"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                             $.ajax({
+                                url: base_url + "index.php/Principal/deletePTVe",
+                                type: "post",
+                                dataType: "json",
+                                data: {id_registro_pt:id_pt},
+                              
+                                success: function (response, textStatus, jqXHR) {
+                                    if (response.error) {
+                                        Swal.fire("Atención", response.respuesta, "warning");
+                                        return false;
+                                    }
+                                    Swal.fire("Correcto", "Se elimino  correctamente", "success");
+                                      setTimeout(() => {
+                                                window.location.reload();
+                                        }, 1500);
+                                },
+                                error: function (jqXHR, textStatus, errorThrown) {
+                                    console.log("error(s):" + jqXHR);
+                                },
+                            });
+                        }
+                    });
+          
+               
+
+         
+       },  
         
     }
 })();

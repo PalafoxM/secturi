@@ -2290,6 +2290,22 @@ class Principal extends BaseController
         $response = $globals->saveTabla(['visible' => 0], $dataConfig, ["script" => "opciones.DeletePT"]);
         return $this->respond($response);
     }
+    public function deletePTVe()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $id_vehiculo = $this->request->getPost('id_registro_pt');
+
+        $dataConfig = [
+            "tabla" => "pt_vehiculo",
+            "editar" => true,
+            "idEditar" => ['id_vehiculo' => $id_vehiculo]
+        ];
+
+
+        $response = $globals->saveTabla(['visible' => 0], $dataConfig, ["script" => "opciones.DeletePT"]);
+        return $this->respond($response);
+    }
     public function listadoEnvioGO()
     {
         $session = \Config\Services::session();
