@@ -2074,6 +2074,11 @@ class Agregar extends BaseController
             $response->respuesta = "Es requerido el id_responsable_gasto";
             return $this->respond($response);
         }
+        if (isset($data['convenio']) && empty($data['convenio'])) {
+            $response->error = true;
+            $response->respuesta = "Es requerido el convenio";
+            return $this->respond($response);
+        }
         if($data['editar'] == 0){
                if (empty($archivos)) {
                 $response->error = true;
@@ -2081,7 +2086,6 @@ class Agregar extends BaseController
                 return $this->respond($response);
                 
                }
-
         }
 
 
@@ -2166,19 +2170,21 @@ class Agregar extends BaseController
         
         $dataInsert = [
             'id_direccion_responsable' => $data['direccion_responsable'],
-            'id_proveedor' => $data['id_proveedor'],
-            'fecha_tramite' => $data['fecha_tramite'],
-            'id_responsable' => (int) $data['id_reponsable_solicitud'],
-            'id_director' => 1,
-            'id_secretario' => $data['id_secretario'],
-            'id_responsable_gasto' => $data['id_responsable_gasto'],
-            'id_banco_proveedor' => $data['id_proveedor_banco'],
-            'fec_inicio' => $data['fecha_inicio'],
-            'fec_fin' => $data['fecha_inicio'],
-            'concepto' => $data['concepto_gasto'],
-            'comision' => $data['comision'],
-            'id_proyecto' => $data['id_proyecto'],
-            'no_consecutivo' => $data['no_consecutivo'],
+            'id_proveedor'             => $data['id_proveedor'],
+            'fecha_tramite'            => $data['fecha_tramite'],
+            'id_responsable'           => (int) $data['id_reponsable_solicitud'],
+            'id_director'              => 1,
+            'id_secretario'            => $data['id_secretario'],
+            'id_responsable_gasto'     => $data['id_responsable_gasto'],
+            'id_banco_proveedor'       => $data['id_proveedor_banco'],
+            'fec_inicio'               => $data['fecha_inicio'],
+            'fec_fin'                  => $data['fecha_inicio'],
+            'concepto'                 => $data['concepto_gasto'],
+            'comision'                 => $data['comision'],
+            'id_proyecto'              => $data['id_proyecto'],
+            'no_consecutivo'           => $data['no_consecutivo'],
+            'convenio'                 => $data['convenio'],
+            'otros'                    => $data['otros'],
           
         ];
 

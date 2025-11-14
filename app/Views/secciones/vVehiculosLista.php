@@ -62,7 +62,7 @@
                                             <td  class="text-center" class="text-center">
                                                 <a href="<?= base_url().'index.php/Usuario/editarVehiculoTP/'.$e->id_vehiculo ?>" class="btn btn-outline-info btn-round" title="editar"  >
                                                     <i class="mdi dripicons-pencil font-18"></i></a>
-                                                     <a href="<?php echo base_url().'index.php/Usuario/VehiculoTP/'.$e->id_vehiculo ?>" target="_blank">
+                                                     <a href="<?php echo base_url().'index.php/Principal/tablaArchivosVehiculos/'.$e->id_vehiculo ?>/PT" target="_blank">
                                                    <button type="button"  class="btn btn-outline-info btn-round">                       
                                                <i class="mdi dripicons-document-new text-success font-18"></i></button></a>
                                                 <a class="btn btn-outline-info btn-round" href="javascript:void(0);"  onclick="ini.inicio.deletePT(<?= $e->id_vehiculo?>)" ><i

@@ -70,6 +70,9 @@
          <div  style="position:absolute; top:48.1%; left:22%; width:25%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "><?= (isset($reserva[0]->no_convenio) && !empty($reserva[0]->no_convenio))?strtoupper($reserva[0]->no_convenio):'' ?></span>
         </div>
+         <div  style="position:absolute; top:48.2%; left:22%; width:25%; background-color:white; font-size: 12px;  height:12px;">
+            <span class="proxima "><?= $vehiculo->convenio; ?></span>
+        </div>
          <div  style="position:absolute; top:49.4%; left:12%; width:25%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima ">S/N</span>
         </div>

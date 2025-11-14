@@ -1093,6 +1093,8 @@ class Usuario extends BaseController
             $data['concepto']       = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->concepto:'';
             $data['fec_inicio']       = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->fec_inicio:'';
             $data['fec_fin']       = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->fec_fin:'';
+            $data['convenio']       = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->convenio:'';
+            $data['otros']       = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->otros:'';
 
         }
 

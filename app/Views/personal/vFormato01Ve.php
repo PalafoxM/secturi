@@ -29,7 +29,7 @@
 
         </div>
         <div  style="position:absolute; text-align:center; top:50.5%; left:25%; width:70%; height:18px; background-color:white; font-size: 10px; ">
-            
+            <?= $vehiculo->otros ?>
         </div>
 
 

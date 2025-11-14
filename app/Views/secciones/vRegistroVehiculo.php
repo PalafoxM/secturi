@@ -181,7 +181,7 @@
                                             placeholder="Concepto del gasto" name="concepto_gasto">
                                     </div><!--end col-->
                                 </div><!--end form-row-->
-                                   <div class="form-row">
+                                <div class="form-row">
 
                                  
                                     <div class="col-md-6 mb-3">
@@ -194,6 +194,21 @@
                                         <label for="fecha_fin">Facha Fin.<span
                                                 style="color:red;">*</span></label>
                                        <input id="fecha_fin" value="<?= (isset($fec_fin)) ? date('Y-m-d', strtotime($fec_fin)) : '' ?>"  type="date" name="fecha_fin" multiple class="form-control"  accept=".xml">
+                                    </div><!--end col-->
+
+                                                                
+                                </div><!--end form-row-->
+                                <div class="form-row">
+
+                                 
+                                    <div class="col-md-6 mb-3">
+                                        <label for="convenio">No. Contrato/Convenio<span style="color:red">*</span></label>
+                                           <input id="convenio" value="<?= (isset($convenio) && !empty($convenio))?$convenio:'' ?>"  type="text" name="convenio" class="form-control" />
+                                
+                                    </div><!--end col-->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="otros">Otros</label>
+                                       <input id="otros" type="text" value="<?= (isset($otros) && !empty($otros))?$otros:'' ?>"  name="otros" multiple class="form-control">
                                     </div><!--end col-->
 
                                                                 
