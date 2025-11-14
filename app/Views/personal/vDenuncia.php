@@ -32,7 +32,7 @@
                                      <div class="row">
                                         <div class="col-lg-6">
                                             <div class="card text-white bg-primary">
-                                                <a href="javascript:void(0)" onclick="mostrarForm();">
+                                                <a href="javascript:void(0)" onclick="mostrarForm1();">
                                                 <div class="card-body">
                                                     <blockquote class="card-bodyquote mb-0">
                                                          <center><h4 class="text-white">Por incumplimiento al Código de Ética y/o Código de Conducta.</h4> </center>
@@ -45,7 +45,7 @@
                                                 
                                         <div class="col-lg-6">
                                             <div class="card text-white bg-warning">
-                                                <a href="javascript:void(0)" onclick="mostrarForm();">
+                                                <a href="javascript:void(0)" onclick="mostrarForm2();">
                                                 <div class="card-body">
                                                     <blockquote class="card-bodyquote mb-0">
                                                         <center> <h4 class="text-white">Por violencia laboral, acoso u hostigamiento sexual.</h4> </center>
@@ -62,6 +62,8 @@
                          <div class="col-lg-12">
                             <div class="card">
                                 <div class="card-body">
+                                     <h4 class="mt-0 header-title" id="incumplimiento">incumplimiento</h4>
+                                      <h4 class="mt-0 header-title" id="violencia">violencia</h4>
                                       <form id="form_denuncia" >
 
                                        <div class="row">
@@ -216,8 +218,15 @@ $(document).on('change', '#denunciando', function () {
     $("#div_input_manual").hide();       // ocultar input
   }
 });
-function mostrarForm() {
+function mostrarForm1() {
     $('#formulario_denuncia').fadeIn(400); // 400 ms = 0.4 segundos
+    $('#incumplimiento').fadeIn();
+    $('#violencia').hide();
+}
+function mostrarForm2() {
+    $('#formulario_denuncia').fadeIn(400); // 400 ms = 0.4 segundos
+     $('#incumplimiento').hide();
+    $('#violencia').fadeIn();
 }
 
 </script>
