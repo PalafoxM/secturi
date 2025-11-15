@@ -166,7 +166,7 @@
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="otros">Otros</label>
-                                                <input type="text" class="form-control" id="otros"  name="otros" value="<?= $registro_pt->otros ?>" readonly>
+                                                <input type="text" class="form-control" id="otros"  name="otros" value="<?= $registro_pt->otros ?>" >
                                                 <div class="invalid-feedback">
                                                     Please provide a valid state.
                                                 </div>
@@ -182,14 +182,14 @@
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="concepto_pago">Concepto del pago.<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" readonly  autocomplete="off" id="concepto_pago" name="concepto_pago" value="<?= (isset($registro_pt->concepto_pago))?$registro_pt->concepto_pago:'' ?>" >
+                                                <input type="text" class="form-control"  autocomplete="off" id="concepto_pago" name="concepto_pago" value="<?= (isset($registro_pt->concepto_pago))?$registro_pt->concepto_pago:'' ?>" >
                                                 <div class="invalid-feedback">
                                                     Please provide a valid state.
                                                 </div>
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="comision">Comisión / Reunión / Evento / Programa</label>
-                                                <input type="text" class="form-control" readonly id="comision"  name="comision" value="<?= (isset($registro_pt->comision))?$registro_pt->comision:'Comisión / Reunión / Evento / Programa' ?>" >
+                                                <input type="text" class="form-control"  id="comision"  name="comision" value="<?= (isset($registro_pt->comision))?$registro_pt->comision:'Comisión / Reunión / Evento / Programa' ?>" >
                                                 <div class="invalid-feedback">
                                                     Please provide a valid state.
                                                 </div>

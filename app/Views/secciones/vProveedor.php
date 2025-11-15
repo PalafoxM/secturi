@@ -258,14 +258,14 @@
                                         <div class="form-row">
                                             <div class="col-md-4 mb-3">
                                                 <label for="no_reserva">No. de Reserva.<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" autocomplete="off" id="no_reserva" name="no_reserva"  value="<?= (isset($reserva->no_reserva))?$reserva->no_reserva:'' ?>" readonly>
+                                                <input type="text" class="form-control"  autocomplete="off" id="no_reserva" name="no_reserva"  value="<?= (isset($reserva->no_reserva))?$reserva->no_reserva:'' ?>" readonly>
                                                 <div class="invalid-feedback">
                                                     Campo no Valido
                                                 </div>
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="no_consecutivo">No. Consecutivo.</label>
-                                                <input type="text" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo" value="<?= (isset($no_consecutivo))?$no_consecutivo:''?>"  >
+                                                <input type="text" class="form-control" readonly autocomplete="off" id="no_consecutivo" name="no_consecutivo" value="<?= (isset($no_consecutivo))?$no_consecutivo:''?>"  >
                                             </div><!--end col-->
                                             
                                         </div><!--end form-row-->
