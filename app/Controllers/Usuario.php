@@ -978,15 +978,15 @@ class Usuario extends BaseController
                         $valorEntrada = 'Sin registro';
                         $sheet->getStyle($colSalida . $fila)
                             ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                            ->getStartColor()->setARGB('FFFFA500');
+                            ->getStartColor()->setARGB('FFFF0000');
                         $sheet->getStyle($colEntrada . $fila)
                                 ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                ->getStartColor()->setARGB('FFFFA500'); // rojo
+                                ->getStartColor()->setARGB('FFFF0000'); // rojo
                     }elseif(empty($salida)  || !$salida){
                         $valorSalida = 'Sin registro';
                         $sheet->getStyle($colSalida . $fila)
                              ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                             ->getStartColor()->setARGB('FFFFA500'); // rojo
+                             ->getStartColor()->setARGB('FFFF0000'); // rojo
                                   
                     } else {
                         // Ejemplo: marcar rojo si la salida es antes de la hora mínima permitida
