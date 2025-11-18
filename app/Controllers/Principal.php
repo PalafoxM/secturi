@@ -1914,8 +1914,6 @@ class Principal extends BaseController
             'ztorrest@guanajuato.gob.mx',
             'ajassome@guanajuato.gob.mx',
             'apenriquez@guanajuato.gob.mx',
-            'crismon@guanajuato.gob.mx',
-            'csoto@guanajuato.gob.mx',
             'hramirezd@guanajuato.gob.mx',
             'ialvarezp@guanajuato.gob.mx',
             'jescobarl@guanajuato.gob.mx',
@@ -1925,7 +1923,7 @@ class Principal extends BaseController
             'yjimenez@guanajuato.gob.mx',
         ]);
  
-        /*          $email->setTo([
+          /*        $email->setTo([
                     'alopez@guanajuato.gob.mx',
                     'cchernandezp@guanajuato.gob.mx',
                     'csoto@guanajuato.gob.mx',
@@ -2003,9 +2001,9 @@ class Principal extends BaseController
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Estimado personal,</p>
                         
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-                            En caso de que aún no hayas realizado las <strong>justificaciones de tu personal correspondientes a la quincena 20/2025</strong>, 
-                            la cual comprende el periodo del <strong>16 al 31 de octubre de 2025</strong>, 
-                            tienes hasta el día <strong> viernes 10 de noviembre hasta las 16:00 hrs</strong> para realizarlas.
+                            En caso de que aún no hayas realizado las <strong>justificaciones de tu personal correspondientes a la quincena 21/2025</strong>, 
+                            la cual comprende el periodo del <strong>1 al 15 de noviembre de 2025</strong>, 
+                            tienes hasta el día <strong> lunes 24 de noviembre hasta las 16:00 hrs</strong> para realizarlas.
                         </p>
 
                         <div class="highlight-box">
@@ -2021,7 +2019,7 @@ class Principal extends BaseController
                         </p>
 
                         <div style="text-align: center; margin: 30px 0;">
-                            <a href="https://secturnet.guanajuato.gob.mx/susi/index.php/Agregar/Asistencia" class="btn" style="color: white; text-decoration: none;">
+                            <a href="https://secturnet.guanajuato.gob.mx/susi/index.php/Principal/incidenciaSubordinado" class="btn" style="color: white; text-decoration: none;">
                                 📋 Revisar Incidencias del Personal
                             </a>
                         </div>
