@@ -937,6 +937,34 @@ class Usuario extends BaseController
                             $stopIncProcessing = true;
                             break;
                         }
+                        if ($estatus === 1 && $entrada >= '12:00:00' && $salida >= '16:00:00') {
+                            $valorEntrada = $entrada;
+                            $colSalida    = $salida;
+             
+                            $sheet->getStyle($colEntrada . $fila)
+                                ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                ->getStartColor()->setARGB('FFFF0000');
+                            $sheet->getStyle($colSalida . $fila)
+                                ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                ->getStartColor()->setARGB('FFFF0000');
+                            $validado = true;
+                            $stopIncProcessing = true;
+                            break;
+                        }
+                        if ($estatus === 1 && $entrada >= '09:00:00' && $salida >= '12:00:00') {
+                            $valorEntrada = $entrada;
+                            $colSalida    = $salida;
+             
+                            $sheet->getStyle($colEntrada . $fila)
+                                ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                ->getStartColor()->setARGB('FFFF0000');
+                            $sheet->getStyle($colSalida . $fila)
+                                ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                ->getStartColor()->setARGB('FFFF0000');
+                            $validado = true;
+                            $stopIncProcessing = true;
+                            break;
+                        }
                    
                     }
                 }
