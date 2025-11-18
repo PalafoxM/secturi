@@ -999,6 +999,16 @@ class Usuario extends BaseController
                                     ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                                     ->getStartColor()->setARGB('FFFFA500'); // rojo
                             }
+                            if ( empty($entrada) && empty($salida)) {
+                                $valorEntrada = 'Sin registro';
+                                $valorSalida = 'Sin registro';
+                                $sheet->getStyle($colEntrada . $fila)
+                                    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                    ->getStartColor()->setARGB('FFFFA500'); // rojo
+                                $sheet->getStyle($colSalida . $fila)
+                                    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                    ->getStartColor()->setARGB('FFFFA500'); // rojo
+                            }
 
                         } catch (\Exception $e) {
                             // si $salida no es parseable, no hacer nada (o registrar)
