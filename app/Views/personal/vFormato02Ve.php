@@ -3,14 +3,14 @@
         </div>
 
         <div  style="position:absolute; text-align:center; top:16.2%; left:70%; width:22%; height:10px; background-color:white; font-size: 7px; ">
-            <span class="proxima">PT <?= $folio;?></span>
+            <span class="proxima">PT <?= $vehiculo->folio;?></span>
         </div>
         <div  style="position:absolute; text-align:center; top:18.5%; left:70%; width:22%; height:10px; background-color:white; font-size: 7px; ">
             <span class="proxima">3550
             </span>
         </div>
          <div  style="position:absolute; text-align:center; top:15.5%; left:22%; width:36%; height:30px; background-color:white; font-size: 7px; ">
-            <span class="proxima"><?= (isset($proveedor->razon_social) && !empty($proveedor->razon_social))?$proveedor->razon_social:'';?></span>
+            <span class="proxima"><?= (isset($vehiculo->proveedor) && !empty($vehiculo->proveedor))?$vehiculo->proveedor:'';?></span>
         </div>
       <div  style="position:absolute; text-align:center; top:20.7%; left:22%; width:66%; height:30px; background-color:white; font-size: 7px; ">
             <span class="proxima"><?= (isset($vehiculo->concepto) && !empty($vehiculo->concepto))?$vehiculo->concepto:''; ?></span>
@@ -31,7 +31,7 @@
                  <strong>(<?= $numero_texto?>)</strong>, por el servicio de
                  <strong>
                   3550
-                </strong> prestado por el proveedor <strong><?=(isset($reserva->razon_social) && !empty($reserva->razon_social))?$reserva->razon_social:'' ?></strong>. Se cuenta con suficiencia presupuestal en la partida
+                </strong> prestado por el proveedor <strong><?=(isset($vehiculo->proveedor) && !empty($vehiculo->proveedor))?$vehiculo->proveedor:'' ?></strong>. Se cuenta con suficiencia presupuestal en la partida
                 <strong>
                  
              

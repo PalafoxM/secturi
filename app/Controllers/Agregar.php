@@ -2190,6 +2190,7 @@ class Agregar extends BaseController
             'clabe'                    => $data['clabe'],
             'no_cuenta'                => $data['no_cuenta'],
             'folio'                    => $data['folio'],
+            'rfc'                      => $data['rfc'],
             'no_proveedor'             => $data['no_proveedor'],
           
         ];

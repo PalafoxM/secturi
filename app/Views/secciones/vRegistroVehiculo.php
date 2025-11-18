@@ -57,6 +57,46 @@
                                             </select>
                                     </div> -->
                                 </div><!--end form-row-->
+                                 <div class="form-row">
+                                    
+                                    <div class="col-md-4 mb-3">
+                                        <label for="folio">Folio</label>
+                                        <input type="text" class="form-control" id="folio" name="folio"
+                                            value="<?= (isset($folio)) ? $folio : '' ?>"  placeholder="folio" >
+                                      
+                                    </div><!--end col-->
+                              
+                                    <div class="col-md-4 mb-3">
+                                        <label for="no_cuenta">No. Cuenta<span
+                                                style="color:red;">*</span></label>
+                                        <input type="text" class="form-control" id="no_cuenta" autocomplete="off"
+                                        value="<?= (isset($no_cuenta)) ? $no_cuenta : '' ?>"
+                                            placeholder="No. Cuenta" name="no_cuenta">
+                                    </div><!--end col-->
+                                    <div class="col-md-4 mb-3">
+                                        <label for="clabe">Clabe<span
+                                                style="color:red;">*</span></label>
+                                        <input type="text" class="form-control" id="clabe" autocomplete="off"
+                                        value="<?= (isset($clabe)) ? $clabe : '' ?>"
+                                            placeholder="Clabe" name="clabe">
+                                    </div><!--end col-->
+                                </div><!--end form-row-->
+                                 <div class="form-row">
+                                    
+                                    <div class="col-md-4 mb-3">
+                                        <label for="rfc">RFC</label>
+                                        <input type="text" class="form-control" id="rfc" name="rfc"
+                                            value="<?= (isset($rfc)) ? $rfc : '' ?>"  placeholder="rfc" >
+                                      
+                                    </div><!--end col-->
+                              
+                                    <div class="col-md-4 mb-3">
+                               
+                                    </div><!--end col-->
+                                    <div class="col-md-4 mb-3">
+                                      
+                                    </div><!--end col-->
+                                </div><!--end form-row-->
                                 <div class="form-row">
                                     <!-- Dirección Responsable -->
                                     <div class="col-md-4 mb-3">
@@ -194,30 +234,7 @@
                                             placeholder="Concepto del gasto" name="concepto_gasto">
                                     </div><!--end col-->
                                 </div><!--end form-row-->
-                                <div class="form-row">
-                                    
-                                    <div class="col-md-4 mb-3">
-                                        <label for="folio">Folio</label>
-                                        <input type="text" class="form-control" id="folio" name="folio"
-                                            value="<?= (isset($folio)) ? $folio : '' ?>"  placeholder="folio" >
-                                      
-                                    </div><!--end col-->
-                              
-                                    <div class="col-md-4 mb-3">
-                                        <label for="no_cuenta">No. Cuenta<span
-                                                style="color:red;">*</span></label>
-                                        <input type="text" class="form-control" id="no_cuenta" autocomplete="off"
-                                        value="<?= (isset($no_cuenta)) ? $no_cuenta : '' ?>"
-                                            placeholder="No. Cuenta" name="no_cuenta">
-                                    </div><!--end col-->
-                                    <div class="col-md-4 mb-3">
-                                        <label for="clabe">Clabe<span
-                                                style="color:red;">*</span></label>
-                                        <input type="text" class="form-control" id="clabe" autocomplete="off"
-                                        value="<?= (isset($clabe)) ? $clabe : '' ?>"
-                                            placeholder="Clabe" name="clabe">
-                                    </div><!--end col-->
-                                </div><!--end form-row-->
+                               
                                 <div class="form-row">
 
                                  

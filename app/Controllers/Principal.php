@@ -2927,11 +2927,8 @@ class Principal extends BaseController
         
             $data['responsableGasto'] = isset($responsableGasto->data) && !empty($responsableGasto->data)?$responsableGasto->data[0]:[];
             $data['responsable'] = isset($responsable->data) && !empty($responsable->data)?$responsable->data[0]:[];
-            $proveedor = $globals->getTabla([
-                'tabla' => 'proveedor',
-                'where' => ['visible' => 1, 'id_proveedor' => $vehiculo->data[0]->id_proveedor ]
-            ]);
-            $data['proveedor'] = isset($proveedor->data) && !empty($proveedor->data)?$proveedor->data[0]:[];
+           
+            
         }
         //die( var_dump($data['responsable'] ) );
          $folio =(isset( $responsableGasto->data) && !empty( $responsableGasto->data))? $responsableGasto->data[0]->folio_prefijo:'S/N/';
@@ -4631,11 +4628,11 @@ class Principal extends BaseController
                 $no_consecutivo = $vehiculo->data[0]->no_consecutivo;
             }
             
-            $folio =(isset( $resposableGasto->data) && !empty( $resposableGasto->data))? $resposableGasto->data[0]->folio_prefijo:'S/N/';
-            $folio_prefijo = $folio . $no_consecutivo . '/' . date('Y');
-            $data['folio'] = $folio_prefijo;
+    
+            $data['folio'] = $vehiculo->data[0]->folio;
             $data['proveedor'] = $vehiculo->data[0]->proveedor;
             $data['no_proveedor'] = $vehiculo->data[0]->no_proveedor;
+            $data['rfc'] = $vehiculo->data[0]->rfc;
             $data['proveedorBanco'] = $vehiculo->data[0]->banco;
             $data['direccion'] = (isset( $direccion->data) && !empty( $direccion->data))? $direccion->data[0]:'';
             $data['proyecto'] = (isset( $proyecto->data) && !empty( $proyecto->data))? $proyecto->data[0]:'';
