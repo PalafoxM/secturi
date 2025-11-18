@@ -973,14 +973,18 @@ class Usuario extends BaseController
               // --- Validación de salida (ejemplo) ---
                 if (!$validado) {
                     // Si no hay salida -> marcar rojo (sin registro de salida)
-                    if (empty($salida) || !$salida) {
+                    if (empty($salida) || !$salida && empty($entrada) || !$entrada) {
                         $valorSalida = 'Sin registro';
+                        $valorEntrada = 'Sin registro';
                         $sheet->getStyle($colSalida . $fila)
                             ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                             ->getStartColor()->setARGB('FFFF0000');
-                    }elseif(empty($entrada)  || !$entrada){
-                        $valorEntrada = 'Sin registro';
                         $sheet->getStyle($colEntrada . $fila)
+                                ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                ->getStartColor()->setARGB('FFFFA500'); // rojo
+                    }elseif(empty($salida)  || !$salida){
+                        $valorSalida = 'Sin registro';
+                        $sheet->getStyle($colSalida . $fila)
                              ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                              ->getStartColor()->setARGB('FFFFA500'); // rojo
                                   
