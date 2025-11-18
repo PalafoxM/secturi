@@ -923,10 +923,13 @@ class Usuario extends BaseController
                             $stopIncProcessing = true;
                             break;
                         }
-                        
+
                         if ($estatus === 1 && empty($salida) && empty($entrada)) {
                             $valorEntrada = 'Sin validar';
                             $valorSalida  = 'Sin validar';
+                            $sheet->getStyle($colEntrada . $fila)
+                                ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                ->getStartColor()->setARGB('FFFF0000');
                             $sheet->getStyle($colSalida . $fila)
                                 ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                                 ->getStartColor()->setARGB('FFFF0000');
