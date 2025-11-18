@@ -939,7 +939,7 @@ class Usuario extends BaseController
                         }
                         if ($estatus === 1 && $entrada >= '12:00:00' && $salida >= '16:00:00') {
                             $valorEntrada = $entrada;
-                            $colSalida    = $salida;
+                            $valorSalida  = $salida;
              
                             $sheet->getStyle($colEntrada . $fila)
                                 ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
@@ -951,7 +951,7 @@ class Usuario extends BaseController
                             $stopIncProcessing = true;
                             break;
                         }
-                        if ($estatus === 1 && $entrada >= '09:00:00' && $salida >= '12:00:00') {
+                        if ($estatus === 1 && $entrada >= '09:00:00' && $salida >= '1:00:00') {
                             $valorEntrada = $entrada;
                             $colSalida    = $salida;
              
