@@ -2025,12 +2025,12 @@ class Agregar extends BaseController
        
       
    
-        if (empty($data['id_proveedor'])) {
+        if (empty($data['proveedor'])) {
             $response->error = true;
-            $response->respuesta = "Es requerido el Secretario o Director";
+            $response->respuesta = "Es requerido el proveedor";
             return $this->respond($response);
         }
-        if (isset($data['id_proveedor_banco']) && empty($data['id_proveedor_banco'])) {
+        if (isset($data['banco']) && empty($data['banco'])) {
             $response->error = true;
             $response->respuesta = "Es requerido el Cuenta Bancaria";
             return $this->respond($response);
@@ -2172,13 +2172,13 @@ class Agregar extends BaseController
         
         $dataInsert = [
             'id_direccion_responsable' => $data['direccion_responsable'],
-            'id_proveedor'             => $data['id_proveedor'],
+            'proveedor'                => $data['proveedor'],
             'fecha_tramite'            => $data['fecha_tramite'],
             'id_responsable'           => (int) $data['id_reponsable_solicitud'],
             'id_director'              => 1,
             'id_secretario'            => $data['id_secretario'],
             'id_responsable_gasto'     => $data['id_responsable_gasto'],
-            'id_banco_proveedor'       => $data['id_proveedor_banco'],
+            'banco'                    => $data['banco'],
             'fec_inicio'               => $data['fecha_inicio'],
             'fec_fin'                  => $data['fecha_fin'],
             'concepto'                 => $data['concepto_gasto'],
@@ -2187,6 +2187,10 @@ class Agregar extends BaseController
             'no_consecutivo'           => $data['no_consecutivo'],
             'convenio'                 => $data['convenio'],
             'otros'                    => $data['otros'],
+            'clabe'                    => $data['clabe'],
+            'no_cuenta'                => $data['no_cuenta'],
+            'folio'                    => $data['folio'],
+            'no_proveedor'             => $data['no_proveedor'],
           
         ];
 

@@ -33,16 +33,29 @@
                                 <input type="hidden" name="id_vehiculo" value="<?= $id_vehiculo?>">
                                 <div class="form-row">
                                     <!-- Dirección Responsable -->
-                                    <div class="col-md-6 mb-6">
+                                    <div class="col-md-4 mb-6">
+                                        <label for="proveedor">Proveedor<span class="text-danger">*</span></label>
+                                        <input class="form-control" id="proveedor" name="proveedor" required>
+                         
+                                    </div>
+                                    <!-- <div class="col-md-6 mb-6">
                                         <label for="id_proveedor">Proveedor<span class="text-danger">*</span></label>
                                         <select class="form-control select2-ajax" id="id_proveedor" name="id_proveedor" required>
                                         </select>
+                                    </div> -->
+                                    <div class="col-md-4 mb-6">
+                                        <label for="banco">Banco<span class="text-danger">*</span></label>
+                                        <input class="form-control" id="banco" name="banco" required>
                                     </div>
-                                    <div class="col-md-6 mb-6">
+                                    <div class="col-md-4 mb-6">
+                                        <label for="no_proveedor">No. proveedor<span class="text-danger">*</span></label>
+                                        <input class="form-control" id="no_proveedor" name="no_proveedor" required>
+                                    </div>
+                                 <!--    <div class="col-md-6 mb-6">
                                         <label for="id_proveedor_banco">Proveedor Banco<span class="text-danger">*</span></label>
                                         <select class="form-control select2-ajax" id="id_proveedor_banco" name="id_proveedor_banco" required>
                                             </select>
-                                    </div>
+                                    </div> -->
                                 </div><!--end form-row-->
                                 <div class="form-row">
                                     <!-- Dirección Responsable -->
@@ -182,6 +195,30 @@
                                     </div><!--end col-->
                                 </div><!--end form-row-->
                                 <div class="form-row">
+                                    
+                                    <div class="col-md-4 mb-3">
+                                        <label for="folio">Folio</label>
+                                        <input type="text" class="form-control" id="folio" name="folio"
+                                            value="<?= (isset($folio)) ? $folio : '' ?>"  placeholder="folio" >
+                                      
+                                    </div><!--end col-->
+                              
+                                    <div class="col-md-4 mb-3">
+                                        <label for="no_cuenta">No. Cuenta<span
+                                                style="color:red;">*</span></label>
+                                        <input type="text" class="form-control" id="no_cuenta" autocomplete="off"
+                                        value="<?= (isset($no_cuenta)) ? $no_cuenta : '' ?>"
+                                            placeholder="No. Cuenta" name="no_cuenta">
+                                    </div><!--end col-->
+                                    <div class="col-md-4 mb-3">
+                                        <label for="clabe">Clabe<span
+                                                style="color:red;">*</span></label>
+                                        <input type="text" class="form-control" id="clabe" autocomplete="off"
+                                        value="<?= (isset($clabe)) ? $clabe : '' ?>"
+                                            placeholder="Clabe" name="clabe">
+                                    </div><!--end col-->
+                                </div><!--end form-row-->
+                                <div class="form-row">
 
                                  
                                     <div class="col-md-6 mb-3">
@@ -298,7 +335,7 @@
 <script>
 
 
-$(document).ready(function() {
+/* $(document).ready(function() {
     $('#id_proveedor').select2({
         placeholder: 'Escribe para buscar un proveedor...',
             minimumInputLength: 3,
@@ -321,7 +358,7 @@ $(document).ready(function() {
             }
         });
     });
-
+ */
     $('#id_proveedor').on('change', function() {
         var idProveedor = $(this).val();
         

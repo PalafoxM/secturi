@@ -4602,14 +4602,8 @@ class Principal extends BaseController
                 'tabla' => 'vw_usuario',
                 'where' => ['visible' => 1, 'id_usuario' =>  $vehiculo->data[0]->id_responsable]
             ]);
-            $proveedor = $globals->getTabla([
-                'tabla' => 'proveedor',
-                'where' => ['visible' => 1, 'id_proveedor' =>  $vehiculo->data[0]->id_proveedor]
-            ]);
-            $proveedorBanco = $globals->getTabla([
-                'tabla' => 'proveedor_banco',
-                'where' => ['visible' => 1, 'idproveedor' =>  $vehiculo->data[0]->id_banco_proveedor]
-            ]);
+          
+           
            
             $proyecto = $globals->getTabla([
                 'tabla' => 'cat_proyecto',
@@ -4640,8 +4634,9 @@ class Principal extends BaseController
             $folio =(isset( $resposableGasto->data) && !empty( $resposableGasto->data))? $resposableGasto->data[0]->folio_prefijo:'S/N/';
             $folio_prefijo = $folio . $no_consecutivo . '/' . date('Y');
             $data['folio'] = $folio_prefijo;
-            $data['proveedor'] = (isset( $proveedor->data) && !empty( $proveedor->data))? $proveedor->data[0]:'';
-            $data['proveedorBanco'] = (isset( $proveedorBanco->data) && !empty( $proveedorBanco->data))? $proveedorBanco->data[0]:'';
+            $data['proveedor'] = $vehiculo->data[0]->proveedor;
+            $data['no_proveedor'] = $vehiculo->data[0]->no_proveedor;
+            $data['proveedorBanco'] = $vehiculo->data[0]->banco;
             $data['direccion'] = (isset( $direccion->data) && !empty( $direccion->data))? $direccion->data[0]:'';
             $data['proyecto'] = (isset( $proyecto->data) && !empty( $proyecto->data))? $proyecto->data[0]:'';
             $data['secretario'] = (isset( $secretario->data) && !empty( $secretario->data))? $secretario->data[0]:'';

@@ -14,17 +14,17 @@
         </div>
         <div  style="position:absolute; top:36.2%; left:60.7%; width:35%; background-color:white; font-size: 12px;  height:12px;">
       
-            <span class="proxima "> <?= $proveedor->razon_social;?> </span>
+            <span class="proxima "> <?= $proveedor;?> </span>
          
         </div>
          <div  style="position:absolute; top:37.4%; left:73.5%; width:20%; background-color:white; font-size: 9px;  height:12px;">
-            <span >  <?= $proveedor->no_proveedor ?> </span>
+            <span >  <?= $no_proveedor ?> </span>
         </div>
         <div  style="position:absolute; top:38.5%; left:64%; width:33%; background-color:white; font-size: 9px;  height:12px;">
             <span class="proxima "> <?= $proveedor->rfc ?> </span>
         </div>
         <div  style="position:absolute; top:40.8%; left:60.8%; width:36%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><STRONG>NOMBRE DEL PROVEEDOR :</STRONG> <?= $proveedor->razon_social;?> </span>
+            <span class="proxima "><STRONG>NOMBRE DEL PROVEEDOR :</STRONG> <?= $proveedor;?> </span>
         
         </div>
           <div  style="position:absolute; top:42%; left:60.8%; width:36%; background-color:white; font-size: 12px;  height:12px;">
