@@ -203,7 +203,7 @@
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label for="no_consecutivo">No. consecutivo.<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo"  value="<?= $no_consecutivo ?>">
+                                                <input type="text" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo"  value="<?= $no_consecutivo ?>" readonly>
                                                
                                             </div>
                                         </div><!--end form-row-->

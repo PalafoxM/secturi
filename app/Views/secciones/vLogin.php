@@ -36,7 +36,7 @@
                             <!--end auth-logo-text-->
                             <div class="form-horizontal auth-form my-4">
 
-                           <!--      <div class="form-group">
+                           <!-- 0     <div class="form-group">
                                     <label for="usuario">Persona Usuaria</label>
                                     <div class="input-group mb-3">
                                         <span class="auth-form-icon">
