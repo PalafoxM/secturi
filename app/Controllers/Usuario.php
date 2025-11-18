@@ -924,6 +924,17 @@ class Usuario extends BaseController
                             break;
                         }
                    
+                        if ($estatus === 1 && empty($horaInicio) && empty($horaFin)) {
+                            $valorEntrada = 'Sin validar';
+                            $valorSalida  = 'Sin validar';
+                            $sheet->getStyle($colSalida . $fila)
+                                ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                ->getStartColor()->setARGB('FFFF0000');
+                            $validado = true;
+                            $stopIncProcessing = true;
+                            break;
+                        }
+                   
                     }
                 }
 
