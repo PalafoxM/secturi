@@ -2178,7 +2178,7 @@ class Agregar extends BaseController
             'id_responsable_gasto'     => $data['id_responsable_gasto'],
             'id_banco_proveedor'       => $data['id_proveedor_banco'],
             'fec_inicio'               => $data['fecha_inicio'],
-            'fec_fin'                  => $data['fecha_inicio'],
+            'fec_fin'                  => $data['fecha_fin'],
             'concepto'                 => $data['concepto_gasto'],
             'comision'                 => $data['comision'],
             'id_proyecto'              => $data['id_proyecto'],
