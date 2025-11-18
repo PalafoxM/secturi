@@ -978,6 +978,12 @@ class Usuario extends BaseController
                         $sheet->getStyle($colSalida . $fila)
                             ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                             ->getStartColor()->setARGB('FFFF0000');
+                    }elseif(empty($entrada) && !$entrada){
+                        $valorEntrada = 'Sin registro';
+                        $sheet->getStyle($colEntrada . $fila)
+                             ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                             ->getStartColor()->setARGB('FFFFA500'); // rojo
+                                  
                     } else {
                         // Ejemplo: marcar rojo si la salida es antes de la hora mínima permitida
                         // o si es demasiado tarde (ajusta $minSalida / $maxSalida a tus reglas)
@@ -999,16 +1005,7 @@ class Usuario extends BaseController
                                     ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                                     ->getStartColor()->setARGB('FFFFA500'); // rojo
                             }
-                            if ( empty($entrada) && empty($salida)) {
-                                $valorEntrada = 'Sin registro';
-                                $valorSalida = 'Sin registro';
-                                $sheet->getStyle($colEntrada . $fila)
-                                    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                    ->getStartColor()->setARGB('FFFFA500'); // rojo
-                                $sheet->getStyle($colSalida . $fila)
-                                    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                    ->getStartColor()->setARGB('FFFFA500'); // rojo
-                            }
+                         
 
                         } catch (\Exception $e) {
                             // si $salida no es parseable, no hacer nada (o registrar)
