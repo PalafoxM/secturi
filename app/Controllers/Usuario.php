@@ -923,8 +923,8 @@ class Usuario extends BaseController
                             $stopIncProcessing = true;
                             break;
                         }
-                   
-                        if ($estatus === 1 && empty($horaInicio) && empty($horaFin)) {
+                        
+                        if ($estatus === 1 && empty($salida) && empty($entrada)) {
                             $valorEntrada = 'Sin validar';
                             $valorSalida  = 'Sin validar';
                             $sheet->getStyle($colSalida . $fila)
