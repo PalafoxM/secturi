@@ -978,7 +978,7 @@ class Usuario extends BaseController
                         $sheet->getStyle($colSalida . $fila)
                             ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                             ->getStartColor()->setARGB('FFFF0000');
-                    }elseif(empty($entrada) && !$entrada){
+                    }elseif(empty($entrada)  || !$entrada){
                         $valorEntrada = 'Sin registro';
                         $sheet->getStyle($colEntrada . $fila)
                              ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
