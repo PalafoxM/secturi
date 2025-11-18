@@ -26,21 +26,17 @@
                 <div class="card auth-card shadow-lg">
                     <div class="card-body">
                         <div class="px-3">
-                            <div class="auth-logo-box">
-                                <a class="logo logo-admin"><img
-                                        src="<?= base_url(); ?>assets/huella.png" height="80" alt="logo"
-                                        class="auth-logo"></a>
-                            </div>
+                           
                             <!--end auth-logo-box-->
 
-                            <div class="text-center auth-logo-text">
+                           <!--   <div class="text-center auth-logo-text">
                                 <h4 class="mt-0 mb-3 mt-5">SUSI</h4>
                                 <p class="text-muted mb-0">SISTEMA UNIFICADO SECTURI</p>
-                            </div>
+                            </div>  -->
                             <!--end auth-logo-text-->
                             <div class="form-horizontal auth-form my-4">
 
-                                <div class="form-group">
+                           <!--      <div class="form-group">
                                     <label for="usuario">Persona Usuaria</label>
                                     <div class="input-group mb-3">
                                         <span class="auth-form-icon">
@@ -50,7 +46,7 @@
                                             placeholder="Ingresar Clave">
                                     </div>
                                 </div>
-                                <!--end form-group-->
+                      
                                 <div class="form-group">
                                     <label for="contrasenia">Contraseña</label>
                                     <div class="input-group mb-3">
@@ -59,10 +55,10 @@
                                       </span>
                                       <input type="password" class="form-control" id="contrasenia" name="contrasenia" placeholder="Ingresar Contraseña">
                                     </div>
-                                </div>
-                                <!--end form-group-->
+                                </div> -->
+                       
 
-                                <div class="form-group row mt-4">
+                         <!--        <div class="form-group row mt-4">
                                     <div class="col-sm-6">
                                         <div class="custom-control custom-switch switch-success">
                                             <input type="checkbox" class="custom-control-input"
@@ -71,21 +67,23 @@
                                                 for="customSwitchSuccess">Recordar</label>
                                         </div>
                                     </div>
-                                    <!--end col-->
+                                   
                                     <div class="col-sm-6 text-right">
                                         <a href="javascript:void(0)" onclick="losePass();" class="text-muted font-13"><i
                                                 class="dripicons-lock"></i> ¿Olvido su contraseña?</a>
                                     </div>
                              
-                                </div>
+                                </div> -->
                                 <!--end form-group-->
 
                                 <div class="form-group mb-0 row" id="btn_login">
                                     <div class="col-12 mt-2">
                                         <button
                                             class="btn btn-gradient-primary btn-round btn-block waves-effect waves-light"
-                                            onclick="saeg.principal.login();" type="button">Ingresar <i
-                                                class="fas fa-sign-in-alt ml-1"></i></button>
+                                            onclick="iniciarGoogle();" type="button">Ingresar a SUSI con Google <i class="fab fa-google google mr-2"></i></button>
+                                       <!--  <button
+                                            class="btn btn-gradient-primary btn-round btn-block waves-effect waves-light"
+                                            onclick="saeg.principal.login();" type="button">Ingresar con Google <i class="fab fa-google google mr-2"></i></button> -->
 
                                     </div>
                                     <!--end col-->
@@ -93,7 +91,7 @@
                                 <div class="form-group mb-0 row" id="btn_load" style="display:none;">
                                     <div class="col-12 mt-2">
                                         <button
-                                            class="btn btn-gradient-primary  btn-round btn-block waves-effect waves-light"
+                                            class="btn btn-gradient-primary btn-round btn-block waves-effect waves-light"
                                             type="button" disabled>
                                             <span class="spinner-border spinner-border-sm" role="status"
                                                 aria-hidden="true"></span>
@@ -116,8 +114,8 @@
                 </div>
                 <!--end card-->
                 <div class="account-social text-center mt-4">
-                    <h6 class="my-4">   Version 2.4</h6>
-                    <ul class="list-inline mb-4">
+                    <h6 class="my-4">   Version 3.0</h6>
+                <!--     <ul class="list-inline mb-4">
                       
                        <li class="btn btn-soft-pink btn-round waves-effect waves-light" id="google-login-btn">
                             <a href="#" class="text-white" onclick="iniciarGoogle(); return false;">
@@ -126,7 +124,7 @@
                             </a>
                         </li>
                       
-                    </ul>
+                    </ul> -->
                 </div>
                 <?php if (session()->getFlashdata('error')): ?>
                     <div class="alert alert-danger">
@@ -175,14 +173,8 @@ function  losePass() {
     Swal.fire("Para restablecer la contraseña", '<p>Favor de comunicarte con el Administrador</p>', 'info'); 
 }
 function iniciarGoogle() {
-    const btn = document.getElementById('google-login-btn');
-    const text = document.getElementById('google-btn-text');
-
-    // Cambiar el texto y deshabilitar visualmente
-    text.textContent = 'Redirigiendo...';
-    btn.classList.add('disabled');
-    btn.style.opacity = '0.7';
-    btn.style.pointerEvents = 'none'; // Evita más clics
+    $('#btn_login').hide();
+    $('#btn_load').show();
 
     // Redirigir después de un breve delay (mejora la percepción)
     setTimeout(() => {
