@@ -2192,6 +2192,13 @@ class Agregar extends BaseController
             'folio'                    => $data['folio'],
             'rfc'                      => $data['rfc'],
             'no_proveedor'             => $data['no_proveedor'],
+            'formatos'                 => $data['formatos'],
+            'documentacion'            => $data['documentacion'],
+            'poliza'                   => $data['poliza'],
+            'conformidad'              => $data['conformidad'],
+            'contrato_convenio'        => $data['contrato_convenio'],
+            'emitir_pago'              => $data['emitir_pago'],
+            'evidencia'                => $data['evidencia'],
           
         ];
 

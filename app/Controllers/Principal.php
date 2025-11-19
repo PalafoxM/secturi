@@ -2931,19 +2931,7 @@ class Principal extends BaseController
             
         }
         //die( var_dump($data['responsable'] ) );
-         $folio =(isset( $responsableGasto->data) && !empty( $responsableGasto->data))? $responsableGasto->data[0]->folio_prefijo:'S/N/';
-          $no_consecutivo = "";
-            if (strlen($vehiculo->data[0]->no_consecutivo) == 1) {
-                $no_consecutivo = '00' . $vehiculo->data[0]->no_consecutivo;
-            }
-            if (strlen($vehiculo->data[0]->no_consecutivo) == 2) {
-                $no_consecutivo = '0' . $vehiculo->data[0]->no_consecutivo;
-            }
-            if (strlen($vehiculo->data[0]->no_consecutivo) >= 3) {
-                $no_consecutivo = $vehiculo->data[0]->no_consecutivo;
-            }
-         $folio_prefijo = $folio . $no_consecutivo . '/' . date('Y'); //ESTO HAY QUE OREGUNTAR
-         $data['folio'] = $folio_prefijo;
+      
      
       
     
@@ -4601,7 +4589,6 @@ class Principal extends BaseController
             ]);
           
            
-           
             $proyecto = $globals->getTabla([
                 'tabla' => 'cat_proyecto',
                 'where' => ['visible' => 1, 'id_proyecto' =>  $vehiculo->data[0]->id_proyecto]
@@ -4611,12 +4598,11 @@ class Principal extends BaseController
                 'where' => ['visible' => 1, 'id_secretario' =>  $vehiculo->data[0]->id_secretario]
             ]);
             $resposableGasto = $globals->getTabla([
-                'tabla' => 'vw_direccion',
-                'where' => ['visible' => 1, 'id_director' =>  $vehiculo->data[0]->id_responsable_gasto]
+                'tabla' => 'vw_usuario',
+                'where' => ['visible' => 1, 'id_usuario' =>  $vehiculo->data[0]->id_responsable_gasto]
             ]);
     
-     
-         
+            
                $no_consecutivo = "";
             if (strlen($vehiculo->data[0]->no_consecutivo) == 1) {
                 $no_consecutivo = '00' . $vehiculo->data[0]->no_consecutivo;
@@ -4634,7 +4620,6 @@ class Principal extends BaseController
             $data['no_proveedor'] = $vehiculo->data[0]->no_proveedor;
             $data['rfc'] = $vehiculo->data[0]->rfc;
             $data['proveedorBanco'] = $vehiculo->data[0]->banco;
-            $data['direccion'] = (isset( $direccion->data) && !empty( $direccion->data))? $direccion->data[0]:'';
             $data['proyecto'] = (isset( $proyecto->data) && !empty( $proyecto->data))? $proyecto->data[0]:'';
             $data['secretario'] = (isset( $secretario->data) && !empty( $secretario->data))? $secretario->data[0]:'';
             $data['solicitud'] = (isset( $solicitud->data) && !empty( $solicitud->data))? $solicitud->data[0]:'';

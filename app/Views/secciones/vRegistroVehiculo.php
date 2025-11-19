@@ -25,18 +25,18 @@
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-body">
-                   
+
                             <form id="form_vehiculo" enctype="multipart/form-data">
                                 <input type="hidden" name="editar" value="<?= $editar ?>">
-                                <input type="hidden" name="id_proyecto" value="<?= $id_proyecto?>">
-                                <input type="hidden" name="no_consecutivo" value="<?= $no_consecutivo?>">
-                                <input type="hidden" name="id_vehiculo" value="<?= $id_vehiculo?>">
+                                <input type="hidden" name="id_proyecto" value="<?= $id_proyecto ?>">
+                                <input type="hidden" name="no_consecutivo" value="<?= $no_consecutivo ?>">
+                                <input type="hidden" name="id_vehiculo" value="<?= $id_vehiculo ?>">
                                 <div class="form-row">
                                     <!-- Dirección Responsable -->
                                     <div class="col-md-4 mb-6">
                                         <label for="proveedor">Proveedor<span class="text-danger">*</span></label>
                                         <input class="form-control" id="proveedor" name="proveedor" required>
-                         
+
                                     </div>
                                     <!-- <div class="col-md-6 mb-6">
                                         <label for="id_proveedor">Proveedor<span class="text-danger">*</span></label>
@@ -48,54 +48,103 @@
                                         <input class="form-control" id="banco" name="banco" required>
                                     </div>
                                     <div class="col-md-4 mb-6">
-                                        <label for="no_proveedor">No. proveedor<span class="text-danger">*</span></label>
+                                        <label for="no_proveedor">No. proveedor<span
+                                                class="text-danger">*</span></label>
                                         <input class="form-control" id="no_proveedor" name="no_proveedor" required>
                                     </div>
-                                 <!--    <div class="col-md-6 mb-6">
+                                    <!--    <div class="col-md-6 mb-6">
                                         <label for="id_proveedor_banco">Proveedor Banco<span class="text-danger">*</span></label>
                                         <select class="form-control select2-ajax" id="id_proveedor_banco" name="id_proveedor_banco" required>
                                             </select>
                                     </div> -->
                                 </div><!--end form-row-->
-                                 <div class="form-row">
-                                    
+                                <div class="form-row">
+
                                     <div class="col-md-4 mb-3">
                                         <label for="folio">Folio</label>
                                         <input type="text" class="form-control" id="folio" name="folio"
-                                            value="<?= (isset($folio)) ? $folio : '' ?>"  placeholder="folio" >
-                                      
+                                            value="<?= (isset($folio)) ? $folio : '' ?>" placeholder="folio">
+
                                     </div><!--end col-->
-                              
+
                                     <div class="col-md-4 mb-3">
-                                        <label for="no_cuenta">No. Cuenta<span
-                                                style="color:red;">*</span></label>
+                                        <label for="no_cuenta">No. Cuenta<span style="color:red;">*</span></label>
                                         <input type="text" class="form-control" id="no_cuenta" autocomplete="off"
-                                        value="<?= (isset($no_cuenta)) ? $no_cuenta : '' ?>"
+                                            value="<?= (isset($no_cuenta)) ? $no_cuenta : '' ?>"
                                             placeholder="No. Cuenta" name="no_cuenta">
                                     </div><!--end col-->
                                     <div class="col-md-4 mb-3">
-                                        <label for="clabe">Clabe<span
-                                                style="color:red;">*</span></label>
+                                        <label for="clabe">Clabe<span style="color:red;">*</span></label>
                                         <input type="text" class="form-control" id="clabe" autocomplete="off"
-                                        value="<?= (isset($clabe)) ? $clabe : '' ?>"
-                                            placeholder="Clabe" name="clabe">
+                                            value="<?= (isset($clabe)) ? $clabe : '' ?>" placeholder="Clabe"
+                                            name="clabe">
                                     </div><!--end col-->
                                 </div><!--end form-row-->
-                                 <div class="form-row">
-                                    
+                                <div class="form-row">
+
                                     <div class="col-md-4 mb-3">
                                         <label for="rfc">RFC</label>
                                         <input type="text" class="form-control" id="rfc" name="rfc"
-                                            value="<?= (isset($rfc)) ? $rfc : '' ?>"  placeholder="rfc" >
-                                      
+                                            value="<?= (isset($rfc)) ? $rfc : '' ?>" placeholder="rfc">
+
                                     </div><!--end col-->
-                              
+
+                                    <div class="col-md-2 mb-3">
+                                        <label for="formatos">Formatos<span class="text-danger">*</span></label>
+                                        <select class="form-control" id="formatos" name="formatos" required>
+                                            <option value="0">SI</option>
+                                            <option value="1">NO</option>
+                                        </select>
+                                    </div><!--end col-->
+                                    <div class="col-md-2 mb-3">
+                                        <label for="documentacion">Documentacion<span
+                                                class="text-danger">*</span></label>
+                                        <select class="form-control" id="documentacion" name="documentacion" required>
+                                            <option value="0">SI</option>
+                                            <option value="1">NO</option>
+                                        </select>
+                                    </div><!--end col-->
+                                    <div class="col-md-2 mb-3">
+                                        <label for="poliza">Poliza<span class="text-danger">*</span></label>
+                                        <select class="form-control" id="poliza" name="poliza" required>
+                                            <option value="0">SI</option>
+                                            <option value="1">NO</option>
+                                        </select>
+                                    </div><!--end col-->
+                                    <div class="col-md-2 mb-3">
+                                        <label for="conformidad">Conformidad<span class="text-danger">*</span></label>
+                                        <select class="form-control" id="conformidad" name="conformidad" required>
+                                            <option value="0">SI</option>
+                                            <option value="1">NO</option>
+                                        </select>
+                                    </div><!--end col-->
+
+                                </div><!--end form-row-->
+                                <div class="form-row">
                                     <div class="col-md-4 mb-3">
-                               
+                                        <label for="contrato_convenio">Contrato/Convenio<span class="text-danger">*</span></label>
+                                        <select class="form-control" id="contrato_convenio" name="contrato_convenio" required>
+                                            <option value="0">SI</option>
+                                            <option value="1">NO</option>
+                                        </select>
                                     </div><!--end col-->
                                     <div class="col-md-4 mb-3">
-                                      
+                                        <label for="emitir_pago">Doc. emitir pago<span
+                                                class="text-danger">*</span></label>
+                                        <select class="form-control" id="emitir_pago" name="emitir_pago" required>
+                                            <option value="0">SI</option>
+                                            <option value="1">NO</option>
+                                        </select>
                                     </div><!--end col-->
+                                    <div class="col-md-4 mb-3">
+                                        <label for="evidencia">Evidencia<span class="text-danger">*</span></label>
+                                        <select class="form-control" id="evidencia" name="evidencia" required>
+                                            <option value="0">SI</option>
+                                            <option value="1">NO</option>
+                                        </select>
+                                    </div><!--end col-->
+                                
+
                                 </div><!--end form-row-->
                                 <div class="form-row">
                                     <!-- Dirección Responsable -->
@@ -105,15 +154,15 @@
                                         <select class="form-control" id="direccion_responsable"
                                             name="direccion_responsable" required>
                                             <?php foreach ($cat_area as $a): ?>
-                                                <?php if($editar == 0): ?>
-                                                <option value="<?= $a->id_area ?>" <?php echo ($a->id_area == $usuario->id_area) ? 'selected' : ''; ?>>
-                                                    <?= $a->dsc_area ?>
-                                                </option>
+                                                <?php if ($editar == 0): ?>
+                                                    <option value="<?= $a->id_area ?>" <?php echo ($a->id_area == $usuario->id_area) ? 'selected' : ''; ?>>
+                                                        <?= $a->dsc_area ?>
+                                                    </option>
                                                 <?php endif; ?>
-                                                <?php if($editar == 1): ?>
-                                                <option value="<?= $a->id_area ?>" <?php echo ($a->id_area == $id_direccion_responsable) ? 'selected' : ''; ?>>
-                                                    <?= $a->dsc_area ?>
-                                                </option>
+                                                <?php if ($editar == 1): ?>
+                                                    <option value="<?= $a->id_area ?>" <?php echo ($a->id_area == $id_direccion_responsable) ? 'selected' : ''; ?>>
+                                                        <?= $a->dsc_area ?>
+                                                    </option>
                                                 <?php endif; ?>
                                             <?php endforeach; ?>
                                         </select>
@@ -137,18 +186,18 @@
                                                 <?php
                                                 // Determina el valor que debe quedar seleccionado
                                                 $selected = '';
-                                              if($editar == 0):
-                                                if (isset($registro_pt->id_reponsable_solicitud) && $registro_pt->id_reponsable_solicitud == $u->id_usuario) {
-                                                    $selected = 'selected';
-                                                } elseif (!isset($registro_pt->id_reponsable_solicitud) && isset($usuario) && $usuario->id_usuario == $u->id_usuario) {
-                                                    $selected = 'selected';
-                                                }
-                                                endif; 
-                                               if($editar == 1):
-                                                if (isset($id_responsable) && $id_responsable == $u->id_usuario) {
-                                                    $selected = 'selected';
-                                                } 
-                                                endif; 
+                                                if ($editar == 0):
+                                                    if (isset($registro_pt->id_reponsable_solicitud) && $registro_pt->id_reponsable_solicitud == $u->id_usuario) {
+                                                        $selected = 'selected';
+                                                    } elseif (!isset($registro_pt->id_reponsable_solicitud) && isset($usuario) && $usuario->id_usuario == $u->id_usuario) {
+                                                        $selected = 'selected';
+                                                    }
+                                                endif;
+                                                if ($editar == 1):
+                                                    if (isset($id_responsable) && $id_responsable == $u->id_usuario) {
+                                                        $selected = 'selected';
+                                                    }
+                                                endif;
                                                 ?>
                                                 <option value="<?= $u->id_usuario ?>" <?= $selected ?>>
                                                     <?= $u->nombre . ' ' . $u->primer_apellido . ' ' . $u->segundo_apellido ?>
@@ -164,7 +213,7 @@
                                                 style="color:red;">*</span></label>
                                         <input type="text" class="form-control" id="director_generar"
                                             value="<?= $dsc_director_general ?>" name="director_generar">
-                                   
+
                                     </div><!--end col-->
                                     <div class="col-md-4 mb-3">
                                         <label for="id_secretario">Secretario(a) o Director(a) que autoriza</label>
@@ -172,21 +221,22 @@
                                             placeholder="Secretario/a" name="id_secretario">
                                             <option value="0" selected>Seleccione una opcion</option>
                                             <?php foreach ($secretario as $s): ?>
-                                                <?php if( $editar == 0 ): ?>
-                                                <?php if (isset($registro_pt->secretario) && !empty($registro_pt->secretario)) { ?>
-                                                    <option value="<?= $s->id_secretario ?>"
-                                                        <?= ($s->id_secretario == $registro_pt->secretario) ? 'selected' : '' ?>>
-                                                        <?= $s->dsc_secretario ?></option>
-                                                <?php } else { ?>
-                                                    <option value="<?= $s->id_secretario ?>"><?= $s->dsc_secretario ?></option>
-                                                <?php } ?>
+                                                <?php if ($editar == 0): ?>
+                                                    <?php if (isset($registro_pt->secretario) && !empty($registro_pt->secretario)) { ?>
+                                                        <option value="<?= $s->id_secretario ?>"
+                                                            <?= ($s->id_secretario == $registro_pt->secretario) ? 'selected' : '' ?>>
+                                                            <?= $s->dsc_secretario ?>
+                                                        </option>
+                                                    <?php } else { ?>
+                                                        <option value="<?= $s->id_secretario ?>"><?= $s->dsc_secretario ?></option>
+                                                    <?php } ?>
                                                 <?php endif; ?>
-                                                <?php if( $editar == 1 ): ?>
+                                                <?php if ($editar == 1): ?>
                                                     <option value="<?= $s->id_secretario ?>"
                                                         <?= ($s->id_secretario == $id_secretario) ? 'selected' : '' ?>>
                                                         <?= $s->dsc_secretario ?>
                                                     </option>
-                                              
+
                                                 <?php endif; ?>
                                             <?php endforeach; ?>
                                         </select>
@@ -197,26 +247,26 @@
                                         <select type="text" class="form-control select2" id="id_responsable_gasto"
                                             placeholder="Responsable" name="id_responsable_gasto">
                                             <option value="0" selected>Seleccione una opcion</option>
-                                               <?php foreach ($cat_usuario as $u): ?>
-                                                 <?php if( $editar == 0 ): ?>
-                                                <option value="<?= $u->id_usuario ?>">
-                                                    <?= $u->nombre . ' ' . $u->primer_apellido . ' ' . $u->segundo_apellido ?>
-                                                </option>
-                                                  <?php endif; ?>
-                                                 <?php if( $editar == 1 ): ?>
-                                                <option value="<?= $u->id_usuario ?>"
-                                                 <?= ($u->id_usuario == $id_responsable_gasto) ? 'selected' : '' ?>>
-                                                    <?= $u->nombre . ' ' . $u->primer_apellido . ' ' . $u->segundo_apellido ?>
-                                                </option>
-                                                  <?php endif; ?>
+                                            <?php foreach ($cat_usuario as $u): ?>
+                                                <?php if ($editar == 0): ?>
+                                                    <option value="<?= $u->id_usuario ?>">
+                                                        <?= $u->nombre . ' ' . $u->primer_apellido . ' ' . $u->segundo_apellido ?>
+                                                    </option>
+                                                <?php endif; ?>
+                                                <?php if ($editar == 1): ?>
+                                                    <option value="<?= $u->id_usuario ?>"
+                                                        <?= ($u->id_usuario == $id_responsable_gasto) ? 'selected' : '' ?>>
+                                                        <?= $u->nombre . ' ' . $u->primer_apellido . ' ' . $u->segundo_apellido ?>
+                                                    </option>
+                                                <?php endif; ?>
                                             <?php endforeach; ?>
                                         </select>
                                     </div><!--end col-->
                                 </div><!--end form-row-->
 
-                        
+
                                 <div class="form-row">
-                                    
+
                                     <div class="col-md-6 mb-3">
                                         <label for="comision">Comisión / Reunión / Evento / Programa</label>
                                         <input type="text" class="form-control" id="comision" name="comision"
@@ -225,75 +275,84 @@
                                             Please provide a valid state.
                                         </div>
                                     </div><!--end col-->
-                              
+
                                     <div class="col-md-6 mb-3">
                                         <label for="concepto_gasto">Concepto del gasto<span
                                                 style="color:red;">*</span></label>
                                         <input type="text" class="form-control" id="concepto_gasto" autocomplete="off"
-                                        value="<?= (isset($concepto)) ? $concepto : '' ?>"
+                                            value="<?= (isset($concepto)) ? $concepto : '' ?>"
                                             placeholder="Concepto del gasto" name="concepto_gasto">
                                     </div><!--end col-->
                                 </div><!--end form-row-->
-                               
+
                                 <div class="form-row">
 
-                                 
+
                                     <div class="col-md-6 mb-3">
-                                        <label for="fecha_inicio">Fecha Inicio.<span
-                                                style="color:red;">*</span></label>
-                                           <input id="fecha_inicio" value="<?= (isset($fec_inicio)) ? date('Y-m-d', strtotime($fec_inicio)) : '' ?>"  type="date" name="fecha_inicio" class="form-control" multiple accept=".pdf" />
-                                
+                                        <label for="fecha_inicio">Fecha Inicio.<span style="color:red;">*</span></label>
+                                        <input id="fecha_inicio"
+                                            value="<?= (isset($fec_inicio)) ? date('Y-m-d', strtotime($fec_inicio)) : '' ?>"
+                                            type="date" name="fecha_inicio" class="form-control" multiple
+                                            accept=".pdf" />
+
                                     </div><!--end col-->
                                     <div class="col-md-6 mb-3">
-                                        <label for="fecha_fin">Facha Fin.<span
-                                                style="color:red;">*</span></label>
-                                       <input id="fecha_fin" value="<?= (isset($fec_fin)) ? date('Y-m-d', strtotime($fec_fin)) : '' ?>"  type="date" name="fecha_fin" multiple class="form-control"  accept=".xml">
+                                        <label for="fecha_fin">Facha Fin.<span style="color:red;">*</span></label>
+                                        <input id="fecha_fin"
+                                            value="<?= (isset($fec_fin)) ? date('Y-m-d', strtotime($fec_fin)) : '' ?>"
+                                            type="date" name="fecha_fin" multiple class="form-control" accept=".xml">
                                     </div><!--end col-->
 
-                                                                
+
                                 </div><!--end form-row-->
                                 <div class="form-row">
 
-                                 
+
                                     <div class="col-md-6 mb-3">
-                                        <label for="convenio">No. Contrato/Convenio<span style="color:red">*</span></label>
-                                           <input id="convenio" value="<?= (isset($convenio) && !empty($convenio))?$convenio:'' ?>"  type="text" name="convenio" class="form-control" />
-                                
+                                        <label for="convenio">No. Contrato/Convenio<span
+                                                style="color:red">*</span></label>
+                                        <input id="convenio"
+                                            value="<?= (isset($convenio) && !empty($convenio)) ? $convenio : '' ?>"
+                                            type="text" name="convenio" class="form-control" />
+
                                     </div><!--end col-->
                                     <div class="col-md-6 mb-3">
                                         <label for="otros">Otros</label>
-                                       <input id="otros" type="text" value="<?= (isset($otros) && !empty($otros))?$otros:'' ?>"  name="otros" multiple class="form-control">
+                                        <input id="otros" type="text"
+                                            value="<?= (isset($otros) && !empty($otros)) ? $otros : '' ?>" name="otros"
+                                            multiple class="form-control">
                                     </div><!--end col-->
 
-                                                                
+
                                 </div><!--end form-row-->
-          
+
                                 <div class="form-row">
 
-                                 
+
                                     <div class="col-md-6 mb-3">
                                         <label for="no_consecutivo">Factura PDF.<span
                                                 style="color:red;">*</span></label>
-                                           <input id="factura_pdf"  type="file" name="factura_pdf" class="dropify" multiple accept=".pdf" />
-                                
+                                        <input id="factura_pdf" type="file" name="factura_pdf" class="dropify" multiple
+                                            accept=".pdf" />
+
                                     </div><!--end col-->
                                     <div class="col-md-6 mb-3">
-                                        <label for="factura_xml">Factura XML.<span
-                                                style="color:red;">*</span></label>
-                                       <input id="factura_xml" type="file" name="factura_xml" multiple class="dropify"  accept=".xml">
+                                        <label for="factura_xml">Factura XML.<span style="color:red;">*</span></label>
+                                        <input id="factura_xml" type="file" name="factura_xml" multiple class="dropify"
+                                            accept=".xml">
                                     </div><!--end col-->
 
-                                                                
+
                                 </div><!--end form-row-->
-                             
+
                                 <br>
 
-                               
+
                                 <div id="hidden-file-inputs-container"></div>
-                              
-                             
-                                    <button class="btn btn-gradient-primary" id="btnGuardaVi" type="submit">Guardar</button>
-                           
+
+
+                                <button class="btn btn-gradient-primary" id="btnGuardaVi" type="submit">Guardar</button>
+
                             </form> <!--end form-->
                         </div><!--end card-body-->
                     </div><!--end card-->
@@ -352,33 +411,33 @@
 <script>
 
 
-/* $(document).ready(function() {
-    $('#id_proveedor').select2({
-        placeholder: 'Escribe para buscar un proveedor...',
-            minimumInputLength: 3,
-            allowClear: true,
-            ajax: {
-                url: base_url + "index.php/Principal/buscarProveedor2",
-                dataType: 'json',
-                delay: 250,
-                data: function (params) {
-                    console.log('Término buscado:', params.term); // Debug
-                    return {
-                        q: params.term // Asegúrate que esto se envía
-                    };
-                },
-                processResults: function (data) {
-                    console.log('Respuesta recibida:', data); // Debug
-                    return data;
-                },
-                cache: true
-            }
+    /* $(document).ready(function() {
+        $('#id_proveedor').select2({
+            placeholder: 'Escribe para buscar un proveedor...',
+                minimumInputLength: 3,
+                allowClear: true,
+                ajax: {
+                    url: base_url + "index.php/Principal/buscarProveedor2",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        console.log('Término buscado:', params.term); // Debug
+                        return {
+                            q: params.term // Asegúrate que esto se envía
+                        };
+                    },
+                    processResults: function (data) {
+                        console.log('Respuesta recibida:', data); // Debug
+                        return data;
+                    },
+                    cache: true
+                }
+            });
         });
-    });
- */
-    $('#id_proveedor').on('change', function() {
+     */
+    $('#id_proveedor').on('change', function () {
         var idProveedor = $(this).val();
-        
+
         if (idProveedor) {
             cargarBancosProveedor(idProveedor);
         } else {
@@ -387,7 +446,7 @@
         }
     });
 
-      function cargarBancosProveedor(idProveedor) {
+    function cargarBancosProveedor(idProveedor) {
         $.ajax({
             url: base_url + "index.php/Principal/obtenerBancosProveedor",
             type: 'GET',
@@ -395,20 +454,20 @@
             data: {
                 id_proveedor: idProveedor
             },
-            beforeSend: function() {
+            beforeSend: function () {
                 // Mostrar loading
-               
+
                 $('#id_proveedor_banco').empty().append('<option value="">Cargando bancos...</option>');
             },
-            success: function(response) {
-                console.log(response  );
+            success: function (response) {
+                console.log(response);
                 $('#id_proveedor_banco').empty();
-                
+
                 if (response && response.length > 0) {
                     // Agregar opción por defecto
                     $('#id_proveedor_banco').append('<option value="">Seleccione un banco</option>');
-                    
-                    $.each(response, function(index, banco) {    
+
+                    $.each(response, function (index, banco) {
                         $('#id_proveedor_banco').append(
                             $('<option>', {
                                 value: banco.id_proveedor_banco,
@@ -421,47 +480,47 @@
                 }
             },
 
-            error: function() {
+            error: function () {
                 $('#id_proveedor_banco').empty().append('<option value="">Error al cargar bancos</option>');
             }
         });
-     }
+    }
 
-$('#form_vehiculo').on('submit', function(e) {
-    e.preventDefault();
+    $('#form_vehiculo').on('submit', function (e) {
+        e.preventDefault();
 
-    var formData = new FormData(this);
-    $.ajax({
-        type: "POST",
-        url: "<?= base_url()?>index.php/Agregar/guardaVe",
-        data: formData,
-        processData: false,
-        contentType: false,
-        dataType: "json",
-        success: function (response) {
-            console.log(response);
-            if(!response.error){
-                Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
-                setTimeout(() => {
-                    window.location.href = base_url + "index.php/Principal/tablaArchivosVehiculos/"+response.idRegistro+'/PT';
-                }, 1500);
-            }else{
-                Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
+        var formData = new FormData(this);
+        $.ajax({
+            type: "POST",
+            url: "<?= base_url() ?>index.php/Agregar/guardaVe",
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: "json",
+            success: function (response) {
+                console.log(response);
+                if (!response.error) {
+                    Swal.fire("Correcto", '<p> ' + response.respuesta + '</p>', 'success');
+                    setTimeout(() => {
+                        window.location.href = base_url + "index.php/Principal/tablaArchivosVehiculos/" + response.idRegistro + '/PT';
+                    }, 1500);
+                } else {
+                    Swal.fire("Atención", '<p> ' + response.respuesta + '</p>', 'info');
+                }
+            },
+            beforeSend: function (info) {
+                //$('#btnGuardaVi').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                $('#btnGuardaVi').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+            },
+            complete: function (info) {
+                $('#btnGuardaVi').prop('disabled', false).html('Guardar');
+            },
+            error: function (response, jqXHR, textStatus, errorThrown) {
+                var res = JSON.parse(response.responseText);
+                Swal.fire("Error", '<p> ' + res.message + '</p>');
             }
-        },
-        beforeSend: function (info){
-            //$('#btnGuardaVi').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
-            $('#btnGuardaVi').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
-        },
-        complete: function (info){
-            $('#btnGuardaVi').prop('disabled', false).html('Guardar');
-        },
-        error: function (response,jqXHR, textStatus, errorThrown) {
-            var res= JSON.parse(response.responseText);
-            Swal.fire("Error", '<p> '+ res.message + '</p>');  
-        }
+        });
     });
-});
-        
+
 
 </script>
