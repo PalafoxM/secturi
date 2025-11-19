@@ -1155,10 +1155,17 @@ class Usuario extends BaseController
             $data['id_responsable_gasto'] = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->id_responsable_gasto:'';
             $data['comision']       = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->comision:'';
             $data['concepto']       = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->concepto:'';
-            $data['fec_inicio']       = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->fec_inicio:'';
-            $data['fec_fin']       = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->fec_fin:'';
+            $data['fec_inicio']     = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->fec_inicio:'';
+            $data['fec_fin']        = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->fec_fin:'';
             $data['convenio']       = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->convenio:'';
-            $data['otros']       = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->otros:'';
+            $data['otros']          = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->otros:'';
+            $data['proveedor']      = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->proveedor:'';
+            $data['banco']          = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->banco:'';
+            $data['no_proveedor']   = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->no_proveedor:'';
+            $data['folio']          = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->folio:'';
+            $data['no_cuenta']      = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->no_cuenta:'';
+            $data['clabe']          = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->clabe:'';
+            $data['rfc']            = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->rfc:'';
 
         }
 
@@ -1173,7 +1180,7 @@ class Usuario extends BaseController
         $data['cat_subsecretario'] = (isset( $cat_subsecretario->data) && !empty( $cat_subsecretario->data))? $cat_subsecretario->data:[];
         $data['cat_usuario'] = (isset( $cat_usuario->data) && !empty( $cat_usuario->data))? $cat_usuario->data:[];
         $data['dsc_director_general'] = (isset( $cat_director_general->data) && !empty( $cat_director_general->data))? $cat_director_general->data[0]->dsc_director_general:[];
-        $data['proveedor'] = (!empty($proveedor->data)) ? $proveedor->data : [];
+        //$data['proveedor'] = (!empty($proveedor->data)) ? $proveedor->data : [];
   
         $data['editar'] = 1;
         $data['id_vehiculo'] = $idVehiculo;

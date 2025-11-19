@@ -35,7 +35,9 @@
                                     <!-- Dirección Responsable -->
                                     <div class="col-md-4 mb-6">
                                         <label for="proveedor">Proveedor<span class="text-danger">*</span></label>
-                                        <input class="form-control" id="proveedor" name="proveedor" required>
+                                        <input class="form-control" id="proveedor" name="proveedor"
+                                            value="<?= isset($proveedor) && !empty($proveedor) ? $proveedor : '' ?>"
+                                            required>
 
                                     </div>
                                     <!-- <div class="col-md-6 mb-6">
@@ -45,12 +47,14 @@
                                     </div> -->
                                     <div class="col-md-4 mb-6">
                                         <label for="banco">Banco<span class="text-danger">*</span></label>
-                                        <input class="form-control" id="banco" name="banco" required>
+                                        <input class="form-control" id="banco" name="banco"  value="<?= isset($banco) && !empty($banco) ? $banco : '' ?>"
+                                         required>
                                     </div>
                                     <div class="col-md-4 mb-6">
                                         <label for="no_proveedor">No. proveedor<span
                                                 class="text-danger">*</span></label>
-                                        <input class="form-control" id="no_proveedor" name="no_proveedor" required>
+                                        <input class="form-control" id="no_proveedor" name="no_proveedor" value="<?= isset($no_proveedor) && !empty($no_proveedor) ? $no_proveedor : '' ?>"
+                                         required>
                                     </div>
                                     <!--    <div class="col-md-6 mb-6">
                                         <label for="id_proveedor_banco">Proveedor Banco<span class="text-danger">*</span></label>
@@ -92,58 +96,60 @@
                                     <div class="col-md-2 mb-3">
                                         <label for="formatos">Formatos<span class="text-danger">*</span></label>
                                         <select class="form-control" id="formatos" name="formatos" required>
-                                            <option value="0">SI</option>
-                                            <option value="1">NO</option>
+                                            <option value="0" <?= isset($formatos) && !empty($formatos) && $formatos == 0 ? 'selected' : ''; ?>>SI</option>
+                                            <option value="1" <?= isset($formatos) && !empty($formatos) && $formatos == 1? 'selected' : ''; ?>>NO</option>
                                         </select>
                                     </div><!--end col-->
                                     <div class="col-md-2 mb-3">
                                         <label for="documentacion">Documentacion<span
                                                 class="text-danger">*</span></label>
                                         <select class="form-control" id="documentacion" name="documentacion" required>
-                                            <option value="0">SI</option>
-                                            <option value="1">NO</option>
+                                            <option value="0" <?= isset($documentacion) && !empty($documentacion) && $documentacion == 0 ? 'selected' : ''; ?>>SI</option>
+                                            <option value="1" <?= isset($documentacion) && !empty($documentacion) && $documentacion == 0 ? 'selected' : ''; ?>>NO</option>
                                         </select>
                                     </div><!--end col-->
                                     <div class="col-md-2 mb-3">
                                         <label for="poliza">Poliza<span class="text-danger">*</span></label>
-                                        <select class="form-control" id="poliza" name="poliza" required>
-                                            <option value="0">SI</option>
-                                            <option value="1">NO</option>
+                                        <select class="form-control" id="poliza" name="poliza"  required>
+                                            <option value="0" <?= isset($poliza) && !empty($poliza) && $poliza == 0 ? 'selected' : ''; ?>>SI</option>
+                                            <option value="1" <?= isset($poliza) && !empty($poliza) && $poliza == 0 ? 'selected' : ''; ?>>NO</option>
                                         </select>
                                     </div><!--end col-->
                                     <div class="col-md-2 mb-3">
                                         <label for="conformidad">Conformidad<span class="text-danger">*</span></label>
                                         <select class="form-control" id="conformidad" name="conformidad" required>
-                                            <option value="0">SI</option>
-                                            <option value="1">NO</option>
+                                            <option value="0" <?= isset($conformidad) && !empty($conformidad) && $conformidad == 0 ? 'selected' : ''; ?>>SI</option>
+                                            <option value="1" <?= isset($conformidad) && !empty($conformidad) && $conformidad == 0 ? 'selected' : ''; ?>>NO</option>
                                         </select>
                                     </div><!--end col-->
 
                                 </div><!--end form-row-->
                                 <div class="form-row">
                                     <div class="col-md-4 mb-3">
-                                        <label for="contrato_convenio">Contrato/Convenio<span class="text-danger">*</span></label>
-                                        <select class="form-control" id="contrato_convenio" name="contrato_convenio" required>
-                                            <option value="0">SI</option>
-                                            <option value="1">NO</option>
+                                        <label for="contrato_convenio">Contrato/Convenio<span
+                                                class="text-danger">*</span></label>
+                                        <select class="form-control" id="contrato_convenio" name="contrato_convenio"
+                                            required>
+                                            <option value="0" <?= isset($contrato_convenio) && !empty($contrato_convenio) && $contrato_convenio == 0 ? 'selected' : ''; ?>>SI</option>
+                                            <option value="1" <?= isset($contrato_convenio) && !empty($contrato_convenio) && $contrato_convenio == 0 ? 'selected' : ''; ?>>NO</option>
                                         </select>
                                     </div><!--end col-->
                                     <div class="col-md-4 mb-3">
                                         <label for="emitir_pago">Doc. emitir pago<span
                                                 class="text-danger">*</span></label>
                                         <select class="form-control" id="emitir_pago" name="emitir_pago" required>
-                                            <option value="0">SI</option>
-                                            <option value="1">NO</option>
+                                            <option value="0" <?= isset($emitir_pago) && !empty($emitir_pago) && $emitir_pago == 0 ? 'selected' : ''; ?>>SI</option>
+                                            <option value="1" <?= isset($emitir_pago) && !empty($emitir_pago) && $emitir_pago == 0 ? 'selected' : ''; ?>>NO</option>
                                         </select>
                                     </div><!--end col-->
                                     <div class="col-md-4 mb-3">
                                         <label for="evidencia">Evidencia<span class="text-danger">*</span></label>
                                         <select class="form-control" id="evidencia" name="evidencia" required>
-                                            <option value="0">SI</option>
-                                            <option value="1">NO</option>
+                                            <option value="0" <?= isset($evidencia) && !empty($evidencia) && $evidencia == 0 ? 'selected' : ''; ?>>SI</option>
+                                            <option value="1" <?= isset($evidencia) && !empty($evidencia) && $evidencia == 0 ? 'selected' : ''; ?>>NO</option>
                                         </select>
                                     </div><!--end col-->
-                                
+
 
                                 </div><!--end form-row-->
                                 <div class="form-row">
