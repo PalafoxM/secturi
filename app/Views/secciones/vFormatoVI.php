@@ -48,7 +48,7 @@
   
               <div style="position:absolute; text-align:center; top:34%; left:46.4%; width:13%; background-color:white; font-size:10px; height:12px; line-height:12px;">
                     <span class="proxima">
-                       <?= $vehiculo->xml_monto ?>
+                       <?= number_format($vehiculo->xml_monto, 2)  ?>
                     </span>
                 </div>
     
