@@ -7,11 +7,9 @@
         </div>
 
         <div  style="position:absolute;text-align:center; top:18.2%; left:70.5%; width:25%; height:18px; background-color:white; font-size: 12px; ">
-            <span class="proxima">PT <?= $folio;?></span>
+            <span class="proxima">PT <?= $folio.'-V';?></span>
         </div>
-        <div  style="position:absolute;text-align:center; top:10%; left:92%; width:5%; height:18px; background-color:black; color:white; font-size: 12px; ">
-            <span class="proxima"><strong>V</span>
-        </div>
+      
         <div  style="position:absolute; top:36.2%; left:60.7%; width:35%; background-color:white; font-size: 12px;  height:12px;">
       
             <span class="proxima "> <?= $proveedor;?> </span>

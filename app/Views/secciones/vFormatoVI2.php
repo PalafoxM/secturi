@@ -32,7 +32,7 @@ $fechaFormateada = $dia . ' de ' . $mes . ' del ' . $anio;
         <div  style="position:absolute; top:24.5%; left:64.5%; width:28%; height:18px; background-color:white; font-size: 14px; ">
       
          
-            <span class="proxima">PT <?= $folio;?></span>
+            <span class="proxima">PT <?= $folio.'-V';?></span>
        
         </div>
         <div style="position:absolute; top:33.2%; left:9.5%; width:81%; height:72px; background-color:white; font-size:13px; text-align:justify;">

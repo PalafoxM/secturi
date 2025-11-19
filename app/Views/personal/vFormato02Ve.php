@@ -3,7 +3,7 @@
         </div>
 
         <div  style="position:absolute; text-align:center; top:16.2%; left:70%; width:22%; height:10px; background-color:white; font-size: 7px; ">
-            <span class="proxima">PT <?= $vehiculo->folio;?></span>
+            <span class="proxima">PT <?= $vehiculo->folio.'-V';?></span>
         </div>
         <div  style="position:absolute; text-align:center; top:18.5%; left:70%; width:22%; height:10px; background-color:white; font-size: 7px; ">
             <span class="proxima">3550
