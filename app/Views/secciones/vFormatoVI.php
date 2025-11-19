@@ -50,12 +50,10 @@
                     <span class="proxima">
                        <?= number_format($vehiculo->xml_monto, 2)  ?>
                     </span>
-                </div>
-    
-
-                <div style="position:absolute; text-align:center; top:34%; left:2.7%; width:13.8%; background-color:white; font-size: 12px;  height:12px;">
+              </div>
+              <div style="position:absolute; text-align:center; top:34%; left:2.7%; width:13.8%; background-color:white; font-size: 12px;  height:12px;">
                   <p> <?= $vehiculo->xml_uuid ?> </p>
-                 </div>
+                </div>
     
 
    
