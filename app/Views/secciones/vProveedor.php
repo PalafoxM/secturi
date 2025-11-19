@@ -263,13 +263,13 @@
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="no_consecutivo">No. Consecutivo.</label>
-                                                <input type="text" class="form-control" readonly autocomplete="off" id="no_consecutivo" name="no_consecutivo" value="<?= (isset($no_consecutivo))?$no_consecutivo:''?>"  >
+                                                <input type="text" class="form-control" readonly autocomplete="off" id="no_consecutivo" name="no_consecutivo" value="<?= (isset($registro_pt->no_consecutivo))?$registro_pt->no_consecutivo:''?>"  >
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
-                                               <label for="dividido">Encabezado dividido <span style="color:red;"></span></label>
-                                                <select type="text" class="form-control" id="dividido"  name="dividido" >
-                                                   <option value="0">NO</option>
-                                                   <option value="1">SI</option>
+                                               <label for="dividido">Encabezado dividido  <span style="color:red;"></span></label>
+                                                <select class="form-control" id="dividido"  name="dividido" >
+                                                   <option value="0" <?=(isset($registro_pt->dividido) && !empty($registro_pt->dividido) && $registro_pt->dividido == 0)?'selected':'' ?>>NO</option>
+                                                   <option value="1" <?=(isset($registro_pt->dividido) && !empty($registro_pt->dividido) && $registro_pt->dividido == 1)?'selected':'' ?>>SI</option>
                                                </select>
                                             </div><!--end col-->
                                             
