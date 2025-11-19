@@ -1115,13 +1115,13 @@ class Usuario extends BaseController
         $cat_subsecretario = $Mglobal->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1]]);
         $cat_usuario = $Mglobal->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
         $cat_director_general = $Mglobal->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1]]);
-        $proveedor = $Mglobal->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit' => 10]);
+       // $proveedor = $Mglobal->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit' => 10]);
         $data['cat_area'] = (isset( $cat_area->data) && !empty( $cat_area->data))? $cat_area->data:[];
         $data['secretario'] = (isset( $cat_secretario->data) && !empty( $cat_secretario->data))? $cat_secretario->data:[];
         $data['cat_subsecretario'] = (isset( $cat_subsecretario->data) && !empty( $cat_subsecretario->data))? $cat_subsecretario->data:[];
         $data['cat_usuario'] = (isset( $cat_usuario->data) && !empty( $cat_usuario->data))? $cat_usuario->data:[];
         $data['dsc_director_general'] = (isset( $cat_director_general->data) && !empty( $cat_director_general->data))? $cat_director_general->data[0]->dsc_director_general:[];
-        $data['proveedor'] = (!empty($proveedor->data)) ? $proveedor->data : [];
+        //$data['proveedor'] = (!empty($proveedor->data)) ? $proveedor->data : [];
         
         if( isset($vehiculo->data) && !empty($vehiculo->data)){
             $idUser =  $vehiculo->data[0]->id_usuario;
