@@ -742,12 +742,12 @@
                     item.nombre = 'Tarde';
                     icon = '⏳';
                 }
-                if (!multiple && entrada < '08:30:59' && salida > '16:00:00') {
+                if (!multiple && entrada < '08:30:59' && salida >= '16:00:00') {
                     eventClass = 'fc-event-puntual';
                     item.nombre = 'Temprano';
                     icon = '✅';
                 }
-                if (!multiple && entrada > '08:46:00' && salida > '16:00:00') {
+                if (!multiple && entrada > '08:46:00' && salida >= '16:00:00') {
                     eventClass = 'fc-event-tarde';
                     item.nombre = 'Tarde';
                     icon = '⏳';
