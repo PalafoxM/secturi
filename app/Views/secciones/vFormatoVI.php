@@ -26,13 +26,13 @@
         
         </div>
           <div  style="position:absolute; top:42%; left:60.8%; width:36%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><strong>NO. CUENTA : <?= isset($vehiculo->no_cuenta) && !empty($vehiculo->no_cuenta)?$vehiculo->no_cuenta:'' ?> </span>
+            <span class="proxima "><strong>NO. CUENTA : <?= isset($proveedorBanco->no_cuenta) && !empty($proveedorBanco->no_cuenta)?$proveedorBanco->no_cuenta:'' ?> </span>
         </div>
         <div  style="position:absolute; top:43%; left:60.8%; width:36%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><STRONG>BANCO: </STRONG><?= isset($vehiculo->banco) && !empty($vehiculo->banco)?$vehiculo->banco:'' ?></span>
+            <span class="proxima "><STRONG>BANCO: </STRONG><?= isset($proveedorBanco->banco) && !empty($proveedorBanco->banco)?$proveedorBanco->banco:'' ?></span>
         </div>
          <div  style="position:absolute; top:44.3%; left:60.8%; width:36%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><STRONG>CLABE:</STRONG> <?= isset($vehiculo->clabe) && !empty($vehiculo->clabe)?$vehiculo->clabe:'' ?></span>
+            <span class="proxima "><STRONG>CLABE:</STRONG> <?= isset($proveedorBanco->clabe) && !empty($proveedorBanco->clabe)?$proveedorBanco->clabe:'' ?></span>
         </div>
          <div  style="position:absolute; top:45.3%; left:60.8%; width:35%; background-color:white; font-size: 12px;  height:15px;">
             <span class="proxima "></span>

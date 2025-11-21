@@ -4613,13 +4613,23 @@ class Principal extends BaseController
             if (strlen($vehiculo->data[0]->no_consecutivo) >= 3) {
                 $no_consecutivo = $vehiculo->data[0]->no_consecutivo;
             }
-            
-    
+
+             $proveedor = $globals->getTabla([
+                'tabla' => 'proveedor',
+                'where' => ['visible' => 1, 'id_proveedor' =>  $vehiculo->data[0]->id_proveedor]
+            ]);
+             $proveedorBanco = $globals->getTabla([
+                'tabla' => 'proveedor_banco',
+                'where' => ['visible' => 1, 'idproveedor' =>  $vehiculo->data[0]->id_proveedor_banco]
+            ]);
+
+            //var_dump($proveedorBanco);
+            //die();
             $data['folio'] = $vehiculo->data[0]->folio;
-            $data['proveedor'] = $vehiculo->data[0]->proveedor;
-            $data['no_proveedor'] = $vehiculo->data[0]->no_proveedor;
-            $data['rfc'] = $vehiculo->data[0]->rfc;
-            $data['proveedorBanco'] = $vehiculo->data[0]->banco;
+            $data['proveedor'] = (isset($proveedor->data) && !empty($proveedor->data) )?$proveedor->data[0]->razon_social:'';
+            $data['no_proveedor'] = (isset($proveedor->data) && !empty($proveedor->data) )?$proveedor->data[0]->no_proveedor:'';
+            $data['rfc'] = (isset($proveedor->data) && !empty($proveedor->data) )?$proveedor->data[0]->rfc:'';
+            $data['proveedorBanco'] = $proveedorBanco->data[0];
             $data['proyecto'] = (isset( $proyecto->data) && !empty( $proyecto->data))? $proyecto->data[0]:'';
             $data['secretario'] = (isset( $secretario->data) && !empty( $secretario->data))? $secretario->data[0]:'';
             $data['solicitud'] = (isset( $solicitud->data) && !empty( $solicitud->data))? $solicitud->data[0]:'';

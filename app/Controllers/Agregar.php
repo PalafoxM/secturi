@@ -2023,14 +2023,13 @@ class Agregar extends BaseController
         $data = $this->request->getPost();
         $archivos = $this->request->getFiles();
        
-      
    
-        if (empty($data['proveedor'])) {
+        if (empty($data['id_proveedor'])) {
             $response->error = true;
             $response->respuesta = "Es requerido el proveedor";
             return $this->respond($response);
         }
-        if (isset($data['banco']) && empty($data['banco'])) {
+        if (isset($data['id_proveedor_banco']) && empty($data['id_proveedor_banco'])) {
             $response->error = true;
             $response->respuesta = "Es requerido el Cuenta Bancaria";
             return $this->respond($response);
@@ -2114,7 +2113,9 @@ class Agregar extends BaseController
                 $xml = simplexml_load_string($contenido);
 
                 if ($xml === false) {
-                    return false;
+                       $response->error = true;
+                      $response->respuesta = "Es requerido el archivo XML";
+                       return $this->respond($response);
                 }
 
                 $namespaces = $xml->getNamespaces(true);
@@ -2170,15 +2171,16 @@ class Agregar extends BaseController
           }
         }
         
+   
         $dataInsert = [
             'id_direccion_responsable' => $data['direccion_responsable'],
-            'proveedor'                => $data['proveedor'],
+            'id_proveedor'             => $data['id_proveedor'],
             'fecha_tramite'            => $data['fecha_tramite'],
             'id_responsable'           => (int) $data['id_reponsable_solicitud'],
             'id_director'              => 1,
             'id_secretario'            => $data['id_secretario'],
             'id_responsable_gasto'     => $data['id_responsable_gasto'],
-            'banco'                    => $data['banco'],
+            'id_proveedor_banco'       => $data['id_proveedor_banco'],
             'fec_inicio'               => $data['fecha_inicio'],
             'fec_fin'                  => $data['fecha_fin'],
             'concepto'                 => $data['concepto_gasto'],
@@ -2187,11 +2189,11 @@ class Agregar extends BaseController
             'no_consecutivo'           => $data['no_consecutivo'],
             'convenio'                 => $data['convenio'],
             'otros'                    => $data['otros'],
-            'clabe'                    => $data['clabe'],
-            'no_cuenta'                => $data['no_cuenta'],
+            //'clabe'                    => $data['clabe'],
+            //'no_cuenta'                => $data['no_cuenta'],
             'folio'                    => $data['folio'],
-            'rfc'                      => $data['rfc'],
-            'no_proveedor'             => $data['no_proveedor'],
+          //  'rfc'                      => $data['rfc'],
+          //  'no_proveedor'             => $data['no_proveedor'],
             'formatos'                 => $data['formatos'],
             'documentacion'            => $data['documentacion'],
             'poliza'                   => $data['poliza'],

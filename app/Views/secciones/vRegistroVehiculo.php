@@ -33,74 +33,76 @@
                                 <input type="hidden" name="id_vehiculo" value="<?= $id_vehiculo ?>">
                                 <div class="form-row">
                                     <!-- Dirección Responsable -->
-                                    <div class="col-md-4 mb-6">
+                                <!--     <div class="col-md-4 mb-6">
                                         <label for="proveedor">Proveedor<span class="text-danger">*</span></label>
                                         <input class="form-control" id="proveedor" name="proveedor"
                                             value="<?= isset($proveedor) && !empty($proveedor) ? $proveedor : '' ?>"
                                             required>
 
-                                    </div>
-                                    <!-- <div class="col-md-6 mb-6">
+                                    </div> -->
+                                    <div class="col-md-6 mb-6">
                                         <label for="id_proveedor">Proveedor<span class="text-danger">*</span></label>
                                         <select class="form-control select2-ajax" id="id_proveedor" name="id_proveedor" required>
                                         </select>
-                                    </div> -->
-                                    <div class="col-md-4 mb-6">
+                                    </div> 
+                                 <!--    <div class="col-md-4 mb-6">
                                         <label for="banco">Banco<span class="text-danger">*</span></label>
                                         <input class="form-control" id="banco" name="banco"  value="<?= isset($banco) && !empty($banco) ? $banco : '' ?>"
                                          required>
-                                    </div>
-                                    <div class="col-md-4 mb-6">
+                                    </div> -->
+                                 <!--    <div class="col-md-4 mb-6">
                                         <label for="no_proveedor">No. proveedor<span
                                                 class="text-danger">*</span></label>
                                         <input class="form-control" id="no_proveedor" name="no_proveedor" value="<?= isset($no_proveedor) && !empty($no_proveedor) ? $no_proveedor : '' ?>"
                                          required>
-                                    </div>
-                                    <!--    <div class="col-md-6 mb-6">
+                                    </div> -->
+                                    <div class="col-md-6 mb-6">
                                         <label for="id_proveedor_banco">Proveedor Banco<span class="text-danger">*</span></label>
                                         <select class="form-control select2-ajax" id="id_proveedor_banco" name="id_proveedor_banco" required>
                                             </select>
-                                    </div> -->
+                                    </div> 
                                 </div><!--end form-row-->
                                 <div class="form-row">
 
-                                    <div class="col-md-4 mb-3">
+                                    <div class="col-md-6 mb-3">
                                         <label for="folio">Folio</label>
                                         <input type="text" class="form-control" id="folio" name="folio"
                                             value="<?= (isset($folio)) ? $folio : '' ?>" placeholder="folio">
 
-                                    </div><!--end col-->
+                                    </div>
+                                    
+                                   <!--  <div class="col-md-6 mb-3">
+                                        <label for="rfc">RFC</label>
+                                        <input type="text" class="form-control" id="rfc" name="rfc"
+                                            value="<?= (isset($rfc)) ? $rfc : '' ?>" placeholder="rfc">
 
-                                    <div class="col-md-4 mb-3">
+                                    </div> -->
+
+                                    <!--end col-->
+
+                                  <!--   <div class="col-md-4 mb-3">
                                         <label for="no_cuenta">No. Cuenta<span style="color:red;">*</span></label>
                                         <input type="text" class="form-control" id="no_cuenta" autocomplete="off"
                                             value="<?= (isset($no_cuenta)) ? $no_cuenta : '' ?>"
                                             placeholder="No. Cuenta" name="no_cuenta">
-                                    </div><!--end col-->
+                                    </div>
                                     <div class="col-md-4 mb-3">
                                         <label for="clabe">Clabe<span style="color:red;">*</span></label>
                                         <input type="text" class="form-control" id="clabe" autocomplete="off"
                                             value="<?= (isset($clabe)) ? $clabe : '' ?>" placeholder="Clabe"
                                             name="clabe">
-                                    </div><!--end col-->
+                                    </div> -->
                                 </div><!--end form-row-->
                                 <div class="form-row">
 
-                                    <div class="col-md-4 mb-3">
-                                        <label for="rfc">RFC</label>
-                                        <input type="text" class="form-control" id="rfc" name="rfc"
-                                            value="<?= (isset($rfc)) ? $rfc : '' ?>" placeholder="rfc">
-
-                                    </div><!--end col-->
-
-                                    <div class="col-md-2 mb-3">
+                                    <div class="col-md-3 mb-3">
                                         <label for="formatos">Formatos<span class="text-danger">*</span></label>
                                         <select class="form-control" id="formatos" name="formatos" required>
                                             <option value="0" <?= isset($formatos) && !empty($formatos) && $formatos == 0 ? 'selected' : ''; ?>>SI</option>
                                             <option value="1" <?= isset($formatos) && !empty($formatos) && $formatos == 1? 'selected' : ''; ?>>NO</option>
                                         </select>
                                     </div><!--end col-->
-                                    <div class="col-md-2 mb-3">
+                                    <div class="col-md-3 mb-3">
                                         <label for="documentacion">Documentacion<span
                                                 class="text-danger">*</span></label>
                                         <select class="form-control" id="documentacion" name="documentacion" required>
@@ -108,14 +110,14 @@
                                             <option value="1" <?= isset($documentacion) && !empty($documentacion) && $documentacion == 0 ? 'selected' : ''; ?>>NO</option>
                                         </select>
                                     </div><!--end col-->
-                                    <div class="col-md-2 mb-3">
+                                    <div class="col-md-3 mb-3">
                                         <label for="poliza">Poliza<span class="text-danger">*</span></label>
                                         <select class="form-control" id="poliza" name="poliza"  required>
                                             <option value="0" <?= isset($poliza) && !empty($poliza) && $poliza == 0 ? 'selected' : ''; ?>>SI</option>
                                             <option value="1" <?= isset($poliza) && !empty($poliza) && $poliza == 0 ? 'selected' : ''; ?>>NO</option>
                                         </select>
                                     </div><!--end col-->
-                                    <div class="col-md-2 mb-3">
+                                    <div class="col-md-3 mb-3">
                                         <label for="conformidad">Conformidad<span class="text-danger">*</span></label>
                                         <select class="form-control" id="conformidad" name="conformidad" required>
                                             <option value="0" <?= isset($conformidad) && !empty($conformidad) && $conformidad == 0 ? 'selected' : ''; ?>>SI</option>
@@ -417,7 +419,7 @@
 <script>
 
 
-    /* $(document).ready(function() {
+     $(document).ready(function() {
         $('#id_proveedor').select2({
             placeholder: 'Escribe para buscar un proveedor...',
                 minimumInputLength: 3,
@@ -440,7 +442,7 @@
                 }
             });
         });
-     */
+    
     $('#id_proveedor').on('change', function () {
         var idProveedor = $(this).val();
 
