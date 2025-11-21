@@ -40,7 +40,7 @@ $fechaFormateada = $dia . ' de ' . $mes . ' del ' . $anio;
                 Por medio de la presente, me permito solicitar su apoyo para que se realice el tramite de Pago a Tercero
                 con folio PT <strong> <?= $folio ?></strong> por la cantidad de 
                 <strong>$<?= $vehiculo->xml_monto; ?> (<?= mb_strtoupper($numero_texto, 'UTF-8'); ?>)</strong>,
-                de comprobante(s) fiscale(s) No. <strong><?= $vehiculo->xml_monto; ?></strong> 
+                de comprobante(s) fiscale(s) No. <strong><?= $vehiculo->xml_uuid; ?></strong> 
     
                 por concepto de <?= $vehiculo->concepto ?> 
                 al proveedor <?= $proveedor ?>.
