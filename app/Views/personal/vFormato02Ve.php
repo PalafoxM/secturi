@@ -10,7 +10,7 @@
             </span>
         </div>
          <div  style="position:absolute; text-align:center; top:15.5%; left:22%; width:36%; height:30px; background-color:white; font-size: 7px; ">
-            <span class="proxima"><?= (isset($vehiculo->proveedor) && !empty($vehiculo->proveedor))?$vehiculo->proveedor:'';?></span>
+            <span class="proxima"><?= (isset($proveedor) && !empty($proveedor))?$proveedor:'';?></span>
         </div>
       <div  style="position:absolute; text-align:center; top:20.7%; left:22%; width:66%; height:30px; background-color:white; font-size: 7px; ">
             <span class="proxima"><?= (isset($vehiculo->concepto) && !empty($vehiculo->concepto))?$vehiculo->concepto:''; ?></span>
@@ -27,11 +27,11 @@
             <strong>
            <?= $vehiculo->xml_uuid ?>
             </strong>
-                 derivado del contrato ó convenio número <strong> <?= (isset($vehiculo->concepto) && !empty($vehiculo->concepto))?$vehiculo->concepto:'S/N' ;?></strong> por la cantidad de <strong>$<?= $vehiculo->xml_monto ;?></strong>
+                 derivado del contrato ó convenio número <strong> <?= (isset($vehiculo->convenio) && !empty($vehiculo->convenio))?$vehiculo->convenio:'S/N' ;?></strong> por la cantidad de <strong>$<?= $vehiculo->xml_monto ;?></strong>
                  <strong>(<?= $numero_texto?>)</strong>, por el servicio de
                  <strong>
                   3550
-                </strong> prestado por el proveedor <strong><?=(isset($vehiculo->proveedor) && !empty($vehiculo->proveedor))?$vehiculo->proveedor:'' ?></strong>. Se cuenta con suficiencia presupuestal en la partida
+                </strong> prestado por el proveedor <strong><?=(isset($proveedor) && !empty($proveedor))?$proveedor:'' ?></strong>. Se cuenta con suficiencia presupuestal en la partida
                 <strong>
                  
              
