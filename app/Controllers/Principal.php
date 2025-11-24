@@ -2924,22 +2924,18 @@ class Principal extends BaseController
                 'tabla' => 'vw_direccion',
                 'where' => ['visible' => 1, 'id_director' => $vehiculo->data[0]->id_responsable_gasto ]
             ]);
-
             $proveedor = $globals->getTabla([
                 'tabla' => 'proveedor',
                 'where' => ['visible' => 1, 'id_proveedor' => $vehiculo->data[0]->id_proveedor ]
             ]);
-
-            $data['proveedor'] = isset($proveedor->data) && !empty($proveedor->data)?$proveedor->data[0]->razon_social:'';
-
-           // die( var_dump( $proveedor  ) );
         
             $data['responsableGasto'] = isset($responsableGasto->data) && !empty($responsableGasto->data)?$responsableGasto->data[0]:[];
             $data['responsable'] = isset($responsable->data) && !empty($responsable->data)?$responsable->data[0]:[];
+            $data['proveedor'] = isset($proveedor->data) && !empty($proveedor->data)?$proveedor->data[0]->razon_social:[];
            
             
         }
-        //die( var_dump($data['responsable'] ) );
+       // die( var_dump($data['proveedor'] ) );
       
      
       
