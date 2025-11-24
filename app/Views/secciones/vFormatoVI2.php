@@ -43,7 +43,7 @@ $fechaFormateada = $dia . ' de ' . $mes . ' del ' . $anio;
                 de comprobante(s) fiscale(s) No. <strong><?= $vehiculo->xml_uuid; ?></strong> 
     
                 por concepto de <?= $vehiculo->concepto ?> 
-                al proveedor <?= $proveedor ?>.
+                al proveedor <?= $proveedor ?>, derivado del contrato ó convenio número  <?= $vehiculo->convenio ?> 
             </span>
         </div>
         <div style="position:absolute; top:42.5%; left:9.5%; width:81%; height:42px; background-color:white; font-size:13px; text-align:justify;">
