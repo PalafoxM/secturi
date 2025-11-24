@@ -4628,6 +4628,7 @@ class Principal extends BaseController
                 'where' => ['visible' => 1, 'idproveedor' =>  $vehiculo->data[0]->id_proveedor_banco]
             ]);
 
+            var_dump($vehiculo->data[0]);
             var_dump($proveedorBanco);
             die();
             $data['folio'] = $vehiculo->data[0]->folio;
