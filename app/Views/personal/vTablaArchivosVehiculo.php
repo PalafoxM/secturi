@@ -65,22 +65,7 @@
                                                             </td>
                                                         </tr>
                                             
-                                                        <tr class="table-secondary">
-                                                            <th scope="row">03. CFDI</th>
-                                                    
-                                                            <td>Comprobante Fiscal Digital por Internet en su representación PDF</td>
-                                                   
-                                                          
-                                                            <td class="text-center">
-                                                       
-                                                                <a style="cursor:pointer;" onclick="ini.inicio.links(<?=$id_registro?>);" class="text-center">
-                                                                    <i class="far fa-file-pdf text-danger"></i>
-                                                                    <h6 class="text-truncate">Archivo03.pdf</h6>
-                                                                </a>  
-                                                        
-                                                       
-                                                            </td>
-                                                        </tr>
+                                              
                                                     
                                                    
                                             

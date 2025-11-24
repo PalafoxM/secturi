@@ -23,10 +23,13 @@
             <span class="proxima"><?= ($vehiculo->formatos==0)?'SI':'NO' ?></span>
         </div>
         <div  style="position:absolute; text-align:center; top:37%; left:84.5%; width:7%; height:18px; background-color:white; font-size: 10px; ">
-
-
             <span class="proxima"><?= ($vehiculo->poliza==0)?'SI':'NO' ?></span>
-
+        </div>
+        <div  style="position:absolute; text-align:center; top:39.5%; left:84.5%; width:7%; height:18px; background-color:white; font-size: 10px; ">
+            <span class="proxima"><?= ($vehiculo->contrato_convenio==0)?'SI':'NO' ?></span>
+        </div>
+        <div  style="position:absolute; text-align:center; top:45%; left:84.5%; width:7%; height:18px; background-color:white; font-size: 10px; ">
+            <span class="proxima"><?= ($vehiculo->emitir_pago==0)?'SI':'NO' ?></span>
         </div>
         <div  style="position:absolute; text-align:center; top:50.5%; left:25%; width:70%; height:18px; background-color:white; font-size: 10px; ">
             <?= $vehiculo->otros ?>
