@@ -287,6 +287,18 @@ class Inicio extends BaseController {
         $this->_renderView($data);
 
     }
+    public function Servicios()
+    {
+        $session            = \Config\Services::session();
+        $data               = array();
+        $globas             = new Mglobal;
+        $data['cat_servicio']    = $globas->getTabla(['tabla' => 'cat_servicio', 'where' => ['visible' => 1]])->data;
+
+        $data['scripts']    = array('principal','inicio');
+        $data['contentView']= 'personal/vServicios';                
+        $this->_renderView($data);
+
+    }
     public function Chat()
     {        
         $session = \Config\Services::session();
