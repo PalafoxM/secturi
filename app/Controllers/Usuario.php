@@ -1166,9 +1166,16 @@ class Usuario extends BaseController
             $data['no_cuenta']      = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->no_cuenta:'';
             $data['clabe']          = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->clabe:'';
             $data['rfc']            = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->rfc:'';
+            $data['formatos']       = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->formatos:'';
+            $data['poliza']         = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->poliza:'';
+            $data['conformidad']    = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->conformidad:'';
+            $data['documentacion']  = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->documentacion:'';
+            $data['contrato_convenio']  = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->contrato_convenio:'';
+            $data['emitir_pago']  = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->emitir_pago:'';
+            $data['evidencia']  = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->evidencia:'';
 
         }
-
+       //die( var_dump( $vehiculo->data ) );
         $cat_area = $Mglobal->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
         $cat_secretario = $Mglobal->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1]]);
         $cat_subsecretario = $Mglobal->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1]]);
