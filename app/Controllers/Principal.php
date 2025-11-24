@@ -4625,12 +4625,10 @@ class Principal extends BaseController
             ]);
              $proveedorBanco = $globals->getTabla([
                 'tabla' => 'proveedor_banco',
-                'where' => ['visible' => 1, 'idproveedor' =>  $vehiculo->data[0]->id_proveedor_banco]
+                'where' => ['visible' => 1, 'id_proveedor_banco' =>  $vehiculo->data[0]->id_proveedor_banco]
             ]);
 
-            var_dump($vehiculo->data[0]);
-            var_dump($proveedorBanco);
-            die();
+         
             $data['folio'] = $vehiculo->data[0]->folio;
             $data['proveedor'] = (isset($proveedor->data) && !empty($proveedor->data) )?$proveedor->data[0]->razon_social:'';
             $data['no_proveedor'] = (isset($proveedor->data) && !empty($proveedor->data) )?$proveedor->data[0]->no_proveedor:'';
