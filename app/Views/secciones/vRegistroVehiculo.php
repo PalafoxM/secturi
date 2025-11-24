@@ -159,7 +159,7 @@
                                     <div class="col-md-4 mb-3">
                                         <label for="direccion_responsable">Dirección Responsable <span
                                                 class="text-danger">*</span></label>
-                                        <select class="form-control" id="direccion_responsable"
+                                        <select class="form-control select2" id="direccion_responsable"
                                             name="direccion_responsable" required>
                                             <?php foreach ($cat_area as $a): ?>
                                                 <?php if ($editar == 0): ?>
@@ -299,7 +299,7 @@
                                     <div class="col-md-6 mb-3">
                                         <label for="fecha_inicio">Fecha Inicio.<span style="color:red;">*</span></label>
                                         <input id="fecha_inicio"
-                                            value="<?= (isset($fec_inicio)) ? date('Y-m-d', strtotime($fec_inicio)) : '' ?>"
+                                            value="<?= (isset($fec_inicio)) ? date('Y-m-d', strtotime($fec_inicio)) : date('Y-m-d') ?>"
                                             type="date" name="fecha_inicio" class="form-control" multiple
                                             accept=".pdf" />
 
@@ -307,7 +307,7 @@
                                     <div class="col-md-6 mb-3">
                                         <label for="fecha_fin">Facha Fin.<span style="color:red;">*</span></label>
                                         <input id="fecha_fin"
-                                            value="<?= (isset($fec_fin)) ? date('Y-m-d', strtotime($fec_fin)) : '' ?>"
+                                            value="<?= (isset($fec_fin)) ? date('Y-m-d', strtotime($fec_fin)) : date('Y-m-d') ?>"
                                             type="date" name="fecha_fin" multiple class="form-control" accept=".xml">
                                     </div><!--end col-->
 
