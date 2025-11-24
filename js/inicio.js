@@ -5417,11 +5417,35 @@ ini.inicio = (function () {
                             });
                         }
                     });
-          
-               
-
-         
        },  
+       servicio: function(id_servicio, elemento) {
+
+            // Ubica la fila (tr) donde se dio clic
+            const fila = elemento.closest('tr');
+
+            // Obtén los valores de los inputs de esa fila
+            const monto = fila.querySelector('input[name="monto"]').value;
+            const folio = fila.querySelector('input[name="folio"]').value;
+            const periodo = fila.querySelector('input[name="periodo"]').value;
+
+            if(!monto){
+                Swal.fire("Atención", "El monto es requerido", "info");
+                return;
+            }
+            if(!folio){
+                Swal.fire("Atención", "El monto es requerido", "info");
+                return;
+            }
+            if(!periodo){
+                Swal.fire("Atención", "El monto es requerido", "info");
+                return;
+            }
+
+             window.open(base_url + "index.php/Principal/servicio/" + id_servicio+'/'+monto+'/'+folio+'/'+periodo, "_blank");
+
+            // Aquí puedes enviarlo por AJAX, fetch, o lo que necesites
+            // ini.inicio.enviarDatos(id_servicio, monto, folio, periodo);
+        },
         
     }
 })();

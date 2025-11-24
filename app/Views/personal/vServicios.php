@@ -29,9 +29,6 @@
                     <div class="card">
                         <div class="card-body">
 
-                            <button onclick="ini.inicio.agregarInventario()"
-                                class="btn btn-gradient-danger px-4 float-right mt-0 mb-3"><i
-                                    class="mdi mdi-plus-outline mr-2"></i>Agregar Inventario</button>
                            
                             <h4 class="header-title mt-0">Lista Inventarios
 
@@ -46,6 +43,7 @@
                                             <th class="text-center">RFC</th>
                                             <th class="text-center">MONTO</th>
                                             <th class="text-center">FOLIO</th>
+                                            <th class="text-center">PERIODO</th>
                     
                                             <th class="text-center">ACCIONES</th>
                                         </tr>
@@ -62,12 +60,14 @@
                                             <td class="text-center"><?= $i->rfc ?></td>
                                             <td class="text-center"><input type="text" class="form-control" name="monto"></td>
                                             <td class="text-center"><input type="text" class="form-control" name="folio"></td>
+                                            <td class="text-center"><input type="text" class="form-control" name="periodo"></td>
                              
                                             <td class="text-center">
 
-                                                <a href="<?=base_url().'index.php/Inicio/Servicios/'.$i->id_servicio?>" >
+                                             <a href="javascript:void(0)"  onclick="ini.inicio.servicio(<?= $i->id_servicio ?>, this)">
                                                     <i class="mdi mdi-file text-success font-18"></i>
                                                 </a>
+
                                               
 
                                             </td>

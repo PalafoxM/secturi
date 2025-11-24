@@ -5362,6 +5362,59 @@ class Principal extends BaseController
         $mpdf->Output('Formato_pt.pdf', 'I');
         exit();
     }
+    public function servicio($id, $monto, $folio, $periodo )
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $data = $this->request->getPost();
+        $data['monto'] = $monto;
+        $data['folio'] = $folio;
+        $data['periodo'] = $periodo;
+
+       $servicio = $globals->getTabla([
+            'tabla' => 'car_servicio',
+            'where' => ['visible' => 1, 'id_servicio' => $id]
+        ]);
+     
+        $data['servicio'] = isset($servicio->data) && !empty($servicio->data)?$servicio->data[0]:'';
+       // die( var_dump($data['proveedor'] ) );
+      
+       $doc = 'assets/pdf/plantillas/anexo01.pdf';
+       $formato = 'personal/vFormatoCheco.php';
+       
+           // die( var_dump($data) );
+
+        $html = view($formato, $data);
+        $htmlSegundaHoja = view('personal/vFormatoCheco2.php', $data);
+        //Crear instancia de mPDF
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 0,
+            'margin_left' => 1,
+            'margin_right' => 1,
+            'format' => [213, 268],
+            'mirrorMargins' => false,
+        ]);
+
+        $pagecount = $mpdf->SetSourceFile(FCPATH . $doc);
+        for ($i = 1; $i <= $pagecount; $i++) {
+            $mpdf->AddPage();
+            $tplId = $mpdf->ImportPage($i);
+            $mpdf->UseTemplate($tplId);
+
+            if ($i == 1) {
+                $mpdf->WriteHTML($html);
+            }
+            if ($i == 2) {
+                $mpdf->WriteHTML($htmlSegundaHoja);
+            }
+        }
+
+
+      
+        $mpdf->Output('Formato_pt.pdf', 'I');
+        exit();
+       
+    }
 
 
 }
