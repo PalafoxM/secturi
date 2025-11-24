@@ -5370,14 +5370,15 @@ class Principal extends BaseController
         $data['monto'] = $monto;
         $data['folio'] = $folio;
         $data['periodo'] = $periodo;
+        $data['numero_texto'] = $this->numeroEnLetras($monto);
 
        $servicio = $globals->getTabla([
-            'tabla' => 'car_servicio',
+            'tabla' => 'cat_servicio',
             'where' => ['visible' => 1, 'id_servicio' => $id]
         ]);
      
         $data['servicio'] = isset($servicio->data) && !empty($servicio->data)?$servicio->data[0]:'';
-       // die( var_dump($data['proveedor'] ) );
+      // die( var_dump($data['servicio'] ) );
       
        $doc = 'assets/pdf/plantillas/anexo01.pdf';
        $formato = 'personal/vFormatoCheco.php';
