@@ -30,14 +30,8 @@
                  derivado del contrato ó convenio número <strong> <?= (isset($vehiculo->convenio) && !empty($vehiculo->convenio))?$vehiculo->convenio:'S/N' ;?></strong> por la cantidad de <strong>$<?= $vehiculo->xml_monto ;?></strong>
                  <strong>(<?= $numero_texto?>)</strong>, por el servicio de
                  <strong>
-                  3550
-                </strong> prestado por el proveedor <strong><?=(isset($proveedor) && !empty($proveedor))?$proveedor:'' ?></strong>. Se cuenta con suficiencia presupuestal en la partida
-                <strong>
-                 
-             
-                    <?= $proyecto->proyecto ?>
-         
-                </strong> correspondiente.
+                  <?= (isset($vehiculo->concepto) && !empty($vehiculo->concepto))?$vehiculo->concepto:''; ?>
+                </strong> prestado por el proveedor <strong><?=(isset($proveedor) && !empty($proveedor))?$proveedor:'' ?></strong>. Se cuenta con suficiencia presupuestal en la partida correspondiente.
            </span>
         </div>
         
