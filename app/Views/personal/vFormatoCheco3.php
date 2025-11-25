@@ -1,65 +1,56 @@
- <div  style="position:absolute; text-align:center; top:14%; left:75%; width:10%; height:10px; background-color:white; font-size: 8px; ">
+ <div  style="position:absolute; text-align:center; top:18%; left:45%; width:12%; height:18px; background-color:white; font-size: 12px; ">
           <?= date('d/m/Y');?> 
     </div>
-        <div  style="position:absolute; text-align:center; top:16.2%; left:70%; width:22%; height:10px; background-color:white; font-size: 8px; ">
+        <div  style="position:absolute; text-align:center; top:18%; left:68%; width:28%; height:18px; background-color:white; font-size: 12px; ">
           <?= 'PT SECTURI/DGA/CRMSG/'.$folio.'/'.date('Y'); ?> 
         </div>
         
-        <div  style="position:absolute; text-align:center; top:18.4%; left:70.5%; width:22%; height:10px; background-color:white; font-size: 8px; ">
+        <div style="position:absolute; text-align:center; top:34%; left:33%; width:10%; height:18px; background-color:white; font-size: 12px; ">
             3140
         </div>
-        <div  style="position:absolute; text-align:center; top:16.2%; left:30%; width:22%; height:10px; background-color:white; font-size: 8px; ">
-         <?=  $servicio->dsc_servicio; ?>
+        <div style="position:absolute; text-align:center; top:34%; left:48%; width:10%; height:18px; background-color:white; font-size: 12px; ">
+        $<?= number_format($monto, 2) ?>
         </div>
-        <div style="position:absolute; text-align:center; top:21.2%; left:30%; width:22%; height:10px; background-color:white; font-size: 8px; ">
-          <?=  $servicio->dsc_servicio .' '. $periodo .' / '. date('Y')?> 
+        <div style="position:absolute; text-align:center; top:34%; left:19%; width:10%; height:18px; background-color:WHITE; font-size: 12px; ">
+         M006GB1400
         </div>
-        <div style="position:absolute; top:27.6%; left:22%; width:22%; height:10px; background-color:white; font-size: 8px; ">
-           RODRIGO GONZALEZ GUERRERO
+        <div style="position:absolute; text-align:center; top:34%; left:5%; width:10%; height:18px; background-color:white; font-size: 12px; ">
+          <?= $folio_fac ?>
         </div>
-        <div style="position:absolute; top:29.8%; left:22%; width:22%; height:10px; background-color:white; font-size: 8px; ">
-               DIRECTOR GENERAL ADMINISTRATIVO
+        <div style="position:absolute;; top:36%; left:60.5%; width:37%; height:15px; background-color:WHITE; font-size: 8px; ">
+        <STRONG>  NOMBRE : </STRONG> <?=  $servicio->dsc_servicio?> 
         </div>
-        <div  style="position:absolute; text-align:justify; top:31.6%; left:7%; width:85.5%; height:30px; background-color:white; font-size: 10px; ">
-       Solicito que se realice trámite de pago del comprobante fiscal con folio <strong><?= $folio_fac ?></strong>, derivado del contrato ó convenio número <strong>N/A </strong> por la cantidad
-        de <strong>$<?= number_format($monto, 2) .' ('.$numero_texto.')' ?></strong>, por el servicio  <strong><?=  $servicio->dsc_servicio .' '. $periodo .' / '. date('Y')?></strong> 
-      prestando por el proveedo <strong><?=  $servicio->dsc_servicio; ?></strong>. Se cuenta con suficiencia presupuestal en la partida correspondiente.
+        <div style="position:absolute;; top:37%; left:60.5%; width:37%; height:15px; background-color:white; font-size: 8px; ">
+        <STRONG>  NO. DE PROVEEDOR:  </STRONG> <?=  $servicio->no_proveedor ?> 
         </div>
-      <?php $top = 43.3; ?>
-      <?php $top1 = 47; ?>
-      <?php $top2 = 49.5; ?>
-      <?php $top3 = 52.2; ?>
-      <?php for($i = 1; $i <= 3; $i++): ?>
-      <?php  if($i != 3): ?>
-      <div style="position:absolute; top:<?=$top?>%; left:50%; width:2%; height:12px; background-color:white; font-size: 10px;">
-       SI
-      </div>
-      <?php endif; ?>
-      <div style="position:absolute; top:<?=$top1?>%; left:21.5%; width:30%; height:12px; background-color:white; font-size: 10px;">
-         ELIZABETH CRISTINA MONDRAGON MARTINEZ
-      </div>
-
-      <div style="position:absolute; top:<?=$top2?>%; left:21.5%; width:30%; height:12px; background-color:white; font-size: 10px;">
-         COORDINADORA DE RECURSOS MATERIALES Y SERVICIOS GENERALES
-      </div>
-
-      <div style="position:absolute; top:<?=$top3?>%; left:21.5%; width:30%; height:12px; background-color:white; font-size: 10px;">
-         DIRECCION GENERAL ADMINISTRATIVA
-      </div>
-
-      <?php $top += 12.4; ?>
-      <?php $top1 += 13; ?>
-      <?php $top2 += 13; ?>
-      <?php $top3 += 13; ?>
-      <?php endfor; ?>
-
-      <div style="position:absolute; top:94.65%; left:21.5%; width:30%; height:10px; background-color:white; font-size: 10px;">
-         ELIZABETH CRISTINA MONDRAGON MARTINEZ
-      </div>
-
-      <div style="position:absolute; top:97%; left:21.5%; width:30%; height:8px; background-color:white; font-size: 10px;">
-         COORDINADORA DE RECURSOS MATERIALES Y SERVICIOS GENERALES
-      </div>
+        <div style="position:absolute;; top:38.2%; left:60.5%; width:37%; height:15px; background-color:white; font-size: 8px; ">
+        <STRONG> RFC : </STRONG> <?=  $servicio->rfc ?> 
+        </div>
+        <div style="position:absolute;; top:42.5%; left:60.5%; width:37%; height:15px; background-color:WHITE; font-size: 8px; ">
+        <STRONG>  NOMBRE DEL PROVEEDOR :</STRONG> <?=  $servicio->dsc_servicio?> 
+        </div>
+        <div style="position:absolute;; top:43.8%; left:60.5%; width:37%; height:15px; background-color:white; font-size: 8px; ">
+         <STRONG> BANCO : </STRONG> <?=  $servicio->banco?> 
+        </div>
+        <div style="position:absolute;; top:45%; left:60.5%; width:37%; height:15px; background-color:white; font-size: 8px; ">
+        <STRONG> CLABE : </STRONG> <?=  $servicio->clabe ?> 
+        </div>
+        <div style="position:absolute; top:48.18%; left:22.2%; width:22%; height:10px; background-color:white; font-size: 12px; ">
+          <STRONG> N/A </STRONG>
+        </div>
+        <div style="position:absolute; top:49.5%; left:12.2%; width:22%; height:10px; background-color:white; font-size: 12px; ">
+          <STRONG> 4578026</STRONG>
+        </div>
+        <div style="position:absolute; text-align:right; top:51.7%; left:37%; width:22%; height:18px; background-color:white; font-size: 12px; ">
+           <strong>   $<?= number_format($monto, 2) ?></strong>
+        </div>
+        <div style="position:absolute; text-align:left; top:51.7%; left:60%; width:38%; height:18px; background-color:white; font-size: 12px; ">
+           <strong>  <?= $numero_texto ?></strong>
+        </div>
+        <div style="position:absolute; text-align:center; top:77%; left:68%; width:28%; height:48px; background-color:WHITE; font-size: 12px; ">
+           ELIZABETH CRISTINA MONDRAGON MARTINEZ<BR>COORDINADORA DE RECURSOS MATERIALES Y SERVICIOS GENERALES
+        </div>
+ 
 
 
 
