@@ -293,6 +293,7 @@ class Inicio extends BaseController {
         $data               = array();
         $globas             = new Mglobal;
         $data['cat_servicio']    = $globas->getTabla(['tabla' => 'cat_servicio', 'where' => ['visible' => 1]])->data;
+        $data['cat_mes']    = $globas->getTabla(['tabla' => 'cat_mes', 'where' => ['visible' => 1]])->data;
 
         $data['scripts']    = array('principal','inicio');
         $data['contentView']= 'personal/vServicios';                

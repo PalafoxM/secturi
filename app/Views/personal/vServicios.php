@@ -40,9 +40,9 @@
                                             <th class="text-center">ID</th>
                                             <th class="text-center">PROVEEDOR</th>
                                             <th class="text-center">NO. PROVEEDOR</th>
-                                            <th class="text-center">RFC</th>
+                                            <th class="text-center">FOLIO FAC.</th>
                                             <th class="text-center">MONTO</th>
-                                            <th class="text-center">FOLIO</th>
+                                            <th class="text-center">FOLIO PT</th>
                                             <th class="text-center">PERIODO</th>
                     
                                             <th class="text-center">ACCIONES</th>
@@ -57,16 +57,23 @@
                                             <td class="text-center"><?= $i->id_servicio ?></td>
                                             <td class="text-center"><?= $i->dsc_servicio ?></td>
                                             <td class="text-center"><?= $i->no_proveedor ?></td>
-                                            <td class="text-center"><?= $i->rfc ?></td>
+                                            <td class="text-center"><input type="text" class="form-control" name="folio_fac"></td>
                                             <td class="text-center"><input type="text" class="form-control" name="monto"></td>
                                             <td class="text-center"><input type="text" class="form-control" name="folio"></td>
-                                            <td class="text-center"><input type="text" class="form-control" name="periodo"></td>
+                                            <td class="text-center">
+                                                <select class="form-control" name="periodo">
+                                                    <?php foreach($cat_mes as $m): ?>
+                                                    <option value="<?= $m->id_mes?>"><?= $m->dsc_mes?></option>
+                                                    <?php endforeach; ?>
+                                                </select >
+                                        
+                                            </td>
                              
                                             <td class="text-center">
 
                                              <a href="javascript:void(0)"  onclick="ini.inicio.servicio(<?= $i->id_servicio ?>, this)">
                                                     <i class="mdi mdi-file text-success font-18"></i>
-                                                </a>
+                                            </a>
 
                                               
 

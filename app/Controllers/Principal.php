@@ -5362,14 +5362,36 @@ class Principal extends BaseController
         $mpdf->Output('Formato_pt.pdf', 'I');
         exit();
     }
-    public function servicio($id, $monto, $folio, $periodo )
+    private function meses($idMes)
+    {
+        $meses = [
+            1 => 'ENERO',
+            2 => 'FEBRERO',
+            3 => 'MARZO',
+            4 => 'ABRIL',
+            5 => 'MAYO',
+            6 => 'JUNIO',
+            7 => 'JULIO',
+            8 => 'AGOSTO',
+            9 => 'SEPTIEMBRE',
+            10 => 'OCTUBRE',
+            11 => 'NOVIEMBRE',
+            12 => 'DICIEMBRE',
+            // agrega más si los necesitas
+        ];
+
+        return $meses[$idMes] ?? '';
+    }
+
+    public function servicio($id, $monto, $folio, $periodo, $folio_fac )
     {
         $session = \Config\Services::session();
         $globals = new Mglobal;
         $data = $this->request->getPost();
         $data['monto'] = $monto;
         $data['folio'] = $folio;
-        $data['periodo'] = $periodo;
+        $data['folio_fac'] = $folio_fac;
+        $data['periodo'] = $this->meses( $periodo);
         $data['numero_texto'] = $this->numeroEnLetras($monto);
 
        $servicio = $globals->getTabla([
@@ -5387,6 +5409,7 @@ class Principal extends BaseController
 
         $html = view($formato, $data);
         $htmlSegundaHoja = view('personal/vFormatoCheco2.php', $data);
+        $htmlTerceraHoja = view('personal/vFormatoCheco3.php', $data);
         //Crear instancia de mPDF
         $mpdf = new \Mpdf\Mpdf([
             'margin_top' => 0,
@@ -5408,13 +5431,22 @@ class Principal extends BaseController
             if ($i == 2) {
                 $mpdf->WriteHTML($htmlSegundaHoja);
             }
+          
+                
+            
         }
 
+     $doc2 = 'assets/pdf/plantillas/anexo07_2.pdf';
+    $pagecount2 = $mpdf->SetSourceFile(FCPATH . $doc2);
 
-      
-        $mpdf->Output('Formato_pt.pdf', 'I');
-        exit();
-       
+    // Solo procesar la primera página (i = 1)
+    $mpdf->AddPage();
+    $tplId = $mpdf->ImportPage(1); // Importar solo la página 1
+    $mpdf->UseTemplate($tplId);
+    $mpdf->WriteHTML($htmlTerceraHoja);
+
+    $mpdf->Output('Formato_pt.pdf', 'I');
+    exit();
     }
 
 

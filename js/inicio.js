@@ -5426,7 +5426,8 @@ ini.inicio = (function () {
             // Obtén los valores de los inputs de esa fila
             const monto = fila.querySelector('input[name="monto"]').value;
             const folio = fila.querySelector('input[name="folio"]').value;
-            const periodo = fila.querySelector('input[name="periodo"]').value;
+            const periodo = fila.querySelector('select[name="periodo"]').value;
+            const folio_fac = fila.querySelector('input[name="folio_fac"]').value;
 
             if(!monto){
                 Swal.fire("Atención", "El monto es requerido", "info");
@@ -5441,7 +5442,7 @@ ini.inicio = (function () {
                 return;
             }
 
-             window.open(base_url + "index.php/Principal/servicio/" + id_servicio+'/'+monto+'/'+folio+'/'+periodo, "_blank");
+             window.open(base_url + "index.php/Principal/servicio/" + id_servicio+'/'+monto+'/'+folio+'/'+periodo+'/'+folio_fac, "_blank");
 
             // Aquí puedes enviarlo por AJAX, fetch, o lo que necesites
             // ini.inicio.enviarDatos(id_servicio, monto, folio, periodo);
