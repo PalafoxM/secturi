@@ -5383,24 +5383,27 @@ class Principal extends BaseController
         return $meses[$idMes] ?? '';
     }
 
-    public function servicio($id, $monto, $folio, $periodo, $folio_fac )
+    public function servicio()
     {
         $session = \Config\Services::session();
         $globals = new Mglobal;
-        $data = $this->request->getPost();
-        $data['monto'] = $monto;
-        $data['folio'] = $folio;
-        $data['folio_fac'] = $folio_fac;
-        $data['periodo'] = $this->meses( $periodo);
-        $data['numero_texto'] = $this->numeroEnLetras($monto);
+        $id               = $this->request->getGet('id_servicio');
+        $data['monto']    = $this->request->getGet('monto');
+        $data['folio']    = $this->request->getGet('folio');
+        $data['folio_fac']= $this->request->getGet('folio_fac');
+        $data['reserva']  = $this->request->getGet('reserva');
+        $periodo          = $this->request->getGet('periodo');
 
+        $data['periodo'] = $this->meses( $periodo);
+        $data['numero_texto'] = $this->numeroEnLetras($data['monto']);
+  
        $servicio = $globals->getTabla([
             'tabla' => 'cat_servicio',
             'where' => ['visible' => 1, 'id_servicio' => $id]
         ]);
      
         $data['servicio'] = isset($servicio->data) && !empty($servicio->data)?$servicio->data[0]:'';
-      // die( var_dump($data['servicio'] ) );
+  
       
        $doc = 'assets/pdf/plantillas/anexo01.pdf';
        $formato = 'personal/vFormatoCheco.php';

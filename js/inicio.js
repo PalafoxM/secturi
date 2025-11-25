@@ -5424,6 +5424,7 @@ ini.inicio = (function () {
             const fila = elemento.closest('tr');
 
             // Obtén los valores de los inputs de esa fila
+            const reserva = fila.querySelector('input[name="reserva"]').value;
             const monto = fila.querySelector('input[name="monto"]').value;
             const folio = fila.querySelector('input[name="folio"]').value;
             const periodo = fila.querySelector('select[name="periodo"]').value;
@@ -5442,7 +5443,18 @@ ini.inicio = (function () {
                 return;
             }
 
-             window.open(base_url + "index.php/Principal/servicio/" + id_servicio+'/'+monto+'/'+folio+'/'+periodo+'/'+folio_fac, "_blank");
+            let data = {
+                id_servicio,
+                monto,
+                folio,
+                periodo,
+                folio_fac,
+                reserva
+            }
+
+            let query = new URLSearchParams(data).toString();
+
+             window.open(base_url + "index.php/Principal/servicio?" + query, "_blank");
 
             // Aquí puedes enviarlo por AJAX, fetch, o lo que necesites
             // ini.inicio.enviarDatos(id_servicio, monto, folio, periodo);

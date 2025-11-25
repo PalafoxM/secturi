@@ -39,7 +39,7 @@
                                         <tr>
                                             <th class="text-center">ID</th>
                                             <th class="text-center">PROVEEDOR</th>
-                                            <th class="text-center">NO. PROVEEDOR</th>
+                                            <th class="text-center">NO. RESERVA</th>
                                             <th class="text-center">FOLIO FAC.</th>
                                             <th class="text-center">MONTO</th>
                                             <th class="text-center">FOLIO PT</th>
@@ -55,8 +55,8 @@
                                         <tr>
                                            
                                             <td class="text-center"><?= $i->id_servicio ?></td>
-                                            <td class="text-center"><?= $i->dsc_servicio ?></td>
-                                            <td class="text-center"><?= $i->no_proveedor ?></td>
+                                            <td class="text-center"><?= $i->dsc_servicio.'-'.$i->no_proveedor ?></td>
+                                            <td class="text-center"><input type="text" class="form-control" name="reserva"> </td>
                                             <td class="text-center"><input type="text" class="form-control" name="folio_fac"></td>
                                             <td class="text-center"><input type="text" class="form-control" name="monto"></td>
                                             <td class="text-center"><input type="text" class="form-control" name="folio"></td>
