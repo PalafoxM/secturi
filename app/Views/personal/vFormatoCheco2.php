@@ -23,7 +23,7 @@
         <div  style="position:absolute; text-align:justify; top:31.6%; left:7%; width:85.5%; height:30px; background-color:white; font-size: 10px; ">
        Solicito que se realice trámite de pago del comprobante fiscal con folio <strong><?= $folio_fac ?></strong>, derivado del contrato ó convenio número <strong>N/A </strong> por la cantidad
         de <strong>$<?= number_format($monto, 2) .' ('.$numero_texto.')' ?></strong>, por el servicio  <strong><?=  $servicio->dsc_servicio .' '. $periodo .' / '. date('Y')?></strong> 
-      prestando por el proveedo <strong><?=  $servicio->dsc_servicio; ?></strong>. Se cuenta con suficiencia presupuestal en la partida correspondiente.
+      prestando por el proveedor <strong><?=  $servicio->dsc_servicio; ?></strong>. Se cuenta con suficiencia presupuestal en la partida correspondiente.
         </div>
       <?php $top = 43.3; ?>
       <?php $top1 = 47; ?>

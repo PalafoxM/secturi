@@ -39,7 +39,7 @@
           <STRONG> N/A </STRONG>
         </div>
         <div style="position:absolute; top:49.5%; left:12.2%; width:22%; height:10px; background-color:white; font-size: 12px; ">
-          <STRONG> 4578026</STRONG>
+          <STRONG> <?= $reserva ?></STRONG>
         </div>
         <div style="position:absolute; text-align:right; top:51.7%; left:37%; width:22%; height:18px; background-color:white; font-size: 12px; ">
            <strong>   $<?= number_format($monto, 2) ?></strong>
@@ -49,6 +49,9 @@
         </div>
         <div style="position:absolute; text-align:center; top:77%; left:68%; width:28%; height:48px; background-color:WHITE; font-size: 12px; ">
            ELIZABETH CRISTINA MONDRAGON MARTINEZ<BR>COORDINADORA DE RECURSOS MATERIALES Y SERVICIOS GENERALES
+        </div>
+        <div style="position:absolute; text-align:center; top:65.5%; left:68%; width:28%; height:48px; background-color:white; font-size: 12px; ">
+          
         </div>
  
 
