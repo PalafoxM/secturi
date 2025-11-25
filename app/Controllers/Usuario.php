@@ -1115,13 +1115,14 @@ class Usuario extends BaseController
         $cat_subsecretario = $Mglobal->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1]]);
         $cat_usuario = $Mglobal->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
         $cat_director_general = $Mglobal->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1]]);
+        $cat_proyecto = $Mglobal->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
        // $proveedor = $Mglobal->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit' => 10]);
         $data['cat_area'] = (isset( $cat_area->data) && !empty( $cat_area->data))? $cat_area->data:[];
         $data['secretario'] = (isset( $cat_secretario->data) && !empty( $cat_secretario->data))? $cat_secretario->data:[];
         $data['cat_subsecretario'] = (isset( $cat_subsecretario->data) && !empty( $cat_subsecretario->data))? $cat_subsecretario->data:[];
         $data['cat_usuario'] = (isset( $cat_usuario->data) && !empty( $cat_usuario->data))? $cat_usuario->data:[];
         $data['dsc_director_general'] = (isset( $cat_director_general->data) && !empty( $cat_director_general->data))? $cat_director_general->data[0]->dsc_director_general:[];
-        //$data['proveedor'] = (!empty($proveedor->data)) ? $proveedor->data : [];
+        $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
         
         if( isset($vehiculo->data) && !empty($vehiculo->data)){
             $idUser =  $vehiculo->data[0]->id_usuario;
@@ -1146,6 +1147,7 @@ class Usuario extends BaseController
      
         $Mglobal = new Mglobal;
         $vehiculo = $Mglobal->getTabla(['tabla' => 'pt_vehiculo', 'where' => ['visible' => 1, 'id_vehiculo' => $idVehiculo]]);
+        $cat_proyecto = $Mglobal->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
         if($vehiculo->data){
             $data['id_proyecto']    = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->id_proyecto:'';
             $data['no_consecutivo'] = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->no_consecutivo:'';
@@ -1173,6 +1175,8 @@ class Usuario extends BaseController
             $data['contrato_convenio']  = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->contrato_convenio:'';
             $data['emitir_pago']  = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->emitir_pago:'';
             $data['evidencia']  = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->evidencia:'';
+         
+
 
         }
        //die( var_dump( $vehiculo->data ) );
@@ -1187,7 +1191,7 @@ class Usuario extends BaseController
         $data['cat_subsecretario'] = (isset( $cat_subsecretario->data) && !empty( $cat_subsecretario->data))? $cat_subsecretario->data:[];
         $data['cat_usuario'] = (isset( $cat_usuario->data) && !empty( $cat_usuario->data))? $cat_usuario->data:[];
         $data['dsc_director_general'] = (isset( $cat_director_general->data) && !empty( $cat_director_general->data))? $cat_director_general->data[0]->dsc_director_general:[];
-        //$data['proveedor'] = (!empty($proveedor->data)) ? $proveedor->data : [];
+        $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
   
         $data['editar'] = 1;
         $data['id_vehiculo'] = $idVehiculo;

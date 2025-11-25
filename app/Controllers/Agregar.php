@@ -2034,6 +2034,11 @@ class Agregar extends BaseController
             $response->respuesta = "Es requerido el Cuenta Bancaria";
             return $this->respond($response);
         }
+        if (isset($data['proyecto']) && empty($data['proyecto'])) {
+            $response->error = true;
+            $response->respuesta = "Es requerido el proyecto";
+            return $this->respond($response);
+        }
         
         if (($data['direccion_responsable']) == 0) {
             $response->error = true;
@@ -2185,7 +2190,7 @@ class Agregar extends BaseController
             'fec_fin'                  => $data['fecha_fin'],
             'concepto'                 => $data['concepto_gasto'],
             'comision'                 => $data['comision'],
-            'id_proyecto'              => $data['id_proyecto'],
+            'id_proyecto'              => $data['proyecto'],
             'no_consecutivo'           => $data['no_consecutivo'],
             'convenio'                 => $data['convenio'],
             'otros'                    => $data['otros'],

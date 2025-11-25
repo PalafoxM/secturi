@@ -70,6 +70,15 @@
                                             value="<?= (isset($folio)) ? $folio : '' ?>" placeholder="folio">
 
                                     </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="folio">Proyecto</label>
+                                        <select type="text" class="form-control select2" id="proyecto" name="proyecto" >
+                                            <?php foreach($cat_proyecto as $p): ?>
+                                                <option value="<?= $p->id_proyecto ?>" <?= (isset($id_proyecto) && !empty($p->id_proyecto) && $p->id_proyecto == $id_proyecto)?'selected':'' ?> > <?= $p->proyecto ?> </option>
+                                            <?php endforeach; ?>
+                                        </select>
+
+                                    </div>
                                     
                                    <!--  <div class="col-md-6 mb-3">
                                         <label for="rfc">RFC</label>
