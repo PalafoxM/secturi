@@ -4247,7 +4247,7 @@ class Principal extends BaseController
                 $mpdf->WriteHTML($html);
             }
             if ($i == 2 && $dividido == 0) {
-
+            
                 $mpdf->WriteHTML($htmlSegundaHoja);
                 $facturas = $formatos->data;
 
@@ -4281,6 +4281,7 @@ class Principal extends BaseController
 
             }
             if ($i == 2 && $dividido == 1) {
+               // die('ok');
                 $data['dividido'] = 1;
                 $mpdf->WriteHTML($htmlSegundaHoja);
                 $facturas = $formatos->data;
@@ -4309,7 +4310,6 @@ class Principal extends BaseController
                                 : [];
                             
                             
-            
                                 $monto = (int)$periodo[$index]->importe ;
                                 $data['total2'] = $monto;
                                 $data['monto2'] = $this->numeroEnLetras($monto);

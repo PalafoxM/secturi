@@ -237,7 +237,7 @@
 
 <div id="partida_respuesta">
    <?php
-      if(isset($dividido) && !empty($dividido) && $dividido == 0):
+      if($dividido == 0):
    $total = count($presupuesto);
    $i = 0;
    foreach($presupuesto as $r):
@@ -247,7 +247,7 @@
    <?php endforeach;
      endif;
    ?>
-     <?php if(isset($dividido) && !empty($dividido) && $dividido == 1): ?>
+     <?php if($dividido == 1): ?>
       <?= $partida2 ?>
    <?php endif;?>
 </div>
@@ -258,7 +258,7 @@
 <div id="factura_respuesta">
 
    <?php 
-   if(isset($dividido) && !empty($dividido) && $dividido == 0):
+   if($dividido == 0):
    $keys = array_keys($uuid);
    $lastKey = end($keys);
    foreach($uuid as $key => $u): ?>
@@ -268,7 +268,7 @@
    endforeach;
      endif;
     ?>
-   <?php if(isset($dividido) && !empty($dividido) && $dividido == 1): ?>
+   <?php if($dividido == 1): ?>
       <?= $uuid2 ?>
    <?php endif;?>
 
@@ -291,10 +291,10 @@
 </div>
 
 <div id="importe_respuesta">
-<?php if(isset($dividido) && !empty($dividido) && $dividido == 0): ?>
+<?php if($dividido == 0): ?>
 <?= $registro->total_importe.' ('.$numero_texto.')' ?>
 <?php endif; ?>
-<?php if(isset($dividido) && !empty($dividido) && $dividido == 1): ?>
+<?php if($dividido == 1): ?>
 <?= $total2.' ('.$monto2.')' ?>
 <?php endif; ?>
 
