@@ -204,8 +204,15 @@
                                             <div class="col-md-4 mb-3">
                                                 <label for="no_consecutivo">No. consecutivo.<span style="color:red;">*</span></label>
                                                 <input type="text" class="form-control" autocomplete="off" id="no_consecutivo" name="no_consecutivo"  value="<?= $no_consecutivo ?>" readonly>
-                                               
                                             </div>
+                                             <div class="col-md-4 mb-3">
+                                               <label for="dividido">Encabezado dividido  <span style="color:red;"></span></label>
+                                                <select class="form-control" id="dividido"  name="dividido" >
+                                                   <option value="1" <?=(isset($registro_pt->dividido) && !empty($registro_pt->dividido) && $registro_pt->dividido == 1)?'selected':'' ?>>SI</option>
+                                                   <option value="0" <?=(isset($registro_pt->dividido) && !empty($registro_pt->dividido) && $registro_pt->dividido == 0)?'selected':'' ?>>NO</option>
+                                               </select>
+                                            </div><!--end col-->
+                                            
                                         </div><!--end form-row-->
                                         
                                        

@@ -1917,7 +1917,7 @@ class Agregar extends BaseController
             'clausula_contrato'        => $data['clausula_contrato'],
             'concepto_pago'            => $data['concepto_pago'],
             'comision'                 => $data['comision'],
-            'dividido'                 => $data['dividido'],
+            'dividido'                 => isset( $data['dividido']) && !empty( $data['dividido'])? $data['dividido']:0,
             'no_reserva'               => $data['no_reserva']
         ];
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaPT'];

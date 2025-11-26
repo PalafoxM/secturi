@@ -233,41 +233,44 @@
 <div id="partida">
    PARTIDA:
 </div>
-<?php if($fic): ?>
+
+
 <div id="partida_respuesta">
    <?php
-   $total = count($reserva);
-   $i = 0;
-   foreach($reserva as $r):
-       $i++;
-   ?>
-       &nbsp;<?= $r->partida ?> <?= $r->dsc_partida ?><?= ($i < $total) ? ' /' : '' ?>
-   <?php endforeach; ?>
-</div>
-<?php endif; ?>
-<?php if(!$fic): ?>
-<div id="partida_respuesta">
-   <?php
+      if(isset($dividido) && !empty($dividido) && $dividido == 0):
    $total = count($presupuesto);
    $i = 0;
    foreach($presupuesto as $r):
        $i++;
    ?>
        &nbsp;<?= $r->partida ?> <?= $r->dsc_partida ?><?= ($i < $total) ? ' /' : '' ?>
-   <?php endforeach; ?>
+   <?php endforeach;
+     endif;
+   ?>
+     <?php if(isset($dividido) && !empty($dividido) && $dividido == 1): ?>
+      <?= $partida2 ?>
+   <?php endif;?>
 </div>
-<?php endif; ?>
+
 <div id="factura">
    FACTURA / RECIBO No: 
 </div>
 <div id="factura_respuesta">
 
    <?php 
+   if(isset($dividido) && !empty($dividido) && $dividido == 0):
    $keys = array_keys($uuid);
    $lastKey = end($keys);
    foreach($uuid as $key => $u): ?>
       <?= $u->uuid ?><?= $key !== $lastKey ? ',' : '' ?>
-   <?php endforeach; ?>
+   <?php 
+ 
+   endforeach;
+     endif;
+    ?>
+   <?php if(isset($dividido) && !empty($dividido) && $dividido == 1): ?>
+      <?= $uuid2 ?>
+   <?php endif;?>
 
 
 </div>
@@ -279,6 +282,7 @@
    <?php if(isset($registro->fecha_gasto_inicio) && !empty($registro->fecha_gasto_inicio)): ?>
    <span > DEL <?= date('d-m-Y', strtotime($registro->fecha_gasto_inicio));?> AL <?= date('d-m-Y',strtotime($registro->fecha_gasto_fin));?>  </span>
    <?php endif; ?>
+
 </div>
 
 
@@ -287,11 +291,12 @@
 </div>
 
 <div id="importe_respuesta">
-<?php if(!$fic): ?>
+<?php if(isset($dividido) && !empty($dividido) && $dividido == 0): ?>
 <?= $registro->total_importe.' ('.$numero_texto.')' ?>
 <?php endif; ?>
-<?php if($fic): ?>
-<?= $reserva[0]->total_importe.' ('.$numero_texto.')' ?>
+<?php if(isset($dividido) && !empty($dividido) && $dividido == 1): ?>
+<?= $total2.' ('.$monto2.')' ?>
 <?php endif; ?>
+
 </div>
 

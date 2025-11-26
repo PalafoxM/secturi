@@ -4126,11 +4126,13 @@ class Principal extends BaseController
       
         $data['GO'] = false;
         $data['fic'] = false;
+        $data['dividido'] = 0;
         if (!empty($registro_pt->data)) {
-            $data['total'] = $registro_pt->data;
-            $registro = $registro_pt->data[0];
-            $id_reserva = $registro_pt->data[0]->id_reserva;
-            $no_consecutivo = $registro_pt->data[0]->no_consecutivo;
+            $data['total']      = $registro_pt->data;
+            $registro           = $registro_pt->data[0];
+            $id_reserva         = $registro_pt->data[0]->id_reserva;
+            $dividido           =  $registro_pt->data[0]->dividido;
+            $no_consecutivo     = $registro_pt->data[0]->no_consecutivo;
             $id_proveedor_banco = $registro_pt->data[0]->id_proveedor_banco; 
             $importe = $registro_pt->data[0]->total_importe; 
             $banco = $globals->getTabla([
@@ -4244,7 +4246,8 @@ class Principal extends BaseController
             if ($i == 1) {
                 $mpdf->WriteHTML($html);
             }
-            if ($i == 2) {
+            if ($i == 2 && $dividido == 0) {
+
                 $mpdf->WriteHTML($htmlSegundaHoja);
                 $facturas = $formatos->data;
 
@@ -4275,6 +4278,92 @@ class Principal extends BaseController
                         }
                     }
                 }
+
+            }
+            if ($i == 2 && $dividido == 1) {
+                $data['dividido'] = 1;
+                $mpdf->WriteHTML($htmlSegundaHoja);
+                $facturas = $formatos->data;
+               // var_dump( $facturas ); 
+               // var_dump(  $presupuesto ); 
+               // var_dump(  $xml ); 
+               // die();
+                if (!empty($facturas)) {
+                   
+                    // var_dump( $presupuestoGO->data );
+                        foreach ($facturas as $index => $facturaItem) {
+                       
+                          $data['partida2'] =  $presupuesto->data[$index]->dsc_partida;
+                          $data['uuid2'] =   $xml->data[$index]->uuid;
+                         // var_dump( $data['uuid2'] );
+                          //die();
+                            $periodo_factura = $globals->getTabla([
+                                'tabla' => 'periodo_factura',
+                                'where' => [
+                                    'visible' => 1,
+                                    'id_registro_pt' => $id_pt,
+                                ]
+                            ]);
+                               $periodo = isset($periodo_factura->data) && !empty($periodo_factura->data)
+                                ? $periodo_factura->data
+                                : [];
+                            
+                            
+            
+                                $monto = (int)$periodo[$index]->importe ;
+                                $data['total2'] = $monto;
+                                $data['monto2'] = $this->numeroEnLetras($monto);
+                            
+                     
+
+                           
+                            
+                            // 1️⃣ Agregamos una sola página con el formato 702GO
+                            $htmlTercerHoja = view('personal/vFormato702.php', $data);
+                            $mpdf->AddPage();
+                            $mpdf->WriteHTML($htmlTercerHoja);
+
+                            
+                          
+                            // 3️⃣ Posición inicial (debajo del contenido del formato)
+                           $currentY = $mpdf->y + 60;
+
+                            // 4️⃣ Insertamos las facturas una debajo de otra
+                          
+                                $facturaPath = FCPATH . $facturaItem->ruta_relativa;
+
+                                if (file_exists($facturaPath)) {
+                                    $facturaPageCount = $mpdf->SetSourceFile($facturaPath);
+
+                                    for ($pageNum = 1; $pageNum <= $facturaPageCount; $pageNum++) {
+                                        $tplFactura = $mpdf->ImportPage($pageNum);
+                                        $templateSize = $mpdf->GetTemplateSize($tplFactura);
+
+                                        $scaleFactor = 0.6;
+                                        $width = $templateSize['width'] * $scaleFactor;
+                                        $height = $templateSize['height'] * $scaleFactor;
+
+                                        // 📍 Si no cabe en la hoja actual, saltamos a una nueva
+                                        if ($currentY + $height > $mpdf->h - 10) {
+                                            $mpdf->AddPage();
+                                            $currentY = 10;
+                                        }
+
+                                        // Centrar horizontalmente
+                                        $xPos = ($mpdf->w - $width) / 2;
+
+                                        // Insertamos la página de factura
+                                        $mpdf->UseTemplate($tplFactura, $xPos, $currentY, $width, $height);
+
+                                        // Avanzamos la posición Y para la siguiente
+                                        $currentY += $height + 10;
+                                    }
+                                }
+                            
+                        }
+                    }
+
+                  
 
             }
         }
@@ -5152,7 +5241,7 @@ class Principal extends BaseController
 
         
         $data['no_consecutivo'] = (int)$no_consecutivo + 1;
-        
+     
         $siExisteIdReserva = $globals->getTabla(['tabla' => 'registro_pt', 'where' => ['visible' => 1, 'id_reserva' => $id_reserva]]);
         $btn = false;
         $partida4000 = false;

@@ -127,10 +127,9 @@
         <?php endforeach; ?>
         <?php endif; ?>
         
-    
              <?php $i = 34;  ?>
             <?php foreach( $uuid as $u ): ?>
-                <div style="position:absolute; text-align:center; top:<?=$i?>%; left:2.7%; width:13.8%; background-color:white; font-size: 12px;  height:12px;">
+                <div style="position:absolute; text-align:center; top:<?=$i?>%; left:2.7%; width:13.8%; background-color:white; font-size: 12px;  height:25px;">
                   <p><?= $u->uuid; ?></p>
                  </div>
             <?php $i += 1.5; ?>
