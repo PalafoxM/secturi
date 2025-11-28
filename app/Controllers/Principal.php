@@ -4132,6 +4132,7 @@ class Principal extends BaseController
         }
 
        $data['suma'] = $total;
+       $data['suma_texto'] = $this->numeroEnLetras($total);
        //die( var_dump( $data['total']  ) );
         $data['GO'] = false;
         $data['fic'] = false;

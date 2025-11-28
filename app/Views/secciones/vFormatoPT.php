@@ -105,7 +105,7 @@
             <span>$<?= (isset($suma) && !empty($suma))? number_format($suma,2):''; ?></span>
         </div>
         <div  style="position:absolute; text-align:center; top:51.8%; left:60%; width:37.5%; background-color:white; font-size: 12px;  height:20px;">
-            <span class="proxima "><strong><?= ($numero_texto); ?></strong></span>
+            <span class="proxima "><strong><?= ($suma_texto); ?></strong></span>
         </div>
          <div  style="position:absolute; top:48.1%; left:22%; width:25%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "><?= (isset($reserva[0]->no_convenio) && !empty($reserva[0]->no_convenio))?strtoupper($reserva[0]->no_convenio):'' ?></span>
