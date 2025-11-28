@@ -1065,7 +1065,7 @@ var marker = L.marker([20.956852, -101.359318]).addTo(map)
     .openPopup();
 
 // Polígono cuadrado con 4 puntos
-var polygon = L.polygon([
+/* var polygon = L.polygon([
     [20.956852, -101.359318],  // Esquina inferior izquierda
     [20.957376, -101.359214],  // Esquina superior izquierda
     [20.957428, -101.359639],  // Esquina superior derecha
@@ -1074,11 +1074,11 @@ var polygon = L.polygon([
     color: 'blue',
     fillColor: '#3388ff',
     fillOpacity: 0.3
-}).addTo(map);
-    /* var circle = L.circle([20.956950, -101.360316], {
-        color: 'red',
-        fillColor: '#f03',
+}).addTo(map); */
+     var circle = L.circle([20.956990, -101.360116], {
+        color: 'blue',
+        fillColor: '#3388ff',
         fillOpacity: 0.5,
-        radius: 1000
-    }).addTo(map); */
+        radius: 150
+    }).addTo(map); 
 </script>

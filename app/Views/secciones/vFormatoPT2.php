@@ -41,7 +41,7 @@ $fechaFormateada = $dia . ' de ' . $mes . ' del ' . $anio;
             <span class="proxima">
                 Por medio de la presente, me permito solicitar su apoyo para que se realice el tramite de <?= (isset($GO) && !empty($GO))?'Gasto de Operación':'Pago a Tercero'?>
                 con folio <strong><?= (isset($GO) && !empty($GO))?'GO':'PT'?> <?= ($fic)?$folio:strtoupper($registro->folio);?></strong> por la cantidad de 
-                <strong>$<?= ($fic)?$reserva[0]->total_importe: $registro->total_importe; ?> (<?= mb_strtoupper($numero_texto, 'UTF-8'); ?>)</strong>,
+                <strong>$<?= (isset($suma) && !empty($suma))? number_format($suma,2):''; ?> (<?= mb_strtoupper($numero_texto, 'UTF-8'); ?>)</strong>,
                 de comprobante(s) fiscale(s) No. 
              
            
@@ -51,7 +51,7 @@ $fechaFormateada = $dia . ' de ' . $mes . ' del ' . $anio;
                     $current = 0;
                     foreach($uuid as $u):
                         $current++;
-                        echo $u->uuid;
+                        echo (isset($u->folio) && !empty($u->folio))?$u->folio:$u->uuid;
                         if ($current < $total) {
                             echo ', ';
                         }

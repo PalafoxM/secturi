@@ -4113,17 +4113,26 @@ class Principal extends BaseController
         ]);
 
         if (isset($xml->data) && !empty($xml->data)) {
+           
             $data['uuid'] = $xml->data;
         }
         
         if (isset($presupuesto->data) && !empty($presupuesto->data)) {
             $data['presupuesto'] = $presupuesto->data;
         }
+       
         $importe = '';
-        if(isset($periodo_factura->data) && !empty($periodo_factura->data)){
-        $data['importe'] =  $periodo_factura->data;
+        $total = 0;
+       if (isset($periodo_factura->data) && !empty($periodo_factura->data)) {
+            $data['periodo_factura'] = $periodo_factura->data;
+
+            foreach ($data['periodo_factura'] as $f) {
+                $total += (float) $f->importe;  // SUMAR
+            }
         }
-      
+
+       $data['suma'] = $total;
+       //die( var_dump( $data['total']  ) );
         $data['GO'] = false;
         $data['fic'] = false;
         $data['dividido'] = 0;
@@ -4221,7 +4230,7 @@ class Principal extends BaseController
         // $usu_sub = $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $subsecretario->data[0]->id_usuario]]);
         $data['usu_sub'] = $subsecretario->data[0];
     
-
+     
         $html = view('secciones/vFormatoPT.php', $data);
         $htmlSegundaHoja = view('secciones/vFormatoPT2.php', $data);
         $htmlTercerHoja = view('personal/vFormato702.php', $data);
@@ -4367,6 +4376,8 @@ class Principal extends BaseController
 
             }
         }
+
+     
 
         if ($savePath) {
             $mpdf->Output($savePath, 'F'); // F = write to file

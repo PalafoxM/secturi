@@ -35,8 +35,10 @@
                                         <input type="hidden" name="id_proveedor" id="id_proveedor" value="<?= (isset($reserva->id_proveedor) && !empty($reserva->id_proveedor))?$reserva->id_proveedor:$registro_pt->id_proveedor?>" >
                                         <input type="hidden" name="editar" id="editar" value="<?= $editar?>">
                                         <input type="hidden" name="id_reserva" id="id_reserva" value="<?= $id_reserva?>">
+                                        <input type="hidden" class="form-control" id="cuenta_bancaria" name="cuenta_bancaria" value="<?= (isset($reserva->banco_completo) && !empty($reserva->banco_completo))?$reserva->banco_completo:''?>">
                                         <?php if(isset($registro_pt->id_registro_pt) && !empty($registro_pt->id_registro_pt)): ?>
                                         <input type="hidden" name="id_registro_pt" id="id_registro_pt" value="<?= $registro_pt->id_registro_pt?>">
+                                       
                                         <?php endif; ?>
                                        <div class="form-row">
                                             <!-- Dirección Responsable -->
@@ -144,27 +146,8 @@
                                                 </select>
                                             </div><!--end col-->
                                         </div><!--end form-row-->
-                                        <div class="form-row">
-                                            <div class="col-md-4 mb-3">
-                                                <label for="cuenta_bancaria">Cuenta Bancaria del Proveedor <span style="color:red;">*</span></label>
-                                                <input readonly type="text" class="form-control" id="cuenta_bancaria" name="cuenta_bancaria" value="<?= (isset($reserva->banco_completo) && !empty($reserva->banco_completo))?$reserva->banco_completo:''?>">
-                                                <div class="invalid-feedback">
-                                                    Campo no Valido
-                                                </div>
-                                            </div><!--end col-->
-                                            <div class="col-md-4 mb-3">
-                                                <label for="fecha_gasto_inicio">Fecha de gasto inicio <span style="color:red;">*</span></label>
-                                                <input type="date" class="form-control" id="fecha_gasto_inicio" name="fecha_gasto_inicio" 
-                                                value="<?= isset($registro_pt->fecha_gasto_inicio) ? date('Y-m-d', strtotime($registro_pt->fecha_gasto_inicio)) : date('Y-m-d') ?>" 
-                                                required>
-                                            </div><!--end col-->
-                                            <div class="col-md-4 mb-3">
-                                                 <label for="fecha_gasto_fin">Fecha de gasto fin <span style="color:red;">*</span></label>
-                                                <input type="date" class="form-control" id="fecha_gasto_fin" name="fecha_gasto_fin" 
-                                                value="<?= isset($registro_pt->fecha_gasto_fin) ? date('Y-m-d', strtotime($registro_pt->fecha_gasto_fin)) : date('Y-m-d') ?>" 
-                                                required>
-                                            </div><!--end col-->
-                                        </div><!--end form-row-->
+                               
+                              
                                         <div class="form-row">
                                             <div class="col-md-6 mb-6">
                                                 <label for="formato_establecido">Formatos establecidos en los Lineamientos Generales de Racionalidad, Austeridad y Disciplina Presupuestal de la Administración Pública Estatal vigente o formatos establecidos en la regulación del trámite ingresado.<span style="color:red;">*</span></label>
@@ -265,8 +248,7 @@
                                                 <label for="no_consecutivo">No. Consecutivo.</label>
                                                 <input type="text" class="form-control" readonly autocomplete="off" id="no_consecutivo" name="no_consecutivo" value="<?= (isset($registro_pt->no_consecutivo))?$registro_pt->no_consecutivo: $no_consecutivo ?>"  >
                                             </div><!--end col-->
-                                            <?php $total_partidas = count($presupuesto);  ?>
-                                            <?php if($total_partidas >= 2): ?>
+                                     
                                             <div class="col-md-4 mb-3">
                                                <label for="dividido">Encabezado dividido  <span style="color:red;"></span></label>
                                                 <select class="form-control" id="dividido"  name="dividido" >
@@ -274,7 +256,7 @@
                                                    <option value="1" <?=(isset($registro_pt->dividido) && !empty($registro_pt->dividido) && $registro_pt->dividido == 1)?'selected':'' ?>>SI</option>
                                                </select>
                                             </div><!--end col-->
-                                            <?php endif; ?>
+                                         
                                         </div><!--end form-row-->
                                         <?php
                                             $partidas_mostradas = [];
@@ -349,33 +331,23 @@
                                                             <p class="text-muted mb-3">Factura XML (Máx 100MB)</p> <?= (isset($factura) && !empty($factura))? '<a target="_blank" href='.base_url().'index.php/Inicio/VerXML/'.$factura[$i]->id_factura.'><i class="mdi dripicons-preview"></i></a>':'' ?>
                                                             <input id="factura_xml_input_<?= $i; ?>" type="file" name="factura_xml_<?= $i; ?>[]" multiple class="dropify" accept=".xml">
                                                         </div>
-                                                        <div class="col-md-4 mb-3">
-                                                            <p class="text-muted mb-3">Importe</p>
-                                                            <?php if($editar != 1): ?>
-                                                                <input id="importe[]" type="text" autocomplete="off" name="importe[]" class="form-control" placeholder="importe" value="<?= (isset($registro_pt->importe))?$registro_pt->importe:'' ?>">
-                                                            <?php else: ?>
-                                                                <!-- Si estás editando, muestra el importe correspondiente -->
-                                                                <?php 
-                                                                $importe_valor = '';
-                                                                if(isset($importe[$i])) {
-                                                                    $importe_valor = $importe[$i]->importe;
-                                                                }
-                                                                ?>
-                                                                <input id="importe[]" type="text" autocomplete="off" name="importe[]" class="form-control" placeholder="importe" value="<?= $importe_valor ?>">
-                                                            <?php endif; ?>
-                                                        </div>
+                                                        <div class="col-md-2 mb-3">
+                                                            <label for="fecha_gasto_inicio">Fec. Inicio <span style="color:red;">*</span></label>
+                                                            <input type="date" class="form-control" id="fecha_gasto_inicio" name="fecha_gasto_inicio[]" 
+                                                            value="<?= isset($registro_pt->fecha_gasto_inicio) ? date('Y-m-d', strtotime($registro_pt->fecha_gasto_inicio)) : date('Y-m-d') ?>" 
+                                                            required>
+                                                        </div><!--end col-->
+                                                        <div class="col-md-2 mb-3">
+                                                            <label for="fecha_gasto_fin">Fec. Fin <span style="color:red;">*</span></label>
+                                                            <input type="date" class="form-control" id="fecha_gasto_fin" name="fecha_gasto_fin[]" 
+                                                            value="<?= isset($registro_pt->fecha_gasto_fin) ? date('Y-m-d', strtotime($registro_pt->fecha_gasto_fin)) : date('Y-m-d') ?>" 
+                                                            required>
+                                                        </div><!--end col-->
                                                     </div>
                                                 </div>
                                             <?php endforeach; ?>
 
-                                            <div class="form-row">
-                                                <div class="col-md-4 mb-3"></div>
-                                                <div class="col-md-4 mb-3"></div>
-                                                <div class="col-md-4 mb-3">
-                                                    <p class="text-muted mb-3">Total</p>
-                                                    <input autocomplete="off" id="total_importe" type="text" name="total_importe" class="form-control" placeholder="0,000.00" value="<?= (isset($registro_pt->total_importe))?$registro_pt->total_importe:'' ?>" readonly>
-                                                </div>
-                                            </div>
+                         
 
                                             <a class="btn btn-gradient-danger" style="color:white" onclick="window.history.back()">Atrás</a>
                                             <?php if(!$edita): ?>  <!-- Corregí $edita por $editar para consistencia -->
@@ -461,26 +433,9 @@
                 }
             });
         });
-                    // Escuchar cambios en cualquier input con clase 'input-importe'
-        $(document).on('input', 'input[name="importe[]"]', function() {
-            calcularTotal();
-        });
-        function calcularTotal() {
-            let total = 0;
-            
-            $('input[name="importe[]"]').each(function() {
-                // Elimina comas y convierte a número
-                const valor = parseFloat($(this).val().replace(/,/g, '')) || 0;
-                total += valor;
-            });
-            
-            // Formatea el total con separadores de miles
-            $('#total_importe').val(formatNumber(total.toFixed(2)));
-        }
-        function formatNumber(num) {
-            return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
-        }
-   
+ 
+      
+    
         $(document).ready(function() {
         
         // Función para actualizar la visibilidad de la sección de factura
