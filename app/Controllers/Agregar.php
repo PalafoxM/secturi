@@ -564,7 +564,7 @@ class Agregar extends BaseController
         $session = \Config\Services::session();
         $data = array();
         $this->globals = new Mglobal();
-
+        
         foreach ($archivos as $archivo) {
             if (!$archivo->isValid()) {
                 continue;
@@ -1953,50 +1953,40 @@ class Agregar extends BaseController
             $periodo = [];
             $response->idRegistro = $response->idRegistro;
             $this->cambiarStatusPT($data['id_reserva']);
+                $i = 0;
+              
+            foreach ($archivos as $nombreCampo => $archivoArray) {
+                foreach ($archivoArray as $archivo) {
 
-                foreach ($archivos as $nombreCampo => $archivoArray) {
-                // Procesar archivos XML
-                if (strpos($nombreCampo, 'factura_xml_') === 0 && !empty($archivoArray[0])) {
-                    $archivo = $archivoArray[0];
-                    
                     if (!$archivo->isValid()) {
                         continue;
                     }
 
                     $tipo = $archivo->getMimeType();
 
+                    // === XML ===
                     if (in_array($tipo, ['text/xml', 'application/xml'])) {
                         $contenido = file_get_contents($archivo->getTempName());
                         libxml_use_internal_errors(true);
                         $xml = simplexml_load_string($contenido);
 
                         if ($xml !== false) {
-                            // Obtener el total
                             $total = (string) $xml['Total'];
-                            
-                            // Obtener el índice
                             $indice = str_replace('factura_xml_', '', $nombreCampo);
-                            
-                  
-                            // Agregar el importe al array periodo
-                            $periodo[$indice]['importe'] = [$total];
-                            
-                            // Guardar el archivo XML para procesamiento posterior
-                            $archivosXml[$indice] = $archivo;
+                            $periodo[$indice]['importe'][] = $total;
+                            $archivosXml[$indice][] = $archivo;
                         }
                     }
-                }
-                
-                // Procesar archivos PDF
-                if (strpos($nombreCampo, 'factura_pdf_') === 0 && !empty($archivoArray[0])) {
-                    $archivo = $archivoArray[0];
-                    
-                    if ($archivo->isValid()) {
+
+                    // === PDF ===
+                    if (in_array($tipo, ['application/pdf'])) {
                         $indice = str_replace('factura_pdf_', '', $nombreCampo);
-                        $archivosPdf[$indice] = $archivo;
+                        $archivosPdf[$indice][] = $archivo;
                     }
                 }
             }
+            
+       
                   
             // PRIMERO: Procesar TODOS los datos del formulario para construir la estructura base
             foreach ($data as $key => $p) {
@@ -2067,13 +2057,9 @@ class Agregar extends BaseController
             // TERCERO: Ordenar el array periodo por índices numéricos
             ksort($periodo);
 
+            $datosXML = ($data['editar'] == 1 && !empty($archivosXml)) ? $this->procesarXMLeditar($archivosXml, $id_registro_pt) : $this->procesarXML($archivosXml[0], $id_registro_pt);
 
-    
-         //die( var_dump( $periodo ) );
-          
-            $datosXML = ($data['editar'] == 1 && !empty($archivosXml)) ? $this->procesarXMLeditar($archivosXml, $id_registro_pt) : $this->procesarXML($archivosXml, $id_registro_pt);
-
-            $datosPDF = ($data['editar'] == 1 && !empty($archivosPdf)) ? $this->procesarPDFeditar($archivosPdf, $id_registro_pt) : $this->procesarPDF($archivosPdf, $id_registro_pt);
+            $datosPDF = ($data['editar'] == 1 && !empty($archivosPdf)) ? $this->procesarPDFeditar($archivosPdf, $id_registro_pt) : $this->procesarPDF($archivosPdf[0], $id_registro_pt);
 
             $datosP = ($data['editar'] == 1 && !empty($periodo)) ? $this->procesarPediodoEditar($periodo, $id_registro_pt) : $this->procesarPediodo($periodo, $id_registro_pt);
 

@@ -262,7 +262,7 @@
    $keys = array_keys($uuid);
    $lastKey = end($keys);
    foreach($uuid as $key => $u): ?>
-      <?= $u->uuid ?><?= $key !== $lastKey ? ',' : '' ?>
+      <?= isset($u->folio) && !empty($u->folio)? $u->folio:$u->uuid ?><?= $key !== $lastKey ? ',' : '' ?>
    <?php 
  
    endforeach;
@@ -292,7 +292,7 @@
 
 <div id="importe_respuesta">
 <?php if($dividido == 0): ?>
-<?= $registro->total_importe.' ('.$numero_texto.')' ?>
+<?= number_format($suma, 2).' ('.$suma_texto.')' ?>
 <?php endif; ?>
 <?php if($dividido == 1): ?>
 <?= $total2.' ('.$monto2.')' ?>
