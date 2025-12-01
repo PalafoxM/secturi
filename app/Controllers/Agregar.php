@@ -2107,8 +2107,18 @@ class Agregar extends BaseController
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
         $archivos = $this->request->getFiles();
-       
-   
+        
+        // Variables para almacenar datos del XML
+        $total = 0;
+        $uuid = '';
+        $Folio = '';
+        $rfcEmisor = '';
+        $nombreReceptor = '';
+        $retencionesFederales = 0;
+        $retencionesLocales = 0;
+        $ruta_relativa = '';
+
+        // Validaciones...
         if (empty($data['id_proveedor'])) {
             $response->error = true;
             $response->respuesta = "Es requerido el proveedor";
@@ -2141,8 +2151,7 @@ class Agregar extends BaseController
             $response->respuesta = "Es requerido el Responsable de la Solicitud";
             return $this->respond($response);
         }
-     
-     
+    
         if (isset($data['fecha_inicio']) && empty($data['fecha_inicio'])) {
             $response->error = true;
             $response->respuesta = "Es requerido el fecha gasto inicio";
@@ -2153,7 +2162,6 @@ class Agregar extends BaseController
             $response->respuesta = "Es requerido el fecha gasto fin";
             return $this->respond($response);
         }
-
 
         if (isset($data['concepto_pago']) && empty($data['concepto_pago'])) {
             $response->error = true;
@@ -2171,97 +2179,124 @@ class Agregar extends BaseController
             return $this->respond($response);
         }
         if($data['editar'] == 0){
-               if (empty($archivos)) {
+            if (empty($archivos)) {
                 $response->error = true;
                 $response->respuesta = "Es requerido los archivos XML and PDF";
                 return $this->respond($response);
-                
-               }
+            }
         }
 
-
+        // Procesamiento de archivos
         if (is_array($archivos) && !empty($archivos)) {
-        foreach($archivos as $key =>$archivo){
-            $tipo = $archivo->getMimeType();
-            if (in_array($tipo, ['text/pdf', 'application/pdf'])) {
-                $timestamp = date('Ymd_His');
-                $extension = $archivo->getClientExtension();
-                $originalName = pathinfo($archivo->getName(), PATHINFO_FILENAME);
-                $file = '03_CFDI_' . $key . '_' . $timestamp . '.' . $extension;
-                // Ruta absoluta
-                $ruta_destino = FCPATH . 'assets/pdf/';
-                $archivo->move($ruta_destino, $file);
-                $ruta_relativa = 'assets/pdf/' . $file;
-             
-            }
-
-
-            if (in_array($tipo, ['text/xml', 'application/xml'])) {
-                $contenido = file_get_contents($archivo->getTempName());
-
-                libxml_use_internal_errors(true);
-                $xml = simplexml_load_string($contenido);
-
-                if ($xml === false) {
-                       $response->error = true;
-                      $response->respuesta = "Es requerido el archivo XML";
-                       return $this->respond($response);
+            foreach($archivos as $key => $archivo){
+                $tipo = $archivo->getMimeType();
+                
+                if (in_array($tipo, ['text/pdf', 'application/pdf'])) {
+                    $timestamp = date('Ymd_His');
+                    $extension = $archivo->getClientExtension();
+                    $originalName = pathinfo($archivo->getName(), PATHINFO_FILENAME);
+                    $file = '03_CFDI_' . $key . '_' . $timestamp . '.' . $extension;
+                    // Ruta absoluta
+                    $ruta_destino = FCPATH . 'assets/pdf/';
+                    $archivo->move($ruta_destino, $file);
+                    $ruta_relativa = 'assets/pdf/' . $file;
                 }
 
-                $namespaces = $xml->getNamespaces(true);
-                $cfdi = $xml->children($namespaces['cfdi']);
+                if (in_array($tipo, ['text/xml', 'application/xml'])) {
+                    $contenido = file_get_contents($archivo->getTempName());
 
-                $attrs = $xml->attributes();
-                $version = (string) $attrs['Version'];
-                $fecha = (string) $attrs['Fecha'];
-                $total = (string) $attrs['Total'];
-                $moneda = (string) $attrs['Moneda'];
-                $Serie = (string) $attrs['Serie'];
-                $Folio = (string) $attrs['Folio'];
-                $FormaPago = (string) $attrs['FormaPago'];
-                $CondicionesDePago = (string) $attrs['CondicionesDePago'];
-                $SubTotal = (float) $attrs['SubTotal'];
-                $Descuento = isset($attrs['Descuento']) ? (float) $attrs['Descuento'] : 0;
-                $TipoCambio = isset($attrs['TipoCambio']) ? (float) $attrs['TipoCambio'] : 1;
+                    libxml_use_internal_errors(true);
+                    $xml = simplexml_load_string($contenido);
 
-                $Certificado = (string) $attrs['Certificado'];
-                $NoCertificado = (string) $attrs['NoCertificado'];
-
-                // ✅ Emisor
-                $emisor = $cfdi->Emisor->attributes();
-                $rfcEmisor = (string) $emisor['Rfc'];
-                $nombreEmisor = (string) $emisor['Nombre'];
-
-                // ✅ Receptor
-                $receptor = $cfdi->Receptor->attributes();
-                $rfcReceptor = (string) $receptor['Rfc'];
-                $nombreReceptor = (string) $receptor['Nombre'];
-
-                // ✅ UUID - CÓDIGO CORREGIDO
-                $uuid = '';
-                $NoCertificado = '';
-
-                // Verificar si existe el complemento
-                if (isset($cfdi->Complemento)) {
-                    // Obtener el namespace correcto para el timbre fiscal
-                    $tfdNamespace = isset($namespaces['tfd']) ? $namespaces['tfd'] : 'http://www.sat.gob.mx/TimbreFiscalDigital';
-
-                    $complemento = $cfdi->Complemento->children($tfdNamespace);
-
-                    // Verificar si existe el TimbreFiscalDigital
-                    if (isset($complemento->TimbreFiscalDigital)) {
-                        $tfdAttributes = $complemento->TimbreFiscalDigital->attributes();
-                        $uuid = (string) $tfdAttributes['UUID'];
-                        $NoCertificado = (string) $tfdAttributes['NoCertificadoSAT'];
+                    if ($xml === false) {
+                        $response->error = true;
+                        $response->respuesta = "Error al procesar el archivo XML";
+                        return $this->respond($response);
                     }
+
+                    $namespaces = $xml->getNamespaces(true);
+                    $cfdi = $xml->children($namespaces['cfdi']);
+
+                    $attrs = $xml->attributes();
+                    $version = (string) $attrs['Version'];
+                    $fecha = (string) $attrs['Fecha'];
+                    $total = (string) $attrs['Total'];
+                    $moneda = (string) $attrs['Moneda'];
+                    $Serie = (string) $attrs['Serie'];
+                    $Folio = (string) $attrs['Folio'];
+                    $FormaPago = (string) $attrs['FormaPago'];
+                    $CondicionesDePago = (string) $attrs['CondicionesDePago'];
+                    $SubTotal = (float) $attrs['SubTotal'];
+                    $Descuento = isset($attrs['Descuento']) ? (float) $attrs['Descuento'] : 0;
+                    $TipoCambio = isset($attrs['TipoCambio']) ? (float) $attrs['TipoCambio'] : 1;
+
+                    $Certificado = (string) $attrs['Certificado'];
+                    $NoCertificado = (string) $attrs['NoCertificado'];
+
+                    // ✅ Emisor
+                    $emisor = $cfdi->Emisor->attributes();
+                    $rfcEmisor = (string) $emisor['Rfc'];
+                    $nombreEmisor = (string) $emisor['Nombre'];
+
+                    // ✅ Receptor
+                    $receptor = $cfdi->Receptor->attributes();
+                    $rfcReceptor = (string) $receptor['Rfc'];
+                    $nombreReceptor = (string) $receptor['Nombre'];
+
+                    // ✅ UUID
+                    $uuid = '';
+                    $NoCertificadoSAT = '';
+
+                    // Verificar si existe el complemento
+                    if (isset($cfdi->Complemento)) {
+                        // Obtener el namespace correcto para el timbre fiscal
+                        $tfdNamespace = isset($namespaces['tfd']) ? $namespaces['tfd'] : 'http://www.sat.gob.mx/TimbreFiscalDigital';
+
+                        $complemento = $cfdi->Complemento->children($tfdNamespace);
+
+                        // Verificar si existe el TimbreFiscalDigital
+                        if (isset($complemento->TimbreFiscalDigital)) {
+                            $tfdAttributes = $complemento->TimbreFiscalDigital->attributes();
+                            $uuid = (string) $tfdAttributes['UUID'];
+                            $NoCertificadoSAT = (string) $tfdAttributes['NoCertificadoSAT'];
+                        }
+                    }
+
+                    // ✅ OBTENER RETENCIONES FEDERALES
+                    $retencionesFederales = 0;
+                    if (isset($cfdi->Impuestos)) {
+                        $impuestosAttrs = $cfdi->Impuestos->attributes();
+                        $retencionesFederales = (float)($impuestosAttrs['TotalImpuestosRetenidos'] ?? 0);
+                    }
+
+                    // ✅ OBTENER RETENCIONES LOCALES
+                    $retencionesLocales = 0;
+                    if (isset($namespaces['implocal']) && isset($cfdi->Complemento)) {
+                        $implocal = $cfdi->Complemento->children($namespaces['implocal']);
+                        
+                        if (isset($implocal->ImpuestosLocales)) {
+                            $impLocalesAttrs = $implocal->ImpuestosLocales->attributes();
+                            $retencionesLocales = (float)($impLocalesAttrs['TotaldeRetenciones'] ?? 0);
+                        }
+                    }
+
+                    // ✅ OBTENER IVA (Traslados)
+                    $iva = 0;
+                    if (isset($cfdi->Impuestos)) {
+                        $impuestosAttrs = $cfdi->Impuestos->attributes();
+                        $iva = (float)($impuestosAttrs['TotalImpuestosTrasladados'] ?? 0);
+                    }
+
+                    // ✅ OBTENER SUBTOTAL
+                    $subtotal = (float)($attrs['SubTotal'] ?? 0);
+
+                    // ✅ OBTENER DESCUENTO
+                    $descuento = isset($attrs['Descuento']) ? (float) $attrs['Descuento'] : 0;
                 }
-
             }
-
-          }
         }
         
-   
+        // Preparar datos para insertar
         $dataInsert = [
             'id_direccion_responsable' => $data['direccion_responsable'],
             'id_proveedor'             => $data['id_proveedor'],
@@ -2279,11 +2314,7 @@ class Agregar extends BaseController
             'no_consecutivo'           => $data['no_consecutivo'],
             'convenio'                 => $data['convenio'],
             'otros'                    => $data['otros'],
-            //'clabe'                    => $data['clabe'],
-            //'no_cuenta'                => $data['no_cuenta'],
             'folio'                    => $data['folio'],
-          //  'rfc'                      => $data['rfc'],
-          //  'no_proveedor'             => $data['no_proveedor'],
             'formatos'                 => $data['formatos'],
             'documentacion'            => $data['documentacion'],
             'poliza'                   => $data['poliza'],
@@ -2291,18 +2322,27 @@ class Agregar extends BaseController
             'contrato_convenio'        => $data['contrato_convenio'],
             'emitir_pago'              => $data['emitir_pago'],
             'evidencia'                => $data['evidencia'],
-          
         ];
 
-        if(isset($ruta_relativa) && !empty($ruta_relativa )){  
-                $dataInsert['pdf']              = $ruta_relativa;
-                $dataInsert['xml_monto']        = $total;
-                $dataInsert['xml_uuid']         = $uuid;
-                $dataInsert['xml_rfc']          = $rfcEmisor;
-                $dataInsert['xml_razon_social'] = $nombreReceptor;
-
+        // Agregar datos del XML si existen
+        if(isset($ruta_relativa) && !empty($ruta_relativa)){  
+            $dataInsert['pdf']              = $ruta_relativa;
+            $dataInsert['xml_monto']        = $total;
+            $dataInsert['xml_uuid']         = (!empty($Folio)) ? $Folio : $uuid;
+            $dataInsert['xml_rfc']          = $rfcEmisor;
+            $dataInsert['xml_razon_social'] = $nombreReceptor;
+            $dataInsert['xml_subtotal']     = $subtotal ?? 0;
+          //$dataInsert['xml_iva']          = $iva ?? 0;
+          //  $dataInsert['xml_descuento']    = $descuento ?? 0;
+            $dataInsert['xml_retenciones_federales'] = $retencionesFederales;
+            $dataInsert['xml_retenciones_locales']   = $retencionesLocales;
+          //$dataInsert['xml_total_retenciones']     = $retencionesFederales + $retencionesLocales;
+          //$dataInsert['xml_moneda']       = $moneda ?? 'MXN';
+          //$dataInsert['xml_fecha']        = $fecha ?? date('Y-m-d H:i:s');
         }
+
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaPTVehiculos'];
+        
         if ($data['editar'] == 0) {
             $dataInsert['usu_reg'] = $session->get('id_usuario');
             $dataInsert['fec_reg'] = date('Y-m-d H:i:s');
@@ -2318,11 +2358,9 @@ class Agregar extends BaseController
             ];
             $dataInsert['usu_act'] = $session->get('id_usuario');
         }
-     
+    
         $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
 
-
-        
         return $this->respond($response);
     }
     public function guardaPT2()

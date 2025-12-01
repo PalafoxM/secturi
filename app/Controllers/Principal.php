@@ -4288,7 +4288,6 @@ class Principal extends BaseController
                         }
                     }
                 }
-
             }
             if ($i == 2 && $dividido == 1) {
                // die('ok');

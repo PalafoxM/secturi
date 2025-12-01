@@ -41,25 +41,65 @@
          <div  style="position:absolute; text-align:center; top:34%; left:17.5%; width:13%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "><?= $proyecto->proyecto ?></span>
         </div>
+           <?php if($no_proveedor == '36986'): ?>
+                         <div  style="position:absolute; text-align:center; top:36%; left:17.5%; width:13%; background-color:white; font-size: 12px;  height:12px;">
+                            <span class="proxima "><?= $proyecto->proyecto ?></span>
+                        </div>
+                         <div  style="position:absolute; text-align:center; top:38%; left:17.5%; width:13%; background-color:white; font-size: 12px;  height:12px;">
+                            <span class="proxima "><?= $proyecto->proyecto ?></span>
+                        </div>
+                <?php endif; ?>
 
          <div  style="position:absolute; text-align:center; top:34%; left:31.7%; width:13%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "> 3550 </span>
         </div>
-  
-              <div style="position:absolute; text-align:center; top:34%; left:46.4%; width:13%; background-color:white; font-size:10px; height:12px; line-height:12px;">
-                    <span class="proxima">
-                       <?= number_format($vehiculo->xml_monto, 2)  ?>
-                    </span>
-              </div>
-              <div style="position:absolute; text-align:center; top:34%; left:2.7%; width:13.8%; background-color:white; font-size: 14px;  height:32px;">
-                    <span class="proxima ">  <?= $vehiculo->xml_uuid ?> </span>
-                </div>
-    
+          <?php if($no_proveedor == '36986'): ?>
+                        <div  style="position:absolute; text-align:center; top:36%; left:31.7%; width:13%; background-color:white; font-size: 12px;  height:12px;">
+                            <span class="proxima "> ISR Retenido Federal </span>
+                        </div>
+                       <div  style="position:absolute; text-align:center; top:38%; left:31.7%; width:13%; background-color:white; font-size: 12px;  height:12px;">
+                        <span class="proxima "> ISR Retenido Cedular  </span>
+                    </div>
+            <?php endif; ?>
+            <?php if($no_proveedor != '36986'): ?>
+                        <div style="position:absolute; text-align:center; top:34%; left:46.4%; width:13%; background-color:white; font-size:10px; height:12px; line-height:12px;">
+                                <span class="proxima">
+                                $<?= number_format($vehiculo->xml_monto, 2)  ?>
+                                </span>
+                        </div>
+            <?php endif; ?>
+            <?php if($no_proveedor == '36986'): ?>
+                        <div style="position:absolute; text-align:center; top:34%; left:46.4%; width:13%; background-color:white; font-size:10px; height:12px; line-height:12px;">
+                                <span class="proxima">
+                                <?php $total = $vehiculo->xml_retenciones_federales+$vehiculo->xml_retenciones_locales+$vehiculo->xml_monto  ?>
+                                $<?= number_format($total, 2)  ?>
+                                </span>
+                        </div>
+            <?php endif; ?>
+                <?php if($no_proveedor == '36986'): ?>
+                      <div style="position:absolute; text-align:center; top:36%; left:46.4%; width:13%; background-color:white; font-size:10px; height:12px; line-height:12px;">
+                                <span class="proxima "> $<?= number_format($vehiculo->xml_retenciones_federales, 2) ?> </span>
+                        </div>
+                       <div style="position:absolute; text-align:center; top:38%; left:46.4%; width:13%; background-color:white; font-size:10px; height:12px; line-height:12px;">
+                                <span class="proxima "> $<?= number_format($vehiculo->xml_retenciones_locales,2) ?> </span>
+                        </div>
+                <?php endif; ?>
 
-   
+              <div style="position:absolute; text-align:center; top:34%; left:2.7%; width:13.8%; background-color:white; font-size: 10px;  height:12px;">
+                    <span class="proxima ">  <?= $vehiculo->xml_uuid ?> </span>
+             </div>
+               <?php if($no_proveedor == '36986'): ?>
+                        <div style="position:absolute; text-align:center; top:36%; left:2.7%; width:13.8%; background-color:white; font-size: 10px;  height:12px;">
+                                <span class="proxima ">  <?= $vehiculo->xml_uuid ?> </span>
+                        </div>
+                        <div style="position:absolute; text-align:center; top:38%; left:2.7%; width:13.8%; background-color:white; font-size: 10px;  height:12px;">
+                                <span class="proxima ">  <?= $vehiculo->xml_uuid ?> </span>
+                        </div>
+                <?php endif; ?>
         <div  style="position:absolute; text-align:right; top:52.2%; left:44%; width:15%; background-color:white; font-size: 12px;  height:12px;">
             <span> <?= number_format($vehiculo->xml_monto, 2)  ?> </span>
         </div>
+       
         <div  style="position:absolute; text-align:center; top:51.8%; left:60%; width:37.5%; background-color:white; font-size: 12px;  height:20px;">
             <span class="proxima "><strong><?= ($numero_texto); ?></strong></span>
         </div>

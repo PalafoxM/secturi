@@ -457,6 +457,7 @@
 
         if (idProveedor) {
             cargarBancosProveedor(idProveedor);
+            
         } else {
             // Limpiar el select de bancos si no hay proveedor seleccionado
             $('#id_proveedor_banco').empty().append('<option value="">Seleccione un banco</option>');
