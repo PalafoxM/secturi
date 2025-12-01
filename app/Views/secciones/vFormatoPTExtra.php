@@ -1,27 +1,16 @@
 
-        <div  style="position:absolute; text-align:center; top:18.2%; left:13%; width:10%; height:18px; background-color:white; font-size: 12px; ">
+        <div  style="position:absolute; text-align:center; top:19.2%; left:53%; width:10%; height:12px; background-color:white; font-size: 10px; ">
             <span class="proxima">21</span>
         </div>
-        <div  style="position:absolute; text-align:center; top:18.2%; left:45.5%; width:10%; height:18px; background-color:white; font-size: 12px; ">
+        <div  style="position:absolute; text-align:center; top:19.2%; left:66.6%; width:7.5%; height:12px; background-color:WHITE; font-size: 12px; ">
             <span class="proxima"><?= date('d/m/Y', strtotime($registro->fecha_tramite)); ?></span>
         </div>
 
-        <div  style="position:absolute;text-align:center; top:18.2%; left:70.5%; width:25%; height:18px; background-color:white; font-size: 12px; ">
-           
-            <?php if(!$fic): ?>
-            <span class="proxima"><?= (isset($GO) && !empty($GO))?'GO':'PT';?> <?= strtoupper($registro->folio);?> </span>
-            <?php endif; ?>
-            <?php if($fic): ?>
-            <span class="proxima">PT <?= $folio;?></span>
-            <?php endif; ?>
+        <div  style="position:absolute;text-align:center; top:19.2%; left:75.5%; width:15%; height:12px; background-color:white; font-size: 12px; ">
+            <span class="proxima">PT <?= strtoupper($registro->folio);?> </span>
         </div>
-        <div  style="position:absolute; top:36.2%; left:60.7%; width:35%; background-color:white; font-size: 12px;  height:12px;">
-            <?php if($GO): ?>
-            <span class="proxima"> <strong> GOBIERNO DEL ESTADO DE GUANAJUATO SFIYA SECRETARIA DE TURISMO</strong></span>
-             <?php endif; ?>
-           <?php if(!$GO): ?>
+        <div  style="position:absolute; top:36.2%; left:60.7%; width:36%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "><?= (isset($registro->dsc_proveedor) && !empty($registro->dsc_proveedor))?strtoupper($registro->dsc_proveedor):'' ?></span>
-             <?php endif; ?>
         </div>
          <div  style="position:absolute; top:37.4%; left:73.5%; width:20%; background-color:white; font-size: 9px;  height:12px;">
             <span ><?= (isset($registro->no_proveedor) && !empty($registro->no_proveedor))?strtoupper($registro->no_proveedor):'' ?></span>
@@ -30,21 +19,18 @@
             <span class="proxima "><?= (isset($registro->rfc) && !empty($registro->rfc))?strtoupper($registro->rfc):'' ?></span>
         </div>
         <div  style="position:absolute; top:40.8%; left:60.8%; width:36%; background-color:white; font-size: 12px;  height:12px;">
-           <?php if($GO): ?>
-            <span class="proxima"> <strong> GOBIERNO DEL ESTADO DE GUANAJUATO SFIYA SECRETARIA DE TURISMO</strong></span>
-             <?php endif; ?>
-           <?php if(!$GO): ?>
+
             <span class="proxima "><STRONG>NOMBRE DEL PROVEEDOR :</STRONG><?= (isset($registro->dsc_proveedor) && !empty($registro->dsc_proveedor))?strtoupper($registro->dsc_proveedor):'' ?></span>
-             <?php endif; ?>
+
         </div>
           <div  style="position:absolute; top:42%; left:60.8%; width:36%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><strong>NO. CUENTA :</strong><?= ($fic)?$registro->no_cuenta: (isset($no_cuenta) && !empty($no_cuenta)?$no_cuenta:'') ?></span>
+            <span class="proxima "><strong>NO. CUENTA :</strong><?= $no_cuenta ?></span>
         </div>
         <div  style="position:absolute; top:43%; left:60.8%; width:36%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><STRONG>BANCO: </STRONG><?= ($fic)?$registro->banco:$banco ?></span>
+            <span class="proxima "><STRONG>BANCO: </STRONG><?= $banco ?></span>
         </div>
          <div  style="position:absolute; top:44.3%; left:60.8%; width:36%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><STRONG>CLABE:</STRONG> <?= ($fic)?$registro->clabe:$clabe ?></span>
+            <span class="proxima "><STRONG>CLABE:</STRONG> <?= $clabe ?></span>
         </div>
          <div  style="position:absolute; top:45.3%; left:60.8%; width:35%; background-color:white; font-size: 12px;  height:15px;">
             <span class="proxima "></span>
