@@ -226,30 +226,43 @@ class Agregar extends BaseController
         $this->globals = new Mglobal();
         $responses = [];
 
-      //  die( var_dump(  $periodo ) );
+    
         foreach ($periodo as $p) {
             // DETECTAR TIPO DE ESTRUCTURA
-             // var_dump(  $p );
             $esAnidado = (is_array($p['encabezado']));
             $esNormal = (is_string($p['encabezado']));
         
             if ($esAnidado) {
-                // Estructura anidada: múltiples registros
-                foreach ($p['encabezado'] as $index => $encabezado) {
+             
+              
+                foreach ($periodo as $p) {
+                    // Convertir todo a arrays si no lo son
+                    $importes = (array)($p['importe'] ?? []);
+                    
+                    // Para otros campos, si no son arrays, convertirlos a arrays con un solo elemento
+                    $partidas = is_array($p['partida'] ?? null) ? $p['partida'] : [$p['partida'] ?? ''];
+                    $proyectos = is_array($p['proyecto'] ?? null) ? $p['proyecto'] : [$p['proyecto'] ?? ''];
+                    $encabezados = is_array($p['encabezado'] ?? null) ? $p['encabezado'] : [$p['encabezado'] ?? ''];
+                    $inicios = is_array($p['periodo_inicio'] ?? null) ? $p['periodo_inicio'] : [$p['periodo_inicio'] ?? ''];
+                    $fines = is_array($p['periodo_fin'] ?? null) ? $p['periodo_fin'] : [$p['periodo_fin'] ?? ''];
 
-                    if (isset($p['importe'][$index])) {
+                    // Iterar por el array más largo (normalmente importe)
+                    $count = count($importes);
+                    
+                    for ($i = 0; $i < $count; $i++) {
                         $this->procesarRegistroIndividual(
                             $id_registro_pt,
-                            $encabezado,
-                            $p['importe'][$index],
-                            $p['partida'][$index],
-                            $p['proyecto'][$index],
-                            $p['periodo_inicio'][$index],
-                            $p['periodo_fin'][$index],
+                            $encabezados[$i] ?? $encabezados[0] ?? '',  // Usa el elemento i o el primero
+                            $importes[$i] ?? '',
+                            $partidas[$i] ?? $partidas[0] ?? '',
+                            $proyectos[$i] ?? $proyectos[0] ?? '',
+                            $inicios[$i] ?? $inicios[0] ?? '',
+                            $fines[$i] ?? $fines[0] ?? '',
                             $responses
                         );
                     }
                 }
+               
             } else if ($esNormal) {
                 // Estructura normal: un solo registro
                 $this->procesarRegistroIndividual(
@@ -264,7 +277,7 @@ class Agregar extends BaseController
                 );
             }
         }
-        //die();
+        
         return $responses;
     }
 
@@ -1805,6 +1818,12 @@ class Agregar extends BaseController
   
     
         if ($data['secretario'] == 0) {
+            $response->error = true;
+            $response->respuesta = "Es requerido el Secretario o Director";
+            return $this->respond($response);
+        }
+    
+        if ($data['id_subsecretario'] == 0) {
             $response->error = true;
             $response->respuesta = "Es requerido el Secretario o Director";
             return $this->respond($response);

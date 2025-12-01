@@ -4226,7 +4226,7 @@ class Principal extends BaseController
                 'tabla' => 'vw_usuario',
                 'where' => ['id_usuario' => $usu_reg]
             ])->data[0];
-
+       // die( var_dump( $registro_pt->data[0]->id_subsecretario ) );
         $subsecretario = $area = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1, 'id_subsecretario' => $registro_pt->data[0]->id_subsecretario]]);
         // $usu_sub = $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $subsecretario->data[0]->id_usuario]]);
         $data['usu_sub'] = $subsecretario->data[0];
