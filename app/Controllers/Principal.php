@@ -1516,6 +1516,7 @@ class Principal extends BaseController
         // Enviar datos a la vista
 
         $response = $this->globals->getTabla($dataDB)->data;
+      
         $data['bitacora'] = $response;
         $data['scripts'] = array('inicio');
         $data['contentView'] = 'personal/vBitacora';
@@ -4125,6 +4126,7 @@ class Principal extends BaseController
         $total = 0;
        if (isset($periodo_factura->data) && !empty($periodo_factura->data)) {
             $data['periodo_factura'] = $periodo_factura->data;
+            $registros = count($periodo_factura->data);
 
             foreach ($data['periodo_factura'] as $f) {
                 $total += (float) $f->importe;  // SUMAR
@@ -4231,8 +4233,14 @@ class Principal extends BaseController
         // $usu_sub = $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $subsecretario->data[0]->id_usuario]]);
         $data['usu_sub'] = $subsecretario->data[0];
     
-     
-        $html = view('secciones/vFormatoPT.php', $data);
+        //die( var_dump( $registros  ) );
+        if($registros >= 15){
+            $html = view('secciones/vFormatoPTExtra.php', $data);
+        }else{
+            $html = view('secciones/vFormatoPT.php', $data);
+        }
+        
+      
         $htmlSegundaHoja = view('secciones/vFormatoPT2.php', $data);
         $htmlTercerHoja = view('personal/vFormato702.php', $data);
 
@@ -4245,8 +4253,14 @@ class Principal extends BaseController
         ]);
 
         // Importar PDF base (anexo07)
+        if($registros >= 15){
+            $pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/plantillas/FormatoPTExtra.pdf');
+        }else{
+            $pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/plantillas/anexo07_2.pdf');
+        }
 
-        $pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/plantillas/anexo07_2.pdf');
+
+
 
         for ($i = 1; $i <= $pagecount; $i++) {
             $mpdf->AddPage();

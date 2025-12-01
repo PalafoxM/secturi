@@ -1814,8 +1814,8 @@ class Agregar extends BaseController
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
         $archivos = $this->request->getFiles();
-       
-  
+        
+       // die( var_dump($archivos) );
     
         if ($data['secretario'] == 0) {
             $response->error = true;
