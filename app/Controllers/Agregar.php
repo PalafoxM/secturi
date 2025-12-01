@@ -3841,33 +3841,41 @@ class Agregar extends BaseController
         }
 
         // Convertir a timestamps para comparación
-        $inicio = strtotime($data['hora_inicio']);
-        $fin = strtotime($data['hora_fin']);
+       // Normalizar las horas del FRONT
+        $inicioDT = new DateTime($data['hora_inicio'] . ':00');
+        $finDT = new DateTime($data['hora_fin'] . ':00');
 
-        if ((int) $fin < (int) $inicio) {
+        // Validar que fin > inicio
+        if ($finDT <= $inicioDT) {
             $response->respuesta = 'La hora de fin debe ser mayor a la hora de inicio';
             return $this->respond($response);
         }
+
         $fecha = $data['fecha'];
         $like = ['fecha' => "%$fecha%"];
         $dataDB = array('tabla' => 'sala_junta', 'where' => ['visible' => 1, 'sala' => $data['sala']], 'orlike' => $like, );
         $response = $globals->getTabla($dataDB);
 
-        if (isset($response->data) && !empty($response->data)) {
-            foreach($response->data as $f){
-                if(strtotime($f->hora_inicio) >= $inicio  || strtotime($f->hora_inicio) <= $fin ){
-                     
-                        $response->error = true;
-                        $response->respuesta = "La Sala " . $data['sala'] . " ya esta reservada de " . $data['hora_inicio'] . " - " . $data['hora_fin'] . "";
-                        return $this->respond($response);
+       if (isset($response->data) && !empty($response->data)) {
 
+            foreach ($response->data as $f) {
+
+                // Normalizar horas del registro existente de BD
+                $inicioExist = new DateTime($f->hora_inicio);
+                $finExist = new DateTime($f->hora_fin);
+
+                // Validar traslape correcto
+                if ($inicioDT < $finExist && $finDT > $inicioExist) {
+
+                    $response->error = true;
+                    $response->respuesta =
+                        "La Sala {$data['sala']} ya está reservada de {$f->hora_inicio} a {$f->hora_fin}";
+                    return $this->respond($response);
                 }
-
             }
-
-        
         }
-       
+
+      
         $dataInsert = [
             'sala' => $data['sala'],
             'fecha' => $data['fecha'] . ' ' . $data['hora_inicio'],
