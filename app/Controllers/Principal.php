@@ -4234,7 +4234,7 @@ class Principal extends BaseController
         $data['usu_sub'] = $subsecretario->data[0];
     
         //die( var_dump( $registros  ) );
-        if($registros >= 4){
+        if($registros >= 15){
             $html = view('secciones/vFormatoPTExtra.php', $data);
         }else{
             $html = view('secciones/vFormatoPT.php', $data);
@@ -4253,7 +4253,7 @@ class Principal extends BaseController
         ]);
 
         // Importar PDF base (anexo07)
-        if($registros >= 4){
+        if($registros >= 15){
             $pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/plantillas/FormatoPTExtra.pdf');
         }else{
             $pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/plantillas/anexo07_2.pdf');
