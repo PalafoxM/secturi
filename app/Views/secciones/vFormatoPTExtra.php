@@ -2,66 +2,62 @@
         <div  style="position:absolute; text-align:center; top:19.2%; left:53%; width:10%; height:12px; background-color:white; font-size: 10px; ">
             <span class="proxima">21</span>
         </div>
-        <div  style="position:absolute; text-align:center; top:19.2%; left:66.6%; width:7.5%; height:12px; background-color:WHITE; font-size: 12px; ">
+        <div  style="position:absolute; text-align:center; top:19.2%; left:66.6%; width:7.5%; height:12px; background-color:white; font-size: 12px; ">
             <span class="proxima"><?= date('d/m/Y', strtotime($registro->fecha_tramite)); ?></span>
         </div>
 
         <div  style="position:absolute;text-align:center; top:19.2%; left:75.5%; width:15%; height:12px; background-color:white; font-size: 12px; ">
             <span class="proxima">PT <?= strtoupper($registro->folio);?> </span>
         </div>
-        <div  style="position:absolute; top:36.2%; left:60.7%; width:36%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><?= (isset($registro->dsc_proveedor) && !empty($registro->dsc_proveedor))?strtoupper($registro->dsc_proveedor):'' ?></span>
+      
+         <div  style="position:absolute; top:31.6%; left:54.5%; width:27%; background-color:white; font-size: 9px;  height:12px;">
+            <span >No. PROVEEDOR : <?= (isset($registro->no_proveedor) && !empty($registro->no_proveedor))?strtoupper($registro->no_proveedor):'' ?></span>
         </div>
-         <div  style="position:absolute; top:37.4%; left:73.5%; width:20%; background-color:white; font-size: 9px;  height:12px;">
-            <span ><?= (isset($registro->no_proveedor) && !empty($registro->no_proveedor))?strtoupper($registro->no_proveedor):'' ?></span>
+        <div  style="position:absolute; top:30%; left:54.5%; width:33%; background-color:white; font-size: 9px;  height:12px;">
+            <span class="proxima ">RFC : <?= (isset($registro->rfc) && !empty($registro->rfc))?strtoupper($registro->rfc):'' ?></span>
         </div>
-        <div  style="position:absolute; top:38.5%; left:64%; width:33%; background-color:white; font-size: 9px;  height:12px;">
-            <span class="proxima "><?= (isset($registro->rfc) && !empty($registro->rfc))?strtoupper($registro->rfc):'' ?></span>
-        </div>
-        <div  style="position:absolute; top:40.8%; left:60.8%; width:36%; background-color:white; font-size: 12px;  height:12px;">
+        <div  style="position:absolute; top:37.3%; left:54.5%; width:36%; background-color:white; font-size: 12px;  height:12px;">
 
-            <span class="proxima "><STRONG>NOMBRE DEL PROVEEDOR :</STRONG><?= (isset($registro->dsc_proveedor) && !empty($registro->dsc_proveedor))?strtoupper($registro->dsc_proveedor):'' ?></span>
+            <span class="proxima "><STRONG>NOMBRE : </STRONG><?= (isset($registro->dsc_proveedor) && !empty($registro->dsc_proveedor))?strtoupper($registro->dsc_proveedor):'' ?></span>
 
         </div>
-          <div  style="position:absolute; top:42%; left:60.8%; width:36%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><strong>NO. CUENTA :</strong><?= $no_cuenta ?></span>
+          <div  style="position:absolute; top:38.7%; left:54.5%; width:36%; background-color:white; font-size: 12px;  height:12px;">
+            <span class="proxima "><strong>NO. CUENTA : </strong><?= $no_cuenta ?></span>
         </div>
-        <div  style="position:absolute; top:43%; left:60.8%; width:36%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><STRONG>BANCO: </STRONG><?= $banco ?></span>
+        <div  style="position:absolute; top:43%; left:54.5%; width:36%; background-color:white; font-size: 12px;  height:12px;">
+            <span class="proxima "><STRONG>BANCO : </STRONG><?= $banco ?></span>
         </div>
-         <div  style="position:absolute; top:44.3%; left:60.8%; width:36%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><STRONG>CLABE:</STRONG> <?= $clabe ?></span>
+         <div  style="position:absolute; top:40.7%; left:54.5%; width:36%; background-color:white; font-size: 12px;  height:12px;">
+            <span class="proxima "><STRONG>CLABE :</STRONG> <?= $clabe ?></span>
         </div>
-         <div  style="position:absolute; top:45.3%; left:60.8%; width:35%; background-color:white; font-size: 12px;  height:15px;">
+         <div  style="position:absolute; top:45%; left:54.5%; width:35%; background-color:white; font-size: 12px;  height:63px;">
             <span class="proxima "></span>
         </div>
-        <?php $i = 34;  ?>
+        <?php $i = 28;  ?>
  
         <?php if( isset($presupuesto) && !empty($presupuesto) ): ?>
         <?php foreach($presupuesto as $r): ?>
-         <div  style="position:absolute; text-align:center; top:<?=$i?>%; left:17.5%; width:13%; background-color:white; font-size: 12px;  height:12px;">
+         <div  style="position:absolute; text-align:center; top:<?=$i?>%; left:23.5%; width:10%; background-color:whitw; font-size: 12px;  height:12px;">
             <span class="proxima "><?= $r->proyecto ?></span>
         </div>
-         <div  style="position:absolute; text-align:center; top:<?=$i?>%; left:3%; width:13%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "></span>
-        </div>
+    
         <?php $i = $i + 1.5; ?>
         <?php endforeach; ?>
         <?php endif; ?>
 
-        <?php $i = 34;  ?>
+       <?php $i = 28;  ?>
         <?php if( isset($presupuesto) && !empty($presupuesto) ): ?>
         <?php foreach($presupuesto as $r): ?>
-         <div  style="position:absolute; text-align:center; top:<?=$i?>%; left:31.7%; width:13%; background-color:white; font-size: 12px;  height:12px;">
+         <div  style="position:absolute; text-align:center; top:<?=$i?>%; left:34%; width:13%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "><?= $r->partida ?></span>
         </div>
         <?php $i = $i + 1.5; ?>
         <?php endforeach; ?>
          <?php endif; ?>
-         <?php $i = 34;  ?>
+         <?php $i = 28;  ?>
          <?php if( isset($periodo_factura) && !empty($periodo_factura) ): ?>
         <?php foreach($periodo_factura as $r): ?>
-              <div style="position:absolute; text-align:center; top:<?=$i?>%; left:46.4%; width:13%; background-color:white; font-size:10px; height:12px; line-height:12px;">
+              <div style="position:absolute; text-align:center; top:<?=$i?>%; left:47.3%; width:6.7%; background-color:whitw; font-size:10px; height:12px; line-height:12px;">
                     <span class="proxima">
                         <?php 
                         $importe = $r->importe;
@@ -78,25 +74,25 @@
         <?php endforeach; ?>
         <?php endif; ?>
       
-             <?php $i = 34;  ?>
+             <?php $i = 28;  ?>
             <?php foreach( $uuid as $u ): ?>
-                <div style="position:absolute; text-align:center; top:<?=$i?>%; left:2.7%; width:13.8%; background-color:white; font-size: 12px;  height:12px;">
+                <div style="position:absolute; text-align:center; top:<?=$i?>%; left:12%; width:11.1%; background-color:white; font-size: 12px;  height:12px;">
                   <span class="proxima"><?= isset($u->folio) && !empty($u->folio)?$u->folio:$u->uuid ?></span>
                  </div>
             <?php $i += 1.5; ?>
             <?php endforeach; ?>
 
    
-        <div  style="position:absolute; text-align:right; top:52.2%; left:44%; width:15%; background-color:white; font-size: 12px;  height:12px;">
+        <div  style="position:absolute; text-align:right; top:55.5%; left:42%; width:12%; background-color:white; font-size: 12px;  height:18px;">
             <span>$<?= (isset($suma) && !empty($suma))? number_format($suma,2):''; ?></span>
         </div>
-        <div  style="position:absolute; text-align:center; top:51.8%; left:60%; width:37.5%; background-color:white; font-size: 12px;  height:20px;">
+        <div  style="position:absolute; text-align:center; top:55.5%; left:55%; width:36%; background-color:white; font-size: 12px;  height:18px;">
             <span class="proxima "><strong><?= ($suma_texto); ?></strong></span>
         </div>
-         <div  style="position:absolute; top:48.1%; left:22%; width:25%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><?= (isset($reserva[0]->no_convenio) && !empty($reserva[0]->no_convenio))?strtoupper($reserva[0]->no_convenio):'' ?></span>
+         <div  style="position:absolute; top:55.6%; left:12%; width:25%; background-color:white; font-size: 12px;  height:12px;">
+            <span class="proxima ">No. Convenio / Contrato : <?= (isset($reserva[0]->no_convenio) && !empty($reserva[0]->no_convenio))?strtoupper($reserva[0]->no_convenio):'' ?></span>
         </div>
-         <div  style="position:absolute; top:49.4%; left:12%; width:25%; background-color:white; font-size: 12px;  height:12px;">
+         <div  style="position:absolute; top:57.8%; left:12%; width:25%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima ">
                 <?php 
                 $valores_unicos = array_unique(array_column($presupuesto, 'no_reserva'));
@@ -105,7 +101,7 @@
 
                 foreach($valores_unicos as $no_reserva):
                     $current++;
-                    echo $no_reserva;
+                    echo 'No. Reserva : '.$no_reserva;
                     if ($current < $total) {
                         echo ', ';
                     }
@@ -114,27 +110,23 @@
                 
             </span>
         </div>
-         <div  style="position:absolute;  text-align:center; top:67.7%; left:3.5%; width:30%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><?= ($fic)?'LIC. RODRIGO GONZÁLEZ GUERRERO':strtoupper($registro->director); ?></span>
+         <div  style="position:absolute;  text-align:center; top:66%; left:15%; width:30%; background-color:white; font-size: 12px;  height:18px;">
+            <span class="proxima "><?= 'L.R.I. RODRIGO GONZÁLEZ GUERRERO' ?></span>
         </div>
         <?php if(!$fic): ?>
-         <div  style="position:absolute;  text-align:center; top:67.7%; left:35.5%; width:30%; background-color:white; font-size: 12px;  height:12px;">
+         <div  style="position:absolute;  text-align:center; top:67.7%; left:35.5%; width:30%; background-color:red; font-size: 12px;  height:12px;">
             <span class="proxima "><?= strtoupper($registro->secretario); ?></span>
         </div>
          <div  style="position:absolute;  text-align:center; top:68.9%; left:35.5%; width:30%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "><?= strtoupper($registro->dsc_puesto_secretario); ?></span>
         </div>
         <?php endif; ?>
-        <?php if($fic): ?>
-         <div  style="position:absolute;  text-align:center; top:67.7%; left:35.5%; width:30%; background-color:white; font-size: 15px;  height:28px;">
-            <span class="proxima ">MTRO. DAVID AYALA SAUCEDO - DIRECTOR GENERAL DE DESARROLLO TURÍSTICO POR ACUERDO SECRETARIAL N° 003/2025</span>
-        </div>
-        <?php endif; ?>
-         <?php if(!$fic): ?>
+      
+      
          <div  style="position:absolute;  text-align:center; top:67.7%; left:67.1%; width:30%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "><?= $usu_sub->dsc_subsecretario?></span>
         </div>
-         <?php endif; ?>
+      
          <?php if($fic): ?>
          <div  style="position:absolute;  text-align:center; top:67.7%; left:67.1%; width:30%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima">MTRO. DAVID AYALA SAUCEDO  </span>
