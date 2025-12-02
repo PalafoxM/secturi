@@ -2002,9 +2002,9 @@ class Principal extends BaseController
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Estimado personal,</p>
                         
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-                            En caso de que aún no hayas realizado las <strong>justificaciones de tu personal correspondientes a la quincena 21/2025</strong>, 
-                            la cual comprende el periodo del <strong>1 al 15 de noviembre de 2025</strong>, 
-                            tienes hasta el día <strong> lunes 24 de noviembre hasta las 16:00 hrs</strong> para realizarlas.
+                            En caso de que aún no hayas realizado las <strong>justificaciones de tu personal correspondientes a la quincena 22/2025</strong>, 
+                            la cual comprende el periodo del <strong>16 al 30 de noviembre de 2025</strong>, 
+                            tienes hasta el día <strong> lunes 8 de diciembre hasta las 16:00 hrs</strong> para realizarlas.
                         </p>
 
                         <div class="highlight-box">
@@ -4254,7 +4254,7 @@ class Principal extends BaseController
 
         // Importar PDF base (anexo07)
         if($registros >= 15){
-            $pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/plantillas/FormatoPTExtra.pdf');
+            $pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/plantillas/FormatoPTExtra_merged.pdf');
         }else{
             $pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/plantillas/anexo07_2.pdf');
         }

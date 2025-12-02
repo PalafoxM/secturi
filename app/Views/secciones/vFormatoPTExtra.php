@@ -2,6 +2,9 @@
         <div  style="position:absolute; text-align:center; top:14.8%; left:49.5%; width:42%; height:22px; background-color:BLACK; color:white; font-size:8px; ">
             <span class="proxima">21 SECRETARIA DE TURISMO E IDENTIDAD</span>
         </div>
+        <div  style="position:absolute; text-align:right; top:9.4%; left:72.4%; width:12%; background-color:white; font-size: 12px;  height:18px;">
+            <span>$<?= (isset($suma) && !empty($suma))? number_format($suma,2):''; ?></span>
+        </div>
         <div  style="position:absolute; text-align:center; top:19.2%; left:53%; width:10%; height:12px; background-color:white; font-size: 10px; ">
             <span class="proxima">21</span>
         </div>
