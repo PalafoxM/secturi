@@ -85,7 +85,8 @@ class Agregar extends BaseController
         $data = array();
         $response = new \stdClass();
         $this->globals = new Mglobal();
-       
+        
+    
     
         foreach ($periodo as $p) {
 
@@ -226,7 +227,8 @@ class Agregar extends BaseController
         $this->globals = new Mglobal();
         $responses = [];
 
-    
+        var_dump( $periodo );
+        die();
         foreach ($periodo as $p) {
             // DETECTAR TIPO DE ESTRUCTURA
             //var_dump( $p['encabezado'] );
@@ -415,9 +417,9 @@ class Agregar extends BaseController
                 continue;
             }
 
-            $timestamp = date('Ymd_His');
+            $random = bin2hex(random_bytes(4)); // 8 caracteres hexadecimales
+            $timestamp = date('Ymd_His_') . $random;
             $extension = $archivo->getClientExtension();
-            $originalName = pathinfo($archivo->getName(), PATHINFO_FILENAME);
             $file = '03_CFDI_' . $i . '_' . $timestamp . '.' . $extension;
 
             // Ruta absoluta
@@ -1818,7 +1820,7 @@ class Agregar extends BaseController
         $data = $this->request->getPost();
         $archivos = $this->request->getFiles();
        
-       // die( var_dump($archivos) );
+      
     
         if ($data['secretario'] == 0) {
             $response->error = true;
@@ -1968,22 +1970,82 @@ class Agregar extends BaseController
 
         $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
 
-        if (!$response->error) {
+       if (!$response->error) {
             $id_registro_pt = $response->idRegistro;
             $archivosXml = [];
             $archivosPdf = [];
             $periodo = [];
             $response->idRegistro = $response->idRegistro;
             $this->cambiarStatusPT($data['id_reserva']);
-              
-           
+            
+            // ==== PRIMERO: Procesar TODOS los datos del formulario para construir la estructura base ====
+            foreach ($data as $key => $p) {
+                if (strpos($key, 'encabezado') === 0) {
+                    $index = str_replace('encabezado', '', $key);
+                    $index = $index === '' ? 0 : $index;
+                    if (!isset($periodo[$index])) {
+                        $periodo[$index] = [];
+                    }
+                    $periodo[$index]['encabezado'] = $p;
+                }
+
+                if (strpos($key, 'partida') === 0) {
+                    $index = str_replace('partida', '', $key);
+                    $index = $index === '' ? 0 : $index;
+                    if (!isset($periodo[$index])) {
+                        $periodo[$index] = [];
+                    }
+                    $periodo[$index]['partida'] = $p;
+                }
+                if (strpos($key, 'proyecto') === 0) {
+                    $index = str_replace('proyecto', '', $key);
+                    $index = $index === '' ? 0 : $index;
+                    if (!isset($periodo[$index])) {
+                        $periodo[$index] = [];
+                    }
+                    $periodo[$index]['proyecto'] = $p;
+                }
+                if (strpos($key, 'fecha_gasto_inicio') === 0) {
+                    $index = str_replace('fecha_gasto_inicio', '', $key);
+                    $index = $index === '' ? 0 : $index;
+                    if (!isset($periodo[$index])) {
+                        $periodo[$index] = [];
+                    }
+                    $periodo[$index]['periodo_inicio'] = $p;
+                }
+                if (strpos($key, 'fecha_gasto_fin') === 0) {
+                    $index = str_replace('fecha_gasto_fin', '', $key);
+                    $index = $index === '' ? 0 : $index;
+                    if (!isset($periodo[$index])) {
+                        $periodo[$index] = [];
+                    }
+                    $periodo[$index]['periodo_fin'] = $p;
+                }
+                if (strpos($key, 'editarPe') === 0) {
+                    $index = str_replace('editarPe', '', $key);
+                    $index = $index === '' ? 0 : $index;
+                    if (!isset($periodo[$index])) {
+                        $periodo[$index] = [];
+                    }
+                    $periodo[$index]['editarPe'] = $p;
+                }
+                if (strpos($key, 'editarPDF') === 0) {
+                    $index = str_replace('editarPDF', '', $key);
+                    $archivosPdf[$index] = $p; // Guardar referencia para edición
+                }
+                if (strpos($key, 'editarXML') === 0) {
+                    $index = str_replace('editarXML', '', $key);
+                    $archivosXml[$index] = $p; // Guardar referencia para edición
+                }
+            }
+            
+            // ==== SEGUNDO: Procesar archivos subidos DESPUÉS de tener la estructura base ====
             foreach ($archivos as $nombreCampo => $archivoArray) {
                 foreach ($archivoArray as $archivo) {
-
                     if (!$archivo->isValid()) {
                         continue;
                     }
-                       
+                    
                     $tipo = $archivo->getMimeType();
 
                     // === XML ===
@@ -1995,7 +2057,15 @@ class Agregar extends BaseController
                         if ($xml !== false) {
                             $total = (string) $xml['Total'];
                             $indice = str_replace('factura_xml_', '', $nombreCampo);
-                            $periodo[$indice]['importe'][] = $total;
+                            
+                            // Inicializar si no existe
+                            if (!isset($periodo[$indice])) {
+                                $periodo[$indice] = [];
+                            }
+                            
+                            // Asignar importe como STRING, NO como array
+                            $periodo[$indice]['importe'] = $total;
+                            
                             $archivosXml[$indice][] = $archivo;
                         }
                     }
@@ -2008,94 +2078,20 @@ class Agregar extends BaseController
                 }
             }
             
-       
-                  
-            // PRIMERO: Procesar TODOS los datos del formulario para construir la estructura base
-            
-            foreach ($data as $key => $p) {
-               if (strpos($key, 'encabezado') === 0) {
-                    $index = str_replace('encabezado', '', $key);
-                    $index = $index === '' ? 0 : $index;  // 👈 SE AGREGA ESTO
-                    if (!isset($periodo[$index])) {
-                        $periodo[$index] = [];
-                    }
-                    $periodo[$index]['encabezado'] = $p;
-                }
-
-                if (strpos($key, 'partida') === 0) {
-                    $index = str_replace('partida', '', $key);
-                    $index = $index === '' ? 0 : $index;  // 👈 SE AGREGA ESTO
-                    if (!isset($periodo[$index])) {
-                        $periodo[$index] = [];
-                    }
-                    $periodo[$index]['partida'] = $p;
-                }
-                if (strpos($key, 'proyecto') === 0) {
-                    $index = str_replace('proyecto', '', $key);
-                    $index = $index === '' ? 0 : $index;  // 👈 SE AGREGA ESTO
-                    if (!isset($periodo[$index])) {
-                        $periodo[$index] = [];
-                    }
-                    $periodo[$index]['proyecto'] = $p;
-                }
-                if (strpos($key, 'fecha_gasto_inicio') === 0) {
-                    $index = str_replace('fecha_gasto_inicio', '', $key);
-                    $index = $index === '' ? 0 : $index;  // 👈 SE AGREGA ESTO
-                    if (!isset($periodo[$index])) {
-                        $periodo[$index] = [];
-                    }
-                    $periodo[$index]['periodo_inicio'] = $p;
-                }
-                if (strpos($key, 'fecha_gasto_fin') === 0) {
-                    $index = str_replace('fecha_gasto_fin', '', $key);
-                    $index = $index === '' ? 0 : $index;  // 👈 SE AGREGA ESTO
-                    if (!isset($periodo[$index])) {
-                        $periodo[$index] = [];
-                    }
-                    $periodo[$index]['periodo_fin'] = $p;
-                }
-                if (strpos($key, 'editarPe') === 0) {
-                    $index = str_replace('editarPe', '', $key);
-                    $index = $index === '' ? 0 : $index;  // 👈 SE AGREGA ESTO
-                    if (!isset($periodo[$index])) {
-                        $periodo[$index] = [];
-                    }
-                    $periodo[$index]['editarPe'] = $p;
-                }
-                if (strpos($key, 'editarPDF') === 0) {
-                    $index = str_replace('editarPDF', '', $key);
-                 //   $index = $index === '' ? 0 : $index;  // 👈 SE AGREGA ESTO
-                    $archivosPdf[$index] = $p; // Guardar referencia para edición
-                }
-                if (strpos($key, 'editarXML') === 0) {
-                    $index = str_replace('editarXML', '', $key);
-                   // $index = $index === '' ? 0 : $index;  // 👈 SE AGREGA ESTO
-                    $archivosXml[$index] = $p; // Guardar referencia para edición
-                }
-
-            }
-
-            // SEGUNDO: Procesar archivos subidos y agregar importes al periodo correspondiente
-        
-
-            // TERCERO: Ordenar el array periodo por índices numéricos
+            // ==== TERCERO: Ordenar el array periodo por índices numéricos ====
             ksort($periodo);
 
-          //  die( var_dump( $archivosXml ) );
-            foreach($archivosXml as $key => $value){
-               $datosXML =  $this->procesarXML($archivosXml[$key], $id_registro_pt);
-              $datosPDF =  $this->procesarPDF($archivosPdf[$key], $id_registro_pt);
-
+            if($data['editar'] == 1){
+                $datosXML = $this->procesarXMLeditar($archivosXml, $id_registro_pt);
+                $datosPDF = $this->procesarPDFeditar($archivosPdf, $id_registro_pt);
+                $datosP = $this->procesarPediodoEditar($periodo, $id_registro_pt);
+            } else {
+                foreach($archivosXml as $key => $value){
+                    $datosXML = $this->procesarXML($archivosXml[$key], $id_registro_pt);
+                    $datosPDF = $this->procesarPDF($archivosPdf[$key], $id_registro_pt);
+                }
+                $datosP = $this->procesarPediodo($periodo, $id_registro_pt);
             }
-
-           // $datosXML = ($data['editar'] == 1 && !empty($archivosXml)) ? $this->procesarXMLeditar($archivosXml, $id_registro_pt) : $this->procesarXML($archivosXml[0], $id_registro_pt);
-
-            //$datosPDF = ($data['editar'] == 1 && !empty($archivosPdf)) ? $this->procesarPDFeditar($archivosPdf, $id_registro_pt) : $this->procesarPDF($archivosPdf[0], $id_registro_pt);
-
-            $datosP = ($data['editar'] == 1 && !empty($periodo)) ? $this->procesarPediodoEditar($periodo, $id_registro_pt) : $this->procesarPediodo($periodo, $id_registro_pt);
-
-            // $datosP = $this->procesarPediodo($periodo, $id_registro_pt, $data['editar']);
-
 
             if (!$datosXML) {
                 $response->errorXML = true;
@@ -2105,8 +2101,6 @@ class Agregar extends BaseController
                 $response->errorPDF = true;
                 $response->respuestaPDF = "PDF inválido o no se encontró.";
             }
-
-
         }
         return $this->respond($response);
     }

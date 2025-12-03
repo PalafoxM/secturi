@@ -67,35 +67,38 @@ $fechaFormateada = $dia . ' de ' . $mes . ' del ' . $anio;
             <span class="proxima">
                 Lo anterior con cargo al proyecto(s) 
                 <strong>
-                <?php if(!$fic): ?>
-                        <?php 
-                        $total = count($presupuesto);
-                        $current = 0;
-                        foreach($presupuesto as $r):
-                            $current++;
-                            echo $r->proyecto;
-                            if ($current < $total) {
-                                echo ', ';
+              
+                      <?php 
+                        $proyectosMostrados = [];
+                        $proyectosArray = [];
+
+                        // Primero recolectar proyectos únicos
+                        foreach($presupuesto as $r) {
+                            if (!in_array($r->proyecto, $proyectosMostrados)) {
+                                $proyectosMostrados[] = $r->proyecto;
                             }
-                        endforeach; 
+                        }
+
+                        // Mostrar resultados
+                        echo implode(', ', $proyectosMostrados);
                         ?>
-                  <?php endif; ?>
-                   <?php if($fic): ?>
-                       E027QC04182501
-                    <?php endif; ?>
+                 
+              
                 </strong> a las partida(s) presupuestal(es) 
                 <strong>
                     
-                        <?php 
-                        $total = count($presupuesto);
-                        $current = 0;
-                        foreach($presupuesto as $r):
-                            $current++;
-                            echo $r->partida;
-                            if ($current < $total) {
-                                echo ', ';
+                      <?php 
+                        $vistas = [];
+                        $resultado = [];
+
+                        foreach($presupuesto as $r) {
+                            if (!in_array($r->partida, $vistas)) {
+                                $vistas[] = $r->partida;
+                                $resultado[] = $r->partida;
                             }
-                        endforeach; 
+                        }
+
+                        echo implode(', ', $resultado);
                         ?>
                   
                </strong>
