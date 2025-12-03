@@ -4109,33 +4109,37 @@ class Principal extends BaseController
             'where' => ['visible' => 1, 'id_registro_pt' => $id_pt]
         ]);
         $periodo_factura = $globals->getTabla([
-            'tabla' => 'periodo_factura',
+            'tabla' => 'vw_periodo_factura',
             'where' => ['visible' => 1, 'id_registro_pt' => $id_pt]
         ]);
-
+       
+        $importe = '';
+        $total = 0;
         if (isset($xml->data) && !empty($xml->data)) {
            
             $data['uuid'] = $xml->data;
+            foreach ($xml->data as $f) {
+                $total += (float) $f->total;  // SUMAR
+            }
         }
         
         if (isset($presupuesto->data) && !empty($presupuesto->data)) {
             $data['presupuesto'] = $presupuesto->data;
         }
        
-        $importe = '';
-        $total = 0;
+      
        if (isset($periodo_factura->data) && !empty($periodo_factura->data)) {
             $data['periodo_factura'] = $periodo_factura->data;
+            $data['periodo_inicio'] = $periodo_factura->data[0]->periodo_inicio;
+            $data['periodo_fin'] = $periodo_factura->data[0]->periodo_fin;
             $registros = count($periodo_factura->data);
 
-            foreach ($data['periodo_factura'] as $f) {
-                $total += (float) $f->importe;  // SUMAR
-            }
+            
         }
 
        $data['suma'] = $total;
        $data['suma_texto'] = $this->numeroEnLetras($total);
-       //die( var_dump( $data['total']  ) );
+       //die( var_dump( $data['periodo_factura']  ) );
         $data['GO'] = false;
         $data['fic'] = false;
         $data['dividido'] = 0;
@@ -4233,7 +4237,7 @@ class Principal extends BaseController
         // $usu_sub = $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $subsecretario->data[0]->id_usuario]]);
         $data['usu_sub'] = $subsecretario->data[0];
     
-        //die( var_dump( $registros  ) );
+       // die( var_dump( $data['periodo_factura']  ) );
         if($registros >= 15){
             $html = view('secciones/vFormatoPTExtra.php', $data);
         }else{
@@ -4278,6 +4282,7 @@ class Principal extends BaseController
                 if (!empty($facturas)) {
                     foreach ($facturas as $index => $factura) {
                         $facturaPath = FCPATH . $factura->ruta_relativa;
+                        
 
                         if (file_exists($facturaPath)) {
                             $facturaPageCount = $mpdf->SetSourceFile($facturaPath);
@@ -4308,32 +4313,25 @@ class Principal extends BaseController
                 $data['dividido'] = 1;
                 $mpdf->WriteHTML($htmlSegundaHoja);
                 $facturas = $formatos->data;
-               // var_dump( $facturas ); 
-               // var_dump(  $presupuesto ); 
-               // var_dump(  $xml ); 
-               // die();
+              
                 if (!empty($facturas)) {
-                   
+               // var_dump( $facturas ); 
+                //var_dump(  $periodo_factura->data ); 
+                //die();
                     // var_dump( $presupuestoGO->data );
                         foreach ($facturas as $index => $facturaItem) {
+             
+                          $data['partida2']           =  $periodo_factura->data[$index]->partida;
+                          $data['fecha_gasto_inicio'] =  $periodo_factura->data[$index]->periodo_inicio;
+                          $data['fecha_gasto_fin']    =  $periodo_factura->data[$index]->periodo_fin;
+                          $data['uuid2']              = $xml->data[$index]->uuid;
+                        //  var_dump( $data['partida2'] );
+
+                            $data['total2'] = "";
+                            $data['monto2'] = "";
                        
-                          $data['partida2'] =  $presupuesto->data[$index]->dsc_partida;
-                          $data['uuid2'] =   $xml->data[$index]->uuid;
-                         // var_dump( $data['uuid2'] );
-                          //die();
-                            $periodo_factura = $globals->getTabla([
-                                'tabla' => 'periodo_factura',
-                                'where' => [
-                                    'visible' => 1,
-                                    'id_registro_pt' => $id_pt,
-                                ]
-                            ]);
-                               $periodo = isset($periodo_factura->data) && !empty($periodo_factura->data)
-                                ? $periodo_factura->data
-                                : [];
                             
-                            
-                                $monto = (int)$periodo[$index]->importe ;
+                                $monto = (int)$xml->data[$index]->total ;
                                 $data['total2'] = $monto;
                                 $data['monto2'] = $this->numeroEnLetras($monto);
                             
@@ -4384,10 +4382,8 @@ class Principal extends BaseController
                                 }
                             
                         }
+                       
                     }
-
-                  
-
             }
         }
 
@@ -5138,18 +5134,45 @@ class Principal extends BaseController
         $globals = new Mglobal;
         
         $response = $globals->getTabla(['tabla' => 'vw_pagos', 'where' => ['visible' => 1, 'id_reserva' => $id_reserva]]);
+        
+        $pagosID = [];
+        $pagos = [];
         if(isset($response->data) && !empty($response->data)){
-            $data['pagos'] = $response->data;
             $data['total_importe'] = $response->data[0]->total_importe;
             $data['id_reserva'] = $id_reserva;
+            
+            foreach($response->data as $p){
+                // Solo agregamos el ID, permitiendo duplicados inicialmente
+                $pagosID[] = $p->id_registro_pt; 
+            }
+            
+            // Paso CLAVE: Eliminar duplicados después de llenar el array
+            $pagosID = array_unique($pagosID);
+            
+            // Si necesitas reindexar el array (empezar las claves desde 0), puedes usar array_values:
+            // $pagosID = array_values($pagosID); 
+        }
+        foreach($pagosID as $key => $value){
+            $pago = $globals->getTabla(['tabla' => 'factura', 'where' => ['visible' => 1, 'id_registro_pt' => $value]]);
 
+            foreach( $pago->data as $p){
+                $pagos[] = [
+                    'total' => $p->total,
+                    'folio' => $p->folio,
+                    'fecha' => $p->fecha,
+                    'emisor_rfc' => $p->emisor_rfc,
+                ];
+            }
+           
         }
 
-      
+       
+        $data['pagos'] = $pagos;
+       // die( var_dump( $data['pagos'] ) );
+
         $data['scripts'] = array('inicio');
         $data['contentView'] = 'personal/vTablaPagos';
         $this->_renderView($data);
-
     }
 
     public function continuarPago($id_registro_pt = null)

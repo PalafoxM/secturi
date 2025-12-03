@@ -84,7 +84,7 @@
                                             </div><!--end col-->
                                         </div><!--end form-row-->
                                         <div class="form-row">
-                                            <div class="col-md-4 mb-3">
+                                            <div class="col-md-6 mb-3">
                                                 <label for="cuenta_bancaria">Cuenta Bancaria del Proveedor <span style="color:red;">*</span></label>
                                                  <select type="text" class="form-control" id="cuenta_bancaria"  name="cuenta_bancaria" >
                                                   <?php foreach( $idproveedor as $o ): ?>
@@ -92,18 +92,7 @@
                                                   <?php endforeach; ?>
                                                </select>
                                             </div><!--end col-->
-                                            <div class="col-md-4 mb-3">
-                                                <label for="fecha_gasto_inicio">Fecha de gasto inicio <span style="color:red;">*</span></label>
-                                                <input type="date" class="form-control" id="fecha_gasto_inicio" name="fecha_gasto_inicio" 
-                                                value="<?= isset($registro_pt->fecha_gasto_inicio) ? date('Y-m-d', strtotime($registro_pt->fecha_gasto_inicio)) : date('Y-m-d') ?>" 
-                                                required>
-                                            </div><!--end col-->
-                                            <div class="col-md-4 mb-3">
-                                                 <label for="fecha_gasto_fin">Fecha de gasto fin <span style="color:red;">*</span></label>
-                                                <input type="date" class="form-control" id="fecha_gasto_fin" name="fecha_gasto_fin" 
-                                                value="<?= isset($registro_pt->fecha_gasto_fin) ? date('Y-m-d', strtotime($registro_pt->fecha_gasto_fin)) : date('Y-m-d') ?>" 
-                                                required>
-                                            </div><!--end col-->
+                                        
                                         </div><!--end form-row-->
                                         <div class="form-row">
                                             <div class="col-md-6 mb-6">
@@ -282,11 +271,19 @@
                                                             <p class="text-muted mb-3">Factura XML (Máx 100MB)</p>
                                                             <input id="factura_xml_input_<?= $i; ?>" type="file" name="factura_xml_<?= $i; ?>[]" multiple class="dropify"  accept=".xml">
                                                         </div>
-                                                        <div class="col-md-4 mb-3">
-                                                          
-                                                            <p class="text-muted mb-3">Importe</p>
-                                                            <input id="importe[]" type="text" name="importe[]" class="form-control" placeholder="importe" autocomplete="off" >
-                                                        </div>
+                                                        <div class="col-md-2 mb-3">
+                                                            <label for="fecha_gasto_inicio">Fecha de gasto inicio <span style="color:red;">*</span></label>
+                                                            <input type="date" class="form-control" id="fecha_gasto_inicio" name="fecha_gasto_inicio[]" 
+                                                            value="<?= isset($registro_pt->fecha_gasto_inicio) ? date('Y-m-d', strtotime($registro_pt->fecha_gasto_inicio)) : date('Y-m-d') ?>" 
+                                                            required>
+                                                        </div><!--end col-->
+                                                        <div class="col-md-2 mb-3">
+                                                            <label for="fecha_gasto_fin">Fecha de gasto fin <span style="color:red;">*</span></label>
+                                                            <input type="date" class="form-control" id="fecha_gasto_fin" name="fecha_gasto_fin[]" 
+                                                            value="<?= isset($registro_pt->fecha_gasto_fin) ? date('Y-m-d', strtotime($registro_pt->fecha_gasto_fin)) : date('Y-m-d') ?>" 
+                                                            required>
+                                                        </div><!--end col-->
+                                                       
                                                     </div>
                                                 </div>    
                                                 <?php endforeach; ?>
@@ -294,11 +291,11 @@
                                                         <div class="col-md-4 mb-3"></div>
                                                         <div class="col-md-4 mb-3"></div>
                                                         <div class="col-md-4 mb-3">
-                                                            <p class="text-muted mb-3">Total</p>
+                                                           
                                                              <div class="input-group">
-                                                                 <input id="total_importe" type="text" name="total_importe" class="form-control" placeholder="0,000.00" readonly>
+                                                                
                                                                   <span class="input-group-append">
-                                                                       <a  href="<?= base_url()?>index.php/Principal/TablaPagos/<?= $id_reserva?>" class="btn btn-gradient-primary" type="button">ver pagos</a>
+                                                                       <a  href="<?= base_url()?>index.php/Principal/TablaPagos/<?= $id_reserva?>" class="btn btn-gradient-info" type="button">ver pagos</a>
                                                                    </span>
                                                               </div>    
                                                         </div>
@@ -390,25 +387,6 @@
                 }
             });
         });
-      $(document).on('input', 'input[name="importe[]"]', function() {
-            calcularTotal();
-        });
-        function calcularTotal() {
-            let total = 0;
-            
-            $('input[name="importe[]"]').each(function() {
-                // Elimina comas y convierte a número
-                const valor = parseFloat($(this).val().replace(/,/g, '')) || 0;
-                total += valor;
-            });
-            
-            // Formatea el total con separadores de miles
-            $('#total_importe').val(formatNumber(total.toFixed(2)));
-        }
-        function formatNumber(num) {
-            return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
-        }
-
 
         $(document).ready(function() {
         

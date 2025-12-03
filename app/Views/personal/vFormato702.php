@@ -185,6 +185,7 @@
       font-size: 7px;
       height:18px; 
       text-align:left;
+
     }
     #importe_respuesta{
        position:absolute; 
@@ -279,9 +280,14 @@
 </div>
 
  <div id="fecha_respuesta">
-   <?php if(isset($registro->fecha_gasto_inicio) && !empty($registro->fecha_gasto_inicio)): ?>
-   <span > DEL <?= date('d-m-Y', strtotime($registro->fecha_gasto_inicio));?> AL <?= date('d-m-Y',strtotime($registro->fecha_gasto_fin));?>  </span>
+   <?php if($dividido == 0): ?>
+   <?php if(isset($periodo_inicio) && !empty($periodo_fin)): ?>
+   <span > DEL <?= date('d-m-Y', strtotime($periodo_inicio));?> AL <?= date('d-m-Y',strtotime($periodo_fin));?>  </span>
    <?php endif; ?>
+   <?php endif; ?>
+<?php if($dividido == 1): ?>
+ DEL <?= date('d-m-Y', strtotime($fecha_gasto_inicio));?> AL <?= date('d-m-Y',strtotime($fecha_gasto_fin));?>  </span>
+<?php endif; ?>
 
 </div>
 
@@ -292,10 +298,10 @@
 
 <div id="importe_respuesta">
 <?php if($dividido == 0): ?>
-<?= number_format($suma, 2).' ('.$suma_texto.')' ?>
+$<?=  number_format($suma, 2).' ('.$suma_texto.')' ?>
 <?php endif; ?>
 <?php if($dividido == 1): ?>
-<?= $total2.' ('.$monto2.')' ?>
+$<?= number_format($total2,2).' ('.$monto2.')' ?>
 <?php endif; ?>
 
 </div>

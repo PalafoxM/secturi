@@ -224,81 +224,59 @@ class Agregar extends BaseController
     public function procesarPediodo(array $periodo, $id_registro_pt = null)
     {
         $session = \Config\Services::session();
-        $this->globals = new Mglobal();
+        // Asegúrate de que $this->globals está inicializado
+        // $this->globals = new Mglobal(); 
         $responses = [];
 
-        var_dump( $periodo );
-        die();
-        foreach ($periodo as $p) {
-            // DETECTAR TIPO DE ESTRUCTURA
-            //var_dump( $p['encabezado'] );
-            //die();
-            
-            $esAnidado = (is_array($p['importe']));
-            $esNormal = (is_string($p['importe']));
-        
-            if ($esAnidado) {
-             
-              
-                foreach ($periodo as $p) {
-                    // Convertir todo a arrays si no lo son
-                    $importes = (array)($p['importe'] ?? []);
-                    
-                    // Para otros campos, si no son arrays, convertirlos a arrays con un solo elemento
-                    $partidas = is_array($p['partida'] ?? null) ? $p['partida'] : [$p['partida'] ?? ''];
-                    $proyectos = is_array($p['proyecto'] ?? null) ? $p['proyecto'] : [$p['proyecto'] ?? ''];
-                    $encabezados = is_array($p['encabezado'] ?? null) ? $p['encabezado'] : [$p['encabezado'] ?? ''];
-                    $inicios = is_array($p['periodo_inicio'] ?? null) ? $p['periodo_inicio'] : [$p['periodo_inicio'] ?? ''];
-                    $fines = is_array($p['periodo_fin'] ?? null) ? $p['periodo_fin'] : [$p['periodo_fin'] ?? ''];
+        // Paso 1: Obtener el array real de datos
+        // La estructura mostrada siempre contiene los datos en el índice 0 del array principal.
+        if (empty($periodo) || !isset($periodo[0])) {
+            return $responses; // No hay datos que procesar
+        }
 
-                    // Iterar por el array más largo (normalmente importe)
-                    $count = count($importes);
-                    
-                    for ($i = 0; $i < $count; $i++) {
-                        $this->procesarRegistroIndividual(
-                            $id_registro_pt,
-                            $encabezados[$i] ?? $encabezados[0] ?? '',  // Usa el elemento i o el primero
-                            $importes[$i] ?? '',
-                            $partidas[$i] ?? $partidas[0] ?? '',
-                            $proyectos[$i] ?? $proyectos[0] ?? '',
-                            $inicios[$i] ?? $inicios[0] ?? '',
-                            $fines[$i] ?? $fines[0] ?? '',
-                            $responses
-                        );
-                    }
-                }
-               
-            } else if ($esNormal) {
-                // Estructura normal: un solo registro
-                $this->procesarRegistroIndividual(
-                    $id_registro_pt,
-                    $p['encabezado'],
-                    $p['importe'],
-                    $p['partida'],
-                    $p['proyecto'],
-                    $p['periodo_inicio'],
-                    $p['periodo_fin'],
-                    $responses
-                );
-            }
+        $datos_por_campo = $periodo[0]; 
+
+        // Paso 2: Determinar cuántos registros hay que procesar
+        // El número de registros es la longitud de cualquiera de los arrays de campos, por ejemplo, 'partida'.
+        if (!isset($datos_por_campo['partida']) || !is_array($datos_por_campo['partida'])) {
+            // Manejar error o estructura inesperada
+            return $responses; 
         }
         
+        // Contamos el número de registros (filas de datos) a partir de la longitud del array 'partida'
+        $num_registros = count($datos_por_campo['partida']);
+
+        // Paso 3: Iterar sobre cada registro (0, 1, 2, ...)
+        for ($i = 0; $i < $num_registros; $i++) {
+            
+            // Llamar a la función de procesamiento individual con los datos para el índice $i
+            $this->procesarRegistroIndividual(
+                $id_registro_pt,
+                $datos_por_campo['encabezado'][$i] ?? null, // Usar ?? null por si acaso, aunque no debería ser necesario
+                $datos_por_campo['partida'][$i] ?? null,
+                $datos_por_campo['proyecto'][$i] ?? null,
+                $datos_por_campo['periodo_inicio'][$i] ?? null,
+                $datos_por_campo['periodo_fin'][$i] ?? null,
+                $responses
+            );
+        }
+
         return $responses;
     }
 
-    private function procesarRegistroIndividual($id_registro_pt, $encabezado, $importe, $partida, $proyecto,$periodo_inicio, $periodo_fin, &$responses)
+    private function procesarRegistroIndividual($id_registro_pt, $encabezado, $partida, $proyecto,$periodo_inicio, $periodo_fin, &$responses)
     {
         $session = \Config\Services::session();
         
-        if (!empty(trim($encabezado)) && !empty(trim($importe))) {
+        if (!empty(trim($encabezado)) && !empty(trim($encabezado))) {
 
             // Limpiar importe
-            $importe_limpio = floatval(str_replace(['$', ',', ' '], '', $importe));
+          //  $importe_limpio = floatval(str_replace(['$', ',', ' '], '', $importe));
 
             $dataInsert = [
                 'id_registro_pt' => (int) $id_registro_pt,
                 'encabezado' => trim($encabezado),
-                'importe' => $importe_limpio,
+               // 'importe' => $importe_limpio,
                 'id_partida' => (int) $partida,
                 'id_proyecto' => (int) $proyecto,
                 'periodo_inicio' =>  $periodo_inicio,
@@ -1820,8 +1798,6 @@ class Agregar extends BaseController
         $data = $this->request->getPost();
         $archivos = $this->request->getFiles();
        
-      
-    
         if ($data['secretario'] == 0) {
             $response->error = true;
             $response->respuesta = "Es requerido el Secretario o Director";
@@ -1902,24 +1878,6 @@ class Agregar extends BaseController
         }
 
         $no_consecutivo = $this->registrarFolio($data['no_consecutivo'], $data['id_reponsable_solicitud']);
-       
-        /*       $consecutivo = $this->globals->getTabla(['tabla' => 'consecutivo', 'where' => ['visible' => 1, 'id_responsable' => $data['id_reponsable_solicitud'] ], 'orderBy' => 'id_consecutivo DESC']);          
-              $conse =  (isset($consecutivo->data) && !empty($consecutivo->data))?$consecutivo->data[0]->no_consecutivo:'';
-
-                if (empty($conse)) {
-                    $jefe = $this->globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $data['id_reponsable_solicitud']]]);
-                    $idJefe = $jefe->data[0]->id_jefe_inmediato;
-                    $consecutivo = $this->globals->getTabla(['tabla' => 'consecutivo', 'where' => ['visible' => 1, 'id_responsable' => $idJefe], 'orderBy' => 'id_consecutivo DESC']);          
-                    $conse =  (isset($consecutivo->data) && !empty($consecutivo->data))?$consecutivo->data[0]->no_consecutivo:'';
-                } 
-
-
-              $no_consecutivo = $conse + 1;
-             $res =  $this->globals->saveTabla(['no_consecutivo' => $no_consecutivo, 'id_responsable' => $data['id_reponsable_solicitud'] ], [ 'tabla' => 'consecutivo', 'editar' => false ], ['id_user' => $session->get('id_usuario'), "script" => "estatus.Reserva"]);
-
-            */
-        //die( var_dump($data['id_reponsable_solicitud']  ) );
-
       
         $dataInsert = [
             'id_reserva'               => (int) $data['id_reserva'],
@@ -1930,12 +1888,9 @@ class Agregar extends BaseController
             'fecha_tramite'            => $data['fecha_tramite'],
             'id_reponsable_solicitud'  => (int) $data['id_reponsable_solicitud'],
             'director_general'         => 1,
-           // 'total_importe'            => $data['total_importe'],
             'secretario'               => $data['secretario'],
             'id_subsecretario'         => $data['id_subsecretario'],
             'cuenta_bancaria'          => $data['cuenta_bancaria'],
-           // 'fecha_gasto_inicio'       => $data['fecha_gasto_inicio'],
-           // 'fecha_gasto_fin'          => $data['fecha_gasto_fin'],
             'formato_establecido'      => ($data['formato_establecido'] == 'SI') ? 1 : 2,
             'documentacion_comprobatoria' => $data['documentacion_comprobatoria'],
             'poliza'                   => ($data['poliza'] == 'SI') ? 1 : 2,
@@ -2050,24 +2005,8 @@ class Agregar extends BaseController
 
                     // === XML ===
                     if (in_array($tipo, ['text/xml', 'application/xml'])) {
-                        $contenido = file_get_contents($archivo->getTempName());
-                        libxml_use_internal_errors(true);
-                        $xml = simplexml_load_string($contenido);
-
-                        if ($xml !== false) {
-                            $total = (string) $xml['Total'];
-                            $indice = str_replace('factura_xml_', '', $nombreCampo);
-                            
-                            // Inicializar si no existe
-                            if (!isset($periodo[$indice])) {
-                                $periodo[$indice] = [];
-                            }
-                            
-                            // Asignar importe como STRING, NO como array
-                            $periodo[$indice]['importe'] = $total;
-                            
-                            $archivosXml[$indice][] = $archivo;
-                        }
+                       $indice = str_replace('factura_xml_', '', $nombreCampo);
+                       $archivosXml[$indice][] = $archivo;
                     }
 
                     // === PDF ===
@@ -2080,7 +2019,7 @@ class Agregar extends BaseController
             
             // ==== TERCERO: Ordenar el array periodo por índices numéricos ====
             ksort($periodo);
-
+           // die( var_dump( $periodo ) );
             if($data['editar'] == 1){
                 $datosXML = $this->procesarXMLeditar($archivosXml, $id_registro_pt);
                 $datosPDF = $this->procesarPDFeditar($archivosPdf, $id_registro_pt);
@@ -2091,6 +2030,7 @@ class Agregar extends BaseController
                     $datosPDF = $this->procesarPDF($archivosPdf[$key], $id_registro_pt);
                 }
                 $datosP = $this->procesarPediodo($periodo, $id_registro_pt);
+               
             }
 
             if (!$datosXML) {
@@ -2402,11 +2342,6 @@ class Agregar extends BaseController
             return $this->respond($response);
         }
 
-        if (isset($data['total_importe']) && empty($data['total_importe'])) {
-            $response->error = true;
-            $response->respuesta = "Es requerido el total_importe";
-            return $this->respond($response);
-        }
 
         $registro_pt = $this->globals->getTabla([
             'tabla' => 'registro_pt',
@@ -2432,9 +2367,9 @@ class Agregar extends BaseController
             'secretario' => $datos->secretario,
             'id_subsecretario' => $datos->id_subsecretario,
             'cuenta_bancaria' => $data['cuenta_bancaria'],
-            'total_importe' => $data['total_importe'],
-            'fecha_gasto_inicio' => date('Y-m-d', strtotime($data['fecha_gasto_inicio'])),
-            'fecha_gasto_fin' => date('Y-m-d', strtotime($data['fecha_gasto_fin'])),
+           // 'total_importe' => $data['total_importe'],
+           // 'fecha_gasto_inicio' => date('Y-m-d', strtotime($data['fecha_gasto_inicio'])),
+            //'fecha_gasto_fin' => date('Y-m-d', strtotime($data['fecha_gasto_fin'])),
             'formato_establecido' => $datos->formato_establecido,
             'documentacion_comprobatoria' => $datos->documentacion_comprobatoria,
             'poliza' => $datos->poliza,
@@ -2465,24 +2400,49 @@ class Agregar extends BaseController
             $periodo = [];
             $response->idRegistro = $response->idRegistro;
 
-            foreach ($data as $key => $p) {
+      
+             foreach ($data as $key => $p) {
                 if (strpos($key, 'encabezado') === 0) {
-                    $index = str_replace('encabezado', '', $key); // ej. encabezado1 → 1
+                    $index = str_replace('encabezado', '', $key);
+                    $index = $index === '' ? 0 : $index;
+                    if (!isset($periodo[$index])) {
+                        $periodo[$index] = [];
+                    }
                     $periodo[$index]['encabezado'] = $p;
                 }
-                if (strpos($key, 'importe') === 0) {
-                    $index = str_replace('importe', '', $key); // ej. periodo1 → 1
-                    $periodo[$index]['importe'] = $p;
-                }
+
                 if (strpos($key, 'partida') === 0) {
-                    $index = str_replace('partida', '', $key); // ej. periodo1 → 1
+                    $index = str_replace('partida', '', $key);
+                    $index = $index === '' ? 0 : $index;
+                    if (!isset($periodo[$index])) {
+                        $periodo[$index] = [];
+                    }
                     $periodo[$index]['partida'] = $p;
                 }
                 if (strpos($key, 'proyecto') === 0) {
-                    $index = str_replace('proyecto', '', $key); // ej. periodo1 → 1
+                    $index = str_replace('proyecto', '', $key);
+                    $index = $index === '' ? 0 : $index;
+                    if (!isset($periodo[$index])) {
+                        $periodo[$index] = [];
+                    }
                     $periodo[$index]['proyecto'] = $p;
                 }
-
+                if (strpos($key, 'fecha_gasto_inicio') === 0) {
+                    $index = str_replace('fecha_gasto_inicio', '', $key);
+                    $index = $index === '' ? 0 : $index;
+                    if (!isset($periodo[$index])) {
+                        $periodo[$index] = [];
+                    }
+                    $periodo[$index]['periodo_inicio'] = $p;
+                }
+                if (strpos($key, 'fecha_gasto_fin') === 0) {
+                    $index = str_replace('fecha_gasto_fin', '', $key);
+                    $index = $index === '' ? 0 : $index;
+                    if (!isset($periodo[$index])) {
+                        $periodo[$index] = [];
+                    }
+                    $periodo[$index]['periodo_fin'] = $p;
+                }
             }
 
             // Recorremos todas las claves de los archivos enviados

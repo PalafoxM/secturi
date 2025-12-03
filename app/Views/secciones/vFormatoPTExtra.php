@@ -41,8 +41,8 @@
         </div>
         <?php $i = 28;  ?>
  
-        <?php if( isset($presupuesto) && !empty($presupuesto) ): ?>
-        <?php foreach($presupuesto as $r): ?>
+        <?php if( isset($periodo_factura) && !empty($periodo_factura) ): ?>
+        <?php foreach($periodo_factura as $r): ?>
          <div  style="position:absolute; text-align:center; top:<?=$i?>%; left:23.5%; width:10%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "><?= $r->proyecto ?></span>
         </div>
@@ -52,8 +52,8 @@
         <?php endif; ?>
 
        <?php $i = 28;  ?>
-        <?php if( isset($presupuesto) && !empty($presupuesto) ): ?>
-        <?php foreach($presupuesto as $r): ?>
+        <?php if( isset($periodo_factura) && !empty($periodo_factura) ): ?>
+        <?php foreach($periodo_factura as $r): ?>
          <div  style="position:absolute; text-align:center; top:<?=$i?>%; left:34%; width:13%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "><?= $r->partida ?></span>
         </div>
@@ -61,12 +61,12 @@
         <?php endforeach; ?>
          <?php endif; ?>
          <?php $i = 28;  ?>
-         <?php if( isset($periodo_factura) && !empty($periodo_factura) ): ?>
-        <?php foreach($periodo_factura as $r): ?>
+         <?php if( isset($uuid) && !empty($uuid) ): ?>
+        <?php foreach($uuid as $r): ?>
               <div style="position:absolute; text-align:right; top:<?=$i?>%; left:47.3%; width:6.7%; background-color:white; font-size:8px; height:12px; line-height:12px;">
                     <span class="proxima">
                         <?php 
-                        $importe = $r->importe;
+                        $importe = $r->total;
                         if (is_numeric($importe)) {
                             echo '$' . number_format(floatval($importe), 2);
                         } else {

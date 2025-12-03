@@ -48,10 +48,13 @@
     
     // Calcular suma total de importes
     $suma_importes = 0;
+    $i=0;
     foreach($pagos as $p) {
-        $suma_importes += limpiarImporte($p->importe);
+        //var_dump($p['total']);
+        $suma_importes += limpiarImporte($p['total']);
+        $i++;
     }
-    
+    //die();
     // Calcular lo que falta
     $total_limpiado = limpiarImporte($total_importe);
     $falta = $total_limpiado - $suma_importes;
@@ -88,22 +91,22 @@
     <table id="datatableCategorias" class="table" data-toggle="table">
         <thead class="thead-light">
             <tr>
-                <th class="text-center">NO. RESERVA</th>
+                <th class="text-center">FOLIO</th>
                 <th class="text-center">IMPORTE</th>
                 <th class="text-center">FECHA</th>
-                <th class="text-center">NO. PROVEEDOR</th>
+                <th class="text-center">RFC</th>
             </tr>
         </thead>
 
         <tbody>
             <?php foreach($pagos as $p): 
-                $importe_limpio = limpiarImporte($p->importe);
+                $importe_limpio = limpiarImporte($p['total']);
             ?>
             <tr>
-                <td class="text-center"><?= $p->no_reserva?></td>
+                <td class="text-center"><?= $p['folio'] ?></td>
                 <td class="text-center">$<?= number_format($importe_limpio, 2)?></td>
-                <td class="text-center"><?= date('d-m-Y', strtotime($p->fec_reg)); ?></td>
-                <td class="text-center"><?= $p->no_proveedor?></td>
+                <td class="text-center"><?= date('d-m-Y', strtotime($p['fecha'])); ?></td>
+                <td class="text-center"><?= $p['emisor_rfc']?></td>
             </tr>
             <?php endforeach; ?>
         </tbody>
