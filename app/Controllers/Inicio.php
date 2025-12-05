@@ -432,6 +432,27 @@ class Inicio extends BaseController {
         // Renderizar la vista
         $this->_renderView($data);
     }
+    public function posada()
+    {
+        $session = \Config\Services::session();
+        $principal = new Mglobal;
+    
+        // Mapeo de casos para obtener usuarios según el perfil
+        $usuarioQuery = [
+            'tabla' => 'posada',
+            'where' => ['visible' => 1]
+        ];
+        // Obtener usuarios
+        $usuario = $principal->getTabla($usuarioQuery);
+  
+        // Asignar datos adicionales
+        $data['usuario'] = isset($usuario->data) && !empty($usuario->data) ? $usuario->data : [];
+        $data['scripts'] = ['principal', 'inicio'];
+        $data['contentView'] = 'secciones/vPosada';
+    
+        // Renderizar la vista
+        $this->_renderView($data);
+    }
     public function listaPerfil()
     {
         $session = \Config\Services::session();
@@ -655,7 +676,7 @@ class Inicio extends BaseController {
         $data['edita']                = $btn;
         $data['partida4000']          = $partida4000;
         $data['contentView']          = 'secciones/vProveedor';
-        //die( var_dump( $data)  );
+       // die( var_dump( $data['importe'])  );
         $this->_renderView($data); 
     }
     public function EditarFIC($id_registro_pt = null)

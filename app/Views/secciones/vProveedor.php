@@ -334,13 +334,13 @@
                                                         <div class="col-md-2 mb-3">
                                                             <label for="fecha_gasto_inicio">Fec. Inicio <span style="color:red;">*</span></label>
                                                             <input type="date" class="form-control" id="fecha_gasto_inicio" name="fecha_gasto_inicio[]" 
-                                                            value="<?= isset($registro_pt->fecha_gasto_inicio) ? date('Y-m-d', strtotime($registro_pt->fecha_gasto_inicio)) : date('Y-m-d') ?>" 
+                                                            value="<?= isset($importe[$i]->periodo_inicio) ? date('Y-m-d', strtotime($importe[$i]->periodo_inicio)) : date('Y-m-d') ?>" 
                                                             required>
                                                         </div><!--end col-->
                                                         <div class="col-md-2 mb-3">
                                                             <label for="fecha_gasto_fin">Fec. Fin <span style="color:red;">*</span></label>
                                                             <input type="date" class="form-control" id="fecha_gasto_fin" name="fecha_gasto_fin[]" 
-                                                            value="<?= isset($registro_pt->fecha_gasto_fin) ? date('Y-m-d', strtotime($registro_pt->fecha_gasto_fin)) : date('Y-m-d') ?>" 
+                                                            value="<?= isset($importe[$i]->periodo_fin) ? date('Y-m-d', strtotime($importe[$i]->periodo_fin)) : date('Y-m-d') ?>" 
                                                             required>
                                                         </div><!--end col-->
                                                     </div>

@@ -159,20 +159,23 @@ class Agregar extends BaseController
         return $response;
     }
 
-    public function periodoIndividual($encabezado, $importe, $idPeriodoFactura)
+    public function periodoIndividual($encabezado,  $partida, $proyecto, $editarPe, $periodo_inicio, $periodo_fin)
     {
         $session = \Config\Services::session();
-
-
+        $this->globals = new Mglobal();
+      
         $dataConfig = [
             "tabla" => "periodo_factura",
             "editar" => true,
-            "idEditar" => ['id_periodo_factura' => $idPeriodoFactura]
+            "idEditar" => ['id_periodo_factura' => $editarPe]
         ];
 
         $dataInsert = [
             'encabezado' => $encabezado,  // ahora sí existe
-            'importe' => $importe,
+            'id_partida' => $partida,
+            'id_proyecto' => $proyecto,
+            'periodo_inicio' => date('Y-m-d', strtotime($periodo_inicio)),
+            'periodo_fin' => date('Y-m-d', strtotime($periodo_fin))
         ];
 
         $dataBitacora = [
@@ -181,45 +184,54 @@ class Agregar extends BaseController
         ];
 
         $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
-
+       // die( var_dump(  $response ) );
+        return $response;
     }
     public function procesarPediodoEditar(array $periodo, $id_registro_pt = null)
     {
-
+        $response = new \stdClass();
         $this->globals = new Mglobal();
-
-        foreach ($periodo as $p) {
+   
+        foreach ($periodo as $pe) {
             // DETECTAR TIPO DE ESTRUCTURA
-            $esAnidado = (is_array($p['editarPe']));
-            $esNormal = (is_string($p['editarPe']));
-
+            $esAnidado = (is_array($pe['editarPe']));
+            $esNormal = (is_string($pe['editarPe']));
+          
+        
             if ($esAnidado) {
                 // Estructura anidada: múltiples registros
-                foreach ($p['editarPe'] as $index => $editarPe) {
-
-                    if (isset($p['importe'][$index])) {
-                        $this->periodoIndividual(
+                foreach ($periodo as $index => $p) {
+               
+                    if (isset($p['editarPe'][$index])) {
+                        $response =  $this->periodoIndividual(
                             $p['encabezado'][$index],
-                            $p['importe'][$index],
-                            $p['editarPe'][$index]
-
+                            $p['partida'][$index],
+                            $p['proyecto'][$index],
+                           // $p['importe'][$index],
+                            $p['editarPe'][$index],
+                            $p['periodo_inicio'][$index],
+                            $p['periodo_fin'][$index]
                         );
                     }
                 }
+             
             } else if ($esNormal) {
                 // Estructura normal: un solo registro
-                $this->periodoIndividual(
-                    $p['encabezado'],
-                    $p['importe'],
-                    $p['partida'],
-                    $p['proyecto'],
-
+               $response =  $this->periodoIndividual(
+                    $pe['encabezado'],
+                   // $p['importe'],
+                    $pe['partida'],
+                    $pe['proyecto'],
+                    $pe['editarPe'],
+                    $pe['periodo_inicio'],
+                    $pe['periodo_fin']
                 );
             }
         }
 
-
-        //return false;
+        var_dump( $response );
+        die();
+        return $response;
     }
     public function procesarPediodo(array $periodo, $id_registro_pt = null)
     {
@@ -301,34 +313,26 @@ class Agregar extends BaseController
         // Si no cumple la condición, simplemente no hace nada (no inserta)
     }
  
-   public function procesarPDFeditar(array $archivos, $id_registro_pt = null)
+   public function procesarPDFeditar(array $archivos, array $idPdf ,  $id_registro_pt = null)
     {
         $session = \Config\Services::session();
         $response = new \stdClass();
         $this->globals = new Mglobal();
 
         // Extraer los IDs de edición (vienen en el primer elemento del array)
-        $idsEdicion = isset($archivos['']['editarPDF']) ? $archivos['']['editarPDF'] : [];
+     
         
-        // Filtrar solo los archivos UploadedFile (eliminar el array de IDs)
-        $archivosSubidos = array_filter($archivos, function($item) {
-            return $item instanceof \CodeIgniter\HTTP\Files\UploadedFile;
-        });
+      
 
         $archivosProcesados = 0;
 
-        foreach ($archivosSubidos as $index => $archivo) {
+        foreach ($archivos as $index => $archivo) {
             // Validar archivo
+         
             if (!$archivo->isValid() || $archivo->getError() == 4 || $archivo->getSize() == 0) {
                 continue;
             }
 
-            // Obtener el ID correspondiente para este archivo
-            $idEditar = isset($idsEdicion[$index]) ? $idsEdicion[$index] : null;
-            
-            if (!$idEditar) {
-                continue; // No hay ID correspondiente, saltar
-            }
 
             $timestamp = date('Ymd_His');
             $extension = $archivo->getClientExtension();
@@ -348,10 +352,11 @@ class Agregar extends BaseController
             $ruta_absoluta = base_url('assets/pdf/' . $file);
             $ruta_relativa = 'assets/pdf/' . $file;
             
-            $dataConfig = [
+            foreach( $idPdf as $key ){
+                $dataConfig = [
                 "tabla" => "factura_pdf",
                 "editar" => true,
-                "idEditar" => ['id_factura_pdf' => $idEditar]
+                "idEditar" => ['id_factura_pdf' => $key]
             ];
             $dataInsert = [
                 'ruta_relativa' => $ruta_relativa,
@@ -364,6 +369,9 @@ class Agregar extends BaseController
             ];
             
             $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+
+            }
+            
             $archivosProcesados++;
         }
 
@@ -427,22 +435,17 @@ class Agregar extends BaseController
     
         return $response;
     }
-   public function procesarXMLeditar(array $archivos, $id_registro_pt = null)
+   public function procesarXMLeditar(array $archivos, array $idXml, $id_registro_pt = null)
     {
         $session = \Config\Services::session();
         $response = new \stdClass();
         $this->globals = new Mglobal();
         
         $responses = []; // Inicializar array de respuestas
-        
-        // var_dump($archivos);
-        // die();
-
+   
         foreach ($archivos as $key => $p) {
-            // Si es el archivo subido (índice 0)
-            if ($key === 0 && $p instanceof \CodeIgniter\HTTP\Files\UploadedFile) {
                 $archivo = $p;
-                
+            
                 // Verificar que sea un XML válido
                 if ($archivo->getError() === 0 && 
                     in_array($archivo->getClientMimeType(), ['text/xml', 'application/xml'])) {
@@ -505,17 +508,13 @@ class Agregar extends BaseController
                         }
                     }
 
-                    // Obtener el ID para editar del array de archivos
-                    $id_editar = null;
-                    if (isset($archivos['']['editarXML'][0])) {
-                        $id_editar = $archivos['']['editarXML'][0];
-                    }
+                   if (isset($idXml[$key])) {
+                        $idFacturaEditar = $idXml[$key]; // <-- ESTE es el ID correcto para este archivo
 
-                    if ($id_editar) {
                         $dataConfig = [
                             "tabla" => "factura",
                             "editar" => true,
-                            "idEditar" => ['id_factura' => $id_editar]
+                            "idEditar" => ['id_factura' => $idFacturaEditar]
                         ];
                         
                         $dataInsert = [
@@ -535,21 +534,25 @@ class Agregar extends BaseController
                         ];
 
                         $dataBitacora = [
-                            'id_user' => $session->get('id_usuario'), 
+                            'id_user' => $session->get('id_usuario'),
                             'script' => 'Agregar.php/editarFacturaFIC'
                         ];
                         
                         $result = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+
                         $responses[] = $result;
+
                     } else {
-                        $responses[] = ['error' => 'No se encontró ID para editar'];
+                        $responses[] = ['error' => 'No existe ID para este archivo'];
                     }
+
                 } else {
                     $responses[] = ['error' => 'Archivo no válido o error en la subida'];
                 }
-            }
+            
+            
         }
-
+    
         return $responses;
     }
    
@@ -1927,9 +1930,13 @@ class Agregar extends BaseController
 
        if (!$response->error) {
             $id_registro_pt = $response->idRegistro;
-            $archivosXml = [];
+            $idPdf = [];
+            $idXml = [];
             $archivosPdf = [];
+            $archivosXml = [];
             $periodo = [];
+            $datosXML = "";
+            $datosPDF = "";
             $response->idRegistro = $response->idRegistro;
             $this->cambiarStatusPT($data['id_reserva']);
             
@@ -1986,11 +1993,13 @@ class Agregar extends BaseController
                 }
                 if (strpos($key, 'editarPDF') === 0) {
                     $index = str_replace('editarPDF', '', $key);
-                    $archivosPdf[$index] = $p; // Guardar referencia para edición
+                    $index = $index === '' ? 0 : $index;
+                    $idPdf[$index] = $p; // Guardar referencia para edición
                 }
                 if (strpos($key, 'editarXML') === 0) {
                     $index = str_replace('editarXML', '', $key);
-                    $archivosXml[$index] = $p; // Guardar referencia para edición
+                    $index = $index === '' ? 0 : $index;
+                    $idXml[$index] = $p; // Guardar referencia para edición
                 }
             }
             
@@ -2006,12 +2015,14 @@ class Agregar extends BaseController
                     // === XML ===
                     if (in_array($tipo, ['text/xml', 'application/xml'])) {
                        $indice = str_replace('factura_xml_', '', $nombreCampo);
+                       $indice = $indice === '' ? 0 : $indice;
                        $archivosXml[$indice][] = $archivo;
                     }
 
                     // === PDF ===
                     if (in_array($tipo, ['application/pdf'])) {
                         $indice = str_replace('factura_pdf_', '', $nombreCampo);
+                        $indice = $indice === '' ? 0 : $indice;
                         $archivosPdf[$indice][] = $archivo;
                     }
                 }
@@ -2019,11 +2030,69 @@ class Agregar extends BaseController
             
             // ==== TERCERO: Ordenar el array periodo por índices numéricos ====
             ksort($periodo);
-           // die( var_dump( $periodo ) );
+           
             if($data['editar'] == 1){
-                $datosXML = $this->procesarXMLeditar($archivosXml, $id_registro_pt);
-                $datosPDF = $this->procesarPDFeditar($archivosPdf, $id_registro_pt);
-                $datosP = $this->procesarPediodoEditar($periodo, $id_registro_pt);
+                 //validamos a que funcion va entrar
+                 
+                $dataDB = array('tabla' => 'presupuesto', 'where' => ['visible' => 1, 'id_reserva' => $data['id_reserva']]);
+                $dobles = $this->globals->getTabla($dataDB);
+                $valor = count($dobles->data);
+              
+                if( $valor == 1){
+                   if(!empty($archivosXml)){
+                       foreach($archivosXml as $key => $value){
+                                $datosXML = $this->procesarXMLeditar($archivosXml[$key],  $idXml[$key], $id_registro_pt,);
+                                $datosPDF = $this->procesarPDFeditar($archivosPdf[$key],  $idPdf[$key], $id_registro_pt);
+                        }
+
+                   }
+                
+                }else{
+                   if(!empty($archivosXml)){
+                         foreach ($archivosXml as $indexGrupo => $archivosDelGrupo) {
+                    
+                            foreach ($archivosDelGrupo as $posArchivo => $archivo) {
+                    
+                                // El ID que corresponde al archivo actual:
+                                $idFactura = $idXml[$posArchivo][$indexGrupo] ?? null;
+                            
+                                if (!$idFactura) {
+                                    continue; // no hay ID para este archivo
+                                }
+
+                                $datosXML = $this->procesarXMLeditar(
+                                    [$archivo],        // archivo individual
+                                    [$idFactura],      // ID individual
+                                    $id_registro_pt
+                                );
+                            
+                            }
+                        }
+                    }
+                }
+                if(!empty($archivosPdf)){
+                  foreach ($archivosPdf as $indexGrupo => $archivosDelGrupo) {
+                 
+                        foreach ($archivosDelGrupo as $posArchivo => $archivo) {
+                   
+                            // El ID que corresponde al archivo actual:
+                            $idFactura = $idXml[$posArchivo][$indexGrupo] ?? null;
+                         
+                            if (!$idFactura) {
+                                continue; // no hay ID para este archivo
+                            }
+
+                            $datosPDF = $this->procesarPDFeditar(
+                                [$archivo],        // archivo individual
+                                [$idFactura],      // ID individual
+                                $id_registro_pt
+                            );
+                           
+                        }
+                    }
+                }
+
+                 $datosP = $this->procesarPediodoEditar($periodo, $id_registro_pt);
             } else {
                 foreach($archivosXml as $key => $value){
                     $datosXML = $this->procesarXML($archivosXml[$key], $id_registro_pt);
@@ -2032,7 +2101,7 @@ class Agregar extends BaseController
                 $datosP = $this->procesarPediodo($periodo, $id_registro_pt);
                
             }
-
+       
             if (!$datosXML) {
                 $response->errorXML = true;
                 $response->respuestaXML = "XML inválido o no se encontró.";
@@ -2042,6 +2111,8 @@ class Agregar extends BaseController
                 $response->respuestaPDF = "PDF inválido o no se encontró.";
             }
         }
+
+           //die( var_dump( $response ) );
         return $this->respond($response);
     }
     public function guardaVe()
