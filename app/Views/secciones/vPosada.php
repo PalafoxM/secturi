@@ -29,6 +29,9 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-body">
+                             <button onclick="ini.inicio.correoPosada()"
+                                class="btn btn-gradient-primary px-4 float-right mt-0 mb-3"><i
+                                    class="mdi mdi-plus-circle-outline mr-2"></i>Enviar Correo Masivo</button>
                        
                             <h4 class="header-title mt-0">Lista de Posada</h4>
                             <div class="table-responsive dash-social">

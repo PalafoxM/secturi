@@ -687,6 +687,43 @@ ini.inicio = (function () {
                         }
                     });
         },
+        correoPosada : function (element) {
+            const row = $(element).closest('tr');
+            const id = row.data('id');
+            Swal.fire({
+                title: "¿Está seguro?",
+                text: "¿Desea Enviar Correo Masivo?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                cancelButtonText: "Cancelar",
+                confirmButtonText: "Eliminar",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                   $.ajax({
+                        url: base_url + 'index.php/Principal/eliminarBanco',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            id_proveedor_banco: id,
+                        },
+                        success: function(response) {
+                            if (!response.error) {
+                                Swal.fire('Éxito', 'Los datos se actualizaron correctamente', 'success');
+                                window.location.reload(); 
+                            } else {
+                                Swal.fire('Error', 'No se pudo actualizar', 'error');
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Error', 'Error de conexión con el servidor', 'error');
+                        }
+                    }); 
+                            
+                        }
+                    });
+        },
         editarReservaGo: function(id_reserva_go, id) {
      
             $.ajax({

@@ -503,52 +503,107 @@ class Principal extends BaseController
         $mpdf->Output('test.pdf', 'I');
         exit();
     }
-    public function im_qr($id)
+   public function im_qr($id)
     {
-        // Ruta del QR
-        $session = \Config\Services::session();
-        $response = new \stdClass();
-        // $response->error = true;
+        $email = \Config\Services::email();
         $this->globals = new Mglobal();
-        $data = array();
-     
-        $usuario = $this->globals->getTabla(["tabla" => "posada", "where" => ["id" => $id ]])->data;
+
+        // =============================
+        // 1️⃣ OBTENER USUARIO
+        // =============================
+        $usuario = $this->globals
+            ->getTabla(["tabla" => "posada", "where" => ["id" => $id]])
+            ->data;
 
         if (empty($usuario)) {
-            echo "<center>EL USUARIO NO EXISTE, FAVOR DE LLAMAR AL ADMINISTRADOR DE SUSI</center>";
-            die();
+            echo "USUARIO NO EXISTE";
+            return;
         }
 
-        $data['nombre'] = $usuario[0]->nombre;
-        $data['correo'] = $usuario[0]->correo;
-        $data['dataImagen'] = base_url().'assets/qrposadas/'.$usuario[0]->valor.'.png';
-      
-     
+        // =============================
+        // 2️⃣ DATOS PARA EL PDF
+        // =============================
+        $data = [
+            'nombre'     => $usuario[0]->nombre,
+            'correo'     => $usuario[0]->correo,
+            'dataImagen' => base_url('assets/qrposadas/' . $usuario[0]->valor . '.png')
+        ];
+
         $html = view('secciones/vFormatoPosada.php', $data);
-        // $html = view($formato, $data);
-        // Crear instancia de mPDF
+
+        // =============================
+        // 3️⃣ GENERAR PDF
+        // =============================
         $mpdf = new \Mpdf\Mpdf([
             'margin_top' => 0,
             'margin_left' => 1,
             'margin_right' => 1,
             'format' => [213, 268],
-            'mirrorMargins' => false,
         ]);
 
-       // die( var_dump(  $data['dataImagen'] ) );
-         $doc = 'assets/pdf/plantillas/posada.pdf';
-        $pagecount = $mpdf->SetSourceFile(FCPATH . $doc);
+        $plantilla = FCPATH . 'assets/pdf/plantillas/posada.pdf';
+        $mpdf->SetSourceFile($plantilla);
+        $tplId = $mpdf->ImportPage(1);
+        $mpdf->AddPage();
+        $mpdf->UseTemplate($tplId);
+        $mpdf->WriteHTML($html);
 
+        // ✅ Guardar PDF temporal
+        $pdfPath = WRITEPATH . 'uploads/Invitacion_Posada_' . $id . '.pdf';
+        $mpdf->Output($pdfPath, 'F');
 
-            $mpdf->AddPage();
-            $tplId = $mpdf->ImportPage(1);
-            $mpdf->UseTemplate($tplId);
-           $mpdf->WriteHTML($html);
-           $mpdf->Output('Formato_pt.pdf', 'I');
-        exit();
-          
-          
+        // =============================
+        // 4️⃣ CONFIGURAR CORREO
+        // =============================
+        $email->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
+        $email->setTo($usuario[0]->correo);
+        $email->setSubject('Invitación a Reunión de Cierre 2025');
+        $email->setMailType('html');
+
+        $email->setMessage("
+            <p>Buen día, <strong>{$usuario[0]->nombre}</strong>:</p>
+
+            <p>
+                Por este medio se te envía la <strong>invitación a nuestra reunión de cierre 2025</strong>.
+                El formato adjunto deberá presentarse de manera <strong>digital el día del evento</strong>,
+                ya que será requerido para su acceso.
+            </p>
+
+            <p>
+                Agradecemos confirmar tu asistencia a más tardar el
+                <strong>miércoles 10 de diciembre a las 13:00 horas</strong>,
+                a través del siguiente enlace:
+            </p>
+
+            <p>
+                <a href='https://forms.gle/ST1RqTzmkMoYAuXr8' target='_blank'>
+                    https://forms.gle/ST1RqTzmkMoYAuXr8
+                </a>
+            </p>
+
+            <p>Sin otro particular, recibe un cordial saludo.</p>
+
+            <p>
+                <strong>Atentamente</strong><br>
+                Sistema Unificado SECTURI (SUSI)
+            </p>
+        ");
+
+        // 📎 Adjuntar PDF
+        $email->attach($pdfPath);
+
+        // =============================
+        // 5️⃣ ENVIAR Y LIMPIAR
+        // =============================
+        if ($email->send()) {
+            unlink($pdfPath);
+            echo "✅ Correo enviado correctamente";
+        } else {
+            echo "❌ Error al enviar correo";
+            echo $email->printDebugger(['headers']);
+        }
     }
+
 
 
 
