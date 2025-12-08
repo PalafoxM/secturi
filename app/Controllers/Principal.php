@@ -503,7 +503,55 @@ class Principal extends BaseController
         $mpdf->Output('test.pdf', 'I');
         exit();
     }
-   public function im_qr($id)
+    public function im_qr2($id)
+    {
+        // Ruta del QR
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        // $response->error = true;
+        $this->globals = new Mglobal();
+        $data = array();
+     
+        $usuario = $this->globals->getTabla(["tabla" => "posada", "where" => ["id" => $id ]])->data;
+
+        if (empty($usuario)) {
+            echo "<center>EL USUARIO NO EXISTE, FAVOR DE LLAMAR AL ADMINISTRADOR DE SUSI</center>";
+            die();
+        }
+
+        $data['nombre'] = $usuario[0]->nombre;
+        $data['correo'] = $usuario[0]->correo;
+        $data['dataImagen'] = base_url().'assets/qrposadas/'.$usuario[0]->valor.'.png';
+      
+     
+        $html = view('secciones/vFormatoPosada.php', $data);
+        // $html = view($formato, $data);
+        // Crear instancia de mPDF
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 0,
+            'margin_left' => 1,
+            'margin_right' => 1,
+            'format' => [213, 268],
+            'mirrorMargins' => false,
+        ]);
+
+       // die( var_dump(  $data['dataImagen'] ) );
+         $doc = 'assets/pdf/plantillas/posada.pdf';
+        $pagecount = $mpdf->SetSourceFile(FCPATH . $doc);
+
+
+            $mpdf->AddPage();
+            $tplId = $mpdf->ImportPage(1);
+            $mpdf->UseTemplate($tplId);
+           $mpdf->WriteHTML($html);
+           $mpdf->Output('Formato_pt.pdf', 'I');
+        exit();
+          
+          
+    }
+
+
+     public function im_qr($id)
     {
         $email = \Config\Services::email();
         $this->globals = new Mglobal();
@@ -603,7 +651,6 @@ class Principal extends BaseController
             echo $email->printDebugger(['headers']);
         }
     }
-
 
 
 
