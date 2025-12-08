@@ -503,7 +503,7 @@ class Principal extends BaseController
         $mpdf->Output('test.pdf', 'I');
         exit();
     }
-    public function im_qr2($id)
+    public function im_qr($id)
     {
         // Ruta del QR
         $session = \Config\Services::session();
@@ -551,7 +551,7 @@ class Principal extends BaseController
     }
 
 
-     public function im_qr($id)
+     public function im_qr2($id)
     {
         $email = \Config\Services::email();
         $this->globals = new Mglobal();
