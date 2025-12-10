@@ -1767,7 +1767,7 @@ class Agregar extends BaseController
                     'id_area'        => $id_area,
                     'id_direccion'   => $responsableGasto,
                     'fec_reg'        => date('Y-m-d H:i:s'),
-                    'usu_reg'        => $session->id_usuario
+                    'usu_reg'        => $session->id_usuario,
                      ];
             $dataConfig = [
                 "tabla" => "folio_direccion",
@@ -1885,7 +1885,7 @@ class Agregar extends BaseController
             'id_reserva'               => (int) $data['id_reserva'],
             'id_direccion_responsable' => $data['direccion_responsable'],
             'tipo_pt'                  => $data['tipo_pt'],
-            'no_consecutivo'           => $no_consecutivo,
+            'no_consecutivo'           => $data['editar'] == 0?$no_consecutivo:$data['no_consecutivo'],
             'id_proveedor'             => $data['id_proveedor'],
             'fecha_tramite'            => $data['fecha_tramite'],
             'id_reponsable_solicitud'  => (int) $data['id_reponsable_solicitud'],

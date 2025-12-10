@@ -5340,6 +5340,7 @@ class Principal extends BaseController
         if( isset($responGasto->data) && !empty($responGasto->data)){
              $no_consecutivo = count($responGasto->data);
         }
+
         if(empty($responGasto->data)){
              $responGasto = $globals->getTabla(['tabla' => 'folio_direccion', 'where' => ['visible' => 1, 'id_direccion', $id_jefe_inmediato ]]);
              $no_consecutivo = (isset($responGasto->data) && !empty($responGasto->data))?count($responGasto->data):'';
@@ -5350,7 +5351,7 @@ class Principal extends BaseController
         }
    
 
-        
+   
         $data['no_consecutivo'] = (int)$no_consecutivo + 1;
         if (!empty($id_registro_pt)) {
             $registro_pt = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]]);

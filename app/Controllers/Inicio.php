@@ -607,9 +607,11 @@ class Inicio extends BaseController {
         $partida4000 = false;
         $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
         $id_reserva = (isset($siExisteIdReserva->data) && !empty($siExisteIdReserva->data))? $siExisteIdReserva->data[0]->id_reserva:'';
+        $id_reponsable_solicitud = (isset($siExisteIdReserva->data) && !empty($siExisteIdReserva->data))? $siExisteIdReserva->data[0]->id_reponsable_solicitud:'';
         if ($id_reserva) {
             $reserva = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['id_reserva' => $id_reserva]]);
-            $consecutivo = $globals->getTabla(['tabla' => 'consecutivo', 'where' => ['visible' => 1], 'orderBy' => 'id_consecutivo DESC']);
+            $consecutivo = $globals->getTabla(['tabla' => 'folio_direccion', 'where' => ['visible' => 1, 'id_direccion' => $id_reponsable_solicitud ]]);
+         //die( var_dump( $consecutivo ) );           
             $conse = (isset($consecutivo->data) && !empty($consecutivo->data)) ? $consecutivo->data[0]->no_consecutivo : '';
             $data['consecutivo'] = $conse + 1; 
             $presupuesto = $globals->getTabla(['tabla' => 'vw_pagos', 'where' => ['id_registro_pt' => $id_registro_pt]]);
