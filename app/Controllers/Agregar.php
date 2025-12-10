@@ -1878,8 +1878,10 @@ class Agregar extends BaseController
             $response->respuesta = "Es requerido el no_consecutivo";
             return $this->respond($response);
         }
-
-        $no_consecutivo = $this->registrarFolio($data['no_consecutivo'], $data['id_reponsable_solicitud']);
+        if($data['editar'] != 1){
+            $no_consecutivo = $this->registrarFolio($data['no_consecutivo'], $data['id_reponsable_solicitud']);
+        }
+        
       
         $dataInsert = [
             'id_reserva'               => (int) $data['id_reserva'],
