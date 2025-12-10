@@ -209,15 +209,12 @@
    RESPONSABLE / CARGO / AREA:
 </div>
  <div id="nombre">
-   <?php if(!$fic): ?>
+
    <?php if(isset($responsableGasto->nombre_completo) && !empty($responsableGasto->nombre_completo)):  ?>
    <span ><?= $responsableGasto->nombre_completo; ?> - <?= $responsableGasto->dsc_puesto ?> - <?= $responsableGasto->dsc_area ?> </span>
     <?php endif; ?>
-   <?php endif; ?>
-   <?php if($fic): ?>
-   <span >HUGO RAMÍREZ DUARTE - DIRECCIÓN DE COMPETITIVIDAD TURÍSTICA
- </span>
-    <?php endif; ?>
+
+
 </div>
 <div id="comision">
    COMISION / REUNION / EVENTO:
@@ -234,8 +231,6 @@
 <div id="partida">
    PARTIDA:
 </div>
-
-
 <div id="partida_respuesta">
    <?php
       if($dividido == 0):

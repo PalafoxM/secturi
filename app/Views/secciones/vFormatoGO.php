@@ -45,7 +45,7 @@
         <?php $i = 27.5;  ?>
             <?php foreach( $uuid as $u ): ?>
                 <div style="position:absolute; text-align:center; top:<?=$i?>%; left:11.8%; width:11%; background-color:white; font-size: 10px;  height:12px; line-height:12px;">
-                   <span class="proxima"> <strong> <?= $u->uuid; ?></strong> </span>
+                   <span class="proxima"> <strong> <?= ($u->folio)?$u->folio:$u->uuid; ?></strong> </span>
                  </div>
       
 

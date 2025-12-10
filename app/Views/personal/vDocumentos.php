@@ -135,7 +135,7 @@
                                                                     </a>
                                                                 </li>
                                                                   <li class="dd-item" data-id="1">
-                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Programa Estatal de Turismo 2025-2030.pdf' ?>">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Programa Estatal de Turismo 2025-2030_.pdf' ?>">
                                                                         <div class="dd-handle">
                                                                         Programa Estatal de Turismo 2025-2030
                                                                         </div>
