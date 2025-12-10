@@ -4101,7 +4101,7 @@ class Principal extends BaseController
                         foreach ($xml_go as $index => $facturaItem) {
                         // die( var_dump( $presupuestoGO ) );
                           $data['partida'] =  $presupuestoGO->data[$index]->dsc_partida;
-                          $data['uuid'] =     $facturaItem->uuid;
+                          $data['uuid'] =     ($facturaItem->folio)?$facturaItem->folio:$facturaItem->uuid;
                             
                             $data['facturaItem'] = $facturaItem;
                             $periodo_factura_go = $globals->getTabla([
