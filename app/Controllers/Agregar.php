@@ -229,8 +229,7 @@ class Agregar extends BaseController
             }
         }
 
-        var_dump( $response );
-        die();
+    ;
         return $response;
     }
     public function procesarPediodo(array $periodo, $id_registro_pt = null)
