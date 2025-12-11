@@ -67,6 +67,11 @@
                                                 <a class="btn btn-outline-info btn-round" href="<?php echo base_url().'index.php/Inicio/Viaticos/'.$e->id_registro_go?>"  ><i
                                                         class="mdi mdi-check text-success font-18"></i></a> 
                                                 <?php endif; ?>
+                                                <?php if($session->get('id_perfil') != 7): ?>
+                                                   <button type="button" class="btn btn-outline-success btn-round">                       
+                                                <a href="<?php echo base_url().'index.php/Principal/editarTramitePagoGo/'.$e->id_registro_go.'/GO' ?>" ><i
+                                                        class="mdi mdi-pen text-success font-18"></i></a></button>
+                                                <?php endif; ?>
                                          
                                               
                                             </td>

@@ -5278,6 +5278,47 @@ class Principal extends BaseController
         $this->_renderView($data);
 
     }
+    public function editarTramitePagoGo($id_reserva_go = null, $id_registro_go = null)
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error|Error al traer los proveedor';
+        $globals = new Mglobal;
+       
+        $registro = $globals->getTabla(['tabla' => 'registro_go', 'where' => ['visible' => 1, 'id_reserva_go' => $id_reserva_go]]);
+        
+        $data['registro'] = ($registro->data)?$registro->data[0]:'';
+        $director_general = ($registro->data)?$registro->data[0]->director_general:'';
+        $directorGeneral  = $globals->getTabla(['tabla' => 'cat_director_general', 'where' => ['id_director_general' => $director_general]]);
+
+        $data['dsc_director_general'] = ($directorGeneral->data)?$directorGeneral->data[0]->dsc_director_general:'';
+        $data['id_reserva'] =  $id_reserva_go;
+        
+        $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
+        $cat_usuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
+        $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1]]);
+        $cat_subsecretario = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1]]);
+        $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
+        $presupuesto = $globals->getTabla(['tabla' => 'vw_presupuesto_go', 'where' => ['id_reserva' => $id_reserva_go]]);
+        $cat_opcion = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1]]);
+        $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+
+        $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+        $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
+        $data['cat_opcion']        = (!empty($cat_opcion->data)) ? $cat_opcion->data : [];
+        $data['cat_area']          = (!empty($cat_area->data)) ? $cat_area->data : [];
+        $data['cat_usuario']       = (!empty($cat_usuario->data)) ? $cat_usuario->data : [];
+        $data['secretario']        = (!empty($secretario->data)) ? $secretario->data : [];
+        $data['cat_subsecretario'] = (!empty($cat_subsecretario->data)) ? $cat_subsecretario->data : [];
+        $data['presupuesto']       = (!empty($presupuesto->data)) ? $presupuesto->data : [];
+    //   die( var_dump( $data['registro']  ) );
+        $data['scripts']          = array('inicio');
+        $data['edita']            = 1;
+        $data['contentView']      = 'secciones/vRegistroEditarGo';
+        $this->_renderView($data);
+
+    }
     public function TablaPagos($id_reserva)
     {
         $session = \Config\Services::session();
