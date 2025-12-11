@@ -38,6 +38,7 @@
         background-size: cover;
         background-position: center;
         transition: background-image 1s ease-in-out;
+        cursor: url('<?= base_url() ?>assets/puntero2.png') 0 0, auto;
     }
 
     #particles-js {
