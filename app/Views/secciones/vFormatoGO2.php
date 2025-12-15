@@ -42,7 +42,7 @@ $fechaFormateada = $dia . ' de ' . $mes . ' del ' . $anio;
                 
                 Por medio de la presente, me permito solicitar su apoyo para que se realice el tramite de <?= (isset($GO) && !empty($GO))?'Gasto de Operación':'Pago a Tercero'?>
                 con folio <strong><?= (isset($GO) && !empty($GO))?'GO':'PT'?> <?= ($fic)?$folio:strtoupper($registro->folio);?></strong> por la cantidad de 
-                <strong><?= $registro->total_importe; ?> (<?= mb_strtoupper($numero_texto, 'UTF-8'); ?>)</strong>,
+                <strong>$<?= number_format($registro->total_importe, 2); ?> (<?= mb_strtoupper($numero_texto, 'UTF-8'); ?>)</strong>,
                 por concepto de <?= $registro->concepto_pago ?>.
             </span>
         </div>

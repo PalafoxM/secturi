@@ -1,8 +1,8 @@
 
      
        
-        <div  style="position:absolute; text-align:center; top:10.8%; left:75%; width:15%; height:10px; background-color:white; font-size: 8px; ">
-           <?= $registro->total_importe; ?>
+        <div  style="position:absolute; text-align:center; top:10.65%; left:75%; width:15%; height:10px; background-color:white; font-size: 8px; ">
+           $<?= number_format($registro->total_importe, 2); ?>
         </div>
         <div  style="position:absolute; text-align:center; top:10.8%; left:49.5%; width:4%; height:10px; background-color:white; font-size: 8px; ">
            <?= isset( $documentos) && !empty( $documentos)? $documentos:'' ?>
@@ -61,7 +61,7 @@
         <?php endforeach; ?>
    
         <div  style="position:absolute; text-align:right; top:69.5%; left:50.5%; width:10%; background-color:white; font-size: 12px;  height:12px;">
-            <span><?= $registro->total_importe; ?></span>
+            <span><?= number_format($registro->total_importe, 2); ?></span>
         </div>
         <div  style="position:absolute; text-align:center; top:69.5%; left:63%; width:30%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "><strong><?= ($numero_texto); ?></strong></span>

@@ -3975,15 +3975,16 @@ class Principal extends BaseController
 
         if (isset($importe->data) && !empty($importe->data)) {
             $data['importe'] = $importe->data;
-
+              $totalGo = 0;
               foreach($xml->data as $key => $value){
                   $data['importe'][$key]->total = $value->total;
+                  $totalGo += $value->total;
                 
                 }
 
 
         }
-       // die( var_dump( $data['importe'] ) );
+        //die( var_dump( $totalGo) );
         //==============================
         
 
@@ -4011,7 +4012,9 @@ class Principal extends BaseController
             $id_reserva_go         = $registro_go->data[0]->id_reserva_go;
             $no_consecutivo        = $registro_go->data[0]->no_consecutivo;
             $data['registro']      = $registro;
-        
+            $data['registro']->total_importe = $totalGo;
+
+           // die( var_dump( $data['registro']  ) );
             $importe_str          =  $registro->total_importe;    
             $importe_limpio = str_replace(['$', ' ', ','], '', $importe_str); 
             $importe_float = (float) $importe_limpio;// quita coma y convierte
@@ -4107,6 +4110,11 @@ class Principal extends BaseController
    
                         foreach ($xml_go as $index => $facturaItem) {
                         // die( var_dump( $presupuestoGO ) );
+                         // $data['partida'] =  $presupuestoGO->data[$index]->dsc_partida;
+                          $importe_str     =  $facturaItem->total;
+                          $data['total']     =  $facturaItem->total;
+                          $importe_float = (float) str_replace(',', '', $importe_str);
+                          $data['monto'] = $this->numeroEnLetras($importe_float);
                           $data['partida'] =  $presupuestoGO->data[$index]->dsc_partida;
                           $data['uuid'] =     ($facturaItem->folio)?$facturaItem->folio:$facturaItem->uuid;
                             
@@ -4122,25 +4130,27 @@ class Principal extends BaseController
                               $periodo = isset($periodo_factura_go->data) && !empty($periodo_factura_go->data)
                                 ? $periodo_factura_go->data
                                 : [];
-                            
-                            
-                            foreach($periodo  as $p){
-                                $importe_str = $p->importe;
+                           // var_dump( $periodo );
+                           
+                            foreach($periodo  as $key => $p){
+                                $importe_str = $xml_go[$key]->total;
                                 $importe_float = (float) str_replace(',', '', $importe_str);
                                 $data['numero_texto2'] = $this->numeroEnLetras($importe_float);
-                                $data['importePartida'] = $p->importe;
+                                $data['importePartida'] =  $xml_go[$key]->total;
 
                                 $data['inicio'] = $p->periodo_inicio;
-                                $data['fin'] = $p->periodo_fin;
-                                $monto = (int)$p->importe + (int)$p->propina ;
-                                $data['total'] = $monto;
-                                $data['monto'] = $this->numeroEnLetras($monto);
+                                $data['fin']    = $p->periodo_fin;
+                                $monto          = (int)$xml_go[$key]->total + (int)$p->propina ;
+                               // $data['total2']  = $monto;
+                               // $data['monto2']  = $this->numeroEnLetras($monto);
+
+                                
                             }
                           
-                       
-                            
-                            // 1️⃣ Agregamos una sola página con el formato 702GO
+                           
                             $htmlTercerHoja = view('personal/vFormato702GO.php', $data);
+                            // 1️⃣ Agregamos una sola página con el formato 702GO
+                          
                             $mpdf->AddPage();
                             $mpdf->WriteHTML($htmlTercerHoja);
 
