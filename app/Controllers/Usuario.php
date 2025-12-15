@@ -907,26 +907,26 @@ class Usuario extends BaseController
 
                     
                         if ($estatus === 1 && $horaInicio >= '08:00:00' &&  $horaFin <= '12:00:00') {
-                            $valorEntrada = $entrada;
+                            $valorEntrada = 'Sin validar';
                             //$valorSalida  = 'Sin validar';
                             $sheet->getStyle($colEntrada . $fila)
                                 ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                                 ->getStartColor()->setARGB('FFFF0000');
-                       
+                            $validado = false;
                             $stopIncProcessing = true;
-                          //  break;
+                            break;
                 
                         }
                         if ($estatus === 1 && $horaInicio >= '12:00:00' &&  $horaFin <= '16:00:00') {
                           //  $valorEntrada = 'Sin validar';
-                            $valorSalida = $salida;
+                            $valorSalida = 'Sin validar';
 
                             $sheet->getStyle($colSalida . $fila)
                                 ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                                 ->getStartColor()->setARGB('FFFF0000');
-                            $validado = true;
+                            $validado = false;
                             $stopIncProcessing = true;
-                          //  break;
+                            break;
                         }
 
                         if ($estatus === 1 && empty($salida) && empty($entrada)) {
@@ -938,45 +938,13 @@ class Usuario extends BaseController
                             $sheet->getStyle($colSalida . $fila)
                                 ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                                 ->getStartColor()->setARGB('FFFF0000');
-                            $validado = true;
+                            $validado = false;
                             $stopIncProcessing = true;
                             break;
                         }
-                        if ($estatus === 1 && $entrada >= '12:00:00' && $salida >= '16:00:00') {
-                            $valorEntrada = $entrada;
-                            $valorSalida  = $salida;
-             
-                            $sheet->getStyle($colEntrada . $fila)
-                                ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                ->getStartColor()->setARGB('FFFF0000');
-                            $sheet->getStyle($colSalida . $fila)
-                                ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                ->getStartColor()->setARGB('FFFF0000');
-                            $validado = true;
-                            $stopIncProcessing = true;
-                            break;
-                        }
-                        if ($estatus === 1 && $entrada >= '09:00:00' && $entrada <= '12:00:00') {
-                            $valorEntrada = $entrada;
-             
-                            $sheet->getStyle($colEntrada . $fila)
-                                ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                ->getStartColor()->setARGB('FFFF0000');
-                      
-                            $validado = true;
-                            $stopIncProcessing = true;
-                            break;
-                        }
-                        if ($estatus === 1 && $salida >= '12:01:00' && $salida >= '16:00:00') {
-
-                            $valorSalida    = $salida;
-                            $sheet->getStyle($colSalida . $fila)
-                                ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                ->getStartColor()->setARGB('FFFF0000');
-                            $validado = true;
-                            $stopIncProcessing = true;
-                            break;
-                        }
+                    
+                  
+                       
                    
                     }
                 }
@@ -1007,9 +975,9 @@ class Usuario extends BaseController
 
                             // Si quieres marcar salida temprana (salió antes de la hora mínima)
                             if ($salida > '12:00:00' && $salida < '16:00:00') {
-                                $sheet->getStyle($colSalida . $fila)
-                                    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                    ->getStartColor()->setARGB('FFFFA500'); // rojo
+                             $sheet->getStyle($colSalida . $fila)
+                                ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                ->getStartColor()->setARGB('FFFF0000'); // Rojo puro
                             }
                             if ($entrada > '08:46:00' && $entrada < '09:00:00') {
                                 $sheet->getStyle($colEntrada . $fila)
@@ -1019,7 +987,7 @@ class Usuario extends BaseController
                             if ($entrada > '09:01:00' && $entrada < '12:00:00') {
                                 $sheet->getStyle($colEntrada . $fila)
                                     ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                    ->getStartColor()->setARGB('FFFFA500'); // rojo
+                                    ->getStartColor()->setARGB('FFFF0000'); // rojo
                             }
                          
 
