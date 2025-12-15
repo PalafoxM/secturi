@@ -30,9 +30,10 @@
                             <p class="text-muted mb-3">
                                 GEG850101FQ2
                             </p>
-                            <form id="form_go" enctype="multipart/form-data">
+                            <form id="form_go_editar" enctype="multipart/form-data">
                                 <input type="hidden" name="editar" value="1">
                                 <input type="hidden" name="id_reserva_go" value="<?= $id_reserva ?>">
+                                <input type="hidden" name="id_registro_go" value="<?= $id_registro_go ?>">
                                 <div class="form-row">
                                     <!-- Dirección Responsable -->
                                     <div class="col-md-4 mb-3">
@@ -294,28 +295,29 @@
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
+                                                                <?php foreach($periodo_factura_go as $r): ?>
+                                                                <input type="hidden" name="id_identificador[]" value="<?= $r->id_identificador ?>" >
                                                                 <tr>
-                                                                 
                                                                     <td><input type="text" autocomplete="off"
-                                                                            class="form-control importe-input" name="importe_<?= $i?>[]"
-                                                                            placeholder="Importe"></td>
+                                                                            class="form-control importe-input" name="importe_<?= $r->id_identificador?>[]"
+                                                                            placeholder="Importe" value="<?= $r->total ?>"></td>
                                                                     <td>
                                                                         <input autocomplete="off" type="text"
-                                                                            class="form-control propina-input" name="propina_<?= $i?>[]"
-                                                                            placeholder="Propina">
+                                                                            class="form-control propina-input" name="propina_<?= $r->id_identificador?>[]"
+                                                                            placeholder="Propina" value="<?= $r->propina; ?>" >
                                                                     </td>
                                                                     <td>
                                                                         <input autocomplete="off" type="date"
-                                                                            class="form-control" name="periodo_inicio_<?= $i?>[]" >
+                                                                            class="form-control" name="periodo_inicio_<?= $r->id_identificador?>[]" value="<?= date('Y-m-d', strtotime($r->periodo_inicio)) ?>" >
                                                                     </td>
                                                                     <td>
                                                                            <input autocomplete="off" type="date"
-                                                                            class="form-control" name="periodo_fin_<?= $i?>[]">
+                                                                            class="form-control" name="periodo_fin_<?= $r->id_identificador?>[]"  value="<?= date('Y-m-d', strtotime($r->periodo_fin))  ?>">
                                                                     </td>
                                                                      <td>
      
-                                                                        <div class="archivos-seleccionados" id="archivos_<?= $i?>">
-                                                                            <small class="text-muted">No hay archivos</small>
+                                                                        <div class="archivos-seleccionados" id="archivos_<?= $r->id_identificador?>">
+                                                                             <a href="<?= base_url(). $r->ruta_relativa ?>" target="_blank" ><i class="fas fa-file-pdf"></i> PDF</a>
                                                                         </div>
                                                                     </td>
                                                                     <td>
@@ -332,27 +334,13 @@
                                                                         </button>
                                                                     </td>
                                                                 </tr>
+
+                                                                <?php endforeach; ?>
+                                                            
                                                             </tbody>
                                                         </table>
-                                                        <div class="text-right mt-2">
-                                                            <!-- Contenedor mejorado para el botón -->
-                                                            <a onclick="addRow(<?= $i?>)"  class="btn btn-primary text-white" >
-                                                              
-                                                                <i class="fas fa-plus"></i> Agregar Fila 
-                                                            </a>
-                                                        </div>
-                                                        <div class="row mt-3">
-                                                            <div class="col-md-8"></div>
-                                                            <div class="col-md-4">
-                                                                <div class="form-group">
-                                                                    <label>TOTAL:</label>
-                                                                    <input type="text"
-                                                                        name="total_importe"
-                                                                        class="form-control font-weight-bold text-right"
-                                                                        id="total_importe_<?=$i?>" value="0.00" readonly>
-                                                                </div>
-                                                            </div>
-                                                        </div>
+                                                      
+                                                    
                                                     </div>
                                                 </div>
                                                 <!--end card-body-->
@@ -366,9 +354,9 @@
                                 <div id="hidden-file-inputs-container"></div>
                                 <a class="btn btn-gradient-danger" style="color:white"
                                     onclick="window.history.back()">Atrás</a>
-                                <?php if (!$edita): ?>
-                                    <button class="btn btn-gradient-primary" id="btnGuardaGo" type="submit">Guardar</button>
-                                <?php endif; ?>
+                           
+                                    <button class="btn btn-gradient-primary" id="btnEditarGo" type="submit">Guardar</button>
+                     
                             </form> <!--end form-->
                         </div><!--end card-body-->
                     </div><!--end card-->
@@ -726,7 +714,7 @@ $(document).on('input', 'input[class*="importe-input"], input[class*="propina-in
 // Preparar FormData corregido
 function prepararFormData() {
     const formData = new FormData();
-    const form = $('#form_go')[0];
+    const form = $('#form_go_editar')[0];
     const formElements = new FormData(form);
     
     for (let [key, value] of formElements) {
@@ -754,7 +742,7 @@ function prepararFormData() {
 }
 
 // Envío del formulario
-$('#form_go').on('submit', function(e) {
+$('#form_go_editar').on('submit', function(e) {
     e.preventDefault();
     const formData = prepararFormData();
 
@@ -762,7 +750,7 @@ $('#form_go').on('submit', function(e) {
 
     $.ajax({
         type: "POST",
-        url: "<?= base_url()?>index.php/Agregar/guardaGO",
+        url: "<?= base_url()?>index.php/Agregar/editarGO",
         data: formData,
         processData: false,
         contentType: false,

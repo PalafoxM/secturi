@@ -5313,27 +5313,37 @@ class Principal extends BaseController
         $data['dsc_director_general'] = ($directorGeneral->data)?$directorGeneral->data[0]->dsc_director_general:'';
        // $data['id_reserva'] =  $id_reserva_go;
         
-        $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
-        $cat_usuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
-        $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1]]);
-        $cat_subsecretario = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1]]);
-        $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
-        $presupuesto = $globals->getTabla(['tabla' => 'vw_presupuesto_go', 'where' => ['id_reserva' => $id_reserva_go]]);
-        $cat_opcion = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1]]);
-        $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
-
-        $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
-        $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
-        $data['cat_opcion']        = (!empty($cat_opcion->data)) ? $cat_opcion->data : [];
-        $data['cat_area']          = (!empty($cat_area->data)) ? $cat_area->data : [];
-        $data['cat_usuario']       = (!empty($cat_usuario->data)) ? $cat_usuario->data : [];
-        $data['secretario']        = (!empty($secretario->data)) ? $secretario->data : [];
-        $data['cat_subsecretario'] = (!empty($cat_subsecretario->data)) ? $cat_subsecretario->data : [];
-        $data['presupuesto']       = (!empty($presupuesto->data)) ? $presupuesto->data : [];
-      // die( var_dump( $data['registro']  ) );
-        $data['scripts']          = array('inicio');
-        $data['edita']            = 1;
-        $data['contentView']      = 'secciones/vRegistroEditarGo';
+        $cat_area           = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
+        $cat_usuario        = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
+        $secretario         = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1]]);
+        $cat_subsecretario  = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1]]);
+        $cat_proyecto       = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
+        $presupuesto        = $globals->getTabla(['tabla' => 'vw_presupuesto_go', 'where' => ['id_reserva' => $id_reserva_go]]);
+        $cat_opcion         = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1]]);
+        $cat_partida        = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $periodo_factura_go = $globals->getTabla(['tabla' => 'periodo_factura_go', 'where' => ['id_registro_go' => $id_registro_go, 'visible' => 1]]);
+        $xml_go             = $globals->getTabla(['tabla' => 'xml_go', 'where' => ['id_registro_go' => $id_registro_go, 'visible' => 1]]);
+        $factura_pdf_go     = $globals->getTabla(['tabla' => 'factura_pdf_go', 'where' => ['id_registro_go' => $id_registro_go, 'visible' => 1]]);
+        //die(var_dump( $periodo_factura_go )  );
+        $data['cat_partida']        = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+        $data['periodo_factura_go'] = (!empty($periodo_factura_go->data)) ? $periodo_factura_go->data : [];
+        $data['cat_proyecto']       = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
+        $data['cat_opcion']         = (!empty($cat_opcion->data)) ? $cat_opcion->data : [];
+        $data['cat_area']           = (!empty($cat_area->data)) ? $cat_area->data : [];
+        $data['cat_usuario']        = (!empty($cat_usuario->data)) ? $cat_usuario->data : [];
+        $data['secretario']         = (!empty($secretario->data)) ? $secretario->data : [];
+        $data['cat_subsecretario']  = (!empty($cat_subsecretario->data)) ? $cat_subsecretario->data : [];
+        $data['presupuesto']        = (!empty($presupuesto->data)) ? $presupuesto->data : [];
+        //die(var_dump( $data['periodo_factura_go'] )  );
+        foreach($xml_go->data as $key => $value){
+                $data['periodo_factura_go'][$key]->total         = (int)$value->total;
+                $data['periodo_factura_go'][$key]->ruta_relativa = $factura_pdf_go->data[$key]->ruta_relativa;
+        }
+       // die( var_dump( $data['periodo_factura_go']  ) );
+        $data['id_registro_go']     = $id_registro_go;
+        $data['scripts']            = array('inicio');
+        $data['edita']              = 1;
+        $data['contentView']        = 'secciones/vRegistroEditarGo';
         $this->_renderView($data);
 
     }

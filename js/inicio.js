@@ -5045,6 +5045,64 @@ ini.inicio = (function () {
                 });
             });
         },
+       formGoEditar: function(){
+            $("#form_go_editar").submit(function (e) {
+                e.preventDefault(); 
+
+                
+                var formData = new FormData(this); // Usar FormData en lugar de serialize
+                     let valido = true;
+                    let mensajes = [];
+
+
+                    // Validar archivos PDF
+                    $("[id^=factura_pdf_input_go_]").each(function(){
+                        let files = this.files;
+                        if(files.length === 0){
+                            valido = false;
+                            mensajes.push("Debe subir al menos un archivo PDF.");
+                        }
+                    });
+
+                    
+
+                    if(!valido){
+                        Swal.fire("Atención", "<p>"+mensajes.join("<br>")+"</p>", "warning");
+                        return;
+                    }
+               
+                $.ajax({
+                    type: "POST",
+                    url: base_url + "index.php/Agregar/editarGO",
+                    data: formData,
+                    processData: false,  // Importante para FormData
+                    contentType: false,  // Importante para FormData
+                    dataType: "json",
+                    success: function (response) {
+                        console.log(response);
+                        if(!response.error){
+                            Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
+                            setTimeout(() => {
+                               // window.location.href = base_url + "index.php/Principal/listadoEstatusPT";
+                                window.location.href = base_url + "index.php/Principal/tablaArchivos/"+response.idRegistro+'/GO';
+                            }, 1500);
+                        }else{
+                            Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
+                        }
+                    },
+                    beforeSend: function (info){
+                         $('#btnGuardaGo').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                    },
+                    complete: function (info){
+                        $('#btnGuardaGo').prop('disabled', false).html('Guardar');
+                    },
+                    error: function (response,jqXHR, textStatus, errorThrown) {
+                        var res= JSON.parse(response.responseText);
+                        Swal.fire("Error", '<p> '+ res.message + '</p>');  
+                    }
+                });
+            });
+        },
         generarZipV: function(id_registro_pt) {
             var formData = new FormData();
             formData.append('id_registro_pt', id_registro_pt);
