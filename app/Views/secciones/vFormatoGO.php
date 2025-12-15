@@ -36,7 +36,8 @@
         <?php $i = 27.5;  ?>
         <?php foreach($importe as $im): ?>
          <div  style="position:absolute; text-align:center; top:<?=$i?>%; left:50%; width:11%; background-color:white; font-size: 10px;  height:12px;">
-            <span class="proxima "><?= (int)$im->importe + (int)$im->propina ?></span>
+            <?php $final = (int)$im->total + (int)$im->propina ?>
+            <span class="proxima ">$<?= number_format($final, 2) ?></span>
         </div>
         <?php $i = $i + 1.5; ?>
         <?php endforeach; ?>

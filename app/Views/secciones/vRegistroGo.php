@@ -304,7 +304,7 @@
                                                         <table class="table table-bordered" id="makeEditable<?= $i?>">
                                                             <thead>
                                                                 <tr>
-                                                                    <th>IMPORTE</th>
+                                                                <!--     <th>IMPORTE</th> -->
                                                                     <th>PROPINA</th>
                                                                     <th>INICIO</th>
                                                                     <th>FIN</th>
@@ -315,10 +315,10 @@
                                                             <tbody>
                                                                 <tr>
                                                                  
-                                                                    <td><input type="text" autocomplete="off"
+                                                                   <!--  <td><input type="text" autocomplete="off"
                                                                             class="form-control importe-input" name="importe_<?= $i?>[]"
-                                                                            placeholder="Importe"></td>
-                                                                    <td>
+                                                                            placeholder="Importe"></td>-->
+                                                                    <td> 
                                                                         <input autocomplete="off" type="text"
                                                                             class="form-control propina-input" name="propina_<?= $i?>[]"
                                                                             placeholder="Propina">
@@ -468,9 +468,7 @@ function addRow(i) {
     
     var newRow = `
     <tr data-row-index="${rowIndex}">
-        <td>
-            <input type="text" autocomplete="off" class="form-control importe-input" name="importe_${i}[]" placeholder="Importe">
-        </td>
+  
         <td>
             <input autocomplete="off" type="text" class="form-control propina-input" name="propina_${i}[]" placeholder="Propina">
         </td>

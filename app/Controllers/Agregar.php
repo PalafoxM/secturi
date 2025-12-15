@@ -1237,7 +1237,7 @@ class Agregar extends BaseController
                 }
             }
         }
-      
+        
         // 2. Iterar por las tablas usando los datos de $data (getPost)
         $tablas_procesadas = [];
         if (isset($data['encabezado'])) { // Usamos 'encabezado' como guía
@@ -1253,7 +1253,7 @@ class Agregar extends BaseController
                 ];
                 
                 // Si no hay 'importe' para esta tabla, saltamos
-                if (!isset($data['importe_' . $i])) {
+                if (!isset($data['periodo_inicio_' . $i])) {
                     continue;
                 }
 
@@ -1264,7 +1264,7 @@ class Agregar extends BaseController
                 }
  
                 // 3. Iterar por cada fila ($j) dentro de la tabla ($i)
-                foreach ($data['importe_' . $i] as $j => $importe_valor) {
+                foreach ($data['periodo_inicio_' . $i] as $j => $importe_valor) {
                     // $j es el índice de la fila (0, 1, 2...)
                    
                     // Usamos $j para obtener la clave de archivo correspondiente por orden
@@ -1277,7 +1277,7 @@ class Agregar extends BaseController
 
                     // 4. Construir el objeto final de la fila
                     $fila_completa = [
-                        'importe'        => $importe_valor,
+                      //  'importe'        => $importe_valor,
                         'propina'        => $data['propina_' . $i][$j] ?? null,
                         'periodo_inicio' => $data['periodo_inicio_' . $i][$j] ?? null,
                         'periodo_fin'    => $data['periodo_fin_' . $i][$j] ?? null,
@@ -1291,7 +1291,7 @@ class Agregar extends BaseController
             }
         }
         
-
+       // die();
         if ($data['secretario'] == 0) {
             $response->error = true;
             $response->respuesta = "Es requerido el Secretario o Director";
@@ -1404,7 +1404,7 @@ class Agregar extends BaseController
                         'id_registro_go' => $id_registro_go, // Se vincula al registro principal
                         'encabezado'     => $tabla['encabezado'], // Dato de la tabla
                         'id_presupuesto' => $tabla['id_presupuesto'], // Dato de la tabla
-                        'importe'        => str_replace(['$', ','], '', $fila['importe']), // Limpiamos el importe
+                       // 'importe'        => str_replace(['$', ','], '', $fila['importe']), // Limpiamos el importe
                         'propina'        => str_replace(['$', ','], '', $fila['propina']), // Limpiamos la propina
                         'periodo_inicio' => $fila['periodo_inicio'],
                         'periodo_fin'    => $fila['periodo_fin'],
