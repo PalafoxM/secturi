@@ -297,7 +297,7 @@
                                                             <tbody>
                                                                 <?php $i = 0; ?>
                                                                 <?php foreach($periodo_factura_go as $r): ?>
-                                                                <input type="hidden" name="id_identificador[]" value="<?= $r->id_identificador ?>" >
+                                                                <input type="hidden" name="id_identificador_<?= $i ?>[]" value="<?= $r->id_identificador ?>" >
                                                                 <tr>
                                                                     <td><input type="text" autocomplete="off"
                                                                             class="form-control importe-input" name="importe_<?= $i ?>[]"

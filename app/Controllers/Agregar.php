@@ -1364,24 +1364,16 @@ class Agregar extends BaseController
             'total_importe'         => $data['total_importe'], // Asegúrate de que este total sea correcto
             'comision'              => $data['comision'],
             'no_reserva'            => $data['no_reserva'],
-            'lugar'                 => $data['lugar']
+            'lugar'                 => $data['lugar'],
+            'usu_act'               => $data['usu_act'],
         ];
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaTurno'];
-        if ($data['editar'] == 1) {
-            $dataInsert['usu_reg'] = $session->get('id_usuario');
-            $dataInsert['fec_reg'] = date('Y-m-d');
-            $dataConfig = [
-                "tabla" => "registro_go",
-                "editar" => false
-            ];
-        } else {
-            $dataConfig = [
+    
+        $dataConfig = [
                 "tabla" => "registro_go",
                 "editar" => true,
                 'idEditar' => ['id_registro_go' => $data['id_registro_go']]
-            ];
-            $dataInsert['usu_act'] = $session->get('id_usuario');
-        }
+             ];
        
         $responsePrincipal = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
 
