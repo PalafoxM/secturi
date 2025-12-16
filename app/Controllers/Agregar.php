@@ -1810,29 +1810,33 @@ class Agregar extends BaseController
                         'periodo_inicio' => $fila['periodo_inicio'],
                         'periodo_fin'    => $fila['periodo_fin'],
                        // 'id_identificador' => $identificador_fila_unica, // EL ENLACE CLAVE (debe ser VARCHAR)
-                        'usu_reg'        => $session->get('id_usuario'),
-                        'fec_reg'        => date('Y-m-d H:i:s')
+                      //  'usu_reg'        => $session->get('id_usuario'),
+                       // 'fec_reg'        => date('Y-m-d H:i:s')
                     ];
 
-                    
-                    $idEdiccion = $this->globals->getTabla(['tabla' => 'periodo_factura_go', 'where' => ['id_registro_go' => $data['id_registro_go'], 'id_identificador' =>  $data['id_identificador'][$j] ]]);
-                  //  die( var_dump( $idEdiccion ) );
-                    $dataConfig = [
-                        "tabla" => "periodo_factura_go",
-                        "editar" => true,
-                        "idEditar" => ['id_periodo_factura' => $idEdiccion->data[0]->id_periodo_factura]
+                    if(!empty($data['id_registro_go']) && !empty($data['id_identificador']))
+                    {
+                            $idEdiccion = $this->globals->getTabla(['tabla' => 'periodo_factura_go', 'where' => ['id_registro_go' => $data['id_registro_go'], 'id_identificador' =>  $data['id_identificador'][$j] ]]);
+                        //  die( var_dump( $idEdiccion ) );
+                            $dataConfig = [
+                                "tabla" => "periodo_factura_go",
+                                "editar" => true,
+                                "idEditar" => ['id_periodo_factura' => $idEdiccion->data[0]->id_periodo_factura]
 
-                    ];
+                            ];
 
-                   
-                    $dataBitacora = [
-                        'id_user' => $session->get('id_usuario'),
-                        'script' => 'Agregar.php/guardarFacturaPeriodo'
-                    ];
+                        
+                            $dataBitacora = [
+                                'id_user' => $session->get('id_usuario'),
+                                'script' => 'Agregar.php/guardarFacturaPeriodo'
+                            ];
 
-                    $responseFila = $this->globals->saveTabla($datos_fila_para_guardar, $dataConfig, $dataBitacora);
-                 
+                            $responseFila = $this->globals->saveTabla($datos_fila_para_guardar, $dataConfig, $dataBitacora);
+                      
 
+
+                    }
+                
                     $archivos_pdf_fila = [];
                     $archivos_xml_fila = [];
                     
@@ -1877,28 +1881,34 @@ class Agregar extends BaseController
 
                             $ruta_absoluta = base_url('assets/pdf/' . $file);
                             $ruta_relativa = 'assets/pdf/' . $file;
+                            if(!empty($id_registro_go) && !empty($data['id_identificador'][$j])){
+                                 $idEdiccion = $this->globals->getTabla(['tabla' => 'factura_pdf_go', 'where' => ['id_registro_go' => $id_registro_go , 'id_identificador' =>  $data['id_identificador'][$j] ]]);
 
-                            $dataConfigPdf = [
-                                "tabla" => "factura_pdf_go",
-                                "editar" => false
-                            ];
+                                $dataConfigPdf = [
+                                    "tabla" => "factura_pdf_go",
+                                    "editar" => true,
+                                    "idEditar" => $idEdiccion->data[0]->id_factura_pdf_go
+                                ];
+                                
+                                $dataInsertPdf = [
+                                // 'id_registro_go' => (int)$id_registro_go, // Enlace al registro maestro
+                                // 'id_identificador' => $identificador_fila_unica, // <-- CORREGIDO: EL ENLACE DE FILA
+                                    'ruta_relativa' => $ruta_relativa,
+                                    'ruta_absoluta' => $ruta_absoluta,
+                                    'fec_reg' => date('Y-m-d H:i:s'),
+                                    'usu_reg' => $session->get('id_usuario')
+                                ];
 
-                            $dataInsertPdf = [
-                                'id_registro_go' => (int) $id_registro_go, // Enlace al registro maestro
-                                'id_identificador' => $identificador_fila_unica, // <-- CORREGIDO: EL ENLACE DE FILA
-                                'ruta_relativa' => $ruta_relativa,
-                                'ruta_absoluta' => $ruta_absoluta,
-                                'fec_reg' => date('Y-m-d H:i:s'),
-                                'usu_reg' => $session->get('id_usuario')
-                            ];
+                                $dataBitacoraPdf = [
+                                    'id_user' => $session->get('id_usuario'),
+                                    'script' => 'Agregar.php/guardarFacturaPDF'
+                                ];
 
-                            $dataBitacoraPdf = [
-                                'id_user' => $session->get('id_usuario'),
-                                'script' => 'Agregar.php/guardarFacturaPDF'
-                            ];
+                                // Guardamos la info del PDF
+                                $this->globals->saveTabla($dataInsertPdf, $dataConfigPdf, $dataBitacoraPdf);
 
-                            // Guardamos la info del PDF
-                            $this->globals->saveTabla($dataInsertPdf, $dataConfigPdf, $dataBitacoraPdf);
+                                }
+                           
                         }
                     }
                     
@@ -1952,39 +1962,49 @@ class Agregar extends BaseController
                                     }
                                 }
                                 // ... Fin del parseo ...
+                              
+                                if(!empty($id_registro_go) && $data['id_identificador'][$j] >= 0 ){
+                                            $idEdiccion = $this->globals->getTabla(['tabla' => 'xml_go', 'where' => ['id_registro_go' => $id_registro_go , 'id_identificador' =>  $data['id_identificador'][$j] ]]);                                         
+                                            if(!$idEdiccion->error){
+                                                    $dataConfigXml = [
+                                                        "tabla" => "xml_go",
+                                                        "editar" => true,
+                                                        "idEditar" => ['id_xml'=>$idEdiccion->data[0]->id_xml]
+                                                    ];
+                                                    $dataInsertXml = [
+                                                    // 'id_registro_go' => (int) $id_registro_go, // Enlace al registro maestro
+                                                        'version' => $version,
+                                                        'fecha' => date('Y-m-d H:i:s', strtotime($fecha)),
+                                                        'total' => $total,
+                                                        'moneda' => $moneda,
+                                                        //'id_identificador' => $identificador_fila_unica, // <-- CORREGIDO: EL ENLACE DE FILA
+                                                        'folio' => $Folio,
+                                                        'no_certificado' => $NoCertificadoSAT, // Usar el del timbre
+                                                        'emisor_rfc' => $rfcEmisor,
+                                                        'emisor_nombre' => $nombreEmisor,
+                                                        'receptor_rfc' => $rfcReceptor,
+                                                        'receptor_nombre' => $nombreReceptor,
+                                                        'uuid' => $uuid,
+                                                        'fec_reg' => date('Y-m-d H:i:s'),
+                                                        'usu_reg' => $session->get('id_usuario')
+                                                    ];
 
-                                $dataConfigXml = [
-                                    "tabla" => "xml_go",
-                                    "editar" => false
-                                ];
-                                $dataInsertXml = [
-                                    'id_registro_go' => (int) $id_registro_go, // Enlace al registro maestro
-                                    'version' => $version,
-                                    'fecha' => date('Y-m-d H:i:s', strtotime($fecha)),
-                                    'total' => $total,
-                                    'moneda' => $moneda,
-                                    'id_identificador' => $identificador_fila_unica, // <-- CORREGIDO: EL ENLACE DE FILA
-                                    'folio' => $Folio,
-                                    'no_certificado' => $NoCertificadoSAT, // Usar el del timbre
-                                    'emisor_rfc' => $rfcEmisor,
-                                    'emisor_nombre' => $nombreEmisor,
-                                    'receptor_rfc' => $rfcReceptor,
-                                    'receptor_nombre' => $nombreReceptor,
-                                    'uuid' => $uuid,
-                                    'fec_reg' => date('Y-m-d H:i:s'),
-                                    'usu_reg' => $session->get('id_usuario')
-                                ];
+                                                    $dataBitacoraXml = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardarFacturaGO'];
+                                                    
+                                                    // Guardamos la info del XML
+                                                    $responseXML = $this->globals->saveTabla($dataInsertXml, $dataConfigXml, $dataBitacoraXml);
+                                              
+                                                    // Importante: Asignar la respuesta final solo si no hay error
+                                                    if(!$responseXML->error){
+                                                        $response->error = false;
+                                                        $response->respuesta = 'Archivos XML y PDF guardados correctamente';
+                                                    }
 
-                                $dataBitacoraXml = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardarFacturaGO'];
-                                
-                                // Guardamos la info del XML
-                                $responseXML = $this->globals->saveTabla($dataInsertXml, $dataConfigXml, $dataBitacoraXml);
-                                
-                                // Importante: Asignar la respuesta final solo si no hay error
-                                if(!$responseXML->error){
-                                    $response->error = false;
-                                    $response->respuesta = 'Archivos XML y PDF guardados correctamente';
-                                }
+                                             }
+                
+
+                                            }
+                                        
                             }
                         }
                     }
@@ -1995,6 +2015,8 @@ class Agregar extends BaseController
             // === FIN NUEVO CÓDIGO DE PROCESAMIENTO ===
 
         } // Fin de if (!$response->error)
+
+       
 
         return $this->respond($responsePrincipal);
     }
