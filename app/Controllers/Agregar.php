@@ -1596,9 +1596,7 @@ class Agregar extends BaseController
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
         $archivos_post = $this->request->getFiles();
-       
-       
-
+      
         $archivos_por_tabla = [];
         if (isset($archivos_post['archivos'])) {
             
@@ -1776,7 +1774,7 @@ class Agregar extends BaseController
             ];
        
         $responsePrincipal = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
-        
+       
         
       
         if (!$responsePrincipal->error) {
@@ -1805,10 +1803,10 @@ class Agregar extends BaseController
                       //  'usu_reg'        => $session->get('id_usuario'),
                        // 'fec_reg'        => date('Y-m-d H:i:s')
                     ];
-
-                    if(!empty($data['id_registro_go']) && !empty($data['id_identificador']))
+              
+                    if(!empty($data['id_registro_go']))
                     {
-                            $idEdiccion = $this->globals->getTabla(['tabla' => 'periodo_factura_go', 'where' => ['id_registro_go' => $data['id_registro_go'], 'id_identificador' =>  $data['id_identificador'][$j] ]]);
+                            $idEdiccion = $this->globals->getTabla(['tabla' => 'periodo_factura_go', 'where' => ['id_registro_go' => $data['id_registro_go'], 'id_identificador' =>  $data['id_identificador'.'_'.$j] ]]);
                         //  die( var_dump( $idEdiccion ) );
                             $dataConfig = [
                                 "tabla" => "periodo_factura_go",
@@ -1824,11 +1822,11 @@ class Agregar extends BaseController
                             ];
 
                             $responseFila = $this->globals->saveTabla($datos_fila_para_guardar, $dataConfig, $dataBitacora);
-                      
+                     // var_dump( $responseFila );
 
 
                     }
-                
+                 //  die();
                     $archivos_pdf_fila = [];
                     $archivos_xml_fila = [];
                     
