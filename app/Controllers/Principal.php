@@ -5324,7 +5324,9 @@ class Principal extends BaseController
         $periodo_factura_go = $globals->getTabla(['tabla' => 'periodo_factura_go', 'where' => ['id_registro_go' => $id_registro_go, 'visible' => 1]]);
         $xml_go             = $globals->getTabla(['tabla' => 'xml_go', 'where' => ['id_registro_go' => $id_registro_go, 'visible' => 1]]);
         $factura_pdf_go     = $globals->getTabla(['tabla' => 'factura_pdf_go', 'where' => ['id_registro_go' => $id_registro_go, 'visible' => 1]]);
-        //die(var_dump( $periodo_factura_go )  );
+        var_dump( $presupuesto );
+        var_dump( $periodo_factura_go );
+        die();
         $data['cat_partida']        = (!empty($cat_partida->data)) ? $cat_partida->data : [];
         $data['periodo_factura_go'] = (!empty($periodo_factura_go->data)) ? $periodo_factura_go->data : [];
         $data['cat_proyecto']       = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];

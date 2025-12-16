@@ -1191,7 +1191,7 @@ class Agregar extends BaseController
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
         $archivos_post = $this->request->getFiles();
-       
+        
 
         $archivos_por_tabla = [];
         if (isset($archivos_post['archivos'])) {
@@ -1365,14 +1365,14 @@ class Agregar extends BaseController
             'comision'              => $data['comision'],
             'no_reserva'            => $data['no_reserva'],
             'lugar'                 => $data['lugar'],
-            'usu_act'               => $data['usu_act'],
+            'usu_act'               => $session->get('id_usuario'),
         ];
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaTurno'];
     
         $dataConfig = [
                 "tabla" => "registro_go",
-                "editar" => true,
-                'idEditar' => ['id_registro_go' => $data['id_registro_go']]
+                "editar" => false
+               
              ];
        
         $responsePrincipal = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
@@ -1597,51 +1597,8 @@ class Agregar extends BaseController
         $data = $this->request->getPost();
         $archivos_post = $this->request->getFiles();
          
-        $archivos_por_tabla = [];
-        if (isset($archivos_post['archivos'])) {
-            
-            foreach ($archivos_post['archivos'] as $key => $file_data) {
-                // $key es 'pdf_0', 'xml_table_1_row_...', etc.
-                
-                $parts = explode('_', $key);
-                $type = $parts[0]; // 'pdf' o 'xml'
-                
-                // El resto es el rowIndex que usó el JS
-                $rowIndex = substr($key, strlen($type) + 1); // '0', '1', 'table_1_row_...'
+     
 
-                // Determinamos a qué tabla '$i' pertenece
-                $tabla_id = null;
-                if (strpos($rowIndex, 'table_') === 0) {
-                    // Es una fila nueva, ej: 'table_1_row_...'
-                    $parts_row = explode('_', $rowIndex);
-                    $tabla_id = $parts_row[1]; // Extrae el '1'
-                } elseif (preg_match('/^\d+$/', $rowIndex)) {
-                    // Es una fila inicial, ej: '0' o '1' (solo números)
-                    $tabla_id = $rowIndex;
-                } else {
-                    // Es un rowIndex complejo de fila inicial, ej: 'initial_0_...'
-                    // Intentamos extraer el ID de la tabla
-                    if (preg_match('/^initial_(\d+)_/', $rowIndex, $matches)) {
-                        $tabla_id = $matches[1]; // Extrae el '0'
-                    }
-                }
-
-                if ($tabla_id !== null) {
-                    // Inicializar array de tabla si no existe
-                    if (!isset($archivos_por_tabla[$tabla_id])) {
-                        $archivos_por_tabla[$tabla_id] = [];
-                    }
-                    
-                    // CORRECCIÓN IMPORTANTE: Extraemos el array de archivos del interior
-                    if ($type == 'pdf' && isset($file_data['pdf'])) {
-                        $archivos_por_tabla[$tabla_id][$rowIndex]['pdf'] = $file_data['pdf'];
-                    } elseif ($type == 'xml' && isset($file_data['xml'])) {
-                        $archivos_por_tabla[$tabla_id][$rowIndex]['xml'] = $file_data['xml'];
-                    }
-                }
-            }
-        }
-       
         // 2. Iterar por las tablas usando los datos de $data (getPost)
         $tablas_procesadas = [];
         if (isset($data['encabezado'])) { // Usamos 'encabezado' como guía
@@ -1824,43 +1781,52 @@ class Agregar extends BaseController
 
 
                     }
-                 //  die();
-                    $archivos_pdf_fila = [];
-                    $archivos_xml_fila = [];
-  
-                    if (!empty($fila['archivos']['pdf'])) {
-                        foreach($fila['archivos']['pdf'] as $pdf) {
-                            if ($pdf->isValid() && !$pdf->hasMoved()) {
-                                $archivos_pdf_fila[] = $pdf;
-                            }
-                        }
-                    }
-                    
-                    // Validar y recolectar XMLs de la fila
-                    if (!empty($fila['archivos']['xml'])) {
-                        foreach($fila['archivos']['xml'] as $xml) {
-                            if ($xml->isValid() && !$xml->hasMoved()) {
-                                $archivos_xml_fila[] = $xml;
-                            }
-                        }
-                    }
-                    
 
-           
-                    // 3. GUARDAR PDFS (CORREGIDO)
-                    if (!empty($archivos_pdf_fila)) {
-                        
-                        // Iteramos sobre los archivos PDF de ESTA fila
-                        foreach($archivos_pdf_fila as $archivo_pdf) { // Cambié $archivo por $archivo_pdf
+                       $archivos_por_tabla = [];
+        if (isset($archivos_post['archivos'])) {
+            
+            foreach ($archivos_post['archivos'] as $key => $file_data) {
+                // $key es 'pdf_0', 'xml_table_1_row_...', etc.
+                
+                $parts = explode('_', $key);
+                $type = $parts[0]; // 'pdf' o 'xml'
+                
+                // El resto es el rowIndex que usó el JS
+                $rowIndex = substr($key, strlen($type) + 1); // '0', '1', 'table_1_row_...'
+
+                // Determinamos a qué tabla '$i' pertenece
+                $tabla_id = null;
+                if (strpos($rowIndex, 'table_') === 0) {
+                    // Es una fila nueva, ej: 'table_1_row_...'
+                    $parts_row = explode('_', $rowIndex);
+                    $tabla_id = $parts_row[1]; // Extrae el '1'
+                } elseif (preg_match('/^\d+$/', $rowIndex)) {
+                    // Es una fila inicial, ej: '0' o '1' (solo números)
+                    $tabla_id = $rowIndex;
+                } else {
+                    // Es un rowIndex complejo de fila inicial, ej: 'initial_0_...'
+                    // Intentamos extraer el ID de la tabla
+                    if (preg_match('/^initial_(\d+)_/', $rowIndex, $matches)) {
+                        $tabla_id = $matches[1]; // Extrae el '0'
+                    }
+                }
+
+                if ($tabla_id !== null) {
+                    // Inicializar array de tabla si no existe
+                    if (!isset($archivos_por_tabla[$tabla_id])) {
+                        $archivos_por_tabla[$tabla_id] = [];
+                    }
+                    // CORRECCIÓN IMPORTANTE: Extraemos el array de archivos del interior
+                    if ($type == 'pdf' && isset($file_data['pdf'])) {
+                       
+                        foreach($file_data['pdf'] as $archivo_pdf) { // Cambié $archivo por $archivo_pdf
                   
                             if (!$archivo_pdf->isValid()) {
                                 continue;
                             }
-
                             $timestamp = date('Ymd_His');
                             $extension = $archivo_pdf->getClientExtension();
                             
-                            // CORRECCIÓN: Usamos el identificador de fila para el nombre
                             $file = 'Factura_go_' . $identificador_fila_unica . '_' . $timestamp . '_' . uniqid() . '.' . $extension;
 
                             $ruta_destino = FCPATH . 'assets/pdf/';
@@ -1870,7 +1836,7 @@ class Agregar extends BaseController
                             $ruta_relativa = 'assets/pdf/' . $file;
                           
                             if(!empty($id_registro_go)){
-                                 $idEdiccion = $this->globals->getTabla(['tabla' => 'factura_pdf_go', 'where' => ['id_registro_go' => $id_registro_go , 'id_identificador' =>  $data['id_identificador_'.$j] ]]);
+                                 $idEdiccion = $this->globals->getTabla(['tabla' => 'factura_pdf_go', 'where' => ['id_registro_go' => $data['id_registro_go'], 'id_identificador' =>  $data['id_identificador_'.$tabla_id] ]]);
 
                                 $dataConfigPdf = [
                                     "tabla" => "factura_pdf_go",
@@ -1894,17 +1860,14 @@ class Agregar extends BaseController
 
                                 // Guardamos la info del PDF
                                 $pdf = $this->globals->saveTabla($dataInsertPdf, $dataConfigPdf, $dataBitacoraPdf);
-                                var_dump($pdf);
+                         
                                 }
                            
-                        }
-                    }
-                
-                    // 4. GUARDAR XMLS (CORREGIDO)
-                    if (!empty($archivos_xml_fila)) {
-                    
-                        // Iteramos sobre los archivos XML de ESTA fila
-                        foreach ($archivos_xml_fila as $archivo_xml) { // Cambié $key => $archivo
+                        } 
+                   
+                    } elseif ($type == 'xml' && isset($file_data['xml'])) {
+                       
+                         foreach ($file_data['xml'] as $archivo_xml) { // Cambié $key => $archivo
                             if (!$archivo_xml->isValid()) {
                                 continue;
                             }
@@ -1952,7 +1915,7 @@ class Agregar extends BaseController
                                 // ... Fin del parseo ...
                               
                                 if(!empty($id_registro_go)){
-                                            $idEdiccion = $this->globals->getTabla(['tabla' => 'xml_go', 'where' => ['id_registro_go' => $id_registro_go , 'id_identificador' =>  $data['id_identificador_'.$j] ]]);                                         
+                                            $idEdiccion = $this->globals->getTabla(['tabla' => 'xml_go', 'where' => ['id_registro_go' => $id_registro_go , 'id_identificador' => $data['id_identificador_'.$tabla_id] ]]);                                         
                                             if(!$idEdiccion->error){
                                                     $dataConfigXml = [
                                                         "tabla" => "xml_go",
@@ -1981,7 +1944,6 @@ class Agregar extends BaseController
                                                     
                                                     // Guardamos la info del XML
                                                     $responseXML = $this->globals->saveTabla($dataInsertXml, $dataConfigXml, $dataBitacoraXml);
-                                                   // var_dump( $responseXML );
                                                     // Importante: Asignar la respuesta final solo si no hay error
                                                     if(!$responseXML->error){
                                                         $response->error = false;
@@ -1995,6 +1957,14 @@ class Agregar extends BaseController
                             }
                         }
                     }
+                }
+            }
+        }
+                
+                    
+      
+           
+
                 }
             }
          
