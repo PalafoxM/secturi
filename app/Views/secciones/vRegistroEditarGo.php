@@ -198,7 +198,7 @@
                                     <div class="col-md-4 mb-3">
                                         <label for="lugar">Lugar<span style="color:red;">*</span></label>
                                         <input type="text" class="form-control" id="lugar" autocomplete="off"
-                                            placeholder="Lugar" name="lugar" value=<?= $registro->lugar ?> >
+                                            placeholder="Lugar" name="lugar" value="<?= $registro->lugar ?>" >
                                     </div><!--end col-->
                                     <div class="col-md-4 mb-3">
                                         <label for="no_reserva">No. de Reserva.<span style="color:red;">*</span></label>
