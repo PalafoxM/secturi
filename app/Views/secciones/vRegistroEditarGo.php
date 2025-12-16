@@ -317,7 +317,7 @@
                                                                     </td>
                                                                      <td>
      
-                                                                        <div class="archivos-seleccionados" id="archivos_<?= $r->id_identificador?>">
+                                                                        <div class="archivos-seleccionados" id="archivos_<?= $i ?>">
                                                                              <a href="<?= base_url(). $r->ruta_relativa ?>" target="_blank" ><i class="fas fa-file-pdf"></i> PDF</a>
                                                                         </div>
                                                                     </td>
@@ -335,7 +335,7 @@
                                                                         </button>
                                                                     </td>
                                                                 </tr>
-
+                                                                <?php $i++; ?>
                                                                 <?php endforeach; ?>
                                                             
                                                             </tbody>
