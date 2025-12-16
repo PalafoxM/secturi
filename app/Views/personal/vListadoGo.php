@@ -59,18 +59,18 @@
                                             <td  class="text-center" class="text-center">
                             
                                                <?php if($session->get('id_perfil') != 7): ?>
+                                            <a href="<?php echo base_url().'index.php/Principal/tablaArchivos/'.$e->id_registro_go.'/GO' ?>" target="_blank">
                                                    <button type="button"  class="btn btn-outline-info btn-round">                       
-                                                <a href="<?php echo base_url().'index.php/Principal/tablaArchivos/'.$e->id_registro_go.'/GO' ?>" target="_blank"><i
-                                                        class="mdi mdi-file-document text-success font-18"></i></a></button>
+                                                <i class="mdi mdi-file-document font-18"></i></button></a>
                                                 <?php endif; ?>
                                                 <?php if(in_array($session->get('id_perfil'),[1,7] )): ?>
                                                 <a class="btn btn-outline-info btn-round" href="<?php echo base_url().'index.php/Inicio/Viaticos/'.$e->id_registro_go?>"  ><i
                                                         class="mdi mdi-check text-success font-18"></i></a> 
                                                 <?php endif; ?>
                                                 <?php if($session->get('id_perfil') != 7): ?>
+                                                <a href="<?php echo base_url().'index.php/Principal/editarTramitePagoGo/'.$e->id_registro_go.'/GO' ?>" >
                                                    <button type="button" class="btn btn-outline-success btn-round">                       
-                                                <a href="<?php echo base_url().'index.php/Principal/editarTramitePagoGo/'.$e->id_registro_go.'/GO' ?>" ><i
-                                                        class="mdi mdi-pen text-success font-18"></i></a></button>
+                                                    <i class="mdi mdi-border-color font-18"></i></button></a>
                                                 <?php endif; ?>
                                          
                                               

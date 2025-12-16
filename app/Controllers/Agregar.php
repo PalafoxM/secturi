@@ -1704,8 +1704,7 @@ class Agregar extends BaseController
                 }
             }
         }
-        
-        
+       
         if ($data['secretario'] == 0) {
             $response->error = true;
             $response->respuesta = "Es requerido el Secretario o Director";
@@ -1781,7 +1780,7 @@ class Agregar extends BaseController
             $dataConfig = [
                 "tabla" => "registro_go",
                 "editar" => true,
-                'idEditar' => ['id_reserva_go' => $data['id_reserva_go']]
+                'idEditar' => ['id_registro_go' => $data['id_registro_go']]
             ];
        
         $responsePrincipal = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
@@ -1791,7 +1790,7 @@ class Agregar extends BaseController
         if (!$responsePrincipal->error) {
             $id_registro_go = $responsePrincipal->idRegistro;
             //$this->cambiarStatus($data['id_reserva_go']);
-             die( var_dump( $tablas_procesadas ) );
+            //die( var_dump( $responsePrincipal ) );
             foreach ($tablas_procesadas as $i => $tabla) {
               
               

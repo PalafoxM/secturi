@@ -295,24 +295,25 @@
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
+                                                                <?php $i = 0; ?>
                                                                 <?php foreach($periodo_factura_go as $r): ?>
                                                                 <input type="hidden" name="id_identificador[]" value="<?= $r->id_identificador ?>" >
                                                                 <tr>
                                                                     <td><input type="text" autocomplete="off"
-                                                                            class="form-control importe-input" name="importe_<?= $r->id_identificador?>[]"
-                                                                            placeholder="Importe" value="<?= $r->total ?>"></td>
+                                                                            class="form-control importe-input" name="importe_<?= $i ?>[]"
+                                                                            placeholder="Importe" value="<?= $r->total ?>" readonly></td>
                                                                     <td>
                                                                         <input autocomplete="off" type="text"
-                                                                            class="form-control propina-input" name="propina_<?= $r->id_identificador?>[]"
+                                                                            class="form-control propina-input" name="propina_<?= $i ?>[]"
                                                                             placeholder="Propina" value="<?= $r->propina; ?>" >
                                                                     </td>
                                                                     <td>
                                                                         <input autocomplete="off" type="date"
-                                                                            class="form-control" name="periodo_inicio_<?= $r->id_identificador?>[]" value="<?= date('Y-m-d', strtotime($r->periodo_inicio)) ?>" >
+                                                                            class="form-control" name="periodo_inicio_<?= $i ?>[]" value="<?= date('Y-m-d', strtotime($r->periodo_inicio)) ?>" >
                                                                     </td>
                                                                     <td>
                                                                            <input autocomplete="off" type="date"
-                                                                            class="form-control" name="periodo_fin_<?= $r->id_identificador?>[]"  value="<?= date('Y-m-d', strtotime($r->periodo_fin))  ?>">
+                                                                            class="form-control" name="periodo_fin_<?= $i ?>[]"  value="<?= date('Y-m-d', strtotime($r->periodo_fin))  ?>">
                                                                     </td>
                                                                      <td>
      
@@ -767,10 +768,10 @@ $('#form_go_editar').on('submit', function(e) {
             }
         },
         beforeSend: function (info){
-            $('#btnGuardaGo').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+            $('#btnEditarGo').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
         },
         complete: function (info){
-            $('#btnGuardaGo').prop('disabled', false).html('Guardar');
+            $('#btnEditarGo').prop('disabled', false).html('Guardar');
         },
         error: function (response,jqXHR, textStatus, errorThrown) {
             var res= JSON.parse(response.responseText);
