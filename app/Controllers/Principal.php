@@ -3972,7 +3972,7 @@ class Principal extends BaseController
             'tabla' => 'periodo_factura_go',
             'where' => ['visible' => 1, 'id_registro_go' => $id_pt]
         ]);
-
+       // var_dump( $xml->data );
         if (isset($importe->data) && !empty($importe->data)) {
             $data['importe'] = $importe->data;
               $totalGo = 0;
@@ -3984,7 +3984,8 @@ class Principal extends BaseController
 
 
         }
-        //die( var_dump( $totalGo) );
+        //var_dump( $data['importe'] );
+        //die();
         //==============================
         
 
@@ -5302,7 +5303,7 @@ class Principal extends BaseController
         $response->error = true;
         $response->respuesta = 'Error|Error al traer los proveedor';
         $globals = new Mglobal;
-       
+        $datosGrupal = [];
         $registro = $globals->getTabla(['tabla' => 'registro_go', 'where' => ['visible' => 1, 'id_registro_go' => $id_registro_go]]);
         
         $data['registro']   = ($registro->data)?$registro->data[0]:[];
@@ -5324,11 +5325,9 @@ class Principal extends BaseController
         $periodo_factura_go = $globals->getTabla(['tabla' => 'periodo_factura_go', 'where' => ['id_registro_go' => $id_registro_go, 'visible' => 1]]);
         $xml_go             = $globals->getTabla(['tabla' => 'xml_go', 'where' => ['id_registro_go' => $id_registro_go, 'visible' => 1]]);
         $factura_pdf_go     = $globals->getTabla(['tabla' => 'factura_pdf_go', 'where' => ['id_registro_go' => $id_registro_go, 'visible' => 1]]);
-        var_dump( $presupuesto );
-        var_dump( $periodo_factura_go );
-        die();
+       
         $data['cat_partida']        = (!empty($cat_partida->data)) ? $cat_partida->data : [];
-        $data['periodo_factura_go'] = (!empty($periodo_factura_go->data)) ? $periodo_factura_go->data : [];
+       
         $data['cat_proyecto']       = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
         $data['cat_opcion']         = (!empty($cat_opcion->data)) ? $cat_opcion->data : [];
         $data['cat_area']           = (!empty($cat_area->data)) ? $cat_area->data : [];
@@ -5336,13 +5335,42 @@ class Principal extends BaseController
         $data['secretario']         = (!empty($secretario->data)) ? $secretario->data : [];
         $data['cat_subsecretario']  = (!empty($cat_subsecretario->data)) ? $cat_subsecretario->data : [];
         $data['presupuesto']        = (!empty($presupuesto->data)) ? $presupuesto->data : [];
-        //die(var_dump( $data['periodo_factura_go'] )  );
-        foreach($xml_go->data as $key => $value){
-                $data['periodo_factura_go'][$key]->total         = (int)$value->total;
-                $data['periodo_factura_go'][$key]->ruta_relativa = $factura_pdf_go->data[$key]->ruta_relativa;
-        }
+         $data['periodo_factura_go'] = (!empty($periodo_factura_go->data)) ? $periodo_factura_go->data : [];
+
+         foreach($data['presupuesto'] as $key => $p){
+                 $datos = $globals->getTabla(['tabla' => 'periodo_factura_go', 'where' => ['id_presupuesto' => $p->id_presupuesto_go, 'visible' => 1]]);
+                 $datosGrupal[$key] = $data['presupuesto'];
+                 foreach($datos->data as $j => $d){
+                    $datosGrupal[$key]['datos'][$j] =  [
+                         'id_periodo_factura' => $d->id_periodo_factura,
+                         'id_registro_go' => $d->id_registro_go,
+                         'id_presupuesto' => $d->id_presupuesto,
+                         'encabezado' => $d->encabezado,
+                         'periodo' => $d->periodo,
+                         'importe' => $d->importe,
+                         'comprobante' => $d->comprobante,
+                         'propina' => $d->propina,
+                         'contribuyente' => $d->contribuyente,
+                         'rfc' => $d->rfc,
+                         'visible' => $d->visible,
+                         'periodo_fin' => $d->periodo_fin,
+                         'periodo_inicio' => $d->periodo_inicio,
+                         'id_identificador' => $d->id_identificador,
+                         'usu_reg' => $d->usu_reg,
+                         'total' => $xml_go->data[$key]->total,
+                         'ruta_relativa' => $factura_pdf_go->data[$key]->ruta_relativa,
+                    ];
+                 }
+                  
+         }
+
+//die( var_dump( $datosGrupal ) );
+
+
+       
        // die( var_dump( $data['periodo_factura_go']  ) );
         $data['id_registro_go']     = $id_registro_go;
+        $data['datosGrupal']        = $datosGrupal;
         $data['scripts']            = array('inicio');
         $data['edita']              = 1;
         $data['contentView']        = 'secciones/vRegistroEditarGo';

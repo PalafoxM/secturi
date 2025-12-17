@@ -1592,390 +1592,431 @@ class Agregar extends BaseController
         $session = \Config\Services::session();
         $response = new \stdClass();
         $response->error = true;
-        $response->respuesta = "Error|Error al guardar PT";
+        $response->respuesta = "Error|Error al guardar GO";
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
         $archivos_post = $this->request->getFiles();
-         
-     
-
-        // 2. Iterar por las tablas usando los datos de $data (getPost)
-        $tablas_procesadas = [];
-        if (isset($data['encabezado'])) { // Usamos 'encabezado' como guía
-            
-            foreach ($data['encabezado'] as $i => $encabezado_texto) {
-                  
-                $tablas_procesadas[$i] = [
-                    'encabezado' => $encabezado_texto,
-                    'id_presupuesto'=> $data['id_presupuesto'][$i] ?? null, // Capturamos el proyecto de la tabla
-                    'filas'      => []
-                ];
-              
-                // Si no hay 'importe' para esta tabla, saltamos
-                if (!isset($data['periodo_inicio_' . $i])) {
-                    continue;
-                }
-
-                // Obtenemos las claves de los archivos para esta tabla, EN ORDEN.
-                $file_keys_para_tabla_i = [];
-                if (isset($archivos_por_tabla[$i])) {
-                    $file_keys_para_tabla_i = array_keys($archivos_por_tabla[$i]);
-                }
- 
-                // 3. Iterar por cada fila ($j) dentro de la tabla ($i)
-                foreach ($data['periodo_inicio_' . $i] as $j => $importe_valor) {
-                    // $j es el índice de la fila (0, 1, 2...)
-                   
-                    // Usamos $j para obtener la clave de archivo correspondiente por orden
-                    $rowIndex_de_archivos = $file_keys_para_tabla_i[$j] ?? null;
-  
-                    $archivos_de_la_fila = null;
-                    if ($rowIndex_de_archivos !== null && isset($archivos_por_tabla[$i][$rowIndex_de_archivos])) {
-                        $archivos_de_la_fila = $archivos_por_tabla[$i][$rowIndex_de_archivos];
-                    }
-
-                    // 4. Construir el objeto final de la fila
-                    $fila_completa = [
-                      //  'importe'        => $importe_valor,
-                        'propina'        => $data['propina_' . $i][$j] ?? null,
-                        'periodo_inicio' => $data['periodo_inicio_' . $i][$j] ?? null,
-                        'periodo_fin'    => $data['periodo_fin_' . $i][$j] ?? null,
-                        'archivos'       => $archivos_de_la_fila, // Ej: ['pdf' => [file1], 'xml' => [file1]]
-                        'js_rowIndex'    => $rowIndex_de_archivos // Para depurar
-                    ];
-                    
-                    // Agregar la fila completa a su tabla
-                    $tablas_procesadas[$i]['filas'][] = $fila_completa;
-                }
-            }
-        }
       
+        // Verificar que tenemos id_registro_go para edición
+        if (empty($data['id_registro_go'])) {
+            $response->respuesta = "Error|No se recibió el ID de registro GO para edición";
+            return $this->respond($response);
+        }
+
+        $id_registro_go = $data['id_registro_go'];
+
+        // Validaciones de campos obligatorios
         if ($data['secretario'] == 0) {
-            $response->error = true;
             $response->respuesta = "Es requerido el Secretario o Director";
             return $this->respond($response);
         }
         if ($data['id_subsecretario'] == 0) {
-            $response->error = true;
             $response->respuesta = "Es requerido el Subsecretario";
             return $this->respond($response);
         }
-      
         if (($data['direccion_responsable']) == 0) {
-            $response->error = true;
             $response->respuesta = "Es requerido el Dirección Responsable";
             return $this->respond($response);
         }
         if (isset($data['documentacion_comprobatoria']) && empty($data['documentacion_comprobatoria'])) {
-            $response->error = true;
             $response->respuesta = "Es requerido el documentacion_comprobatorian";
             return $this->respond($response);
         }
         if (isset($data['poliza']) && empty($data['poliza'])) {
-            $response->error = true;
             $response->respuesta = "Es requerido el poliza";
             return $this->respond($response);
         }
         if (isset($data['formato_conformidad']) && empty($data['formato_conformidad'])) {
-            $response->error = true;
             $response->respuesta = "Es requerido el formato_conformidad";
             return $this->respond($response);
         }
         if (isset($data['concepto_gasto']) && empty($data['concepto_gasto'])) {
-            $response->error = true;
             $response->respuesta = "Es requerido el concepto gasto";
             return $this->respond($response);
         }
-
         if (isset($data['no_reserva']) && empty($data['no_reserva'])) {
-            $response->error = true;
             $response->respuesta = "Es requerido el no_reserva";
             return $this->respond($response);
         }
         if (isset($data['fecha_tramite']) && empty($data['fecha_tramite'])) {
             $data['fecha_tramite'] = date('Y-m-d');
         }
-        
-       
+
+        // 1. Actualizar el registro principal
         $dataInsert = [
-            'id_reserva_go'         => $data['id_reserva_go'],
+            'id_reserva_go' => $data['id_reserva_go'],
             'id_direccion_responsable' => $data['direccion_responsable'],
-            'fecha_tramite'         => $data['fecha_tramite'],
-            'no_consecutivo'        => (int) $data['no_consecutivo'],
+            'fecha_tramite' => $data['fecha_tramite'],
+            'no_consecutivo' => (int) $data['no_consecutivo'],
             'id_reponsable_solicitud' => (int) $data['id_reponsable_solicitud'],
-            'director_general'      => 1,
-            'secretario'            => (int) $data['secretario'],
-            'id_subsecretario'      => (int) $data['id_subsecretario'],
-            'contrato_convenio'     => ($data['contrato_convenio'] == 'NO') ? 2 : 1,
-            'formato_establecido'   => ($data['formato_establecido'] == 'SI') ? 1 : 2,
+            'director_general' => 1,
+            'secretario' => (int) $data['secretario'],
+            'id_subsecretario' => (int) $data['id_subsecretario'],
+            'contrato_convenio' => ($data['contrato_convenio'] == 'NO') ? 2 : 1,
+            'formato_establecido' => ($data['formato_establecido'] == 'SI') ? 1 : 2,
             'documentacion_comprobatoria' => $data['documentacion_comprobatoria'],
-            'poliza'                => ($data['poliza'] == 'SI') ? 1 : 2,
-            'formato_conformidad'   => ($data['formato_conformidad'] == 'SI') ? 1 : 2,
+            'poliza' => ($data['poliza'] == 'SI') ? 1 : 2,
+            'formato_conformidad' => ($data['formato_conformidad'] == 'SI') ? 1 : 2,
             'documentacion_requerida' => ($data['documentacion_requerida'] == 'SI') ? 1 : 2,
-            'evidencia_entrega'     => (int) $data['evidencia_entrega'],
-            'concepto_gasto'        => $data['concepto_gasto'],
-           // 'total_importe'         => $data['total_importe'], // Asegúrate de que este total sea correcto
-            'comision'              => $data['comision'],
-            'no_reserva'            => $data['no_reserva'],
-            'lugar'                 => $data['lugar'],
-            'usu_act'               => $session->get('id_usuario'),
+            'evidencia_entrega' => (int) $data['evidencia_entrega'],
+            'concepto_gasto' => $data['concepto_gasto'],
+            'comision' => $data['comision'],
+            'no_reserva' => $data['no_reserva'],
+            'lugar' => $data['lugar'],
+            'usu_act' => $session->get('id_usuario'),
         ];
-        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaTurno'];
-    
-            $dataConfig = [
-                "tabla" => "registro_go",
-                "editar" => true,
-                'idEditar' => ['id_registro_go' => $data['id_registro_go']]
-            ];
-       
+
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/editarGO'];
+        $dataConfig = [
+            "tabla" => "registro_go",
+            "editar" => true,
+            'idEditar' => ['id_registro_go' => $data['id_registro_go']]
+        ];
+
         $responsePrincipal = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
-       
+
+        if ($responsePrincipal->error) {
+            return $this->respond($responsePrincipal);
+        }
+
+        // 2. Organizar archivos por fila
+        $archivos_por_fila = [];
         
-      
-        if (!$responsePrincipal->error) {
-            $id_registro_go = $responsePrincipal->idRegistro;
-            //$this->cambiarStatus($data['id_reserva_go']);
-            //die( var_dump( $responsePrincipal ) );
-            foreach ($tablas_procesadas as $i => $tabla) {
-            
-              
-                foreach ($tabla['filas'] as $j => $fila) {
-            
-                    // OBTENEMOS EL IDENTIFICADOR ÚNICO DE LA FILA
-                    $identificador_fila_unica = $fila['js_rowIndex'];
-
-                    // 1. GUARDAR DATOS DE LA FILA (Importe, Propina, etc.)
-                    // ¡ESTO ES LO QUE TE FALTA!
-                    $datos_fila_para_guardar = [
-                       // 'id_registro_go' => $id_registro_go, // Se vincula al registro principal
-                        'encabezado'     => $tabla['encabezado'], // Dato de la tabla
-                        'id_presupuesto' => $tabla['id_presupuesto'], // Dato de la tabla
-                       // 'importe'        => str_replace(['$', ','], '', $fila['importe']), // Limpiamos el importe
-                        'propina'        => str_replace(['$', ','], '', $fila['propina']), // Limpiamos la propina
-                        'periodo_inicio' => $fila['periodo_inicio'],
-                        'periodo_fin'    => $fila['periodo_fin'],
-                       // 'id_identificador' => $identificador_fila_unica, // EL ENLACE CLAVE (debe ser VARCHAR)
-                      //  'usu_reg'        => $session->get('id_usuario'),
-                       // 'fec_reg'        => date('Y-m-d H:i:s')
-                    ];
-              
-                    if(!empty($data['id_registro_go']))
-                    {
-                            $idEdiccion = $this->globals->getTabla(['tabla' => 'periodo_factura_go', 'where' => ['id_registro_go' => $data['id_registro_go'], 'id_identificador' =>  $data['id_identificador_'.$j] ]]);
-                        //  die( var_dump( $idEdiccion ) );
-                            $dataConfig = [
-                                "tabla" => "periodo_factura_go",
-                                "editar" => true,
-                                "idEditar" => ['id_periodo_factura' => $idEdiccion->data[0]->id_periodo_factura]
-
-                            ];
-
-                        
-                            $dataBitacora = [
-                                'id_user' => $session->get('id_usuario'),
-                                'script' => 'Agregar.php/guardarFacturaPeriodo'
-                            ];
-
-                            $responseFila = $this->globals->saveTabla($datos_fila_para_guardar, $dataConfig, $dataBitacora);
-                     // var_dump( $responseFila );
-
-
-                    }
-
-                       $archivos_por_tabla = [];
-        if (isset($archivos_post['archivos'])) {
-            
-            foreach ($archivos_post['archivos'] as $key => $file_data) {
-                // $key es 'pdf_0', 'xml_table_1_row_...', etc.
+        // Procesar archivos subidos
+        foreach ($archivos_post as $clave => $grupo_archivos) {
+            // Buscar archivos PDF (formato: pdf_{rowIndex})
+            if (strpos($clave, 'pdf_') === 0) {
+                $rowIndex = substr($clave, 4); // Remover "pdf_"
                 
-                $parts = explode('_', $key);
-                $type = $parts[0]; // 'pdf' o 'xml'
-                
-                // El resto es el rowIndex que usó el JS
-                $rowIndex = substr($key, strlen($type) + 1); // '0', '1', 'table_1_row_...'
-
-                // Determinamos a qué tabla '$i' pertenece
-                $tabla_id = null;
-                if (strpos($rowIndex, 'table_') === 0) {
-                    // Es una fila nueva, ej: 'table_1_row_...'
-                    $parts_row = explode('_', $rowIndex);
-                    $tabla_id = $parts_row[1]; // Extrae el '1'
-                } elseif (preg_match('/^\d+$/', $rowIndex)) {
-                    // Es una fila inicial, ej: '0' o '1' (solo números)
-                    $tabla_id = $rowIndex;
-                } else {
-                    // Es un rowIndex complejo de fila inicial, ej: 'initial_0_...'
-                    // Intentamos extraer el ID de la tabla
-                    if (preg_match('/^initial_(\d+)_/', $rowIndex, $matches)) {
-                        $tabla_id = $matches[1]; // Extrae el '0'
-                    }
+                if (!isset($archivos_por_fila[$rowIndex])) {
+                    $archivos_por_fila[$rowIndex] = ['pdf' => [], 'xml' => []];
                 }
-
-                if ($tabla_id !== null) {
-                    // Inicializar array de tabla si no existe
-                    if (!isset($archivos_por_tabla[$tabla_id])) {
-                        $archivos_por_tabla[$tabla_id] = [];
-                    }
-                    // CORRECCIÓN IMPORTANTE: Extraemos el array de archivos del interior
-                    if ($type == 'pdf' && isset($file_data['pdf'])) {
-                       
-                        foreach($file_data['pdf'] as $archivo_pdf) { // Cambié $archivo por $archivo_pdf
-                  
-                            if (!$archivo_pdf->isValid()) {
-                                continue;
-                            }
-                            $timestamp = date('Ymd_His');
-                            $extension = $archivo_pdf->getClientExtension();
-                            
-                            $file = 'Factura_go_' . $identificador_fila_unica . '_' . $timestamp . '_' . uniqid() . '.' . $extension;
-
-                            $ruta_destino = FCPATH . 'assets/pdf/';
-                            $archivo_pdf->move($ruta_destino, $file);
-
-                            $ruta_absoluta = base_url('assets/pdf/' . $file);
-                            $ruta_relativa = 'assets/pdf/' . $file;
-                          
-                            if(!empty($id_registro_go)){
-                                 $idEdiccion = $this->globals->getTabla(['tabla' => 'factura_pdf_go', 'where' => ['id_registro_go' => $data['id_registro_go'], 'id_identificador' =>  $data['id_identificador_'.$tabla_id] ]]);
-
-                                $dataConfigPdf = [
-                                    "tabla" => "factura_pdf_go",
-                                    "editar" => true,
-                                    "idEditar" => ['id_factura_pdf_go' => $idEdiccion->data[0]->id_factura_pdf_go]
-                                ];
-                                
-                                $dataInsertPdf = [
-                                // 'id_registro_go' => (int)$id_registro_go, // Enlace al registro maestro
-                                // 'id_identificador' => $identificador_fila_unica, // <-- CORREGIDO: EL ENLACE DE FILA
-                                    'ruta_relativa' => $ruta_relativa,
-                                    'ruta_absoluta' => $ruta_absoluta,
-                                    'fec_reg' => date('Y-m-d H:i:s'),
-                                    'usu_reg' => $session->get('id_usuario')
-                                ];
-
-                                $dataBitacoraPdf = [
-                                    'id_user' => $session->get('id_usuario'),
-                                    'script' => 'Agregar.php/guardarFacturaPDF'
-                                ];
-
-                                // Guardamos la info del PDF
-                                $pdf = $this->globals->saveTabla($dataInsertPdf, $dataConfigPdf, $dataBitacoraPdf);
-                         
-                                }
-                           
-                        } 
-                   
-                    } elseif ($type == 'xml' && isset($file_data['xml'])) {
-                       
-                         foreach ($file_data['xml'] as $archivo_xml) { // Cambié $key => $archivo
-                            if (!$archivo_xml->isValid()) {
-                                continue;
-                            }
-
-                            $tipo = $archivo_xml->getMimeType();
-
-                            if (in_array($tipo, ['text/xml', 'application/xml'])) {
-                                $contenido = file_get_contents($archivo_xml->getTempName());
-                                
-                                // ... (Tu código de parseo de XML va aquí, es correcto) ...
-                                libxml_use_internal_errors(true);
-                                $xml = simplexml_load_string($contenido);
-                                if ($xml === false) { continue; } // Saltar si el XML está mal
-
-                                $namespaces = $xml->getNamespaces(true);
-                                $cfdi = $xml->children($namespaces['cfdi']);
-                                
-                                // ... (extracción de $version, $fecha, $total, $rfcEmisor, $uuid, etc.)
-                                
-                                $attrs = $xml->attributes();
-                                $version = (string) $attrs['Version'];
-                                $fecha = (string) $attrs['Fecha'];
-                                $total = (string) $attrs['Total'];
-                                $moneda = (string) $attrs['Moneda'];
-                                $Folio = (string) $attrs['Folio'];
-                                
-                                $emisor = $cfdi->Emisor->attributes();
-                                $rfcEmisor = (string) $emisor['Rfc'];
-                                $nombreEmisor = (string) $emisor['Nombre'];
-
-                                $receptor = $cfdi->Receptor->attributes();
-                                $rfcReceptor = (string) $receptor['Rfc'];
-                                $nombreReceptor = (string) $receptor['Nombre'];
-                                
-                                $uuid = '';
-                                $NoCertificadoSAT = ''; // Renombrado para claridad
-                                if (isset($cfdi->Complemento)) {
-                                    $tfdNamespace = isset($namespaces['tfd']) ? $namespaces['tfd'] : 'http://www.sat.gob.mx/TimbreFiscalDigital';
-                                    if (isset($cfdi->Complemento->children($tfdNamespace)->TimbreFiscalDigital)) {
-                                        $tfdAttributes = $cfdi->Complemento->children($tfdNamespace)->TimbreFiscalDigital->attributes();
-                                        $uuid = (string) $tfdAttributes['UUID'];
-                                        $NoCertificadoSAT = (string) $tfdAttributes['NoCertificadoSAT'];
-                                    }
-                                }
-                                // ... Fin del parseo ...
-                              
-                                if(!empty($id_registro_go)){
-                                            $idEdiccion = $this->globals->getTabla(['tabla' => 'xml_go', 'where' => ['id_registro_go' => $id_registro_go , 'id_identificador' => $data['id_identificador_'.$tabla_id] ]]);                                         
-                                            if(!$idEdiccion->error){
-                                                    $dataConfigXml = [
-                                                        "tabla" => "xml_go",
-                                                        "editar" => true,
-                                                        "idEditar" => ['id_xml'=>$idEdiccion->data[0]->id_xml]
-                                                    ];
-                                                    $dataInsertXml = [
-                                                    // 'id_registro_go' => (int) $id_registro_go, // Enlace al registro maestro
-                                                        'version' => $version,
-                                                        'fecha' => date('Y-m-d H:i:s', strtotime($fecha)),
-                                                        'total' => $total,
-                                                        'moneda' => $moneda,
-                                                        //'id_identificador' => $identificador_fila_unica, // <-- CORREGIDO: EL ENLACE DE FILA
-                                                        'folio' => $Folio,
-                                                        'no_certificado' => $NoCertificadoSAT, // Usar el del timbre
-                                                        'emisor_rfc' => $rfcEmisor,
-                                                        'emisor_nombre' => $nombreEmisor,
-                                                        'receptor_rfc' => $rfcReceptor,
-                                                        'receptor_nombre' => $nombreReceptor,
-                                                        'uuid' => $uuid,
-                                                        'fec_reg' => date('Y-m-d H:i:s'),
-                                                        'usu_reg' => $session->get('id_usuario')
-                                                    ];
-
-                                                    $dataBitacoraXml = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardarFacturaGO'];
-                                                    
-                                                    // Guardamos la info del XML
-                                                    $responseXML = $this->globals->saveTabla($dataInsertXml, $dataConfigXml, $dataBitacoraXml);
-                                                    // Importante: Asignar la respuesta final solo si no hay error
-                                                    if(!$responseXML->error){
-                                                        $response->error = false;
-                                                        $response->respuesta = 'Archivos XML y PDF guardados correctamente';
-                                                    }
-
-                                             }
                 
-                                        
-                                        }      
-                            }
+                // Manejar múltiples archivos PDF
+                if (is_array($grupo_archivos)) {
+                    foreach ($grupo_archivos as $archivo) {
+                        if ($archivo->isValid() && $archivo->getError() === UPLOAD_ERR_OK) {
+                            $archivos_por_fila[$rowIndex]['pdf'][] = $archivo;
                         }
                     }
+                } elseif ($grupo_archivos->isValid() && $grupo_archivos->getError() === UPLOAD_ERR_OK) {
+                    $archivos_por_fila[$rowIndex]['pdf'][] = $grupo_archivos;
+                }
+            }
+            
+            // Buscar archivos XML (formato: xml_{rowIndex})
+            if (strpos($clave, 'xml_') === 0) {
+                $rowIndex = substr($clave, 4); // Remover "xml_"
+                
+                if (!isset($archivos_por_fila[$rowIndex])) {
+                    $archivos_por_fila[$rowIndex] = ['pdf' => [], 'xml' => []];
+                }
+                
+                // Manejar múltiples archivos XML
+                if (is_array($grupo_archivos)) {
+                    foreach ($grupo_archivos as $archivo) {
+                        if ($archivo->isValid() && $archivo->getError() === UPLOAD_ERR_OK) {
+                            $archivos_por_fila[$rowIndex]['xml'][] = $archivo;
+                        }
+                    }
+                } elseif ($grupo_archivos->isValid() && $grupo_archivos->getError() === UPLOAD_ERR_OK) {
+                    $archivos_por_fila[$rowIndex]['xml'][] = $grupo_archivos;
                 }
             }
         }
+     
+        // 3. Procesar cada tabla (conjunto de partidas)
+        $tablas_procesadas = [];
+       
+        if (isset($data['encabezado'])) {
+            foreach ($data['encabezado'] as $i => $encabezado_texto) {
+                $tablas_procesadas[$i] = [
+                    'encabezado' => $encabezado_texto,
+                    'id_presupuesto' => $data['id_presupuesto'][$i] ?? null,
+                    'filas' => []
+                ];
                 
+                // Si no hay datos para esta tabla, continuar
+                if (!isset($data['periodo_inicio_' . $i])) {
+                    continue;
+                }
+                
+                // Procesar cada fila de la tabla
+                foreach ($data['periodo_inicio_' . $i] as $j => $periodo_inicio) {
+                    // Obtener el id_identificador de la fila (si existe)
+                    $id_identificador = $data['id_identificador_' . $i][$j] ?? null;
                     
-      
-           
-
+                    // Determinar el rowIndex para buscar archivos
+                    $rowIndex = $id_identificador;
+                    if (empty($rowIndex)) {
+                        // Para filas nuevas, usar un patrón diferente
+                        $rowIndex = 'nuevo_' . $i . '_' . $j;
+                    }
+                    
+                    // Obtener archivos para esta fila
+                    $archivos_fila = $archivos_por_fila[$rowIndex] ?? ['pdf' => [], 'xml' => []];
+                    
+                    // Construir objeto de fila
+                    $fila_completa = [
+                        'id_identificador' => $id_identificador,
+                        'propina' => $data['propina_' . $i][$j] ?? null,
+                        'periodo_inicio' => $data['periodo_inicio_' . $i][$j] ?? null,
+                        'periodo_fin' => $data['periodo_fin_' . $i][$j] ?? null,
+                        'archivos' => $archivos_fila,
+                        'rowIndex' => $rowIndex,
+                        'tabla_index' => $i,
+                        'fila_index' => $j
+                    ];
+                    
+                    $tablas_procesadas[$i]['filas'][] = $fila_completa;
                 }
             }
-         
+        }
+   
+        // 4. Procesar cada tabla y sus filas
+        foreach ($tablas_procesadas as $i => $tabla) {
+            foreach ($tabla['filas'] as $j => $fila) {
+                
+                $id_identificador = $fila['id_identificador'];
+                
+                // Preparar datos para periodo_factura_go
+                $datos_periodo = [
+                    'id_registro_go' => $id_registro_go,
+                    'encabezado' => $tabla['encabezado'],
+                    'id_presupuesto' => $tabla['id_presupuesto'],
+                    'propina' => str_replace(['$', ','], '', $fila['propina']),
+                    'periodo_inicio' => $fila['periodo_inicio'],
+                    'periodo_fin' => $fila['periodo_fin'],
+                    'usu_reg' => $session->get('id_usuario')
+                ];
+                      
+                // Determinar si es edición o inserción
+                if (isset($id_identificador) && $id_identificador >=0) {
+                    // EDICIÓN: Buscar registro existente
+                
+                    $existePeriodo = $this->globals->getTabla([
+                        'tabla' => 'periodo_factura_go', 
+                        'where' => [
+                            'id_registro_go' => $id_registro_go, 
+                            'id_identificador' => $id_identificador
+                        ]
+                    ]);
+                    
+                    if (!$existePeriodo->error && !empty($existePeriodo->data)) {
+                        // Actualizar registro existente
+                        $dataConfig = [
+                            "tabla" => "periodo_factura_go",
+                            "editar" => true,
+                            "idEditar" => ['id_periodo_factura' => $existePeriodo->data[0]->id_periodo_factura]
+                        ];
+                        
+                        $dataBitacora = [
+                            'id_user' => $session->get('id_usuario'),
+                            'script' => 'Agregar.php/editarGO'
+                        ];
+                        
+                        $responsePeriodo = $this->globals->saveTabla($datos_periodo, $dataConfig, $dataBitacora);
+                  
+                        if ($responsePeriodo->error) {
+                            $response->error = true;
+                            $response->respuesta .= "|Error al actualizar periodo para fila $i-$j";
+                        }
+                    } 
+                }
+
+
+                //====================================================================================
+                //====================================================================================
+                //====================================================================================
+          
+                foreach($archivos_post as $clave => $a){
+
+                    if (strpos($clave, 'pdf_') === 0) {
+                        $identificador = substr($clave, 4); // Remover "xml_"
+                            $existePeriodo = $this->globals->getTabla([
+                                'tabla' => 'factura_pdf_go', 
+                                'where' => [
+                                    'id_registro_go' => $id_registro_go, 
+                                    'id_identificador' => $identificador
+                                ]
+                            ]);
+                            $ID = (isset($existePeriodo->data) && !empty($existePeriodo->data))?$existePeriodo->data[0]->id_factura_pdf_go:'';
+                            if($ID){
+                                foreach ($a as $archivo_pdf) {
+                            
+                                        if ($archivo_pdf->isValid() && $archivo_pdf->getError() === UPLOAD_ERR_OK) {
+                                            $timestamp = date('Ymd_His');
+                                            $extension = $archivo_pdf->getClientExtension();
+                                            $nombre_archivo = 'Factura_go_' . $id_identificador . '_' . $timestamp . '_' . uniqid() . '.' . $extension;
+                                            
+                                            $ruta_destino = FCPATH . 'assets/pdf/';
+                                            
+                                            // Crear directorio si no existe
+                                            if (!is_dir($ruta_destino)) {
+                                                mkdir($ruta_destino, 0777, true);
+                                            }
+                                            
+                                            if ($archivo_pdf->move($ruta_destino, $nombre_archivo)) {
+                                                $ruta_relativa = 'assets/pdf/' . $nombre_archivo;
+                                                $ruta_absoluta = base_url($ruta_relativa);
+                                                
+                                             
+                                                
+                                                $datos_pdf = [
+                                                    'id_registro_go' => $id_registro_go,
+                                                    'id_identificador' => $id_identificador,
+                                                    'ruta_relativa' => $ruta_relativa,
+                                                    'ruta_absoluta' => $ruta_absoluta,
+                                                    'fec_reg' => date('Y-m-d H:i:s'),
+                                                    'usu_reg' => $session->get('id_usuario')
+                                                ];
+                                                
+                                           
+                                                    // Actualizar PDF existente (último registro)
+                                                    $dataConfigPdf = [
+                                                        "tabla" => "factura_pdf_go",
+                                                        "editar" => true,
+                                                        "idEditar" => ['id_factura_pdf_go' => $ID]
+                                                    ];
+                                                }
+                                                
+                                                $dataBitacoraPdf = [
+                                                    'id_user' => $session->get('id_usuario'),
+                                                    'script' => 'Agregar.php/editarGO'
+                                                ];
+                                                
+                                                $respuestaPDF = $this->globals->saveTabla($datos_pdf, $dataConfigPdf, $dataBitacoraPdf);
+                                       
+                                                if ($respuestaPDF->error) {
+                                                    $response->respuesta .= "|Error al guardar PDF para fila";
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                    }
+                    if (strpos($clave, 'xml_') === 0) {
+                        $identificador = substr($clave, 4); // Remover "xml_"
+                            $existePeriodo = $this->globals->getTabla([
+                                'tabla' => 'xml_go', 
+                                'where' => [
+                                    'id_registro_go' => $id_registro_go, 
+                                    'id_identificador' => $identificador
+                                ]
+                            ]);
+                            $ID = (isset($existePeriodo->data) && !empty($existePeriodo->data))?$existePeriodo->data[0]->id_xml:'';
+                            if($ID){
+                                foreach ($a as $archivo_xml) {
+                            
+                                   $tipo = $archivo_xml->getMimeType();
+                                    
+                                    if (in_array($tipo, ['text/xml', 'application/xml'])) {
+                                        $contenido = file_get_contents($archivo_xml->getTempName());
+                                        libxml_use_internal_errors(true);
+                                        $xml = simplexml_load_string($contenido);
+                                        
+                                        if ($xml !== false) {
+                                            $namespaces = $xml->getNamespaces(true);
+                                            $cfdi = $xml->children($namespaces['cfdi']);
+                                            
+                                            $attrs = $xml->attributes();
+                                            $version = (string) $attrs['Version'];
+                                            $fecha = (string) $attrs['Fecha'];
+                                            $total = (string) $attrs['Total'];
+                                            $moneda = (string) $attrs['Moneda'];
+                                            $Folio = (string) $attrs['Folio'];
+                                            
+                                            $emisor = $cfdi->Emisor->attributes();
+                                            $rfcEmisor = (string) $emisor['Rfc'];
+                                            $nombreEmisor = (string) $emisor['Nombre'];
+                                            
+                                            $receptor = $cfdi->Receptor->attributes();
+                                            $rfcReceptor = (string) $receptor['Rfc'];
+                                            $nombreReceptor = (string) $receptor['Nombre'];
+                                            
+                                            $uuid = '';
+                                            $NoCertificadoSAT = '';
+                                            
+                                            if (isset($cfdi->Complemento)) {
+                                                $tfdNamespace = isset($namespaces['tfd']) ? $namespaces['tfd'] : 'http://www.sat.gob.mx/TimbreFiscalDigital';
+                                                if (isset($cfdi->Complemento->children($tfdNamespace)->TimbreFiscalDigital)) {
+                                                    $tfdAttributes = $cfdi->Complemento->children($tfdNamespace)->TimbreFiscalDigital->attributes();
+                                                    $uuid = (string) $tfdAttributes['UUID'];
+                                                    $NoCertificadoSAT = (string) $tfdAttributes['NoCertificadoSAT'];
+                                                }
+                                            }
+                                            
+                                            // Verificar si ya existe un XML para esta fila
+                                            $existeXML = $this->globals->getTabla([
+                                                'tabla' => 'xml_go', 
+                                                'where' => [
+                                                    'id_registro_go' => $id_registro_go, 
+                                                    'id_identificador' => $id_identificador
+                                                ],
+                                                'order_by' => 'id_xml DESC'
+                                            ]);
+                                            
+                                            $datos_xml = [
+                                                'id_registro_go' => $id_registro_go,
+                                                'id_identificador' => $id_identificador,
+                                                'version' => $version,
+                                                'fecha' => date('Y-m-d H:i:s', strtotime($fecha)),
+                                                'total' => $total,
+                                                'moneda' => $moneda,
+                                                'folio' => $Folio,
+                                                'no_certificado' => $NoCertificadoSAT,
+                                                'emisor_rfc' => $rfcEmisor,
+                                                'emisor_nombre' => $nombreEmisor,
+                                                'receptor_rfc' => $rfcReceptor,
+                                                'receptor_nombre' => $nombreReceptor,
+                                                'uuid' => $uuid,
+                                                'fec_reg' => date('Y-m-d H:i:s'),
+                                                'usu_reg' => $session->get('id_usuario')
+                                            ];
+                                            
+                                            if (!$existeXML->error && !empty($existeXML->data)) {
+                                                // Actualizar XML existente (último registro)
+                                                $dataConfigXml = [
+                                                    "tabla" => "xml_go",
+                                                    "editar" => true,
+                                                    "idEditar" => ['id_xml' => $existeXML->data[0]->id_xml]
+                                                ];
+                                            } 
+                                            
+                                            $dataBitacoraXml = [
+                                                'id_user' => $session->get('id_usuario'),
+                                                'script' => 'Agregar.php/editarGO'
+                                            ];
+                                            
+                                            $respuestaXML = $this->globals->saveTabla($datos_xml, $dataConfigXml, $dataBitacoraXml);
+                               
+                                            if ($respuestaXML->error) {
+                                                $response->respuesta .= "|Error al guardar XML para fila $i-$j";
+                                            }
+                                        }
+                                    }
+                                }
+                              }
+                            }
+
+                   
+                    
+                   
+
+                }
+               
+              
+               
+           
+            
+        }
+     
+        // 7. Responder con éxito
+        $response->error = false;
+        $response->respuesta = "GO editado correctamente";
+        $response->idRegistro = $id_registro_go;
         
-            // === FIN NUEVO CÓDIGO DE PROCESAMIENTO ===
-
-        } // Fin de if (!$response->error)
-
-       
-
-        return $this->respond($responsePrincipal);
+        return $this->respond($response);
     }
     private function cambiarStatusPT($id = null)
     {

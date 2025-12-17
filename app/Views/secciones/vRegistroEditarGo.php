@@ -227,131 +227,127 @@
                                 </div><!--end form-row-->
                                 <br>
 
-                                <?php
-                                $partidas_mostradas = [];
-                                foreach ($presupuesto as $i => $p):
-                                    // Evita duplicados por id_partida
-                                    if (in_array($p->id_partida, $partidas_mostradas)) {
-                                        continue;
-                                    }
-                                    $partidas_mostradas[] = $p->id_partida;
-                                    ?>
-                                    <input type="hidden" id="id_presupuesto" name="id_presupuesto[]" value="<?= $p->id_presupuesto_go ;?>" >
-                                    <p class="text-muted mb-4 text-center">Agregar Factura GO.</p>
-                                    <hr>
-                                    <div class="form-row"> <!-- presupuesto -->
-                                        <!-- Partida y Factura PDF -->
-                                        <div class="col-md-4 mb-3">
-                                            <label for="partida_<?= $i ?>">Partida<span style="color:red;">*</span></label>
-                                            <select class="form-control" id="partida_<?= $i ?>" name="partida[]" disabled>
-                                                <?php foreach ($cat_partida as $o): ?>
-                                                    <option value="<?= $o->id_partida ?>" <?= (isset($p->id_partida) && $p->id_partida == $o->id_partida) ? 'selected' : '' ?>>
-                                                        <?= $o->cuenta_cable ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-4 mb-3">
-                                            <label for="proyecto_<?= $i ?>">Proyecto<span
-                                                    style="color:red;">*</span></label>
-                                            <select class="form-control" id="proyecto_<?= $i ?>" name="proyecto[]" disabled>
-                                                <?php foreach ($cat_proyecto as $o): ?>
-                                                    <option value="<?= $o->id_proyecto ?>" <?= (isset($p->id_proyecto) && $p->id_proyecto == $o->id_proyecto) ? 'selected' : '' ?>>
-                                                        <?= $o->proyecto ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-
-                                        <!-- Encabezado y XML -->
-                                        <div class="col-md-4 mb-3">
-                                            <label for="encabezado_<?= $i ?>">Encabezado<span
-                                                    style="color:red;">*</span></label>
-                                            <input type="text" class="form-control" autocomplete="off"
-                                                id="encabezado_<?= $i ?>" name="encabezado[]"
-                                                value="<?= (isset($p->encabezado) && !empty($p->encabezado)) ? $p->encabezado : '' ?>">
-                                        </div>
-
-
-                                    </div>
-
-                             
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <div class="card">
-                                                <div class="card-body">
-
-                                                    <h4 class="mt-0 header-title">REFERENCIA</h4>
-                                                    <div class="table-responsive">
-                                                        <table class="table table-bordered" id="makeEditable<?= $i?>">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>IMPORTE</th>
-                                                                    <th>PROPINA</th>
-                                                                    <th>INICIO</th>
-                                                                    <th>FIN</th>
-                                                                    <th>ARCHIVOS</th>
-                                                                    <th>ACCIONES</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                <?php $i = 0; ?>
-                                                                <?php foreach($periodo_factura_go as $r): ?>
-                                                                <input type="hidden" name="id_identificador_<?= $i ?>[]" value="<?= $r->id_identificador ?>" >
-                                                                <tr>
-                                                                    <td><input type="text" autocomplete="off"
-                                                                            class="form-control importe-input" name="importe_<?= $i ?>[]"
-                                                                            placeholder="Importe" value="<?= $r->total ?>" readonly></td>
-                                                                    <td>
-                                                                        <input autocomplete="off" type="text"
-                                                                            class="form-control propina-input" name="propina_<?= $i ?>[]"
-                                                                            placeholder="Propina" value="<?= $r->propina; ?>" >
-                                                                    </td>
-                                                                    <td>
-                                                                        <input autocomplete="off" type="date"
-                                                                            class="form-control" name="periodo_inicio_<?= $i ?>[]" value="<?= date('Y-m-d', strtotime($r->periodo_inicio)) ?>" >
-                                                                    </td>
-                                                                    <td>
-                                                                           <input autocomplete="off" type="date"
-                                                                            class="form-control" name="periodo_fin_<?= $i ?>[]"  value="<?= date('Y-m-d', strtotime($r->periodo_fin))  ?>">
-                                                                    </td>
-                                                                     <td>
-     
-                                                                        <div class="archivos-seleccionados" id="archivos_<?= $i ?>">
-                                                                             <a href="<?= base_url(). $r->ruta_relativa ?>" target="_blank" ><i class="fas fa-file-pdf"></i> PDF</a>
-                                                                        </div>
-                                                                    </td>
-                                                                    <td>
-                                         
-                                                                        <button type="button" class="btn btn-sm btn-success btn-seleccionar-pdf" data-row="<?= $i?>">
-                                                                            <i class="fas fa-file-pdf"></i> PDF
-                                                                        </button>
-                                                                        <button type="button" class="btn btn-sm btn-warning btn-seleccionar-xml" data-row="<?= $i?>">
-                                                                            <i class="mdi mdi-code-tags"></i> XML
-                                                                        </button>
-                                                                        
-                                                                         <button type="button" class="btn btn-sm btn-danger remove-row">
-                                                                            <i class="fas fa-trash"></i>
-                                                                        </button>
-                                                                    </td>
-                                                                </tr>
-                                                                <?php $i++; ?>
-                                                                <?php endforeach; ?>
-                                                            
-                                                            </tbody>
-                                                        </table>
-                                                      
-                                                    
-                                                    </div>
-                                                </div>
-                                                <!--end card-body-->
+                              <?php
+                                    $partidas_mostradas = [];
+                                    foreach ($datosGrupal as $i => $p):
+                                        // Evita duplicados por id_partida
+                                        if (in_array($p[$i]->id_partida, $partidas_mostradas)) {
+                                            continue;
+                                        }
+                                        $partidas_mostradas[] = $p[$i]->id_partida;
+                                        ?>
+                                        <input type="hidden" id="id_presupuesto_<?= $i ?>" name="id_presupuesto[]" value="<?= $p[$i]->id_presupuesto_go ;?>" >
+                                        <p class="text-muted mb-4 text-center">Agregar Factura GO.</p>
+                                        <hr>
+                                        <div class="form-row"> <!-- presupuesto -->
+                                            <!-- Partida y Factura PDF -->
+                                            <div class="col-md-4 mb-3">
+                                                <label for="partida_<?= $i ?>">Partida<span style="color:red;">*</span></label>
+                                                <select class="form-control" id="partida_<?= $i ?>" name="partida[]" disabled>
+                                                    <?php foreach ($cat_partida as $o): ?>
+                                                        <option value="<?= $o->id_partida ?>" <?= (isset($p[$i]->id_partida) && $p[$i]->id_partida == $o->id_partida) ? 'selected' : '' ?>>
+                                                            <?= $o->cuenta_cable ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label for="proyecto_<?= $i ?>">Proyecto<span style="color:red;">*</span></label>
+                                                <select class="form-control" id="proyecto_<?= $i ?>" name="proyecto[]" disabled>
+                                                    <?php foreach ($cat_proyecto as $o): ?>
+                                                        <option value="<?= $o->id_proyecto ?>" <?= (isset($p[$i]->id_proyecto) && $p[$i]->id_proyecto == $o->id_proyecto) ? 'selected' : '' ?>>
+                                                            <?= $o->proyecto ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
                                             </div>
 
-
+                                            <!-- Encabezado y XML -->
+                                            <div class="col-md-4 mb-3">
+                                                <label for="encabezado_<?= $i ?>">Encabezado<span style="color:red;">*</span></label>
+                                                <input type="text" class="form-control" autocomplete="off"
+                                                    id="encabezado_<?= $i ?>" name="encabezado[]"
+                                                    value="<?= (isset($p[$i]->encabezado) && !empty($p[$i]->encabezado)) ? $p[$i]->encabezado : '' ?>">
+                                            </div>
                                         </div>
-                                        <!-- end col -->
-                                    </div>
-                                <?php endforeach; ?>
+
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <h4 class="mt-0 header-title">REFERENCIA</h4>
+                                                        <div class="table-responsive">
+                                                            <table class="table table-bordered" id="makeEditable_<?= $i ?>">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>IMPORTE</th>
+                                                                        <th>PROPINA</th>
+                                                                        <th>INICIO</th>
+                                                                        <th>FIN</th>
+                                                                        <th>ARCHIVOS</th>
+                                                                        <th>ACCIONES</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <?php foreach($p['datos'] as $j => $r): ?>
+                                                                    <?php $uniqueId = $r['id_identificador'] ?>
+                                                                    <tr data-row-index="<?= $uniqueId ?>">
+                                                                        <input type="hidden" name="id_identificador_<?= $i ?>[]" value="<?= $r['id_identificador'] ?>" >
+                                                                        <td>
+                                                                            <input type="text" autocomplete="off" class="form-control importe-input" 
+                                                                                name="importe_<?= $i ?>[]" placeholder="Importe" 
+                                                                                value="<?= $r['total'] ?>" readonly>
+                                                                        </td>
+                                                                        <td>
+                                                                            <input autocomplete="off" type="text" class="form-control propina-input" 
+                                                                                name="propina_<?= $i ?>[]" placeholder="Propina" 
+                                                                                value="<?= $r['propina']; ?>" >
+                                                                        </td>
+                                                                        <td>
+                                                                            <input autocomplete="off" type="date" class="form-control" 
+                                                                                name="periodo_inicio_<?= $i ?>[]" 
+                                                                                value="<?= date('Y-m-d', strtotime($r['periodo_inicio'])) ?>" >
+                                                                        </td>
+                                                                        <td>
+                                                                            <input autocomplete="off" type="date" class="form-control" 
+                                                                                name="periodo_fin_<?= $i ?>[]"  
+                                                                                value="<?= date('Y-m-d', strtotime($r['periodo_fin']))  ?>">
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="archivos-seleccionados" id="archivos_<?= $uniqueId ?>">
+                                                                                <?php if(!empty($r['ruta_relativa'])): ?>
+                                                                                <a href="<?= base_url() . $r['ruta_relativa'] ?>" target="_blank">
+                                                                                    <i class="fas fa-file-pdf"></i> PDF
+                                                                                </a>
+                                                                                <?php else: ?>
+                                                                                <small class="text-muted">No hay archivos</small>
+                                                                                <?php endif; ?>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <button type="button" class="btn btn-sm btn-success btn-seleccionar-pdf" 
+                                                                                data-row="<?= $uniqueId ?>">
+                                                                                <i class="fas fa-file-pdf"></i> PDF
+                                                                            </button>
+                                                                            <button type="button" class="btn btn-sm btn-warning btn-seleccionar-xml" 
+                                                                                data-row="<?= $uniqueId ?>">
+                                                                                <i class="mdi mdi-code-tags"></i> XML
+                                                                            </button>
+                                                                            <button type="button" class="btn btn-sm btn-danger remove-row" 
+                                                                                data-row="<?= $uniqueId ?>">
+                                                                                <i class="fas fa-trash"></i>
+                                                                            </button>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <?php endforeach; ?>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
                                 <div id="hidden-file-inputs-container"></div>
                                 <a class="btn btn-gradient-danger" style="color:white"
                                     onclick="window.history.back()">Atrás</a>
@@ -414,12 +410,6 @@
 
 
 <script>
-$('.add-file').on('click', function (e) {
-    e.preventDefault();
-    const inputId = $(this).data('target');
-    $(inputId).click();
-});
-
 // Objeto global para almacenar archivos por fila
 const archivosPorFila = {};
 
@@ -433,73 +423,10 @@ function inicializarFilaEnArchivos(rowIndex) {
     }
 }
 
-function addRow(i) {
-    const rowIndex = 'table_' + i + '_row_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    
-    var newRow = `
-    <tr data-row-index="${rowIndex}">
-        <td>
-            <input type="text" autocomplete="off" class="form-control importe-input" name="importe_${i}[]" placeholder="Importe">
-        </td>
-        <td>
-            <input autocomplete="off" type="text" class="form-control propina-input" name="propina_${i}[]" placeholder="Propina">
-        </td>
-        <td>
-            <input autocomplete="off" type="date" class="form-control" name="periodo_inicio_${i}[]">
-        </td>
-        <td>
-            <input autocomplete="off" type="date" class="form-control" name="periodo_fin_${i}[]">
-        </td>
-        <td>
-            <div class="archivos-seleccionados" id="archivos_${rowIndex}">
-                <small class="text-muted">No hay archivos</small>
-            </div>
-        </td>
-        <td>
-            <button type="button" class="btn btn-sm btn-success btn-seleccionar-pdf" data-row="${rowIndex}">
-                <i class="fas fa-file-pdf"></i> PDF
-            </button>
-            <button type="button" class="btn btn-sm btn-warning btn-seleccionar-xml" data-row="${rowIndex}">
-                <i class="mdi mdi-code-tags"></i> XML
-            </button>
-            <button type="button" class="btn btn-sm btn-danger remove-row">
-                <i class="fas fa-trash"></i>
-            </button>
-        </td>
-    </tr>`;
-
-    $(`#makeEditable${i} tbody`).append(newRow);
-
-    // INICIALIZAR LA FILA EN EL OBJETO
-    inicializarFilaEnArchivos(rowIndex);
-
-    // Inicializar máscaras para campos numéricos
-    $(`#makeEditable${i} tbody tr[data-row-index="${rowIndex}"] input[name="importe_${i}[]"]`).inputmask('numeric', {
-        radixPoint: ".",
-        groupSeparator: ",",
-        digits: 2,
-        autoGroup: true,
-        prefix: '$ ',
-        rightAlign: false
-    });
-    
-    $(`#makeEditable${i} tbody tr[data-row-index="${rowIndex}"] input[name="propina_${i}[]"]`).inputmask('numeric', {
-        radixPoint: ".",
-        groupSeparator: ",",
-        digits: 2,
-        autoGroup: true,
-        prefix: '$ ',
-        rightAlign: false
-    });
-    
-    calcularTotal(i);
-}
-
-
 // Eliminar fila
 $(document).on('click', '.remove-row', function () {
+    const rowId = $(this).data('row');
     const row = $(this).closest('tr');
-    const rowIndex = row.data('row-index');
     
     Swal.fire({
         title: '¿Estás seguro?',
@@ -512,26 +439,20 @@ $(document).on('click', '.remove-row', function () {
         cancelButtonText: 'Cancelar'
     }).then((result) => {
         if (result.isConfirmed) {
-            if (archivosPorFila[rowIndex]) {
-                delete archivosPorFila[rowIndex];
+            if (archivosPorFila[rowId]) {
+                delete archivosPorFila[rowId];
             }
             
             row.remove();
-            // Recalcular total para todas las tablas
-            <?php foreach ($presupuesto as $i => $p): ?>
-            calcularTotal(<?= $i ?>);
-            <?php endforeach; ?>
             
             Swal.fire('Eliminado!', 'La fila ha sido eliminada.', 'success');
         }
     });
 });
 
-// SweetAlert para seleccionar PDF - CORREGIDO
+// SweetAlert para seleccionar PDF
 $(document).on('click', '.btn-seleccionar-pdf', function() {
     const rowIndex = $(this).data('row');
-    
-    // VERIFICAR E INICIALIZAR SI NO EXISTE
     inicializarFilaEnArchivos(rowIndex);
     
     const input = document.createElement('input');
@@ -573,7 +494,6 @@ $(document).on('click', '.btn-seleccionar-pdf', function() {
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-                // VERIFICAR NUEVAMENTE ANTES DE ASIGNAR
                 inicializarFilaEnArchivos(rowIndex);
                 archivosPorFila[rowIndex].pdf = archivosValidos;
                 actualizarVistaArchivos(rowIndex);
@@ -590,11 +510,9 @@ $(document).on('click', '.btn-seleccionar-pdf', function() {
     input.click();
 });
 
-// SweetAlert para seleccionar XML - CORREGIDO
+// SweetAlert para seleccionar XML
 $(document).on('click', '.btn-seleccionar-xml', function() {
     const rowIndex = $(this).data('row');
-    
-    // VERIFICAR E INICIALIZAR SI NO EXISTE
     inicializarFilaEnArchivos(rowIndex);
 
     const input = document.createElement('input');
@@ -636,7 +554,6 @@ $(document).on('click', '.btn-seleccionar-xml', function() {
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-                // VERIFICAR NUEVAMENTE ANTES DE ASIGNAR
                 inicializarFilaEnArchivos(rowIndex);
                 archivosPorFila[rowIndex].xml = archivosValidos;
                 actualizarVistaArchivos(rowIndex);
@@ -657,7 +574,6 @@ $(document).on('click', '.btn-seleccionar-xml', function() {
 function actualizarVistaArchivos(rowIndex) {
     const container = $(`#archivos_${rowIndex}`);
     
-    // Verificar que la fila existe en el objeto
     if (!archivosPorFila[rowIndex]) {
         container.html('<small class="text-muted">No hay archivos</small>');
         return;
@@ -686,55 +602,30 @@ function actualizarVistaArchivos(rowIndex) {
     container.html(html);
 }
 
-// Cálculo de totales corregido
-function calcularTotal(i) {
-    let total = 0;
-    
-    $(`input[name="importe_${i}[]"]`).each(function() {
-        let valor = $(this).val().replace(/[$,]/g, '') || 0;
-        total += parseFloat(valor);
-    });
-    
-    $(`input[name="propina_${i}[]"]`).each(function() {
-        let valor = $(this).val().replace(/[$,]/g, '') || 0;
-        total += parseFloat(valor);
-    });
-    
-    $(`#total_importe_${i}`).val('$ ' + total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'));
-}
-
-// Eventos para cálculos en tiempo real
-$(document).on('input', 'input[class*="importe-input"], input[class*="propina-input"]', function() {
-    // Encontrar el índice i de la tabla padre
-    const table = $(this).closest('table');
-    const tableId = table.attr('id');
-    const i = tableId.replace('makeEditable', '');
-    calcularTotal(i);
-});
-
-// Preparar FormData corregido
+// Preparar FormData
 function prepararFormData() {
     const formData = new FormData();
     const form = $('#form_go_editar')[0];
     const formElements = new FormData(form);
     
+    // Agregar todos los campos del formulario
     for (let [key, value] of formElements) {
         formData.append(key, value);
     }
     
-    // Agregar archivos - SOLO FILAS QUE EXISTEN
+    // Agregar archivos
     Object.keys(archivosPorFila).forEach(rowIndex => {
         const archivos = archivosPorFila[rowIndex];
         
         if (archivos && archivos.pdf) {
             archivos.pdf.forEach((file, fileIndex) => {
-                formData.append(`archivos[pdf_${rowIndex}][pdf][${fileIndex}]`, file);
+                formData.append(`pdf_${rowIndex}[${fileIndex}]`, file);
             });
         }
         
         if (archivos && archivos.xml) {
             archivos.xml.forEach((file, fileIndex) => {
-                formData.append(`archivos[xml_${rowIndex}][xml][${fileIndex}]`, file);
+                formData.append(`xml_${rowIndex}[${fileIndex}]`, file);
             });
         }
     });
@@ -746,8 +637,6 @@ function prepararFormData() {
 $('#form_go_editar').on('submit', function(e) {
     e.preventDefault();
     const formData = prepararFormData();
-
-
 
     $.ajax({
         type: "POST",
@@ -780,35 +669,28 @@ $('#form_go_editar').on('submit', function(e) {
     });
 });
 
-// Inicialización CORREGIDA
+// Inicialización
 $(document).ready(function() {
     // Inicializar filas existentes
-    <?php foreach ($presupuesto as $i => $p): ?>
-    const initialRowIndex<?= $i ?> = 'initial_<?= $i ?>_' + Date.now();
-    $(`#makeEditable<?= $i ?> tbody tr`).first().attr('data-row-index', initialRowIndex<?= $i ?>);
-    
-    // INICIALIZAR LA FILA EN EL OBJETO
-    inicializarFilaEnArchivos(initialRowIndex<?= $i ?>);
-    
-    // Aplicar inputmask a campos existentes
-    $(`input[name="importe_<?= $i ?>[]"]`).inputmask('numeric', {
-        radixPoint: ".",
-        groupSeparator: ",",
-        digits: 2,
-        autoGroup: true,
-        prefix: '$ ',
-        rightAlign: false
+    $('table tbody tr').each(function() {
+        const rowIndex = $(this).data('row-index');
+        if (rowIndex) {
+            inicializarFilaEnArchivos(rowIndex);
+        }
     });
-    $(`input[name="propina_<?= $i ?>[]"]`).inputmask('numeric', {
-        radixPoint: ".",
-        groupSeparator: ",",
-        digits: 2,
-        autoGroup: true,
-        prefix: '$ ',
-        rightAlign: false
-    });
-    <?php endforeach; ?>
     
-    console.log('Filas inicializadas:', archivosPorFila);
+    // Aplicar inputmask a todos los campos de importe y propina
+    $('.importe-input, .propina-input').each(function() {
+        $(this).inputmask('numeric', {
+            radixPoint: ".",
+            groupSeparator: ",",
+            digits: 2,
+            autoGroup: true,
+            prefix: '$ ',
+            rightAlign: false
+        });
+    });
+    
+    console.log('Archivos por fila inicializados:', archivosPorFila);
 });
 </script>
