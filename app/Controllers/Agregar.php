@@ -1904,7 +1904,9 @@ class Agregar extends BaseController
                                     'id_identificador' => $identificador
                                 ]
                             ]);
+                           
                             $ID = (isset($existePeriodo->data) && !empty($existePeriodo->data))?$existePeriodo->data[0]->id_xml:'';
+
                             if($ID){
                                 foreach ($a as $archivo_xml) {
                             
@@ -1946,16 +1948,7 @@ class Agregar extends BaseController
                                                 }
                                             }
                                             
-                                            // Verificar si ya existe un XML para esta fila
-                                            $existeXML = $this->globals->getTabla([
-                                                'tabla' => 'xml_go', 
-                                                'where' => [
-                                                    'id_registro_go' => $id_registro_go, 
-                                                    'id_identificador' => $id_identificador
-                                                ],
-                                                'order_by' => 'id_xml DESC'
-                                            ]);
-                                            
+
                                             $datos_xml = [
                                                 'id_registro_go' => $id_registro_go,
                                                 'id_identificador' => $id_identificador,
@@ -1974,14 +1967,14 @@ class Agregar extends BaseController
                                                 'usu_reg' => $session->get('id_usuario')
                                             ];
                                             
-                                            if (!$existeXML->error && !empty($existeXML->data)) {
+                                
                                                 // Actualizar XML existente (último registro)
                                                 $dataConfigXml = [
                                                     "tabla" => "xml_go",
                                                     "editar" => true,
-                                                    "idEditar" => ['id_xml' => $existeXML->data[0]->id_xml]
+                                                    "idEditar" => ['id_xml' => $ID ]
                                                 ];
-                                            } 
+                                            
                                             
                                             $dataBitacoraXml = [
                                                 'id_user' => $session->get('id_usuario'),
@@ -1989,9 +1982,9 @@ class Agregar extends BaseController
                                             ];
                                             
                                             $respuestaXML = $this->globals->saveTabla($datos_xml, $dataConfigXml, $dataBitacoraXml);
-                               
+ 
                                             if ($respuestaXML->error) {
-                                                $response->respuesta .= "|Error al guardar XML para fila $i-$j";
+                                                $response->respuesta .= "|Error al guardar XML para fila";
                                             }
                                         }
                                     }
@@ -2010,7 +2003,7 @@ class Agregar extends BaseController
            
             
         }
-     
+
         // 7. Responder con éxito
         $response->error = false;
         $response->respuesta = "GO editado correctamente";
