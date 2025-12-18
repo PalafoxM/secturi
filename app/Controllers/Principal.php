@@ -5324,7 +5324,7 @@ class Principal extends BaseController
         $cat_partida        = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
         $periodo_factura_go = $globals->getTabla(['tabla' => 'periodo_factura_go', 'where' => ['id_registro_go' => $id_registro_go, 'visible' => 1]]);
         $xml_go             = $globals->getTabla(['tabla' => 'xml_go', 'where' => ['id_registro_go' => $id_registro_go, 'visible' => 1]]);
-        $factura_pdf_go     = $globals->getTabla(['tabla' => 'factura_pdf_go', 'where' => ['id_registro_go' => $id_registro_go, 'visible' => 1]]);
+        
        
         $data['cat_partida']        = (!empty($cat_partida->data)) ? $cat_partida->data : [];
        
@@ -5336,11 +5336,16 @@ class Principal extends BaseController
         $data['cat_subsecretario']  = (!empty($cat_subsecretario->data)) ? $cat_subsecretario->data : [];
         $data['presupuesto']        = (!empty($presupuesto->data)) ? $presupuesto->data : [];
          $data['periodo_factura_go'] = (!empty($periodo_factura_go->data)) ? $periodo_factura_go->data : [];
-
+         //var_dump( $data['presupuesto'] );
          foreach($data['presupuesto'] as $key => $p){
                  $datos = $globals->getTabla(['tabla' => 'periodo_factura_go', 'where' => ['id_presupuesto' => $p->id_presupuesto_go, 'visible' => 1]]);
+           //      var_dump(  $datos );
                  $datosGrupal[$key] = $data['presupuesto'];
                  foreach($datos->data as $j => $d){
+             //      var_dump(  $d );
+                    $xml      = $globals->getTabla(['tabla' => 'xml_go', 'where' => ['id_registro_go' => $id_registro_go, 'id_identificador' => $d->id_identificador, 'visible' => 1]]);
+                    $factura  = $globals->getTabla(['tabla' => 'factura_pdf_go', 'where' => ['id_registro_go' => $id_registro_go, 'id_identificador' => $d->id_identificador, 'visible' => 1]]);
+    
                     $datosGrupal[$key]['datos'][$j] =  [
                          'id_periodo_factura' => $d->id_periodo_factura,
                          'id_registro_go' => $d->id_registro_go,
@@ -5357,16 +5362,21 @@ class Principal extends BaseController
                          'periodo_inicio' => $d->periodo_inicio,
                          'id_identificador' => $d->id_identificador,
                          'usu_reg' => $d->usu_reg,
-                         'total' => $xml_go->data[$key]->total,
-                         'ruta_relativa' => $factura_pdf_go->data[$key]->ruta_relativa,
+                         'total' => $xml->data[0]->total,
+                         'ruta_relativa' => $factura->data[0]->ruta_relativa,
                     ];
                  }
-                  
+
+
+               //   var_dump( $datosGrupal[$key]['datos'][$j] );
          }
+      /*    foreach($periodo_factura_go as $f){
+
+         } */
 
 //die( var_dump( $datosGrupal ) );
 
-
+ //    die();
        
        // die( var_dump( $data['periodo_factura_go']  ) );
         $data['id_registro_go']     = $id_registro_go;
