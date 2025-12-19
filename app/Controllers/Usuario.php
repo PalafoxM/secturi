@@ -775,6 +775,22 @@ class Usuario extends BaseController
                                     $stopIncProcessing = true;
                                 }
                             }
+                            if (!$stopIncProcessing && $horaFin) {
+                                if ($horaInicio >= '9:01:00' && $horaFin <= '18:00:00') {
+                                    $valorSalida = $nombreInc;
+                                    $sheet->getStyle($colEntrada . $fila)
+                                        ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                        // agregar FF al color
+                                        ->getStartColor()->setARGB('FF6EA11D');
+                                    $validado = true;
+                                    $stopIncProcessing = true;
+                                    $sheet->getStyle($colSalida . $fila)
+                                        ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                        ->getStartColor()->setARGB('FF6EA11D');
+                                    $validado = true;
+                                    $stopIncProcessing = true;
+                                }
+                            }
 
                             // Si la comisión es de todo el día (inicio y fin) podrías decidir marcar ambos campos:
                             if (!$stopIncProcessing && $horaInicio && $horaFin) {
@@ -795,9 +811,9 @@ class Usuario extends BaseController
                             if ($stopIncProcessing)
                                 break;
                         }
-                        if ($cat === 1 && $estatus === 3) {
+                        if ($cat === 1 && $estatus === 3 ) {
                             // Normalizamos con DateTime (si existe)
-
+                          
                             // Si hay hora de inicio dentro del rango de la mañana -> marcar entrada como permiso
                             if ($horaInicio) {
                                 // compara solo la parte de tiempo: 09:01:00 - 12:00:00 (ajusta si tus rangos cambian)
@@ -848,6 +864,7 @@ class Usuario extends BaseController
                         }
                         if ($cat === 7 && $estatus === 3) {
                             // Normalizamos con DateTime (si existe)
+                           
 
                             // Si hay hora de inicio dentro del rango de la mañana -> marcar entrada como permiso
                             if ($horaInicio) {
@@ -862,6 +879,21 @@ class Usuario extends BaseController
                                     $stopIncProcessing = true;
                                 }
                             }
+
+                             if ($horaInicio >= '08:00:00' && $horaFin <= '20:00:00') {
+                                    $valorEntrada = 'CONSTANCIA DE TIEMPO';
+                                    $sheet->getStyle($colEntrada . $fila)
+                                        ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                        // agregar FF al color
+                                        ->getStartColor()->setARGB('FF6EA11D');
+                                    $validado = true;
+                                    $sheet->getStyle($colSalida . $fila)
+                                        ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                        // agregar FF al color
+                                        ->getStartColor()->setARGB('FF6EA11D');
+                                    $validado = true;
+                                    $stopIncProcessing = true;
+                                }
 
                             // Si hay hora fin y cae en el rango de tarde -> marcar salida como permiso
                             if (!$stopIncProcessing && $horaFin) {
@@ -1010,7 +1042,7 @@ class Usuario extends BaseController
            
         }
 
-      
+        //die();
 
         // Ajustar dimensiones de columnas
         $sheet->getColumnDimension('A')->setWidth(15); // ← No. Empleado
