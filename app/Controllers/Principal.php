@@ -5258,6 +5258,28 @@ class Principal extends BaseController
             $registro_pt = $globals->getTabla(['tabla' => 'vw_registro_go', 'where' => ['visible' => 1, 'id_registro_go' => $id_registro_go]]);
         }
 
+        $user = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario ]]);
+        $id_area           = (isset($user->data) && !empty($user->data))?$user->data[0]->id_area:0;
+        $id_jefe_inmediato = (isset($user->data) && !empty($user->data))?$user->data[0]->id_jefe_inmediato:0;
+      
+        $responGasto = $globals->getTabla(['tabla' => 'folio_go', 'where' => ['id_direccion' => (int)$session->id_usuario]]);  //primero revisamos si tu no eres responsable del gasto
+
+        if( isset($responGasto->data) && !empty($responGasto->data)){
+             $no_consecutivo = count($responGasto->data);
+        }
+        if(empty($responGasto->data)){
+             $responGasto = $globals->getTabla(['tabla' => 'folio_go', 'where' => ['visible' => 1, 'id_direccion', $id_jefe_inmediato ]]);
+             $no_consecutivo = (isset($responGasto->data) && !empty($responGasto->data))?count($responGasto->data):'';
+        }
+        if(isset($no_consecutivo) && empty($no_consecutivo)){
+               $responGasto = $globals->getTabla(['tabla' => 'folio_go', 'where' => ['visible' => 1, 'id_area ', $id_area]]);
+               $no_consecutivo = (isset($responGasto->data) && !empty($responGasto->data))?count($responGasto->data):'';
+        }
+   
+
+        
+        $data['no_consecutivo'] = (int)$no_consecutivo + 1;
+
 
         $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1]]);
         $cat_tipo = $globals->getTabla(['tabla' => 'cat_tipo', 'where' => ['visible' => 1]]);
@@ -5305,7 +5327,13 @@ class Principal extends BaseController
         $globals = new Mglobal;
         $datosGrupal = [];
         $registro = $globals->getTabla(['tabla' => 'registro_go', 'where' => ['visible' => 1, 'id_registro_go' => $id_registro_go]]);
-        
+        $id_reponsable_solicitud = (isset($registro->data) && !empty($registro->data))? $registro->data[0]->id_reponsable_solicitud:'';
+        $consecutivo = $globals->getTabla(['tabla' => 'folio_go', 'where' => ['visible' => 1, 'id_direccion' => $id_reponsable_solicitud ]]);
+         //die( var_dump( $consecutivo ) );           
+            $conse = (isset($consecutivo->data) && !empty($consecutivo->data)) ? $consecutivo->data[0]->no_consecutivo : '';
+           // die( var_dump( $conse ) );
+            $data['consecutivo'] = (int)$conse + 1; 
+       
         $data['registro']   = ($registro->data)?$registro->data[0]:[];
         $director_general   = ($registro->data)?$registro->data[0]->director_general:'';
         $data['id_reserva'] = $id_reserva_go = ($registro->data)?$registro->data[0]->id_reserva_go:'';

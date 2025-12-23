@@ -1342,13 +1342,13 @@ class Agregar extends BaseController
             $data['fecha_tramite'] = date('Y-m-d');
         }
 
-
+       $no_consecutivo = $this->registrarFolioGo($data['no_consecutivo'], $data['id_reponsable_solicitud']);
 
         $dataInsert = [
             'id_reserva_go' => $data['id_reserva_go'],
             'id_direccion_responsable' => $data['direccion_responsable'],
             'fecha_tramite' => $data['fecha_tramite'],
-            'no_consecutivo' => (int) $data['no_consecutivo'],
+            'no_consecutivo' => (int) $no_consecutivo,
             'id_reponsable_solicitud' => (int) $data['id_reponsable_solicitud'],
             'director_general' => 1,
             'secretario' => (int) $data['secretario'],
@@ -2164,6 +2164,46 @@ class Agregar extends BaseController
         $dataDB = array('tabla' => 'inventario', 'where' => ['visible' => 1, 'id_inventario' => $id_inventario]);
         $response = $globals->getTabla($dataDB);
         return $this->respond($response->data[0]);
+
+    }
+    private function registrarFolioGo($no_consecutivo, $responsableGasto)
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+        $globals = new Mglobal;
+        $idRegistro = 0;
+        $dataDB = array('tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario]);
+        $user = $globals->getTabla($dataDB);
+        //vemos si el usuario tiene id_area
+        if (isset($user->data) && !empty($user->data)) {
+            $id_area = $user->data[0]->id_area;
+            $dataInsert = [
+                'no_consecutivo' => $no_consecutivo,
+                'id_area' => $id_area,
+                'id_direccion' => $responsableGasto,
+                'fec_reg' => date('Y-m-d H:i:s'),
+                'usu_reg' => $session->id_usuario,
+            ];
+            $dataConfig = [
+                "tabla" => "folio_go",
+                "editar" => false
+            ];
+
+
+        }
+
+
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFolio'];
+        $no_consecutivo = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+        // var_dump($no_consecutivo);
+        // die();
+        if (!$no_consecutivo->error) {
+            $idRegistro = $no_consecutivo->idRegistro;
+
+        }
+
+        return $idRegistro;
 
     }
     private function registrarFolio($no_consecutivo, $responsableGasto)

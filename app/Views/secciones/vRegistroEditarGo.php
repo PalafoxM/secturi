@@ -218,7 +218,7 @@
                                                 style="color:red;">*</span></label>
                                         <input type="number" class="form-control" autocomplete="off" id="no_consecutivo"
                                             name="no_consecutivo" placeholder="001"
-                                            value="<?= (isset($reserva->no_consecutivo)) ? $reserva->no_consecutivo : '' ?>">
+                                            value="<?= (isset($consecutivo)) ? $consecutivo : '' ?>">
                                         <div class="invalid-feedback">
                                             Campo no Valido
                                         </div>
