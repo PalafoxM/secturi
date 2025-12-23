@@ -5345,7 +5345,7 @@ class Principal extends BaseController
              //      var_dump(  $d );
                     $xml      = $globals->getTabla(['tabla' => 'xml_go', 'where' => ['id_registro_go' => $id_registro_go, 'id_identificador' => $d->id_identificador, 'visible' => 1]]);
                     $factura  = $globals->getTabla(['tabla' => 'factura_pdf_go', 'where' => ['id_registro_go' => $id_registro_go, 'id_identificador' => $d->id_identificador, 'visible' => 1]]);
-    
+                    //die( var_dump( $xml ) );
                     $datosGrupal[$key]['datos'][$j] =  [
                          'id_periodo_factura' => $d->id_periodo_factura,
                          'id_registro_go' => $d->id_registro_go,

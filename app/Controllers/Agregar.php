@@ -85,20 +85,20 @@ class Agregar extends BaseController
         $data = array();
         $response = new \stdClass();
         $this->globals = new Mglobal();
-        
-    
-    
+
+
+
         foreach ($periodo as $p) {
 
-           
+
             $esAnidado = (is_array($p['encabezado']) && is_array($p['encabezado']));
             $esNormal = (is_string($p['encabezado']) && is_string($p['encabezado']));
-    
+
             if ($esAnidado) {
                 // Estructura anidada: múltiples registros
                 foreach ($p['encabezado'] as $index => $encabezado) {
-                     // Iterar sobre cada conjunto de datos
-                  
+                    // Iterar sobre cada conjunto de datos
+
                     $dataConfig = [
                         "tabla" => "periodo_factura_go",
                         "editar" => false
@@ -106,12 +106,12 @@ class Agregar extends BaseController
 
                     $dataInsert = [
                         'id_registro_go' => (int) $id_registro_go,
-                        'encabezado'     => $p['encabezado'][$index] ?? $p['encabezado'][0] ?? null,  
-                        'importe'        => (int)$p['importe'][$index] ?? null,
+                        'encabezado' => $p['encabezado'][$index] ?? $p['encabezado'][0] ?? null,
+                        'importe' => (int) $p['importe'][$index] ?? null,
                         'periodo_inicio' => date('Y-m-d', strtotime($p['periodo_inicio'][$index])) ?? null,
-                        'periodo_fin'    =>date('Y-m-d', strtotime($p['periodo_fin'][$index])) ?? null,
-                        'propina'        => (int)$p['propina'][$index] ?? null,
-                   
+                        'periodo_fin' => date('Y-m-d', strtotime($p['periodo_fin'][$index])) ?? null,
+                        'propina' => (int) $p['propina'][$index] ?? null,
+
                     ];
 
                     $dataBitacora = [
@@ -120,14 +120,14 @@ class Agregar extends BaseController
                     ];
 
                     $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
-               
-                
-              }
+
+
+                }
             } else if ($esNormal) {
                 // Estructura normal: un solo registro
-                 // Iterar sobre cada conjunto de datos
+                // Iterar sobre cada conjunto de datos
                 $count = count($p['encabezado']);
-                
+
                 for ($i = 0; $i < $count; $i++) {
                     $dataConfig = [
                         "tabla" => "periodo_factura_go",
@@ -136,12 +136,12 @@ class Agregar extends BaseController
 
                     $dataInsert = [
                         'id_registro_go' => (int) $id_registro_go,
-                        'encabezado'     => $p['encabezado'][$i] ?? $p['encabezado'][0] ?? null,  
-                        'importe'        => (int)$p['importe'][$i] ?? null,
+                        'encabezado' => $p['encabezado'][$i] ?? $p['encabezado'][0] ?? null,
+                        'importe' => (int) $p['importe'][$i] ?? null,
                         'periodo_inicio' => date('Y-m-d', strtotime($p['periodo_inicio'][$i])) ?? null,
-                        'periodo_fin'    =>date('Y-m-d', strtotime($p['periodo_fin'][$i])) ?? null,
-                        'propina'        => (int)$p['propina'][$i] ?? null,
-                   
+                        'periodo_fin' => date('Y-m-d', strtotime($p['periodo_fin'][$i])) ?? null,
+                        'propina' => (int) $p['propina'][$i] ?? null,
+
                     ];
 
                     $dataBitacora = [
@@ -150,20 +150,20 @@ class Agregar extends BaseController
                     ];
 
                     $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
-               
+
+                }
             }
-         }
         }
 
-       
+
         return $response;
     }
 
-    public function periodoIndividual($encabezado,  $partida, $proyecto, $editarPe, $periodo_inicio, $periodo_fin)
+    public function periodoIndividual($encabezado, $partida, $proyecto, $editarPe, $periodo_inicio, $periodo_fin)
     {
         $session = \Config\Services::session();
         $this->globals = new Mglobal();
-      
+
         $dataConfig = [
             "tabla" => "periodo_factura",
             "editar" => true,
@@ -184,42 +184,42 @@ class Agregar extends BaseController
         ];
 
         $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
-       // die( var_dump(  $response ) );
+        // die( var_dump(  $response ) );
         return $response;
     }
     public function procesarPediodoEditar(array $periodo, $id_registro_pt = null)
     {
         $response = new \stdClass();
         $this->globals = new Mglobal();
-   
+
         foreach ($periodo as $pe) {
             // DETECTAR TIPO DE ESTRUCTURA
             $esAnidado = (is_array($pe['editarPe']));
             $esNormal = (is_string($pe['editarPe']));
-          
-        
+
+
             if ($esAnidado) {
                 // Estructura anidada: múltiples registros
                 foreach ($periodo as $index => $p) {
-               
+
                     if (isset($p['editarPe'][$index])) {
-                        $response =  $this->periodoIndividual(
+                        $response = $this->periodoIndividual(
                             $p['encabezado'][$index],
                             $p['partida'][$index],
                             $p['proyecto'][$index],
-                           // $p['importe'][$index],
+                            // $p['importe'][$index],
                             $p['editarPe'][$index],
                             $p['periodo_inicio'][$index],
                             $p['periodo_fin'][$index]
                         );
                     }
                 }
-             
+
             } else if ($esNormal) {
                 // Estructura normal: un solo registro
-               $response =  $this->periodoIndividual(
+                $response = $this->periodoIndividual(
                     $pe['encabezado'],
-                   // $p['importe'],
+                    // $p['importe'],
                     $pe['partida'],
                     $pe['proyecto'],
                     $pe['editarPe'],
@@ -229,7 +229,7 @@ class Agregar extends BaseController
             }
         }
 
-    ;
+        ;
         return $response;
     }
     public function procesarPediodo(array $periodo, $id_registro_pt = null)
@@ -245,21 +245,21 @@ class Agregar extends BaseController
             return $responses; // No hay datos que procesar
         }
 
-        $datos_por_campo = $periodo[0]; 
+        $datos_por_campo = $periodo[0];
 
         // Paso 2: Determinar cuántos registros hay que procesar
         // El número de registros es la longitud de cualquiera de los arrays de campos, por ejemplo, 'partida'.
         if (!isset($datos_por_campo['partida']) || !is_array($datos_por_campo['partida'])) {
             // Manejar error o estructura inesperada
-            return $responses; 
+            return $responses;
         }
-        
+
         // Contamos el número de registros (filas de datos) a partir de la longitud del array 'partida'
         $num_registros = count($datos_por_campo['partida']);
 
         // Paso 3: Iterar sobre cada registro (0, 1, 2, ...)
         for ($i = 0; $i < $num_registros; $i++) {
-            
+
             // Llamar a la función de procesamiento individual con los datos para el índice $i
             $this->procesarRegistroIndividual(
                 $id_registro_pt,
@@ -275,23 +275,23 @@ class Agregar extends BaseController
         return $responses;
     }
 
-    private function procesarRegistroIndividual($id_registro_pt, $encabezado, $partida, $proyecto,$periodo_inicio, $periodo_fin, &$responses)
+    private function procesarRegistroIndividual($id_registro_pt, $encabezado, $partida, $proyecto, $periodo_inicio, $periodo_fin, &$responses)
     {
         $session = \Config\Services::session();
-        
+
         if (!empty(trim($encabezado)) && !empty(trim($encabezado))) {
 
             // Limpiar importe
-          //  $importe_limpio = floatval(str_replace(['$', ',', ' '], '', $importe));
+            //  $importe_limpio = floatval(str_replace(['$', ',', ' '], '', $importe));
 
             $dataInsert = [
                 'id_registro_pt' => (int) $id_registro_pt,
                 'encabezado' => trim($encabezado),
-               // 'importe' => $importe_limpio,
+                // 'importe' => $importe_limpio,
                 'id_partida' => (int) $partida,
                 'id_proyecto' => (int) $proyecto,
-                'periodo_inicio' =>  $periodo_inicio,
-                'periodo_fin' =>  $periodo_fin,
+                'periodo_inicio' => $periodo_inicio,
+                'periodo_fin' => $periodo_fin,
                 'fec_reg' => date('Y-m-d H:i:s'),
             ];
             //die( var_dump( $dataInsert ) );
@@ -311,23 +311,23 @@ class Agregar extends BaseController
         }
         // Si no cumple la condición, simplemente no hace nada (no inserta)
     }
- 
-   public function procesarPDFeditar(array $archivos, array $idPdf ,  $id_registro_pt = null)
+
+    public function procesarPDFeditar(array $archivos, array $idPdf, $id_registro_pt = null)
     {
         $session = \Config\Services::session();
         $response = new \stdClass();
         $this->globals = new Mglobal();
 
         // Extraer los IDs de edición (vienen en el primer elemento del array)
-     
-        
-      
+
+
+
 
         $archivosProcesados = 0;
 
         foreach ($archivos as $index => $archivo) {
             // Validar archivo
-         
+
             if (!$archivo->isValid() || $archivo->getError() == 4 || $archivo->getSize() == 0) {
                 continue;
             }
@@ -339,38 +339,38 @@ class Agregar extends BaseController
 
             // Ruta absoluta
             $ruta_destino = FCPATH . 'assets/pdf/';
-            
+
             // Crear directorio si no existe
             if (!is_dir($ruta_destino)) {
                 mkdir($ruta_destino, 0755, true);
             }
-            
+
             $archivo->move($ruta_destino, $file);
 
             // Rutas públicas
             $ruta_absoluta = base_url('assets/pdf/' . $file);
             $ruta_relativa = 'assets/pdf/' . $file;
-            
-            foreach( $idPdf as $key ){
+
+            foreach ($idPdf as $key) {
                 $dataConfig = [
-                "tabla" => "factura_pdf",
-                "editar" => true,
-                "idEditar" => ['id_factura_pdf' => $key]
-            ];
-            $dataInsert = [
-                'ruta_relativa' => $ruta_relativa,
-                'ruta_absoluta' => $ruta_absoluta,
-                'usu_act' => $session->get('id_usuario')
-            ];
-            $dataBitacora = [
-                'id_user' => $session->get('id_usuario'), 
-                'script' => 'Agregar.php/editarFacturaPDF'
-            ];
-            
-            $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+                    "tabla" => "factura_pdf",
+                    "editar" => true,
+                    "idEditar" => ['id_factura_pdf' => $key]
+                ];
+                $dataInsert = [
+                    'ruta_relativa' => $ruta_relativa,
+                    'ruta_absoluta' => $ruta_absoluta,
+                    'usu_act' => $session->get('id_usuario')
+                ];
+                $dataBitacora = [
+                    'id_user' => $session->get('id_usuario'),
+                    'script' => 'Agregar.php/editarFacturaPDF'
+                ];
+
+                $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
 
             }
-            
+
             $archivosProcesados++;
         }
 
@@ -392,10 +392,10 @@ class Agregar extends BaseController
         $response = new \stdClass();
         $this->globals = new Mglobal();
         $i = 1;
-    
-    
+
+
         foreach ($archivos as $archivo) {
-             if (!$archivo || !$archivo->isValid()) {
+            if (!$archivo || !$archivo->isValid()) {
                 $errorMsg = $archivo->getErrorString() ?: 'Archivo inválido';
                 $response->errores[] = "Archivo {$i}: {$errorMsg}";
                 $i++;
@@ -428,141 +428,143 @@ class Agregar extends BaseController
             ];
             $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardarFacturaPDF'];
             $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
-            
-         $i++;
+
+            $i++;
         }
-    
+
         return $response;
     }
-   public function procesarXMLeditar(array $archivos, array $idXml, $id_registro_pt = null)
+    public function procesarXMLeditar(array $archivos, array $idXml, $id_registro_pt = null)
     {
         $session = \Config\Services::session();
         $response = new \stdClass();
         $this->globals = new Mglobal();
-        
+
         $responses = []; // Inicializar array de respuestas
-   
+
         foreach ($archivos as $key => $p) {
-                $archivo = $p;
-            
-                // Verificar que sea un XML válido
-                if ($archivo->getError() === 0 && 
-                    in_array($archivo->getClientMimeType(), ['text/xml', 'application/xml'])) {
-                    
-                    $contenido = file_get_contents($archivo->getTempName());
-                    libxml_use_internal_errors(true);
-                    $xml = simplexml_load_string($contenido);
+            $archivo = $p;
 
-                    if ($xml === false) {
-                        $responses[] = ['error' => 'Archivo XML inválido'];
-                        continue;
+            // Verificar que sea un XML válido
+            if (
+                $archivo->getError() === 0 &&
+                in_array($archivo->getClientMimeType(), ['text/xml', 'application/xml'])
+            ) {
+
+                $contenido = file_get_contents($archivo->getTempName());
+                libxml_use_internal_errors(true);
+                $xml = simplexml_load_string($contenido);
+
+                if ($xml === false) {
+                    $responses[] = ['error' => 'Archivo XML inválido'];
+                    continue;
+                }
+
+                // Procesar el XML
+                $namespaces = $xml->getNamespaces(true);
+                $cfdi = $xml->children($namespaces['cfdi']);
+
+                $attrs = $xml->attributes();
+                $version = (string) $attrs['Version'];
+                $fecha = (string) $attrs['Fecha'];
+                $total = (string) $attrs['Total'];
+                $moneda = (string) $attrs['Moneda'];
+                $Serie = (string) $attrs['Serie'];
+                $Folio = (string) $attrs['Folio'];
+                $FormaPago = (string) $attrs['FormaPago'];
+                $CondicionesDePago = (string) $attrs['CondicionesDePago'];
+                $SubTotal = (float) $attrs['SubTotal'];
+                $Descuento = isset($attrs['Descuento']) ? (float) $attrs['Descuento'] : 0;
+                $TipoCambio = isset($attrs['TipoCambio']) ? (float) $attrs['TipoCambio'] : 1;
+
+                $Certificado = (string) $attrs['Certificado'];
+                $NoCertificado = (string) $attrs['NoCertificado'];
+
+                // ✅ Emisor
+                $emisor = $cfdi->Emisor->attributes();
+                $rfcEmisor = (string) $emisor['Rfc'];
+                $nombreEmisor = (string) $emisor['Nombre'];
+
+                // ✅ Receptor
+                $receptor = $cfdi->Receptor->attributes();
+                $rfcReceptor = (string) $receptor['Rfc'];
+                $nombreReceptor = (string) $receptor['Nombre'];
+
+                // ✅ UUID - CÓDIGO CORREGIDO
+                $uuid = '';
+                $NoCertificadoSAT = '';
+
+                // Verificar si existe el complemento
+                if (isset($cfdi->Complemento)) {
+                    // Obtener el namespace correcto para el timbre fiscal
+                    $tfdNamespace = isset($namespaces['tfd']) ? $namespaces['tfd'] : 'http://www.sat.gob.mx/TimbreFiscalDigital';
+
+                    $complemento = $cfdi->Complemento->children($tfdNamespace);
+
+                    // Verificar si existe el TimbreFiscalDigital
+                    if (isset($complemento->TimbreFiscalDigital)) {
+                        $tfdAttributes = $complemento->TimbreFiscalDigital->attributes();
+                        $uuid = (string) $tfdAttributes['UUID'];
+                        $NoCertificadoSAT = (string) $tfdAttributes['NoCertificadoSAT'];
                     }
+                }
 
-                    // Procesar el XML
-                    $namespaces = $xml->getNamespaces(true);
-                    $cfdi = $xml->children($namespaces['cfdi']);
+                if (isset($idXml[$key])) {
+                    $idFacturaEditar = $idXml[$key]; // <-- ESTE es el ID correcto para este archivo
 
-                    $attrs = $xml->attributes();
-                    $version = (string) $attrs['Version'];
-                    $fecha = (string) $attrs['Fecha'];
-                    $total = (string) $attrs['Total'];
-                    $moneda = (string) $attrs['Moneda'];
-                    $Serie = (string) $attrs['Serie'];
-                    $Folio = (string) $attrs['Folio'];
-                    $FormaPago = (string) $attrs['FormaPago'];
-                    $CondicionesDePago = (string) $attrs['CondicionesDePago'];
-                    $SubTotal = (float) $attrs['SubTotal'];
-                    $Descuento = isset($attrs['Descuento']) ? (float) $attrs['Descuento'] : 0;
-                    $TipoCambio = isset($attrs['TipoCambio']) ? (float) $attrs['TipoCambio'] : 1;
+                    $dataConfig = [
+                        "tabla" => "factura",
+                        "editar" => true,
+                        "idEditar" => ['id_factura' => $idFacturaEditar]
+                    ];
 
-                    $Certificado = (string) $attrs['Certificado'];
-                    $NoCertificado = (string) $attrs['NoCertificado'];
+                    $dataInsert = [
+                        'version' => $version,
+                        'fecha' => date('Y-m-d H:i:s', strtotime($fecha)),
+                        'total' => $total,
+                        'moneda' => $moneda,
+                        'folio' => $Folio,
+                        'no_certificado' => $NoCertificadoSAT ?: $NoCertificado,
+                        'emisor_rfc' => $rfcEmisor,
+                        'emisor_nombre' => $nombreEmisor,
+                        'receptor_rfc' => $rfcReceptor,
+                        'receptor_nombre' => $nombreReceptor,
+                        'uuid' => $uuid,
+                        'fec_reg' => date('Y-m-d H:i:s'),
+                        'usu_reg' => $session->get('id_usuario')
+                    ];
 
-                    // ✅ Emisor
-                    $emisor = $cfdi->Emisor->attributes();
-                    $rfcEmisor = (string) $emisor['Rfc'];
-                    $nombreEmisor = (string) $emisor['Nombre'];
+                    $dataBitacora = [
+                        'id_user' => $session->get('id_usuario'),
+                        'script' => 'Agregar.php/editarFacturaFIC'
+                    ];
 
-                    // ✅ Receptor
-                    $receptor = $cfdi->Receptor->attributes();
-                    $rfcReceptor = (string) $receptor['Rfc'];
-                    $nombreReceptor = (string) $receptor['Nombre'];
+                    $result = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
 
-                    // ✅ UUID - CÓDIGO CORREGIDO
-                    $uuid = '';
-                    $NoCertificadoSAT = '';
-
-                    // Verificar si existe el complemento
-                    if (isset($cfdi->Complemento)) {
-                        // Obtener el namespace correcto para el timbre fiscal
-                        $tfdNamespace = isset($namespaces['tfd']) ? $namespaces['tfd'] : 'http://www.sat.gob.mx/TimbreFiscalDigital';
-
-                        $complemento = $cfdi->Complemento->children($tfdNamespace);
-
-                        // Verificar si existe el TimbreFiscalDigital
-                        if (isset($complemento->TimbreFiscalDigital)) {
-                            $tfdAttributes = $complemento->TimbreFiscalDigital->attributes();
-                            $uuid = (string) $tfdAttributes['UUID'];
-                            $NoCertificadoSAT = (string) $tfdAttributes['NoCertificadoSAT'];
-                        }
-                    }
-
-                   if (isset($idXml[$key])) {
-                        $idFacturaEditar = $idXml[$key]; // <-- ESTE es el ID correcto para este archivo
-
-                        $dataConfig = [
-                            "tabla" => "factura",
-                            "editar" => true,
-                            "idEditar" => ['id_factura' => $idFacturaEditar]
-                        ];
-                        
-                        $dataInsert = [
-                            'version' => $version,
-                            'fecha' => date('Y-m-d H:i:s', strtotime($fecha)),
-                            'total' => $total,
-                            'moneda' => $moneda,
-                            'folio' => $Folio,
-                            'no_certificado' => $NoCertificadoSAT ?: $NoCertificado,
-                            'emisor_rfc' => $rfcEmisor,
-                            'emisor_nombre' => $nombreEmisor,
-                            'receptor_rfc' => $rfcReceptor,
-                            'receptor_nombre' => $nombreReceptor,
-                            'uuid' => $uuid,
-                            'fec_reg' => date('Y-m-d H:i:s'),
-                            'usu_reg' => $session->get('id_usuario')
-                        ];
-
-                        $dataBitacora = [
-                            'id_user' => $session->get('id_usuario'),
-                            'script' => 'Agregar.php/editarFacturaFIC'
-                        ];
-                        
-                        $result = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
-
-                        $responses[] = $result;
-
-                    } else {
-                        $responses[] = ['error' => 'No existe ID para este archivo'];
-                    }
+                    $responses[] = $result;
 
                 } else {
-                    $responses[] = ['error' => 'Archivo no válido o error en la subida'];
+                    $responses[] = ['error' => 'No existe ID para este archivo'];
                 }
-            
-            
+
+            } else {
+                $responses[] = ['error' => 'Archivo no válido o error en la subida'];
+            }
+
+
         }
-    
+
         return $responses;
     }
-   
 
-  
+
+
     public function procesarXML(array $archivos, $id_registro_pt = null)
     {
         $session = \Config\Services::session();
         $data = array();
         $this->globals = new Mglobal();
-        
+
         foreach ($archivos as $archivo) {
             if (!$archivo->isValid()) {
                 continue;
@@ -956,16 +958,16 @@ class Agregar extends BaseController
     }
     public function guardaFIC()
     {
-            $session = \Config\Services::session();
-            $response = new \stdClass();
-            $response->error = true;
-            $response->respuesta = "Error|Error al guardar PT";
-            $this->globals = new Mglobal();
-            $data = $this->request->getPost();
-            $archivos = $this->request->getFiles();
-            $response->idReserva = "";
-    
-   
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = "Error|Error al guardar PT";
+        $this->globals = new Mglobal();
+        $data = $this->request->getPost();
+        $archivos = $this->request->getFiles();
+        $response->idReserva = "";
+
+
 
         if ($data['no_consecutivo'] == '') {
             $response->error = true;
@@ -1013,174 +1015,172 @@ class Agregar extends BaseController
         }
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaTurno'];
 
-            // Pre-procesar archivos UNA SOLA VEZ fuera del loop
-            $archivosXml = [];
-            $archivosPdf = [];
-            
-            foreach ($archivos as $key => $fileArray) {
-                if (strpos($key, 'factura_xml_fic') === 0) {
-                    $archivosXml = array_merge($archivosXml, is_array($fileArray) ? $fileArray : [$fileArray]);
-                } elseif (strpos($key, 'factura_pdf_fic') === 0) {
-                    $archivosPdf = array_merge($archivosPdf, is_array($fileArray) ? $fileArray : [$fileArray]);
-                }
+        // Pre-procesar archivos UNA SOLA VEZ fuera del loop
+        $archivosXml = [];
+        $archivosPdf = [];
+
+        foreach ($archivos as $key => $fileArray) {
+            if (strpos($key, 'factura_xml_fic') === 0) {
+                $archivosXml = array_merge($archivosXml, is_array($fileArray) ? $fileArray : [$fileArray]);
+            } elseif (strpos($key, 'factura_pdf_fic') === 0) {
+                $archivosPdf = array_merge($archivosPdf, is_array($fileArray) ? $fileArray : [$fileArray]);
             }
+        }
 
 
-        
-                $iteracionResponse = new \stdClass();
-                $iteracionResponse->error = false;
-                $iteracionResponse->idRegistro = null;
 
-                // 1. Insertar Reserva
-                foreach ($data['no_reserva'] as $k => $v) 
-                {
-                 $noReserva = (($v == 'hoteles') )?4327278:4327277;
+        $iteracionResponse = new \stdClass();
+        $iteracionResponse->error = false;
+        $iteracionResponse->idRegistro = null;
+
+        // 1. Insertar Reserva
+        foreach ($data['no_reserva'] as $k => $v) {
+            $noReserva = (($v == 'hoteles')) ? 4327278 : 4327277;
+        }
+
+        $insertReserva = [
+            'id_proveedor' => (int) $data['id_proveedor'],
+            'id_estatus' => 3,
+            'id_proveedor_banco' => (int) $data['id_proveedor_banco'],
+            'folio' => 'PT - ' . date('YmdHis') . substr((string) microtime(), 1, 4),
+            'no_reserva' => $noReserva,
+            'no_convenio' => $data['no_convenio'],
+            'total_importe' => $data['total_importe'],
+            'observaciones' => 'PAGOS FIC',
+            'fec_reg' => date('Y-m-d H:i:s'),
+            'usu_reg' => $session->get('id_usuario')
+        ];
+
+        $dataConfig = ["tabla" => "reserva", "editar" => false];
+        $reservaResult = $this->globals->saveTabla($insertReserva, $dataConfig, $dataBitacora);
+
+        if ($reservaResult->error) {
+            $iteracionResponse->error = true;
+            $iteracionResponse->respuesta = "Error al guardar reserva: " . $reservaResult->respuesta;
+
+        }
+
+        $id_reserva = $reservaResult->idRegistro;
+
+        // 3. Insertar Registro PT
+        $insertRegistro = [
+            'id_reserva' => $id_reserva,
+            'id_proveedor' => $data['id_proveedor'],
+            'id_direccion_responsable' => 99,
+            'id_subsecretario' => 2,
+            'no_consecutivo' => $data['no_consecutivo'],
+            'tipo_pt' => (int) $data['tipo_pt'],
+            'fecha_tramite' => $data['fecha_tramite'],
+            'id_reponsable_solicitud' => 99,
+            'director_general' => (int) $data['director_generar'],
+            'secretario' => 18,
+            'fic' => 1,
+            'fecha_gasto_inicio' => $data['fecha_gasto_inicio'],
+            'fecha_gasto_fin' => $data['fecha_gasto_fin'],
+            'formato_establecido' => ($data['formato_establecido'] == 'SI') ? 1 : 2,
+            'documentacion_comprobatoria' => (int) $data['documentacion_comprobatoria'],
+            'evidencia_entrega' => (int) $data['evidencia_entrega'],
+            'otros' => $data['otros'],
+            'comision' => $data['comision'],
+            'clausula_contrato' => $data['clausula_contrato'],
+            'contrato_convenio' => 2,
+            'concepto_pago' => $data['concepto_pago'],
+            'fec_reg' => date('Y-m-d H:i:s'),
+            'usu_reg' => $session->get('id_usuario')
+        ];
+
+        $dataConfig = ["tabla" => "registro_pt", "editar" => false];
+        $registroResult = $this->globals->saveTabla($insertRegistro, $dataConfig, $dataBitacora);
+
+        if ($registroResult->error) {
+            $iteracionResponse->error = true;
+            $iteracionResponse->respuesta = "Error al guardar registro PT: " . $registroResult->respuesta;
+
+        }
+
+        $id_registro_pt = $registroResult->idRegistro;
+        foreach ($data['no_reserva'] as $k => $v) {
+
+            // 2. Insertar Presupuesto
+            $insertPresupuesto = [
+                'id_reserva' => $id_reserva,
+                'id_proyecto' => 34,
+                'id_partida' => (($v == 'restaurantes_geg')) ? 10 : 94,
+                'importe' => $data['importe'][$k],
+                'fec_reg' => date('Y-m-d H:i:s'),
+                'usu_reg' => $session->get('id_usuario')
+            ];
+
+            $dataConfig = ["tabla" => "presupuesto", "editar" => false];
+            $presupuestoResult = $this->globals->saveTabla($insertPresupuesto, $dataConfig, $dataBitacora);
+
+            if ($presupuestoResult->error) {
+                $iteracionResponse->error = true;
+                $iteracionResponse->respuesta = "Error al guardar presupuesto: " . $presupuestoResult->respuesta;
+
+            }
+            $id_presupuesto = $presupuestoResult->idRegistro;
+
+        }
+        // 4. Procesar archivos SOLO para el primer registro exitoso
+
+        $this->cambiarStatusPT($id_reserva);
+
+        // Procesar XML
+        if (!empty($archivosXml)) {
+            $datosXML = $this->procesarXML($archivosXml, $id_registro_pt);
+            if ($datosXML && $datosXML->error) {
+                $iteracionResponse->errorXML = true;
+                $iteracionResponse->respuestaXML = "Error en XML: " . ($datosXML->respuesta ?? 'Desconocido');
+            }
+        }
+
+        // Procesar PDF
+        if (!empty($archivosPdf)) {
+            foreach ($archivosPdf as $archivo) {
+                if (!$archivo || !$archivo->isValid()) {
+                    continue;
                 }
-    
-                $insertReserva = [
-                    'id_proveedor' => (int) $data['id_proveedor'],
-                    'id_estatus' => 3,
-                    'id_proveedor_banco' => (int) $data['id_proveedor_banco'],
-                    'folio' => 'PT - ' . date('YmdHis') . substr((string) microtime(), 1, 4),
-                    'no_reserva' => $noReserva,
-                    'no_convenio' => $data['no_convenio'],
-                    'total_importe' => $data['total_importe'],
-                    'observaciones' => 'PAGOS FIC',
-                    'fec_reg' => date('Y-m-d H:i:s'),
-                    'usu_reg' => $session->get('id_usuario')
-                ];
 
-                $dataConfig = ["tabla" => "reserva", "editar" => false];
-                $reservaResult = $this->globals->saveTabla($insertReserva, $dataConfig, $dataBitacora);
+                $microtime = microtime(true);
+                $timestamp = date('Ymd_His', $microtime) . sprintf('%03d', ($microtime - floor($microtime)) * 1000);
+                $extension = $archivo->getClientExtension();
+                $file = '03_CFDI_' . $timestamp . '.' . $extension;
 
-                if ($reservaResult->error) {
-                    $iteracionResponse->error = true;
-                    $iteracionResponse->respuesta = "Error al guardar reserva: " . $reservaResult->respuesta;
-                  
-                }
+                $ruta_destino = FCPATH . 'assets/pdf/';
+                if ($archivo->move($ruta_destino, $file)) {
+                    $ruta_absoluta = base_url('assets/pdf/' . $file);
+                    $ruta_relativa = 'assets/pdf/' . $file;
 
-                $id_reserva = $reservaResult->idRegistro;
-
-                  // 3. Insertar Registro PT
-                $insertRegistro = [
-                    'id_reserva' => $id_reserva,
-                    'id_proveedor' => $data['id_proveedor'],
-                    'id_direccion_responsable' => 99,
-                    'id_subsecretario' => 2,
-                    'no_consecutivo' => $data['no_consecutivo'],
-                    'tipo_pt' => (int) $data['tipo_pt'],
-                    'fecha_tramite' => $data['fecha_tramite'],
-                    'id_reponsable_solicitud' => 99,
-                    'director_general' => (int) $data['director_generar'],
-                    'secretario' => 18,
-                    'fic' => 1,
-                    'fecha_gasto_inicio' => $data['fecha_gasto_inicio'],
-                    'fecha_gasto_fin' => $data['fecha_gasto_fin'],
-                    'formato_establecido' => ($data['formato_establecido'] == 'SI') ? 1 : 2,
-                    'documentacion_comprobatoria' => (int) $data['documentacion_comprobatoria'],
-                    'evidencia_entrega' => (int) $data['evidencia_entrega'],
-                    'otros' => $data['otros'],
-                    'comision' => $data['comision'],
-                    'clausula_contrato' => $data['clausula_contrato'],
-                    'contrato_convenio' => 2,
-                    'concepto_pago' => $data['concepto_pago'],
-                    'fec_reg' => date('Y-m-d H:i:s'),
-                    'usu_reg' => $session->get('id_usuario')
-                ];
-
-                $dataConfig = ["tabla" => "registro_pt", "editar" => false];
-                $registroResult = $this->globals->saveTabla($insertRegistro, $dataConfig, $dataBitacora);
-
-                if ($registroResult->error) {
-                    $iteracionResponse->error = true;
-                    $iteracionResponse->respuesta = "Error al guardar registro PT: " . $registroResult->respuesta;
-                 
-                }
-
-                $id_registro_pt = $registroResult->idRegistro;
-                foreach ($data['no_reserva'] as $k => $v) 
-                {
-
-                    // 2. Insertar Presupuesto
-                    $insertPresupuesto = [
-                        'id_reserva' => $id_reserva,
-                        'id_proyecto' => 34,
-                        'id_partida' => (($v == 'restaurantes_geg') )?10:94,
-                        'importe' => $data['importe'][$k],
+                    $dataConfig = ["tabla" => "factura_pdf", "editar" => false];
+                    $dataInsert = [
+                        'id_registro_pt' => $id_registro_pt,
+                        'ruta_relativa' => $ruta_relativa,
+                        'ruta_absoluta' => $ruta_absoluta,
                         'fec_reg' => date('Y-m-d H:i:s'),
                         'usu_reg' => $session->get('id_usuario')
                     ];
 
-                    $dataConfig = ["tabla" => "presupuesto", "editar" => false];
-                    $presupuestoResult = $this->globals->saveTabla($insertPresupuesto, $dataConfig, $dataBitacora);
-
-                    if ($presupuestoResult->error) {
-                        $iteracionResponse->error = true;
-                        $iteracionResponse->respuesta = "Error al guardar presupuesto: " . $presupuestoResult->respuesta;
-                       
-                    }
-                    $id_presupuesto = $presupuestoResult->idRegistro;
-            
+                    $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
                 }
-                // 4. Procesar archivos SOLO para el primer registro exitoso
-         
-                    $this->cambiarStatusPT($id_reserva);
-                    
-                    // Procesar XML
-                    if (!empty($archivosXml)) {
-                        $datosXML = $this->procesarXML($archivosXml, $id_registro_pt);
-                        if ($datosXML && $datosXML->error) {
-                            $iteracionResponse->errorXML = true;
-                            $iteracionResponse->respuestaXML = "Error en XML: " . ($datosXML->respuesta ?? 'Desconocido');
-                        }
-                    }
+            }
+        }
 
-                    // Procesar PDF
-                    if (!empty($archivosPdf)) {
-                        foreach ($archivosPdf as $archivo) {
-                            if (!$archivo || !$archivo->isValid()) {
-                                continue;
-                            }
+        $response->idReserva = $id_registro_pt;
 
-                            $microtime = microtime(true);
-                            $timestamp = date('Ymd_His', $microtime) . sprintf('%03d', ($microtime - floor($microtime)) * 1000);
-                            $extension = $archivo->getClientExtension();
-                            $file = '03_CFDI_' . $timestamp . '.' . $extension;
 
-                            $ruta_destino = FCPATH . 'assets/pdf/';
-                            if ($archivo->move($ruta_destino, $file)) {
-                                $ruta_absoluta = base_url('assets/pdf/' . $file);
-                                $ruta_relativa = 'assets/pdf/' . $file;
-                                
-                                $dataConfig = ["tabla" => "factura_pdf", "editar" => false];
-                                $dataInsert = [
-                                    'id_registro_pt' => $id_registro_pt,
-                                    'ruta_relativa' => $ruta_relativa,
-                                    'ruta_absoluta' => $ruta_absoluta,
-                                    'fec_reg' => date('Y-m-d H:i:s'),
-                                    'usu_reg' => $session->get('id_usuario')
-                                ];
-                                
-                                $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
-                            }
-                        }
-                    }
 
-                    $response->idReserva = $id_registro_pt;
-                
+        $iteracionResponse->idRegistro = $id_registro_pt;
 
-              
-                $iteracionResponse->idRegistro = $id_registro_pt;
-              
-            
 
-            // Determinar respuesta final
-     
-                $response->error = false;
-                $response->respuesta = "registros guardados correctamente";
-                
-          
-            return $this->respond($response);
+
+        // Determinar respuesta final
+
+        $response->error = false;
+        $response->respuesta = "registros guardados correctamente";
+
+
+        return $this->respond($response);
     }
     public function guardaGO()
     {
@@ -1191,17 +1191,17 @@ class Agregar extends BaseController
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
         $archivos_post = $this->request->getFiles();
-        
+
 
         $archivos_por_tabla = [];
         if (isset($archivos_post['archivos'])) {
-            
+
             foreach ($archivos_post['archivos'] as $key => $file_data) {
                 // $key es 'pdf_0', 'xml_table_1_row_...', etc.
-                
+
                 $parts = explode('_', $key);
                 $type = $parts[0]; // 'pdf' o 'xml'
-                
+
                 // El resto es el rowIndex que usó el JS
                 $rowIndex = substr($key, strlen($type) + 1); // '0', '1', 'table_1_row_...'
 
@@ -1227,7 +1227,7 @@ class Agregar extends BaseController
                     if (!isset($archivos_por_tabla[$tabla_id])) {
                         $archivos_por_tabla[$tabla_id] = [];
                     }
-                    
+
                     // CORRECCIÓN IMPORTANTE: Extraemos el array de archivos del interior
                     if ($type == 'pdf' && isset($file_data['pdf'])) {
                         $archivos_por_tabla[$tabla_id][$rowIndex]['pdf'] = $file_data['pdf'];
@@ -1237,21 +1237,21 @@ class Agregar extends BaseController
                 }
             }
         }
-        
+
         // 2. Iterar por las tablas usando los datos de $data (getPost)
         $tablas_procesadas = [];
         if (isset($data['encabezado'])) { // Usamos 'encabezado' como guía
-            
+
             foreach ($data['encabezado'] as $i => $encabezado_texto) {
-                  
+
                 $tablas_procesadas[$i] = [
                     'encabezado' => $encabezado_texto,
-                    'partida'    => $data['partida'][$i] ?? null, // Capturamos la partida de la tabla
-                    'proyecto'   => $data['proyecto'][$i] ?? null, // Capturamos el proyecto de la tabla
-                    'id_presupuesto'=> $data['id_presupuesto'][$i] ?? null, // Capturamos el proyecto de la tabla
-                    'filas'      => []
+                    'partida' => $data['partida'][$i] ?? null, // Capturamos la partida de la tabla
+                    'proyecto' => $data['proyecto'][$i] ?? null, // Capturamos el proyecto de la tabla
+                    'id_presupuesto' => $data['id_presupuesto'][$i] ?? null, // Capturamos el proyecto de la tabla
+                    'filas' => []
                 ];
-                
+
                 // Si no hay 'importe' para esta tabla, saltamos
                 if (!isset($data['periodo_inicio_' . $i])) {
                     continue;
@@ -1262,14 +1262,14 @@ class Agregar extends BaseController
                 if (isset($archivos_por_tabla[$i])) {
                     $file_keys_para_tabla_i = array_keys($archivos_por_tabla[$i]);
                 }
- 
+
                 // 3. Iterar por cada fila ($j) dentro de la tabla ($i)
                 foreach ($data['periodo_inicio_' . $i] as $j => $importe_valor) {
                     // $j es el índice de la fila (0, 1, 2...)
-                   
+
                     // Usamos $j para obtener la clave de archivo correspondiente por orden
                     $rowIndex_de_archivos = $file_keys_para_tabla_i[$j] ?? null;
-  
+
                     $archivos_de_la_fila = null;
                     if ($rowIndex_de_archivos !== null && isset($archivos_por_tabla[$i][$rowIndex_de_archivos])) {
                         $archivos_de_la_fila = $archivos_por_tabla[$i][$rowIndex_de_archivos];
@@ -1277,21 +1277,21 @@ class Agregar extends BaseController
 
                     // 4. Construir el objeto final de la fila
                     $fila_completa = [
-                      //  'importe'        => $importe_valor,
-                        'propina'        => $data['propina_' . $i][$j] ?? null,
+                        //  'importe'        => $importe_valor,
+                        'propina' => $data['propina_' . $i][$j] ?? null,
                         'periodo_inicio' => $data['periodo_inicio_' . $i][$j] ?? null,
-                        'periodo_fin'    => $data['periodo_fin_' . $i][$j] ?? null,
-                        'archivos'       => $archivos_de_la_fila, // Ej: ['pdf' => [file1], 'xml' => [file1]]
-                        'js_rowIndex'    => $rowIndex_de_archivos // Para depurar
+                        'periodo_fin' => $data['periodo_fin_' . $i][$j] ?? null,
+                        'archivos' => $archivos_de_la_fila, // Ej: ['pdf' => [file1], 'xml' => [file1]]
+                        'js_rowIndex' => $rowIndex_de_archivos // Para depurar
                     ];
-                    
+
                     // Agregar la fila completa a su tabla
                     $tablas_procesadas[$i]['filas'][] = $fila_completa;
                 }
             }
         }
-        
-       // die();
+
+        // die();
         if ($data['secretario'] == 0) {
             $response->error = true;
             $response->respuesta = "Es requerido el Secretario o Director";
@@ -1341,52 +1341,52 @@ class Agregar extends BaseController
         if (isset($data['fecha_tramite']) && empty($data['fecha_tramite'])) {
             $data['fecha_tramite'] = date('Y-m-d');
         }
-        
-       
+
+
 
         $dataInsert = [
-            'id_reserva_go'         => $data['id_reserva_go'],
+            'id_reserva_go' => $data['id_reserva_go'],
             'id_direccion_responsable' => $data['direccion_responsable'],
-            'fecha_tramite'         => $data['fecha_tramite'],
-            'no_consecutivo'        => (int) $data['no_consecutivo'],
+            'fecha_tramite' => $data['fecha_tramite'],
+            'no_consecutivo' => (int) $data['no_consecutivo'],
             'id_reponsable_solicitud' => (int) $data['id_reponsable_solicitud'],
-            'director_general'      => 1,
-            'secretario'            => (int) $data['secretario'],
-            'id_subsecretario'      => (int) $data['id_subsecretario'],
-            'contrato_convenio'     => ($data['contrato_convenio'] == 'NO') ? 2 : 1,
-            'formato_establecido'   => ($data['formato_establecido'] == 'SI') ? 1 : 2,
+            'director_general' => 1,
+            'secretario' => (int) $data['secretario'],
+            'id_subsecretario' => (int) $data['id_subsecretario'],
+            'contrato_convenio' => ($data['contrato_convenio'] == 'NO') ? 2 : 1,
+            'formato_establecido' => ($data['formato_establecido'] == 'SI') ? 1 : 2,
             'documentacion_comprobatoria' => $data['documentacion_comprobatoria'],
-            'poliza'                => ($data['poliza'] == 'SI') ? 1 : 2,
-            'formato_conformidad'   => ($data['formato_conformidad'] == 'SI') ? 1 : 2,
+            'poliza' => ($data['poliza'] == 'SI') ? 1 : 2,
+            'formato_conformidad' => ($data['formato_conformidad'] == 'SI') ? 1 : 2,
             'documentacion_requerida' => ($data['documentacion_requerida'] == 'SI') ? 1 : 2,
-            'evidencia_entrega'     => (int) $data['evidencia_entrega'],
-            'concepto_gasto'        => $data['concepto_gasto'],
-            'total_importe'         => $data['total_importe'], // Asegúrate de que este total sea correcto
-            'comision'              => $data['comision'],
-            'no_reserva'            => $data['no_reserva'],
-            'lugar'                 => $data['lugar'],
-            'usu_act'               => $session->get('id_usuario'),
+            'evidencia_entrega' => (int) $data['evidencia_entrega'],
+            'concepto_gasto' => $data['concepto_gasto'],
+            'total_importe' => $data['total_importe'], // Asegúrate de que este total sea correcto
+            'comision' => $data['comision'],
+            'no_reserva' => $data['no_reserva'],
+            'lugar' => $data['lugar'],
+            'usu_act' => $session->get('id_usuario'),
         ];
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaTurno'];
-    
+
         $dataConfig = [
-                "tabla" => "registro_go",
-                "editar" => false
-               
-             ];
-       
+            "tabla" => "registro_go",
+            "editar" => false
+
+        ];
+
         $responsePrincipal = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
 
-       
+
         if (!$responsePrincipal->error) {
             $id_registro_go = $responsePrincipal->idRegistro;
             $this->cambiarStatus($data['id_reserva_go']);
-             
+
             foreach ($tablas_procesadas as $i => $tabla) {
-              
-                
+
+
                 foreach ($tabla['filas'] as $j => $fila) {
-                 
+
                     // OBTENEMOS EL IDENTIFICADOR ÚNICO DE LA FILA
                     $identificador_fila_unica = $fila['js_rowIndex'];
 
@@ -1394,26 +1394,26 @@ class Agregar extends BaseController
                     // ¡ESTO ES LO QUE TE FALTA!
                     $datos_fila_para_guardar = [
                         'id_registro_go' => $id_registro_go, // Se vincula al registro principal
-                        'encabezado'     => $tabla['encabezado'], // Dato de la tabla
+                        'encabezado' => $tabla['encabezado'], // Dato de la tabla
                         'id_presupuesto' => $tabla['id_presupuesto'], // Dato de la tabla
-                       // 'importe'        => str_replace(['$', ','], '', $fila['importe']), // Limpiamos el importe
-                        'propina'        => str_replace(['$', ','], '', $fila['propina']), // Limpiamos la propina
+                        // 'importe'        => str_replace(['$', ','], '', $fila['importe']), // Limpiamos el importe
+                        'propina' => str_replace(['$', ','], '', $fila['propina']), // Limpiamos la propina
                         'periodo_inicio' => $fila['periodo_inicio'],
-                        'periodo_fin'    => $fila['periodo_fin'],
+                        'periodo_fin' => $fila['periodo_fin'],
                         'id_identificador' => $identificador_fila_unica, // EL ENLACE CLAVE (debe ser VARCHAR)
-                        'usu_reg'        => $session->get('id_usuario'),
-                        'fec_reg'        => date('Y-m-d H:i:s')
+                        'usu_reg' => $session->get('id_usuario'),
+                        'fec_reg' => date('Y-m-d H:i:s')
                     ];
 
-                    
-                     // Iterar sobre cada conjunto de datos
-                  
+
+                    // Iterar sobre cada conjunto de datos
+
                     $dataConfig = [
                         "tabla" => "periodo_factura_go",
                         "editar" => false
                     ];
 
-                 
+
 
                     $dataBitacora = [
                         'id_user' => $session->get('id_usuario'),
@@ -1421,44 +1421,44 @@ class Agregar extends BaseController
                     ];
 
                     $responseFila = $this->globals->saveTabla($datos_fila_para_guardar, $dataConfig, $dataBitacora);
-            
+
 
                     $archivos_pdf_fila = [];
                     $archivos_xml_fila = [];
-                    
+
                     // Validar y recolectar PDFs de la fila
                     if (!empty($fila['archivos']['pdf'])) {
-                        foreach($fila['archivos']['pdf'] as $pdf) {
+                        foreach ($fila['archivos']['pdf'] as $pdf) {
                             if ($pdf->isValid() && !$pdf->hasMoved()) {
                                 $archivos_pdf_fila[] = $pdf;
                             }
                         }
                     }
-                    
+
                     // Validar y recolectar XMLs de la fila
                     if (!empty($fila['archivos']['xml'])) {
-                        foreach($fila['archivos']['xml'] as $xml) {
+                        foreach ($fila['archivos']['xml'] as $xml) {
                             if ($xml->isValid() && !$xml->hasMoved()) {
                                 $archivos_xml_fila[] = $xml;
                             }
                         }
                     }
-                    
 
-          
+
+
                     // 3. GUARDAR PDFS (CORREGIDO)
                     if (!empty($archivos_pdf_fila)) {
-                        
+
                         // Iteramos sobre los archivos PDF de ESTA fila
-                        foreach($archivos_pdf_fila as $archivo_pdf) { // Cambié $archivo por $archivo_pdf
-                  
+                        foreach ($archivos_pdf_fila as $archivo_pdf) { // Cambié $archivo por $archivo_pdf
+
                             if (!$archivo_pdf->isValid()) {
                                 continue;
                             }
 
                             $timestamp = date('Ymd_His');
                             $extension = $archivo_pdf->getClientExtension();
-                            
+
                             // CORRECCIÓN: Usamos el identificador de fila para el nombre
                             $file = 'Factura_go_' . $identificador_fila_unica . '_' . $timestamp . '_' . uniqid() . '.' . $extension;
 
@@ -1491,10 +1491,10 @@ class Agregar extends BaseController
                             $this->globals->saveTabla($dataInsertPdf, $dataConfigPdf, $dataBitacoraPdf);
                         }
                     }
-                    
+
                     // 4. GUARDAR XMLS (CORREGIDO)
                     if (!empty($archivos_xml_fila)) {
-                    
+
                         // Iteramos sobre los archivos XML de ESTA fila
                         foreach ($archivos_xml_fila as $archivo_xml) { // Cambié $key => $archivo
                             if (!$archivo_xml->isValid()) {
@@ -1505,24 +1505,26 @@ class Agregar extends BaseController
 
                             if (in_array($tipo, ['text/xml', 'application/xml'])) {
                                 $contenido = file_get_contents($archivo_xml->getTempName());
-                                
+
                                 // ... (Tu código de parseo de XML va aquí, es correcto) ...
                                 libxml_use_internal_errors(true);
                                 $xml = simplexml_load_string($contenido);
-                                if ($xml === false) { continue; } // Saltar si el XML está mal
+                                if ($xml === false) {
+                                    continue;
+                                } // Saltar si el XML está mal
 
                                 $namespaces = $xml->getNamespaces(true);
                                 $cfdi = $xml->children($namespaces['cfdi']);
-                                
+
                                 // ... (extracción de $version, $fecha, $total, $rfcEmisor, $uuid, etc.)
-                                
+
                                 $attrs = $xml->attributes();
                                 $version = (string) $attrs['Version'];
                                 $fecha = (string) $attrs['Fecha'];
                                 $total = (string) $attrs['Total'];
                                 $moneda = (string) $attrs['Moneda'];
                                 $Folio = (string) $attrs['Folio'];
-                                
+
                                 $emisor = $cfdi->Emisor->attributes();
                                 $rfcEmisor = (string) $emisor['Rfc'];
                                 $nombreEmisor = (string) $emisor['Nombre'];
@@ -1530,7 +1532,7 @@ class Agregar extends BaseController
                                 $receptor = $cfdi->Receptor->attributes();
                                 $rfcReceptor = (string) $receptor['Rfc'];
                                 $nombreReceptor = (string) $receptor['Nombre'];
-                                
+
                                 $uuid = '';
                                 $NoCertificadoSAT = ''; // Renombrado para claridad
                                 if (isset($cfdi->Complemento)) {
@@ -1566,12 +1568,12 @@ class Agregar extends BaseController
                                 ];
 
                                 $dataBitacoraXml = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardarFacturaGO'];
-                                
+
                                 // Guardamos la info del XML
                                 $responseXML = $this->globals->saveTabla($dataInsertXml, $dataConfigXml, $dataBitacoraXml);
-                                
+
                                 // Importante: Asignar la respuesta final solo si no hay error
-                                if(!$responseXML->error){
+                                if (!$responseXML->error) {
                                     $response->error = false;
                                     $response->respuesta = 'Archivos XML y PDF guardados correctamente';
                                 }
@@ -1580,7 +1582,7 @@ class Agregar extends BaseController
                     }
                 }
             }
-      
+
             // === FIN NUEVO CÓDIGO DE PROCESAMIENTO ===
 
         } // Fin de if (!$response->error)
@@ -1596,7 +1598,7 @@ class Agregar extends BaseController
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
         $archivos_post = $this->request->getFiles();
-      
+
         // Verificar que tenemos id_registro_go para edición
         if (empty($data['id_registro_go'])) {
             $response->respuesta = "Error|No se recibió el ID de registro GO para edición";
@@ -1681,17 +1683,17 @@ class Agregar extends BaseController
 
         // 2. Organizar archivos por fila
         $archivos_por_fila = [];
-        
+
         // Procesar archivos subidos
         foreach ($archivos_post as $clave => $grupo_archivos) {
             // Buscar archivos PDF (formato: pdf_{rowIndex})
             if (strpos($clave, 'pdf_') === 0) {
                 $rowIndex = substr($clave, 4); // Remover "pdf_"
-                
+
                 if (!isset($archivos_por_fila[$rowIndex])) {
                     $archivos_por_fila[$rowIndex] = ['pdf' => [], 'xml' => []];
                 }
-                
+
                 // Manejar múltiples archivos PDF
                 if (is_array($grupo_archivos)) {
                     foreach ($grupo_archivos as $archivo) {
@@ -1703,15 +1705,15 @@ class Agregar extends BaseController
                     $archivos_por_fila[$rowIndex]['pdf'][] = $grupo_archivos;
                 }
             }
-            
+
             // Buscar archivos XML (formato: xml_{rowIndex})
             if (strpos($clave, 'xml_') === 0) {
                 $rowIndex = substr($clave, 4); // Remover "xml_"
-                
+
                 if (!isset($archivos_por_fila[$rowIndex])) {
                     $archivos_por_fila[$rowIndex] = ['pdf' => [], 'xml' => []];
                 }
-                
+
                 // Manejar múltiples archivos XML
                 if (is_array($grupo_archivos)) {
                     foreach ($grupo_archivos as $archivo) {
@@ -1724,10 +1726,10 @@ class Agregar extends BaseController
                 }
             }
         }
-     
+
         // 3. Procesar cada tabla (conjunto de partidas)
         $tablas_procesadas = [];
-       
+
         if (isset($data['encabezado'])) {
             foreach ($data['encabezado'] as $i => $encabezado_texto) {
                 $tablas_procesadas[$i] = [
@@ -1735,27 +1737,27 @@ class Agregar extends BaseController
                     'id_presupuesto' => $data['id_presupuesto'][$i] ?? null,
                     'filas' => []
                 ];
-                
+
                 // Si no hay datos para esta tabla, continuar
                 if (!isset($data['periodo_inicio_' . $i])) {
                     continue;
                 }
-                
+
                 // Procesar cada fila de la tabla
                 foreach ($data['periodo_inicio_' . $i] as $j => $periodo_inicio) {
                     // Obtener el id_identificador de la fila (si existe)
                     $id_identificador = $data['id_identificador_' . $i][$j] ?? null;
-                    
+
                     // Determinar el rowIndex para buscar archivos
                     $rowIndex = $id_identificador;
                     if (empty($rowIndex)) {
                         // Para filas nuevas, usar un patrón diferente
                         $rowIndex = 'nuevo_' . $i . '_' . $j;
                     }
-                    
+
                     // Obtener archivos para esta fila
                     $archivos_fila = $archivos_por_fila[$rowIndex] ?? ['pdf' => [], 'xml' => []];
-                    
+
                     // Construir objeto de fila
                     $fila_completa = [
                         'id_identificador' => $id_identificador,
@@ -1767,18 +1769,18 @@ class Agregar extends BaseController
                         'tabla_index' => $i,
                         'fila_index' => $j
                     ];
-                    
+
                     $tablas_procesadas[$i]['filas'][] = $fila_completa;
                 }
             }
         }
-   
+
         // 4. Procesar cada tabla y sus filas
         foreach ($tablas_procesadas as $i => $tabla) {
             foreach ($tabla['filas'] as $j => $fila) {
-                
+
                 $id_identificador = $fila['id_identificador'];
-                
+
                 // Preparar datos para periodo_factura_go
                 $datos_periodo = [
                     'id_registro_go' => $id_registro_go,
@@ -1789,19 +1791,19 @@ class Agregar extends BaseController
                     'periodo_fin' => $fila['periodo_fin'],
                     'usu_reg' => $session->get('id_usuario')
                 ];
-                      
+
                 // Determinar si es edición o inserción
-                if (isset($id_identificador) && $id_identificador >=0) {
+                if (isset($id_identificador) && $id_identificador >= 0) {
                     // EDICIÓN: Buscar registro existente
-                
+
                     $existePeriodo = $this->globals->getTabla([
-                        'tabla' => 'periodo_factura_go', 
+                        'tabla' => 'periodo_factura_go',
                         'where' => [
-                            'id_registro_go' => $id_registro_go, 
+                            'id_registro_go' => $id_registro_go,
                             'id_identificador' => $id_identificador
                         ]
                     ]);
-                    
+
                     if (!$existePeriodo->error && !empty($existePeriodo->data)) {
                         // Actualizar registro existente
                         $dataConfig = [
@@ -1809,206 +1811,204 @@ class Agregar extends BaseController
                             "editar" => true,
                             "idEditar" => ['id_periodo_factura' => $existePeriodo->data[0]->id_periodo_factura]
                         ];
-                        
+
                         $dataBitacora = [
                             'id_user' => $session->get('id_usuario'),
                             'script' => 'Agregar.php/editarGO'
                         ];
-                        
+
                         $responsePeriodo = $this->globals->saveTabla($datos_periodo, $dataConfig, $dataBitacora);
-                  
+
                         if ($responsePeriodo->error) {
                             $response->error = true;
                             $response->respuesta .= "|Error al actualizar periodo para fila $i-$j";
                         }
-                    } 
+                    }
                 }
 
 
                 //====================================================================================
                 //====================================================================================
                 //====================================================================================
-          
-                foreach($archivos_post as $clave => $a){
+
+                foreach ($archivos_post as $clave => $a) {
 
                     if (strpos($clave, 'pdf_') === 0) {
                         $identificador = substr($clave, 4); // Remover "xml_"
-                            $existePeriodo = $this->globals->getTabla([
-                                'tabla' => 'factura_pdf_go', 
-                                'where' => [
-                                    'id_registro_go' => $id_registro_go, 
-                                    'id_identificador' => $identificador
-                                ]
-                            ]);
-                            $ID = (isset($existePeriodo->data) && !empty($existePeriodo->data))?$existePeriodo->data[0]->id_factura_pdf_go:'';
-                            if($ID){
-                                foreach ($a as $archivo_pdf) {
-                            
-                                        if ($archivo_pdf->isValid() && $archivo_pdf->getError() === UPLOAD_ERR_OK) {
-                                            $timestamp = date('Ymd_His');
-                                            $extension = $archivo_pdf->getClientExtension();
-                                            $nombre_archivo = 'Factura_go_' . $id_identificador . '_' . $timestamp . '_' . uniqid() . '.' . $extension;
-                                            
-                                            $ruta_destino = FCPATH . 'assets/pdf/';
-                                            
-                                            // Crear directorio si no existe
-                                            if (!is_dir($ruta_destino)) {
-                                                mkdir($ruta_destino, 0777, true);
-                                            }
-                                            
-                                            if ($archivo_pdf->move($ruta_destino, $nombre_archivo)) {
-                                                $ruta_relativa = 'assets/pdf/' . $nombre_archivo;
-                                                $ruta_absoluta = base_url($ruta_relativa);
-                                                
-                                             
-                                                
-                                                $datos_pdf = [
-                                                    'id_registro_go' => $id_registro_go,
-                                                    'id_identificador' => $id_identificador,
-                                                    'ruta_relativa' => $ruta_relativa,
-                                                    'ruta_absoluta' => $ruta_absoluta,
-                                                    'fec_reg' => date('Y-m-d H:i:s'),
-                                                    'usu_reg' => $session->get('id_usuario')
-                                                ];
-                                                
-                                           
-                                                    // Actualizar PDF existente (último registro)
-                                                    $dataConfigPdf = [
-                                                        "tabla" => "factura_pdf_go",
-                                                        "editar" => true,
-                                                        "idEditar" => ['id_factura_pdf_go' => $ID]
-                                                    ];
-                                                }
-                                                
-                                                $dataBitacoraPdf = [
-                                                    'id_user' => $session->get('id_usuario'),
-                                                    'script' => 'Agregar.php/editarGO'
-                                                ];
-                                                
-                                                $respuestaPDF = $this->globals->saveTabla($datos_pdf, $dataConfigPdf, $dataBitacoraPdf);
-                                       
-                                                if ($respuestaPDF->error) {
-                                                    $response->respuesta .= "|Error al guardar PDF para fila";
-                                                }
-                                            }
-                                        }
+                        $existePeriodo = $this->globals->getTabla([
+                            'tabla' => 'factura_pdf_go',
+                            'where' => [
+                                'id_registro_go' => $id_registro_go,
+                                'id_identificador' => $identificador
+                            ]
+                        ]);
+                        $ID = (isset($existePeriodo->data) && !empty($existePeriodo->data)) ? $existePeriodo->data[0]->id_factura_pdf_go : '';
+                        if ($ID) {
+                            foreach ($a as $archivo_pdf) {
+
+                                if ($archivo_pdf->isValid() && $archivo_pdf->getError() === UPLOAD_ERR_OK) {
+                                    $timestamp = date('Ymd_His');
+                                    $extension = $archivo_pdf->getClientExtension();
+                                    $nombre_archivo = 'Factura_go_' . $id_identificador . '_' . $timestamp . '_' . uniqid() . '.' . $extension;
+
+                                    $ruta_destino = FCPATH . 'assets/pdf/';
+
+                                    // Crear directorio si no existe
+                                    if (!is_dir($ruta_destino)) {
+                                        mkdir($ruta_destino, 0777, true);
+                                    }
+
+                                    if ($archivo_pdf->move($ruta_destino, $nombre_archivo)) {
+                                        $ruta_relativa = 'assets/pdf/' . $nombre_archivo;
+                                        $ruta_absoluta = base_url($ruta_relativa);
+
+
+
+                                        $datos_pdf = [
+                                            'id_registro_go' => $id_registro_go,
+                                            //  'id_identificador' => $id_identificador,
+                                            'ruta_relativa' => $ruta_relativa,
+                                            'ruta_absoluta' => $ruta_absoluta,
+                                            'fec_reg' => date('Y-m-d H:i:s'),
+                                            'usu_reg' => $session->get('id_usuario')
+                                        ];
+
+
+                                        // Actualizar PDF existente (último registro)
+                                        $dataConfigPdf = [
+                                            "tabla" => "factura_pdf_go",
+                                            "editar" => true,
+                                            "idEditar" => ['id_factura_pdf_go' => $ID]
+                                        ];
+                                    }
+
+                                    $dataBitacoraPdf = [
+                                        'id_user' => $session->get('id_usuario'),
+                                        'script' => 'Agregar.php/editarGO'
+                                    ];
+
+                                    $respuestaPDF = $this->globals->saveTabla($datos_pdf, $dataConfigPdf, $dataBitacoraPdf);
+
+                                    if ($respuestaPDF->error) {
+                                        $response->respuesta .= "|Error al guardar PDF para fila";
                                     }
                                 }
+                            }
+                        }
                     }
                     if (strpos($clave, 'xml_') === 0) {
                         $identificador = substr($clave, 4); // Remover "xml_"
-                            $existePeriodo = $this->globals->getTabla([
-                                'tabla' => 'xml_go', 
-                                'where' => [
-                                    'id_registro_go' => $id_registro_go, 
-                                    'id_identificador' => $identificador
-                                ]
-                            ]);
-                           
-                            $ID = (isset($existePeriodo->data) && !empty($existePeriodo->data))?$existePeriodo->data[0]->id_xml:'';
+                        $existePeriodo = $this->globals->getTabla([
+                            'tabla' => 'xml_go',
+                            'where' => [
+                                'id_registro_go' => $id_registro_go,
+                                'id_identificador' => $identificador
+                            ]
+                        ]);
 
-                            if($ID){
-                                foreach ($a as $archivo_xml) {
-                            
-                                   $tipo = $archivo_xml->getMimeType();
-                                    
-                                    if (in_array($tipo, ['text/xml', 'application/xml'])) {
-                                        $contenido = file_get_contents($archivo_xml->getTempName());
-                                        libxml_use_internal_errors(true);
-                                        $xml = simplexml_load_string($contenido);
-                                        
-                                        if ($xml !== false) {
-                                            $namespaces = $xml->getNamespaces(true);
-                                            $cfdi = $xml->children($namespaces['cfdi']);
-                                            
-                                            $attrs = $xml->attributes();
-                                            $version = (string) $attrs['Version'];
-                                            $fecha = (string) $attrs['Fecha'];
-                                            $total = (string) $attrs['Total'];
-                                            $moneda = (string) $attrs['Moneda'];
-                                            $Folio = (string) $attrs['Folio'];
-                                            
-                                            $emisor = $cfdi->Emisor->attributes();
-                                            $rfcEmisor = (string) $emisor['Rfc'];
-                                            $nombreEmisor = (string) $emisor['Nombre'];
-                                            
-                                            $receptor = $cfdi->Receptor->attributes();
-                                            $rfcReceptor = (string) $receptor['Rfc'];
-                                            $nombreReceptor = (string) $receptor['Nombre'];
-                                            
-                                            $uuid = '';
-                                            $NoCertificadoSAT = '';
-                                            
-                                            if (isset($cfdi->Complemento)) {
-                                                $tfdNamespace = isset($namespaces['tfd']) ? $namespaces['tfd'] : 'http://www.sat.gob.mx/TimbreFiscalDigital';
-                                                if (isset($cfdi->Complemento->children($tfdNamespace)->TimbreFiscalDigital)) {
-                                                    $tfdAttributes = $cfdi->Complemento->children($tfdNamespace)->TimbreFiscalDigital->attributes();
-                                                    $uuid = (string) $tfdAttributes['UUID'];
-                                                    $NoCertificadoSAT = (string) $tfdAttributes['NoCertificadoSAT'];
-                                                }
-                                            }
-                                            
+                        $ID = (isset($existePeriodo->data) && !empty($existePeriodo->data)) ? $existePeriodo->data[0]->id_xml : '';
 
-                                            $datos_xml = [
-                                                'id_registro_go' => $id_registro_go,
-                                                'id_identificador' => $id_identificador,
-                                                'version' => $version,
-                                                'fecha' => date('Y-m-d H:i:s', strtotime($fecha)),
-                                                'total' => $total,
-                                                'moneda' => $moneda,
-                                                'folio' => $Folio,
-                                                'no_certificado' => $NoCertificadoSAT,
-                                                'emisor_rfc' => $rfcEmisor,
-                                                'emisor_nombre' => $nombreEmisor,
-                                                'receptor_rfc' => $rfcReceptor,
-                                                'receptor_nombre' => $nombreReceptor,
-                                                'uuid' => $uuid,
-                                                'fec_reg' => date('Y-m-d H:i:s'),
-                                                'usu_reg' => $session->get('id_usuario')
-                                            ];
-                                            
-                                
-                                                // Actualizar XML existente (último registro)
-                                                $dataConfigXml = [
-                                                    "tabla" => "xml_go",
-                                                    "editar" => true,
-                                                    "idEditar" => ['id_xml' => $ID ]
-                                                ];
-                                            
-                                            
-                                            $dataBitacoraXml = [
-                                                'id_user' => $session->get('id_usuario'),
-                                                'script' => 'Agregar.php/editarGO'
-                                            ];
-                                            
-                                            $respuestaXML = $this->globals->saveTabla($datos_xml, $dataConfigXml, $dataBitacoraXml);
- 
-                                            if ($respuestaXML->error) {
-                                                $response->respuesta .= "|Error al guardar XML para fila";
+                        if ($ID) {
+                            foreach ($a as $archivo_xml) {
+
+                                $tipo = $archivo_xml->getMimeType();
+
+                                if (in_array($tipo, ['text/xml', 'application/xml'])) {
+                                    $contenido = file_get_contents($archivo_xml->getTempName());
+                                    libxml_use_internal_errors(true);
+                                    $xml = simplexml_load_string($contenido);
+
+                                    if ($xml !== false) {
+                                        $namespaces = $xml->getNamespaces(true);
+                                        $cfdi = $xml->children($namespaces['cfdi']);
+
+                                        $attrs = $xml->attributes();
+                                        $version = (string) $attrs['Version'];
+                                        $fecha = (string) $attrs['Fecha'];
+                                        $total = (string) $attrs['Total'];
+                                        $moneda = (string) $attrs['Moneda'];
+                                        $Folio = (string) $attrs['Folio'];
+
+                                        $emisor = $cfdi->Emisor->attributes();
+                                        $rfcEmisor = (string) $emisor['Rfc'];
+                                        $nombreEmisor = (string) $emisor['Nombre'];
+
+                                        $receptor = $cfdi->Receptor->attributes();
+                                        $rfcReceptor = (string) $receptor['Rfc'];
+                                        $nombreReceptor = (string) $receptor['Nombre'];
+
+                                        $uuid = '';
+                                        $NoCertificadoSAT = '';
+
+                                        if (isset($cfdi->Complemento)) {
+                                            $tfdNamespace = isset($namespaces['tfd']) ? $namespaces['tfd'] : 'http://www.sat.gob.mx/TimbreFiscalDigital';
+                                            if (isset($cfdi->Complemento->children($tfdNamespace)->TimbreFiscalDigital)) {
+                                                $tfdAttributes = $cfdi->Complemento->children($tfdNamespace)->TimbreFiscalDigital->attributes();
+                                                $uuid = (string) $tfdAttributes['UUID'];
+                                                $NoCertificadoSAT = (string) $tfdAttributes['NoCertificadoSAT'];
                                             }
+                                        }
+
+
+                                        $datos_xml = [
+                                            'id_registro_go' => $id_registro_go,
+                                            // 'id_identificador' => $id_identificador,
+                                            'version' => $version,
+                                            'fecha' => date('Y-m-d H:i:s', strtotime($fecha)),
+                                            'total' => $total,
+                                            'moneda' => $moneda,
+                                            'folio' => $Folio,
+                                            'no_certificado' => $NoCertificadoSAT,
+                                            'emisor_rfc' => $rfcEmisor,
+                                            'emisor_nombre' => $nombreEmisor,
+                                            'receptor_rfc' => $rfcReceptor,
+                                            'receptor_nombre' => $nombreReceptor,
+                                            'uuid' => $uuid,
+                                            'fec_reg' => date('Y-m-d H:i:s'),
+                                            'usu_reg' => $session->get('id_usuario')
+                                        ];
+
+
+                                        // Actualizar XML existente (último registro)
+                                        $dataConfigXml = [
+                                            "tabla" => "xml_go",
+                                            "editar" => true,
+                                            "idEditar" => ['id_xml' => $ID]
+                                        ];
+
+
+                                        $dataBitacoraXml = [
+                                            'id_user' => $session->get('id_usuario'),
+                                            'script' => 'Agregar.php/editarGO'
+                                        ];
+
+                                        $respuestaXML = $this->globals->saveTabla($datos_xml, $dataConfigXml, $dataBitacoraXml);
+                                        // var_dump($respuestaXML);
+                                        if ($respuestaXML->error) {
+                                            $response->respuesta .= "|Error al guardar XML para fila";
                                         }
                                     }
                                 }
-                              }
                             }
-
-                   
-                    
-                   
-
+                        }
+                    }
                 }
-               
-              
-               
-           
-            
+
+
+            }
+
+
+
+
+
         }
+        // die();
 
         // 7. Responder con éxito
         $response->error = false;
         $response->respuesta = "GO editado correctamente";
         $response->idRegistro = $id_registro_go;
-        
+
         return $this->respond($response);
     }
     private function cambiarStatusPT($id = null)
@@ -2166,43 +2166,43 @@ class Agregar extends BaseController
         return $this->respond($response->data[0]);
 
     }
-    private function registrarFolio($no_consecutivo,$responsableGasto)
+    private function registrarFolio($no_consecutivo, $responsableGasto)
     {
-      $session = \Config\Services::session();
-       $response = new \stdClass();
+        $session = \Config\Services::session();
+        $response = new \stdClass();
         $response->error = true;
-       $globals = new Mglobal;
-       $idRegistro = 0;
-       $dataDB = array('tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario]);
-        $user = $globals->getTabla($dataDB); 
+        $globals = new Mglobal;
+        $idRegistro = 0;
+        $dataDB = array('tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario]);
+        $user = $globals->getTabla($dataDB);
         //vemos si el usuario tiene id_area
-        if(isset($user->data) && !empty($user->data)){
+        if (isset($user->data) && !empty($user->data)) {
             $id_area = $user->data[0]->id_area;
             $dataInsert = [
-                    'no_consecutivo' => $no_consecutivo,
-                    'id_area'        => $id_area,
-                    'id_direccion'   => $responsableGasto,
-                    'fec_reg'        => date('Y-m-d H:i:s'),
-                    'usu_reg'        => $session->id_usuario,
-                     ];
+                'no_consecutivo' => $no_consecutivo,
+                'id_area' => $id_area,
+                'id_direccion' => $responsableGasto,
+                'fec_reg' => date('Y-m-d H:i:s'),
+                'usu_reg' => $session->id_usuario,
+            ];
             $dataConfig = [
                 "tabla" => "folio_direccion",
                 "editar" => false
             ];
-  
+
 
         }
-      
-        
+
+
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFolio'];
-        $no_consecutivo = $globals->saveTabla($dataInsert,$dataConfig, $dataBitacora);
-       // var_dump($no_consecutivo);
-       // die();
-        if(!$no_consecutivo->error){
-         $idRegistro=  $no_consecutivo->idRegistro;
+        $no_consecutivo = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+        // var_dump($no_consecutivo);
+        // die();
+        if (!$no_consecutivo->error) {
+            $idRegistro = $no_consecutivo->idRegistro;
 
         }
-        
+
         return $idRegistro;
 
     }
@@ -2215,13 +2215,13 @@ class Agregar extends BaseController
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
         $archivos = $this->request->getFiles();
-       
+
         if ($data['secretario'] == 0) {
             $response->error = true;
             $response->respuesta = "Es requerido el Secretario o Director";
             return $this->respond($response);
         }
-    
+
         if ($data['id_subsecretario'] == 0) {
             $response->error = true;
             $response->respuesta = "Es requerido el Secretario o Director";
@@ -2288,42 +2288,42 @@ class Agregar extends BaseController
             $response->respuesta = "Es requerido el no_reserva";
             return $this->respond($response);
         }
-     
+
         if (isset($data['no_consecutivo']) && empty($data['no_consecutivo'])) {
             $response->error = true;
             $response->respuesta = "Es requerido el no_consecutivo";
             return $this->respond($response);
         }
-        if($data['editar'] != 1){
+        if ($data['editar'] != 1) {
             $no_consecutivo = $this->registrarFolio($data['no_consecutivo'], $data['id_reponsable_solicitud']);
         }
-        
-      
+
+
         $dataInsert = [
-            'id_reserva'               => (int) $data['id_reserva'],
+            'id_reserva' => (int) $data['id_reserva'],
             'id_direccion_responsable' => $data['direccion_responsable'],
-            'tipo_pt'                  => $data['tipo_pt'],
-            'no_consecutivo'           => $data['editar'] == 0?$no_consecutivo:$data['no_consecutivo'],
-            'id_proveedor'             => $data['id_proveedor'],
-            'fecha_tramite'            => $data['fecha_tramite'],
-            'id_reponsable_solicitud'  => (int) $data['id_reponsable_solicitud'],
-            'director_general'         => 1,
-            'secretario'               => $data['secretario'],
-            'id_subsecretario'         => $data['id_subsecretario'],
-            'cuenta_bancaria'          => $data['cuenta_bancaria'],
-            'formato_establecido'      => ($data['formato_establecido'] == 'SI') ? 1 : 2,
+            'tipo_pt' => $data['tipo_pt'],
+            'no_consecutivo' => $data['editar'] == 0 ? $no_consecutivo : $data['no_consecutivo'],
+            'id_proveedor' => $data['id_proveedor'],
+            'fecha_tramite' => $data['fecha_tramite'],
+            'id_reponsable_solicitud' => (int) $data['id_reponsable_solicitud'],
+            'director_general' => 1,
+            'secretario' => $data['secretario'],
+            'id_subsecretario' => $data['id_subsecretario'],
+            'cuenta_bancaria' => $data['cuenta_bancaria'],
+            'formato_establecido' => ($data['formato_establecido'] == 'SI') ? 1 : 2,
             'documentacion_comprobatoria' => $data['documentacion_comprobatoria'],
-            'poliza'                   => ($data['poliza'] == 'SI') ? 1 : 2,
-            'formato_conformidad'      => ($data['formato_conformidad'] == 'SI') ? 1 : 2,
-            'contrato_convenio'        => $data['contrato_convenio'],
-            'documentacion_requerida'  => $data['documentacion_requerida'],
-            'evidencia_entrega'        => $data['evidencia_entrega'],
-            'otros'                    => $data['otros'],
-            'clausula_contrato'        => $data['clausula_contrato'],
-            'concepto_pago'            => $data['concepto_pago'],
-            'comision'                 => $data['comision'],
-            'dividido'                 => isset( $data['dividido']) && !empty( $data['dividido'])? $data['dividido']:0,
-            'no_reserva'               => $data['no_reserva']
+            'poliza' => ($data['poliza'] == 'SI') ? 1 : 2,
+            'formato_conformidad' => ($data['formato_conformidad'] == 'SI') ? 1 : 2,
+            'contrato_convenio' => $data['contrato_convenio'],
+            'documentacion_requerida' => $data['documentacion_requerida'],
+            'evidencia_entrega' => $data['evidencia_entrega'],
+            'otros' => $data['otros'],
+            'clausula_contrato' => $data['clausula_contrato'],
+            'concepto_pago' => $data['concepto_pago'],
+            'comision' => $data['comision'],
+            'dividido' => isset($data['dividido']) && !empty($data['dividido']) ? $data['dividido'] : 0,
+            'no_reserva' => $data['no_reserva']
         ];
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaPT'];
         if ($data['editar'] == 0) {
@@ -2345,7 +2345,7 @@ class Agregar extends BaseController
 
         $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
 
-       if (!$response->error) {
+        if (!$response->error) {
             $id_registro_pt = $response->idRegistro;
             $idPdf = [];
             $idXml = [];
@@ -2356,7 +2356,7 @@ class Agregar extends BaseController
             $datosPDF = "";
             $response->idRegistro = $response->idRegistro;
             $this->cambiarStatusPT($data['id_reserva']);
-            
+
             // ==== PRIMERO: Procesar TODOS los datos del formulario para construir la estructura base ====
             foreach ($data as $key => $p) {
                 if (strpos($key, 'encabezado') === 0) {
@@ -2419,21 +2419,21 @@ class Agregar extends BaseController
                     $idXml[$index] = $p; // Guardar referencia para edición
                 }
             }
-            
+
             // ==== SEGUNDO: Procesar archivos subidos DESPUÉS de tener la estructura base ====
             foreach ($archivos as $nombreCampo => $archivoArray) {
                 foreach ($archivoArray as $archivo) {
                     if (!$archivo->isValid()) {
                         continue;
                     }
-                    
+
                     $tipo = $archivo->getMimeType();
 
                     // === XML ===
                     if (in_array($tipo, ['text/xml', 'application/xml'])) {
-                       $indice = str_replace('factura_xml_', '', $nombreCampo);
-                       $indice = $indice === '' ? 0 : $indice;
-                       $archivosXml[$indice][] = $archivo;
+                        $indice = str_replace('factura_xml_', '', $nombreCampo);
+                        $indice = $indice === '' ? 0 : $indice;
+                        $archivosXml[$indice][] = $archivo;
                     }
 
                     // === PDF ===
@@ -2444,35 +2444,35 @@ class Agregar extends BaseController
                     }
                 }
             }
-            
+
             // ==== TERCERO: Ordenar el array periodo por índices numéricos ====
             ksort($periodo);
-           
-            if($data['editar'] == 1){
-                 //validamos a que funcion va entrar
-                 
+
+            if ($data['editar'] == 1) {
+                //validamos a que funcion va entrar
+
                 $dataDB = array('tabla' => 'presupuesto', 'where' => ['visible' => 1, 'id_reserva' => $data['id_reserva']]);
                 $dobles = $this->globals->getTabla($dataDB);
                 $valor = count($dobles->data);
-              
-                if( $valor == 1){
-                   if(!empty($archivosXml)){
-                       foreach($archivosXml as $key => $value){
-                                $datosXML = $this->procesarXMLeditar($archivosXml[$key],  $idXml[$key], $id_registro_pt,);
-                                $datosPDF = $this->procesarPDFeditar($archivosPdf[$key],  $idPdf[$key], $id_registro_pt);
+
+                if ($valor == 1) {
+                    if (!empty($archivosXml)) {
+                        foreach ($archivosXml as $key => $value) {
+                            $datosXML = $this->procesarXMLeditar($archivosXml[$key], $idXml[$key], $id_registro_pt, );
+                            $datosPDF = $this->procesarPDFeditar($archivosPdf[$key], $idPdf[$key], $id_registro_pt);
                         }
 
-                   }
-                
-                }else{
-                   if(!empty($archivosXml)){
-                         foreach ($archivosXml as $indexGrupo => $archivosDelGrupo) {
-                    
+                    }
+
+                } else {
+                    if (!empty($archivosXml)) {
+                        foreach ($archivosXml as $indexGrupo => $archivosDelGrupo) {
+
                             foreach ($archivosDelGrupo as $posArchivo => $archivo) {
-                    
+
                                 // El ID que corresponde al archivo actual:
                                 $idFactura = $idXml[$posArchivo][$indexGrupo] ?? null;
-                            
+
                                 if (!$idFactura) {
                                     continue; // no hay ID para este archivo
                                 }
@@ -2482,19 +2482,19 @@ class Agregar extends BaseController
                                     [$idFactura],      // ID individual
                                     $id_registro_pt
                                 );
-                            
+
                             }
                         }
                     }
                 }
-                if(!empty($archivosPdf)){
-                  foreach ($archivosPdf as $indexGrupo => $archivosDelGrupo) {
-                 
+                if (!empty($archivosPdf)) {
+                    foreach ($archivosPdf as $indexGrupo => $archivosDelGrupo) {
+
                         foreach ($archivosDelGrupo as $posArchivo => $archivo) {
-                   
+
                             // El ID que corresponde al archivo actual:
                             $idFactura = $idXml[$posArchivo][$indexGrupo] ?? null;
-                         
+
                             if (!$idFactura) {
                                 continue; // no hay ID para este archivo
                             }
@@ -2504,21 +2504,21 @@ class Agregar extends BaseController
                                 [$idFactura],      // ID individual
                                 $id_registro_pt
                             );
-                           
+
                         }
                     }
                 }
 
-                 $datosP = $this->procesarPediodoEditar($periodo, $id_registro_pt);
+                $datosP = $this->procesarPediodoEditar($periodo, $id_registro_pt);
             } else {
-                foreach($archivosXml as $key => $value){
+                foreach ($archivosXml as $key => $value) {
                     $datosXML = $this->procesarXML($archivosXml[$key], $id_registro_pt);
                     $datosPDF = $this->procesarPDF($archivosPdf[$key], $id_registro_pt);
                 }
                 $datosP = $this->procesarPediodo($periodo, $id_registro_pt);
-               
+
             }
-       
+
             if (!$datosXML) {
                 $response->errorXML = true;
                 $response->respuestaXML = "XML inválido o no se encontró.";
@@ -2529,7 +2529,7 @@ class Agregar extends BaseController
             }
         }
 
-           //die( var_dump( $response ) );
+        //die( var_dump( $response ) );
         return $this->respond($response);
     }
     public function guardaVe()
@@ -2541,7 +2541,7 @@ class Agregar extends BaseController
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
         $archivos = $this->request->getFiles();
-        
+
         // Variables para almacenar datos del XML
         $total = 0;
         $uuid = '';
@@ -2568,7 +2568,7 @@ class Agregar extends BaseController
             $response->respuesta = "Es requerido el proyecto";
             return $this->respond($response);
         }
-        
+
         if (($data['direccion_responsable']) == 0) {
             $response->error = true;
             $response->respuesta = "Es requerido el Dirección Responsable";
@@ -2585,7 +2585,7 @@ class Agregar extends BaseController
             $response->respuesta = "Es requerido el Responsable de la Solicitud";
             return $this->respond($response);
         }
-    
+
         if (isset($data['fecha_inicio']) && empty($data['fecha_inicio'])) {
             $response->error = true;
             $response->respuesta = "Es requerido el fecha gasto inicio";
@@ -2612,7 +2612,7 @@ class Agregar extends BaseController
             $response->respuesta = "Es requerido el convenio";
             return $this->respond($response);
         }
-        if($data['editar'] == 0){
+        if ($data['editar'] == 0) {
             if (empty($archivos)) {
                 $response->error = true;
                 $response->respuesta = "Es requerido los archivos XML and PDF";
@@ -2622,9 +2622,9 @@ class Agregar extends BaseController
 
         // Procesamiento de archivos
         if (is_array($archivos) && !empty($archivos)) {
-            foreach($archivos as $key => $archivo){
+            foreach ($archivos as $key => $archivo) {
                 $tipo = $archivo->getMimeType();
-                
+
                 if (in_array($tipo, ['text/pdf', 'application/pdf'])) {
                     $timestamp = date('Ymd_His');
                     $extension = $archivo->getClientExtension();
@@ -2700,17 +2700,17 @@ class Agregar extends BaseController
                     $retencionesFederales = 0;
                     if (isset($cfdi->Impuestos)) {
                         $impuestosAttrs = $cfdi->Impuestos->attributes();
-                        $retencionesFederales = (float)($impuestosAttrs['TotalImpuestosRetenidos'] ?? 0);
+                        $retencionesFederales = (float) ($impuestosAttrs['TotalImpuestosRetenidos'] ?? 0);
                     }
 
                     // ✅ OBTENER RETENCIONES LOCALES
                     $retencionesLocales = 0;
                     if (isset($namespaces['implocal']) && isset($cfdi->Complemento)) {
                         $implocal = $cfdi->Complemento->children($namespaces['implocal']);
-                        
+
                         if (isset($implocal->ImpuestosLocales)) {
                             $impLocalesAttrs = $implocal->ImpuestosLocales->attributes();
-                            $retencionesLocales = (float)($impLocalesAttrs['TotaldeRetenciones'] ?? 0);
+                            $retencionesLocales = (float) ($impLocalesAttrs['TotaldeRetenciones'] ?? 0);
                         }
                     }
 
@@ -2718,65 +2718,65 @@ class Agregar extends BaseController
                     $iva = 0;
                     if (isset($cfdi->Impuestos)) {
                         $impuestosAttrs = $cfdi->Impuestos->attributes();
-                        $iva = (float)($impuestosAttrs['TotalImpuestosTrasladados'] ?? 0);
+                        $iva = (float) ($impuestosAttrs['TotalImpuestosTrasladados'] ?? 0);
                     }
 
                     // ✅ OBTENER SUBTOTAL
-                    $subtotal = (float)($attrs['SubTotal'] ?? 0);
+                    $subtotal = (float) ($attrs['SubTotal'] ?? 0);
 
                     // ✅ OBTENER DESCUENTO
                     $descuento = isset($attrs['Descuento']) ? (float) $attrs['Descuento'] : 0;
                 }
             }
         }
-        
+
         // Preparar datos para insertar
         $dataInsert = [
             'id_direccion_responsable' => $data['direccion_responsable'],
-            'id_proveedor'             => $data['id_proveedor'],
-            'fecha_tramite'            => $data['fecha_tramite'],
-            'id_responsable'           => (int) $data['id_reponsable_solicitud'],
-            'id_director'              => 1,
-            'id_secretario'            => $data['id_secretario'],
-            'id_responsable_gasto'     => $data['id_responsable_gasto'],
-            'id_proveedor_banco'       => $data['id_proveedor_banco'],
-            'fec_inicio'               => $data['fecha_inicio'],
-            'fec_fin'                  => $data['fecha_fin'],
-            'concepto'                 => $data['concepto_gasto'],
-            'comision'                 => $data['comision'],
-            'id_proyecto'              => $data['proyecto'],
-            'no_consecutivo'           => $data['no_consecutivo'],
-            'convenio'                 => $data['convenio'],
-            'otros'                    => $data['otros'],
-            'folio'                    => $data['folio'],
-            'formatos'                 => $data['formatos'],
-            'documentacion'            => $data['documentacion'],
-            'poliza'                   => $data['poliza'],
-            'conformidad'              => $data['conformidad'],
-            'contrato_convenio'        => $data['contrato_convenio'],
-            'emitir_pago'              => $data['emitir_pago'],
-            'evidencia'                => $data['evidencia'],
+            'id_proveedor' => $data['id_proveedor'],
+            'fecha_tramite' => $data['fecha_tramite'],
+            'id_responsable' => (int) $data['id_reponsable_solicitud'],
+            'id_director' => 1,
+            'id_secretario' => $data['id_secretario'],
+            'id_responsable_gasto' => $data['id_responsable_gasto'],
+            'id_proveedor_banco' => $data['id_proveedor_banco'],
+            'fec_inicio' => $data['fecha_inicio'],
+            'fec_fin' => $data['fecha_fin'],
+            'concepto' => $data['concepto_gasto'],
+            'comision' => $data['comision'],
+            'id_proyecto' => $data['proyecto'],
+            'no_consecutivo' => $data['no_consecutivo'],
+            'convenio' => $data['convenio'],
+            'otros' => $data['otros'],
+            'folio' => $data['folio'],
+            'formatos' => $data['formatos'],
+            'documentacion' => $data['documentacion'],
+            'poliza' => $data['poliza'],
+            'conformidad' => $data['conformidad'],
+            'contrato_convenio' => $data['contrato_convenio'],
+            'emitir_pago' => $data['emitir_pago'],
+            'evidencia' => $data['evidencia'],
         ];
 
         // Agregar datos del XML si existen
-        if(isset($ruta_relativa) && !empty($ruta_relativa)){  
-            $dataInsert['pdf']              = $ruta_relativa;
-            $dataInsert['xml_monto']        = $total;
-            $dataInsert['xml_uuid']         = (!empty($Folio)) ? $Folio : $uuid;
-            $dataInsert['xml_rfc']          = $rfcEmisor;
+        if (isset($ruta_relativa) && !empty($ruta_relativa)) {
+            $dataInsert['pdf'] = $ruta_relativa;
+            $dataInsert['xml_monto'] = $total;
+            $dataInsert['xml_uuid'] = (!empty($Folio)) ? $Folio : $uuid;
+            $dataInsert['xml_rfc'] = $rfcEmisor;
             $dataInsert['xml_razon_social'] = $nombreReceptor;
-            $dataInsert['xml_subtotal']     = $subtotal ?? 0;
-          //$dataInsert['xml_iva']          = $iva ?? 0;
-          //  $dataInsert['xml_descuento']    = $descuento ?? 0;
+            $dataInsert['xml_subtotal'] = $subtotal ?? 0;
+            //$dataInsert['xml_iva']          = $iva ?? 0;
+            //  $dataInsert['xml_descuento']    = $descuento ?? 0;
             $dataInsert['xml_retenciones_federales'] = $retencionesFederales;
-            $dataInsert['xml_retenciones_locales']   = $retencionesLocales;
-          //$dataInsert['xml_total_retenciones']     = $retencionesFederales + $retencionesLocales;
-          //$dataInsert['xml_moneda']       = $moneda ?? 'MXN';
-          //$dataInsert['xml_fecha']        = $fecha ?? date('Y-m-d H:i:s');
+            $dataInsert['xml_retenciones_locales'] = $retencionesLocales;
+            //$dataInsert['xml_total_retenciones']     = $retencionesFederales + $retencionesLocales;
+            //$dataInsert['xml_moneda']       = $moneda ?? 'MXN';
+            //$dataInsert['xml_fecha']        = $fecha ?? date('Y-m-d H:i:s');
         }
 
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaPTVehiculos'];
-        
+
         if ($data['editar'] == 0) {
             $dataInsert['usu_reg'] = $session->get('id_usuario');
             $dataInsert['fec_reg'] = date('Y-m-d H:i:s');
@@ -2792,7 +2792,7 @@ class Agregar extends BaseController
             ];
             $dataInsert['usu_act'] = $session->get('id_usuario');
         }
-    
+
         $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
 
         return $this->respond($response);
@@ -2808,7 +2808,7 @@ class Agregar extends BaseController
         $archivos = $this->request->getFiles();
 
 
-      
+
         if (isset($data['cuenta_bancaria']) && empty($data['cuenta_bancaria'])) {
             $response->error = true;
             $response->respuesta = "Es requerido el Cuenta Bancaria";
@@ -2840,7 +2840,7 @@ class Agregar extends BaseController
             $datos = $registro_pt->data[0];
         }
 
-        $this->registrarFolio( $data['no_consecutivo'], $datos->id_reponsable_solicitud);
+        $this->registrarFolio($data['no_consecutivo'], $datos->id_reponsable_solicitud);
         //die( var_dump( $noConsecutivo ) );
 
         $dataInsert = [
@@ -2855,8 +2855,8 @@ class Agregar extends BaseController
             'secretario' => $datos->secretario,
             'id_subsecretario' => $datos->id_subsecretario,
             'cuenta_bancaria' => $data['cuenta_bancaria'],
-           // 'total_importe' => $data['total_importe'],
-           // 'fecha_gasto_inicio' => date('Y-m-d', strtotime($data['fecha_gasto_inicio'])),
+            // 'total_importe' => $data['total_importe'],
+            // 'fecha_gasto_inicio' => date('Y-m-d', strtotime($data['fecha_gasto_inicio'])),
             //'fecha_gasto_fin' => date('Y-m-d', strtotime($data['fecha_gasto_fin'])),
             'formato_establecido' => $datos->formato_establecido,
             'documentacion_comprobatoria' => $datos->documentacion_comprobatoria,
@@ -2865,10 +2865,10 @@ class Agregar extends BaseController
             'contrato_convenio' => $datos->contrato_convenio,
             'documentacion_requerida' => $datos->documentacion_requerida,
             'evidencia_entrega' => $datos->evidencia_entrega,
-            'otros' =>$data['otros'],
+            'otros' => $data['otros'],
             'clausula_contrato' => $datos->clausula_contrato,
             'concepto_pago' => $data['concepto_pago'],
-            'comision' =>  $data['comision'],
+            'comision' => $data['comision'],
             'no_reserva' => $datos->no_reserva,
             'usu_reg' => $session->get('id_usuario'),
             'fec_reg' => date('Y-m-d H:i:s'),
@@ -2878,7 +2878,7 @@ class Agregar extends BaseController
             "tabla" => "registro_pt",
             "editar" => false
         ];
-      
+
         $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
 
         if (!$response->error) {
@@ -2888,8 +2888,8 @@ class Agregar extends BaseController
             $periodo = [];
             $response->idRegistro = $response->idRegistro;
 
-      
-             foreach ($data as $key => $p) {
+
+            foreach ($data as $key => $p) {
                 if (strpos($key, 'encabezado') === 0) {
                     $index = str_replace('encabezado', '', $key);
                     $index = $index === '' ? 0 : $index;
@@ -2941,8 +2941,8 @@ class Agregar extends BaseController
                     $archivosPdf = array_merge($archivosPdf, $fileArray);
                 }
             }
-        
-        
+
+
 
             $datosXML = $this->procesarXML($archivosXml, $id_registro_pt);
             $datosPDF = $this->procesarPDF($archivosPdf, $id_registro_pt);
@@ -4089,14 +4089,14 @@ class Agregar extends BaseController
         $fechaFin = date('Y-m-d', strtotime($fec_fin));
 
         $data = array();
-        if($usuario == 'todos'){
+        if ($usuario == 'todos') {
             $incidencia = $globals->getTabla([
                 'tabla' => 'vw_incidenica',
                 'where' => ['id_estatus' => 3],
                 'whereBetween' => [['fecha_inicio', $fechaInicio, $fechaFin]]
             ]);
-        }else{
-             $incidencia = $globals->getTabla([
+        } else {
+            $incidencia = $globals->getTabla([
                 'tabla' => 'vw_incidenica',
                 'where' => ['id_usuario' => $usuario, 'id_estatus' => 3],
                 'whereBetween' => [['fecha_inicio', $fechaInicio, $fechaFin]]
@@ -4105,44 +4105,44 @@ class Agregar extends BaseController
         }
         //die( var_dump( $incidencia->data ) );
         $data['incidencia'] = (isset($incidencia->data) && !empty($incidencia->data)) ? $incidencia->data : '';
-              if($usuario == 'todos'){
-                $data['usuario'] = (isset($incidencia->data) && !empty($incidencia->data)) ? $incidencia->data : '';
-                $usuariosAgrupados = [];
+        if ($usuario == 'todos') {
+            $data['usuario'] = (isset($incidencia->data) && !empty($incidencia->data)) ? $incidencia->data : '';
+            $usuariosAgrupados = [];
 
-                    foreach($data['incidencia'] as $key => $i) {
-                        $nombreUsuario = $i->nombre_completo;
-                        
-                        if(!isset($usuariosAgrupados[$nombreUsuario])) {
-                            $usuariosAgrupados[$nombreUsuario] = [
-                                'nombre_completo' => $nombreUsuario,
-                                'dsc_area' => $i->dsc_area,
-                                'incidencias' => []
-                            ];
-                        }
-                        
-                        $usuariosAgrupados[$nombreUsuario]['incidencias'][] = [
-                            'dsc_incidencia' => $i->dsc_incidencia,
-                            'fecha_inicio' => $i->fecha_inicio,
-                            'hora_inicio' => $i->hora_inicio,
-                            'fecha_fin' => $i->fecha_fin,
-                            'hora_fin' => $i->hora_fin,
-                            'detalles' => $i->detalles,
-                            'tipo' => $i->tipo
-                        ];
-                    }
+            foreach ($data['incidencia'] as $key => $i) {
+                $nombreUsuario = $i->nombre_completo;
 
-                    // Convertir a array indexado si lo prefieres
-                    $usuariosAgrupados = array_values($usuariosAgrupados);
-                    $data['usuariosAgrupados'] = $usuariosAgrupados;
-                    //die( var_dump(  $data['usuariosAgrupados']  ) );
+                if (!isset($usuariosAgrupados[$nombreUsuario])) {
+                    $usuariosAgrupados[$nombreUsuario] = [
+                        'nombre_completo' => $nombreUsuario,
+                        'dsc_area' => $i->dsc_area,
+                        'incidencias' => []
+                    ];
+                }
 
-                      
+                $usuariosAgrupados[$nombreUsuario]['incidencias'][] = [
+                    'dsc_incidencia' => $i->dsc_incidencia,
+                    'fecha_inicio' => $i->fecha_inicio,
+                    'hora_inicio' => $i->hora_inicio,
+                    'fecha_fin' => $i->fecha_fin,
+                    'hora_fin' => $i->hora_fin,
+                    'detalles' => $i->detalles,
+                    'tipo' => $i->tipo
+                ];
+            }
 
-              }else{
-                $data['usuario'] = (isset($incidencia->data) && !empty($incidencia->data)) ? $incidencia->data[0] : '';
-              }
-     
-       
+            // Convertir a array indexado si lo prefieres
+            $usuariosAgrupados = array_values($usuariosAgrupados);
+            $data['usuariosAgrupados'] = $usuariosAgrupados;
+            //die( var_dump(  $data['usuariosAgrupados']  ) );
+
+
+
+        } else {
+            $data['usuario'] = (isset($incidencia->data) && !empty($incidencia->data)) ? $incidencia->data[0] : '';
+        }
+
+
         $tempQrPath = FCPATH . 'assets/images/qr_final.png';
         $folio = 'GTO - ' . date('YmdHis') . substr((string) microtime(), 1, 4);
         // Generar el QR
@@ -4164,7 +4164,7 @@ class Agregar extends BaseController
         $data['dataImagen'] = $dataImagen;
         $data['folio'] = $folio;
 
-        $vista = ($usuario == 'todos')?'personal/vFormatoAsistenciaAll.php':'personal/vFormatoAsistenciaUser.php';
+        $vista = ($usuario == 'todos') ? 'personal/vFormatoAsistenciaAll.php' : 'personal/vFormatoAsistenciaUser.php';
 
         $doc = 'assets/pdf/plantillas/asistencia.pdf';
         $formato = $vista;
@@ -4214,7 +4214,7 @@ class Agregar extends BaseController
         $id_usuario = $this->request->getPost('usuario');
         $fec_ini = date('Y-m-d', strtotime($periodoInicio));
         $fec_fin = date('Y-m-d', strtotime($periodoFin));
-        if($id_usuario == 'todos'){
+        if ($id_usuario == 'todos') {
             $response->error = false;
             $response->respuesta = 'Si existen incidencia del usuario';
             return $this->respond($response);
@@ -4295,7 +4295,7 @@ class Agregar extends BaseController
         }
 
         // Convertir a timestamps para comparación
-       // Normalizar las horas del FRONT
+        // Normalizar las horas del FRONT
         $inicioDT = new DateTime($data['hora_inicio'] . ':00');
         $finDT = new DateTime($data['hora_fin'] . ':00');
 
@@ -4310,7 +4310,7 @@ class Agregar extends BaseController
         $dataDB = array('tabla' => 'sala_junta', 'where' => ['visible' => 1, 'sala' => $data['sala']], 'orlike' => $like, );
         $response = $globals->getTabla($dataDB);
 
-       if (isset($response->data) && !empty($response->data)) {
+        if (isset($response->data) && !empty($response->data)) {
 
             foreach ($response->data as $f) {
 
@@ -4329,7 +4329,7 @@ class Agregar extends BaseController
             }
         }
 
-      
+
         $dataInsert = [
             'sala' => $data['sala'],
             'fecha' => $data['fecha'] . ' ' . $data['hora_inicio'],
