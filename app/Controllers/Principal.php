@@ -3978,7 +3978,7 @@ class Principal extends BaseController
               $totalGo = 0;
               foreach($xml->data as $key => $value){
                   $data['importe'][$key]->total = $value->total;
-                  $totalGo += $value->total;
+                  $totalGo += $value->total + (int)$importe->data[$key]->propina;
                 
                 }
 
