@@ -3934,6 +3934,10 @@ class Principal extends BaseController
             'tabla' => 'vw_formato_go',
             'where' => ['visible' => 1, 'id_registro_go' => $id_pt]
         ]);
+        $documentos = $globals->getTabla([
+            'tabla' => 'periodo_factura_go',
+            'where' => ['visible' => 1, 'id_registro_go' => $id_pt]
+        ]);
         
         $importe = '';
          //var_dump( $periodo_factura );
@@ -3954,7 +3958,7 @@ class Principal extends BaseController
           
           
             $itemFactura  =  $periodo_factura->data;
-            $data['documentos'] = count($periodo_factura->data);
+            $data['documentos'] = count($documentos->data);
         }
           
         //==============================
@@ -5327,13 +5331,7 @@ class Principal extends BaseController
         $globals = new Mglobal;
         $datosGrupal = [];
         $registro = $globals->getTabla(['tabla' => 'registro_go', 'where' => ['visible' => 1, 'id_registro_go' => $id_registro_go]]);
-        $id_reponsable_solicitud = (isset($registro->data) && !empty($registro->data))? $registro->data[0]->id_reponsable_solicitud:'';
-        $consecutivo = $globals->getTabla(['tabla' => 'folio_go', 'where' => ['visible' => 1, 'id_direccion' => $id_reponsable_solicitud ]]);
-         //die( var_dump( $consecutivo ) );           
-            $conse = (isset($consecutivo->data) && !empty($consecutivo->data)) ? $consecutivo->data[0]->no_consecutivo : '';
-           // die( var_dump( $conse ) );
-            $data['consecutivo'] = (int)$conse + 1; 
-       
+ 
         $data['registro']   = ($registro->data)?$registro->data[0]:[];
         $director_general   = ($registro->data)?$registro->data[0]->director_general:'';
         $data['id_reserva'] = $id_reserva_go = ($registro->data)?$registro->data[0]->id_reserva_go:'';

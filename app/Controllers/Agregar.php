@@ -1322,6 +1322,11 @@ class Agregar extends BaseController
             $response->respuesta = "Es requerido el poliza";
             return $this->respond($response);
         }
+        if (isset($data['lugar']) && empty($data['lugar'])) {
+            $response->error = true;
+            $response->respuesta = "Es requerido el lugar";
+            return $this->respond($response);
+        }
         if (isset($data['formato_conformidad']) && empty($data['formato_conformidad'])) {
             $response->error = true;
             $response->respuesta = "Es requerido el formato_conformidad";
