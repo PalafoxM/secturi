@@ -1252,8 +1252,7 @@ class Principal extends BaseController
             }
         }
         $res = $this->enviarEmail(1);
-        var_dump( $res );
-        die();
+      
 
         return $this->respond($response);
     }

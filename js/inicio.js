@@ -770,9 +770,7 @@ ini.inicio = (function () {
                                         <td>
                                             <input type="text" autocomplete="off" class="form-control" name="importe_go[]" placeholder="0,000.00" value="${p.importe}" >
                                         </td>
-                                         <td>
-                                            <input type="text" autocomplete="off" class="form-control" name="propina_go[]" placeholder="0,000.00" value="${p.propina}" >
-                                        </td>
+                                   
                                         <td>
                                             <button type="button" class="btn btn-sm btn-danger remove-row">
                                                 <i class="fas fa-trash"></i>

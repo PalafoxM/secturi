@@ -204,7 +204,7 @@
                                                                                         <th>PROYECTO-META</th>
                                                                                         <th>PARTIDA</th>
                                                                                         <th>IMPORTE</th>
-                                                                                        <th>PROPINA</th>
+                                                                                  
                                                                                         <th>ACCIONES</th>
                                                                                     </tr>
                                                                                 </thead>
