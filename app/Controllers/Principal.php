@@ -4137,16 +4137,28 @@ class Principal extends BaseController
                            // var_dump( $periodo );
                            
                             foreach($periodo  as $key => $p){
-                                $importe_str = $xml_go[$key]->total;
-                                $importe_float = (float) str_replace(',', '', $importe_str);
-                                $data['numero_texto2'] = $this->numeroEnLetras($importe_float);
-                                $data['importePartida'] =  $xml_go[$key]->total;
-
-                                $data['inicio'] = $p->periodo_inicio;
-                                $data['fin']    = $p->periodo_fin;
-                                $monto          = (int)$xml_go[$key]->total + (int)$p->propina ;
-                               // $data['total2']  = $monto;
-                               // $data['monto2']  = $this->numeroEnLetras($monto);
+                           // Reemplazar el foreach interno por:
+                                if (isset($periodo[$index])) {
+                                    $p = $periodo[$index];
+                                    
+                                    $importe_str = $facturaItem->total; // Usar el item actual
+                                    $importe_float = (float) str_replace(',', '', $importe_str);
+                                    $data['numero_texto2'] = $this->numeroEnLetras($importe_float);
+                                    $data['importePartida'] = $facturaItem->total;
+                                    $data['inicio'] = $p->periodo_inicio;
+                                    $data['fin']    = $p->periodo_fin;
+                                    $monto          = (int)$facturaItem->total + (int)$p->propina;
+                                    $data['total2']  = $monto;
+                                    $data['monto2']  = $this->numeroEnLetras($monto);
+                                } else {
+                                    // Valores por defecto si no hay período
+                                    $data['numero_texto2'] = '';
+                                    $data['importePartida'] = '';
+                                    $data['inicio'] = '';
+                                    $data['fin']    = '';
+                                    $data['total2']  = '';
+                                    $data['monto2']  = '';
+                                };
 
                                 
                             }

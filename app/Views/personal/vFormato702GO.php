@@ -254,8 +254,12 @@
 </div>
 
 <div id="importe_respuesta">
-    <?php if(isset($monto) && !empty($monto)): ?>
-   <span > <?= '$' . number_format($total, 2) .' ('.$monto.')' ?>  </span>
-   <?php endif; ?>
+    <?php if(isset($total2) && !empty($total2)): ?>
+        <span><?= '$' . number_format($total2, 2) .' ('.$monto2.')' ?></span>
+    <?php elseif(isset($total) && !empty($total)): ?>
+        <span><?= '$' . number_format($total, 2) .' ('.$monto.')' ?></span>
+    <?php else: ?>
+        <span>No disponible</span>
+    <?php endif; ?>
 </div>
 
