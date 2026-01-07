@@ -3797,23 +3797,10 @@ class Agregar extends BaseController
            '2025-12-12' => 'Día de la Virgen de Guadalupe',
             $anio . '-12-25' => 'Navidad',
             $anio . '-' . $cumple => 'Mi cumpleaños',
-            '2025-12-22' => '2do Periodo Vacacional',
-            '2025-12-23' => '2do Periodo Vacacional',
-            '2025-12-24' => '2do Periodo Vacacional',
-            '2025-12-25' => '2do Periodo Vacacional',
-            '2025-12-26' => '2do Periodo Vacacional',
-            '2025-12-27' => '2do Periodo Vacacional',
-            '2025-12-28' => '2do Periodo Vacacional',
-            '2025-12-29' => '2do Periodo Vacacional',
-            '2025-12-30' => '2do Periodo Vacacional',
-            '2025-12-31' => '2do Periodo Vacacional',
-            $anio . '-01-01' => '2do Periodo Vacacional',
-            $anio . '-01-02' => '2do Periodo Vacacional',
-            $anio . '-01-03' => '2do Periodo Vacacional',
-            $anio . '-01-04' => '2do Periodo Vacacional',
-            $anio . '-01-05' => '2do Periodo Vacacional',
-            $anio . '-01-06' => '2do Periodo Vacacional',
-    
+            '2025-12-25' => 'Asueto',
+            $anio . '-12-25' => 'Asueto',
+            $anio . '-01-01' => 'Asueto',
+
         ];
 
         $data['diasFestivos'] = $diasFestivos;
