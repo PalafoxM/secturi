@@ -2149,9 +2149,9 @@ class Principal extends BaseController
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Estimado personal,</p>
                         
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-                            En caso de que aún no hayas realizado las <strong>justificaciones de su personal correspondientes a la quincena 23/2025</strong>, 
-                            la cual comprende el periodo del <strong>1 al 15 de diciembre de 2025</strong>, 
-                            tienes hasta el día <strong> viernes 19 de diciembre hasta las 16:00 hrs</strong> para realizarlas.
+                            En caso de que aún no hayas realizado las <strong>justificaciones de su personal correspondientes a la quincena 24/2025</strong>, 
+                            la cual comprende el periodo del <strong>16 al 31 de diciembre de 2025</strong>, 
+                            tienes hasta el día <strong> miercoles 14 de enero hasta las 16:00 hrs</strong> para realizarlas.
                         </p>
 
                         <div class="highlight-box">

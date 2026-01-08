@@ -444,7 +444,8 @@ class Usuario extends BaseController
             $anio . '-09-16' => 'Día de la Independencia',
             $anio . '-11-17' => 'Asueto',
             $anio . '-12-12' => 'Dia de la Virgen de Guadalupe',
-            $anio . '-12-25' => 'Navidad'
+            '2025-12-25' => 'Navidad',
+            $anio . '-01-01' => 'Asueto'
         ];
    
         $tabla = [
