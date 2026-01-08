@@ -703,7 +703,7 @@
                                                                         </div>
                                                                     </li>
                                                                 </a>
-                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/Formato-de-Afectacion-Presupuestal_INTR V2026.xlsx" >  
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/Formato-de-Afectacion-Presupuestal_INTR V2026.xlsm" >  
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
                                                                         Formato de Afectación Presupuestal
