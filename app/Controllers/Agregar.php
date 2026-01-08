@@ -3789,8 +3789,8 @@ class Agregar extends BaseController
         $anio = date('Y');
         $diasFestivos = [
             $anio . '-01-01' => 'Año Nuevo',
-            $anio . '-02-05' => 'Día de la Constitución',
-            $anio . '-03-18' => 'Natalicio de Benito Juárez',
+            $anio . '-02-02' => 'Conmemoración del 5 de febrero',
+            $anio . '-03-16' => 'Natalicio de Benito Juárez',
             $anio . '-05-01' => 'Día del Trabajo',
             $anio . '-09-16' => 'Día de la Independencia',
             $anio . '-11-17' => 'Asueto',

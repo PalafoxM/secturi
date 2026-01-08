@@ -438,7 +438,7 @@ class Usuario extends BaseController
         $anio = date('Y');
         $diasFestivosGenerales = [
             $anio . '-01-01' => 'Año Nuevo',
-            $anio . '-02-05' => 'Día de la Constitución',
+            $anio . '-02-02' => 'Día de la Constitución',
             $anio . '-03-18' => 'Natalicio de Benito Juárez',
             $anio . '-05-01' => 'Día del Trabajo',
             $anio . '-09-16' => 'Día de la Independencia',
