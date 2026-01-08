@@ -4446,7 +4446,8 @@ class Principal extends BaseController
         if($registros >= 15){
             $pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/plantillas/FormatoPTExtra_merged.pdf');
         }else{
-            $pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/plantillas/anexo07_2.pdf');
+            //$pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/plantillas/anexo07_2.pdf');
+            $pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/plantillas/anexo07_2_2026.pdf');
         }
 
 
