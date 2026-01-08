@@ -2974,7 +2974,7 @@ class Principal extends BaseController
         if (!empty($instrumento)) {
             switch ($id_archivo) {
                 case 1:
-                    $doc = 'assets/pdf/plantillas/anexo01.pdf';
+                    $doc = 'assets/pdf/plantillas/anexo02_2026.pdf';
                     $formato = 'personal/vFormato01.php';
                     break;
                 case 4:
@@ -2997,7 +2997,7 @@ class Principal extends BaseController
         } else {
             switch ($id_archivo) {
                 case 1:
-                    $doc = 'assets/pdf/plantillas/anexo01.pdf';
+                    $doc = 'assets/pdf/plantillas/anexo02_2026.pdf';
                     $formato = 'personal/vFormato01.php';
                     break;
                 case 4:

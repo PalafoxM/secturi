@@ -39,7 +39,7 @@
             $keys = array_keys($uuid);
             $lastKey = end($keys);
             foreach($uuid as $key => $u): ?>
-                <?= $u->uuid ?><?= $key !== $lastKey ? ',' : '' ?>
+                <?= ($u->folio)?$u->folio:$u->uuid ?><?= $key !== $lastKey ? ',' : '' ?>
             <?php endforeach; ?>
 
            
