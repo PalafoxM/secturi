@@ -675,7 +675,7 @@
                                                                         </div>
                                                                     </li>
                                                                 </a>
-                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/F-RF-07-2026 SOLICITUD GRC.xlsm" >  
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/F-RF-07-2026 SOLICITUD GRC.docx" >  
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
                                                                         SOLICITUD GRC
