@@ -549,31 +549,31 @@
                                                                     </li>
                                                                 </a>
                                                                 
-                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/F-DAJ-09-2020_Formato_Solicitud_de_Convenios-40e5.xlsx" >
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/DGJ-2 Solicitud de elaboración de Convenio.xlsx" >
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
                                                                     Formato Solicitud de Convenios
                                                                         </div>
                                                                     </li>  
                                                                 </a>
-                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/F-DAJ-10-2020_Solicitud_de_Contratos_De_Adquisicion-97a6.xlsx" >
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/DAJ-3 Solicitud de elaboracipon de Contrato de Adquisicion.xlsx" >
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
                                                                         Solicitud de Contratos de Adquisición
                                                                         </div>
                                                                     </li> 
                                                                 </a> 
-                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/F-DAJ-11-2020_Solicitud_de_Contratos-07eb.xlsx">
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/DAJ-1 Solicitud de elaboración de Contrato de Prestación de Servicios.xlsx">
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
-                                                                      Solicitud de Contratos
+                                                                      Solicitud de Contrato de Prestación de Servicios
                                                                     </div>
                                                                 </li>  
                                                                 </a>
-                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/F-DAJ-12-2022_Solicitud_de_Honorarios-5763.xlsx">
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/DGJ-4 Solicitud de elaboración de Contrato de Honorarios Asimilados a Salarios.xlsx">
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
-                                                                       Solicitud de Honorarios
+                                                                       Solicitud de Honorarios Asimilados a Salarios
                                                                     </div>
                                                                 </li>
                                                                  </a>
@@ -588,6 +588,13 @@
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
                                                                         Inventario
+                                                                        </div>
+                                                                    </li>
+                                                                 </a>
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/AVISO_PRIVACIDAD_INTEGRAL_ACTUALIZADO_2025.pdf">
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Aviso de Privacidad Integral Actualizado 2025
                                                                         </div>
                                                                     </li>
                                                                  </a>
