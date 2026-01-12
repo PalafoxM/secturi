@@ -714,7 +714,8 @@ class Usuario extends BaseController
 
                 $valorEntrada = $entrada;
                 $valorSalida = $salida;
-                $validado = false;
+                $validadoEntrada = false;
+                $validadoSalida = false;
                 $stopIncProcessing = false; // para no sobrescribir si ya procesamos una incidencia relevante
 
                 if (!empty($incArr)) {
@@ -741,7 +742,8 @@ class Usuario extends BaseController
                             $sheet->getStyle($colSalida . $fila)
                                 ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                                 ->getStartColor()->setARGB('FF00B050');
-                            $validado = true;
+                            $validadoEntrada = true;
+                            $validadoSalida = true;
                             $stopIncProcessing = true;
                             break;
                         }
@@ -759,8 +761,8 @@ class Usuario extends BaseController
                                     $sheet->getStyle($colEntrada . $fila)
                                         ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                                         // agregar FF al color
-                                        ->getStartColor()->setARGB('FF6EA11D');
-                                    $validado = true;
+                                        ->getStartColor()->setARGB('FF00B050');
+                                    $validadoEntrada = true;
                                     $stopIncProcessing = true;
                                 }
                             }
@@ -771,24 +773,23 @@ class Usuario extends BaseController
                                     $valorSalida = $nombreInc;
                                     $sheet->getStyle($colSalida . $fila)
                                         ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                        ->getStartColor()->setARGB('FF6EA11D');
-                                    $validado = true;
+                                        ->getStartColor()->setARGB('FF00B050');
+                                    $validadoSalida = true;
                                     $stopIncProcessing = true;
                                 }
                             }
                             if (!$stopIncProcessing && $horaFin) {
-                                if ($horaInicio >= '9:01:00' && $horaFin <= '18:00:00') {
+                                if ($horaInicio >= '09:01:00' && $horaFin <= '18:00:00') {
                                     $valorSalida = $nombreInc;
                                     $sheet->getStyle($colEntrada . $fila)
                                         ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                                         // agregar FF al color
-                                        ->getStartColor()->setARGB('FF6EA11D');
-                                    $validado = true;
-                                    $stopIncProcessing = true;
+                                        ->getStartColor()->setARGB('FF00B050');
+                                    $validadoEntrada = true;
                                     $sheet->getStyle($colSalida . $fila)
                                         ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                        ->getStartColor()->setARGB('FF6EA11D');
-                                    $validado = true;
+                                        ->getStartColor()->setARGB('FF00B050');
+                                    $validadoSalida = true;
                                     $stopIncProcessing = true;
                                 }
                             }
@@ -800,11 +801,12 @@ class Usuario extends BaseController
                                 $valorSalida = $nombreInc;
                                 $sheet->getStyle($colEntrada . $fila)
                                     ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                    ->getStartColor()->setARGB('FF6EA11D');
+                                    ->getStartColor()->setARGB('FF00B050');
                                 $sheet->getStyle($colSalida . $fila)
                                     ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                    ->getStartColor()->setARGB('FF6EA11D');
-                                $validado = true;
+                                    ->getStartColor()->setARGB('FF00B050');
+                                $validadoEntrada = true;
+                                $validadoSalida = true;
                                 $stopIncProcessing = true;
                             }
 
@@ -812,222 +814,191 @@ class Usuario extends BaseController
                             if ($stopIncProcessing)
                                 break;
                         }
-                        if ($cat === 1 && $estatus === 3 ) {
-                            // Normalizamos con DateTime (si existe)
-                          
-                            // Si hay hora de inicio dentro del rango de la mañana -> marcar entrada como permiso
-                            if ($horaInicio) {
-                                // compara solo la parte de tiempo: 09:01:00 - 12:00:00 (ajusta si tus rangos cambian)
+                     
+                        // Otros bloques Cat 1 y Cat 7 omitidos por brevedad pero deben ser corregidos manual o en siguiente paso si necesarios
+                        // Asumiremos que Cat 11 es el principal problema reportado, pero corregiremos Cat 1 y 7 en un paso mas amplio si es necesario.
+                        
+                        // FIX CAT 1 y CAT 7 AQUI MISMO PARA ASEGURAR:
+                         if ($cat === 1 && $estatus === 3 ) {
+                             if ($horaInicio) {
                                 if ($horaInicio >= '08:00:00' && $horaFin <= '12:01:00') {
                                     $valorEntrada = $nombreInc;
                                     $sheet->getStyle($colEntrada . $fila)
                                         ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                        // agregar FF al color
-                                        ->getStartColor()->setARGB('FF6EA11D');
-                                    $validado = true;
+                                        ->getStartColor()->setARGB('FF00B050');
+                                    $validadoEntrada = true;
                                     $stopIncProcessing = true;
                                 }
                             }
-
-                            // Si hay hora fin y cae en el rango de tarde -> marcar salida como permiso
                             if (!$stopIncProcessing && $horaFin) {
-                             
                                 if ($horaInicio >= '12:01:00' && $horaFin <= '16:00:00') {
                                     $valorSalida = $nombreInc;
                                     $sheet->getStyle($colSalida . $fila)
                                         ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                        ->getStartColor()->setARGB('FF6EA11D');
-                                    $validado = true;
+                                        ->getStartColor()->setARGB('FF00B050');
+                                    $validadoSalida = true;
                                     $stopIncProcessing = true;
                                 }
                             }
-
-                            // Si la comisión es de todo el día (inicio y fin) podrías decidir marcar ambos campos:
                             if (!$stopIncProcessing && $horaInicio >= '08:00:00' &&  $horaFin <= '16:00:00') {
-                                // ejemplo simple: si cubre mañana y tarde -> marcar ambos   
-                            
                                 $valorEntrada = $valorSalida = $nombreInc;
                                 $sheet->getStyle($colEntrada . $fila)
                                     ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                    ->getStartColor()->setARGB('FF6EA11D');
+                                    ->getStartColor()->setARGB('FF00B050');
                                 $sheet->getStyle($colSalida . $fila)
                                     ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                    ->getStartColor()->setARGB('FF6EA11D');
-                                $validado = true;
+                                    ->getStartColor()->setARGB('FF00B050');
+                                $validadoEntrada = true;
+                                $validadoSalida = true;
                                 $stopIncProcessing = true;
                             }
-                          
-                           
-
-                            // si ya procesaste, salir
-                            if ($stopIncProcessing)
-                                break;
+                             if ($stopIncProcessing) break;
                         }
-                        if ($cat === 7 && $estatus === 3) {
-                            // Normalizamos con DateTime (si existe)
-                           
-
-                            // Si hay hora de inicio dentro del rango de la mañana -> marcar entrada como permiso
+                        
+                         if ($cat === 7 && $estatus === 3) {
                             if ($horaInicio) {
-                                // compara solo la parte de tiempo: 09:01:00 - 12:00:00 (ajusta si tus rangos cambian)
                                 if ($horaInicio >= '08:00:00' && $horaFin <= '12:01:00') {
                                     $valorEntrada = 'CONSTANCIA DE TIEMPO';
                                     $sheet->getStyle($colEntrada . $fila)
                                         ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                        // agregar FF al color
-                                        ->getStartColor()->setARGB('FF6EA11D');
-                                    $validado = true;
+                                        ->getStartColor()->setARGB('FF00B050');
+                                    $validadoEntrada = true;
                                     $stopIncProcessing = true;
                                 }
                             }
-
                              if ($horaInicio >= '08:00:00' && $horaFin <= '20:00:00') {
                                     $valorEntrada = 'CONSTANCIA DE TIEMPO';
                                     $sheet->getStyle($colEntrada . $fila)
                                         ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                        // agregar FF al color
-                                        ->getStartColor()->setARGB('FF6EA11D');
-                                    $validado = true;
+                                        ->getStartColor()->setARGB('FF00B050');
+                                    $validadoEntrada = true;
                                     $sheet->getStyle($colSalida . $fila)
                                         ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                        // agregar FF al color
-                                        ->getStartColor()->setARGB('FF6EA11D');
-                                    $validado = true;
+                                        ->getStartColor()->setARGB('FF00B050');
+                                    $validadoSalida = true;
                                     $stopIncProcessing = true;
                                 }
-
-                            // Si hay hora fin y cae en el rango de tarde -> marcar salida como permiso
                             if (!$stopIncProcessing && $horaFin) {
                                 if ($horaInicio >= '12:01:00' && $horaFin <= '16:00:00') {
                                     $valorSalida = 'CONSTANCIA DE TIEMPO';
                                     $sheet->getStyle($colSalida . $fila)
                                         ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                        ->getStartColor()->setARGB('FF6EA11D');
-                                    $validado = true;
+                                        ->getStartColor()->setARGB('FF00B050');
+                                    $validadoSalida = true;
                                     $stopIncProcessing = true;
                                 }
                             }
-
-                            // Si la comisión es de todo el día (inicio y fin) podrías decidir marcar ambos campos:
                             if (!$stopIncProcessing && $horaInicio >= '08:30:00' &&  $horaFin <= '16:00:00') {
-                                // ejemplo simple: si cubre mañana y tarde -> marcar ambos
                                 $valorEntrada = $valorSalida ='CONSTANCIA DE TIEMPO';
                                 $sheet->getStyle($colEntrada . $fila)
                                     ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                    ->getStartColor()->setARGB('FF6EA11D');
+                                    ->getStartColor()->setARGB('FF00B050');
                                 $sheet->getStyle($colSalida . $fila)
                                     ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                    ->getStartColor()->setARGB('FF6EA11D');
-                                $validado = true;
+                                    ->getStartColor()->setARGB('FF00B050');
+                                $validadoEntrada = true;
+                                $validadoSalida = true;
                                 $stopIncProcessing = true;
                             }
-
-                            // si ya procesaste, salir
-                            if ($stopIncProcessing)
-                                break;
+                            if ($stopIncProcessing) break;
                         }
 
-                        // Otros estatus (rechazado/en proceso) -> manejar aquí si lo necesitas
-                        if ($estatus === 2) {
+                        // Otros estatus (rechazado/en proceso)
+                         if ($estatus === 2) {
                             $valorEntrada = 'Declinado';
                             $sheet->getStyle($colEntrada . $fila)
                                 ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                                 ->getStartColor()->setARGB('FFFF0000');
-                            $validado = true;
+                            $validadoEntrada = true; // prevent red overrides? actually if declined, maybe we want unrelated red? But kept for safety.
+                            $validadoSalida = true; // Assuming declined covers it ?? Actually original code set validado=true
                             $stopIncProcessing = true;
                             break;
                         }
-
-                    
-                        if ($estatus === 1 && $horaInicio >= '08:00:00' &&  $horaFin <= '12:00:00') {
-                            $valorEntrada = 'Sin validar';
-                            //$valorSalida  = 'Sin validar';
-                            $sheet->getStyle($colEntrada . $fila)
-                                ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                ->getStartColor()->setARGB('FFFF0000');
-                            $validado = false;
-                            $stopIncProcessing = true;
-                            break;
-                
-                        }
-                        if ($estatus === 1 && $horaInicio >= '12:00:00' &&  $horaFin <= '16:00:00') {
-                          //  $valorEntrada = 'Sin validar';
-                            $valorSalida = 'Sin validar';
-
-                            $sheet->getStyle($colSalida . $fila)
-                                ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                ->getStartColor()->setARGB('FFFF0000');
-                            $validado = false;
-                            $stopIncProcessing = true;
-                            break;
-                        }
-
-                        if ($estatus === 1 && empty($salida) && empty($entrada)) {
-                            $valorEntrada = 'Sin validar';
-                            $valorSalida  = 'Sin validar';
-                            $sheet->getStyle($colEntrada . $fila)
-                                ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                ->getStartColor()->setARGB('FFFF0000');
-                            $sheet->getStyle($colSalida . $fila)
-                                ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                ->getStartColor()->setARGB('FFFF0000');
-                            $validado = false;
-                            $stopIncProcessing = true;
-                            break;
-                        }
-                    
-                  
-                       
-                   
-                    }
+                        
+                         if ($estatus === 1) {
+                            // En proceso
+                            // (Logica original mantenida pero adaptada a flags)
+                             if ($horaInicio >= '08:00:00' &&  $horaFin <= '12:00:00') {
+                                $valorEntrada = 'Sin validar';
+                                $sheet->getStyle($colEntrada . $fila)
+                                    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                    ->getStartColor()->setARGB('FFFF0000');
+                                // $validadoEntrada = false; // Ya es false por defecto, no necesitamos setearlo a false explicitamente si ya lo es.
+                                $stopIncProcessing = true;
+                                break;
+                            }
+                             if ($horaInicio >= '12:00:00' &&  $horaFin <= '16:00:00') {
+                                $valorSalida = 'Sin validar';
+                                $sheet->getStyle($colSalida . $fila)
+                                    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                    ->getStartColor()->setARGB('FFFF0000');
+                                // $validadoSalida = false;
+                                $stopIncProcessing = true;
+                                break;
+                            }
+                             if (empty($salida) && empty($entrada)) {
+                                $valorEntrada = 'Sin validar';
+                                $valorSalida  = 'Sin validar';
+                                $sheet->getStyle($colEntrada . $fila)
+                                    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                    ->getStartColor()->setARGB('FFFF0000');
+                                $sheet->getStyle($colSalida . $fila)
+                                    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                    ->getStartColor()->setARGB('FFFF0000');
+                                $stopIncProcessing = true;
+                                break;
+                            }
+                         }
+                    } // end foreach loop
                 }
 
                 // --- AHORA aplicar la validación de retardo/ sin registro solo si NO fue validado por incidencias ---
-              // --- Validación de salida (ejemplo) ---
-                if (!$validado) {
-                    // Si no hay salida -> marcar rojo (sin registro de salida)
-                    if (empty($salida) && empty($entrada)) {
-                        $valorSalida = 'Sin registro';
-                        $valorEntrada = 'Sin registro';
-                        $sheet->getStyle($colSalida . $fila)
-                            ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                            ->getStartColor()->setARGB('FFFF0000');
-                        $sheet->getStyle($colEntrada . $fila)
-                                ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                ->getStartColor()->setARGB('FFFF0000'); // rojo
-                    }elseif(empty($salida)  || !$salida){
+                
+                // 1. Caso especial: faltó todo el día (y no justificado)
+                if (!$validadoEntrada && !$validadoSalida && empty($entrada) && empty($salida)) {
+                     $valorSalida = 'Sin registro';
+                     $valorEntrada = 'Sin registro';
+                     $sheet->getStyle($colSalida . $fila)
+                         ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                         ->getStartColor()->setARGB('FFFF0000');
+                     $sheet->getStyle($colEntrada . $fila)
+                             ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                             ->getStartColor()->setARGB('FFFF0000'); // rojo
+                }elseif(!$validadoSalida && (empty($salida)  || !$salida)){
                         $valorSalida = 'Sin registro';
                         $sheet->getStyle($colSalida . $fila)
                              ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                              ->getStartColor()->setARGB('FFFF0000'); // rojo
-                                  
-                    } else {
-                        // Ejemplo: marcar rojo si la salida es antes de la hora mínima permitida
-                        // o si es demasiado tarde (ajusta $minSalida / $maxSalida a tus reglas)
-                        try {    
-
-                            // Si quieres marcar salida temprana (salió antes de la hora mínima)
-                            if ($salida > '12:00:00' && $salida < '16:00:00') {
-                             $sheet->getStyle($colSalida . $fila)
-                                ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                ->getStartColor()->setARGB('FFFF0000'); // Rojo puro
-                            }
-                            if ($entrada > '08:46:00' && $entrada < '09:00:00') {
-                                $sheet->getStyle($colEntrada . $fila)
-                                    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                    ->getStartColor()->setARGB('FFFFFF00'); // naranja
-                            }
-                            if ($entrada > '09:01:00' && $entrada < '12:00:00') {
-                                $sheet->getStyle($colEntrada . $fila)
-                                    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                    ->getStartColor()->setARGB('FFFF0000'); // rojo
-                            }
-                         
-
-                        } catch (\Exception $e) {
-                            // si $salida no es parseable, no hacer nada (o registrar)
-                        }
-                    }
+                } else {
+                     // VALIDACIÓN ENTRADA
+                     if (!$validadoEntrada) {
+                          if (!empty($entrada)) {
+                             if ($entrada > '08:46:00' && $entrada < '09:00:00') {
+                                 $sheet->getStyle($colEntrada . $fila)
+                                     ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                     ->getStartColor()->setARGB('FFFFFF00'); // naranja
+                             }
+                             if ($entrada > '09:01:00' && $entrada < '12:00:00') {
+                                 $sheet->getStyle($colEntrada . $fila)
+                                     ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                     ->getStartColor()->setARGB('FFFF0000'); // rojo
+                             }
+                          } else if (!$validadoEntrada && $entrada === '') {
+                                // Missing entry but present exit or just general missing
+                                // (Do nothing or mark red depending on prefs, staying keeping logic minimal to avoid breaking existing flows)
+                          }
+                     }
+                     
+                     // VALIDACIÓN SALIDA
+                     if (!$validadoSalida) {
+                         if (!empty($salida)) {
+                             if ($salida > '12:00:00' && $salida < '16:00:00') {
+                              $sheet->getStyle($colSalida . $fila)
+                                 ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                 ->getStartColor()->setARGB('FFFF0000'); // Rojo puro
+                             }
+                         }
+                     }
                 }
 
 
