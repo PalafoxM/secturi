@@ -3797,12 +3797,11 @@ class Agregar extends BaseController
             $anio . '-11-17' => 'Asueto',
            '2025-12-12' => 'Día de la Virgen de Guadalupe',
             $anio . '-12-25' => 'Navidad',
-             '2025-' . $cumple => 'Mi cumpleaños',
+            '2025-' . $cumple => 'Mi cumpleaños',
             $anio . '-' . $cumple => 'Mi cumpleaños',
             '2025-12-25' => 'Asueto',
             $anio . '-12-25' => 'Asueto',
             $anio . '-01-01' => 'Asueto',
-
         ];
 
         $data['diasFestivos'] = $diasFestivos;
@@ -4775,4 +4774,152 @@ class Agregar extends BaseController
     }
 
 
+
+    public function guardarSolicitud()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = "Error al guardar Solicitud";
+
+        $this->globals = new Mglobal();
+        $data = $this->request->getPost();
+        
+        // Validaciones
+        $camposRequeridos = [
+            'cheque_favor' => 'Cheque a favor',
+            'cantidad' => 'Cantidad',
+            'nombre_evento' => 'Nombre del evento',
+            'lugar' => 'Lugar',
+            'fecha_incicio' => 'Fecha Inicio',
+            'fecha_fin' => 'Fecha Fin',
+            'clave' => 'Clave',
+            'nombre_resposable' => 'Nombre Responsable'
+        ];
+
+        foreach($camposRequeridos as $campo => $nombre) {
+             if (empty($data[$campo])) {
+                $response->respuesta = "Es requerido el campo: " . $nombre;
+                return $this->respond($response);
+            }
+        }
+        
+        // Limpiar cantidad
+        $cantidad_limpia = floatval(str_replace(['$', ',', ' '], '', $data['cantidad']));
+
+        // Datos principales
+        $dataInsert = [
+           'cheque_favor' => $data['cheque_favor'],
+           'cantidad' => $cantidad_limpia,
+           'nombre_evento' => $data['nombre_evento'],
+           'lugar' => $data['lugar'],
+           'fecha_inicio' => $data['fecha_incicio'],
+           'fecha_fin' => $data['fecha_fin'],
+           'clave' => $data['clave'],
+           'nombre_responsable' => $data['nombre_resposable'], 
+           'fec_reg' => date('Y-m-d H:i:s'),
+           'usu_reg' => $session->get('id_usuario')
+        ];
+
+        $id_solicitud = isset($data['id_solicitud']) && !empty($data['id_solicitud']) ? $data['id_solicitud'] : 0;
+
+        // Configuración para Guardar/Editar
+        $dataConfig = [
+            "tabla" => "solicitud_grc", 
+            "editar" => ($id_solicitud > 0)
+        ];
+        
+        if ($id_solicitud > 0) {
+            $dataConfig["idEditar"] = ['id_solicitud_grc' => $id_solicitud];
+        }
+
+        $dataBitacora = [
+            'id_user' => $session->get('id_usuario'),
+            'script' => 'Agregar.php/guardarSolicitud'
+        ];
+
+        $result = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+
+        if (!$result->error) {
+            // Si es nuevo registro, obtener el ID insertado
+            if ($id_solicitud == 0) {
+                 $id_solicitud = isset($result->idRegistro) ? $result->idRegistro : 0;
+            } else {
+                 // Si es edición, deshabilitar detalles anteriores para insertar los nuevos (clean slate approach)
+                 // Primero obtenemos los detalles actuales
+                 $detallesActuales = $this->globals->getTabla(['tabla' => 'solicitud_grc_detalle', 'where' => ['id_solicitud_grc' => $id_solicitud, 'visible' => 1]]);
+                 if (!empty($detallesActuales->data)) {
+                     foreach($detallesActuales->data as $det) {
+                         // Deshabilitamos cada detalle
+                         $this->globals->saveTabla(['visible' => 0], ["tabla" => "solicitud_grc_detalle", "editar" => true, "idEditar" => ['id_solicitud_grc_detalle' => $det->id_solicitud_grc_detalle]], $dataBitacora);
+                     }
+                 }
+            }
+            
+            // Guardar detalles (Nuevos o Reemplazo)
+            if (isset($data['detalles']) && is_array($data['detalles'])) {
+                foreach ($data['detalles'] as $detalle) {
+                    if(!empty($detalle['partida']) && !empty($detalle['importe'])) {
+                         $importe_limpio = floatval(str_replace(['$', ',', ' '], '', $detalle['importe']));
+                         
+                         $detalleInsert = [
+                             'id_solicitud_grc' => $id_solicitud, // FK
+                             'id_partida' => $detalle['partida'],
+                             'importe' => $importe_limpio,
+                             'id_proyecto' => $detalle['proyecto'] ?? null,
+                             'fec_reg' => date('Y-m-d H:i:s'),
+                             'usu_reg' => $session->get('id_usuario'),
+                             'visible' => 1
+                         ];
+                         
+                         $this->globals->saveTabla($detalleInsert, ["tabla" => "solicitud_grc_detalle", "editar" => false], $dataBitacora);
+                    }
+                }
+            }
+            
+            $response->error = false;
+            $response->respuesta = ($id_solicitud > 0 && isset($data['id_solicitud'])) ? "Solicitud actualizada correctamente" : "Solicitud guardada correctamente";
+            // Check if it was an update but $id_solicitud came from result (create case) vs form (update case)
+             if (isset($data['id_solicitud']) && !empty($data['id_solicitud'])) {
+                  $response->respuesta = "Solicitud actualizada correctamente";
+             } else {
+                  $response->respuesta = "Solicitud guardada correctamente";
+             }
+
+        } else {
+             $response->respuesta = $result->respuesta;
+        }
+
+        return $this->respond($response);
+    }
+    public function eliminarSolicitud()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = "Error al eliminar Solicitud";
+
+        $this->globals = new Mglobal();
+        $id_solicitud = $this->request->getPost('id_solicitud');
+        
+        if ($id_solicitud) {
+            $dataConfig = [
+                "tabla" => "solicitud_grc", 
+                "editar" => true,
+                "idEditar" => ['id_solicitud_grc' => $id_solicitud]
+            ];
+            $dataBitacora = [
+                'id_user' => $session->get('id_usuario'),
+                'script' => 'Agregar.php/eliminarSolicitud'
+            ];
+            
+            // Soft delete (visible = 0)
+            $result = $this->globals->saveTabla(['visible' => 0], $dataConfig, $dataBitacora);
+            
+            $response->error = $result->error;
+            $response->respuesta = $result->error ? "Error al eliminar" : "Solicitud eliminada correctamente";
+        }
+
+        return $this->respond($response);
+    }
 }

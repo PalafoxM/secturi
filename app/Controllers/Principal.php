@@ -2420,6 +2420,137 @@ class Principal extends BaseController
         $this->_renderView($data);
 
     }
+    public function listadoGrc($id_registro_pt = null, $id_reserva = null)
+    {
+
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+ 
+
+
+        $cat_perfil = $globals->getTabla(['tabla' => 'perfil', 'where' => ['visible' => 1]]);
+        $cat_director_general = $globals->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1]]);
+        $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
+        $cat_usuario = $globals->getTabla(['tabla' => 'cat_usuario', 'where' => ['visible' => 1]]);
+        $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
+        $cat_tipo = $globals->getTabla(['tabla' => 'cat_tipo', 'where' => ['visible' => 1]]);
+        $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1]]);
+        $cat_opcion = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1]]);
+        $proveedor = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit' => 10]);
+        $usuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
+        $data['dsc_director_general'] = (!empty($cat_director_general->data)) ? $cat_director_general->data[0]->dsc_director_general : [];
+        $data['cat_tipo'] = (!empty($cat_tipo->data)) ? $cat_tipo->data : [];
+        $data['cat_opcion'] = (!empty($cat_opcion->data)) ? $cat_opcion->data : [];
+        $data['cat_perfil'] = (!empty($cat_perfil->data)) ? $cat_perfil->data : [];
+        $data['proveedor'] = (!empty($proveedor->data)) ? $proveedor->data : [];
+        $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
+        $data['secretario'] = (!empty($secretario->data)) ? $secretario->data : [];
+        $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+        $data['cat_area'] = (!empty($cat_area->data)) ? $cat_area->data : [];
+        $data['usuario'] = (!empty($usuario->data)) ? $usuario->data : [];
+        $data['cat_usuario'] = (!empty($cat_usuario->data)) ? $cat_usuario->data : [];
+        $data['scripts'] = array('inicio');
+        $data['edita'] = 0;
+        $data['contentView'] = 'personal/vSolicitudGrc';
+        $this->_renderView($data);
+
+    }
+    public function editarSolicitudGrc($id_solicitud = null)
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+
+        // Validar ID
+        if (!$id_solicitud) {
+             return redirect()->to(base_url('index.php/Inicio/ListadoSolicitudes'));
+        }
+
+        // Obtener datos de la solicitud
+        $solicitud = $globals->getTabla(['tabla' => 'solicitud_grc', 'where' => ['id_solicitud_grc' => $id_solicitud, 'visible' => 1]]);
+        
+        if (empty($solicitud->data)) {
+            return redirect()->to(base_url('index.php/Inicio/ListadoSolicitudes'));
+        }
+
+        // Obtener detalles
+        $detalles = $globals->getTabla(['tabla' => 'solicitud_grc_detalle', 'where' => ['id_solicitud_grc' => $id_solicitud, 'visible' => 1]]);
+
+        // Cargar catálogos (mismos que en listadoGrc/Crear)
+        $cat_perfil = $globals->getTabla(['tabla' => 'perfil', 'where' => ['visible' => 1]]);
+        $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
+        $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $usuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
+
+        $data['cat_perfil'] = (!empty($cat_perfil->data)) ? $cat_perfil->data : [];
+        $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
+        $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+        $data['usuario'] = (!empty($usuario->data)) ? $usuario->data : [];
+        
+        // Datos para edición
+        $data['solicitud'] = $solicitud->data[0];
+        $data['detalles'] = (!empty($detalles->data)) ? $detalles->data : [];
+        $data['editar'] = true;
+
+        $data['scripts'] = array('inicio');
+        $data['contentView'] = 'personal/vSolicitudGrc';
+        $this->_renderView($data);
+    }
+    public function ArchivoGRC($id_solicitud = null)
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+
+        if (!$id_solicitud) {
+            echo "ID no válido";
+            return;
+        }
+
+        // Obtener datos de la solicitud (usando vista para nombres)
+        $solicitud = $globals->getTabla(['tabla' => 'vw_solicitud_grc', 'where' => ['id_solicitud_grc' => $id_solicitud, 'visible' => 1]]);
+        
+        if (empty($solicitud->data)) {
+            echo "Solicitud no encontrada";
+            return;
+        }
+
+        // Obtener detalles
+        $detalles = $globals->getTabla(['tabla' => 'vw_solicitud_grc_detalle', 'where' => ['id_solicitud_grc' => $id_solicitud, 'visible' => 1]]);
+
+        $data['solicitud'] = $solicitud->data[0];
+        $data['detalles'] = (!empty($detalles->data)) ? $detalles->data : [];
+        
+        // Convertir cantidad a letras
+        // Convertir cantidad a letras
+        $data['cantidad_letra'] = $this->numeroEnLetras($data['solicitud']->cantidad);
+
+        // Fecha creación texto
+        $meses = array("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
+        $fecha = strtotime($data['solicitud']->fec_reg);
+        $data['fecha_texto'] = "Silao, Gto., a " . date('d', $fecha) . " de " . $meses[date('n', $fecha)-1] . " de " . date('Y', $fecha);
+
+        $html = view('personal/vFormatoGRC', $data);
+        $doc = 'assets/documentos/SOLICITUD_GRC.pdf';
+        
+        // Crear PDF
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 0,
+            'margin_left' => 0,
+            'margin_right' => 0,
+            'margin_bottom' => 0,
+            'format' => 'Letter'
+        ]);
+
+        if (file_exists(FCPATH . $doc)) {
+            $mpdf->SetSourceFile(FCPATH . $doc);
+            $tplId = $mpdf->ImportPage(1);
+            $mpdf->UseTemplate($tplId);
+        }
+
+        $mpdf->WriteHTML($html);
+        $mpdf->Output('Solicitud_GRC_' . $id_solicitud . '.pdf', 'I');
+        exit();
+    }
     public function deletePT()
     {
         $session = \Config\Services::session();

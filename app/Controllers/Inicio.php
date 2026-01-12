@@ -243,6 +243,18 @@ class Inicio extends BaseController {
         $this->_renderView($data);
         
     }
+    public function ListadoSolicitudes()
+    {        
+        $session = \Config\Services::session();
+        $globas  = new Mglobal;
+        $vista = 'personal/vInicio';
+        $data['datos'] = $globas->getTabla(['tabla' => 'vw_solicitud_grc', 'where' => ['visible' => 1]])->data;
+        $data['scripts'] = array('principal','inicio');
+        $data['edita'] = 0;
+        $data['contentView'] = 'personal/vListaSolicitudes';                
+        $this->_renderView($data);
+        
+    }
     public function Viaticos()
     {        
         $session = \Config\Services::session();

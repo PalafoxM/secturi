@@ -443,7 +443,7 @@
                                 <ul class="nav-second-level" aria-expanded="false">
                                     <li><a href="<?php echo base_url(); ?>index.php/Principal/listadoPT">Reserva PT</a></li>
                                     <li><a href="<?php echo base_url(); ?>index.php/Principal/listadoGo">Reserva GO</a></li>
-                                    <!--  <li><a href="../apps/email-read.html">Reserva GRC</a></li>   -->
+                                    <li><a href="<?php echo base_url(); ?>index.php/Principal/listadoGrc">Solicitud GRC</a></li>
                                 </ul>
                             </li><!--end nav-item-->
                         <?php endif; ?>
@@ -455,7 +455,7 @@
                                 </li>
                                 <li><a href="<?php echo base_url(); ?>index.php/Principal/listaReservaGO">Estatus GO</a>
                                 </li>
-                                <!-- <li><a href="../apps/email-read.html">Estatus GRC</a></li>  -->
+                                <li><a href="<?php echo base_url(); ?>index.php/Inicio/ListadoSolicitudes">Estatus GRC</a></li> 
                             </ul>
                         </li><!--end nav-item-->
                         <li class="nav-item">
