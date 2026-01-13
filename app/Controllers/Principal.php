@@ -6021,5 +6021,114 @@ class Principal extends BaseController
     exit();
     }
 
+    public function validarSolicitudGrc()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = "Error al validar la solicitud";
+
+        // Validar permisos (Perfil 1 y 2)
+        if (!in_array($session->get('id_perfil'), [1, 2])) {
+             $response->respuesta = "No tiene permisos para realizar esta acción.";
+             return $this->respond($response);
+        }
+
+        $id_solicitud = $this->request->getPost('id_solicitud');
+
+        if(empty($id_solicitud)){
+             $response->respuesta = "ID de solicitud incorrecto.";
+             return $this->respond($response);
+        }
+
+        $formodel = new Mglobal();
+
+        // Actualizar estatus a 2 (Validado)
+        $dataConfig = [
+            "tabla" => "solicitud_grc", 
+            "editar" => true, 
+            "idEditar" => ['id_solicitud_grc' => $id_solicitud]
+        ];
+        
+        $dataUpdate = [
+            'id_estatus' => 2, 
+            'usu_act' => $session->get('id_usuario'),
+            'fec_act' => date('Y-m-d H:i:s')
+        ];
+
+        $result = $formodel->saveTabla($dataUpdate, $dataConfig, ['script' => 'Principal-validarSolicitudGrc', 'id_user' => $session->get('id_usuario')]);
+
+        if (!$result->error) {
+            $response->error = false;
+            $response->respuesta = "Solicitud validada correctamente";
+
+            // Enviar Correo de notificación
+            $solicitudQuery = $formodel->getTabla(['tabla' => 'solicitud_grc', 'where' => ['id_solicitud_grc' => $id_solicitud]]);
+            
+            if(isset($solicitudQuery->data[0])){
+                $id_usu_reg = $solicitudQuery->data[0]->usu_reg;
+                // Obtener correo del usuario que registró
+                $usuarioQuery = $formodel->getTabla(['tabla' => 'vw_usuario', 'where' => ['id_usuario' => $id_usu_reg]]);
+                
+                if(isset($usuarioQuery->data[0]) && !empty($usuarioQuery->data[0]->correo)){
+                    $correo = $usuarioQuery->data[0]->correo;
+                    
+                    $email = \Config\Services::email();
+                    $email->setTo($correo);
+                    $email->setSubject('Notificación Susi: Solicitud GRC Validada');
+                    
+                    $mensaje = '
+                    <div style="font-family: Arial, sans-serif; padding: 20px;">
+                        <h2 style="color: #28a745;">Solicitud Validada</h2>
+                        <p>Estimado usuario,</p>
+                        <p>Su solicitud GRC con folio <strong>' . $id_solicitud . '</strong> ha sido VALIDADA por el área correspondiente.</p>
+                        <p>Ahora puede proceder a realizar la comprobación de gastos en el sistema.</p>
+                        <p>Atentamente,<br>Sistema SUSI</p>
+                    </div>';
+                    
+                    $email->setMessage($mensaje);
+                    $email->send();
+                }
+            }
+
+        } else {
+            $response->respuesta = $result->respuesta;
+        }
+
+        return $this->respond($response);
+    }
+
+    public function comprobarGastos($id_solicitud = null)
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+
+        if (!$id_solicitud) {
+            echo "ID no válido";
+            return;
+        }
+
+        // Obtener datos de la solicitud
+        $solicitudQuery = $globals->getTabla(['tabla' => 'vw_solicitud_grc', 'where' => ['id_solicitud_grc' => $id_solicitud, 'visible' => 1]]);
+        
+        if (empty($solicitudQuery->data)) {
+            echo "Solicitud no encontrada";
+            return;
+        }
+
+        // Obtener detalles
+        $detallesQuery = $globals->getTabla(['tabla' => 'vw_solicitud_grc_detalle', 'where' => ['id_solicitud_grc' => $id_solicitud, 'visible' => 1]]);
+
+        // Obtener usuarios para el select
+        $usuariosQuery = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
+
+        $data['solicitud'] = $solicitudQuery->data[0];
+        $data['detalles'] = (!empty($detallesQuery->data)) ? $detallesQuery->data : [];
+        $data['usuarios'] = (!empty($usuariosQuery->data)) ? $usuariosQuery->data : [];
+        $data['scripts'] = ['principal', 'inicio']; // Ensure necessary scripts are loaded
+        $data['contentView'] = 'personal/vComprobarGastos';
+
+        $this->_renderView($data);
+    }
 
 }

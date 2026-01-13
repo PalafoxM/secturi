@@ -54,14 +54,24 @@
                 </tr>
             </thead>
             <tbody>
-                <?php if (isset($detalles) && !empty($detalles)): ?>
-                    <?php foreach ($detalles as $det): ?>
+                <?php 
+                $totalGeneral = 0;
+                if (isset($detalles) && !empty($detalles)): ?>
+                    <?php foreach ($detalles as $det): 
+                        $totalGeneral += $det->importe;
+                    ?>
                     <tr>
                         <td><?= $det->cuenta_cable .' '. $det->nombre_fondo?></td>
                         <td class="text-right">$<?= number_format($det->importe, 2) ?></td>
                         <td><?= $det->proyecto ?></td>
                     </tr>
                     <?php endforeach; ?>
+                    <!-- Fila de Total -->
+                     <tr>
+                        <td style="text-align: right; font-weight: bold;">TOTAL:</td>
+                        <td class="text-right" style="font-weight: bold;">$<?= number_format($totalGeneral, 2) ?></td>
+                        <td></td>
+                    </tr>
                 <?php else: ?>
                     <tr><td colspan="3" style="text-align:center">No hay detalles registrados</td></tr>
                 <?php endif; ?>

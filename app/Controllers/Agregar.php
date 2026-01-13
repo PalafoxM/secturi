@@ -4922,4 +4922,68 @@ class Agregar extends BaseController
 
         return $this->respond($response);
     }
+
+    public function guardarComprobacion()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = "Error al guardar comprobación";
+
+        $this->globals = new Mglobal();
+        $data = $this->request->getPost();
+
+        $id_solicitud = isset($data['id_solicitud_grc']) ? $data['id_solicitud_grc'] : 0;
+
+        if ($id_solicitud == 0) {
+            $response->respuesta = "Solicitud no válida";
+            return $this->respond($response);
+        }
+
+        if (!isset($data['comprobacion']) || empty($data['comprobacion'])) {
+            $response->respuesta = "No hay comprobantes para guardar";
+            return $this->respond($response);
+        }
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardarComprobacion'];
+        // Deshabilitar anteriores (limpieza para evitar duplicados si se edita)
+        // NOTA: Esto asume que la tabla 'solicitud_grc_comprobacion' existe.
+        $detallesActuales = $this->globals->getTabla(['tabla' => 'solicitud_grc_comprobacion', 'where' => ['id_solicitud_grc' => $id_solicitud, 'visible' => 1]]);
+        
+        if (isset($detallesActuales->data)) {
+            foreach($detallesActuales->data as $d){
+                 $this->globals->saveTabla(['visible' => 0], ['tabla' => 'solicitud_grc_comprobacion', 'idEditar' => ['id_solicitud_grc_comprobacion' => $d->id_solicitud_grc_comprobacion]], $dataBitacora);
+            }
+        }
+
+        $error = false;
+        foreach ($data['comprobacion'] as $row) {
+            $insert = [
+                'id_solicitud_grc' => $id_solicitud,
+                'nombre_emisor' => $row['nombre_emisor'],
+                'rfc' => $row['rfc'],
+                'importe' => floatval(str_replace(['$', ',', ' '], '', $row['importe'])),
+                'fec_reg' => date('Y-m-d H:i:s'),
+                'usu_reg' => $session->get('id_usuario')
+            ];
+           
+            $res = $this->globals->saveTabla($insert, ['tabla' => 'solicitud_grc_comprobacion', "editar" => false], $dataBitacora);
+            //die( var_dump( $res ) );
+            if ($res->error) {
+                $error = true;
+            }
+        }
+
+        if (!$error) {
+            // Actualizar estatus de solicitud a 3 (Comprobado) se asume flujo
+            $dataUpdate = ['id_estatus' => 3]; 
+            $this->globals->saveTabla($dataUpdate, ['tabla' => 'solicitud_grc', 'idEditar' => ['id_solicitud_grc' => $id_solicitud]], $dataBitacora);
+
+            $response->error = false;
+            $response->respuesta = "Comprobación guardada correctamente";
+        } else {
+            $response->respuesta = "Ocurrió un error al guardar algunos comprobantes. Verifique la tabla solicitud_grc_comprobacion.";
+        }
+
+        return $this->respond($response);
+    }
 }

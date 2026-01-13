@@ -5541,5 +5541,68 @@ ini.inicio = (function () {
                 }
             });
         },
+        validarSolicitudGrc: function (id_solicitud) {
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "¡Se validará la solicitud y se notificará al usuario!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, validar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: base_url + 'index.php/Principal/validarSolicitudGrc',
+                        type: 'POST',
+                        data: { id_solicitud: id_solicitud },
+                        dataType: 'json',
+                        success: function (response) {
+                            if (!response.error) {
+                                Swal.fire('¡Validado!', response.respuesta, 'success').then(() => {
+                                    window.location.reload();
+                                });
+                            } else {
+                                Swal.fire('Error', response.respuesta, 'error');
+                            }
+                        },
+                        error: function () {
+                            Swal.fire('Error', 'Error de conexión', 'error');
+                        }
+                    });
+                }
+            });
+        },
+        guardarComprobacion: function () {
+            var form = document.getElementById('form_comprobacion_gastos');
+            var formData = new FormData(form);
+
+            $.ajax({
+                url: base_url + "index.php/Agregar/guardarComprobacion",
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                dataType: "json",
+                beforeSend: function () {
+                    $('#btnGuardarComprobacion').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                },
+                success: function (response) {
+                    if (!response.error) {
+                        Swal.fire("Éxito", response.respuesta, "success").then(() => {
+                            window.location.href = base_url + "index.php/Inicio/ListadoSolicitudes";
+                        });
+                    } else {
+                        Swal.fire("Error", response.respuesta, "error");
+                        $('#btnGuardarComprobacion').prop('disabled', false).html('Guardar Comprobación');
+                    }
+                },
+                error: function () {
+                    Swal.fire("Error", "Error de conexión con el servidor", "error");
+                    $('#btnGuardarComprobacion').prop('disabled', false).html('Guardar Comprobación');
+                }
+            });
+        },
     }
 })();
