@@ -1364,7 +1364,7 @@ class Principal extends BaseController
                 }
             }
         }
-        //$this->enviarEmail(0);
+        $this->enviarEmail(0);
        
 
         return $this->respond($response);
@@ -1382,13 +1382,13 @@ class Principal extends BaseController
         
 
 
-        /*  $email->setTo([
+          $email->setTo([
            'alopez@guanajuato.gob.mx',
            'negonzalez@guanajuato.gob.mx',
            'dhernandezq@guanajuato.gob.mx'
-         ]);  */
+         ]);  
 
-   /*      $email->setTo('palafox.marin31@gmail.com'); // destinatario principal
+   //     $email->setTo('palafox.marin31@gmail.com'); // destinatario principal
         // $email->setCC(['palafox.marin@hotmail.com', 'palafox.marin31@gmail.com']); // copia visible
         //$email->setCC(['negonzalez@guanajuato.gob.mx ', 'dhernandezq@guanajuato.gob.mx']); // copia visible
         //   $email->setBCC(['a.palafoxm@guanajuato.gob.com']); // copia oculta
@@ -1421,7 +1421,7 @@ class Principal extends BaseController
             $response->respuesta = "Correo enviado correctamente.";
         } else {
             $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
-        } */
+        } 
 
          return $this->respond($response);
     }

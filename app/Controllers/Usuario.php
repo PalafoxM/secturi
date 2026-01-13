@@ -1253,7 +1253,7 @@ class Usuario extends BaseController
          if($usuReg){
              $id_usuario = $usuReg[0]->usu_reg;
               $correo =  $principal->getTabla(['tabla' => 'vw_usuario', 'where' => ['id_usuario' => $id_usuario, 'visible' => 1]])->data[0]->correo;
-             // $this->enviarCorreoPagos($correo);
+              $this->enviarCorreoPagos($correo);
          }
 
         if (!$result->error) {
