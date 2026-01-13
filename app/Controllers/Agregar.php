@@ -4974,9 +4974,13 @@ class Agregar extends BaseController
         }
 
         if (!$error) {
-            // Actualizar estatus de solicitud a 3 (Comprobado) se asume flujo
-            $dataUpdate = ['id_estatus' => 3]; 
-            $this->globals->saveTabla($dataUpdate, ['tabla' => 'solicitud_grc', 'idEditar' => ['id_solicitud_grc' => $id_solicitud]], $dataBitacora);
+            // Actualizar estatus de solicitud a 3 (Comprobado) y registrar quien actualizó
+            $dataUpdate = [
+                'id_estatus' => 3,
+                'usu_act' => $session->get('id_usuario'),
+                'fec_act' => date('Y-m-d H:i:s')
+            ]; 
+            $this->globals->saveTabla($dataUpdate, ['tabla' => 'solicitud_grc', 'editar' => true, 'idEditar' => ['id_solicitud_grc' => $id_solicitud]], $dataBitacora);
 
             $response->error = false;
             $response->respuesta = "Comprobación guardada correctamente";

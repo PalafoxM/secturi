@@ -62,13 +62,15 @@
                                                         <a href="<?= base_url('index.php/Principal/editarSolicitudGrc/' . $row->id_solicitud_grc) ?>" class="btn btn-sm btn-info" title="Editar"><i class="fas fa-edit"></i></a>
                                                         <a href="<?= base_url('index.php/Principal/ArchivoGRC/' . $row->id_solicitud_grc) ?>" class="btn btn-sm btn-secondary" title="Imprimir" target="_blank"><i class="fas fa-print"></i></a>
                                                         <a href="javascript:void(0);" class="btn btn-sm btn-danger" title="Eliminar" onclick="ini.inicio.eliminarSolicitud(<?= $row->id_solicitud_grc ?>)"><i class="fas fa-trash"></i></a>
-                                                        <?php if (in_array($session->get('id_perfil'), [1, 2])): ?>
-                                                            <?php if ($row->id_estatus != 2): ?>
-                                                                <a href="javascript:void(0);" class="btn btn-sm btn-success" title="Validar" onclick="ini.inicio.validarSolicitudGrc(<?= $row->id_solicitud_grc ?>)"><i class="fas fa-check"></i> Validar</a>
-                                                            <?php else: ?>
-                                                                <a href="<?= base_url('index.php/Principal/comprobarGastos/' . $row->id_solicitud_grc) ?>" class="btn btn-sm btn-warning" title="Comprobar Gastos"><i class="fas fa-file-invoice-dollar"></i> Comprobar</a>
+                                                      
+                                                            <?php if ($row->id_estatus == 1 && in_array($session->get('id_perfil'), [1, 2])): ?>
+                                                                <a href="javascript:void(0);" class="btn btn-sm btn-success" title="Validar" onclick="ini.inicio.validarSolicitudGrc(<?= $row->id_solicitud_grc ?>)"><i class="fas fa-check"></i></a>
+                                                            <?php elseif ($row->id_estatus == 2): ?>
+                                                                <a href="<?= base_url('index.php/Principal/comprobarGastos/' . $row->id_solicitud_grc) ?>" class="btn btn-sm btn-warning" title="Comprobar Gastos"><i class="fas fa-file-invoice-dollar"></i></a>
+                                                            <?php elseif ($row->id_estatus == 3): ?>
+                                                                <a href="<?= base_url('index.php/Principal/ArchivoComprobacion/' . $row->id_solicitud_grc) ?>" class="btn btn-sm btn-primary" title="Ver Comprobación" target="_blank"><i class="fas fa-file-pdf"></i></a>
                                                             <?php endif; ?>
-                                                        <?php endif; ?>
+                                                    
                                                     </td>
                                                 </tr>
                                             <?php endforeach; ?>

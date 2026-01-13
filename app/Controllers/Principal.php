@@ -2551,6 +2551,47 @@ class Principal extends BaseController
         $mpdf->Output('Solicitud_GRC_' . $id_solicitud . '.pdf', 'I');
         exit();
     }
+    public function ArchivoComprobacion($id_solicitud = null)
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+
+        if (!$id_solicitud) {
+            echo "ID no válido";
+            return;
+        }
+
+        // Obtener datos de la solicitud
+        $solicitud = $globals->getTabla(['tabla' => 'vw_solicitud_grc', 'where' => ['id_solicitud_grc' => $id_solicitud, 'visible' => 1]]);
+        
+        if (empty($solicitud->data)) {
+            echo "Solicitud no encontrada";
+            return;
+        }
+
+        // Obtener comprobaciones
+        // NOTA: Asumimos que la tabla de comprobación se llama solicitud_grc_comprobacion
+        $comprobaciones = $globals->getTabla(['tabla' => 'solicitud_grc_comprobacion', 'where' => ['id_solicitud_grc' => $id_solicitud, 'visible' => 1]]);
+
+        $data['solicitud'] = $solicitud->data[0];
+        $data['comprobaciones'] = (!empty($comprobaciones->data)) ? $comprobaciones->data : [];
+        
+        $html = view('personal/vFormatoComprobacion', $data);
+        $doc = 'assets/documentos/SOLICITUD_GRC.pdf'; // Template base if needed, or just plain HTML
+        
+        // Crear PDF
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 10,
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_bottom' => 10,
+            'format' => 'Letter'
+        ]);
+
+        $mpdf->WriteHTML($html);
+        $mpdf->Output('Comprobacion_GRC_' . $id_solicitud . '.pdf', 'I');
+        exit();
+    }
     public function deletePT()
     {
         $session = \Config\Services::session();
