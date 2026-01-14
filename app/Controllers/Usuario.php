@@ -814,6 +814,15 @@ class Usuario extends BaseController
                             if ($stopIncProcessing)
                                 break;
                         }
+
+                        // NUEVA LOGICA: Si es estatus 3 (Aprobado), asegurar Salida Verde + Texto
+                        if ($estatus === 3 && !$validadoSalida) {
+                            $valorSalida = $nombreInc;
+                             $sheet->getStyle($colSalida . $fila)
+                                ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                ->getStartColor()->setARGB('FF00B050');
+                            $validadoSalida = true;
+                        }
                      
                         // Otros bloques Cat 1 y Cat 7 omitidos por brevedad pero deben ser corregidos manual o en siguiente paso si necesarios
                         // Asumiremos que Cat 11 es el principal problema reportado, pero corregiremos Cat 1 y 7 en un paso mas amplio si es necesario.
