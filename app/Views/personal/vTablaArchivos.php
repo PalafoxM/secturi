@@ -237,17 +237,17 @@
                                                                 Se creará una carpeta que contenga cada uno de los siguientes archivos (.pdf), según apliquen y por separado: Carátula de pago, oficio delegatorio, oficio de liberación de pago, CFDI con su respectivo encabezado, oficio de comisión, evidencia fotográfica, soporte de datos bancarios,  registro en el padrón de proveedores, garantía, CURP en caso de ayudas y subsidios a persona físicas, listado de beneficiarios, minutas, programas, agendas, itinerarios, lista de asistencia, etc. 
                                                                 <br>
                                                                 <?php if(isset($factura) && !empty($factura)): ?>
+                                                                     <a href="<?= base_url("index.php/Principal/ImprimirPT/".$id_registro."/1") ?>" target="_blank" title="Hoja 1">
+                                                                        <i class="far fa-file-pdf text-danger fa-2x"></i> 1
+                                                                    </a>
+                                                                    &nbsp;
+                                                                    <a href="<?= base_url("index.php/Principal/ImprimirPT/".$id_registro."/2") ?>" target="_blank" title="Hoja 2">
+                                                                        <i class="far fa-file-pdf text-danger fa-2x"></i> 2
+                                                                    </a>
+                                                                    <br>
                                                                     <?php foreach($factura as $index => $f): ?>
                                                                          <div class="mb-1">
-                                                                            <span class="mr-2">Partida <?= $index + 1 ?>:</span>
-                                                                            <a href="<?= base_url("index.php/Principal/ImprimirPT/".$id_registro."/1/".$index) ?>" target="_blank" title="Hoja 1">
-                                                                                <i class="far fa-file-pdf text-danger fa-2x"></i> 1
-                                                                            </a>
-                                                                            &nbsp;
-                                                                            <a href="<?= base_url("index.php/Principal/ImprimirPT/".$id_registro."/2/".$index) ?>" target="_blank" title="Hoja 2">
-                                                                                <i class="far fa-file-pdf text-danger fa-2x"></i> 2
-                                                                            </a>
-                                                                            &nbsp;
+                                                                            <span class="mr-2">Carátula <?= $index + 1 ?>:</span>
                                                                             <a href="<?= base_url("index.php/Principal/ImprimirPT/".$id_registro."/3/".$index) ?>" target="_blank" title="Hoja 3">
                                                                                 <i class="far fa-file-pdf text-danger fa-2x"></i> 3
                                                                             </a>
