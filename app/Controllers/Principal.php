@@ -4085,7 +4085,7 @@ class Principal extends BaseController
     }
 
 
-    public function ImprimirGO($id_pt = null, $savePath = null)
+    public function ImprimirGO($id_pt = null, $hoja = null, $index = null, $savePath = null)
     {
         $session = \Config\Services::session();
         $globals = new Mglobal;
@@ -4272,28 +4272,48 @@ class Principal extends BaseController
             'mirrorMargins' => false,
         ]);
 
-        $pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/plantillas/formatoGO2.pdf');
+        $runAll = ($hoja == null);
+        $templateFile = 'assets/pdf/plantillas/formatoGO2.pdf';
 
-        for ($i = 1; $i <= $pagecount; $i++) {
+        if ($runAll || $hoja == 1 || $hoja == 2) {
+             $mpdf->SetSourceFile(FCPATH . $templateFile);
+        }
+
+        // --- HOJA 1 ---
+        if ($runAll || $hoja == 1) {
             $mpdf->AddPage();
-            $tplId = $mpdf->ImportPage($i);
+            $tplId = $mpdf->ImportPage(1);
             $mpdf->UseTemplate($tplId);
+            $mpdf->WriteHTML($html);
+        }
 
-            if ($i == 1) {
-                $mpdf->WriteHTML($html);
+        // --- HOJA 2 ---
+        if ($runAll || $hoja == 2) {
+             // Reload source if specific page requested to be safe (though handled above)
+             if (!$runAll && $hoja == 2) { // Only set source if specifically requesting page 2 and not all
+                 $mpdf->SetSourceFile(FCPATH . $templateFile);
+             }
+             $mpdf->AddPage();
+             $tplId = $mpdf->ImportPage(2);
+             $mpdf->UseTemplate($tplId);
+             $mpdf->WriteHTML($htmlSegundaHoja);
+        }
+        
+        // --- HOJA 3 (Facturas) ---
+        if ($runAll || $hoja == 3) {
+            $xml_go = $globals->getTabla([
+                    'tabla' => 'xml_go',
+                    'where' => ['visible' => 1, 'id_registro_go' => $id_pt]
+            ])->data;
+
+            if ($index !== null && isset($xml_go[$index])) {
+                $xml_go = [$index => $xml_go[$index]];
             }
 
-            if ($i == 2) {
-                $mpdf->WriteHTML($htmlSegundaHoja);
-        
-                $xml_go = $globals->getTabla([
-                        'tabla' => 'xml_go',
-                        'where' => ['visible' => 1, 'id_registro_go' => $id_pt]
-                ])->data;
-                if (!empty($xml_go)) {
+            if (!empty($xml_go)) {
    
-                        foreach ($xml_go as $index => $facturaItem) {
-                        // die( var_dump( $presupuestoGO ) );
+                    foreach ($xml_go as $index => $facturaItem) {
+                    // die( var_dump( $presupuestoGO ) );
                          // $data['partida'] =  $presupuestoGO->data[$index]->dsc_partida;
                           $importe_str     =  $facturaItem->total;
                           $data['total']     =  $facturaItem->total;
@@ -4403,11 +4423,7 @@ class Principal extends BaseController
                             }
                         }
                     }
-
-
-
             }
-        }
 
 
         if ($savePath) {
