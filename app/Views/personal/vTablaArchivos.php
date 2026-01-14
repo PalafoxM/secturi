@@ -77,19 +77,19 @@
                                                                 <?php if($PT): ?>
                                                                 <a target="_blank" href="<?= base_url().'index.php/Principal/Archivo/'.$id_registro.'/1' ?>" class="text-center">
                                                                     <i class="mdi mdi-file-table-outline text-succes"></i>
-                                                                    <h6 class="text-truncate">Archivo01.pdf</h6>
+                                                                    <h6 class="text-truncate">Archivo01.xlsx</h6>
                                                                 </a> 
                                                                 <?php endif; ?> 
                                                                 <?php if($FIC): ?>
                                                                 <a target="_blank" href="<?= base_url().'index.php/Principal/ArchivoFIC/'.$id_registro.'/1' ?>" class="text-center">
                                                                     <i class="mdi mdi-file-table-outline text-success"></i>
-                                                                    <h6 class="text-truncate">Archivo01.pdf</h6>
+                                                                    <h6 class="text-truncate">Archivo01.xlsx</h6>
                                                                 </a> 
                                                                 <?php endif; ?> 
                                                                  <?php if($GO): ?>
                                                                 <a target="_blank" href="<?= base_url().'index.php/Principal/ArchivoGO/'.$id_registro.'/1' ?>" class="text-center">
                                                                     <i class="mdi mdi-file-table-outline text-success"></i>
-                                                                    <h6 class="text-truncate">Archivo01.pdf</h6>
+                                                                    <h6 class="text-truncate">Archivo01.xlsx</h6>
                                                                 </a> 
                                                                 <?php endif; ?>  
                                                             </td>

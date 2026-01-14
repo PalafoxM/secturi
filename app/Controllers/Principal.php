@@ -2978,11 +2978,72 @@ class Principal extends BaseController
 
         
        
+        if ($id_archivo == 1) {
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load(FCPATH . 'assets/documentos/Anexo1_Reporte_d_ integracion_documental_2026.xlsx');
+            $sheet = $spreadsheet->getActiveSheet();
+
+            // Populate Excel Cells
+            // Header Data
+            $sheet->setCellValue('J4', date('d/m/Y', strtotime($data['registro']->fecha_tramite)));
+            $folioText = (isset($data['GO']) && !empty($data['GO']) ? 'GO' : 'PT') . ' ' . $folio_prefijo;
+            $sheet->setCellValue('J6', $folioText);
+
+            // Checkboxes
+            // 02_Póliza
+            $sheet->setCellValue('D14', ($data['registro']->poliza == 1) ? 'Si' : 'No'); 
+            
+            // 14_Otros
+            $sheet->setCellValue('I21', 'Si');
+
+            // Footer / Payment Data
+            $sheet->setCellValue('D24', isset($data['registro']->dsc_proveedor) ? $data['registro']->dsc_proveedor : '');
+            
+            // Partida Presupuestal
+            $arrPartida = [];
+            if (isset($data['presupuesto']) && is_array($data['presupuesto'])) {
+                foreach ($data['presupuesto'] as $p) {
+                    $arrPartida[] = $p->partida;
+                }
+            } elseif (isset($data['presupuesto']->partida)) {
+                $arrPartida[] = $data['presupuesto']->partida;
+            }
+            $sheet->setCellValue('H24', implode(', ', $arrPartida));
+
+            $sheet->setCellValue('D26', isset($data['registro']->concepto_pago) ? $data['registro']->concepto_pago : '');
+            
+            // Contrato o convenio No.
+            $noConvenio = isset($data['presupuesto'][0]->no_convenio) ? $data['presupuesto'][0]->no_convenio : '';
+            $sheet->setCellValue('H26', $noConvenio);
+
+            // Folio Fiscal (UUIDs)
+             $arrUuid = [];
+             $sumaTotal = 0;
+            if (isset($data['uuid'])) {
+                 $uuids = is_array($data['uuid']) ? $data['uuid'] : [$data['uuid']];
+                foreach ($uuids as $u) {
+                     $val = is_object($u) ? ((isset($u->folio) && $u->folio) ? $u->folio : $u->uuid) : $u;
+                    $arrUuid[] = $val;
+                    $sumaTotal += (float)(is_object($u) ? $u->total : 0);
+                }
+            }
+            $sheet->setCellValue('D28', implode(', ', $arrUuid));
+            
+            // Importe Total
+             $fn = new \App\Libraries\Funciones();
+             $importeTexto = '$' . number_format($sumaTotal, 2) . ' ' . $fn->numeroALetras($sumaTotal);
+             $sheet->setCellValue('D30', $importeTexto);
+
+
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="Anexo1_' . $folio_prefijo . '.xlsx"');
+            header('Cache-Control: max-age=0');
+            $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+            $writer->save('php://output');
+            exit();
+        }
+        
+       
         switch ($id_archivo) {
-            case 1:
-                $doc = 'assets/pdf/plantillas/anexo01.pdf';
-                $formato = 'personal/vFormato01.php';
-                break;
             case 4:
                 if ($savePath) {
                     $source = FCPATH . $instrumento;
@@ -3151,12 +3212,77 @@ class Principal extends BaseController
             $data['uuid'] = ($data['fic'])?$uuid->data[0]->uuid:$uuid->data;
         }
        
+        if ($id_archivo == 1) {
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load(FCPATH . 'assets/documentos/Anexo1_Reporte_d_ integracion_documental_2026.xlsx');
+            $sheet = $spreadsheet->getActiveSheet();
+           // die(var_dump($spreadsheet));
+            // Populate Excel Cells
+            // Header Data
+            $sheet->setCellValue('J4', date('d/m/Y', strtotime($data['registro']->fecha_tramite)));
+            $folioText = (isset($data['GO']) && !empty($data['GO']) ? 'GO' : 'PT') . ' ' . $folio_prefijo;
+            if ($data['fic']) {
+                 $folioText = 'PT ' . $data['folio'];
+            }
+            $sheet->setCellValue('J6', $folioText);
+
+            // Checkboxes (using 'X' or 'Si' as per template logic - assuming 'Si'/'No' text based on image)
+            // 02_Póliza
+            //die( var_dump(  $data['registro']) );
+            $sheet->setCellValue('D14', ($data['registro']->poliza == 1) ? 'Si' : 'No'); 
+            
+            // 14_Otros - Logic from vFormato01 implies this might be dynamic or 'Si'
+            $sheet->setCellValue('I21', 'Si'); // Defaulting to Si based on current usage or map from DB
+
+            // Footer / Payment Data
+            $sheet->setCellValue('D24', isset($data['registro']->dsc_proveedor) ? $data['registro']->dsc_proveedor : '');
+            
+            // Partida Presupuestal
+            $arrPartida = [];
+            if (isset($data['presupuesto']) && is_array($data['presupuesto'])) {
+                foreach ($data['presupuesto'] as $p) {
+                    $arrPartida[] = $p->partida;
+                }
+            } elseif (isset($data['presupuesto']->partida)) {
+                $arrPartida[] = $data['presupuesto']->partida;
+            }
+            $sheet->setCellValue('H24', implode(', ', $arrPartida));
+
+            $sheet->setCellValue('D26', isset($data['registro']->concepto_pago) ? $data['registro']->concepto_pago : '');
+            
+            // Contrato o convenio No.
+            $noConvenio = isset($data['presupuesto'][0]->no_convenio) ? $data['presupuesto'][0]->no_convenio : '';
+            $sheet->setCellValue('H26', $noConvenio);
+
+            // Folio Fiscal (UUIDs)
+             $arrUuid = [];
+             $sumaTotal = 0;
+            if (isset($data['uuid'])) {
+                 $uuids = is_array($data['uuid']) ? $data['uuid'] : [$data['uuid']];
+                foreach ($uuids as $u) {
+                     $val = is_object($u) ? ((isset($u->folio) && $u->folio) ? $u->folio : $u->uuid) : $u;
+                    $arrUuid[] = $val;
+                    $sumaTotal += (float)(is_object($u) ? $u->total : 0);
+                }
+            }
+            $sheet->setCellValue('D28', implode(', ', $arrUuid));
+            
+            // Importe Total
+             $fn = new \App\Libraries\Funciones();
+             $importeTexto = '$' . number_format($sumaTotal, 2) . ' ' . $fn->numeroALetras($sumaTotal);
+             $sheet->setCellValue('D30', $importeTexto);
+
+
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="Anexo1_' . $folio_prefijo . '.xlsx"');
+            header('Cache-Control: max-age=0');
+            $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+            $writer->save('php://output');
+            exit();
+            die();
+        }
+
         if (!empty($instrumento)) {
             switch ($id_archivo) {
-                case 1:
-                    $doc = 'assets/pdf/plantillas/Anexo1_2026.pdf';
-                    $formato = 'personal/vFormato01.php';
-                    break;
                 case 4:
                     if ($savePath) {
                         $source = FCPATH . $instrumento;
@@ -3176,10 +3302,6 @@ class Principal extends BaseController
 
         } else {
             switch ($id_archivo) {
-                case 1:
-                    $doc = 'assets/pdf/plantillas/Anexo1_2026.pdf';
-                    $formato = 'personal/vFormato01.php';
-                    break;
                 case 4:
                     $data['layout'] = 'plantilla/lytVacio';
                     $data['contentView'] = 'secciones/vError500';
