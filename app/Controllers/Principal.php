@@ -3035,12 +3035,12 @@ class Principal extends BaseController
             'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
         ]);
 
-    
+        //die( var_dump($registro_pt) );
         $presupuesto = $globals->getTabla([
             'tabla' => 'vw_reserva',
             'where' => ['visible' => 1, 'id_reserva' => $registro_pt->data[0]->id_reserva]
         ]);
-        
+        //die( var_dump($presupuesto) );
         $direccion = $globals->getTabla([
             'tabla' => 'vw_direccion',
             'where' => [
@@ -3138,7 +3138,7 @@ class Principal extends BaseController
         }
   
         $uuid = $globals->getTabla(['tabla' => 'factura', 'where' => ['id_registro_pt' => $id_registro_pt, 'visible' => 1]]);
-      
+       //die(var_dump($uuid));
         if(isset($uuid->data) && !empty($uuid->data)) {
             $data['uuid'] = ($data['fic'])?$uuid->data[0]->uuid:$uuid->data;
         }
@@ -3146,7 +3146,7 @@ class Principal extends BaseController
         if (!empty($instrumento)) {
             switch ($id_archivo) {
                 case 1:
-                    $doc = 'assets/pdf/plantillas/anexo02_2026.pdf';
+                    $doc = 'assets/pdf/plantillas/anexo1_2026.pdf';
                     $formato = 'personal/vFormato01.php';
                     break;
                 case 4:
@@ -3169,7 +3169,7 @@ class Principal extends BaseController
         } else {
             switch ($id_archivo) {
                 case 1:
-                    $doc = 'assets/pdf/plantillas/anexo02_2026.pdf';
+                    $doc = 'assets/pdf/plantillas/anexo1_2026.pdf';
                     $formato = 'personal/vFormato01.php';
                     break;
                 case 4:

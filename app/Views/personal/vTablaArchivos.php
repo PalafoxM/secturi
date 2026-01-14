@@ -41,15 +41,15 @@
                                                     <table class="table mb-0">
                                                         <thead>
                                                             <tr>
-                                                            <th class="text-center" scope="col">Nombre</th>
+                                                            <th class="text-center" scope="col">Nombre del documento</th>
                                                             <?php if($PT): ?>
-                                                            <th class="text-center" scope="col">Contenido PT</th>
+                                                            <th class="text-center" scope="col">Pago a terceros</th>
                                                             <?php endif; ?>
                                                             <?php if($GO): ?>
-                                                            <th class="text-center" scope="col">Contenido GO</th>
+                                                            <th class="text-center" scope="col">Gasto de operación</th>
                                                             <?php endif; ?>
                                                             <?php if($GRC): ?>
-                                                            <th class="text-center" scope="col">Contenido GRC</th>
+                                                            <th class="text-center" scope="col">Solicitud Gasto a Reserva de Comprobar</th>
                                                             <?php endif; ?>
                                                             <?php if($FIC): ?>
                                                             <th class="text-center" scope="col">Contenido FIC</th>
@@ -58,19 +58,20 @@
                                                             </tr>
                                                         </thead>
                                                       <tbody>
+                                                        <!-- Anexo 1 -->
                                                         <tr class="table-primary">
-                                                            <th scope="row">01. Anexos y formato de los LTPOFB</th>
+                                                            <th scope="row">Anexo 1</th>
                                                             <?php if($PT): ?>
-                                                            <td>Anexo 2 - Reporte de Integración Documental y Formato de conformidad del producto recibido.</td>
+                                                            <td>Reporte de integración documental (.xlsx).</td>
                                                             <?php endif; ?>
                                                              <?php if($GO): ?>
-                                                            <td>Anexo 2 - Reporte de Integración Documental</td>
+                                                            <td>Reporte de integración documental (.xlsx).</td>
                                                             <?php endif; ?>
                                                               <?php if($GRC): ?>
-                                                            <td>Anexo 2 - Reporte de Integración Documental</td>
+                                                            <td>Reporte de integración documental (.xlsx).</td>
                                                             <?php endif; ?>
                                                              <?php if($FIC): ?>
-                                                            <td>Anexo 2 - Reporte de Integración Documental y Formato de conformidad del producto recibido.</td>
+                                                            <td>Reporte de integración documental (.xlsx).</td>
                                                             <?php endif; ?>
                                                             <td class="text-center">
                                                                 <?php if($PT): ?>
@@ -93,20 +94,41 @@
                                                                 <?php endif; ?>  
                                                             </td>
                                                         </tr>
-                                            
+                                                        
+                                                        <!-- 01_Oficio de solicitud -->
+                                                        <tr>
+                                                            <th scope="row">01_Oficio de solicitud</th>
+                                                            <?php if($PT): ?><td>N/A</td><?php endif; ?>
+                                                            <?php if($GO): ?><td>N/A</td><?php endif; ?>
+                                                            <?php if($GRC): ?><td>FINANCIEROS</td><?php endif; ?>
+                                                            <?php if($FIC): ?><td>N/A</td><?php endif; ?>
+                                                            <td class="text-center"></td>
+                                                        </tr>
+
+                                                        <!-- 02_Póliza -->
+                                                        <tr>
+                                                            <th scope="row">02_Póliza</th>
+                                                            <?php if($PT): ?><td>FINANCIEROS</td><?php endif; ?>
+                                                            <?php if($GO): ?><td>FINANCIEROS</td><?php endif; ?>
+                                                            <?php if($GRC): ?><td>FINANCIEROS</td><?php endif; ?>
+                                                            <?php if($FIC): ?><td>N/A</td><?php endif; ?>
+                                                            <td class="text-center"></td>
+                                                        </tr>
+
+                                                        <!-- 03_CFDI -->
                                                         <tr class="table-secondary">
-                                                            <th scope="row">03. CFDI</th>
+                                                            <th scope="row">03_CFDI</th>
                                                             <?php if($PT): ?>
-                                                            <td>Comprobante Fiscal Digital por Internet en su representación PDF</td>
-                                                            <?php endif; ?>
-                                                             <?php if($FIC): ?>
-                                                            <td>Comprobante Fiscal Digital por Internet en su representación PDF</td>
+                                                            <td>Comprobante Fiscal Digital por Internet o comprobante que ampara el pago (.pdf).</td>
                                                             <?php endif; ?>
                                                              <?php if($GO): ?>
-                                                            <td>Comprobante Fiscal Digital por Internet en su representación PDF</td>
+                                                            <td>Comprobante Fiscal Digital por Internet o comprobante que ampara el pago (.pdf).</td>
                                                             <?php endif; ?>
                                                               <?php if($GRC): ?>
                                                             <td>N/A</td>
+                                                            <?php endif; ?>
+                                                             <?php if($FIC): ?>
+                                                            <td>Comprobante Fiscal Digital por Internet o comprobante que ampara el pago (.pdf).</td>
                                                             <?php endif; ?>
                                                             <td class="text-center">
                                                                 <?php if($PT): ?>
@@ -129,15 +151,20 @@
                                                                 <?php endif; ?> 
                                                             </td>
                                                         </tr>
-                                                          <?php if(!$GO && !$FIC): ?>
+
+                                                        <!-- 04_Contrato o convenio -->
                                                         <tr>
-                                                            <th scope="row">04. Contrato o Convenio (según corresponda)</th>
+                                                            <th scope="row">04_Contrato o convenio</th>
                                                              <?php if($PT): ?>
-                                                            <td>Instrumento jurídico que corresponda</td>
+                                                            <td>Instrumento jurídico correspondiente (.pdf).</td>
                                                               <?php endif; ?>
+                                                              <?php if($GO): ?>
+                                                            <td>N/A</td>
+                                                            <?php endif; ?>
                                                               <?php if($GRC): ?>
                                                             <td>N/A</td>
                                                             <?php endif; ?>
+                                                            <?php if($FIC): ?><td>N/A</td><?php endif; ?>
                                                             <td class="text-center">
                                                                 <?php if($PT): ?>
                                                                 <a target="_blank"  href="<?= base_url().'index.php/Principal/Archivo/'.$id_registro.'/4' ?>" class="text-center">
@@ -153,106 +180,69 @@
                                                                 <?php endif; ?> 
                                                             </td>
                                                         </tr>
-                                                          <?php endif; ?>
-                                                        <?php if(!$FIC): ?>
-                                                        <tr class="table-success">
-                                                            <th scope="row">05. Formatos de los LRADP</th>
-                                                             
-                                                     
-                                                              <?php if($PT): ?>
-                                                            <td>OMVE-1 (Orden de Ministración de Viáticos en el Extranjero)</td>
-                                                              <?php endif; ?>
-                                                               <?php if($GO): ?>
-                                                            <td>OMVE-1 (Orden de Ministración de Viáticos Nacionales)</td>
-                                                            <?php endif; ?>
-                                                              <?php if($GRC): ?>
-                                                            <td>Solicitud de gastos a reserva de comprobar GRC-1 y OMVE-1 (Orden de Ministración de Viáticos en el Extranjero)</td>
-                                                            <?php endif; ?>
+
+                                                        <!-- 09_GRC-1 Gastos a Reserva de Comprobar -->
+                                                        <tr>
+                                                            <th scope="row">09_GRC-1 Gastos a Reserva de Comprobar</th>
+                                                            <?php if($PT): ?><td>N/A</td><?php endif; ?>
+                                                            <?php if($GO): ?><td>N/A</td><?php endif; ?>
+                                                            <?php if($GRC): ?><td>Solicitud de Gasto a Reserva de Comprobar GRC-1 (.pdf).</td><?php endif; ?>
+                                                            <?php if($FIC): ?><td>N/A</td><?php endif; ?>
                                                             <td class="text-center">
-                                                             <input type="file" id="archivo05" name="archivo05[]" accept=".pdf" >
+                                                                <input type="file" id="archivo09" name="archivo09[]" multiple accept=".pdf">
                                                             </td>
                                                         </tr>
-                                                        <?php endif; ?>
-                                                          <?php if(!$GO): ?>
+
+                                                        <!-- 10_Oficio de Autorización de Partidas Restringidas -->
                                                         <tr>
-                                                            <th scope="row">06. Oficios de Autorizaciones</th>
-                                                             <?php if($PT): ?>
-                                                            <td>Autorización de Servicios Profesionales (1330, 3330, 3340 y 3390), Validación de la Coordinación General de Comunicación Social (3611, 3612, 3630, 3660 y 3690), Validación de imagen, Autorización de partidas restringidas (3710, 3760, 3810, 3820 y 3830), Autorización de pasivos, Autorización de refrendos.</td>
-                                                           <?php endif; ?>
-                                                             <?php if($FIC): ?>
-                                                            <td>Autorización de Servicios Profesionales (1330, 3330, 3340 y 3390), Validación de la Coordinación General de Comunicación Social (3611, 3612, 3630, 3660 y 3690), Validación de imagen, Autorización de partidas restringidas (3710, 3760, 3810, 3820 y 3830), Autorización de pasivos, Autorización de refrendos.</td>
-                                                           <?php endif; ?>
-                                                               <?php if($GRC): ?>
-                                                            <td>Autorización de Servicios Profesionales (3310, 3330, 3340 y 3390), Autorización de partidas restringidas (3710, 3760, 3810 y 3830)</td>
-                                                           <?php endif; ?>
-                                                            <td><input type="file" id="archivo06" name="archivo06[]" accept=".pdf" ></td>
-                                                        </tr>
-                                                         <?php endif; ?>
-                                                        <tr class="table-info">
-                                                            <th scope="row">07. Formatos diversos</th>
-                                                             <?php if($PT): ?>
-                                                            <td>Carátula de pago, Oficio(s) Delegatorio(s), Oficio de Liberación de Pago, CFDI con su respectivo encabezado de factura, Oficio de Comisión, Evidencia Fotográfica, Lista de Asistencia.</td>
-                                                              <?php endif; ?>
-                                                             <?php if($FIC): ?>
-                                                            <td>Carátula de pago, Oficio(s) Delegatorio(s), Oficio de Liberación de Pago, CFDI con su respectivo encabezado de factura, Oficio de Comisión, Evidencia Fotográfica, Lista de Asistencia.</td>
-                                                              <?php endif; ?>
-                                                               <?php if($GO): ?>
-                                                            <td>Carátula de pago, Oficio(s) Delegatorio(s), Oficio de Liberación de Gastos, CFDI con su respectivo encabezado de factura (incluir notas de consumo, check-in/out vouchers, tickets de peajes), Formato de Desglose de Gastos (Viáticos por persona), Oficio de Comisión, Evidencia Fotográfica, Lista de Asistencia.</td>
-                                                            <?php endif; ?>
-                                                              <?php if($GRC): ?>
-                                                            <td>Formato de Desglose de Gastos (Viáticos por persona presupuestado), Oficio de Comisión.</td>
-                                                            <?php endif; ?>
-                                                           <td class="text-center">
-                                                               <?php if($FIC): ?>
-                                                                <a target="_blank"  href="<?= base_url().'index.php/Principal/ImprimirFIC/'.$id_registro ?>" class="text-center">
-                                                                    <i class="far fa-file-pdf text-danger"></i>
-                                                                    <h6 class="text-truncate">Archivo07.pdf</h6>
-                                                                </a> 
-                                                                <?php endif; ?> 
-                                                               <?php if($PT): ?>
-                                                                <a target="_blank"  href="<?= base_url().'index.php/Principal/ImprimirPT/'.$id_registro ?>" class="text-center">
-                                                                    <i class="far fa-file-pdf text-danger"></i>
-                                                                    <h6 class="text-truncate">Archivo07.pdf</h6>
-                                                                </a> 
-                                                                <?php endif; ?>  
-                                                               <?php if($GO): ?>
-                                                                <a target="_blank"  href="<?= base_url().'index.php/Principal/ImprimirGO/'.$id_registro ?>" class="text-center">
-                                                                    <i class="far fa-file-pdf text-danger"></i>
-                                                                    <h6 class="text-truncate">Archivo07.pdf</h6>
-                                                                </a> 
-                                                                <?php endif; ?>  
+                                                            <th scope="row">10_Oficio de Autorización de Partidas Restringidas</th>
+                                                            <?php if($PT): ?><td>Oficio de Autorización de la Subsecretaría de Administración para el ejercicio de partidas restringidas (3710, 3760, 3810, 3820, 3830, 3310, 3330, 3340, y 3390), debidamente firmado (.pdf).</td><?php endif; ?>
+                                                            <?php if($GO): ?><td>Oficio de Autorización de la Subsecretaría de Administración para el ejercicio de partidas restringidas (3710), Oficio de Autorización de la DGRMSG (2610) debidamente firmado (.pdf).</td><?php endif; ?>
+                                                            <?php if($GRC): ?><td>Oficio de Autorización de la Subsecretaría de Administración para el ejercicio de partidas restringidas (3710, 3760, 3810, 3820, 3830, 3310, 3330, 3340, y 3390), debidamente firmado (.pdf).</td><?php endif; ?>
+                                                            <?php if($FIC): ?><td>N/A</td><?php endif; ?>
+                                                            <td class="text-center">
+                                                                 <input type="file" id="archivo10" name="archivo10[]" accept=".pdf" >
                                                             </td>
                                                         </tr>
-                                                          <?php if(!$GO): ?>
+
+                                                        <!-- 11_Oficio de Autorización de Comunicación Social -->
                                                         <tr>
-                                                            <th scope="row">08. Evidencia de entregable</th>
-                                                             <?php if($FIC): ?>
-                                                            <td>Entregable con sello, fecha y firma de recibido</td>
-                                                            <?php endif; ?>
-                                                             <?php if($PT): ?>
-                                                            <td>Entregable con sello, fecha y firma de recibido</td>
-                                                            <?php endif; ?>
-                                                              <?php if($GRC): ?>
-                                                            <td>N/A</td>
-                                                            <?php endif; ?>
-                                                            <td><input type="file" id="archivo08" name="archivo08[]" accept=".pdf" ></td>
+                                                            <th scope="row">11_Oficio de Autorización de Comunicación Social</th>
+                                                            <?php if($PT): ?><td>Oficio de Autorización emitido por la Coordinación General de Comunicación Social para el ejercicio de partidas de difusión (3611, 3612, 3639, 3660 y 3690), debidamente firmado (.pdf).</td><?php endif; ?>
+                                                            <?php if($GO): ?><td>N/A</td><?php endif; ?>
+                                                            <?php if($GRC): ?><td>N/A</td><?php endif; ?>
+                                                            <?php if($FIC): ?><td>N/A</td><?php endif; ?>
+                                                            <td class="text-center">
+                                                                 <input type="file" id="archivo11" name="archivo11[]" accept=".pdf" >
+                                                            </td>
                                                         </tr>
-                                                          <?php endif; ?>
+
+                                                        <!-- 12_Oficio de Autorización de Pasivos -->
+                                                        <tr>
+                                                            <th scope="row">12_Oficio de Autorización de Pasivos</th>
+                                                            <?php if($PT): ?><td>Oficio de Autorización de Pasivos (.pdf).</td><?php endif; ?>
+                                                            <?php if($GO): ?><td>N/A</td><?php endif; ?>
+                                                            <?php if($GRC): ?><td>N/A</td><?php endif; ?>
+                                                            <?php if($FIC): ?><td>N/A</td><?php endif; ?>
+                                                            <td class="text-center">
+                                                                 <input type="file" id="archivo12" name="archivo12[]" accept=".pdf" >
+                                                            </td>
+                                                        </tr>
+
+                                                        <!-- 14_Otros -->
                                                         <tr class="table-warning">
-                                                            <th scope="row">09. Otros</th>
-                                                             <?php if($FIC): ?>
-                                                            <td>Soporte de datos bancarios, Registro en el Padrón de Proveedores (vigente), Soporte documental inherente al trámite (Garantía, CURP; en caso de ayudas y subsidios a personas físicas: listado de beneficiarios, minutas, programas, agendas, itinerarios, etc.).</td>
+                                                            <th scope="row">14_Otros</th>
+                                                            <?php if($PT): ?>
+                                                            <td>Se creará una carpeta que contenga cada uno de los siguientes archivos (.pdf), según apliquen y por separado: Carátula de pago, oficio delegatorio, oficio de liberación de pago, CFDI con su respectivo encabezado, oficio de comisión, evidencia fotográfica, soporte de datos bancarios, registro en el padrón de proveedores, garantía, CURP en caso de ayudas y subsidios a persona físicas, listado de beneficiarios, minutas, programas, agendas, itinerarios, lista de asistencia, etc.</td>
                                                             <?php endif; ?>
-                                                             <?php if($PT): ?>
-                                                            <td>Soporte de datos bancarios, Registro en el Padrón de Proveedores (vigente), Soporte documental inherente al trámite (Garantía, CURP; en caso de ayudas y subsidios a personas físicas: listado de beneficiarios, minutas, programas, agendas, itinerarios, etc.).</td>
+                                                            <?php if($GO): ?>
+                                                            <td>Se creará una carpeta que contenga cada uno de los siguientes archivos (.pdf), según apliquen y por separado: Carátula de pago, oficio delegatorio, oficio de liberación de gasto, un archivo por cada CFDI (con su respectivo encabezado, notas de consumo, oficio de comisión, check in-out, vouchers, tickets, programas, agendas, itinerarios, evidencia fotográfica, recibo de verificación, lista de asistencia, etc.) y formato de desglose de gastos (viáticos por persona).</td>
                                                             <?php endif; ?>
-                                                             <?php if($GO): ?>
-                                                            <td>Programas, agendas, itinerarios, recibo de verificación, etc.</td>
+                                                            <?php if($GRC): ?>
+                                                            <td>Se creará una carpeta que contenga cada uno de los siguientes archivos (.pdf), según apliquen y por separado: oficio de comisión, invitaciones, programas, agendas, itinerarios, etc., y formato de desglose de gastos (viáticos por persona).</td>
                                                             <?php endif; ?>
-                                                              <?php if($GRC): ?>
-                                                            <td>Programas, agendas, itinerarios, etc.</td>
-                                                            <?php endif; ?>
-                                                            <td><input type="file" id="archivo09" name="archivo09[]" multiple accept=".pdf"></td>
+                                                            <?php if($FIC): ?><td>Soporte de datos bancarios, Registro en el Padrón de Proveedores...</td><?php endif; ?>
+                                                            <td><input type="file" id="archivo14" name="archivo14[]" multiple accept=".zip, .pdf, .rar"></td>
                                                         </tr>
                                                     </tbody>
 
