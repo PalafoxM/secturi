@@ -2704,7 +2704,15 @@ class Principal extends BaseController
         $GO = ($tipo == 'GO') ? TRUE : FALSE;
         $GRC = ($tipo == 'GRC') ? TRUE : FALSE;
         $FIC = ($tipo == 'FIC') ? TRUE : FALSE;
+        if($PT) {
+            $factura = $globals->getTabla(['tabla' => 'factura', 'where' => ['visible' => 1, 'id_registro_pt' => $id]]);
+        }
+        if($GO) {
+            $factura = $globals->getTabla(['tabla' => 'xml_go', 'where' => ['visible' => 1, 'id_registro_go' => $id]]);
+        }
+        //die(var_dump($factura));
         $data['PT'] = $PT;
+        $data['factura'] = (!empty($factura->data)) ? $factura->data : [];
         $data['GO'] = $GO;
         $data['GRC'] = $GRC;
         $data['FIC'] = $FIC;
@@ -4442,7 +4450,7 @@ class Principal extends BaseController
         $data['contentView'] = 'personal/vListaDenuncia';
         $this->_renderView($data);
     }
-    public function ImprimirPT($id_pt = null, $hoja = null, $savePath = null)
+    public function ImprimirPT($id_pt = null, $hoja = null, $index = null, $savePath = null)
     {
         $session = \Config\Services::session();
         $globals = new Mglobal;
@@ -4495,6 +4503,21 @@ class Principal extends BaseController
 
        $data['suma'] = $total;
        $data['suma_texto'] = $this->numeroEnLetras($total);
+
+        // Filter Data for Specific Index if provided
+        if ($index !== null) {
+             if (isset($xml->data) && isset($xml->data[$index])) {
+                  $data['uuid'] = [$xml->data[$index]];
+                  $monto = (float)$xml->data[$index]->total;
+                  $data['suma'] = $monto;
+                  $data['suma_texto'] = $this->numeroEnLetras($monto);
+             }
+             if (isset($periodo_factura->data) && isset($periodo_factura->data[$index])) {
+                 // Reset keys to 0 for view consumption
+                 $data['periodo_factura'] = array_values([$periodo_factura->data[$index]]);
+             }
+        }
+
        
         $data['GO'] = false;
         $data['fic'] = false;
@@ -4637,6 +4660,10 @@ class Principal extends BaseController
                  // Estructura original: escribía HTML3 sobre la primera factura
                  // Simular la lógica original de facturas
                  $facturas = $formatos->data;
+                 if ($index !== null && isset($facturas[$index])) {
+                    $facturas = [$index => $facturas[$index]];
+                 }
+
                  if (!empty($facturas)) {
                     foreach ($facturas as $index => $factura) {
                         $facturaPath = FCPATH . $factura->ruta_relativa;
@@ -4660,9 +4687,13 @@ class Principal extends BaseController
                     }
                 }
              } elseif ($dividido == 1) {
-                // Lógica de dividido = 1
+               // Lógica de dividido = 1
                  $data['dividido'] = 1;
                  $facturas = $formatos->data;
+                 if ($index !== null && isset($facturas[$index])) {
+                    $facturas = [$index => $facturas[$index]];
+                 }
+
                  if (!empty($facturas)) {
                         foreach ($facturas as $index => $facturaItem) {
                           $data['partida2']           =  $periodo_factura->data[$index]->partida;
