@@ -4442,7 +4442,7 @@ class Principal extends BaseController
         $data['contentView'] = 'personal/vListaDenuncia';
         $this->_renderView($data);
     }
-    public function ImprimirPT($id_pt = null, $savePath = null)
+    public function ImprimirPT($id_pt = null, $hoja = null, $savePath = null)
     {
         $session = \Config\Services::session();
         $globals = new Mglobal;
@@ -4477,7 +4477,7 @@ class Principal extends BaseController
            
             $data['uuid'] = $xml->data;
             foreach ($xml->data as $f) {
-                $total += (float) $f->total;  // SUMAR
+                $total += (float) $f->total; 
             }
         }
         
@@ -4491,13 +4491,11 @@ class Principal extends BaseController
             $data['periodo_inicio'] = $periodo_factura->data[0]->periodo_inicio;
             $data['periodo_fin'] = $periodo_factura->data[0]->periodo_fin;
             $registros = count($periodo_factura->data);
-
-            
         }
 
        $data['suma'] = $total;
        $data['suma_texto'] = $this->numeroEnLetras($total);
-       //die( var_dump( $data['periodo_factura']  ) );
+       
         $data['GO'] = false;
         $data['fic'] = false;
         $data['dividido'] = 0;
@@ -4525,18 +4523,14 @@ class Principal extends BaseController
 
             $data['registro'] = $registro;
 
-            //validar si yo tengo folio 
             $direccion = $globals->getTabla([
                 'tabla' => 'vw_direccion',
                 'where' => [
                     'visible' => 1,
-                    //'id_director' => 110
                     'id_director' => $registro_pt->data[0]->id_reponsable_solicitud
                 ]
             ]);
           
-
-
             if (empty($direccion->data)) {
                 $jefe = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_pt->data[0]->id_reponsable_solicitud]]);
                 if (!empty($jefe->data)) {
@@ -4548,8 +4542,6 @@ class Principal extends BaseController
                 }
 
             }
-            //die( var_dump($registro_pt->data[0]) );
-            // $folio = $direccion; //ESTO HAY QUE OREGUNTAR
 
             $data['responsableGasto'] = (isset($direccion->data) && !empty($direccion->data)) ? $direccion->data[0] : '';
             $reserva = $globals->getTabla([
@@ -4557,8 +4549,6 @@ class Principal extends BaseController
                 'where' => ['visible' => 1, 'id_reserva' => $id_reserva]
             ]);
 
-          
-           
             if (strlen($no_consecutivo) == 2) {
                 $zero = '0';
             } elseif (strlen($no_consecutivo) == 1) {
@@ -4567,7 +4557,7 @@ class Principal extends BaseController
                 $zero = '';
             }
             if (!empty($direccion->data)) {
-                $folio_prefijo = $direccion->data[0]->folio_prefijo . $zero . $no_consecutivo . '/' . date('Y'); //ESTO HAY QUE OREGUNTAR
+                $folio_prefijo = $direccion->data[0]->folio_prefijo . $zero . $no_consecutivo . '/' . date('Y'); 
                 $data['registro']->folio = $folio_prefijo;
             } else {
                
@@ -4583,26 +4573,25 @@ class Principal extends BaseController
                 $data['no_convenio'] = $reserva->data[0]->no_convenio;
                 $importe_str = ( $data['fic'] )?$reserva->data[0]->total_importe:$importe;
                 $usu_reg = $reserva->data[0]->usu_reg;
-                $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
+                $importe_float = (float) str_replace(',', '', $importe_str);
                 $data['numero_texto'] = $this->numeroEnLetras($importe_float);
             }
            $data['nombre_registro'] = $globals->getTabla([
                 'tabla' => 'vw_usuario',
                 'where' => ['id_usuario' => $usu_reg]
             ])->data[0];
-       // die( var_dump( $registro_pt->data[0]->id_subsecretario ) );
+       
         $subsecretario = $area = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1, 'id_subsecretario' => $registro_pt->data[0]->id_subsecretario]]);
-        // $usu_sub = $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $subsecretario->data[0]->id_usuario]]);
         $data['usu_sub'] = $subsecretario->data[0];
     
-       // die( var_dump( $data['periodo_factura']  ) );
         if($registros >= 15){
             $html = view('secciones/vFormatoPTExtra.php', $data);
+            $templateFile = 'assets/pdf/plantillas/FormatoPTExtra_merged.pdf';
         }else{
             $html = view('secciones/vFormatoPT.php', $data);
+            $templateFile = 'assets/pdf/plantillas/anexo07_2_2026.pdf';
         }
         
-      
         $htmlSegundaHoja = view('secciones/vFormatoPT2.php', $data);
         $htmlTercerHoja = view('personal/vFormato702.php', $data);
 
@@ -4614,142 +4603,107 @@ class Principal extends BaseController
             'mirrorMargins' => false,
         ]);
 
-        // Importar PDF base (anexo07)
-        if($registros >= 15){
-            $pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/plantillas/FormatoPTExtra_merged.pdf');
-        }else{
-            //$pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/plantillas/anexo07_2.pdf');
-            $pagecount = $mpdf->SetSourceFile(FCPATH . 'assets/pdf/plantillas/anexo07_2_2026.pdf');
+        // Logic to select pages
+        $runAll = ($hoja == null);
+
+        // --- HOJA 1 ---
+        if ($runAll || $hoja == 1) {
+            $mpdf->SetSourceFile(FCPATH . $templateFile);
+            $mpdf->AddPage();
+            $tplId = $mpdf->ImportPage(1);
+            $mpdf->UseTemplate($tplId);
+            $mpdf->WriteHTML($html);
         }
 
-
-
-
-        for ($i = 1; $i <= $pagecount; $i++) {
-            $mpdf->AddPage();
-            $tplId = $mpdf->ImportPage($i);
-            $mpdf->UseTemplate($tplId);
-
-            if ($i == 1) {
-                $mpdf->WriteHTML($html);
+        // --- HOJA 2 ---
+        if ($runAll || $hoja == 2) {
+            // Need to reload/ensure source if we skipped H1
+            if (!$runAll) {
+                 $mpdf->SetSourceFile(FCPATH . $templateFile);
             }
-            if ($i == 2 && $dividido == 0) {
-            
-                $mpdf->WriteHTML($htmlSegundaHoja);
-                $facturas = $formatos->data;
+            $mpdf->AddPage();
+            $tplId = $mpdf->ImportPage(2);
+            $mpdf->UseTemplate($tplId);
+            $mpdf->WriteHTML($htmlSegundaHoja);
+        }
 
-                if (!empty($facturas)) {
+        // --- HOJA 3 (Facturas/Soporte) ---
+        if ($runAll || $hoja == 3) {
+             
+             // Si es solo Hoja 3 y no RunAll, NO imprimimos la segunda hoja (ya filtrada arriba).
+             // Pero la lógica original ejecutaba esto "if ($i == 2)".
+             
+             if ($dividido == 0) {
+                 // Estructura original: escribía HTML3 sobre la primera factura
+                 // Simular la lógica original de facturas
+                 $facturas = $formatos->data;
+                 if (!empty($facturas)) {
                     foreach ($facturas as $index => $factura) {
                         $facturaPath = FCPATH . $factura->ruta_relativa;
-                        
-
                         if (file_exists($facturaPath)) {
                             $facturaPageCount = $mpdf->SetSourceFile($facturaPath);
-
                             for ($j = 1; $j <= $facturaPageCount; $j++) {
                                 $mpdf->AddPage();
                                 $tplFactura = $mpdf->ImportPage($j);
-
                                 // Escribir HTML solo en la primera página de la primera factura
                                 if ($index === 0 && $j === 1) {
                                     $mpdf->WriteHTML($htmlTercerHoja);
                                 }
-
                                 // Escalar factura
                                 $templateSize = $mpdf->GetTemplateSize($tplFactura);
-                                $scaleFactor = 0.6; // ajusta si es necesario
+                                $scaleFactor = 0.6; 
                                 $width = $templateSize['width'] * $scaleFactor;
                                 $height = $templateSize['height'] * $scaleFactor;
-
                                 $mpdf->UseTemplate($tplFactura, 40, 55, $width, $height);
                             }
                         }
                     }
                 }
-            }
-            if ($i == 2 && $dividido == 1) {
-               // die('ok');
-                $data['dividido'] = 1;
-                $mpdf->WriteHTML($htmlSegundaHoja);
-                $facturas = $formatos->data;
-              
-                if (!empty($facturas)) {
-               // var_dump( $facturas ); 
-                //var_dump(  $periodo_factura->data ); 
-                //die();
-                    // var_dump( $presupuestoGO->data );
+             } elseif ($dividido == 1) {
+                // Lógica de dividido = 1
+                 $data['dividido'] = 1;
+                 $facturas = $formatos->data;
+                 if (!empty($facturas)) {
                         foreach ($facturas as $index => $facturaItem) {
-             
                           $data['partida2']           =  $periodo_factura->data[$index]->partida;
                           $data['fecha_gasto_inicio'] =  $periodo_factura->data[$index]->periodo_inicio;
                           $data['fecha_gasto_fin']    =  $periodo_factura->data[$index]->periodo_fin;
                           $data['uuid2']              = $xml->data[$index]->uuid;
-                        //  var_dump( $data['partida2'] );
-
-                            $data['total2'] = "";
-                            $data['monto2'] = "";
-                       
-                            
+                          $data['total2'] = "";
+                          $data['monto2'] = "";
                                 $monto = (int)$xml->data[$index]->total ;
                                 $data['total2'] = $monto;
                                 $data['monto2'] = $this->numeroEnLetras($monto);
-                            
-                     
 
-                           
-                            
                             // 1️⃣ Agregamos una sola página con el formato 702GO
-                            $htmlTercerHoja = view('personal/vFormato702.php', $data);
+                            // Re-render view with updated data inside loop
+                            $htmlTercerHojaLoop = view('personal/vFormato702.php', $data); 
                             $mpdf->AddPage();
-                            $mpdf->WriteHTML($htmlTercerHoja);
-
+                            $mpdf->WriteHTML($htmlTercerHojaLoop);
                             
-                          
-                            // 3️⃣ Posición inicial (debajo del contenido del formato)
-                           $currentY = $mpdf->y + 60;
-
-                            // 4️⃣ Insertamos las facturas una debajo de otra
-                          
+                            // 4️⃣ Insertamos las facturas
                                 $facturaPath = FCPATH . $facturaItem->ruta_relativa;
-
                                 if (file_exists($facturaPath)) {
                                     $facturaPageCount = $mpdf->SetSourceFile($facturaPath);
-
                                     for ($pageNum = 1; $pageNum <= $facturaPageCount; $pageNum++) {
+                                        $mpdf->AddPage(); // Separar cada hoja
                                         $tplFactura = $mpdf->ImportPage($pageNum);
                                         $templateSize = $mpdf->GetTemplateSize($tplFactura);
-
                                         $scaleFactor = 0.6;
                                         $width = $templateSize['width'] * $scaleFactor;
                                         $height = $templateSize['height'] * $scaleFactor;
-
-                                        // 📍 Si no cabe en la hoja actual, saltamos a una nueva
-                                        if ($currentY + $height > $mpdf->h - 10) {
-                                            $mpdf->AddPage();
-                                            $currentY = 10;
-                                        }
-
-                                        // Centrar horizontalmente
                                         $xPos = ($mpdf->w - $width) / 2;
-
-                                        // Insertamos la página de factura
-                                        $mpdf->UseTemplate($tplFactura, $xPos, $currentY, $width, $height);
-
-                                        // Avanzamos la posición Y para la siguiente
-                                        $currentY += $height + 10;
+                                        $yPos = 40; 
+                                        $mpdf->UseTemplate($tplFactura, $xPos, $yPos, $width, $height);
                                     }
                                 }
-                            
                         }
-                       
                     }
-            }
+             }
         }
 
-     
-
         if ($savePath) {
-            $mpdf->Output($savePath, 'F'); // F = write to file
+            $mpdf->Output($savePath, 'F'); 
             return $savePath;
         }
 
