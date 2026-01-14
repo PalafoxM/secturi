@@ -233,7 +233,12 @@
                                                         <tr class="table-warning">
                                                             <th scope="row">14_Otros</th>
                                                             <?php if($PT): ?>
-                                                            <td>Se creará una carpeta que contenga cada uno de los siguientes archivos (.pdf), según apliquen y por separado: Carátula de pago, oficio delegatorio, oficio de liberación de pago, CFDI con su respectivo encabezado, oficio de comisión, evidencia fotográfica, soporte de datos bancarios, registro en el padrón de proveedores, garantía, CURP en caso de ayudas y subsidios a persona físicas, listado de beneficiarios, minutas, programas, agendas, itinerarios, lista de asistencia, etc.</td>
+                                                            <td class="text-center">
+                                                                Se creará una carpeta que contenga cada uno de los siguientes archivos (.pdf), según apliquen y por separado: Carátula de pago, oficio delegatorio, oficio de liberación de pago, CFDI con su respectivo encabezado, oficio de comisión, evidencia fotográfica, soporte de datos bancarios,  registro en el padrón de proveedores, garantía, CURP en caso de ayudas y subsidios a persona físicas, listado de beneficiarios, minutas, programas, agendas, itinerarios, lista de asistencia, etc. 
+                                                                <a href="<?= base_url("index.php/Principal/ImprimirPT/".$id_registro) ?>" target="_blank">
+                                                                    <i class="far fa-file-pdf text-danger fa-2x"></i>
+                                                                </a>
+                                                            </td>
                                                             <?php endif; ?>
                                                             <?php if($GO): ?>
                                                             <td>Se creará una carpeta que contenga cada uno de los siguientes archivos (.pdf), según apliquen y por separado: Carátula de pago, oficio delegatorio, oficio de liberación de gasto, un archivo por cada CFDI (con su respectivo encabezado, notas de consumo, oficio de comisión, check in-out, vouchers, tickets, programas, agendas, itinerarios, evidencia fotográfica, recibo de verificación, lista de asistencia, etc.) y formato de desglose de gastos (viáticos por persona).</td>
