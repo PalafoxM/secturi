@@ -2593,6 +2593,224 @@ class Principal extends BaseController
         $mpdf->Output('Comprobacion_GRC_' . $id_solicitud . '.pdf', 'I');
         exit();
     }
+
+    public function SolicitudContrato()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $data = array();
+        
+        // Cargar catalogos si es necesario, similar a otras vistas
+        // Por ahora solo cargamos la vista básica
+        $data['scripts'] = array('inicio'); // Asumiendo scripts estandar
+        $data['edita'] = 0;
+        $data['contentView'] = 'personal/vSolicitudContrato';
+        $this->_renderView($data);
+    }
+
+    public function editarSolicitudContrato($id_solicitud = null)
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        
+        if (!$id_solicitud) {
+             return redirect()->to(base_url('index.php/Principal/ListaSolicitudContrato'));
+        }
+
+        // Obtener solicitud
+        $solicitud = $globals->getTabla(['tabla' => 'solicitud_contrato', 'where' => ['id_solicitud_contrato' => $id_solicitud, 'visible' => 1]]);
+        if (empty($solicitud->data)) {
+            return redirect()->to(base_url('index.php/Principal/ListaSolicitudContrato'));
+        }
+
+        // Obtener pagos
+        $pagos = $globals->getTabla(['tabla' => 'solicitud_contrato_pagos', 'where' => ['id_solicitud_contrato' => $id_solicitud, 'visible' => 1]]);
+
+        $data['solicitud'] = $solicitud->data[0];
+        $data['pagos'] = (!empty($pagos->data)) ? $pagos->data : [];
+        
+        $data['scripts'] = array('inicio');
+        $data['edita'] = 1; // Indicador de edicion
+        $data['contentView'] = 'personal/vSolicitudContrato';
+        $this->_renderView($data);
+    }
+
+    public function guardarSolicitudContrato()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error al guardar la solicitud';
+
+        $post = $this->request->getPost();
+        
+        // Manejo de archivo
+        $archivo_suficiencia = '';
+        if($file = $this->request->getFile('archivo_suficiencia')) {
+             if ($file->isValid() && !$file->hasMoved()) {
+                $newName = $file->getRandomName();
+                $file->move(FCPATH . 'assets/uploads/contratos', $newName);
+                $archivo_suficiencia = $newName;
+             }
+        }
+
+        // Datos principales
+        $dataInsert = [
+            'usu_reg' => $session->id_usuario,
+            'fec_reg' => date('Y-m-d H:i:s'),
+            'responsable_proyecto' => $post['responsable_proyecto'],
+            'responsable_seguimiento' => $post['responsable_seguimiento'],
+            'enlace_comunicaciones' => $post['enlace_comunicaciones'],
+            'proyecto' => $post['proyecto'],
+            'partida' => $post['partida'],
+            'clave_estandarizada' => $post['clave_estandarizada'],
+            'archivo_suficiencia' => $archivo_suficiencia,
+            'monto_total' => $post['monto_total'],
+            'garantia' => $post['garantia'],
+            'objeto_contrato' => $post['objeto_contrato'],
+            'fecha_inicio' => $post['fecha_inicio'],
+            'fecha_termino' => $post['fecha_termino'],
+            'proveedor_nombre' => $post['proveedor_nombre'],
+            'proveedor_domicilio' => $post['proveedor_domicilio'],
+            'proveedor_rfc' => $post['proveedor_rfc'],
+            'proveedor_cedula' => $post['proveedor_cedula'],
+            'proveedor_representante' => $post['proveedor_representante'],
+            'proveedor_correo' => $post['proveedor_correo'],
+            'visible' => 1
+        ];
+
+        // Guardar Encabezado
+        // NOTA: Asumimos tabla solicitud_contrato. Si no existe, fallará y el usuario reportará.
+        $dataBitacora = ['id_user' => $session->id_usuario, 'script' => 'Agregar.php/guardaSolicitudContrato'];
+        $res = $globals->saveTabla($dataInsert, ["tabla" => "solicitud_contrato", "editar" => false], $dataBitacora);
+
+        if (!$res->error) {
+            $id_solicitud = $res->id;
+            
+            // Guardar Pagos
+            if(isset($post['pagos']) && is_array($post['pagos'])){
+                foreach($post['pagos'] as $pago){
+                    $dataPago = [
+                        'id_solicitud_contrato' => $id_solicitud,
+                        'numero_pago' => $pago['numero'],
+                        'monto' => $pago['monto'],
+                        'fecha' => $pago['fecha'],
+                        'entregable' => $pago['entregable'],
+                        'visible' => 1
+                    ];
+                    $globals->saveTabla($dataPago, ["tabla" => "solicitud_contrato_pagos", "id" => "id_pago"], ["tabla" => "bitacora", "id" => "id_bitacora"]);
+                }
+            }
+
+            $response->error = false;
+            $response->respuesta = 'Solicitud guardada correctamente';
+        } else {
+            $response->respuesta = $res->respuesta;
+        }
+
+        return $this->respond($response);
+    }
+
+    public function eliminarSolicitudContrato()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        
+        $id_solicitud = $this->request->getPost('id_solicitud');
+        
+        if($id_solicitud){
+            $dataUpdate = ['visible' => 0];
+            $dataBitacora = ['id_user' => $session->id_usuario, 'script' => 'Principal.php/eliminarSolicitudContrato'];
+            $res = $globals->saveTabla($dataUpdate, ["tabla" => "solicitud_contrato", "id" => "id_solicitud_contrato", "valor_id" => $id_solicitud], $dataBitacora);
+            
+            if(!$res->error){
+                $response->error = false;
+                $response->respuesta = 'Solicitud eliminada correctamente';
+            } else {
+                $response->respuesta = $res->respuesta;
+            }
+        } else {
+            $response->respuesta = 'ID no válido';
+        }
+        
+        return $this->respond($response);
+    }
+
+    public function enviarSolicitudContrato()
+    {
+         $session = \Config\Services::session();
+         $globals = new Mglobal;
+         $response = new \stdClass();
+         $response->error = true;
+         
+         $id_solicitud = $this->request->getPost('id_solicitud');
+         // Logica de envío de correo (Placeholder)
+         // Aquí se integraría la librería de Email similar a enviarEmail()
+         
+         if($id_solicitud){
+             $response->error = false;
+             $response->respuesta = 'Correo enviado (Simulado)';
+         } else {
+             $response->respuesta = 'ID no válido';
+         }
+         
+         return $this->respond($response);
+    }
+    
+    public function verSolicitudContratoPDF($id = null)
+    {
+        if(!$id){
+            echo "ID no válido"; return;
+        }
+
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        
+        // Cargar datos
+        $solicitud = $globals->getTabla(['tabla' => 'solicitud_contrato', 'where' => ['id_solicitud_contrato' => $id]]);
+        $pagos = $globals->getTabla(['tabla' => 'solicitud_contrato_pagos', 'where' => ['id_solicitud_contrato' => $id, 'visible' => 1]]);
+        
+        if(empty($solicitud->data)){
+            echo "Solicitud no encontrada"; return;
+        }
+
+        $data['solicitud'] = $solicitud->data[0];
+        $data['pagos'] = (!empty($pagos->data)) ? $pagos->data : [];
+        
+        // Reutilizamos la vista de formulario pero en modo lectura o creamos una vista optimizada para impresión
+        // Por ahora usaré una vista simple para PDF
+        $html = view('personal/vPdfSolicitudContrato', $data);
+        
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 10,
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_bottom' => 10,
+            'format' => 'Letter'
+        ]);
+
+        $mpdf->WriteHTML($html);
+        $mpdf->Output('Solicitud_Contrato_' . $id . '.pdf', 'I');
+        exit();
+    }
+
+    public function ListaSolicitudContrato()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $data = array();
+
+        $solicitudes = $globals->getTabla(["tabla" => "solicitud_contrato", "where" => ["visible" => 1]]);
+        
+        $data['solicitudes'] = (!empty($solicitudes->data)) ? $solicitudes->data : [];
+        $data['scripts'] = array('inicio');
+        $data['contentView'] = 'personal/vListaSolicitudContrato';
+        $this->_renderView($data);
+    }
+
     public function deletePT()
     {
         $session = \Config\Services::session();

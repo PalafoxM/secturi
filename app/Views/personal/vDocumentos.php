@@ -818,38 +818,59 @@
                                                             </ol>
                                                             <ol class="dd-list">
                                                                  <p class="text-muted mb-4">Coordinación de Recursos Materiales</p>
-                                                                  <a target="_blank" href="<?= base_url()?>assets/documentos/F-CRMG-02-2020_Solicitud_de_Mantenimiento_Vehicular-4388.xlsx" > 
+                                                                  <a target="_blank" href="<?= base_url()?>assets/documentos/ANEXO_EDOCOMB.xlsx" > 
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
-                                                                        Solicitud de Mantenimiento Vehicular
+                                                                         Autorización fuera del Estado
                                                                         </div>
                                                                     </li>
                                                                 </a>
-                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/BITACORA_DE_REVISION_DE_NIVELES-7c5f.xlsx" >  
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/ANEXO_MODOCOMB.xlsx" >  
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
-                                                                        Bitácora de Revisión de Niveles
+                                                                       Traspaso compensado combustible
                                                                         </div>
                                                                     </li>
                                                                 </a>
-                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-CRMSG-04-2021_INVESTIGACION_DE_MERCADO-a766.xlsx" >  
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/ANEXO_SSV.xlsx" >  
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                       Solicitud de servicio vehicular
+                                                                        </div>
+                                                                    </li>
+                                                                 </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/ANEXO_DOTEXTCOMB.xlsx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Asignación adicional combustible
+                                                                        </div>
+                                                                    </li>
+                                                                 </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/Anexo_4_Investigacion_de_Mercado.xlsx" > 
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
                                                                         Investigación de Mercado
                                                                         </div>
                                                                     </li>
                                                                  </a>
-                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-CRMSG-04-2021__ANEXO_4_Investigacion_de_Mercado_-a8a8.xlsx" > 
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/Anexo J-C1 (Solicitud autorizacion subse admon).doc" > 
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
-                                                                        Investigación de Mercado Servicios
+                                                                       Partidas restringidas
                                                                         </div>
                                                                     </li>
                                                                  </a>
-                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-CRMSG-04-2021_Investigacion_de_Mercado__Federal_-f397.xlsx" > 
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/Anexo RM C1 Calendario Anual de Compras.pdf" > 
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
-                                                                        Investigación de Mercado Adquisiciones
+                                                                        Calendario Anual de Compras
+                                                                        </div>
+                                                                    </li>
+                                                                 </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/Anexo RM-C2 SOL INICIO COMPRA.xlsx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Solicitud inicio de compra
                                                                         </div>
                                                                     </li>
                                                                  </a>

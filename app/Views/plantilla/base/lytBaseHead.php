@@ -578,6 +578,7 @@
                         <h6 class="menu-title">GASTOS POR CONCEPTOS</h6>
                     </div>
                     <ul class="nav">
+                        <?php if (in_array($session->get('id_perfil'),[1,7])): ?>
                         <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Inicio/Viaticos">viáticos/representación</a>
                         </li>
@@ -590,6 +591,13 @@
                                 href="<?php echo base_url(); ?>authentication/auth-recover-pw.html">Lista GRC</a></li>
                         <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Principal/ListaDenuncia">Lista Denuncia</a>
+                        </li>
+                        <?php endif ?>
+                        <li class="nav-item"><a class="nav-link"
+                                href="<?php echo base_url(); ?>index.php/Principal/SolicitudContrato">Solicitud Contrato</a>
+                        </li>
+                        <li class="nav-item"><a class="nav-link"
+                                href="<?php echo base_url(); ?>index.php/Principal/ListaSolicitudContrato">Listado de Contratos</a>
                         </li>
 
                     </ul>
