@@ -579,15 +579,16 @@
                                        
                                         <div class="col-lg-6">
                                             <div class="card">
-                                                <a href="<?= base_url().'assets/pdf/plantillas/Personas_Servidoras_Publicas_Honestas.pdf'?>" target="_blank" >
+                                                <a href="<?= base_url().'assets/documentos/Integracion_del_tramite_SECTURI_2026.pdf'?>" target="_blank" >
                                                 <div class="card-body">
                                                     <div class="blog-card">
-                                                        <img src="<?= base_url() ?>assets/images/ganadores.jpg" alt=""
-                                                            class="img-fluid" />
+                                                        <h4 class="header-title mt-0 mb-4">Integración del trámite SECTURI 2026</h4>
+                                                        <iframe src="<?= base_url() ?>assets/documentos/Integracion_del_tramite_SECTURI_2026.pdf" alt=""
+                                                            class="img-fluid" ></iframe>
                                                     </div><!--end blog-card-->
 
                                                 </div><!--end card-body-->
-                                                   </a>
+                                                </a>
                                             </div><!--end card-->
                                         </div><!--end col-->
                                      
