@@ -874,7 +874,7 @@
                                                                         </div>
                                                                     </li>
                                                                  </a>
-                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/DISPOSICIONES CRMySG SECTURI 2026.xlsx" > 
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/DISPOSICIONES_CRMySG_SECTURI_2026.pdf" > 
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
                                                                         Disposiciones CRM y SECTURI 2026
