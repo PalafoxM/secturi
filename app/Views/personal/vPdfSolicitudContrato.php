@@ -6,7 +6,7 @@
     <style>
         body { font-family: Arial, sans-serif; font-size: 12px; }
         .header { text-align: center; margin-bottom: 20px; }
-        .section-title { background-color: #0e50c9; color: white; padding: 5px; font-weight: bold; margin-top: 15px; }
+        .section-title { background-color: #213E66; color: white; padding: 5px; font-weight: bold; margin-top: 15px; }
         .row { display: flex; flex-wrap: wrap; margin-bottom: 5px; }
         .label { font-weight: bold; width: 30%; display: inline-block; }
         .value { border-bottom: 1px solid #ccc; width: 68%; display: inline-block; }

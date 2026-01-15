@@ -6,7 +6,7 @@
     h3 { text-align: center; }
     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
     th, td { border: 1px solid black; padding: 5px; text-align: left; }
-    th { background-color: #0e50c9ff; }
+    th { background-color: #213E66; }
     .text-right { text-align: right; }
     .header-info { margin-bottom: 20px; }
     .text-align-center { text-align: center; }
@@ -49,7 +49,7 @@
             </tr>
             <tr>
                 <?php $fn = new \App\Libraries\Funciones(); ?>
-                <td colspan="4" class="text-right;" style="background-color: #0e50c9ff; color:white"><strong>(<?= $fn->numeroALetras($totalComprobado) ?>)</strong></td>
+                <td colspan="4" class="text-right;" style="background-color: #213E66; color:white"><strong>(<?= $fn->numeroALetras($totalComprobado) ?>)</strong></td>
             </tr>
         <?php else: ?>
             <tr><td colspan="3" style="text-align:center">No hay comprobantes registrados</td></tr>
