@@ -867,10 +867,17 @@
                                                                         </div>
                                                                     </li>
                                                                  </a>
-                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/Anexo RM-C2 SOL INICIO COMPRA.xlsx" > 
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/Anexo_RM_C2_SOL_INICIO_COMPRA.xlsx" > 
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
                                                                         Solicitud inicio de compra
+                                                                        </div>
+                                                                    </li>
+                                                                 </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/DISPOSICIONES CRMySG SECTURI 2026.xlsx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Disposiciones CRM y SECTURI 2026
                                                                         </div>
                                                                     </li>
                                                                  </a>
