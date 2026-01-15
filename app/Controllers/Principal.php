@@ -2563,6 +2563,7 @@ class Principal extends BaseController
 
         // Obtener datos de la solicitud
         $solicitud = $globals->getTabla(['tabla' => 'vw_solicitud_grc', 'where' => ['id_solicitud_grc' => $id_solicitud, 'visible' => 1]]);
+       // var_dump($solicitud->data[0]); die();
         
         if (empty($solicitud->data)) {
             echo "Solicitud no encontrada";
