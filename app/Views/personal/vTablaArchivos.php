@@ -381,7 +381,7 @@
 
                                                     </table><!--end /table-->
                                                     <br>
-                                                       <div class="row mb-5">
+                                                     <!--   <div class="row mb-5">
                                                             <div class="col-md-12 text-right">
                                                                 <?php if($FIC): ?>
                                                                 <a id="btnZip" style="color:white" class="btn btn-info" onclick="ini.inicio.generarZipFIC(<?= $id_registro ?>);" >
@@ -399,7 +399,7 @@
                                                                 </a>
                                                                 <?php endif; ?>
                                                             </div>
-                                                        </div>
+                                                        </div> -->
                                                 </div><!--end /tableresponsive-->
                                             </div><!--end card-body-->
                                         </div><!--end card-->
