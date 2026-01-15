@@ -877,7 +877,7 @@
                                                                  <a target="_blank" href="<?= base_url()?>assets/documentos/DISPOSICIONES_CRMySG_SECTURI_2026.pdf" > 
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
-                                                                        Disposiciones CRM y SECTURI 2026
+                                                                        Disposiciones CRMySG 2026
                                                                         </div>
                                                                     </li>
                                                                  </a>
