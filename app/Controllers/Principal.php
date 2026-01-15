@@ -2984,32 +2984,38 @@ class Principal extends BaseController
 
             // Populate Excel Cells
             // Header Data
-            $sheet->setCellValue('J4', date('d/m/Y', strtotime($data['registro']->fecha_tramite)));
+            $sheet->setCellValue('H7', date('d/m/Y', strtotime($data['registro']->fecha_tramite)));
             $folioText = (isset($data['GO']) && !empty($data['GO']) ? 'GO' : 'PT') . ' ' . $folio_prefijo;
-            $sheet->setCellValue('J6', $folioText);
+            $sheet->setCellValue('H9', $folioText);
 
             // Checkboxes
             // 02_Póliza
-            $sheet->setCellValue('D14', ($data['registro']->poliza == 1) ? 'Si' : 'No'); 
+            //die( var_dump($data['registro']) );
+            $sheet->setCellValue('B15', ($data['registro']->poliza == 1) ? 'Si' : 'No'); 
+            $sheet->setCellValue('B17',  'Si'); 
             
             // 14_Otros
-            $sheet->setCellValue('I21', 'Si');
+            $sheet->setCellValue('F19', 'Si');
+            $sheet->setCellValue('D32', 'Si');
+
+            $sheet->setCellValue('D33', 'Si');
+            $sheet->setCellValue('D34', 'Si');
 
             // Footer / Payment Data
-            $sheet->setCellValue('D24', isset($data['registro']->dsc_proveedor) ? $data['registro']->dsc_proveedor : '');
-            
+            $sheet->setCellValue('B24', isset($data['registro']->dsc_proveedor) ? $data['registro']->dsc_proveedor : '');
+            //die( var_dump($data['presupuesto']) );
             // Partida Presupuestal
             $arrPartida = [];
             if (isset($data['presupuesto']) && is_array($data['presupuesto'])) {
                 foreach ($data['presupuesto'] as $p) {
-                    $arrPartida[] = $p->partida;
+                    $arrPartida[] = $p->dsc_partida;
                 }
-            } elseif (isset($data['presupuesto']->partida)) {
-                $arrPartida[] = $data['presupuesto']->partida;
+            } elseif (isset($data['presupuesto']->dsc_partida)) {
+                $arrPartida[] = $data['presupuesto']->dsc_partida;
             }
             $sheet->setCellValue('H24', implode(', ', $arrPartida));
 
-            $sheet->setCellValue('D26', isset($data['registro']->concepto_pago) ? $data['registro']->concepto_pago : '');
+            $sheet->setCellValue('B25', isset($data['registro']->concepto_pago) ? $data['registro']->concepto_pago : '');
             
             // Contrato o convenio No.
             $noConvenio = isset($data['presupuesto'][0]->no_convenio) ? $data['presupuesto'][0]->no_convenio : '';
@@ -3026,16 +3032,16 @@ class Principal extends BaseController
                     $sumaTotal += (float)(is_object($u) ? $u->total : 0);
                 }
             }
-            $sheet->setCellValue('D28', implode(', ', $arrUuid));
+            $sheet->setCellValue('B26', implode(', ', $arrUuid));
             
             // Importe Total
              $fn = new \App\Libraries\Funciones();
              $importeTexto = '$' . number_format($sumaTotal, 2) . ' ' . $fn->numeroALetras($sumaTotal);
-             $sheet->setCellValue('D30', $importeTexto);
+             $sheet->setCellValue('B27', $importeTexto);
 
 
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-            header('Content-Disposition: attachment;filename="Anexo1_' . $folio_prefijo . '.xlsx"');
+            header('Content-Disposition: attachment;filename="Anexo1_' . $folioText . '.xlsx"');
             header('Cache-Control: max-age=0');
             $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
             $writer->save('php://output');
@@ -3218,25 +3224,29 @@ class Principal extends BaseController
            // die(var_dump($spreadsheet));
             // Populate Excel Cells
             // Header Data
-            $sheet->setCellValue('J4', date('d/m/Y', strtotime($data['registro']->fecha_tramite)));
+            $sheet->setCellValue('H7', date('d/m/Y', strtotime($data['registro']->fecha_tramite)));
             $folioText = (isset($data['GO']) && !empty($data['GO']) ? 'GO' : 'PT') . ' ' . $folio_prefijo;
             if ($data['fic']) {
                  $folioText = 'PT ' . $data['folio'];
             }
-            $sheet->setCellValue('J6', $folioText);
+            $sheet->setCellValue('H9', $folioText);
 
             // Checkboxes (using 'X' or 'Si' as per template logic - assuming 'Si'/'No' text based on image)
             // 02_Póliza
             //die( var_dump(  $data['registro']) );
-            $sheet->setCellValue('D14', ($data['registro']->poliza == 1) ? 'Si' : 'No'); 
+            $sheet->setCellValue('B15', ($data['registro']->poliza == 1) ? 'Si' : 'No');
+            $sheet->setCellValue('B17', ($data['registro']->contrato_convenio == 1) ? 'Si' : 'No');  
             
             // 14_Otros - Logic from vFormato01 implies this might be dynamic or 'Si'
-            $sheet->setCellValue('I21', 'Si'); // Defaulting to Si based on current usage or map from DB
-
+            $sheet->setCellValue('F19', 'Si'); // Defaulting to Si based on current usage or map from DB
+            $sheet->setCellValue('D32', 'Si');
+            $sheet->setCellValue('D33', 'Si');
+            $sheet->setCellValue('D34', 'Si');
             // Footer / Payment Data
-            $sheet->setCellValue('D24', isset($data['registro']->dsc_proveedor) ? $data['registro']->dsc_proveedor : '');
+            $sheet->setCellValue('B24', isset($data['registro']->dsc_proveedor) ? $data['registro']->dsc_proveedor : '');
             
             // Partida Presupuestal
+            //die( var_dump($data['presupuesto']) );
             $arrPartida = [];
             if (isset($data['presupuesto']) && is_array($data['presupuesto'])) {
                 foreach ($data['presupuesto'] as $p) {
@@ -3247,7 +3257,7 @@ class Principal extends BaseController
             }
             $sheet->setCellValue('H24', implode(', ', $arrPartida));
 
-            $sheet->setCellValue('D26', isset($data['registro']->concepto_pago) ? $data['registro']->concepto_pago : '');
+            $sheet->setCellValue('B25', isset($data['registro']->concepto_pago) ? $data['registro']->concepto_pago : '');
             
             // Contrato o convenio No.
             $noConvenio = isset($data['presupuesto'][0]->no_convenio) ? $data['presupuesto'][0]->no_convenio : '';
@@ -3264,16 +3274,16 @@ class Principal extends BaseController
                     $sumaTotal += (float)(is_object($u) ? $u->total : 0);
                 }
             }
-            $sheet->setCellValue('D28', implode(', ', $arrUuid));
+            $sheet->setCellValue('B26', implode(', ', $arrUuid));
             
             // Importe Total
              $fn = new \App\Libraries\Funciones();
              $importeTexto = '$' . number_format($sumaTotal, 2) . ' ' . $fn->numeroALetras($sumaTotal);
-             $sheet->setCellValue('D30', $importeTexto);
+             $sheet->setCellValue('B27', $importeTexto);
 
 
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-            header('Content-Disposition: attachment;filename="Anexo1_' . $folio_prefijo . '.xlsx"');
+            header('Content-Disposition: attachment;filename="Anexo1_' . $folioText . '.xlsx"');
             header('Cache-Control: max-age=0');
             $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
             $writer->save('php://output');
