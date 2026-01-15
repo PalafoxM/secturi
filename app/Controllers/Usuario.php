@@ -717,6 +717,8 @@ class Usuario extends BaseController
                 $validadoEntrada = false;
                 $validadoSalida = false;
                 $stopIncProcessing = false; // para no sobrescribir si ya procesamos una incidencia relevante
+                $cat = null;
+                $estatus = null;
 
                 if (!empty($incArr)) {
                   
@@ -811,8 +813,8 @@ class Usuario extends BaseController
                             }
 
                             // si ya procesaste, salir
-                            if ($stopIncProcessing)
-                                break;
+                            // if ($stopIncProcessing)
+                                // break;
                         }
 
                         // NUEVA LOGICA: Si es estatus 3 (Aprobado), asegurar Salida Verde + Texto
