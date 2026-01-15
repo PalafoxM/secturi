@@ -47,6 +47,10 @@
                 <td colspan="2" class="text-right"><strong>TOTAL COMPROBADO:</strong></td>
                 <td colspan="2" class="text-right"><strong>$<?= number_format($totalComprobado, 2) ?></strong></td>
             </tr>
+            <tr>
+                <?php $fn = new \App\Libraries\Funciones(); ?>
+                <td colspan="4" class="text-right"><strong>(<?= $fn->numeroALetras($totalComprobado) ?>)</strong></td>
+            </tr>
         <?php else: ?>
             <tr><td colspan="3" style="text-align:center">No hay comprobantes registrados</td></tr>
         <?php endif; ?>
