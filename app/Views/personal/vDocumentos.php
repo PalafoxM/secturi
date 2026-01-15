@@ -120,6 +120,13 @@
                                                             <ol class="dd-list">
                                                               
                                                                 <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/REGLAMENTO INTERIOR SECTURI.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                        REGLAMENTO INTERIOR SECTURI
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
                                                                     <a target="_blank" href="<?= base_url().'assets/documentos/Acuerdo Secretarial-004-2025.pdf' ?>">
                                                                         <div class="dd-handle">
                                                                         Acuerdo Secretarial-004-2025
