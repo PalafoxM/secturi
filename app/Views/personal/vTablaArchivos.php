@@ -173,10 +173,10 @@
                                                                 </a>  
                                                                 <?php endif; ?> 
                                                                 <?php if($GO): ?>
-                                                                <a target="_blank"  href="<?= base_url().'index.php/Principal/ArchivoGO/'.$id_registro.'/4' ?>" class="text-center">
+                                                              <!--   <a target="_blank"  href="<?= base_url().'index.php/Principal/ArchivoGO/'.$id_registro.'/4' ?>" class="text-center">
                                                                     <i class="far fa-file-pdf text-danger"></i>
                                                                     <h6 class="text-truncate">Archivo04.pdf</h6>
-                                                                </a>  
+                                                                </a>  --> 
                                                                 <?php endif; ?> 
                                                             </td>
                                                         </tr>
@@ -188,9 +188,11 @@
                                                             <?php if($GO): ?><td>N/A</td><?php endif; ?>
                                                             <?php if($GRC): ?><td>Solicitud de Gasto a Reserva de Comprobar GRC-1 (.pdf).</td><?php endif; ?>
                                                             <?php if($FIC): ?><td>N/A</td><?php endif; ?>
+                                                                <?php if($GRC): ?>
                                                             <td class="text-center">
                                                                 <input type="file" id="archivo09" name="archivo09[]" multiple accept=".pdf">
                                                             </td>
+                                                            <?php endif; ?>
                                                         </tr>
 
                                                         <!-- 10_Oficio de Autorización de Partidas Restringidas -->
@@ -201,7 +203,9 @@
                                                             <?php if($GRC): ?><td>Oficio de Autorización de la Subsecretaría de Administración para el ejercicio de partidas restringidas (3710, 3760, 3810, 3820, 3830, 3310, 3330, 3340, y 3390), debidamente firmado (.pdf).</td><?php endif; ?>
                                                             <?php if($FIC): ?><td>N/A</td><?php endif; ?>
                                                             <td class="text-center">
+                                                               
                                                                  <input type="file" id="archivo10" name="archivo10[]" accept=".pdf" >
+                                                                
                                                             </td>
                                                         </tr>
 
@@ -213,7 +217,9 @@
                                                             <?php if($GRC): ?><td>N/A</td><?php endif; ?>
                                                             <?php if($FIC): ?><td>N/A</td><?php endif; ?>
                                                             <td class="text-center">
+                                                                <?php if($PT): ?>
                                                                  <input type="file" id="archivo11" name="archivo11[]" accept=".pdf" >
+                                                                 <?php endif; ?>
                                                             </td>
                                                         </tr>
 
@@ -225,7 +231,9 @@
                                                             <?php if($GRC): ?><td>N/A</td><?php endif; ?>
                                                             <?php if($FIC): ?><td>N/A</td><?php endif; ?>
                                                             <td class="text-center">
+                                                                <?php if($PT): ?>
                                                                  <input type="file" id="archivo12" name="archivo12[]" accept=".pdf" >
+                                                                 <?php endif; ?>
                                                             </td>
                                                         </tr>
 
@@ -235,80 +243,139 @@
                                                             <?php if($PT): ?>
                                                             <td class="text-center">
                                                                 Se creará una carpeta que contenga cada uno de los siguientes archivos (.pdf), según apliquen y por separado: Carátula de pago, oficio delegatorio, oficio de liberación de pago, CFDI con su respectivo encabezado, oficio de comisión, evidencia fotográfica, soporte de datos bancarios,  registro en el padrón de proveedores, garantía, CURP en caso de ayudas y subsidios a persona físicas, listado de beneficiarios, minutas, programas, agendas, itinerarios, lista de asistencia, etc. 
-                                                                <br>
-                                                                <?php if(isset($factura) && !empty($factura)): ?>
-                                                                     <a href="<?= base_url("index.php/Principal/ImprimirPT/".$id_registro."/1") ?>" target="_blank" title="Hoja 1">
-                                                                        <i class="far fa-file-pdf text-danger fa-2x"></i> 1
-                                                                    </a>
-                                                                    &nbsp;
-                                                                    <a href="<?= base_url("index.php/Principal/ImprimirPT/".$id_registro."/2") ?>" target="_blank" title="Hoja 2">
-                                                                        <i class="far fa-file-pdf text-danger fa-2x"></i> 2
-                                                                    </a>
-                                                                    <br>
-                                                                    <?php foreach($factura as $index => $f): ?>
-                                                                         <div class="mb-1">
-                                                                            <span class="mr-2">Carátula <?= $index + 1 ?>:</span>
-                                                                            <a href="<?= base_url("index.php/Principal/ImprimirPT/".$id_registro."/3/".$index) ?>" target="_blank" title="Hoja 3">
-                                                                                <i class="far fa-file-pdf text-danger fa-2x"></i> 3
-                                                                            </a>
-                                                                         </div>
-                                                                    <?php endforeach; ?>
-                                                                <?php else: ?>
-                                                                    <a href="<?= base_url("index.php/Principal/ImprimirPT/".$id_registro."/1") ?>" target="_blank" title="Hoja 1">
-                                                                        <i class="far fa-file-pdf text-danger fa-2x"></i> 1
-                                                                    </a>
-                                                                    &nbsp;
-                                                                    <a href="<?= base_url("index.php/Principal/ImprimirPT/".$id_registro."/2") ?>" target="_blank" title="Hoja 2">
-                                                                        <i class="far fa-file-pdf text-danger fa-2x"></i> 2
-                                                                    </a>
-                                                                    &nbsp;
-                                                                    <a href="<?= base_url("index.php/Principal/ImprimirPT/".$id_registro."/3") ?>" target="_blank" title="Hoja 3">
-                                                                        <i class="far fa-file-pdf text-danger fa-2x"></i> 3
-                                                                    </a>
-                                                                <?php endif; ?>
+                                                                
+                                                               
                                                             </td>
                                                             <?php endif; ?>
                                                             <?php if($GO): ?>
                                                             <td>
                                                                 Se creará una carpeta que contenga cada uno de los siguientes archivos (.pdf), según apliquen y por separado: Carátula de pago, oficio delegatorio, oficio de liberación de gasto, un archivo por cada CFDI (con su respectivo encabezado, notas de consumo, oficio de comisión, check in-out, vouchers, tickets, programas, agendas, itinerarios, evidencia fotográfica, recibo de verificación, lista de asistencia, etc.) y formato de desglose de gastos (viáticos por persona).
                                                                 <br>
-                                                                <?php if(isset($factura) && !empty($factura)): ?>
-                                                                     <a href="<?= base_url("index.php/Principal/ImprimirGO/".$id_registro."/1") ?>" target="_blank" title="Hoja 1">
-                                                                        <i class="far fa-file-pdf text-danger fa-2x"></i> 1
-                                                                    </a>
-                                                                    &nbsp;
-                                                                    <a href="<?= base_url("index.php/Principal/ImprimirGO/".$id_registro."/2") ?>" target="_blank" title="Hoja 2">
-                                                                        <i class="far fa-file-pdf text-danger fa-2x"></i> 2
-                                                                    </a>
-                                                                    <br>
-                                                                    <?php foreach($factura as $index => $f): ?>
-                                                                         <div class="mb-1">
-                                                                            <span class="mr-2">Carátula <?= $index + 1 ?>:</span>
-                                                                            <a href="<?= base_url("index.php/Principal/ImprimirGO/".$id_registro."/3/".$index) ?>" target="_blank" title="Hoja 3">
-                                                                                <i class="far fa-file-pdf text-danger fa-2x"></i> 3
-                                                                            </a>
-                                                                         </div>
-                                                                    <?php endforeach; ?>
-                                                                <?php else: ?>
-                                                                    <a href="<?= base_url("index.php/Principal/ImprimirGO/".$id_registro."/1") ?>" target="_blank" title="Hoja 1">
-                                                                        <i class="far fa-file-pdf text-danger fa-2x"></i> 1
-                                                                    </a>
-                                                                    &nbsp;
-                                                                    <a href="<?= base_url("index.php/Principal/ImprimirGO/".$id_registro."/2") ?>" target="_blank" title="Hoja 2">
-                                                                        <i class="far fa-file-pdf text-danger fa-2x"></i> 2
-                                                                    </a>
-                                                                    &nbsp;
-                                                                    <a href="<?= base_url("index.php/Principal/ImprimirGO/".$id_registro."/3") ?>" target="_blank" title="Hoja 3">
-                                                                        <i class="far fa-file-pdf text-danger fa-2x"></i> 3
-                                                                    </a>
+                                                               
+                                                            </td>
+                                                            <td>
+                                                                <?php if($GO): ?>
+                                                                <table class="table mb-0">
+                                                                    <tbody>
+                                                                        <?php if(isset($factura) && !empty($factura)): ?>
+                                                                            <tr>
+                                                                                <td>
+                                                                                    <a href="<?= base_url("index.php/Principal/ImprimirGO/".$id_registro."/1") ?>" target="_blank" title="Hoja 1">
+                                                                                        <i class="far fa-file-pdf text-danger fa-2x"></i> PT
+                                                                                    </a>
+                                                                                </td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td>
+                                                                                    <a href="<?= base_url("index.php/Principal/ImprimirGO/".$id_registro."/2") ?>" target="_blank" title="Hoja 2">
+                                                                                        <i class="far fa-file-pdf text-danger fa-2x"></i> Solicitud
+                                                                                    </a>
+                                                                                </td>
+                                                                            </tr>
+                                                                            <?php foreach($factura as $index => $f): ?>
+                                                                                <tr>
+                                                                                    <td>
+                                                                                        <a href="<?= base_url("index.php/Principal/ImprimirGO/".$id_registro."/3/".$index) ?>" target="_blank" title="Hoja 3">
+                                                                                            <i class="far fa-file-pdf text-danger fa-2x"></i> Carátula <?= $index + 1 ?>
+                                                                                        </a>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            <?php endforeach; ?>
+                                                                        <?php else: ?>
+                                                                            <tr>
+                                                                                <td>
+                                                                                    <a href="<?= base_url("index.php/Principal/ImprimirGO/".$id_registro."/1") ?>" target="_blank" title="Hoja 1">
+                                                                                        <i class="far fa-file-pdf text-danger fa-2x"></i> PT
+                                                                                    </a>
+                                                                                </td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td>
+                                                                                    <a href="<?= base_url("index.php/Principal/ImprimirGO/".$id_registro."/2") ?>" target="_blank" title="Hoja 2">
+                                                                                        <i class="far fa-file-pdf text-danger fa-2x"></i> Solicitud
+                                                                                    </a>
+                                                                                </td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td>
+                                                                                    <a href="<?= base_url("index.php/Principal/ImprimirGO/".$id_registro."/3") ?>" target="_blank" title="Hoja 3">
+                                                                                        <i class="far fa-file-pdf text-danger fa-2x"></i> Carátula
+                                                                                    </a>
+                                                                                </td>
+                                                                            </tr>
+                                                                        <?php endif; ?>
+                                                                    </tbody>
+                                                                </table>
                                                                 <?php endif; ?>
                                                             </td>
                                                             <?php endif; ?>
                                                             <?php if($GRC): ?>
-                                                            <td>Se creará una carpeta que contenga cada uno de los siguientes archivos (.pdf), según apliquen y por separado: oficio de comisión, invitaciones, programas, agendas, itinerarios, etc., y formato de desglose de gastos (viáticos por persona).</td>
+                                                            <td>
+                                                                <table class="table mb-0">
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td>Se creará una carpeta que contenga cada uno de los siguientes archivos (.pdf), según apliquen y por separado: oficio de comisión, invitaciones, programas, agendas, itinerarios, etc., y formato de desglose de gastos (viáticos por persona).</td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </td>
                                                             <?php endif; ?>
                                                             <?php if($FIC): ?><td>Soporte de datos bancarios, Registro en el Padrón de Proveedores...</td><?php endif; ?>
-                                                            <td><input type="file" id="archivo14" name="archivo14[]" multiple accept=".zip, .pdf, .rar"></td>
+                                                            <td>
+                                                                <?php if($PT): ?>
+                                                                <table class="table mb-0">
+                                                                    <tbody>
+                                                                        <?php if(isset($factura) && !empty($factura)): ?>
+                                                                            <tr>
+                                                                                <td>
+                                                                                    <a href="<?= base_url("index.php/Principal/ImprimirPT/".$id_registro."/1") ?>" target="_blank" title="Hoja 1">
+                                                                                        <i class="far fa-file-pdf text-danger fa-2x"></i> PT
+                                                                                    </a>
+                                                                                </td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td>
+                                                                                    <a href="<?= base_url("index.php/Principal/ImprimirPT/".$id_registro."/2") ?>" target="_blank" title="Hoja 2">
+                                                                                        <i class="far fa-file-pdf text-danger fa-2x"></i> Solicitud
+                                                                                    </a>
+                                                                                </td>
+                                                                            </tr>
+                                                                            <?php foreach($factura as $index => $f): ?>
+                                                                                <tr>
+                                                                                    <td>
+                                                                                        <a href="<?= base_url("index.php/Principal/ImprimirPT/".$id_registro."/3/".$index) ?>" target="_blank" title="Hoja 3">
+                                                                                            <i class="far fa-file-pdf text-danger fa-2x"></i> Carátula <?= $index + 1 ?>
+                                                                                        </a>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            <?php endforeach; ?>
+                                                                        <?php else: ?>
+                                                                            <tr>
+                                                                                <td>
+                                                                                    <a href="<?= base_url("index.php/Principal/ImprimirPT/".$id_registro."/1") ?>" target="_blank" title="Hoja 1">
+                                                                                        <i class="far fa-file-pdf text-danger fa-2x"></i> PT
+                                                                                    </a>
+                                                                                </td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td>
+                                                                                    <a href="<?= base_url("index.php/Principal/ImprimirPT/".$id_registro."/2") ?>" target="_blank" title="Hoja 2">
+                                                                                        <i class="far fa-file-pdf text-danger fa-2x"></i> Solicitud
+                                                                                    </a>
+                                                                                </td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td>
+                                                                                    <a href="<?= base_url("index.php/Principal/ImprimirPT/".$id_registro."/3") ?>" target="_blank" title="Hoja 3">
+                                                                                        <i class="far fa-file-pdf text-danger fa-2x"></i> Carátula
+                                                                                    </a>
+                                                                                </td>
+                                                                            </tr>
+                                                                        <?php endif; ?>
+                                                                    </tbody>
+                                                                </table>
+                                                                <?php endif; ?>
+                                                            </td>
                                                         </tr>
                                                     </tbody>
 
