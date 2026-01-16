@@ -860,14 +860,14 @@
                                                                         </div>
                                                                     </li>
                                                                  </a>
-                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/Anexo RM C1 Calendario Anual de Compras.pdf" > 
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/Anexo_RM_C1 Calendario_Anual_de_Compras.pdf" > 
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
                                                                         Calendario Anual de Compras
                                                                         </div>
                                                                     </li>
                                                                  </a>
-                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/Anexo_RM_C2_SOL_INICIO_COMPRA.xlsx" > 
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/Anexo_RMC2_SOL_INICIO_COMPRA.xlsx" > 
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
                                                                         Solicitud inicio de compra
@@ -878,6 +878,13 @@
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
                                                                         Disposiciones CRMySG 2026
+                                                                        </div>
+                                                                    </li>
+                                                                 </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/Exposicion.docx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Exposición de motivos por captura extemporánea
                                                                         </div>
                                                                     </li>
                                                                  </a>
