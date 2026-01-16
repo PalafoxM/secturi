@@ -818,7 +818,14 @@
                                                             </ol>
                                                             <ol class="dd-list">
                                                                  <p class="text-muted mb-4">Coordinación de Recursos Materiales</p>
-                                                                  <a target="_blank" href="<?= base_url()?>assets/documentos/ANEXO_EDOCOMB.xlsx" > 
+                                                                   <a target="_blank" href="<?= base_url()?>assets/documentos/DISPOSICIONES_CRMySG_SECTURI_2026.pdf" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Disposiciones CRMySG 2026
+                                                                        </div>
+                                                                    </li>
+                                                                 </a> 
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/ANEXO_EDOCOMB.xlsx" > 
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
                                                                          Autorización fuera del Estado
@@ -874,13 +881,7 @@
                                                                         </div>
                                                                     </li>
                                                                  </a>
-                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/DISPOSICIONES_CRMySG_SECTURI_2026.pdf" > 
-                                                                    <li class="dd-item" data-id="2">
-                                                                        <div class="dd-handle">
-                                                                        Disposiciones CRMySG 2026
-                                                                        </div>
-                                                                    </li>
-                                                                 </a>
+                                                               
                                                                  <a target="_blank" href="<?= base_url()?>assets/documentos/Exposicion.docx" > 
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
