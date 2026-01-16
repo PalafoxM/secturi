@@ -85,7 +85,7 @@
         </div>
         
          <div  style="position:absolute;  text-align:center; top:75.7%; left:75.1%; width:19%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><?= $usu_sub->dsc_subsecretario?></span>
+            <span class="proxima "><?= ($usu_sub->dsc_subsecretario == 'NO APLICA')?'':$usu_sub->dsc_subsecretario?></span>
         </div>
      
       

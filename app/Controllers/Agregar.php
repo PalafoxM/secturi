@@ -1338,11 +1338,7 @@ class Agregar extends BaseController
             return $this->respond($response);
         }
 
-        if (isset($data['no_reserva']) && empty($data['no_reserva'])) {
-            $response->error = true;
-            $response->respuesta = "Es requerido el no_reserva";
-            return $this->respond($response);
-        }
+
         if (isset($data['fecha_tramite']) && empty($data['fecha_tramite'])) {
             $data['fecha_tramite'] = date('Y-m-d');
         }
@@ -1368,7 +1364,7 @@ class Agregar extends BaseController
             'concepto_gasto' => $data['concepto_gasto'],
             'total_importe' => $data['total_importe'], // Asegúrate de que este total sea correcto
             'comision' => $data['comision'],
-            'no_reserva' => $data['no_reserva'],
+            //'no_reserva' => $data['no_reserva'],
             'lugar' => $data['lugar'],
             'usu_act' => $session->get('id_usuario'),
         ];
@@ -1641,10 +1637,7 @@ class Agregar extends BaseController
             $response->respuesta = "Es requerido el concepto gasto";
             return $this->respond($response);
         }
-        if (isset($data['no_reserva']) && empty($data['no_reserva'])) {
-            $response->respuesta = "Es requerido el no_reserva";
-            return $this->respond($response);
-        }
+
         if (isset($data['fecha_tramite']) && empty($data['fecha_tramite'])) {
             $data['fecha_tramite'] = date('Y-m-d');
         }
@@ -1668,7 +1661,7 @@ class Agregar extends BaseController
             'evidencia_entrega' => (int) $data['evidencia_entrega'],
             'concepto_gasto' => $data['concepto_gasto'],
             'comision' => $data['comision'],
-            'no_reserva' => $data['no_reserva'],
+
             'lugar' => $data['lugar'],
             'usu_act' => $session->get('id_usuario'),
         ];

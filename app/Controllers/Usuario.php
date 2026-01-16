@@ -1485,6 +1485,108 @@ class Usuario extends BaseController
         $writer->save('php://output');
         exit;
     }
+    public function exportarExcelGo()
+    {
+        // 1. Crear el documento
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // 2. Obtener datos de la BD con Query Personalizado
+        $db = \Config\Database::connect();
+        $sql = "SELECT
+                  rg.id_reserva_go,
+                  rg.id_proveedor,
+                  rg.folio             AS folio_interno,
+                  rg.total_importe,
+                  rg.id_estatus,
+                  rg.fec_reg,
+                  rg.no_reserva,
+                  pg.id_presupuesto_go,
+                  pg.id_reserva,
+                  pg.id_proyecto,
+                  pg.id_partida,
+                  pg.importe,
+                  pg.propina,
+                  rg.usu_reg,
+                  cp.proyecto,
+                  cpp.cuenta_cable     AS partida,
+                  cpp.nombre_fondo     AS dsc_partida
+                FROM reserva_go rg
+                JOIN presupuesto_go pg ON rg.id_reserva_go = pg.id_reserva
+                LEFT JOIN cat_proyecto cp ON pg.id_proyecto = cp.id_proyecto
+                LEFT JOIN cat_partida cpp ON pg.id_partida = cpp.id_partida
+                WHERE rg.visible = 1";
+        
+        $query = $db->query($sql);
+        $result = $query->getResult();
+
+        if (empty($result)) {
+            echo "No hay datos para exportar";
+            return;
+        }
+
+        // 3. Encabezados
+        $encabezados = [
+            'id_reserva_go',
+            'id_proveedor',
+            'folio_interno',
+            'total_importe',
+            'id_estatus',
+            'fec_reg',
+            'no_reserva',
+            'id_presupuesto_go',
+            'id_reserva',
+            'id_proyecto',
+            'id_partida',
+            'importe',
+            'propina',
+            'usu_reg',
+            'proyecto',
+            'partida',
+            'dsc_partida'
+        ];
+        
+        $col = 'A';
+        foreach ($encabezados as $titulo) {
+            $sheet->setCellValue($col . '1', $titulo);
+            $col++;
+        }
+
+        // 4. Llenar datos
+        $fila = 2;
+        foreach ($result as $row) {
+            $sheet->setCellValue('A' . $fila, $row->id_reserva_go);
+            $sheet->setCellValue('B' . $fila, $row->id_proveedor);
+            $sheet->setCellValue('C' . $fila, $row->folio_interno);
+            $sheet->setCellValue('D' . $fila, $row->total_importe);
+            $sheet->setCellValue('E' . $fila, $row->id_estatus);
+            $sheet->setCellValue('F' . $fila, $row->fec_reg);
+            $sheet->setCellValue('G' . $fila, $row->no_reserva);
+            $sheet->setCellValue('H' . $fila, $row->id_presupuesto_go);
+            $sheet->setCellValue('I' . $fila, $row->id_reserva);
+            $sheet->setCellValue('J' . $fila, $row->id_proyecto);
+            $sheet->setCellValue('K' . $fila, $row->id_partida);
+            $sheet->setCellValue('L' . $fila, $row->importe);
+            $sheet->setCellValue('M' . $fila, $row->propina);
+            $sheet->setCellValue('N' . $fila, $row->usu_reg);
+            $sheet->setCellValue('O' . $fila, $row->proyecto);
+            $sheet->setCellValue('P' . $fila, $row->partida);
+            $sheet->setCellValue('Q' . $fila, $row->dsc_partida);
+            $fila++;
+        }
+
+        // 5. Descargar archivo
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'reserva_detalle_' . date('Ymd_His') . '.xlsx';
+
+        // Enviar headers
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$fileName\"");
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        exit;
+    }
     public function Descarga()
     {
         $session = \Config\Services::session();

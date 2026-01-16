@@ -36,7 +36,7 @@
                                     
                                         <div class="card-body">
                                             <?php if(in_array($session->get('id_perfil'),[1,2])): ?>
-                                            <a href="<?php echo base_url().'index.php/Usuario/exportarExcel'?>" class="btn btn-primary mb-3">
+                                            <a href="<?php echo base_url().'index.php/Usuario/exportarExcelGo'?>" class="btn btn-primary mb-3">
                                                 Descargar Excel
                                             </a>
                                             <br>
