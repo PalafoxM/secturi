@@ -1197,6 +1197,7 @@ class Principal extends BaseController
             "total_importe" => $data['total_importe'],
             "fec_reg" => $hoy,
             "usu_reg" => $session->get('id_usuario'),
+            "id_estatus" => 3,
             "folio" => $folio
         ];
 
@@ -2055,7 +2056,7 @@ class Principal extends BaseController
         $email = \Config\Services::email();
         $result = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_tipo_empleado' => 1]])->data;
 
-       $email->setTo([
+       /*$email->setTo([
             'agascag@guanajuato.gob.mx',
             'ccampos@guanajuato.gob.mx',
             'sandag@guanajuato.gob.mx',
@@ -2069,9 +2070,9 @@ class Principal extends BaseController
             'mvallejo@guanajuato.gob.mx',
             'rgonzalezgu@guanajuato.gob.mx',
             'yjimenez@guanajuato.gob.mx',
-        ]);
+        ]);*/
  
-              /*  $email->setTo([
+                $email->setTo([
                     'alopez@guanajuato.gob.mx',
                     'cchernandezp@guanajuato.gob.mx',
                     'csoto@guanajuato.gob.mx',
@@ -2116,7 +2117,7 @@ class Principal extends BaseController
                     'rantonio@guanajuato.gob.mx',
                     'alvarezp@guanajuato.gob.mx',
                     'jrodriguezgo@guanajuato.gob.mx',
-                ]);  */
+                ]);  
         $email->setSubject('Recordatorio: Revisión de Asistencias - Sistema SUSI');
         $email->setMessage('
             <!DOCTYPE html>
@@ -2149,9 +2150,9 @@ class Principal extends BaseController
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Estimado personal,</p>
                         
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-                            En caso de que aún no hayas realizado las <strong>justificaciones de su personal correspondientes a la quincena 24/2025</strong>, 
-                            la cual comprende el periodo del <strong>16 al 31 de diciembre de 2025</strong>, 
-                            tienes hasta el día <strong> miercoles 14 de enero hasta las 16:00 hrs</strong> para realizarlas.
+                            En caso de que aún no hayas realizado las <strong>justificaciones correspondientes a la quincena 01/2026</strong>, 
+                            la cual comprende el periodo del <strong>01 al 15 de enero de 2026</strong>, 
+                            tienes hasta el día <strong>viernes 23 de enero hasta las 16:00 hrs</strong> para realizarlas.
                         </p>
 
                         <div class="highlight-box">
@@ -2163,7 +2164,7 @@ class Principal extends BaseController
                         </div>
 
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
-                            Le invitamos a revisar y validar sus incidencias de su personal correspondientes en el sistema SUSI.
+                            Le invitamos a revisar y validar sus incidencias correspondientes en el sistema SUSI.
                         </p>
 
                         <div style="text-align: center; margin: 30px 0;">
