@@ -3202,6 +3202,22 @@ class Principal extends BaseController
             $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load(FCPATH . 'assets/documentos/Anexo1_Reporte_d_ integracion_documental_2026.xlsx');
             $sheet = $spreadsheet->getActiveSheet();
 
+            // Insertar Logo
+            $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
+            $drawing->setName('Logo');
+            $drawing->setDescription('Logo');
+            $drawing->setPath(FCPATH . 'assets/logo2.jpg'); // Ruta al logo en assets
+            $drawing->setHeight(140); 
+            //$drawing->setWidth(200);
+            $drawing->setCoordinates('A1');
+            $drawing->setOffsetX(20);
+            $drawing->setWorksheet($sheet);
+
+            // set background color
+            $sheet->getStyle('A1:E6')->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFFFFFFF');
+
             // Populate Excel Cells
             // Header Data
             $sheet->setCellValue('H7', date('d/m/Y', strtotime($data['registro']->fecha_tramite)));
@@ -3441,6 +3457,22 @@ class Principal extends BaseController
         if ($id_archivo == 1) {
             $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load(FCPATH . 'assets/documentos/Anexo1_Reporte_d_ integracion_documental_2026.xlsx');
             $sheet = $spreadsheet->getActiveSheet();
+
+            // Insertar Logo
+            $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
+            $drawing->setName('Logo');
+            $drawing->setDescription('Logo');
+            $drawing->setPath(FCPATH . 'assets/logo2.jpg'); // Ruta al logo en assets
+            $drawing->setHeight(140); 
+            $drawing->setWidth(200);
+            $drawing->setCoordinates('A1');
+            $drawing->setOffsetX(20);
+            $drawing->setWorksheet($sheet);
+
+             // set background color
+             $sheet->getStyle('A1:E6')->getFill()
+             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+             ->getStartColor()->setARGB('FFFFFFFF');
            // die(var_dump($spreadsheet));
             // Populate Excel Cells
             // Header Data
