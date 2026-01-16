@@ -1398,7 +1398,7 @@ class Agregar extends BaseController
                         'encabezado' => $tabla['encabezado'], // Dato de la tabla
                         'id_presupuesto' => $tabla['id_presupuesto'], // Dato de la tabla
                         // 'importe'        => str_replace(['$', ','], '', $fila['importe']), // Limpiamos el importe
-                        'propina' => str_replace(['$', ','], '', $fila['propina']), // Limpiamos la propina
+                        'propina' => (!empty($fila['propina'])) ? str_replace(['$', ','], '', $fila['propina']) : 0, // Limpiamos la propina
                         'periodo_inicio' => $fila['periodo_inicio'],
                         'periodo_fin' => $fila['periodo_fin'],
                         'id_identificador' => $identificador_fila_unica, // EL ENLACE CLAVE (debe ser VARCHAR)
@@ -1784,7 +1784,7 @@ class Agregar extends BaseController
                     'id_registro_go' => $id_registro_go,
                     'encabezado' => $tabla['encabezado'],
                     'id_presupuesto' => $tabla['id_presupuesto'],
-                    'propina' => str_replace(['$', ','], '', $fila['propina']),
+                    'propina' => (!empty($fila['propina'])) ? str_replace(['$', ','], '', $fila['propina']) : 0,
                     'periodo_inicio' => $fila['periodo_inicio'],
                     'periodo_fin' => $fila['periodo_fin'],
                     'usu_reg' => $session->get('id_usuario')

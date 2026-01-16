@@ -1491,34 +1491,8 @@ class Usuario extends BaseController
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        // 2. Obtener datos de la BD con Query Personalizado
-        $db = \Config\Database::connect();
-        $sql = "SELECT
-                  rg.id_reserva_go,
-                  rg.id_proveedor,
-                  rg.folio             AS folio_interno,
-                  rg.total_importe,
-                  rg.id_estatus,
-                  rg.fec_reg,
-                  rg.no_reserva,
-                  pg.id_presupuesto_go,
-                  pg.id_reserva,
-                  pg.id_proyecto,
-                  pg.id_partida,
-                  pg.importe,
-                  pg.propina,
-                  rg.usu_reg,
-                  cp.proyecto,
-                  cpp.cuenta_cable     AS partida,
-                  cpp.nombre_fondo     AS dsc_partida
-                FROM reserva_go rg
-                JOIN presupuesto_go pg ON rg.id_reserva_go = pg.id_reserva
-                LEFT JOIN cat_proyecto cp ON pg.id_proyecto = cp.id_proyecto
-                LEFT JOIN cat_partida cpp ON pg.id_partida = cpp.id_partida
-                WHERE rg.visible = 1";
-        
-        $query = $db->query($sql);
-        $result = $query->getResult();
+        $globals = new Mglobal();
+        $result = $globals->getTabla(['tabla' => 'vw_reserva_go', 'where' => ['visible' => 1]]);
 
         if (empty($result)) {
             echo "No hay datos para exportar";
@@ -1534,13 +1508,13 @@ class Usuario extends BaseController
             'id_estatus',
             'fec_reg',
             'no_reserva',
-            'id_presupuesto_go',
-            'id_reserva',
-            'id_proyecto',
-            'id_partida',
+            // 'id_presupuesto_go',
+            // 'id_reserva',
+            // 'id_proyecto',
+            // 'id_partida',
             'importe',
             'propina',
-            'usu_reg',
+            // 'usu_reg',
             'proyecto',
             'partida',
             'dsc_partida'
@@ -1553,8 +1527,9 @@ class Usuario extends BaseController
         }
 
         // 4. Llenar datos
+        //die( var_dump($result) );
         $fila = 2;
-        foreach ($result as $row) {
+        foreach ($result->data as $row) {
             $sheet->setCellValue('A' . $fila, $row->id_reserva_go);
             $sheet->setCellValue('B' . $fila, $row->id_proveedor);
             $sheet->setCellValue('C' . $fila, $row->folio_interno);
@@ -1562,16 +1537,14 @@ class Usuario extends BaseController
             $sheet->setCellValue('E' . $fila, $row->id_estatus);
             $sheet->setCellValue('F' . $fila, $row->fec_reg);
             $sheet->setCellValue('G' . $fila, $row->no_reserva);
-            $sheet->setCellValue('H' . $fila, $row->id_presupuesto_go);
-            $sheet->setCellValue('I' . $fila, $row->id_reserva);
-            $sheet->setCellValue('J' . $fila, $row->id_proyecto);
-            $sheet->setCellValue('K' . $fila, $row->id_partida);
-            $sheet->setCellValue('L' . $fila, $row->importe);
-            $sheet->setCellValue('M' . $fila, $row->propina);
-            $sheet->setCellValue('N' . $fila, $row->usu_reg);
-            $sheet->setCellValue('O' . $fila, $row->proyecto);
-            $sheet->setCellValue('P' . $fila, $row->partida);
-            $sheet->setCellValue('Q' . $fila, $row->dsc_partida);
+            
+            // Re-mapeo de columnas tras eliminar las solicitadas
+            $sheet->setCellValue('H' . $fila, $row->importe);
+            $sheet->setCellValue('I' . $fila, $row->propina);
+            $sheet->setCellValue('J' . $fila, $row->proyecto);
+            $sheet->setCellValue('K' . $fila, $row->partida);
+            $sheet->setCellValue('L' . $fila, $row->dsc_partida);
+            
             $fila++;
         }
 
