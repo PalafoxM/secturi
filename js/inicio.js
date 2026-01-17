@@ -1733,7 +1733,8 @@ ini.inicio = (function () {
                         } else {
                             Swal.fire("Correcto", response.respuesta, "success");
                             setTimeout(() => {
-                                window.location.href = base_url + "index.php/Principal/listaReservaGO";
+                                //window.location.href = base_url + "index.php/Principal/listaReservaGO" ;
+                                window.location.href = base_url + "index.php/Principal/generarTramitePagoGo/" + response.idRegistro;
 
                             }, 1000);
 

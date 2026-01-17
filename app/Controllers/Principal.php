@@ -1248,6 +1248,7 @@ class Principal extends BaseController
                 if (!$res->error) {
                     $response->error = $res->error;
                     $response->respuesta = $res->respuesta;
+                    $response->idRegistro = $id_reserva;
 
                 }
             }
