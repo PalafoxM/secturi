@@ -3206,11 +3206,11 @@ class Principal extends BaseController
             $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
             $drawing->setName('Logo');
             $drawing->setDescription('Logo');
-            $drawing->setPath(FCPATH . 'assets/logo2.jpg'); // Ruta al logo en assets
+            $drawing->setPath(FCPATH . 'assets/logo3.png'); // Ruta al logo en assets
             $drawing->setHeight(140); 
             //$drawing->setWidth(200);
             $drawing->setCoordinates('A1');
-            $drawing->setOffsetX(20);
+            $drawing->setOffsetX(10);
             $drawing->setWorksheet($sheet);
 
             // set background color
@@ -3228,17 +3228,19 @@ class Principal extends BaseController
             // 02_Póliza
             //die( var_dump($data['registro']) );
             $sheet->setCellValue('B15', ($data['registro']->poliza == 1) ? 'Si' : 'No'); 
-            $sheet->setCellValue('B17',  'Si'); 
+            $sheet->setCellValue('B17',  'No'); 
             
             // 14_Otros
             $sheet->setCellValue('F19', 'Si');
-            $sheet->setCellValue('D32', 'Si');
-
-            $sheet->setCellValue('D33', 'Si');
-            $sheet->setCellValue('D34', 'Si');
+            $sheet->setCellValue('B16', 'Si');
+            $sheet->setCellValue('F14', 'Si');
+            $sheet->setCellValue('F15', 'Si');
+            $sheet->setCellValue('F16', 'Si');
+            $sheet->setCellValue('F17', 'Si');
+            
 
             // Footer / Payment Data
-            $sheet->setCellValue('B24', isset($data['registro']->dsc_proveedor) ? $data['registro']->dsc_proveedor : '');
+    /*         $sheet->setCellValue('B24', isset($data['registro']->dsc_proveedor) ? $data['registro']->dsc_proveedor : '');
             //die( var_dump($data['presupuesto']) );
             // Partida Presupuestal
             $arrPartida = [];
@@ -3250,8 +3252,8 @@ class Principal extends BaseController
                 $arrPartida[] = $data['presupuesto']->dsc_partida;
             }
             $sheet->setCellValue('H24', implode(', ', $arrPartida));
-
-            $sheet->setCellValue('B25', isset($data['registro']->concepto_pago) ? $data['registro']->concepto_pago : '');
+ */
+         /*    $sheet->setCellValue('B25', isset($data['registro']->concepto_pago) ? $data['registro']->concepto_pago : '');
             
             // Contrato o convenio No.
             $noConvenio = isset($data['presupuesto'][0]->no_convenio) ? $data['presupuesto'][0]->no_convenio : '';
@@ -3267,13 +3269,13 @@ class Principal extends BaseController
                     $arrUuid[] = $val;
                     $sumaTotal += (float)(is_object($u) ? $u->total : 0);
                 }
-            }
-            $sheet->setCellValue('B26', implode(', ', $arrUuid));
+            } */
+           // $sheet->setCellValue('B26', implode(', ', $arrUuid));
             
             // Importe Total
-             $fn = new \App\Libraries\Funciones();
-             $importeTexto = '$' . number_format($sumaTotal, 2) . ' ' . $fn->numeroALetras($sumaTotal);
-             $sheet->setCellValue('B27', $importeTexto);
+             //$fn = new \App\Libraries\Funciones();
+             //$importeTexto = '$' . number_format($sumaTotal, 2) . ' ' . $fn->numeroALetras($sumaTotal);
+           //  $sheet->setCellValue('B27', $importeTexto);
 
 
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -3459,14 +3461,14 @@ class Principal extends BaseController
             $sheet = $spreadsheet->getActiveSheet();
 
             // Insertar Logo
-            $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
+                  $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
             $drawing->setName('Logo');
             $drawing->setDescription('Logo');
-            $drawing->setPath(FCPATH . 'assets/logo2.jpg'); // Ruta al logo en assets
+            $drawing->setPath(FCPATH . 'assets/logo3.png'); // Ruta al logo en assets
             $drawing->setHeight(140); 
-            $drawing->setWidth(200);
+            //$drawing->setWidth(200);
             $drawing->setCoordinates('A1');
-            $drawing->setOffsetX(20);
+            $drawing->setOffsetX(10);
             $drawing->setWorksheet($sheet);
 
              // set background color
