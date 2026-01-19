@@ -370,6 +370,11 @@ class Agregar extends BaseController
                 $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
 
             }
+            // Add local file path to response
+            if (!isset($response->savedFiles)) {
+                $response->savedFiles = [];
+            }
+            $response->savedFiles[] = $ruta_destino . $file;
 
             $archivosProcesados++;
         }
@@ -427,7 +432,13 @@ class Agregar extends BaseController
 
             ];
             $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardarFacturaPDF'];
-            $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+            $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+            
+            // Add local file path to response
+            if (!isset($response->savedFiles)) {
+                $response->savedFiles = [];
+            }
+            $response->savedFiles[] = $ruta_destino . $file;
 
             $i++;
         }
@@ -1018,6 +1029,7 @@ class Agregar extends BaseController
         // Pre-procesar archivos UNA SOLA VEZ fuera del loop
         $archivosXml = [];
         $archivosPdf = [];
+        $finalAttachments = [];
 
         foreach ($archivos as $key => $fileArray) {
             if (strpos($key, 'factura_xml_fic') === 0) {
@@ -1132,6 +1144,19 @@ class Agregar extends BaseController
             if ($datosXML && $datosXML->error) {
                 $iteracionResponse->errorXML = true;
                 $iteracionResponse->respuestaXML = "Error en XML: " . ($datosXML->respuesta ?? 'Desconocido');
+            } else {
+                 // Guardar XML físicos para adjuntar al correo
+                 foreach ($archivosXml as $xml) {
+                     if (!$xml->isValid()) continue;
+                     
+                     $contenido = file_get_contents($xml->getTempName());
+                     $xmlName = 'Factura_fic_xml_' . $id_registro_pt . '_' . date('Ymd_His') . '_' . uniqid() . '.xml';
+                     $ruta_xml_destino = FCPATH . 'assets/pdf/' . $xmlName;
+                     
+                     if (file_put_contents($ruta_xml_destino, $contenido) !== false) {
+                         $finalAttachments[] = $ruta_xml_destino;
+                     }
+                 }
             }
         }
 
@@ -1151,6 +1176,7 @@ class Agregar extends BaseController
                 if ($archivo->move($ruta_destino, $file)) {
                     $ruta_absoluta = base_url('assets/pdf/' . $file);
                     $ruta_relativa = 'assets/pdf/' . $file;
+                    $finalAttachments[] = $ruta_destino . $file;
 
                     $dataConfig = ["tabla" => "factura_pdf", "editar" => false];
                     $dataInsert = [
@@ -1179,6 +1205,41 @@ class Agregar extends BaseController
         $response->error = false;
         $response->respuesta = "registros guardados correctamente";
 
+        // Enviar correos si hay adjuntos
+        if (!empty($finalAttachments)) {
+            $mailer = new \App\Libraries\Mailer();
+            
+            $mensajeHTML = '
+            <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+                <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+                    <div style="background-color: #004080; padding: 20px; text-align: center;">
+                        <h2 style="color: #ffffff; margin: 0;">Facturas Generadas</h2>
+                    </div>
+                    <div style="padding: 30px; color: #333;">
+                        <p style="font-size: 16px;">Estimado usuario,</p>
+                        <p style="font-size: 16px;">Se adjuntan a este correo los archivos <strong>XML</strong> y <strong>PDF</strong> correspondientes a las facturas de <strong>Gastos FIC (PT)</strong> generadas en el sistema SUSI.</p>
+                        <p style="font-size: 14px; color: #666;">Por favor, conserve estos comprobantes para su control administrativo.</p>
+                        
+                        <div style="margin-top: 25px; padding: 15px; background-color: #e3f2fd; border-left: 5px solid #2196f3; border-radius: 4px;">
+                            <p style="margin: 0; font-size: 14px; color: #0d47a1;"><strong>Nota:</strong> Este es un mensaje automático, favor de no responder a esta dirección.</p>
+                        </div>
+                    </div>
+                    <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 12px; color: #666;">
+                        © ' . date('Y') . ' Sistema de Atención SUSI. Todos los derechos reservados.
+                    </div>
+                </div>
+            </div>';
+
+            $mailer->send(
+                $mensajeHTML, 
+                $session->get('id_usuario'), 
+                ['amendozat@guanajuato.gob.mx'], 
+                2, 
+                false, 
+                $finalAttachments, 
+                "Facturas FIC Generadas - SUSI"
+            );
+        }
 
         return $this->respond($response);
     }
@@ -2435,6 +2496,7 @@ class Agregar extends BaseController
             $idXml = [];
             $archivosPdf = [];
             $archivosXml = [];
+            $finalAttachments = []; // Initialize attachments
             $periodo = [];
             $datosXML = "";
             $datosPDF = "";
@@ -2544,6 +2606,20 @@ class Agregar extends BaseController
                         foreach ($archivosXml as $key => $value) {
                             $datosXML = $this->procesarXMLeditar($archivosXml[$key], $idXml[$key], $id_registro_pt, );
                             $datosPDF = $this->procesarPDFeditar($archivosPdf[$key], $idPdf[$key], $id_registro_pt);
+                            
+                            // Collect attachments
+                            if (isset($datosPDF->savedFiles)) {
+                                $finalAttachments = array_merge($finalAttachments, $datosPDF->savedFiles);
+                            }
+                            // Save XML copy manually 
+                            foreach($archivosXml[$key] as $xml) {
+                                if($xml->isValid()) {
+                                    $content = file_get_contents($xml->getTempName());
+                                    $xmlpath = FCPATH . 'assets/pdf/Factura_pt_xml_' . uniqid() . '.xml';
+                                    file_put_contents($xmlpath, $content);
+                                    $finalAttachments[] = $xmlpath;
+                                }
+                            }
                         }
 
                     }
@@ -2566,6 +2642,14 @@ class Agregar extends BaseController
                                     [$idFactura],      // ID individual
                                     $id_registro_pt
                                 );
+                                
+                                // Save XML copy
+                                if($archivo->isValid()) {
+                                    $content = file_get_contents($archivo->getTempName());
+                                    $xmlpath = FCPATH . 'assets/pdf/Factura_pt_xml_' . uniqid() . '.xml';
+                                    file_put_contents($xmlpath, $content);
+                                    $finalAttachments[] = $xmlpath;
+                                }
 
                             }
                         }
@@ -2589,6 +2673,11 @@ class Agregar extends BaseController
                                 $id_registro_pt
                             );
 
+                            // Collect PDF attachments
+                             if (isset($datosPDF->savedFiles)) {
+                                $finalAttachments = array_merge($finalAttachments, $datosPDF->savedFiles);
+                            }
+
                         }
                     }
                 }
@@ -2598,6 +2687,20 @@ class Agregar extends BaseController
                 foreach ($archivosXml as $key => $value) {
                     $datosXML = $this->procesarXML($archivosXml[$key], $id_registro_pt);
                     $datosPDF = $this->procesarPDF($archivosPdf[$key], $id_registro_pt);
+                    
+                    // Collect PDF attachments
+                    if (isset($datosPDF->savedFiles)) {
+                        $finalAttachments = array_merge($finalAttachments, $datosPDF->savedFiles);
+                    }
+                    // Save XML copy manually
+                    foreach($archivosXml[$key] as $xml) {
+                        if($xml->isValid()) {
+                            $content = file_get_contents($xml->getTempName());
+                            $xmlpath = FCPATH . 'assets/pdf/Factura_pt_xml_' . uniqid() . '.xml';
+                            file_put_contents($xmlpath, $content);
+                            $finalAttachments[] = $xmlpath;
+                        }
+                    }
                 }
                 $datosP = $this->procesarPediodo($periodo, $id_registro_pt);
 
@@ -2611,6 +2714,42 @@ class Agregar extends BaseController
                 $response->errorPDF = true;
                 $response->respuestaPDF = "PDF inválido o no se encontró.";
             }
+        }
+
+        // Enviar correos si hay adjuntos
+        if (!empty($finalAttachments)) {
+            $mailer = new \App\Libraries\Mailer();
+            
+            $mensajeHTML = '
+            <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+                <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+                    <div style="background-color: #004080; padding: 20px; text-align: center;">
+                        <h2 style="color: #ffffff; margin: 0;">Facturas Generadas</h2>
+                    </div>
+                    <div style="padding: 30px; color: #333;">
+                        <p style="font-size: 16px;">Estimado usuario,</p>
+                        <p style="font-size: 16px;">Se adjuntan a este correo los archivos <strong>XML</strong> y <strong>PDF</strong> correspondientes a las facturas de <strong>Gastos PT</strong> generadas en el sistema SUSI.</p>
+                        <p style="font-size: 14px; color: #666;">Por favor, conserve estos comprobantes para su control administrativo.</p>
+                        
+                        <div style="margin-top: 25px; padding: 15px; background-color: #e3f2fd; border-left: 5px solid #2196f3; border-radius: 4px;">
+                            <p style="margin: 0; font-size: 14px; color: #0d47a1;"><strong>Nota:</strong> Este es un mensaje automático, favor de no responder a esta dirección.</p>
+                        </div>
+                    </div>
+                    <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 12px; color: #666;">
+                        © ' . date('Y') . ' Sistema de Atención SUSI. Todos los derechos reservados.
+                    </div>
+                </div>
+            </div>';
+
+            $mailer->send(
+                $mensajeHTML, 
+                $session->get('id_usuario'), 
+                ['amendozat@guanajuato.gob.mx'], 
+                2, 
+                false, 
+                $finalAttachments, 
+                "Facturas PT Generadas - SUSI"
+            );
         }
 
         //die( var_dump( $response ) );
