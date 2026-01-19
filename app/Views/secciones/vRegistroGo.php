@@ -38,7 +38,7 @@
                                     <div class="col-md-4 mb-3">
                                         <label for="direccion_responsable">Dirección Responsable <span
                                                 class="text-danger">*</span></label>
-                                        <select class="form-control" id="direccion_responsable"
+                                        <select class="form-control select2" id="direccion_responsable"
                                             name="direccion_responsable" required>
                                             <?php foreach ($cat_area as $a): ?>
                                                 <option value="<?= $a->id_area ?>" <?php echo ($a->id_area == $usuario->id_area) ? 'selected' : ''; ?>>
@@ -61,7 +61,7 @@
                                     <div class="col-md-4 mb-3">
                                         <label for="reponsable_solicitud">Responsable de la Solicitud <span
                                                 style="color:red;">*</span></label>
-                                        <select name="id_reponsable_solicitud" class="form-control" required>
+                                        <select name="id_reponsable_solicitud" class="form-control select2" required>
                                             <?php foreach ($cat_usuario as $u): ?>
                                                 <?php
                                                 // Determina el valor que debe quedar seleccionado
@@ -92,7 +92,7 @@
                                     </div><!--end col-->
                                     <div class="col-md-4 mb-3">
                                         <label for="secretario">Secretario(a) o Director(a) que autoriza</label>
-                                        <select type="text" class="form-control" id="secretario"
+                                        <select type="text" class="form-control select2" id="secretario"
                                             placeholder="Secretario/a" name="secretario">
                                             <option value="0" selected>Seleccione una opcion</option>
                                             <?php foreach ($secretario as $s): ?>

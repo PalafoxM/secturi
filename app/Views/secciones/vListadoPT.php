@@ -142,10 +142,10 @@
                                                               <div class="form-group">
                                                                     <label for="banco">Banco</label>
                                                                      <?php if(isset($PT) && !empty($PT)): ?>
-                                                                   <select class="form-control" id="banco"></select>
+                                                                   <select class="form-control select2" id="banco"></select>
                                                                     <?php endif; ?>
                                                                      <?php if(isset($GO) && !empty($GO)): ?>
-                                                                      <input type="text" class="form-control" id="banco_go" name="banco_go" value="1109434000" readonly>
+                                                                      <input type="text" class="form-control select2" id="banco_go" name="banco_go" value="1109434000" readonly>
                                                                     <?php endif; ?>
                                                                     
                                                                 </div>
