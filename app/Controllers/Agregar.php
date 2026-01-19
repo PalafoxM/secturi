@@ -1241,7 +1241,7 @@ class Agregar extends BaseController
             );
         }
 
-        return $this->respond($response);
+        //return $this->respond($response);
     }
     public function guardaGO()
     {

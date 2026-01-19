@@ -57,7 +57,8 @@ class Mailer {
                 $body,
                 $recipients,
                 $attachments,
-                $header
+                $header,
+                $footer
             );
 
         //boletin
@@ -144,7 +145,7 @@ class Mailer {
         }       
     }
 
-    private function custom_template($title, $name, $body, $recipients, $attachments, $header)
+    private function custom_template($title, $name, $body, $recipients, $attachments, $header, $footer)
     {
         $title = ($title) ? $title : "Notificaciones DTIC";
         $name  = ($name) ? $name : "Notificaciones DTIC";
