@@ -222,7 +222,7 @@
    CONCEPTO DEL PAGO:
 </div>
  <div id="concepto_respuesta">
-   <span> &nbsp;<?= ($registro->concepto_pago); ?>  </span>
+   <span> &nbsp;<?= ($encabezado)?$encabezado:''; ?>  </span>
 </div>
 <div id="partida">
    PARTIDA:

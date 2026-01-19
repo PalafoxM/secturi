@@ -4734,6 +4734,7 @@ class Principal extends BaseController
                                     $data['importePartida'] = $facturaItem->total;
                                     $data['inicio'] = $p->periodo_inicio;
                                     $data['fin']    = $p->periodo_fin;
+                                    $data['encabezado'] = $p->encabezado;
                                     $monto          = (int)$facturaItem->total + (int)$p->propina;
                                     $data['total2']  = $monto;
                                     $data['monto2']  = $this->numeroEnLetras($monto);
@@ -4743,6 +4744,7 @@ class Principal extends BaseController
                                     $data['importePartida'] = '';
                                     $data['inicio'] = '';
                                     $data['fin']    = '';
+                                    $data['encabezado'] = '';
                                     $data['total2']  = '';
                                     $data['monto2']  = '';
                                 };
