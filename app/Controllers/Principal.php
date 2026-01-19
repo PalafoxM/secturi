@@ -4506,14 +4506,14 @@ class Principal extends BaseController
         ]);
         
         $importe = '';
-         //var_dump( $periodo_factura );
+        // var_dump( $periodo_factura );
         if(isset($periodo_factura->data) && !empty($periodo_factura->data)){
 
             $presupuestoGO = $globals->getTabla([
                     'tabla' => 'vw_periodo_factura_go',
                     'where' => ['visible' => 1, 'id_reserva' => $periodo_factura->data[0]->id_reserva_go]
             ]);
-          
+        // die( var_dump(   $presupuestoGO ) );
             if(isset($presupuestoGO) && !empty($presupuestoGO)){
 
                
@@ -4692,15 +4692,16 @@ class Principal extends BaseController
                     'tabla' => 'xml_go',
                     'where' => ['visible' => 1, 'id_registro_go' => $id_pt]
             ])->data;
-
+         
             if ($index !== null && isset($xml_go[$index])) {
                 $xml_go = [$index => $xml_go[$index]];
             }
-
+              
             if (!empty($xml_go)) {
    
                     foreach ($xml_go as $index => $facturaItem) {
-                    // die( var_dump( $presupuestoGO ) );
+                       // var_dump($xml_go);
+               // die( var_dump( $presupuestoGO ) );
                          // $data['partida'] =  $presupuestoGO->data[$index]->dsc_partida;
                           $importe_str     =  $facturaItem->total;
                           $data['total']     =  $facturaItem->total;

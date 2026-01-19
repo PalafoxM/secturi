@@ -22,7 +22,19 @@
      
         
         <?php $i = 27.5;  ?>
-        <?php foreach($presupuestoGO as $r): ?>
+        <?php 
+           $total_p = count($presupuestoGO);
+           $total_i = count($importe);
+           $iteraciones = ($total_p == 1 && $total_i > 1) ? $importe : $presupuestoGO;
+        ?>
+        <?php foreach($iteraciones as $k => $v): ?>
+            <?php 
+               if ($total_p == 1 && $total_i > 1) {
+                   $r = $presupuestoGO[0];
+               } else {
+                   $r = $v;
+               }
+            ?>
          <div  style="position:absolute; text-align:center; top:<?=$i?>%; left:22%; width:10%; background-color:white; font-size: 10px;  height:12px;">
             <span class="proxima "><?= $r->dsc_partida ?></span>
         </div>
