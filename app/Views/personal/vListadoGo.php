@@ -14,10 +14,10 @@
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="javascript:void(0);">SUSI</a></li>
                                 <li class="breadcrumb-item"><a href="javascript:void(0);">lista PT</a></li>
-                                <li class="breadcrumb-item active">PT</li>
+                                <li class="breadcrumb-item active">GO</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Lista PT</h4>
+                        <h4 class="page-title">Lista GO </h4>
 
                     </div>
                     <!--end page-title-box-->
@@ -67,12 +67,10 @@
                                                 <a class="btn btn-outline-info btn-round" href="<?php echo base_url().'index.php/Inicio/Viaticos/'.$e->id_registro_go?>"  ><i
                                                         class="mdi mdi-check text-success font-18"></i></a> 
                                                 <?php endif; ?>
-                                                <?php if($session->get('id_perfil') != 7): ?>
+                              
                                                 <a href="<?php echo base_url().'index.php/Principal/editarTramitePagoGo/'.$e->id_registro_go.'/GO' ?>" >
                                                    <button type="button" class="btn btn-outline-success btn-round">                       
                                                     <i class="mdi mdi-border-color font-18"></i></button></a>
-                                                <?php endif; ?>
-                                         
                                               
                                             </td>
                                         </tr>
