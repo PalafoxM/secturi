@@ -1428,7 +1428,7 @@ class Agregar extends BaseController
             'comision' => $data['comision'],
             //'no_reserva' => $data['no_reserva'],
             'lugar' => $data['lugar'],
-            'usu_act' => $session->get('id_usuario'),
+            'usu_reg' => $session->get('id_usuario'),
         ];
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaTurno'];
 
