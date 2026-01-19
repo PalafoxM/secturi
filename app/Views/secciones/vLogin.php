@@ -34,7 +34,7 @@
                                 <p class="text-muted mb-0">SISTEMA UNIFICADO SECTURI</p>
                             </div>  -->
                             <!--end auth-logo-text-->
-                              <div class="form-horizontal auth-form my-4">
+  <!--                            <div class="form-horizontal auth-form my-4">
 
                                <div class="form-group">
                                     <label for="usuario">Persona Usuaria</label>
@@ -55,7 +55,7 @@
                                       </span>
                                       <input type="password" class="form-control" id="contrasenia" name="contrasenia" placeholder="Ingresar Contraseña">
                                     </div>
-                                </div>   
+                                </div>   -->
                        
 
                          <!--        <div class="form-group row mt-4">
@@ -81,9 +81,9 @@
                                         <button
                                             class="btn btn-gradient-primary btn-round btn-block waves-effect waves-light"
                                             onclick="iniciarGoogle();" type="button">Ingresar a SUSI con Google <i class="fab fa-google google mr-2"></i></button>
-                                          <button
+                                       <!--   <button
                                             class="btn btn-gradient-primary btn-round btn-block waves-effect waves-light"
-                                            onclick="saeg.principal.login();" type="button">Ingresar con Google <i class="fab fa-google google mr-2"></i></button> 
+                                            onclick="saeg.principal.login();" type="button">Ingresar con Google <i class="fab fa-google google mr-2"></i></button>  -->
 
                                     </div>
                                     <!--end col-->
