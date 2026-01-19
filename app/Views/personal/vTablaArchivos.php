@@ -261,14 +261,14 @@
                                                                             <tr>
                                                                                 <td>
                                                                                     <a href="<?= base_url("index.php/Principal/ImprimirGO/".$id_registro."/1") ?>" target="_blank" title="Hoja 1">
-                                                                                        <i class="far fa-file-pdf text-danger fa-2x"></i> PT
+                                                                                        <i class="far fa-file-pdf text-danger fa-2x"></i> Carátula de pago
                                                                                     </a>
                                                                                 </td>
                                                                             </tr>
                                                                             <tr>
                                                                                 <td>
                                                                                     <a href="<?= base_url("index.php/Principal/ImprimirGO/".$id_registro."/2") ?>" target="_blank" title="Hoja 2">
-                                                                                        <i class="far fa-file-pdf text-danger fa-2x"></i> Solicitud
+                                                                                        <i class="far fa-file-pdf text-danger fa-2x"></i> Oficio de liberación de pago
                                                                                     </a>
                                                                                 </td>
                                                                             </tr>
@@ -276,7 +276,7 @@
                                                                                 <tr>
                                                                                     <td>
                                                                                         <a href="<?= base_url("index.php/Principal/ImprimirGO/".$id_registro."/3/".$index) ?>" target="_blank" title="Hoja 3">
-                                                                                            <i class="far fa-file-pdf text-danger fa-2x"></i> Carátula <?= $index + 1 ?>
+                                                                                            <i class="far fa-file-pdf text-danger fa-2x"></i> CFDI con encabezado <?= $index + 1 ?>
                                                                                         </a>
                                                                                     </td>
                                                                                 </tr>
