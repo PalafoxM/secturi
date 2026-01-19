@@ -931,7 +931,7 @@ class Principal extends BaseController
         $hoy = date("Y-m-d H:i:s");
         $dataInsert = [
             "total_importe" => $data['total_importe'],
-            "id_estatus" => 1,
+            "id_estatus" => 3,
             "usu_act" => $session->get('id_usuario')
         ];
 
@@ -970,7 +970,7 @@ class Principal extends BaseController
             }
         }
 
-        /*  $email->setTo([
+    /*       $email->setTo([
               'alopez@guanajuato.gob.mx',
               'negonzalez@guanajuato.gob.mx',
               'dhernandezq@guanajuato.gob.mx'
@@ -1003,7 +1003,7 @@ class Principal extends BaseController
             $response->respuesta = "Correo enviado correctamente.";
           } else {
             $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
-          } */
+          }  */
 
         return $this->respond($response);
 
@@ -1253,7 +1253,7 @@ class Principal extends BaseController
                 }
             }
         }
-        $res = $this->enviarEmail(1);
+       // $res = $this->enviarEmail(1);
       
 
         return $this->respond($response);
@@ -2057,7 +2057,7 @@ class Principal extends BaseController
         $email = \Config\Services::email();
         $result = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_tipo_empleado' => 1]])->data;
 
-       /*$email->setTo([
+       $email->setTo([
             'agascag@guanajuato.gob.mx',
             'ccampos@guanajuato.gob.mx',
             'sandag@guanajuato.gob.mx',
@@ -2071,9 +2071,9 @@ class Principal extends BaseController
             'mvallejo@guanajuato.gob.mx',
             'rgonzalezgu@guanajuato.gob.mx',
             'yjimenez@guanajuato.gob.mx',
-        ]);*/
+        ]);
  
-                $email->setTo([
+             /*   $email->setTo([
                     'alopez@guanajuato.gob.mx',
                     'cchernandezp@guanajuato.gob.mx',
                     'csoto@guanajuato.gob.mx',
@@ -2118,7 +2118,7 @@ class Principal extends BaseController
                     'rantonio@guanajuato.gob.mx',
                     'alvarezp@guanajuato.gob.mx',
                     'jrodriguezgo@guanajuato.gob.mx',
-                ]);  
+                ]);  */
         $email->setSubject('Recordatorio: Revisión de Asistencias - Sistema SUSI');
         $email->setMessage('
             <!DOCTYPE html>
@@ -2151,9 +2151,9 @@ class Principal extends BaseController
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Estimado personal,</p>
                         
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-                            En caso de que aún no hayas realizado las <strong>justificaciones correspondientes a la quincena 01/2026</strong>, 
+                            En caso de que aún no hayas realizado las <strong>justificaciones de tu personal correspondientes a la quincena 01/2026</strong>, 
                             la cual comprende el periodo del <strong>01 al 15 de enero de 2026</strong>, 
-                            tienes hasta el día <strong>viernes 23 de enero hasta las 16:00 hrs</strong> para realizarlas.
+                            tienes hasta el día <strong>lunes 26 de enero hasta las 16:00 hrs</strong> para realizarlas.
                         </p>
 
                         <div class="highlight-box">

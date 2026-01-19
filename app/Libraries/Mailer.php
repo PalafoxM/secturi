@@ -77,7 +77,7 @@ class Mailer {
                 // 'enviado'            => time(),
                 'fecha_envio'        => date('Y-m-d H:mm:ss', time()),
                 'id_usuario_envio'   => $user,
-                'remitente'          => 'soporteti_isapeg@guanajuato.gob.mx',
+                'remitente'          => 'a.palafoxm@guanajuato.gob.mx',
                 'destinatario'       => json_encode($recipients),
                 'asunto'             => $title,
                 'mensaje'            => json_encode($body),

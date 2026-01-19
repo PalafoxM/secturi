@@ -35,7 +35,7 @@
                                 <table id="datatableUsuario" class="table">
                                     <thead class="thead-light">
                                         <tr>
-                                            <th class="text-center">RESERVA</th>
+                                            
                                             <th class="text-center">FECHA</th>
                                             <th class="text-center">CUENTA</th>
                                             <th class="text-center">RESPONSABLE</th>
@@ -49,7 +49,7 @@
                                     <tbody>
                                         <?php foreach($registro_go as $e): ?>
                                         <tr>
-                                            <td  class="text-center"><?= $e->no_reserva?></td>
+
 
                                             <td  class="text-center"><?= date('d/m/Y', strtotime($e->fecha_tramite)); ?> </td>
                                             <td  class="text-center"><?= $e->no_cuenta?></td>
