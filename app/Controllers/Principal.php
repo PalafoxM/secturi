@@ -2770,7 +2770,7 @@ class Principal extends BaseController
          
          $id_solicitud = $this->request->getPost('id_solicitud');
          // Logica de envío de correo (Placeholder)
-         // Aquí se integraría la librería de Email similar a enviarEmail()
+
          
          if($id_solicitud){
              $response->error = false;
@@ -4562,7 +4562,8 @@ class Principal extends BaseController
             'tabla' => 'periodo_factura_go',
             'where' => ['visible' => 1, 'id_registro_go' => $id_pt]
         ]);
- 
+
+  //var_dump( $xml );
         if (isset($importe->data) && !empty($importe->data)) {
             $data['importe'] = $importe->data;
               $totalGo = 0;
@@ -4574,8 +4575,7 @@ class Principal extends BaseController
 
 
         }
-        //var_dump( $data['importe'] );
-        //die();
+    
         //==============================
         
 

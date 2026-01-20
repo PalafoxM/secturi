@@ -777,6 +777,27 @@ $('#form_go').on('submit', function(e) {
         return;
     }
 
+    // Validacion de archivos requeridos (PDF y XML por fila)
+    let archivosValidos = true;
+    $('tr[data-row-index]').each(function() {
+        const rowIndex = $(this).data('row-index');
+        const archivos = archivosPorFila[rowIndex];
+        
+        // Verificar si existe el objeto de archivos para esta fila y si tiene adjuntos
+        if (!archivos || !archivos.pdf || archivos.pdf.length === 0 || !archivos.xml || archivos.xml.length === 0) {
+            archivosValidos = false;
+            // Se puede agregar una clase visual de error a la fila o al contenedor de archivos si se desea
+            $(this).find('.archivos-seleccionados').addClass('border border-danger');
+        } else {
+            $(this).find('.archivos-seleccionados').removeClass('border border-danger');
+        }
+    });
+
+    if (!archivosValidos) {
+        Swal.fire("Atención", "Es requerido adjuntar al menos un PDF y un XML por cada fila.", "warning");
+        return;
+    }
+
     $.ajax({
         type: "POST",
         url: "<?= base_url()?>index.php/Agregar/guardaGO",
@@ -812,7 +833,7 @@ $('#form_go').on('submit', function(e) {
 $(document).ready(function() {
     // Inicializar filas existentes
     <?php foreach ($presupuesto as $i => $p): ?>
-    const initialRowIndex<?= $i ?> = 'initial_<?= $i ?>_' + Date.now();
+    const initialRowIndex<?= $i ?> = '<?= $i ?>';
     $(`#makeEditable<?= $i ?> tbody tr`).first().attr('data-row-index', initialRowIndex<?= $i ?>);
     
     // INICIALIZAR LA FILA EN EL OBJETO
