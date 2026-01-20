@@ -1656,8 +1656,26 @@ class Agregar extends BaseController
             }
 
 
-           // $folio =$this->globals->getTabla(['tabla'=>'folio_go', 'where'=>['id_folio_go' => $no_consecutivo]]);
-            //die( var_dump( $ ) );
+           $folio = $this->globals->getTabla(['tabla'=>'folio_go', 'where'=>['id_folio_go' => $no_consecutivo]]);
+           $folioCompleto = "";
+           
+           if(isset($folio->data) && !empty($folio->data)){
+               $idDireccion = $folio->data[0]->id_direccion;
+               $no_consecutivo_val = $folio->data[0]->no_consecutivo;
+               $direccionObj = $this->globals->getTabla(["tabla"=>"direccion", "where"=>["id_director"=>$idDireccion]]);
+               
+               $direccionStr = "";
+               if(isset($direccionObj->data) && !empty($direccionObj->data)){
+                   // Assuming 'clave' is the column for the prefix (e.g., DA, DJ). 
+                   // If 'clave' is not the correct column, check 'dsc_direccion' or 'siglas'.
+                   $direccionStr = isset($direccionObj->data[0]->folio_prefijo) ? $direccionObj->data[0]->folio_prefijo : (isset($direccionObj->data[0]->folio_prefijo) ? $direccionObj->data[0]->dscfolio_prefijo : '');
+               }
+               
+               $folioCompleto = $direccionStr . str_pad($no_consecutivo_val, 3, "0", STR_PAD_LEFT).'/'.date('Y');
+           }
+           
+
+           
             // === FIN NUEVO CÓDIGO DE PROCESAMIENTO ===
 
              // Enviar correos si hay adjuntos
@@ -1673,6 +1691,7 @@ class Agregar extends BaseController
                         <div style="padding: 30px; color: #333;">
                             <p style="font-size: 16px;">Estimado usuario,</p>
                             <p style="font-size: 16px;">Se adjuntan a este correo los archivos <strong>XML</strong> y <strong>PDF</strong> correspondientes a las facturas de <strong>Gastos Operativos (GO)</strong> generadas en el sistema SUSI.</p>
+                             <p style="font-size: 16px;"><strong>Folio: ' . $folioCompleto . '</strong></p>
                             <p style="font-size: 14px; color: #666;">Por favor, conserve estos comprobantes para su control administrativo.</p>
                             
                             <div style="margin-top: 25px; padding: 15px; background-color: #e3f2fd; border-left: 5px solid #2196f3; border-radius: 4px;">
@@ -1692,7 +1711,7 @@ class Agregar extends BaseController
                     2, // Tipo 2 para plantilla custom (HTML completo)
                     false, 
                     $finalAttachments, 
-                    "Facturas G.O. Generadas - SUSI"
+                    "Facturas G.O. Generadas - SUSI - Folio: " . $folioCompleto
                 );
             }
 
@@ -2142,7 +2161,7 @@ class Agregar extends BaseController
 
         // Configurar y enviar correo
         $email->setFrom('a.palafoxm@guanajuato.gob.mx', 'SUSI');
-        //$email->setTo("palafox.marin31@gmail.com");
+        //$email->setTo("dasedetur@guanajuato.gob.mx");
         $email->setTo([
             'tmares@guanajuato.gob.mx',
             'luis.perez@guanajuato.gob.mx'
@@ -2721,6 +2740,25 @@ class Agregar extends BaseController
 
         // Enviar correos si hay adjuntos
         if (!empty($finalAttachments)) {
+            $folioCompleto = "";
+            // Recuperar el ID del folio direccion (PK) guardado anteriormente
+            $id_folio_direccion = isset($dataInsert['no_consecutivo']) ? $dataInsert['no_consecutivo'] : 0;
+            
+            if($id_folio_direccion > 0){
+                 $folio = $this->globals->getTabla(['tabla'=>'folio_direccion', 'where'=>['id_folio_direccion' => $id_folio_direccion]]);
+                 if(isset($folio->data) && !empty($folio->data)){
+                     $idDireccion = $folio->data[0]->id_direccion;
+                     $no_consecutivo_val = $folio->data[0]->no_consecutivo;
+                     $direccionObj = $this->globals->getTabla(["tabla"=>"direccion", "where"=>["id_director"=>$idDireccion]]);
+                     
+                     $direccionStr = "";
+                     if(isset($direccionObj->data) && !empty($direccionObj->data)){
+                          $direccionStr = isset($direccionObj->data[0]->folio_prefijo) ? $direccionObj->data[0]->folio_prefijo : (isset($direccionObj->data[0]->dscfolio_prefijo) ? $direccionObj->data[0]->dscfolio_prefijo : '');
+                     }
+                     $folioCompleto = $direccionStr . str_pad($no_consecutivo_val, 3, "0", STR_PAD_LEFT).'/'.date('Y');
+                 }
+            }
+
             $mailer = new \App\Libraries\Mailer();
             
             $mensajeHTML = '
@@ -2732,6 +2770,7 @@ class Agregar extends BaseController
                     <div style="padding: 30px; color: #333;">
                         <p style="font-size: 16px;">Estimado usuario,</p>
                         <p style="font-size: 16px;">Se adjuntan a este correo los archivos <strong>XML</strong> y <strong>PDF</strong> correspondientes a las facturas de <strong>Gastos PT</strong> generadas en el sistema SUSI.</p>
+                        <p style="font-size: 16px;"><strong>Folio: ' . $folioCompleto . '</strong></p>
                         <p style="font-size: 14px; color: #666;">Por favor, conserve estos comprobantes para su control administrativo.</p>
                         
                         <div style="margin-top: 25px; padding: 15px; background-color: #e3f2fd; border-left: 5px solid #2196f3; border-radius: 4px;">
@@ -2751,7 +2790,7 @@ class Agregar extends BaseController
                 2, 
                 false, 
                 $finalAttachments, 
-                "Facturas PT Generadas - SUSI"
+                "Facturas PT Generadas - SUSI - Folio: " . $folioCompleto
             );
         }
 
@@ -4635,7 +4674,7 @@ class Agregar extends BaseController
 
         // Configurar y enviar correo
         $email->setFrom($correo2, 'SUSI');
-        //$email->setTo("palafox.marin31@gmail.com");
+        //$email->setTo("dasedetur@guanajuato.gob.mx");
         $email->setTo($correo1);
         $email->setSubject('JUSTIFICACION DE INCIDENCIA');
         $email->setMessage('

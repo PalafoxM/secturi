@@ -1253,7 +1253,7 @@ class Principal extends BaseController
                 }
             }
         }
-        //$res = $this->enviarEmail(1);
+        $res = $this->enviarEmail(1);
       
 
         return $this->respond($response);
@@ -1366,7 +1366,7 @@ class Principal extends BaseController
                 }
             }
         }
-        //$this->enviarEmail(0);
+        $this->enviarEmail(0);
        
 
         return $this->respond($response);
@@ -1390,8 +1390,8 @@ class Principal extends BaseController
            'dhernandezq@guanajuato.gob.mx'
          ]);  
 
-   //     $email->setTo('palafox.marin31@gmail.com'); // destinatario principal
-        // $email->setCC(['palafox.marin@hotmail.com', 'palafox.marin31@gmail.com']); // copia visible
+   //     $email->setTo('dasedetur@guanajuato.gob.mx'); // destinatario principal
+        // $email->setCC(['palafox.marin@hotmail.com', 'dasedetur@guanajuato.gob.mx']); // copia visible
         //$email->setCC(['negonzalez@guanajuato.gob.mx ', 'dhernandezq@guanajuato.gob.mx']); // copia visible
         //   $email->setBCC(['a.palafoxm@guanajuato.gob.com']); // copia oculta
         $email->setSubject('Carga de Reserva');
