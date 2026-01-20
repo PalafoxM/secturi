@@ -384,12 +384,12 @@
                     data-trigger="hover" title="Mi espacio" data-original-title="Mi espacio">
                     <i data-feather="home" class="align-self-center menu-icon icon-dual"></i>
                 </a><!--end MetricaPages-->
-                <?php if (in_array($session->id_perfil, [1, 6, 7])): ?>
+        
                     <a href="#MetricaAuthentication" class="nav-link" data-toggle="tooltip-custom" data-placement="right"
                         data-trigger="hover" title="" data-original-title="Jurídico">
                         <i class="fas fa-balance-scale align-self-center menu-icon icon-dual"></i>
                     </a> <!--end MetricaAuthentication-->
-                <?php endif; ?>
+         
 
 
 
@@ -436,7 +436,7 @@
                         <h6 class="menu-title">Recursos</h6>
                     </div>
                     <ul class="nav metismenu">
-                        <?php if ($session->get('id_perfil') != 2): ?>
+                  
                             <li class="nav-item">
                                 <a class="nav-link" href="javascript: void(0);"><span class="w-100">Registro</span><span
                                         class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
@@ -446,7 +446,7 @@
                                     <li><a href="<?php echo base_url(); ?>index.php/Principal/listadoGrc">Solicitud GRC</a></li>
                                 </ul>
                             </li><!--end nav-item-->
-                        <?php endif; ?>
+                    
                         <li class="nav-item">
                             <a class="nav-link" href="javascript: void(0);"><span class="w-100">Estatus</span><span
                                     class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>

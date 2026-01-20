@@ -34,19 +34,40 @@
                                 <div class="form-group row">
                                     <label class="col-sm-3 col-form-label">Nombre y cargo del Responsable del Proyecto:</label>
                                     <div class="col-sm-9">
-                                        <input type="text" class="form-control" name="responsable_proyecto" value="<?= isset($solicitud) ? $solicitud->responsable_proyecto : '' ?>" required>
+                                        <select class="form-control select2" name="responsable_proyecto" required>
+                                            <option value="">Seleccione una opción</option>
+                                            <?php foreach ($usuario as $u): ?>
+                                                <option value="<?= $u->id_usuario ?>" <?= (isset($solicitud) && $solicitud->responsable_proyecto == $u->id_usuario) ? 'selected' : '' ?>>
+                                                    <?= $u->nombre_completo ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <label class="col-sm-3 col-form-label">Nombre y cargo del Responsable de Seguimiento:</label>
                                     <div class="col-sm-9">
-                                        <input type="text" class="form-control" name="responsable_seguimiento" value="<?= isset($solicitud) ? $solicitud->responsable_seguimiento : '' ?>" required>
+                                        <select class="form-control select2" name="responsable_seguimiento" required>
+                                            <option value="">Seleccione una opción</option>
+                                            <?php foreach ($usuario as $u): ?>
+                                                <option value="<?= $u->id_usuario ?>" <?= (isset($solicitud) && $solicitud->responsable_seguimiento == $u->id_usuario) ? 'selected' : '' ?>>
+                                                    <?= $u->nombre_completo ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <label class="col-sm-3 col-form-label">Nombre y cargo del Enlace de Comunicaciones:</label>
                                     <div class="col-sm-9">
-                                        <input type="text" class="form-control" name="enlace_comunicaciones" value="<?= isset($solicitud) ? $solicitud->enlace_comunicaciones : '' ?>">
+                                        <select class="form-control select2" name="enlace_comunicaciones">
+                                            <option value="">Seleccione una opción</option>
+                                            <?php foreach ($usuario as $u): ?>
+                                                <option value="<?= $u->id_usuario ?>" <?= (isset($solicitud) && $solicitud->enlace_comunicaciones == $u->id_usuario) ? 'selected' : '' ?>>
+                                                    <?= $u->nombre_completo ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
                                     </div>
                                 </div>
 
@@ -64,8 +85,26 @@
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                <td><input type="text" class="form-control" name="proyecto" value="<?= isset($solicitud) ? $solicitud->proyecto : '' ?>"></td>
-                                                <td><input type="text" class="form-control" name="partida" value="<?= isset($solicitud) ? $solicitud->partida : '' ?>"></td>
+                                                <td>
+                                                    <select class="form-control select2" name="proyecto">
+                                                        <option value="">Seleccione una opción</option>
+                                                        <?php foreach ($cat_proyecto as $p): ?>
+                                                            <option value="<?= $p->id_proyecto ?>" <?= (isset($solicitud) && $solicitud->proyecto == $p->id_proyecto) ? 'selected' : '' ?>>
+                                                                <?= $p->proyecto ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <select class="form-control select2" name="partida">
+                                                        <option value="">Seleccione una opción</option>
+                                                        <?php foreach ($cat_partida as $p): ?>
+                                                            <option value="<?= $p->id_partida ?>" <?= (isset($solicitud) && $solicitud->partida == $p->id_partida) ? 'selected' : '' ?>>
+                                                                <?= $p->partida ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </td>
                                                 <td><input type="text" class="form-control" name="clave_estandarizada" value="<?= isset($solicitud) ? $solicitud->clave_estandarizada : '' ?>"></td>
                                                 <td>
                                                     <p class="small text-muted mb-0">El proyecto cuenta con la suficiencia presupuestal para la contratación de los servicios requeridos en la presente solicitud. Se anexa captura de pantalla Sistema SAP/R3</p>
@@ -198,6 +237,7 @@
         <link href="<?= base_url() ?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
         <link href="<?= base_url() ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
         <link href="<?= base_url() ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
+        <link href="<?= base_url() ?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
         <!-- jQuery  -->
         <script src="<?= base_url() ?>assets/js/jquery.min.js"></script>
         <script src="<?= base_url() ?>assets/js/jquery-ui.min.js"></script>
@@ -206,6 +246,7 @@
         <script src="<?= base_url() ?>assets/js/waves.js"></script>
         <script src="<?= base_url() ?>assets/js/feather.min.js"></script>
         <script src="<?= base_url() ?>assets/js/jquery.slimscroll.min.js"></script>
+        <script src="<?= base_url() ?>plugins/select2/select2.min.js"></script>
 
 <script>
     const pagosExistentes = <?= isset($pagos) ? json_encode($pagos) : '[]' ?>;
@@ -234,6 +275,9 @@
     
     // Add initial row
     document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Select2
+        $('.select2').select2();
+
         if (pagosExistentes && pagosExistentes.length > 0) {
             pagosExistentes.forEach(pago => {
                 agregarPago(pago);

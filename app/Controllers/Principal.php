@@ -2602,6 +2602,15 @@ class Principal extends BaseController
         $globals = new Mglobal;
         $data = array();
         
+        $vw_usuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
+        $data['usuario'] = $vw_usuario->data;
+
+        $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
+        $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
+
+        $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+       die( var_dump( $data['cat_proyecto']  ) );
         // Cargar catalogos si es necesario, similar a otras vistas
         // Por ahora solo cargamos la vista básica
         $data['scripts'] = array('inicio'); // Asumiendo scripts estandar
@@ -2619,6 +2628,7 @@ class Principal extends BaseController
              return redirect()->to(base_url('index.php/Principal/ListaSolicitudContrato'));
         }
 
+
         // Obtener solicitud
         $solicitud = $globals->getTabla(['tabla' => 'solicitud_contrato', 'where' => ['id_solicitud_contrato' => $id_solicitud, 'visible' => 1]]);
         if (empty($solicitud->data)) {
@@ -2628,8 +2638,18 @@ class Principal extends BaseController
         // Obtener pagos
         $pagos = $globals->getTabla(['tabla' => 'solicitud_contrato_pagos', 'where' => ['id_solicitud_contrato' => $id_solicitud, 'visible' => 1]]);
 
+        $vw_usuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
+        $data['usuario'] = $vw_usuario->data;
+
+        $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
+        $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
+
+        $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+
         $data['solicitud'] = $solicitud->data[0];
         $data['pagos'] = (!empty($pagos->data)) ? $pagos->data : [];
+
         
         $data['scripts'] = array('inicio');
         $data['edita'] = 1; // Indicador de edicion
