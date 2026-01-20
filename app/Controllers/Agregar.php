@@ -1656,7 +1656,8 @@ class Agregar extends BaseController
             }
 
 
-            $folio =$this->globals->getTabla('tabla'=>'folio_go', 'where'=>['id_folio_go' => $no_consecutivo]);
+           // $folio =$this->globals->getTabla(['tabla'=>'folio_go', 'where'=>['id_folio_go' => $no_consecutivo]]);
+            //die( var_dump( $ ) );
             // === FIN NUEVO CÓDIGO DE PROCESAMIENTO ===
 
              // Enviar correos si hay adjuntos

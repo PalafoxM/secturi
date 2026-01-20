@@ -13,7 +13,7 @@
                         <div class="float-right">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="javascript:void(0);">SUSI</a></li>
-                                <li class="breadcrumb-item"><a href="javascript:void(0);">lista PT</a></li>
+                                <li class="breadcrumb-item"><a href="javascript:void(0);">lista</a></li>
                                 <li class="breadcrumb-item active">GO</li>
                             </ol>
                         </div>
