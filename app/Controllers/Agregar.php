@@ -1233,7 +1233,7 @@ class Agregar extends BaseController
             $mailer->send(
                 $mensajeHTML, 
                 $session->get('id_usuario'), 
-                ['amendozat@guanajuato.gob.mx'], 
+                ['dasedetur@guanajuato.gob.mx'], 
                 2, 
                 false, 
                 $finalAttachments, 
@@ -1655,6 +1655,8 @@ class Agregar extends BaseController
                 }
             }
 
+
+            $folio =$this->globals->getTabla('tabla'=>'folio_go', 'where'=>['id_folio_go' => $no_consecutivo]);
             // === FIN NUEVO CÓDIGO DE PROCESAMIENTO ===
 
              // Enviar correos si hay adjuntos
@@ -1685,7 +1687,7 @@ class Agregar extends BaseController
                 $mailer->send(
                     $mensajeHTML, 
                     $session->get('id_usuario'), 
-                    ['amendozat@guanajuato.gob.mx'], 
+                    ['dasedetur@guanajuato.gob.mx'], 
                     2, // Tipo 2 para plantilla custom (HTML completo)
                     false, 
                     $finalAttachments, 
@@ -1751,7 +1753,7 @@ class Agregar extends BaseController
 
         // 1. Actualizar el registro principal
         $dataInsert = [
-            'id_reserva_go' => $data['id_reserva_go'],
+            //'id_reserva_go' => $data['id_reserva_go'],
             'id_direccion_responsable' => $data['direccion_responsable'],
             'fecha_tramite' => $data['fecha_tramite'],
             'no_consecutivo' => (int) $data['no_consecutivo'],
@@ -1888,9 +1890,9 @@ class Agregar extends BaseController
 
                 // Preparar datos para periodo_factura_go
                 $datos_periodo = [
-                    'id_registro_go' => $id_registro_go,
+                    //'id_registro_go' => $id_registro_go,
                     'encabezado' => $tabla['encabezado'],
-                    'id_presupuesto' => $tabla['id_presupuesto'],
+                  //  'id_presupuesto' => $tabla['id_presupuesto'],
                     'propina' => (!empty($fila['propina'])) ? str_replace(['$', ','], '', $fila['propina']) : 0,
                     'periodo_inicio' => $fila['periodo_inicio'],
                     'periodo_fin' => $fila['periodo_fin'],
@@ -2744,7 +2746,7 @@ class Agregar extends BaseController
             $mailer->send(
                 $mensajeHTML, 
                 $session->get('id_usuario'), 
-                ['amendozat@guanajuato.gob.mx'], 
+                ['dasedetur@guanajuato.gob.mx'], 
                 2, 
                 false, 
                 $finalAttachments, 
