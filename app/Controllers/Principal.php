@@ -1253,7 +1253,7 @@ class Principal extends BaseController
                 }
             }
         }
-        $res = $this->enviarEmail(1);
+       // $res = $this->enviarEmail(1);
       
 
         return $this->respond($response);
@@ -5943,10 +5943,11 @@ class Principal extends BaseController
            //      var_dump(  $datos );
                  $datosGrupal[$key] = $data['presupuesto'];
                  foreach($datos->data as $j => $d){
-             //      var_dump(  $d );
+                     $datosGrupal[$key][$key]->encabezado = $d->encabezado;
+
                     $xml      = $globals->getTabla(['tabla' => 'xml_go', 'where' => ['id_registro_go' => $id_registro_go, 'id_identificador' => $d->id_identificador, 'visible' => 1]]);
                     $factura  = $globals->getTabla(['tabla' => 'factura_pdf_go', 'where' => ['id_registro_go' => $id_registro_go, 'id_identificador' => $d->id_identificador, 'visible' => 1]]);
-                    //die( var_dump( $xml ) );
+                   //die( var_dump( $factura->data[0]->ruta_relativa ) );
                     $datosGrupal[$key]['datos'][$j] =  [
                          'id_periodo_factura' => $d->id_periodo_factura,
                          'id_registro_go' => $d->id_registro_go,
@@ -5963,8 +5964,8 @@ class Principal extends BaseController
                          'periodo_inicio' => $d->periodo_inicio,
                          'id_identificador' => $d->id_identificador,
                          'usu_reg' => $d->usu_reg,
-                         'total' => $xml->data[0]->total,
-                         'ruta_relativa' => $factura->data[0]->ruta_relativa,
+                         'total' => (!empty($xml->data) && isset($xml->data[0]->total)) ? $xml->data[0]->total : 0,
+                         'ruta_relativa' => (!empty($factura->data) && isset($factura->data[0]->ruta_relativa)) ? $factura->data[0]->ruta_relativa : ''
                     ];
                  }
 

@@ -39,7 +39,7 @@
                                     <div class="col-md-4 mb-3">
                                         <label for="direccion_responsable">Dirección Responsable <span
                                                 class="text-danger">*</span></label>
-                                        <select class="form-control" id="direccion_responsable"
+                                        <select class="form-control select2" id="direccion_responsable"
                                             name="direccion_responsable" required>
                                             <?php foreach ($cat_area as $a): ?>
                                                 <option value="<?= $a->id_area ?>" <?php echo ($a->id_area == $registro->id_direccion_responsable) ? 'selected' : ''; ?>>
@@ -62,7 +62,7 @@
                                     <div class="col-md-4 mb-3">
                                         <label for="reponsable_solicitud">Responsable de la Solicitud <span
                                                 style="color:red;">*</span></label>
-                                        <select name="id_reponsable_solicitud" class="form-control" required>
+                                        <select name="id_reponsable_solicitud" class="form-control select2" required>
                                             <?php foreach ($cat_usuario as $u): ?>
                                                 <option value="<?= $u->id_usuario ?>" <?php echo ($u->id_usuario == $registro->id_reponsable_solicitud) ? 'selected' : ''; ?>>
                                                     <?= $u->nombre_completo ?>
