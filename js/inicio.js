@@ -1704,7 +1704,6 @@ ini.inicio = (function () {
                 // Agregar datos del formulario principal
                 formData.append('nombre_go', $('#nombre_go').val());
                 formData.append('id_proveedor', $('#id_proveedor').val());
-                formData.append('total_importe', $('#total_importe').val());
                 formData.append('banco_go', $('#banco_go').val());
 
 
@@ -1712,8 +1711,7 @@ ini.inicio = (function () {
                 $('#makeEditable3 tbody tr').each(function (index) {
                     formData.append('proyecto[]', $(this).find('[name="proyecto[]"]').val());
                     formData.append('partida[]', $(this).find('[name="partida[]"]').val());
-                    formData.append('importe[]', $(this).find('[name="importe[]"]').val());
-                    formData.append('propina[]', $(this).find('[name="propina[]"]').val());
+
                 });
 
                 // Enviar datos via AJAX

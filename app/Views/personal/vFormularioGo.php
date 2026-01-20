@@ -79,7 +79,7 @@
 														<tr>
 															<th>PROYECTO-META</th>
 															<th>PARTIDA</th>
-															<th>IMPORTE</th>
+
 															<th>ACCIONES</th>
 														</tr>
 													</thead>
@@ -101,7 +101,6 @@
                                                                     <?php endforeach; ?>
                                                                 </select>
 															</td>
-															<td><input type="text" autocomplete="off" class="form-control" name="importe[]" placeholder="0,000.00"></td>
 															
 															<td>
 																<button type="button" class="btn btn-sm btn-danger remove-row">
@@ -117,15 +116,7 @@
                                                         <i class="fas fa-plus"></i> Agregar Fila
                                                     </button>
 												</div>
-												<div class="row mt-3">
-													<div class="col-md-8"></div>
-													<div class="col-md-4">
-														<div class="form-group">
-															<label>TOTAL:</label>
-															<input type="text" class="form-control font-weight-bold text-right" id="total_importe" value="0.00" readonly>
-														</div>
-													</div>
-												</div>
+									
 											</div>
 										</div>
 										<!--end card-body-->
@@ -204,29 +195,8 @@
 	});
 	  
 	            
-	$(document).on('input', 'input[name="importe[]"]', function() {
-	    calcularTotal();
-	});
-		$(document).on('input', 'input[name="propina[]"]', function() {
-	    calcularTotal();
-	});
-	function calcularTotal() {
-	    let total = 0;
-	    
-	    $('input[name="importe[]"]').each(function() {
-	        // Elimina comas y convierte a número
-	        const valor = parseFloat($(this).val().replace(/,/g, '')) || 0;
-	        total += valor;
-	    });
-		 $('input[name="propina[]"]').each(function() {
-	        // Elimina comas y convierte a número
-	        const valor = parseFloat($(this).val().replace(/,/g, '')) || 0;
-	        total += valor;
-	    });
-	    
-	    // Formatea el total con separadores de miles
-	    $('#total_importe').val(formatNumber(total.toFixed(2)));
-	}
+
+	
 	function formatNumber(num) {
 	    return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 	}
@@ -247,9 +217,6 @@
 	                    <option value="<?= $p->id_partida?>"><?= $p->cuenta_cable ?></option>
 	                    <?php endforeach; ?>
 	                </select>
-	            </td>
-	            <td>
-	                <input autocomplete="off" type="text" class="form-control" name="importe[]" placeholder="0,000.000">
 	            </td>
 	            <td>
 	                <button type="button" class="btn btn-sm btn-danger remove-row">

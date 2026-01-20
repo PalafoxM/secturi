@@ -1194,7 +1194,7 @@ class Principal extends BaseController
 
         $dataInsert = [
             "id_proveedor" => 1,
-            "total_importe" => $data['total_importe'],
+            "total_importe" => 0,
             "fec_reg" => $hoy,
             "usu_reg" => $session->get('id_usuario'),
             "id_estatus" => 3,
@@ -1214,15 +1214,15 @@ class Principal extends BaseController
             $datosCombinados = [];
 
             // Verificar que todos los arrays tengan la misma longitud
-            if (count($data['proyecto']) === count($data['partida']) && count($data['partida']) === count($data['importe'])) {
+            if (count($data['proyecto']) === count($data['partida']) && count($data['partida']) ) {
                 foreach ($data['proyecto'] as $index => $proyecto) {
                     // Solo agregar si todos los valores existen
-                    if (!empty($data['proyecto']) && !empty($data['partida'][$index]) && !empty($data['importe'][$index])) {
+                    if (!empty($data['proyecto']) && !empty($data['partida'][$index])) {
                         $datosCombinados[] = [
                             'proyecto' => $proyecto,
                             'partida' => $data['partida'][$index],
-                            'importe' => str_replace(',', '', $data['importe'][$index]),
-                            'propina' => str_replace(',', '', $data['propina'][$index]) // Elimina comas del formato numérico
+                          //  'importe' => str_replace(',', '', $data['importe'][$index]),
+                           // 'propina' => str_replace(',', '', $data['propina'][$index]) // Elimina comas del formato numérico
                         ];
                     }
                 }
@@ -1237,8 +1237,8 @@ class Principal extends BaseController
                     "id_reserva" => $id_reserva,
                     "id_proyecto" => $d['proyecto'],
                     "id_partida" => $d['partida'],
-                    "importe" => $d['importe'],
-                    "propina" => $d['propina'],
+                    "importe" => 0,
+                    "propina" => 0,
                     "fec_reg" => $hoy,
                     "usu_reg" => $session->get('id_usuario')
 
@@ -1253,7 +1253,7 @@ class Principal extends BaseController
                 }
             }
         }
-        $res = $this->enviarEmail(1);
+        //$res = $this->enviarEmail(1);
       
 
         return $this->respond($response);
@@ -1366,7 +1366,7 @@ class Principal extends BaseController
                 }
             }
         }
-        $this->enviarEmail(0);
+        //$this->enviarEmail(0);
        
 
         return $this->respond($response);
@@ -4562,7 +4562,7 @@ class Principal extends BaseController
             'tabla' => 'periodo_factura_go',
             'where' => ['visible' => 1, 'id_registro_go' => $id_pt]
         ]);
-       // var_dump( $xml->data );
+ 
         if (isset($importe->data) && !empty($importe->data)) {
             $data['importe'] = $importe->data;
               $totalGo = 0;

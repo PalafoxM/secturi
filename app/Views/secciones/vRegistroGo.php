@@ -351,7 +351,7 @@
                                                                 <i class="fas fa-plus"></i> Agregar Fila 
                                                             </a>
                                                         </div>
-                                                        <div class="row mt-3">
+                                                        <div class="row mt-3" style="visibility: hidden;">
                                                             <div class="col-md-8"></div>
                                                             <div class="col-md-4">
                                                                 <div class="form-group">
@@ -493,14 +493,7 @@ function addRow(i) {
     inicializarFilaEnArchivos(rowIndex);
 
     // Inicializar máscaras para campos numéricos
-    $(`#makeEditable${i} tbody tr[data-row-index="${rowIndex}"] input[name="importe_${i}[]"]`).inputmask('numeric', {
-        radixPoint: ".",
-        groupSeparator: ",",
-        digits: 2,
-        autoGroup: true,
-        prefix: '$ ',
-        rightAlign: false
-    });
+
     
     $(`#makeEditable${i} tbody tr[data-row-index="${rowIndex}"] input[name="propina_${i}[]"]`).inputmask('numeric', {
         radixPoint: ".",
@@ -767,6 +760,22 @@ $('#form_go').on('submit', function(e) {
     const formData = prepararFormData();
 
 
+
+    // Validacion de fechas requeridas
+    let fechasValidas = true;
+    $('input[type="date"]').each(function() {
+        if ($(this).val() === '') {
+            fechasValidas = false;
+            $(this).addClass('is-invalid');
+        } else {
+            $(this).removeClass('is-invalid');
+        }
+    });
+
+    if (!fechasValidas) {
+        Swal.fire("Atención", "Por favor, complete todas las fechas requeridas.", "warning");
+        return;
+    }
 
     $.ajax({
         type: "POST",

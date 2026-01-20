@@ -1400,13 +1400,25 @@ class Agregar extends BaseController
             return $this->respond($response);
         }
 
+        // VALIDAR FECHAS EN FILAS
+        foreach ($tablas_procesadas as $tabla) {
+            foreach ($tabla['filas'] as $fila) {
+                if (empty($fila['periodo_inicio']) || empty($fila['periodo_fin'])) {
+                    $response->error = true;
+                    $response->respuesta = "Es necesario capturar las fechas de inicio y fin en todas las filas.";
+                    return $this->respond($response);
+                }
+            }
+        }
+
 
         if (isset($data['fecha_tramite']) && empty($data['fecha_tramite'])) {
             $data['fecha_tramite'] = date('Y-m-d');
         }
-
+   
+        
        $no_consecutivo = $this->registrarFolioGo($data['no_consecutivo'], $data['id_reponsable_solicitud']);
-
+      
         $dataInsert = [
             'id_reserva_go' => $data['id_reserva_go'],
             'id_direccion_responsable' => $data['direccion_responsable'],
@@ -1679,7 +1691,7 @@ class Agregar extends BaseController
             // === FIN NUEVO CÓDIGO DE PROCESAMIENTO ===
 
              // Enviar correos si hay adjuntos
-            if (!empty($finalAttachments)) {
+          if (!empty($finalAttachments)) {
                 $mailer = new \App\Libraries\Mailer();
                 
                 $mensajeHTML = '
@@ -1713,7 +1725,7 @@ class Agregar extends BaseController
                     $finalAttachments, 
                     "Facturas G.O. Generadas - SUSI - Folio: " . $folioCompleto
                 );
-            }
+            } 
 
         } // Fin de if (!$response->error)
 
@@ -2293,7 +2305,7 @@ class Agregar extends BaseController
         return $this->respond($response->data[0]);
 
     }
-    private function registrarFolioGo($no_consecutivo, $responsableGasto)
+    private function registrarFolioGo($noConsecutivo, $responsableGasto)
     {
         $session = \Config\Services::session();
         $response = new \stdClass();
@@ -2306,7 +2318,7 @@ class Agregar extends BaseController
         if (isset($user->data) && !empty($user->data)) {
             $id_area = $user->data[0]->id_area;
             $dataInsert = [
-                'no_consecutivo' => $no_consecutivo,
+                'no_consecutivo' => $noConsecutivo,
                 'id_area' => $id_area,
                 'id_direccion' => $responsableGasto,
                 'fec_reg' => date('Y-m-d H:i:s'),
@@ -2330,10 +2342,10 @@ class Agregar extends BaseController
 
         }
 
-        return $idRegistro;
+        return $noConsecutivo;
 
     }
-    private function registrarFolio($no_consecutivo, $responsableGasto)
+    private function registrarFolio($noConsecutivo, $responsableGasto)
     {
         $session = \Config\Services::session();
         $response = new \stdClass();
@@ -2346,7 +2358,7 @@ class Agregar extends BaseController
         if (isset($user->data) && !empty($user->data)) {
             $id_area = $user->data[0]->id_area;
             $dataInsert = [
-                'no_consecutivo' => $no_consecutivo,
+                'no_consecutivo' => $noConsecutivo,
                 'id_area' => $id_area,
                 'id_direccion' => $responsableGasto,
                 'fec_reg' => date('Y-m-d H:i:s'),
@@ -2370,7 +2382,7 @@ class Agregar extends BaseController
 
         }
 
-        return $idRegistro;
+        return $noConsecutivo;
 
     }
     public function guardaPT()
@@ -2739,7 +2751,7 @@ class Agregar extends BaseController
         }
 
         // Enviar correos si hay adjuntos
-        if (!empty($finalAttachments)) {
+         if (!empty($finalAttachments)) {
             $folioCompleto = "";
             // Recuperar el ID del folio direccion (PK) guardado anteriormente
             $id_folio_direccion = isset($dataInsert['no_consecutivo']) ? $dataInsert['no_consecutivo'] : 0;
@@ -2792,7 +2804,7 @@ class Agregar extends BaseController
                 $finalAttachments, 
                 "Facturas PT Generadas - SUSI - Folio: " . $folioCompleto
             );
-        }
+        } 
 
         //die( var_dump( $response ) );
         return $this->respond($response);

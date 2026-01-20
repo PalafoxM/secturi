@@ -49,7 +49,7 @@
                                                     <tr>
                                                         
                                                         <th class="text-center">FOLIO</th>
-                                                        <th class="text-center">TOTAL IMPORTE</th>
+                                                        <th class="text-center">FECHA</th>
                                                         <th class="text-center">USUARIO</th>
                                                          <th class="text-center">ESTATUS</th>
                                                         <th class="text-center">ACCIONES</th>
@@ -63,7 +63,7 @@
                                                     <tr>
                                                
                                                         <td class="text-center"><?= $p->folio?></td>
-                                                        <td class="text-center"><?= $p->total_importe?></td>
+                                                        <td class="text-center"><?= date('d-m-Y', strtotime($p->fec_reg));?></td>
                                                         <td class="text-center"><?= $p->nombre_completo?></td>
                                                         <?php
                                                         switch ($p->id_estatus) {

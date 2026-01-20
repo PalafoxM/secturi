@@ -89,7 +89,7 @@ class Mailer {
                 'tabla'     => 'correos_enviados',
                 'editar'    => false
             ];
-            $status = $query->saveTabla($dataInsert,$dataConfig,['script'=>'Mailer.envio']);
+           // $status = $query->saveTabla($dataInsert,$dataConfig,['script'=>'Mailer.envio']);
 
             return true;
         }
