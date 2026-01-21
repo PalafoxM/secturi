@@ -1206,7 +1206,7 @@ class Agregar extends BaseController
         $response->respuesta = "registros guardados correctamente";
 
         // Enviar correos si hay adjuntos
-        if (!empty($finalAttachments)) {
+     /*    if (!empty($finalAttachments)) {
             $mailer = new \App\Libraries\Mailer();
             
             $mensajeHTML = '
@@ -1239,7 +1239,7 @@ class Agregar extends BaseController
                 $finalAttachments, 
                 "Facturas FIC Generadas - SUSI"
             );
-        }
+        } */
 
         //return $this->respond($response);
     }
@@ -1325,41 +1325,73 @@ class Agregar extends BaseController
                     $file_keys_para_tabla_i = array_keys($archivos_por_tabla[$i]);
                 }
 
-                // Determinamos la fuente de datos para iterar
-                $source_data = isset($data['periodo_inicio_' . $i]) ? $data['periodo_inicio_' . $i] : $data['nombre_viatico_' . $i];
-                $is_viaticos = isset($data['nombre_viatico_' . $i]);
+                // Obtenemos las claves de los archivos para esta tabla, EN ORDEN.
+                $file_keys_para_tabla_i = [];
+                if (isset($archivos_por_tabla[$i])) {
+                    $file_keys_para_tabla_i = array_keys($archivos_por_tabla[$i]);
+                }
 
-                // 3. Iterar por cada fila ($j) dentro de la tabla ($i)
-                foreach ($source_data as $j => $val) {
-                    // $j es el índice de la fila (0, 1, 2...)
+                // 1. PROCESAR FILAS ESTÁNDAR (usando periodo_inicio como guía)
+                if (isset($data['periodo_inicio_' . $i])) {
+                    foreach ($data['periodo_inicio_' . $i] as $j => $val) {
+                         // Robustez: Si el valor guía está vacío (fila vacía), ignoramos
+                         if (empty($val)) continue;
 
-                    // Usamos $j para obtener la clave de archivo correspondiente por orden
-                    $rowIndex_de_archivos = $file_keys_para_tabla_i[$j] ?? null;
+                         // Usamos $j para obtener la clave de archivo correspondiente por orden
+                        $rowIndex_de_archivos = $file_keys_para_tabla_i[$j] ?? null;
 
-                    $archivos_de_la_fila = null;
-                    if ($rowIndex_de_archivos !== null && isset($archivos_por_tabla[$i][$rowIndex_de_archivos])) {
-                        $archivos_de_la_fila = $archivos_por_tabla[$i][$rowIndex_de_archivos];
+                        $archivos_de_la_fila = null;
+                        if ($rowIndex_de_archivos !== null && isset($archivos_por_tabla[$i][$rowIndex_de_archivos])) {
+                            $archivos_de_la_fila = $archivos_por_tabla[$i][$rowIndex_de_archivos];
+                        }
+
+                        $fila_completa = [
+                            // Standar fields
+                            'propina' => $data['propina_' . $i][$j] ?? null,
+                            'periodo_inicio' => $data['periodo_inicio_' . $i][$j] ?? null,
+                            'periodo_fin' => $data['periodo_fin_' . $i][$j] ?? null,
+                            
+                            // Viaticos fields (NULL for standard rows)
+                            'contribuyente' => null,
+                            'rfc'           => null,
+                            'importe'       => null,
+                            'is_viaticos'   => false,
+
+                            'archivos' => $archivos_de_la_fila,
+                            'js_rowIndex' => $rowIndex_de_archivos
+                        ];
+
+                        $tablas_procesadas[$i]['filas'][] = $fila_completa;
                     }
+                }
 
-                    // 4. Construir el objeto final de la fila
-                    $fila_completa = [
-                        // Standar fields
-                        'propina' => $data['propina_' . $i][$j] ?? null,
-                        'periodo_inicio' => $data['periodo_inicio_' . $i][$j] ?? null,
-                        'periodo_fin' => $data['periodo_fin_' . $i][$j] ?? null,
+                // 2. PROCESAR FILAS DE VIATICOS (usando nombre_viatico como guía)
+                if (isset($data['nombre_viatico_' . $i])) {
+                    foreach ($data['nombre_viatico_' . $i] as $j => $val) {
+                        // Robustez: Si el nombre está vacío, ignoramos
+                        if (empty($val)) continue;
+
+                        // Viaticos NO tienen archivos asociados en este flujo (o se manejan diferente)
+                        // Si tuvieran, necesitarían su propia lógica de asignación
                         
-                        // Viaticos fields
-                        'contribuyente' => $is_viaticos ? ($data['nombre_viatico_' . $i][$j] ?? null) : null,
-                        'rfc'           => $is_viaticos ? ($data['rfc_viatico_' . $i][$j] ?? null) : null,
-                        'importe'       => $is_viaticos ? ($data['importe_' . $i][$j] ?? null) : null,
-                        'is_viaticos'   => $is_viaticos,
+                         $fila_completa = [
+                            // Standar fields (NULL or irrelevant for viaticos)
+                            'propina' => null,
+                            'periodo_inicio' => null, // Validación ignorará esto si is_viaticos es true
+                            'periodo_fin' => null,
+                            
+                            // Viaticos fields
+                            'contribuyente' => $data['nombre_viatico_' . $i][$j] ?? null,
+                            'rfc'           => $data['rfc_viatico_' . $i][$j] ?? null,
+                            'importe'       => $data['importe_' . $i][$j] ?? null,
+                            'is_viaticos'   => true,
 
-                        'archivos' => $archivos_de_la_fila, // Ej: ['pdf' => [file1], 'xml' => [file1]]
-                        'js_rowIndex' => $rowIndex_de_archivos // Para depurar
-                    ];
+                            'archivos' => null, 
+                            'js_rowIndex' => null
+                        ];
 
-                    // Agregar la fila completa a su tabla
-                    $tablas_procesadas[$i]['filas'][] = $fila_completa;
+                        $tablas_procesadas[$i]['filas'][] = $fila_completa;
+                    }
                 }
             }
         }
@@ -1521,7 +1553,7 @@ class Agregar extends BaseController
 
                         $responseViatico = $this->globals->saveTabla($datos_viatico, $dataConfig, $dataBitacora);
 
-                    }
+                    } else {
                         // === GUARDAR EN PERIODO_FACTURA_GO (Estándar) ===
                         $datos_periodo = [
                             'id_registro_go' => $id_registro_go, // Se vincula al registro principal
@@ -1546,6 +1578,7 @@ class Agregar extends BaseController
                         ];
 
                         $responseFila = $this->globals->saveTabla($datos_periodo, $dataConfig, $dataBitacora);
+                    }
                     
 
 
@@ -1742,7 +1775,7 @@ class Agregar extends BaseController
             // === FIN NUEVO CÓDIGO DE PROCESAMIENTO ===
 
              // Enviar correos si hay adjuntos
-          if (!empty($finalAttachments)) {
+       /*    if (!empty($finalAttachments)) {
                 $mailer = new \App\Libraries\Mailer();
                 
                 $mensajeHTML = '
@@ -1776,7 +1809,7 @@ class Agregar extends BaseController
                     $finalAttachments, 
                     "Facturas G.O. Generadas - SUSI - Folio: " . $folioCompleto
                 );
-            }   
+            }    */
 
         } // Fin de if (!$response->error)
 
@@ -2802,7 +2835,7 @@ class Agregar extends BaseController
         }
 
         // Enviar correos si hay adjuntos
-           if (!empty($finalAttachments)) {
+       /*    if (!empty($finalAttachments)) {
             $folioCompleto = "";
             // Recuperar el ID del folio direccion (PK) guardado anteriormente
             $id_folio_direccion = isset($dataInsert['no_consecutivo']) ? $dataInsert['no_consecutivo'] : 0;
@@ -2855,7 +2888,7 @@ class Agregar extends BaseController
                 $finalAttachments, 
                 "Facturas PT Generadas - SUSI - Folio: " . $folioCompleto
             );
-        }   
+        } */  
 
         //die( var_dump( $response ) );
         return $this->respond($response);

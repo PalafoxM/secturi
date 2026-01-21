@@ -1253,7 +1253,7 @@ class Principal extends BaseController
                 }
             }
         }
-        $res = $this->enviarEmail(1);
+        //$res = $this->enviarEmail(1);
       
 
         return $this->respond($response);
@@ -1366,7 +1366,7 @@ class Principal extends BaseController
                 }
             }
         }
-        $this->enviarEmail(0);
+        //$this->enviarEmail(0);
        
 
         return $this->respond($response);
@@ -4599,7 +4599,7 @@ class Principal extends BaseController
             'where' => ['visible' => 1, 'id_registro_go' => $id_pt]
         ]);
 
-  //var_dump( $xml );
+      
         if (isset($importe->data) && !empty($importe->data)) {
             $data['importe'] = $importe->data;
               $totalGo = 0;
@@ -4611,6 +4611,8 @@ class Principal extends BaseController
 
 
         }
+
+    
     
         //==============================
         

@@ -1530,6 +1530,17 @@ class Usuario extends BaseController
                     'id_director' => $row->id_reponsable_solicitud
                 ]
             ]);
+            $registroGo = $globals->getTabla([
+                'tabla' => 'registro_go',
+                'where' => [
+                    'visible' => 1,
+                    'id_reserva_go' => $row->id_reserva_go
+                ]
+            ]);
+
+            if(!empty($registroGo->data) && isset($registroGo)){
+
+            }
 
             if (empty($direccion->data)) {
                 $usuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $row->id_reponsable_solicitud]]);
