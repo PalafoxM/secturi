@@ -1501,23 +1501,16 @@ class Usuario extends BaseController
 
         // 3. Encabezados
         $encabezados = [
-            'id_reserva_go',
-            'id_proveedor',
-            'folio_interno',
-            'total_importe',
-            'id_estatus',
-            'fec_reg',
-            'no_reserva',
-            // 'id_presupuesto_go',
-            // 'id_reserva',
-            // 'id_proyecto',
-            // 'id_partida',
-            'importe',
-            'propina',
-            // 'usu_reg',
-            'proyecto',
-            'partida',
-            'dsc_partida'
+            'Suma de Importe',
+            'FOLIO',
+            'PARTIDA',
+            'CENTRO GESTOR',
+            'CTA MAYOR',
+            'FONDO',
+            'DIV',
+            'CENTRO COSTO',
+            'ORDEN',
+            'ELEMENTO PEP'
         ];
         
         $col = 'A';
@@ -1525,25 +1518,51 @@ class Usuario extends BaseController
             $sheet->setCellValue($col . '1', $titulo);
             $col++;
         }
-
         // 4. Llenar datos
         //die( var_dump($result) );
         $fila = 2;
         foreach ($result->data as $row) {
-            $sheet->setCellValue('A' . $fila, $row->id_reserva_go);
-            $sheet->setCellValue('B' . $fila, $row->id_proveedor);
-            $sheet->setCellValue('C' . $fila, $row->folio_interno);
-            $sheet->setCellValue('D' . $fila, $row->total_importe);
-            $sheet->setCellValue('E' . $fila, $row->id_estatus);
-            $sheet->setCellValue('F' . $fila, $row->fec_reg);
-            $sheet->setCellValue('G' . $fila, $row->no_reserva);
+           // die( var_dump($row) );
+            $direccion = $globals->getTabla([
+                'tabla' => 'vw_direccion',
+                'where' => [
+                    'visible' => 1,
+                    'id_director' => $row->id_reponsable_solicitud
+                ]
+            ]);
+
+            if (empty($direccion->data)) {
+                $usuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $row->id_reponsable_solicitud]]);
+                
+                if (!empty($usuario->data)) {
+                    $idJefe = $usuario->data[0]->id_jefe_inmediato;
+                    $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_director' => $idJefe]]);
+                    
+                    if (empty($direccion->data)) {
+                         $idArea = $usuario->data[0]->id_area;
+                         $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_area' => $idArea]]);
+                    }
+                }
+            }
+
+            $prefijo = (isset($direccion->data) && !empty($direccion->data)) ? $direccion->data[0]->folio_prefijo : '';
+            $no_consecutivo = str_pad($row->no_consecutivo, 3, "0", STR_PAD_LEFT);
+
+
+             $folio_prefijo = $prefijo . $no_consecutivo . '/' . date('Y');
+            $sheet->setCellValue('A' . $fila, floatval(str_replace(',', '', $row->importe)) + floatval(str_replace(',', '', $row->propina)));
+            $sheet->setCellValue('B' . $fila, $folio_prefijo);
+            $sheet->setCellValue('C' . $fila, $row->partida);
+            $sheet->setCellValue('D' . $fila, $row->centro_gestor);
+            $sheet->setCellValue('E' . $fila, '');
+            $sheet->setCellValue('F' . $fila, $row->fondo);
+            $sheet->setCellValue('G' . $fila, '21');
             
             // Re-mapeo de columnas tras eliminar las solicitadas
-            $sheet->setCellValue('H' . $fila, $row->importe);
-            $sheet->setCellValue('I' . $fila, $row->propina);
-            $sheet->setCellValue('J' . $fila, $row->proyecto);
-            $sheet->setCellValue('K' . $fila, $row->partida);
-            $sheet->setCellValue('L' . $fila, $row->dsc_partida);
+            $sheet->setCellValue('H' . $fila, '');
+       
+            $sheet->setCellValue('I' . $fila, '');
+            $sheet->setCellValue('J' . $fila, $row->elemento_pep);
             
             $fila++;
         }

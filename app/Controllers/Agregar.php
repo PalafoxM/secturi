@@ -1425,7 +1425,7 @@ class Agregar extends BaseController
    
         
        $no_consecutivo = $this->registrarFolioGo($data['no_consecutivo'], $data['id_reponsable_solicitud']);
-      
+
         $dataInsert = [
             'id_reserva_go' => $data['id_reserva_go'],
             'id_direccion_responsable' => $data['direccion_responsable'],
@@ -1698,7 +1698,7 @@ class Agregar extends BaseController
             // === FIN NUEVO CÓDIGO DE PROCESAMIENTO ===
 
              // Enviar correos si hay adjuntos
-         if (!empty($finalAttachments)) {
+        /*  if (!empty($finalAttachments)) {
                 $mailer = new \App\Libraries\Mailer();
                 
                 $mensajeHTML = '
@@ -1732,7 +1732,7 @@ class Agregar extends BaseController
                     $finalAttachments, 
                     "Facturas G.O. Generadas - SUSI - Folio: " . $folioCompleto
                 );
-            }  
+            } */  
 
         } // Fin de if (!$response->error)
 
@@ -2758,7 +2758,7 @@ class Agregar extends BaseController
         }
 
         // Enviar correos si hay adjuntos
-          if (!empty($finalAttachments)) {
+       /*    if (!empty($finalAttachments)) {
             $folioCompleto = "";
             // Recuperar el ID del folio direccion (PK) guardado anteriormente
             $id_folio_direccion = isset($dataInsert['no_consecutivo']) ? $dataInsert['no_consecutivo'] : 0;
@@ -2811,7 +2811,7 @@ class Agregar extends BaseController
                 $finalAttachments, 
                 "Facturas PT Generadas - SUSI - Folio: " . $folioCompleto
             );
-        }  
+        } */  
 
         //die( var_dump( $response ) );
         return $this->respond($response);
