@@ -2610,7 +2610,7 @@ class Principal extends BaseController
 
         $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
         $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
-       die( var_dump( $data['cat_proyecto']  ) );
+       //die( var_dump( $data['cat_partida']  ) );
         // Cargar catalogos si es necesario, similar a otras vistas
         // Por ahora solo cargamos la vista básica
         $data['scripts'] = array('inicio'); // Asumiendo scripts estandar
@@ -2931,6 +2931,37 @@ class Principal extends BaseController
         $data['contentView'] = 'secciones/vregistroPT';
         $this->_renderView($data);
     }
+    public function viaticoPersona($id = null)
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        
+        // Obtener datos de viaticos
+        $viaticos = $globals->getTabla(['tabla' => 'viaticos_go', 'where' => ['visible' => 1, 'id_registro_go' => $id]]);
+        
+        // Obtener datos del registro principal para el folio (si es necesario)
+        $registro_go = $globals->getTabla(['tabla' => 'registro_go', 'where' => ['id_registro_go' => $id]]);
+        
+        $data = [];
+        $data['viaticos'] = (!empty($viaticos->data)) ? $viaticos->data : [];
+        $data['folio'] = (!empty($registro_go->data)) ? $registro_go->data[0]->no_consecutivo : 'N/A'; // Asumimos no_consecutivo como parte del folio o similar
+
+        // Cargar vista HTML
+        $html = view('secciones/vFormatoViaticosDesglose', $data);
+
+        // Generar PDF
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 20,
+            'margin_left' => 20,
+            'margin_right' => 20,
+            'margin_bottom' => 20,
+            'format' => 'Letter'
+        ]);
+
+        $mpdf->WriteHTML($html);
+        $mpdf->Output('Viaticos_Desglose.pdf', 'I');
+        exit();
+    }
     public function tablaArchivos($id = null, $tipo = null)
     {
         $session = \Config\Services::session();
@@ -2941,6 +2972,7 @@ class Principal extends BaseController
             $this->_renderView($data);
             die();
         }
+        $data['viaticos']= false;
         $PT = ($tipo == 'PT') ? TRUE : FALSE;
         $GO = ($tipo == 'GO') ? TRUE : FALSE;
         $GRC = ($tipo == 'GRC') ? TRUE : FALSE;
@@ -2950,6 +2982,10 @@ class Principal extends BaseController
         }
         if($GO) {
             $factura = $globals->getTabla(['tabla' => 'xml_go', 'where' => ['visible' => 1, 'id_registro_go' => $id]]);
+            $viaticos = $globals->getTabla(['tabla' => 'viaticos_go', 'where' => ['visible' => 1, 'id_registro_go' => $id]]);
+            if(isset($viaticos->data) && !empty($viaticos->data)){
+               $data['viaticos']= true;
+            }
         }
         //die(var_dump($factura));
         $data['PT'] = $PT;

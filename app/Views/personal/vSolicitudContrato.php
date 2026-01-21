@@ -100,7 +100,7 @@
                                                         <option value="">Seleccione una opción</option>
                                                         <?php foreach ($cat_partida as $p): ?>
                                                             <option value="<?= $p->id_partida ?>" <?= (isset($solicitud) && $solicitud->partida == $p->id_partida) ? 'selected' : '' ?>>
-                                                                <?= $p->partida ?>
+                                                                <?= $p->cuenta_cable ?>
                                                             </option>
                                                         <?php endforeach; ?>
                                                     </select>

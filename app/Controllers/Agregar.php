@@ -1314,8 +1314,8 @@ class Agregar extends BaseController
                     'filas' => []
                 ];
 
-                // Si no hay 'importe' para esta tabla, saltamos
-                if (!isset($data['periodo_inicio_' . $i])) {
+                // Si no hay 'periodo_inicio' (estándar) ni 'nombre_viatico' (viáticos) para esta tabla, saltamos
+                if (!isset($data['periodo_inicio_' . $i]) && !isset($data['nombre_viatico_' . $i])) {
                     continue;
                 }
 
@@ -1325,8 +1325,12 @@ class Agregar extends BaseController
                     $file_keys_para_tabla_i = array_keys($archivos_por_tabla[$i]);
                 }
 
+                // Determinamos la fuente de datos para iterar
+                $source_data = isset($data['periodo_inicio_' . $i]) ? $data['periodo_inicio_' . $i] : $data['nombre_viatico_' . $i];
+                $is_viaticos = isset($data['nombre_viatico_' . $i]);
+
                 // 3. Iterar por cada fila ($j) dentro de la tabla ($i)
-                foreach ($data['periodo_inicio_' . $i] as $j => $importe_valor) {
+                foreach ($source_data as $j => $val) {
                     // $j es el índice de la fila (0, 1, 2...)
 
                     // Usamos $j para obtener la clave de archivo correspondiente por orden
@@ -1339,10 +1343,17 @@ class Agregar extends BaseController
 
                     // 4. Construir el objeto final de la fila
                     $fila_completa = [
-                        //  'importe'        => $importe_valor,
+                        // Standar fields
                         'propina' => $data['propina_' . $i][$j] ?? null,
                         'periodo_inicio' => $data['periodo_inicio_' . $i][$j] ?? null,
                         'periodo_fin' => $data['periodo_fin_' . $i][$j] ?? null,
+                        
+                        // Viaticos fields
+                        'contribuyente' => $is_viaticos ? ($data['nombre_viatico_' . $i][$j] ?? null) : null,
+                        'rfc'           => $is_viaticos ? ($data['rfc_viatico_' . $i][$j] ?? null) : null,
+                        'importe'       => $is_viaticos ? ($data['importe_' . $i][$j] ?? null) : null,
+                        'is_viaticos'   => $is_viaticos,
+
                         'archivos' => $archivos_de_la_fila, // Ej: ['pdf' => [file1], 'xml' => [file1]]
                         'js_rowIndex' => $rowIndex_de_archivos // Para depurar
                     ];
@@ -1401,8 +1412,19 @@ class Agregar extends BaseController
         }
 
         // VALIDAR FECHAS Y ARCHIVOS EN FILAS
+        // VALIDAR FECHAS Y ARCHIVOS EN FILAS
         foreach ($tablas_procesadas as $tabla) {
             foreach ($tabla['filas'] as $fila) {
+                // Si es viaticos, validamos campos específicos y saltamos lo demás
+                if (!empty($fila['is_viaticos'])) {
+                    if (empty($fila['contribuyente']) || empty($fila['importe'])) {
+                         $response->error = true;
+                         $response->respuesta = "Nombre y Total son requeridos en Desglose de Gastos.";
+                         return $this->respond($response);
+                    }
+                    continue; 
+                }
+
                 if (empty($fila['periodo_inicio']) || empty($fila['periodo_fin'])) {
                     $response->error = true;
                     $response->respuesta = "Es necesario capturar las fechas de inicio y fin en todas las filas.";
@@ -1473,36 +1495,58 @@ class Agregar extends BaseController
                     $identificador_fila_unica = $fila['js_rowIndex'];
 
                     // 1. GUARDAR DATOS DE LA FILA (Importe, Propina, etc.)
-                    // ¡ESTO ES LO QUE TE FALTA!
-                    $datos_fila_para_guardar = [
-                        'id_registro_go' => $id_registro_go, // Se vincula al registro principal
-                        'encabezado' => $tabla['encabezado'], // Dato de la tabla
-                        'id_presupuesto' => $tabla['id_presupuesto'], // Dato de la tabla
-                        // 'importe'        => str_replace(['$', ','], '', $fila['importe']), // Limpiamos el importe
-                        'propina' => (!empty($fila['propina'])) ? str_replace(['$', ','], '', $fila['propina']) : 0, // Limpiamos la propina
-                        'periodo_inicio' => $fila['periodo_inicio'],
-                        'periodo_fin' => $fila['periodo_fin'],
-                        'id_identificador' => $identificador_fila_unica, // EL ENLACE CLAVE (debe ser VARCHAR)
-                        'usu_reg' => $session->get('id_usuario'),
-                        'fec_reg' => date('Y-m-d H:i:s')
-                    ];
+                   
+                    if (!empty($fila['is_viaticos'])) {
+                        // === GUARDAR EN VIATICOS_GO ===
+                        $datos_viatico = [
+                            'id_registro_go' => $id_registro_go,
+                            'id_presupuesto' => $tabla['id_presupuesto'],
+                            'nombre'         => $fila['contribuyente'],
+                            'rfc'            => $fila['rfc'],
+                            'importe'        => (!empty($fila['importe'])) ? str_replace(['$', ','], '', $fila['importe']) : 0,
+                            'id_identificador' => $identificador_fila_unica,
+                            'usu_reg'        => $session->get('id_usuario'),
+                            'fec_reg'        => date('Y-m-d H:i:s')
+                        ];
 
+                        $dataConfig = [
+                            "tabla" => "viaticos_go",
+                            "editar" => false
+                        ];
 
-                    // Iterar sobre cada conjunto de datos
+                        $dataBitacora = [
+                            'id_user' => $session->get('id_usuario'),
+                            'script' => 'Agregar.php/guardarViatico'
+                        ];
 
-                    $dataConfig = [
-                        "tabla" => "periodo_factura_go",
-                        "editar" => false
-                    ];
+                        $responseViatico = $this->globals->saveTabla($datos_viatico, $dataConfig, $dataBitacora);
 
+                    }
+                        // === GUARDAR EN PERIODO_FACTURA_GO (Estándar) ===
+                        $datos_periodo = [
+                            'id_registro_go' => $id_registro_go, // Se vincula al registro principal
+                            'encabezado' => $tabla['encabezado'], // Dato de la tabla
+                            'id_presupuesto' => $tabla['id_presupuesto'], // Dato de la tabla
+                            'propina' => (!empty($fila['propina'])) ? str_replace(['$', ','], '', $fila['propina']) : 0, // Limpiamos la propina
+                            'periodo_inicio' => $fila['periodo_inicio'],
+                            'periodo_fin' => $fila['periodo_fin'],
+                            'id_identificador' => $identificador_fila_unica, // EL ENLACE CLAVE
+                            'usu_reg' => $session->get('id_usuario'),
+                            'fec_reg' => date('Y-m-d H:i:s')
+                        ];
 
+                        $dataConfig = [
+                            "tabla" => "periodo_factura_go",
+                            "editar" => false
+                        ];
 
-                    $dataBitacora = [
-                        'id_user' => $session->get('id_usuario'),
-                        'script' => 'Agregar.php/guardarFacturaPeriodo'
-                    ];
+                        $dataBitacora = [
+                            'id_user' => $session->get('id_usuario'),
+                            'script' => 'Agregar.php/guardarFacturaPeriodo'
+                        ];
 
-                    $responseFila = $this->globals->saveTabla($datos_fila_para_guardar, $dataConfig, $dataBitacora);
+                        $responseFila = $this->globals->saveTabla($datos_periodo, $dataConfig, $dataBitacora);
+                    
 
 
                     $archivos_pdf_fila = [];

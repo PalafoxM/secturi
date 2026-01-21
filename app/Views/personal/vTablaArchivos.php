@@ -272,6 +272,15 @@
                                                                                     </a>
                                                                                 </td>
                                                                             </tr>
+                                                                             <?php if($viaticos): ?>
+                                                                            <tr>
+                                                                                <td>
+                                                                                    <a href="<?= base_url("index.php/Principal/viaticoPersona/".$id_registro."/3") ?>" target="_blank" title="Hoja 3">
+                                                                                        <i class="far fa-file-pdf text-danger fa-2x"></i> Viaticos por Persona
+                                                                                    </a>
+                                                                                </td>
+                                                                            </tr>
+                                                                            <?php endif; ?>
                                                                             <?php foreach($factura as $index => $f): ?>
                                                                                 <tr>
                                                                                     <td>
@@ -296,6 +305,15 @@
                                                                                     </a>
                                                                                 </td>
                                                                             </tr>
+                                                                            <?php if($viaticos): ?>
+                                                                            <tr>
+                                                                                <td>
+                                                                                    <a href="<?= base_url("index.php/Principal/viaticoPersona/".$id_registro."/3") ?>" target="_blank" title="Hoja 3">
+                                                                                        <i class="far fa-file-pdf text-danger fa-2x"></i> Viaticos por Persona
+                                                                                    </a>
+                                                                                </td>
+                                                                            </tr>
+                                                                            <?php endif; ?>
                                                                             <tr>
                                                                                 <td>
                                                                                     <a href="<?= base_url("index.php/Principal/ImprimirGO/".$id_registro."/3") ?>" target="_blank" title="Hoja 3">
@@ -303,6 +321,7 @@
                                                                                     </a>
                                                                                 </td>
                                                                             </tr>
+                                                                            
                                                                         <?php endif; ?>
                                                                     </tbody>
                                                                 </table>

@@ -273,6 +273,66 @@
                                         </div>
 
                                         <!-- Encabezado y XML -->
+                                         <?php if($p->id_partida == 129): ?>
+                                        <div class="col-md-2 mb-3">
+                                            <label for="encabezado_<?= $i ?>">Encabezado<span
+                                                    style="color:red;">*</span></label>
+                                            <input type="text" class="form-control" autocomplete="off"
+                                                id="encabezado_<?= $i ?>" name="encabezado[]"
+                                                value="<?= (isset($p->encabezado) && !empty($p->encabezado)) ? $p->encabezado : '' ?>">
+                                        </div>
+                                        <div class="col-md-2 mb-3">
+                                             <a onclick="addViaticos(<?= $i?>)"  class="btn btn-secondary text-white" >
+                                                 <i class="fas fa-plus"></i> Agregar Viaticos por Persona
+                                             </a>
+                                             
+                                              <!-- MODAL VIATICOS (Injecting here to be inside the loop scope) -->
+                                            <div class="modal fade" id="modalViaticos_<?= $i ?>" tabindex="-1" role="dialog" aria-labelledby="modalLabel<?= $i ?>" aria-hidden="true" data-backdrop="static">
+                                                <div class="modal-dialog modal-xl" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header bg-light">
+                                                            <h5 class="modal-title" id="modalLabel<?= $i ?>">Desglose de Gastos (Viáticos - Partida 129)</h5>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body p-4">
+                                                            <div class="alert alert-info border-0" role="alert">
+                                                                <i class="mdi mdi-information-outline mr-2"></i> Agregue las personas y sus gastos. Pulse <strong>"Guardar en Memoria"</strong> al finalizar los cambios en esta ventana. 
+                                                                <strong>Nota:</strong> La información se enviará al servidor solo cuando pulse el botón "Guardar" principal del formulario.
+                                                            </div>
+                                                            <table class="table table-bordered table-striped" id="tableViaticos_<?= $i ?>">
+                                                                <thead class="thead-dark">
+                                                                    <tr>
+                                                                        <th>NOMBRE</th>
+                                                                        <th>RFC</th>
+                                                                        <th>TOTAL GASTO EN VIATICOS (3760-3750)</th>
+                                                                        <th>ACCIONES</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <!-- Filas dinámicas -->
+                                                                </tbody>
+                                                            </table>
+                                                            <div class="text-right mt-3">
+                                                                <button type="button" class="btn btn-primary btn-sm" onclick="addRowViaticosModal(<?= $i ?>)">
+                                                                    <i class="fas fa-plus"></i> Agregar Persona
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar / Cerrar</button>
+                                                            <button type="button" class="btn btn-success" onclick="guardarViaticosModal(<?= $i ?>)">
+                                                                <i class="fas fa-check"></i> Guardar en Memoria
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                             <div id="viaticos-summary-<?= $i ?>" class="mt-2 text-muted font-weight-bold">Status: Sin datos locales</div>
+                                        </div>
+                                        <?php endif; ?>
+                                         <?php if($p->id_partida != 129): ?>
                                         <div class="col-md-4 mb-3">
                                             <label for="encabezado_<?= $i ?>">Encabezado<span
                                                     style="color:red;">*</span></label>
@@ -280,6 +340,8 @@
                                                 id="encabezado_<?= $i ?>" name="encabezado[]"
                                                 value="<?= (isset($p->encabezado) && !empty($p->encabezado)) ? $p->encabezado : '' ?>">
                                         </div>
+                                        <?php endif; ?>
+
 
 
                                     </div>
@@ -602,6 +664,75 @@ $(document).on('click', '.btn-seleccionar-pdf', function() {
     input.click();
 });
 
+// Funciones Modal Viaticos RE-IMPLEMENTADAS
+function addViaticos(i) {
+    // Si la función se llama addViaticos en el onclick
+    $(`#modalViaticos_${i}`).modal('show');
+}
+
+function openModalViaticos(i) {
+    // Alias por compatibilidad
+    $(`#modalViaticos_${i}`).modal('show');
+}
+
+function addRowViaticosModal(i) {
+    const tableBody = $(`#tableViaticos_${i} tbody`);
+    const rowIndex = 'viatico_' + i + '_' + Date.now();
+    
+    // Generar opciones de usuarios desde PHP
+    let userOptions = '<option value="">Seleccione un usuario</option>';
+    <?php if(isset($cat_usuario)): ?>
+        <?php foreach ($cat_usuario as $u): ?>
+             // Escape single quotes in names to prevent JS errors
+            userOptions += `<option value="<?= $u->nombre . ' ' . $u->primer_apellido . ' ' . $u->segundo_apellido ?>" data-rfc="<?= isset($u->rfc) ? $u->rfc : '' ?>"><?= $u->nombre . ' ' . $u->primer_apellido . ' ' . $u->segundo_apellido ?></option>`;
+        <?php endforeach; ?>
+    <?php endif; ?>
+    const newRow = `
+    <tr data-row-index="${rowIndex}" data-viaticos="true">
+         <td>
+            <select class="form-control select2-viaticos select2" name="nombre_viatico_${i}[]" onchange="updateViaticoRFC(this)">
+                ${userOptions}
+            </select>
+        </td>
+        <td>
+            <input type="text" class="form-control" name="rfc_viatico_${i}[]" placeholder="RFC" readonly>
+        </td>
+        <td>
+            <input type="text" class="form-control" name="importe_${i}[]" placeholder="Total">
+        </td>
+        <td>
+            <button type="button" class="btn btn-sm btn-danger" onclick="$(this).closest('tr').remove()">
+                <i class="fas fa-trash"></i>
+            </button>
+        </td>
+    </tr>`;
+    
+    tableBody.append(newRow);
+    
+     // Inputmask
+    $(`#tableViaticos_${i} tbody tr[data-row-index="${rowIndex}"] input[name="importe_${i}[]"]`).inputmask('numeric', {
+        radixPoint: ".",
+        groupSeparator: ",",
+        digits: 2,
+        autoGroup: true,
+        prefix: '$ ',
+        rightAlign: false
+    });
+}
+
+function guardarViaticosModal(i) {
+    // Solo cierra el modal, los datos ya están en inputs
+    const count = $(`#tableViaticos_${i} tbody tr`).length;
+    
+    if (count > 0) {
+        $(`#viaticos-summary-${i}`).html(`<span class="text-success"><i class="fas fa-check-circle"></i> ${count} personas agregadas (Listo para guardar)</span>`);
+    } else {
+        $(`#viaticos-summary-${i}`).text(`Status: Sin datos locales`);
+    }
+
+    $(`#modalViaticos_${i}`).modal('hide');
+}
+
 // SweetAlert para seleccionar XML - CORREGIDO
 $(document).on('click', '.btn-seleccionar-xml', function() {
     const rowIndex = $(this).data('row');
@@ -734,6 +865,22 @@ function prepararFormData() {
         formData.append(key, value);
     }
     
+    // Capturar inputs de los modales de viaticos MANUALMENTE
+    // Esto es necesario si Bootstrap mueve el modal fuera del <form>
+    $('[id^="modalViaticos_"]').each(function() {
+         const i = this.id.split('_')[1];
+         // Solo si el modal no es hijo del form (Bootstrap a veces los mueve al body)
+         if (!$.contains(form, this)) {
+             $(this).find('input').each(function() {
+                 if (this.name && this.value) {
+                     formData.append(this.name, this.value);
+                 }
+             });
+         }
+    });
+    
+
+    
     // Agregar archivos - SOLO FILAS QUE EXISTEN
     Object.keys(archivosPorFila).forEach(rowIndex => {
         const archivos = archivosPorFila[rowIndex];
@@ -777,9 +924,14 @@ $('#form_go').on('submit', function(e) {
         return;
     }
 
-    // Validacion de archivos requeridos (PDF y XML por fila)
+
     let archivosValidos = true;
     $('tr[data-row-index]').each(function() {
+        // SKIP VIATICOS
+        if ($(this).attr('data-viaticos') === 'true') {
+            return; 
+        }
+
         const rowIndex = $(this).data('row-index');
         const archivos = archivosPorFila[rowIndex];
         
@@ -860,4 +1012,17 @@ $(document).ready(function() {
     
     console.log('Filas inicializadas:', archivosPorFila);
 });
+
+function updateViaticoRFC(selectElement) {
+    const selectedOption = selectElement.options[selectElement.selectedIndex];
+    const rfc = selectedOption.getAttribute('data-rfc');
+    const row = $(selectElement).closest('tr');
+    const rfcInput = row.find('input[name^="rfc_viatico_"]');
+    
+    if(rfc) {
+        rfcInput.val(rfc);
+    } else {
+        rfcInput.val('');
+    }
+}
 </script>
