@@ -1253,7 +1253,7 @@ class Principal extends BaseController
                 }
             }
         }
-       // $res = $this->enviarEmail(1);
+        $res = $this->enviarEmail(1);
       
 
         return $this->respond($response);
@@ -1366,7 +1366,7 @@ class Principal extends BaseController
                 }
             }
         }
-        //$this->enviarEmail(0);
+        $this->enviarEmail(0);
        
 
         return $this->respond($response);
