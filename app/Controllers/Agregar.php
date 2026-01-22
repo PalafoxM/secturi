@@ -1484,7 +1484,7 @@ class Agregar extends BaseController
             'id_reserva_go' => $data['id_reserva_go'],
             'id_direccion_responsable' => $data['direccion_responsable'],
             'fecha_tramite' => $data['fecha_tramite'],
-            'no_consecutivo' => (int) $no_consecutivo,
+            'no_consecutivo' => $no_consecutivo,
             'id_reponsable_solicitud' => (int) $data['id_reponsable_solicitud'],
             'director_general' => 1,
             'secretario' => (int) $data['secretario'],
@@ -2392,17 +2392,30 @@ class Agregar extends BaseController
     private function registrarFolioGo($noConsecutivo, $responsableGasto)
     {
         $session = \Config\Services::session();
-        $response = new \stdClass();
-        $response->error = true;
         $globals = new Mglobal;
         $idRegistro = 0;
-        $dataDB = array('tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario]);
-        $user = $globals->getTabla($dataDB);
+        
+        $user = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario]]);
+
         //vemos si el usuario tiene id_area
         if (isset($user->data) && !empty($user->data)) {
             $id_area = $user->data[0]->id_area;
+
+            // BUSCAR EL ÚLTIMO CONSECUTIVO PARA ESTA ÁREA
+            $ultimoFolio = $globals->getTabla([
+                'tabla' => 'folio_go',
+                'where' => ['id_area' => $id_area],
+                'order' => 'no_consecutivo DESC',
+                'limit' => 1
+            ]);
+
+            $nuevoConsecutivo = 1;
+            if (isset($ultimoFolio->data) && !empty($ultimoFolio->data)) {
+                $nuevoConsecutivo = intval($ultimoFolio->data[0]->no_consecutivo) + 1;
+            }
+
             $dataInsert = [
-                'no_consecutivo' => $noConsecutivo,
+                'no_consecutivo' => $nuevoConsecutivo,
                 'id_area' => $id_area,
                 'id_direccion' => $responsableGasto,
                 'fec_reg' => date('Y-m-d H:i:s'),
@@ -2413,21 +2426,18 @@ class Agregar extends BaseController
                 "editar" => false
             ];
 
+            $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFolio'];
+            $resultado = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
 
+            if (!$resultado->error) {
+                // $idRegistro = $resultado->idRegistro; 
+                // Si necesitas el ID del registro, úsalo. Si necesitas el consecutivo, retorna $nuevoConsecutivo
+            }
+             
+             return $nuevoConsecutivo;
         }
 
-
-        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFolio'];
-        $no_consecutivo = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
-        // var_dump($no_consecutivo);
-        // die();
-        if (!$no_consecutivo->error) {
-            $idRegistro = $no_consecutivo->idRegistro;
-
-        }
-
-        return $noConsecutivo;
-
+        return 0; // O manejar error si no tiene área
     }
     private function registrarFolio($noConsecutivo, $responsableGasto)
     {

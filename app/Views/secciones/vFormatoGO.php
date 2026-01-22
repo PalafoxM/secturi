@@ -10,12 +10,12 @@
         <div  style="position:absolute;text-align:center; top:14.75%; left:53.5%; width:40.5%; height:15px; background-color:black; color:white; font-size: 12px; ">
            21 SECRETARIA DE TURISMO E IDENTIDAD
         </div>
-       <div  style="position:absolute; text-align:center; top:19.5%; left:61.4%; width:7%; height:10px; background-color:white; font-size: 8px; ">
+       <div  style="position:absolute; text-align:center; top:19.5%; left:61.35%; width:6%; height:10px; background-color:white; font-size: 8px; ">
             <span class="proxima"><?= date('d/m/Y', strtotime($registro->fecha_tramite)); ?></span>
         </div>
         <div  style="position:absolute;text-align:center; top:19.5%; left:70%; width:23%; height:10px; background-color:white; font-size: 12px; ">
             <?php if(!$fic): ?>
-            <span class="proxima"><?=  strtoupper($registro->folio); ?></span>
+            <span class="proxima">GO <?=  strtoupper($registro->folio); ?></span>
             <?php endif; ?>
         </div>
   
@@ -101,7 +101,7 @@
         </div>
         
          <div  style="position:absolute;  text-align:center; top:78.7%; left:75.3%; width:18.5%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><?= (isset($usu_sub->puesto) && !empty($usu_sub->puesto))?$usu_sub->puesto:''?></span>
+            <span class="proxima "><?= ($usu_sub->puesto  == 'NO APLICA')?'':$usu_sub->puesto?></span>
         </div>
                 
       

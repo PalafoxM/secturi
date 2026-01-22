@@ -4690,8 +4690,15 @@ class Principal extends BaseController
             } else {
                 $zero = '';
             }
-            if (!empty($direccion->data)) {
-                $folio_prefijo = $direccion->data[0]->folio_prefijo . $zero . $no_consecutivo . '/' . date('Y'); //ESTO HAY QUE OREGUNTAR
+
+            if (!empty($registro_go->data[0]->id_direccion_responsable)) {
+                $prefijo = $globals->getTabla([
+                    'tabla' => 'cat_area',
+                    'where' => ['visible' => 1, 'id_area' => $registro_go->data[0]->id_direccion_responsable ]
+                ]);
+           
+             
+                $folio_prefijo = (isset($prefijo->data) && !empty($prefijo->data))?$prefijo->data[0]->prefijo . $zero . $no_consecutivo . '/' . date('Y'):''; //ESTO HAY QUE OREGUNTAR
                 $data['registro']->folio = $folio_prefijo;
             } else {
                 $data['registro']->folio = ''; // O un valor por defecto
@@ -5899,18 +5906,25 @@ class Principal extends BaseController
         $id_area           = (isset($user->data) && !empty($user->data))?$user->data[0]->id_area:0;
         $id_jefe_inmediato = (isset($user->data) && !empty($user->data))?$user->data[0]->id_jefe_inmediato:0;
       
-        $responGasto = $globals->getTabla(['tabla' => 'folio_go', 'where' => ['id_direccion' => (int)$session->id_usuario]]);  //primero revisamos si tu no eres responsable del gasto
+        // BUSCAR EL ÚLTIMO CONSECUTIVO PARA ESTA ÁREA
+        $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1, 'titular' => $session->id_usuario ]]);
+        if (isset($cat_area->data) && !empty($cat_area->data)) {
+            $id_area = $cat_area->data[0]->id_area;
+        }else{
+            $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1, 'titular' => $id_jefe_inmediato ]]);
+            if (isset($cat_area->data) && !empty($cat_area->data)) {
+                $id_area = $cat_area->data[0]->id_area;
+            }
+        }
+     
+        $ultimoFolio = $globals->getTabla([
+            'tabla' => 'folio_go',
+            'where' => ['id_direccion' => $id_area]
+        ]);
 
-        if( isset($responGasto->data) && !empty($responGasto->data)){
-             $no_consecutivo = count($responGasto->data);
-        }
-        if(empty($responGasto->data)){
-             $responGasto = $globals->getTabla(['tabla' => 'folio_go', 'where' => ['visible' => 1, 'id_direccion', $id_jefe_inmediato ]]);
-             $no_consecutivo = (isset($responGasto->data) && !empty($responGasto->data))?count($responGasto->data):'';
-        }
-        if(isset($no_consecutivo) && empty($no_consecutivo)){
-               $responGasto = $globals->getTabla(['tabla' => 'folio_go', 'where' => ['visible' => 1, 'id_area ', $id_area]]);
-               $no_consecutivo = (isset($responGasto->data) && !empty($responGasto->data))?count($responGasto->data):'';
+        $no_consecutivo = 0;
+        if (isset($ultimoFolio->data) && !empty($ultimoFolio->data)) {
+            $no_consecutivo = intval($ultimoFolio->data[0]->no_consecutivo) + 1;
         }
    
 
