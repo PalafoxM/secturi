@@ -45,6 +45,7 @@
                                                         <th class="text-center">ID AREA</th>
                                                         <th class="text-center">AREA</th>
                                                         <th class="text-center">SIGLAS</th>
+                                                        <th class="text-center">PREFIJO</th>
                                                         <th class="text-center">ESTATUS</th>
                                                         <th class="text-center">ACCIONES</th>
                                                     </tr>
@@ -57,6 +58,7 @@
                                                         <td class="text-center"><?= $p->id_area?></td>
                                                         <td class="text-center"><?= $p->dsc_area?></td>
                                                         <td class="text-center"><?= $p->dsc_corto?></td>
+                                                        <td class="text-center"><?= $p->prefijo?></td>
                                                         <td class="text-center">
                                                             <?php if($p->visible == 1):?>
                                                             <i class="mdi mdi-eye text-success font-18"></i>
@@ -118,19 +120,25 @@
                 <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
                     <input type="hidden" id="id_area" >
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="form-group">
                                 <label for="dsc_area">ÁREA</label>
                                 <input type="text" class="form-control" id="dsc_area">
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="form-group">
                                 <label for="dsc_corto">SIGLAS</label>
                                 <input type="text" class="form-control" id="dsc_corto">
                             </div>
                         </div>
-                         <div class="col-md-4">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="prefijo">PREFIJO</label>
+                                <input type="text" class="form-control" id="prefijo">
+                            </div>
+                        </div>
+                         <div class="col-md-3">
                             <div class="form-group">
                                 <label for="des_corto">RESPONSABLE</label>
                                <select class="form-control select2" id="titular" name="titular">

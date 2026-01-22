@@ -2613,6 +2613,7 @@ ini.inicio = (function () {
                     let data = res.data;
                     $('#dsc_area').val(data.dsc_area);
                     $('#dsc_corto').val(data.dsc_corto);
+                    $('#prefijo').val(data.prefijo);
                     $('#id_area').val(id);
                     if (data.titular) {
                         $('#titular').val(data.titular).change();
@@ -2631,12 +2632,13 @@ ini.inicio = (function () {
             let dsc_corto = $('#dsc_corto').val();
             let id_usuario = $('#titular').val();
             let id_area = $('#id_area').val();
+            let prefijo = $('#prefijo').val();
 
             $.ajax({
                 type: "POST",
                 url: base_url + "index.php/Usuario/guardarArea",
                 dataType: "json",
-                data: { dsc_area, dsc_corto, id_usuario, editar: 1, id_area },
+                data: { dsc_area, dsc_corto, id_usuario, editar: 1, id_area, prefijo },
                 success: function (res) {
                     console.log(res);
                     if (res.error) {

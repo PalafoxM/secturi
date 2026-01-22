@@ -1981,6 +1981,7 @@ class Usuario extends BaseController
                 $dataInsert = [
                     'dsc_area' => trim($data['dsc_area']),
                     'dsc_corto' => $data['dsc_corto'],
+                    'prefijo' => isset($data['prefijo']) ? $data['prefijo'] : '',
                     'titular' => (int) $data['id_usuario'],
                 ];
                 $dataConfig = [

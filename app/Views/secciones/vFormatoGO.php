@@ -96,17 +96,21 @@
             <span class="proxima "><?= strtoupper($registro->dsc_puesto_secretario); ?></span>
         </div>
         
-         <div  style="position:absolute;  text-align:center; top:75.7%; left:75.1%; width:19%; background-color:white; font-size: 12px;  height:12px;">
+         <div  style="position:absolute;  text-align:center; top:75.7%; left:75.3%; width:18.5%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "><?= ($usu_sub->dsc_subsecretario == 'NO APLICA')?'':$usu_sub->dsc_subsecretario?></span>
         </div>
-     
+        
+         <div  style="position:absolute;  text-align:center; top:78.7%; left:75.3%; width:18.5%; background-color:white; font-size: 12px;  height:12px;">
+            <span class="proxima "><?= (isset($usu_sub->puesto) && !empty($usu_sub->puesto))?$usu_sub->puesto:''?></span>
+        </div>
+                
       
       
-         <div  style="position:absolute;  text-align:center; top:86%; left:75.1%; width:19%; background-color:white; font-size: 12px;  height:12px;">
+         <div  style="position:absolute;  text-align:center; top:86%; left:75.3%; width:18.5%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "> <?= (isset($responsableGasto->nombre_completo) && !empty($responsableGasto->nombre_completo))?$responsableGasto->nombre_completo:'' ?> </span>
         </div>
-         <div  style="position:absolute;  text-align:center; top:88%; left:75.1%; width:19%; background-color:white; font-size: 9px;  height:18px;">
-            <span class="proxima "> <?= (isset($responsableGasto->dsc_puesto) && $responsableGasto->dsc_puesto)?$responsableGasto->dsc_puesto:'' ?> </span>
+         <div  style="position:absolute;  text-align:center; top:88%; left:75.3%; width:18.5%; background-color:white; font-size: 9px;  height:18px;">
+            <span class="proxima "> <?= (isset($responsableGasto->dsc_puesto) && !empty($responsableGasto->dsc_puesto))?$responsableGasto->dsc_puesto:'' ?> </span>
         </div>
 
         
