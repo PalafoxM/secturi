@@ -4697,12 +4697,12 @@ class Principal extends BaseController
                     'where' => ['visible' => 1, 'id_area' => $registro_go->data[0]->id_direccion_responsable ]
                 ]);
            
-             
                 $folio_prefijo = (isset($prefijo->data) && !empty($prefijo->data))?$prefijo->data[0]->prefijo . $zero . $no_consecutivo . '/' . date('Y'):''; //ESTO HAY QUE OREGUNTAR
                 $data['registro']->folio = $folio_prefijo;
             } else {
                 $data['registro']->folio = ''; // O un valor por defecto
             }
+          
 
         } else {
             echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
@@ -5920,16 +5920,16 @@ class Principal extends BaseController
      
         $ultimoFolio = $globals->getTabla([
             'tabla' => 'folio_go',
-            'where' => ['id_direccion' => $id_area]
+            'where' => ['id_direccion' => $id_area, 'visible' => 1]
         ]);
 
-
         if (isset($ultimoFolio->data) && !empty($ultimoFolio->data)) {
-            $no_consecutivo = intval($ultimoFolio->data[0]->no_consecutivo);
+            $no_consecutivo = count($ultimoFolio->data);
+        }else{
+            $no_consecutivo = 0;
         }
- 
+        //var_dump($no_consecutivo);
         $data['no_consecutivo'] = (int)$no_consecutivo + 1;
-
 
         $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1]]);
         $cat_tipo = $globals->getTabla(['tabla' => 'cat_tipo', 'where' => ['visible' => 1]]);
