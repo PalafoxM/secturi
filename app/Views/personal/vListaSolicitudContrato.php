@@ -34,9 +34,9 @@
                                         <tr>
                                             <th>ID</th>
                                             <th>Fecha Registro</th>
-                                            <th>Responsable Proyecto</th>
                                             <th>Proyecto</th>
-                                            <th>Proveedor</th>
+                                            <th>Responsable Proyecto</th>
+                                            <th>Responsable Seguimiento</th>
                                             <th>Monto</th>
                                             <th>Acciones</th>
                                         </tr>
@@ -47,9 +47,9 @@
                                                 <tr>
                                                     <td><?= $sol->id_solicitud_contrato ?></td>
                                                     <td><?= date('d/m/Y H:i', strtotime($sol->fec_reg)) ?></td>
-                                                    <td><?= $sol->responsable_proyecto ?></td>
-                                                    <td><?= $sol->proyecto ?></td>
-                                                    <td><?= $sol->proveedor_nombre ?></td>
+                                                    <td><?= $sol->dsc_proyecto ?></td>
+                                                    <td><?= $sol->nombre_proyecto ?></td>
+                                                    <td><?= $sol->nombre_seguimiento ?></td>
                                                     <td><?= $sol->monto_total ?></td>
                                                     <td class="text-center">
                                                         <a href="<?= base_url('index.php/Principal/editarSolicitudContrato/' . $sol->id_solicitud_contrato) ?>" class="btn btn-sm btn-warning" title="Editar"><i class="fas fa-edit"></i></a>
@@ -94,4 +94,54 @@
             }
         });
     });
+
+    function eliminarSolicitud(id) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "No podrás revertir esto",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '<?= base_url("index.php/Principal/eliminarSolicitudContrato") ?>',
+                    type: 'POST',
+                    data: { id_solicitud: id },
+                    success: function(response) {
+                        if (!response.error) {
+                            Swal.fire(
+                                'Eliminado!',
+                                'El registro ha sido eliminado.',
+                                'success'
+                            ).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire(
+                                'Error!',
+                                'No se pudo eliminar el registro.',
+                                'error'
+                            );
+                        }
+                    },
+                    error: function() {
+                        Swal.fire(
+                            'Error!',
+                            'Ocurrió un error al procesar la solicitud.',
+                            'error'
+                        );
+                    }
+                });
+            }
+        });
+    }
+    
+    function enviarSolicitud(id) {
+          // Implementar envío de correo o cambio de estatus
+          alert('Funcionalidad de envío en desarrollo ' + id);
+    }
 </script>

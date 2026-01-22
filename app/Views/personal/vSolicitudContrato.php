@@ -36,9 +36,9 @@
                                     <div class="col-sm-9">
                                         <select class="form-control select2" name="responsable_proyecto" required>
                                             <option value="">Seleccione una opción</option>
-                                            <?php foreach ($usuario as $u): ?>
+                                            <?php foreach ($direccion as $u): ?>
                                                 <option value="<?= $u->id_usuario ?>" <?= (isset($solicitud) && $solicitud->responsable_proyecto == $u->id_usuario) ? 'selected' : '' ?>>
-                                                    <?= $u->nombre_completo ?>
+                                                    <?= $u->nombre_completo .' - '. $u->dsc_puesto ?>
                                                 </option>
                                             <?php endforeach; ?>
                                         </select>
@@ -51,7 +51,7 @@
                                             <option value="">Seleccione una opción</option>
                                             <?php foreach ($usuario as $u): ?>
                                                 <option value="<?= $u->id_usuario ?>" <?= (isset($solicitud) && $solicitud->responsable_seguimiento == $u->id_usuario) ? 'selected' : '' ?>>
-                                                    <?= $u->nombre_completo ?>
+                                                     <?= $u->nombre_completo .' - '. $u->dsc_puesto ?>
                                                 </option>
                                             <?php endforeach; ?>
                                         </select>
@@ -64,7 +64,7 @@
                                             <option value="">Seleccione una opción</option>
                                             <?php foreach ($usuario as $u): ?>
                                                 <option value="<?= $u->id_usuario ?>" <?= (isset($solicitud) && $solicitud->enlace_comunicaciones == $u->id_usuario) ? 'selected' : '' ?>>
-                                                    <?= $u->nombre_completo ?>
+                                                    <?= $u->nombre_completo .' - '. $u->dsc_puesto ?>
                                                 </option>
                                             <?php endforeach; ?>
                                         </select>
@@ -120,13 +120,20 @@
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label">Monto Total del Contrato (con número y letra):</label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" name="monto_total" value="<?= isset($solicitud) ? $solicitud->monto_total : '' ?>" required>
+                                        <input type="text" class="form-control" id="monto_total" name="monto_total" value="<?= isset($solicitud) ? $solicitud->monto_total : '' ?>" required>
+                                        <input type="text" class="form-control mt-2" id="monto_letra" readonly placeholder="Monto en letra">
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label">Tipo y monto de Garantía (con número y letra):</label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" name="garantia" value="<?= isset($solicitud) ? $solicitud->garantia : '' ?>">
+                                        <select class="form-control" name="garantia">
+                                            <option value="">Seleccione una opción</option>
+                                            <option value="CHEQUE" <?= (isset($solicitud) && $solicitud->garantia == 'CHEQUE') ? 'selected' : '' ?>>CHEQUE</option>
+                                            <option value="PAGARE" <?= (isset($solicitud) && $solicitud->garantia == 'PAGARE') ? 'selected' : '' ?>>PAGARE</option>
+                                            <option value="FIANZA" <?= (isset($solicitud) && $solicitud->garantia == 'FIANZA') ? 'selected' : '' ?>>FIANZA</option>
+                                        </select>
+                                        <input type="text" class="form-control mt-2" name="monto_garantia" id="monto_garantia" value="<?= isset($solicitud) ? $solicitud->monto_total : '' ?>" readonly placeholder="112% del monto total">
                                     </div>
                                 </div>
 
@@ -206,7 +213,10 @@
                                 </div>
                                 <div class="form-group row">
                                     <label class="col-sm-3 col-form-label">Responsable de Seguimiento (correo electrónico):</label>
-                                    <div class="col-sm-9">
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" name="proveedor_seguimiento" value="<?= isset($solicitud) ? $solicitud->proveedor_seguimiento : '' ?>">
+                                    </div>
+                                    <div class="col-sm-4">
                                         <input type="email" class="form-control" name="proveedor_correo" value="<?= isset($solicitud) ? $solicitud->proveedor_correo : '' ?>">
                                     </div>
                                 </div>
@@ -249,7 +259,147 @@
         <script src="<?= base_url() ?>plugins/select2/select2.min.js"></script>
 
 <script>
+    function numeroALetras(amount) {
+        if (amount == 0) return "CERO PESOS 00/100 M.N.";
+        var pesos = Math.floor(amount);
+        var centavos = Math.round((amount - pesos) * 100);
+        var letras = "";
+
+        if (pesos == 0) letras = "CERO";
+        else if (pesos == 1) letras = "UN";
+        else letras = convertirGrupo(pesos);
+
+        return (letras + " PESOS " + (centavos < 10 ? "0" : "") + centavos + "/100 M.N.").toUpperCase();
+    }
+
+    function convertirGrupo(n) {
+        var output = "";
+        if (n == 100) output = "CIEN";
+        else if (n > 100 && n < 1000) output = centenas(n);
+        else if (n >= 1000 && n < 1000000) {
+            var miles = Math.floor(n / 1000);
+            var resto = n % 1000;
+            output = (miles == 1 ? "UN" : convertirGrupo(miles)) + " MIL" + (resto > 0 ? " " + convertirGrupo(resto) : "");
+        } else if (n >= 1000000) {
+            var millones = Math.floor(n / 1000000);
+            var resto = n % 1000000;
+            output = (millones == 1 ? "UN MILLON" : convertirGrupo(millones) + " MILLONES") + (resto > 0 ? " " + convertirGrupo(resto) : "");
+        } else {
+            output = centenas(n);
+        }
+        return output;
+    }
+
+    function centenas(n) {
+        var centenas = Math.floor(n / 100);
+        var decenas = n % 100;
+        var output = "";
+        
+        switch (centenas) {
+            case 1: output = (decenas > 0 ? "CIENTO" : "CIEN"); break;
+            case 2: output = "DOSCIENTOS"; break;
+            case 3: output = "TRESCIENTOS"; break;
+            case 4: output = "CUATROCIENTOS"; break;
+            case 5: output = "QUINIENTOS"; break;
+            case 6: output = "SEISCIENTOS"; break;
+            case 7: output = "SETECIENTOS"; break;
+            case 8: output = "OCHOCIENTOS"; break;
+            case 9: output = "NOVECIENTOS"; break;
+        }
+        
+        if (decenas > 0) output += (output ? " " : "") + dec(decenas);
+        return output;
+    }
+
+    function dec(n) {
+        if (n < 10) return unidades(n);
+        var output = "";
+        if (n >= 10 && n <= 29) {
+            switch (n) {
+                case 10: output = "DIEZ"; break;
+                case 11: output = "ONCE"; break;
+                case 12: output = "DOCE"; break;
+                case 13: output = "TRECE"; break;
+                case 14: output = "CATORCE"; break;
+                case 15: output = "QUINCE"; break;
+                case 16: output = "DIECISEIS"; break;
+                case 17: output = "DIECISIETE"; break;
+                case 18: output = "DIECIOCHO"; break;
+                case 19: output = "DIECINUEVE"; break;
+                case 20: output = "VEINTE"; break;
+                case 21: output = "VEINTIUNO"; break;
+                case 22: output = "VEINTIDOS"; break;
+                case 23: output = "VEINTITRES"; break;
+                case 24: output = "VEINTICUATRO"; break;
+                case 25: output = "VEINTICINCO"; break;
+                case 26: output = "VEINTISEIS"; break;
+                case 27: output = "VEINTISIETE"; break;
+                case 28: output = "VEINTIOCHO"; break;
+                case 29: output = "VEINTINUEVE"; break;
+            }
+        } else {
+             var d = Math.floor(n / 10);
+             var u = n % 10;
+             switch(d) {
+                 case 3: output = "TREINTA"; break;
+                 case 4: output = "CUARENTA"; break;
+                 case 5: output = "CINCUENTA"; break;
+                 case 6: output = "SESENTA"; break;
+                 case 7: output = "SETENTA"; break;
+                 case 8: output = "OCHENTA"; break;
+                 case 9: output = "NOVENTA"; break;
+             }
+             if (u > 0) output += " Y " + unidades(u);
+        }
+        return output;
+    }
+
+    function unidades(n) {
+        switch(n) {
+            case 1: return "UN";
+            case 2: return "DOS";
+            case 3: return "TRES";
+            case 4: return "CUATRO";
+            case 5: return "CINCO";
+            case 6: return "SEIS";
+            case 7: return "SIETE";
+            case 8: return "OCHO";
+            case 9: return "NUEVE";
+        }
+        return "";
+    }
+
+    $(document).ready(function() {
+        $('#monto_total').on('input', function() {
+            var valor = $(this).val();
+            // Validación de número
+            if (isNaN(valor) || valor.trim() === '') {
+                 if(valor.trim() !== '') {
+                      $('#monto_letra').val('NUMERO NO LEGIBLE');
+                 } else {
+                      $('#monto_letra').val('');
+                 }
+            } else {
+                $('#monto_letra').val(numeroALetras(parseFloat(valor)));
+                
+                // Calcular 12%
+                var monto = parseFloat(valor);
+                var garantia = monto * 0.12;
+                var totalMonto = garantia + monto;
+                // Formatear a 2 decimales
+                $('#monto_garantia').val(totalMonto.toFixed(2));
+            }
+        });
+        
+        // Trigger inicial si ya hay valor
+        if($('#monto_total').val()) {
+            $('#monto_total').trigger('input');
+        }
+    });
+
     const pagosExistentes = <?= isset($pagos) ? json_encode($pagos) : '[]' ?>;
+
+    const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
     function agregarPago(data = null) {
         const tbody = document.querySelector('#tabla_pagos tbody');
@@ -258,13 +408,40 @@
         
         let numero = data ? data.numero_pago : `${count}º Pago`;
         let monto = data ? data.monto : '';
-        let fecha = data ? data.fecha.split(' ')[0] : ''; // Ajustar si fecha incluye hora
         let entregable = data ? data.entregable : '';
+        
+        // Determinar mes seleccionado
+        let mesSeleccionado = '';
+        if (data && data.fecha) {
+            // Si es formato fecha YYYY-MM-DD
+            if (data.fecha.match(/^\d{4}-\d{2}-\d{2}/)) {
+                let parts = data.fecha.split('-'); // [YYYY, MM, DD]
+                if(parts.length >= 2) {
+                    let mesIndex = parseInt(parts[1]) - 1;
+                    if(mesIndex >= 0 && mesIndex < 12) {
+                        mesSeleccionado = meses[mesIndex];
+                    }
+                }
+            } else {
+                // Si ya es texto
+                mesSeleccionado = data.fecha;
+            }
+        }
+
+        let options = '<option value="">Seleccione mes</option>';
+        meses.forEach(mes => {
+            let selected = (mes === mesSeleccionado) ? 'selected' : '';
+            options += `<option value="${mes}" ${selected}>${mes}</option>`;
+        });
 
         row.innerHTML = `
             <td><input type="text" class="form-control" name="pagos[${count}][numero]" value="${numero}" placeholder="Ej. 1er Pago"></td>
             <td><input type="text" class="form-control" name="pagos[${count}][monto]" value="${monto}" placeholder="$"></td>
-            <td><input type="date" class="form-control" name="pagos[${count}][fecha]" value="${fecha}"></td>
+            <td>
+                <select class="form-control" name="pagos[${count}][fecha]">
+                    ${options}
+                </select>
+            </td>
             <td><input type="text" class="form-control" name="pagos[${count}][entregable]" value="${entregable}" placeholder="Descripción"></td>
             <td class="text-center">
                 <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()"><i class="mdi mdi-trash-can"></i></button>
@@ -286,48 +463,50 @@
             agregarPago();
         }
         
-        const form = document.getElementById('form_solicitud_contrato');
-        form.addEventListener('submit', function(e) {
+        $('#form_solicitud_contrato').on('submit', function(e) {
             e.preventDefault();
             
-            const formData = new FormData(this);
-            const btnSubmit = form.querySelector('button[type="submit"]');
-            btnSubmit.disabled = true;
-            btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+            var formData = new FormData(this);
+            var btnSubmit = $(this).find('button[type="submit"]');
+            
+            btnSubmit.prop('disabled', true);
+            btnSubmit.html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
 
-            fetch('<?= base_url("index.php/Principal/guardarSolicitudContrato") ?>', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (!data.error) {
-                   // alert('Solicitud guardada correctamente');
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Solicitud guardada correctamente',
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
-                    window.location.href = '<?= base_url("index.php/Principal/ListaSolicitudContrato") ?>';
-                } else {
-                    //alert('Error: ' + data.respuesta);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Error: ' + data.respuesta,
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
-                    btnSubmit.disabled = false;
-                    btnSubmit.innerHTML = '<i class="mdi mdi-content-save"></i> Guardar Solicitud';
+            $.ajax({
+                url: '<?= base_url("index.php/Principal/guardarSolicitudContrato") ?>',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function(data) {
+                    if (!data.error) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Solicitud guardada correctamente',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            window.location.href = '<?= base_url("index.php/Principal/ListaSolicitudContrato") ?>';
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Error: ' + data.respuesta,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        btnSubmit.prop('disabled', false);
+                        btnSubmit.html('<i class="mdi mdi-content-save"></i> Guardar Solicitud');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', error);
+                    alert('Ocurrió un error al procesar la solicitud');
+                    btnSubmit.prop('disabled', false);
+                    btnSubmit.html('<i class="mdi mdi-content-save"></i> Guardar Solicitud');
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Ocurrió un error al procesar la solicitud');
-                btnSubmit.disabled = false;
-                btnSubmit.innerHTML = '<i class="mdi mdi-content-save"></i> Guardar Solicitud';
             });
         });
     });

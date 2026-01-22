@@ -1253,7 +1253,7 @@ class Principal extends BaseController
                 }
             }
         }
-        $res = $this->enviarEmail(1);
+       // $res = $this->enviarEmail(1);
       
 
         return $this->respond($response);
@@ -1366,7 +1366,7 @@ class Principal extends BaseController
                 }
             }
         }
-        $this->enviarEmail(0);
+        //$this->enviarEmail(0);
        
 
         return $this->respond($response);
@@ -2602,6 +2602,8 @@ class Principal extends BaseController
         $globals = new Mglobal;
         $data = array();
         
+        $vw_usuario = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1]]);
+        $data['direccion'] = $vw_usuario->data;
         $vw_usuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
         $data['usuario'] = $vw_usuario->data;
 
@@ -2640,6 +2642,8 @@ class Principal extends BaseController
 
         $vw_usuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
         $data['usuario'] = $vw_usuario->data;
+        $vw_direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1]]);
+        $data['direccion'] = $vw_direccion->data;
 
         $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
         $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
@@ -2666,7 +2670,12 @@ class Principal extends BaseController
         $response->respuesta = 'Error al guardar la solicitud';
 
         $post = $this->request->getPost();
+        $id_solicitud_contrato = isset($post['id_solicitud_contrato']) ? $post['id_solicitud_contrato'] : null;
         
+        // DEBUG: Uncomment to see data in response
+        // $response->post_received = $post;
+        // return $this->respond($response); 
+
         // Manejo de archivo
         $archivo_suficiencia = '';
         if($file = $this->request->getFile('archivo_suficiencia')) {
@@ -2679,17 +2688,15 @@ class Principal extends BaseController
 
         // Datos principales
         $dataInsert = [
-            'usu_reg' => $session->id_usuario,
-            'fec_reg' => date('Y-m-d H:i:s'),
             'responsable_proyecto' => $post['responsable_proyecto'],
             'responsable_seguimiento' => $post['responsable_seguimiento'],
             'enlace_comunicaciones' => $post['enlace_comunicaciones'],
             'proyecto' => $post['proyecto'],
             'partida' => $post['partida'],
             'clave_estandarizada' => $post['clave_estandarizada'],
-            'archivo_suficiencia' => $archivo_suficiencia,
             'monto_total' => $post['monto_total'],
             'garantia' => $post['garantia'],
+            'proveedor_seguimiento' => $post['proveedor_seguimiento'],
             'objeto_contrato' => $post['objeto_contrato'],
             'fecha_inicio' => $post['fecha_inicio'],
             'fecha_termino' => $post['fecha_termino'],
@@ -2699,18 +2706,55 @@ class Principal extends BaseController
             'proveedor_cedula' => $post['proveedor_cedula'],
             'proveedor_representante' => $post['proveedor_representante'],
             'proveedor_correo' => $post['proveedor_correo'],
-            'visible' => 1
+           // 'correo_responsable' => $post['correo_responsable'],
         ];
 
-        // Guardar Encabezado
-        // NOTA: Asumimos tabla solicitud_contrato. Si no existe, fallará y el usuario reportará.
-        $dataBitacora = ['id_user' => $session->id_usuario, 'script' => 'Agregar.php/guardaSolicitudContrato'];
-        $res = $globals->saveTabla($dataInsert, ["tabla" => "solicitud_contrato", "editar" => false], $dataBitacora);
+        if (!empty($archivo_suficiencia)) {
+            $dataInsert['archivo_suficiencia'] = $archivo_suficiencia;
+        }
+
+        // Configuración para guardar
+        $dataConfig = ["tabla" => "solicitud_contrato", "editar" => false];
+        $script = 'Agregar.php/guardaSolicitudContrato';
+
+        if ($id_solicitud_contrato) {
+            $dataConfig = [
+                "tabla" => "solicitud_contrato", 
+                "editar" => true, 
+                "idEditar" => ['id_solicitud_contrato' => $id_solicitud_contrato]
+            ];
+            $script = 'Principal.php/editarSolicitudContrato';
+            
+            // Campos de auditoría para edición
+             //$dataInsert['usu_act'] = $session->id_usuario;
+             //$dataInsert['fec_act'] = date('Y-m-d H:i:s');
+        } else {
+             // Campos de auditoría para creación
+             $dataInsert['usu_reg'] = $session->id_usuario;
+             $dataInsert['fec_reg'] = date('Y-m-d H:i:s');
+        }
+
+        $dataBitacora = ['id_user' => $session->id_usuario, 'script' => $script];
+        $res = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
 
         if (!$res->error) {
-            $id_solicitud = $res->id;
+            $id_solicitud = $id_solicitud_contrato ? $id_solicitud_contrato : $res->idRegistro;
             
-            // Guardar Pagos
+            // Si es edición, desactivar pagos anteriores
+            if ($id_solicitud_contrato) {
+                $globals->saveTabla(
+                    ['visible' => 0], 
+                    [
+                        "tabla" => "solicitud_contrato_pagos", 
+                        "editar" => true, 
+                        "idEditar" => ['id_solicitud_contrato' => $id_solicitud_contrato]
+                    ], 
+                    ['id_user' => $session->id_usuario, 'script' => 'Principal.php/eliminarPagosAntiguos']
+                );
+            }
+
+            // Guardar Pagos Nuevos
+            // Guardar Pagos Nuevos
             if(isset($post['pagos']) && is_array($post['pagos'])){
                 foreach($post['pagos'] as $pago){
                     $dataPago = [
@@ -2721,7 +2765,7 @@ class Principal extends BaseController
                         'entregable' => $pago['entregable'],
                         'visible' => 1
                     ];
-                    $globals->saveTabla($dataPago, ["tabla" => "solicitud_contrato_pagos", "id" => "id_pago"], ["tabla" => "bitacora", "id" => "id_bitacora"]);
+                    $globals->saveTabla($dataPago, ["tabla" => "solicitud_contrato_pagos", "editar" => false], ["id_user" => $session->id_usuario, 'script' => 'Principal.php/guardarSolicitudContrato']);
                 }
             }
 
@@ -2825,7 +2869,7 @@ class Principal extends BaseController
         $globals = new Mglobal;
         $data = array();
 
-        $solicitudes = $globals->getTabla(["tabla" => "solicitud_contrato", "where" => ["visible" => 1]]);
+        $solicitudes = $globals->getTabla(["tabla" => "vw_solicitud_contrato", "where" => ["visible" => 1]]);
         
         $data['solicitudes'] = (!empty($solicitudes->data)) ? $solicitudes->data : [];
         $data['scripts'] = array('inicio');
@@ -4569,7 +4613,7 @@ class Principal extends BaseController
                     'tabla' => 'vw_periodo_factura_go',
                     'where' => ['visible' => 1, 'id_reserva' => $periodo_factura->data[0]->id_reserva_go]
             ]);
-        // die( var_dump(   $presupuestoGO ) );
+       //  die( var_dump(   $presupuestoGO ) );
             if(isset($presupuestoGO) && !empty($presupuestoGO)){
 
                
