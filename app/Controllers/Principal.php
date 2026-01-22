@@ -1253,7 +1253,7 @@ class Principal extends BaseController
                 }
             }
         }
-        $res = $this->enviarEmail(1);
+       // $res = $this->enviarEmail(1);
       
 
         return $this->respond($response);
@@ -1366,7 +1366,7 @@ class Principal extends BaseController
                 }
             }
         }
-        $this->enviarEmail(0);
+        //$this->enviarEmail(0);
        
 
         return $this->respond($response);
@@ -5050,14 +5050,26 @@ class Principal extends BaseController
             } else {
                 $zero = '';
             }
-            if (!empty($direccion->data)) {
+         /*    if (!empty($direccion->data)) {
                 $folio_prefijo = $direccion->data[0]->folio_prefijo . $zero . $no_consecutivo . '/' . date('Y'); 
                 $data['registro']->folio = $folio_prefijo;
             } else {
                
                 $data['registro']->folio = '';
+            } */
+            //var_dump($registro_pt->data);
+             if (!empty($registro_pt->data[0]->id_direccion_responsable)) {
+                $prefijo = $globals->getTabla([
+                    'tabla' => 'cat_area',
+                    'where' => ['visible' => 1, 'id_area' => $registro_pt->data[0]->id_direccion_responsable ]
+                ]);
+           
+                $folio_prefijo = (isset($prefijo->data) && !empty($prefijo->data))?$prefijo->data[0]->prefijo . $zero . $no_consecutivo . '/' . date('Y'):''; //ESTO HAY QUE OREGUNTAR
+                $data['registro']->folio = $folio_prefijo;
+            } else {
+                $data['registro']->folio = ''; // O un valor por defecto
             }
-
+             //die();
         } else {
             echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
             die();
@@ -6208,7 +6220,7 @@ class Principal extends BaseController
         $id_area           = (isset($user->data) && !empty($user->data))?$user->data[0]->id_area:0;
         $id_jefe_inmediato = (isset($user->data) && !empty($user->data))?$user->data[0]->id_jefe_inmediato:0;
       
-        $responGasto = $globals->getTabla(['tabla' => 'folio_direccion', 'where' => ['id_direccion' => (int)$session->id_usuario]]);  //primero revisamos si tu no eres responsable del gasto
+  /*       $responGasto = $globals->getTabla(['tabla' => 'folio_direccion', 'where' => ['id_direccion' => (int)$session->id_usuario]]);  //primero revisamos si tu no eres responsable del gasto
 
         if( isset($responGasto->data) && !empty($responGasto->data)){
              $no_consecutivo = count($responGasto->data);
@@ -6220,12 +6232,35 @@ class Principal extends BaseController
         if(isset($no_consecutivo) && empty($no_consecutivo)){
                $responGasto = $globals->getTabla(['tabla' => 'folio_direccion', 'where' => ['visible' => 1, 'id_area ', $id_area]]);
                $no_consecutivo = (isset($responGasto->data) && !empty($responGasto->data))?count($responGasto->data):'';
-        }
-   
+        } */
+        // BUSCAR EL ÚLTIMO CONSECUTIVO PARA ESTA ÁREA
+        $area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1, 'titular' => $session->id_usuario ]]);
 
+        if (isset($area->data) && !empty($area->data)) {
+            $id_area = $area->data[0]->id_area;
+        }else{
+            $area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1, 'titular' => $id_jefe_inmediato ]]);
+            if (isset($area->data) && !empty($area->data)) {
+                $id_area = $area->data[0]->id_area;
+            }
+        }
+     
+        $ultimoFolio = $globals->getTabla([
+            'tabla' => 'folio_direccion',
+            'where' => ['id_direccion' => $id_area, 'visible' => 1]
+        ]);
+
+        if (isset($ultimoFolio->data) && !empty($ultimoFolio->data)) {
+            $no_consecutivo = count($ultimoFolio->data);
+        }else{
+            $no_consecutivo = 0;
+        }
+        //var_dump($no_consecutivo);
+        //$data['no_consecutivo'] = (int)$no_consecutivo + 1;
         
         $data['no_consecutivo'] = (int)$no_consecutivo + 1;
-     
+        //var_dump($data['no_consecutivo']);
+        //die();
         $siExisteIdReserva = $globals->getTabla(['tabla' => 'registro_pt', 'where' => ['visible' => 1, 'id_reserva' => $id_reserva]]);
         $btn = false;
         $partida4000 = false;

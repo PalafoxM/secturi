@@ -45,7 +45,7 @@
                                              <?php if($editar != 1): ?>
                                             <div class="col-md-4 mb-3">
                                                 <label for="direccion_responsable">Dirección Responsable <span class="text-danger">*</span></label>
-                                                <select class="form-control" id="direccion_responsable" name="direccion_responsable" required>
+                                                <select class="form-control select2" id="direccion_responsable" name="direccion_responsable" required>
                                                     <?php foreach($cat_area as $a): ?>
                                                     <option value="<?=$a->id_area?>" <?php echo ($a->id_area == $usuario->id_area) ? 'selected' : ''; ?>>
                                                         <?=$a->dsc_area?>

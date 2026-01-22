@@ -1775,7 +1775,7 @@ class Agregar extends BaseController
             // === FIN NUEVO CÓDIGO DE PROCESAMIENTO ===
 
              // Enviar correos si hay adjuntos
-           if (!empty($finalAttachments)) {
+       /*    if (!empty($finalAttachments)) {
                 $mailer = new \App\Libraries\Mailer();
                 
                 $mensajeHTML = '
@@ -1809,7 +1809,7 @@ class Agregar extends BaseController
                     $finalAttachments, 
                     "Facturas G.O. Generadas - SUSI - Folio: " . $folioCompleto
                 );
-            }    
+            }    */
 
         } // Fin de if (!$response->error)
 
@@ -2427,22 +2427,25 @@ class Agregar extends BaseController
 
         return 0; // O manejar error si no tiene área
     }
-    private function registrarFolio($noConsecutivo, $responsableGasto)
+    private function registrarFolio($noConsecutivo, $responsableGasto, $direccionResponsable)
     {
+     
+
         $session = \Config\Services::session();
-        $response = new \stdClass();
-        $response->error = true;
         $globals = new Mglobal;
         $idRegistro = 0;
-        $dataDB = array('tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario]);
-        $user = $globals->getTabla($dataDB);
+        
+        $user = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario]]);
+
         //vemos si el usuario tiene id_area
         if (isset($user->data) && !empty($user->data)) {
-            $id_area = $user->data[0]->id_area;
+           // $id_area = $user->data[0]->id_area;
+
+
             $dataInsert = [
                 'no_consecutivo' => $noConsecutivo,
-                'id_area' => $id_area,
-                'id_direccion' => $responsableGasto,
+                'id_area' => $responsableGasto,
+                'id_direccion' => $direccionResponsable,
                 'fec_reg' => date('Y-m-d H:i:s'),
                 'usu_reg' => $session->id_usuario,
             ];
@@ -2451,20 +2454,18 @@ class Agregar extends BaseController
                 "editar" => false
             ];
 
+            $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFolio'];
+            $resultado = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
 
+            if (!$resultado->error) {
+                // $idRegistro = $resultado->idRegistro; 
+                // Si necesitas el ID del registro, úsalo. Si necesitas el consecutivo, retorna $nuevoConsecutivo
+            }
+             
+             return $noConsecutivo;
         }
 
-
-        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFolio'];
-        $no_consecutivo = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
-        // var_dump($no_consecutivo);
-        // die();
-        if (!$no_consecutivo->error) {
-            $idRegistro = $no_consecutivo->idRegistro;
-
-        }
-
-        return $noConsecutivo;
+        return 0; // O manejar error si no tiene área
 
     }
     public function guardaPT()
@@ -2556,7 +2557,7 @@ class Agregar extends BaseController
             return $this->respond($response);
         }
         if ($data['editar'] != 1) {
-            $no_consecutivo = $this->registrarFolio($data['no_consecutivo'], $data['id_reponsable_solicitud']);
+            $no_consecutivo = $this->registrarFolio($data['no_consecutivo'], $data['id_reponsable_solicitud'], $data['direccion_responsable']);
         }
 
 
