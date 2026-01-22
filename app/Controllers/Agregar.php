@@ -2834,7 +2834,7 @@ class Agregar extends BaseController
         }
 
         // Enviar correos si hay adjuntos
-          if (!empty($finalAttachments)) {
+           if (!empty($finalAttachments)) {
             $folioCompleto = "";
             // Recuperar el ID del folio direccion (PK) guardado anteriormente
             $id_folio_direccion = isset($dataInsert['no_consecutivo']) ? $dataInsert['no_consecutivo'] : 0;
@@ -2887,7 +2887,7 @@ class Agregar extends BaseController
                 $finalAttachments, 
                 "Facturas PT Generadas - SUSI - Folio: " . $folioCompleto
             );
-        } 
+        }   
 
         //die( var_dump( $response ) );
         return $this->respond($response);

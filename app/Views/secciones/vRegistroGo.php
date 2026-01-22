@@ -62,8 +62,17 @@
                                         <label for="reponsable_solicitud">Responsable de la Solicitud <span
                                                 style="color:red;">*</span></label>
                                         <select name="id_reponsable_solicitud" class="form-control select2" required>
-                                            <?php foreach ($cat_usuario as $u): ?>
-                                                <?php
+                                            <?php 
+                                            $opcionNoAplica = null;
+                                            foreach ($cat_usuario as $u): 
+                                                $nombreCompleto = $u->nombre . ' ' . $u->primer_apellido . ' ' . $u->segundo_apellido;
+                                                
+                                                // Si es NO APLICA, lo guardamos para el final
+                                                if (stripos($nombreCompleto, 'NO APLICA') !== false) {
+                                                    $opcionNoAplica = $u;
+                                                    continue;
+                                                }
+
                                                 // Determina el valor que debe quedar seleccionado
                                                 $selected = '';
                                                 if (isset($registro_pt->id_reponsable_solicitud) && $registro_pt->id_reponsable_solicitud == $u->id_usuario) {
@@ -73,9 +82,27 @@
                                                 }
                                                 ?>
                                                 <option value="<?= $u->id_usuario ?>" <?= $selected ?>>
-                                                    <?= $u->nombre . ' ' . $u->primer_apellido . ' ' . $u->segundo_apellido ?>
+                                                    <?= $nombreCompleto ?>
                                                 </option>
                                             <?php endforeach; ?>
+
+                                            <?php 
+                                            // Renderizamos NO APLICA al final si se encontró
+                                            if ($opcionNoAplica): 
+                                                $u = $opcionNoAplica;
+                                                $nombreCompleto = $u->nombre . ' ' . $u->primer_apellido . ' ' . $u->segundo_apellido;
+                                                
+                                                $selected = '';
+                                                if (isset($registro_pt->id_reponsable_solicitud) && $registro_pt->id_reponsable_solicitud == $u->id_usuario) {
+                                                    $selected = 'selected';
+                                                } elseif (!isset($registro_pt->id_reponsable_solicitud) && isset($usuario) && $usuario->id_usuario == $u->id_usuario) {
+                                                    $selected = 'selected';
+                                                }
+                                            ?>
+                                                <option value="<?= $u->id_usuario ?>" <?= $selected ?>>
+                                                    <?= $nombreCompleto ?>
+                                                </option>
+                                            <?php endif; ?>
                                         </select>
                                     </div><!--end col-->
                                 </div><!--end form-row-->
