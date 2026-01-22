@@ -1478,7 +1478,7 @@ class Agregar extends BaseController
         }
    
         
-       $no_consecutivo = $this->registrarFolioGo($data['no_consecutivo'], $data['id_reponsable_solicitud']);
+       $no_consecutivo = $this->registrarFolioGo($data['no_consecutivo'], $data['id_reponsable_solicitud'], $data['direccion_responsable']);
 
         $dataInsert = [
             'id_reserva_go' => $data['id_reserva_go'],
@@ -2389,7 +2389,7 @@ class Agregar extends BaseController
         return $this->respond($response->data[0]);
 
     }
-    private function registrarFolioGo($noConsecutivo, $responsableGasto)
+    private function registrarFolioGo($noConsecutivo, $responsableGasto, $direccionResponsable)
     {
         $session = \Config\Services::session();
         $globals = new Mglobal;
@@ -2399,25 +2399,13 @@ class Agregar extends BaseController
 
         //vemos si el usuario tiene id_area
         if (isset($user->data) && !empty($user->data)) {
-            $id_area = $user->data[0]->id_area;
+           // $id_area = $user->data[0]->id_area;
 
-            // BUSCAR EL ÚLTIMO CONSECUTIVO PARA ESTA ÁREA
-            $ultimoFolio = $globals->getTabla([
-                'tabla' => 'folio_go',
-                'where' => ['id_area' => $id_area],
-                'order' => 'no_consecutivo DESC',
-                'limit' => 1
-            ]);
-
-            $nuevoConsecutivo = 1;
-            if (isset($ultimoFolio->data) && !empty($ultimoFolio->data)) {
-                $nuevoConsecutivo = intval($ultimoFolio->data[0]->no_consecutivo) + 1;
-            }
 
             $dataInsert = [
-                'no_consecutivo' => $nuevoConsecutivo,
-                'id_area' => $id_area,
-                'id_direccion' => $responsableGasto,
+                'no_consecutivo' => $noConsecutivo,
+                'id_area' => $responsableGasto,
+                'id_direccion' => $direccionResponsable,
                 'fec_reg' => date('Y-m-d H:i:s'),
                 'usu_reg' => $session->id_usuario,
             ];
@@ -2434,7 +2422,7 @@ class Agregar extends BaseController
                 // Si necesitas el ID del registro, úsalo. Si necesitas el consecutivo, retorna $nuevoConsecutivo
             }
              
-             return $nuevoConsecutivo;
+             return $noConsecutivo;
         }
 
         return 0; // O manejar error si no tiene área

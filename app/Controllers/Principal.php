@@ -5907,13 +5907,14 @@ class Principal extends BaseController
         $id_jefe_inmediato = (isset($user->data) && !empty($user->data))?$user->data[0]->id_jefe_inmediato:0;
       
         // BUSCAR EL ÚLTIMO CONSECUTIVO PARA ESTA ÁREA
-        $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1, 'titular' => $session->id_usuario ]]);
-        if (isset($cat_area->data) && !empty($cat_area->data)) {
-            $id_area = $cat_area->data[0]->id_area;
+        $area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1, 'titular' => $session->id_usuario ]]);
+
+        if (isset($area->data) && !empty($area->data)) {
+            $id_area = $area->data[0]->id_area;
         }else{
-            $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1, 'titular' => $id_jefe_inmediato ]]);
-            if (isset($cat_area->data) && !empty($cat_area->data)) {
-                $id_area = $cat_area->data[0]->id_area;
+            $area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1, 'titular' => $id_jefe_inmediato ]]);
+            if (isset($area->data) && !empty($area->data)) {
+                $id_area = $area->data[0]->id_area;
             }
         }
      
@@ -5922,13 +5923,11 @@ class Principal extends BaseController
             'where' => ['id_direccion' => $id_area]
         ]);
 
-        $no_consecutivo = 0;
-        if (isset($ultimoFolio->data) && !empty($ultimoFolio->data)) {
-            $no_consecutivo = intval($ultimoFolio->data[0]->no_consecutivo) + 1;
-        }
-   
 
-        
+        if (isset($ultimoFolio->data) && !empty($ultimoFolio->data)) {
+            $no_consecutivo = intval($ultimoFolio->data[0]->no_consecutivo);
+        }
+ 
         $data['no_consecutivo'] = (int)$no_consecutivo + 1;
 
 
@@ -5949,7 +5948,7 @@ class Principal extends BaseController
         if (!empty($id_registro_go)) {
             $data['registro_pt'] = (!empty($registro_pt->data)) ? $registro_pt->data[0] : [];
         }
-      
+       // die( var_dump( $cat_area ) );
         $data['dsc_director_general'] = (!empty($cat_director_general->data)) ? $cat_director_general->data[0]->dsc_director_general : [];
         $data['cat_area'] = (!empty($cat_area->data)) ? $cat_area->data : [];
         $data['cat_tipo'] = (!empty($cat_tipo->data)) ? $cat_tipo->data : [];
