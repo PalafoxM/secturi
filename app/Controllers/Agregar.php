@@ -1775,7 +1775,7 @@ class Agregar extends BaseController
             // === FIN NUEVO CÓDIGO DE PROCESAMIENTO ===
 
              // Enviar correos si hay adjuntos
-           if (!empty($finalAttachments)) {
+          /* if (!empty($finalAttachments)) {
                 $mailer = new \App\Libraries\Mailer();
                 
                 $mensajeHTML = '
@@ -1809,7 +1809,7 @@ class Agregar extends BaseController
                     $finalAttachments, 
                     "Facturas G.O. Generadas - SUSI - Folio: " . $folioCompleto
                 );
-            }    
+            }    */
 
         } // Fin de if (!$response->error)
 
