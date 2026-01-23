@@ -16,7 +16,7 @@
 
  <img src="<?= base_url() ?>assets/logo-guanajuato.png" alt="Logo" style="width: 300px;">
 <div class="header-info">
-    <p><strong>FOLIO: </strong> <?= isset($folio) ? $folio : 'GO SECTURI/SSITR/DGA/001/2026' ?> </p>
+    <p><strong>FOLIO: </strong>GO <?= isset($folio) ? $folio : 'GO SECTURI/SSITR/DGA/001/2026' ?> </p>
 </div>
     <table>
         <thead>

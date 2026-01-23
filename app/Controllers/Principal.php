@@ -3022,7 +3022,37 @@ class Principal extends BaseController
         
         $data = [];
         $data['viaticos'] = (!empty($viaticos->data)) ? $viaticos->data : [];
-        $data['folio'] = (!empty($registro_go->data)) ? $registro_go->data[0]->no_consecutivo : 'N/A'; // Asumimos no_consecutivo como parte del folio o similar
+        if (!empty($registro_go->data)) {
+            $direccion = $globals->getTabla([
+                'tabla' => 'cat_area',
+                'where' => [
+                    'visible' => 1,
+                    //'id_director' => 110
+                    'id_area' => $registro_go->data[0]->id_direccion_responsable
+                ]
+            ]);
+
+    
+       // die( var_dump($direccion) );
+            $no_consecutivo = "";
+            if (strlen($registro_go->data[0]->no_consecutivo) == 1) {
+                $no_consecutivo = '00' . $registro_go->data[0]->no_consecutivo;
+            }
+            if (strlen($registro_go->data[0]->no_consecutivo) == 2) {
+                $no_consecutivo = '0' . $registro_go->data[0]->no_consecutivo;
+            }
+            if (strlen($registro_go->data[0]->no_consecutivo) >= 3) {
+                $no_consecutivo = $registro_go->data[0]->no_consecutivo;
+            }
+            
+            $folio =(isset( $direccion->data) && !empty( $direccion->data))? $direccion->data[0]->prefijo:'S/N/';
+        
+            $folio_prefijo = $folio . $no_consecutivo . '/' . date('Y'); //ESTO HAY QUE OREGUNTAR
+
+            $data['folio'] = $folio_prefijo;
+        } else {
+             $data['folio'] = 'N/A';
+        }
 
         // Cargar vista HTML
         $html = view('secciones/vFormatoViaticosDesglose', $data);
