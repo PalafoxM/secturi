@@ -1,5 +1,6 @@
 # Evitar subir la configuración de base de datos
 app/Config/Database.php
+app/Views/secciones/vLogin.php
 
 # Evitar que se suba el .env local
 .env
