@@ -530,6 +530,29 @@ $('.add-file').on('click', function (e) {
     $(inputId).click();
 });
 
+    $('#direccion_responsable').on('change', function() {
+        var id_area = $(this).val();
+        console.log(id_area);
+        if(id_area) {
+            $.ajax({
+                url: '<?= base_url("index.php/Principal/getFolioPorArea") ?>',
+                type: 'POST',
+                data: {id_area: id_area},
+                dataType: 'json',
+                success: function(response) {
+                    if(!response.error) {
+                        $('#no_consecutivo').val(response.consecutivo);
+                    } else {
+                        console.error(response.respuesta);
+                    }
+                },
+                error: function() {
+                    console.error('Error al obtener el folio');
+                }
+            });
+        }
+    });
+
 // Objeto global para almacenar archivos por fila
 const archivosPorFila = {};
 
@@ -1038,6 +1061,8 @@ $(document).ready(function() {
     <?php endforeach; ?>
     
     console.log('Filas inicializadas:', archivosPorFila);
+    // Evento para actualizar consecutivo al cambiar area
+
 });
 
 function updateViaticoRFC(selectElement) {

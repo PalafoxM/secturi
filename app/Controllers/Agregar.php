@@ -1206,7 +1206,7 @@ class Agregar extends BaseController
         $response->respuesta = "registros guardados correctamente";
 
         // Enviar correos si hay adjuntos
-     /*    if (!empty($finalAttachments)) {
+         if (!empty($finalAttachments)) {
             $mailer = new \App\Libraries\Mailer();
             
             $mensajeHTML = '
@@ -1239,7 +1239,7 @@ class Agregar extends BaseController
                 $finalAttachments, 
                 "Facturas FIC Generadas - SUSI"
             );
-        } */
+        } 
 
         //return $this->respond($response);
     }

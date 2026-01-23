@@ -6749,4 +6749,34 @@ class Principal extends BaseController
         $this->_renderView($data);
     }
 
+    public function getFolioPorArea()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+
+        $id_area = $this->request->getPost('id_area');
+
+        if ($id_area) {
+            $ultimoFolio = $globals->getTabla([
+                'tabla' => 'folio_go',
+                'where' => ['id_direccion' => $id_area, 'visible' => 1]
+            ]);
+
+            if (isset($ultimoFolio->data) && !empty($ultimoFolio->data)) {
+                $no_consecutivo = count($ultimoFolio->data);
+            } else {
+                $no_consecutivo = 0;
+            }
+            
+            $response->consecutivo = (int)$no_consecutivo + 1;
+            $response->error = false;
+        } else {
+             $response->respuesta = 'ID de área no válido';
+        }
+
+        return $this->respond($response);
+    }
+
 }
