@@ -532,7 +532,7 @@ $('.add-file').on('click', function (e) {
 
     $('#direccion_responsable').on('change', function() {
         var id_area = $(this).val();
-        console.log(id_area);
+        //console.log(id_area);
         if(id_area) {
             $.ajax({
                 url: '<?= base_url("index.php/Principal/getFolioPorArea") ?>',
