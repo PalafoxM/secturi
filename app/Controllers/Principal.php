@@ -2754,7 +2754,7 @@ class Principal extends BaseController
             }
 
             // Guardar Pagos Nuevos
-            // Guardar Pagos Nuevos
+           
             if(isset($post['pagos']) && is_array($post['pagos'])){
                 foreach($post['pagos'] as $pago){
                     $dataPago = [
@@ -2765,10 +2765,10 @@ class Principal extends BaseController
                         'entregable' => $pago['entregable'],
                         'visible' => 1
                     ];
-                    $globals->saveTabla($dataPago, ["tabla" => "solicitud_contrato_pagos", "editar" => false], ["id_user" => $session->id_usuario, 'script' => 'Principal.php/guardarSolicitudContrato']);
+                    $res = $globals->saveTabla($dataPago, ["tabla" => "solicitud_contrato_pagos", "editar" => false], ["id_user" => $session->id_usuario, 'script' => 'Principal.php/guardarSolicitudContrato']);
                 }
             }
-
+          
             $response->error = false;
             $response->respuesta = 'Solicitud guardada correctamente';
         } else {
@@ -2790,7 +2790,7 @@ class Principal extends BaseController
         if($id_solicitud){
             $dataUpdate = ['visible' => 0];
             $dataBitacora = ['id_user' => $session->id_usuario, 'script' => 'Principal.php/eliminarSolicitudContrato'];
-            $res = $globals->saveTabla($dataUpdate, ["tabla" => "solicitud_contrato", "id" => "id_solicitud_contrato", "valor_id" => $id_solicitud], $dataBitacora);
+            $res = $globals->saveTabla($dataUpdate, ["tabla" => "solicitud_contrato", "editar" => true, "idEditar" => ['id_solicitud_contrato' => $id_solicitud]], $dataBitacora);
             
             if(!$res->error){
                 $response->error = false;
@@ -2861,6 +2861,40 @@ class Principal extends BaseController
         $mpdf->WriteHTML($html);
         $mpdf->Output('Solicitud_Contrato_' . $id . '.pdf', 'I');
         exit();
+    }
+
+    public function subirArchivosSolicitud()
+    {
+        $session = \Config\Services::session();
+        $id_solicitud = $this->request->getPost('id_solicitud');
+        $documentos_seleccionados = $this->request->getPost('documentos');
+
+        if (!$id_solicitud || empty($documentos_seleccionados)) {
+            return redirect()->to(base_url('index.php/Principal/ListaSolicitudContrato'));
+        }
+
+        $data['id_solicitud'] = $id_solicitud;
+        $data['documentos'] = $documentos_seleccionados;
+        
+        $data['contentView'] = 'secciones/vSubirArchivosSolicitud';
+        $this->_renderView($data);
+    }
+
+    public function guardarArchivosSolicitud()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+
+        $id_solicitud = $this->request->getPost('id_solicitud');
+        
+        // Simulación: aquí se procesarían los archivos $_FILES
+        
+        $response->error = false;
+        $response->respuesta = "Archivos guardados correctamente (Simulación)";
+
+        return $this->respond($response);
     }
 
     public function ListaSolicitudContrato()
