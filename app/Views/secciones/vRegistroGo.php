@@ -41,7 +41,7 @@
                                         <select class="form-control select2" id="direccion_responsable"
                                             name="direccion_responsable" required>
                                             <?php foreach ($cat_area as $a): ?>
-                                                <option value="<?= $a->id_area ?>" <?php echo ($a->id_area == $usuario->id_area) ? 'selected' : ''; ?>>
+                                                <option value="<?= $a->id_area ?>" <?php echo ($a->id_area == $id_area) ? 'selected' : ''; ?>>
                                                     <?= $a->dsc_area ?>
                                                 </option>
                                             <?php endforeach; ?>

@@ -1253,7 +1253,7 @@ class Principal extends BaseController
                 }
             }
         }
-        $res = $this->enviarEmail(1);
+       // $res = $this->enviarEmail(1);
       
 
         return $this->respond($response);
@@ -1366,7 +1366,7 @@ class Principal extends BaseController
                 }
             }
         }
-        $this->enviarEmail(0);
+        //$this->enviarEmail(0);
        
 
         return $this->respond($response);
@@ -5981,7 +5981,7 @@ class Principal extends BaseController
         $globals = new Mglobal;
        
         $siExisteIdReserva = $globals->getTabla(['tabla' => 'registro_go', 'where' => ['visible' => 1, 'id_reserva_go' => $id_reserva_go]]);
-
+        
         $btn = (!empty($siExisteIdReserva->data)) ? true : false;
 
         $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
@@ -6008,7 +6008,7 @@ class Principal extends BaseController
                 $id_area = $area->data[0]->id_area;
             }
         }
-     
+        $data['id_area'] = $id_area;
         $ultimoFolio = $globals->getTabla([
             'tabla' => 'folio_go',
             'where' => ['id_direccion' => $id_area, 'visible' => 1]
