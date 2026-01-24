@@ -4635,6 +4635,161 @@ class Principal extends BaseController
             ->setBody(file_get_contents($zipPath));
     }
 
+    public function caratulaGo($id_go)
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $data = [];
+        $id_reserva = null;
+
+        $facturaXml = $globals->getTabla([
+            'tabla' => 'xml_go',
+            'where' => ['visible' => 1, 'id_registro_go' => $id_go]
+        ]);
+        $facturaPdfGo = $globals->getTabla([
+            'tabla' => 'factura_pdf_go',
+            'where' => ['visible' => 1, 'id_registro_go' => $id_go]
+        ]);
+        $docAmpara = (isset($facturaXml->data) ? count($facturaXml->data) : 0);
+        $registroGo = $globals->getTabla([
+            'tabla' => 'vw_registro_go',
+            'where' => ['visible' => 1, 'id_registro_go' => $id_go]
+        ]);
+
+        $prefijo = $globals->getTabla([
+            'tabla' => 'cat_area',
+            'where' => ['visible' => 1, 'id_area' => $registroGo->data[0]->id_direccion_responsable]
+        ]);
+         if (strlen($registroGo->data[0]->no_consecutivo) == 2) {
+                $zero = '0';
+            } elseif (strlen($registroGo->data[0]->no_consecutivo) == 1) {
+                $zero = '00';
+            } else {
+                $zero = '';
+            }
+        $prefijoCompleto = $prefijo->data[0]->prefijo.$zero.$registroGo->data[0]->no_consecutivo.'/'.date('Y');
+        $data['prefijoCompleto'] = $prefijoCompleto;
+        $data['docAmpara'] = (int)$docAmpara;
+        $data['fecha_tramite'] = $registroGo->data[0]->fecha_tramite;
+        $idReservaGo = $registroGo->data[0]->id_reserva_go;
+
+        $presupuestoGO = $globals->getTabla([
+            'tabla' => 'vw_presupuesto_go',
+            'where' => ['visible' => 1, 'id_reserva' => $idReservaGo]
+        ]);
+        $data['presupuestoGO'] = $presupuestoGO->data;
+        $data['facturaXml'] = $facturaXml->data;
+        $data['facturaPdfGo'] = $facturaPdfGo->data;
+
+        $total_importe = 0;
+        foreach ($data['facturaXml'] as $factura) {
+            $total_importe += $factura->total;
+        }
+        $data['total_importe'] = $total_importe;
+        $data['numero_texto'] = $this->numeroEnLetras($total_importe);
+
+        // Obtener la relación de filas (periodo_factura_go) para enlazar XML con Presupuesto
+        $periodoFacturaGo = $globals->getTabla([
+            'tabla' => 'periodo_factura_go',
+            'where' => ['visible' => 1, 'id_registro_go' => $id_go]
+        ]);
+
+        // Mapas de búsqueda
+        $identificadorToPresupuesto = [];
+        $identificadorToPropina = []; // Nuevo: Mapa para propina
+        if (isset($periodoFacturaGo->data)) {
+            foreach ($periodoFacturaGo->data as $fila) {
+                $identificadorToPresupuesto[$fila->id_identificador] = $fila->id_presupuesto;
+                $identificadorToPropina[$fila->id_identificador]     = $fila->propina;
+            }
+        }
+
+        $presupuestoToPartida = [];
+        $presupuestoToProyecto = []; // Nuevo: Mapa para Proyecto
+        if (isset($data['presupuestoGO'])) {
+            foreach ($data['presupuestoGO'] as $presupuesto) {
+                $presupuestoToPartida[$presupuesto->id_presupuesto_go]  = $presupuesto->dsc_partida;
+                $presupuestoToProyecto[$presupuesto->id_presupuesto_go] = $presupuesto->proyecto;
+            }
+        }
+
+        // Construir lista plana enriquecida
+        $listaFacturas = [];
+        
+        foreach ($data['facturaXml'] as $factura) {
+            $rawId = $factura->id_identificador;
+            
+            // Valores por defecto
+            $partida = 'Desconocida';
+            $proyecto = 'Desconocido';
+            $propina = 0;
+            
+            if (isset($identificadorToPresupuesto[$rawId])) {
+                $idPresupuesto = $identificadorToPresupuesto[$rawId];
+                $propina       = $identificadorToPropina[$rawId] ?? 0; // Obtener propina
+                
+                if (isset($presupuestoToPartida[$idPresupuesto])) {
+                    $partida  = $presupuestoToPartida[$idPresupuesto];
+                    $proyecto = $presupuestoToProyecto[$idPresupuesto] ?? '';
+                }
+            }
+            
+            // Calcular importe total (Total XML + Propina, si aplica)
+            // Nota: La imagen muestra "IMPORTE". Asumimos Total Factura por ahora, o la suma.
+            // Si el código anterior sumaba: $totalGo += $value->total + (int)$importe->data[$key]->propina;
+            $importeTotal = (float)str_replace([',','$'], '', $factura->total); // + (float)$propina; // Descomentar si se requiere sumar propina
+
+            $listaFacturas[] = [
+                'comprobante'   => $factura->folio ?: $factura->uuid, // Usa Folio o UUID si no hay folio
+                'proyecto'      => $proyecto,
+                'partida'       => $partida,
+                'importe'       => $importeTotal, // Formato numérico
+                'contribuyente' => $factura->emisor_nombre,
+                'rfc'           => $factura->emisor_rfc,
+                'objeto_xml'    => $factura // Mantener objeto original por si acaso
+            ];
+        }
+        
+        // Ordenar: Primero por Partida (DESC para coincidir con el ejemplo 3790 luego 2210?), luego por Comprobante
+        usort($listaFacturas, function($a, $b) {
+            // Ordenar por Partida Descendente (ej. 3790 antes de 2210)
+            $res = strcmp($b['partida'], $a['partida']); 
+            if ($res == 0) {
+                // Si la partida es igual, ordenar por Comprobante Ascendente
+                return strcmp($a['comprobante'], $b['comprobante']);
+            }
+            return $res;
+        });
+        
+        $data['listaOrdenada'] = $listaFacturas;
+        $html = view('secciones/vCaratulaGO.php', $data);
+
+
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 0,
+            'margin_left' => 1,
+            'margin_right' => 1,
+            'format' => [213, 268],
+            'mirrorMargins' => false,
+        ]);
+
+  
+        $templateFile = 'assets/pdf/plantillas/formatoGO2.pdf';
+
+        // --- HOJA 1 ---
+        $mpdf->SetSourceFile(FCPATH . $templateFile);
+        $tplId = $mpdf->ImportPage(1);
+        $mpdf->UseTemplate($tplId);
+        $mpdf->WriteHTML($html);
+
+        
+        $mpdf->Output('Formato_pt.pdf', 'I');
+        exit();
+
+        //die(var_dump($data['listaOrdenada']));
+        // var_dump( $periodo_factura );
+    }
+
 
     public function ImprimirGO($id_pt = null, $hoja = null, $index = null, $savePath = null)
     {

@@ -1464,6 +1464,7 @@ class Agregar extends BaseController
                 }
 
                 // Validación de archivos (PDF y XML)
+                //die( var_dump($fila['archivos']) );
                 if (empty($fila['archivos']) || empty($fila['archivos']['pdf']) || empty($fila['archivos']['xml'])) {
                     $response->error = true;
                     $response->respuesta = "Es necesario adjuntar al menos un PDF y un XML en todas las filas.";
@@ -1824,7 +1825,7 @@ class Agregar extends BaseController
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
         $archivos_post = $this->request->getFiles();
-
+      
         // Verificar que tenemos id_registro_go para edición
         if (empty($data['id_registro_go'])) {
             $response->respuesta = "Error|No se recibió el ID de registro GO para edición";
