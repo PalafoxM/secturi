@@ -3,7 +3,7 @@
            $<?= number_format($total_importe, 2); ?>
         </div>
         <div  style="position:absolute; text-align:center; top:10.8%; left:49.5%; width:4%; height:10px; background-color:white; font-size: 8px; ">
-           <?= isset( $docAmparados) && !empty( $docAmparados)? $docAmparados:'' ?>
+           <?= isset( $docAmpara) && !empty( $docAmpara)? $docAmpara:'' ?>
         </div>
         <div  style="position:absolute;text-align:center; top:14.75%; left:53.5%; width:40.5%; height:15px; background-color:black; color:white; font-size: 12px; ">
            21 SECRETARIA DE TURISMO E IDENTIDAD
@@ -24,18 +24,26 @@
         ?>
         
         <?php foreach($listaOrdenada as $fila): ?>
+            <?php 
+            $comprobante = $fila['comprobante'];
+            $isLong = strlen($comprobante) > 15;
+            if ($isLong) {
+                $half = ceil(strlen($comprobante) / 2);
+                $comprobante = substr($comprobante, 0, $half) . '<br>' . substr($comprobante, $half);
+            }
+            ?>
             <!-- Comprobante (Folio/UUID) -->
-            <div style="position:absolute; text-align:center; top:<?=$i?>%; left:11.8%; width:11%; background-color:white; font-size: 10px; height:12px; line-height:12px; overflow:hidden;">
-                <span class="proxima"><strong><?= $fila['comprobante'] ?></strong></span>
+            <div style="position:absolute; text-align:center; top:<?=$i?>%; left:11.8%; width:10.2%; background-color:white; font-size: <?= $isLong ? '7px' : '9px' ?>; height:12px; line-height:<?= $isLong ? '6px' : '12px' ?>; overflow:hidden;">
+                <span class="proxima"><strong><?= $comprobante ?></strong></span>
             </div>
 
             <!-- Proyecto Meta -->
-            <div style="position:absolute; text-align:center; top:<?=$i?>%; left:22%; width:10%; background-color:white; font-size: 10px; height:12px; line-height:12px; overflow:hidden;">
+            <div style="position:absolute; text-align:center; top:<?=$i?>%; left:22.1%; width:10.4%; background-color:white; font-size: 9px; height:12px; line-height:12px; overflow:hidden;">
                 <span class="proxima"><?= $fila['proyecto'] ?></span>
             </div>
 
             <!-- Partida No. -->
-            <div style="position:absolute; text-align:center; top:<?=$i?>%; left:33%; width:16%; background-color:white; font-size: 10px; height:12px; line-height:12px; overflow:hidden;">
+            <div style="position:absolute; text-align:center; top:<?=$i?>%; left:32.6%; width:16%; background-color:white; font-size: 9px; height:12px; line-height:12px; overflow:hidden;">
                 <span class="proxima"><?= $fila['partida'] ?></span>
             </div>
 
@@ -45,7 +53,7 @@
             </div>
 
             <!-- Datos del Contribuyente (Nombre) -->
-            <div style="position:absolute; text-align:left; padding-left:2px; top:<?=$i?>%; left:61.35%; width:18%; background-color:white; font-size: 9px; height:12px; line-height:12px; overflow:hidden;">
+            <div style="position:absolute; text-align:left; padding-left:2px; top:<?=$i?>%; left:61.35%; width:17.5%; background-color:white; font-size: 9px; height:12px; line-height:12px; overflow:hidden;">
                 <span class="proxima"><?= substr($fila['contribuyente'], 0, 35) // Truncate si es muy largo ?></span>
             </div>
 
@@ -69,32 +77,32 @@
         </div>
    
          <div  style="position:absolute;  text-align:center; top:75.7%; left:16%; width:30%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "><?= 'L.R.I. RODRIGO RODRIGUEZ GONZALEZ' ?></span>
+            <span class="proxima "><?= 'L.R.I. RODRIGO GONZALEZ GUERRERO' ?></span>
         </div>
          <div  style="position:absolute;  text-align:center; top:78.7%; left:16%; width:30%; background-color:white; font-size: 12px;  height:13px;">
             <span class="proxima ">DIRECTOR GENERAL ADMINISTRATIVO</span>
         </div>
    
          <div  style="position:absolute;  text-align:center; top:75.7%; left:55.5%; width:19%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "></span>
+            <span class="proxima "><?= $nombreSecretario ?></span>
         </div>
          <div  style="position:absolute;  text-align:center; top:78.7%; left:55.5%; width:19%; background-color:white; font-size: 12px;  height:13px;">
-            <span class="proxima "></span>
+            <span class="proxima "><?= $puestoSecretario ?></span>
         </div>
         
          <div  style="position:absolute;  text-align:center; top:75.7%; left:75.3%; width:18.5%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "></span>
+            <span class="proxima "><?= $nombreResponsable == 'NO APLICA' ? '' : $nombreResponsable ?></span>
         </div>
         
          <div  style="position:absolute;  text-align:center; top:78.7%; left:75.3%; width:18.5%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima "></span>
+            <span class="proxima "><?= $puestoResponsable == "NO APLICA" ? '' : $puestoResponsable ?></span>
         </div>
                 
       
       
          <div  style="position:absolute;  text-align:center; top:86%; left:75.3%; width:18.5%; background-color:white; font-size: 12px;  height:12px;">
-            <span class="proxima ">  </span>
+            <span class="proxima "> <?= $nombreReponsableSolicitud ?> </span>
         </div>
          <div  style="position:absolute;  text-align:center; top:88%; left:75.3%; width:18.5%; background-color:white; font-size: 9px;  height:18px;">
-            <span class="proxima ">  </span>
+            <span class="proxima "> <?= $puestoReponsableSolicitud ?> </span>
         </div>

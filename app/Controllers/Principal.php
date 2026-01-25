@@ -4651,11 +4651,16 @@ class Principal extends BaseController
             'where' => ['visible' => 1, 'id_registro_go' => $id_go]
         ]);
         $docAmpara = (isset($facturaXml->data) ? count($facturaXml->data) : 0);
+       
         $registroGo = $globals->getTabla([
             'tabla' => 'vw_registro_go',
             'where' => ['visible' => 1, 'id_registro_go' => $id_go]
         ]);
-
+        if(isset($registroGo->data) && empty($registroGo->data)){
+            echo '<center>No se encontro el registro</center>';
+            die();
+        }
+        //die(var_dump($registroGo));
         $prefijo = $globals->getTabla([
             'tabla' => 'cat_area',
             'where' => ['visible' => 1, 'id_area' => $registroGo->data[0]->id_direccion_responsable]
@@ -4672,7 +4677,42 @@ class Principal extends BaseController
         $data['docAmpara'] = (int)$docAmpara;
         $data['fecha_tramite'] = $registroGo->data[0]->fecha_tramite;
         $idReservaGo = $registroGo->data[0]->id_reserva_go;
+        $data['nombreSecretario'] = $registroGo->data[0]->secretario;
+        $data['puestoSecretario'] = $registroGo->data[0]->dsc_puesto_secretario;
+        $idSubsecretario = $registroGo->data[0]->id_subsecretario;
+        $idReponsableSolicitud = $registroGo->data[0]->id_reponsable_solicitud;
 
+        //logica para ver el responsable de la solicitud
+        //vedificasmos si tiene area a cargo
+        $areaCargo = $globals->getTabla([
+            'tabla' => 'cat_area',
+            'where' => ['visible' => 1, 'titular' => $idReponsableSolicitud]
+        ]);
+        if(isset($areaCargo->data) && !empty($areaCargo->data)){
+            $ReponsableSolicitud = $globals->getTabla([
+                'tabla' => 'vw_usuario',
+                'where' => ['visible' => 1, 'id_usuario' => $idReponsableSolicitud]
+            ]);
+        }else{
+            $idJefe = $globals->getTabla([
+                'tabla' => 'vw_usuario',
+                'where' => ['visible' => 1, 'id_usuario' => $idReponsableSolicitud]
+            ])->data[0]->id_jefe_inmediato;
+            $ReponsableSolicitud = $globals->getTabla([
+                'tabla' => 'vw_usuario',
+                'where' => ['visible' => 1, 'id_usuario' => $idJefe]
+            ]);
+        }
+       
+        $subsecretario = $globals->getTabla([
+            'tabla' => 'cat_subsecretario',
+            'where' => ['visible' => 1, 'id_subsecretario' => $idSubsecretario]
+        ]);
+        $data['nombreResponsable'] = $subsecretario->data[0]->dsc_subsecretario;
+        $data['puestoResponsable'] = $subsecretario->data[0]->puesto;
+        $data['nombreReponsableSolicitud'] = $ReponsableSolicitud->data[0]->nombre_completo;
+        $data['puestoReponsableSolicitud'] = $ReponsableSolicitud->data[0]->dsc_puesto;
+ //die(var_dump($data['docAmpara']));
         $presupuestoGO = $globals->getTabla([
             'tabla' => 'vw_presupuesto_go',
             'where' => ['visible' => 1, 'id_reserva' => $idReservaGo]
