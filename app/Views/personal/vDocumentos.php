@@ -1012,7 +1012,7 @@
                                                                  <a target="_blank" href="<?= base_url()?>assets/documentos/F-RH-05-2026_Permiso_Economico.docx" > 
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
-                                                                        Permiso Economico
+                                                                        Permiso Económico
                                                                         </div>
                                                                     </li>
                                                                 </a>
@@ -1023,13 +1023,7 @@
                                                                         </div>
                                                                     </li>
                                                                 </a>
-                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-RH-06-2025_Justificante_Incidencias-2b64.xlsx" > 
-                                                                    <li class="dd-item" data-id="2">
-                                                                        <div class="dd-handle">
-                                                                        Justificante Incidencias
-                                                                        </div>
-                                                                    </li>
-                                                                </a>
+                                                             
                                                                  <a target="_blank" href="<?= base_url()?>assets/documentos/F-RH-07-2026_Licencia_por_Paternidad.docx" > 
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
@@ -1044,31 +1038,24 @@
                                                                         </div>
                                                                     </li>
                                                                 </a>
-                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-RH-09-2025_Permiso_Economico-8dce.docx" > 
-                                                                    <li class="dd-item" data-id="2">
-                                                                        <div class="dd-handle">
-                                                                        Permiso Económico
-                                                                        </div>
-                                                                    </li> 
-                                                                </a>
                                                                  <a target="_blank" href="<?= base_url()?>assets/documentos/R-RH-02-2026_Becas_para_Descendientes.pdf" >
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
-                                                                        Becas para Descendientes
+                                                                       <i class="far fa-file-pdf text-danger"></i> Becas para Descendientes
                                                                         </div>
                                                                     </li>
                                                                 </a>
                                                                  <a target="_blank" href="<?= base_url()?>assets/documentos/R-RH-03-2026 Seguro_de_Gastos_Médicos_Mayores.pdf" > 
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
-                                                                        Seguro de Gastos Médicos Mayores
+                                                                        <i class="far fa-file-pdf text-danger"></i> Seguro de Gastos Médicos Mayores
                                                                         </div>
                                                                     </li>
                                                                 </a>
                                                                  <a target="_blank" href="<?= base_url()?>assets/documentos/R-RH-04-2026_Licencias y permisos.pdf" > 
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
-                                                                        Licencias y permisos
+                                                                        <i class="far fa-file-pdf text-danger"></i> Licencias y permisos
                                                                         </div>
                                                                     </li>
                                                                 </a>

@@ -267,7 +267,7 @@
                                                                             </tr>
                                                                             <tr>
                                                                                 <td>
-                                                                                    <a href="<?= base_url("index.php/Principal/ImprimirGO/".$id_registro."/2") ?>" target="_blank" title="Hoja 2">
+                                                                                    <a href="<?= base_url("index.php/Principal/oficioLiberacion/" . $id_registro) ?>" target="_blank" title="Hoja 2">
                                                                                         <i class="far fa-file-pdf text-danger fa-2x"></i> Oficio de liberación de pago
                                                                                     </a>
                                                                                 </td>
@@ -300,7 +300,7 @@
                                                                             </tr>
                                                                             <tr>
                                                                                 <td>
-                                                                                    <a href="<?= base_url("index.php/Principal/ImprimirGO/".$id_registro."/2") ?>" target="_blank" title="Hoja 2">
+                                                                                    <a href="<?= base_url("index.php/Principal/oficioLiberacion/" . $id_registro) ?>" target="_blank" title="Hoja 2">
                                                                                         <i class="far fa-file-pdf text-danger fa-2x"></i> Oficio de liberación de pago
                                                                                     </a>
                                                                                 </td>

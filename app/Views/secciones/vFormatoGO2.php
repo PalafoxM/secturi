@@ -30,19 +30,13 @@ $fechaFormateada = $dia . ' de ' . $mes . ' del ' . $anio;
     <span class="proxima"><strong>Silao de la Victoria, Gto, <?= ucfirst($fechaFormateada); ?></strong></span>
 </div>
         <div  style="position:absolute; top:24.5%; left:64.5%; width:28%; height:18px; background-color:white; font-size: 14px; ">
-            <?php if(!$fic): ?>
-            <span class="proxima"><?= (isset($GO) && !empty($GO))?'GO':'PT';?> <?= strtoupper($registro->folio);?></span>
-            <?php endif; ?>
-            <?php if($fic): ?>
-            <span class="proxima">PT <?= $folio;?></span>
-            <?php endif; ?>
+            <span class="proxima"><?='GO';?> <?= strtoupper($prefijoCompleto);?></span>
         </div>
         <div style="position:absolute; top:33.2%; left:9.5%; width:81%; height:72px; background-color:white; font-size:13px; text-align:justify;">
             <span class="proxima">
-                
-                Por medio de la presente, me permito solicitar su apoyo para que se realice el tramite de <?= (isset($GO) && !empty($GO))?'Gasto de Operación':'Pago a Tercero'?>
-                con folio <strong><?= (isset($GO) && !empty($GO))?'GO':'PT'?> <?= ($fic)?$folio:strtoupper($registro->folio);?></strong> por la cantidad de 
-                <strong>$<?= number_format($registro->total_importe, 2); ?> (<?= mb_strtoupper($numero_texto, 'UTF-8'); ?>)</strong>,
+                Por medio de la presente, me permito solicitar su apoyo para que se realice el tramite de Gasto de Operación
+                con folio <strong><?= 'GO';?> <?= strtoupper($prefijoCompleto);?></strong> por la cantidad de 
+                <strong>$<?=number_format($total_importe, 2); ?> (<?= mb_strtoupper($numero_texto, 'UTF-8'); ?>)</strong>,
                 por concepto de <?= $registro->concepto_pago ?>.
             </span>
         </div>
