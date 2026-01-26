@@ -579,13 +579,19 @@
                                        
                                         <div class="col-lg-6">
                                             <div class="card">
-                                                <a href="<?= base_url().'assets/documentos/Integracion_del_tramite_SECTURI_2026.pdf'?>" target="_blank" >
+                                                <a href="<?= base_url() ?>assets/documentos/DESPACHO-AGE-0207-2026.pdf" target="_blank" >
                                                 <div class="card-body">
                                                     <div class="blog-card">
-                                                        <h4 class="header-title mt-0 mb-4">Integración del trámite SECTURI 2026</h4>
-                                                        <iframe src="<?= base_url() ?>assets/documentos/Integracion_del_tramite_SECTURI_2026.pdf" alt=""
+                                                        <h4 class="header-title mt-0 mb-4">Semana del 26 de enero al 30, acciones SIGAP</h4>
+                                                        <iframe src="<?= base_url() ?>assets/documentos/DESPACHO-AGE-0207-2026.pdf" alt=""
                                                             class="img-fluid" ></iframe>
                                                     </div><!--end blog-card-->
+                                                       <a href="https://meet.google.com/mxr-pios-rfy"
+                                                                    target="_blank" class="text-primary">Unirse a la reunión 11:00 a 12:00 horas <i
+                                                                        class="fas fa-long-arrow-alt-right"></i></a>
+                                                                        <a href="https://meet.google.com/jmk-rgge-cer"
+                                                                    target="_blank" class="text-primary">Unirse a la reunión 13:00 a 14:00 horas <i
+                                                                        class="fas fa-long-arrow-alt-right"></i></a>
 
                                                 </div><!--end card-body-->
                                                 </a>
