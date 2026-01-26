@@ -988,38 +988,38 @@
                                                             </ol>
                                                              <ol class="dd-list">
                                                                  <p class="text-muted mb-4">Coordinación de Recursos Humanos</p>
-                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-RH-01-2025_Ejemplo_Entregable-8d10.docx" > 
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-RH-02-2026_Solicitud_de_Beca_para_Descendientes.docx" > 
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
-                                                                        Ejemplo Entregable
+                                                                        Solicitud de Beca para Descendientes
                                                                         </div>
                                                                     </li>
                                                                 </a>
-                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-RH-02-2025_Solicitud_de_Beca_para_Hijos-0597.docx" > 
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-RH-03-2026_Seguro_Gastos_Medicos_Mayores.docx" > 
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
-                                                                        Solicitud de Beca para Hijos
+                                                                        Seguro Gastos Medicos Mayores
                                                                         </div>
                                                                     </li>
                                                                 </a>
-                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/R-RH-03-2025_Seguro_de_Gastos_Medicos_Mayores-fef2.pdf" > 
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-RH-04-2026_Formato_Licencia_sin_goce_de_sueldo.docx" > 
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
-                                                                        Seguro Gastos Médicos Mayores
+                                                                        Formato Licencia sin goce de sueldo
                                                                         </div>
                                                                     </li>
                                                                 </a>
-                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-RH-04-2025_Carta_Compromiso_CT-352a.docx" > 
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-RH-05-2026_Permiso_Economico.docx" > 
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
-                                                                        Carta Compromiso CT
+                                                                        Permiso Economico
                                                                         </div>
                                                                     </li>
                                                                 </a>
-                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-RH-05-2025_Solicitud_Apoyo_para_Estudios-b422.docx" > 
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-RH-06-2026_Justificante_Incidencias.xlsx" > 
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
-                                                                        Solicitud Apoyo para Estudios
+                                                                        Justificante Incidencias
                                                                         </div>
                                                                     </li>
                                                                 </a>
@@ -1030,14 +1030,14 @@
                                                                         </div>
                                                                     </li>
                                                                 </a>
-                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/S-RH-15-2021_LICENCIA_PATERNIDAD-841a.docx" > 
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-RH-07-2026_Licencia_por_Paternidad.docx" > 
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
                                                                         Licencia por Paternidad
                                                                         </div>
                                                                     </li>
                                                                 </a>
-                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-RH-08-2025_Licencia_por_Lactancia-2fb6.docx" > 
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-RH-08-2026_Licencia_por_Lactancia.docx" > 
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
                                                                         Licencia por Lactancia
@@ -1051,17 +1051,24 @@
                                                                         </div>
                                                                     </li> 
                                                                 </a>
-                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/R-RH-01-2025_Requisitos_Apoyo_para_estudios_y_formacion_basica-9b36.pdf" >
-                                                                    <li class="dd-item" data-id="2">
-                                                                        <div class="dd-handle">
-                                                                        Requisitos Apoyo para estudios y formación básica
-                                                                        </div>
-                                                                    </li>
-                                                                </a>
-                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/R-RH-02-2025_Solicitud_de_Beca_para_Descendientes-cef8.pdf" > 
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/R-RH-02-2026_Becas_para_Descendientes.pdf" >
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
                                                                         Becas para Descendientes
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/R-RH-03-2026 Seguro_de_Gastos_Médicos_Mayores.pdf" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Seguro de Gastos Médicos Mayores
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/R-RH-04-2026_Licencias y permisos.pdf" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Licencias y permisos
                                                                         </div>
                                                                     </li>
                                                                 </a>

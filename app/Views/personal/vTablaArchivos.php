@@ -260,7 +260,7 @@
                                                                         <?php if(isset($factura) && !empty($factura)): ?>
                                                                             <tr>
                                                                                 <td>
-                                                                                    <a href="<?= base_url("index.php/Principal/ImprimirGO/".$id_registro."/1") ?>" target="_blank" title="Hoja 1">
+                                                                                    <a href="<?= base_url("index.php/Principal/caratulaGo/".$id_registro) ?>" target="_blank" title="Hoja 1">
                                                                                         <i class="far fa-file-pdf text-danger fa-2x"></i> Carátula de pago
                                                                                     </a>
                                                                                 </td>
@@ -293,7 +293,7 @@
                                                                         <?php else: ?>
                                                                             <tr>
                                                                                 <td>
-                                                                                    <a href="<?= base_url("index.php/Principal/ImprimirGO/".$id_registro."/1") ?>" target="_blank" title="Hoja 1">
+                                                                                    <a href="<?= base_url("index.php/Principal/caratulaGo/".$id_registro) ?>" target="_blank" title="Hoja 1">
                                                                                         <i class="far fa-file-pdf text-danger fa-2x"></i> Carátula de pago
                                                                                     </a>
                                                                                 </td>
