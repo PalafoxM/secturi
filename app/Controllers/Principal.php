@@ -4737,12 +4737,6 @@ class Principal extends BaseController
         $data['facturaPdfGo'] = $facturaPdfGo->data;
 
         $total_importe = 0;
-        foreach ($data['facturaXml'] as $factura) {
-            $total_importe += $factura->total;
-        }
-        $data['total_importe'] = $total_importe;
-        $data['numero_texto'] = $this->numeroEnLetras($total_importe);
-
         // Obtener la relación de filas (periodo_factura_go) para enlazar XML con Presupuesto
         $periodoFacturaGo = $globals->getTabla([
             'tabla' => 'periodo_factura_go',
@@ -4770,6 +4764,7 @@ class Principal extends BaseController
 
         // Construir lista plana enriquecida
         $listaFacturas = [];
+        $total_importe = 0; // Inicializar
         
         foreach ($data['facturaXml'] as $factura) {
             $rawId = $factura->id_identificador;
@@ -4781,7 +4776,7 @@ class Principal extends BaseController
             
             if (isset($identificadorToPresupuesto[$rawId])) {
                 $idPresupuesto = $identificadorToPresupuesto[$rawId];
-                $propina       = $identificadorToPropina[$rawId] ?? 0; // Obtener propina
+                $propina       = $identificadorToPropina[$rawId] ?? 0; // Obtener propina correctamente por ID
                 
                 if (isset($presupuestoToPartida[$idPresupuesto])) {
                     $partida  = $presupuestoToPartida[$idPresupuesto];
@@ -4789,10 +4784,9 @@ class Principal extends BaseController
                 }
             }
             
-            // Calcular importe total (Total XML + Propina, si aplica)
-            // Nota: La imagen muestra "IMPORTE". Asumimos Total Factura por ahora, o la suma.
-            // Si el código anterior sumaba: $totalGo += $value->total + (int)$importe->data[$key]->propina;
-            $importeTotal = (float)str_replace([',','$'], '', $factura->total); // + (float)$propina; // Descomentar si se requiere sumar propina
+            // Calcular importe total (Total XML + Propina)
+            $importeTotal = (float)str_replace([',','$'], '', $factura->total) + (float)$propina;
+            $total_importe += $importeTotal; // Acumular
 
             $listaFacturas[] = [
                 'comprobante'   => $factura->folio ?: $factura->uuid, // Usa Folio o UUID si no hay folio
@@ -4804,6 +4798,10 @@ class Principal extends BaseController
                 'objeto_xml'    => $factura // Mantener objeto original por si acaso
             ];
         }
+
+        // Asignar totales calculados
+        $data['total_importe'] = $total_importe;
+        $data['numero_texto'] = $this->numeroEnLetras($total_importe);
         
         // Ordenar: Primero por Partida (DESC para coincidir con el ejemplo 3790 luego 2210?), luego por Comprobante
         usort($listaFacturas, function($a, $b) {
