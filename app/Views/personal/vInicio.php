@@ -588,7 +588,7 @@
                                                     </div><!--end blog-card-->
                                                        <a href="https://meet.google.com/mxr-pios-rfy"
                                                                     target="_blank" class="text-primary">Unirse a la reunión 11:00 a 12:00 horas <i
-                                                                        class="fas fa-long-arrow-alt-right"></i></a>
+                                                                        class="fas fa-long-arrow-alt-right"></i></a><br>
                                                                         <a href="https://meet.google.com/jmk-rgge-cer"
                                                                     target="_blank" class="text-primary">Unirse a la reunión 13:00 a 14:00 horas <i
                                                                         class="fas fa-long-arrow-alt-right"></i></a>
