@@ -44,7 +44,7 @@
                                 <div class="row mt-3">
                                     <div class="col-12 text-right">
                                         <a href="<?= base_url('index.php/Principal/ListaSolicitudContrato') ?>" class="btn btn-secondary">Cancelar</a>
-                                        <a onclick="guardarArchivosSolicitud();" class="btn btn-primary"><i class="fas fa-save"></i> Guardar Archivos 2</a>
+                                        <a onclick="guardarArchivosSolicitud();" class="btn btn-primary text-white"><i class="fas fa-save"></i> Guardar Archivos</a>
                                     </div>
                                 </div>
                             </form>

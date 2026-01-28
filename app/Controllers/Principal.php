@@ -2907,10 +2907,61 @@ class Principal extends BaseController
 
         $id_solicitud = $this->request->getPost('id_solicitud');
         
-        // Simulación: aquí se procesarían los archivos $_FILES
+        if (!$id_solicitud) {
+            $response->respuesta = "ID de solicitud no válido.";
+            return $this->respond($response);
+        }
+
+        $count = 0;
+        $errores = 0;
         
-        $response->error = false;
-        $response->respuesta = "Archivos guardados correctamente (Simulación)";
+        // Verificar si hay archivos enviados
+        if (isset($_FILES['archivos']) && is_array($_FILES['archivos']['name'])) {
+            foreach ($_FILES['archivos']['name'] as $key => $originalName) {
+                if (empty($originalName)) continue;
+                
+                if ($_FILES['archivos']['error'][$key] === UPLOAD_ERR_OK) {
+                    $tmpName = $_FILES['archivos']['tmp_name'][$key];
+                    $ext = pathinfo($originalName, PATHINFO_EXTENSION);
+                    $newName = $id_solicitud . '_' . $key . '_' . time() . '.' . $ext;
+                    $targetPath = FCPATH . 'assets/uploads/contratos/' . $newName;
+                    
+                    if (move_uploaded_file($tmpName, $targetPath)) {
+                        
+                        $dataInsert = [
+                            'id_solicitud_contrato' => $id_solicitud,
+                            'clave_documento' => $key,
+                            'nombre_archivo' => $newName,
+                            'tipo' => $ext,
+                            'usu_reg' => $session->id_usuario ?? 0,
+                            'fec_reg' => date('Y-m-d H:i:s'),
+                            'visible' => 1
+                        ];
+                        
+                        $res = $globals->saveTabla($dataInsert, ["tabla" => "solicitud_contrato_archivos", "editar" => false], ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/guardarArchivosSolicitud']);
+                        
+                        if (!$res->error) {
+                            $count++;
+                        } else {
+                            $errores++;
+                        }
+                    } else {
+                        $errores++;
+                    }
+                } else {
+                     $errores++;
+                }
+            }
+        }
+        
+        if ($count > 0) {
+            $response->error = false;
+            $msg = "Se guardaron $count archivos correctamente.";
+            if ($errores > 0) $msg .= " Hubo problemas con $errores archivos.";
+            $response->respuesta = $msg;
+        } else {
+            $response->respuesta = "No se guardó ningún archivo. " . ($errores > 0 ? "Hubo errores al procesar." : "No se seleccionaron archivos.");
+        }
 
         return $this->respond($response);
     }
