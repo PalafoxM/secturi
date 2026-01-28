@@ -44,7 +44,7 @@
                                 <div class="row mt-3">
                                     <div class="col-12 text-right">
                                         <a href="<?= base_url('index.php/Principal/ListaSolicitudContrato') ?>" class="btn btn-secondary">Cancelar</a>
-                                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar Archivos</button>
+                                        <a onclick="guardarArchivosSolicitud();" class="btn btn-primary"><i class="fas fa-save"></i> Guardar Archivos 2</a>
                                     </div>
                                 </div>
                             </form>
@@ -58,53 +58,74 @@
     </div>
 </div>
 
+
+<link href="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet"
+    type="text/css" />
+<!-- App css -->
+<link href="<?php echo base_url(); ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo base_url(); ?>assets/css/jquery-ui.min.css" rel="stylesheet">
+<link href="<?php echo base_url(); ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo base_url(); ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
+<link href="<?= base_url()?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+<!-- jQuery  -->
+<script src="<?php echo base_url(); ?>assets/js/jquery.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/jquery-ui.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/bootstrap.bundle.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/jquery.slimscroll.min.js"></script>
+
+<script src="<?php echo base_url(); ?>assets/pages/jquery.analytics_customers.init.js"></script>
+
+
+
+<script src="<?= base_url()?>assets/js/metismenu.min.js"></script>
+<script src="<?= base_url()?>assets/js/waves.js"></script>
+<script src="<?= base_url()?>assets/js/feather.min.js"></script>
+
 <script>
-    $(document).ready(function() {
-        $('#formSubirArchivos').on('submit', function(e) {
-            e.preventDefault();
-            
-            var formData = new FormData(this);
 
-            Swal.fire({
-                title: 'Guardando archivos...',
-                text: 'Por favor espere',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
+    function guardarArchivosSolicitud() {
+        var form = $('#formSubirArchivos')[0];
+        var formData = new FormData(form);
 
-            $.ajax({
-                url: '<?= base_url("index.php/Principal/guardarArchivosSolicitud") ?>',
-                type: 'POST',
-                data: formData,
-                contentType: false,
-                processData: false,
-                success: function(response) {
-                    if (!response.error) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: '¡Éxito!',
-                            text: response.respuesta,
-                        }).then((result) => {
-                            window.location.href = '<?= base_url("index.php/Principal/ListaSolicitudContrato") ?>';
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: response.respuesta
-                        });
-                    }
-                },
-                error: function() {
+        Swal.fire({
+            title: 'Guardando archivos...',
+            text: 'Por favor espere',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        $.ajax({
+            url: '<?= base_url("index.php/Principal/guardarArchivosSolicitud") ?>',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function(response) {
+                if (!response.error) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Éxito!',
+                        text: response.respuesta,
+                    }).then((result) => {
+                        window.location.href = '<?= base_url("index.php/Principal/ListaSolicitudContrato") ?>';
+                    });
+                } else {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: 'Ocurrió un error al subir los archivos.'
+                        text: response.respuesta
                     });
                 }
-            });
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Ocurrió un error al subir los archivos.'
+                });
+            }
         });
-    });
+    }
 </script>

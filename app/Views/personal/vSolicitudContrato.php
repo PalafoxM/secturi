@@ -222,10 +222,7 @@
                                 </div>
 
                                 <!-- SECCION 5: DOCUMENTOS Y ANEXOS -->
-                                <h5 class="bg-primary text-white p-2 mt-4">DOCUMENTOS Y ANEXOS</h5>
-                                <div class="alert alert-info text-center">
-                                    <strong>SOPORTE DOCUMENTAL SE RELACIONA EN EL REVERSO</strong>
-                                </div>
+                          
 
                                 <div class="row mt-4">
                                     <div class="col-12 text-center">

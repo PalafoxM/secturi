@@ -2880,6 +2880,24 @@ class Principal extends BaseController
         $this->_renderView($data);
     }
 
+    public function verArchivosSolicitud($id_solicitud)
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        
+        $archivos = $globals->getTabla([
+            'tabla' => 'solicitud_contrato_archivos',
+            'where' => ['id_solicitud_contrato' => $id_solicitud, 'visible' => 1]
+        ]);
+        
+        $data['id_solicitud'] = $id_solicitud;
+        $data['archivos'] = (!empty($archivos->data)) ? $archivos->data : [];
+        $data['scripts'] = array(); // No scripts needed for basic list
+        $data['contentView'] = 'secciones/vVerArchivosSolicitud';
+        
+        $this->_renderView($data);
+    }
+
     public function guardarArchivosSolicitud()
     {
         $session = \Config\Services::session();
@@ -2903,7 +2921,22 @@ class Principal extends BaseController
         $globals = new Mglobal;
         $data = array();
 
-        $solicitudes = $globals->getTabla(["tabla" => "vw_solicitud_contrato", "where" => ["visible" => 1]]);
+        if(in_array($session->id_perfil, [1,7])) {
+            $solicitudes = $globals->getTabla(["tabla" => "vw_solicitud_contrato", "where" => ["visible" => 1]]);
+        } else {
+            $solicitudes = $globals->getTabla(["tabla" => "vw_solicitud_contrato", "where" => ["visible" => 1, "usu_reg" => $session->id_usuario]]);
+        }
+
+        // Verificar archivos
+        if (!empty($solicitudes->data)) {
+            foreach ($solicitudes->data as &$sol) {
+                 $archivos = $globals->getTabla([
+                     "tabla" => "solicitud_contrato_archivos", 
+                     "where" => ["visible" => 1, 'id_solicitud_contrato' => $sol->id_solicitud_contrato]
+                 ]);
+                 $sol->tienen_archivos = (!empty($archivos->data));
+            }
+        }
         
         $data['solicitudes'] = (!empty($solicitudes->data)) ? $solicitudes->data : [];
         $data['scripts'] = array('inicio');

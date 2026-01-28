@@ -1,3 +1,4 @@
+<?php $session = \Config\Services::session(); ?>
 <div class="page-wrapper">
     <div class="page-content-tab">
         <div class="container-fluid">
@@ -55,9 +56,15 @@
                                                         <a href="<?= base_url('index.php/Principal/editarSolicitudContrato/' . $sol->id_solicitud_contrato) ?>" class="btn btn-sm btn-warning" title="Editar"><i class="fas fa-edit"></i></a>
                                                         <button class="btn btn-sm btn-danger" title="Eliminar" onclick="eliminarSolicitud(<?= $sol->id_solicitud_contrato ?>)"><i class="fas fa-trash"></i></button>
                                                         <a href="<?= base_url('index.php/Principal/verSolicitudContratoPDF/' . $sol->id_solicitud_contrato) ?>" target="_blank" class="btn btn-sm btn-info" title="Ver PDF"><i class="fas fa-file-pdf"></i></a>
-                                                        <button class="btn btn-sm btn-secondary" title="Adjuntar Archivos" onclick="abrirModalArchivos(<?= $sol->id_solicitud_contrato ?>)"><i class="fas fa-paperclip"></i></button>
-                                                    </td>
-                                                </tr>
+                                                         <?php if(!$sol->tienen_archivos): ?>
+                                                            <button class="btn btn-sm btn-secondary" title="Adjuntar Archivos" onclick="abrirModalArchivos(<?= $sol->id_solicitud_contrato ?>)"><i class="fas fa-paperclip"></i></button>
+                                                         <?php else: ?>
+                                                            <?php if(in_array($session->id_perfil, [1,7])): ?>
+                                                                <a href="<?= base_url('index.php/Principal/verArchivosSolicitud/' . $sol->id_solicitud_contrato) ?>" class="btn btn-sm btn-success" title="Ver Archivos"><i class="fas fa-eye"></i></a>
+                                                            <?php endif; ?>
+                                                         <?php endif; ?>
+                                                     </td>
+                                                 </tr>
                                             <?php endforeach; ?>
                                         <?php endif; ?>
                                     </tbody>
@@ -90,7 +97,7 @@
                                 <th style="width: 5%;">Num.</th>
                                 <th>DOCUMENTO</th>
                                 <th style="width: 10%; text-align: center;">SI</th>
-                                <th style="width: 10%; text-align: center;">N/A</th>
+
                             </tr>
                         </thead>
                         <tbody>
@@ -110,7 +117,14 @@
                                 7 => 'Cédula de Registro en el Padrón de Proveedores (Refrendo vigente)',
                                 8 => 'Escritura Constitutiva/Documento que acredite la legal constitución de la persona moral',
                                 9 => 'Documento que acredite la representación de la persona moral (Poder)',
-                                10 => 'Identificación oficial vigente (Personas morales Representante y Personas Físicas)'
+                                10 => 'Identificación oficial vigente (Personas morales Representante y Personas Físicas)',
+                                11 => 'Constancia de situación fiscal',
+                                12 => 'Comprobante de domicilio',
+                                '13a' => 'Opinión de cumplimiento de obligaciones fiscales',
+                                '13b' => 'Manifiesto bajo protesta de complimiento de obligaciones fiscales',
+                                14 => 'Manifiesto de no encontrare impedido para contratar',
+                                15 => 'Carta de Declaración de intereses',
+                                16 => 'Manifiesto de contar con infraestructura'
                             ];
                             foreach($documentos as $key => $doc): ?>
                             <tr>
@@ -122,12 +136,7 @@
                                         <label class="custom-control-label" for="si_<?= $key ?>"></label>
                                     </div>
                                 </td>
-                                <td class="text-center">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input check-na" id="na_<?= $key ?>">
-                                        <label class="custom-control-label" for="na_<?= $key ?>"></label>
-                                    </div>
-                                </td>
+                              
                             </tr>
                             <?php endforeach; ?>
                         </tbody>
