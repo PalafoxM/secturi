@@ -5173,7 +5173,7 @@ class Principal extends BaseController
                         $data['inicio'] = $p->periodo_inicio;
                         $data['fin']    = $p->periodo_fin;
                         $data['encabezado'] = $p->encabezado;
-                        $monto          = (int)$facturaItem->total + (int)$p->propina;
+                        $monto          = $importe_float + (float)$p->propina;
                         $data['total2']  = $monto;
                         $data['monto2']  = $this->numeroEnLetras($monto);
                     } else {
