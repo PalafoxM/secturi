@@ -5,27 +5,38 @@
     <title>Solicitud de Elaboración de Contrato</title>
     <style>
         body { font-family: Arial, sans-serif; font-size: 12px; }
-        .header { text-align: center; margin-bottom: 20px; }
+        .header { text-align: center; margin-bottom: 20px;  background-color: #213E66;color: white; }
         .section-title { background-color: #213E66; color: white; padding: 5px; font-weight: bold; margin-top: 15px; }
         .row { display: flex; flex-wrap: wrap; margin-bottom: 5px; }
         .label { font-weight: bold; width: 30%; display: inline-block; }
         .value { border-bottom: 1px solid #ccc; width: 68%; display: inline-block; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #ddd; padding: 5px; text-align: left; }
+        th, td { border: 1px solid #ddd; padding: 5px; text-align: left; width: 25%; }
         th { background-color: #f2f2f2; }
     </style>
 </head>
 <body>
+       <p>Fecha de registro: <?= date('d/m/Y H:i', strtotime($solicitud->fec_reg)) ?></p>
     <div class="header">
-        <h3>SOLICITUD DE ELABORACIÓN DE CONTRATO</h3>
-        <p>Fecha de registro: <?= date('d/m/Y H:i', strtotime($solicitud->fec_reg)) ?></p>
+        <table style="width: 100%; border: none;">
+            <tr>
+                <td style="width: 10%; border: none; background-color: #213E66; text-align: left; padding: 10px;">
+                    <img src="<?= base_url('assets/logo3.png') ?>" width="100" alt="Logo">
+                </td>
+                <td style="width: 90%; border: none; background-color: #213E66; color: white; text-align: center;">
+                    <h3 style="margin: 5px 0;">SOLICITUD DE ELABORACIÓN DE CONTRATO</h3>
+                    <h4 style="margin: 5px 0;">DIRECCIÓN GENERAL JURÍDICA</h4>
+                    <h4 style="margin: 5px 0;">DGJ-1</h4>
+                </td>
+            </tr>
+        </table>
     </div>
 
     <div class="section-title">INFORMACIÓN DEL ÁREA SOLICITANTE</div>
     <div>
-        <div class="row"><span class="label">Responsable del Proyecto:</span> <span class="value"><?= $solicitud->responsable_proyecto ?></span></div>
-        <div class="row"><span class="label">Responsable de Seguimiento:</span> <span class="value"><?= $solicitud->responsable_seguimiento ?></span></div>
-        <div class="row"><span class="label">Enlace de Comunicaciones:</span> <span class="value"><?= $solicitud->enlace_comunicaciones ?></span></div>
+        <div class="row"><span class="label">Nombre y cargo del responsable del Proyecto:</span> <span class="value"><i><?= $solicitud->responsable_proyecto ?></i></span></div>
+        <div class="row"><span class="label">Nombre y cargo del responsable de Seguimiento:</span> <span class="value"><i><?= $solicitud->responsable_seguimiento ?></i></span></div>
+        <div class="row"><span class="label">Nombre y cargo del enlace de Comunicaciones:</span> <span class="value"><i><?= $solicitud->enlace_comunicaciones ?></i></span></div>
     </div>
 
     <div class="section-title">INFORMACIÓN PRESUPUESTAL</div>
@@ -35,13 +46,15 @@
                 <th>Proyecto</th>
                 <th>Partida</th>
                 <th>Clave Estándar</th>
+                <th>Suficiencia Presupuestal</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td><?= $solicitud->proyecto ?></td>
-                <td><?= $solicitud->partida ?></td>
-                <td><?= $solicitud->clave_estandarizada ?></td>
+                <td style="text-align: center;"><?= $solicitud->proyecto ?></td>
+                <td style="text-align: center;"><?= $solicitud->partida ?></td>
+                <td style="text-align: center;"><?= $solicitud->clave_estandarizada ?></td>
+                <td style="text-align: center;">El proyecto cuenta con suficiencia presupuestal para a contratación de los servicios requeridos en la presente solicitud. Se sube captura de pantalla Sistema SAP/R3</td>
             </tr>
         </tbody>
     </table>
