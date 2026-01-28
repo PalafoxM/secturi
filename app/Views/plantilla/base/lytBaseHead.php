@@ -528,6 +528,7 @@
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/vehiculosPT">Vehiculos PT</a></li>
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/ListaInventario">Inventarios</a>
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/Servicios">Servicios</a>
+                                    <li><a href="<?php echo base_url(); ?>index.php/Inicio/InventarioProductos">Inventario Productos</a>
                                     </li>
 
                                 </ul>

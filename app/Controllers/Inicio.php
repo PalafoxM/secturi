@@ -243,6 +243,100 @@ class Inicio extends BaseController {
         $this->_renderView($data);
         
     }
+
+    public function InventarioProductos()
+
+    {   
+        
+        $globas = new Mglobal;
+      
+        $data['cat_inventario_papel'] = $globas->getTabla([
+        'tabla' => 'cat_inventario_papel',
+        'where' => ['visible' => 1]
+    ])->data;
+
+        $data['cat_inventario_art_papel'] = $globas->getTabla([
+        'tabla' => 'cat_inventario_art_papel',
+        'where' => ['visible' => 1]
+    ])->data;
+
+        $data['cat_inventario_art_ofi'] = $globas->getTabla([
+        'tabla' => 'cat_inventario_art_ofi',
+        'where' => ['visible' => 1]
+    ])->data;
+
+        $data['scripts'] = array('principal', 'inicio');
+        $data['contentView']= 'personal/vInventarioProductos';                
+        $this->_renderView($data);
+        return view('personal/vInventarioProductos');
+        
+    }
+    public function actualizarInventario()
+    {
+        $response = new \stdClass();
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response->error = true;
+        
+        $id_producto = $this->request->getPost('id_producto');
+        $tabla = $this->request->getPost('tabla');
+        $tipo_movimiento = $this->request->getPost('tipo_movimiento'); // 'entrada' o 'salida'
+        $cantidad = (int)$this->request->getPost('cantidad');
+
+        if (!$id_producto || !$tabla || !$cantidad) {
+            $response->respuesta = "Datos incompletos.";
+            return $this->respond($response);
+        }
+
+        // 1. Obtener producto actual para validar stock
+        $producto = $globals->getTabla([
+            'tabla' => $tabla,
+            'where' => ['id' => $id_producto]
+        ]);
+
+        if (empty($producto->data)) {
+            $response->respuesta = "Producto no encontrado.";
+            return $this->respond($response);
+        }
+
+        $stockActual = (int)$producto->data[0]->stock;
+        $nuevoStock = $stockActual;
+
+        // 2. Calcular nuevo stock
+        if ($tipo_movimiento == 'entrada') {
+            $nuevoStock += $cantidad;
+        } elseif ($tipo_movimiento == 'salida') {
+            if ($stockActual < $cantidad) {
+                $response->respuesta = "No hay suficiente stock para realizar la baja.";
+                return $this->respond($response);
+            }
+            $nuevoStock -= $cantidad;
+        }
+
+        // 3. Guardar cambios
+        $dataUpdate = ['stock' => $nuevoStock];
+        $dataConfig = [
+            'tabla' => $tabla,
+            'editar' => true,
+            'idEditar' => ['id' => $id_producto]
+        ];
+
+        // Opcional: Guardar en bitácora de movimientos si existe una tabla para ello
+        // $globals->saveTabla(...) 
+
+        $result = $globals->saveTabla($dataUpdate, $dataConfig, ['script' => 'Inicio.actualizarInventario']);
+
+        if ($result) {
+            $response->error = false;
+            $response->respuesta = "Movimiento registrado correctamente. Nuevo stock: $nuevoStock";
+            $response->nuevo_stock = $nuevoStock;
+        } else {
+            $response->respuesta = "Error al actualizar la base de datos.";
+        }
+
+        return $this->respond($response);
+    }
+
     public function ListadoSolicitudes()
     {        
         $session = \Config\Services::session();
