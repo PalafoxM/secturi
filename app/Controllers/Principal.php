@@ -4735,7 +4735,7 @@ class Principal extends BaseController
             'where' => ['visible' => 1, 'id_registro_go' => $id_go]
         ]);
         $docAmpara = (isset($facturaXml->data) ? count($facturaXml->data) : 0);
-       
+      
         $registroGo = $globals->getTabla([
             'tabla' => 'vw_registro_go',
             'where' => ['visible' => 1, 'id_registro_go' => $id_go]
@@ -4899,6 +4899,8 @@ class Principal extends BaseController
         });
         
         $data['listaOrdenada'] = $listaFacturas;
+
+        //die( var_dump( $data['listaOrdenada'] ) );
         $html = view('secciones/vCaratulaGO.php', $data);
 
 
