@@ -350,7 +350,7 @@ class Inicio extends BaseController {
         $dataConfig = [
             'tabla' => $tabla,
             'editar' => true,
-            'idEditar' => ['id' => $id_producto]
+            'idEditar' => [$idGenerico => $id_producto]
         ];
 
         // Opcional: Guardar en bitácora de movimientos si existe una tabla para ello
@@ -432,6 +432,54 @@ class Inicio extends BaseController {
             $response->respuesta = "Producto guardado correctamente.";
         } else {
             $response->respuesta = $result->respuesta ?? "Error al guardar en la base de datos.";
+        }
+
+        return $this->respond($response);
+    }
+
+    public function eliminarProducto()
+    {
+        $response = new \stdClass();
+        $globals = new Mglobal;
+        $response->error = true;
+
+        $id_producto = $this->request->getPost('id');
+        $tabla = $this->request->getPost('tabla');
+
+        if (!$id_producto || !$tabla) {
+            $response->respuesta = "Datos incompletos para eliminar.";
+            return $this->respond($response);
+        }
+
+        $idGenerico = '';
+        if ($tabla == 'cat_inventario_papel') {
+            $idGenerico = 'id_inventario_papel';
+        } elseif ($tabla == 'cat_inventario_art_papel') {
+            $idGenerico = 'id_inventario_art_papel';
+        } elseif ($tabla == 'cat_inventario_art_ofi') {
+            $idGenerico = 'id_inventario_art_ofi';
+        }
+
+        if ($idGenerico == '') {
+            $response->respuesta = "Tabla no válida.";
+            return $this->respond($response);
+        }
+
+        $dataUpdate = ['visible' => 0];
+        
+        $dataConfig = [
+            'tabla' => $tabla,
+            'editar' => true,
+            'idEditar' => [$idGenerico => $id_producto]
+        ];
+
+        $result = $globals->saveTabla($dataUpdate, $dataConfig, ['script' => 'Inicio.eliminarProducto']);
+
+        if ($result) {
+            $response->error = false;
+            $response->respuesta = "Producto eliminado correctamente.";
+        } else {
+            $response->respuesta = "Error al intentar eliminar.";
         }
 
         return $this->respond($response);

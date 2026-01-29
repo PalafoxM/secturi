@@ -97,6 +97,13 @@
                                                                     title="Registrar Salida">
                                                                 <i class="mdi mdi-minus"></i> Baja
                                                             </button>
+                                                            <button class="btn btn-xs btn-outline-danger btn-eliminar ml-2"
+                                                                data-id="<?= $item->id_inventario_art_ofi ?>"
+                                                                data-tabla="cat_inventario_art_ofi"
+                                                                data-nombre="<?= $item->nombre ?? $item->descripcion ?? '' ?>"
+                                                                title="Eliminar Producto">
+                                                                <i class="mdi mdi-trash-can"></i> Eliminar
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                     <?php endforeach; ?>
@@ -151,6 +158,13 @@
                                                                     title="Registrar Salida">
                                                                 <i class="mdi mdi-minus"></i> Baja
                                                             </button>
+                                                            <button class="btn btn-xs btn-outline-danger btn-eliminar ml-2"
+                                                                data-id="<?= $item->id_inventario_art_papel ?>"
+                                                                data-tabla="cat_inventario_art_papel"
+                                                                data-nombre="<?= $item->nombre ?? $item->descripcion ?? '' ?>"
+                                                                title="Eliminar Producto">
+                                                                <i class="mdi mdi-trash-can"></i> Eliminar
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                     <?php endforeach; ?>
@@ -204,6 +218,13 @@
                                                                     data-tipo="salida"
                                                                     title="Registrar Salida">
                                                                 <i class="mdi mdi-minus"></i> Baja
+                                                            </button>
+                                                            <button class="btn btn-xs btn-outline-danger btn-eliminar ml-2"
+                                                                data-id="<?= $item->id_inventario_papel ?>"
+                                                                data-tabla="cat_inventario_papel"
+                                                                data-nombre="<?= $item->nombre ?? $item->descripcion ?? '' ?>"
+                                                                title="Eliminar Producto">
+                                                                <i class="mdi mdi-trash-can"></i> Eliminar
                                                             </button>
                                                         </td>
                                                     </tr>
@@ -304,95 +325,156 @@
 <script src="<?= base_url(); ?>plugins/select2/select2.min.js"></script>
 
 <script>
-$(document).ready(function() {
+    $(document).ready(function() {
     
-    // Initialize DataTables
-
-
-    // Handle "Alta" (New), "Editar", and "Baja" button clicks
-    $(document).on('click', '.btn-movimiento', function() {
-        var id = $(this).data('id');
-        var tabla = $(this).data('tabla');
-        var nombre = $(this).data('nombre');
-        var tipo = $(this).data('tipo');
-        // 'stock' data attribute might miss if we didn't add it to 'baja' button, but it's fine
-        var stock = $(this).data('stock'); 
-        
-        $('#id_producto').val(id);
-        $('#tipo_movimiento').val(tipo);
-        $('#nombre_producto').val(nombre);
-        $('#cantidad').val(stock); // Default to current stock
-
-        var titulo = '';
-        var icono = '';
-        
-        // Reset valid elements
-        $('#nombre_producto').prop('readonly', false);
-        $('#div_tabla_select').hide();
-        $('#tabla_hidden').val(tabla);
-
-        if(tipo == 'nuevo'){
-             titulo = 'Nuevo Producto';
-             icono = 'mdi-plus-box text-primary';
-             $('#id_producto').val('');
-             $('#nombre_producto').val('');
-             $('#cantidad').val('0');
-             $('#div_tabla_select').show();
-             $('#label_cantidad').text('Stock Inicial');
-        } else if(tipo == 'editar'){
-             titulo = 'Editar Producto';
-             icono = 'mdi-pencil text-primary';
-             $('#label_cantidad').text('Stock Actual');
-        } else if(tipo == 'salida'){
-             titulo = 'Baja de Stock';
-             icono = 'mdi-minus-circle text-warning';
-             $('#nombre_producto').prop('readonly', true);
-             $('#label_cantidad').text('Cantidad a retirar');
-             $('#cantidad').val(''); // Clear for input
-        }
-        
-        $('#modalTitulo').html('<i class="mdi '+icono+' mr-2"></i> ' + titulo);
-        
-        $('#modalMovimientoInventario').modal('show');
-    });
-
-    // Handle form submit
-    $('#formMovimientoInventario').submit(function(e) {
-        e.preventDefault();
-        
-        var tipo = $('#tipo_movimiento').val();
-        var urlInfo = '';
-        
-        // If 'nuevo', get table from select
-        if(tipo == 'nuevo'){
-             $('#tabla_hidden').val($('#tabla_select').val());
-        }
-
-        var formData = $(this).serialize();
-
-        if(tipo == 'salida'){
-             urlInfo = '<?= base_url() ?>index.php/Inicio/actualizarInventario'; 
-        } else {
-             urlInfo = '<?= base_url() ?>index.php/Inicio/guardarProducto';
-        }
-
-        $.ajax({
-            url: urlInfo,
-            type: 'POST',
-            data: formData,
-            dataType: 'json',
-            success: function(response) {
-                if (!response.error) {
-                    Swal.fire("Correcto", response.respuesta, "success");
-                    location.reload(); // Reload to show new data/totals
-                } else {
-                    Swal.fire("Error", response.respuesta, "error");
+        // Initialize DataTables
+        $('.tabla-inventario').DataTable({
+            language: {
+                "decimal": "",
+                "emptyTable": "No hay información",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ productos",
+                "infoEmpty": "Mostrando 0 a 0 de 0 productos",
+                "infoFiltered": "(Filtrado de _MAX_ total productos)",
+                "lengthMenu": "Mostrar _MENU_ productos",
+                "loadingRecords": "Cargando...",
+                "processing": "Procesando...",
+                "search": "Buscar:", // <--- Texto del buscador
+                "zeroRecords": "Sin resultados encontrados",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
                 }
             },
-            error: function() {
-                Swal.fire("Error", "Error de conexión con el servidor.", "error");
+            responsive: true,
+            order: [[ 0, "asc" ]] // Ordenar alfabéticamente por nombre
+        });
+
+        // Handle "Alta" (New), "Editar", and "Baja" button clicks
+        $(document).on('click', '.btn-movimiento', function() {
+            var id = $(this).data('id');
+            var tabla = $(this).data('tabla');
+            var nombre = $(this).data('nombre');
+            var tipo = $(this).data('tipo');
+            // 'stock' data attribute might miss if we didn't add it to 'baja' button, but it's fine
+            var stock = $(this).data('stock'); 
+        
+            $('#id_producto').val(id);
+            $('#tipo_movimiento').val(tipo);
+            $('#nombre_producto').val(nombre);
+            $('#cantidad').val(stock); // Default to current stock
+
+            var titulo = '';
+            var icono = '';
+        
+            // Reset valid elements
+            $('#nombre_producto').prop('readonly', false);
+            $('#div_tabla_select').hide();
+            $('#tabla_hidden').val(tabla);
+
+            if(tipo == 'nuevo'){
+                titulo = 'Nuevo Producto';
+                icono = 'mdi-plus-box text-primary';
+                $('#id_producto').val('');
+                $('#nombre_producto').val('');
+                $('#cantidad').val('0');
+                $('#div_tabla_select').show();
+                $('#label_cantidad').text('Stock Inicial');
+            } else if(tipo == 'editar'){
+                 titulo = 'Editar Producto';
+                icono = 'mdi-pencil text-primary';
+                $('#label_cantidad').text('Stock Actual');
+            } else if(tipo == 'salida'){
+                 titulo = 'Baja de Stock';
+                icono = 'mdi-minus-circle text-warning';
+                $('#nombre_producto').prop('readonly', true);
+                $('#label_cantidad').text('Cantidad a retirar');
+                $('#cantidad').val(''); // Clear for input
+            }
+        
+            $('#modalTitulo').html('<i class="mdi '+icono+' mr-2"></i> ' + titulo);
+        
+            $('#modalMovimientoInventario').modal('show');
+        });
+
+        $(document).on('click', '.btn-eliminar', function() {
+            var id = $(this).data('id');
+            var tabla = $(this).data('tabla');
+            var nombre = $(this).data('nombre');
+
+            // Usamos SweetAlert para confirmar antes de borrar
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "Se eliminará el producto: " + nombre,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                if (result.isConfirmed) {
+                    // Si el usuario dice que SÍ, hacemos la petición AJAX
+                    $.ajax({
+                        url: '<?= base_url() ?>index.php/Inicio/eliminarProducto',
+                        type: 'POST',
+                        data: { id: id, tabla: tabla },
+                        dataType: 'json',
+                        success: function(response) {
+                            if (!response.error) {
+                                Swal.fire("Eliminado", response.respuesta, "success");
+                                // Recargamos la página para ver los cambios
+                                setTimeout(function(){ location.reload(); }, 1500);
+                            } else {
+                                Swal.fire("Error", response.respuesta, "error");
+                            }
+                        },
+                        error: function() {
+                            Swal.fire("Error", "Error de conexión con el servidor.", "error");
+                    }
+                });
             }
         });
+
+        // Handle form submit
+        $('#formMovimientoInventario').submit(function(e) {
+            e.preventDefault();
+        
+            var tipo = $('#tipo_movimiento').val();
+            var urlInfo = '';
+        
+           // If 'nuevo', get table from select
+            if(tipo == 'nuevo'){
+                $('#tabla_hidden').val($('#tabla_select').val());
+            }
+
+            var formData = $(this).serialize();
+
+            if(tipo == 'salida'){
+                 urlInfo = '<?= base_url() ?>index.php/Inicio/actualizarInventario'; 
+            } else {
+                 urlInfo = '<?= base_url() ?>index.php/Inicio/guardarProducto';
+            }
+
+            $.ajax({
+                url: urlInfo,
+                type: 'POST',
+                data: formData,
+                dataType: 'json',
+                success: function(response) {
+                    if (!response.error) {
+                        Swal.fire("Correcto", response.respuesta, "success");
+                        location.reload(); // Reload to show new data/totals
+                    } else {
+                        Swal.fire("Error", response.respuesta, "error");
+                    }
+                },
+                error: function() {
+                    Swal.fire("Error", "Error de conexión con el servidor.", "error");
+                }
+            });
+        }); 
     });
 });
 </script>
