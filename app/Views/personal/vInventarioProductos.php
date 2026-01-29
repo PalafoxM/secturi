@@ -3,44 +3,7 @@
     <div class="page-content-tab">
         <div class="container-fluid">
 
-            <!-- ===================== HEADER ===================== -->
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-
-                            <h4 class="header-title mt-0">Inventario</h4>
-
-                            <div class="row align-items-center">
-                                <div class="col-md-4">
-                                    <div class="media my-2">
-                                        <img src="<?= base_url('assets/images/widgets/logo2.png') ?>"
-                                             class="thumb-md-2 rounded-circle" alt="stock">
-                                        <div class="media-body ml-3">
-                                            <h4 class="mt-0 mb-1 font-weight-semibold text-dark font-24">
-                                                1,248
-                                            </h4>
-                                            <p class="text-muted text-uppercase mb-0 font-12">
-                                                Stock total activo
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- ===================== GRÁFICA ===================== -->
-                            <div class="row mt-3">
-                                <div class="col-12">
-                                    <div style="height:300px;">
-                                        <canvas id="graficaInventario"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
+         
 
             <!-- ===================== TABS DE INVENTARIO ===================== -->
             <!-- ===================== TABS DE INVENTARIO ===================== -->
@@ -49,6 +12,26 @@
                     <div class="card">
                         <div class="card-body">
                             
+                            <div class="row mb-3">
+                                <div class="col-md-9">
+                                    <div class="alert alert-secondary d-flex justify-content-around align-items-center mb-0">
+                                        <span class="font-14"><i class="mdi mdi-paperclip mr-1"></i> Total Oficina: <strong><?= $total_stock_art_ofi ?? 0 ?></strong></span>
+                                        <span class="font-14"><i class="mdi mdi-pen mr-1"></i> Total Papelería: <strong><?= $total_stock_art_papel ?? 0 ?></strong></span>
+                                        <span class="font-14"><i class="mdi mdi-file-outline mr-1"></i> Total Papel: <strong><?= $total_stock_papel ?? 0 ?></strong></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <button class="btn btn-primary btn-block btn-movimiento"
+                                            data-id=""
+                                            data-tabla=""
+                                            data-nombre=""
+                                            data-stock=""
+                                            data-tipo="nuevo">
+                                        <i class="mdi mdi-plus-box mr-1"></i> Nuevo Producto
+                                    </button>
+                                </div>
+                            </div>
+
                             <ul class="nav nav-tabs nav-tabs-custom" role="tablist">
                                 <li class="nav-item">
                                     <a class="nav-link active font-weight-semibold" data-toggle="tab" href="#oficina" role="tab">
@@ -97,13 +80,14 @@
                                                             </span>
                                                         </td>
                                                         <td class="text-center align-middle">
-                                                            <button class="btn btn-xs btn-outline-success btn-movimiento"
+                                                            <button class="btn btn-xs btn-outline-primary btn-movimiento"
                                                                     data-id="<?= $item->id_inventario_art_ofi ?>"
                                                                     data-tabla="cat_inventario_art_ofi"
                                                                     data-nombre="<?= $item->nombre ?? $item->descripcion ?? '' ?>"
-                                                                    data-tipo="entrada"
-                                                                    title="Registrar Entrada">
-                                                                <i class="mdi mdi-plus"></i> Alta
+                                                                    data-stock="<?= $item->stock ?>"
+                                                                    data-tipo="editar"
+                                                                    title="Editar Producto">
+                                                                <i class="mdi mdi-pencil"></i> Editar
                                                             </button>
                                                             <button class="btn btn-xs btn-outline-warning btn-movimiento ml-2"
                                                                     data-id="<?= $item->id_inventario_art_ofi ?>"
@@ -150,13 +134,14 @@
                                                             </span>
                                                         </td>
                                                         <td class="text-center align-middle">
-                                                            <button class="btn btn-xs btn-outline-success btn-movimiento"
+                                                            <button class="btn btn-xs btn-outline-primary btn-movimiento"
                                                                     data-id="<?= $item->id_inventario_art_papel ?>"
                                                                     data-tabla="cat_inventario_art_papel"
                                                                     data-nombre="<?= $item->nombre ?? $item->descripcion ?? '' ?>"
-                                                                    data-tipo="entrada"
-                                                                    title="Registrar Entrada">
-                                                                <i class="mdi mdi-plus"></i> Alta
+                                                                    data-stock="<?= $item->stock ?>"
+                                                                    data-tipo="editar"
+                                                                    title="Editar Producto">
+                                                                <i class="mdi mdi-pencil"></i> Editar
                                                             </button>
                                                             <button class="btn btn-xs btn-outline-warning btn-movimiento ml-2"
                                                                     data-id="<?= $item->id_inventario_art_papel ?>"
@@ -203,13 +188,14 @@
                                                             </span>
                                                         </td>
                                                         <td class="text-center align-middle">
-                                                            <button class="btn btn-xs btn-outline-success btn-movimiento"
+                                                            <button class="btn btn-xs btn-outline-primary btn-movimiento"
                                                                     data-id="<?= $item->id_inventario_papel ?>"
                                                                     data-tabla="cat_inventario_papel"
                                                                     data-nombre="<?= $item->nombre ?? $item->descripcion ?? '' ?>"
-                                                                    data-tipo="entrada"
-                                                                    title="Registrar Entrada">
-                                                                <i class="mdi mdi-plus"></i> Alta
+                                                                    data-stock="<?= $item->stock ?>"
+                                                                    data-tipo="editar"
+                                                                    title="Editar Producto">
+                                                                <i class="mdi mdi-pencil"></i> Editar
                                                             </button>
                                                             <button class="btn btn-xs btn-outline-warning btn-movimiento ml-2"
                                                                     data-id="<?= $item->id_inventario_papel ?>"
@@ -251,24 +237,33 @@
                         <form id="formMovimientoInventario">
                             <div class="modal-body">
                                 <input type="hidden" id="id_producto" name="id_producto">
-                                <input type="hidden" id="tabla" name="tabla">
                                 <input type="hidden" id="tipo_movimiento" name="tipo_movimiento">
+                                <!-- Hidden field for table name when editing or fixed -->
+                                <input type="hidden" id="tabla_hidden" name="tabla"> 
 
-                                <div class="form-group">
-                                    <label class="font-weight-bold">Producto</label>
-                                    <input type="text" class="form-control" id="nombre_producto" readonly>
+                                <div class="form-group" id="div_tabla_select" style="display:none;">
+                                    <label class="font-weight-bold">Categoría</label>
+                                    <select class="form-control" id="tabla_select">
+                                        <option value="cat_inventario_art_ofi">Artículos de Oficina</option>
+                                        <option value="cat_inventario_art_papel">Artículos Papelería</option>
+                                        <option value="cat_inventario_papel">Papel</option>
+                                    </select>
                                 </div>
 
                                 <div class="form-group">
-                                    <label class="font-weight-bold">Cantidad</label>
-                                    <input type="number" class="form-control" id="cantidad" name="cantidad" min="1" required placeholder="0">
+                                    <label class="font-weight-bold">Producto</label>
+                                    <input type="text" class="form-control" id="nombre_producto" name="nombre" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="font-weight-bold" id="label_cantidad">Stock</label>
+                                    <input type="number" class="form-control" id="cantidad" name="stock" min="0" required placeholder="0">
                                 </div>
                             </div>
 
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary btn-sm"
-                                        data-dismiss="modal">Cancelar</button>
-                                <button type="submit" class="btn btn-primary btn-sm">Guardar Movimiento</button>
+                                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-primary btn-sm">Guardar</button>
                             </div>
                         </form>
 
@@ -314,27 +309,46 @@ $(document).ready(function() {
     // Initialize DataTables
 
 
-    // Handle "Alta" and "Baja" button clicks
+    // Handle "Alta" (New), "Editar", and "Baja" button clicks
     $(document).on('click', '.btn-movimiento', function() {
         var id = $(this).data('id');
         var tabla = $(this).data('tabla');
         var nombre = $(this).data('nombre');
         var tipo = $(this).data('tipo');
+        // 'stock' data attribute might miss if we didn't add it to 'baja' button, but it's fine
+        var stock = $(this).data('stock'); 
         
         $('#id_producto').val(id);
-        $('#tabla').val(tabla);
-        $('#nombre_producto').val(nombre);
         $('#tipo_movimiento').val(tipo);
-        $('#cantidad').val('');
+        $('#nombre_producto').val(nombre);
+        $('#cantidad').val(stock); // Default to current stock
 
         var titulo = '';
         var icono = '';
-        if(tipo == 'entrada'){
-            titulo = 'Alta de Stock';
-            icono = 'mdi-plus-circle text-success';
-        } else {
-            titulo = 'Baja de Stock';
-            icono = 'mdi-minus-circle text-warning';
+        
+        // Reset valid elements
+        $('#nombre_producto').prop('readonly', false);
+        $('#div_tabla_select').hide();
+        $('#tabla_hidden').val(tabla);
+
+        if(tipo == 'nuevo'){
+             titulo = 'Nuevo Producto';
+             icono = 'mdi-plus-box text-primary';
+             $('#id_producto').val('');
+             $('#nombre_producto').val('');
+             $('#cantidad').val('0');
+             $('#div_tabla_select').show();
+             $('#label_cantidad').text('Stock Inicial');
+        } else if(tipo == 'editar'){
+             titulo = 'Editar Producto';
+             icono = 'mdi-pencil text-primary';
+             $('#label_cantidad').text('Stock Actual');
+        } else if(tipo == 'salida'){
+             titulo = 'Baja de Stock';
+             icono = 'mdi-minus-circle text-warning';
+             $('#nombre_producto').prop('readonly', true);
+             $('#label_cantidad').text('Cantidad a retirar');
+             $('#cantidad').val(''); // Clear for input
         }
         
         $('#modalTitulo').html('<i class="mdi '+icono+' mr-2"></i> ' + titulo);
@@ -346,45 +360,37 @@ $(document).ready(function() {
     $('#formMovimientoInventario').submit(function(e) {
         e.preventDefault();
         
-        var formData = $(this).serialize();
+        var tipo = $('#tipo_movimiento').val();
+        var urlInfo = '';
         
+        // If 'nuevo', get table from select
+        if(tipo == 'nuevo'){
+             $('#tabla_hidden').val($('#tabla_select').val());
+        }
+
+        var formData = $(this).serialize();
+
+        if(tipo == 'salida'){
+             urlInfo = '<?= base_url() ?>index.php/Inicio/actualizarInventario'; 
+        } else {
+             urlInfo = '<?= base_url() ?>index.php/Inicio/guardarProducto';
+        }
+
         $.ajax({
-            url: '<?= base_url() ?>index.php/Inicio/actualizarInventario',
+            url: urlInfo,
             type: 'POST',
             data: formData,
             dataType: 'json',
             success: function(response) {
                 if (!response.error) {
-                    alert(response.respuesta);
-                    
-                    // Update the UI
-                    var id = $('#id_producto').val();
-                    var tabla = $('#tabla').val();
-                    var nuevoStock = response.nuevo_stock;
-                    
-                    // Determine which cell to update based on table
-                    var prefix = '';
-                    if (tabla == 'cat_inventario_art_ofi') prefix = 'art_ofi';
-                    else if (tabla == 'cat_inventario_art_papel') prefix = 'art_papel';
-                    else if (tabla == 'cat_inventario_papel') prefix = 'papel';
-                    
-                    var badge = $('#stock-' + prefix + '-' + id);
-                    badge.text(nuevoStock);
-                    
-                    // Update badge color logic (optional dynamic class change)
-                    if (nuevoStock < 5) {
-                        badge.removeClass('badge-soft-success').addClass('badge-soft-danger');
-                    } else {
-                        badge.removeClass('badge-soft-danger').addClass('badge-soft-success');
-                    }
-                    
-                    $('#modalMovimientoInventario').modal('hide');
+                    Swal.fire("Correcto", response.respuesta, "success");
+                    location.reload(); // Reload to show new data/totals
                 } else {
-                    alert('Error: ' + response.respuesta);
+                    Swal.fire("Error", response.respuesta, "error");
                 }
             },
             error: function() {
-                alert('Error de conexión con el servidor.');
+                Swal.fire("Error", "Error de conexión con el servidor.", "error");
             }
         });
     });

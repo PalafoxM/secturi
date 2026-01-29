@@ -265,10 +265,32 @@ class Inicio extends BaseController {
         'where' => ['visible' => 1]
     ])->data;
 
+        // Calcular totales de stock
+        $data['total_stock_papel'] = 0;
+        if (!empty($data['cat_inventario_papel'])) {
+            foreach ($data['cat_inventario_papel'] as $item) {
+                $data['total_stock_papel'] += (int)$item->stock;
+            }
+        }
+
+        $data['total_stock_art_papel'] = 0;
+        if (!empty($data['cat_inventario_art_papel'])) {
+            foreach ($data['cat_inventario_art_papel'] as $item) {
+                $data['total_stock_art_papel'] += (int)$item->stock;
+            }
+        }
+
+        $data['total_stock_art_ofi'] = 0;
+        if (!empty($data['cat_inventario_art_ofi'])) {
+            foreach ($data['cat_inventario_art_ofi'] as $item) {
+                $data['total_stock_art_ofi'] += (int)$item->stock;
+            }
+        }
+
         $data['scripts'] = array('principal', 'inicio');
         $data['contentView']= 'personal/vInventarioProductos';                
         $this->_renderView($data);
-        return view('personal/vInventarioProductos');
+        // return view('personal/vInventarioProductos'); // Remove this unreachable/redundant line
         
     }
     public function actualizarInventario()
@@ -281,17 +303,27 @@ class Inicio extends BaseController {
         $id_producto = $this->request->getPost('id_producto');
         $tabla = $this->request->getPost('tabla');
         $tipo_movimiento = $this->request->getPost('tipo_movimiento'); // 'entrada' o 'salida'
-        $cantidad = (int)$this->request->getPost('cantidad');
+        // Accept 'cantidad' (legacy/Baja) or 'stock' (new form)
+        $cantidad = (int)($this->request->getPost('cantidad') ?: $this->request->getPost('stock'));
 
         if (!$id_producto || !$tabla || !$cantidad) {
             $response->respuesta = "Datos incompletos.";
             return $this->respond($response);
         }
-
+        
+        if($tabla == 'cat_inventario_papel'){
+           $idGenerico = 'id_inventario_papel';
+        }
+        if($tabla == 'cat_inventario_art_papel'){
+           $idGenerico = 'id_inventario_art_papel';
+        }
+        if($tabla == 'cat_inventario_art_ofi'){
+           $idGenerico = 'id_inventario_art_ofi';
+        }
         // 1. Obtener producto actual para validar stock
         $producto = $globals->getTabla([
             'tabla' => $tabla,
-            'where' => ['id' => $id_producto]
+            'where' => [$idGenerico => $id_producto]
         ]);
 
         if (empty($producto->data)) {
@@ -332,6 +364,74 @@ class Inicio extends BaseController {
             $response->nuevo_stock = $nuevoStock;
         } else {
             $response->respuesta = "Error al actualizar la base de datos.";
+        }
+
+        return $this->respond($response);
+    }
+
+    public function guardarProducto()
+    {
+        $response = new \stdClass();
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response->error = true;
+        
+        $id_producto = $this->request->getPost('id_producto');
+        $tabla = $this->request->getPost('tabla');
+        $nombre = $this->request->getPost('nombre');
+        $stock = (int)$this->request->getPost('stock');
+        // die( var_dump($nombre) );
+        if (!$tabla || !$nombre) {
+            $response->respuesta = "Datos incompletos.";
+            return $this->respond($response);
+        }
+
+        // Determine correct column for name based on table or try 'nombre' then 'descripcion'
+        // Strategy: Verify if the table uses 'descripcion' instead of 'nombre' by checking one record.
+        // If table is empty, default to 'nombre'.
+        $checkCol = $globals->getTabla(['tabla' => $tabla, 'limit' => 1]);
+        $colName = 'nombre';
+        if (isset($checkCol->data) && !empty($checkCol->data)) {
+            $firstItem = $checkCol->data[0];
+            if (!isset($firstItem->nombre) && isset($firstItem->descripcion)) {
+                $colName = 'descripcion';
+            }
+        }
+        
+        $dataSave = [
+            'stock' => $stock,
+            'visible' => 1
+        ];
+
+        $dataSave[$colName] = $nombre;
+
+        $dataConfig = [
+            'tabla' => $tabla,
+            'editar' => false
+        ];
+
+        if($tabla == 'cat_inventario_papel'){
+            $idGenerico = 'id_inventario_papel';
+        }
+        if($tabla == 'cat_inventario_art_papel'){
+            $idGenerico = 'id_inventario_art_papel';
+        }
+        if($tabla == 'cat_inventario_art_ofi'){
+            $idGenerico = 'id_inventario_art_ofi';
+        }
+
+        if (!empty($id_producto)) {
+            $dataConfig['editar'] = true;
+            $dataConfig['idEditar'] = [$idGenerico => $id_producto];
+        }
+
+        $result = $globals->saveTabla($dataSave, $dataConfig, ['script' => 'Inicio.guardarProducto']);
+
+        if ($result->error === false) { // Check error property of result object
+            $response->error = false;
+            $response->respuesta = "Producto guardado correctamente.";
+        } else {
+            $response->respuesta = $result->respuesta ?? "Error al guardar en la base de datos.";
         }
 
         return $this->respond($response);
