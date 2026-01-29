@@ -988,7 +988,7 @@
                                                             </ol>
                                                              <ol class="dd-list">
                                                                  <p class="text-muted mb-4">Coordinación de Recursos Humanos</p>
-                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/CALENDARIO DIAS INHABILES 2026-1.docx" > 
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/CALENDARIO DIAS INHABILES 2026-1.pdf" > 
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
                                                                         Calendario dias inhabiles 2026
