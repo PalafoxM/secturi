@@ -867,7 +867,7 @@
                                                                         </div>
                                                                     </li>
                                                                  </a>
-                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/Anexo_RM_C1 Calendario_Anual_de_Compras.pdf" > 
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/Anexo_RM_C1_Calendario_Anual_de_Compras.pdf" > 
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
                                                                         Calendario Anual de Compras
