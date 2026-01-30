@@ -3047,7 +3047,7 @@ class Principal extends BaseController
         $session = \Config\Services::session();
         $globals = new Mglobal;
         $data = array();
-
+    //die(var_dump($session->id_perfil));
         if(in_array($session->id_perfil, [1,7])) {
             $solicitudes = $globals->getTabla(["tabla" => "vw_solicitud_contrato", "where" => ["visible" => 1]]);
         } else {
