@@ -425,45 +425,80 @@
                                         <?php endif; ?> -->
                                         
                                             <div class="col-lg-4">
-                                                <div class="card">
-                                                    <div class="card-body">
-                                                        <div class="ribbon4 rib4-warning">
-                                                            <span
-                                                                class="ribbon4-band ribbon4-band-warning text-white text-center">Figura</span>
-                                                        </div><!--end ribbon-->
-                                                        <img src="<?= base_url() ?>/assets/images/fotos/foto_3.png" alt=""
-                                                            class="d-block mx-auto my-4" height="170">
-                                                        <div class="d-flex justify-content-between align-items-center my-4">
-                                                            <div>
-                                                                <p class="text-muted mb-2">Ombudsperson</p>
+                                            
+                                                    <div class="card">
+                                                        <div class="card-body dash-info-carousel">
+                                                            <h4 class="mt-0  mb-4">PADA 2026 E INFORME DE CUMPLIMIENTO 2025</h4>
+                                                            <div id="carousel_1" class="carousel slide" data-ride="carousel">
+                                                                <div class="carousel-inner">
+                                                                    <div class="carousel-item">
+                                                                        <a href="<?= base_url() . 'assets/documentos/Informe de cumplimiento 2025 JFARCHIVOS.pdf' ?>"
+                                                                            target="_black">
+                                                                            <div class="media">
+                                                                                <div class="icon-info mb-3">
+                                                                                    <!-- Constitución, leyes, normas -->
+                                                                                    <i
+                                                                                        class="fas fa-file-pdf bg-soft-primary"></i>
+                                                                                </div>
+                                                                                <div class="media-body align-self-center">
+                                                                                    <h4 class="mt-0 mb-1 title-text text-dark">
+                                                                                        Informe de Cumplimiento 2025</h4>
+                                                                                    <p class="text-muted mb-0">Ver más</p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </a>
+                                                                    </div>
 
-                                                            </div>
-                                                            <div>
+                                                                    <div class="carousel-item">
+                                                                        <a href="<?= base_url() . 'assets/documentos/PADA 2026.pdf' ?>"
+                                                                            target="_black">
+                                                                            <div class="media">
+                                                                                <div class="icon-info mb-3">
+                                                                                    <!-- Reglas, integridad, lineamientos -->
+                                                                                    <i class="fas fa-file-pdf bg-soft-success"></i>
+                                                                                </div>
+                                                                                <div class="media-body align-self-center">
+                                                                                    <h4 class="mt-0 mb-1">PADA 2026</h4>
+                                                                                    <p class="text-muted mb-0">Saber más</p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </a>
+                                                                    </div>
 
-                                                                <ul
-                                                                    class="list-inline mb-0 product-review align-self-center">
-                                                                    <li class="list-inline-item"><i
-                                                                            class="la la-star text-warning font-16"></i>
-                                                                    </li>
-                                                                    <li class="list-inline-item"><i
-                                                                            class="la la-star text-warning font-16 ml-n2"></i>
-                                                                    </li>
-                                                                    <li class="list-inline-item"><i
-                                                                            class="la la-star text-warning font-16 ml-n2"></i>
-                                                                    </li>
-                                                                    <li class="list-inline-item"><i
-                                                                            class="la la-star text-warning font-16 ml-n2"></i>
-                                                                    </li>
-                                                                    <li class="list-inline-item"><i
-                                                                            class="la la-star text-warning font-16 ml-n2"></i>
-                                                                    </li>
-                                                                </ul>
+                                                                    <div class="carousel-item active">
+                                                                        <a href="<?= base_url() . 'assets/documentos/PADA 2026.pdf' ?>"
+                                                                            target="_black">
+                                                                            <div class="media">
+                                                                                <div class="icon-info mb-3">
+                                                                                    <!-- Valores, ética, principios -->
+                                                                                    <i
+                                                                                        class="fas fa-file-pdf bg-soft-warning"></i>
+                                                                                </div>
+                                                                                <div class="media-body align-self-center">
+                                                                                    <h4 class="mt-0 mb-1 title-text">E-Archivo
+                                                                                    </h4>
+                                                                                    <p class="text-muted mb-0">Conoce los
+                                                                                        Valores</p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </a>
+                                                                    </div>
+                                                                </div>
+                                                                <a class="carousel-control-prev" href="#carousel_1"
+                                                                    role="button" data-slide="prev">
+                                                                    <span class="carousel-control-prev-icon"
+                                                                        aria-hidden="true"></span>
+                                                                    <span class="sr-only">Previous</span>
+                                                                </a>
+                                                                <a class="carousel-control-next" href="#carousel_1"
+                                                                    role="button" data-slide="next">
+                                                                    <span class="carousel-control-next-icon"
+                                                                        aria-hidden="true"></span>
+                                                                    <span class="sr-only">Next</span>
+                                                                </a>
                                                             </div>
-                                                        </div>
-                                                        <a href="<?= base_url()?>index.php/Principal/Ombudsperson" class="btn btn-soft-primary btn-block">Javier Pacheco
-                                                            Cano</a>
-                                                    </div><!--end card-body-->
-                                                </div><!--end card-->
+                                                        </div><!--end card-body-->
+                                                    </div><!--end card-->
                                             </div>
                                      
                                     </div><!--end row-->
@@ -596,7 +631,48 @@
                                                 </div><!--end card-body-->
                                                 </a>
                                             </div><!--end card-->
+                                           <div class="card">
+                                                    <div class="card-body">
+                                                        <div class="ribbon4 rib4-warning">
+                                                            <span
+                                                                class="ribbon4-band ribbon4-band-warning text-white text-center">Figura</span>
+                                                        </div><!--end ribbon-->
+                                                        <img src="<?= base_url() ?>/assets/images/fotos/foto_3.png" alt=""
+                                                            class="d-block mx-auto my-4" height="170">
+                                                        <div class="d-flex justify-content-between align-items-center my-4">
+                                                            <div>
+                                                                <p class="text-muted mb-2">Ombudsperson</p>
+
+                                                            </div>
+                                                            <div>
+
+                                                                <ul
+                                                                    class="list-inline mb-0 product-review align-self-center">
+                                                                    <li class="list-inline-item"><i
+                                                                            class="la la-star text-warning font-16"></i>
+                                                                    </li>
+                                                                    <li class="list-inline-item"><i
+                                                                            class="la la-star text-warning font-16 ml-n2"></i>
+                                                                    </li>
+                                                                    <li class="list-inline-item"><i
+                                                                            class="la la-star text-warning font-16 ml-n2"></i>
+                                                                    </li>
+                                                                    <li class="list-inline-item"><i
+                                                                            class="la la-star text-warning font-16 ml-n2"></i>
+                                                                    </li>
+                                                                    <li class="list-inline-item"><i
+                                                                            class="la la-star text-warning font-16 ml-n2"></i>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                        <a href="<?= base_url()?>index.php/Principal/Ombudsperson" class="btn btn-soft-primary btn-block">Javier Pacheco
+                                                            Cano</a>
+                                                    </div><!--end card-body-->
+                                                </div><!--end card-->
+                                            
                                         </div><!--end col-->
+                                        
                                      
                                     </div><!--end row-->
                                 </div><!--end col-->

@@ -524,14 +524,17 @@
                                 <a class="nav-link" href="#"><span class="w-100">Admin RM</span><span class="menu-arrow"><i
                                             class="mdi mdi-chevron-right"></i></span></a>
                                 <ul class="nav-second-level" aria-expanded="false">
+                                    <?php if ($session->id_usuario != 91): ?>
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/vehiculos">Vehiculos</a></li>
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/vehiculosPT">Vehiculos PT</a></li>
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/ListaInventario">Inventarios</a>
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/Servicios">Servicios</a>
+                                    <?php endif; ?>
+                                    <?php if (in_array($session->id_usuario, [ 91,121, 53, 85, 1 ])): ?>
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/InventarioProductos">Inventario Productos</a>
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/InventarioLimpieza">Inventario Limpieza</a></li>
-
-                                </ul>
+                                    <?php endif; ?>
+                                </ul>   
                             </li><!--end nav-item-->
                         <?php endif; ?>
                     </ul><!--end nav-->
@@ -559,17 +562,17 @@
                                 href="<?php echo base_url(); ?>index.php/Agregar/ListaAlba">Lista ALBA</a></li>
                         <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Agregar/Denuncia">Denuncia</a></li>
-                        <?php if(in_array($session->id_usuario, [1,75])): ?>
+                    <!--     <?php if(in_array($session->id_usuario, [1,75])): ?>
                         <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Agregar/Ganadores">Ganadores</a></li>
-                        <?php endif ?>
+                        <?php endif ?> -->
                <!--          <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Agregar/Inventario">Inventario</a></li> -->
                         <!--   <li class="nav-item"><a class="nav-link" href="<?php echo base_url(); ?>index.php/Agregar/vTiketDisenio">Tickets Diseño</a></li> -->
-                        <li class="nav-item"><a class="nav-link"
+                     <!--    <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Agregar/aboutSusi">sobre SUSI</a></li>
                         <li class="nav-item"><a class="nav-link"
-                                href="<?php echo base_url(); ?>index.php/Principal/Ombudsperson">Ombudsperson</a></li>
+                                href="<?php echo base_url(); ?>index.php/Principal/Ombudsperson">Ombudsperson</a></li> -->
                         <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Principal/ControlInterno">Control Interno</a></li>
                     </ul>
