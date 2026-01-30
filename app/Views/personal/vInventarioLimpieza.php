@@ -140,7 +140,7 @@
 
                                 <div class="form-group">
                                     <label class="font-weight-bold" id="label_cantidad">Stock</label>
-                                    <input type="number" class="form-control" id="cantidad" name="stock" min="0" required placeholder="0">
+                                    <input type="number" class="form-control" id="cantidad" name="stock" min="0" required>
                                 </div>
                             </div>
 
@@ -187,156 +187,95 @@
 <script src="<?= base_url(); ?>plugins/select2/select2.min.js"></script>
 
 <script>
-    $(document).ready(function() {
-    
-        // Initialize DataTables
-        $('.tabla-inventario').DataTable({
-            language: {
-                "decimal": "",
-                "emptyTable": "No hay información",
-                "info": "Mostrando _START_ a _END_ de _TOTAL_ productos",
-                "infoEmpty": "Mostrando 0 a 0 de 0 productos",
-                "infoFiltered": "(Filtrado de _MAX_ total productos)",
-                "lengthMenu": "Mostrar _MENU_ productos",
-                "loadingRecords": "Cargando...",
-                "processing": "Procesando...",
-                "search": "Buscar:", // <--- Texto del buscador
-                "zeroRecords": "Sin resultados encontrados",
-                "paginate": {
-                    "first": "Primero",
-                    "last": "Último",
-                    "next": "Siguiente",
-                    "previous": "Anterior"
+$(document).ready(function() {
+    // 1. Inicializar DataTable
+    if ($.fn.DataTable.isDataTable('.tabla-inventario')) {
+        $('.tabla-inventario').DataTable().destroy();
+    }
+    $('.tabla-inventario').DataTable({
+        language: { url: "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json" },
+        responsive: true,
+        order: [[ 0, "asc" ]]
+    });
+
+    // 2. Abrir Modal y Configurar Datos
+    $(document).on('click', '.btn-movimiento', function() {
+        var d = $(this).data();
+        
+        $('#id_producto').val(d.id);
+        $('#tipo_movimiento').val(d.tipo);
+        $('#nombre_producto').val(d.nombre);
+        $('#tabla_hidden').val(d.tabla);
+        
+        // Reset de campos
+        $('#nombre_producto').prop('readonly', false);
+        $('#div_tabla_select').hide();
+        $('#cantidad').val(d.stock || '');
+
+        var titulo = 'Movimiento';
+        if(d.tipo == 'nuevo'){
+            titulo = 'Nuevo Producto';
+            $('#div_tabla_select').show();
+            $('#label_cantidad').text('Stock Inicial');
+        } else if(d.tipo == 'editar'){
+            titulo = 'Editar Producto';
+            $('#label_cantidad').text('Stock Actual');
+        } else if(d.tipo == 'salida'){
+            titulo = 'Baja de Stock';
+            $('#nombre_producto').prop('readonly', true);
+            $('#label_cantidad').text('Cantidad a retirar');
+            $('#cantidad').val('');
+        }
+        
+        $('#modalTitulo').text(titulo);
+        $('#modalMovimientoInventario').modal('show');
+    });
+
+    // 3. ENVIAR FORMULARIO (Aquí estaba el fallo)
+    $('#formMovimientoInventario').on('submit', function(e) {
+        e.preventDefault(); // ESTO DETIENE EL ENVÍO POR URL
+        console.log("Intentando enviar formulario...");
+
+        var tipo = $('#tipo_movimiento').val();
+        var urlInfo = (tipo == 'salida') ? 
+            '<?= base_url("index.php/Inicio/actualizarInventario") ?>' : 
+            '<?= base_url("index.php/Inicio/guardarProducto") ?>';
+
+        if(tipo == 'nuevo') $('#tabla_hidden').val($('#tabla_select').val());
+
+        $.ajax({
+            url: urlInfo,
+            type: 'POST',
+            data: $(this).serialize(),
+            dataType: 'json',
+            success: function(res) {
+                if (!res.error) {
+                    Swal.fire("¡Éxito!", res.respuesta, "success").then(() => location.reload());
+                } else {
+                    Swal.fire("Error", res.respuesta, "error");
                 }
             },
-            responsive: true,
-            order: [[ 0, "asc" ]] // Ordenar alfabéticamente por nombre
-        });
-
-        // Handle "Alta" (New), "Editar", and "Baja" button clicks
-        $(document).on('click', '.btn-movimiento', function() {
-            var id = $(this).data('id');
-            var tabla = $(this).data('tabla');
-            var nombre = $(this).data('nombre');
-            var tipo = $(this).data('tipo');
-            // 'stock' data attribute might miss if we didn't add it to 'baja' button, but it's fine
-            var stock = $(this).data('stock'); 
-        
-            $('#id_producto').val(id);
-            $('#tipo_movimiento').val(tipo);
-            $('#nombre_producto').val(nombre);
-            $('#cantidad').val(stock); // Default to current stock
-
-            var titulo = '';
-            var icono = '';
-        
-            // Reset valid elements
-            $('#nombre_producto').prop('readonly', false);
-            $('#div_tabla_select').hide();
-            $('#tabla_hidden').val(tabla);
-
-            if(tipo == 'nuevo'){
-                titulo = 'Nuevo Producto';
-                icono = 'mdi-plus-box text-primary';
-                $('#id_producto').val('');
-                $('#nombre_producto').val('');
-                $('#cantidad').val('0');
-                $('#div_tabla_select').show();
-                $('#label_cantidad').text('Stock Inicial');
-            } else if(tipo == 'editar'){
-                 titulo = 'Editar Producto';
-                icono = 'mdi-pencil text-primary';
-                $('#label_cantidad').text('Stock Actual');
-            } else if(tipo == 'salida'){
-                 titulo = 'Baja de Stock';
-                icono = 'mdi-minus-circle text-warning';
-                $('#nombre_producto').prop('readonly', true);
-                $('#label_cantidad').text('Cantidad a retirar');
-                $('#cantidad').val(''); // Clear for input
-            }
-        
-            $('#modalTitulo').html('<i class="mdi '+icono+' mr-2"></i> ' + titulo);
-        
-            $('#modalMovimientoInventario').modal('show');
-        });
-
-        $(document).on('click', '.btn-eliminar', function() {
-            var id = $(this).data('id');
-            var tabla = $(this).data('tabla');
-            var nombre = $(this).data('nombre');
-
-            // Usamos SweetAlert para confirmar antes de borrar
-            Swal.fire({
-                title: '¿Estás seguro?',
-                text: "Se eliminará el producto: " + nombre,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar'
-                }).then((result) => {
-                if (result.isConfirmed) {
-                    // Si el usuario dice que SÍ, hacemos la petición AJAX
-                    $.ajax({
-                        url: '<?= base_url() ?>index.php/Inicio/eliminarProducto',
-                        type: 'POST',
-                        data: { id: id, tabla: tabla },
-                        dataType: 'json',
-                        success: function(response) {
-                            if (!response.error) {
-                                Swal.fire("Eliminado", response.respuesta, "success");
-                                // Recargamos la página para ver los cambios
-                                setTimeout(function(){ location.reload(); }, 1500);
-                            } else {
-                                Swal.fire("Error", response.respuesta, "error");
-                            }
-                        },
-                        error: function() {
-                            Swal.fire("Error", "Error de conexión con el servidor.", "error");
-                    }
-                });
+            error: function() {
+                Swal.fire("Error", "No se pudo procesar la petición en el servidor.", "error");
             }
         });
-
-        // Handle form submit
-        $('#formMovimientoInventario').submit(function(e) {
-            e.preventDefault();
-        
-            var tipo = $('#tipo_movimiento').val();
-            var urlInfo = '';
-        
-           // If 'nuevo', get table from select
-            if(tipo == 'nuevo'){
-                $('#tabla_hidden').val($('#tabla_select').val());
-            }
-
-            var formData = $(this).serialize();
-
-            if(tipo == 'salida'){
-                 urlInfo = '<?= base_url() ?>index.php/Inicio/actualizarInventario'; 
-            } else {
-                 urlInfo = '<?= base_url() ?>index.php/Inicio/guardarProducto';
-            }
-
-            $.ajax({
-                url: urlInfo,
-                type: 'POST',
-                data: formData,
-                dataType: 'json',
-                success: function(response) {
-                    if (!response.error) {
-                        Swal.fire("Correcto", response.respuesta, "success");
-                        location.reload(); // Reload to show new data/totals
-                    } else {
-                        Swal.fire("Error", response.respuesta, "error");
-                    }
-                },
-                error: function() {
-                    Swal.fire("Error", "Error de conexión con el servidor.", "error");
-                }
-            });
-        }); 
     });
-});
+
+    // 4. Eliminar
+    $(document).on('click', '.btn-eliminar', function() {
+        var d = $(this).data();
+        Swal.fire({
+            title: '¿Eliminar ' + d.nombre + '?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, borrar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post('<?= base_url("index.php/Inicio/eliminarProducto") ?>', {id: d.id, tabla: d.tabla}, function(res) {
+                    location.reload();
+                }, 'json');
+            }
+        });
+    });
+}); // <--- Solo un cierre de ready
 </script>
