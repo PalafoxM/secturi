@@ -2718,6 +2718,7 @@ class Principal extends BaseController
         $script = 'Agregar.php/guardaSolicitudContrato';
 
         if ($id_solicitud_contrato) {
+             $dataInsert['id_estatus'] = 1;
             $dataConfig = [
                 "tabla" => "solicitud_contrato", 
                 "editar" => true, 
@@ -2939,7 +2940,7 @@ class Principal extends BaseController
                         ];
                         
                         $res = $globals->saveTabla($dataInsert, ["tabla" => "solicitud_contrato_archivos", "editar" => false], ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/guardarArchivosSolicitud']);
-                        
+                        $globals->saveTabla(['id_estatus' => 4], ["tabla" => "solicitud_contrato", "editar" => true, "idEditar" => ["id_solicitud_contrato" => $id_solicitud]], ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/guardarArchivosSolicitud']);
                         if (!$res->error) {
                             $count++;
                         } else {
@@ -2966,6 +2967,81 @@ class Principal extends BaseController
         return $this->respond($response);
     }
 
+    public function aprobarSolicitudContrato()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+
+        $id = $this->request->getPost('id_solicitud');
+
+        if (!$id) {
+            $response->respuesta = "ID de solicitud no válido.";
+            return $this->respond($response);
+        }
+
+        $dataConfig = [
+            "tabla" => "solicitud_contrato",
+            "editar" => true,
+            "idEditar" => ["id_solicitud_contrato" => $id]
+        ];
+
+        $dataUpdate = [
+            "id_estatus" => 3,
+            "usu_act" => $session->id_usuario ?? 0,
+            "fec_act" => date('Y-m-d H:i:s')
+        ];
+
+        $res = $globals->saveTabla($dataUpdate, $dataConfig, ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/aprobarSolicitudContrato']);
+
+        if (!$res->error) {
+            $response->error = false;
+            $response->respuesta = "Solicitud aprobada correctamente.";
+        } else {
+            $response->respuesta = "No se pudo aprobar la solicitud.";
+        }
+
+        return $this->respond($response);
+    }
+    public function declinarSolicitudContrato()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+
+        $id = $this->request->getPost('id_solicitud');
+
+        if (!$id) {
+            $response->respuesta = "ID de solicitud no válido.";
+            return $this->respond($response);
+        }
+
+        $dataConfig = [
+            "tabla" => "solicitud_contrato",
+            "editar" => true,
+            "idEditar" => ["id_solicitud_contrato" => $id]
+        ];
+
+        $dataUpdate = [
+            "id_estatus" => 2,
+            "usu_act" => $session->id_usuario ?? 0,
+            "fec_act" => date('Y-m-d H:i:s')
+        ];
+
+        $res = $globals->saveTabla($dataUpdate, $dataConfig, ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/declinarSolicitudContrato']);
+
+        if (!$res->error) {
+            $response->error = false;
+            $response->respuesta = "Solicitud declinada correctamente.";
+        } else {
+            $response->respuesta = "No se pudo declinar la solicitud.";
+        }
+
+        return $this->respond($response);
+    }
+
     public function ListaSolicitudContrato()
     {
         $session = \Config\Services::session();
@@ -2977,7 +3053,7 @@ class Principal extends BaseController
         } else {
             $solicitudes = $globals->getTabla(["tabla" => "vw_solicitud_contrato", "where" => ["visible" => 1, "usu_reg" => $session->id_usuario]]);
         }
-
+      // die( var_dump( $solicitudes ) );
         // Verificar archivos
         if (!empty($solicitudes->data)) {
             foreach ($solicitudes->data as &$sol) {

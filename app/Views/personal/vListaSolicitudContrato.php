@@ -53,17 +53,37 @@
                                                     <td><?= $sol->nombre_seguimiento ?></td>
                                                     <td><?= $sol->monto_total ?></td>
                                                     <td class="text-center">
-                                                        <a href="<?= base_url('index.php/Principal/editarSolicitudContrato/' . $sol->id_solicitud_contrato) ?>" class="btn btn-sm btn-warning" title="Editar"><i class="fas fa-edit"></i></a>
-                                                        <button class="btn btn-sm btn-danger" title="Eliminar" onclick="eliminarSolicitud(<?= $sol->id_solicitud_contrato ?>)"><i class="fas fa-trash"></i></button>
-                                                        <a href="<?= base_url('index.php/Principal/verSolicitudContratoPDF/' . $sol->id_solicitud_contrato) ?>" target="_blank" class="btn btn-sm btn-info" title="Ver PDF"><i class="fas fa-file-pdf"></i></a>
-                                                         <?php if(!$sol->tienen_archivos): ?>
+                                                        <?php if($sol->id_estatus != 3 && $sol->id_estatus != 4 && $session->id_perfil != 7): ?>
+                                                            <a href="<?= base_url('index.php/Principal/editarSolicitudContrato/' . $sol->id_solicitud_contrato) ?>" class="btn btn-sm btn-warning" title="Editar"><i class="fas fa-edit"></i></a>
+                                                            <button class="btn btn-sm btn-danger" title="Eliminar" onclick="eliminarSolicitud(<?= $sol->id_solicitud_contrato ?>)"><i class="fas fa-trash"></i></button>
+                                                        <?php endif; ?>
+
+                                                        <?php if($session->id_perfil != 7): ?>
+                                                            <a href="<?= base_url('index.php/Principal/verSolicitudContratoPDF/' . $sol->id_solicitud_contrato) ?>" target="_blank" class="btn btn-sm btn-info" title="Ver PDF"><i class="fas fa-file-pdf"></i></a>
+                                                        <?php endif; ?>
+
+                                                        <?php if(in_array($sol->id_estatus, [1, 2]) && $session->id_perfil != 7): ?>
                                                             <button class="btn btn-sm btn-secondary" title="Adjuntar Archivos" onclick="abrirModalArchivos(<?= $sol->id_solicitud_contrato ?>)"><i class="fas fa-paperclip"></i></button>
-                                                         <?php else: ?>
-                                                            <?php if(in_array($session->id_perfil, [1,7])): ?>
+                                                        <?php endif; ?>
+
+                                                        <?php if($sol->tienen_archivos): ?>
                                                                 <a href="<?= base_url('index.php/Principal/verArchivosSolicitud/' . $sol->id_solicitud_contrato) ?>" class="btn btn-sm btn-success" title="Ver Archivos"><i class="fas fa-eye"></i></a>
+                                                        <?php endif; ?>
+
+                                                        <?php if($sol->id_estatus == 1 && in_array($session->id_perfil, [1,7])): ?>
+                                                                <a onclick="aprobarSolicitud(<?= $sol->id_solicitud_contrato ?>);" class="btn btn-sm btn-primary" title="Aprobar"><i class="fas fa-check text-white"></i></a>
+                                                        <?php endif; ?>
+
+                                                        <?php if($session->id_perfil != 7): ?>
+                                                            <?php if($sol->id_estatus == 4): ?>
+                                                                <button class="btn btn-sm btn-success" title="Enviado"><i class="fas fa-check"></i>Enviado</button>
                                                             <?php endif; ?>
-                                                         <?php endif; ?>
-                                                     </td>
+                                                            <?php if($sol->id_estatus == 2): ?>
+                                                                <button class="btn btn-sm btn-danger" title="Declinado"><i class="fas fa-times"></i>Declinado</button>
+                                                            <?php endif; ?>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                        
                                                  </tr>
                                             <?php endforeach; ?>
                                         <?php endif; ?>
@@ -190,6 +210,80 @@
         });
     });
 
+    function aprobarSolicitud(id) {
+        Swal.fire({
+            title: '¿Estás seguro de aprobar la solicitud?',
+            text: "No podrás revertir esto",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, Aprobar',
+            cancelButtonText: 'No, Declinar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '<?= base_url("index.php/Principal/aprobarSolicitudContrato") ?>',
+                    type: 'POST',
+                    data: { id_solicitud: id },
+                    success: function(response) {
+                        if (!response.error) {
+                            Swal.fire(
+                                'Aprobado!',
+                                'El registro ha sido aprobado.',
+                                'success'
+                            ).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire(
+                                'Error!',
+                                'No se pudo eliminar el registro.',
+                                'error'
+                            );
+                        }
+                    },
+                    error: function() {
+                        Swal.fire(
+                            'Error!',
+                            'Ocurrió un error al procesar la solicitud.',
+                            'error'
+                        );
+                    }
+                });
+            }else{
+                 $.ajax({
+                    url: '<?= base_url("index.php/Principal/declinarSolicitudContrato") ?>',
+                    type: 'POST',
+                    data: { id_solicitud: id },
+                    success: function(response) {
+                        if (!response.error) {
+                            Swal.fire(
+                                'Declinado!',
+                                'El registro ha sido declinado.',
+                                'success'
+                            ).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire(
+                                'Error!',
+                                'No se pudo eliminar el registro.',
+                                'error'
+                            );
+                        }
+                    },
+                    error: function() {
+                        Swal.fire(
+                            'Error!',
+                            'Ocurrió un error al procesar la solicitud.',
+                            'error'
+                        );
+                    }
+                });
+            }
+        });
+    }
     function eliminarSolicitud(id) {
         Swal.fire({
             title: '¿Estás seguro?',
