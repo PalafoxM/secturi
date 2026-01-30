@@ -275,10 +275,10 @@ class Inicio extends BaseController {
             'where' => ['visible' => 1]
         ])->data;
 
-        $data['total_stock_limpieza'] = 0;
+        $data['total_stock_lim'] = 0;
         if (!empty($data['cat_inventario_limpieza'])) {
             foreach ($data['cat_inventario_limpieza'] as $item) {
-                $data['total_stock_limpieza'] += (int)$item->stock;
+                $data['total_stock_lim'] += (int)$item->stock;
             }
         }
         
