@@ -34,9 +34,9 @@
 
     <div class="section-title">INFORMACIÓN DEL ÁREA SOLICITANTE</div>
     <div>
-        <div class="row"><span class="label">Nombre y cargo del responsable del Proyecto:</span> <span class="value"><i><?= $solicitud->responsable_proyecto ?></i></span></div>
-        <div class="row"><span class="label">Nombre y cargo del responsable de Seguimiento:</span> <span class="value"><i><?= $solicitud->responsable_seguimiento ?></i></span></div>
-        <div class="row"><span class="label">Nombre y cargo del enlace de Comunicaciones:</span> <span class="value"><i><?= $solicitud->enlace_comunicaciones ?></i></span></div>
+        <div class="row"><span class="label">Nombre y cargo del responsable del Proyecto:</span> <span class="value"><i><?= $solicitud->nombre_proyecto ?></i></span></div>
+        <div class="row"><span class="label">Nombre y cargo del responsable de Seguimiento:</span> <span class="value"><i><?= $solicitud->nombre_seguimiento ?></i></span></div>
+        <div class="row"><span class="label">Nombre y cargo del enlace de Comunicaciones:</span> <span class="value"><i><?= $solicitud->nombre_enlace ?></i></span></div>
     </div>
 
     <div class="section-title">INFORMACIÓN PRESUPUESTAL</div>
@@ -51,8 +51,8 @@
         </thead>
         <tbody>
             <tr>
-                <td style="text-align: center;"><?= $solicitud->proyecto ?></td>
-                <td style="text-align: center;"><?= $solicitud->partida ?></td>
+                <td style="text-align: center;"><?= $solicitud->dsc_proyecto ?></td>
+                <td style="text-align: center;"><?= $solicitud->cuenta_cable ?></td>
                 <td style="text-align: center;"><?= $solicitud->clave_estandarizada ?></td>
                 <td style="text-align: center;">El proyecto cuenta con suficiencia presupuestal para a contratación de los servicios requeridos en la presente solicitud. Se sube captura de pantalla Sistema SAP/R3</td>
             </tr>
@@ -102,13 +102,31 @@
 
     <div class="section-title">INFORMACIÓN DEL PROVEEDOR</div>
     <div>
-        <div class="row"><span class="label">Razón Social:</span> <span class="value"><?= $solicitud->proveedor_nombre ?></span></div>
-        <div class="row"><span class="label">Domicilio:</span> <span class="value"><?= $solicitud->proveedor_domicilio ?></span></div>
+        <div class="row"><span class="label">Nombre/Razón Social:</span> <span class="value"><?= $solicitud->proveedor_nombre ?></span></div>
+        <div class="row"><span class="label">Domicilio fiscal:</span> <span class="value"><?= $solicitud->proveedor_domicilio ?></span></div>
         <div class="row"><span class="label">RFC:</span> <span class="value"><?= $solicitud->proveedor_rfc ?></span></div>
-        <div class="row"><span class="label">Cédula:</span> <span class="value"><?= $solicitud->proveedor_cedula ?></span></div>
-        <div class="row"><span class="label">Representante:</span> <span class="value"><?= $solicitud->proveedor_representante ?></span></div>
-        <div class="row"><span class="label">Correo:</span> <span class="value"><?= $solicitud->proveedor_correo ?></span></div>
+        <div class="row"><span class="label">Cédula de Registro en el Padrón de Proveedores:</span> <span class="value"><?= $solicitud->proveedor_cedula ?></span></div>
+        <div class="row"><span class="label">Nombre del Representante Legal (persona moral):</span> <span class="value"><?= $solicitud->proveedor_representante ?></span></div>
+        <div class="row"><span class="label">Correo electrónico:</span> <span class="value"><?= $solicitud->proveedor_correo ?></span></div>
     </div>
+    <div class="section-title">FIRMAS</div>
+
+        <table style="width: 100%; border: none;">
+          
+            <tr>
+                <td style="width: 50%; border: none; text-align: center;">
+                 <h3 style="margin: 5px 0;">_________________________________________</h3>
+                 <h3 style="margin: 5px 0;">Nombre Dir. Gral/Subsecretario</h3>
+                 <h4 style="margin: 5px 0;">Cargo</h4>
+                </td>
+                <td style="width: 50%; border: none; text-align: center;">
+                    <h3 style="margin: 5px 0;">_________________________________________</h3>
+                    <h4 style="margin: 5px 0;">Nombre Responsable del Proyecto</h4>
+                    <h4 style="margin: 5px 0;">Cargo</h4>
+                </td>
+            </tr>
+        </table>
+
 
 </body>
 </html>

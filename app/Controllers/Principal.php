@@ -2836,7 +2836,7 @@ class Principal extends BaseController
         $globals = new Mglobal;
         
         // Cargar datos
-        $solicitud = $globals->getTabla(['tabla' => 'solicitud_contrato', 'where' => ['id_solicitud_contrato' => $id]]);
+        $solicitud = $globals->getTabla(['tabla' => 'vw_solicitud_contrato', 'where' => ['id_solicitud_contrato' => $id]]);
         $pagos = $globals->getTabla(['tabla' => 'solicitud_contrato_pagos', 'where' => ['id_solicitud_contrato' => $id, 'visible' => 1]]);
         
         if(empty($solicitud->data)){

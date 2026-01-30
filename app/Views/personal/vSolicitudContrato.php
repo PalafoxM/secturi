@@ -447,10 +447,48 @@
         tbody.appendChild(row);
     }
     
+    // Validate payment sum
+    function validarMontoPagos(mostrarError = false) {
+        var montoTotal = parseFloat($('#monto_total').val()) || 0;
+        var sumaPagos = 0;
+
+        $('#tabla_pagos tbody input[name*="[monto]"]').each(function() {
+            sumaPagos += parseFloat($(this).val()) || 0;
+        });
+
+        if (sumaPagos > montoTotal) {
+            if (mostrarError) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'El monto total de los pagos (' + sumaPagos.toFixed(2) + ') no debe ser mayor al Monto Total del Contrato (' + montoTotal.toFixed(2) + ').',
+                    showConfirmButton: true
+                });
+            } else {
+                 // Toast or subtle indicator
+                 Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'warning',
+                    title: 'La suma de pagos excede el total',
+                    showConfirmButton: false,
+                    timer: 3500
+                });
+            }
+            return false;
+        }
+        return true;
+    }
+
     // Add initial row
     document.addEventListener('DOMContentLoaded', function() {
         // Initialize Select2
         $('.select2').select2();
+
+        // Real-time validation
+        $(document).on('input', '#monto_total, #tabla_pagos input[name*="[monto]"]', function() {
+            validarMontoPagos(false);
+        });
 
         if (pagosExistentes && pagosExistentes.length > 0) {
             pagosExistentes.forEach(pago => {
@@ -462,6 +500,10 @@
         
         $('#form_solicitud_contrato').on('submit', function(e) {
             e.preventDefault();
+
+            if (!validarMontoPagos(true)) {
+                return;
+            }
             
             var formData = new FormData(this);
             var btnSubmit = $(this).find('button[type="submit"]');
