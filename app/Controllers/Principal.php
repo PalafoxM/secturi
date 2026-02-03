@@ -1366,7 +1366,7 @@ class Principal extends BaseController
                 }
             }
         }
-    // $this->enviarEmail(0);
+     $this->enviarEmail(0);
        
 
         return $this->respond($response);

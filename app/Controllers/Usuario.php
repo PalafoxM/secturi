@@ -1468,7 +1468,7 @@ class Usuario extends BaseController
             $sheet->setCellValue('R' . $fila, '/');
             $sheet->setCellValue('S' . $fila, $row->elemento_pep);
             $sheet->setCellValue('T' . $fila, '');
-            $sheet->setCellValue('U' . $fila, '31122025');
+            $sheet->setCellValue('U' . $fila, '31122026');
             $sheet->setCellValue('V' . $fila, $row->dsc_area);
             $fila++;
         }
