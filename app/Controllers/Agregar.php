@@ -4114,7 +4114,7 @@ class Agregar extends BaseController
             $anio . '-04-01' => 'Semana Santa',
             $anio . '-04-02' => 'Semana Santa',
             $anio . '-04-03' => 'Semana Santa',
-            $anio . '-06-25' => 'Fiesta del Santo Patrón de la región "Santiago Apóstol"',
+            $anio . '-07-25' => 'Fiesta del Santo Patrón de la región "Santiago Apóstol"',
             '2025-11-17' => 'Asueto',
            '2025-12-12' => 'Día de la Virgen de Guadalupe',
             $anio . '-11-02' => 'Asueto',
