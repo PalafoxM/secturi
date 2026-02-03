@@ -52,7 +52,7 @@
                                                         <th class="text-center">No. PROVEEDOR</th>
                                                         <th class="text-center">No. CONVENIO</th>
                                                         <th class="text-center">INSTRUMENTO</th>
-                                                        <th class="text-center">OBSERVACIONES</th>
+                                                        <th class="text-center">REGISTRO</th>
                                                          <th class="text-center">ESTATUS</th>
                                                         <th class="text-center">ACCIONES</th>
                                                     </tr>
@@ -76,7 +76,7 @@
                                                             <?php endif; ?>
                                                         </td>
 
-                                                          <td class="text-center"><?= (empty($p->observaciones))?'S/O':$p->observaciones?></td>
+                                                          <td class="text-center"><?= (empty($p->nombre_completo))?'S/O':$p->nombre_completo?></td>
                                                         <?php
                                                         switch ($p->id_estatus) {
                                                             case 1:
@@ -298,7 +298,7 @@
                                         <input class="form-control" id="varlidar_nombre_proveedor" autocomplete="off" name="varlidar_nombre_proveedor" readonly>
                                     </div> 
                                     <div class="form-group" >
-                                        <label for="validar_no_proveedor" class="form-label">No. Reserva</label>
+                                        <label for="validar_no_proveedor" class="form-label">No. Proveedor</label>
                                         <input class="form-control" id="validar_no_proveedor" autocomplete="off" name="validar_no_proveedor" readonly>
                                     </div>                                                                                    
                               </div>                                                             

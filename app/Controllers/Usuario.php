@@ -1450,7 +1450,7 @@ class Usuario extends BaseController
         foreach ($resul->data as $row) {
             $sheet->setCellValue('A' . $fila, '');
             $sheet->setCellValue('B' . $fila, 'GEG');
-            $sheet->setCellValue('C' . $fila, $row->ejercicio);
+            $sheet->setCellValue('C' . $fila, '2026');
             $sheet->setCellValue('D' . $fila, 'RF');
             $sheet->setCellValue('E' . $fila, date('dmY', strtotime($row->fec_reg)));
             $sheet->setCellValue('F' . $fila, date('dmY', strtotime($row->fec_reg)));
@@ -1459,8 +1459,8 @@ class Usuario extends BaseController
             $sheet->setCellValue('I' . $fila, $row->importe);
             $sheet->setCellValue('J' . $fila, $row->no_convenio);
             $sheet->setCellValue('K' . $fila, $row->partida);
-            $sheet->setCellValue('L' . $fila, $row->centro_gestor);
-            $sheet->setCellValue('M' . $fila, $row->fondo);
+            $sheet->setCellValueExplicit('L' . $fila, $row->centro_gestor, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+            $sheet->setCellValueExplicit('M' . $fila, $row->fondo, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
             $sheet->setCellValue('N' . $fila, $row->area);
             $sheet->setCellValue('O' . $fila, '');
             $sheet->setCellValue('P' . $fila, '21');

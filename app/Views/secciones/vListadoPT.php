@@ -172,6 +172,7 @@
                                                                             <div class="dropdown-menu">
                                                                                 <a class="dropdown-item" onclick="setConvenio('SECTURI/CONV/')">SECTURI/CONV/</a>
                                                                                 <a class="dropdown-item" onclick="setConvenio('SECTURI/CTO/')">SECTURI/CTO/</a>
+                                                                                <a class="dropdown-item" onclick="setConvenio('NO APLICA')">NO APLICA</a>
                                                                             </div>
                                                                         </div>
                                                                         <input type="text" id="no_convenio" name="no_convenio" class="form-control" placeholder="025" autocomplete="off">

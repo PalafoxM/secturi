@@ -1314,7 +1314,7 @@ class Principal extends BaseController
         if (!empty($ruta_relativa)) {
             $dataInsert['instrumento'] = $ruta_relativa;
             $dataInsert['ruta_absoluta'] = $ruta_absoluta;
-            $dataInsert['no_convenio'] = $data['no_convenio'];
+            $dataInsert['no_convenio'] = ($data['no_convenio'] == 'NO APLICA') ? 'NO APLICA' : $data['no_convenio'];
         }
 
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaReserva'];
@@ -1366,7 +1366,7 @@ class Principal extends BaseController
                 }
             }
         }
-       // $this->enviarEmail(0);
+    // $this->enviarEmail(0);
        
 
         return $this->respond($response);
@@ -2057,7 +2057,7 @@ class Principal extends BaseController
         $email = \Config\Services::email();
         $result = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_tipo_empleado' => 1]])->data;
 
-       $email->setTo([
+      /* $email->setTo([
             'agascag@guanajuato.gob.mx',
             'ccampos@guanajuato.gob.mx',
             'sandag@guanajuato.gob.mx',
@@ -2071,9 +2071,9 @@ class Principal extends BaseController
             'mvallejo@guanajuato.gob.mx',
             'rgonzalezgu@guanajuato.gob.mx',
             'yjimenez@guanajuato.gob.mx',
-        ]);
+        ]);*/
  
-             /*   $email->setTo([
+                $email->setTo([
                     'alopez@guanajuato.gob.mx',
                     'cchernandezp@guanajuato.gob.mx',
                     'csoto@guanajuato.gob.mx',
@@ -2118,7 +2118,7 @@ class Principal extends BaseController
                     'rantonio@guanajuato.gob.mx',
                     'alvarezp@guanajuato.gob.mx',
                     'jrodriguezgo@guanajuato.gob.mx',
-                ]);  */
+                ]);  
         $email->setSubject('Recordatorio: Revisión de Asistencias - Sistema SUSI');
         $email->setMessage('
             <!DOCTYPE html>
@@ -2151,9 +2151,9 @@ class Principal extends BaseController
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Estimado personal,</p>
                         
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-                            En caso de que aún no hayas realizado las <strong>justificaciones de tu personal correspondientes a la quincena 01/2026</strong>, 
-                            la cual comprende el periodo del <strong>01 al 15 de enero de 2026</strong>, 
-                            tienes hasta el día <strong>lunes 26 de enero hasta las 16:00 hrs</strong> para realizarlas.
+                            En caso de que aún no hayas realizado las <strong>justificaciones correspondientes a la quincena 02/2026</strong>, 
+                            la cual comprende el periodo del <strong>16 al 31 de enero de 2026</strong>, 
+                            tienes hasta el día <strong>lunes 9 de febrero hasta las 16:00 hrs</strong> para realizarlas.
                         </p>
 
                         <div class="highlight-box">
@@ -2169,8 +2169,8 @@ class Principal extends BaseController
                         </p>
 
                         <div style="text-align: center; margin: 30px 0;">
-                            <a href="https://secturnet.guanajuato.gob.mx/susi/index.php/Principal/incidenciaSubordinado" class="btn" style="color: white; text-decoration: none;">
-                                📋 Revisar Incidencias del Personal
+                            <a href="https://secturnet.guanajuato.gob.mx/susi/index.php/Agregar/Asistencia" class="btn" style="color: white; text-decoration: none;">
+                                📋 Revisar Incidencias
                             </a>
                         </div>
 
@@ -2318,7 +2318,7 @@ class Principal extends BaseController
         } else {
             $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['usu_reg' => $session->get('id_usuario'), 'visible' => 1 ]]);
         }
-        //die( var_dump($reserva ) );
+       // die( var_dump($reserva ) );
         $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
         $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
         $proveedor = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit' => 100]);
