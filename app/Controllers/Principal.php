@@ -4823,7 +4823,7 @@ class Principal extends BaseController
         //die(var_dump($registroGo));
         $prefijo = $globals->getTabla([
             'tabla' => 'cat_area',
-            'where' => ['visible' => 1, 'id_area' => $registroGo->data[0]->id_direccion_responsable]
+            'where' => ['id_pago' => 1, 'id_area' => $registroGo->data[0]->id_direccion_responsable]
         ]);
          if (strlen($registroGo->data[0]->no_consecutivo) == 2) {
                 $zero = '0';
@@ -4846,7 +4846,7 @@ class Principal extends BaseController
         //vedificasmos si tiene area a cargo
         $areaCargo = $globals->getTabla([
             'tabla' => 'cat_area',
-            'where' => ['visible' => 1, 'titular' => $idReponsableSolicitud]
+            'where' => ['id_pago' => 1, 'titular' => $idReponsableSolicitud]
         ]);
         if(isset($areaCargo->data) && !empty($areaCargo->data)){
             $ReponsableSolicitud = $globals->getTabla([
@@ -4860,7 +4860,7 @@ class Principal extends BaseController
             ])->data[0]->id_jefe_inmediato;
             $areaTitular = $globals->getTabla([
                 'tabla' => 'cat_area',
-                'where' => ['visible' => 1, 'titular' => $idJefe]
+                'where' => ['id_pago' => 1, 'titular' => $idJefe]
             ]);
             if(empty($areaTitular->data)){
                 $idJefe2 = $globals->getTabla([
@@ -5023,7 +5023,7 @@ class Principal extends BaseController
 
         $prefijo = $globals->getTabla([
             'tabla' => 'cat_area',
-            'where' => ['visible' => 1, 'id_area' => $registroGo->data[0]->id_direccion_responsable]
+            'where' => ['id_pago' => 1, 'id_area' => $registroGo->data[0]->id_direccion_responsable]
         ]);
         
          if (strlen($registroGo->data[0]->no_consecutivo) == 2) {
@@ -5046,7 +5046,7 @@ class Principal extends BaseController
         //vedificasmos si tiene area a cargo
         $areaCargo = $globals->getTabla([
             'tabla' => 'cat_area',
-            'where' => ['visible' => 1, 'titular' => $idReponsableSolicitud]
+            'where' => ['id_pago' => 1, 'titular' => $idReponsableSolicitud]
         ]);
         if(isset($areaCargo->data) && !empty($areaCargo->data)){
             $ReponsableSolicitud = $globals->getTabla([
@@ -5060,7 +5060,7 @@ class Principal extends BaseController
             ])->data[0]->id_jefe_inmediato;
             $areaTitular = $globals->getTabla([
                 'tabla' => 'cat_area',
-                'where' => ['visible' => 1, 'titular' => $idJefe]
+                'where' => ['id_pago' => 1, 'titular' => $idJefe]
             ]);
             if(empty($areaTitular->data)){
                 $idJefe2 = $globals->getTabla([
@@ -6358,12 +6358,12 @@ class Principal extends BaseController
         $id_jefe_inmediato = (isset($user->data) && !empty($user->data))?$user->data[0]->id_jefe_inmediato:0;
       
         // BUSCAR EL ÚLTIMO CONSECUTIVO PARA ESTA ÁREA
-        $area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1, 'titular' => $session->id_usuario ]]);
+        $area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['id_pago' => 1, 'titular' => $session->id_usuario ]]);
 
         if (isset($area->data) && !empty($area->data)) {
             $id_area = $area->data[0]->id_area;
         }else{
-            $area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1, 'titular' => $id_jefe_inmediato ]]);
+            $area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['id_pago' => 1, 'titular' => $id_jefe_inmediato ]]);
             if (isset($area->data) && !empty($area->data)) {
                 $id_area = $area->data[0]->id_area;
             }
@@ -6437,7 +6437,7 @@ class Principal extends BaseController
         $data['dsc_director_general'] = ($directorGeneral->data)?$directorGeneral->data[0]->dsc_director_general:'';
        // $data['id_reserva'] =  $id_reserva_go;
         
-        $cat_area           = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
+        $cat_area           = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['id_pago' => 1]]);
         $cat_usuario        = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
         $secretario         = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1]]);
         $cat_subsecretario  = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1]]);
