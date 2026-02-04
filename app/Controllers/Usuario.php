@@ -1448,7 +1448,7 @@ class Usuario extends BaseController
         // 4. Llenar datos
         $fila = 2;
         foreach ($resul->data as $row) {
-            $sheet->setCellValue('A' . $fila, '');
+            $sheet->setCellValue('A' . $fila, $row->no_reserva);
             $sheet->setCellValue('B' . $fila, 'GEG');
             $sheet->setCellValue('C' . $fila, '2026');
             $sheet->setCellValue('D' . $fila, 'RF');
