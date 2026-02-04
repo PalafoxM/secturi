@@ -448,7 +448,7 @@
                             </li><!--end nav-item-->
                     
                         <li class="nav-item">
-                            <a class="nav-link" href="javascript: void(0);"><span class="w-100">Estatus</span><span
+                            <a class="nav-link" href="javascript: void(0);"><span class="w-100">En Proceso</span><span
                                     class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
                             <ul class="nav-second-level" aria-expanded="false">
                                 <li><a href="<?php echo base_url(); ?>index.php/Principal/listaReservaPT">En proceso PT</a>

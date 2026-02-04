@@ -101,7 +101,11 @@
                                                         }
                                                         ?>
                                                         <td class="text-center">
-                                                            <span class="badge badge-md <?= $color ?>"><?= $texto ?></span>
+                                                            <?php if ($p->id_estatus == 2): ?>
+                                                                <span style="cursor:pointer;" onclick="verObservacion('<?= htmlspecialchars($p->observaciones ?? '', ENT_QUOTES) ?>')" class="badge badge-md <?= $color ?> btn-ver-observacion"><?= $texto ?></span>
+                                                            <?php else: ?>
+                                                                <span class="badge badge-md <?= $color ?>"><?= $texto ?></span>
+                                                            <?php endif; ?>
                                                         </td>
                                                         
                                                         <td class="text-center">
@@ -374,6 +378,9 @@
 
 
 
+
+
+
 <link href="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet"
     type="text/css" />
 <!-- App css -->
@@ -435,6 +442,17 @@ $(document).ready(function() {
     function setAnio(anio) {
         let input = document.getElementById('no_convenio_editar');
         input.value = input.value + anio;
+    }
+
+
+    function verObservacion(observacion) {
+        Swal.fire({
+            title: 'Motivo de Declinación',
+            text: observacion,
+            icon: 'info',
+            confirmButtonText: 'Cerrar',
+            confirmButtonColor: '#5b73e8'
+        });
     }
 
 
