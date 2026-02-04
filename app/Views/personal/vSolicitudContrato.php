@@ -133,7 +133,7 @@
                                             <option value="PAGARE" <?= (isset($solicitud) && $solicitud->garantia == 'PAGARE') ? 'selected' : '' ?>>PAGARE</option>
                                             <option value="FIANZA" <?= (isset($solicitud) && $solicitud->garantia == 'FIANZA') ? 'selected' : '' ?>>FIANZA</option>
                                         </select>
-                                        <input type="text" class="form-control mt-2" name="monto_garantia" id="monto_garantia" value="<?= isset($solicitud) ? $solicitud->monto_total : '' ?>" readonly placeholder="112% del monto total">
+                                        <input type="text" class="form-control mt-2" name="monto_garantia" id="monto_garantia" value="<?= isset($solicitud) ? $solicitud->monto_total : '' ?>" readonly placeholder="12% del monto total">
                                     </div>
                                 </div>
 
