@@ -7180,4 +7180,136 @@ class Principal extends BaseController
         return $this->respond($response);
     }
 
+    public function listaBorradoresGO()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        
+        // Filtro por estatus 1 (Borrador)
+        $where = ['visible' => 1, 'id_estatus' => 1];
+        
+        if (!in_array($session->get('id_perfil'), [1, 2])) {
+            // Si no es admin/director, solo sus propios registros
+            $where['usu_reg'] = $session->get('id_usuario');
+        }
+
+        $registro_go = $globals->getTabla([
+            'tabla' => 'vw_registro_go', 
+            'where' => $where
+        ]);
+
+        $data['registro_go'] = (!empty($registro_go->data)) ? $registro_go->data : [];
+        $data['scripts'] = array('inicio');
+        $data['contentView'] = 'secciones/vListadoBorradorGO';
+        $this->_renderView($data);
+    }
+
+    public function borradorPagoGo($id_registro_go = null)
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        
+        if(empty($id_registro_go)){
+             return redirect()->to(base_url().'index.php/Principal/listaBorradoresGO');
+        }
+
+        $registro_go = $globals->getTabla(['tabla' => 'vw_registro_go', 'where' => ['visible' => 1, 'id_registro_go' => $id_registro_go]]);
+        
+        if(empty($registro_go->data)){
+            echo "Borrador no encontrado"; 
+            return;
+        }
+        
+        $dataRegistro = $registro_go->data[0];
+        $id_reserva_go = $dataRegistro->id_reserva_go;
+
+        // Obtener datos necesarios 
+        $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
+        $reserva = $globals->getTabla(['tabla' => 'vw_reserva_go', 'where' => ['id_reserva' => $id_reserva_go]]);
+        $presupuesto = $globals->getTabla(['tabla' => 'vw_presupuesto_go', 'where' => ['id_reserva' => $id_reserva_go]]);
+        
+        // Periodos/Facturas
+        $periodo_factura = $globals->getTabla(['tabla' => 'periodo_factura_go', 'where' => ['visible' => 1, 'id_registro_go' => $id_registro_go]]);
+        $factura_pdf = $globals->getTabla(['tabla' => 'factura_pdf_go', 'where' => ['visible' => 1, 'id_registro_go' => $id_registro_go]]);
+        $xml_go = $globals->getTabla(['tabla' => 'xml_go', 'where' => ['visible' => 1, 'id_registro_go' => $id_registro_go]]);
+
+        $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1]]);
+        $cat_tipo = $globals->getTabla(['tabla' => 'cat_tipo', 'where' => ['visible' => 1]]);
+        $cat_usuario = $globals->getTabla(['tabla' => 'usuario', 'where' => ['visible' => 1]]);
+        $cat_director_general = $globals->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1]]);
+        $cat_opcion = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1]]);
+        $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $cat_proyecto  = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
+        $cat_subsecretario = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1]]);
+
+        $data['reserva'] = (!empty($reserva->data)) ? $reserva->data[0] : [];
+        $data['presupuesto'] = (!empty($presupuesto->data)) ? $presupuesto->data : [];
+        $data['registro_pt'] = $dataRegistro; 
+        
+        // Mapear archivos por fila para JS
+    
+        $archivosPorFila = [];
+        if(!empty($periodo_factura->data)){
+            foreach($periodo_factura->data as $pf){
+                $rowIndex = $pf->id_identificador;
+                 $archivosPorFila[$rowIndex] = [
+                     'pdf' => [], 
+                     'xml' => [],
+                     'periodo_inicio' => date('Y-m-d', strtotime($pf->periodo_inicio)),
+                     'periodo_fin' => date('d-m-Y', strtotime($pf->periodo_fin))
+                ];
+                 
+                 // Buscar PDFs
+                 if(!empty($factura_pdf->data)){
+                     foreach($factura_pdf->data as $pdf){
+                         if($pdf->id_identificador == $rowIndex){
+                              $archivosPorFila[$rowIndex]['pdf'][] = [
+                                  'nombre' => basename($pdf->ruta_relativa),
+                                  'ruta' => base_url($pdf->ruta_relativa),
+                                  'id' => $pdf->id_factura_pdf_go
+                              ];
+                         }
+                     }
+                 }
+                  // Buscar XMLs
+                 if(!empty($xml_go->data)){
+                     foreach($xml_go->data as $xml){
+                         if($xml->id_identificador == $rowIndex){
+                              $archivosPorFila[$rowIndex]['xml'][] = [
+                                  'nombre' => 'XML Folio: '.$xml->folio, 
+                                  'id' => $xml->id_xml,
+                                  'folio' => $xml->folio,
+                                  'total' => $xml->total
+                              ];
+                         }
+                     }
+                 }
+            }
+        }
+        //die( var_dump( $archivosPorFila ) );
+        $data['archivosPorFila'] = $archivosPorFila;
+        
+
+        $data['dsc_director_general'] = (!empty($cat_director_general->data)) ? $cat_director_general->data[0]->dsc_director_general : [];
+        $data['cat_area'] = (!empty($cat_area->data)) ? $cat_area->data : [];
+        $data['cat_tipo'] = (!empty($cat_tipo->data)) ? $cat_tipo->data : [];
+        $data['cat_opcion'] = (!empty($cat_opcion->data)) ? $cat_opcion->data : [];
+        $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+        $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
+        $data['cat_subsecretario'] = (!empty($cat_subsecretario->data)) ? $cat_subsecretario->data : [];
+
+        $data['secretario'] = (!empty($secretario->data)) ? $secretario->data : [];
+        $data['cat_usuario'] = (!empty($cat_usuario->data)) ? $cat_usuario->data : [];
+        $data['id_reserva'] = $id_reserva_go;
+        $data['id_area'] = $dataRegistro->id_direccion_responsable;
+        
+        $data['registro_guardado'] = $dataRegistro; 
+        $data['periodos_guardados'] = (!empty($periodo_factura->data)) ? $periodo_factura->data : [];
+        
+        $data['scripts'] = array('inicio');
+        $data['edita'] = true; 
+        $data['contentView'] = 'secciones/vRegistroGoBorrador'; 
+        $this->_renderView($data);
+    }
+
 }
