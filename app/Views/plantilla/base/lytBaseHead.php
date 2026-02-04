@@ -451,11 +451,11 @@
                             <a class="nav-link" href="javascript: void(0);"><span class="w-100">Estatus</span><span
                                     class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
                             <ul class="nav-second-level" aria-expanded="false">
-                                <li><a href="<?php echo base_url(); ?>index.php/Principal/listaReservaPT">Estatus PT</a>
+                                <li><a href="<?php echo base_url(); ?>index.php/Principal/listaReservaPT">En proceso PT</a>
                                 </li>
-                                <li><a href="<?php echo base_url(); ?>index.php/Principal/listaReservaGO">Estatus GO</a>
+                                <li><a href="<?php echo base_url(); ?>index.php/Principal/listaReservaGO">En proceso GO</a>
                                 </li>
-                                <li><a href="<?php echo base_url(); ?>index.php/Inicio/ListadoSolicitudes">Estatus GRC</a></li> 
+                                <li><a href="<?php echo base_url(); ?>index.php/Inicio/ListadoSolicitudes">En proceso GRC</a></li> 
                             </ul>
                         </li><!--end nav-item-->
                         <li class="nav-item">
