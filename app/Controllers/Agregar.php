@@ -1481,8 +1481,12 @@ class Agregar extends BaseController
         
        $no_consecutivo = $this->registrarFolioGo($data['no_consecutivo'], $data['id_reponsable_solicitud'], $data['direccion_responsable']);
 
+       // Definir estatus: 1 = En captura/Borrador, 2 = Enviado
+       $estatus = ($data['es_borrador'] == 1) ? 1 : 2;
+
         $dataInsert = [
             'id_reserva_go' => $data['id_reserva_go'],
+            'id_estatus' => $estatus,
             'id_direccion_responsable' => $data['direccion_responsable'],
             'fecha_tramite' => $data['fecha_tramite'],
             'no_consecutivo' => $no_consecutivo,
@@ -1517,8 +1521,13 @@ class Agregar extends BaseController
 
         if (!$responsePrincipal->error) {
             $id_registro_go = $responsePrincipal->idRegistro;
-            $this->cambiarStatus($data['id_reserva_go']);
-
+            
+            // Lógica de Estatus: Si es borrador no cambiamos estatus o lo dejamos en 1
+            $es_borrador = $data['es_borrador'] ?? 0;
+            if ($es_borrador != 1) {
+                 $this->cambiarStatus($data['id_reserva_go']);
+            }
+            
             foreach ($tablas_procesadas as $i => $tabla) {
 
 
@@ -1869,8 +1878,37 @@ class Agregar extends BaseController
         }
 
         // 1. Actualizar el registro principal
+        $estatus = ($data['es_borrador'] == 1) ? 1 : 2;
+        
+        // PROCESAR ELIMINACIÓN DE FILAS
+        if (isset($data['deleted_rows']) && !empty($data['deleted_rows'])) {
+            $deleted_rows = json_decode($data['deleted_rows'], true);
+            if (is_array($deleted_rows) && !empty($deleted_rows)) {
+                foreach ($deleted_rows as $id_identificador) {
+                    // Marcar como no visible en periodo_factura_go
+                     $this->globals->saveTabla(
+                        ['visible' => 0],
+                        ['tabla' => 'periodo_factura_go', 'editar' => true, 'idEditar' => ['id_identificador' => $id_identificador]],
+                        ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/editarGO/deleteRow']
+                    );
+                     // Opcional: Marcar facturas PDF y XML también
+                     $this->globals->saveTabla(
+                        ['visible' => 0],
+                        ['tabla' => 'factura_pdf_go', 'editar' => true, 'idEditar' => ['id_identificador' => $id_identificador]],
+                        ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/editarGO/deleteRowPDF']
+                    );
+                     $this->globals->saveTabla(
+                        ['visible' => 0],
+                        ['tabla' => 'xml_go', 'editar' => true, 'idEditar' => ['id_identificador' => $id_identificador]],
+                        ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/editarGO/deleteRowXML']
+                    );
+                }
+            }
+        }
+
         $dataInsert = [
             //'id_reserva_go' => $data['id_reserva_go'],
+            'id_estatus' => $estatus,
             'id_direccion_responsable' => $data['direccion_responsable'],
             'fecha_tramite' => $data['fecha_tramite'],
             'no_consecutivo' => (int) $data['no_consecutivo'],

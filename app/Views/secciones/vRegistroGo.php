@@ -33,6 +33,8 @@
                             <form id="form_go" enctype="multipart/form-data">
                                 <input type="hidden" name="editar" value="1">
                                 <input type="hidden" name="id_reserva_go" value="<?= $id_reserva ?>">
+                                <input type="hidden" name="es_borrador" id="es_borrador" value="0">
+                                <input type="hidden" name="deleted_rows" id="deleted_rows" value="">
                                 <div class="form-row">
                                     <!-- Dirección Responsable -->
                                     <div class="col-md-4 mb-3">
@@ -466,7 +468,8 @@
                                 <a class="btn btn-gradient-danger" style="color:white"
                                     onclick="window.history.back()">Atrás</a>
                                 <?php if (!$edita): ?>
-                                    <button class="btn btn-gradient-primary" id="btnGuardaGo" type="submit">Guardar</button>
+                                    <button class="btn btn-gradient-secondary" id="btnGuardarBorrador" type="button" style="margin-right: 10px;">Guardar sin enviar</button>
+                                    <button class="btn btn-gradient-primary" id="btnGuardaGo" type="submit">Guardar y Enviar</button>
                                 <?php endif; ?>
                             </form> <!--end form-->
                         </div><!--end card-body-->
@@ -636,6 +639,15 @@ $(document).on('click', '.remove-row', function () {
         cancelButtonText: 'Cancelar'
     }).then((result) => {
         if (result.isConfirmed) {
+            
+            // Lógica para rastrear eliminación
+            // El rowIndex para filas CARGADAS desde DB es el id_identificador (numérico)
+            // Para filas nuevas es 'table_...'
+            if (/^\d+$/.test(rowIndex)) {
+                 deletedRows.push(rowIndex);
+                 //console.log("Marked for deletion:", deletedRows);
+            }
+
             if (archivosPorFila[rowIndex]) {
                 delete archivosPorFila[rowIndex];
             }
@@ -952,15 +964,28 @@ function prepararFormData() {
 }
 
 // Envío del formulario
+// Variable global para filas eliminadas
+let deletedRows = [];
+
+$('#btnGuardarBorrador').on('click', function() {
+    $('#es_borrador').val('1');
+    $('#form_go').submit();
+});
+
+// Envío del formulario unificado
 $('#form_go').on('submit', function(e) {
     e.preventDefault();
+    
+    // 1. Preparar FormData con la función existente (maneja archivos JS)
     const formData = prepararFormData();
 
+    // 2. Agregar filas eliminadas al FormData
+    formData.append('deleted_rows', JSON.stringify(deletedRows));
 
-
-    // Validacion de fechas requeridas
+    // 3. Validacion de fechas requeridas
     let fechasValidas = true;
     $('input[type="date"]').each(function() {
+        // Solo validar fechas si no es borrador O si se requiere estricto
         if ($(this).val() === '') {
             fechasValidas = false;
             $(this).addClass('is-invalid');
@@ -974,7 +999,7 @@ $('#form_go').on('submit', function(e) {
         return;
     }
 
-
+    // 4. Validacion de Archivos
     let archivosValidos = true;
     $('tr[data-row-index]').each(function() {
         // SKIP VIATICOS
@@ -988,7 +1013,6 @@ $('#form_go').on('submit', function(e) {
         // Verificar si existe el objeto de archivos para esta fila y si tiene adjuntos
         if (!archivos || !archivos.pdf || archivos.pdf.length === 0 || !archivos.xml || archivos.xml.length === 0) {
             archivosValidos = false;
-            // Se puede agregar una clase visual de error a la fila o al contenedor de archivos si se desea
             $(this).find('.archivos-seleccionados').addClass('border border-danger');
         } else {
             $(this).find('.archivos-seleccionados').removeClass('border border-danger');
@@ -1000,6 +1024,7 @@ $('#form_go').on('submit', function(e) {
         return;
     }
 
+    // 5. Enviar AJAX
     $.ajax({
         type: "POST",
         url: "<?= base_url()?>index.php/Agregar/guardaGO",
@@ -1020,9 +1045,11 @@ $('#form_go').on('submit', function(e) {
         },
         beforeSend: function (info){
             $('#btnGuardaGo').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+            $('#btnGuardarBorrador').prop('disabled', true);
         },
         complete: function (info){
-            $('#btnGuardaGo').prop('disabled', false).html('Guardar');
+            $('#btnGuardaGo').prop('disabled', false).html('Guardar y Enviar');
+            $('#btnGuardarBorrador').prop('disabled', false);
         },
         error: function (response,jqXHR, textStatus, errorThrown) {
             var res= JSON.parse(response.responseText);

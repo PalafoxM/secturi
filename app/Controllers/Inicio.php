@@ -809,7 +809,7 @@ class Inicio extends BaseController {
             $consecutivo = $globals->getTabla(['tabla' => 'folio_direccion', 'where' => ['visible' => 1, 'id_direccion' => $id_reponsable_solicitud ]]);
          //die( var_dump( $consecutivo ) );           
             $conse = (isset($consecutivo->data) && !empty($consecutivo->data)) ? $consecutivo->data[0]->no_consecutivo : '';
-            $data['consecutivo'] = $conse + 1; 
+            $data['consecutivo'] = (int)$conse + 1; 
             $presupuesto = $globals->getTabla(['tabla' => 'vw_pagos', 'where' => ['id_registro_pt' => $id_registro_pt]]);
             foreach ($presupuesto->data as $i => $p) {
                 if ($p->id_partida >= 149 && $p->id_partida <= 248) {
