@@ -1467,7 +1467,7 @@ class Usuario extends BaseController
             $sheet->setCellValueExplicit('Q' . $fila, substr($row->centro_gestor, 5), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
             $sheet->setCellValue('R' . $fila, '/');
             $sheet->setCellValue('S' . $fila, $row->elemento_pep);
-            $sheet->setCellValue('T' . $fila, '');
+            $sheet->setCellValue('T' . $fila, $row->no_proveedor);
             $sheet->setCellValue('U' . $fila, '31122026');
             $sheet->setCellValue('V' . $fila, $row->dsc_area);
             $fila++;
