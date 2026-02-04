@@ -608,7 +608,7 @@
                                                                 </ol>
                                                             <ol class="dd-list">
                                                                  <p class="text-muted mb-4">Coordinación de Planeación</p>
-                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-CPE-02-2023__Formato_de_Verificacion_Alineacion_de_Informacion_Estrategica-030c.xlsx">
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/Formato_de_Verificacion_Alineacion_de_Informacion_Estrategica.xlsx">
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
                                                                             Formato de Verificación Alineación de Información Estratégica
