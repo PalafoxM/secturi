@@ -556,7 +556,7 @@
                                                                     </li>
                                                                 </a>
                                                                 
-                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/DGJ-2 Solicitud de elaboración de Convenio.xlsx" >
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/SOLICITUD_DE_CONVENIO_2026.xlsx" >
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
                                                                     Formato Solicitud de Convenios
