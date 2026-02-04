@@ -5591,14 +5591,54 @@ class Principal extends BaseController
                     foreach ($facturas as $index => $factura) {
                         $facturaPath = FCPATH . $factura->ruta_relativa;
                         if (file_exists($facturaPath)) {
+                            
+                            // 1. Prepare SPECIFIC data for this invoice (Header)
+                            // We treat it visually as 'dividido = 1' for the header content
+                            $dataLoop = $data;
+                            $dataLoop['dividido'] = 1; 
+
+                            // Map UUID and Amount
+                            if (isset($xml->data) && isset($xml->data[$index])) {
+                                $dataLoop['uuid2'] = $xml->data[$index]->uuid;
+                                $montoIndex = (float)$xml->data[$index]->total;
+                                $dataLoop['total2'] = $montoIndex;
+                                $dataLoop['monto2'] = $this->numeroEnLetras($montoIndex);
+                            } else {
+                                $dataLoop['uuid2'] = '';
+                                $dataLoop['total2'] = 0;
+                                $dataLoop['monto2'] = '';
+                            }
+
+                            // Map Dates / Periodo
+                            if (isset($periodo_factura->data) && isset($periodo_factura->data[$index])) {
+                                $dataLoop['fecha_gasto_inicio'] = $periodo_factura->data[$index]->periodo_inicio;
+                                $dataLoop['fecha_gasto_fin'] = $periodo_factura->data[$index]->periodo_fin;
+                                $dataLoop['partida2'] = $periodo_factura->data[$index]->partida; // Assuming partida is here
+                            } else {
+                                // Fallback to global or leaving empty if not available specific
+                                $dataLoop['fecha_gasto_inicio'] = $data['periodo_inicio'] ?? '';
+                                $dataLoop['fecha_gasto_fin'] = $data['periodo_fin'] ?? '';
+                                // Try to get Partida from Budget if available by index
+                                if(isset($presupuesto->data) && isset($presupuesto->data[$index])) {
+                                     $dataLoop['partida2'] = $presupuesto->data[$index]->partida . ' ' . $presupuesto->data[$index]->dsc_partida;
+                                } else {
+                                     $dataLoop['partida2'] = '';
+                                }
+                            }
+                            
+                            // Render specific header
+                            $htmlSpecific = view('personal/vFormato702.php', $dataLoop);
+
                             $facturaPageCount = $mpdf->SetSourceFile($facturaPath);
                             for ($j = 1; $j <= $facturaPageCount; $j++) {
                                 $mpdf->AddPage();
                                 $tplFactura = $mpdf->ImportPage($j);
-                                // Escribir HTML solo en la primera página de la primera factura
-                                if ($index === 0 && $j === 1) {
-                                    $mpdf->WriteHTML($htmlTercerHoja);
+                                
+                                // Write Header on the FIRST page of this invoice
+                                if ($j === 1) {
+                                    $mpdf->WriteHTML($htmlSpecific);
                                 }
+                                
                                 // Escalar factura
                                 $templateSize = $mpdf->GetTemplateSize($tplFactura);
                                 $scaleFactor = 0.6; 
