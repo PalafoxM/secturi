@@ -38,9 +38,10 @@
                                             <th class="text-center">PREVEEDOR</th>
                                             <th class="text-center">TIPO</th>
                                             <th class="text-center">FECHA</th>
+                                            <th class="text-center">ID</th>
                                             <th class="text-center">RESERVA</th>
                                             <th class="text-center">RESPONSABLE</th>
-                                            <th class="text-center">CONCEPTO</th>
+                                            <th class="text-center">FOLIO</th>
                                             <th class="text-center">PAGO</th>
                                             <th class="text-center">ACCIONES</th>
                                         </tr>
@@ -53,9 +54,19 @@
                                             <td  class="text-center"><?= $e->dsc_proveedor?></td>
                                             <td  class="text-center"><?= $e->dsc_tipo?></td>
                                             <td  class="text-center"><?= date('d/m/Y', strtotime($e->fecha_tramite)); ?> </td>
+                                            <td  class="text-center"><?= $e->id_registro_pt ?></td>
                                             <td  class="text-center"><?= $e->no_reserva?></td>
                                             <td  class="text-center"><?= $e->responsable?></td>
-                                            <td  class="text-center"><?= $e->concepto_pago?></td>
+                                            <td  class="text-center">
+                                                 <?php 
+                                                    // Rellenar con ceros a la izquierda (3 dígitos)
+                                                    $consecutivo = str_pad($e->no_consecutivo ?? 0, 3, '0', STR_PAD_LEFT);
+                                                    // Año del trámite o actual
+                                                    $anio = date('Y');
+                                                    
+                                                    echo "PT {$e->prefijo}{$consecutivo}/{$anio}";
+                                                ?>
+                                            </td>
                                             <td  class="text-center <?= ($e->fic==1)?'text-success':'text-info'?>"><strong><?= ($e->fic==1)?'FIC':'PT'?></strong></td>
                                             <td  class="text-center" class="text-center">
                                             <?php if($e->fic==1): ?>            

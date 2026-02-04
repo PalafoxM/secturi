@@ -3112,7 +3112,7 @@ class Principal extends BaseController
         } else {
             $registro_go = $globals->getTabla(['tabla' => 'vw_registro_go', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]]);
         }
-
+       // die( var_dump( $registro_go ) );
         $data['registro_go'] = (!empty($registro_go->data)) ? $registro_go->data : [];
         $data['scripts'] = array('inicio');
         $data['edita'] = 0;

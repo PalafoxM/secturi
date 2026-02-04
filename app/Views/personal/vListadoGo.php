@@ -36,10 +36,10 @@
                                     <thead class="thead-light">
                                         <tr>
                                             
-                                            <th class="text-center">FECHA</th>
+                                            <th class="text-center">ID</th>
                                             <th class="text-center">CUENTA</th>
                                             <th class="text-center">RESPONSABLE</th>
-                                            <th class="text-center">CONCEPTO</th>
+                                            <th class="text-center">FOLIO</th>
                                             <th class="text-center">ESTATUS</th>
                                             <th class="text-center">ACCIONES</th>
                                         </tr>
@@ -49,12 +49,17 @@
                                     <tbody>
                                         <?php foreach($registro_go as $e): ?>
                                         <tr>
-
-
-                                            <td  class="text-center"><?= date('d/m/Y', strtotime($e->fecha_tramite)); ?> </td>
+                                            <td  class="text-center"><?= $e->id_registro_go; ?> </td>
                                             <td  class="text-center"><?= $e->no_cuenta?></td>
                                             <td  class="text-center"><?= $e->nombre_completo?></td>
-                                            <td  class="text-center"><?= $e->concepto_gasto?></td>
+                                            <td  class="text-center">
+                                                <?php 
+                                                    // Rellenar con ceros a la izquierda (3 dígitos)
+                                                    $consecutivo = str_pad($e->no_consecutivo ?? 0, 3, '0', STR_PAD_LEFT);
+                                                    
+                                                    echo 'GO '.$e->prefijo.$consecutivo.'/'.date('Y');
+                                                ?>
+                                            </td>
                                             <td  class="text-center">ENVIADO</td>
                                             <td  class="text-center" class="text-center">
                             
