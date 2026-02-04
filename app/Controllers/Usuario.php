@@ -1431,7 +1431,7 @@ class Usuario extends BaseController
             'Centro Gestor',
             'Fondo',
             'Area Funcional',
-            'Cuenta de Mayor',
+            'Cuenta Mayor',
             'Division',
             'Centro de Costo',
             'Numero de Orden',
@@ -1462,9 +1462,9 @@ class Usuario extends BaseController
             $sheet->setCellValueExplicit('L' . $fila, $row->centro_gestor, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
             $sheet->setCellValueExplicit('M' . $fila, $row->fondo, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
             $sheet->setCellValue('N' . $fila, $row->area);
-            $sheet->setCellValue('O' . $fila, $row->cuenta_mayor);
+            $sheet->setCellValueExplicit('O' . $fila, $row->cuenta_mayor, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
             $sheet->setCellValue('P' . $fila, '21');
-            $sheet->setCellValue('Q' . $fila, '');
+            $sheet->setCellValueExplicit('Q' . $fila, substr($row->centro_gestor, 5), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
             $sheet->setCellValue('R' . $fila, '/');
             $sheet->setCellValue('S' . $fila, $row->elemento_pep);
             $sheet->setCellValue('T' . $fila, '');
