@@ -3,9 +3,6 @@
     <div class="page-content-tab">
         <div class="container-fluid">
 
-         
-
-            <!-- ===================== TABS DE INVENTARIO ===================== -->
             <!-- ===================== TABS DE INVENTARIO ===================== -->
             <div class="row mt-4">
                 <div class="col-12">
@@ -93,6 +90,7 @@
                                                                     data-id="<?= $item->id_inventario_art_ofi ?>"
                                                                     data-tabla="cat_inventario_art_ofi"
                                                                     data-nombre="<?= $item->nombre ?? $item->descripcion ?? '' ?>"
+                                                                    data-stock="<?= $item->stock ?>"
                                                                     data-tipo="salida"
                                                                     title="Registrar Salida">
                                                                 <i class="mdi mdi-minus"></i> Baja
@@ -154,6 +152,7 @@
                                                                     data-id="<?= $item->id_inventario_art_papel ?>"
                                                                     data-tabla="cat_inventario_art_papel"
                                                                     data-nombre="<?= $item->nombre ?? $item->descripcion ?? '' ?>"
+                                                                    data-stock="<?= $item->stock ?>"
                                                                     data-tipo="salida"
                                                                     title="Registrar Salida">
                                                                 <i class="mdi mdi-minus"></i> Baja
@@ -215,6 +214,7 @@
                                                                     data-id="<?= $item->id_inventario_papel ?>"
                                                                     data-tabla="cat_inventario_papel"
                                                                     data-nombre="<?= $item->nombre ?? $item->descripcion ?? '' ?>"
+                                                                    data-stock="<?= $item->stock ?>"
                                                                     data-tipo="salida"
                                                                     title="Registrar Salida">
                                                                 <i class="mdi mdi-minus"></i> Baja
@@ -413,7 +413,7 @@
                 cancelButtonColor: '#3085d6',
                 confirmButtonText: 'Sí, eliminar',
                 cancelButtonText: 'Cancelar'
-                }).then((result) => {
+            }).then((result) => {
                 if (result.isConfirmed) {
                     // Si el usuario dice que SÍ, hacemos la petición AJAX
                     $.ajax({
@@ -432,11 +432,11 @@
                         },
                         error: function() {
                             Swal.fire("Error", "Error de conexión con el servidor.", "error");
-                    }
-                });
-            }
+                        }
+                    });
+                }
+            });
         });
-
         // Handle form submit
         $('#formMovimientoInventario').submit(function(e) {
             e.preventDefault();
@@ -476,5 +476,4 @@
             });
         }); 
     });
-});
 </script>

@@ -287,46 +287,45 @@
         </div>
     </div>
 
-<!-- Modal -->
+<script src="<?= base_url(); ?>assets/js/jquery.min.js"></script>
+<script src="<?= base_url(); ?>assets/js/bootstrap.bundle.min.js"></script>
 
+<script src="<?= base_url(); ?>assets/js/waves.js"></script>
+<script src="<?= base_url(); ?>assets/js/feather.min.js"></script>
+<script src="<?= base_url(); ?>assets/js/metismenu.min.js"></script>
 
-<link href="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet"
-    type="text/css" />
-<!-- App css -->
-<link href="<?php echo base_url(); ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-<link href="<?php echo base_url(); ?>assets/css/jquery-ui.min.css" rel="stylesheet">
-<link href="<?php echo base_url(); ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
-<link href="<?= base_url()?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
-<link href="<?= base_url()?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
-<!-- jQuery  -->
- 
-<script src="<?php echo base_url(); ?>assets/js/jquery.min.js"></script>
-<script src="<?php echo base_url(); ?>assets/js/jquery-ui.min.js"></script>
-<script src="<?php echo base_url(); ?>assets/js/bootstrap.bundle.min.js"></script>
-<script src="<?php echo base_url(); ?>assets/js/jquery.slimscroll.min.js"></script>
+<script src="<?= base_url(); ?>assets/js/app.js"></script>
 
-
-<!-- Required datatable js -->
-<script src="<?php echo base_url(); ?>plugins/datatables/jquery.dataTables.min.js"></script>
-<script src="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.js"></script>
-
-<!-- App js -->
-<script src="<?= base_url()?>assets/js/app.js"></script>
-<script src="<?= base_url()?>assets/js/waves.js"></script>
-<script src="<?= base_url()?>assets/js/feather.min.js"></script>
-
-<script src="<?= base_url()?>plugins/tiny-editable/mindmup-editabletable.js"></script>
-<script src="<?= base_url()?>plugins/tiny-editable/numeric-input-example.js"></script>
-<script src="<?= base_url()?>plugins/bootable/bootstable.js"></script> 
-<link href="<?php echo base_url(); ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
-
-<script src="<?= base_url(); ?>plugins/select2/select2.min.js"></script>
 <script>
-  $('#usuariosTable').DataTable({
-        language: {
-            url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json' // Ruta al archivo de localización
-        },
-        destroy: true,
-        searching: true,
+$(document).ready(function() {
+    console.log("Sistema listo. Probando botón de Opalina...");
+
+    // Nota: Asegúrate de que el botón en tu tabla tenga la clase o ID correcto
+    $(document).on('click', '.btn-actualizar-stock', function(e) {
+        e.preventDefault();
+        
+        const id = 13; // ID Opalina
+        const cant = 1; // Cantidad a descontar
+
+        $.ajax({
+            url: '<?= base_url("index.php/Inicio/actualizarInventario") ?>',
+            type: 'POST',
+            data: {
+                id_producto: id,
+                tabla: 'cat_inventario_papel',
+                tipo_movimiento: 'salida',
+                cantidad: cant
+            },
+            dataType: 'json',
+            success: function(res) {
+                alert(res.respuesta);
+                if (!res.error) location.reload();
+            },
+            error: function(xhr) {
+                console.error(xhr.responseText);
+                alert("Error al conectar con el controlador.");
+            }
+        });
     });
+});
 </script>
