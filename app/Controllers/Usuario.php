@@ -1592,17 +1592,18 @@ class Usuario extends BaseController
     }
     public function Descarga()
     {
-        // 1. Limpieza absoluta del buffer para evitar que el Excel se corrompa
+        // --- 1. Limpieza de Buffer ---
         if (ob_get_level() > 0) {
             ob_end_clean();
         }
 
+        // --- 2. Carga de recursos ---
         $session = \Config\Services::session();
         $globals = new Mglobal;
-
-        $ruta = FCPATH . 'assets/pdf/plantillas/9-LTAIPG26F1_IX.xlsx';
     
-        // Validar que el archivo existe antes de cargarlo
+        // Ruta de la plantilla
+        $ruta = FCPATH . 'assets/pdf/plantillas/9-LTAIPG26F1_IX.xlsx';
+
         if (!file_exists($ruta)) {
             die("Error: No se encontró la plantilla en: " . $ruta);
         }
@@ -1610,6 +1611,7 @@ class Usuario extends BaseController
         $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($ruta);
         $sheet = $spreadsheet->getSheetByName('Reporte de Formatos') ?? $spreadsheet->getActiveSheet();
 
+        // Consulta a la VISTA (usará los ALIAS corregidos)
         $resul = $globals->getTabla([
             'tabla' => 'vw_juridico_viaticos',
             'where' => ['visible' => 1]
@@ -1619,67 +1621,106 @@ class Usuario extends BaseController
 
         if (!empty($resul->data)) {
             foreach ($resul->data as $row) {
-                // A. Datos básicos
-                $sheet->setCellValue('A' . $fila, $row->ejercicio);
             
-                // B. Fechas: Las enviamos con guiones para que Excel las reconozca mejor
-                $sheet->setCellValue('B' . $fila, date('d/m/Y', strtotime($row->fecha_inicio)));
-                $sheet->setCellValue('C' . $fila, date('d/m/Y', strtotime($row->fecha_termino)));
+            // --- CÁLCULOS PREVIOS ---
+            // Aseguramos que sean números para evitar errores de resta
+            $total_asignado = is_numeric($row->importe_total) ? $row->importe_total : 0;
+            $ejercido_partida = is_numeric($row->importe_ejercicio_partida) ? $row->importe_ejercicio_partida : 0;
             
-                $sheet->setCellValue('D' . $fila, $row->dsc_tipo_funcionario);
-                $sheet->setCellValue('E' . $fila, $row->clave_nivel);
-                $sheet->setCellValue('F' . $fila, $row->dsc_denominacion);
-                $sheet->setCellValue('G' . $fila, $row->dsc_cargo);
-                $sheet->setCellValue('H' . $fila, $row->dsc_area);
-                $sheet->setCellValue('I' . $fila, $row->nombre);
-                $sheet->setCellValue('J' . $fila, $row->primer_apellido);
-                $sheet->setCellValue('K' . $fila, $row->segundo_apellido);
-                $sheet->setCellValue('L' . $fila, ($row->id_sexo == 2) ? 'HOMBRE' : 'MUJER');
-                $sheet->setCellValue('M' . $fila, $row->dsc_gasto);
-                $sheet->setCellValue('N' . $fila, 'COMPROBADO'); // Valor por defecto
-                $sheet->setCellValue('O' . $fila, $row->dsc_viaje);
-                $sheet->setCellValue('P' . $fila, $row->no_personas);
-                $sheet->setCellValue('Q' . $fila, $row->importe_total);
-            
-                // C. Validación de ORIGEN (Uso de isset para evitar "Undefined Key")
-                $sheet->setCellValue('R' . $fila, $row->dsc_pais_origen ?? '');
-                $estado_o = !empty($row->estado_origen_text) ? $row->estado_origen_text : ($row->dsc_estado_origen ?? '');
-                $sheet->setCellValue('S' . $fila, $estado_o);
-            
-                $muni_o = !empty($row->municipio_origen_text) ? $row->municipio_origen_text : ($row->dsc_municipio_origen ?? '');
-                $sheet->setCellValue('T' . $fila, $muni_o);
+            // Lógica: No erogado = Total Asignado - Lo que se gastó (Ejercido)
+            $no_erogado = $total_asignado - $ejercido_partida;
 
-                // D. Validación de DESTINO
-                $sheet->setCellValue('U' . $fila, $row->dsc_pais_destino ?? '');
-                $estado_d = !empty($row->estado_destino_text) ? $row->estado_destino_text : ($row->dsc_estado_destino ?? '');
-                $sheet->setCellValue('V' . $fila, $estado_d);
-
-                $muni_d = !empty($row->municipio_destino_text) ? $row->municipio_destino_text : ($row->dsc_municipio_destino ?? '');
-                $sheet->setCellValue('W' . $fila, $muni_d);
-
-                $sheet->setCellValue('X' . $fila, $row->motivo_encargo);
-                $sheet->setCellValue('Y' . $fila, $row->fec_salida);
-                $sheet->setCellValue('Z' . $fila, $row->fec_regreso);
+            // --- LLENADO DE CELDAS ---
+            // A - Datos Básicos
+            $sheet->setCellValue('A' . $fila, $row->ejercicio);
+            $sheet->setCellValue('B' . $fila, date('d/m/Y', strtotime($row->fecha_inicio)));
+            $sheet->setCellValue('C' . $fila, date('d/m/Y', strtotime($row->fecha_termino)));
+            $sheet->setCellValue('D' . $fila, $row->dsc_tipo_funcionario);
+            $sheet->setCellValue('E' . $fila, $row->clave_nivel);
+            $sheet->setCellValue('F' . $fila, $row->dsc_denominacion);
+            $sheet->setCellValue('G' . $fila, $row->dsc_cargo);
+            $sheet->setCellValue('H' . $fila, $row->dsc_area);
+            $sheet->setCellValue('I' . $fila, $row->nombre);
+            $sheet->setCellValue('J' . $fila, $row->primer_apellido);
+            $sheet->setCellValue('K' . $fila, $row->segundo_apellido);
+            $sheet->setCellValue('L' . $fila, ($row->id_sexo == 2) ? 'HOMBRE' : 'MUJER');
+            $sheet->setCellValue('M' . $fila, $row->dsc_gasto);
+            $sheet->setCellValue('N' . $fila, 'COMPROBADO'); 
+            $sheet->setCellValue('O' . $fila, $row->dsc_viaje);
+            $sheet->setCellValue('P' . $fila, $row->no_personas);    
             
-                $fila++;
-            }
+            // Q - Importe Total (Asignado)
+            $sheet->setCellValue('Q' . $fila, $total_asignado);
+            
+            // R, S, T - Origen
+            $sheet->setCellValue('R' . $fila, $row->dsc_pais_origen ?? '');
+            $estado_o = !empty($row->estado_origen_text) ? $row->estado_origen_text : ($row->dsc_estado_origen ?? '');
+            $sheet->setCellValue('S' . $fila, $estado_o);
+            $muni_o = !empty($row->municipio_origen_text) ? $row->municipio_origen_text : ($row->dsc_municipio_origen ?? '');
+            $sheet->setCellValue('T' . $fila, $muni_o);
+
+            // U, V, W - Destino
+            $sheet->setCellValue('U' . $fila, $row->dsc_pais_destino ?? '');
+            $estado_d = !empty($row->estado_destino_text) ? $row->estado_destino_text : ($row->dsc_estado_destino ?? '');
+            $sheet->setCellValue('V' . $fila, $estado_d);
+            $muni_d = !empty($row->municipio_destino_text) ? $row->municipio_destino_text : ($row->dsc_municipio_destino ?? '');
+            $sheet->setCellValue('W' . $fila, $muni_d);
+
+            // X, Y, Z
+            $sheet->setCellValue('X' . $fila, $row->motivo_encargo);
+            $sheet->setCellValue('Y' . $fila, $row->fec_salida);
+            $sheet->setCellValue('Z' . $fila, $row->fec_regreso);
+            
+            // --- NUEVAS COLUMNAS (AA - AJ) ---
+
+            // AA - Importe ejercido por partida
+            $sheet->setCellValue('AA' . $fila, $ejercido_partida);
+
+            // AB - Importe total erogado (La suma de lo gastado, igual a AA en este caso)
+            $sheet->setCellValue('AB' . $fila, $ejercido_partida);
+
+            // AC - Importe total gastos NO erogados (Calculado)
+            $sheet->setCellValue('AC' . $fila, $no_erogado);
+
+            // AD - Fecha entrega informe (Usa alias corregido: 'fec_entrega_informa')
+            $sheet->setCellValue('AD' . $fila, $row->fec_entrega_informa ?? '');
+
+            // AE - Hipervínculo al informe
+            $sheet->setCellValue('AE' . $fila, $row->hipervinculo_informe ?? '');
+
+            // AF - Hipervínculo a facturas
+            $sheet->setCellValue('AF' . $fila, $row->hipervinculo_factura ?? '');
+
+            // AG - Hipervínculo normativa
+            $sheet->setCellValue('AG' . $fila, $row->hipervinculo_normativa ?? '');
+
+            // AH - Área responsable
+            $sheet->setCellValue('AH' . $fila, $row->area_responsable ?? '');
+
+            // AI - Fecha actualización
+            // Si la fecha viene null, ponemos la fecha actual como fallback
+            $sheet->setCellValue('AI' . $fila, $row->fec_actualizacion ?? date('d/m/Y'));
+
+            // AJ - Nota
+            $sheet->setCellValue('AJ' . $fila, $row->nota ?? '');
+
+            $fila++;    
         }
+    }
 
-        // 2. Preparación final de descarga
+        // --- 3. Finalizar Descarga ---
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
         $filename = 'reporte_viaticos_' . date('Ymd_His') . '.xlsx';
+    
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment; filename=\"$filename\"");
         header('Cache-Control: max-age=0');
     
-        // Limpiamos buffer una última vez por si acaso
         if (ob_get_level() > 0) ob_end_clean();
     
-        $writer->save("php://output");
-        exit(); // Importante para que CI no ensucie la salida
+            $writer->save("php://output");
+            exit();
     }
-
-
     public function getUsuarios()
     {
         $session = \Config\Services::session();

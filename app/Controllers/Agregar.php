@@ -4737,11 +4737,11 @@ class Agregar extends BaseController
         $response = new stdClass();
         $response->error = true;
         $response->respuesta = 'Error al insertar en la tabla';
-    
+
         $globals = new Mglobal;
         $data = $this->request->getPost();
 
-        // Función auxiliar para limpiar números (quitar formato de moneda del JS)
+        // Limpiar montos
         $limpiarMonto = function($monto) {
             return str_replace(['$', ',', ' '], '', $monto);
         };
@@ -4753,7 +4753,10 @@ class Agregar extends BaseController
             'tipo_integrante'          => (int) ($data['tipo_integrante'] ?? 0),
             'clave_nivel'              => (int) ($data['clave_nivel'] ?? 0),
             'denominacion_puesto'      => (int) ($data['denominacion_puesto'] ?? 0),
+        
+            // --- CORRECCION CRÍTICA: HTML usa 'denomicacion_cargo' ---
             'denomicacion_cargo'       => (int) ($data['denomicacion_cargo'] ?? 0),
+        
             'area_adscripcion'         => (int) ($data['area_adscripcion'] ?? 0),
             'nombre_completo'          => (int) ($data['nombre_completo'] ?? 0),
             'tipo_gasto'               => (int) ($data['tipo_gasto'] ?? 0),
@@ -4768,26 +4771,33 @@ class Agregar extends BaseController
             'pais_destino'             => (int) ($data['pais_destino'] ?? 0),
             'estado_destino_id'        => (int) ($data['estado_destino_id'] ?? 0),
             'estado_destino_text'      => $data['estado_destino_text'] ?? '',
-            'denomicacion_encargo'     => $data['denomicacion_encargo'] ?? '',
+        
+            // HTML usa 'denominacion_encargo' (correcto) -> BD 'denomicacion_encargo' (errata)
+            'denomicacion_encargo'     => $data['denominacion_encargo'] ?? '',
+        
             'municipio_destino_text'   => $data['municipio_destino_text'] ?? '',
-            // IMPORTANTE: Cambié 'municipio_destino' por 'municipio_destino_id' para coincidir con tu lógica
             'municipio_destino_id'     => (int) ($data['municipio_destino'] ?? 0), 
             'motivo_encargo'           => $data['motivo_encargo'] ?? '',
             'fec_salida'               => $data['fec_salida'] ?? null,
             'fec_regreso'              => $data['fec_regreso'] ?? null,
             'importe_ejercicio_partida'=> $limpiarMonto($data['importe_ejercicio_partida'] ?? '0'),
             'importe_total'            => $limpiarMonto($data['importe_total'] ?? '0'),
-            'fec_entraga_informa'      => $data['fec_entraga_informa'] ?? null,
+        
+            // --- CORRECCION CRÍTICA: HTML usa 'fec_entrega_informe' (con 'e') ---
+            'fec_entraga_informa'      => $data['fec_entrega_informe'] ?? null,
+        
             'hipervinculo_informe'     => $data['hipervinculo_informe'] ?? '',
             'hipervinculo_factura'     => $data['hipervinculo_factura'] ?? '',
             'hipervinculo_normativa'   => $data['hipervinculo_normativa'] ?? '',
-            'area_responsabe'          => $data['area_responsabe'] ?? '',
+        
+            // HTML usa 'area_responsable' (correcto) -> BD 'area_responsabe' (errata)
+            'area_responsabe'          => $data['area_responsable'] ?? '',
+        
             'fec_actualizacion'        => $data['fec_actualizacion'] ?? null,
             'nota'                     => $data['nota'] ?? '',
             'usu_reg'                  => $session->id_usuario,
             'fec_reg'                  => date('Y-m-d')
         ];
-
 
         $dataConfig = [
             "tabla" => "juridico_viaticos",
@@ -4795,12 +4805,54 @@ class Agregar extends BaseController
         ];
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaViatico'];
         $result = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+    
         if (!$result->error) {
-            $response->error = false;
-            $response->respuesta = $result->respuesta;
+        $response->error = false;
+        $response->respuesta = $result->respuesta;
         }
         return $this->respond($response);
+    }
+    public function eliminar()
+    {
+        $session = \Config\Services::session();
+        $response = new stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error al eliminar';
 
+        $globals = new Mglobal;
+        $data = $this->request->getPost();
+        $session = \Config\Services::session();
+        $id = $this->request->getPost('id_juridico_viatico');
+
+        if (!$id) {
+            $response->respuesta = "No se recibió el ID del registro.";
+            return $this->respond($response);
+        }   
+
+        $dataUpdate = [
+            'visible' => 0,
+            'usu_act' => $session->id_usuario,
+            'fec_act' => date('Y-m-d H:i:s')
+        ];
+
+        $dataConfig = [
+            "tabla"  => "juridico_viaticos",
+            "editar" => true,
+            "idEditar"  => ["id_juridico_viatico" => $id]
+        ];
+
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/eliminar'];
+
+        $result = $globals->saveTabla($dataUpdate, $dataConfig, $dataBitacora);
+
+        if (!$result->error) {
+           $response->error = false;
+            $response->respuesta = 'Registro eliminado correctamente.';
+        } else {
+            $response->respuesta = $result->respuesta;
+        }
+
+        return $this->respond($response);
     }
     public function ReservarSala()
     {

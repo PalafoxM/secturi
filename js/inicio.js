@@ -4585,6 +4585,45 @@ ini.inicio = (function () {
                 });
             })
         },
+        eliminarViatico: function(id) {
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "¡No podrás revertir esto! El registro se ocultará de la lista.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, eliminarlo',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "POST",
+                        url: base_url + "index.php/Agregar/eliminar", // Ruta al nuevo controlador
+                        data: { id_juridico_viatico: id },
+                        dataType: "json",
+                        success: function(response) {
+                        if (!response.error) {
+                            Swal.fire(
+                                '¡Eliminado!',
+                                response.respuesta,
+                                'success'
+                            );
+                            // Recargar la tabla o la página después de 1 segundo
+                            setTimeout(function() {
+                                location.reload(); 
+                            }, 1000);
+                            } else {
+                                Swal.fire("Error", response.respuesta, 'error');
+                            }
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            Swal.fire("Error", "Ocurrió un error al procesar la solicitud.", 'error');
+                        }
+                    });
+                }
+            });
+        },
         formPT: function () {
             $("#form_proveedor").submit(function (e) {
                 e.preventDefault();

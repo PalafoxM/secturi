@@ -53,11 +53,29 @@
                                                         <td class="text-center"><?= $p->dsc_tipo_funcionario ?></td>
                                                         <td class="text-center"><?= $p->dsc_denominacion ?></td>
                                                         <td class="text-center">
-                                                            <a style="color:white" 
-                                                                onclick="ini.inicio.consultarViatico(<?= $p->id_juridico_viatico ?>);" 
-                                                                class="btn btn-gradient-success px-4">
-                                                                <i class="mdi mdi-eye font-21"></i>
-                                                            </a>                                                        
+                                                            <div style="display: flex; justify-content: center; gap: 5px;">
+                                                                <!-- 1. Botón Ver -->
+                                                                <button type="button" 
+                                                                    onclick="ini.inicio.consultarViatico(<?= $p->id_juridico_viatico ?>);" 
+                                                                    class="btn btn-gradient-success btn-sm" 
+                                                                    title="Ver Detalle" style="color:white; padding: 5px 10px;">
+                                                                    <i class="mdi mdi-eye"></i>
+                                                                </button>
+                                                                <!-- 2. Botón Editar -->
+                                                                <button type="button" 
+                                                                    onclick="ini.inicio.editarViatico(<?= $p->id_juridico_viatico ?>);" 
+                                                                    class="btn btn-gradient-info btn-sm" 
+                                                                    title="Editar Registro" style="color:white; padding: 5px 10px;">
+                                                                    <i class="mdi mdi-pencil"></i>
+                                                                </button>
+                                                                <!-- 3. Botón Eliminar -->
+                                                                <button type="button" 
+                                                                    onclick="ini.inicio.eliminarViatico(<?= $p->id_juridico_viatico ?>);" 
+                                                                    class="btn btn-gradient-danger btn-sm" 
+                                                                    title="Eliminar" style="color:white; padding: 5px 10px;">
+                                                                    <i class="mdi mdi-delete"></i>
+                                                                </button>
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                     <?php endforeach; ?>

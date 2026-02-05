@@ -115,8 +115,8 @@
                                             </select>
                                         </div><!--end col-->
                                         <div class="col-md-4 mb-3">
-                                            <label for="denomicacion_encargo">Denominación del encargo o comisión<span style="color:red;">*</span></label>
-                                            <input type="text" class="form-control" id="denomicacion_encargo" name="denomicacion_encargo" required>
+                                            <label for="denominacion_encargo">Denominación del encargo o comisión<span style="color:red;">*</span></label>
+                                            <input type="text" class="form-control" id="denominacion_encargo" name="denominacion_encargo" required>
                                         </div><!--end col-->
                                         <div class="col-md-4 mb-6">
                                             <label for="tipo_viaje">Tipo de Viaje<span style="color:red;">*</span></label>
@@ -235,8 +235,8 @@
                                             <input type="text" class="form-control" autocomplete="off" id="importe_total" name="importe_total" >
                                         </div><!--end col-->
                                         <div class="col-md-4 mb-3">
-                                            <label for="fec_entraga_informa">Fecha de entrega del informe de la comisión o encargo<span style="color:red;">*</span></label>
-                                            <input type="date" class="form-control" autocomplete="off" id="fec_entraga_informa" name="fec_entraga_informa">
+                                            <label for="fec_entrega_informe">Fecha de entrega del informe de la comisión o encargo<span style="color:red;">*</span></label>
+                                            <input type="date" class="form-control" autocomplete="off" id="fec_entrega_informe" name="fec_entrega_informe">
                                         </div><!--end col-->
                                         <div class="col-md-4 mb-3">
                                             <label for="hipervinculo_informe">Hipervínculo al informe de la comisión o encargo encomendado<span style="color:red;">*</span></label>
@@ -253,8 +253,8 @@
                                             <input type="text" class="form-control" autocomplete="off" id="hipervinculo_normativa" name="hipervinculo_normativa">
                                         </div><!--end col-->
                                         <div class="col-md-4 mb-3">
-                                            <label for="area_responsabe">Área(s) responsable(s) que genera(n), posee(n), publica(n) y actualizan la información<span style="color:red;">*</span></label>
-                                            <input type="text" class="form-control" autocomplete="off" id="area_responsabe" name="area_responsabe">
+                                            <label for="area_responsable">Área(s) responsable(s) que genera(n), posee(n), publica(n) y actualizan la información<span style="color:red;">*</span></label>
+                                            <input type="text" class="form-control" autocomplete="off" id="area_responsable" name="area_responsable">
                                         </div><!--end col-->
                                     </div><!--end form-row-->
                                     <div class="form-row">
