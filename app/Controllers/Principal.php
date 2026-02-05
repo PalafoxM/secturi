@@ -5464,7 +5464,7 @@ class Principal extends BaseController
                     'id_director' => $registro_pt->data[0]->id_reponsable_solicitud
                 ]
             ]);
-          die( var_dump($direccion->data) );
+          //die( var_dump($direccion->data) );
             if (empty($direccion->data)) {
                 $jefe = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_pt->data[0]->id_reponsable_solicitud]]);
                 if (!empty($jefe->data)) {
