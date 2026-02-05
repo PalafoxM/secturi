@@ -793,13 +793,17 @@ class Inicio extends BaseController {
         $data['contentView'] = 'secciones/vlistaPuesto';
         $this->_renderView($data);   
     }
-    public function verXML($idFactura =  null)
+    public function verXML($idFactura =  null, $tipo = null)
     {
         $session = \Config\Services::session();
         $principal            = new Mglobal;
-      
-        $factura           = $principal->getTabla(['tabla' => 'factura', 'where'=>['visible' => 1, 'id_factura' => $idFactura]]); 
+        if($tipo == 'go'){
+            $factura           = $principal->getTabla(['tabla' => 'xml_go', 'where'=>['visible' => 1, 'id_xml' => $idFactura]]); 
+        }else{
+            $factura           = $principal->getTabla(['tabla' => 'factura_pdf', 'where'=>['visible' => 1, 'id_factura_pdf' => $idFactura]]); 
+        }
         $data['factura']   = (isset($factura->data) && !empty($factura->data))?$factura->data[0]:[];
+      //  die( var_dump( $data['factura'] ) );
         $data['scripts']     = ['principal', 'inicio'];
         $data['contentView'] = 'secciones/vFactura';
         $this->_renderView($data);   

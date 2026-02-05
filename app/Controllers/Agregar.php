@@ -1785,43 +1785,47 @@ class Agregar extends BaseController
             // === FIN NUEVO CÓDIGO DE PROCESAMIENTO ===
 
              // Enviar correos si hay adjuntos
-           if (!empty($finalAttachments)) {
-                $mailer = new \App\Libraries\Mailer();
+             if(isset($data['es_borrador']) && $data['es_borrador'] != 1){
                 
-                $mensajeHTML = '
-                <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
-                    <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-                        <div style="background-color: #004080; padding: 20px; text-align: center;">
-                            <h2 style="color: #ffffff; margin: 0;">Facturas Generadas</h2>
-                        </div>
-                        <div style="padding: 30px; color: #333;">
-                            <p style="font-size: 16px;">Estimado usuario,</p>
-                            <p style="font-size: 16px;">Se adjuntan a este correo los archivos <strong>XML</strong> y <strong>PDF</strong> correspondientes a las facturas de <strong>Gastos Operativos (GO)</strong> generadas en el sistema SUSI.</p>
-                             <p style="font-size: 16px;"><strong>Folio: ' . $folioCompleto . '</strong></p>
-                            <p style="font-size: 14px; color: #666;">Por favor, conserve estos comprobantes para su control administrativo.</p>
-                            
-                            <div style="margin-top: 25px; padding: 15px; background-color: #e3f2fd; border-left: 5px solid #2196f3; border-radius: 4px;">
-                                <p style="margin: 0; font-size: 14px; color: #0d47a1;"><strong>Nota:</strong> Este es un mensaje automático, favor de no responder a esta dirección.</p>
+             
+                if (!empty($finalAttachments)) {
+                    $mailer = new \App\Libraries\Mailer();
+                    
+                    $mensajeHTML = '
+                    <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+                        <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+                            <div style="background-color: #004080; padding: 20px; text-align: center;">
+                                <h2 style="color: #ffffff; margin: 0;">Facturas Generadas</h2>
+                            </div>
+                            <div style="padding: 30px; color: #333;">
+                                <p style="font-size: 16px;">Estimado usuario,</p>
+                                <p style="font-size: 16px;">Se adjuntan a este correo los archivos <strong>XML</strong> y <strong>PDF</strong> correspondientes a las facturas de <strong>Gastos Operativos (GO)</strong> generadas en el sistema SUSI.</p>
+                                <p style="font-size: 16px;"><strong>Folio: ' . $folioCompleto . '</strong></p>
+                                <p style="font-size: 14px; color: #666;">Por favor, conserve estos comprobantes para su control administrativo.</p>
+                                
+                                <div style="margin-top: 25px; padding: 15px; background-color: #e3f2fd; border-left: 5px solid #2196f3; border-radius: 4px;">
+                                    <p style="margin: 0; font-size: 14px; color: #0d47a1;"><strong>Nota:</strong> Este es un mensaje automático, favor de no responder a esta dirección.</p>
+                                </div>
+                            </div>
+                            <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 12px; color: #666;">
+                                © ' . date('Y') . ' Sistema de Atención SUSI. Todos los derechos reservados.
                             </div>
                         </div>
-                        <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 12px; color: #666;">
-                            © ' . date('Y') . ' Sistema de Atención SUSI. Todos los derechos reservados.
-                        </div>
-                    </div>
-                </div>';
+                    </div>';
 
-                $mailer->send(
-                    $mensajeHTML, 
-                    $session->get('id_usuario'), 
-                    ['dasedetur@guanajuato.gob.mx'], 
-                    2, // Tipo 2 para plantilla custom (HTML completo)
-                    false, 
-                    $finalAttachments, 
-                    "Facturas G.O. Generadas - SUSI - Folio: " . $folioCompleto
-                );
-            }    
+                    $mailer->send(
+                        $mensajeHTML, 
+                        $session->get('id_usuario'), 
+                        ['dasedetur@guanajuato.gob.mx'], 
+                        2, // Tipo 2 para plantilla custom (HTML completo)
+                        false, 
+                        $finalAttachments, 
+                        "Facturas G.O. Generadas - SUSI - Folio: " . $folioCompleto
+                    );
+                }  
 
-        } // Fin de if (!$response->error)
+            } 
+        }
 
         return $this->respond($responsePrincipal);
     }
@@ -1891,7 +1895,7 @@ class Agregar extends BaseController
             'documentacion_requerida' => ($data['documentacion_requerida'] == 'SI') ? 1 : 2,
             'evidencia_entrega' => (int) $data['evidencia_entrega'],
             'concepto_gasto' => $data['concepto_gasto'],
-            'total_importe' => $data['total_importe'], 
+            //'total_importe' => $data['total_importe'], 
             'comision' => $data['comision'],
             'lugar' => $data['lugar'],
             'usu_reg' => $session->get('id_usuario'),
@@ -1969,8 +1973,8 @@ class Agregar extends BaseController
                             'encabezado' => $encabezado_texto, 
                             'id_presupuesto' => $data['id_presupuesto'][$i] ?? null, 
                             'propina' => (!empty($data['propina_' . $i][$j])) ? str_replace(['$', ','], '', $data['propina_' . $i][$j]) : 0, 
-                            'periodo_inicio' => $data['periodo_inicio_' . $i][$j],
-                            'periodo_fin' => $data['periodo_fin_' . $i][$j],
+                            'periodo_inicio' => isset($data['periodo_inicio_' . $i][$j]) ? $data['periodo_inicio_' . $i][$j] : date('Y-m-d'),
+                            'periodo_fin' => isset($data['periodo_fin_' . $i][$j]) ? $data['periodo_fin_' . $i][$j] : date('Y-m-d'),
                             'usu_reg' => $session->get('id_usuario'),
                             'fec_reg' => date('Y-m-d H:i:s')
                         ];
@@ -2048,7 +2052,7 @@ class Agregar extends BaseController
                                 // Muchos sistemas legados hacen esto.
                                 $this->globals->saveTabla(
                                     ['id_identificador' => $id_fila_real],
-                                    ["tabla" => "periodo_factura_go", "editar" => true, "idEditar" => ['id_periodo_factura_go' => $id_fila_real]], // Asumiendo PK estándar
+                                    ["tabla" => "periodo_factura_go", "editar" => true, "idEditar" => ['id_periodo_factura' => $id_fila_real]], // Asumiendo PK estándar
                                      ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/updateIdIdentificador']
                                 );
                             }
@@ -2216,7 +2220,7 @@ class Agregar extends BaseController
         }
 
         // 1. Actualizar el registro principal
-        $estatus = ($data['es_borrador'] == 1) ? 1 : 2;
+        $estatus = (isset($data['es_borrador']) && $data['es_borrador'] == 1) ? 1 : 2;
         
         // PROCESAR ELIMINACIÓN DE FILAS
         if (isset($data['deleted_rows']) && !empty($data['deleted_rows'])) {
@@ -3233,7 +3237,7 @@ class Agregar extends BaseController
                  }
             }
      
-        if ($data['editar'] != 1) {
+         if (isset($data['editar']) && $data['editar'] != 1) {
             $mailer = new \App\Libraries\Mailer();
             
                 $mensajeHTML = '
@@ -3267,7 +3271,7 @@ class Agregar extends BaseController
                     $finalAttachments, 
                     "Facturas PT Generadas - SUSI - Folio: " . $folioCompleto
                 );
-            }   
+            }  
         }   
 
         //die( var_dump( $response ) );

@@ -5464,7 +5464,7 @@ class Principal extends BaseController
                     'id_director' => $registro_pt->data[0]->id_reponsable_solicitud
                 ]
             ]);
-          
+          die( var_dump($direccion->data) );
             if (empty($direccion->data)) {
                 $jefe = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_pt->data[0]->id_reponsable_solicitud]]);
                 if (!empty($jefe->data)) {
@@ -5476,7 +5476,7 @@ class Principal extends BaseController
                 }
 
             }
-
+            
             $data['responsableGasto'] = (isset($direccion->data) && !empty($direccion->data)) ? $direccion->data[0] : '';
             $reserva = $globals->getTabla([
                 'tabla' => 'vw_reserva',
@@ -7267,7 +7267,7 @@ class Principal extends BaseController
                          if($pdf->id_identificador == $rowIndex){
                               $archivosPorFila[$rowIndex]['pdf'][] = [
                                   'nombre' => basename($pdf->ruta_relativa),
-                                  'ruta' => base_url($pdf->ruta_relativa),
+                                  'ruta' => $pdf->ruta_relativa,
                                   'id' => $pdf->id_factura_pdf_go
                               ];
                          }
@@ -7291,6 +7291,7 @@ class Principal extends BaseController
 
         $data['archivosPorFila'] = $archivosPorFila;
         
+        //die( var_dump( $archivosPorFila ) );
 
         $data['dsc_director_general'] = (!empty($cat_director_general->data)) ? $cat_director_general->data[0]->dsc_director_general : [];
         $data['cat_area'] = (!empty($cat_area->data)) ? $cat_area->data : [];

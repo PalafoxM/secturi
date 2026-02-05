@@ -265,7 +265,8 @@
 
                                 </div><!--end form-row-->
                                 <br>
-                  <div class="row">
+                                
+                               <div class="row">
                                             <div class="col-12">
                                                 <div class="card">
                                                     <div class="card-body">
@@ -274,11 +275,11 @@
                                                             <table class="table table-bordered" id="makeEditable">
                                                                 <thead>
                                                                     <tr>
-                                                                        <th>IMPORTE</th>
-                                                                        <th>PROPINA</th>
+                                                              
+                                                                        <th style="width: 10%;">PROPINA</th>
                                                                         <th>INICIO</th>
                                                                         <th>FIN</th>
-                                                                        <th>ARCHIVOS</th>
+                                                                        <th style="width: 25%;">ARCHIVOS</th>
                                                                         <th>ACCIONES</th>
                                                                     </tr>
                                                                 </thead>
@@ -305,12 +306,9 @@
                                                                     <tr data-row-index="<?= $uniqueId ?>">
                                                                         <!-- Enviar index para controller -->
                                                                         <input type="hidden" name="rowIndex[]" value="<?= $uniqueId ?>">
+                                                                        <!-- Input hidden para encabezado requerido por el controller -->
+                                                                        <input type="hidden" name="encabezado[<?= $uniqueId ?>]" value="Borrador">
                                                                         
-                                                                        <td>
-                                                                            <input type="text" autocomplete="off" class="form-control importe-input" 
-                                                                                name="importe_<?= $uniqueId ?>[]" placeholder="Importe" 
-                                                                                value="<?= number_format($totalImporte, 2, '.', '') ?>" readonly>
-                                                                        </td>
                                                                         <td>
                                                                             <input autocomplete="off" type="text" class="form-control propina-input" 
                                                                                 name="propina_<?= $uniqueId ?>[]" placeholder="Propina" 
@@ -336,7 +334,7 @@
                                                                                         <?php foreach($r['pdf'] as $pdf): ?>
                                                                                             <li>
                                                                                                 <?php if(isset($pdf['ruta'])): ?>
-                                                                                                    <a href="<?= $pdf['ruta'] ?>" target="_blank"><small><?= $pdf['nombre'] ?></small></a>
+                                                                                                    <a href="<?= base_url().$pdf['ruta'] ?>" target="_blank"><small><?= $pdf['nombre'] ?></small></a>
                                                                                                 <?php else: ?>
                                                                                                     <small><?= $pdf['nombre'] ?></small>
                                                                                                 <?php endif; ?>
@@ -352,7 +350,7 @@
                                                                                         <div class="text-info"><small><strong>XML:</strong></small></div>
                                                                                         <ul class="list-unstyled mb-0">
                                                                                         <?php foreach($r['xml'] as $xml): ?>
-                                                                                            <li><small><?= $xml['nombre'] ?> (Total: <?= isset($xml['total']) ? $xml['total'] : '0.00' ?>)</small></li>
+                                                                                           <a href="<?= base_url().'index.php/Inicio/VerXML/'.$xml['id'].'/go' ?>" target="_blank"> <li><small><?= $xml['nombre'] ?> (Total: <?= isset($xml['total']) ? $xml['total'] : '0.00' ?>)</small></li></a>
                                                                                         <?php endforeach; ?>
                                                                                         </ul>
                                                                                     <?php endif; ?>
@@ -362,26 +360,31 @@
                                                                                     <small class="text-muted">No hay archivos</small>
                                                                                 <?php endif; ?>
                                                                                 
-                                                                                <div class="mt-1">
-                                                                                    <button type="button" class="btn btn-sm btn-success btn-seleccionar-pdf" data-row="<?= $uniqueId ?>">
-                                                                                        <i class="fas fa-file-pdf"></i> PDF
-                                                                                    </button>
-                                                                                    <button type="button" class="btn btn-sm btn-warning btn-seleccionar-xml" data-row="<?= $uniqueId ?>">
-                                                                                        <i class="mdi mdi-code-tags"></i> XML
-                                                                                    </button>
-                                                                                </div>
+                                                                              
                                                                             </div>
                                                                         </td>
                                                                         <td>
+                                                                            <div class="mt-1">
+                                                                                <button type="button" class="btn btn-sm btn-success btn-seleccionar-pdf" data-row="<?= $uniqueId ?>">
+                                                                                    <i class="fas fa-file-pdf"></i> PDF
+                                                                                </button>
+                                                                                <button type="button" class="btn btn-sm btn-warning btn-seleccionar-xml" data-row="<?= $uniqueId ?>">
+                                                                                    <i class="mdi mdi-code-tags"></i> XML
+                                                                                </button>
+                                                                            </div>
                                                                             <button type="button" class="btn btn-sm btn-danger remove-row" 
                                                                                 data-row="<?= $uniqueId ?>">
                                                                                 <i class="fas fa-trash"></i>
                                                                             </button>
+                                                                            
                                                                         </td>
                                                                     </tr>
                                                                     <?php endforeach; ?>
                                                                 </tbody>
                                                             </table>
+                                                            <button type="button" class="btn btn-primary btn-sm mt-2" id="btnAgregarFila">
+                                                                <i class="fas fa-plus"></i> Agregar Fila
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -451,6 +454,11 @@
 
 
 <script>
+    // Inicializar variable global desde PHP
+    var archivosPorFila = <?= json_encode($archivosPorFila) ?>;
+    if (typeof archivosPorFila !== 'object' || archivosPorFila === null) {
+        archivosPorFila = {};
+    }
 
 
 
@@ -621,7 +629,144 @@ $('#formBorrador_go').on('submit', function(e) {
             Swal.fire("Error", '<p> '+ res.message + '</p>');  
         }
     });
+
+    });
+
+
+// Función para agregar nueva fila
+$('#btnAgregarFila').on('click', function() {
+    // Generar ID único no numérico para que el backend lo trate como INSERT
+    const newId = 'new_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+    
+    // Inicializar almacenamiento de archivos para esta nueva fila
+    archivosPorFila[newId] = { pdf: [], xml: [] };
+    
+    const nuevaFila = `
+        <tr data-row-index="${newId}">
+            <!-- Input hidden para rowIndex -->
+            <input type="hidden" name="rowIndex[]" value="${newId}">
+            <!-- Input hidden para encabezado requerido -->
+            <input type="hidden" name="encabezado[${newId}]" value="Borrador">
+            
+            <td>
+                <input autocomplete="off" type="text" class="form-control propina-input" 
+                    name="propina_${newId}[]" placeholder="Propina" 
+                    value="0" >
+            </td>
+            <td>
+                <input autocomplete="off" type="date" class="form-control" 
+                    name="periodo_inicio_${newId}[]" 
+                    value="" >
+            </td>
+            <td>
+                <input autocomplete="off" type="date" class="form-control" 
+                    name="periodo_fin_${newId}[]"  
+                    value="">
+            </td>
+            <td>
+                <div class="archivos-seleccionados" id="archivos_${newId}">
+                    <small class="text-muted">No hay archivos</small>
+                </div>
+            </td>
+            <td>
+                <div class="mt-1">
+                    <button type="button" class="btn btn-sm btn-success btn-seleccionar-pdf" data-row="${newId}">
+                        <i class="fas fa-file-pdf"></i> PDF
+                    </button>
+                    <button type="button" class="btn btn-sm btn-warning btn-seleccionar-xml" data-row="${newId}">
+                        <i class="mdi mdi-code-tags"></i> XML
+                    </button>
+                </div>
+                <button type="button" class="btn btn-sm btn-danger remove-row" 
+                    data-row="${newId}">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `;
+    
+    $('#makeEditable tbody').append(nuevaFila);
 });
+
+// Delegación de eventos para botones de filas dinámicas (Eliminar)
+$(document).on('click', '.remove-row', function() {
+    const rowId = $(this).data('row');
+    const tr = $(this).closest('tr');
+    
+    // Si no es una fila nueva (es decir, ya existía en DB), agregamos a deletedRows
+    if (!isNaN(rowId) && !String(rowId).startsWith('new_')) {
+        deletedRows.push(rowId);
+    } else {
+        // Es una fila nueva que no se ha guardado aun, solo la borramos del DOM y de la variable JS
+        delete archivosPorFila[rowId];
+    }
+    
+    tr.remove();
+    $('#deleted_rows').val(JSON.stringify(deletedRows));
+});
+
+// Delegación de eventos para selección de archivos (PDF/XML) en filas dinámicas
+$(document).on('click', '.btn-seleccionar-pdf, .btn-seleccionar-xml', function() {
+    const rowId = $(this).data('row');
+    const isPdf = $(this).hasClass('btn-seleccionar-pdf');
+    const type = isPdf ? 'pdf' : 'xml';
+    const accept = isPdf ? '.pdf' : '.xml';
+    
+    // Crear input file temporal
+    const fileInput = $('<input type="file" multiple accept="' + accept + '" style="display:none;">');
+    $('body').append(fileInput);
+    
+    fileInput.trigger('click');
+    
+    fileInput.on('change', function() {
+        const files = this.files;
+        if (files.length > 0) {
+            // Agregar archivos al array global
+            if (!archivosPorFila[rowId]) archivosPorFila[rowId] = { pdf: [], xml: [] };
+            if (!archivosPorFila[rowId][type]) archivosPorFila[rowId][type] = [];
+            
+            Array.from(files).forEach(file => {
+                archivosPorFila[rowId][type].push(file);
+            });
+            
+            // Renderizar vista previa
+            renderizarArchivosFila(rowId);
+        }
+        fileInput.remove();
+    });
+});
+
+// Función helper para renderizar los archivos de una fila
+function renderizarArchivosFila(rowId) {
+    const container = $(`#archivos_${rowId}`);
+    const archivos = archivosPorFila[rowId];
+    let html = '';
+    
+    if (archivos && archivos.pdf && archivos.pdf.length > 0) {
+        html += '<div class="text-success"><small><strong>PDF:</strong></small></div><ul class="list-unstyled mb-1">';
+        archivos.pdf.forEach(file => {
+            const name = (file instanceof File) ? file.name : file.nombre;
+            html += `<li><small>${name}</small></li>`;
+        });
+        html += '</ul>';
+    }
+    
+    if (archivos && archivos.xml && archivos.xml.length > 0) {
+        html += '<div class="text-info"><small><strong>XML:</strong></small></div><ul class="list-unstyled mb-0">';
+        archivos.xml.forEach(file => {
+             const name = (file instanceof File) ? file.name : file.nombre;
+             const total = (file instanceof File) ? '' : (file.total ? ` (Total: ${file.total})` : '');
+             html += `<li><small>${name}${total}</small></li>`;
+        });
+        html += '</ul>';
+    }
+    
+    if (html === '') {
+        html = '<small class="text-muted">No hay archivos</small>';
+    }
+    
+    container.html(html);
+}
 
 
 
