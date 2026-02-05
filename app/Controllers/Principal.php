@@ -1253,7 +1253,7 @@ class Principal extends BaseController
                 }
             }
         }
-      $res = $this->enviarEmail(1);
+      //$res = $this->enviarEmail(1);
       
 
         return $this->respond($response);
@@ -1366,7 +1366,7 @@ class Principal extends BaseController
                 }
             }
         }
-     $this->enviarEmail(0);
+     //$this->enviarEmail(0);
        
 
         return $this->respond($response);
@@ -7249,14 +7249,35 @@ class Principal extends BaseController
         // Mapear archivos por fila para JS
 
        
-    
         $archivosPorFila = [];
         if(!empty($periodo_factura->data)){
             foreach($periodo_factura->data as $pf){
                 $rowIndex = $pf->id_identificador;
-                 $archivosPorFila[$rowIndex] = [
+                $idPartida = '';
+                $idProyecto = '';
+                $idPresupuesto = isset($pf->id_presupuesto) ? $pf->id_presupuesto : ''; // La columna en periodo_factura_go es id_presupuesto_go
+                if (!empty($presupuesto->data) && !empty($idPresupuesto)) {
+                        
+                    foreach ($presupuesto->data as $p) {
+                        //var_dump( $p );
+                         // Comparar con id_presupuesto_go o id_proyecto (dependiendo de la vista, pero id_presupuesto_go es lo más seguro)
+                         if (isset($p->id_presupuesto_go) && $p->id_presupuesto_go == $idPresupuesto) {
+                             $idPartida = isset($p->id_partida) ? $p->id_partida : '';
+                             $idProyecto = isset($p->id_proyecto) ? $p->id_proyecto : '';
+                             break;
+                         }
+                    }
+                }
+
+                $archivosPorFila[$rowIndex] = [
                      'pdf' => [], 
                      'xml' => [],
+                     'encabezado' => isset($pf->encabezado) ? $pf->encabezado : '',
+                     'id_identificador' => $rowIndex, 
+                     'id_partida' => $idPartida,
+                     'id_proyecto' => $idProyecto,
+                     'id_presupuesto' => $idPresupuesto,
+                     'propina' => isset($pf->propina) ? $pf->propina : '',
                      'periodo_inicio' => date('Y-m-d', strtotime($pf->periodo_inicio)),
                      'periodo_fin' => date('d-m-Y', strtotime($pf->periodo_fin))
                 ];
@@ -7291,7 +7312,8 @@ class Principal extends BaseController
 
         $data['archivosPorFila'] = $archivosPorFila;
         
-        //die( var_dump( $archivosPorFila ) );
+       //var_dump($archivosPorFila);
+       //die();
 
         $data['dsc_director_general'] = (!empty($cat_director_general->data)) ? $cat_director_general->data[0]->dsc_director_general : [];
         $data['cat_area'] = (!empty($cat_area->data)) ? $cat_area->data : [];

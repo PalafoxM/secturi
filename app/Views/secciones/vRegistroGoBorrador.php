@@ -266,130 +266,194 @@
                                 </div><!--end form-row-->
                                 <br>
                                 
-                               <div class="row">
-                                            <div class="col-12">
-                                                <div class="card">
-                                                    <div class="card-body">
-                                                        <h4 class="mt-0 header-title">REFERENCIA</h4>
-                                                        <div class="table-responsive">
-                                                            <table class="table table-bordered" id="makeEditable">
-                                                                <thead>
-                                                                    <tr>
-                                                              
-                                                                        <th style="width: 10%;">PROPINA</th>
-                                                                        <th>INICIO</th>
-                                                                        <th>FIN</th>
-                                                                        <th style="width: 25%;">ARCHIVOS</th>
-                                                                        <th>ACCIONES</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    <?php foreach($archivosPorFila as $j => $r): ?>
-                                                                    <?php 
-                                                                        $uniqueId = $j;
-                                                                        
-                                                                        // Calcular Importe Total de los XMLs
-                                                                        $totalImporte = 0;
-                                                                        if(isset($r['xml']) && is_array($r['xml'])) {
-                                                                            foreach($r['xml'] as $xml) {
-                                                                                $totalImporte += isset($xml['total']) ? (float)$xml['total'] : 0;
-                                                                            }
-                                                                        }
+                                <?php
+                                $grupos = [];
+                                if (!empty($archivosPorFila)) {
+                                    foreach ($archivosPorFila as $id => $fila) {
+                                        $pId = $fila['id_partida'] ?? '';
+                                        $prId = $fila['id_proyecto'] ?? '';
+                                        $psId = $fila['id_presupuesto'] ?? '';
+                                        $enc = $fila['encabezado'] ?? '';
+                                        $key = $pId . '-' . $prId . '-' . $enc; 
+                                        
+                                        if (!isset($grupos[$key])) {
+                                             $grupos[$key] = [
+                                                 'datos' => [],
+                                                 'id_partida' => $pId,
+                                                 'id_proyecto' => $prId,
+                                                 'id_presupuesto' => $psId,
+                                                 'encabezado' => $enc
+                                             ];
+                                        }
+                                        $grupos[$key]['datos'][$id] = $fila;
+                                    }
+                                } else {
+                                    // Grupo por defecto vacio
+                                    $grupos['default'] = [
+                                        'datos' => [],
+                                        'id_partida' => '',
+                                        'id_presupuesto' => '',
+                                        'encabezado' => 'Borrador'
+                                    ];
+                                }
+                                $groupIndex = 0;
+                                ?>
 
-                                                                        // Fechas
-                                                                        $inicio = isset($r['periodo_inicio']) ? date('Y-m-d', strtotime($r['periodo_inicio'])) : '';
-                                                                        $fin = isset($r['periodo_fin']) ? date('Y-m-d', strtotime($r['periodo_fin'])) : '';
-                                                                        
-                                                                        // Propina (No viene en el dump de archivos, se deja vacía o 0 si no existe)
-                                                                        $propina = isset($r['propina']) ? $r['propina'] : '';
-                                                                    ?>
-                                                                    <tr data-row-index="<?= $uniqueId ?>">
-                                                                        <!-- Enviar index para controller -->
-                                                                        <input type="hidden" name="rowIndex[]" value="<?= $uniqueId ?>">
-                                                                        <!-- Input hidden para encabezado requerido por el controller -->
-                                                                        <input type="hidden" name="encabezado[<?= $uniqueId ?>]" value="Borrador">
-                                                                        
-                                                                        <td>
-                                                                            <input autocomplete="off" type="text" class="form-control propina-input" 
-                                                                                name="propina_<?= $uniqueId ?>[]" placeholder="Propina" 
-                                                                                value="<?= $propina ?>" >
-                                                                        </td>
-                                                                        <td>
-                                                                            <input autocomplete="off" type="date" class="form-control" 
-                                                                                name="periodo_inicio_<?= $uniqueId ?>[]" 
-                                                                                value="<?= $inicio ?>" >
-                                                                        </td>
-                                                                        <td>
-                                                                            <input autocomplete="off" type="date" class="form-control" 
-                                                                                name="periodo_fin_<?= $uniqueId ?>[]"  
-                                                                                value="<?= $fin ?>">
-                                                                        </td>
-                                                                        <td>
-                                                                            <div class="archivos-seleccionados" id="archivos_<?= $uniqueId ?>">
-                                                                                <!-- Renderizar PDF existentes -->
-                                                                                <?php if(isset($r['pdf']) && is_array($r['pdf'])): ?>
-                                                                                    <?php if(count($r['pdf']) > 0): ?>
-                                                                                        <div class="text-success"><small><strong>PDF:</strong></small></div>
-                                                                                        <ul class="list-unstyled mb-1">
-                                                                                        <?php foreach($r['pdf'] as $pdf): ?>
-                                                                                            <li>
-                                                                                                <?php if(isset($pdf['ruta'])): ?>
-                                                                                                    <a href="<?= base_url().$pdf['ruta'] ?>" target="_blank"><small><?= $pdf['nombre'] ?></small></a>
-                                                                                                <?php else: ?>
-                                                                                                    <small><?= $pdf['nombre'] ?></small>
-                                                                                                <?php endif; ?>
-                                                                                            </li>
-                                                                                        <?php endforeach; ?>
-                                                                                        </ul>
-                                                                                    <?php endif; ?>
-                                                                                <?php endif; ?>
-
-                                                                                <!-- Renderizar XML existentes -->
-                                                                                <?php if(isset($r['xml']) && is_array($r['xml'])): ?>
-                                                                                    <?php if(count($r['xml']) > 0): ?>
-                                                                                        <div class="text-info"><small><strong>XML:</strong></small></div>
-                                                                                        <ul class="list-unstyled mb-0">
-                                                                                        <?php foreach($r['xml'] as $xml): ?>
-                                                                                           <a href="<?= base_url().'index.php/Inicio/VerXML/'.$xml['id'].'/go' ?>" target="_blank"> <li><small><?= $xml['nombre'] ?> (Total: <?= isset($xml['total']) ? $xml['total'] : '0.00' ?>)</small></li></a>
-                                                                                        <?php endforeach; ?>
-                                                                                        </ul>
-                                                                                    <?php endif; ?>
-                                                                                <?php endif; ?>
-                                                                                
-                                                                                <?php if(empty($r['pdf']) && empty($r['xml'])): ?>
-                                                                                    <small class="text-muted">No hay archivos</small>
-                                                                                <?php endif; ?>
-                                                                                
-                                                                              
-                                                                            </div>
-                                                                        </td>
-                                                                        <td>
-                                                                            <div class="mt-1">
-                                                                                <button type="button" class="btn btn-sm btn-success btn-seleccionar-pdf" data-row="<?= $uniqueId ?>">
-                                                                                    <i class="fas fa-file-pdf"></i> PDF
-                                                                                </button>
-                                                                                <button type="button" class="btn btn-sm btn-warning btn-seleccionar-xml" data-row="<?= $uniqueId ?>">
-                                                                                    <i class="mdi mdi-code-tags"></i> XML
-                                                                                </button>
-                                                                            </div>
-                                                                            <button type="button" class="btn btn-sm btn-danger remove-row" 
-                                                                                data-row="<?= $uniqueId ?>">
-                                                                                <i class="fas fa-trash"></i>
-                                                                            </button>
-                                                                            
-                                                                        </td>
-                                                                    </tr>
-                                                                    <?php endforeach; ?>
-                                                                </tbody>
-                                                            </table>
-                                                            <button type="button" class="btn btn-primary btn-sm mt-2" id="btnAgregarFila">
-                                                                <i class="fas fa-plus"></i> Agregar Fila
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                <?php foreach($grupos as $key => $grupo): ?>
+                                <?php $groupIndex++; ?>
+                                <div class="card group-container mb-4" data-group-id="<?= $groupIndex ?>">
+                                    <div class="card-body">
+                                        
+                                        <!-- Header Inputs (Visual Controls) -->
+                                        <div class="form-row">
+                                            <div class="col-md-4 mb-3">
+                                                <label>Partida <span class="text-danger">* <?=  $grupo['id_partida'] ?> </span></label>
+                                                <select class="form-control header-partida">
+                                                    <option value="">Seleccione</option>
+                                                    <?php foreach ($cat_partida as $partida): ?>
+                                                        <option value="<?= $partida->id_partida ?>" <?= ($grupo['id_partida'] == $partida->id_partida) ? 'selected' : '' ?>>
+                                                            <?= $partida->cuenta_cable ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label>Proyecto <span class="text-danger">* <?= $grupo['id_proyecto'] ?> </span></label>
+                                                <select class="form-control header-proyecto">
+                                                    <option value="">Seleccione</option>
+                                                    <?php foreach ($cat_proyecto as $proyecto): ?>
+                                                        <option value="<?= $proyecto->id_proyecto ?>" <?= ($grupo['id_proyecto'] == $proyecto->id_proyecto) ? 'selected' : '' ?>>
+                                                            <?= $proyecto->proyecto ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label>Encabezado <span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control header-encabezado" value="<?= $grupo['encabezado'] ?>" placeholder="Encabezado">
                                             </div>
                                         </div>
+
+                                        <h4 class="mt-0 header-title">REFERENCIA</h4>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-rows">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="width: 10%;">IMPORTE</th>
+                                                        <th style="width: 8%;">PROPINA</th>
+                                                        <th>INICIO</th>
+                                                        <th>FIN</th>
+                                                        <th style="width: 20%;">ARCHIVOS</th>
+                                                        <th>ACCIONES</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php foreach($grupo['datos'] as $j => $r): ?>
+                                                    <?php 
+                                                        $uniqueId = $j;
+                                                        $totalImporte = 0;
+                                                        if(isset($r['xml']) && is_array($r['xml'])) {
+                                                            foreach($r['xml'] as $xml) {
+                                                                $totalImporte += isset($xml['total']) ? (float)$xml['total'] : 0;
+                                                            }
+                                                        }
+                                                        $inicio = isset($r['periodo_inicio']) ? date('Y-m-d', strtotime($r['periodo_inicio'])) : '';
+                                                        $fin = isset($r['periodo_fin']) ? date('Y-m-d', strtotime($r['periodo_fin'])) : '';
+                                                        $propina = isset($r['propina']) ? $r['propina'] : '';
+                                                    ?>
+                                                    <tr data-row-index="<?= $uniqueId ?>">
+                                                        <input type="hidden" name="rowIndex[]" value="<?= $uniqueId ?>">
+                                                        <input type="hidden" name="id_identificador[<?= $uniqueId ?>]" value="<?= isset($r['id_identificador']) ? $r['id_identificador'] : '' ?>">
+                                                        
+                                                        <!-- Hidden Inputs synced with Header -->
+                                                        <input type="hidden" class="row-partida" name="id_partida[<?= $uniqueId ?>]" value="<?= $grupo['id_partida'] ?>">
+                                                        <input type="hidden" class="row-proyecto" name="id_presupuesto[<?= $uniqueId ?>]" value="<?= $grupo['id_presupuesto'] ?>">
+                                                        <input type="hidden" class="row-encabezado" name="encabezado[<?= $uniqueId ?>]" value="<?= $grupo['encabezado'] ?>">
+                                                        
+                                                        <td>
+                                                            <input type="text" autocomplete="off" class="form-control importe-input" 
+                                                                name="importe[<?= $uniqueId ?>]" placeholder="Importe" 
+                                                                value="<?= number_format($totalImporte, 2, '.', '') ?>" readonly>
+                                                        </td>
+                                                        <td>
+                                                            <input autocomplete="off" type="text" class="form-control propina-input" 
+                                                                name="propina[<?= $uniqueId ?>]" placeholder="Propina" 
+                                                                value="<?= $propina ?>" >
+                                                        </td>
+                                                        <td>
+                                                            <input autocomplete="off" type="date" class="form-control" 
+                                                                name="periodo_inicio[<?= $uniqueId ?>]" 
+                                                                value="<?= $inicio ?>" >
+                                                        </td>
+                                                        <td>
+                                                            <input autocomplete="off" type="date" class="form-control" 
+                                                                name="periodo_fin[<?= $uniqueId ?>]"  
+                                                                value="<?= $fin ?>">
+                                                        </td>
+                                                        <td>
+                                                            <div class="archivos-seleccionados" id="archivos_<?= $uniqueId ?>">
+                                                                <?php if(isset($r['pdf']) && is_array($r['pdf'])): ?>
+                                                                    <?php if(count($r['pdf']) > 0): ?>
+                                                                        <div class="text-success"><small><strong>PDF:</strong></small></div>
+                                                                        <ul class="list-unstyled mb-1">
+                                                                        <?php foreach($r['pdf'] as $pdf): ?>
+                                                                            <li>
+                                                                                <?php if(isset($pdf['ruta'])): ?>
+                                                                                    <a href="<?= base_url().$pdf['ruta'] ?>" target="_blank"><small><?= $pdf['nombre'] ?></small></a>
+                                                                                <?php else: ?>
+                                                                                    <small><?= $pdf['nombre'] ?></small>
+                                                                                <?php endif; ?>
+                                                                            </li>
+                                                                        <?php endforeach; ?>
+                                                                        </ul>
+                                                                    <?php endif; ?>
+                                                                <?php endif; ?>
+
+                                                                <?php if(isset($r['xml']) && is_array($r['xml'])): ?>
+                                                                    <?php if(count($r['xml']) > 0): ?>
+                                                                        <div class="text-info"><small><strong>XML:</strong></small></div>
+                                                                        <ul class="list-unstyled mb-0">
+                                                                        <?php foreach($r['xml'] as $xml): ?>
+                                                                           <a href="<?= base_url().'index.php/Inicio/VerXML/'.$xml['id'].'/go' ?>" target="_blank"> <li><small><?= $xml['nombre'] ?> (Total: <?= isset($xml['total']) ? $xml['total'] : '0.00' ?>)</small></li></a>
+                                                                        <?php endforeach; ?>
+                                                                        </ul>
+                                                                    <?php endif; ?>
+                                                                <?php endif; ?>
+                                                                
+                                                                <?php if(empty($r['pdf']) && empty($r['xml'])): ?>
+                                                                    <small class="text-muted">No hay archivos</small>
+                                                                <?php endif; ?>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="mt-1">
+                                                                <button type="button" class="btn btn-sm btn-success btn-seleccionar-pdf" data-row="<?= $uniqueId ?>">
+                                                                    <i class="fas fa-file-pdf"></i> PDF
+                                                                </button>
+                                                                <button type="button" class="btn btn-sm btn-warning btn-seleccionar-xml" data-row="<?= $uniqueId ?>">
+                                                                    <i class="mdi mdi-code-tags"></i> XML
+                                                                </button>
+                                                            </div>
+                                                            <button type="button" class="btn btn-sm btn-danger remove-row" 
+                                                                data-row="<?= $uniqueId ?>">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
+                                            <button type="button" class="btn btn-primary btn-sm mt-2 btnAgregarFila">
+                                                <i class="fas fa-plus"></i> Agregar Fila
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <?php endforeach; ?>
+                                
+                                <button type="button" class="btn btn-info btn-sm mb-4" id="btnAgregarGrupo">
+                                    <i class="fas fa-plus-circle"></i> Agregar Nueva Sección
+                                </button>
  
                                 <div id="hidden-file-inputs-container"></div>
                                 <a class="btn btn-gradient-danger" style="color:white"
@@ -454,11 +518,15 @@
 
 
 <script>
-    // Inicializar variable global desde PHP
+    // Inicializar variables globales desde PHP
     var archivosPorFila = <?= json_encode($archivosPorFila) ?>;
     if (typeof archivosPorFila !== 'object' || archivosPorFila === null) {
         archivosPorFila = {};
     }
+    
+    // Catalogos para JS
+    var catPartida = <?= json_encode($cat_partida) ?>;
+    var catProyecto = <?= json_encode($cat_proyecto) ?>;
 
 
 
@@ -633,34 +701,48 @@ $('#formBorrador_go').on('submit', function(e) {
     });
 
 
-// Función para agregar nueva fila
-$('#btnAgregarFila').on('click', function() {
-    // Generar ID único no numérico para que el backend lo trate como INSERT
+// Función para agregar nueva fila (en contexto de grupo)
+$(document).on('click', '.btnAgregarFila', function() {
+    const groupContainer = $(this).closest('.group-container');
+    const tableBody = groupContainer.find('table tbody');
+    
+    // Obtener valores del header del grupo
+    const idPartida = groupContainer.find('.header-partida').val();
+    const idProyecto = groupContainer.find('.header-proyecto').val();
+    const encabezado = groupContainer.find('.header-encabezado').val();
+    
+    // Generar ID único no numérico
     const newId = 'new_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
     
-    // Inicializar almacenamiento de archivos para esta nueva fila
+    // Inicializar almacenamiento de archivos
     archivosPorFila[newId] = { pdf: [], xml: [] };
     
     const nuevaFila = `
         <tr data-row-index="${newId}">
-            <!-- Input hidden para rowIndex -->
             <input type="hidden" name="rowIndex[]" value="${newId}">
-            <!-- Input hidden para encabezado requerido -->
-            <input type="hidden" name="encabezado[${newId}]" value="Borrador">
+            
+            <input type="hidden" class="row-partida" name="id_partida[${newId}]" value="${idPartida}">
+            <input type="hidden" class="row-proyecto" name="id_presupuesto[${newId}]" value="${idProyecto}">
+            <input type="hidden" class="row-encabezado" name="encabezado[${newId}]" value="${encabezado}">
             
             <td>
+                <input type="text" autocomplete="off" class="form-control importe-input" 
+                    name="importe[${newId}]" placeholder="Importe" 
+                    value="0.00" readonly>
+            </td>
+            <td>
                 <input autocomplete="off" type="text" class="form-control propina-input" 
-                    name="propina_${newId}[]" placeholder="Propina" 
+                    name="propina[${newId}]" placeholder="Propina" 
                     value="0" >
             </td>
             <td>
                 <input autocomplete="off" type="date" class="form-control" 
-                    name="periodo_inicio_${newId}[]" 
+                    name="periodo_inicio[${newId}]" 
                     value="" >
             </td>
             <td>
                 <input autocomplete="off" type="date" class="form-control" 
-                    name="periodo_fin_${newId}[]"  
+                    name="periodo_fin[${newId}]"  
                     value="">
             </td>
             <td>
@@ -685,7 +767,51 @@ $('#btnAgregarFila').on('click', function() {
         </tr>
     `;
     
-    $('#makeEditable tbody').append(nuevaFila);
+    tableBody.append(nuevaFila);
+});
+
+// Sincronizar cambios del Header con los inputs ocultos de las filas
+$(document).on('change keyup', '.header-partida', function() {
+    const val = $(this).val();
+    const groupContainer = $(this).closest('.group-container');
+    groupContainer.find('.row-partida').val(val);
+});
+$(document).on('change keyup', '.header-proyecto', function() {
+    const val = $(this).val();
+    const groupContainer = $(this).closest('.group-container');
+    groupContainer.find('.row-proyecto').val(val);
+});
+$(document).on('change keyup', '.header-encabezado', function() {
+    const val = $(this).val();
+    const groupContainer = $(this).closest('.group-container');
+    groupContainer.find('.row-encabezado').val(val);
+});
+
+// Agregar Nuevo Grupo
+$('#btnAgregarGrupo').on('click', function() {
+    // Clonar el primer grupo para usarlo como template (limpiando valores)
+    // Nota: Esto requiere que exista al menos un grupo. Si no, habría que construir el template en JS.
+    // Como backend garantiza al menos 'default', podemos intentar clonar.
+    
+    const primerGrupo = $('.group-container').first();
+    if(primerGrupo.length > 0) {
+        const nuevoGrupo = primerGrupo.clone();
+        
+        // Limpiar inputs del header
+        nuevoGrupo.find('.header-partida').val('');
+        nuevoGrupo.find('.header-proyecto').val('');
+        nuevoGrupo.find('.header-encabezado').val('Borrador');
+        
+        // Limpiar tabla (dejar vacía)
+        nuevoGrupo.find('tbody').empty();
+        
+        // Actualizar data-group-id (opcional, solo para unicidad si se usa)
+        const id = Date.now();
+        nuevoGrupo.attr('data-group-id', id);
+        
+        // Insertar antes del boton
+        $(this).before(nuevoGrupo);
+    }
 });
 
 // Delegación de eventos para botones de filas dinámicas (Eliminar)

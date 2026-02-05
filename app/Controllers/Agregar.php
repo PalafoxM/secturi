@@ -1785,7 +1785,7 @@ class Agregar extends BaseController
             // === FIN NUEVO CÓDIGO DE PROCESAMIENTO ===
 
              // Enviar correos si hay adjuntos
-             if(isset($data['es_borrador']) && $data['es_borrador'] != 1){
+             /* if(isset($data['es_borrador']) && $data['es_borrador'] != 1){
                 
              
                 if (!empty($finalAttachments)) {
@@ -1824,7 +1824,7 @@ class Agregar extends BaseController
                     );
                 }  
 
-            } 
+            }  */
         }
 
         return $this->respond($responsePrincipal);
@@ -1839,7 +1839,7 @@ class Agregar extends BaseController
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
         $archivos_post = $this->request->getFiles();
-
+        
         // 1. MAPEAR ARCHIVOS POR rowIndex (Corrección de mapeo)
         $archivos_por_rowIndex = [];
         if (isset($archivos_post['archivos'])) {
@@ -1863,7 +1863,7 @@ class Agregar extends BaseController
 
         // 2. PROCESAR DATOS PRINCIPALES
         $id_registro_go = isset($data['id_registro_go']) && !empty($data['id_registro_go']) ? $data['id_registro_go'] : null;
-
+        
         // Si NO hay ID, creamos uno nuevo (Primer guardado)
         // Si SÍ hay ID, actualizamos (Edición)
         
@@ -1874,7 +1874,7 @@ class Agregar extends BaseController
         // Si es nuevo, generamos folio. Si es edición, mantenemos el que tiene (o actualizamos si aplica lógica)
         // Para borrador simple, asumimos que si ya existe no regeneramos folio a menos que sea necesario.
         // Pero registrarFolioGo probablemente maneja lógica interna. Si ya tiene folio asignado en DB no deberíamos cambiarlo.
-         $no_consecutivo = $this->registrarFolioGo($data['no_consecutivo'], $data['id_reponsable_solicitud'], $data['direccion_responsable']);
+        // $no_consecutivo = $this->registrarFolioGo($data['no_consecutivo'], $data['id_reponsable_solicitud'], $data['direccion_responsable']);
 
 
         $dataInsert = [
@@ -1882,7 +1882,7 @@ class Agregar extends BaseController
             'id_estatus' => 1, // Siempre borrador
             'id_direccion_responsable' => $data['direccion_responsable'],
             'fecha_tramite' => $data['fecha_tramite'],
-            'no_consecutivo' => $no_consecutivo,
+            'no_consecutivo' => $data['no_consecutivo'],
             'id_reponsable_solicitud' => (int) $data['id_reponsable_solicitud'],
             'director_general' => 1,
             'secretario' => (int) $data['secretario'],
@@ -1903,26 +1903,18 @@ class Agregar extends BaseController
         
         $dataConfig = [
             "tabla" => "registro_go",
-            "editar" => false // Default insert
+            "editar" => true,
+            "idEditar" => ['id_registro_go' => $id_registro_go]
         ];
 
-        if ($id_registro_go) {
-            $dataConfig["editar"] = true;
-            $dataConfig["idEditar"] = ['id_registro_go' => $id_registro_go];
-        }
 
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaBorradorGO'];
         $responsePrincipal = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
-
+       
         if ($responsePrincipal->error) {
             return $this->respond($responsePrincipal);
         }
-
-        // Si era insert, recuperamos el ID
-        if (!$id_registro_go) {
-            $id_registro_go = $responsePrincipal->idRegistro;
-        }
-
+       
         // 3. PROCESAR ELIMINACIONES
         if (!empty($data['deleted_rows'])) {
             $deleted_rows = json_decode($data['deleted_rows'], true);
@@ -1954,23 +1946,44 @@ class Agregar extends BaseController
         }
 
         // 4. PROCESAR FILAS (Insertar nuevas o Editar existentes)
+       
         if (isset($data['encabezado'])) { 
             foreach ($data['encabezado'] as $i => $encabezado_texto) {
                 
                 // --- FILAS ESTÁNDAR ---
-                if (isset($data['periodo_inicio_' . $i])) {
-                    foreach ($data['periodo_inicio_' . $i] as $j => $val) {
+                if (isset($data['periodo_inicio'])) {
+                     
+                    foreach ($data['periodo_inicio'] as $j => $val) {
+                         
                          if (empty($val)) continue; // Fila vacía
+                       
+                        // Obtenemos el id_identificador enviado desde el input hidden
+                        $idIdentificadorInput = isset($data['id_identificador'][$j]) ? $data['id_identificador'][$j] : null; // Input del form
+                     
+                        // Verificamos si existe en DB
+                        $existe = false;
+                        // Usamos validación explicita !== null && !== '' para permitir '0'
+                        if ($idIdentificadorInput !== null && $idIdentificadorInput !== '') {
+                             // Consulta directa para ver si este id_identificador ya existe para este registro
+                             $existencia = $this->globals->getTabla([
+                                "tabla" => "periodo_factura_go",
+                                "where" => ["id_registro_go" => $id_registro_go, "id_identificador" => $idIdentificadorInput]
+                             ]);
+                            
+                             if (!empty($existencia->data)) {
+                                 $existe = true;
+                             }
+                        }
 
-                        // Obtenemos el rowIndex enviado desde el input hidden
-                        $rowIndex = isset($data['rowIndex_' . $i][$j]) ? $data['rowIndex_' . $i][$j] : null;
-
-                        // Si no hay rowIndex, algo anda mal con el JS, generamos uno temporal (aunque fallará mapeo de archivos)
-                         if (!$rowIndex) $rowIndex = 'unknown_' . uniqid();
-
+                        // Si existe, IGNORAMOS completamente
+                        if ($existe) {
+                            continue;
+                        }
+                    
                         $datos_periodo = [
                             'id_registro_go' => $id_registro_go, 
                             'encabezado' => $encabezado_texto, 
+                            'id_identificador' => $rowIndex, // Usamos el ID temporal 'new_...'
                             'id_presupuesto' => $data['id_presupuesto'][$i] ?? null, 
                             'propina' => (!empty($data['propina_' . $i][$j])) ? str_replace(['$', ','], '', $data['propina_' . $i][$j]) : 0, 
                             'periodo_inicio' => isset($data['periodo_inicio_' . $i][$j]) ? $data['periodo_inicio_' . $i][$j] : date('Y-m-d'),
@@ -1979,92 +1992,22 @@ class Agregar extends BaseController
                             'fec_reg' => date('Y-m-d H:i:s')
                         ];
 
-                        // Determinamos si es INSERT o UPDATE
-                        $es_update = is_numeric($rowIndex);
-                        $id_fila_real = null;
-
-                        if ($es_update) {
-                            // UPDATE
-                            $id_fila_real = $rowIndex;
-                            $dataConfig = [
-                                "tabla" => "periodo_factura_go", 
-                                "editar" => true,
-                                "idEditar" => ['id_identificador' => $id_fila_real]
-                            ];
-                             // No incluimos id_identificador en el update data, es la llave
-                            $this->globals->saveTabla($datos_periodo, $dataConfig, ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/updateFacturaPeriodo']);
-                        } else {
-                            // INSERT
-                            // Generamos un nuevo ID identificador unico para el insert (si la tabla usa autoincrement id_identificador no se manda, pero parece que aqui usamos id_identificador como PK lógica o manual?)
-                            // Revisando 'guardaGO' original: 'id_identificador' => $identificador_fila_unica
-                            // Si id_identificador es la PK autoincrementable, no deberíamos mandarlo.
-                            // Si es un campo auxiliar, sí.
-                            // Asumamos que para nuevos registros, el sistema genera el ID y lo recuperamos.
-                            
-                            // ERROR POTENCIAL: En guardaGO original se mandaba 'id_identificador' => $string_row_index.
-                            // Esto sugiere que id_identificador puede ser string temporal? No, la DB seguro espera int.
-                            // O el campo en DB es varchar?
-                            // REVISIÓN: En 'guardaGO' original: $identificador_fila_unica = $fila['js_rowIndex']; ... 'id_identificador' => $identificador_fila_unica
-                            // Si rowIndex es 'table_1_row_...', eso se guarda en la DB?
-                            // Si es así, entonces guardamos el string.
-                            
-                            $datos_periodo['id_identificador'] = $rowIndex; // Guardamos el string temporal como identificador inicial?
-                            // ESPERA: Si guardamos 'table_1_row_...' en la DB, luego cuando cargamos edit, ese será el ID?
-                            // El campo id_identificador en DB suele ser INT.
-                            // Si es INT AI, entonces NO debemos mandarlo en insert, y usar el insert_id para los archivos.
-                            
-                            // PERO: La lógica original usaba $identificador_fila_unica para vincular archivos.
-                            // Si es INT AUTO_INCREMENT, saveTabla retorna el ID.
-                            
-                            // VAMOS A ASUMIR MODELO ESTÁNDAR: Insert crea ID. Usamos ese ID para guardar archivos.
-                            
-                            // IMPORTANTE: El campo 'id_identificador' en la tabla periodo_factura_go... ¿Es la PK?
-                            // Si, saveTabla usa la PK de la tabla para updates.
-                            // Si la tabla es 'periodo_factura_go', su PK deberia ser 'id_periodo_factura_go' o algo asi.
-                            // 'id_identificador' suena a FK o campo de enlace.
-                            // REVISANDO Principal.php: $rowIndex = $pf->id_identificador;
-                            // Esto sugiere que 'id_identificador' ES la columna que usamos para rastrear la fila.
-                            
-                            // ENFOQUE SEGURO:
-                            // Para INSERT, dejamos que la DB genere su PK (si tiene).
-                            // Pero 'id_identificador' parece requerirse.
-                            // Si col 'id_identificador' es el ID unico de la fila (PK), no lo mandamos.
-                            // Si es otra cosa, lo mandamos.
-                            
-                            // Dado que no puedo ver el esquema SQL, asumiré comportamiento de 'guardaGO':
-                            // guardaGO guarda 'id_identificador' => $identificador_fila_unica.
-                            // Si eso funcionaba, lo replico. Pero si $identificador_fila_unica era un string largo 'table_...', cabrá en la columna?
-                            // Si falla, es porque id_identificador debe ser INT.
-                            
-                            // CAMBIO ESTRATEGICO: 
-                            // Insertaremos SIN 'id_identificador' si es nuevo, y usaremos el return ID como el nuevo 'identificador' para los archivos.
-                            // Y actualizamos el registro con ese mismo ID en id_identificador si es necesario duplicarlo?
-                            
-                             // INTENTO: Insertar sin id_identificador, obtener ID, usar ese ID.
-                            unset($datos_periodo['id_identificador']);
-                            
-                            $dataConfig = ["tabla" => "periodo_factura_go", "editar" => false];
-                            $respInsert = $this->globals->saveTabla($datos_periodo, $dataConfig, ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/insertFacturaPeriodo']);
-                            
-                            if (!$respInsert->error) {
-                                $id_fila_real = $respInsert->idRegistro;
-                                // OPCIONAL: Si se requiere que id_identificador tenga el valor del ID, hacemos update inmediato.
-                                // Muchos sistemas legados hacen esto.
-                                $this->globals->saveTabla(
-                                    ['id_identificador' => $id_fila_real],
-                                    ["tabla" => "periodo_factura_go", "editar" => true, "idEditar" => ['id_periodo_factura' => $id_fila_real]], // Asumiendo PK estándar
-                                     ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/updateIdIdentificador']
-                                );
-                            }
+                        // INSERTAR
+                       $response = $this->globals->saveTabla(
+                            $datos_periodo,
+                            ["tabla" => "periodo_factura_go", "editar" => false], 
+                             ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/insertPeriodo']
+                        );
+                       
+                        // GUARDAR ARCHIVOS DE ESTA FILA
+                        if (!$response->error) {
+                             // Usamos el id_identificador (que es el rowIndex string para nuevos) para vincular archivos
+                             $idForFiles = $datos_periodo['id_identificador'];
+                             $this->procesarArchivosFila($id_registro_go, $idForFiles, $idForFiles, $archivos_por_rowIndex, $session);
                         }
-
-                        // --- GUARDAR ARCHIVOS DE ESTA FILA ---
-                        if ($id_fila_real) {
-                            $this->procesarArchivosFila($id_registro_go, $id_fila_real, $rowIndex, $archivos_por_rowIndex, $session);
                         }
                     }
-                }
-
+                 // die();
                 // --- FILAS VIATICOS ---
                 if (isset($data['nombre_viatico_' . $i])) {
                     foreach ($data['nombre_viatico_' . $i] as $j => $val) {
@@ -2113,6 +2056,7 @@ class Agregar extends BaseController
     private function procesarArchivosFila($id_registro_go, $id_fila_real, $rowIndexOriginal, $archivos_por_rowIndex, $session) {
         // Buscamos archivos mapeados al rowIndex original (que puede ser string 'table_1...')
         $archivos = isset($archivos_por_rowIndex[$rowIndexOriginal]) ? $archivos_por_rowIndex[$rowIndexOriginal] : null;
+        $response = new \stdClass();
         
         if (!$archivos) return;
 
@@ -2135,34 +2079,93 @@ class Agregar extends BaseController
                         'fec_reg' => date('Y-m-d H:i:s'),
                         'usu_reg' => $session->get('id_usuario')
                     ];
-                    $this->globals->saveTabla($dataInsert, ["tabla" => "factura_pdf_go", "editar" => false], []);
+                    $response = $this->globals->saveTabla($dataInsert, ["tabla" => "factura_pdf_go", "editar" => false], []);
                 }
             }
         }
-
-        // XML
+        
         if (isset($archivos['xml']) && is_array($archivos['xml'])) {
             foreach ($archivos['xml'] as $xml_file) {
                  if ($xml_file->isValid() && !$xml_file->hasMoved()) {
-                     // Parseo XML simplificado
-                    $contenido = file_get_contents($xml_file->getTempName());
-                    // ... Logica de parseo minima o completa ...
-                    // Por brevedad, asumimos guardado básico, pero idealmente parsear para sacar UUID, etc.
-                    // Copiamos logica de parseo si es vital, o guardamos el archivo fisico y registro basico.
-                    
-                    // Guardado físico
-                    $xmlName = 'Factura_go_xml_' . $id_fila_real . '_' . date('Ymd_His') . '_' . uniqid() . '.xml';
-                    file_put_contents(FCPATH . 'assets/pdf/' . $xmlName, $contenido);
-                    
-                    $dataInsertXml = [
-                        'id_registro_go' => (int) $id_registro_go, 
-                        'id_identificador' => $id_fila_real, 
-                        'folio' => 'XML_DRAFT', // Placeholder si no parseamos
-                        'uuid' => 'DRAFT_' . uniqid(),
-                        'fec_reg' => date('Y-m-d H:i:s'),
-                        'usu_reg' => $session->get('id_usuario')
-                    ];
-                     $this->globals->saveTabla($dataInsertXml, ["tabla" => "xml_go", "editar" => false], []);
+                     $contenido = file_get_contents($xml_file->getTempName());
+
+                                // ... (Tu código de parseo de XML va aquí, es correcto) ...
+                                libxml_use_internal_errors(true);
+                                $xml = simplexml_load_string($contenido);
+                                if ($xml === false) {
+                                    continue;
+                                } // Saltar si el XML está mal
+
+                                $namespaces = $xml->getNamespaces(true);
+                                $cfdi = $xml->children($namespaces['cfdi']);
+
+                                // ... (extracción de $version, $fecha, $total, $rfcEmisor, $uuid, etc.)
+
+                                $attrs = $xml->attributes();
+                                $version = (string) $attrs['Version'];
+                                $fecha = (string) $attrs['Fecha'];
+                                $total = (string) $attrs['Total'];
+                                $moneda = (string) $attrs['Moneda'];
+                                $Folio = (string) $attrs['Folio'];
+
+                                $emisor = $cfdi->Emisor->attributes();
+                                $rfcEmisor = (string) $emisor['Rfc'];
+                                $nombreEmisor = (string) $emisor['Nombre'];
+
+                                $receptor = $cfdi->Receptor->attributes();
+                                $rfcReceptor = (string) $receptor['Rfc'];
+                                $nombreReceptor = (string) $receptor['Nombre'];
+
+                                $uuid = '';
+                                $NoCertificadoSAT = ''; // Renombrado para claridad
+                                if (isset($cfdi->Complemento)) {
+                                    $tfdNamespace = isset($namespaces['tfd']) ? $namespaces['tfd'] : 'http://www.sat.gob.mx/TimbreFiscalDigital';
+                                    if (isset($cfdi->Complemento->children($tfdNamespace)->TimbreFiscalDigital)) {
+                                        $tfdAttributes = $cfdi->Complemento->children($tfdNamespace)->TimbreFiscalDigital->attributes();
+                                        $uuid = (string) $tfdAttributes['UUID'];
+                                        $NoCertificadoSAT = (string) $tfdAttributes['NoCertificadoSAT'];
+                                    }
+                                }
+                                // ... Fin del parseo ...
+
+                                // Guardar XML físico para adjuntar
+                                $xmlName = 'Factura_go_xml_' . $id_fila_real . '_' . date('Ymd_His') . '_' . uniqid() . '.xml';
+                                $ruta_xml_destino = FCPATH . 'assets/pdf/' . $xmlName;
+                                file_put_contents($ruta_xml_destino, $contenido);
+                                $finalAttachments[] = $ruta_xml_destino;
+
+                                $dataConfigXml = [
+                                    "tabla" => "xml_go",
+                                    "editar" => false
+                                ];
+                                $dataInsertXml = [
+                                    'id_registro_go' => (int) $id_registro_go, // Enlace al registro maestro
+                                    'version' => $version,
+                                    'fecha' => date('Y-m-d H:i:s', strtotime($fecha)),
+                                    'total' => $total,
+                                    'moneda' => $moneda,
+                                    'id_identificador' => $id_fila_real, // <-- CORREGIDO: EL ENLACE DE FILA
+                                    'folio' => $Folio,
+                                    'no_certificado' => $NoCertificadoSAT, // Usar el del timbre
+                                    'emisor_rfc' => $rfcEmisor,
+                                    'emisor_nombre' => $nombreEmisor,
+                                    'receptor_rfc' => $rfcReceptor,
+                                    'receptor_nombre' => $nombreReceptor,
+                                    'uuid' => $uuid,
+                                    'fec_reg' => date('Y-m-d H:i:s'),
+                                    'usu_reg' => $session->get('id_usuario')
+                                ];
+
+                                $dataBitacoraXml = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardarFacturaGO'];
+
+                                // Guardamos la info del XML
+                                $responseXML = $this->globals->saveTabla($dataInsertXml, $dataConfigXml, $dataBitacoraXml);
+
+                                // Importante: Asignar la respuesta final solo si no hay error
+                                if (!$responseXML->error) {
+                                    $response->error = false;
+                                    $response->respuesta = 'Archivos XML y PDF guardados correctamente';
+                                }
                  }
             }
         }
@@ -3217,7 +3220,7 @@ class Agregar extends BaseController
         }
 
         // Enviar correos si hay adjuntos
-           if (!empty($finalAttachments)) {
+        if (!empty($finalAttachments)) {
             $folioCompleto = "";
             // Recuperar el ID del folio direccion (PK) guardado anteriormente
             $id_folio_direccion = isset($dataInsert['no_consecutivo']) ? $dataInsert['no_consecutivo'] : 0;
@@ -3237,7 +3240,7 @@ class Agregar extends BaseController
                  }
             }
      
-         if (isset($data['editar']) && $data['editar'] != 1) {
+        /*  if (isset($data['editar']) && $data['editar'] != 1) {
             $mailer = new \App\Libraries\Mailer();
             
                 $mensajeHTML = '
@@ -3271,7 +3274,7 @@ class Agregar extends BaseController
                     $finalAttachments, 
                     "Facturas PT Generadas - SUSI - Folio: " . $folioCompleto
                 );
-            }  
+            }  */ 
         }   
 
         //die( var_dump( $response ) );
