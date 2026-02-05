@@ -4733,49 +4733,55 @@ class Agregar extends BaseController
         $response = new stdClass();
         $response->error = true;
         $response->respuesta = 'Error al insertar en la tabla';
+    
         $globals = new Mglobal;
         $data = $this->request->getPost();
-        //  if($this->validarViativos()); return false
+
+        // Función auxiliar para limpiar números (quitar formato de moneda del JS)
+        $limpiarMonto = function($monto) {
+            return str_replace(['$', ',', ' '], '', $monto);
+        };
 
         $dataInsert = [
-            'ejercicio' => $data['ejercicio'],
-            'fecha_inicio' => date('Y-m-d', strtotime($data['fecha_inicio'])),
-            'fecha_termino' => date('Y-m-d', strtotime($data['fecha_termino'])),
-            'tipo_integrante' => (int) $data['tipo_integrante'],
-            'clave_nivel' => (int) $data['clave_nivel'],
-            'denominacion_puesto' => (int) $data['denominacion_puesto'],
-            'denomicacion_cargo' => (int) $data['denomicacion_cargo'],
-            'area_adscripcion' => (int) $data['area_adscripcion'],
-            'nombre_completo' => (int) $data['nombre_completo'],
-            'tipo_gasto' => (int) $data['tipo_gasto'],
-            'tipo_viaje' => (int) $data['tipo_viaje'],
-            'no_personas' => (int) $data['no_personas'],
-            'importe_ejercicio' => $data['importe_ejercicio'],
-            'pais_origen' => (int) $data['pais_origen'],
-            'estado_origen_id' => (int) $data['estado_origen_id'],
-            'estado_origen_text' => $data['estado_origen_text'],
-            'municipio_origen_id' => (int) $data['municipio_origen_id'],
-            'municipio_origen_text' => $data['municipio_origen_text'],
-            'pais_destino' => (int) $data['pais_destino'],
-            'estado_destino_id' => (int) $data['estado_destino_id'],
-            'estado_destino_text' => $data['estado_destino_text'],
-            'denomicacion_encargo' => $data['denomicacion_encargo'],
-            'municipio_destino_text' => $data['municipio_destino_text'],
-            'municipio_destino_id' => $data['municipio_destino'],
-            'motivo_encargo' => $data['motivo_encargo'],
-            'fec_salida' => $data['fec_salida'],
-            'fec_regreso' => $data['fec_regreso'],
-            'importe_ejercicio_partida' => $data['importe_ejercicio_partida'],
-            'importe_total' => $data['importe_total'],
-            'fec_entraga_informa' => $data['fec_entraga_informa'],
-            'hipervinculo_informe' => $data['hipervinculo_informe'],
-            'hipervinculo_factura' => $data['hipervinculo_factura'],
-            'hipervinculo_normativa' => $data['hipervinculo_normativa'],
-            'area_responsabe' => $data['area_responsabe'],
-            'fec_actualizacion' => $data['fec_actualizacion'],
-            'nota' => $data['nota'],
-            'usu_reg' => $session->id_usuario,
-            'fec_reg' => date('Y-m-d')
+            'ejercicio'                => $data['ejercicio'] ?? null,
+            'fecha_inicio'             => isset($data['fecha_inicio']) ? date('Y-m-d', strtotime($data['fecha_inicio'])) : null,
+            'fecha_termino'            => isset($data['fecha_termino']) ? date('Y-m-d', strtotime($data['fecha_termino'])) : null,
+            'tipo_integrante'          => (int) ($data['tipo_integrante'] ?? 0),
+            'clave_nivel'              => (int) ($data['clave_nivel'] ?? 0),
+            'denominacion_puesto'      => (int) ($data['denominacion_puesto'] ?? 0),
+            'denomicacion_cargo'       => (int) ($data['denomicacion_cargo'] ?? 0),
+            'area_adscripcion'         => (int) ($data['area_adscripcion'] ?? 0),
+            'nombre_completo'          => (int) ($data['nombre_completo'] ?? 0),
+            'tipo_gasto'               => (int) ($data['tipo_gasto'] ?? 0),
+            'tipo_viaje'               => (int) ($data['tipo_viaje'] ?? 0),
+            'no_personas'              => (int) ($data['no_personas'] ?? 0),
+            'importe_ejercicio'        => $limpiarMonto($data['importe_ejercicio'] ?? '0'),
+            'pais_origen'              => (int) ($data['pais_origen'] ?? 0),
+            'estado_origen_id'         => (int) ($data['estado_origen_id'] ?? 0),
+            'estado_origen_text'       => $data['estado_origen_text'] ?? '',
+            'municipio_origen_id'      => (int) ($data['municipio_origen_id'] ?? 0),
+            'municipio_origen_text'    => $data['municipio_origen_text'] ?? '',
+            'pais_destino'             => (int) ($data['pais_destino'] ?? 0),
+            'estado_destino_id'        => (int) ($data['estado_destino_id'] ?? 0),
+            'estado_destino_text'      => $data['estado_destino_text'] ?? '',
+            'denomicacion_encargo'     => $data['denomicacion_encargo'] ?? '',
+            'municipio_destino_text'   => $data['municipio_destino_text'] ?? '',
+            // IMPORTANTE: Cambié 'municipio_destino' por 'municipio_destino_id' para coincidir con tu lógica
+            'municipio_destino_id'     => (int) ($data['municipio_destino'] ?? 0), 
+            'motivo_encargo'           => $data['motivo_encargo'] ?? '',
+            'fec_salida'               => $data['fec_salida'] ?? null,
+            'fec_regreso'              => $data['fec_regreso'] ?? null,
+            'importe_ejercicio_partida'=> $limpiarMonto($data['importe_ejercicio_partida'] ?? '0'),
+            'importe_total'            => $limpiarMonto($data['importe_total'] ?? '0'),
+            'fec_entraga_informa'      => $data['fec_entraga_informa'] ?? null,
+            'hipervinculo_informe'     => $data['hipervinculo_informe'] ?? '',
+            'hipervinculo_factura'     => $data['hipervinculo_factura'] ?? '',
+            'hipervinculo_normativa'   => $data['hipervinculo_normativa'] ?? '',
+            'area_responsabe'          => $data['area_responsabe'] ?? '',
+            'fec_actualizacion'        => $data['fec_actualizacion'] ?? null,
+            'nota'                     => $data['nota'] ?? '',
+            'usu_reg'                  => $session->id_usuario,
+            'fec_reg'                  => date('Y-m-d')
         ];
 
 

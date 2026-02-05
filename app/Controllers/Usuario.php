@@ -1592,32 +1592,40 @@ class Usuario extends BaseController
     }
     public function Descarga()
     {
+        // 1. Limpieza absoluta del buffer para evitar que el Excel se corrompa
+        if (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+
         $session = \Config\Services::session();
         $globals = new Mglobal;
 
         $ruta = FCPATH . 'assets/pdf/plantillas/9-LTAIPG26F1_IX.xlsx';
-        $spreadsheet = IOFactory::load($ruta);
-
-        // Selecciona la hoja exacta por nombre
-        $sheet = $spreadsheet->getSheetByName('Reporte de Formatos');
-        if (!$sheet) {
-            // fallback: activa la primera si no encuentra esa hoja
-            $sheet = $spreadsheet->getActiveSheet();
+    
+        // Validar que el archivo existe antes de cargarlo
+        if (!file_exists($ruta)) {
+            die("Error: No se encontró la plantilla en: " . $ruta);
         }
 
-        // obtén los registros
+        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($ruta);
+        $sheet = $spreadsheet->getSheetByName('Reporte de Formatos') ?? $spreadsheet->getActiveSheet();
+
         $resul = $globals->getTabla([
             'tabla' => 'vw_juridico_viaticos',
             'where' => ['visible' => 1]
         ]);
 
-        $fila = 8; // fila inicial
+        $fila = 8; 
 
         if (!empty($resul->data)) {
             foreach ($resul->data as $row) {
+                // A. Datos básicos
                 $sheet->setCellValue('A' . $fila, $row->ejercicio);
-                $sheet->setCellValue('B' . $fila, date('dmY', strtotime($row->fecha_inicio)));
-                $sheet->setCellValue('C' . $fila, date('dmY', strtotime($row->fecha_termino)));
+            
+                // B. Fechas: Las enviamos con guiones para que Excel las reconozca mejor
+                $sheet->setCellValue('B' . $fila, date('d/m/Y', strtotime($row->fecha_inicio)));
+                $sheet->setCellValue('C' . $fila, date('d/m/Y', strtotime($row->fecha_termino)));
+            
                 $sheet->setCellValue('D' . $fila, $row->dsc_tipo_funcionario);
                 $sheet->setCellValue('E' . $fila, $row->clave_nivel);
                 $sheet->setCellValue('F' . $fila, $row->dsc_denominacion);
@@ -1628,29 +1636,47 @@ class Usuario extends BaseController
                 $sheet->setCellValue('K' . $fila, $row->segundo_apellido);
                 $sheet->setCellValue('L' . $fila, ($row->id_sexo == 2) ? 'HOMBRE' : 'MUJER');
                 $sheet->setCellValue('M' . $fila, $row->dsc_gasto);
-                $sheet->setCellValue('N' . $fila, 'revisar');
+                $sheet->setCellValue('N' . $fila, 'COMPROBADO'); // Valor por defecto
                 $sheet->setCellValue('O' . $fila, $row->dsc_viaje);
                 $sheet->setCellValue('P' . $fila, $row->no_personas);
                 $sheet->setCellValue('Q' . $fila, $row->importe_total);
-                $sheet->setCellValue('R' . $fila, $row->dsc_pais_origen);
-                $sheet->setCellValue('S' . $fila, (empty($row->estado_origen_text)) ? $row->dsc_estado_origen : $row->estado_origen_text);
-                $sheet->setCellValue('T' . $fila, (empty($row->municipio_origen_text)) ? $row->dsc_municipio_origen : $row->municipio_origen_text);
-                $sheet->setCellValue('U' . $fila, $row->dsc_pais_destino);
-                $sheet->setCellValue('V' . $fila, (empty($row->estado_destino_text)) ? $row->dsc_estado_destino : $row->estado_destino_text);
-                $sheet->setCellValue('W' . $fila, (empty($row->municipio_destino_text)) ? $row->dsc_municipio_destino : $row->municipio_destino_text);
+            
+                // C. Validación de ORIGEN (Uso de isset para evitar "Undefined Key")
+                $sheet->setCellValue('R' . $fila, $row->dsc_pais_origen ?? '');
+                $estado_o = !empty($row->estado_origen_text) ? $row->estado_origen_text : ($row->dsc_estado_origen ?? '');
+                $sheet->setCellValue('S' . $fila, $estado_o);
+            
+                $muni_o = !empty($row->municipio_origen_text) ? $row->municipio_origen_text : ($row->dsc_municipio_origen ?? '');
+                $sheet->setCellValue('T' . $fila, $muni_o);
+
+                // D. Validación de DESTINO
+                $sheet->setCellValue('U' . $fila, $row->dsc_pais_destino ?? '');
+                $estado_d = !empty($row->estado_destino_text) ? $row->estado_destino_text : ($row->dsc_estado_destino ?? '');
+                $sheet->setCellValue('V' . $fila, $estado_d);
+
+                $muni_d = !empty($row->municipio_destino_text) ? $row->municipio_destino_text : ($row->dsc_municipio_destino ?? '');
+                $sheet->setCellValue('W' . $fila, $muni_d);
+
                 $sheet->setCellValue('X' . $fila, $row->motivo_encargo);
                 $sheet->setCellValue('Y' . $fila, $row->fec_salida);
-                $sheet->setCellValue('Z' . $fila, $row->fec_regreso); // corregido
+                $sheet->setCellValue('Z' . $fila, $row->fec_regreso);
+            
                 $fila++;
             }
         }
 
-        $writer = new Xlsx($spreadsheet);
-        $filename = 'reporte_generado.xlsx';
-
+        // 2. Preparación final de descarga
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $filename = 'reporte_viaticos_' . date('Ymd_His') . '.xlsx';
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment; filename=\"$filename\"");
+        header('Cache-Control: max-age=0');
+    
+        // Limpiamos buffer una última vez por si acaso
+        if (ob_get_level() > 0) ob_end_clean();
+    
         $writer->save("php://output");
+        exit(); // Importante para que CI no ensucie la salida
     }
 
 

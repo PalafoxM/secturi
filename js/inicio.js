@@ -344,6 +344,31 @@ ini.inicio = (function () {
             $('.dropdown-toggle').dropdown();
             ini.inicio.traerReserva(id_proveedor);
         },
+        consultarViatico: function (id_viatico) {
+            $('#modalDetalleViatico').modal('show');
+            ini.inicio.traerDetalleViatico(id_viatico);
+        },
+        traerDetalleViatico: function(id_viatico) {
+            $.post(base_url + "index.php/Inicio/getDetalleViaticoJSON", {id: id_viatico}, function(data) {
+                const d = (typeof data === 'string') ? JSON.parse(data) : data;
+        
+                // Mapeo exacto según tus columnas de base de datos
+                $('#det_ejercicio').text(d.ejercicio || 'N/A'); // varchar
+        
+                // IMPORTANTE: Estos campos son INT en la tabla, usa el alias de texto de tu vista SQL
+                $('#det_integrante').text(d.dsc_tipo_funcionario || 'N/A'); 
+                $('#det_nombre').text(d.nombre_persona || 'N/A'); // El JOIN con la tabla de personas
+                $('#det_cargo').text(d.dsc_cargo || 'N/A'); 
+        
+                // Campos de texto directo
+                $('#det_motivo').text(d.motivo_encargo || 'N/A'); // varchar
+                $('#det_importe').text(d.importe_total ? '$' + d.importe_total : '$0.00'); // varchar
+        
+                // Fechas (Timestamp)
+                $('#det_salida').text(d.fec_salida || 'N/A'); // timestamp
+                $('#det_regreso').text(d.fec_regreso || 'N/A'); // timestamp
+            });
+        },
         editarFic: function () {
             $("#editarFic").submit(function (e) {
                 e.preventDefault();

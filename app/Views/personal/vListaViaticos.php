@@ -1,11 +1,6 @@
-
-
-
 <div class="page-wrapper">
-
     <!-- Page Content-->
     <div class="page-content-tab">
-
         <div class="container-fluid">
             <!-- Page-Title -->
             <div class="row">
@@ -19,25 +14,24 @@
                             </ol>
                         </div>
                         <h4 class="page-title">Listado 9-LTAIPG26F1_IX</h4><br>
-                          <a href="<?= base_url().'index.php/Usuario/Descarga' ?>" class="btn btn-gradient-primary px-4 float-right mt-0 mb-3 text-white">
-                            <i class="dripicons-arrow-thin-down mr-2"></i>Descargar Plantilla</a>
+                        <a href="<?= base_url().'index.php/Usuario/Descarga' ?>" class="btn btn-gradient-primary px-4 float-right mt-0 mb-3 text-white">
+                            <i class="dripicons-arrow-thin-down mr-2"></i>
+                            Descargar Plantilla
+                        </a>
                     </div>
                     <!--end page-title-box-->
                 </div>
                 <!--end col-->
             </div>
-     
             <!--end row-->
             <div class="row">
                 <div class="col-12">
                     <div class="tab-content detail-list" id="pills-tabContent">
                         <div class="tab-pane fade show active" id="general_detail">
-                          
                             <div class="row">
                                 <div class="col-12">
                                     <div class="card">
-                                        <div class="card-body">
-                                                  
+                                        <div class="card-body"> 
                                             <table id="datatableProveedores" class="table" data-toggle="table">
                                                 <thead class="thead-light">
                                                     <tr>
@@ -59,17 +53,11 @@
                                                         <td class="text-center"><?= $p->dsc_tipo_funcionario ?></td>
                                                         <td class="text-center"><?= $p->dsc_denominacion ?></td>
                                                         <td class="text-center">
-                                                             <a style="color:white" onclick="ini.inicio.reserva(<?= $p->id_juridico_viatico ?>);" title="Seccionar Proveedor"
-                                                               
-                                                                class="btn btn-gradient-success px-4"><i
-                                                                    class="mdi mdi-arrow-collapse-right font-21"></i>
-                                                            </a>
-                                                          <!--   <a href="<?php echo base_url(); ?>index.php/Principal/Proveedor/<?= $p->id_juridico_viatico ?>" title="Seccionar Proveedor"
-                                                               
-                                                                class="btn btn-gradient-success px-4"><i
-                                                                    class="mdi mdi-arrow-collapse-right font-21"></i>
-                                                            </a> -->
-                                                          
+                                                            <a style="color:white" 
+                                                                onclick="ini.inicio.consultarViatico(<?= $p->id_juridico_viatico ?>);" 
+                                                                class="btn btn-gradient-success px-4">
+                                                                <i class="mdi mdi-eye font-21"></i>
+                                                            </a>                                                        
                                                         </td>
                                                     </tr>
                                                     <?php endforeach; ?>
@@ -89,8 +77,65 @@
 </div>
 
 <!--Inicio Modal -->
-
-                                                    <!--FIN MODAL -->
+<div class="modal fade" id="modalDetalleViatico" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tituloModal">Detalle del Registro de Viático</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label><b>Ejercicio:</b></label>
+                        <p id="det_ejercicio"></p>
+                    </div>
+                    <div class="col-md-8">
+                        <label><b>Integrante:</b></label>
+                        <p id="det_integrante"></p>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label><b>Nombre Completo:</b></label>
+                        <p id="det_nombre"></p>
+                    </div>
+                    <div class="col-md-6">
+                        <label><b>Cargo:</b></label>
+                        <p id="det_cargo"></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label><b>Motivo del Encargo:</b></label>
+                        <p id="det_motivo"></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <label><b>Importe Total:</b></label>
+                        <p id="det_importe" class="text-success font-weight-bold"></p>
+                    </div>
+                    <div class="col-md-4">
+                        <label><b>Fecha Salida:</b></label>
+                        <p id="det_salida"></p>
+                    </div>
+                    <div class="col-md-4">
+                        <label><b>Fecha Regreso:</b></label>
+                        <p id="det_regreso"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--FIN MODAL -->
 <link href="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet"
     type="text/css" />
 <!-- App css -->
@@ -127,17 +172,17 @@
 <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.js"></script>
 <script>
-$(document).ready(function() {
-    ini.inicio.guardarReserva();
-    ini.inicio.guardarGo();
-    $('#datatableCategorias,#datatableProveedores').DataTable({
-        order: [[0, 'desc']],
-        language: {
-            url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json' // Ruta al archivo de localización
-        },
-        destroy: true,
-        searching: true,
+    $(document).ready(function() {
+        ini.inicio.guardarReserva();
+        ini.inicio.guardarGo();
+        $('#datatableCategorias,#datatableProveedores').DataTable({
+            order: [[0, 'desc']],
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json' // Ruta al archivo de localización
+            },
+            destroy: true,
+            searching: true,
+        });
+        // Función debounce para retrasar la ejecución
     });
-    // Función debounce para retrasar la ejecución
-});
 </script>

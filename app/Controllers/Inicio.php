@@ -243,7 +243,20 @@ class Inicio extends BaseController {
         $this->_renderView($data);
         
     }
-
+    public function getDetalleViaticoJSON()
+    {
+        $id = $this->request->getPost('id');
+        $globas = new Mglobal;
+        $res = $globas->getTabla([
+            'tabla' => 'vw_juridico_viaticos', 
+            'where' => ['id_juridico_viatico' => $id]
+        ]);
+            if (isset($res->data[0])) {
+            return $this->response->setJSON($res->data[0]);
+        } else {
+            return $this->response->setJSON(['error' => 'No se encontraron datos']);
+        }
+    }
    // ==========================================
     // VISTAS DE INVENTARIO
     // ==========================================
