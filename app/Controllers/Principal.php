@@ -2337,9 +2337,9 @@ class Principal extends BaseController
         $session = \Config\Services::session();
         $globals = new Mglobal;
         if (in_array($session->get('id_perfil'), [1, 2])) {
-            $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva_go', 'where' => ['visible' => 1]]);
+            $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva_go', 'where' => ['visible' => 1, 'borrador' => 2]]);
         } else {
-            $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva_go', 'where' => ['usu_reg' => $session->get('id_usuario'), 'visible' => 1]]);
+            $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva_go', 'where' => ['usu_reg' => $session->get('id_usuario'), 'visible' => 1,  'borrador' => 2]]);
         }
 
         $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
@@ -3109,9 +3109,9 @@ class Principal extends BaseController
         $session = \Config\Services::session();
         $globals = new Mglobal;
         if (in_array($session->get('id_perfil'), [1, 2])) {
-            $registro_go = $globals->getTabla(['tabla' => 'vw_registro_go', 'where' => ['visible' => 1]]);
+            $registro_go = $globals->getTabla(['tabla' => 'vw_registro_go', 'where' => ['visible' => 1, 'id_estatus' => 2]]);
         } else {
-            $registro_go = $globals->getTabla(['tabla' => 'vw_registro_go', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]]);
+            $registro_go = $globals->getTabla(['tabla' => 'vw_registro_go', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario'), 'id_estatus' => 2]]);
         }
        // die( var_dump( $registro_go ) );
         $data['registro_go'] = (!empty($registro_go->data)) ? $registro_go->data : [];
@@ -7247,6 +7247,8 @@ class Principal extends BaseController
         $data['registro_pt'] = $dataRegistro; 
         
         // Mapear archivos por fila para JS
+
+       
     
         $archivosPorFila = [];
         if(!empty($periodo_factura->data)){
@@ -7286,7 +7288,7 @@ class Principal extends BaseController
                  }
             }
         }
-        //die( var_dump( $archivosPorFila ) );
+
         $data['archivosPorFila'] = $archivosPorFila;
         
 

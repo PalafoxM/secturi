@@ -480,7 +480,7 @@
                             </ul>
                         </li><!--end nav-item-->
 
-                      <li class="nav-item"><a class="nav-link" href="<?php echo base_url(); ?>index.php/Principal/MesaRF" aria-expanded="false">Solicitud de Op. Bancarias</a></li>
+                      <!-- <li class="nav-item"><a class="nav-link" href="<?php echo base_url(); ?>index.php/Principal/MesaRF" aria-expanded="false">Solicitud de Op. Bancarias</a></li> -->
                     </ul>
                 </div><!-- end Crypto -->
 
@@ -777,21 +777,7 @@
                     </h6>
                 </li>
                 <li class="hide-phone">
-                    <?php
-                    $hoy = date("Y-m-d H:i:s");
-                    $fecha_nac = new DateTime($session->fec_nac); // Convierte la fecha de nacimiento a objeto DateTime
-                    $hoy_solo_fecha = date("m-d"); // Obtiene solo mes y día actual
-                    $fecha_nac_solo_fecha = $fecha_nac->format("m-d"); // Extrae mes y día de la fecha de nacimiento
-                    ?>
-                    <?php if ($fecha_nac_solo_fecha === $hoy_solo_fecha): ?>
-                        <div id="caja" style="cursor:pointer"><a class="nav-link" onclick="lanzarConfeti()"><i
-                                    class="ti-gift text-info font-22"></i></a></div>
-                        <div id="pastel" style="display:none" data-toggle="tooltip" data-placement="right"
-                            data-trigger="hover" title="Feliz Compleaños">
-                            <a class="nav-link"><i title="Feliz Compleaños"
-                                    class="mdi mdi-cake-layered text-success font-22"></i></a>
-                        </div>
-                    <?php endif; ?>
+                   
                 </li>
 
             </ul>
