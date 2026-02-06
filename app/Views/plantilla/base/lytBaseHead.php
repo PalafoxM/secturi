@@ -458,6 +458,7 @@
                                 <li><a href="<?php echo base_url(); ?>index.php/Inicio/ListadoSolicitudes">En proceso GRC</a></li> 
                             </ul>
                         </li><!--end nav-item-->
+                        
                         <li class="nav-item">
                             <a class="nav-link" href="javascript: void(0);"><span class="w-100">Enviados</span><span
                                     class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
@@ -469,6 +470,19 @@
                                 <!--  <li><a href="../apps/email-read.html">Envio GRC</a></li>     -->
                             </ul>
                         </li><!--end nav-item-->
+
+                        <?php if (in_array($session->id_perfil, [1, 2])): ?>
+                        <li class="nav-item">
+                             <a class="nav-link" href="javascript: void(0);"><span class="w-100">Concluidos</span><span
+                                     class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
+                             <ul class="nav-second-level" aria-expanded="false">
+                                 <li><a href="<?php echo base_url(); ?>index.php/Principal/concluidosAceptados">Aceptados</a>
+                                 </li>
+                                 <li><a href="<?php echo base_url(); ?>index.php/Principal/concluidosDeclinados">Declinados</a>
+                                 </li>
+                             </ul>
+                         </li>
+                         <?php endif; ?>                       <!--end nav-item-->
                        <!--  <li class="nav-item">
                             <a class="nav-link" href="javascript: void(0);"><span class="w-100">Sin enviar</span>
                             <span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>

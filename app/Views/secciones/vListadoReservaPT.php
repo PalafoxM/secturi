@@ -51,7 +51,11 @@
                                                         <th class="text-center">PROVEEDOR</th>
                                                         <th class="text-center">No. PROVEEDOR</th>
                                                         <th class="text-center">No. CONVENIO</th>
-                                                        <th class="text-center">INSTRUMENTO</th>
+                                                        <?php if(isset($es_declinado) && $es_declinado): ?>
+                                                            <th class="text-center">OBSERVACIONES</th>
+                                                        <?php else: ?>
+                                                            <th class="text-center">INSTRUMENTO</th>
+                                                        <?php endif; ?>
                                                         <th class="text-center">REGISTRO</th>
                                                          <th class="text-center">ESTATUS</th>
                                                         <th class="text-center">ACCIONES</th>
@@ -68,13 +72,17 @@
                                                         <td class="text-center"><?= $p->no_proveedor?></td>
                                                         <td class="text-center"><?= $p->no_convenio?></td>
                                                        
-                                                     <td class="text-center">
-                                                            <?php if (!empty($p->instrumento)) : ?>
-                                                                <a target="_blank" href="<?= base_url() . $p->instrumento ?>" class="btn btn-gradient-info px-4">
-                                                                    <i class="dripicons-document-new font-21"></i>
-                                                                </a>
-                                                            <?php endif; ?>
-                                                        </td>
+                                                        <?php if(isset($es_declinado) && $es_declinado): ?>
+                                                            <td class="text-center"><?= $p->observaciones ?? '' ?></td>
+                                                        <?php else: ?>
+                                                            <td class="text-center">
+                                                                <?php if (!empty($p->instrumento)) : ?>
+                                                                    <a target="_blank" href="<?= base_url() . $p->instrumento ?>" class="btn btn-gradient-info px-4">
+                                                                        <i class="dripicons-document-new font-21"></i>
+                                                                    </a>
+                                                                <?php endif; ?>
+                                                            </td>
+                                                        <?php endif; ?>
 
                                                           <td class="text-center"><?= (empty($p->nombre_completo))?'S/O':$p->nombre_completo?></td>
                                                         <?php
