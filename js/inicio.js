@@ -348,25 +348,26 @@ ini.inicio = (function () {
             $('#modalDetalleViatico').modal('show');
             ini.inicio.traerDetalleViatico(id_viatico);
         },
-        traerDetalleViatico: function(id_viatico) {
-            $.post(base_url + "index.php/Inicio/getDetalleViaticoJSON", {id: id_viatico}, function(data) {
+        traerDetalleViatico: function (id_viatico) {
+            var fecha_corta = function (f) {
+                if (!f) return '';
+                return f.substring(0, 10);
+            };
+            $.post(base_url + "index.php/Inicio/getDetalleViaticoJSON", { id: id_viatico }, function (data) {
                 const d = (typeof data === 'string') ? JSON.parse(data) : data;
-        
-                // Mapeo exacto según tus columnas de base de datos
-                $('#det_ejercicio').text(d.ejercicio || 'N/A'); // varchar
-        
-                // IMPORTANTE: Estos campos son INT en la tabla, usa el alias de texto de tu vista SQL
-                $('#det_integrante').text(d.dsc_tipo_funcionario || 'N/A'); 
-                $('#det_nombre').text(d.nombre_persona || 'N/A'); // El JOIN con la tabla de personas
-                $('#det_cargo').text(d.dsc_cargo || 'N/A'); 
-        
-                // Campos de texto directo
-                $('#det_motivo').text(d.motivo_encargo || 'N/A'); // varchar
-                $('#det_importe').text(d.importe_total ? '$' + d.importe_total : '$0.00'); // varchar
-        
-                // Fechas (Timestamp)
-                $('#det_salida').text(d.fec_salida || 'N/A'); // timestamp
-                $('#det_regreso').text(d.fec_regreso || 'N/A'); // timestamp
+
+                $('#det_ejercicio').text(d.ejercicio || 'N/A');
+                $('#det_integrante').text(d.dsc_tipo_funcionario || 'N/A');
+                $('#det_puesto').text(d.dsc_denominacion || 'N/A');
+                $('#det_nombre').text(d.nombre_persona || d.nombre_completo || 'N/A');
+                $('#det_cargo').text(d.dsc_cargo || 'N/A');
+                $('#det_encargo').text(d.denomicacion_encargo || 'N/A');
+                $('#det_motivo').text(d.motivo_encargo || 'N/A');
+                $('#det_importe_ejercicio').text(d.importe_ejercicio ? '$' + d.importe_ejercicio : '$0.00');
+                $('#det_importe').text(d.importe_total ? '$' + d.importe_total : '$0.00');
+                $('#det_origen').text((d.estado_origen_text || "") + " / " + (d.municipio_origen_text || ""));
+                $('#det_salida').text(fecha_corta(d.fec_salida) || 'N/A');
+                $('#det_regreso').text(fecha_corta(d.fec_regreso) || 'N/A');
             });
         },
         editarFic: function () {
@@ -4553,7 +4554,7 @@ ini.inicio = (function () {
             $("#form_viatico").submit(function (e) {
                 e.preventDefault();
                 var formData = new FormData(this); // Usar FormData en lugar de serialize
-                console.log(formData);
+
                 $.ajax({
                     type: "POST",
                     url: base_url + "index.php/Agregar/formViatico",
@@ -4585,7 +4586,7 @@ ini.inicio = (function () {
                 });
             })
         },
-        eliminarViatico: function(id) {
+        eliminarViatico: function (id) {
             Swal.fire({
                 title: '¿Estás seguro?',
                 text: "¡No podrás revertir esto! El registro se ocultará de la lista.",
@@ -4602,25 +4603,103 @@ ini.inicio = (function () {
                         url: base_url + "index.php/Agregar/eliminar", // Ruta al nuevo controlador
                         data: { id_juridico_viatico: id },
                         dataType: "json",
-                        success: function(response) {
-                        if (!response.error) {
-                            Swal.fire(
-                                '¡Eliminado!',
-                                response.respuesta,
-                                'success'
-                            );
-                            // Recargar la tabla o la página después de 1 segundo
-                            setTimeout(function() {
-                                location.reload(); 
-                            }, 1000);
+                        success: function (response) {
+                            if (!response.error) {
+                                Swal.fire(
+                                    '¡Eliminado!',
+                                    response.respuesta,
+                                    'success'
+                                );
+                                // Recargar la tabla o la página después de 1 segundo
+                                setTimeout(function () {
+                                    location.reload();
+                                }, 1000);
                             } else {
                                 Swal.fire("Error", response.respuesta, 'error');
                             }
                         },
-                        error: function(jqXHR, textStatus, errorThrown) {
+                        error: function (jqXHR, textStatus, errorThrown) {
                             Swal.fire("Error", "Ocurrió un error al procesar la solicitud.", 'error');
                         }
                     });
+                }
+            });
+        },
+        editarViatico: function (id) {
+            // 1. Limpiar (reset) el formulario para borrar datos viejos
+            $('#form_viatico')[0].reset();
+            $('#id_juridico_viatico').val(id); // Asignamos el ID para que PHP sepa que es UPDATE
+
+            var fecha_corta = function (f) {
+                if (!f) return '';
+                // Toma los primeros 10 caracteres (YYYY-MM-DD)
+                return f.substring(0, 10);
+            };
+            // 2. Pedir datos al PHP (Homologado a Inicio/getDetalleViaticoJSON)
+            $.ajax({
+                type: "POST",
+                url: base_url + "index.php/Inicio/getDetalleViaticoJSON",
+                data: { id: id },
+                dataType: "json",
+                success: function (data) {
+                    const d = (typeof data === 'string') ? JSON.parse(data) : data;
+                    console.log(d);
+                    if (d && !d.error) {
+                        // Fechas
+                        $('#ejercicio').val(d.ejercicio).change();
+                        $('#fecha_inicio').val(fecha_corta(d.fecha_inicio));
+                        $('#fecha_termino').val(fecha_corta(d.fecha_termino));
+
+                        // Selects
+                        $('#tipo_integrante').val(d.tipo_integrante).trigger('change');
+                        $('#clave_nivel').val(d.clave_nivel).trigger('change');
+                        $('#denominacion_puesto').val(d.denominacion_puesto).trigger('change');
+                        $('#denomicacion_cargo').val(d.denomicacion_cargo).trigger('change');
+                        $('#area_adscripcion').val(d.area_adscripcion).trigger('change');
+                        $('#nombre_completo').val(d.nombre_completo).trigger('change');
+                        $('#tipo_gasto').val(d.tipo_gasto).trigger('change');
+                        $('#tipo_viaje').val(d.tipo_viaje).trigger('change');
+
+                        // Inputs normales (Usando nombres de DB con typos)
+                        $('#denominacion_encargo').val(d.denomicacion_encargo); // BD: denomicacion
+                        $('#no_personas').val(d.no_personas);
+                        $('#importe_ejercicio').val(d.importe_ejercicio);
+
+                        // Ubicaciones
+                        $('#pais_origen').val(d.pais_origen).trigger('change');
+                        $('#estado_origen').val(d.estado_origen_id).trigger('change');
+                        $('#estado_origen_text').val(d.estado_origen_text);
+                        $('#municipio_origen').val(d.municipio_origen_id).trigger('change');
+                        $('#municipio_origen_text').val(d.municipio_origen_text);
+
+                        $('#pais_destino').val(d.pais_destino).trigger('change');
+                        $('#estado_destino').val(d.estado_destino_id).trigger('change');
+                        $('#estado_destino_text').val(d.estado_destino_text);
+                        $('#municipio_destino').val(d.municipio_destino_id).trigger('change');
+                        $('#municipio_destino_text').val(d.municipio_destino_text);
+
+                        $('#motivo_encargo').val(d.motivo_encargo);
+
+                        // Más fechas
+                        $('#fec_salida').val(fecha_corta(d.fec_salida));
+                        $('#fec_regreso').val(fecha_corta(d.fec_regreso));
+                        $('#fec_entrega_informe').val(fecha_corta(d.fec_entraga_informa)); // BD: entraga
+                        $('#fec_actualizacion').val(fecha_corta(d.fec_actualizacion));
+                        $('#importe_ejercicio_partida').val(d.importe_ejercicio_partida);
+                        $('#importe_total').val(d.importe_total);
+
+                        $('#hipervinculo_informe').val(d.hipervinculo_informe);
+                        $('#hipervinculo_factura').val(d.hipervinculo_factura);
+                        $('#hipervinculo_normativa').val(d.hipervinculo_normativa);
+                        $('#area_responsable').val(d.area_responsabe); // BD: responsabe typo
+                        $('#nota').val(d.nota);
+                        $('#modal_form_viatico').modal('show');
+                    } else if (d && d.error) {
+                        Swal.fire("Atención", d.error, "warning");
+                    }
+                },
+                error: function () {
+                    Swal.fire("Error", "No se pudo cargar la información.", "error");
                 }
             });
         },

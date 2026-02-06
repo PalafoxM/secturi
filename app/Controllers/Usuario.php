@@ -92,11 +92,11 @@ class Usuario extends BaseController
         $usuario = $participante->data[0];
         $hoy = date("Y-m-d H:i:s");
         $dataInsert = [
-            'id_sexo' => (int) $usuario->id_sexo,
-            'id_nivel' => (int) $usuario->id_nivel,
-            'id_dependencia' => (int) $usuario->id_dependencia,
+            'id_sexo' => (int)$usuario->id_sexo,
+            'id_nivel' => (int)$usuario->id_nivel,
+            'id_dependencia' => (int)$usuario->id_dependencia,
             'id_perfil' => 8,
-            'id_padre' => (int) $session->id_perfil,
+            'id_padre' => (int)$session->id_perfil,
             'usuario' => $usuario->curp,
             'nombre' => $usuario->nombre,
             'primer_apellido' => $usuario->primer_apellido,
@@ -128,50 +128,47 @@ class Usuario extends BaseController
         $response->error = false;
         $response->respuesta = "Correo enviado correctamente.";
         return $this->respond($response);
-        /*         try {
-                    $mail->isSMTP(); // Usar SMTP para el envío
-                    $mail->SMTPDebug = 2; // Habilitar depuración (2 para mensajes de cliente y servidor)
-                    $mail->Host = 'smtp.gmail.com'; // Servidor SMTP de Gmail
-                    $mail->SMTPAuth = true; // Habilitar autenticación SMTP
-                    $mail->Username = 'palafox.marin31@gmail.com'; // Correo electrónico del remitente
-                    $mail->Password = 'vxqh wycc fsgg tzvk'; // Contraseña de aplicación o contraseña de Gmail
-                    $mail->SMTPSecure = 'tls'; // Usar cifrado TLS
-                    $mail->Port = 587; // Puerto SMTP para TLS
-
-                    // Configurar el correo electrónico
-                    $mail->setFrom($usuario->correo, 'Sistema de Administración de Capacitación (SAC)');
-                    $mail->addAddress('palafox.marin@hotmail.com'); // Correo del destinatario
-                    $mail->Subject = 'Credenciales de Acceso al Sistema SAC'; // Asunto del correo
-                    $mail->isHTML(true); // Habilitar contenido HTML en el cuerpo del correo
-
-                    // Cuerpo del correo
-                    $mail->Body = "
-                        <p>Te damos la bienvenida al <strong>Sistema de Administración de Capacitación (SAC)</strong>.</p>
-                        <p>A continuación, te proporcionamos tus credenciales de acceso:</p>
-                        <ul>
-                            <li><strong>Usuario:</strong> $usuario->curp</li>
-                            <li><strong>Contraseña:</strong> $contrasenia</li>
-                        </ul>
-                        <p>Puedes acceder al sistema a través del siguiente enlace: <a href='http://172.31.187.142/sac2/'>http://172.31.187.142/sac2/</a></p>
-                        <p>Si tienes alguna duda o necesitas asistencia, no dudes en contactarnos.</p>
-                        <p>¡Gracias por ser parte de SAC!</p>
-                    ";
-
-                    // Enviar el correo
-                    if ($mail->send()) {
-                        $response->error = false;
-                        $response->respuesta = "Correo enviado correctamente.";
-                    } else {
-                        $response->error = true;
-                        $response->respuesta = "Error al enviar el correo: " . $mail->ErrorInfo;
-                    }
-                    return $this->respond($response); // Devolver la respuesta
-                } catch (Exception $e) {
-                    // Manejar excepciones
-                    $response->error = true;
-                    $response->respuesta = "Error inesperado al enviar el correo: " . $e->getMessage();
-                    return $this->respond($response);
-                } */
+    /*         try {
+     $mail->isSMTP(); // Usar SMTP para el envío
+     $mail->SMTPDebug = 2; // Habilitar depuración (2 para mensajes de cliente y servidor)
+     $mail->Host = 'smtp.gmail.com'; // Servidor SMTP de Gmail
+     $mail->SMTPAuth = true; // Habilitar autenticación SMTP
+     $mail->Username = 'palafox.marin31@gmail.com'; // Correo electrónico del remitente
+     $mail->Password = 'vxqh wycc fsgg tzvk'; // Contraseña de aplicación o contraseña de Gmail
+     $mail->SMTPSecure = 'tls'; // Usar cifrado TLS
+     $mail->Port = 587; // Puerto SMTP para TLS
+     // Configurar el correo electrónico
+     $mail->setFrom($usuario->correo, 'Sistema de Administración de Capacitación (SAC)');
+     $mail->addAddress('palafox.marin@hotmail.com'); // Correo del destinatario
+     $mail->Subject = 'Credenciales de Acceso al Sistema SAC'; // Asunto del correo
+     $mail->isHTML(true); // Habilitar contenido HTML en el cuerpo del correo
+     // Cuerpo del correo
+     $mail->Body = "
+     <p>Te damos la bienvenida al <strong>Sistema de Administración de Capacitación (SAC)</strong>.</p>
+     <p>A continuación, te proporcionamos tus credenciales de acceso:</p>
+     <ul>
+     <li><strong>Usuario:</strong> $usuario->curp</li>
+     <li><strong>Contraseña:</strong> $contrasenia</li>
+     </ul>
+     <p>Puedes acceder al sistema a través del siguiente enlace: <a href='http://172.31.187.142/sac2/'>http://172.31.187.142/sac2/</a></p>
+     <p>Si tienes alguna duda o necesitas asistencia, no dudes en contactarnos.</p>
+     <p>¡Gracias por ser parte de SAC!</p>
+     ";
+     // Enviar el correo
+     if ($mail->send()) {
+     $response->error = false;
+     $response->respuesta = "Correo enviado correctamente.";
+     } else {
+     $response->error = true;
+     $response->respuesta = "Error al enviar el correo: " . $mail->ErrorInfo;
+     }
+     return $this->respond($response); // Devolver la respuesta
+     } catch (Exception $e) {
+     // Manejar excepciones
+     $response->error = true;
+     $response->respuesta = "Error inesperado al enviar el correo: " . $e->getMessage();
+     return $this->respond($response);
+     } */
 
     }
     public function validarReporteExcel2()
@@ -190,7 +187,8 @@ class Usuario extends BaseController
         if ($dia == '01') {
             $fec_ini = date('Y-m-01', strtotime($periodoInicio));
             $fec_fin = date('Y-m-15', strtotime($periodoInicio));
-        } else {
+        }
+        else {
             $fec_ini = date('Y-m-16', strtotime($periodoInicio));
             $fec_fin = date('Y-m-' . $ultimoDiaMes, strtotime($periodoInicio)); // Usar el último día real
         }
@@ -206,7 +204,8 @@ class Usuario extends BaseController
 
         if (empty($resul)) {
             $response->respuesta = "No se encontrarón datos en el<strong> periodo indicado</strong>";
-        } else {
+        }
+        else {
             $response->error = false;
             $response->respuesta = "Datos Correctos";
         }
@@ -219,22 +218,22 @@ class Usuario extends BaseController
         $response = new \stdClass();
         $response->error = true;
         $globals = new Mglobal;
-     
-            $dataConfig = [
-                "tabla" => "capacitacion",
-                "editar" => false
-            ];
-            $dataInsert = [
-                'id_usuario' => $session->get('id_usuario'),
-                'fec_reg' => date('Y-m-d H:i:s'),
 
-            ];
-            $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardarCapacitacion'];
-            $response = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
-            if(!$response->error){
-                $session->set('capacitacion', 1);
+        $dataConfig = [
+            "tabla" => "capacitacion",
+            "editar" => false
+        ];
+        $dataInsert = [
+            'id_usuario' => $session->get('id_usuario'),
+            'fec_reg' => date('Y-m-d H:i:s'),
 
-            }
+        ];
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardarCapacitacion'];
+        $response = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+        if (!$response->error) {
+            $session->set('capacitacion', 1);
+
+        }
         return $this->respond($response);
     }
     public function validarReporteExcel()
@@ -259,7 +258,8 @@ class Usuario extends BaseController
         $resul = (isset($incidencias->data) && !empty($incidencias->data)) ? $incidencias->data : [];
         if (empty($resul)) {
             $response->respuesta = "No se encontrarón datos en el<strong> periodo indicado</strong>";
-        } else {
+        }
+        else {
             $response->error = false;
             $response->respuesta = "Datos Correctos";
         }
@@ -365,13 +365,16 @@ class Usuario extends BaseController
                 if ($entrada && $entrada > '09:00:00') {
                     $sheet->getStyle($col . $fila)->getFill()->setFillType(Fill::FILL_SOLID)
                         ->getStartColor()->setARGB('F55166');
-                } elseif ($entrada && $entrada > '08:45:00') {
+                }
+                elseif ($entrada && $entrada > '08:45:00') {
                     $sheet->getStyle($col . $fila)->getFill()->setFillType(Fill::FILL_SOLID)
                         ->getStartColor()->setARGB('C9321A');
-                } elseif ($entrada === '') {
+                }
+                elseif ($entrada === '') {
                     $sheet->getStyle($col . $fila)->getFill()->setFillType(Fill::FILL_SOLID)
                         ->getStartColor()->setARGB('FFFFFF00'); // Amarillo
-                } elseif (strcasecmp(trim($incidencia), 'Aprobada') === 0) {
+                }
+                elseif (strcasecmp(trim($incidencia), 'Aprobada') === 0) {
                     $sheet->getStyle($col . $fila)->getFill()->setFillType(Fill::FILL_SOLID)
                         ->getStartColor()->setARGB('80F293'); // Verde
                 }
@@ -430,7 +433,8 @@ class Usuario extends BaseController
         if ($dia == '01') {
             $fec_ini = date('Y-m-01', strtotime($periodoInicio));
             $fec_fin = date('Y-m-15', strtotime($periodoInicio));
-        } else {
+        }
+        else {
             $fec_ini = date('Y-m-16', strtotime($periodoInicio));
             $fec_fin = date('Y-m-' . $ultimoDiaMes, strtotime($periodoInicio));
         }
@@ -447,7 +451,7 @@ class Usuario extends BaseController
             '2025-12-25' => 'Navidad',
             $anio . '-01-01' => 'Asueto'
         ];
-   
+
         $tabla = [
             'tabla' => 'vw_asistencia_incidencia',
             'where' => ['visible' => 1, 'id_tipo_empleado' => 1],
@@ -456,7 +460,7 @@ class Usuario extends BaseController
 
         $datos = $globals->getTabla($tabla);
         $resul = (isset($datos->data) && !empty($datos->data)) ? $datos->data : [];
-      
+
         // Fechas laborales del periodo
         $start = new \DateTime($fec_ini);
         $end = new \DateTime($fec_fin);
@@ -477,11 +481,11 @@ class Usuario extends BaseController
 
         foreach ($resul as $r) {
             $nombre = trim($r->nombre_completo ?: 'Sin nombre');
-        
-           
+
+
             // Verificar si es una incidencia de tipo 2 (por semana)
             if (!empty($r->tipo) && $r->tipo == 2) {
-           
+
                 // Procesar todas las fechas del rango de la incidencia
                 $startIncidencia = new \DateTime($r->fecha_inicio_incidencia);
                 $endIncidencia = new \DateTime($r->fecha_fin_incidencia);
@@ -522,9 +526,10 @@ class Usuario extends BaseController
                     }
                 }
 
-            } else {
+            }
+            else {
                 // Procesamiento normal para otros registros
-              
+
                 $fechaYmd = !empty($r->fecha) ? date('Y-m-d', strtotime($r->fecha)) : null;
                 if (!$fechaYmd || date('N', strtotime($fechaYmd)) >= 6)
                     continue;
@@ -585,7 +590,7 @@ class Usuario extends BaseController
                 }
             }
 
-            
+
         }
 
         // Resto del código para cumpleaños y generación del Excel...
@@ -605,7 +610,7 @@ class Usuario extends BaseController
                 }
             }
         }
- 
+
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
@@ -626,7 +631,8 @@ class Usuario extends BaseController
             $sheet->getRowDimension(1)->setRowHeight(60);
             $sheet->getRowDimension(2)->setRowHeight(20);
             $sheet->getRowDimension(3)->setRowHeight(20);
-        } else {
+        }
+        else {
             // Si no hay logo, poner el nombre de la secretaría como texto
             $sheet->setCellValue('A1', 'SECRETARÍA DE [NOMBRE]');
             $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
@@ -687,19 +693,19 @@ class Usuario extends BaseController
 
         foreach ($usuarios as $nombre => $fechas) {
 
-              $numeroEmpleado = '';
-                foreach ($resul as $r) {
-                    if (trim($r->nombre_completo ?: 'Sin nombre') === $nombre) {
-                        $numeroEmpleado = isset($r->no_empleado) ? $r->no_empleado : 'N/A';
-                        break;
-                    }
+            $numeroEmpleado = '';
+            foreach ($resul as $r) {
+                if (trim($r->nombre_completo ?: 'Sin nombre') === $nombre) {
+                    $numeroEmpleado = isset($r->no_empleado) ? $r->no_empleado : 'N/A';
+                    break;
                 }
-                
+            }
+
             $sheet->setCellValue('A' . $fila, $numeroEmpleado);
-    
+
             // NOMBRE AHORA VA EN COLUMNA B (antes era A)
             $sheet->setCellValue('B' . $fila, $nombre);
-            
+
             $colIndex = 3; // ← Cambiar de 2 a 3
 
             foreach ($fechasDelPeriodo as $fecha) {
@@ -721,21 +727,21 @@ class Usuario extends BaseController
                 $estatus = null;
 
                 if (!empty($incArr)) {
-                  
+
                     foreach ($incArr as $inc) {
-                       
+
                         if ($stopIncProcessing)
                             break;
 
-                        $cat = isset($inc['cat_incidencia']) ? (int) $inc['cat_incidencia'] : null;
-                        $estatus = isset($inc['estatus']) ? (int) $inc['estatus'] : null;
+                        $cat = isset($inc['cat_incidencia']) ? (int)$inc['cat_incidencia'] : null;
+                        $estatus = isset($inc['estatus']) ? (int)$inc['estatus'] : null;
                         $horaInicio = isset($inc['hora_inicio']) ? $inc['hora_inicio'] : '';
                         $horaFin = isset($inc['hora_fin']) ? $inc['hora_fin'] : '';
                         $nombreInc = isset($inc['nombre']) ? strtoupper($inc['nombre']) : '';
 
                         // Incidencia aprobada y NO cat 11 -> comportamiento original (marcar ambos campos con el nombre)
-                        if ($estatus === 3 && !in_array($cat,[11,1,7])) {
-                          
+                        if ($estatus === 3 && !in_array($cat, [11, 1, 7])) {
+
                             $valorEntrada = $nombreInc;
                             $valorSalida = $nombreInc;
                             $sheet->getStyle($colEntrada . $fila)
@@ -753,8 +759,8 @@ class Usuario extends BaseController
                         // Caso cat 11 (comisión / permiso personal): solo entrada O salida, usar horas aprobadas
                         if ($cat === 11 && $estatus === 3) {
                             // Normalizamos con DateTime (si existe)
-             
-                              
+
+
                             // Si hay hora de inicio dentro del rango de la mañana -> marcar entrada como permiso
                             if ($horaInicio) {
                                 // compara solo la parte de tiempo: 09:01:00 - 12:00:00 (ajusta si tus rangos cambian)
@@ -812,26 +818,26 @@ class Usuario extends BaseController
                                 $stopIncProcessing = true;
                             }
 
-                            // si ya procesaste, salir
-                            // if ($stopIncProcessing)
-                                // break;
+                        // si ya procesaste, salir
+                        // if ($stopIncProcessing)
+                        // break;
                         }
 
                         // NUEVA LOGICA: Si es estatus 3 (Aprobado), asegurar Salida Verde + Texto
                         if ($estatus === 3 && !$validadoSalida) {
                             $valorSalida = $nombreInc;
-                             $sheet->getStyle($colSalida . $fila)
+                            $sheet->getStyle($colSalida . $fila)
                                 ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                                 ->getStartColor()->setARGB('FF00B050');
                             $validadoSalida = true;
                         }
-                     
+
                         // Otros bloques Cat 1 y Cat 7 omitidos por brevedad pero deben ser corregidos manual o en siguiente paso si necesarios
                         // Asumiremos que Cat 11 es el principal problema reportado, pero corregiremos Cat 1 y 7 en un paso mas amplio si es necesario.
-                        
+
                         // FIX CAT 1 y CAT 7 AQUI MISMO PARA ASEGURAR:
-                         if ($cat === 1 && $estatus === 3 ) {
-                             if ($horaInicio) {
+                        if ($cat === 1 && $estatus === 3) {
+                            if ($horaInicio) {
                                 if ($horaInicio >= '08:00:00' && $horaFin <= '12:01:00') {
                                     $valorEntrada = $nombreInc;
                                     $sheet->getStyle($colEntrada . $fila)
@@ -851,7 +857,7 @@ class Usuario extends BaseController
                                     $stopIncProcessing = true;
                                 }
                             }
-                            if (!$stopIncProcessing && $horaInicio >= '08:00:00' &&  $horaFin <= '16:00:00') {
+                            if (!$stopIncProcessing && $horaInicio >= '08:00:00' && $horaFin <= '16:00:00') {
                                 $valorEntrada = $valorSalida = $nombreInc;
                                 $sheet->getStyle($colEntrada . $fila)
                                     ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
@@ -863,10 +869,11 @@ class Usuario extends BaseController
                                 $validadoSalida = true;
                                 $stopIncProcessing = true;
                             }
-                             if ($stopIncProcessing) break;
+                            if ($stopIncProcessing)
+                                break;
                         }
-                        
-                         if ($cat === 7 && $estatus === 3) {
+
+                        if ($cat === 7 && $estatus === 3) {
                             if ($horaInicio) {
                                 if ($horaInicio >= '08:00:00' && $horaFin <= '12:01:00') {
                                     $valorEntrada = 'CONSTANCIA DE TIEMPO';
@@ -877,18 +884,18 @@ class Usuario extends BaseController
                                     $stopIncProcessing = true;
                                 }
                             }
-                             if ($horaInicio >= '08:00:00' && $horaFin <= '20:00:00') {
-                                    $valorEntrada = 'CONSTANCIA DE TIEMPO';
-                                    $sheet->getStyle($colEntrada . $fila)
-                                        ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                        ->getStartColor()->setARGB('FF00B050');
-                                    $validadoEntrada = true;
-                                    $sheet->getStyle($colSalida . $fila)
-                                        ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                        ->getStartColor()->setARGB('FF00B050');
-                                    $validadoSalida = true;
-                                    $stopIncProcessing = true;
-                                }
+                            if ($horaInicio >= '08:00:00' && $horaFin <= '20:00:00') {
+                                $valorEntrada = 'CONSTANCIA DE TIEMPO';
+                                $sheet->getStyle($colEntrada . $fila)
+                                    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                    ->getStartColor()->setARGB('FF00B050');
+                                $validadoEntrada = true;
+                                $sheet->getStyle($colSalida . $fila)
+                                    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                    ->getStartColor()->setARGB('FF00B050');
+                                $validadoSalida = true;
+                                $stopIncProcessing = true;
+                            }
                             if (!$stopIncProcessing && $horaFin) {
                                 if ($horaInicio >= '12:01:00' && $horaFin <= '16:00:00') {
                                     $valorSalida = 'CONSTANCIA DE TIEMPO';
@@ -899,8 +906,8 @@ class Usuario extends BaseController
                                     $stopIncProcessing = true;
                                 }
                             }
-                            if (!$stopIncProcessing && $horaInicio >= '08:30:00' &&  $horaFin <= '16:00:00') {
-                                $valorEntrada = $valorSalida ='CONSTANCIA DE TIEMPO';
+                            if (!$stopIncProcessing && $horaInicio >= '08:30:00' && $horaFin <= '16:00:00') {
+                                $valorEntrada = $valorSalida = 'CONSTANCIA DE TIEMPO';
                                 $sheet->getStyle($colEntrada . $fila)
                                     ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                                     ->getStartColor()->setARGB('FF00B050');
@@ -911,11 +918,12 @@ class Usuario extends BaseController
                                 $validadoSalida = true;
                                 $stopIncProcessing = true;
                             }
-                            if ($stopIncProcessing) break;
+                            if ($stopIncProcessing)
+                                break;
                         }
 
                         // Otros estatus (rechazado/en proceso)
-                         if ($estatus === 2) {
+                        if ($estatus === 2) {
                             $valorEntrada = 'Declinado';
                             $sheet->getStyle($colEntrada . $fila)
                                 ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
@@ -925,11 +933,11 @@ class Usuario extends BaseController
                             $stopIncProcessing = true;
                             break;
                         }
-                        
-                         if ($estatus === 1) {
+
+                        if ($estatus === 1) {
                             // En proceso
                             // (Logica original mantenida pero adaptada a flags)
-                             if ($horaInicio >= '08:00:00' &&  $horaFin <= '12:00:00') {
+                            if ($horaInicio >= '08:00:00' && $horaFin <= '12:00:00') {
                                 $valorEntrada = 'Sin validar';
                                 $sheet->getStyle($colEntrada . $fila)
                                     ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
@@ -938,7 +946,7 @@ class Usuario extends BaseController
                                 $stopIncProcessing = true;
                                 break;
                             }
-                             if ($horaInicio >= '12:00:00' &&  $horaFin <= '16:00:00') {
+                            if ($horaInicio >= '12:00:00' && $horaFin <= '16:00:00') {
                                 $valorSalida = 'Sin validar';
                                 $sheet->getStyle($colSalida . $fila)
                                     ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
@@ -947,9 +955,9 @@ class Usuario extends BaseController
                                 $stopIncProcessing = true;
                                 break;
                             }
-                             if (empty($salida) && empty($entrada)) {
+                            if (empty($salida) && empty($entrada)) {
                                 $valorEntrada = 'Sin validar';
-                                $valorSalida  = 'Sin validar';
+                                $valorSalida = 'Sin validar';
                                 $sheet->getStyle($colEntrada . $fila)
                                     ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                                     ->getStartColor()->setARGB('FFFF0000');
@@ -959,57 +967,60 @@ class Usuario extends BaseController
                                 $stopIncProcessing = true;
                                 break;
                             }
-                         }
+                        }
                     } // end foreach loop
                 }
 
                 // --- AHORA aplicar la validación de retardo/ sin registro solo si NO fue validado por incidencias ---
-                
+
                 // 1. Caso especial: faltó todo el día (y no justificado)
                 if (!$validadoEntrada && !$validadoSalida && empty($entrada) && empty($salida)) {
-                     $valorSalida = 'Sin registro';
-                     $valorEntrada = 'Sin registro';
-                     $sheet->getStyle($colSalida . $fila)
-                         ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                         ->getStartColor()->setARGB('FFFF0000');
-                     $sheet->getStyle($colEntrada . $fila)
-                             ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                             ->getStartColor()->setARGB('FFFF0000'); // rojo
-                }elseif(!$validadoSalida && (empty($salida)  || !$salida)){
-                        $valorSalida = 'Sin registro';
-                        $sheet->getStyle($colSalida . $fila)
-                             ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                             ->getStartColor()->setARGB('FFFF0000'); // rojo
-                } else {
-                     // VALIDACIÓN ENTRADA
-                     if (!$validadoEntrada) {
-                          if (!empty($entrada)) {
-                             if ($entrada > '08:46:00' && $entrada < '09:00:00') {
-                                 $sheet->getStyle($colEntrada . $fila)
-                                     ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                     ->getStartColor()->setARGB('FFFFFF00'); // naranja
-                             }
-                             if ($entrada > '09:01:00' && $entrada < '12:00:00') {
-                                 $sheet->getStyle($colEntrada . $fila)
-                                     ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                     ->getStartColor()->setARGB('FFFF0000'); // rojo
-                             }
-                          } else if (!$validadoEntrada && $entrada === '') {
-                                // Missing entry but present exit or just general missing
-                                // (Do nothing or mark red depending on prefs, staying keeping logic minimal to avoid breaking existing flows)
-                          }
-                     }
-                     
-                     // VALIDACIÓN SALIDA
-                     if (!$validadoSalida) {
-                         if (!empty($salida)) {
-                             if ($salida > '12:00:00' && $salida < '16:00:00') {
-                              $sheet->getStyle($colSalida . $fila)
-                                 ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                 ->getStartColor()->setARGB('FFFF0000'); // Rojo puro
-                             }
-                         }
-                     }
+                    $valorSalida = 'Sin registro';
+                    $valorEntrada = 'Sin registro';
+                    $sheet->getStyle($colSalida . $fila)
+                        ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                        ->getStartColor()->setARGB('FFFF0000');
+                    $sheet->getStyle($colEntrada . $fila)
+                        ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                        ->getStartColor()->setARGB('FFFF0000'); // rojo
+                }
+                elseif (!$validadoSalida && (empty($salida) || !$salida)) {
+                    $valorSalida = 'Sin registro';
+                    $sheet->getStyle($colSalida . $fila)
+                        ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                        ->getStartColor()->setARGB('FFFF0000'); // rojo
+                }
+                else {
+                    // VALIDACIÓN ENTRADA
+                    if (!$validadoEntrada) {
+                        if (!empty($entrada)) {
+                            if ($entrada > '08:46:00' && $entrada < '09:00:00') {
+                                $sheet->getStyle($colEntrada . $fila)
+                                    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                    ->getStartColor()->setARGB('FFFFFF00'); // naranja
+                            }
+                            if ($entrada > '09:01:00' && $entrada < '12:00:00') {
+                                $sheet->getStyle($colEntrada . $fila)
+                                    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                    ->getStartColor()->setARGB('FFFF0000'); // rojo
+                            }
+                        }
+                        else if (!$validadoEntrada && $entrada === '') {
+                        // Missing entry but present exit or just general missing
+                        // (Do nothing or mark red depending on prefs, staying keeping logic minimal to avoid breaking existing flows)
+                        }
+                    }
+
+                    // VALIDACIÓN SALIDA
+                    if (!$validadoSalida) {
+                        if (!empty($salida)) {
+                            if ($salida > '12:00:00' && $salida < '16:00:00') {
+                                $sheet->getStyle($colSalida . $fila)
+                                    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                    ->getStartColor()->setARGB('FFFF0000'); // Rojo puro
+                            }
+                        }
+                    }
                 }
 
 
@@ -1022,7 +1033,7 @@ class Usuario extends BaseController
             }
             $fila++;
 
-           
+
         }
 
         //die();
@@ -1080,12 +1091,12 @@ class Usuario extends BaseController
         $dataConfig = [
             "tabla" => "reserva_go",
             "editar" => true,
-            "idEditar" => ['id_reserva_go' => (int) $data['id_reserva']]
+            "idEditar" => ['id_reserva_go' => (int)$data['id_reserva']]
         ];
         $dataInsert = [
             "observaciones" => (isset($data['observaciones']) && !empty($data['observaciones'])) ? $data['observaciones'] : '',
-            "id_estatus" => (isset($data['motivo']) && !empty($data['motivo'])) ? (int) $data['motivo'] : '',
-            "no_reserva" => (isset($data['numero_reserva']) && !empty($data['numero_reserva'])) ? (int) $data['numero_reserva'] : '',
+            "id_estatus" => (isset($data['motivo']) && !empty($data['motivo'])) ? (int)$data['motivo'] : '',
+            "no_reserva" => (isset($data['numero_reserva']) && !empty($data['numero_reserva'])) ? (int)$data['numero_reserva'] : '',
             "usu_act" => $session->get('id_usuario'),
         ];
 
@@ -1099,7 +1110,7 @@ class Usuario extends BaseController
         return $this->respond($response);
     }
 
-    public function VehiculoTP($idVehiculo, $editar=null)
+    public function VehiculoTP($idVehiculo, $editar = null)
     {
         $response = new \stdClass();
         $data = $this->request->getPost();
@@ -1111,26 +1122,26 @@ class Usuario extends BaseController
         $cat_usuario = $Mglobal->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
         $cat_director_general = $Mglobal->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1]]);
         $cat_proyecto = $Mglobal->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1, 'servicios' => 0]]);
-       // $proveedor = $Mglobal->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit' => 10]);
-        $data['cat_area'] = (isset( $cat_area->data) && !empty( $cat_area->data))? $cat_area->data:[];
-        $data['secretario'] = (isset( $cat_secretario->data) && !empty( $cat_secretario->data))? $cat_secretario->data:[];
-        $data['cat_subsecretario'] = (isset( $cat_subsecretario->data) && !empty( $cat_subsecretario->data))? $cat_subsecretario->data:[];
-        $data['cat_usuario'] = (isset( $cat_usuario->data) && !empty( $cat_usuario->data))? $cat_usuario->data:[];
-        $data['dsc_director_general'] = (isset( $cat_director_general->data) && !empty( $cat_director_general->data))? $cat_director_general->data[0]->dsc_director_general:[];
+        // $proveedor = $Mglobal->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit' => 10]);
+        $data['cat_area'] = (isset($cat_area->data) && !empty($cat_area->data)) ? $cat_area->data : [];
+        $data['secretario'] = (isset($cat_secretario->data) && !empty($cat_secretario->data)) ? $cat_secretario->data : [];
+        $data['cat_subsecretario'] = (isset($cat_subsecretario->data) && !empty($cat_subsecretario->data)) ? $cat_subsecretario->data : [];
+        $data['cat_usuario'] = (isset($cat_usuario->data) && !empty($cat_usuario->data)) ? $cat_usuario->data : [];
+        $data['dsc_director_general'] = (isset($cat_director_general->data) && !empty($cat_director_general->data)) ? $cat_director_general->data[0]->dsc_director_general : [];
         $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
-        
-        if( isset($vehiculo->data) && !empty($vehiculo->data)){
-            $idUser =  $vehiculo->data[0]->id_usuario;
-            $data['id_proyecto'] =  $vehiculo->data[0]->id_proyecto;
+
+        if (isset($vehiculo->data) && !empty($vehiculo->data)) {
+            $idUser = $vehiculo->data[0]->id_usuario;
+            $data['id_proyecto'] = $vehiculo->data[0]->id_proyecto;
             $usuario = $Mglobal->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $idUser]]);
-            $data['usuario'] = (isset($usuario->data) && !empty( $usuario->data))?$usuario->data[0]:'';
+            $data['usuario'] = (isset($usuario->data) && !empty($usuario->data)) ? $usuario->data[0] : '';
 
         }
         $noConsecutivo = $Mglobal->getTabla(['tabla' => 'pt_vehiculo', 'where' => ['visible' => 1]]);
         $data['id_vehiculo'] = $idVehiculo;
         $data['editar'] = 0;
-        $data['no_consecutivo'] = count($noConsecutivo->data) +1;
-   
+        $data['no_consecutivo'] = count($noConsecutivo->data) + 1;
+
         $data['scripts'] = array('principal', 'inicio');
         $data['contentView'] = 'secciones/vRegistroVehiculo';
         $this->_renderView($data);
@@ -1139,55 +1150,55 @@ class Usuario extends BaseController
     public function editarVehiculoTP($idVehiculo)
     {
         $response = new \stdClass();
-     
+
         $Mglobal = new Mglobal;
         $vehiculo = $Mglobal->getTabla(['tabla' => 'pt_vehiculo', 'where' => ['visible' => 1, 'id_vehiculo' => $idVehiculo]]);
         $cat_proyecto = $Mglobal->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
-        if($vehiculo->data){
-            $data['id_proyecto']    = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->id_proyecto:'';
-            $data['no_consecutivo'] = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->no_consecutivo:'';
-            $data['id_direccion_responsable'] = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->id_direccion_responsable:'';
-            $data['id_responsable'] = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->id_responsable:'';
-            $data['id_secretario']  = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->id_secretario:'';
-            $data['id_responsable_gasto'] = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->id_responsable_gasto:'';
-            $data['comision']       = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->comision:'';
-            $data['concepto']       = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->concepto:'';
-            $data['fec_inicio']     = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->fec_inicio:'';
-            $data['fec_fin']        = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->fec_fin:'';
-            $data['convenio']       = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->convenio:'';
-            $data['otros']          = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->otros:'';
-            $data['proveedor']      = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->proveedor:'';
-            $data['banco']          = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->banco:'';
-            $data['no_proveedor']   = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->no_proveedor:'';
-            $data['folio']          = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->folio:'';
-            $data['no_cuenta']      = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->no_cuenta:'';
-            $data['clabe']          = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->clabe:'';
-            $data['rfc']            = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->rfc:'';
-            $data['formatos']       = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->formatos:'';
-            $data['poliza']         = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->poliza:'';
-            $data['conformidad']    = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->conformidad:'';
-            $data['documentacion']  = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->documentacion:'';
-            $data['contrato_convenio']  = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->contrato_convenio:'';
-            $data['emitir_pago']  = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->emitir_pago:'';
-            $data['evidencia']  = (isset($vehiculo->data) && !empty($vehiculo->data))?$vehiculo->data[0]->evidencia:'';
-         
+        if ($vehiculo->data) {
+            $data['id_proyecto'] = (isset($vehiculo->data) && !empty($vehiculo->data)) ? $vehiculo->data[0]->id_proyecto : '';
+            $data['no_consecutivo'] = (isset($vehiculo->data) && !empty($vehiculo->data)) ? $vehiculo->data[0]->no_consecutivo : '';
+            $data['id_direccion_responsable'] = (isset($vehiculo->data) && !empty($vehiculo->data)) ? $vehiculo->data[0]->id_direccion_responsable : '';
+            $data['id_responsable'] = (isset($vehiculo->data) && !empty($vehiculo->data)) ? $vehiculo->data[0]->id_responsable : '';
+            $data['id_secretario'] = (isset($vehiculo->data) && !empty($vehiculo->data)) ? $vehiculo->data[0]->id_secretario : '';
+            $data['id_responsable_gasto'] = (isset($vehiculo->data) && !empty($vehiculo->data)) ? $vehiculo->data[0]->id_responsable_gasto : '';
+            $data['comision'] = (isset($vehiculo->data) && !empty($vehiculo->data)) ? $vehiculo->data[0]->comision : '';
+            $data['concepto'] = (isset($vehiculo->data) && !empty($vehiculo->data)) ? $vehiculo->data[0]->concepto : '';
+            $data['fec_inicio'] = (isset($vehiculo->data) && !empty($vehiculo->data)) ? $vehiculo->data[0]->fec_inicio : '';
+            $data['fec_fin'] = (isset($vehiculo->data) && !empty($vehiculo->data)) ? $vehiculo->data[0]->fec_fin : '';
+            $data['convenio'] = (isset($vehiculo->data) && !empty($vehiculo->data)) ? $vehiculo->data[0]->convenio : '';
+            $data['otros'] = (isset($vehiculo->data) && !empty($vehiculo->data)) ? $vehiculo->data[0]->otros : '';
+            $data['proveedor'] = (isset($vehiculo->data) && !empty($vehiculo->data)) ? $vehiculo->data[0]->proveedor : '';
+            $data['banco'] = (isset($vehiculo->data) && !empty($vehiculo->data)) ? $vehiculo->data[0]->banco : '';
+            $data['no_proveedor'] = (isset($vehiculo->data) && !empty($vehiculo->data)) ? $vehiculo->data[0]->no_proveedor : '';
+            $data['folio'] = (isset($vehiculo->data) && !empty($vehiculo->data)) ? $vehiculo->data[0]->folio : '';
+            $data['no_cuenta'] = (isset($vehiculo->data) && !empty($vehiculo->data)) ? $vehiculo->data[0]->no_cuenta : '';
+            $data['clabe'] = (isset($vehiculo->data) && !empty($vehiculo->data)) ? $vehiculo->data[0]->clabe : '';
+            $data['rfc'] = (isset($vehiculo->data) && !empty($vehiculo->data)) ? $vehiculo->data[0]->rfc : '';
+            $data['formatos'] = (isset($vehiculo->data) && !empty($vehiculo->data)) ? $vehiculo->data[0]->formatos : '';
+            $data['poliza'] = (isset($vehiculo->data) && !empty($vehiculo->data)) ? $vehiculo->data[0]->poliza : '';
+            $data['conformidad'] = (isset($vehiculo->data) && !empty($vehiculo->data)) ? $vehiculo->data[0]->conformidad : '';
+            $data['documentacion'] = (isset($vehiculo->data) && !empty($vehiculo->data)) ? $vehiculo->data[0]->documentacion : '';
+            $data['contrato_convenio'] = (isset($vehiculo->data) && !empty($vehiculo->data)) ? $vehiculo->data[0]->contrato_convenio : '';
+            $data['emitir_pago'] = (isset($vehiculo->data) && !empty($vehiculo->data)) ? $vehiculo->data[0]->emitir_pago : '';
+            $data['evidencia'] = (isset($vehiculo->data) && !empty($vehiculo->data)) ? $vehiculo->data[0]->evidencia : '';
+
 
 
         }
-       //die( var_dump( $vehiculo->data ) );
+        //die( var_dump( $vehiculo->data ) );
         $cat_area = $Mglobal->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
         $cat_secretario = $Mglobal->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1]]);
         $cat_subsecretario = $Mglobal->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1]]);
         $cat_usuario = $Mglobal->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
         $cat_director_general = $Mglobal->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1]]);
         $proveedor = $Mglobal->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit' => 10]);
-        $data['cat_area'] = (isset( $cat_area->data) && !empty( $cat_area->data))? $cat_area->data:[];
-        $data['secretario'] = (isset( $cat_secretario->data) && !empty( $cat_secretario->data))? $cat_secretario->data:[];
-        $data['cat_subsecretario'] = (isset( $cat_subsecretario->data) && !empty( $cat_subsecretario->data))? $cat_subsecretario->data:[];
-        $data['cat_usuario'] = (isset( $cat_usuario->data) && !empty( $cat_usuario->data))? $cat_usuario->data:[];
-        $data['dsc_director_general'] = (isset( $cat_director_general->data) && !empty( $cat_director_general->data))? $cat_director_general->data[0]->dsc_director_general:[];
+        $data['cat_area'] = (isset($cat_area->data) && !empty($cat_area->data)) ? $cat_area->data : [];
+        $data['secretario'] = (isset($cat_secretario->data) && !empty($cat_secretario->data)) ? $cat_secretario->data : [];
+        $data['cat_subsecretario'] = (isset($cat_subsecretario->data) && !empty($cat_subsecretario->data)) ? $cat_subsecretario->data : [];
+        $data['cat_usuario'] = (isset($cat_usuario->data) && !empty($cat_usuario->data)) ? $cat_usuario->data : [];
+        $data['dsc_director_general'] = (isset($cat_director_general->data) && !empty($cat_director_general->data)) ? $cat_director_general->data[0]->dsc_director_general : [];
         $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
-  
+
         $data['editar'] = 1;
         $data['id_vehiculo'] = $idVehiculo;
         $data['scripts'] = array('principal', 'inicio');
@@ -1196,14 +1207,14 @@ class Usuario extends BaseController
 
     }
 
-     public function enviarCorreoPagos($correo)
+    public function enviarCorreoPagos($correo)
     {
         // Inicializar servicios y objetos
         $email = \Config\Services::email();
 
         $response = new \stdClass();
 
- 
+
 
         $email->setTo($correo);
         $email->setSubject('ESTATUS DE PAGO CAMBIO');
@@ -1230,7 +1241,8 @@ class Usuario extends BaseController
         if ($email->send()) {
             $response->error = false;
             $response->respuesta = "Correo enviado correctamente.";
-        } else {
+        }
+        else {
             $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
         }
 
@@ -1250,22 +1262,22 @@ class Usuario extends BaseController
         $dataConfig = [
             "tabla" => "reserva",
             "editar" => true,
-            "idEditar" => ['id_reserva' => (int) $data['id_reserva']]
+            "idEditar" => ['id_reserva' => (int)$data['id_reserva']]
         ];
         $dataInsert = [
             "observaciones" => (isset($data['observaciones']) && !empty($data['observaciones'])) ? $data['observaciones'] : '',
-            "id_estatus" => (isset($data['motivo']) && !empty($data['motivo'])) ? (int) $data['motivo'] : '',
-            "no_reserva" => (isset($data['numero_reserva']) && !empty($data['numero_reserva'])) ? (int) $data['numero_reserva'] : '',
+            "id_estatus" => (isset($data['motivo']) && !empty($data['motivo'])) ? (int)$data['motivo'] : '',
+            "no_reserva" => (isset($data['numero_reserva']) && !empty($data['numero_reserva'])) ? (int)$data['numero_reserva'] : '',
             "usu_act" => $session->get('id_usuario'),
         ];
 
         $result = $principal->saveTabla($dataInsert, $dataConfig, ['id_user' => $session->get('id_usuario'), "script" => "estatus.Reserva"]);
-         $usuReg =  $principal->getTabla(['tabla' => 'reserva', 'where' => ['id_reserva' => $data['id_reserva'], 'visible' => 1]])->data;
-         if($usuReg){
-             $id_usuario = $usuReg[0]->usu_reg;
-              $correo =  $principal->getTabla(['tabla' => 'vw_usuario', 'where' => ['id_usuario' => $id_usuario, 'visible' => 1]])->data[0]->correo;
-              $this->enviarCorreoPagos($correo);
-         }
+        $usuReg = $principal->getTabla(['tabla' => 'reserva', 'where' => ['id_reserva' => $data['id_reserva'], 'visible' => 1]])->data;
+        if ($usuReg) {
+            $id_usuario = $usuReg[0]->usu_reg;
+            $correo = $principal->getTabla(['tabla' => 'vw_usuario', 'where' => ['id_usuario' => $id_usuario, 'visible' => 1]])->data[0]->correo;
+            $this->enviarCorreoPagos($correo);
+        }
 
         if (!$result->error) {
             $response->error = false;
@@ -1512,7 +1524,7 @@ class Usuario extends BaseController
             'ORDEN',
             'ELEMENTO PEP'
         ];
-        
+
         $col = 'A';
         foreach ($encabezados as $titulo) {
             $sheet->setCellValue($col . '1', $titulo);
@@ -1522,7 +1534,7 @@ class Usuario extends BaseController
         //die( var_dump($result) );
         $fila = 2;
         foreach ($result->data as $row) {
-           // die( var_dump($row) );
+            // die( var_dump($row) );
             $direccion = $globals->getTabla([
                 'tabla' => 'vw_direccion',
                 'where' => [
@@ -1538,20 +1550,20 @@ class Usuario extends BaseController
                 ]
             ]);
 
-            if(!empty($registroGo->data) && isset($registroGo)){
+            if (!empty($registroGo->data) && isset($registroGo)) {
 
             }
 
             if (empty($direccion->data)) {
                 $usuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $row->id_reponsable_solicitud]]);
-                
+
                 if (!empty($usuario->data)) {
                     $idJefe = $usuario->data[0]->id_jefe_inmediato;
                     $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_director' => $idJefe]]);
-                    
+
                     if (empty($direccion->data)) {
-                         $idArea = $usuario->data[0]->id_area;
-                         $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_area' => $idArea]]);
+                        $idArea = $usuario->data[0]->id_area;
+                        $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_area' => $idArea]]);
                     }
                 }
             }
@@ -1560,7 +1572,7 @@ class Usuario extends BaseController
             $no_consecutivo = str_pad($row->no_consecutivo, 3, "0", STR_PAD_LEFT);
 
 
-             $folio_prefijo = $prefijo . $no_consecutivo . '/' . date('Y');
+            $folio_prefijo = $prefijo . $no_consecutivo . '/' . date('Y');
             $sheet->setCellValue('A' . $fila, floatval(str_replace(',', '', $row->importe)) + floatval(str_replace(',', '', $row->propina)));
             $sheet->setCellValue('B' . $fila, $folio_prefijo);
             $sheet->setCellValue('C' . $fila, $row->partida);
@@ -1568,13 +1580,13 @@ class Usuario extends BaseController
             $sheet->setCellValue('E' . $fila, '');
             $sheet->setCellValue('F' . $fila, $row->fondo);
             $sheet->setCellValue('G' . $fila, '21');
-            
+
             // Re-mapeo de columnas tras eliminar las solicitadas
             $sheet->setCellValue('H' . $fila, '');
-       
+
             $sheet->setCellValue('I' . $fila, '');
             $sheet->setCellValue('J' . $fila, $row->elemento_pep);
-            
+
             $fila++;
         }
 
@@ -1600,7 +1612,7 @@ class Usuario extends BaseController
         // --- 2. Carga de recursos ---
         $session = \Config\Services::session();
         $globals = new Mglobal;
-    
+
         // Ruta de la plantilla
         $ruta = FCPATH . 'assets/pdf/plantillas/9-LTAIPG26F1_IX.xlsx';
 
@@ -1617,109 +1629,129 @@ class Usuario extends BaseController
             'where' => ['visible' => 1]
         ]);
 
-        $fila = 8; 
+        $fila = 8;
 
         if (!empty($resul->data)) {
             foreach ($resul->data as $row) {
-            
-            // --- CÁLCULOS PREVIOS ---
-            // Aseguramos que sean números para evitar errores de resta
-            $total_asignado = is_numeric($row->importe_total) ? $row->importe_total : 0;
-            $ejercido_partida = is_numeric($row->importe_ejercicio_partida) ? $row->importe_ejercicio_partida : 0;
-            
-            // Lógica: No erogado = Total Asignado - Lo que se gastó (Ejercido)
-            $no_erogado = $total_asignado - $ejercido_partida;
 
-            // --- LLENADO DE CELDAS ---
-            // A - Datos Básicos
-            $sheet->setCellValue('A' . $fila, $row->ejercicio);
-            $sheet->setCellValue('B' . $fila, date('d/m/Y', strtotime($row->fecha_inicio)));
-            $sheet->setCellValue('C' . $fila, date('d/m/Y', strtotime($row->fecha_termino)));
-            $sheet->setCellValue('D' . $fila, $row->dsc_tipo_funcionario);
-            $sheet->setCellValue('E' . $fila, $row->clave_nivel);
-            $sheet->setCellValue('F' . $fila, $row->dsc_denominacion);
-            $sheet->setCellValue('G' . $fila, $row->dsc_cargo);
-            $sheet->setCellValue('H' . $fila, $row->dsc_area);
-            $sheet->setCellValue('I' . $fila, $row->nombre);
-            $sheet->setCellValue('J' . $fila, $row->primer_apellido);
-            $sheet->setCellValue('K' . $fila, $row->segundo_apellido);
-            $sheet->setCellValue('L' . $fila, ($row->id_sexo == 2) ? 'HOMBRE' : 'MUJER');
-            $sheet->setCellValue('M' . $fila, $row->dsc_gasto);
-            $sheet->setCellValue('N' . $fila, 'COMPROBADO'); 
-            $sheet->setCellValue('O' . $fila, $row->dsc_viaje);
-            $sheet->setCellValue('P' . $fila, $row->no_personas);    
-            
-            // Q - Importe Total (Asignado)
-            $sheet->setCellValue('Q' . $fila, $total_asignado);
-            
-            // R, S, T - Origen
-            $sheet->setCellValue('R' . $fila, $row->dsc_pais_origen ?? '');
-            $estado_o = !empty($row->estado_origen_text) ? $row->estado_origen_text : ($row->dsc_estado_origen ?? '');
-            $sheet->setCellValue('S' . $fila, $estado_o);
-            $muni_o = !empty($row->municipio_origen_text) ? $row->municipio_origen_text : ($row->dsc_municipio_origen ?? '');
-            $sheet->setCellValue('T' . $fila, $muni_o);
+                // --- CÁLCULOS PREVIOS ---
+                // Aseguramos que sean números para evitar errores de resta
+                $total_asignado = is_numeric($row->importe_total) ? $row->importe_total : 0;
+                $ejercido_partida = is_numeric($row->importe_ejercicio_partida) ? $row->importe_ejercicio_partida : 0;
 
-            // U, V, W - Destino
-            $sheet->setCellValue('U' . $fila, $row->dsc_pais_destino ?? '');
-            $estado_d = !empty($row->estado_destino_text) ? $row->estado_destino_text : ($row->dsc_estado_destino ?? '');
-            $sheet->setCellValue('V' . $fila, $estado_d);
-            $muni_d = !empty($row->municipio_destino_text) ? $row->municipio_destino_text : ($row->dsc_municipio_destino ?? '');
-            $sheet->setCellValue('W' . $fila, $muni_d);
+                // Lógica: No erogado = Total Asignado - Lo que se gastó (Ejercido)
+                $no_erogado = $total_asignado - $ejercido_partida;
 
-            // X, Y, Z
-            $sheet->setCellValue('X' . $fila, $row->motivo_encargo);
-            $sheet->setCellValue('Y' . $fila, $row->fec_salida);
-            $sheet->setCellValue('Z' . $fila, $row->fec_regreso);
-            
-            // --- NUEVAS COLUMNAS (AA - AJ) ---
+                // --- LLENADO DE CELDAS ---
+                // A - Datos Básicos
+                $sheet->setCellValue('A' . $fila, $row->ejercicio);
+                $sheet->setCellValue('B' . $fila, date('d/m/Y', strtotime($row->fecha_inicio)));
+                $sheet->setCellValue('C' . $fila, date('d/m/Y', strtotime($row->fecha_termino)));
+                $sheet->setCellValue('D' . $fila, $row->dsc_tipo_funcionario);
+                $sheet->setCellValue('E' . $fila, $row->clave_nivel);
+                $sheet->setCellValue('F' . $fila, $row->dsc_denominacion);
+                $sheet->setCellValue('G' . $fila, $row->dsc_cargo);
+                $sheet->setCellValue('H' . $fila, $row->dsc_area);
+                $sheet->setCellValue('I' . $fila, $row->nombre);
+                $sheet->setCellValue('J' . $fila, $row->primer_apellido);
+                $sheet->setCellValue('K' . $fila, $row->segundo_apellido);
+                $sheet->setCellValue('L' . $fila, ($row->id_sexo == 2) ? 'HOMBRE' : 'MUJER');
+                $sheet->setCellValue('M' . $fila, $row->dsc_gasto);
+                $sheet->setCellValue('N' . $fila, 'COMPROBADO');
+                $sheet->setCellValue('O' . $fila, $row->dsc_viaje);
+                $sheet->setCellValue('P' . $fila, $row->no_personas);
 
-            // AA - Importe ejercido por partida
-            $sheet->setCellValue('AA' . $fila, $ejercido_partida);
+                // Q - Importe Total (Asignado)
+                $sheet->setCellValue('Q' . $fila, $total_asignado);
 
-            // AB - Importe total erogado (La suma de lo gastado, igual a AA en este caso)
-            $sheet->setCellValue('AB' . $fila, $ejercido_partida);
+                // R, S, T - Origen
+                $sheet->setCellValue('R' . $fila, $row->dsc_pais_origen ?? '');
+                $estado_o = !empty($row->estado_origen_text) ? $row->estado_origen_text : ($row->dsc_estado_origen ?? '');
+                $sheet->setCellValue('S' . $fila, $estado_o);
+                $muni_o = !empty($row->municipio_origen_text) ? $row->municipio_origen_text : ($row->dsc_municipio_origen ?? '');
+                $sheet->setCellValue('T' . $fila, $muni_o);
 
-            // AC - Importe total gastos NO erogados (Calculado)
-            $sheet->setCellValue('AC' . $fila, $no_erogado);
+                // U, V, W - Destino
+                $sheet->setCellValue('U' . $fila, $row->dsc_pais_destino ?? '');
+                $estado_d = !empty($row->estado_destino_text) ? $row->estado_destino_text : ($row->dsc_estado_destino ?? '');
+                $sheet->setCellValue('V' . $fila, $estado_d);
+                $muni_d = !empty($row->municipio_destino_text) ? $row->municipio_destino_text : ($row->dsc_municipio_destino ?? '');
+                $sheet->setCellValue('W' . $fila, $muni_d);
 
-            // AD - Fecha entrega informe (Usa alias corregido: 'fec_entrega_informa')
-            $sheet->setCellValue('AD' . $fila, $row->fec_entrega_informa ?? '');
+                // X, Y, Z
+                $sheet->setCellValue('X' . $fila, $row->motivo_encargo);
+                $sheet->setCellValue('Y' . $fila, $row->fec_salida);
+                $sheet->setCellValue('Z' . $fila, $row->fec_regreso);
 
-            // AE - Hipervínculo al informe
-            $sheet->setCellValue('AE' . $fila, $row->hipervinculo_informe ?? '');
+                // --- NUEVAS COLUMNAS (AA - AJ) ---
 
-            // AF - Hipervínculo a facturas
-            $sheet->setCellValue('AF' . $fila, $row->hipervinculo_factura ?? '');
+                // AA - Importe ejercido por partida
+                $sheet->setCellValue('AA' . $fila, $ejercido_partida);
 
-            // AG - Hipervínculo normativa
-            $sheet->setCellValue('AG' . $fila, $row->hipervinculo_normativa ?? '');
+                // AB - Importe total erogado (La suma de lo gastado, igual a AA en este caso)
+                $sheet->setCellValue('AB' . $fila, $ejercido_partida);
 
-            // AH - Área responsable
-            $sheet->setCellValue('AH' . $fila, $row->area_responsable ?? '');
+                // AC - Importe total gastos NO erogados (Calculado)
+                $sheet->setCellValue('AC' . $fila, $no_erogado);
 
-            // AI - Fecha actualización
-            // Si la fecha viene null, ponemos la fecha actual como fallback
-            $sheet->setCellValue('AI' . $fila, $row->fec_actualizacion ?? date('d/m/Y'));
+                // AD - Fecha entrega informe (Usa alias corregido: 'fec_entrega_informa')
+                $sheet->setCellValue('AD' . $fila, $row->fec_entrega_informa ?? '');
 
-            // AJ - Nota
-            $sheet->setCellValue('AJ' . $fila, $row->nota ?? '');
+                // AE - Hipervínculo al informe
+                $sheet->setCellValue('AE' . $fila, $row->hipervinculo_informe ?? '');
 
-            $fila++;    
+                // AF - Hipervínculo a facturas
+                $sheet->setCellValue('AF' . $fila, $row->hipervinculo_factura ?? '');
+
+                // AG - Hipervínculo normativa
+                $sheet->setCellValue('AG' . $fila, $row->hipervinculo_normativa ?? '');
+
+                // AH - Área responsable
+                $sheet->setCellValue('AH' . $fila, $row->area_responsable ?? '');
+
+                // AI - Fecha actualización
+                // Si la fecha viene null, ponemos la fecha actual como fallback
+                $sheet->setCellValue('AI' . $fila, $row->fec_actualizacion ?? date('d/m/Y'));
+
+                // AJ - Nota
+                $sheet->setCellValue('AJ' . $fila, $row->nota ?? '');
+
+                $fila++;
+            }
         }
-    }
 
         // --- 3. Finalizar Descarga ---
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
         $filename = 'reporte_viaticos_' . date('Ymd_His') . '.xlsx';
-    
+
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment; filename=\"$filename\"");
         header('Cache-Control: max-age=0');
-    
-        if (ob_get_level() > 0) ob_end_clean();
-    
-            $writer->save("php://output");
-            exit();
+
+        if (ob_get_level() > 0)
+            ob_end_clean();
+
+        $writer->save("php://output");
+        exit();
+    }
+    public function get_viatico()
+    {
+        $globals = new Mglobal;
+        $id = $this->request->getPost('id');
+
+        // Obtenemos los datos directos de la vista o tabla
+        $tabla = $globals->getTabla([
+            "tabla" => "vw_juridico_viaticos",
+            "where" => ["id_juridico_viatico" => $id]
+        ]);
+
+        // Devolvemos el primer resultado como JSON con el formato correcto de CI4
+        if (!empty($tabla->data[0])) {
+            return $this->response->setJSON($tabla->data[0]);
+        }
+        else {
+            return $this->response->setJSON(['error' => 'No se encontraron datos']);
+        }
     }
     public function getUsuarios()
     {
@@ -1728,7 +1760,8 @@ class Usuario extends BaseController
         $dataDB = array();
         if ($session->id_perfil == -1) {
             $dataDB = array('tabla' => 'vw_usuario', 'where' => ['visible' => 1]);
-        } elseif ($session->id_perfil == 1) {
+        }
+        elseif ($session->id_perfil == 1) {
             $dataDB = array('tabla' => 'vw_usuario', 'where' => ['visible' => 1]);
         }
         $response = $principal->getTabla($dataDB);
@@ -2049,12 +2082,12 @@ class Usuario extends BaseController
                     'dsc_area' => trim($data['dsc_area']),
                     'dsc_corto' => $data['dsc_corto'],
                     'prefijo' => isset($data['prefijo']) ? $data['prefijo'] : '',
-                    'titular' => (int) $data['id_usuario'],
+                    'titular' => (int)$data['id_usuario'],
                 ];
                 $dataConfig = [
                     "tabla" => "cat_area",
                     "editar" => true,
-                    "idEditar" => ['id_area' => (int) $data['id_area']]
+                    "idEditar" => ['id_area' => (int)$data['id_area']]
                 ];
                 break;
 
@@ -2070,13 +2103,13 @@ class Usuario extends BaseController
                 $dataConfig = [
                     "tabla" => "cat_area",
                     "editar" => true,
-                    "idEditar" => ['id_area' => (int) $data['id_area']]
+                    "idEditar" => ['id_area' => (int)$data['id_area']]
                 ];
                 break;
             default: // Nuevo perfil
-                
 
-               $dataInsert = [
+
+                $dataInsert = [
                     'dsc_area' => $data['comentario'],
                 ];
                 $dataConfig = [
@@ -2092,7 +2125,8 @@ class Usuario extends BaseController
         try {
             $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
             return $this->respond($response);
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e) {
             $response->error = true;
             $response->message = "Error al guardar: " . $e->getMessage();
             return $this->respond($response, 500);
@@ -2128,7 +2162,7 @@ class Usuario extends BaseController
                 $dataConfig = [
                     "tabla" => "perfil",
                     "editar" => true,
-                    "idEditar" => ['id_perfil' => (int) $data['id_perfil']]
+                    "idEditar" => ['id_perfil' => (int)$data['id_perfil']]
                 ];
                 break;
 
@@ -2144,7 +2178,7 @@ class Usuario extends BaseController
                 $dataConfig = [
                     "tabla" => "perfil",
                     "editar" => true,
-                    "idEditar" => ['id_perfil' => (int) $data['id_perfil']]
+                    "idEditar" => ['id_perfil' => (int)$data['id_perfil']]
                 ];
                 break;
 
@@ -2168,7 +2202,8 @@ class Usuario extends BaseController
         try {
             $response = $this->globals->saveTabla($dataInsert, $dataConfig, ["script" => "perfil.savePerfil"]);
             return $this->respond($response);
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e) {
             $response->error = true;
             $response->message = "Error al guardar: " . $e->getMessage();
             return $this->respond($response, 500);
@@ -2204,7 +2239,7 @@ class Usuario extends BaseController
                 $dataConfig = [
                     "tabla" => "cat_puesto",
                     "editar" => true,
-                    "idEditar" => ['id_puesto' => (int) $data['id_puesto']]
+                    "idEditar" => ['id_puesto' => (int)$data['id_puesto']]
                 ];
                 break;
 
@@ -2220,7 +2255,7 @@ class Usuario extends BaseController
                 $dataConfig = [
                     "tabla" => "cat_puesto",
                     "editar" => true,
-                    "idEditar" => ['id_puesto' => (int) $data['id_puesto']]
+                    "idEditar" => ['id_puesto' => (int)$data['id_puesto']]
                 ];
                 break;
 
@@ -2243,7 +2278,8 @@ class Usuario extends BaseController
         try {
             $response = $this->globals->saveTabla($dataInsert, $dataConfig, ["script" => "perfil.savePerfil"]);
             return $this->respond($response);
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e) {
             $response->error = true;
             $response->message = "Error al guardar: " . $e->getMessage();
             return $this->respond($response, 500);
@@ -2358,8 +2394,8 @@ class Usuario extends BaseController
             $dataInsert = [
                 'dia_inicio' => $data['diaInicio'],
                 'dia_fin' => $data['diaFin'],
-                'periodo' => (int) $data['periodo'],
-                'mes' => (int) $data['mes'],
+                'periodo' => (int)$data['periodo'],
+                'mes' => (int)$data['mes'],
                 'usu_act' => $session->id_usuario,
 
             ];
@@ -2368,7 +2404,8 @@ class Usuario extends BaseController
                 "editar" => true,
                 "idEditar" => ['id_periodo_sac' => $data['id_periodo']]
             ];
-        } else {
+        }
+        else {
             $periodo = $this->globals->getTabla(["tabla" => "periodo_sac", 'where' => ['visible' => 1, 'periodo' => $data['periodo']]]);
             $mes = $this->globals->getTabla(["tabla" => "periodo_sac", 'where' => ['visible' => 1, 'mes' => $data['mes']]]);
             if (isset($periodo->data) && !empty($periodo->data)) {
@@ -2382,8 +2419,8 @@ class Usuario extends BaseController
             $dataInsert = [
                 'dia_inicio' => $data['diaInicio'],
                 'dia_fin' => $data['diaFin'],
-                'periodo' => (int) $data['periodo'],
-                'mes' => (int) $data['mes'],
+                'periodo' => (int)$data['periodo'],
+                'mes' => (int)$data['mes'],
                 'fec_reg' => date('Y-m-d H:i:s'),
                 'usu_reg' => $session->id_usuario,
 
@@ -2473,7 +2510,8 @@ class Usuario extends BaseController
                 "editar" => true,
                 "idEditar" => ["id_cursos_sac" => $id_curso_sac]
             ];
-        } else {
+        }
+        else {
             $dataInsert = [
                 'activo' => 1,
                 'usu_act' => $session->id_usuario
@@ -2520,7 +2558,8 @@ class Usuario extends BaseController
                 "editar" => false,
                 //  "idEditar"=>['id_usuario'=>$data['id_usuario']]
             ];
-        } else {
+        }
+        else {
             $dataConfig = [
                 "tabla" => "seg_usuarios",
                 "editar" => true,

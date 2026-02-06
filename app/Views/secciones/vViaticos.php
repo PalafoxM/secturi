@@ -28,6 +28,7 @@
                                 <h3 class="mt-0 header-title">LTAIPG26F1: <strong></strong></h3>
                                 <p class="text-muted mb-3"></p>
                                 <form id="form_viatico" enctype="multipart/form-data">
+                                    <input type="hidden" id="id_juridico_viatico" name="id_juridico_viatico" value="">
                                     <div class="form-row">
                                         <!-- Dirección Responsable -->
                                         <div class="col-md-4 mb-3">

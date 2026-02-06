@@ -237,22 +237,35 @@ class Inicio extends BaseController {
         $globas  = new Mglobal;
         $vista = 'personal/vInicio';
         $data['datos'] = $globas->getTabla(['tabla' => 'vw_juridico_viaticos', 'where' => ['visible' => 1]])->data;
+        $data['cat_funcionario'] = $globas->getTabla(['tabla' => 'cat_tipo_funcionario', 'where' => ['visible' => 1]])->data;
+        $data['cat_area']        = $globas->getTabla(['tabla' => 'cat_area_adscripcion', 'where' => ['visible' => 1]])->data;
+        $data['cat_gasto']       = $globas->getTabla(['tabla' => 'cat_gasto', 'where' => ['visible' => 1]])->data;
+        $data['cat_viaje']       = $globas->getTabla(['tabla' => 'cat_viaje', 'where' => ['visible' => 1]])->data;
+        $data['cat_pais']        = $globas->getTabla(['tabla' => 'cat_pais', 'where' => ['visible' => 1]])->data;
+        $data['cat_estado']      = $globas->getTabla(['tabla' => 'cat_estado', 'where' => ['visible' => 1]])->data;
+        $data['cat_municipios']  = $globas->getTabla(['tabla' => 'cat_municipios', 'where' => ['visible' => 1]])->data;
+        $data['deno_puesto']     = $globas->getTabla(['tabla' => 'deno_puesto', 'where' => ['visible' => 1]])->data;
+        $data['deno_cargo']      = $globas->getTabla(['tabla' => 'deno_cargo', 'where' => ['visible' => 1]])->data;
+        $data['usuarios']        = $globas->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]])->data;
         $data['scripts'] = array('principal','inicio');
         $data['edita'] = 0;
         $data['contentView'] = 'personal/vListaViaticos';                
         $this->_renderView($data);
-        
     }
     public function getDetalleViaticoJSON()
     {
+        $globals = new Mglobal;
         $id = $this->request->getPost('id');
-        $globas = new Mglobal;
-        $res = $globas->getTabla([
-            'tabla' => 'vw_juridico_viaticos', 
-            'where' => ['id_juridico_viatico' => $id]
+    
+        // Obtenemos los datos directos de la vista o tabla
+        $tabla = $globals->getTabla([
+            "tabla" => "vw_juridico_viaticos", 
+            "where" => ["id_juridico_viatico" => $id]
         ]);
-            if (isset($res->data[0])) {
-            return $this->response->setJSON($res->data[0]);
+    
+        // Devolvemos el primer resultado como JSON con el formato correcto de CI4
+        if (!empty($tabla->data[0])) {
+            return $this->response->setJSON($tabla->data[0]);
         } else {
             return $this->response->setJSON(['error' => 'No se encontraron datos']);
         }
@@ -321,13 +334,23 @@ class Inicio extends BaseController {
         }
         
         // Mapeo de IDs según la tabla
-        $idGenerico = match($tabla) {
-            'cat_inventario_papel' => 'id_inventario_papel',
-            'cat_inventario_art_papel' => 'id_inventario_art_papel',
-            'cat_inventario_art_ofi' => 'id_inventario_art_ofi',
-            'cat_inventario_limpieza' => 'id_inventario_lim',
-            default => ''
-        };
+        switch ($tabla) {
+            case 'cat_inventario_papel':
+                $idGenerico = 'id_inventario_papel';
+                break;
+            case 'cat_inventario_art_papel':
+                $idGenerico = 'id_inventario_art_papel';
+                break;
+            case 'cat_inventario_art_ofi':
+                $idGenerico = 'id_inventario_art_ofi';
+                break;
+            case 'cat_inventario_limpieza':
+                $idGenerico = 'id_inventario_lim';
+                break;
+            default:
+                $idGenerico = '';
+                break;
+        }
 
         if (!$idGenerico) {
             $response->respuesta = "Tabla no reconocida.";
@@ -379,13 +402,23 @@ class Inicio extends BaseController {
             return $this->respond($response);
         }
 
-        $idGenerico = match($tabla) {
-            'cat_inventario_papel' => 'id_inventario_papel',
-            'cat_inventario_art_papel' => 'id_inventario_art_papel',
-            'cat_inventario_art_ofi' => 'id_inventario_art_ofi',
-            'cat_inventario_limpieza' => 'id_inventario_lim',
-            default => ''
-        };
+        switch ($tabla) {
+            case 'cat_inventario_papel':
+                $idGenerico = 'id_inventario_papel';
+                break;
+            case 'cat_inventario_art_papel':
+                $idGenerico = 'id_inventario_art_papel';
+                break;
+            case 'cat_inventario_art_ofi':
+                $idGenerico = 'id_inventario_art_ofi';
+                break;
+            case 'cat_inventario_limpieza':
+                $idGenerico = 'id_inventario_lim';
+                break;
+            default:
+                $idGenerico = '';
+                break;
+        }
 
         $dataSave = ['stock' => $stock, 'visible' => 1, 'nombre' => $nombre];
         $dataConfig = ['tabla' => $tabla, 'editar' => !empty($id_producto)];
