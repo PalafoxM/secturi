@@ -1785,7 +1785,7 @@ class Agregar extends BaseController
             // === FIN NUEVO CÓDIGO DE PROCESAMIENTO ===
 
              // Enviar correos si hay adjuntos
-             /* if(isset($data['es_borrador']) && $data['es_borrador'] != 1){
+             if(isset($data['es_borrador']) && $data['es_borrador'] != 1){
                 
              
                 if (!empty($finalAttachments)) {
@@ -1824,7 +1824,7 @@ class Agregar extends BaseController
                     );
                 }  
 
-            }  */
+            } 
         }
 
         return $this->respond($responsePrincipal);
@@ -1905,9 +1905,9 @@ class Agregar extends BaseController
 
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaBorradorGO'];
         $responsePrincipal = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
-        
+       
       $rowIndex = is_array($data['rowIndex']) ? $data['rowIndex'] : [];
-
+     
         $grupal = [];
         $pdf = [];
         $xml = [];
@@ -1917,20 +1917,27 @@ class Agregar extends BaseController
             if (isset($data['id_identificador'][$rowKey]) && $data['id_identificador'][$rowKey] === '0') {
                 continue; // Saltar elementos con id_identificador = '0'
             }
+
+            if (strpos($rowKey, 'new_') === 0) {
+                 $grupal[] = [
+                    'rowIndex' => $rowKey,
+                    'id_partida' => $data['id_partida'][$rowKey] ?? null,
+                    'id_presupuesto' => $data['id_presupuesto'][$rowKey] ?? null,
+                    'propina' => $data['propina'][$rowKey] ?? null,
+                    'periodo_inicio' => $data['periodo_inicio'][$rowKey] ?? null,
+                    'periodo_fin' => $data['periodo_fin'][$rowKey] ?? null,
+                    'importe' => $data['importe'][$rowKey] ?? null,
+                    'encabezado' => $data['encabezado'][$rowKey] ?? null,
+                ];
+                     
+                $pdf[] = $archivos[$rowKey]['pdf'] ?? null;
+                $xml[] = $archivos[$rowKey]['xml'] ?? null;
+                
+            }
             
-            $grupal[] = [
-                'rowIndex' => $rowKey,
-                'id_partida' => $data['id_partida'][$rowKey] ?? null,
-                'id_presupuesto' => $data['id_presupuesto'][$rowKey] ?? null,
-                'propina' => $data['propina'][$rowKey] ?? null,
-                'periodo_inicio' => $data['periodo_inicio'][$rowKey] ?? null,
-                'periodo_fin' => $data['periodo_fin'][$rowKey] ?? null,
-                'importe' => $data['importe'][$rowKey] ?? null,
-                'encabezado' => $data['encabezado'][$rowKey] ?? null,
-            ];
-            $pdf[] = $archivos[$rowKey]['pdf'] ?? null;
-            $xml[] = $archivos[$rowKey]['xml'] ?? null;
+      
         }
+    
     
         foreach ($grupal as $key => $value) {
              $datos_periodo = [
@@ -1949,44 +1956,48 @@ class Agregar extends BaseController
                             ["tabla" => "periodo_factura_go", "editar" => false], 
                              ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/insertPeriodo']
                         );
-                foreach ($pdf[$key] as $index => $pdf) {
-                    if ($pdf->isValid() && !$pdf->hasMoved()) {
-                        $timestamp = date('Ymd_His');
-                        $extension = $pdf->getClientExtension();
-                        // Usamos $id_fila_real para asegurar unicidad y referencia real
-                        $file = 'Factura_go_' . $value['rowIndex'] . '_' . $timestamp . '_' . uniqid() . '.' . $extension;
-                        $ruta_destino = FCPATH . 'assets/pdf/';
-                        $pdf->move($ruta_destino, $file);
-                        
-                        $dataInsert = [
-                            'id_registro_go' => (int) $id_registro_go, 
-                            'id_identificador' => $value['rowIndex'], 
-                            'ruta_relativa' => 'assets/pdf/' . $file,
-                            'ruta_absoluta' => base_url('assets/pdf/' . $file),
-                            'fec_reg' => date('Y-m-d H:i:s'),
-                            'usu_reg' => $session->get('id_usuario')
-                        ];
-                        $response = $this->globals->saveTabla($dataInsert, ["tabla" => "factura_pdf_go", "editar" => false], []);
+                
+                if (isset($pdf[$key])) {
+                    foreach ($pdf[$key] as $index => $pdfFile) { // Renombrado variable interna para evitar colisión
+                        if ($pdfFile->isValid() && !$pdfFile->hasMoved()) {
+                            $timestamp = date('Ymd_His');
+                            $extension = $pdfFile->getClientExtension();
+                            // Usamos $id_fila_real para asegurar unicidad y referencia real
+                            $file = 'Factura_go_' . $value['rowIndex'] . '_' . $timestamp . '_' . uniqid() . '.' . $extension;
+                            $ruta_destino = FCPATH . 'assets/pdf/';
+                            $pdfFile->move($ruta_destino, $file);
+                            
+                            $dataInsert = [
+                                'id_registro_go' => (int) $id_registro_go, 
+                                'id_identificador' => $value['rowIndex'], 
+                                'ruta_relativa' => 'assets/pdf/' . $file,
+                                'ruta_absoluta' => base_url('assets/pdf/' . $file),
+                                'fec_reg' => date('Y-m-d H:i:s'),
+                                'usu_reg' => $session->get('id_usuario')
+                            ];
+                            $response = $this->globals->saveTabla($dataInsert, ["tabla" => "factura_pdf_go", "editar" => false], []);
+                        }
                     }
-                    
                 }
-                foreach($xml[$key] as $i => $xml_file){
+
+                if (isset($xml[$key])) {
+                    foreach($xml[$key] as $i => $xml_file){
                      if ($xml_file->isValid() && !$xml_file->hasMoved()) {
                      $contenido = file_get_contents($xml_file->getTempName());
 
                                 // ... (Tu código de parseo de XML va aquí, es correcto) ...
                                 libxml_use_internal_errors(true);
-                                $xml = simplexml_load_string($contenido);
-                                if ($xml === false) {
+                                $xmlObj = simplexml_load_string($contenido);
+                                if ($xmlObj === false) {
                                     continue;
                                 } // Saltar si el XML está mal
 
-                                $namespaces = $xml->getNamespaces(true);
-                                $cfdi = $xml->children($namespaces['cfdi']);
+                                $namespaces = $xmlObj->getNamespaces(true);
+                                $cfdi = $xmlObj->children($namespaces['cfdi']);
 
                                 // ... (extracción de $version, $fecha, $total, $rfcEmisor, $uuid, etc.)
 
-                                $attrs = $xml->attributes();
+                                $attrs = $xmlObj->attributes();
                                 $version = (string) $attrs['Version'];
                                 $fecha = (string) $attrs['Fecha'];
                                 $total = (string) $attrs['Total'];
@@ -2045,18 +2056,14 @@ class Agregar extends BaseController
 
                                 // Guardamos la info del XML
                                 $responseXML = $this->globals->saveTabla($dataInsertXml, $dataConfigXml, $dataBitacoraXml);
-
                            
                     }
 
                 }
+            }
         
             
-        }
-     
- 
-       
-
+        } // Fin foreach grupal
 
         return $this->respond($responsePrincipal);
     }
@@ -3132,7 +3139,7 @@ class Agregar extends BaseController
                  }
             }
      
-        /*  if (isset($data['editar']) && $data['editar'] != 1) {
+          if (isset($data['editar']) && $data['editar'] != 1) {
             $mailer = new \App\Libraries\Mailer();
             
                 $mensajeHTML = '
@@ -3166,7 +3173,7 @@ class Agregar extends BaseController
                     $finalAttachments, 
                     "Facturas PT Generadas - SUSI - Folio: " . $folioCompleto
                 );
-            }  */ 
+            }   
         }   
 
         //die( var_dump( $response ) );
