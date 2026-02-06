@@ -280,6 +280,7 @@
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
+                                                                    <?php if(isset($p['datos']) && is_array($p['datos'])): ?>
                                                                     <?php foreach($p['datos'] as $j => $r): ?>
                                                                     <?php $uniqueId = $r['id_identificador'] ?>
                                                                     <tr data-row-index="<?= $uniqueId ?>">
@@ -331,6 +332,7 @@
                                                                         </td>
                                                                     </tr>
                                                                     <?php endforeach; ?>
+                                                                    <?php endif; ?>
                                                                 </tbody>
                                                             </table>
                                                         </div>

@@ -6550,7 +6550,7 @@ class Principal extends BaseController
          //var_dump( $data['presupuesto'] );
          foreach($data['presupuesto'] as $key => $p){
                  $datos = $globals->getTabla(['tabla' => 'periodo_factura_go', 'where' => ['id_presupuesto' => $p->id_presupuesto_go, 'visible' => 1]]);
-           //      var_dump(  $datos );
+               
                  $datosGrupal[$key] = $data['presupuesto'];
                  foreach($datos->data as $j => $d){
                      $datosGrupal[$key][$key]->encabezado = $d->encabezado;
