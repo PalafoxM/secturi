@@ -179,27 +179,20 @@
                                             <?php endforeach; ?>
                                         </select>
                                     </div><!--end col-->
+                                    <div class="col-md-4 mb-3">
+                                        <label for="lugar">Lugar.<span
+                                                style="color:red;">*</span></label>
+                                        <input type="text" class="form-control" id="lugar"
+                                            name="lugar" value="<?= $registro->lugar ?>">
+                                        
+                                    </div><!--end col-->
 
                                 </div><!--end form-row-->
                                 <div class="form-row">
 
 
-                                    <div class="col-md-4 mb-3">
-                                        <label for="comision">Comisión / Reunión / Evento / Programa</label>
-                                        <input type="text" class="form-control" id="comision" name="comision"
-                                            value="<?= (isset($registro->comision)) ? $registro->comision : 'Comisión / Reunión / Evento / Programa' ?>">
-                                   
-                                    </div><!--end col-->
-                                    <div class="col-md-4 mb-3">
-                                        <label for="lugar">Lugar<span style="color:red;">*</span></label>
-                                        <input type="text" class="form-control" id="lugar" autocomplete="off"
-                                            placeholder="Lugar" name="lugar" value="<?= $registro->lugar ?>" >
-                                    </div><!--end col-->
-                                
-                                </div><!--end form-row-->
-                                <div class="form-row">
-
-                                    <div class="col-md-4 mb-3">
+                                    <!-- Comisión Eliminada de Aquí -->
+                                    <div class="col-md-12 mb-3">
                                         <label for="no_consecutivo">No. Consecutivo.<span
                                                 style="color:red;">*</span></label>
                                         <input type="number" class="form-control" autocomplete="off" id="no_consecutivo"
@@ -266,13 +259,11 @@
                                                             <table class="table table-bordered" id="makeEditable_<?= $i ?>">
                                                                 <thead>
                                                                     <tr>
-                                                                        <th>IMPORTE</th>
-                                                                        <th>PROPINA</th>
-                                                                        <th>CONCEPTO</th>
-                                                                        <th>INICIO</th>
-                                                                        <th>FIN</th>
-                                                                        <th>ARCHIVOS</th>
-                                                                        <th>ACCIONES</th>
+                                                                        <th style="width: 12%">PROPINA</th>
+                                                                        <th style="width: 30%">DESCRIPCIÓN</th>
+                                                                        <th style="width: 15%">VIGENCIA</th>
+                                                                        <th style="width: 20%">ARCHIVOS</th>
+                                                                        <th style="width: 15%">ACCIONES</th>
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
@@ -281,31 +272,43 @@
                                                                     <?php $uniqueId = $r['id_identificador'] ?>
                                                                     <tr data-row-index="<?= $uniqueId ?>">
                                                                         <input type="hidden" name="id_identificador_<?= $i ?>[]" value="<?= $r['id_identificador'] ?>" >
+                                                                        <!-- Propina -->
                                                                         <td>
-                                                                            <input type="text" autocomplete="off" class="form-control importe-input" 
-                                                                                name="importe_<?= $i ?>[]" placeholder="Importe" 
-                                                                                value="<?= $r['total'] ?>" readonly>
+                                                                            <div class="input-group">
+                                                                                <div class="input-group-prepend">
+                                                                                    <span class="input-group-text">$</span>
+                                                                                </div>
+                                                                                <input autocomplete="off" type="text" class="form-control propina-input" 
+                                                                                    name="propina_<?= $i ?>[]" placeholder="0.00" 
+                                                                                    value="<?= $r['propina']; ?>" >
+                                                                            </div>
                                                                         </td>
+                                                                        <!-- Descripción (Concepto + Comisión) -->
                                                                         <td>
-                                                                            <input autocomplete="off" type="text" class="form-control propina-input" 
-                                                                                name="propina_<?= $i ?>[]" placeholder="Propina" 
-                                                                                value="<?= $r['propina']; ?>" >
-                                                                        </td>
-                                                                        <td>
-                                                                            <input autocomplete="off" type="text" class="form-control" 
+                                                                            <textarea autocomplete="off" class="form-control mb-1" 
                                                                                 name="concepto_<?= $i ?>[]" placeholder="Concepto" 
-                                                                                value="<?= (isset($r['concepto'])) ? $r['concepto'] : '' ?>" >
+                                                                                rows="2" style="font-size: 0.85rem;"><?= (isset($r['concepto'])) ? $r['concepto'] : '' ?></textarea>
+                                                                            
+                                                                            <textarea autocomplete="off" class="form-control" 
+                                                                                name="comision_<?= $i ?>[]" placeholder="Comisión / Evento" 
+                                                                                rows="2" style="font-size: 0.85rem; background-color: #f8f9fa;"><?= (isset($r['comision'])) ? $r['comision'] : '' ?></textarea>
                                                                         </td>
+                                                                        <!-- Vigencia -->
                                                                         <td>
-                                                                            <input autocomplete="off" type="date" class="form-control" 
-                                                                                name="periodo_inicio_<?= $i ?>[]" 
-                                                                                value="<?= date('Y-m-d', strtotime($r['periodo_inicio'])) ?>" >
+                                                                            <div class="input-group input-group-sm mb-1">
+                                                                                <div class="input-group-prepend"><span class="input-group-text">Del</span></div>
+                                                                                <input autocomplete="off" type="date" class="form-control" 
+                                                                                    name="periodo_inicio_<?= $i ?>[]" 
+                                                                                    value="<?= date('Y-m-d', strtotime($r['periodo_inicio'])) ?>" >
+                                                                            </div>
+                                                                            <div class="input-group input-group-sm">
+                                                                                <div class="input-group-prepend"><span class="input-group-text">Al </span></div>
+                                                                                <input autocomplete="off" type="date" class="form-control" 
+                                                                                    name="periodo_fin_<?= $i ?>[]"  
+                                                                                    value="<?= date('Y-m-d', strtotime($r['periodo_fin']))  ?>">
+                                                                            </div>
                                                                         </td>
-                                                                        <td>
-                                                                            <input autocomplete="off" type="date" class="form-control" 
-                                                                                name="periodo_fin_<?= $i ?>[]"  
-                                                                                value="<?= date('Y-m-d', strtotime($r['periodo_fin']))  ?>">
-                                                                        </td>
+                                                                        <!-- Archivos -->
                                                                         <td>
                                                                             <div class="archivos-seleccionados" id="archivos_<?= $uniqueId ?>">
                                                                                 <?php if(!empty($r['ruta_relativa'])): ?>
@@ -317,19 +320,22 @@
                                                                                 <?php endif; ?>
                                                                             </div>
                                                                         </td>
+                                                                        <!-- Acciones -->
                                                                         <td>
-                                                                            <button type="button" class="btn btn-sm btn-success btn-seleccionar-pdf" 
-                                                                                data-row="<?= $uniqueId ?>">
-                                                                                <i class="fas fa-file-pdf"></i> PDF
-                                                                            </button>
-                                                                            <button type="button" class="btn btn-sm btn-warning btn-seleccionar-xml" 
-                                                                                data-row="<?= $uniqueId ?>">
-                                                                                <i class="mdi mdi-code-tags"></i> XML
-                                                                            </button>
-                                                                            <button type="button" class="btn btn-sm btn-danger remove-row" 
-                                                                                data-row="<?= $uniqueId ?>">
-                                                                                <i class="fas fa-trash"></i>
-                                                                            </button>
+                                                                            <div class="btn-group-vertical btn-group-sm w-100">
+                                                                                <button type="button" class="btn btn-success btn-seleccionar-pdf mb-1" 
+                                                                                    data-row="<?= $uniqueId ?>">
+                                                                                    <i class="fas fa-file-pdf"></i> PDF
+                                                                                </button>
+                                                                                <button type="button" class="btn btn-warning btn-seleccionar-xml mb-1" 
+                                                                                    data-row="<?= $uniqueId ?>">
+                                                                                    <i class="mdi mdi-code-tags"></i> XML
+                                                                                </button>
+                                                                                <button type="button" class="btn btn-danger remove-row" 
+                                                                                    data-row="<?= $uniqueId ?>">
+                                                                                    <i class="fas fa-trash"></i> Eliminar
+                                                                                </button>
+                                                                            </div>
                                                                         </td>
                                                                     </tr>
                                                                     <?php endforeach; ?>

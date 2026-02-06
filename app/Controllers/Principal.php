@@ -5285,6 +5285,7 @@ class Principal extends BaseController
             $data['fin']    = $periodo->periodo_fin;
             $data['encabezado'] = $periodo->encabezado;
             $data['concepto'] = (isset($periodo->concepto)) ? $periodo->concepto : ''; // NUEVO CAMPO
+            $data['comision'] = (isset($periodo->comision)) ? $periodo->comision : ''; // NUEVO CAMPO COMISION
             $data['total'] = $facturaItem->total;
             
             $monto          = $importe_float + (float)$periodo->propina;
@@ -6562,6 +6563,7 @@ class Principal extends BaseController
                          'comprobante' => $d->comprobante,
                          'propina' => $d->propina,
                          'concepto' => (isset($d->concepto)) ? $d->concepto : '',
+                         'comision' => (isset($d->comision)) ? $d->comision : '',
                          'contribuyente' => $d->contribuyente,
                          'rfc' => $d->rfc,
                          'visible' => $d->visible,

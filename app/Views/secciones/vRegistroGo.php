@@ -234,15 +234,8 @@
                                 <div class="form-row">
 
 
-                                    <div class="col-md-8 mb-3">
-                                        <label for="comision">Comisión / Reunión / Evento / Programa</label>
-                                        <input type="text" class="form-control" id="comision" name="comision"
-                                            value="<?= (isset($registro_pt->comision)) ? $registro_pt->comision : 'Comisión / Reunión / Evento / Programa' ?>">
-                                        <div class="invalid-feedback">
-                                            Please provide a valid state.
-                                        </div>
-                                    </div><!--end col-->
-                                     <div class="col-md-4 mb-3">
+                                    <!-- Comisión Eliminada de Aquí -->
+                                    <div class="col-md-12 mb-3">
                                         <label for="no_consecutivo">No. Consecutivo.<span
                                                 style="color:red;">*</span></label>
                                         <input type="number" class="form-control" autocomplete="off" id="no_consecutivo"
@@ -379,57 +372,68 @@
                                                         <table class="table table-bordered" id="makeEditable<?= $i?>">
                                                             <thead>
                                                                 <tr>
-                                                                <!--     <th>IMPORTE</th> -->
-                                                                    <th>PROPINA</th>
-                                                                    <th>CONCEPTO</th>
-                                                                    <th>INICIO</th>
-                                                                    <th>FIN</th>
-                                                                    <th>ARCHIVOS</th>
-                                                                    <th>ACCIONES</th>
+                                                                    <th style="width: 12%">PROPINA</th>
+                                                                    <th style="width: 30%">DESCRIPCIÓN</th>
+                                                                    <th style="width: 15%">VIGENCIA</th>
+                                                                    <th style="width: 20%">ARCHIVOS</th>
+                                                                    <th style="width: 15%">ACCIONES</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
                                                                 <tr>
-                                                                 
-                                                                   <!--  <td><input type="text" autocomplete="off"
-                                                                            class="form-control importe-input" name="importe_<?= $i?>[]"
-                                                                            placeholder="Importe"></td>-->
+                                                                    <!-- Propina -->
                                                                     <td> 
-                                                                        <input autocomplete="off" type="text"
+                                                                        <div class="input-group">
+                                                                            <div class="input-group-prepend">
+                                                                                <span class="input-group-text">$</span>
+                                                                            </div>
+                                                                            <input autocomplete="off" type="text"
                                                                             class="form-control propina-input" name="propina_<?= $i?>[]"
-                                                                            placeholder="Propina">
-                                                                    </td>
-                                                                    <td>
-                                                                        <input autocomplete="off" type="text"
-                                                                            class="form-control" name="concepto_<?= $i?>[]"
-                                                                            placeholder="Concepto">
-                                                                    </td>
-                                                                    <td>
-                                                                        <input autocomplete="off" type="date"
-                                                                            class="form-control" name="periodo_inicio_<?= $i?>[]" >
-                                                                    </td>
-                                                                    <td>
-                                                                           <input autocomplete="off" type="date"
-                                                                            class="form-control" name="periodo_fin_<?= $i?>[]">
-                                                                    </td>
-                                                                     <td>
-     
-                                                                        <div class="archivos-seleccionados" id="archivos_<?= $i?>">
-                                                                            <small class="text-muted">No hay archivos</small>
+                                                                            placeholder="0.00">
                                                                         </div>
                                                                     </td>
+                                                                    <!-- Descripción (Concepto + Comisión) -->
                                                                     <td>
-                                         
-                                                                        <button type="button" class="btn btn-sm btn-success btn-seleccionar-pdf" data-row="<?= $i?>">
-                                                                            <i class="fas fa-file-pdf"></i> PDF
-                                                                        </button>
-                                                                        <button type="button" class="btn btn-sm btn-warning btn-seleccionar-xml" data-row="<?= $i?>">
-                                                                            <i class="mdi mdi-code-tags"></i> XML
-                                                                        </button>
+                                                                        <textarea autocomplete="off" class="form-control mb-1" 
+                                                                            name="concepto_<?= $i?>[]" placeholder="Concepto" 
+                                                                            rows="2" style="font-size: 0.85rem;"></textarea>
                                                                         
-                                                                         <button type="button" class="btn btn-sm btn-danger remove-row">
-                                                                            <i class="fas fa-trash"></i>
-                                                                        </button>
+                                                                        <textarea autocomplete="off" class="form-control" 
+                                                                            name="comision_<?= $i?>[]" placeholder="Comisión / Evento" 
+                                                                            rows="2" style="font-size: 0.85rem; background-color: #f8f9fa;"></textarea>
+                                                                    </td>
+                                                                    <!-- Vigencia (Inicio + Fin) -->
+                                                                    <td>
+                                                                        <div class="input-group input-group-sm mb-1">
+                                                                            <div class="input-group-prepend"><span class="input-group-text">Del</span></div>
+                                                                            <input autocomplete="off" type="date"
+                                                                                class="form-control" name="periodo_inicio_<?= $i?>[]" >
+                                                                        </div>
+                                                                        <div class="input-group input-group-sm">
+                                                                             <div class="input-group-prepend"><span class="input-group-text">Al </span></div>
+                                                                            <input autocomplete="off" type="date"
+                                                                                class="form-control" name="periodo_fin_<?= $i?>[]">
+                                                                        </div>
+                                                                    </td>
+                                                                    <!-- Archivos -->
+                                                                    <td>
+                                                                        <div class="archivos-seleccionados" id="archivos_<?= $i?>">
+                                                                            <small class="text-muted">Sin archivos</small>
+                                                                        </div>
+                                                                    </td>
+                                                                    <!-- Acciones -->
+                                                                    <td>
+                                                                        <div class="btn-group-vertical btn-group-sm w-100">
+                                                                            <button type="button" class="btn btn-success btn-seleccionar-pdf mb-1" data-row="<?= $i?>">
+                                                                                <i class="fas fa-file-pdf"></i> PDF
+                                                                            </button>
+                                                                            <button type="button" class="btn btn-warning btn-seleccionar-xml mb-1" data-row="<?= $i?>">
+                                                                                <i class="mdi mdi-code-tags"></i> XML
+                                                                            </button>
+                                                                            <button type="button" class="btn btn-danger remove-row">
+                                                                                <i class="fas fa-trash"></i> Eliminar
+                                                                            </button>
+                                                                        </div>
                                                                     </td>
                                                                 </tr>
                                                             </tbody>
@@ -573,34 +577,51 @@ function addRow(i) {
     
     var newRow = `
     <tr data-row-index="${rowIndex}">
-  
         <td>
-            <input autocomplete="off" type="text" class="form-control propina-input" name="propina_${i}[]" placeholder="Propina">
-        </td>
-        <td>
-            <input autocomplete="off" type="text" class="form-control" name="concepto_${i}[]" placeholder="Concepto">
-        </td>
-        <td>
-            <input autocomplete="off" type="date" class="form-control" name="periodo_inicio_${i}[]">
-        </td>
-        <td>
-            <input autocomplete="off" type="date" class="form-control" name="periodo_fin_${i}[]">
-        </td>
-        <td>
-            <div class="archivos-seleccionados" id="archivos_${rowIndex}">
-                <small class="text-muted">No hay archivos</small>
+             <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">$</span>
+                </div>
+                <input autocomplete="off" type="text" class="form-control propina-input" name="propina_${i}[]" placeholder="0.00">
             </div>
         </td>
         <td>
-            <button type="button" class="btn btn-sm btn-success btn-seleccionar-pdf" data-row="${rowIndex}">
-                <i class="fas fa-file-pdf"></i> PDF
-            </button>
-            <button type="button" class="btn btn-sm btn-warning btn-seleccionar-xml" data-row="${rowIndex}">
-                <i class="mdi mdi-code-tags"></i> XML
-            </button>
-            <button type="button" class="btn btn-sm btn-danger remove-row">
-                <i class="fas fa-trash"></i>
-            </button>
+            <textarea autocomplete="off" class="form-control mb-1" 
+                name="concepto_${i}[]" placeholder="Concepto" 
+                rows="2" style="font-size: 0.85rem;"></textarea>
+            
+            <textarea autocomplete="off" class="form-control" 
+                name="comision_${i}[]" placeholder="Comisión / Evento" 
+                rows="2" style="font-size: 0.85rem; background-color: #f8f9fa;"></textarea>
+        </td>
+        <td>
+            <div class="input-group input-group-sm mb-1">
+                <div class="input-group-prepend"><span class="input-group-text">Del</span></div>
+                <input autocomplete="off" type="date" class="form-control" name="periodo_inicio_${i}[]">
+            </div>
+            <div class="input-group input-group-sm">
+                    <div class="input-group-prepend"><span class="input-group-text">Al </span></div>
+                <input autocomplete="off" type="date" class="form-control" name="periodo_fin_${i}[]">
+            </div>
+        </td>
+        <td>
+            <div class="archivos-seleccionados" id="archivos_${rowIndex}">
+                <small class="text-muted">Sin archivos</small>
+            </div>
+        </td>
+        <td>
+            <div class="btn-group-vertical btn-group-sm w-100">
+                <button type="button" class="btn btn-success btn-seleccionar-pdf mb-1" data-row="${rowIndex}">
+                    <i class="fas fa-file-pdf"></i> PDF
+                </button>
+                <button type="button" class="btn btn-warning btn-seleccionar-xml mb-1" data-row="${rowIndex}">
+                    <i class="mdi mdi-code-tags"></i> XML
+                </button>
+                <button type="button" class="btn btn-danger remove-row">
+                    <i class="fas fa-trash"></i> Eliminar
+                </button>
+            </div>
+        </td>
         </td>
     </tr>`;
 

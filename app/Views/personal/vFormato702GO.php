@@ -217,7 +217,7 @@
    COMISION / REUNION / EVENTO:
 </div>
  <div id="comision_respuesta">
-   <span > &nbsp;<?= ($registro->comision); ?>  </span>
+   <span > &nbsp;<?= (isset($comision) && !empty($comision)) ? $comision : $registro->comision; ?>  </span>
 </div>
 <div id="concepto">
    CONCEPTO DEL PAGO:
