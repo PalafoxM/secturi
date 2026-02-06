@@ -179,12 +179,7 @@
                                             <?php endforeach; ?>
                                         </select>
                                     </div><!--end col-->
-                                    <div class="col-md-4 mb-3">
-                                        <label for="concepto_gasto">Concepto del gasto<span
-                                                style="color:red;">*</span></label>
-                                        <input type="text" class="form-control" id="concepto_gasto" autocomplete="off"
-                                            placeholder="Concepto del gasto" name="concepto_gasto" value="<?= $registro->concepto_gasto ?>">
-                                    </div><!--end col-->
+
                                 </div><!--end form-row-->
                                 <div class="form-row">
 
@@ -273,6 +268,7 @@
                                                                     <tr>
                                                                         <th>IMPORTE</th>
                                                                         <th>PROPINA</th>
+                                                                        <th>CONCEPTO</th>
                                                                         <th>INICIO</th>
                                                                         <th>FIN</th>
                                                                         <th>ARCHIVOS</th>
@@ -294,6 +290,11 @@
                                                                             <input autocomplete="off" type="text" class="form-control propina-input" 
                                                                                 name="propina_<?= $i ?>[]" placeholder="Propina" 
                                                                                 value="<?= $r['propina']; ?>" >
+                                                                        </td>
+                                                                        <td>
+                                                                            <input autocomplete="off" type="text" class="form-control" 
+                                                                                name="concepto_<?= $i ?>[]" placeholder="Concepto" 
+                                                                                value="<?= (isset($r['concepto'])) ? $r['concepto'] : '' ?>" >
                                                                         </td>
                                                                         <td>
                                                                             <input autocomplete="off" type="date" class="form-control" 

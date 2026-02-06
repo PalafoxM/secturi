@@ -5186,196 +5186,190 @@ class Principal extends BaseController
     }
 
 
+
     public function ImprimirGO($id_pt = null, $hoja = null, $index = null, $savePath = null)
     {
         $session = \Config\Services::session();
         $globals = new Mglobal;
         $data = [];
-        $id_reserva = null;
-        
-        $registro_go = $globals->getTabla([
-            'tabla' => 'vw_registro_go',
-            'where' => ['visible' => 1, 'id_registro_go' => $id_pt]
-        ]);
-        
-        if (isset($registro_go->data) && empty($registro_go->data)) {
-            echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
-            die();
-        }
 
-        $direccion = $globals->getTabla([
-            'tabla' => 'vw_direccion',
-            'where' => [
-                'visible' => 1,
-                'id_director' => $registro_go->data[0]->id_reponsable_solicitud
-            ]
-        ]);
-
-        $periodo_factura = $globals->getTabla([
-            'tabla' => 'vw_formato_go',
-            'where' => ['visible' => 1, 'id_registro_go' => $id_pt]
-        ]);
-        
-        // Fetch Presupuesto GO
-        if(isset($periodo_factura->data) && !empty($periodo_factura->data)){
-             $presupuestoGO = $globals->getTabla([
-                    'tabla' => 'vw_periodo_factura_go',
-                    'where' => ['visible' => 1, 'id_reserva' => $periodo_factura->data[0]->id_reserva_go]
-            ]);
-            if(isset($presupuestoGO) && !empty($presupuestoGO)){
-               $data['presupuestoGO'] = $presupuestoGO->data;
-            }
+        // 1. Obtener Registro GO y Responsable
+        $registro_go = $globals->getTabla(['tabla' => 'vw_registro_go', 'where' => ['visible' => 1, 'id_registro_go' => $id_pt]]);
+        if (empty($registro_go->data)) {
+            echo '<h2>Error al encontrar registro.</h2>'; die();
         }
-
-        // Logic for Responsable Gasto
-         if (empty($direccion->data)) {
-            $jefe = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_go->data[0]->id_reponsable_solicitud]]);
-            if (!empty($jefe->data)) {
-                $idJefe = $jefe->data[0]->id_jefe_inmediato;
-                $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_director' => $idJefe]]);
-            } else {
-                $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_go->data[0]->id_reponsable_solicitud]]);
-                $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_area' => $area->data[0]->id_area]]);
-            }
-        }
-        $data['responsableGasto'] = ($direccion->data) ? $direccion->data[0] : '';
-        
         $data['registro'] = $registro_go->data[0];
 
+        // Obtener dirección/responsable
+        $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_director' => $data['registro']->id_reponsable_solicitud]]);
+        if (empty($direccion->data)) {
+             $jefe = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $data['registro']->id_reponsable_solicitud]]);
+             if (!empty($jefe->data)) {
+                 $idJefe = $jefe->data[0]->id_jefe_inmediato;
+                 $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_director' => $idJefe]]);
+             } else {
+                 $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $data['registro']->id_reponsable_solicitud]]);
+                 $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_area' => $area->data[0]->id_area]]);
+             }
+        }
+        $data['responsableGasto'] = ($direccion->data) ? $direccion->data[0] : '';
+
+
+        // 2. Obtener Factura (XML) específica por índice
+        $xml_go = $globals->getTabla(['tabla' => 'xml_go', 'where' => ['visible' => 1, 'id_registro_go' => $id_pt]]);
+        
+        if ($index === null || !isset($xml_go->data[$index])) {
+             // Fallback: Si no hay index, tomar el primero si existe, sino error o vacío
+             if(!empty($xml_go->data)) {
+                 $index = 0;
+             } else {
+                 echo '<h2>No hay facturas asociadas para imprimir.</h2>'; die();
+             }
+        }
+        $facturaItem = $xml_go->data[$index];
+        $data['uuid'] = ($facturaItem->folio) ? $facturaItem->folio : $facturaItem->uuid;
+
+        // 3. Obtener Datos del Periodo/Partida
+        $periodo_factura_go = $globals->getTabla(['tabla' => 'periodo_factura_go', 'where' => ['visible' => 1, 'id_registro_go' => $id_pt]]);
+        // Importante: Asumimos correspondencia por orden. Mejor sería por id_identificador si ambos lo tienen.
+        // Revisando estructura: xml_go tiene id_identificador y periodo_factura_go tiene id_identificador.
+        // Vamos a buscar el periodo que coincida con el id_identificador de la factura.
+        
+        $periodo = null;
+        if (!empty($periodo_factura_go->data)) {
+            foreach($periodo_factura_go->data as $p) {
+                if ($p->id_identificador == $facturaItem->id_identificador) {
+                    $periodo = $p;
+                    break;
+                }
+            }
+        }
+        // Fallback por índice si no se encontró por identificador (compatibilidad)
+        if (!$periodo && isset($periodo_factura_go->data[$index])) {
+            $periodo = $periodo_factura_go->data[$index];
+        }
+
+        // Recuperar nombre de partida
+        $nombre_partida = '';
+        if ($periodo) {
+             $presupuestoGO = $globals->getTabla(['tabla' => 'vw_periodo_factura_go', 'where' => ['visible' => 1, 'id_reserva' => $data['registro']->id_reserva_go]]);
+             // Buscar en presupuestos el que coincida con id_presupuesto
+             if (!empty($presupuestoGO->data)) {
+                 foreach($presupuestoGO->data as $presup) {
+                     // Nota: id_presupuesto en periodo es FK a cat_presupuesto/partida?
+                     // Asumiremos que vw_periodo_factura_go tiene la info. 
+                     // Simplificación: usaremos el mismo índice si es consistente, o busqueda.
+                     // Dado el modelo anterior, parece que vw_periodo_factura_go trae todo, pero periodo_factura_go es la tabla raw.
+                     // Intentaremos obtener el nombre de la partida directamente de cat_partida si tenemos id
+                     // O mejor, el usuario dijo "cuenta_cable".
+                     if(isset($presup->id_presupuesto_go) && $presup->id_presupuesto_go == $periodo->id_presupuesto) {
+                          $nombre_partida = $presup->dsc_partida; // o cuenta_cable
+                          break;
+                     }
+                 }
+                 // Si no se encontró, fallback a index
+                 if (empty($nombre_partida) && isset($presupuestoGO->data[$index])) {
+                      $nombre_partida = $presupuestoGO->data[$index]->dsc_partida;
+                 }
+             }
+        }
+        $data['partida'] = $nombre_partida;
+
+
+        // 4. Mapear datos a la vista
+        if ($periodo) {
+            $importe_str = $facturaItem->total; 
+            $importe_float = (float) str_replace(',', '', $importe_str);
+            
+            $data['inicio'] = $periodo->periodo_inicio;
+            $data['fin']    = $periodo->periodo_fin;
+            $data['encabezado'] = $periodo->encabezado;
+            $data['concepto'] = (isset($periodo->concepto)) ? $periodo->concepto : ''; // NUEVO CAMPO
+            $data['total'] = $facturaItem->total;
+            
+            $monto          = $importe_float + (float)$periodo->propina;
+            $data['total2']  = $monto;
+            $data['monto2']  = $this->numeroEnLetras($monto);
+        } else {
+             $data['encabezado'] = '';
+             $data['concepto'] = '';
+             $data['total'] = $facturaItem->total;
+             $data['monto'] = $this->numeroEnLetras((float) str_replace(',', '', $facturaItem->total));
+             $data['total2'] = '';
+             $data['monto2'] = '';
+        }
+
+        // 5. Renderizar PDF
         $mpdf = new \Mpdf\Mpdf([
-            'margin_top' => 0,
-            'margin_left' => 1,
-            'margin_right' => 1,
-            'format' => [213, 268],
-            'mirrorMargins' => false,
+            'margin_top' => 0, 'margin_left' => 1, 'margin_right' => 1,
+            'format' => [213, 268], 'mirrorMargins' => false,
         ]);
 
-        // Logic for "Hoja 3" (Invoices) - Now the only logic
-        $xml_go = $globals->getTabla([
-                'tabla' => 'xml_go',
-                'where' => ['visible' => 1, 'id_registro_go' => $id_pt]
-        ])->data;
-        
-        if ($index !== null && isset($xml_go[$index])) {
-            $xml_go = [$index => $xml_go[$index]];
-        }
-            
-        if (!empty($xml_go)) {
-            foreach ($xml_go as $index => $facturaItem) {
-                    $importe_str     =  $facturaItem->total;
-                    $data['total']     =  $facturaItem->total;
-                    $importe_float = (float) str_replace(',', '', $importe_str);
-                    $data['monto'] = $this->numeroEnLetras($importe_float);
-                    
-                    // Assign partida if available in presupuestoGO
-                    if (isset($data['presupuestoGO'][$index])) {
-                         $data['partida'] =  $data['presupuestoGO'][$index]->dsc_partida;
-                    } else {
-                         // Fallback or handle if index mismatch
-                         $data['partida'] = '';
-                    }
+        $html = view('personal/vFormato702GO', $data);
+        $mpdf->WriteHTML($html);
 
-                    $data['uuid'] = ($facturaItem->folio)?$facturaItem->folio:$facturaItem->uuid;
-                    $data['facturaItem'] = $facturaItem;
-                    
-                    $periodo_factura_go = $globals->getTabla([
-                        'tabla' => 'periodo_factura_go',
-                        'where' => [
-                            'visible' => 1,
-                            'id_registro_go' => $id_pt,
-                        ]
-                    ]);
-                    
-                    $periodo = isset($periodo_factura_go->data) && !empty($periodo_factura_go->data)
-                        ? $periodo_factura_go->data
-                        : [];
+        // 6. Adjuntar PDF Factura
+        if (isset($facturaItem->id_identificador)) {
+             $factura_pdf_go = $globals->getTabla([
+                'tabla' => 'factura_pdf_go',
+                'where' => [
+                    'visible' => 1,
+                    'id_registro_go' => $id_pt,
+                    'id_identificador' => $facturaItem->id_identificador
+                ]
+            ]);
 
-                    if (isset($periodo[$index])) {
-                        $p = $periodo[$index];
-                        $importe_str = $facturaItem->total; 
-                        $importe_float = (float) str_replace(',', '', $importe_str);
-                        $data['numero_texto2'] = $this->numeroEnLetras($importe_float);
-                        $data['importePartida'] = $facturaItem->total;
-                        $data['inicio'] = $p->periodo_inicio;
-                        $data['fin']    = $p->periodo_fin;
-                        $data['encabezado'] = $p->encabezado;
-                        $monto          = $importe_float + (float)$p->propina;
-                        $data['total2']  = $monto;
-                        $data['monto2']  = $this->numeroEnLetras($monto);
-                    } else {
-                        $data['numero_texto2'] = '';
-                        $data['importePartida'] = '';
-                        $data['inicio'] = '';
-                        $data['fin']    = '';
-                        $data['encabezado'] = '';
-                        $data['total2']  = '';
-                        $data['monto2']  = '';
-                    };
+            if (!empty($factura_pdf_go->data)) {
+                 $pdfRegistro = $factura_pdf_go->data[0];
+                 $facturaPath = FCPATH . $pdfRegistro->ruta_relativa;
+                 
+                 if (file_exists($facturaPath)) {
+                      $pageCount = $mpdf->SetSourceFile($facturaPath);
+                      // Solo importamos la primera página para ponerla "debajo" si cabe
+                      // Si hay más páginas, quizás deban ir en hojas nuevas, pero el requerimiento dice "misma hoja".
+                      // Asumiremos que se quiere visualizar la factura principal allí.
+                      
+                      $tplId = $mpdf->ImportPage(1);
+                      $size = $mpdf->GetTemplateSize($tplId);
+                      
+                      // Coordenadas: Debajo del formato (aprox Y=60mm)
+                      $yPos = 65; 
+                      $xPos = 10;
+                      
+                      // Calcular escala para ajustar al ancho disponible o alto disponible
+                      // Ancho disponible: 213 - 20 (borde) = 193
+                      // Alto disponible: 268 - 65 (top) - 10 (bottom) = 193
+                      
+                      $maxWidth = 190;
+                      $maxHeight = 200;
+                      
+                      $width = $size['width'];
+                      $height = $size['height'];
+                      
+                      // Escalar si excede ancho
+                      if ($width > $maxWidth) {
+                          $ratio = $maxWidth / $width;
+                          $width = $maxWidth;
+                          $height = $height * $ratio;
+                      }
+                      
+                      // Escalar si excede alto (después de ajustar ancho)
+                      if ($height > $maxHeight) {
+                           $ratio = $maxHeight / $height;
+                           $height = $maxHeight;
+                           $width = $width * $ratio;
+                      }
+                      
+                      // Centrar X
+                      $xPos = (213 - $width) / 2;
 
-                    $htmlTercerHoja = view('personal/vFormato702GO.php', $data);
-                    
-                    // 1. Add page with format
-                    $mpdf->AddPage();
-                    $mpdf->WriteHTML($htmlTercerHoja);
-
-                    // 2. Add related PDF invoices
-                    $factura_pdf_go = $globals->getTabla([
-                        'tabla' => 'factura_pdf_go',
-                        'where' => [
-                            'visible' => 1,
-                            'id_registro_go' => $id_pt,
-                            'id_identificador' => $facturaItem->id_identificador
-                        ]
-                    ]);
-                
-                    $facturas = isset($factura_pdf_go->data) && !empty($factura_pdf_go->data)
-                        ? $factura_pdf_go->data
-                        : [];
-                    
-                    // 3. Initial position below content
-                    $currentY = $mpdf->y + 60;
-
-                    // 4. Insert invoices
-                    foreach ($facturas as $factura) {
-                        $facturaPath = FCPATH . $factura->ruta_relativa;
-
-                        if (file_exists($facturaPath)) {
-                            $facturaPageCount = $mpdf->SetSourceFile($facturaPath);
-
-                            for ($pageNum = 1; $pageNum <= $facturaPageCount; $pageNum++) {
-                                $tplFactura = $mpdf->ImportPage($pageNum);
-                                $templateSize = $mpdf->GetTemplateSize($tplFactura);
-
-                                $scaleFactor = 0.6;
-                                $width = $templateSize['width'] * $scaleFactor;
-                                $height = $templateSize['height'] * $scaleFactor;
-
-                                // If it doesn't fit, add new page
-                                if ($currentY + $height > $mpdf->h - 10) {
-                                    $mpdf->AddPage();
-                                    $currentY = 10;
-                                }
-
-                                // Center horizontally
-                                $xPos = ($mpdf->w - $width) / 2;
-
-                                $mpdf->UseTemplate($tplFactura, $xPos, $currentY, $width, $height);
-
-                                $currentY += $height + 10;
-                            }
-                        }
-                    }
+                      $mpdf->UseTemplate($tplId, $xPos, $yPos, $width, $height);
+                 }
             }
         }
 
-        if ($savePath) {
-            $mpdf->Output($savePath, 'F'); 
-            return $savePath;
-        }
-
-        $mpdf->Output('Formato_pt.pdf', 'I');
-        exit();
-
+        $this->response->setHeader('Content-Type', 'application/pdf');
+        $mpdf->Output('Formato702GO.pdf', 'I');
     }
     public function avanceActividad()
     {
@@ -6567,6 +6561,7 @@ class Principal extends BaseController
                          'importe' => $d->importe,
                          'comprobante' => $d->comprobante,
                          'propina' => $d->propina,
+                         'concepto' => (isset($d->concepto)) ? $d->concepto : '',
                          'contribuyente' => $d->contribuyente,
                          'rfc' => $d->rfc,
                          'visible' => $d->visible,

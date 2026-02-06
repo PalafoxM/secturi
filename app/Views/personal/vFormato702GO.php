@@ -1,27 +1,27 @@
- 
- 
- <style>
+
+
+<style>
     #encabezado{
        position:absolute; 
        top:5%; 
        left:8%; 
        width:84.5%; 
        background-color:black;
-      font-size: 8px;
-        height:18px; 
+      font-size: 14px;
+        height:25px; 
         color:white;
         text-align:center;
          padding-left: 4px;     /* Espacio a la izquierda */
-        padding-top: 2px;      /* Opcional: si el texto toca el borde superior */
+         padding-top: 7px;      /* Opcional: si el texto toca el borde superior */
         box-sizing: border-box;
     }
     #responsable{
        position:absolute; 
-       top:6.77%; 
+       top:8.77%; 
        left:8%; 
        width: 19.5%; 
        border:solid 1px black;
-       font-size: 7px;
+       font-size: 9px;
        height:18px; 
        text-align:left;
        background-color: #BFBDBB;
@@ -31,11 +31,11 @@
     }
     #concepto{
        position:absolute; 
-       top:10.5%; 
+       top:12.5%; 
        left:8%; 
        width:19.5%; 
        border:solid 1px black;
-       font-size: 7px;
+       font-size: 9px;
        height:18px; 
        text-align:left;
        background-color: #BFBDBB;
@@ -45,11 +45,11 @@
     }
     #comision{
        position:absolute; 
-       top:8.65%; 
+       top:10.65%; 
        left:8%; 
        width:19.5%; 
        border:solid 1px black;
-      font-size: 7px;
+       font-size: 9px;
         height:18px; 
         text-align:left;
        background-color: #BFBDBB;
@@ -60,11 +60,11 @@
     }
     #partida{
        position:absolute; 
-       top:12.4%; 
+       top:14.4%; 
        left:8%; 
        width:19.5%; 
        border:solid 1px black;
-      font-size: 7px;
+       font-size: 9px;
        height:18px; 
        text-align:left;
        background-color: #BFBDBB;
@@ -74,11 +74,11 @@
     }
     #factura{
        position:absolute; 
-       top:14.3%; 
+       top:16.3%; 
        left:8%; 
        width:19.5%; 
        border:solid 1px black;
-      font-size: 7px;
+       font-size: 9px;
         height:18px; 
         text-align:left;
        background-color: #BFBDBB;
@@ -88,11 +88,11 @@
     }
     #fecha{
        position:absolute; 
-       top:16.2%; 
+       top:18.2%; 
        left:8%; 
        width:19.5%; 
        border:solid 1px black;
-       font-size: 7px;
+       font-size: 9px;
        height:18px; 
        text-align:left;
        background-color: #BFBDBB;
@@ -102,11 +102,11 @@
     }
     #importe{
        position:absolute; 
-       top:18.1%; 
+       top:20.1%; 
        left:8%; 
        width:19.5%; 
        border:solid 1px black;
-      font-size: 7px;
+       font-size: 9px;
         height:18px; 
         text-align:left;
        background-color: #BFBDBB;
@@ -116,11 +116,11 @@
     }
     #nombre{
        position:absolute; 
-       top:6.62%; 
+       top:8.62%; 
        left:28.1%; 
        width: 64.15%; 
        border:solid 1px black;
-      font-size: 7px;
+       font-size: 9px;
         height:18px; 
        text-align:left;
          padding-left: 4px;     /* Espacio a la izquierda */
@@ -130,42 +130,42 @@
     }
     #comision_respuesta{
        position:absolute; 
-       top:8.65%; 
+       top:10.65%; 
        left:28.1%; 
        width: 64.65%; 
        border:solid 1px black;
-      font-size: 7px;
+       font-size: 9px;
         height:18px; 
         text-align:left;
     }
     #concepto_respuesta{
        position:absolute; 
-       top:10.5%; 
+       top:12.5%; 
        left:28.1%; 
        width: 64.65%; 
        border:solid 1px black;
-      font-size: 7px;
+       font-size: 9px;
         height:18px; 
         text-align:left;
     }
     #partida_respuesta{
        position:absolute; 
-       top:12.4%; 
+       top:14.4%; 
        left:28.1%; 
        width: 64.65%; 
        border:solid 1px black;
-      font-size: 7px;
+       font-size: 9px;
         height:18px; 
         text-align:left;
        /* background-color: red;*/
     }
     #factura_respuesta{
        position:absolute; 
-       top:14.3%; 
+       top:16.3%; 
        left:28.1%; 
        width: 64.65%; 
        border:solid 1px black;
-      font-size: 7px;
+       font-size: 9px;
         height:18px; 
         text-align:left;
 
@@ -175,23 +175,23 @@
     }
     #fecha_respuesta{
       position:absolute; 
-      top:16.1%; 
+      top:18.1%; 
       left:28.1%; 
       width: 64.15%;
       padding-left: 4px;     /* Espacio a la izquierda */
       padding-top: 2px;      /* Opcional: si el texto toca el borde superior */
       box-sizing: border-box;
       border:solid 1px black;
-      font-size: 7px;
+      font-size: 9px;
       height:18px; 
       text-align:left;
     }
     #importe_respuesta{
        position:absolute; 
-       top:18.1%; 
+       top:20.1%; 
        left:28.1%; 
        border:solid 1px black;
-       font-size: 7px;
+       font-size: 9px;
        height:18px; 
        text-align:left;
         width: 64.15%;
@@ -222,14 +222,14 @@
    CONCEPTO DEL PAGO:
 </div>
  <div id="concepto_respuesta">
-   <span> &nbsp;<?= ($encabezado)?$encabezado:''; ?>  </span>
+   <span> &nbsp;<?= (isset($concepto))?$concepto:''; ?>  </span>
 </div>
 <div id="partida">
    PARTIDA:
 </div>
 <div id="partida_respuesta">
  
-  <?= (isset($partida) && !empty($partida))?$partida:''; ?>
+  <?= (isset($partida) && !empty($partida))?$partida:''; ?> <?= (isset($encabezado) && !empty($encabezado))? ' - ' . $encabezado:''; ?>
 
 </div>
 <div id="factura">

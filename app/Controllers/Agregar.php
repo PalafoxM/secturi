@@ -1348,6 +1348,7 @@ class Agregar extends BaseController
                         $fila_completa = [
                             // Standar fields
                             'propina' => $data['propina_' . $i][$j] ?? null,
+                            'concepto' => $data['concepto_' . $i][$j] ?? null,
                             'periodo_inicio' => $data['periodo_inicio_' . $i][$j] ?? null,
                             'periodo_fin' => $data['periodo_fin_' . $i][$j] ?? null,
                             
@@ -1437,11 +1438,7 @@ class Agregar extends BaseController
             $response->respuesta = "Es requerido el formato_conformidad";
             return $this->respond($response);
         }
-        if (isset($data['concepto_gasto']) && empty($data['concepto_gasto'])) {
-            $response->error = true;
-            $response->respuesta = "Es requerido el concepto gasto";
-            return $this->respond($response);
-        }
+
 
         // VALIDAR FECHAS Y ARCHIVOS EN FILAS
         // VALIDAR FECHAS Y ARCHIVOS EN FILAS
@@ -1501,7 +1498,7 @@ class Agregar extends BaseController
             'formato_conformidad' => ($data['formato_conformidad'] == 'SI') ? 1 : 2,
             'documentacion_requerida' => ($data['documentacion_requerida'] == 'SI') ? 1 : 2,
             'evidencia_entrega' => (int) $data['evidencia_entrega'],
-            'concepto_gasto' => $data['concepto_gasto'],
+
             'total_importe' => $data['total_importe'], // Asegúrate de que este total sea correcto
             'comision' => $data['comision'],
             //'no_reserva' => $data['no_reserva'],
@@ -1572,6 +1569,7 @@ class Agregar extends BaseController
                             'propina' => (!empty($fila['propina'])) ? str_replace(['$', ','], '', $fila['propina']) : 0, // Limpiamos la propina
                             'periodo_inicio' => $fila['periodo_inicio'],
                             'periodo_fin' => $fila['periodo_fin'],
+                            'concepto' => (isset($fila['concepto']) && !empty($fila['concepto'])) ? $fila['concepto'] : '',
                             'id_identificador' => $identificador_fila_unica, // EL ENLACE CLAVE
                             'usu_reg' => $session->get('id_usuario'),
                             'fec_reg' => date('Y-m-d H:i:s')

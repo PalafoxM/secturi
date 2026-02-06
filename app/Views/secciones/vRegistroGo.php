@@ -224,25 +224,7 @@
                                             <?php endforeach; ?>
                                         </select>
                                     </div><!--end col-->
-                                    <div class="col-md-4 mb-3">
-                                        <label for="concepto_gasto">Concepto del gasto<span
-                                                style="color:red;">*</span></label>
-                                        <input type="text" class="form-control" id="concepto_gasto" autocomplete="off"
-                                            placeholder="Concepto del gasto" name="concepto_gasto">
-                                    </div><!--end col-->
-                                </div><!--end form-row-->
-                                <div class="form-row">
-
-
-                                    <div class="col-md-4 mb-3">
-                                        <label for="comision">Comisión / Reunión / Evento / Programa</label>
-                                        <input type="text" class="form-control" id="comision" name="comision"
-                                            value="<?= (isset($registro_pt->comision)) ? $registro_pt->comision : 'Comisión / Reunión / Evento / Programa' ?>">
-                                        <div class="invalid-feedback">
-                                            Please provide a valid state.
-                                        </div>
-                                    </div><!--end col-->
-                                    <div class="col-md-4 mb-3">
+                                     <div class="col-md-4 mb-3">
                                         <label for="lugar">Lugar<span style="color:red;">*</span></label>
                                         <input type="text" class="form-control" id="lugar" autocomplete="off"
                                             placeholder="Lugar" name="lugar">
@@ -251,7 +233,16 @@
                                 </div><!--end form-row-->
                                 <div class="form-row">
 
-                                    <div class="col-md-4 mb-3">
+
+                                    <div class="col-md-8 mb-3">
+                                        <label for="comision">Comisión / Reunión / Evento / Programa</label>
+                                        <input type="text" class="form-control" id="comision" name="comision"
+                                            value="<?= (isset($registro_pt->comision)) ? $registro_pt->comision : 'Comisión / Reunión / Evento / Programa' ?>">
+                                        <div class="invalid-feedback">
+                                            Please provide a valid state.
+                                        </div>
+                                    </div><!--end col-->
+                                     <div class="col-md-4 mb-3">
                                         <label for="no_consecutivo">No. Consecutivo.<span
                                                 style="color:red;">*</span></label>
                                         <input type="number" class="form-control" autocomplete="off" id="no_consecutivo"
@@ -261,8 +252,10 @@
                                             Campo no Valido
                                         </div>
                                     </div><!--end col-->
+                                   
 
                                 </div><!--end form-row-->
+                           
                                 <br>
 
                                 <?php
@@ -388,6 +381,7 @@
                                                                 <tr>
                                                                 <!--     <th>IMPORTE</th> -->
                                                                     <th>PROPINA</th>
+                                                                    <th>CONCEPTO</th>
                                                                     <th>INICIO</th>
                                                                     <th>FIN</th>
                                                                     <th>ARCHIVOS</th>
@@ -404,6 +398,11 @@
                                                                         <input autocomplete="off" type="text"
                                                                             class="form-control propina-input" name="propina_<?= $i?>[]"
                                                                             placeholder="Propina">
+                                                                    </td>
+                                                                    <td>
+                                                                        <input autocomplete="off" type="text"
+                                                                            class="form-control" name="concepto_<?= $i?>[]"
+                                                                            placeholder="Concepto">
                                                                     </td>
                                                                     <td>
                                                                         <input autocomplete="off" type="date"
@@ -577,6 +576,9 @@ function addRow(i) {
   
         <td>
             <input autocomplete="off" type="text" class="form-control propina-input" name="propina_${i}[]" placeholder="Propina">
+        </td>
+        <td>
+            <input autocomplete="off" type="text" class="form-control" name="concepto_${i}[]" placeholder="Concepto">
         </td>
         <td>
             <input autocomplete="off" type="date" class="form-control" name="periodo_inicio_${i}[]">

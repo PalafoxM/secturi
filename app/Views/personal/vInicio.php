@@ -507,6 +507,30 @@
                                     <div class="row">
 
                                         <div class="col-lg-6">
+                                             <div class="card">
+                                                <div class="card-body">
+                                                    <h4 class="mt-0  mb-4">DISPOSICIONES ADMINISTRATAS</h4>
+                                                    <div class="blog-card">
+                                                        <div class="ratio ratio-16x9"> <!-- BS5 -->
+                                                            <iframe
+                                                                src="<?= base_url() ?>assets/documentos/Integracion_del_tramite_SECTURI_2026.pdf"
+                                                                title="Código de Conducta" style="border:0"
+                                                                loading="lazy" width="100%">
+                                                            </iframe>
+                                                        </div>
+                                                        <p class="text-muted text-truncate">SECTURI 2026</p>
+                                                        <hr class="hr-dashed">
+                                                        <div class="d-flex justify-content-between">
+
+                                                            <div class="align-self-center">
+                                                                <a href="<?= base_url() ?>assets/documentos/Integracion_del_tramite_SECTURI_2026.pdf"
+                                                                    target="_blank" class="text-primary">Leer más <i
+                                                                        class="fas fa-long-arrow-alt-right"></i></a>
+                                                            </div>
+                                                        </div>
+                                                    </div><!--end blog-card-->
+                                                </div><!--end card-body-->
+                                            </div><!--end card-->
                                             <div class="card">
                                                 <div class="card-body dash-info-carousel">
                                                     <h4 class="mt-0  mb-4">Código de Conducta</h4>
