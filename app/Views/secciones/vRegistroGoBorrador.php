@@ -319,7 +319,7 @@
                                                 <tbody>
                                                     <?php foreach($grupo['tabla'] as $j => $r): ?>
                                                     <?php 
-                                                        $uniqueId = $j;
+                                                        $uniqueId = $key . '_' . $j;
                                                         $totalImporte = 0;
                                                         
                                                         $inicio = isset($r['periodo_inicio']) ? date('Y-m-d', strtotime($r['periodo_inicio'])) : '';
@@ -478,7 +478,225 @@
 
 
 <script>
+    // Inicializar variables globales
+    var archivosPorFila = {}; // Se gestiona localmente
+    
+    // Catalogos para JS
+    var catPartida = <?= json_encode($cat_partida) ?>;
+    var catProyecto = <?= json_encode($cat_proyecto) ?>;
+    
+    // Variable global para filas eliminadas
+    let deletedRows = [];
 
+    // --- MANEJO DE ARCHIVOS Y FORMDATA ---
+
+    function prepararFormData() {
+        const formData = new FormData();
+        const form = $('#formBorrador_go')[0];
+        const formElements = new FormData(form);
+        
+        for (let [key, value] of formElements) {
+            formData.append(key, value);
+        }
+        
+        // Agregar archivos - SOLO ARCHIVOS NUEVOS DE FILAS ACTIVAS
+        Object.keys(archivosPorFila).forEach(rowIndex => {
+            const archivos = archivosPorFila[rowIndex];
+            
+            if (archivos && archivos.pdf) {
+                archivos.pdf.forEach((file, fileIndex) => {
+                    if(file instanceof File) {
+                        formData.append(`archivos[pdf_${rowIndex}][pdf][]`, file);
+                    }
+                });
+            }
+            
+            if (archivos && archivos.xml) {
+                archivos.xml.forEach((file, fileIndex) => {
+                     if(file instanceof File) {
+                        formData.append(`archivos[xml_${rowIndex}][xml][]`, file);
+                     }
+                });
+            }
+        });
+
+        return formData;
+    }
+
+    function renderizarArchivosFila(rowId) {
+        const container = $(`#archivos_${rowId}`);
+        const archivos = archivosPorFila[rowId];
+        
+        // Buscar o crear contenedor de nuevos archivos para no borrar los existentes
+        let nuevosContainer = container.find('.nuevos-archivos');
+        if(nuevosContainer.length === 0) {
+            container.append('<div class="nuevos-archivos mt-2"></div>');
+            nuevosContainer = container.find('.nuevos-archivos');
+        }
+        
+        let html = '';
+        if (archivos && archivos.pdf && archivos.pdf.length > 0) {
+            html += '<div class="text-success"><small><strong>PDF (Nuevo):</strong></small></div><ul class="list-unstyled mb-1">';
+            archivos.pdf.forEach(file => {
+                html += `<li><small>${file.name}</small></li>`;
+            });
+            html += '</ul>';
+        }
+        
+        if (archivos && archivos.xml && archivos.xml.length > 0) {
+            html += '<div class="text-info"><small><strong>XML (Nuevo):</strong></small></div><ul class="list-unstyled mb-0">';
+            archivos.xml.forEach(file => {
+                 html += `<li><small>${file.name}</small></li>`;
+            });
+            html += '</ul>';
+        }
+        
+        nuevosContainer.html(html);
+    }
+
+    // --- EVENTOS DE INTERFAZ ---
+
+    // Agregar Nueva Fila
+    $(document).on('click', '.btnAgregarFila', function() {
+        const groupContainer = $(this).closest('.group-container');
+        const tableBody = groupContainer.find('table tbody');
+        
+        // Obtener valores del header del grupo
+        const idPartida = groupContainer.find('.header-partida').val();
+        const idProyecto = groupContainer.find('.header-proyecto').val();
+        const encabezado = groupContainer.find('.header-encabezado').val();
+        
+        // Generar ID único temporal
+        const newId = 'new_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+        
+        // Inicializar almacenamiento de archivos
+        archivosPorFila[newId] = { pdf: [], xml: [] };
+        
+        const nuevaFila = `
+            <tr data-row-index="${newId}">
+                <input type="hidden" name="rowIndex[]" value="${newId}">
+                <!-- Inputs ocultos sincronizados -->
+                <input type="hidden" class="row-partida" name="id_partida[${newId}]" value="${idPartida}">
+                <input type="hidden" class="row-proyecto" name="id_presupuesto[${newId}]" value="${idProyecto}">
+                <input type="hidden" class="row-encabezado" name="encabezado[${newId}]" value="${encabezado}">
+                
+                <td>
+                    <input autocomplete="off" type="text" class="form-control propina-input" 
+                        name="propina[${newId}]" placeholder="Propina" 
+                        value="0" >
+                </td>
+                <td>
+                    <input autocomplete="off" type="date" class="form-control" 
+                        name="periodo_inicio[${newId}]" 
+                        value="" >
+                </td>
+                <td>
+                    <input autocomplete="off" type="date" class="form-control" 
+                        name="periodo_fin[${newId}]"  
+                        value="">
+                </td>
+                <td>
+                    <!-- Contenedor Visual de Archivos -->
+                    <div class="archivos-seleccionados" id="archivos_${newId}">
+                        <div class="nuevos-archivos">
+                             <small class="text-muted">Sin archivos</small>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="mt-1">
+                        <button type="button" class="btn btn-sm btn-success btn-seleccionar-pdf" data-row="${newId}">
+                            <i class="fas fa-file-pdf"></i> PDF
+                        </button>
+                        <button type="button" class="btn btn-sm btn-warning btn-seleccionar-xml" data-row="${newId}">
+                            <i class="mdi mdi-code-tags"></i> XML
+                        </button>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-danger remove-row" data-row="${newId}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+        
+        tableBody.append(nuevaFila);
+    });
+
+    // Agregar Nuevo Grupo
+    $('#btnAgregarGrupo').on('click', function() {
+        const primerGrupo = $('.group-container').first();
+        if(primerGrupo.length > 0) {
+            const nuevoGrupo = primerGrupo.clone();
+            
+            // Limpiar valores
+            nuevoGrupo.find('.header-partida').val('');
+            nuevoGrupo.find('.header-proyecto').val('');
+            nuevoGrupo.find('.header-encabezado').val('');
+            
+            // Vaciar tabla
+            nuevoGrupo.find('tbody').empty();
+            
+            // Insertar nueva sección
+            $(this).before(nuevoGrupo);
+        }
+    });
+
+    // Eliminar Fila
+    $(document).on('click', '.remove-row', function() {
+        const rowId = $(this).data('row');
+        const tr = $(this).closest('tr');
+        
+        // Si no empieza con 'new_', es una fila existente en BD
+        if (String(rowId).indexOf('new_') === -1) {
+            deletedRows.push(rowId);
+        } else {
+            // Limpiar de memoria JS
+            delete archivosPorFila[rowId];
+        }
+        
+        tr.remove();
+        $('#deleted_rows').val(JSON.stringify(deletedRows));
+    });
+
+    // Selección de Archivos
+    $(document).on('click', '.btn-seleccionar-pdf, .btn-seleccionar-xml', function() {
+        const rowId = $(this).data('row');
+        const isPdf = $(this).hasClass('btn-seleccionar-pdf');
+        const type = isPdf ? 'pdf' : 'xml';
+        const accept = isPdf ? '.pdf' : '.xml';
+        
+        // Crear input temporal dinámico
+        const fileInput = $('<input type="file" multiple accept="' + accept + '" style="display:none;">');
+        $('body').append(fileInput);
+        
+        fileInput.trigger('click');
+        
+        fileInput.on('change', function() {
+            const files = this.files;
+            if (files.length > 0) {
+                if (!archivosPorFila[rowId]) archivosPorFila[rowId] = { pdf: [], xml: [] };
+                if (!archivosPorFila[rowId][type]) archivosPorFila[rowId][type] = []; 
+                
+                Array.from(files).forEach(file => {
+                    archivosPorFila[rowId][type].push(file);
+                });
+                
+                renderizarArchivosFila(rowId);
+            }
+            fileInput.remove(); 
+        });
+    });
+
+    // Sincronización de Headers -> Inputs Ocultos
+    $(document).on('change keyup', '.header-partida', function() {
+        $(this).closest('.group-container').find('.row-partida').val($(this).val());
+    });
+    $(document).on('change keyup', '.header-proyecto', function() {
+        $(this).closest('.group-container').find('.row-proyecto').val($(this).val());
+    });
+    $(document).on('change keyup', '.header-encabezado', function() {
+        $(this).closest('.group-container').find('.row-encabezado').val($(this).val());
+    });
 
     // --- ENVIAR ---
 
@@ -530,7 +748,6 @@
                 btn.prop('disabled', false).html(btnText);
             },
             error: function (response) {
-                // Manejo de error seguro
                 let msg = "Error desconocido";
                 try {
                     const res = JSON.parse(response.responseText);
@@ -542,7 +759,6 @@
     }
 
     function validarFormulario() {
-        // Validacion de fechas
         let fechasValidas = true;
         $('input[type="date"]').each(function() {
             if ($(this).val() === '') {
@@ -558,25 +774,31 @@
             return false;
         }
 
-        // Validacion de Archivos (Al menos 1 PDF y 1 XML por fila activa)
         let archivosValidos = true;
+        
         $('tr[data-row-index]').each(function() {
-            const rowIndex = $(this).data('row-index');
-            const archivos = archivosPorFila[rowIndex];
+            const row = $(this);
+            const rowIndex = row.data('row-index');
             
+            // Verificar Archivos PDF
             let tienePdf = false;
+            // 1. Checar si hay visualmente un "PDF" (viejo)
+            if (row.find('.text-success').length > 0) tienePdf = true;
+            // 2. Checar si hay nuevos en JS
+            if (archivosPorFila[rowIndex] && archivosPorFila[rowIndex].pdf && archivosPorFila[rowIndex].pdf.length > 0) tienePdf = true;
+            
+            // Verificar Archivos XML
             let tieneXml = false;
-
-            if (archivos) {
-                if (archivos.pdf && archivos.pdf.length > 0) tienePdf = true;
-                if (archivos.xml && archivos.xml.length > 0) tieneXml = true;
-            }
+            // 1. Checar si hay visualmente un "XML" (viejo)
+            if (row.find('.text-info').length > 0) tieneXml = true;
+            // 2. Checar si hay nuevos en JS
+            if (archivosPorFila[rowIndex] && archivosPorFila[rowIndex].xml && archivosPorFila[rowIndex].xml.length > 0) tieneXml = true;
 
             if (!tienePdf || !tieneXml) {
                 archivosValidos = false;
-                $(this).find('.archivos-seleccionados').addClass('border border-danger');
+                row.find('.archivos-seleccionados').addClass('border border-danger');
             } else {
-                $(this).find('.archivos-seleccionados').removeClass('border border-danger');
+                row.find('.archivos-seleccionados').removeClass('border border-danger');
             }
         });
 
