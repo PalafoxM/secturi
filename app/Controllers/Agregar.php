@@ -3879,6 +3879,7 @@ class Agregar extends BaseController
 
             $response->error = $e->getMessage();
             return $this->respond($response);
+        }
     }
     public function uploadCSV()
     {
