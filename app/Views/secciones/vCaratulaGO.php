@@ -31,6 +31,9 @@
                 $half = ceil(strlen($comprobante) / 2);
                 $comprobante = substr($comprobante, 0, $half) . '<br>' . substr($comprobante, $half);
             }
+
+            $contribuyente = $fila['contribuyente'];
+            $isLongName = strlen($contribuyente) > 30; // Bajamos umbral para ajustar mejor
             ?>
             <!-- Comprobante (Folio/UUID) -->
             <div style="position:absolute; text-align:center; top:<?=$i?>%; left:11.8%; width:10.2%; background-color:white; font-size: <?= $isLong ? '7px' : '9px' ?>; height:12px; line-height:<?= $isLong ? '6px' : '12px' ?>; overflow:hidden;">
@@ -53,8 +56,8 @@
             </div>
 
             <!-- Datos del Contribuyente (Nombre) -->
-            <div style="position:absolute; text-align:left; padding-left:2px; top:<?=$i?>%; left:61.35%; width:17.5%; background-color:white; font-size: 9px; height:12px; line-height:12px; overflow:hidden;">
-                <span class="proxima"><?= substr($fila['contribuyente'], 0, 35) // Truncate si es muy largo ?></span>
+            <div style="position:absolute; text-align:left; padding-left:2px; top:<?=$i?>%; left:61.35%; width:17.5%; background-color:white; font-size: <?= $isLongName ? '7px' : '9px' ?>; height:12px; line-height:<?= $isLongName ? '6px' : '12px' ?>; overflow:hidden;">
+                <span class="proxima"><?= $contribuyente ?></span>
             </div>
 
             <!-- RFC -->
