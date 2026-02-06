@@ -3,7 +3,7 @@
 <style>
     #encabezado{
        position:absolute; 
-       top:5%; 
+       top:5.5%; 
        left:8%; 
        width:84.5%; 
        background-color:black;
@@ -17,7 +17,7 @@
     }
     #responsable{
        position:absolute; 
-       top:8.77%; 
+       top:8.6%; 
        left:8%; 
        width: 19.5%; 
        border:solid 1px black;
@@ -28,6 +28,20 @@
         padding-left: 4px;     /* Espacio a la izquierda */
         padding-top: 2px;      /* Opcional: si el texto toca el borde superior */
         box-sizing: border-box;
+    }
+      #nombre{
+       position:absolute; 
+       top:8.6%; 
+       left:28.1%; 
+       width: 64.15%; 
+       border:solid 1px black;
+       font-size: 9px;
+        height:18px; 
+       text-align:left;
+         padding-left: 4px;     /* Espacio a la izquierda */
+        padding-top: 2px;      /* Opcional: si el texto toca el borde superior */
+        box-sizing: border-box;
+
     }
     #concepto{
        position:absolute; 
@@ -114,20 +128,7 @@
         padding-top: 2px;      /* Opcional: si el texto toca el borde superior */
         box-sizing: border-box;
     }
-    #nombre{
-       position:absolute; 
-       top:8.62%; 
-       left:28.1%; 
-       width: 64.15%; 
-       border:solid 1px black;
-       font-size: 9px;
-        height:18px; 
-       text-align:left;
-         padding-left: 4px;     /* Espacio a la izquierda */
-        padding-top: 2px;      /* Opcional: si el texto toca el borde superior */
-        box-sizing: border-box;
-
-    }
+  
     #comision_respuesta{
        position:absolute; 
        top:10.65%; 
