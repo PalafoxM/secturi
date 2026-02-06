@@ -266,48 +266,17 @@
                                 </div><!--end form-row-->
                                 <br>
                                 
-                                <?php
-                                $grupos = [];
-                                if (!empty($archivosPorFila)) {
-                                    foreach ($archivosPorFila as $id => $fila) {
-                                        $pId = $fila['id_partida'] ?? '';
-                                        $prId = $fila['id_proyecto'] ?? '';
-                                        $psId = $fila['id_presupuesto'] ?? '';
-                                        $enc = $fila['encabezado'] ?? '';
-                                        $key = $pId . '-' . $prId . '-' . $enc; 
-                                        
-                                        if (!isset($grupos[$key])) {
-                                             $grupos[$key] = [
-                                                 'datos' => [],
-                                                 'id_partida' => $pId,
-                                                 'id_proyecto' => $prId,
-                                                 'id_presupuesto' => $psId,
-                                                 'encabezado' => $enc
-                                             ];
-                                        }
-                                        $grupos[$key]['datos'][$id] = $fila;
-                                    }
-                                } else {
-                                    // Grupo por defecto vacio
-                                    $grupos['default'] = [
-                                        'datos' => [],
-                                        'id_partida' => '',
-                                        'id_presupuesto' => '',
-                                        'encabezado' => 'Borrador'
-                                    ];
-                                }
-                                $groupIndex = 0;
-                                ?>
+
 
                                 <?php foreach($grupos as $key => $grupo): ?>
-                                <?php $groupIndex++; ?>
-                                <div class="card group-container mb-4" data-group-id="<?= $groupIndex ?>">
+                               
+                                <div class="card group-container mb-4" >
                                     <div class="card-body">
                                         
                                         <!-- Header Inputs (Visual Controls) -->
                                         <div class="form-row">
                                             <div class="col-md-4 mb-3">
-                                                <label>Partida <span class="text-danger">* <?=  $grupo['id_partida'] ?> </span></label>
+                                                <label>Partida <span class="text-danger">*  </span></label>
                                                 <select class="form-control header-partida">
                                                     <option value="">Seleccione</option>
                                                     <?php foreach ($cat_partida as $partida): ?>
@@ -318,7 +287,7 @@
                                                 </select>
                                             </div>
                                             <div class="col-md-4 mb-3">
-                                                <label>Proyecto <span class="text-danger">* <?= $grupo['id_proyecto'] ?> </span></label>
+                                                <label>Proyecto <span class="text-danger">*  </span></label>
                                                 <select class="form-control header-proyecto">
                                                     <option value="">Seleccione</option>
                                                     <?php foreach ($cat_proyecto as $proyecto): ?>
@@ -339,7 +308,7 @@
                                             <table class="table table-bordered table-rows">
                                                 <thead>
                                                     <tr>
-                                                        <th style="width: 10%;">IMPORTE</th>
+                                                     
                                                         <th style="width: 8%;">PROPINA</th>
                                                         <th>INICIO</th>
                                                         <th>FIN</th>
@@ -348,15 +317,11 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <?php foreach($grupo['datos'] as $j => $r): ?>
+                                                    <?php foreach($grupo['tabla'] as $j => $r): ?>
                                                     <?php 
                                                         $uniqueId = $j;
                                                         $totalImporte = 0;
-                                                        if(isset($r['xml']) && is_array($r['xml'])) {
-                                                            foreach($r['xml'] as $xml) {
-                                                                $totalImporte += isset($xml['total']) ? (float)$xml['total'] : 0;
-                                                            }
-                                                        }
+                                                        
                                                         $inicio = isset($r['periodo_inicio']) ? date('Y-m-d', strtotime($r['periodo_inicio'])) : '';
                                                         $fin = isset($r['periodo_fin']) ? date('Y-m-d', strtotime($r['periodo_fin'])) : '';
                                                         $propina = isset($r['propina']) ? $r['propina'] : '';
@@ -367,14 +332,9 @@
                                                         
                                                         <!-- Hidden Inputs synced with Header -->
                                                         <input type="hidden" class="row-partida" name="id_partida[<?= $uniqueId ?>]" value="<?= $grupo['id_partida'] ?>">
-                                                        <input type="hidden" class="row-proyecto" name="id_presupuesto[<?= $uniqueId ?>]" value="<?= $grupo['id_presupuesto'] ?>">
-                                                        <input type="hidden" class="row-encabezado" name="encabezado[<?= $uniqueId ?>]" value="<?= $grupo['encabezado'] ?>">
-                                                        
-                                                        <td>
-                                                            <input type="text" autocomplete="off" class="form-control importe-input" 
-                                                                name="importe[<?= $uniqueId ?>]" placeholder="Importe" 
-                                                                value="<?= number_format($totalImporte, 2, '.', '') ?>" readonly>
-                                                        </td>
+                                                        <input type="hidden" class="row-proyecto" name="id_presupuesto[<?= $uniqueId ?>]" value="<?= $r['id_presupuesto'] ?>">
+                                                      
+                                                      
                                                         <td>
                                                             <input autocomplete="off" type="text" class="form-control propina-input" 
                                                                 name="propina[<?= $uniqueId ?>]" placeholder="Propina" 
@@ -392,32 +352,32 @@
                                                         </td>
                                                         <td>
                                                             <div class="archivos-seleccionados" id="archivos_<?= $uniqueId ?>">
-                                                                <?php if(isset($r['pdf']) && is_array($r['pdf'])): ?>
-                                                                    <?php if(count($r['pdf']) > 0): ?>
+                                                                <?php if(isset($r['ruta_relativa'])): ?>
+                                                                   
                                                                         <div class="text-success"><small><strong>PDF:</strong></small></div>
                                                                         <ul class="list-unstyled mb-1">
-                                                                        <?php foreach($r['pdf'] as $pdf): ?>
+                                                                      
                                                                             <li>
-                                                                                <?php if(isset($pdf['ruta'])): ?>
-                                                                                    <a href="<?= base_url().$pdf['ruta'] ?>" target="_blank"><small><?= $pdf['nombre'] ?></small></a>
+                                                                                <?php if(isset($r['ruta_relativa'])): ?>
+                                                                                    <a href="<?= base_url().$r['ruta_relativa'] ?>" target="_blank"><small> FACTURA PDF</small></a>
                                                                                 <?php else: ?>
-                                                                                    <small><?= $pdf['nombre'] ?></small>
+                                                                                    <small><?= $r['ruta_relativa'] ?></small>
                                                                                 <?php endif; ?>
                                                                             </li>
-                                                                        <?php endforeach; ?>
+                                                                       
                                                                         </ul>
-                                                                    <?php endif; ?>
+                                                                   
                                                                 <?php endif; ?>
 
-                                                                <?php if(isset($r['xml']) && is_array($r['xml'])): ?>
-                                                                    <?php if(count($r['xml']) > 0): ?>
+                                                                <?php if(isset($r['id_xml']) ): ?>
+                                                                    
                                                                         <div class="text-info"><small><strong>XML:</strong></small></div>
                                                                         <ul class="list-unstyled mb-0">
-                                                                        <?php foreach($r['xml'] as $xml): ?>
-                                                                           <a href="<?= base_url().'index.php/Inicio/VerXML/'.$xml['id'].'/go' ?>" target="_blank"> <li><small><?= $xml['nombre'] ?> (Total: <?= isset($xml['total']) ? $xml['total'] : '0.00' ?>)</small></li></a>
-                                                                        <?php endforeach; ?>
+                                                                   
+                                                                           <a href="<?= base_url().'index.php/Inicio/VerXML/'.$r['id_xml'].'/go' ?>" target="_blank"> <li><small>FOLIO: <?= $r['folio'] ?> (Total: <?= isset($r['total']) ? $r['total'] : '0.00' ?>)</small></li></a>
+                                                                      
                                                                         </ul>
-                                                                    <?php endif; ?>
+                                                                    
                                                                 <?php endif; ?>
                                                                 
                                                                 <?php if(empty($r['pdf']) && empty($r['xml'])): ?>
@@ -518,383 +478,114 @@
 
 
 <script>
-    // Inicializar variables globales desde PHP
-    var archivosPorFila = <?= json_encode($archivosPorFila) ?>;
-    if (typeof archivosPorFila !== 'object' || archivosPorFila === null) {
-        archivosPorFila = {};
-    }
-    
-    // Catalogos para JS
-    var catPartida = <?= json_encode($cat_partida) ?>;
-    var catProyecto = <?= json_encode($cat_proyecto) ?>;
 
 
+    // --- ENVIAR ---
 
-// Preparar FormData corregido
-function prepararFormData() {
-    const formData = new FormData();
-    const form = $('#formBorrador_go')[0];
-    const formElements = new FormData(form);
-    
-    for (let [key, value] of formElements) {
-        formData.append(key, value);
-    }
-    
-    // Capturar inputs de los modales de viaticos MANUALMENTE
+    // Guardar Borrador
+    $('#btnGuardarBorrador').on('click', function() {
+        $('#es_borrador').val('1');
+        enviarFormulario("<?= base_url()?>index.php/Agregar/guardaBorradorGO", $(this));
+    });
 
-    
-
-    
-    // Agregar archivos - SOLO FILAS QUE EXISTEN
-    Object.keys(archivosPorFila).forEach(rowIndex => {
-        const archivos = archivosPorFila[rowIndex];
+    // Guardar y Enviar
+    $('#formBorrador_go').on('submit', function(e) {
+        e.preventDefault();
+        $('#es_borrador').val('0');
         
-        if (archivos && archivos.pdf) {
-            archivos.pdf.forEach((file, fileIndex) => {
-                if(file instanceof File) {
-                    formData.append(`archivos[pdf_${rowIndex}][pdf][${fileIndex}]`, file);
+        if (!validarFormulario()) return;
+
+        enviarFormulario("<?= base_url()?>index.php/Agregar/guardaGO", $('#btnGuardaGo'));
+    });
+
+    function enviarFormulario(url, btn) {
+        const formData = prepararFormData();
+        formData.append('deleted_rows', JSON.stringify(deletedRows));
+        
+        const btnText = btn.html();
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: "json",
+            beforeSend: function (){
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+            },
+            success: function (response) {
+                if(!response.error){
+                    Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
+                    setTimeout(() => {
+                        // Redirección según sea borrador o final
+                        const redirect = ($('#es_borrador').val() == '1') ? "listaBorradoresGO" : "listaReservaGO";
+                        window.location.href = base_url + "index.php/Principal/" + redirect;
+                    }, 1500);
+                }else{
+                    Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
                 }
-            });
-        }
-        
-        if (archivos && archivos.xml) {
-            archivos.xml.forEach((file, fileIndex) => {
-                 if(file instanceof File) {
-                    formData.append(`archivos[xml_${rowIndex}][xml][${fileIndex}]`, file);
-                 }
-            });
-        }
-    });
-
-    return formData;
-}
-
-// Envío del formulario
-// Variable global para filas eliminadas
-let deletedRows = [];
-
-// ENVIAR BORRADOR (Sin validación estricta de archivos)
-$('#btnGuardarBorrador').on('click', function() {
-    $('#es_borrador').val('1');
-    
-    // 1. Preparar FormData
-    const formData = prepararFormData();
-    formData.append('deleted_rows', JSON.stringify(deletedRows));
-
-    // 2. Enviar AJAX a endpoint de Borrador
-    $.ajax({
-        type: "POST",
-        url: "<?= base_url()?>index.php/Agregar/guardaBorradorGO",
-        data: formData,
-        processData: false,
-        contentType: false,
-        dataType: "json",
-        success: function (response) {
-            if(!response.error){
-                Swal.fire("Borrador Guardado", '<p> '+ response.respuesta + '</p>', 'success');  
-                setTimeout(() => {
-                     window.location.href = base_url + "index.php/Principal/listaBorradoresGO";
-                }, 1500);
-            }else{
-                Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
+            },
+            complete: function (){
+                btn.prop('disabled', false).html(btnText);
+            },
+            error: function (response) {
+                // Manejo de error seguro
+                let msg = "Error desconocido";
+                try {
+                    const res = JSON.parse(response.responseText);
+                    msg = res.message || msg;
+                } catch(e) {}
+                Swal.fire("Error", '<p> '+ msg + '</p>');  
             }
-        },
-        beforeSend: function (){
-            $('#btnGuardarBorrador').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
-        },
-        complete: function (){
-            $('#btnGuardarBorrador').prop('disabled', false).html('Guardar sin enviar');
-        },
-        error: function (response) {
-            var res = JSON.parse(response.responseText);
-            Swal.fire("Error", '<p> '+ res.message + '</p>');  
-        }
-    });
-});
-
-
-// ENVIAR FINAL (Con validación estricta)
-$('#formBorrador_go').on('submit', function(e) {
-    e.preventDefault();
-    
-    $('#es_borrador').val('0'); // Asegurar que no es borrador
-
-    // 1. Preparar FormData
-    const formData = prepararFormData();
-    formData.append('deleted_rows', JSON.stringify(deletedRows));
-
-    // 2. Validacion de fechas requeridas
-    let fechasValidas = true;
-    $('input[type="date"]').each(function() {
-        if ($(this).val() === '') {
-            fechasValidas = false;
-            $(this).addClass('is-invalid');
-        } else {
-            $(this).removeClass('is-invalid');
-        }
-    });
-
-    if (!fechasValidas) {
-        Swal.fire("Atención", "Por favor, complete todas las fechas requeridas.", "warning");
-        return;
+        });
     }
 
-    // 3. Validacion de Archivos (ESTRICTA)
-    let archivosValidos = true;
-    $('tr[data-row-index]').each(function() {
-        if ($(this).attr('data-viaticos') === 'true') return; 
-
-        const rowIndex = $(this).data('row-index');
-        const archivos = archivosPorFila[rowIndex];
-        
-        let tienePdf = false;
-        let tieneXml = false;
-
-        if (archivos) {
-            if (archivos.pdf && Array.isArray(archivos.pdf) && archivos.pdf.length > 0) tienePdf = true;
-            if (archivos.xml && Array.isArray(archivos.xml) && archivos.xml.length > 0) tieneXml = true;
-        }
-
-        if (!tienePdf || !tieneXml) {
-            archivosValidos = false;
-            $(this).find('.archivos-seleccionados').addClass('border border-danger');
-        } else {
-            $(this).find('.archivos-seleccionados').removeClass('border border-danger');
-        }
-    });
-
-    if (!archivosValidos) {
-        Swal.fire("Atención", "Es requerido adjuntar al menos un PDF y un XML por cada fila.", "warning");
-        return;
-    }
-
-    // 4. Enviar AJAX a endpoint Original
-    $.ajax({
-        type: "POST",
-        url: "<?= base_url()?>index.php/Agregar/guardaGO",
-        data: formData,
-        processData: false,
-        contentType: false,
-        dataType: "json",
-        success: function (response) {
-            if(!response.error){
-                Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
-                setTimeout(() => {
-                    window.location.href = base_url + "index.php/Principal/listaReservaGO";
-                }, 1500);
-            }else{
-                Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  
+    function validarFormulario() {
+        // Validacion de fechas
+        let fechasValidas = true;
+        $('input[type="date"]').each(function() {
+            if ($(this).val() === '') {
+                fechasValidas = false;
+                $(this).addClass('is-invalid');
+            } else {
+                $(this).removeClass('is-invalid');
             }
-        },
-        beforeSend: function (){
-            $('#btnGuardaGo').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
-        },
-        complete: function (){
-            $('#btnGuardaGo').prop('disabled', false).html('Guardar y Enviar');
-        },
-        error: function (response) {
-            var res= JSON.parse(response.responseText);
-            Swal.fire("Error", '<p> '+ res.message + '</p>');  
-        }
-    });
-
-    });
-
-
-// Función para agregar nueva fila (en contexto de grupo)
-$(document).on('click', '.btnAgregarFila', function() {
-    const groupContainer = $(this).closest('.group-container');
-    const tableBody = groupContainer.find('table tbody');
-    
-    // Obtener valores del header del grupo
-    const idPartida = groupContainer.find('.header-partida').val();
-    const idProyecto = groupContainer.find('.header-proyecto').val();
-    const encabezado = groupContainer.find('.header-encabezado').val();
-    
-    // Generar ID único no numérico
-    const newId = 'new_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
-    
-    // Inicializar almacenamiento de archivos
-    archivosPorFila[newId] = { pdf: [], xml: [] };
-    
-    const nuevaFila = `
-        <tr data-row-index="${newId}">
-            <input type="hidden" name="rowIndex[]" value="${newId}">
-            
-            <input type="hidden" class="row-partida" name="id_partida[${newId}]" value="${idPartida}">
-            <input type="hidden" class="row-proyecto" name="id_presupuesto[${newId}]" value="${idProyecto}">
-            <input type="hidden" class="row-encabezado" name="encabezado[${newId}]" value="${encabezado}">
-            
-            <td>
-                <input type="text" autocomplete="off" class="form-control importe-input" 
-                    name="importe[${newId}]" placeholder="Importe" 
-                    value="0.00" readonly>
-            </td>
-            <td>
-                <input autocomplete="off" type="text" class="form-control propina-input" 
-                    name="propina[${newId}]" placeholder="Propina" 
-                    value="0" >
-            </td>
-            <td>
-                <input autocomplete="off" type="date" class="form-control" 
-                    name="periodo_inicio[${newId}]" 
-                    value="" >
-            </td>
-            <td>
-                <input autocomplete="off" type="date" class="form-control" 
-                    name="periodo_fin[${newId}]"  
-                    value="">
-            </td>
-            <td>
-                <div class="archivos-seleccionados" id="archivos_${newId}">
-                    <small class="text-muted">No hay archivos</small>
-                </div>
-            </td>
-            <td>
-                <div class="mt-1">
-                    <button type="button" class="btn btn-sm btn-success btn-seleccionar-pdf" data-row="${newId}">
-                        <i class="fas fa-file-pdf"></i> PDF
-                    </button>
-                    <button type="button" class="btn btn-sm btn-warning btn-seleccionar-xml" data-row="${newId}">
-                        <i class="mdi mdi-code-tags"></i> XML
-                    </button>
-                </div>
-                <button type="button" class="btn btn-sm btn-danger remove-row" 
-                    data-row="${newId}">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        </tr>
-    `;
-    
-    tableBody.append(nuevaFila);
-});
-
-// Sincronizar cambios del Header con los inputs ocultos de las filas
-$(document).on('change keyup', '.header-partida', function() {
-    const val = $(this).val();
-    const groupContainer = $(this).closest('.group-container');
-    groupContainer.find('.row-partida').val(val);
-});
-$(document).on('change keyup', '.header-proyecto', function() {
-    const val = $(this).val();
-    const groupContainer = $(this).closest('.group-container');
-    groupContainer.find('.row-proyecto').val(val);
-});
-$(document).on('change keyup', '.header-encabezado', function() {
-    const val = $(this).val();
-    const groupContainer = $(this).closest('.group-container');
-    groupContainer.find('.row-encabezado').val(val);
-});
-
-// Agregar Nuevo Grupo
-$('#btnAgregarGrupo').on('click', function() {
-    // Clonar el primer grupo para usarlo como template (limpiando valores)
-    // Nota: Esto requiere que exista al menos un grupo. Si no, habría que construir el template en JS.
-    // Como backend garantiza al menos 'default', podemos intentar clonar.
-    
-    const primerGrupo = $('.group-container').first();
-    if(primerGrupo.length > 0) {
-        const nuevoGrupo = primerGrupo.clone();
-        
-        // Limpiar inputs del header
-        nuevoGrupo.find('.header-partida').val('');
-        nuevoGrupo.find('.header-proyecto').val('');
-        nuevoGrupo.find('.header-encabezado').val('Borrador');
-        
-        // Limpiar tabla (dejar vacía)
-        nuevoGrupo.find('tbody').empty();
-        
-        // Actualizar data-group-id (opcional, solo para unicidad si se usa)
-        const id = Date.now();
-        nuevoGrupo.attr('data-group-id', id);
-        
-        // Insertar antes del boton
-        $(this).before(nuevoGrupo);
-    }
-});
-
-// Delegación de eventos para botones de filas dinámicas (Eliminar)
-$(document).on('click', '.remove-row', function() {
-    const rowId = $(this).data('row');
-    const tr = $(this).closest('tr');
-    
-    // Si no es una fila nueva (es decir, ya existía en DB), agregamos a deletedRows
-    if (!isNaN(rowId) && !String(rowId).startsWith('new_')) {
-        deletedRows.push(rowId);
-    } else {
-        // Es una fila nueva que no se ha guardado aun, solo la borramos del DOM y de la variable JS
-        delete archivosPorFila[rowId];
-    }
-    
-    tr.remove();
-    $('#deleted_rows').val(JSON.stringify(deletedRows));
-});
-
-// Delegación de eventos para selección de archivos (PDF/XML) en filas dinámicas
-$(document).on('click', '.btn-seleccionar-pdf, .btn-seleccionar-xml', function() {
-    const rowId = $(this).data('row');
-    const isPdf = $(this).hasClass('btn-seleccionar-pdf');
-    const type = isPdf ? 'pdf' : 'xml';
-    const accept = isPdf ? '.pdf' : '.xml';
-    
-    // Crear input file temporal
-    const fileInput = $('<input type="file" multiple accept="' + accept + '" style="display:none;">');
-    $('body').append(fileInput);
-    
-    fileInput.trigger('click');
-    
-    fileInput.on('change', function() {
-        const files = this.files;
-        if (files.length > 0) {
-            // Agregar archivos al array global
-            if (!archivosPorFila[rowId]) archivosPorFila[rowId] = { pdf: [], xml: [] };
-            if (!archivosPorFila[rowId][type]) archivosPorFila[rowId][type] = [];
-            
-            Array.from(files).forEach(file => {
-                archivosPorFila[rowId][type].push(file);
-            });
-            
-            // Renderizar vista previa
-            renderizarArchivosFila(rowId);
-        }
-        fileInput.remove();
-    });
-});
-
-// Función helper para renderizar los archivos de una fila
-function renderizarArchivosFila(rowId) {
-    const container = $(`#archivos_${rowId}`);
-    const archivos = archivosPorFila[rowId];
-    let html = '';
-    
-    if (archivos && archivos.pdf && archivos.pdf.length > 0) {
-        html += '<div class="text-success"><small><strong>PDF:</strong></small></div><ul class="list-unstyled mb-1">';
-        archivos.pdf.forEach(file => {
-            const name = (file instanceof File) ? file.name : file.nombre;
-            html += `<li><small>${name}</small></li>`;
         });
-        html += '</ul>';
-    }
-    
-    if (archivos && archivos.xml && archivos.xml.length > 0) {
-        html += '<div class="text-info"><small><strong>XML:</strong></small></div><ul class="list-unstyled mb-0">';
-        archivos.xml.forEach(file => {
-             const name = (file instanceof File) ? file.name : file.nombre;
-             const total = (file instanceof File) ? '' : (file.total ? ` (Total: ${file.total})` : '');
-             html += `<li><small>${name}${total}</small></li>`;
+
+        if (!fechasValidas) {
+            Swal.fire("Atención", "Por favor, complete todas las fechas requeridas.", "warning");
+            return false;
+        }
+
+        // Validacion de Archivos (Al menos 1 PDF y 1 XML por fila activa)
+        let archivosValidos = true;
+        $('tr[data-row-index]').each(function() {
+            const rowIndex = $(this).data('row-index');
+            const archivos = archivosPorFila[rowIndex];
+            
+            let tienePdf = false;
+            let tieneXml = false;
+
+            if (archivos) {
+                if (archivos.pdf && archivos.pdf.length > 0) tienePdf = true;
+                if (archivos.xml && archivos.xml.length > 0) tieneXml = true;
+            }
+
+            if (!tienePdf || !tieneXml) {
+                archivosValidos = false;
+                $(this).find('.archivos-seleccionados').addClass('border border-danger');
+            } else {
+                $(this).find('.archivos-seleccionados').removeClass('border border-danger');
+            }
         });
-        html += '</ul>';
+
+        if (!archivosValidos) {
+            Swal.fire("Atención", "Es requerido adjuntar al menos un PDF y un XML por cada fila.", "warning");
+            return false;
+        }
+
+        return true;
     }
-    
-    if (html === '') {
-        html = '<small class="text-muted">No hay archivos</small>';
-    }
-    
-    container.html(html);
-}
-
-
-
 
 </script>

@@ -7247,72 +7247,48 @@ class Principal extends BaseController
         $data['registro_pt'] = $dataRegistro; 
         
         // Mapear archivos por fila para JS
-
-       
-        $archivosPorFila = [];
-        if(!empty($periodo_factura->data)){
-            foreach($periodo_factura->data as $pf){
-                $rowIndex = $pf->id_identificador;
-                $idPartida = '';
-                $idProyecto = '';
-                $idPresupuesto = isset($pf->id_presupuesto) ? $pf->id_presupuesto : ''; // La columna en periodo_factura_go es id_presupuesto_go
-                if (!empty($presupuesto->data) && !empty($idPresupuesto)) {
-                        
-                    foreach ($presupuesto->data as $p) {
-                        //var_dump( $p );
-                         // Comparar con id_presupuesto_go o id_proyecto (dependiendo de la vista, pero id_presupuesto_go es lo más seguro)
-                         if (isset($p->id_presupuesto_go) && $p->id_presupuesto_go == $idPresupuesto) {
-                             $idPartida = isset($p->id_partida) ? $p->id_partida : '';
-                             $idProyecto = isset($p->id_proyecto) ? $p->id_proyecto : '';
-                             break;
-                         }
-                    }
-                }
-
-                $archivosPorFila[$rowIndex] = [
-                     'pdf' => [], 
-                     'xml' => [],
-                     'encabezado' => isset($pf->encabezado) ? $pf->encabezado : '',
-                     'id_identificador' => $rowIndex, 
-                     'id_partida' => $idPartida,
-                     'id_proyecto' => $idProyecto,
-                     'id_presupuesto' => $idPresupuesto,
-                     'propina' => isset($pf->propina) ? $pf->propina : '',
-                     'periodo_inicio' => date('Y-m-d', strtotime($pf->periodo_inicio)),
-                     'periodo_fin' => date('d-m-Y', strtotime($pf->periodo_fin))
+      
+        $grupos = [];
+        foreach($presupuesto->data as $key => $value){
+            $grupos[] = [
+                'id_presupuesto_go' => $value->id_presupuesto_go,
+                'id_reserva'        => $value->id_reserva,
+                'id_proyecto'       => $value->id_proyecto,
+                'id_partida'        => $value->id_partida,
+                'importe'           => $value->importe,
+                'fec_reg'           => $value->fec_reg,
+                'usu_reg'           => $value->usu_reg,
+                'encabezado'        => $value->encabezado,
+                'dsc_partida'       => $value->dsc_partida,
+                'partida'           => $value->partida,
+                'proyecto'          => $value->proyecto
+  
+            ];
+            foreach($periodo_factura->data as $index => $v){
+                $grupos[$key]['tabla'][] = [
+                    'id_periodo_factura' =>$v->id_periodo_factura,
+                    'id_registro_go' =>$v->id_registro_go,
+                    'id_presupuesto' =>$v->id_presupuesto,
+                    'periodo_fin' =>$v->periodo_fin,
+                    'periodo_inicio' =>$v->periodo_inicio,
+                    'id_identificador' =>$v->id_identificador,
+                    'id_periodo_factura' =>$v->id_periodo_factura,
+                    'ruta_absoluta' =>$factura_pdf->data[$index]->ruta_absoluta,
+                    'ruta_relativa' =>$factura_pdf->data[$index]->ruta_relativa,
+                    'folio' =>$xml_go->data[$index]->folio,
+                    'id_xml' =>$xml_go->data[$index]->id_xml,
+                    'total' =>$xml_go->data[$index]->total
+                
                 ];
-                 
-                 // Buscar PDFs
-                 if(!empty($factura_pdf->data)){
-                     foreach($factura_pdf->data as $pdf){
-                         if($pdf->id_identificador == $rowIndex){
-                              $archivosPorFila[$rowIndex]['pdf'][] = [
-                                  'nombre' => basename($pdf->ruta_relativa),
-                                  'ruta' => $pdf->ruta_relativa,
-                                  'id' => $pdf->id_factura_pdf_go
-                              ];
-                         }
-                     }
-                 }
-                  // Buscar XMLs
-                 if(!empty($xml_go->data)){
-                     foreach($xml_go->data as $xml){
-                         if($xml->id_identificador == $rowIndex){
-                              $archivosPorFila[$rowIndex]['xml'][] = [
-                                  'nombre' => 'XML Folio: '.$xml->folio, 
-                                  'id' => $xml->id_xml,
-                                  'folio' => $xml->folio,
-                                  'total' => $xml->total
-                              ];
-                         }
-                     }
-                 }
             }
+
         }
 
-        $data['archivosPorFila'] = $archivosPorFila;
         
-       //var_dump($archivosPorFila);
+
+        $data['grupos'] = $grupos;
+        
+       //var_dump($grupos);
        //die();
 
         $data['dsc_director_general'] = (!empty($cat_director_general->data)) ? $cat_director_general->data[0]->dsc_director_general : [];

@@ -1841,43 +1841,37 @@ class Agregar extends BaseController
         $archivos_post = $this->request->getFiles();
         
         // 1. MAPEAR ARCHIVOS POR rowIndex (Corrección de mapeo)
-        $archivos_por_rowIndex = [];
-        if (isset($archivos_post['archivos'])) {
-            // Estructura esperada: archivos[pdf_ROWINDEX][pdf][]
-            foreach ($archivos_post['archivos'] as $key => $file_data) {
-                // $key ej: 'pdf_table_1_row_xxx' o 'pdf_123' (siendo 123 ID real)
+      $archivos = [];
 
+        if (isset($archivos_post['archivos'])) {
+            foreach ($archivos_post['archivos'] as $key => $file_data) {
+                // Extraer tipo (pdf/xml) y rowIndex
                 if (strpos($key, 'pdf_') === 0) {
                     $rowIndex = substr($key, 4); // Remover 'pdf_'
                     if (isset($file_data['pdf'])) {
-                        $archivos_por_rowIndex[$rowIndex]['pdf'] = $file_data['pdf'];
+                        // Inicializar array para este rowIndex si no existe
+                        if (!isset($archivos[$rowIndex])) {
+                            $archivos[$rowIndex] = ['pdf' => [], 'xml' => []];
+                        }
+                        $archivos[$rowIndex]['pdf'] = $file_data['pdf'];
                     }
                 } elseif (strpos($key, 'xml_') === 0) {
                     $rowIndex = substr($key, 4); // Remover 'xml_'
                     if (isset($file_data['xml'])) {
-                        $archivos_por_rowIndex[$rowIndex]['xml'] = $file_data['xml'];
+                        // Inicializar array para este rowIndex si no existe
+                        if (!isset($archivos[$rowIndex])) {
+                            $archivos[$rowIndex] = ['pdf' => [], 'xml' => []];
+                        }
+                        $archivos[$rowIndex]['xml'] = $file_data['xml'];
                     }
                 }
             }
         }
 
-        // 2. PROCESAR DATOS PRINCIPALES
+
         $id_registro_go = isset($data['id_registro_go']) && !empty($data['id_registro_go']) ? $data['id_registro_go'] : null;
-        
-        // Si NO hay ID, creamos uno nuevo (Primer guardado)
-        // Si SÍ hay ID, actualizamos (Edición)
-        
-        if (isset($data['fecha_tramite']) && empty($data['fecha_tramite'])) {
-            $data['fecha_tramite'] = date('Y-m-d');
-        }
 
-        // Si es nuevo, generamos folio. Si es edición, mantenemos el que tiene (o actualizamos si aplica lógica)
-        // Para borrador simple, asumimos que si ya existe no regeneramos folio a menos que sea necesario.
-        // Pero registrarFolioGo probablemente maneja lógica interna. Si ya tiene folio asignado en DB no deberíamos cambiarlo.
-        // $no_consecutivo = $this->registrarFolioGo($data['no_consecutivo'], $data['id_reponsable_solicitud'], $data['direccion_responsable']);
-
-
-        $dataInsert = [
+         $dataInsert = [
             'id_reserva_go' => $data['id_reserva_go'],
             'id_estatus' => 1, // Siempre borrador
             'id_direccion_responsable' => $data['direccion_responsable'],
@@ -1895,6 +1889,7 @@ class Agregar extends BaseController
             'documentacion_requerida' => ($data['documentacion_requerida'] == 'SI') ? 1 : 2,
             'evidencia_entrega' => (int) $data['evidencia_entrega'],
             'concepto_gasto' => $data['concepto_gasto'],
+            'fecha_tramite' => (isset($data['fecha_tramite']) && !empty($data['fecha_tramite']))?$data['fecha_tramite']:date('Y-m-d'),
             //'total_importe' => $data['total_importe'], 
             'comision' => $data['comision'],
             'lugar' => $data['lugar'],
@@ -1910,183 +1905,73 @@ class Agregar extends BaseController
 
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaBorradorGO'];
         $responsePrincipal = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
-       
-        if ($responsePrincipal->error) {
-            return $this->respond($responsePrincipal);
-        }
-       
-        // 3. PROCESAR ELIMINACIONES
-        if (!empty($data['deleted_rows'])) {
-            $deleted_rows = json_decode($data['deleted_rows'], true);
-            if (is_array($deleted_rows)) {
-                foreach ($deleted_rows as $del_id) {
-                    // Si es numérico, es un ID real de base de datos
-                    if (is_numeric($del_id)) {
-                        // Eliminamos de las tablas hijas. 
-                        // Nota: Se podría hacer más específico borrando solo de la tabla correcta si supiéramos cual es,
-                        // pero IDs suelen ser únicos por tabla. Aquí asumimos periodo_factura_go o viaticos_go.
-                        // Probaremos borrar de periodo_factura_go primero.
-                        
-                         // Intento Delete periodo_factura_go
-                        $this->globals->saveTabla(
-                            ['visible' => 0], 
-                            ["tabla" => "periodo_factura_go", "editar" => true, "idEditar" => ['id_identificador' => $del_id]], 
-                            ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/deleteRow']
-                        );
-                        
-                        // Intento Delete viaticos_go
-                         $this->globals->saveTabla(
-                            ['visible' => 0], 
-                            ["tabla" => "viaticos_go", "editar" => true, "idEditar" => ['id_identificador' => $del_id]], 
-                            ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/deleteRow']
-                        );
-                    }
-                }
+        
+      $rowIndex = is_array($data['rowIndex']) ? $data['rowIndex'] : [];
+
+        $grupal = [];
+        $pdf = [];
+        $xml = [];
+        foreach ($rowIndex as $key => $rowKey) {
+            // Verificar si existe id_identificador para este rowKey
+            // O si el valor de id_identificador es 0 (para filtrar)
+            if (isset($data['id_identificador'][$rowKey]) && $data['id_identificador'][$rowKey] === '0') {
+                continue; // Saltar elementos con id_identificador = '0'
             }
+            
+            $grupal[] = [
+                'rowIndex' => $rowKey,
+                'id_partida' => $data['id_partida'][$rowKey] ?? null,
+                'id_presupuesto' => $data['id_presupuesto'][$rowKey] ?? null,
+                'propina' => $data['propina'][$rowKey] ?? null,
+                'periodo_inicio' => $data['periodo_inicio'][$rowKey] ?? null,
+                'periodo_fin' => $data['periodo_fin'][$rowKey] ?? null,
+                'importe' => $data['importe'][$rowKey] ?? null,
+                'encabezado' => $data['encabezado'][$rowKey] ?? null,
+            ];
+            $pdf[] = $archivos[$rowKey]['pdf'] ?? null;
+            $xml[] = $archivos[$rowKey]['xml'] ?? null;
         }
-
-        // 4. PROCESAR FILAS (Insertar nuevas o Editar existentes)
-       
-        if (isset($data['encabezado'])) { 
-            foreach ($data['encabezado'] as $i => $encabezado_texto) {
-                
-                // --- FILAS ESTÁNDAR ---
-                if (isset($data['periodo_inicio'])) {
-                     
-                    foreach ($data['periodo_inicio'] as $j => $val) {
-                         
-                         if (empty($val)) continue; // Fila vacía
-                       
-                        // Obtenemos el id_identificador enviado desde el input hidden
-                        $idIdentificadorInput = isset($data['id_identificador'][$j]) ? $data['id_identificador'][$j] : null; // Input del form
-                     
-                        // Verificamos si existe en DB
-                        $existe = false;
-                        // Usamos validación explicita !== null && !== '' para permitir '0'
-                        if ($idIdentificadorInput !== null && $idIdentificadorInput !== '') {
-                             // Consulta directa para ver si este id_identificador ya existe para este registro
-                             $existencia = $this->globals->getTabla([
-                                "tabla" => "periodo_factura_go",
-                                "where" => ["id_registro_go" => $id_registro_go, "id_identificador" => $idIdentificadorInput]
-                             ]);
-                            
-                             if (!empty($existencia->data)) {
-                                 $existe = true;
-                             }
-                        }
-
-                        // Si existe, IGNORAMOS completamente
-                        if ($existe) {
-                            continue;
-                        }
-                    
-                        $datos_periodo = [
+    
+        foreach ($grupal as $key => $value) {
+             $datos_periodo = [
                             'id_registro_go' => $id_registro_go, 
-                            'encabezado' => $encabezado_texto, 
-                            'id_identificador' => $rowIndex, // Usamos el ID temporal 'new_...'
-                            'id_presupuesto' => $data['id_presupuesto'][$i] ?? null, 
-                            'propina' => (!empty($data['propina_' . $i][$j])) ? str_replace(['$', ','], '', $data['propina_' . $i][$j]) : 0, 
-                            'periodo_inicio' => isset($data['periodo_inicio_' . $i][$j]) ? $data['periodo_inicio_' . $i][$j] : date('Y-m-d'),
-                            'periodo_fin' => isset($data['periodo_fin_' . $i][$j]) ? $data['periodo_fin_' . $i][$j] : date('Y-m-d'),
+                            'encabezado' => $value['encabezado'], 
+                            'id_identificador' => $value['rowIndex'], // Usamos el ID temporal 'new_...'
+                            'id_presupuesto' => $value['id_presupuesto'] ?? null, 
+                            'propina' => (!empty($value['propina'])) ? str_replace(['$', ','], '', $value['propina']) : 0, 
+                            'periodo_inicio' => isset($value['periodo_inicio']) ? $value['periodo_inicio'] : date('Y-m-d'),
+                            'periodo_fin' => isset($value['periodo_fin']) ? $value['periodo_fin'] : date('Y-m-d'),
                             'usu_reg' => $session->get('id_usuario'),
                             'fec_reg' => date('Y-m-d H:i:s')
                         ];
-
-                        // INSERTAR
-                       $response = $this->globals->saveTabla(
+                          $response = $this->globals->saveTabla(
                             $datos_periodo,
                             ["tabla" => "periodo_factura_go", "editar" => false], 
                              ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/insertPeriodo']
                         );
-                       
-                        // GUARDAR ARCHIVOS DE ESTA FILA
-                        if (!$response->error) {
-                             // Usamos el id_identificador (que es el rowIndex string para nuevos) para vincular archivos
-                             $idForFiles = $datos_periodo['id_identificador'];
-                             $this->procesarArchivosFila($id_registro_go, $idForFiles, $idForFiles, $archivos_por_rowIndex, $session);
-                        }
-                        }
-                    }
-                 // die();
-                // --- FILAS VIATICOS ---
-                if (isset($data['nombre_viatico_' . $i])) {
-                    foreach ($data['nombre_viatico_' . $i] as $j => $val) {
-                         if (empty($val)) continue;
-                         
-                         // VIATICOS NO USAN ROWINDEX EN EL VIEW ORIGINAL MODIFICADO, NO TIENEN INPUT HIDDEN AUN?
-                         // En mi modify anterior no agregué hidden input a viaticos. 
-                         // Asumiremos que son siempre nuevos o simples inserts por ahora, O faltaría agregar lógica de edición para viáticos.
-                         // El usuario mencionó: "editar, eliminar o bien agregar... y eso es igual para xml_go y factura_pdf_go"
-                         // Viaticos no llevan archivos xml/pdf adjuntos en este flujo.
-                         
-                         $datos_viatico = [
-                            'id_registro_go' => $id_registro_go,
-                            'id_presupuesto' => $data['id_presupuesto'][$i] ?? null,
-                            'nombre'         => $data['nombre_viatico_' . $i][$j],
-                            'rfc'            => $data['rfc_viatico_' . $i][$j],
-                            'importe'        => (!empty($data['importe_' . $i][$j])) ? str_replace(['$', ','], '', $data['importe_' . $i][$j]) : 0,
-                            'usu_reg'        => $session->get('id_usuario'),
-                            'fec_reg'        => date('Y-m-d H:i:s')
+                foreach ($pdf[$key] as $index => $pdf) {
+                    if ($pdf->isValid() && !$pdf->hasMoved()) {
+                        $timestamp = date('Ymd_His');
+                        $extension = $pdf->getClientExtension();
+                        // Usamos $id_fila_real para asegurar unicidad y referencia real
+                        $file = 'Factura_go_' . $value['rowIndex'] . '_' . $timestamp . '_' . uniqid() . '.' . $extension;
+                        $ruta_destino = FCPATH . 'assets/pdf/';
+                        $pdf->move($ruta_destino, $file);
+                        
+                        $dataInsert = [
+                            'id_registro_go' => (int) $id_registro_go, 
+                            'id_identificador' => $value['rowIndex'], 
+                            'ruta_relativa' => 'assets/pdf/' . $file,
+                            'ruta_absoluta' => base_url('assets/pdf/' . $file),
+                            'fec_reg' => date('Y-m-d H:i:s'),
+                            'usu_reg' => $session->get('id_usuario')
                         ];
-                        
-                        // Logica simplificada para viaticos: Insert always (borramos previos con soft delete arriba si los mandan en deleted_rows? No, deleted_rows viene del JS main table... la tabla de viaticos es un modal aparte).
-                        // Si el usuario edita viaticos, el modal debe manejar sus IDs.
-                        // SI NO TENEMOS IDs DE VIATICOS, ASUMIREMOS INSERT SIEMPRE.
-                        
-                         $dataConfig = ["tabla" => "viaticos_go", "editar" => false];
-                         $respV = $this->globals->saveTabla($datos_viatico, $dataConfig, ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/saveViatico']);
-                         
-                         if (!$respV->error) {
-                             $idV = $respV->idRegistro;
-                             // Update id_identificador mirror
-                             $this->globals->saveTabla(
-                                ['id_identificador' => $idV],
-                                ["tabla" => "viaticos_go", "editar" => true, "idEditar" => ['id_viaticos_go' => $idV]], 
-                                ['id_user' => $session->get('id_usuario'), 'script' => 'updateIdViatico']
-                            );
-                         }
+                        $response = $this->globals->saveTabla($dataInsert, ["tabla" => "factura_pdf_go", "editar" => false], []);
                     }
-                }
-            }
-        } 
-
-        return $this->respond($responsePrincipal);
-    }
-    
-    private function procesarArchivosFila($id_registro_go, $id_fila_real, $rowIndexOriginal, $archivos_por_rowIndex, $session) {
-        // Buscamos archivos mapeados al rowIndex original (que puede ser string 'table_1...')
-        $archivos = isset($archivos_por_rowIndex[$rowIndexOriginal]) ? $archivos_por_rowIndex[$rowIndexOriginal] : null;
-        $response = new \stdClass();
-        
-        if (!$archivos) return;
-
-        // PDF
-        if (isset($archivos['pdf']) && is_array($archivos['pdf'])) {
-            foreach ($archivos['pdf'] as $pdf) {
-                if ($pdf->isValid() && !$pdf->hasMoved()) {
-                    $timestamp = date('Ymd_His');
-                    $extension = $pdf->getClientExtension();
-                    // Usamos $id_fila_real para asegurar unicidad y referencia real
-                    $file = 'Factura_go_' . $id_fila_real . '_' . $timestamp . '_' . uniqid() . '.' . $extension;
-                    $ruta_destino = FCPATH . 'assets/pdf/';
-                    $pdf->move($ruta_destino, $file);
                     
-                    $dataInsert = [
-                        'id_registro_go' => (int) $id_registro_go, 
-                        'id_identificador' => $id_fila_real, 
-                        'ruta_relativa' => 'assets/pdf/' . $file,
-                        'ruta_absoluta' => base_url('assets/pdf/' . $file),
-                        'fec_reg' => date('Y-m-d H:i:s'),
-                        'usu_reg' => $session->get('id_usuario')
-                    ];
-                    $response = $this->globals->saveTabla($dataInsert, ["tabla" => "factura_pdf_go", "editar" => false], []);
                 }
-            }
-        }
-        
-        if (isset($archivos['xml']) && is_array($archivos['xml'])) {
-            foreach ($archivos['xml'] as $xml_file) {
-                 if ($xml_file->isValid() && !$xml_file->hasMoved()) {
+                foreach($xml[$key] as $i => $xml_file){
+                     if ($xml_file->isValid() && !$xml_file->hasMoved()) {
                      $contenido = file_get_contents($xml_file->getTempName());
 
                                 // ... (Tu código de parseo de XML va aquí, es correcto) ...
@@ -2129,7 +2014,7 @@ class Agregar extends BaseController
                                 // ... Fin del parseo ...
 
                                 // Guardar XML físico para adjuntar
-                                $xmlName = 'Factura_go_xml_' . $id_fila_real . '_' . date('Ymd_His') . '_' . uniqid() . '.xml';
+                                $xmlName = 'Factura_go_xml_' . $value['rowIndex'] . '_' . date('Ymd_His') . '_' . uniqid() . '.xml';
                                 $ruta_xml_destino = FCPATH . 'assets/pdf/' . $xmlName;
                                 file_put_contents($ruta_xml_destino, $contenido);
                                 $finalAttachments[] = $ruta_xml_destino;
@@ -2144,7 +2029,7 @@ class Agregar extends BaseController
                                     'fecha' => date('Y-m-d H:i:s', strtotime($fecha)),
                                     'total' => $total,
                                     'moneda' => $moneda,
-                                    'id_identificador' => $id_fila_real, // <-- CORREGIDO: EL ENLACE DE FILA
+                                    'id_identificador' => $value['rowIndex'], // <-- CORREGIDO: EL ENLACE DE FILA
                                     'folio' => $Folio,
                                     'no_certificado' => $NoCertificadoSAT, // Usar el del timbre
                                     'emisor_rfc' => $rfcEmisor,
@@ -2161,15 +2046,22 @@ class Agregar extends BaseController
                                 // Guardamos la info del XML
                                 $responseXML = $this->globals->saveTabla($dataInsertXml, $dataConfigXml, $dataBitacoraXml);
 
-                                // Importante: Asignar la respuesta final solo si no hay error
-                                if (!$responseXML->error) {
-                                    $response->error = false;
-                                    $response->respuesta = 'Archivos XML y PDF guardados correctamente';
-                                }
-                 }
-            }
+                           
+                    }
+
+                }
+        
+            
         }
+     
+ 
+       
+
+
+        return $this->respond($responsePrincipal);
     }
+    
+ 
     public function editarGO()
     {
         $session = \Config\Services::session();
