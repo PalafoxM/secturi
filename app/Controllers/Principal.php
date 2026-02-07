@@ -4892,41 +4892,45 @@ class Principal extends BaseController
 
         //logica para ver el responsable de la solicitud
         //vedificasmos si tiene area a cargo
-        $areaCargo = $globals->getTabla([
-            'tabla' => 'cat_area',
-            'where' => ['id_pago' => 1, 'titular' => $idReponsableSolicitud]
-        ]);
-        if(isset($areaCargo->data) && !empty($areaCargo->data)){
-            $ReponsableSolicitud = $globals->getTabla([
-                'tabla' => 'vw_usuario',
-                'where' => ['visible' => 1, 'id_usuario' => $idReponsableSolicitud]
-            ]);
-        }else{
-            $idJefe = $globals->getTabla([
-                'tabla' => 'vw_usuario',
-                'where' => ['visible' => 1, 'id_usuario' => $idReponsableSolicitud]
-            ])->data[0]->id_jefe_inmediato;
-            $areaTitular = $globals->getTabla([
+        if(!in_array($idReponsableSolicitud,[56,101,60])){
+
+        
+            $areaCargo = $globals->getTabla([
                 'tabla' => 'cat_area',
-                'where' => ['id_pago' => 1, 'titular' => $idJefe]
+                'where' => ['id_pago' => 1, 'titular' => $idReponsableSolicitud]
             ]);
-            if(empty($areaTitular->data)){
-                $idJefe2 = $globals->getTabla([
-                    'tabla' => 'vw_usuario',
-                    'where' => ['visible' => 1, 'id_usuario' => $idJefe]
-                ])->data[0]->id_jefe_inmediato;
-                    $ReponsableSolicitud = $globals->getTabla([
-                    'tabla' => 'vw_usuario',
-                    'where' => ['visible' => 1, 'id_usuario' => $idJefe2]
-                ]);
-            }else{
+            if(isset($areaCargo->data) && !empty($areaCargo->data)){
                 $ReponsableSolicitud = $globals->getTabla([
                     'tabla' => 'vw_usuario',
-                    'where' => ['visible' => 1, 'id_usuario' => $idJefe]
+                    'where' => ['visible' => 1, 'id_usuario' => $idReponsableSolicitud]
                 ]);
+            }else{
+                $idJefe = $globals->getTabla([
+                    'tabla' => 'vw_usuario',
+                    'where' => ['visible' => 1, 'id_usuario' => $idReponsableSolicitud]
+                ])->data[0]->id_jefe_inmediato;
+                $areaTitular = $globals->getTabla([
+                    'tabla' => 'cat_area',
+                    'where' => ['id_pago' => 1, 'titular' => $idJefe]
+                ]);
+                if(empty($areaTitular->data)){
+                    $idJefe2 = $globals->getTabla([
+                        'tabla' => 'vw_usuario',
+                        'where' => ['visible' => 1, 'id_usuario' => $idJefe]
+                    ])->data[0]->id_jefe_inmediato;
+                        $ReponsableSolicitud = $globals->getTabla([
+                        'tabla' => 'vw_usuario',
+                        'where' => ['visible' => 1, 'id_usuario' => $idJefe2]
+                    ]);
+                }else{
+                    $ReponsableSolicitud = $globals->getTabla([
+                        'tabla' => 'vw_usuario',
+                        'where' => ['visible' => 1, 'id_usuario' => $idJefe]
+                    ]);
+                }
             }
         }
-       
+        //die( var_dump(  ) );
         $subsecretario = $globals->getTabla([
             'tabla' => 'cat_subsecretario',
             'where' => ['visible' => 1, 'id_subsecretario' => $idSubsecretario]
@@ -5199,21 +5203,21 @@ class Principal extends BaseController
             echo '<h2>Error al encontrar registro.</h2>'; die();
         }
         $data['registro'] = $registro_go->data[0];
+        // die( var_dump( $registro_go->data[0] ) );
+        $id_reponsable_solicitud = $registro_go->data[0]->id_reponsable_solicitud;
+        $data['nombre_responsable'] = "";
+        $data['puesto_responsable'] = "";
+        $data['area_responsable']   = "";
+        if(isset($id_reponsable_solicitud) && !empty($id_reponsable_solicitud)){
 
-        // Obtener dirección/responsable
-        $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_director' => $data['registro']->id_reponsable_solicitud]]);
-        if (empty($direccion->data)) {
-             $jefe = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $data['registro']->id_reponsable_solicitud]]);
-             if (!empty($jefe->data)) {
-                 $idJefe = $jefe->data[0]->id_jefe_inmediato;
-                 $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_director' => $idJefe]]);
-             } else {
-                 $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $data['registro']->id_reponsable_solicitud]]);
-                 $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_area' => $area->data[0]->id_area]]);
-             }
+             $res = $globals->getTabla(['tabla' => 'vw_usuario', 'where' =>["id_usuario" => $id_reponsable_solicitud ] ]);
+             $data['nombre_responsable'] = $res->data[0]->nombre_completo;
+             $data['puesto_responsable'] = $res->data[0]->dsc_puesto;
+             $data['area_responsable']   = $res->data[0]->dsc_area;
+            //die( var_dump( $res ) );
         }
-        $data['responsableGasto'] = ($direccion->data) ? $direccion->data[0] : '';
 
+       
 
         // 2. Obtener Factura (XML) específica por índice
         $xml_go = $globals->getTabla(['tabla' => 'xml_go', 'where' => ['visible' => 1, 'id_registro_go' => $id_pt]]);

@@ -209,8 +209,8 @@
    RESPONSABLE / CARGO / AREA:
 </div>
  <div id="nombre">
-   <?php if(isset($responsableGasto->nombre_completo) && !empty($responsableGasto->nombre_completo)):  ?>
-   <span ><?= $responsableGasto->nombre_completo ?> - <?= $responsableGasto->dsc_puesto ?> - <?= $responsableGasto->dsc_area; ?> </span>
+   <?php if(isset($nombre_responsable) && !empty($nombre_responsable)):  ?>
+   <span ><?= $nombre_responsable ?> - <?= $puesto_responsable ?> - <?= $area_responsable; ?> </span>
     <?php endif; ?>
 </div>
 <div id="comision">
