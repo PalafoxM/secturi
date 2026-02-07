@@ -471,7 +471,7 @@
                                 <a class="btn btn-gradient-danger" style="color:white"
                                     onclick="window.history.back()">Atrás</a>
                                 <?php if (!$edita): ?>
-                       <!--              <button class="btn btn-gradient-secondary" id="btnGuardarBorrador" type="button" style="margin-right: 10px;">Guardar sin enviar</button> -->
+                                     <button class="btn btn-gradient-secondary" id="btnGuardarBorrador" type="button" style="margin-right: 10px;">Guardar sin enviar</button>
                                     <button class="btn btn-gradient-primary" id="btnGuardaGo" type="submit">Guardar y Enviar</button>
                                 <?php endif; ?>
                             </form> <!--end form-->
@@ -996,6 +996,18 @@ $('#btnGuardarBorrador').on('click', function() {
 });
 
 // Envío del formulario unificado
+// Variable para control de redirección
+let isDraft = false;
+
+$('#btnGuardarBorrador').on('click', function() {
+    isDraft = true;
+    $('#form_go').submit();
+});
+
+$('#btnGuardaGo').on('click', function() {
+    isDraft = false;
+});
+
 $('#form_go').on('submit', function(e) {
     e.preventDefault();
     
@@ -1060,7 +1072,11 @@ $('#form_go').on('submit', function(e) {
             if(!response.error){
                 Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
                 setTimeout(() => {
-                    window.location.href = base_url + "index.php/Principal/tablaArchivos/"+response.idRegistro+'/GO';
+                    if(isDraft) {
+                        window.location.href = base_url + "index.php/Principal/listaBorradoresGO";
+                    } else {
+                        window.location.href = base_url + "index.php/Principal/tablaArchivos/"+response.idRegistro+'/GO';
+                    }
                 }, 1500);
             }else{
                 Swal.fire("Atención", '<p> '+ response.respuesta + '</p>', 'info');  

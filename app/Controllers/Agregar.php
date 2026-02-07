@@ -1500,7 +1500,7 @@ class Agregar extends BaseController
             'documentacion_requerida' => ($data['documentacion_requerida'] == 'SI') ? 1 : 2,
             'evidencia_entrega' => (int) $data['evidencia_entrega'],
 
-            'total_importe' => $data['total_importe'], // Asegúrate de que este total sea correcto
+            'total_importe' => (isset($data['total_importe']) && !empty($data['total_importe'])) ? $data['total_importe'] : 0, // Asegúrate de que este total sea correcto
             // 'comision' => $data['comision'],
             //'no_reserva' => $data['no_reserva'],
             'lugar' => $data['lugar'],
@@ -1888,10 +1888,10 @@ class Agregar extends BaseController
             'formato_conformidad' => ($data['formato_conformidad'] == 'SI') ? 1 : 2,
             'documentacion_requerida' => ($data['documentacion_requerida'] == 'SI') ? 1 : 2,
             'evidencia_entrega' => (int) $data['evidencia_entrega'],
-            'concepto_gasto' => $data['concepto_gasto'],
+          //  'concepto_gasto' => $data['concepto_gasto'],
             'fecha_tramite' => (isset($data['fecha_tramite']) && !empty($data['fecha_tramite']))?$data['fecha_tramite']:date('Y-m-d'),
             //'total_importe' => $data['total_importe'], 
-            'comision' => $data['comision'],
+           // 'comision' => $data['comision'],
             'lugar' => $data['lugar'],
             'usu_reg' => $session->get('id_usuario'),
         ];
@@ -1928,6 +1928,8 @@ class Agregar extends BaseController
                     'periodo_fin' => $data['periodo_fin'][$rowKey] ?? null,
                     'importe' => $data['importe'][$rowKey] ?? null,
                     'encabezado' => $data['encabezado'][$rowKey] ?? null,
+                    'concepto' => $data['concepto'][$rowKey] ?? null,
+                    'comision' => $data['comision'][$rowKey] ?? null,
                 ];
                      
                 $pdf[] = $archivos[$rowKey]['pdf'] ?? null;
@@ -1949,7 +1951,9 @@ class Agregar extends BaseController
                             'periodo_inicio' => isset($value['periodo_inicio']) ? $value['periodo_inicio'] : date('Y-m-d'),
                             'periodo_fin' => isset($value['periodo_fin']) ? $value['periodo_fin'] : date('Y-m-d'),
                             'usu_reg' => $session->get('id_usuario'),
-                            'fec_reg' => date('Y-m-d H:i:s')
+                            'fec_reg' => date('Y-m-d H:i:s'),
+                            'concepto' => $value['concepto'] ?? null,
+                            'comision' => $value['comision'] ?? null,
                         ];
                           $response = $this->globals->saveTabla(
                             $datos_periodo,

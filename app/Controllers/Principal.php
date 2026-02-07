@@ -2378,6 +2378,55 @@ class Principal extends BaseController
         $this->_renderView($data);
 
     }
+
+    public function concluidosAceptadosGO()
+    {
+
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        if (in_array($session->get('id_perfil'), [1, 2])) {
+            $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva_go', 'where' => ['visible' => 1, "id_estatus"=> 3]]);
+        } else {
+             // Redireccionar o mostrar error si no tiene permiso, aunque el menú lo oculta.
+             return redirect()->to(base_url() . 'index.php/Inicio');
+        }
+       // die( var_dump($reserva ) );
+        $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
+        $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $proveedor = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit' => 100]);
+        $data['reserva'] = (!empty($reserva->data)) ? $reserva->data : [];
+        $data['scripts'] = array('inicio');
+        $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
+        $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+        $data['contentView'] = 'secciones/vListadoReservaGO';
+        $this->_renderView($data);
+
+    }
+
+    public function concluidosDeclinadosGO()
+    {
+
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        if (in_array($session->get('id_perfil'), [1, 2])) {
+            $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva_go', 'where' => ['visible' => 1, "id_estatus"=> 2]]);
+        } else {
+             return redirect()->to(base_url() . 'index.php/Inicio');
+        }
+       // die( var_dump($reserva ) );
+        $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
+        $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $proveedor = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit' => 100]);
+        $data['reserva'] = (!empty($reserva->data)) ? $reserva->data : [];
+        $data['scripts'] = array('inicio');
+        $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
+        $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+        $data['contentView'] = 'secciones/vListadoReservaGO';
+        $data['es_declinado'] = true;
+        $this->_renderView($data);
+
+    }
+
     public function listaReservaGO()
     {
 
@@ -7325,7 +7374,10 @@ class Principal extends BaseController
                     'ruta_relativa' =>$factura_pdf->data[$index]->ruta_relativa,
                     'folio' =>$xml_go->data[$index]->folio,
                     'id_xml' =>$xml_go->data[$index]->id_xml,
-                    'total' =>$xml_go->data[$index]->total
+                    'total' =>$xml_go->data[$index]->total,
+                    'concepto' => (isset($v->concepto)) ? $v->concepto: '',
+                    'propina' => (isset($v->propina)) ? $v->propina: '',
+                    'comision' => (isset($v->comision)) ? $v->comision: '',
                 
                 ];
             }

@@ -226,30 +226,13 @@
                                         </select>
                                     </div><!--end col-->
                                     <div class="col-md-4 mb-3">
-                                        <label for="concepto_gasto">Concepto del gasto<span
-                                                style="color:red;">*</span></label>
-                                        <input type="text" class="form-control" id="concepto_gasto" autocomplete="off"
-                                            placeholder="Concepto del gasto" name="concepto_gasto" value="<?= (isset($registro_pt->concepto_gasto)) ? $registro_pt->concepto_gasto : '' ?>">
-                                    </div><!--end col-->
-                                </div><!--end form-row-->
-                                <div class="form-row">
-
-
-                                    <div class="col-md-4 mb-3">
-                                        <label for="comision">Comisión / Reunión / Evento / Programa</label>
-                                        <input type="text" class="form-control" id="comision" name="comision"
-                                            value="<?= (isset($registro_pt->comision)) ? $registro_pt->comision : 'Comisión / Reunión / Evento / Programa' ?>">
-                                        <div class="invalid-feedback">
-                                            Please provide a valid state.
-                                        </div>
-                                    </div><!--end col-->
-                                    <div class="col-md-4 mb-3">
                                         <label for="lugar">Lugar<span style="color:red;">*</span></label>
                                         <input type="text" class="form-control" id="lugar" autocomplete="off"
                                             placeholder="Lugar" name="lugar" value="<?= (isset($registro_pt->lugar)) ? $registro_pt->lugar : '' ?>">
                                     </div><!--end col-->
-
+                                  
                                 </div><!--end form-row-->
+                       
                                 <div class="form-row">
 
                                     <div class="col-md-4 mb-3">
@@ -310,8 +293,8 @@
                                                     <tr>
                                                      
                                                         <th style="width: 8%;">PROPINA</th>
-                                                        <th>INICIO</th>
-                                                        <th>FIN</th>
+                                                        <th style="width: 30%">DESCRIPCIÓN</th>
+                                                        <th style="width: 15%">VIGENCIA</th>
                                                         <th style="width: 20%;">ARCHIVOS</th>
                                                         <th>ACCIONES</th>
                                                     </tr>
@@ -325,6 +308,8 @@
                                                         $inicio = isset($r['periodo_inicio']) ? date('Y-m-d', strtotime($r['periodo_inicio'])) : '';
                                                         $fin = isset($r['periodo_fin']) ? date('Y-m-d', strtotime($r['periodo_fin'])) : '';
                                                         $propina = isset($r['propina']) ? $r['propina'] : '';
+                                                        $concepto = isset($r['concepto']) ? $r['concepto'] : '';
+                                                        $comision = isset($r['comision']) ? $r['comision'] : '';
                                                     ?>
                                                     <tr data-row-index="<?= $uniqueId ?>">
                                                         <input type="hidden" name="rowIndex[]" value="<?= $uniqueId ?>">
@@ -336,19 +321,35 @@
                                                       
                                                       
                                                         <td>
-                                                            <input autocomplete="off" type="text" class="form-control propina-input" 
-                                                                name="propina[<?= $uniqueId ?>]" placeholder="Propina" 
-                                                                value="<?= $propina ?>" >
+                                                              <div class="input-group">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text">$</span>
+                                                                </div>
+                                                                <input autocomplete="off" type="text"
+                                                                class="form-control propina-input" name="propina[<?= $uniqueId ?>]"
+                                                                placeholder="0.00" value="<?= $propina ?>">
+                                                            </div>
                                                         </td>
                                                         <td>
-                                                            <input autocomplete="off" type="date" class="form-control" 
-                                                                name="periodo_inicio[<?= $uniqueId ?>]" 
-                                                                value="<?= $inicio ?>" >
+                                                            <textarea autocomplete="off" class="form-control mb-1" 
+                                                                name="concepto[<?= $uniqueId ?>]" placeholder="Concepto" 
+                                                                rows="2" style="font-size: 0.85rem;"><?= $concepto ?></textarea>
+                                                            
+                                                            <textarea autocomplete="off" class="form-control" 
+                                                                name="comision[<?= $uniqueId ?>]" placeholder="Comisión / Evento" 
+                                                                rows="2" style="font-size: 0.85rem; background-color: #f8f9fa;"><?= $comision ?></textarea>
                                                         </td>
                                                         <td>
-                                                            <input autocomplete="off" type="date" class="form-control" 
-                                                                name="periodo_fin[<?= $uniqueId ?>]"  
-                                                                value="<?= $fin ?>">
+                                                             <div class="input-group input-group-sm mb-1">
+                                                                <div class="input-group-prepend"><span class="input-group-text">Del</span></div>
+                                                                <input autocomplete="off" type="date"
+                                                                    class="form-control" name="periodo_inicio[<?= $uniqueId ?>]" value="<?= $inicio ?>" >
+                                                            </div>
+                                                            <div class="input-group input-group-sm">
+                                                                 <div class="input-group-prepend"><span class="input-group-text">Al </span></div>
+                                                                <input autocomplete="off" type="date"
+                                                                    class="form-control" name="periodo_fin[<?= $uniqueId ?>]" value="<?= $fin ?>">
+                                                            </div>
                                                         </td>
                                                         <td>
                                                             <div class="archivos-seleccionados" id="archivos_<?= $uniqueId ?>">
@@ -386,26 +387,30 @@
                                                             </div>
                                                         </td>
                                                         <td>
-                                                            <div class="mt-1">
+                                                            
+                                                            <div class="btn-group-vertical btn-group-sm w-100">
                                                                 <button type="button" class="btn btn-sm btn-success btn-seleccionar-pdf" data-row="<?= $uniqueId ?>">
                                                                     <i class="fas fa-file-pdf"></i> PDF
                                                                 </button>
                                                                 <button type="button" class="btn btn-sm btn-warning btn-seleccionar-xml" data-row="<?= $uniqueId ?>">
                                                                     <i class="mdi mdi-code-tags"></i> XML
                                                                 </button>
-                                                            </div>
-                                                            <button type="button" class="btn btn-sm btn-danger remove-row" 
+                                                            
+                                                                <button type="button" class="btn btn-sm btn-danger remove-row" 
                                                                 data-row="<?= $uniqueId ?>">
                                                                 <i class="fas fa-trash"></i>
-                                                            </button>
+                                                                </button>
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                     <?php endforeach; ?>
                                                 </tbody>
                                             </table>
-                                            <button type="button" class="btn btn-primary btn-sm mt-2 btnAgregarFila">
-                                                <i class="fas fa-plus"></i> Agregar Fila
-                                            </button>
+                                            <div class="text-right mt-2">
+                                                <button type="button" class="btn btn-primary btn-sm mt-2 btnAgregarFila">
+                                                    <i class="fas fa-plus"></i> Agregar Fila
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -487,6 +492,18 @@
     
     // Variable global para filas eliminadas
     let deletedRows = [];
+
+    $(document).ready(function() {
+        // Inicializar inputmask para filas existentes
+        $('.propina-input').inputmask('numeric', {
+            radixPoint: ".",
+            groupSeparator: ",",
+            digits: 2,
+            autoGroup: true,
+            prefix: '$ ',
+            rightAlign: false
+        });
+    });
 
     // --- MANEJO DE ARCHIVOS Y FORMDATA ---
 
@@ -581,19 +598,35 @@
                 <input type="hidden" class="row-encabezado" name="encabezado[${newId}]" value="${encabezado}">
                 
                 <td>
-                    <input autocomplete="off" type="text" class="form-control propina-input" 
-                        name="propina[${newId}]" placeholder="Propina" 
-                        value="0" >
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">$</span>
+                        </div>
+                        <input autocomplete="off" type="text"
+                        class="form-control propina-input" name="propina[${newId}]"
+                        placeholder="0.00">
+                    </div>
                 </td>
                 <td>
-                    <input autocomplete="off" type="date" class="form-control" 
-                        name="periodo_inicio[${newId}]" 
-                        value="" >
+                    <textarea autocomplete="off" class="form-control mb-1" 
+                        name="concepto[${newId}]" placeholder="Concepto" 
+                        rows="2" style="font-size: 0.85rem;"></textarea>
+                    
+                    <textarea autocomplete="off" class="form-control" 
+                        name="comision[${newId}]" placeholder="Comisión / Evento" 
+                        rows="2" style="font-size: 0.85rem; background-color: #f8f9fa;"></textarea>
                 </td>
                 <td>
-                    <input autocomplete="off" type="date" class="form-control" 
-                        name="periodo_fin[${newId}]"  
-                        value="">
+                    <div class="input-group input-group-sm mb-1">
+                        <div class="input-group-prepend"><span class="input-group-text">Del</span></div>
+                        <input autocomplete="off" type="date"
+                            class="form-control" name="periodo_inicio[${newId}]" >
+                    </div>
+                    <div class="input-group input-group-sm">
+                            <div class="input-group-prepend"><span class="input-group-text">Al </span></div>
+                        <input autocomplete="off" type="date"
+                            class="form-control" name="periodo_fin[${newId}]">
+                    </div>
                 </td>
                 <td>
                     <!-- Contenedor Visual de Archivos -->
@@ -604,22 +637,33 @@
                     </div>
                 </td>
                 <td>
-                    <div class="mt-1">
+                    <div class="btn-group-vertical btn-group-sm w-100">
                         <button type="button" class="btn btn-sm btn-success btn-seleccionar-pdf" data-row="${newId}">
                             <i class="fas fa-file-pdf"></i> PDF
                         </button>
                         <button type="button" class="btn btn-sm btn-warning btn-seleccionar-xml" data-row="${newId}">
                             <i class="mdi mdi-code-tags"></i> XML
                         </button>
+                    
+                        <button type="button" class="btn btn-sm btn-danger remove-row" data-row="${newId}">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </div>
-                    <button type="button" class="btn btn-sm btn-danger remove-row" data-row="${newId}">
-                        <i class="fas fa-trash"></i>
-                    </button>
                 </td>
             </tr>
         `;
         
         tableBody.append(nuevaFila);
+
+        // Inicializar inputmask para la nueva fila
+        tableBody.find(`tr[data-row-index="${newId}"] .propina-input`).inputmask('numeric', {
+            radixPoint: ".",
+            groupSeparator: ",",
+            digits: 2,
+            autoGroup: true,
+            prefix: '$ ',
+            rightAlign: false
+        });
     });
 
     // Agregar Nuevo Grupo
@@ -737,7 +781,7 @@
                     Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
                     setTimeout(() => {
                         // Redirección según sea borrador o final
-                        const redirect = ($('#es_borrador').val() == '1') ? "listaBorradoresGO" : "listaReservaGO";
+                        const redirect = ($('#es_borrador').val() == '1') ? "listaBorradoresGO" : "tablaArchivos/" + response.id+"/GO";
                         window.location.href = base_url + "index.php/Principal/" + redirect;
                     }, 1500);
                 }else{

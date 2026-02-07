@@ -476,14 +476,18 @@
                              <a class="nav-link" href="javascript: void(0);"><span class="w-100">Concluidos</span><span
                                      class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
                              <ul class="nav-second-level" aria-expanded="false">
-                                 <li><a href="<?php echo base_url(); ?>index.php/Principal/concluidosAceptados">Aceptados</a>
+                                 <li><a href="<?php echo base_url(); ?>index.php/Principal/concluidosAceptados">Aceptados PT</a>
                                  </li>
-                                 <li><a href="<?php echo base_url(); ?>index.php/Principal/concluidosDeclinados">Declinados</a>
+                                 <li><a href="<?php echo base_url(); ?>index.php/Principal/concluidosDeclinados">Declinados PT</a>
+                                 </li>
+                                 <li><a href="<?php echo base_url(); ?>index.php/Principal/concluidosAceptadosGO">Aceptados GO</a>
+                                 </li>
+                                 <li><a href="<?php echo base_url(); ?>index.php/Principal/concluidosDeclinadosGO">Declinados GO</a>
                                  </li>
                              </ul>
                          </li>
                          <?php endif; ?>                       <!--end nav-item-->
-                       <!--  <li class="nav-item">
+                         <li class="nav-item">
                             <a class="nav-link" href="javascript: void(0);"><span class="w-100">Sin enviar</span>
                             <span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
                             <ul class="nav-second-level" aria-expanded="false">
@@ -492,7 +496,7 @@
                                 </li>
                           
                             </ul>
-                        </li>  -->
+                        </li> 
 
                       <!-- <li class="nav-item"><a class="nav-link" href="<?php echo base_url(); ?>index.php/Principal/MesaRF" aria-expanded="false">Solicitud de Op. Bancarias</a></li> -->
                     </ul>
