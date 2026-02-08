@@ -322,6 +322,7 @@
                                                         <!-- Hidden Inputs synced with Header -->
                                                         <input type="hidden" class="row-partida" name="id_partida[<?= $uniqueId ?>]" value="<?= $grupo['id_partida'] ?>">
                                                         <input type="hidden" class="row-proyecto" name="id_presupuesto[<?= $uniqueId ?>]" value="<?= $r['id_presupuesto'] ?>">
+                                                        <input type="hidden" class="row-encabezado" name="encabezado[<?= $uniqueId ?>]" value="<?= isset($r['encabezado']) ? $r['encabezado'] : $grupo['encabezado'] ?>">
                                                       
                                                       
                                                         <td>
@@ -411,7 +412,7 @@
                                                 </tbody>
                                             </table>
                                             <div class="text-right mt-2">
-                                                <button type="button" class="btn btn-primary btn-sm mt-2 btnAgregarFila">
+                                                <button type="button" class="btn btn-primary btn-sm mt-2 btnAgregarFila" data-group-index="<?= $key ?>">
                                                     <i class="fas fa-plus"></i> Agregar Fila
                                                 </button>
                                             </div>
@@ -589,8 +590,9 @@
         const encabezado = groupContainer.find('.header-encabezado').val();
         
         // Generar ID único temporal
-        const newId = 'new_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
-        
+        const groupIndex = $(this).data('group-index');
+        const newId = 'new_' + groupIndex + '_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+
         // Inicializar almacenamiento de archivos
         archivosPorFila[newId] = { pdf: [], xml: [] };
         

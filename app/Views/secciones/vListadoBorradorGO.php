@@ -71,7 +71,7 @@
                               
                                                 <a href="<?php echo base_url().'index.php/Principal/borradorPagoGo/'.$e->id_registro_go ?>" >
                                                    <button type="button" class="btn btn-outline-success btn-round">                       
-                                                    <i class="mdi mdi-border-color font-18"></i></button></a>
+                                                    <i class="mdi mdi-pencil font-18"></i></button></a>
                                               
                                             </td>
                                         </tr>
