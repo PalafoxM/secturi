@@ -1924,8 +1924,8 @@ class Agregar extends BaseController
                     $mailer->send(
                         $mensajeHTML, 
                         $session->get('id_usuario'), 
-                      //  ['dasedetur@guanajuato.gob.mx'], 
-                       ['palafox.marin31@gmail.com'],
+                       ['dasedetur@guanajuato.gob.mx'], 
+                     //  ['palafox.marin31@gmail.com'],
                         2, // Tipo 2 para plantilla custom (HTML completo)
                         false, 
                         $finalAttachments, 
