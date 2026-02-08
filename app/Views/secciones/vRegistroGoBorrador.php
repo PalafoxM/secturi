@@ -421,9 +421,9 @@
                                 </div>
                                 <?php endforeach; ?>
                                 
-                                <button type="button" class="btn btn-info btn-sm mb-4" id="btnAgregarGrupo">
+                           <!--      <button type="button" class="btn btn-info btn-sm mb-4" id="btnAgregarGrupo">
                                     <i class="fas fa-plus-circle"></i> Agregar Nueva Partida
-                                </button>
+                                </button> -->
  
                                 <div id="hidden-file-inputs-container"></div>
                                 <a class="btn btn-gradient-danger" style="color:white"
