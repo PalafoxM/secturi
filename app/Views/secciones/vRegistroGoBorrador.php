@@ -32,8 +32,8 @@
                             </p>
                             <form id="formBorrador_go" enctype="multipart/form-data">
                                 <input type="hidden" name="editar" value="1">
-                                <input type="hidden" name="id_reserva_go" value="<?= $id_reserva ?>">
-                                <input type="hidden" name="id_registro_go" value="<?= isset($registro_guardado->id_registro_go) ? $registro_guardado->id_registro_go : '' ?>">
+                                <input type="hidden" name="id_reserva_go" value="<?= $id_reserva ?? $registro_pt->id_reserva_go ?? '' ?>">
+                                <input type="hidden" name="id_registro_go" value="<?= $registro_guardado->id_registro_go ?? $registro_pt->id_registro_go ?? '' ?>">
                                 <input type="hidden" name="es_borrador" id="es_borrador" value="0">
                                 <input type="hidden" name="deleted_rows" id="deleted_rows" value="">
                                 <div class="form-row">
@@ -282,6 +282,7 @@
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label>Encabezado <span class="text-danger">*</span></label>
+                                                <input type="hidden" class="header-reserva" value="<?= $grupo['id_reserva'] ?>">
                                                 <input type="text" class="form-control header-encabezado" value="<?= $grupo['encabezado'] ?>" placeholder="Encabezado">
                                             </div>
                                         </div>
@@ -314,7 +315,10 @@
                                                     <tr data-row-index="<?= $uniqueId ?>">
                                                         <input type="hidden" name="rowIndex[]" value="<?= $uniqueId ?>">
                                                         <input type="hidden" name="id_identificador[<?= $uniqueId ?>]" value="<?= isset($r['id_identificador']) ? $r['id_identificador'] : '' ?>">
-                                                        
+                                                        <!-- ADDED: IDs for Logic -->
+                                                        <input type="hidden" name="id_presupuesto_go[<?= $uniqueId ?>]" value="<?= isset($r['id_presupuesto_go']) ? $r['id_presupuesto_go'] : '' ?>">
+                                                        <input type="hidden" name="id_reserva[<?= $uniqueId ?>]" value="<?= $grupo['id_reserva'] ?>">
+
                                                         <!-- Hidden Inputs synced with Header -->
                                                         <input type="hidden" class="row-partida" name="id_partida[<?= $uniqueId ?>]" value="<?= $grupo['id_partida'] ?>">
                                                         <input type="hidden" class="row-proyecto" name="id_presupuesto[<?= $uniqueId ?>]" value="<?= $r['id_presupuesto'] ?>">
@@ -580,6 +584,7 @@
         
         // Obtener valores del header del grupo
         const idPartida = groupContainer.find('.header-partida').val();
+         const idReserva = groupContainer.find('.header-reserva').val(); // ADDED
         const idProyecto = groupContainer.find('.header-proyecto').val();
         const encabezado = groupContainer.find('.header-encabezado').val();
         
@@ -593,6 +598,9 @@
             <tr data-row-index="${newId}">
                 <input type="hidden" name="rowIndex[]" value="${newId}">
                 <!-- Inputs ocultos sincronizados -->
+                <input type="hidden" name="id_presupuesto_go[${newId}]" value="0">
+                <input type="hidden" name="id_reserva[${newId}]" value="${idReserva}">
+
                 <input type="hidden" class="row-partida" name="id_partida[${newId}]" value="${idPartida}">
                 <input type="hidden" class="row-proyecto" name="id_presupuesto[${newId}]" value="${idProyecto}">
                 <input type="hidden" class="row-encabezado" name="encabezado[${newId}]" value="${encabezado}">
@@ -745,13 +753,13 @@
     // --- ENVIAR ---
 
     // Guardar Borrador
-    $('#btnGuardarBorrador').on('click', function() {
+    $('#btnGuardarBorrador').off('click').on('click', function() {
         $('#es_borrador').val('1');
         enviarFormulario("<?= base_url()?>index.php/Agregar/guardaBorradorGO", $(this));
     });
 
     // Guardar y Enviar
-    $('#formBorrador_go').on('submit', function(e) {
+    $('#formBorrador_go').off('submit').on('submit', function(e) {
         e.preventDefault();
         $('#es_borrador').val('0');
         

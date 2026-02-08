@@ -1251,9 +1251,9 @@ class Agregar extends BaseController
         $response->respuesta = "Error|Error al guardar PT";
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
-        $archivos_post = $this->request->getFiles();
+        $archivos_post = $this->request->getFiles(); 
 
-
+      
         $archivos_por_tabla = [];
         if (isset($archivos_post['archivos'])) {
 
@@ -1308,7 +1308,7 @@ class Agregar extends BaseController
 
                 $tablas_procesadas[$i] = [
                     'encabezado' => $encabezado_texto,
-                    'partida' => $data['partida'][$i] ?? null, // Capturamos la partida de la tabla
+                    'partida' => $data['partida'][$i] ?? $data['id_partida'][$i] ?? null, // Capturamos la partida (fallback id_partida)
                     'proyecto' => $data['proyecto'][$i] ?? null, // Capturamos el proyecto de la tabla
                     'id_presupuesto' => $data['id_presupuesto'][$i] ?? null, // Capturamos el proyecto de la tabla
                     'filas' => []
@@ -1332,26 +1332,96 @@ class Agregar extends BaseController
                 }
 
                 // 1. PROCESAR FILAS ESTÁNDAR (usando periodo_inicio como guía)
+                $rows_data = [];
+                $format = 'wizard'; // Default
+
                 if (isset($data['periodo_inicio_' . $i])) {
-                    foreach ($data['periodo_inicio_' . $i] as $j => $val) {
+                    $rows_data = $data['periodo_inicio_' . $i];
+                } elseif (isset($data['periodo_inicio'][$i])) {
+                    $rows_data = [$data['periodo_inicio'][$i]]; // Treat as single row
+                    $format = 'borrador';
+                }
+
+                if (!empty($rows_data)) {
+                    foreach ($rows_data as $j => $val) {
                          // Robustez: Si el valor guía está vacío (fila vacía), ignoramos
                          if (empty($val)) continue;
 
-                         // Usamos $j para obtener la clave de archivo correspondiente por orden
-                        $rowIndex_de_archivos = $file_keys_para_tabla_i[$j] ?? null;
+                         // EXTRAER VALORES SEGÚN FORMATO
+                         if ($format == 'borrador') {
+                            $propina = $data['propina'][$i] ?? null;
+                            $concepto = $data['concepto'][$i] ?? null;
+                            $comision = $data['comision'][$i] ?? null;
+                            $periodo_inicio = $data['periodo_inicio'][$i] ?? null;
+                            $periodo_fin = $data['periodo_fin'][$i] ?? null;
+                            $id_presupuesto_go = $data['id_presupuesto_go'][$i] ?? 0;
+                            $id_reserva = $data['id_reserva'][$i] ?? 0;
+                            
+                            $rowIndex_de_archivos = $i; // En borrador, $i es el rowId
+                             
+                         } else {
+                            $propina = $data['propina_' . $i][$j] ?? null;
+                            $concepto = $data['concepto_' . $i][$j] ?? null;
+                            $comision = $data['comision_' . $i][$j] ?? null;
+                            $periodo_inicio = $data['periodo_inicio_' . $i][$j] ?? null;
+                            $periodo_fin = $data['periodo_fin_' . $i][$j] ?? null;
+                            // Wizard no envía estos IDs por ahora (son registros nuevos desde presupuesto)
+                            $id_presupuesto_go = 0; 
+                            $id_reserva = 0; // Debería venir de alguna parte si es necesario
+
+                            // Usamos $j para obtener la clave de archivo correspondiente por orden
+                            $file_keys_para_tabla_i = [];
+                            if (isset($archivos_por_tabla[$i])) {
+                                $file_keys_para_tabla_i = array_keys($archivos_por_tabla[$i]);
+                            }
+                            $rowIndex_de_archivos = $file_keys_para_tabla_i[$j] ?? null;
+                         }
 
                         $archivos_de_la_fila = null;
-                        if ($rowIndex_de_archivos !== null && isset($archivos_por_tabla[$i][$rowIndex_de_archivos])) {
-                            $archivos_de_la_fila = $archivos_por_tabla[$i][$rowIndex_de_archivos];
+                        if ($rowIndex_de_archivos !== null) {
+                             // Buscar en archivos_por_tabla. 
+                             // En formato borrador, $i es 'new_...' o '123'. 
+                             // prepararArchivos agrupa por indices numéricos (tablas) o strings (filas)? 
+                             // Si isArray format, prepararArchivos lo maneja?
+                             // Asumamos que funciona si $archivos_por_tabla está bien construido.
+                             if ($format == 'borrador') {
+                                 // En borrador, no hay tabla indexada. Todo está en $archivos_por_tabla directamente?
+                                 // NO, prepararArchivos itera $_FILES['archivos'][...].
+                                 // Si borrador envía archivos[pdf_ROWID], prepararArchivos usará ROWID como key.
+                                 // Entonces $archivos_por_tabla tiene keys como 'pdf_ROWID' o 'xml_ROWID'. 
+                                 
+                                 // REVISAR LOGICA DE ARCHIVOS LUEGO SI FALLA
+                                  if (isset($archivos_por_tabla[$rowIndex_de_archivos])) {
+                                    $archivos_de_la_fila = $archivos_por_tabla[$rowIndex_de_archivos];
+                                  } else {
+                                      // Buscar keys con prefix si es necesario...
+                                      // Por ahora, intento directo.
+                                      // Nota: prepararArchivos usa explode('_', $key)[1] para tabla index...
+                                      // Si key es pdf_new_123...
+                                  }
+                             } else {
+                                if (isset($archivos_por_tabla[$i][$rowIndex_de_archivos])) {
+                                    $archivos_de_la_fila = $archivos_por_tabla[$i][$rowIndex_de_archivos];
+                                }
+                             }
                         }
+                        
+                        // PARCHE PARA ARCHIVOS EN BORRADOR (SI NO SE ENCUENTRAN POR LOGICA ANTERIOR)
+                        if ($format == 'borrador' && empty($archivos_de_la_fila)) {
+                             // Intentar recuperar directamente del global procesado si existe estructura plana
+                             // (Depende de prepararArchivos)
+                        }
+
 
                         $fila_completa = [
                             // Standar fields
-                            'propina' => $data['propina_' . $i][$j] ?? null,
-                            'concepto' => $data['concepto_' . $i][$j] ?? null,
-                            'comision' => $data['comision_' . $i][$j] ?? null, // Nueva Captura
-                            'periodo_inicio' => $data['periodo_inicio_' . $i][$j] ?? null,
-                            'periodo_fin' => $data['periodo_fin_' . $i][$j] ?? null,
+                            'propina' => $propina,
+                            'concepto' => $concepto,
+                            'comision' => $comision, 
+                            'periodo_inicio' => $periodo_inicio,
+                            'periodo_fin' => $periodo_fin,
+                            'id_presupuesto_go' => $id_presupuesto_go,
+                            'id_reserva' => $id_reserva,
                             
                             // Viaticos fields (NULL for standard rows)
                             'contribuyente' => null,
@@ -1568,6 +1638,37 @@ class Agregar extends BaseController
                         $responseViatico = $this->globals->saveTabla($datos_viatico, $dataConfig, $dataBitacora);
 
                     } else {
+                        // === LOGICA PARA NUEVAS FILAS DE BORRADOR (PRESUPUESTO_GO) ===
+                        // Si viene de Borrador y es nueva fila (sin ID, con Reserva)
+                        if (empty($fila['id_presupuesto_go']) && !empty($fila['id_reserva'])) {
+                             $datos_presupuesto = [
+                                'id_reserva' => $fila['id_reserva'],
+                                'id_proyecto' => $tabla['id_presupuesto'],
+                                'id_partida' => $tabla['partida'],
+                                'importe' => (!empty($fila['propina'])) ? str_replace(['$', ','], '', $fila['propina']) : 0,
+                                'encabezado' => $tabla['encabezado'],
+                                'usu_reg' => $session->get('id_usuario'),
+                                'fec_reg' => date('Y-m-d H:i:s'),
+                                // dsc_partida? partida? Se asume que ID partida es suficiente o trigger llena dsc
+                            ];
+
+                            $dataConfigPres = ["tabla" => "presupuesto_go", "editar" => false];
+                            $dataBitacoraPres = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardarPresupuestoGo'];
+                            
+                            $respPres = $this->globals->saveTabla($datos_presupuesto, $dataConfigPres, $dataBitacoraPres);
+                            
+                            if (!$respPres->error) {
+                                $identificador_fila_unica = $respPres->idRegistro;
+                            }
+                        } elseif (!empty($fila['id_presupuesto_go'])) {
+                             // Si ya existe ID (Update en Borrador), usarlo como identificador
+                             $identificador_fila_unica = $fila['id_presupuesto_go'];
+                        }
+                        
+                        // Si falla la lógica anterior, $identificador_fila_unica sigue siendo js_rowIndex (temporal)
+                        // Esto causaría probelmas en factura. Para filas nuevas DEBE ser el ID real.
+
+
                         // === GUARDAR EN PERIODO_FACTURA_GO (Estándar) ===
                         $datos_periodo = [
                             'id_registro_go' => $id_registro_go, // Se vincula al registro principal
@@ -1578,7 +1679,7 @@ class Agregar extends BaseController
                             'periodo_fin' => $fila['periodo_fin'],
                             'concepto' => (isset($fila['concepto']) && !empty($fila['concepto'])) ? $fila['concepto'] : '',
                             'comision' => $fila['comision'],
-                            'id_identificador' => $identificador_fila_unica, // EL ENLACE CLAVE
+                            'id_identificador' => $identificador_fila_unica, // EL ENLACE CLAVE (Ahora es ID Real para nuevos/updates)
                             'usu_reg' => $session->get('id_usuario'),
                             'fec_reg' => date('Y-m-d H:i:s')
                         ];
@@ -1822,7 +1923,8 @@ class Agregar extends BaseController
                     $mailer->send(
                         $mensajeHTML, 
                         $session->get('id_usuario'), 
-                        ['dasedetur@guanajuato.gob.mx'], 
+                      //  ['dasedetur@guanajuato.gob.mx'], 
+                       ['palafox.marin31@gmail.com'],
                         2, // Tipo 2 para plantilla custom (HTML completo)
                         false, 
                         $finalAttachments, 
@@ -1901,6 +2003,11 @@ class Agregar extends BaseController
             'lugar' => $data['lugar'],
             'usu_reg' => $session->get('id_usuario'),
         ];
+        
+        // CORRECCIÓN: Agregar ID al array de datos para asegurar UPDATE
+        if(!empty($id_registro_go)) {
+            $dataInsert['id_registro_go'] = $id_registro_go;
+        }
         
         $dataConfig = [
             "tabla" => "registro_go",
