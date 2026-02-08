@@ -1253,6 +1253,7 @@ class Agregar extends BaseController
         $data = $this->request->getPost();
         $archivos_post = $this->request->getFiles(); 
 
+       // die( var_dump($data) );
      
         $archivos_por_tabla = [];
         if (isset($archivos_post['archivos'])) {
@@ -1948,8 +1949,9 @@ class Agregar extends BaseController
         $data = $this->request->getPost();
         $archivos_post = $this->request->getFiles();
         
-        // 1. MAPEAR ARCHIVOS POR rowIndex (Corrección de mapeo)
-      $archivos = [];
+        // 1. MAPEAR ARCHIVOS POR rowIndex (Corrección de mapeo);
+       // die( var_dump($data) );
+        $archivos = [];
 
         if (isset($archivos_post['archivos'])) {
             foreach ($archivos_post['archivos'] as $key => $file_data) {

@@ -7344,8 +7344,9 @@ class Principal extends BaseController
         $data['registro_pt'] = $dataRegistro; 
         
         // Mapear archivos por fila para JS
-      
-        $grupos = [];
+ 
+
+      $grupos = [];
         foreach($presupuesto->data as $key => $value){
             $grupos[] = [
                 'id_presupuesto_go' => $value->id_presupuesto_go,
@@ -7361,7 +7362,9 @@ class Principal extends BaseController
                 'proyecto'          => $value->proyecto
   
             ];
-            foreach($periodo_factura->data as $index => $v){
+            foreach($periodo_factura->data as $index => $v){ 
+                if($v->id_identificador == $factura_pdf->data[$index]->id_identificador && 
+                $v->id_identificador == $xml_go->data[$index]->id_identificador){
                 $grupos[$key]['tabla'][] = [
                     'id_periodo_factura' =>$v->id_periodo_factura,
                     'id_registro_go' =>$v->id_registro_go,
@@ -7380,9 +7383,10 @@ class Principal extends BaseController
                     'comision' => (isset($v->comision)) ? $v->comision: '',
                 
                 ];
-            }
+              }   
+            }   
 
-        }
+        } 
 
         
 
