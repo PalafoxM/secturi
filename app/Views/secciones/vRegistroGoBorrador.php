@@ -755,6 +755,9 @@
     // Guardar Borrador
     $('#btnGuardarBorrador').off('click').on('click', function() {
         $('#es_borrador').val('1');
+        
+        if (!validarFormulario()) return;
+
         enviarFormulario("<?= base_url()?>index.php/Agregar/guardaBorradorGO", $(this));
     });
 
@@ -827,14 +830,18 @@
         }
 
         let camposTextoValidos = true;
-        $('textarea[name^="concepto"], textarea[name^="comision"]').each(function() {
-            if ($.trim($(this).val()) === '') {
-                camposTextoValidos = false;
-                $(this).addClass('is-invalid');
-            } else {
-                $(this).removeClass('is-invalid');
-            }
-        });
+
+        // Validar Concepto/Comisión SOLO si NO es borrador
+        if ($('#es_borrador').val() !== '1') {
+            $('textarea[name^="concepto"], textarea[name^="comision"]').each(function() {
+                if ($.trim($(this).val()) === '') {
+                    camposTextoValidos = false;
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+        }
 
         if (!camposTextoValidos) {
              Swal.fire("Atención", "Por favor, complete todos los campos de Concepto y Comisión.", "warning");

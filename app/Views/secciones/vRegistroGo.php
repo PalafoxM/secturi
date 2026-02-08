@@ -1011,25 +1011,31 @@ $('#form_go').on('submit', function(e) {
     formData.append('deleted_rows', JSON.stringify(deletedRows));
 
     // Si es borrador, saltar validaciones estrictas
+    // Si es borrador, YA NO saltar validaciones de fecha/archivo
+    /*
     if (isDraft) {
         enviarFormulario(formData);
         return;
     }
+    */
 
     // --- VALIDACIONES ESTRICTAS PARA GUARDAR Y ENVIAR ---
     let isValid = true;
     let mensajeError = "";
 
     // 3. Validar Campos de Texto (Concepto y Comisión)
-    $('textarea[name^="concepto_"], textarea[name^="comision_"]').each(function() {
-        if ($.trim($(this).val()) === '') {
-            isValid = false;
-            $(this).addClass('is-invalid');
-            mensajeError = "Por favor, complete todos los campos de Concepto y Comisión.";
-        } else {
-            $(this).removeClass('is-invalid');
-        }
-    });
+    // 3. Validar Campos de Texto (Concepto y Comisión) - SOLO SI NO ES BORRADOR
+    if (!isDraft) {
+        $('textarea[name^="concepto_"], textarea[name^="comision_"]').each(function() {
+            if ($.trim($(this).val()) === '') {
+                isValid = false;
+                $(this).addClass('is-invalid');
+                mensajeError = "Por favor, complete todos los campos de Concepto y Comisión.";
+            } else {
+                $(this).removeClass('is-invalid');
+            }
+        });
+    }
 
     if (!isValid) {
         Swal.fire("Atención", mensajeError, "warning");
