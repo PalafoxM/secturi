@@ -1461,6 +1461,12 @@ class Agregar extends BaseController
                     return $this->respond($response);
                 }
 
+                if (empty($fila['concepto']) || empty($fila['comision'])) {
+                    $response->error = true;
+                    $response->respuesta = "Es necesario capturar Concepto y Comisión en todas las filas.";
+                    return $this->respond($response);
+                }
+
                 // Validación de archivos (PDF y XML)
                 //die( var_dump($fila['archivos']) );
                 if (empty($fila['archivos']) || empty($fila['archivos']['pdf']) || empty($fila['archivos']['xml'])) {

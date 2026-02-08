@@ -417,7 +417,7 @@
                                 <?php endforeach; ?>
                                 
                                 <button type="button" class="btn btn-info btn-sm mb-4" id="btnAgregarGrupo">
-                                    <i class="fas fa-plus-circle"></i> Agregar Nueva Sección
+                                    <i class="fas fa-plus-circle"></i> Agregar Nueva Partida
                                 </button>
  
                                 <div id="hidden-file-inputs-container"></div>
@@ -815,6 +815,21 @@
 
         if (!fechasValidas) {
             Swal.fire("Atención", "Por favor, complete todas las fechas requeridas.", "warning");
+            return false;
+        }
+
+        let camposTextoValidos = true;
+        $('textarea[name^="concepto"], textarea[name^="comision"]').each(function() {
+            if ($.trim($(this).val()) === '') {
+                camposTextoValidos = false;
+                $(this).addClass('is-invalid');
+            } else {
+                $(this).removeClass('is-invalid');
+            }
+        });
+
+        if (!camposTextoValidos) {
+             Swal.fire("Atención", "Por favor, complete todos los campos de Concepto y Comisión.", "warning");
             return false;
         }
 

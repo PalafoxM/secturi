@@ -1017,25 +1017,51 @@ $('#form_go').on('submit', function(e) {
     // 2. Agregar filas eliminadas al FormData
     formData.append('deleted_rows', JSON.stringify(deletedRows));
 
-    // 3. Validacion de fechas requeridas
-    let fechasValidas = true;
-    $('input[type="date"]').each(function() {
-        // Solo validar fechas si no es borrador O si se requiere estricto
-        if ($(this).val() === '') {
-            fechasValidas = false;
+    // Si es borrador, saltar validaciones estrictas
+    if (isDraft) {
+        enviarFormulario(formData);
+        return;
+    }
+
+    // --- VALIDACIONES ESTRICTAS PARA GUARDAR Y ENVIAR ---
+    let isValid = true;
+    let mensajeError = "";
+
+    // 3. Validar Campos de Texto (Concepto y Comisión)
+    $('textarea[name^="concepto_"], textarea[name^="comision_"]').each(function() {
+        if ($.trim($(this).val()) === '') {
+            isValid = false;
             $(this).addClass('is-invalid');
+            mensajeError = "Por favor, complete todos los campos de Concepto y Comisión.";
         } else {
             $(this).removeClass('is-invalid');
         }
     });
 
-    if (!fechasValidas) {
-        Swal.fire("Atención", "Por favor, complete todas las fechas requeridas.", "warning");
+    if (!isValid) {
+        Swal.fire("Atención", mensajeError, "warning");
         return;
     }
 
-    // 4. Validacion de Archivos
-    let archivosValidos = true;
+    // 4. Validacion de fechas requeridas
+    $('input[type="date"]').each(function() {
+        if ($(this).val() === '') {
+             // Ignorar fechas de viáticos si no estamos validando eso ahora mismo (aunque deberían tener fecha si se muestran)
+            // Pero la lógica general pide fechas en todas las filas estándar
+            isValid = false;
+            $(this).addClass('is-invalid');
+            mensajeError = "Por favor, complete todas las fechas requeridas.";
+        } else {
+            $(this).removeClass('is-invalid');
+        }
+    });
+
+    if (!isValid) {
+        Swal.fire("Atención", mensajeError, "warning");
+        return;
+    }
+
+    // 5. Validacion de Archivos
     $('tr[data-row-index]').each(function() {
         // SKIP VIATICOS
         if ($(this).attr('data-viaticos') === 'true') {
@@ -1047,19 +1073,24 @@ $('#form_go').on('submit', function(e) {
         
         // Verificar si existe el objeto de archivos para esta fila y si tiene adjuntos
         if (!archivos || !archivos.pdf || archivos.pdf.length === 0 || !archivos.xml || archivos.xml.length === 0) {
-            archivosValidos = false;
+            isValid = false;
             $(this).find('.archivos-seleccionados').addClass('border border-danger');
+             mensajeError = "Es requerido adjuntar al menos un PDF y un XML por cada fila.";
         } else {
             $(this).find('.archivos-seleccionados').removeClass('border border-danger');
         }
     });
 
-    if (!archivosValidos) {
-        Swal.fire("Atención", "Es requerido adjuntar al menos un PDF y un XML por cada fila.", "warning");
+    if (!isValid) {
+        Swal.fire("Atención", mensajeError, "warning");
         return;
     }
 
-    // 5. Enviar AJAX
+    // 6. Enviar Formulario
+    enviarFormulario(formData);
+});
+
+function enviarFormulario(formData) {
     $.ajax({
         type: "POST",
         url: "<?= base_url()?>index.php/Agregar/guardaGO",
@@ -1091,11 +1122,15 @@ $('#form_go').on('submit', function(e) {
             $('#btnGuardarBorrador').prop('disabled', false);
         },
         error: function (response,jqXHR, textStatus, errorThrown) {
-            var res= JSON.parse(response.responseText);
-            Swal.fire("Error", '<p> '+ res.message + '</p>');  
+             let msg = "Error desconocido";
+            try {
+                const res = JSON.parse(response.responseText);
+                msg = res.message || msg;
+            } catch(e) {}
+            Swal.fire("Error", '<p> '+ msg + '</p>'); 
         }
     });
-});
+}
 
 // Inicialización CORREGIDA
 $(document).ready(function() {
