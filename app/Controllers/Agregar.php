@@ -1981,7 +1981,7 @@ class Agregar extends BaseController
 
          $dataInsert = [
             'id_reserva_go' => $data['id_reserva_go'],
-            'id_estatus' => 1, // Siempre borrador
+            'id_estatus' => (isset($data['es_borrador']) && $data['es_borrador'] == 0) ? 2: 1, // Siempre borrador
             'id_direccion_responsable' => $data['direccion_responsable'],
             'fecha_tramite' => $data['fecha_tramite'],
             'no_consecutivo' => $data['no_consecutivo'],

@@ -768,7 +768,7 @@
         
         if (!validarFormulario()) return;
 
-        enviarFormulario("<?= base_url()?>index.php/Agregar/guardaGO", $('#btnGuardaGo'));
+        enviarFormulario("<?= base_url()?>index.php/Agregar/guardaBorradorGO", $('#btnGuardaGo'));
     });
 
     function enviarFormulario(url, btn) {
@@ -792,7 +792,9 @@
                     Swal.fire("Correcto", '<p> '+ response.respuesta + '</p>', 'success');  
                     setTimeout(() => {
                         // Redirección según sea borrador o final
-                        const redirect = ($('#es_borrador').val() == '1') ? "listaBorradoresGO" : "tablaArchivos/" + response.id+"/GO";
+                        // Usar idRegistro (coherente con vRegistroGo.php y Agregar.php)
+                        const id = response.idRegistro || response.id; 
+                        const redirect = ($('#es_borrador').val() == '1') ? "listaBorradoresGO" : "tablaArchivos/" + id + "/GO";
                         window.location.href = base_url + "index.php/Principal/" + redirect;
                     }, 1500);
                 }else{
