@@ -1253,7 +1253,7 @@ class Agregar extends BaseController
         $data = $this->request->getPost();
         $archivos_post = $this->request->getFiles(); 
 
-      
+     
         $archivos_por_tabla = [];
         if (isset($archivos_post['archivos'])) {
 

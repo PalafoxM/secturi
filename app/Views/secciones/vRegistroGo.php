@@ -530,6 +530,8 @@
 
 
 <script>
+let deletedRows = []; // Global scope
+
 $('.add-file').on('click', function (e) {
     e.preventDefault();
     const inputId = $(this).data('target');
@@ -986,21 +988,12 @@ function prepararFormData() {
     return formData;
 }
 
-// Envío del formulario
-// Variable global para filas eliminadas
-let deletedRows = [];
 
-$('#btnGuardarBorrador').on('click', function() {
-    $('#es_borrador').val('1');
-    $('#form_go').submit();
-});
-
-// Envío del formulario unificado
-// Variable para control de redirección
 let isDraft = false;
 
-$('#btnGuardarBorrador').on('click', function() {
+$('#btnGuardarBorrador').off('click').on('click', function() {
     isDraft = true;
+    $('#es_borrador').val('1'); // Ensure this is set
     $('#form_go').submit();
 });
 
@@ -1143,6 +1136,7 @@ $(document).ready(function() {
     inicializarFilaEnArchivos(initialRowIndex<?= $i ?>);
     
     // Aplicar inputmask a campos existentes
+    /*
     $(`input[name="importe_<?= $i ?>[]"]`).inputmask('numeric', {
         radixPoint: ".",
         groupSeparator: ",",
@@ -1151,6 +1145,8 @@ $(document).ready(function() {
         prefix: '$ ',
         rightAlign: false
     });
+    */
+    /*
     $(`input[name="propina_<?= $i ?>[]"]`).inputmask('numeric', {
         radixPoint: ".",
         groupSeparator: ",",
@@ -1159,6 +1155,7 @@ $(document).ready(function() {
         prefix: '$ ',
         rightAlign: false
     });
+    */
     <?php endforeach; ?>
     
     console.log('Filas inicializadas:', archivosPorFila);
