@@ -263,6 +263,7 @@
                                                                                     <a href="<?= base_url("index.php/Principal/caratulaGo/".$id_registro) ?>" target="_blank" title="Hoja 1">
                                                                                         <i class="far fa-file-pdf text-danger fa-2x"></i> Carátula de pago
                                                                                     </a>
+                                                                                   
                                                                                 </td>
                                                                             </tr>
                                                                             <tr>
@@ -286,6 +287,10 @@
                                                                                     <td>
                                                                                         <a href="<?= base_url("index.php/Principal/ImprimirGO/".$id_registro."/3/".$index) ?>" target="_blank" title="Hoja 3">
                                                                                             <i class="far fa-file-pdf text-danger fa-2x"></i> CFDI con encabezado <?= $index + 1 ?>
+                                                                                        </a>
+                                                                                        <br>
+                                                                                        <a href="<?= base_url("index.php/Principal/ImprimirTicket/".$id_registro."/3/".$index) ?>" target="_blank" title="Hoja 3">
+                                                                                            <i class="far fa-file-pdf text-danger fa-2x"></i> Encabezado Tikect <?= $index + 1 ?>
                                                                                         </a>
                                                                                     </td>
                                                                                 </tr>

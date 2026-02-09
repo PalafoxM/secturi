@@ -5443,6 +5443,133 @@ class Principal extends BaseController
         $this->response->setHeader('Content-Type', 'application/pdf');
         $mpdf->Output('Formato702GO.pdf', 'I');
     }
+    public function ImprimirTicket($id_pt = null, $hoja = null, $index = null, $savePath = null)
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $data = [];
+
+        // 1. Obtener Registro GO y Responsable
+        $registro_go = $globals->getTabla(['tabla' => 'vw_registro_go', 'where' => ['visible' => 1, 'id_registro_go' => $id_pt]]);
+        if (empty($registro_go->data)) {
+            echo '<h2>Error al encontrar registro.</h2>'; die();
+        }
+        $data['registro'] = $registro_go->data[0];
+        // die( var_dump( $registro_go->data[0] ) );
+        $id_reponsable_solicitud = $registro_go->data[0]->id_reponsable_solicitud;
+        $data['nombre_responsable'] = "";
+        $data['puesto_responsable'] = "";
+        $data['area_responsable']   = "";
+        if(isset($id_reponsable_solicitud) && !empty($id_reponsable_solicitud)){
+
+             $res = $globals->getTabla(['tabla' => 'vw_usuario', 'where' =>["id_usuario" => $id_reponsable_solicitud ] ]);
+             $data['nombre_responsable'] = $res->data[0]->nombre_completo;
+             $data['puesto_responsable'] = $res->data[0]->dsc_puesto;
+             $data['area_responsable']   = $res->data[0]->dsc_area;
+            //die( var_dump( $res ) );
+        }
+
+       
+
+        // 2. Obtener Factura (XML) específica por índice
+        $xml_go = $globals->getTabla(['tabla' => 'xml_go', 'where' => ['visible' => 1, 'id_registro_go' => $id_pt]]);
+        
+        if ($index === null || !isset($xml_go->data[$index])) {
+             // Fallback: Si no hay index, tomar el primero si existe, sino error o vacío
+             if(!empty($xml_go->data)) {
+                 $index = 0;
+             } else {
+                 echo '<h2>No hay facturas asociadas para imprimir.</h2>'; die();
+             }
+        }
+        $facturaItem = $xml_go->data[$index];
+        $data['uuid'] = ($facturaItem->folio) ? $facturaItem->folio : $facturaItem->uuid;
+
+        // 3. Obtener Datos del Periodo/Partida
+        $periodo_factura_go = $globals->getTabla(['tabla' => 'periodo_factura_go', 'where' => ['visible' => 1, 'id_registro_go' => $id_pt]]);
+        // Importante: Asumimos correspondencia por orden. Mejor sería por id_identificador si ambos lo tienen.
+        // Revisando estructura: xml_go tiene id_identificador y periodo_factura_go tiene id_identificador.
+        // Vamos a buscar el periodo que coincida con el id_identificador de la factura.
+        
+        $periodo = null;
+        if (!empty($periodo_factura_go->data)) {
+            foreach($periodo_factura_go->data as $p) {
+                if ($p->id_identificador == $facturaItem->id_identificador) {
+                    $periodo = $p;
+                    break;
+                }
+            }
+        }
+        // Fallback por índice si no se encontró por identificador (compatibilidad)
+        if (!$periodo && isset($periodo_factura_go->data[$index])) {
+            $periodo = $periodo_factura_go->data[$index];
+        }
+
+        // Recuperar nombre de partida
+        $nombre_partida = '';
+        if ($periodo) {
+             $presupuestoGO = $globals->getTabla(['tabla' => 'vw_periodo_factura_go', 'where' => ['visible' => 1, 'id_reserva' => $data['registro']->id_reserva_go]]);
+             // Buscar en presupuestos el que coincida con id_presupuesto
+             if (!empty($presupuestoGO->data)) {
+                 foreach($presupuestoGO->data as $presup) {
+                     // Nota: id_presupuesto en periodo es FK a cat_presupuesto/partida?
+                     // Asumiremos que vw_periodo_factura_go tiene la info. 
+                     // Simplificación: usaremos el mismo índice si es consistente, o busqueda.
+                     // Dado el modelo anterior, parece que vw_periodo_factura_go trae todo, pero periodo_factura_go es la tabla raw.
+                     // Intentaremos obtener el nombre de la partida directamente de cat_partida si tenemos id
+                     // O mejor, el usuario dijo "cuenta_cable".
+                     if(isset($presup->id_presupuesto_go) && $presup->id_presupuesto_go == $periodo->id_presupuesto) {
+                          $nombre_partida = $presup->dsc_partida; // o cuenta_cable
+                          break;
+                     }
+                 }
+                 // Si no se encontró, fallback a index
+                 if (empty($nombre_partida) && isset($presupuestoGO->data[$index])) {
+                      $nombre_partida = $presupuestoGO->data[$index]->dsc_partida;
+                 }
+             }
+        }
+        $data['partida'] = $nombre_partida;
+
+
+        // 4. Mapear datos a la vista
+        if ($periodo) {
+            $importe_str = $facturaItem->total; 
+            $importe_float = (float) str_replace(',', '', $importe_str);
+            
+            $data['inicio'] = $periodo->periodo_inicio;
+            $data['fin']    = $periodo->periodo_fin;
+            $data['encabezado'] = $periodo->encabezado;
+            $data['concepto'] = (isset($periodo->concepto)) ? $periodo->concepto : ''; // NUEVO CAMPO
+            $data['comision'] = (isset($periodo->comision)) ? $periodo->comision : ''; // NUEVO CAMPO COMISION
+            $data['total'] = $facturaItem->total;
+            
+            $monto          = $importe_float + (float)$periodo->propina;
+            $data['total2']  = $monto;
+            $data['monto2']  = $this->numeroEnLetras($monto);
+        } else {
+             $data['encabezado'] = '';
+             $data['concepto'] = '';
+             $data['total'] = $facturaItem->total;
+             $data['monto'] = $this->numeroEnLetras((float) str_replace(',', '', $facturaItem->total));
+             $data['total2'] = '';
+             $data['monto2'] = '';
+        }
+
+        // 5. Renderizar PDF
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 0, 'margin_left' => 1, 'margin_right' => 1,
+            'format' => [213, 268], 'mirrorMargins' => false,
+        ]);
+
+        $html = view('personal/vFormato702GO', $data);
+        $mpdf->WriteHTML($html);
+
+      
+
+        $this->response->setHeader('Content-Type', 'application/pdf');
+        $mpdf->Output('Formato702GO.pdf', 'I');
+    }
     public function avanceActividad()
     {
         $session = \Config\Services::session();
