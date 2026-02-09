@@ -5748,5 +5748,96 @@ ini.inicio = (function () {
                 }
             });
         },
+        tipoOperacion: {
+            nuevo: function(){
+                $('#formTipoOperacion')[0].reset();
+                $('#id_operacion').val('');
+                $('.seccion-op').hide();
+                $('#link_comprobante').html('');
+                $('#modalTipoOperacion').modal('show');
+            },
+            cambioTipo: function(tipo){
+                $('.seccion-op').hide();
+                if(tipo == 1) $('#div_deposito').show();
+                if(tipo == 2) $('#div_traspaso').show();
+                if(tipo == 3) $('#div_corte').show();
+            },
+            guardar: function(){
+                 var formData = new FormData(document.getElementById("formTipoOperacion"));
+                 $.ajax({
+                    url: base_url + "index.php/Inicio/guardarTipoOperacion",
+                    type: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    dataType: "json",
+                    success: function (response) {
+                        if (!response.error) {
+                            Swal.fire("Correcto", response.respuesta, "success").then(() => {
+                                window.location.reload();
+                            });
+                        } else {
+                            Swal.fire("Error", response.respuesta, "error");
+                        }
+                    },
+                    error: function () {
+                        Swal.fire("Error", "Error de conexión", "error");
+                    }
+                 });
+            },
+            editar: function(id){
+                $.post(base_url + "index.php/Inicio/getTipoOperacion", {id_operacion: id}, function(data){
+                    if(data.error){
+                        Swal.fire("Error", "No encontrado", "error");
+                        return;
+                    }
+                    $('#formTipoOperacion')[0].reset();
+                    $('.seccion-op').hide();
+                    $('#link_comprobante').html('');
+
+                    $('#id_operacion').val(data.id_operacion);
+                    $('#id_tipo_operacion').val(data.id_tipo_operacion).trigger('change');
+                    
+                    // Populate specific fields
+                    if(data.id_tipo_operacion == 1){
+                        $('#id_deposito').val(data.id_deposito);
+                        $('#importe_deposito').val(data.importe);
+                        if(data.comprobante){
+                             $('#link_comprobante').html('<a href="'+base_url+data.comprobante+'" target="_blank">Ver Comprobante Actual</a>');
+                        }
+                    } else if(data.id_tipo_operacion == 2){
+                        $('#cuenta_traspaso').val(data.id_deposito); // id_deposito acts as account for traspaso
+                        $('#importe_traspaso').val(data.importe);
+                        $('#justificaciones').val(data.justificaciones);
+                    } else if(data.id_tipo_operacion == 3){
+                        $('#estado_cuenta').val(data.estado_cuenta);
+                        $('#periodo').val(data.periodo);
+                    }
+                    
+                    $('#modalTipoOperacion').modal('show');
+                }, 'json');
+            },
+            eliminar: function(id){
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: "No podrás revertir esto!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, eliminarlo!'
+                }).then((result) => {
+                    if (result.value) {
+                         $.post(base_url + "index.php/Inicio/eliminarTipoOperacion", {id_operacion: id}, function(response){
+                             if (!response.error) {
+                                Swal.fire("Eliminado!", "El registro ha sido eliminado.", "success").then(() => {
+                                    window.location.reload();
+                                });
+                            } else {
+                                Swal.fire("Error", response.respuesta, "error");
+                            }
+                         }, 'json');
+                    }
+                })
+            }
+        },
     }
 })();

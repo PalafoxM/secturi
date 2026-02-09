@@ -756,6 +756,132 @@ class Inicio extends BaseController {
         $data['contentView'] = 'secciones/vVehiculosLista';
         $this->_renderView($data);
     }
+
+    // ==========================================
+    // TIPO DE OPERACIÓN CRUD
+    // ==========================================
+
+    public function TipoOperacion()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+
+        // Load Catalog for Deposito/Traspaso
+        // Assuming cat_deposito exists. If not, user might need to create it.
+        $cat_deposito = $globals->getTabla(['tabla' => 'cat_deposito', 'where' => ['visible' => 1]]);
+        
+        // Load existing operations
+        // Assuming table 'operaciones' exists.
+        $operaciones = $globals->getTabla(['tabla' => 'operaciones', 'where' => ['visible' => 1]]);
+
+        $data['cat_deposito'] = $cat_deposito->data ?? [];
+        $data['operaciones'] = $operaciones->data ?? [];
+        
+        $data['scripts'] = ['principal', 'inicio']; 
+        $data['contentView'] = 'secciones/vTipoOperacion';
+        $this->_renderView($data);
+    }
+
+    public function guardarTipoOperacion()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $globals = new Mglobal;
+        $response->error = true;
+
+        $id_operacion = $this->request->getPost('id_operacion');
+        $id_tipo_operacion = $this->request->getPost('id_tipo_operacion'); // 1=Deposito, 2=Traspaso, 3=Consulta Corte
+        
+        // Common fields
+        $dataSave = [
+            'id_tipo_operacion' => $id_tipo_operacion,
+            'visible' => 1,
+            'usu_reg' => $session->id_usuario ?? 0,
+            'fec_reg' => date('Y-m-d H:i:s')
+        ];
+
+        // Specific fields based on type
+        if ($id_tipo_operacion == 1) { // Deposito
+            $dataSave['id_deposito'] = $this->request->getPost('id_deposito');
+            $dataSave['importe'] = $this->request->getPost('importe');
+            
+            // File Upload
+            $file = $this->request->getFile('comprobante');
+            if ($file && $file->isValid() && !$file->hasMoved()) {
+                $uploadPath = FCPATH . 'assets/uploads/comprobantes';
+                if (!is_dir($uploadPath)) {
+                    mkdir($uploadPath, 0777, true);
+                }
+                $newName = $file->getRandomName();
+                $file->move($uploadPath, $newName);
+                $dataSave['comprobante'] = 'assets/uploads/comprobantes/' . $newName;
+            }
+        
+        } elseif ($id_tipo_operacion == 2) { // Traspaso
+            $dataSave['id_deposito'] = $this->request->getPost('cuenta_traspaso'); // Reusing field or new one?
+            $dataSave['importe'] = $this->request->getPost('importe');
+            $dataSave['justificaciones'] = $this->request->getPost('justificaciones');
+
+        } elseif ($id_tipo_operacion == 3) { // Consulta Corte
+            $dataSave['estado_cuenta'] = $this->request->getPost('estado_cuenta');
+            $dataSave['periodo'] = $this->request->getPost('periodo');
+        }
+
+        $dataConfig = [
+            'tabla' => 'operaciones',
+            'editar' => !empty($id_operacion),
+            'idEditar' => ['id_operacion' => $id_operacion]
+        ];
+
+        $result = $globals->saveTabla($dataSave, $dataConfig, ['script' => 'Inicio.guardarTipoOperacion']);
+
+        if ($result) {
+            $response->error = false;
+            $response->respuesta = "Operación guardada correctamente.";
+        } else {
+            $response->respuesta = "Error al guardar la operación.";
+        }
+
+        return $this->respond($response);
+    }
+
+    public function eliminarTipoOperacion()
+    {
+        $response = new \stdClass();
+        $globals = new Mglobal;
+        $response->error = true;
+
+        $id_operacion = $this->request->getPost('id_operacion');
+
+        $result = $globals->saveTabla(['visible' => 0], [
+            'tabla' => 'operaciones',
+            'editar' => true,
+            'idEditar' => ['id_operacion' => $id_operacion]
+        ], ['script' => 'Inicio.eliminarTipoOperacion']);
+
+        if ($result) {
+            $response->error = false;
+            $response->respuesta = "Eliminado correctamente.";
+        } else {
+             $response->respuesta = "Error al eliminar.";
+        }
+
+        return $this->respond($response);
+    }
+
+    public function getTipoOperacion()
+    {
+        $globals = new Mglobal;
+        $id = $this->request->getPost('id_operacion');
+        
+        $data = $globals->getTabla(['tabla' => 'operaciones', 'where' => ['id_operacion' => $id]]);
+
+        if (!empty($data->data[0])) {
+            return $this->response->setJSON($data->data[0]);
+        } else {
+            return $this->response->setJSON(['error' => 'No encontrado']);
+        }
+    }
 /*   public function subirAsistencia()
     {
         $session     = \Config\Services::session();

@@ -498,7 +498,7 @@
                             </ul>
                         </li> 
 
-                      <!-- <li class="nav-item"><a class="nav-link" href="<?php echo base_url(); ?>index.php/Principal/MesaRF" aria-expanded="false">Solicitud de Op. Bancarias</a></li> -->
+                       <li class="nav-item"><a class="nav-link" href="<?php echo base_url(); ?>index.php/Inicio/TipoOperacion" aria-expanded="false">Solicitud de Op. Bancarias</a></li>
                     </ul>
                 </div><!-- end Crypto -->
 
