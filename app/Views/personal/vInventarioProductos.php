@@ -425,7 +425,7 @@
                             if (!response.error) {
                                 Swal.fire("Eliminado", response.respuesta, "success");
                                 // Recargamos la página para ver los cambios
-                                setTimeout(function(){ location.reload(); }, 1500);
+                                //setTimeout(function(){ location.reload(); }, 1500);
                             } else {
                                 Swal.fire("Error", response.respuesta, "error");
                             }
@@ -465,7 +465,7 @@
                 success: function(response) {
                     if (!response.error) {
                         Swal.fire("Correcto", response.respuesta, "success");
-                        location.reload(); // Reload to show new data/totals
+                        //location.reload(); // Reload to show new data/totals
                     } else {
                         Swal.fire("Error", response.respuesta, "error");
                     }

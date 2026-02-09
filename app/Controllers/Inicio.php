@@ -1,4 +1,5 @@
-<?php namespace App\Controllers;
+<?php
+namespace App\Controllers;
 use CodeIgniter\Controller;
 use App\Libraries\Curps;
 use App\Libraries\Fechas;
@@ -9,7 +10,8 @@ use DateTime;
 use stdClass;
 use CodeIgniter\API\ResponseTrait;
 require_once FCPATH . '/mpdf/autoload.php';
-class Inicio extends BaseController {
+class Inicio extends BaseController
+{
 
     use ResponseTrait;
     private $defaultData = array(
@@ -21,263 +23,266 @@ class Inicio extends BaseController {
     public function __construct()
     {
         setlocale(LC_TIME, 'es_ES.utf8', 'es_MX.UTF-8', 'es_MX', 'esp_esp', 'Spanish'); // usar solo LC_TIME para evitar que los decimales los separe con coma en lugar de punto y fallen los inserts de peso y talla
-        date_default_timezone_set('America/Mexico_City');  
+        date_default_timezone_set('America/Mexico_City');
         $session = \Config\Services::session();
-        if($session->get('logueado')!= 1){
-            header('Location:'.base_url().'index.php/Login/cerrar?inactividad=1');            
+        if ($session->get('logueado') != 1) {
+            header('Location:' . base_url() . 'index.php/Login/cerrar?inactividad=1');
             die();
         }
     }
 
-    private function _renderView($data = array()) { 
+    private function _renderView($data = array())
+    {
         $session = \Config\Services::session();
-        $Mglobal = new Mglobal;   
+        $Mglobal = new Mglobal;
         //die(var_dump($data["dscCursos"]));
         $data = array_merge($this->defaultData, $data);
-        echo view($data['layout'], $data); 
-                      
+        echo view($data['layout'], $data);
+
     }
 
     public function index()
-    {        
+    {
         $session = \Config\Services::session();
-        $data    = array();
-        $globas  = new Mglobal;
+        $data = array();
+        $globas = new Mglobal;
         $vista = null;
         $votoHombre = false;
         $votoMujer = false;
-        $data['eventos']  = "";
+        $data['eventos'] = "";
         $votoH = $globas->getTabla(['tabla' => 'vw_honestidad', 'where' => ['visible' => 1, 'usu_reg' => $session->id_usuario, 'id_sexo' => 1]]);
         $votoM = $globas->getTabla(['tabla' => 'vw_honestidad', 'where' => ['visible' => 1, 'usu_reg' => $session->id_usuario, 'id_sexo' => 2]]);
-        if(isset($votoH->data) && !empty($votoH->data)){
-              $votoHombre = true;
+        if (isset($votoH->data) && !empty($votoH->data)) {
+            $votoHombre = true;
         }
-        if(isset($votoM->data) && !empty($votoM->data)){
-              $votoMujer = true;
+        if (isset($votoM->data) && !empty($votoM->data)) {
+            $votoMujer = true;
         }
-        if(in_array( $session->get('id_perfil'), [1,2,3] )){
-           $vista = 'secciones/vInicio';
-        }else{
-          $vista = 'personal/vInicio';
-          $data['datos'] = $globas->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario]])->data[0];
-           $data['lista_alba'] = $globas->getTabla(['tabla' => 'lista_alba', 'where' => ['visible' => 1]])->data;
-          
+        if (in_array($session->get('id_perfil'), [1, 2, 3])) {
+            $vista = 'secciones/vInicio';
         }
-          $mes_actual = date('m');
-           $cumple = $globas->getTabla([
-            'tabla' => 'vw_usuario', 
-            'where' => ['visible' => 1], 
+        else {
+            $vista = 'personal/vInicio';
+            $data['datos'] = $globas->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario]])->data[0];
+            $data['lista_alba'] = $globas->getTabla(['tabla' => 'lista_alba', 'where' => ['visible' => 1]])->data;
+
+        }
+        $mes_actual = date('m');
+        $cumple = $globas->getTabla([
+            'tabla' => 'vw_usuario',
+            'where' => ['visible' => 1],
             'whereMonth' => [['fec_nac', $mes_actual]]
         ])->data;
         $personal = [];
-       if(isset($cumple) && !empty($cumple)){
-            foreach($cumple as $c){
+        if (isset($cumple) && !empty($cumple)) {
+            foreach ($cumple as $c) {
                 $fecha_nacimiento = new DateTime($c->fec_nac);
                 $hoy = new DateTime();
                 $edad = $hoy->diff($fecha_nacimiento)->y;
-                 $personal[] =  [
-                      'nombre_completo'  => $c->nombre,
-                      'id_edad'          => $c->id_edad,
-                      'id_nivel'         => $c->id_nivel,
-                      'id_sexo'          => $c->sexo,
-                      'id_fec_nac'       => $c->id_fec_nac,
-                      'id_usuario'       => $c->id_usuario,
-                      'dsc_area'         => $c->dsc_area,
-                      'edad'             => $edad,
-                      'ruta_foto_relativa' =>$c->ruta_foto_relativa,
-                      'dia'             =>  date('d', strtotime($c->fec_nac))
-                 ];
-           
+                $personal[] = [
+                    'nombre_completo' => $c->nombre,
+                    'id_edad' => $c->id_edad,
+                    'id_nivel' => $c->id_nivel,
+                    'id_sexo' => $c->sexo,
+                    'id_fec_nac' => $c->id_fec_nac,
+                    'id_usuario' => $c->id_usuario,
+                    'dsc_area' => $c->dsc_area,
+                    'edad' => $edad,
+                    'ruta_foto_relativa' => $c->ruta_foto_relativa,
+                    'dia' => date('d', strtotime($c->fec_nac))
+                ];
+
             }
         }
-        $actividad     = $globas->getTabla(['tabla' => 'vw_actividad', 'where' => ['visible' => 1, "id_usuario" => $session->id_usuario]])->data;
+        $actividad = $globas->getTabla(['tabla' => 'vw_actividad', 'where' => ['visible' => 1, "id_usuario" => $session->id_usuario]])->data;
         $configuracion = $globas->getTabla(['tabla' => 'vw_configuracion', 'where' => ['visible' => 1, "id_usuario" => $session->id_usuario]])->data;
-       
+
         $tiket = $globas->getTabla(['tabla' => 'vw_tiket', 'where' => ['visible' => 1, "id_usuario" => $session->id_usuario]])->data;
-       // die( var_dump( $tiket) );
-        $eventos = $globas->getTabla(['tabla' => 'eventos', 'where' => ['visible' => 1],  'whereMonth' => [['fecha', $mes_actual]] ])->data;
-        $tiketNuevo    = [];
-        $tiketProceso  = [];
-        $tiketConcluido= [];
-    
-        foreach($tiket as $t){
-                 if($t->estatus == 0){
-                     $tiketNuevo[] = $t->estatus;
-                 }
-                 if($t->estatus == 1){
-                     $tiketConcluido[] = $t->estatus;
-                 }
-                 if($t->estatus == 2){
-                     $tiketProceso[] = $t->estatus;
-                 }
+        // die( var_dump( $tiket) );
+        $eventos = $globas->getTabla(['tabla' => 'eventos', 'where' => ['visible' => 1], 'whereMonth' => [['fecha', $mes_actual]]])->data;
+        $tiketNuevo = [];
+        $tiketProceso = [];
+        $tiketConcluido = [];
+
+        foreach ($tiket as $t) {
+            if ($t->estatus == 0) {
+                $tiketNuevo[] = $t->estatus;
+            }
+            if ($t->estatus == 1) {
+                $tiketConcluido[] = $t->estatus;
+            }
+            if ($t->estatus == 2) {
+                $tiketProceso[] = $t->estatus;
+            }
 
         }
-        foreach($eventos as $e){
-           
-                 if(date('d-m') == date('d-m', strtotime($e->fecha))){
-                     $data['eventos'] = $e;
-                 }
+        foreach ($eventos as $e) {
+
+            if (date('d-m') == date('d-m', strtotime($e->fecha))) {
+                $data['eventos'] = $e;
+            }
 
         }
-        $data['votoHombre']      = $votoHombre;
-        $data['votoMujer']       = $votoMujer;
+        $data['votoHombre'] = $votoHombre;
+        $data['votoMujer'] = $votoMujer;
 
-        $data['tiketNuevo']      = count($tiketNuevo);
-        $data['tiketConcluido']  = count($tiketConcluido);
-        $data['tiketProceso']    = count($tiketProceso);
-        $data['actividad']       = (isset($actividad) && !empty($actividad))?$actividad:[];
-        $data['configuracion']   = (isset($configuracion[0]) && !empty($configuracion))?$configuracion[0]:'';
-        $data['personal']        = $personal;
-        $data['scripts']         = array('principal','inicio');
-        $data['edita']           = 0;
+        $data['tiketNuevo'] = count($tiketNuevo);
+        $data['tiketConcluido'] = count($tiketConcluido);
+        $data['tiketProceso'] = count($tiketProceso);
+        $data['actividad'] = (isset($actividad) && !empty($actividad)) ? $actividad : [];
+        $data['configuracion'] = (isset($configuracion[0]) && !empty($configuracion)) ? $configuracion[0] : '';
+        $data['personal'] = $personal;
+        $data['scripts'] = array('principal', 'inicio');
+        $data['edita'] = 0;
         $data['nombre_completo'] = $session->nombre_completo;
-        $data['contentView']     =   $vista;               
+        $data['contentView'] = $vista;
         $this->_renderView($data);
-        
+
     }
     public function Perfil()
     {
         $session = \Config\Services::session();
-        $data    = array();
-        $globas  = new Mglobal;
+        $data = array();
+        $globas = new Mglobal;
         $votoHombre = false;
         $votoMujer = false;
         $vista = 'personal/vInicio';
-         $votoH = $globas->getTabla(['tabla' => 'vw_honestidad', 'where' => ['visible' => 1, 'usu_reg' => $session->id_usuario, 'id_sexo' => 1]]);
+        $votoH = $globas->getTabla(['tabla' => 'vw_honestidad', 'where' => ['visible' => 1, 'usu_reg' => $session->id_usuario, 'id_sexo' => 1]]);
         $votoM = $globas->getTabla(['tabla' => 'vw_honestidad', 'where' => ['visible' => 1, 'usu_reg' => $session->id_usuario, 'id_sexo' => 2]]);
-        if(isset($votoH->data) && !empty($votoH->data)){
-              $votoHombre = true;
+        if (isset($votoH->data) && !empty($votoH->data)) {
+            $votoHombre = true;
         }
-        if(isset($votoM->data) && !empty($votoM->data)){
-              $votoMujer = true;
+        if (isset($votoM->data) && !empty($votoM->data)) {
+            $votoMujer = true;
         }
         $mes_actual = date('m');
 
 
         $cumple = $globas->getTabla([
-            'tabla' => 'vw_usuario', 
-            'where' => ['visible' => 1], 
+            'tabla' => 'vw_usuario',
+            'where' => ['visible' => 1],
             'whereMonth' => [['fec_nac', $mes_actual]]
         ])->data;
         $personal = [];
-       if(isset($cumple) && !empty($cumple)){
-            foreach($cumple as $c){
+        if (isset($cumple) && !empty($cumple)) {
+            foreach ($cumple as $c) {
                 $fecha_nacimiento = new DateTime($c->fec_nac);
                 $hoy = new DateTime();
                 $edad = $hoy->diff($fecha_nacimiento)->y;
-                 $personal[] =  [
-                      'nombre_completo'  => $c->nombre,
-                      'id_edad'          => $c->id_edad,
-                      'id_nivel'         => $c->id_nivel,
-                      'id_sexo'          => $c->sexo,
-                      'id_fec_nac'       => $c->id_fec_nac,
-                      'id_usuario'       => $c->id_usuario,
-                      'dsc_area'         => $c->dsc_area,
-                      'edad'             => $edad,
-                      'ruta_foto_relativa' =>$c->ruta_foto_relativa,
-                      'dia'             =>  date('d', strtotime($c->fec_nac))
-                 ];
-           
+                $personal[] = [
+                    'nombre_completo' => $c->nombre,
+                    'id_edad' => $c->id_edad,
+                    'id_nivel' => $c->id_nivel,
+                    'id_sexo' => $c->sexo,
+                    'id_fec_nac' => $c->id_fec_nac,
+                    'id_usuario' => $c->id_usuario,
+                    'dsc_area' => $c->dsc_area,
+                    'edad' => $edad,
+                    'ruta_foto_relativa' => $c->ruta_foto_relativa,
+                    'dia' => date('d', strtotime($c->fec_nac))
+                ];
+
             }
         }
-        $data['eventos']  = "";
-        $fechaInicio   = date("Y-m-d");
-        $fechaFin      = date("Y-m-d");
-        $actividad     = $globas->getTabla(['tabla' => 'vw_actividad', 'where' => ['visible' => 1, "id_usuario" => $session->id_usuario]])->data;
+        $data['eventos'] = "";
+        $fechaInicio = date("Y-m-d");
+        $fechaFin = date("Y-m-d");
+        $actividad = $globas->getTabla(['tabla' => 'vw_actividad', 'where' => ['visible' => 1, "id_usuario" => $session->id_usuario]])->data;
         $configuracion = $globas->getTabla(['tabla' => 'vw_configuracion', 'where' => ['visible' => 1, "id_usuario" => $session->id_usuario]])->data;
 
         $tiket = $globas->getTabla(['tabla' => 'vw_tiket', 'where' => ['visible' => 1, "id_usuario" => $session->id_usuario]])->data;
-        $eventos = $globas->getTabla(['tabla' => 'eventos', 'where' => ['visible' => 1],  'whereMonth' => [['fecha', $mes_actual]] ])->data;
-        $tiketNuevo    = [];
-        $tiketProceso  = [];
-        $tiketConcluido= [];
-       
-        foreach($eventos as $e){
-           
-                 if(date('d-m') == date('d-m', strtotime($e->fecha))){
-                     $data['eventos'] = $e;
-                 }
+        $eventos = $globas->getTabla(['tabla' => 'eventos', 'where' => ['visible' => 1], 'whereMonth' => [['fecha', $mes_actual]]])->data;
+        $tiketNuevo = [];
+        $tiketProceso = [];
+        $tiketConcluido = [];
+
+        foreach ($eventos as $e) {
+
+            if (date('d-m') == date('d-m', strtotime($e->fecha))) {
+                $data['eventos'] = $e;
+            }
 
         }
-        
-       
-        foreach($tiket as $t){
-                 if($t->estatus == 0){
-                     $tiketNuevo[] = $t->estatus;
-                 }
-                 if($t->estatus == 1){
-                     $tiketConcluido[] = $t->estatus;
-                 }
-                 if($t->estatus == 2){
-                     $tiketProceso[] = $t->estatus;
-                 }
+
+
+        foreach ($tiket as $t) {
+            if ($t->estatus == 0) {
+                $tiketNuevo[] = $t->estatus;
+            }
+            if ($t->estatus == 1) {
+                $tiketConcluido[] = $t->estatus;
+            }
+            if ($t->estatus == 2) {
+                $tiketProceso[] = $t->estatus;
+            }
 
         }
-        $data['votoHombre']      = $votoHombre;
-        $data['votoMujer']       = $votoMujer;
-       
-        $data['tiketNuevo']      = count($tiketNuevo);
-        $data['tiketConcluido']  = count($tiketConcluido);
-        $data['tiketProceso']    = count($tiketProceso);
-        $data['actividad']       = (isset($actividad) && !empty($actividad))?$actividad:[];
-        $data['configuracion']   = (isset($configuracion[0]) && !empty($configuracion))?$configuracion[0]:'';
-        $data['personal']   = $personal;
-        $data['datos']      = $globas->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario]])->data[0];
+        $data['votoHombre'] = $votoHombre;
+        $data['votoMujer'] = $votoMujer;
+
+        $data['tiketNuevo'] = count($tiketNuevo);
+        $data['tiketConcluido'] = count($tiketConcluido);
+        $data['tiketProceso'] = count($tiketProceso);
+        $data['actividad'] = (isset($actividad) && !empty($actividad)) ? $actividad : [];
+        $data['configuracion'] = (isset($configuracion[0]) && !empty($configuracion)) ? $configuracion[0] : '';
+        $data['personal'] = $personal;
+        $data['datos'] = $globas->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario]])->data[0];
         $data['lista_alba'] = $globas->getTabla(['tabla' => 'lista_alba', 'where' => ['visible' => 1]])->data;
-        $data['scripts']    = array('principal','inicio');
-        $data['edita']      = 0;
+        $data['scripts'] = array('principal', 'inicio');
+        $data['edita'] = 0;
         $data['nombre_completo'] = $session->nombre_completo;
-        $data['contentView'] =   $vista;
-         //die(json_encode($data));
+        $data['contentView'] = $vista;
+        //die(json_encode($data));
         $this->_renderView($data);
     }
     public function ListaViaticos()
-    {        
+    {
         $session = \Config\Services::session();
-        $globas  = new Mglobal;
+        $globas = new Mglobal;
         $vista = 'personal/vInicio';
         $data['datos'] = $globas->getTabla(['tabla' => 'vw_juridico_viaticos', 'where' => ['visible' => 1]])->data;
         $data['cat_funcionario'] = $globas->getTabla(['tabla' => 'cat_tipo_funcionario', 'where' => ['visible' => 1]])->data;
-        $data['cat_area']        = $globas->getTabla(['tabla' => 'cat_area_adscripcion', 'where' => ['visible' => 1]])->data;
-        $data['cat_gasto']       = $globas->getTabla(['tabla' => 'cat_gasto', 'where' => ['visible' => 1]])->data;
-        $data['cat_viaje']       = $globas->getTabla(['tabla' => 'cat_viaje', 'where' => ['visible' => 1]])->data;
-        $data['cat_pais']        = $globas->getTabla(['tabla' => 'cat_pais', 'where' => ['visible' => 1]])->data;
-        $data['cat_estado']      = $globas->getTabla(['tabla' => 'cat_estado', 'where' => ['visible' => 1]])->data;
-        $data['cat_municipios']  = $globas->getTabla(['tabla' => 'cat_municipios', 'where' => ['visible' => 1]])->data;
-        $data['deno_puesto']     = $globas->getTabla(['tabla' => 'deno_puesto', 'where' => ['visible' => 1]])->data;
-        $data['deno_cargo']      = $globas->getTabla(['tabla' => 'deno_cargo', 'where' => ['visible' => 1]])->data;
-        $data['usuarios']        = $globas->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]])->data;
-        $data['scripts'] = array('principal','inicio');
+        $data['cat_area'] = $globas->getTabla(['tabla' => 'cat_area_adscripcion', 'where' => ['visible' => 1]])->data;
+        $data['cat_gasto'] = $globas->getTabla(['tabla' => 'cat_gasto', 'where' => ['visible' => 1]])->data;
+        $data['cat_viaje'] = $globas->getTabla(['tabla' => 'cat_viaje', 'where' => ['visible' => 1]])->data;
+        $data['cat_pais'] = $globas->getTabla(['tabla' => 'cat_pais', 'where' => ['visible' => 1]])->data;
+        $data['cat_estado'] = $globas->getTabla(['tabla' => 'cat_estado', 'where' => ['visible' => 1]])->data;
+        $data['cat_municipios'] = $globas->getTabla(['tabla' => 'cat_municipios', 'where' => ['visible' => 1]])->data;
+        $data['deno_puesto'] = $globas->getTabla(['tabla' => 'deno_puesto', 'where' => ['visible' => 1]])->data;
+        $data['deno_cargo'] = $globas->getTabla(['tabla' => 'deno_cargo', 'where' => ['visible' => 1]])->data;
+        $data['usuarios'] = $globas->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]])->data;
+        $data['scripts'] = array('principal', 'inicio');
         $data['edita'] = 0;
-        $data['contentView'] = 'personal/vListaViaticos';                
+        $data['contentView'] = 'personal/vListaViaticos';
         $this->_renderView($data);
     }
     public function getDetalleViaticoJSON()
     {
         $globals = new Mglobal;
         $id = $this->request->getPost('id');
-    
+
         // Obtenemos los datos directos de la vista o tabla
         $tabla = $globals->getTabla([
-            "tabla" => "vw_juridico_viaticos", 
+            "tabla" => "vw_juridico_viaticos",
             "where" => ["id_juridico_viatico" => $id]
         ]);
-    
+
         // Devolvemos el primer resultado como JSON con el formato correcto de CI4
         if (!empty($tabla->data[0])) {
             return $this->response->setJSON($tabla->data[0]);
-        } else {
+        }
+        else {
             return $this->response->setJSON(['error' => 'No se encontraron datos']);
         }
     }
-   // ==========================================
+    // ==========================================
     // VISTAS DE INVENTARIO
     // ==========================================
 
     public function InventarioProductos()
-    {   
+    {
         $globas = new Mglobal;
-      
+
         $data['cat_inventario_papel'] = $globas->getTabla(['tabla' => 'cat_inventario_papel', 'where' => ['visible' => 1]])->data;
         $data['cat_inventario_art_papel'] = $globas->getTabla(['tabla' => 'cat_inventario_art_papel', 'where' => ['visible' => 1]])->data;
         $data['cat_inventario_art_ofi'] = $globas->getTabla(['tabla' => 'cat_inventario_art_ofi', 'where' => ['visible' => 1]])->data;
@@ -288,7 +293,7 @@ class Inicio extends BaseController {
         $data['total_stock_art_ofi'] = array_sum(array_column($data['cat_inventario_art_ofi'] ?? [], 'stock'));
 
         $data['scripts'] = array('principal', 'inicio');
-        $data['contentView']= 'personal/vInventarioProductos';                
+        $data['contentView'] = 'personal/vInventarioProductos';
         $this->_renderView($data);
     }
 
@@ -307,9 +312,9 @@ class Inicio extends BaseController {
                 $data['total_stock_lim'] += (int)$item->stock;
             }
         }
-        
+
         $data['scripts'] = array('principal', 'inicio');
-        $data['contentView']= 'personal/vInventarioLimpieza';                
+        $data['contentView'] = 'personal/vInventarioLimpieza';
         $this->_renderView($data);
     }
 
@@ -322,17 +327,17 @@ class Inicio extends BaseController {
         $response = new \stdClass();
         $globals = new Mglobal;
         $response->error = true;
-        
+
         $id_producto = $this->request->getPost('id_producto');
         $tabla = $this->request->getPost('tabla');
-        $tipo_movimiento = $this->request->getPost('tipo_movimiento'); 
+        $tipo_movimiento = $this->request->getPost('tipo_movimiento');
         $cantidad = (int)($this->request->getPost('cantidad') ?: $this->request->getPost('stock'));
 
         if (!$id_producto || !$tabla || !$cantidad) {
             $response->respuesta = "Datos incompletos.";
             return $this->respond($response);
         }
-        
+
         // Mapeo de IDs según la tabla
         switch ($tabla) {
             case 'cat_inventario_papel':
@@ -391,7 +396,7 @@ class Inicio extends BaseController {
         $response = new \stdClass();
         $globals = new Mglobal;
         $response->error = true;
-        
+
         $id_producto = $this->request->getPost('id_producto');
         $tabla = $this->request->getPost('tabla');
         $nombre = $this->request->getPost('nombre');
@@ -446,13 +451,23 @@ class Inicio extends BaseController {
         $id_producto = $this->request->getPost('id');
         $tabla = $this->request->getPost('tabla');
 
-        $idGenerico = match($tabla) {
-            'cat_inventario_papel' => 'id_inventario_papel',
-            'cat_inventario_art_papel' => 'id_inventario_art_papel',
-            'cat_inventario_art_ofi' => 'id_inventario_art_ofi',
-            'cat_inventario_limpieza' => 'id_inventario_lim',
-            default => ''
-        };
+        switch ($tabla) {
+            case 'cat_inventario_papel':
+                $idGenerico = 'id_inventario_papel';
+                break;
+            case 'cat_inventario_art_papel':
+                $idGenerico = 'id_inventario_art_papel';
+                break;
+            case 'cat_inventario_art_ofi':
+                $idGenerico = 'id_inventario_art_ofi';
+                break;
+            case 'cat_inventario_limpieza':
+                $idGenerico = 'id_inventario_lim';
+                break;
+            default:
+                $idGenerico = '';
+                break;
+        }
 
         if (!$idGenerico) {
             $response->respuesta = "Error de configuración de tabla.";
@@ -474,123 +489,124 @@ class Inicio extends BaseController {
     }
 
     public function ListadoSolicitudes()
-    {        
+    {
         $session = \Config\Services::session();
-        $globas  = new Mglobal;
+        $globas = new Mglobal;
         $vista = 'personal/vInicio';
         $data['datos'] = $globas->getTabla(['tabla' => 'vw_solicitud_grc', 'where' => ['visible' => 1]])->data;
-        $data['scripts'] = array('principal','inicio');
+        $data['scripts'] = array('principal', 'inicio');
         $data['edita'] = 0;
-        $data['contentView'] = 'personal/vListaSolicitudes';                
+        $data['contentView'] = 'personal/vListaSolicitudes';
         $this->_renderView($data);
-        
+
     }
     public function Viaticos()
-    {        
+    {
         $session = \Config\Services::session();
-        $data        = array();
-        $globas  = new Mglobal;
-          if (!in_array($session->get('id_perfil'), [1, 7])) {
+        $data = array();
+        $globas = new Mglobal;
+        if (!in_array($session->get('id_perfil'), [1, 7])) {
             $data['contentView'] = 'secciones/vError500';
             $data['layout'] = 'plantilla/lytVacio';
             $this->_renderView($data);
             die();
         }
-        
+
         $data['cat_funcionario'] = $globas->getTabla(['tabla' => 'cat_tipo_funcionario', 'where' => ['visible' => 1]])->data;
-        $data['cat_gasto']       = $globas->getTabla(['tabla' => 'cat_gasto', 'where' => ['visible' => 1]])->data;
-        $data['cat_viaje']       = $globas->getTabla(['tabla' => 'cat_viaje', 'where' => ['visible' => 1]])->data;
-        $data['cat_pais']        = $globas->getTabla(['tabla' => 'cat_pais', 'where' => ['visible' => 1]])->data;
-        $data['cat_estado']      = $globas->getTabla(['tabla' => 'cat_estado', 'where' => ['visible' => 1]])->data;
-        $data['cat_municipios']  = $globas->getTabla(['tabla' => 'cat_municipios', 'where' => ['visible' => 1]])->data;
-        $data['deno_puesto']     = $globas->getTabla(['tabla' => 'deno_puesto', 'where' => ['visible' => 1]])->data;
-        $data['deno_cargo']      = $globas->getTabla(['tabla' => 'deno_cargo', 'where' => ['visible' => 1]])->data;
-        $data['cat_area']        = $globas->getTabla(['tabla' => 'cat_area_adscripcion', 'where' => ['visible' => 1]])->data;
-       // die( var_dump( $data['deno_puesto'] ) );
-        $data['usuarios']  = $globas->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]])->data;
-        $data['scripts']         = array('inicio', 'principal');
+        $data['cat_gasto'] = $globas->getTabla(['tabla' => 'cat_gasto', 'where' => ['visible' => 1]])->data;
+        $data['cat_viaje'] = $globas->getTabla(['tabla' => 'cat_viaje', 'where' => ['visible' => 1]])->data;
+        $data['cat_pais'] = $globas->getTabla(['tabla' => 'cat_pais', 'where' => ['visible' => 1]])->data;
+        $data['cat_estado'] = $globas->getTabla(['tabla' => 'cat_estado', 'where' => ['visible' => 1]])->data;
+        $data['cat_municipios'] = $globas->getTabla(['tabla' => 'cat_municipios', 'where' => ['visible' => 1]])->data;
+        $data['deno_puesto'] = $globas->getTabla(['tabla' => 'deno_puesto', 'where' => ['visible' => 1]])->data;
+        $data['deno_cargo'] = $globas->getTabla(['tabla' => 'deno_cargo', 'where' => ['visible' => 1]])->data;
+        $data['cat_area'] = $globas->getTabla(['tabla' => 'cat_area_adscripcion', 'where' => ['visible' => 1]])->data;
+        // die( var_dump( $data['deno_puesto'] ) );
+        $data['usuarios'] = $globas->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]])->data;
+        $data['scripts'] = array('inicio', 'principal');
         $data['edita'] = 0;
-        $data['contentView'] = 'secciones/vViaticos';                
+        $data['contentView'] = 'secciones/vViaticos';
         $this->_renderView($data);
-        
+
     }
     public function ListaInventario()
     {
-        $session            = \Config\Services::session();
-        $data               = array();
-        $globas             = new Mglobal;
-        $data['inventario']    = $globas->getTabla(['tabla' => 'vw_inventario', 'where' => ['visible' => 1]])->data;
+        $session = \Config\Services::session();
+        $data = array();
+        $globas = new Mglobal;
+        $data['inventario'] = $globas->getTabla(['tabla' => 'vw_inventario', 'where' => ['visible' => 1]])->data;
         $data['cat_perfil'] = $globas->getTabla(['tabla' => 'perfil', 'where' => ['visible' => 1]])->data;
-        $data['cat_area']   = $globas->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]])->data;
-        $data['usuario']   = $globas->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]])->data;
-   
-        $data['scripts']    = array('principal','inicio');
-        $data['contentView']= 'personal/vListaInventario';                
+        $data['cat_area'] = $globas->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]])->data;
+        $data['usuario'] = $globas->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]])->data;
+
+        $data['scripts'] = array('principal', 'inicio');
+        $data['contentView'] = 'personal/vListaInventario';
         $this->_renderView($data);
 
     }
     public function Servicios()
     {
-        $session            = \Config\Services::session();
-        $data               = array();
-        $globas             = new Mglobal;
-        $data['cat_servicio']    = $globas->getTabla(['tabla' => 'cat_servicio', 'where' => ['visible' => 1]])->data;
-        $data['cat_mes']    = $globas->getTabla(['tabla' => 'cat_mes', 'where' => ['visible' => 1]])->data;
+        $session = \Config\Services::session();
+        $data = array();
+        $globas = new Mglobal;
+        $data['cat_servicio'] = $globas->getTabla(['tabla' => 'cat_servicio', 'where' => ['visible' => 1]])->data;
+        $data['cat_mes'] = $globas->getTabla(['tabla' => 'cat_mes', 'where' => ['visible' => 1]])->data;
 
-        $data['scripts']    = array('principal','inicio');
-        $data['contentView']= 'personal/vServicios';                
+        $data['scripts'] = array('principal', 'inicio');
+        $data['contentView'] = 'personal/vServicios';
         $this->_renderView($data);
 
     }
     public function Chat()
-    {        
+    {
         $session = \Config\Services::session();
-        $data        = array();
-        $data['scripts'] = array('principal','inicio');
+        $data = array();
+        $data['scripts'] = array('principal', 'inicio');
         $data['edita'] = 0;
-        $data['contentView'] = 'secciones/vChat';                
+        $data['contentView'] = 'secciones/vChat';
         $this->_renderView($data);
-        
+
     }
     public function Preinscritos()
-    {        
-        $session = \Config\Services::session();   
+    {
+        $session = \Config\Services::session();
         $data = array();
-        
-      
-        $globas              = new Mglobal;
-        if($session->id_perfil == 1){
-            $detenidos           = $globas->getTabla(['tabla' => 'detenidos', 'where' => ['visible' => 1]]);
-            $participantes         = $globas->getTabla(['tabla' => 'participantes', 'where' => ['visible' => 1]]);
-        }else{
-            $detenidos           = $globas->getTabla(['tabla' => 'detenidos', 'where' => ['visible' => 1, 'id_dependencia' => $session->id_dependencia]]);
-            $participantes         = $globas->getTabla(['tabla' => 'participantes', 'where' => ['visible' => 1, 'id_dependencia' => $session->id_dependencia]]);
+
+
+        $globas = new Mglobal;
+        if ($session->id_perfil == 1) {
+            $detenidos = $globas->getTabla(['tabla' => 'detenidos', 'where' => ['visible' => 1]]);
+            $participantes = $globas->getTabla(['tabla' => 'participantes', 'where' => ['visible' => 1]]);
+        }
+        else {
+            $detenidos = $globas->getTabla(['tabla' => 'detenidos', 'where' => ['visible' => 1, 'id_dependencia' => $session->id_dependencia]]);
+            $participantes = $globas->getTabla(['tabla' => 'participantes', 'where' => ['visible' => 1, 'id_dependencia' => $session->id_dependencia]]);
         }
 
-        $dataDB           = array('tabla' => 'cat_nivel', 'where' => ['visible' => 1]);
-        $dependenciaDB    = array('tabla' => 'cat_dependencia', 'where' => ['visible' => 1]);
-        $perfilDB         = array('tabla' => 'cat_perfil', 'where' => ['visible' => 1]);
-        $cat_nivel        = $globas->getTabla($dataDB);
-        $cat_dependencia  = $globas->getTabla($dependenciaDB);
-        $cat_perfil       = $globas->getTabla($perfilDB);
-        $cat_municipio    = $globas->getTabla(['tabla' => 'cat_municipio', 'where' => ['visible' => 1]]);
+        $dataDB = array('tabla' => 'cat_nivel', 'where' => ['visible' => 1]);
+        $dependenciaDB = array('tabla' => 'cat_dependencia', 'where' => ['visible' => 1]);
+        $perfilDB = array('tabla' => 'cat_perfil', 'where' => ['visible' => 1]);
+        $cat_nivel = $globas->getTabla($dataDB);
+        $cat_dependencia = $globas->getTabla($dependenciaDB);
+        $cat_perfil = $globas->getTabla($perfilDB);
+        $cat_municipio = $globas->getTabla(['tabla' => 'cat_municipio', 'where' => ['visible' => 1]]);
 
-        $data['cat_nivel']       =$cat_nivel->data;
-        $data['cat_dependencia'] =$cat_dependencia->data;
-        $data['cat_perfil']      =$cat_perfil->data;
-        $data['cat_municipio']   =$cat_municipio->data;
-        $data['detenidos']   = (isset($detenidos) && !empty($detenidos))?$detenidos->data:[];
-        $data['participantes'] = (isset($participantes) && !empty($participantes))?$participantes->data:[];
-        $data['scripts'] = array('agregar','inicio');
-        $data['contentView'] = 'secciones/vPreinscritos';                
+        $data['cat_nivel'] = $cat_nivel->data;
+        $data['cat_dependencia'] = $cat_dependencia->data;
+        $data['cat_perfil'] = $cat_perfil->data;
+        $data['cat_municipio'] = $cat_municipio->data;
+        $data['detenidos'] = (isset($detenidos) && !empty($detenidos)) ? $detenidos->data : [];
+        $data['participantes'] = (isset($participantes) && !empty($participantes)) ? $participantes->data : [];
+        $data['scripts'] = array('agregar', 'inicio');
+        $data['contentView'] = 'secciones/vPreinscritos';
         $this->_renderView($data);
-        
+
     }
     public function listaIncidencia()
     {
         $session = \Config\Services::session();
         $principal = new Mglobal;
-   
+
         if (!in_array($session->get('id_perfil'), [1, 3])) {
             $data['contentView'] = 'secciones/vError500';
             $data['layout'] = 'plantilla/lytVacio';
@@ -598,25 +614,25 @@ class Inicio extends BaseController {
             die();
         }
         // Obtener categorías desde la base de datos
-        $Periodo= ['tabla' => 'cat_periodo', 'where' => ['visible' => 1]];
+        $Periodo = ['tabla' => 'cat_periodo', 'where' => ['visible' => 1]];
         $dataDB = ['tabla' => 'vw_incidenica', 'where' => ['visible' => 1]];
         $usuario = [
-            'tabla'   => 'vw_incidenica',
-            'select'  => ['id_usuario', 'nombre_completo'],
-            'where'   => ['visible' => 1],
+            'tabla' => 'vw_incidenica',
+            'select' => ['id_usuario', 'nombre_completo'],
+            'where' => ['visible' => 1],
             'groupBy' => ['id_usuario']
-            ];
+        ];
 
-       
+
         $response = $principal->getTabla($dataDB);
         $periodo = $principal->getTabla($Periodo);
         $usuario = $principal->getTabla($usuario);
-     
-        $data['incidencia']  = (isset($response->data) && !empty($response->data))?$response->data:[];
-        $data['periodo']     = (isset($periodo->data) && !empty($periodo->data))?$periodo->data:[];
-        $data['usuario']     = (isset($usuario->data) && !empty($usuario->data))?$usuario->data:[];
+
+        $data['incidencia'] = (isset($response->data) && !empty($response->data)) ? $response->data : [];
+        $data['periodo'] = (isset($periodo->data) && !empty($periodo->data)) ? $periodo->data : [];
+        $data['usuario'] = (isset($usuario->data) && !empty($usuario->data)) ? $usuario->data : [];
         //die( var_dump($data['usuario']) );
-        $data['scripts']     = ['principal', 'inicio'];
+        $data['scripts'] = ['principal', 'inicio'];
         $data['contentView'] = 'secciones/vListaIncidencia';
         $this->_renderView($data);
     }
@@ -624,32 +640,32 @@ class Inicio extends BaseController {
     {
         $session = \Config\Services::session();
         $principal = new Mglobal;
-        if($session->id_perfil == 8){
-            header('Location:'.base_url().'index.php/');            
+        if ($session->id_perfil == 8) {
+            header('Location:' . base_url() . 'index.php/');
             die();
         }
-        $usuario     = $principal->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' =>1]]); 
-        $cat_perfil  = $principal->getTabla(['tabla' => 'perfil', 'where' => ['visible' =>1]]); 
-        $cat_area    = $principal->getTabla(['tabla' => 'cat_area', 'where' => ['visible' =>1]]); 
-        $cat_puesto  = $principal->getTabla(['tabla' => 'cat_puesto', 'where' => ['visible' =>1]]); 
-        $tipo_empleado  = $principal->getTabla(['tabla' => 'cat_tipo_empleado ', 'where' => ['visible' =>1]]); 
+        $usuario = $principal->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
+        $cat_perfil = $principal->getTabla(['tabla' => 'perfil', 'where' => ['visible' => 1]]);
+        $cat_area = $principal->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
+        $cat_puesto = $principal->getTabla(['tabla' => 'cat_puesto', 'where' => ['visible' => 1]]);
+        $tipo_empleado = $principal->getTabla(['tabla' => 'cat_tipo_empleado ', 'where' => ['visible' => 1]]);
 
-     
-        $data['editar']        = 0;
-        $data['cat_perfil']    = $cat_perfil->data;
-        $data['cat_area']      = $cat_area->data;
-        $data['cat_puesto']    = $cat_puesto->data;
+
+        $data['editar'] = 0;
+        $data['cat_perfil'] = $cat_perfil->data;
+        $data['cat_area'] = $cat_area->data;
+        $data['cat_puesto'] = $cat_puesto->data;
         $data['tipo_empleado'] = $tipo_empleado->data;
-        $data['usuario']       = (isset($usuario->data) && !empty($usuario->data))?$usuario->data:[];
-        $data['scripts']       = ['principal', 'agregar'];
-        $data['contentView']   = 'secciones/vAltaUsuario';
+        $data['usuario'] = (isset($usuario->data) && !empty($usuario->data)) ? $usuario->data : [];
+        $data['scripts'] = ['principal', 'agregar'];
+        $data['contentView'] = 'secciones/vAltaUsuario';
         $this->_renderView($data);
     }
     public function usuarios()
     {
         $session = \Config\Services::session();
         $principal = new Mglobal;
-    
+
         // Mapeo de casos para obtener usuarios según el perfil
         $usuarioQuery = [
             'tabla' => 'vw_usuario',
@@ -657,20 +673,20 @@ class Inicio extends BaseController {
         ];
         // Obtener usuarios
         $usuario = $principal->getTabla($usuarioQuery);
-        $cat_perfil  = $principal->getTabla(['tabla' => 'perfil', 'where' => ['visible' =>1]]); 
-        $cat_area  = $principal->getTabla(['tabla' => 'cat_area', 'where' => ['visible' =>1]]); 
-        $cat_puesto  = $principal->getTabla(['tabla' => 'cat_puesto', 'where' => ['visible' =>1]]);  
-        $tipo_empleado  = $principal->getTabla(['tabla' => 'cat_tipo_empleado', 'where' => ['visible' =>1]]); 
+        $cat_perfil = $principal->getTabla(['tabla' => 'perfil', 'where' => ['visible' => 1]]);
+        $cat_area = $principal->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
+        $cat_puesto = $principal->getTabla(['tabla' => 'cat_puesto', 'where' => ['visible' => 1]]);
+        $tipo_empleado = $principal->getTabla(['tabla' => 'cat_tipo_empleado', 'where' => ['visible' => 1]]);
 
-        $data['cat_perfil']   = $cat_perfil->data;
-        $data['cat_area']     = $cat_area->data;
-        $data['cat_puesto']   = $cat_puesto->data;
-        $data['tipo_empleado']     = $tipo_empleado->data;
+        $data['cat_perfil'] = $cat_perfil->data;
+        $data['cat_area'] = $cat_area->data;
+        $data['cat_puesto'] = $cat_puesto->data;
+        $data['tipo_empleado'] = $tipo_empleado->data;
         // Asignar datos adicionales
         $data['usuario'] = isset($usuario->data) && !empty($usuario->data) ? $usuario->data : [];
         $data['scripts'] = ['principal', 'inicio'];
         $data['contentView'] = 'secciones/vUsuarios';
-    
+
         // Renderizar la vista
         $this->_renderView($data);
     }
@@ -678,7 +694,7 @@ class Inicio extends BaseController {
     {
         $session = \Config\Services::session();
         $principal = new Mglobal;
-    
+
         // Mapeo de casos para obtener usuarios según el perfil
         $usuarioQuery = [
             'tabla' => 'posada',
@@ -686,49 +702,49 @@ class Inicio extends BaseController {
         ];
         // Obtener usuarios
         $usuario = $principal->getTabla($usuarioQuery);
-  
+
         // Asignar datos adicionales
         $data['usuario'] = isset($usuario->data) && !empty($usuario->data) ? $usuario->data : [];
         $data['scripts'] = ['principal', 'inicio'];
         $data['contentView'] = 'secciones/vPosada';
-    
+
         // Renderizar la vista
         $this->_renderView($data);
     }
     public function listaPerfil()
     {
         $session = \Config\Services::session();
-        $principal            = new Mglobal;
-        $cat_perfil           = $principal->getTabla(['tabla' => 'perfil', 'where'=>['visible' => 1]]);
-        $data['cat_perfil']   = (isset($cat_perfil->data) && !empty($cat_perfil->data))?$cat_perfil->data:[];
-        $data['scripts']     = ['principal', 'inicio'];
+        $principal = new Mglobal;
+        $cat_perfil = $principal->getTabla(['tabla' => 'perfil', 'where' => ['visible' => 1]]);
+        $data['cat_perfil'] = (isset($cat_perfil->data) && !empty($cat_perfil->data)) ? $cat_perfil->data : [];
+        $data['scripts'] = ['principal', 'inicio'];
         $data['contentView'] = 'secciones/vlistaPerfiles';
-        $this->_renderView($data);   
+        $this->_renderView($data);
     }
-  public function subirAsistencia()
+    public function subirAsistencia()
     {
-        $session     = \Config\Services::session();
-        $principal   = new Mglobal;
+        $session = \Config\Services::session();
+        $principal = new Mglobal;
         $cat_usuario = $principal->getTabla([
             'tabla' => 'vw_asistencia',
             'where' => ['visible' => 1, 'id_tipo_empleado' => 1]
         ]);
         //die( var_dump( $cat_usuario   )  );
-        $Periodo= ['tabla' => 'cat_periodo', 'where' => ['visible' => 1]];
+        $Periodo = ['tabla' => 'cat_periodo', 'where' => ['visible' => 1]];
         $periodo = $principal->getTabla($Periodo);
-        $data['periodo']     = (isset($periodo->data) && !empty($periodo->data))?$periodo->data:[];
+        $data['periodo'] = (isset($periodo->data) && !empty($periodo->data)) ? $periodo->data : [];
         // Enviar datos a la vista
-        $data['mes']           = date('m');
-        $data['cat_usuario']   = $cat_usuario->data ?? [];  
-        
-        $data['scripts']       = ['principal', 'inicio'];
-        $data['contentView']   = 'secciones/vSubirAsistencia';
+        $data['mes'] = date('m');
+        $data['cat_usuario'] = $cat_usuario->data ?? [];
+
+        $data['scripts'] = ['principal', 'inicio'];
+        $data['contentView'] = 'secciones/vSubirAsistencia';
         $this->_renderView($data);
     }
-  public function vehiculos()
+    public function vehiculos()
     {
-        $session     = \Config\Services::session();
-        $principal   = new Mglobal;
+        $session = \Config\Services::session();
+        $principal = new Mglobal;
         $vehiculos = $principal->getTabla([
             'tabla' => 'vehiculo',
             'where' => ['visible' => 1]
@@ -737,22 +753,22 @@ class Inicio extends BaseController {
             'tabla' => 'vw_usuario',
             'where' => ['visible' => 1]
         ]);
-        $data['vehiculos']   = $vehiculos->data ?? [];  
-        $data['usuario']     = $usuario->data ?? [];  
-        $data['scripts']     = ['principal', 'inicio'];
+        $data['vehiculos'] = $vehiculos->data ?? [];
+        $data['usuario'] = $usuario->data ?? [];
+        $data['scripts'] = ['principal', 'inicio'];
         $data['contentView'] = 'secciones/vVehiculos';
         $this->_renderView($data);
     }
-  public function vehiculosPT()
+    public function vehiculosPT()
     {
-        $session     = \Config\Services::session();
-        $principal   = new Mglobal;
+        $session = \Config\Services::session();
+        $principal = new Mglobal;
         $vehiculos = $principal->getTabla([
             'tabla' => 'pt_vehiculo',
             'where' => ['visible' => 1]
         ]);
-        $data['vehiculos']   = $vehiculos->data ?? [];  
-        $data['scripts']     = ['principal', 'inicio'];
+        $data['vehiculos'] = $vehiculos->data ?? [];
+        $data['scripts'] = ['principal', 'inicio'];
         $data['contentView'] = 'secciones/vVehiculosLista';
         $this->_renderView($data);
     }
@@ -947,48 +963,49 @@ class Inicio extends BaseController {
     public function listaPuesto()
     {
         $session = \Config\Services::session();
-        $principal            = new Mglobal;
-      
-        $cat_puesto           = $principal->getTabla(['tabla' => 'cat_puesto', 'where'=>['visible' => 1]]); 
-        $data['cat_puesto']   = (isset($cat_puesto->data) && !empty($cat_puesto->data))?$cat_puesto->data:[];
-        $data['scripts']     = ['principal', 'inicio'];
+        $principal = new Mglobal;
+
+        $cat_puesto = $principal->getTabla(['tabla' => 'cat_puesto', 'where' => ['visible' => 1]]);
+        $data['cat_puesto'] = (isset($cat_puesto->data) && !empty($cat_puesto->data)) ? $cat_puesto->data : [];
+        $data['scripts'] = ['principal', 'inicio'];
         $data['contentView'] = 'secciones/vlistaPuesto';
-        $this->_renderView($data);   
+        $this->_renderView($data);
     }
-    public function verXML($idFactura =  null, $tipo = null)
+    public function verXML($idFactura = null, $tipo = null)
     {
         $session = \Config\Services::session();
-        $principal            = new Mglobal;
-        if($tipo == 'go'){
-            $factura           = $principal->getTabla(['tabla' => 'xml_go', 'where'=>['visible' => 1, 'id_xml' => $idFactura]]); 
-        }else{
-            $factura           = $principal->getTabla(['tabla' => 'factura_pdf', 'where'=>['visible' => 1, 'id_factura_pdf' => $idFactura]]); 
+        $principal = new Mglobal;
+        if ($tipo == 'go') {
+            $factura = $principal->getTabla(['tabla' => 'xml_go', 'where' => ['visible' => 1, 'id_xml' => $idFactura]]);
         }
-        $data['factura']   = (isset($factura->data) && !empty($factura->data))?$factura->data[0]:[];
-      //  die( var_dump( $data['factura'] ) );
-        $data['scripts']     = ['principal', 'inicio'];
+        else {
+            $factura = $principal->getTabla(['tabla' => 'factura_pdf', 'where' => ['visible' => 1, 'id_factura_pdf' => $idFactura]]);
+        }
+        $data['factura'] = (isset($factura->data) && !empty($factura->data)) ? $factura->data[0] : [];
+        //  die( var_dump( $data['factura'] ) );
+        $data['scripts'] = ['principal', 'inicio'];
         $data['contentView'] = 'secciones/vFactura';
-        $this->_renderView($data);   
+        $this->_renderView($data);
     }
     public function EditarPT($id_registro_pt)
     {
-          $session = \Config\Services::session();
+        $session = \Config\Services::session();
         $response = new \stdClass();
         $response->error = true;
         $response->respuesta = 'Error|Error al traer los proveedor';
         $globals = new Mglobal;
         $siExisteIdReserva = $globals->getTabla(['tabla' => 'registro_pt', 'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]]);
-        $btn =  false;
+        $btn = false;
         $partida4000 = false;
         $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
-        $id_reserva = (isset($siExisteIdReserva->data) && !empty($siExisteIdReserva->data))? $siExisteIdReserva->data[0]->id_reserva:'';
-        $id_reponsable_solicitud = (isset($siExisteIdReserva->data) && !empty($siExisteIdReserva->data))? $siExisteIdReserva->data[0]->id_reponsable_solicitud:'';
+        $id_reserva = (isset($siExisteIdReserva->data) && !empty($siExisteIdReserva->data)) ? $siExisteIdReserva->data[0]->id_reserva : '';
+        $id_reponsable_solicitud = (isset($siExisteIdReserva->data) && !empty($siExisteIdReserva->data)) ? $siExisteIdReserva->data[0]->id_reponsable_solicitud : '';
         if ($id_reserva) {
             $reserva = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['id_reserva' => $id_reserva]]);
-            $consecutivo = $globals->getTabla(['tabla' => 'folio_direccion', 'where' => ['visible' => 1, 'id_direccion' => $id_reponsable_solicitud ]]);
-         //die( var_dump( $consecutivo ) );           
+            $consecutivo = $globals->getTabla(['tabla' => 'folio_direccion', 'where' => ['visible' => 1, 'id_direccion' => $id_reponsable_solicitud]]);
+            //die( var_dump( $consecutivo ) );           
             $conse = (isset($consecutivo->data) && !empty($consecutivo->data)) ? $consecutivo->data[0]->no_consecutivo : '';
-            $data['consecutivo'] = (int)$conse + 1; 
+            $data['consecutivo'] = (int)$conse + 1;
             $presupuesto = $globals->getTabla(['tabla' => 'vw_pagos', 'where' => ['id_registro_pt' => $id_registro_pt]]);
             foreach ($presupuesto->data as $i => $p) {
                 if ($p->id_partida >= 149 && $p->id_partida <= 248) {
@@ -997,26 +1014,26 @@ class Inicio extends BaseController {
             }
 
         }
-         
+
         if (!empty($id_registro_pt)) {
-          
+
             $registro_pt = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]]);
             $importe = $globals->getTabla(['tabla' => 'periodo_factura', 'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]]);
             $factura_pdf = $globals->getTabla(['tabla' => 'factura_pdf', 'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]]);
             $factura = $globals->getTabla(['tabla' => 'factura', 'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]]);
-            if(isset($importe->data) && !empty($importe->data)){
+            if (isset($importe->data) && !empty($importe->data)) {
                 $data['importe'] = $importe->data;
             }
-            if(isset($factura_pdf->data) && !empty($factura_pdf->data)){
+            if (isset($factura_pdf->data) && !empty($factura_pdf->data)) {
                 $data['factura_pdf'] = $factura_pdf->data;
             }
-            
-            if(isset($factura->data) && !empty($factura->data)){
+
+            if (isset($factura->data) && !empty($factura->data)) {
                 $data['factura'] = $factura->data;
             }
-            
+
         }
-       
+
         $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1]]);
         $cat_tipo = $globals->getTabla(['tabla' => 'cat_tipo', 'where' => ['visible' => 1]]);
 
@@ -1038,45 +1055,45 @@ class Inicio extends BaseController {
 
         // die( var_dump(  $data['registro_pt'] ) );
         $data['dsc_director_general'] = (!empty($cat_director_general->data)) ? $cat_director_general->data[0]->dsc_director_general : [];
-        $data['cat_area']             = (!empty($cat_area->data)) ? $cat_area->data : [];
-        $data['cat_tipo']             = (!empty($cat_tipo->data)) ? $cat_tipo->data : [];
-        $data['cat_opcion']           = (!empty($cat_opcion->data)) ? $cat_opcion->data : [];
-        $data['cat_subsecretario']    = (!empty($cat_subsecretario->data)) ? $cat_subsecretario->data : [];
-        $data['cat_partida']          = (!empty($cat_partida->data)) ? $cat_partida->data : [];
-        $data['cat_proyecto']         = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
-        $data['editar']               =  1;
-        $data['secretario']           = (!empty($secretario->data)) ? $secretario->data : [];
-        $data['usuario']              = (!empty($usuario->data)) ? $usuario->data[0] : [];
-        $data['cat_usuario']          = (!empty($cat_usuario->data)) ? $cat_usuario->data : [];
-        $data['id_reserva']           = (!empty($id_reserva)) ? $id_reserva : 0;
-        $data['scripts']              = array('inicio');
-        $data['edita']                = $btn;
-        $data['partida4000']          = $partida4000;
-        $data['contentView']          = 'secciones/vProveedor';
-       // die( var_dump( $data['importe'])  );
-        $this->_renderView($data); 
+        $data['cat_area'] = (!empty($cat_area->data)) ? $cat_area->data : [];
+        $data['cat_tipo'] = (!empty($cat_tipo->data)) ? $cat_tipo->data : [];
+        $data['cat_opcion'] = (!empty($cat_opcion->data)) ? $cat_opcion->data : [];
+        $data['cat_subsecretario'] = (!empty($cat_subsecretario->data)) ? $cat_subsecretario->data : [];
+        $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+        $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
+        $data['editar'] = 1;
+        $data['secretario'] = (!empty($secretario->data)) ? $secretario->data : [];
+        $data['usuario'] = (!empty($usuario->data)) ? $usuario->data[0] : [];
+        $data['cat_usuario'] = (!empty($cat_usuario->data)) ? $cat_usuario->data : [];
+        $data['id_reserva'] = (!empty($id_reserva)) ? $id_reserva : 0;
+        $data['scripts'] = array('inicio');
+        $data['edita'] = $btn;
+        $data['partida4000'] = $partida4000;
+        $data['contentView'] = 'secciones/vProveedor';
+        // die( var_dump( $data['importe'])  );
+        $this->_renderView($data);
     }
     public function EditarFIC($id_registro_pt = null)
     {
-        $globals  = new Mglobal;
+        $globals = new Mglobal;
         $session = \Config\Services::session();
         $idRegistroPT = $id_registro_pt;
         $registro_pt = $globals->getTabla(['tabla' => 'registro_pt', 'where' => ['visible' => 1, 'id_registro_pt' => $idRegistroPT]]);
-        if(isset($registro_pt) && !empty($registro_pt)){
+        if (isset($registro_pt) && !empty($registro_pt)) {
             $data['datos'] = $registro_pt->data[0];
             $id_proveedor = $registro_pt->data[0]->id_proveedor;
             $id_reserva = $registro_pt->data[0]->id_reserva;
             $banco = $globals->getTabla(['tabla' => 'proveedor_banco', 'where' => ['visible' => 1, 'idproveedor' => $id_proveedor, 'fic' => 1]]);
             $reserva = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['visible' => 1, 'id_reserva' => $id_reserva]]);
 
-            $data['banco'] = (isset( $banco) && !empty($banco))? $banco->data:'';
+            $data['banco'] = (isset($banco) && !empty($banco)) ? $banco->data : '';
             $data['edita'] = 1;
-            if( isset($reserva->data) && !empty($reserva->data)){
+            if (isset($reserva->data) && !empty($reserva->data)) {
                 $data['reserva'] = $reserva->data[0];
 
             }
         }
-       
+
         $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
         $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1]]);
         $cat_subsecretario = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1]]);
@@ -1087,7 +1104,7 @@ class Inicio extends BaseController {
         $cat_director_general = $globals->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1]]);
         $cat_opcion = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1]]);
 
-      
+
         $data['FIC'] = true;
         $data['dsc_director_general'] = (!empty($cat_director_general->data)) ? $cat_director_general->data[0]->dsc_director_general : [];
         $data['cat_area'] = (!empty($cat_area->data)) ? $cat_area->data : [];
@@ -1099,40 +1116,41 @@ class Inicio extends BaseController {
         $data['cat_usuario'] = (!empty($cat_usuario->data)) ? $cat_usuario->data : [];
         $data['scripts'] = array('inicio');
         //die( var_dump( $data['datos'] ) );
-        $data['scripts']     = ['principal', 'inicio'];
+        $data['scripts'] = ['principal', 'inicio'];
         $data['contentView'] = 'personal/vFormularioEditarFic';
-        $this->_renderView($data);   
-        
+        $this->_renderView($data);
+
 
     }
     public function listaTiket()
     {
         $session = \Config\Services::session();
-        $principal  = new Mglobal;
-        if($session->get('id_perfil')==1){
-            $tabla = array('tabla' => 'vw_tiket', 'where' => ['visible' => 1],'orderBy' => 'id_tiket DESC');
-        }else{
-            $tabla = array('tabla' => 'vw_tiket','where'=>['id_usuario'=> $session->get('id_usuario'), 'visible' => 1] , 'orderBy' => 'id_tiket DESC');
+        $principal = new Mglobal;
+        if ($session->get('id_perfil') == 1) {
+            $tabla = array('tabla' => 'vw_tiket', 'where' => ['visible' => 1], 'orderBy' => 'id_tiket DESC');
         }
-    
-        $cat_tiket  = $principal->getTabla($tabla);
-       
-        $data['cat_tiket']   = (isset($cat_tiket->data) && !empty($cat_tiket->data))?$cat_tiket->data:[];
-        $data['scripts']     = ['principal', 'inicio'];
+        else {
+            $tabla = array('tabla' => 'vw_tiket', 'where' => ['id_usuario' => $session->get('id_usuario'), 'visible' => 1], 'orderBy' => 'id_tiket DESC');
+        }
+
+        $cat_tiket = $principal->getTabla($tabla);
+
+        $data['cat_tiket'] = (isset($cat_tiket->data) && !empty($cat_tiket->data)) ? $cat_tiket->data : [];
+        $data['scripts'] = ['principal', 'inicio'];
         $data['contentView'] = 'secciones/vListaTiket';
-        $this->_renderView($data);   
+        $this->_renderView($data);
     }
     public function listaArea()
     {
         $session = \Config\Services::session();
-        $principal           = new Mglobal;
-        $cat_area            = $principal->getTabla(['tabla' => 'cat_area', 'where'=>['visible' => 1]]); 
-        $usuario             = $principal->getTabla(['tabla' => 'vw_usuario', 'where'=>['visible' => 1]]); 
-        $data['cat_area']    = (isset($cat_area->data) && !empty($cat_area->data))?$cat_area->data:[];
-        $data['usuario']     = (isset($usuario->data) && !empty($usuario->data))?$usuario->data:[];
-        $data['scripts']     = ['principal', 'inicio'];
+        $principal = new Mglobal;
+        $cat_area = $principal->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
+        $usuario = $principal->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
+        $data['cat_area'] = (isset($cat_area->data) && !empty($cat_area->data)) ? $cat_area->data : [];
+        $data['usuario'] = (isset($usuario->data) && !empty($usuario->data)) ? $usuario->data : [];
+        $data['scripts'] = ['principal', 'inicio'];
         $data['contentView'] = 'secciones/vlistaArea';
-        $this->_renderView($data);   
+        $this->_renderView($data);
     }
 
     // Función para formatear el árbol para jsTree
@@ -1142,35 +1160,35 @@ class Inicio extends BaseController {
         $principal = new Mglobal;
         $activos = [];
         $activo = $principal->getTabla(['tabla' => 'categorias_padre', 'where' => ['visible' => 1, 'activo' => 1]]);
-        
+
         if (isset($activo->data) && !empty($activo->data)) {
             foreach ($activo->data as $d) {
                 $activos[] = $d->id_categoria;
             }
         }
-    
+
         // Formatear el árbol para jsTree
         $formattedTree = [];
         foreach ($tree as $node) {
             // Verificar si el nodo debe estar deshabilitado
             $disabled = in_array($node->id, $activos);
-    
+
             // Crear el nodo formateado
             $formattedNode = [
                 'id' => $node->id,
                 'text' => $node->name,
                 'state' => [
                     'disabled' => false, // Deshabilitar el nodo si está en $activos
-                    'opened' =>  false,    // Abrir el nodo si es necesario
+                    'opened' => false, // Abrir el nodo si es necesario
                     'selected' => $disabled, // Seleccionar el nodo si es necesario
                 ],
                 'children' => !empty($node->children) ? $this->formatForJsTree($node->children) : [],
             ];
-    
+
             // Agregar el nodo formateado al árbol
             $formattedTree[] = $formattedNode;
         }
-    
+
         return $formattedTree;
     }
 
@@ -1188,17 +1206,17 @@ class Inicio extends BaseController {
         $html .= '</ul>';
         return $html;
     }
-    
+
 
     public function getPrincipal()
     {
         $session = \Config\Services::session();
         $principal = new Mglobal;
-       
-        $dataDB = array('tabla' => 'turno', 'where' => 'visible = 1 ORDER BY fecha_registro DESC');  
-        $response = $principal->getTabla($dataDB); 
-      
-         return $this->respond($response->data);
+
+        $dataDB = array('tabla' => 'turno', 'where' => 'visible = 1 ORDER BY fecha_registro DESC');
+        $response = $principal->getTabla($dataDB);
+
+        return $this->respond($response->data);
     }
     public function getCurso()
     {
@@ -1219,73 +1237,77 @@ class Inicio extends BaseController {
             }
             foreach ($result->data as $category) {
                 if ($category->parent == 0 || !isset($categoryMap[$category->parent])) {
-                    $tree[] = &$categoryMap[$category->id];
-                } else {
-                    $categoryMap[$category->parent]->children[] = &$categoryMap[$category->id];
+                    $tree[] = & $categoryMap[$category->id];
+                }
+                else {
+                    $categoryMap[$category->parent]->children[] = & $categoryMap[$category->id];
                 }
             }
         }
-       // insertamos las categorias padre 
-       if($session->get('id_perfil') == 1){
-        if (!empty($result->data)) {
-            foreach ($result->data as $category) {
-                if ($category->parent == 0) { // Filtrar solo categorías padre
-                    $dataInsert = [
-                        'id_categoria'  => (int)$category->id,
-                        'dsc_categoria' => $category->name
-                    ];
-                    
-                    $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaCategoriasPadre'];
-                    
-                   
-                    $dataConfig = [
-                        "tabla"=>"categorias_padre",
-                        "editar"=>false
-                    ];
-                    $cat  = $principal->getTabla(['tabla' => 'categorias_padre', 'where' => ['id_categoria' => (int)$category->id, 'visible' =>1]]); 
-                    if(isset($cat->data) && empty($cat->data)){
-                        $principal->saveTabla($dataInsert,$dataConfig,$dataBitacora);
-                    }
-                    
+        // insertamos las categorias padre 
+        if ($session->get('id_perfil') == 1) {
+            if (!empty($result->data)) {
+                foreach ($result->data as $category) {
+                    if ($category->parent == 0) { // Filtrar solo categorías padre
+                        $dataInsert = [
+                            'id_categoria' => (int)$category->id,
+                            'dsc_categoria' => $category->name
+                        ];
 
+                        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaCategoriasPadre'];
+
+
+                        $dataConfig = [
+                            "tabla" => "categorias_padre",
+                            "editar" => false
+                        ];
+                        $cat = $principal->getTabla(['tabla' => 'categorias_padre', 'where' => ['id_categoria' => (int)$category->id, 'visible' => 1]]);
+                        if (isset($cat->data) && empty($cat->data)) {
+                            $principal->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+                        }
+
+
+                    }
                 }
             }
         }
-       }
-       
+
 
         // Filtrar categorías si el perfil es diferente de 1
         if ($session->get('id_perfil') != 1) {
             $cursos = []; // Array para múltiples categorías
             $activo = $principal->getTabla(['tabla' => 'categorias_padre', 'where' => ['visible' => 1, 'activo' => 1]]);
-            
+
             // Si hay categorías activas, se agregan al array
             if (isset($activo->data) && !empty($activo->data)) {
                 foreach ($activo->data as $categoria) {
                     $cursos[] = $categoria->dsc_categoria; // Agregar cada categoría activa
                 }
-            } else {
+            }
+            else {
 
                 $cursos[] = 'CURSO 2025'; // Valor por defecto si no hay activas
             }
-            
+
             $tree = $this->filterTree($tree, $cursos); // Filtrar con múltiples categorías
         }
-        
-        
+
+
         // Formatear el árbol para jsTree
         $formattedTree = $this->formatForJsTree($tree);
-       
+
         return $this->respond($formattedTree);
     }
-    private function filterTree($tree, $cursos) {
+    private function filterTree($tree, $cursos)
+    {
         $filteredTree = [];
-        
+
         foreach ($tree as $node) {
             // Verificar si el nodo actual está en el array de categorías permitidas
             if (in_array($node->name, $cursos)) {
                 $filteredTree[] = $node;
-            } elseif (!empty($node->children)) {
+            }
+            elseif (!empty($node->children)) {
                 // Filtrar los hijos si los hay
                 $node->children = $this->filterTree($node->children, $cursos);
                 if (!empty($node->children)) {
@@ -1293,17 +1315,18 @@ class Inicio extends BaseController {
                 }
             }
         }
-        
+
         return $filteredTree;
     }
 
-    public function pdfTurno(){
+    public function pdfTurno()
+    {
         // $session = \Config\Services::session();
         setlocale(LC_TIME, 'es_ES');
         $catalogos = new Mglobal;
         $dataPage = [];
         $mpdf = new \Mpdf\Mpdf();
-        $id_turno= $this->request->getGet('id_turno');
+        $id_turno = $this->request->getGet('id_turno');
         // Agregar contenido al PDF
         // $dataPage['id_turno'] = $id_turno;
         $select = '
@@ -1321,44 +1344,45 @@ class Inicio extends BaseController {
         usuario_registro,
         firma_turno,
         ';
-        $dataDB = array('select' => $select,'tabla' => 'turno', 'where' => 'id_turno= "'.$id_turno.'" AND visible = 1');
+        $dataDB = array('select' => $select, 'tabla' => 'turno', 'where' => 'id_turno= "' . $id_turno . '" AND visible = 1');
         $response = $catalogos->getTabla($dataDB);
 
-        $dataPage['id_turno'] =     $response->data[0]->id_turno;
-        $dataPage['anio'] =         $response->data[0]->anio;
-        $titulo = (empty($response->data[0]->solicitante_titulo)) ? '' : $response->data[0]->solicitante_titulo.".";
-        $dataPage['nombre_completo'] = $response->data[0]->solicitante_nombre." ".$response->data[0]->solicitante_primer_apellido." ".$response->data[0]->solicitante_segundo_apellido;
+        $dataPage['id_turno'] = $response->data[0]->id_turno;
+        $dataPage['anio'] = $response->data[0]->anio;
+        $titulo = (empty($response->data[0]->solicitante_titulo)) ? '' : $response->data[0]->solicitante_titulo . ".";
+        $dataPage['nombre_completo'] = $response->data[0]->solicitante_nombre . " " . $response->data[0]->solicitante_primer_apellido . " " . $response->data[0]->solicitante_segundo_apellido;
         $dataPage['cargo'] = $response->data[0]->solicitante_cargo;
-        $dataPage['razon_social'] = $response->data[0]->solicitante_razon_social; 
-        $dataPage['resumen'] =$response->data[0]->resumen; 
-       
-        $dataPage['fecha_recepcion'] =  strftime('%d/%b/%y', strtotime($response->data[0]->fecha_recepcion));;
-        
-        $dataDB = array('select' => 'dsc_asunto', 'tabla' => 'cat_asuntos', 'where' => 'id_asunto= "'.$response->data[0]->id_asunto.'" AND visible = 1');
+        $dataPage['razon_social'] = $response->data[0]->solicitante_razon_social;
+        $dataPage['resumen'] = $response->data[0]->resumen;
+
+        $dataPage['fecha_recepcion'] = strftime('%d/%b/%y', strtotime($response->data[0]->fecha_recepcion));
+        ;
+
+        $dataDB = array('select' => 'dsc_asunto', 'tabla' => 'cat_asuntos', 'where' => 'id_asunto= "' . $response->data[0]->id_asunto . '" AND visible = 1');
         $responseAsunto = $catalogos->getTabla($dataDB);
         $dataPage['asunto'] = $responseAsunto->data[0]->dsc_asunto;
 
-        $dataDB = array('select' => 'usuario','tabla' => 'seg_usuarios', 'where' => 'id_usuario= "'.$response->data[0]->usuario_registro.'" AND visible = 1');
+        $dataDB = array('select' => 'usuario', 'tabla' => 'seg_usuarios', 'where' => 'id_usuario= "' . $response->data[0]->usuario_registro . '" AND visible = 1');
         $responseUsuario = $catalogos->getTabla($dataDB);
         $dataPage['usuario_registro'] = $responseUsuario->data[0]->usuario;
         // turnado a: 
-        $dataDB = array('select' => 'nombre_destinatario,cargo','tabla' => 'cat_destinatario', 'where' => 'id_destinatario IN (SELECT id_destinatario FROM `turno_destinatario` WHERE id_turno ="'.$id_turno.'")');
+        $dataDB = array('select' => 'nombre_destinatario,cargo', 'tabla' => 'cat_destinatario', 'where' => 'id_destinatario IN (SELECT id_destinatario FROM `turno_destinatario` WHERE id_turno ="' . $id_turno . '")');
         $responseIndicacion = $catalogos->getTabla($dataDB);
-        $dataPage['turnado'] =$responseIndicacion->data;
+        $dataPage['turnado'] = $responseIndicacion->data;
         // con indicaciones
-        $dataDB = array('select' => 'dsc_indicacion','tabla' => 'cat_indicaciones', 'where' => 'id_indicacion IN (SELECT id_indicacion FROM `turno_indicacion` WHERE id_turno ="'.$id_turno.'")');
+        $dataDB = array('select' => 'dsc_indicacion', 'tabla' => 'cat_indicaciones', 'where' => 'id_indicacion IN (SELECT id_indicacion FROM `turno_indicacion` WHERE id_turno ="' . $id_turno . '")');
         $responseIndicacion = $catalogos->getTabla($dataDB);
-        $dataPage['indicaciones'] =$responseIndicacion->data;
+        $dataPage['indicaciones'] = $responseIndicacion->data;
         //  var_dump($responseCopia->data);
         //   die();
         // con copia
-        $dataDB = array('select' => 'nombre_destinatario','tabla' => 'cat_destinatario', 'where' => 'id_destinatario IN (SELECT id_destinatario FROM `turno_con_copia` WHERE id_turno = "'.$id_turno.'")');
+        $dataDB = array('select' => 'nombre_destinatario', 'tabla' => 'cat_destinatario', 'where' => 'id_destinatario IN (SELECT id_destinatario FROM `turno_con_copia` WHERE id_turno = "' . $id_turno . '")');
         $responseCopia = $catalogos->getTabla($dataDB);
-        $dataPage['destinatarioCopia'] =$responseCopia->data;
+        $dataPage['destinatarioCopia'] = $responseCopia->data;
         //  var_dump($responseCopia->data);
         //   die();
 
-        $dataImagen = $this->encode_img_base64(FCPATH .'assets/images/formato.png', 'png');
+        $dataImagen = $this->encode_img_base64(FCPATH . 'assets/images/formato.png', 'png');
         $mpdfConfig = [
             'fontDir' => FCPATH . 'assets/fonts/custom/',
             'fontdata' => [
@@ -1367,10 +1391,10 @@ class Inicio extends BaseController {
                 ],
             ],
         ];
-        
+
         $mpdf = new \Mpdf\Mpdf($mpdfConfig);
-        
-        $html = view("pdfs/vpdfTurno.php", ["dataPage" => $dataPage,"dataImagen" =>$dataImagen] );
+
+        $html = view("pdfs/vpdfTurno.php", ["dataPage" => $dataPage, "dataImagen" => $dataImagen]);
         $mpdf->WriteHTML($html);
 
         // Generar el PDF
@@ -1392,5 +1416,6 @@ class Inicio extends BaseController {
         return false;
     }
 
-    
+
+
 }
