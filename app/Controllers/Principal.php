@@ -5140,7 +5140,11 @@ class Principal extends BaseController
             'tabla' => 'cat_area',
             'where' => ['id_pago' => 1, 'id_area' => $registroGo->data[0]->id_direccion_responsable]
         ]);
-        
+        $concepto = $globals->getTabla([
+            'tabla' => 'periodo_factura_go',
+            'where' => ['id_registro_go' => $id_go]
+        ])->data[0]->concepto;
+           $data['concepto'] = $concepto;
          if (strlen($registroGo->data[0]->no_consecutivo) == 2) {
                 $zero = '0';
             } elseif (strlen($registroGo->data[0]->no_consecutivo) == 1) {
@@ -5209,7 +5213,7 @@ class Principal extends BaseController
         ]);
         $data['presupuestoGO'] = $presupuestoGO->data;
   
-        // Calcular total importe (sumando facturas)
+        //Calcular total importe (sumando facturas)
         $facturaXml = $globals->getTabla([
             'tabla' => 'xml_go',
             'where' => ['visible' => 1, 'id_registro_go' => $id_go]
