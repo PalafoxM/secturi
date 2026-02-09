@@ -49,14 +49,14 @@
                                         if($op->id_tipo_operacion == 1){ 
                                             $tipo = '<span class="badge badge-success">Depósito</span>';
                                             // Find nombre deposito in $cat_deposito
-                                            foreach($cat_deposito as $dep){ if($dep->id_deposito == $op->id_deposito) $detalles = $dep->dsc_deposito; }
+                                            foreach($cat_deposito as $dep){ if($dep->id_deposito == $op->id_deposito) $detalles = $dep->dsc_cuenta; }
                                             $extra = '$' . number_format($op->importe, 2);
                                             if($op->comprobante) {
                                                 $estado = '<a href="'.base_url($op->comprobante).'" target="_blank" class="btn btn-xs btn-info"><i class="fas fa-file-alt"></i> Ver Comp.</a>';
                                             }
                                         } elseif($op->id_tipo_operacion == 2){
                                             $tipo = '<span class="badge badge-warning">Traspaso</span>';
-                                             foreach($cat_deposito as $dep){ if($dep->id_deposito == $op->id_deposito) $detalles = "Cuenta: " . $dep->dsc_deposito; }
+                                             foreach($cat_deposito as $dep){ if($dep->id_deposito == $op->id_deposito) $detalles = "Cuenta: " . $dep->dsc_cuenta; }
                                             $extra = '$' . number_format($op->importe, 2);
                                         } elseif($op->id_tipo_operacion == 3){
                                             $tipo = '<span class="badge badge-info">Consulta Corte</span>';
