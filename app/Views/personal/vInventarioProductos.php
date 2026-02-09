@@ -1,5 +1,4 @@
-
-<div class="page-wrapper">
+﻿<div class="page-wrapper">
     <div class="page-content-tab">
         <div class="container-fluid">
 
@@ -13,7 +12,7 @@
                                 <div class="col-md-9">
                                     <div class="alert alert-secondary d-flex justify-content-around align-items-center mb-0">
                                         <span class="font-14"><i class="mdi mdi-paperclip mr-1"></i> Total Oficina: <strong><?= $total_stock_art_ofi ?? 0 ?></strong></span>
-                                        <span class="font-14"><i class="mdi mdi-pen mr-1"></i> Total Papelería: <strong><?= $total_stock_art_papel ?? 0 ?></strong></span>
+                                        <span class="font-14"><i class="mdi mdi-pen mr-1"></i> Total Papelerí­a: <strong><?= $total_stock_art_papel ?? 0 ?></strong></span>
                                         <span class="font-14"><i class="mdi mdi-file-outline mr-1"></i> Total Papel: <strong><?= $total_stock_papel ?? 0 ?></strong></span>
                                     </div>
                                 </div>
@@ -32,12 +31,12 @@
                             <ul class="nav nav-tabs nav-tabs-custom" role="tablist">
                                 <li class="nav-item">
                                     <a class="nav-link active font-weight-semibold" data-toggle="tab" href="#oficina" role="tab">
-                                        <i class="mdi mdi-paperclip mr-1"></i> Artículos de Oficina
+                                        <i class="mdi mdi-paperclip mr-1"></i> Artí­culos de Oficina
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link font-weight-semibold" data-toggle="tab" href="#papeleria" role="tab">
-                                        <i class="mdi mdi-pen mr-1"></i> Artículos Papelería
+                                        <i class="mdi mdi-pen mr-1"></i> Artí­culos PapelerÍ­a
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -111,7 +110,7 @@
                                     </div>
                                 </div>
 
-                                <!-- ===== PAPELERÍA ===== -->
+                                <!-- ===== PAPELERÍA ===== -->
                                 <div class="tab-pane fade" id="papeleria" role="tabpanel">
                                     <div class="table-responsive">
                                         <table class="table table-hover table-bordered table-striped dt-responsive nowrap tabla-inventario" style="width:100%">
@@ -263,10 +262,10 @@
                                 <input type="hidden" id="tabla_hidden" name="tabla"> 
 
                                 <div class="form-group" id="div_tabla_select" style="display:none;">
-                                    <label class="font-weight-bold">Categoría</label>
+                                    <label class="font-weight-bold">CategorÍ­a</label>
                                     <select class="form-control" id="tabla_select">
-                                        <option value="cat_inventario_art_ofi">Artículos de Oficina</option>
-                                        <option value="cat_inventario_art_papel">Artículos Papelería</option>
+                                        <option value="cat_inventario_art_ofi">ArtÍ­culos de Oficina</option>
+                                        <option value="cat_inventario_art_papel">ArtÍ­culos PapelerÍ­a</option>
                                         <option value="cat_inventario_papel">Papel</option>
                                     </select>
                                 </div>
@@ -296,27 +295,27 @@
     </div>
 </div>
 
-<link href="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
-<link href="<?php echo base_url(); ?>plugins/datatables/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+<link href="<?= base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+<link href="<?= base_url(); ?>plugins/datatables/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
 
 <!-- App css -->
-<link href="<?php echo base_url(); ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-<link href="<?php echo base_url(); ?>assets/css/jquery-ui.min.css" rel="stylesheet">
-<link href="<?php echo base_url(); ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
+<link href="<?= base_url(); ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+<link href="<?= base_url(); ?>assets/css/jquery-ui.min.css" rel="stylesheet">
+<link href="<?= base_url(); ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
 <link href="<?= base_url()?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
 <link href="<?= base_url()?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
 
 <!-- jQuery  -->
-<script src="<?php echo base_url(); ?>assets/js/jquery.min.js"></script>
-<script src="<?php echo base_url(); ?>assets/js/jquery-ui.min.js"></script>
-<script src="<?php echo base_url(); ?>assets/js/bootstrap.bundle.min.js"></script>
-<script src="<?php echo base_url(); ?>assets/js/jquery.slimscroll.min.js"></script>
+<script src="<?= base_url(); ?>assets/js/jquery.min.js"></script>
+<script src="<?= base_url(); ?>assets/js/jquery-ui.min.js"></script>
+<script src="<?= base_url(); ?>assets/js/bootstrap.bundle.min.js"></script>
+<script src="<?= base_url(); ?>assets/js/jquery.slimscroll.min.js"></script>
 
 <!-- Required datatable js -->
-<script src="<?php echo base_url(); ?>plugins/datatables/jquery.dataTables.min.js"></script>
-<script src="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.js"></script>
-<script src="<?php echo base_url(); ?>plugins/datatables/dataTables.responsive.min.js"></script>
-<script src="<?php echo base_url(); ?>plugins/datatables/responsive.bootstrap4.min.js"></script>
+<script src="<?= base_url(); ?>plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="<?= base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.js"></script>
+<script src="<?= base_url(); ?>plugins/datatables/dataTables.responsive.min.js"></script>
+<script src="<?= base_url(); ?>plugins/datatables/responsive.bootstrap4.min.js"></script>
 
 <!-- App js -->
 <script src="<?= base_url()?>assets/js/app.js"></script>
@@ -327,11 +326,23 @@
 <script>
     $(document).ready(function() {
     
+        // Persistencia de Pestañas
+        var activeTab = localStorage.getItem('inventoryActiveTab');
+        if (activeTab) {
+            setTimeout(function() {
+                $('.nav-tabs a[href="' + activeTab + '"]').tab('show');
+            }, 300);
+        }
+
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            localStorage.setItem('inventoryActiveTab', $(e.target).attr("href"));
+        });
+
         // Initialize DataTables
         $('.tabla-inventario').DataTable({
             language: {
                 "decimal": "",
-                "emptyTable": "No hay información",
+                "emptyTable": "No hay informaciÍ³n",
                 "info": "Mostrando _START_ a _END_ de _TOTAL_ productos",
                 "infoEmpty": "Mostrando 0 a 0 de 0 productos",
                 "infoFiltered": "(Filtrado de _MAX_ total productos)",
@@ -342,13 +353,13 @@
                 "zeroRecords": "Sin resultados encontrados",
                 "paginate": {
                     "first": "Primero",
-                    "last": "Último",
+                    "last": "Íšltimo",
                     "next": "Siguiente",
                     "previous": "Anterior"
                 }
             },
             responsive: true,
-            order: [[ 0, "asc" ]] // Ordenar alfabéticamente por nombre
+            order: [[ 0, "asc" ]] // Ordenar alfabÍ©ticamente por nombre
         });
 
         // Handle "Alta" (New), "Editar", and "Baja" button clicks
@@ -405,17 +416,17 @@
 
             // Usamos SweetAlert para confirmar antes de borrar
             Swal.fire({
-                title: '¿Estás seguro?',
-                text: "Se eliminará el producto: " + nombre,
+                title: 'Â¿EstÍ¡s seguro?',
+                text: "Se eliminarÍ¡ el producto: " + nombre,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Sí, eliminar',
+                confirmButtonText: 'SÍ­, eliminar',
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Si el usuario dice que SÍ, hacemos la petición AJAX
+                    // Si el usuario dice que SÍ, hacemos la peticiÍ³n AJAX
                     $.ajax({
                         url: '<?= base_url() ?>index.php/Inicio/eliminarProducto',
                         type: 'POST',
@@ -424,14 +435,14 @@
                         success: function(response) {
                             if (!response.error) {
                                 Swal.fire("Eliminado", response.respuesta, "success");
-                                // Recargamos la página para ver los cambios
-                                //setTimeout(function(){ location.reload(); }, 1500);
+                                // Recargamos la pÍ¡gina para ver los cambios
+                                setTimeout(function(){ location.reload(); }, 1500);
                             } else {
                                 Swal.fire("Error", response.respuesta, "error");
                             }
                         },
                         error: function() {
-                            Swal.fire("Error", "Error de conexión con el servidor.", "error");
+                            Swal.fire("Error", "Error de conexiÍ³n con el servidor.", "error");
                         }
                     });
                 }
@@ -465,13 +476,13 @@
                 success: function(response) {
                     if (!response.error) {
                         Swal.fire("Correcto", response.respuesta, "success");
-                        //location.reload(); // Reload to show new data/totals
+                        location.reload(); // Reload to show new data/totals
                     } else {
                         Swal.fire("Error", response.respuesta, "error");
                     }
                 },
                 error: function() {
-                    Swal.fire("Error", "Error de conexión con el servidor.", "error");
+                    Swal.fire("Error", "Error de conexiÍ³n con el servidor.", "error");
                 }
             });
         }); 
