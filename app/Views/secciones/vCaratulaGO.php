@@ -92,17 +92,23 @@
          <div  style="position:absolute;  text-align:center; top:78.7%; left:55.5%; width:19%; background-color:white; font-size: 12px;  height:13px;">
             <span class="proxima "><?= $puestoSecretario ?></span>
         </div>
-        
+        <?php if(in_array($idReponsableSolicitud,[56,101,60])): ?>
          <div  style="position:absolute;  text-align:center; top:75.7%; left:75.3%; width:18.5%; background-color:white; font-size: 12px;  height:12px;">
+            <span class="proxima ">MARÍA GUADALUPE ROBLES LEÓN</span>
+        </div>
+        
+         <div  style="position:absolute;  text-align:center; top:78.7%; left:75.3%; width:18.5%; background-color:white; font-size: 12px;  height:12px;">
+            <span class="proxima ">SECRETARIO/A DE TURISMO E IDENTIDAD</span>
+        </div>
+        <?php else: ?> 
+       <div  style="position:absolute;  text-align:center; top:75.7%; left:75.3%; width:18.5%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "><?= $nombreResponsable == 'NO APLICA' ? '' : $nombreResponsable ?></span>
         </div>
         
          <div  style="position:absolute;  text-align:center; top:78.7%; left:75.3%; width:18.5%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "><?= $puestoResponsable == "NO APLICA" ? '' : $puestoResponsable ?></span>
         </div>
-                
-      
-      
+       <?php endif; ?>
          <div  style="position:absolute;  text-align:center; top:86%; left:75.3%; width:18.5%; background-color:white; font-size: 12px;  height:12px;">
             <span class="proxima "> <?= $nombreReponsableSolicitud ?> </span>
         </div>

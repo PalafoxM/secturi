@@ -4930,14 +4930,28 @@ class Principal extends BaseController
                 $zero = '';
             }
         $prefijoCompleto = $prefijo->data[0]->prefijo.$zero.$registroGo->data[0]->no_consecutivo.'/'.date('Y');
-        $data['prefijoCompleto'] = $prefijoCompleto;
+        $idReponsableSolicitud = $registroGo->data[0]->id_reponsable_solicitud;
+        $data['idReponsableSolicitud'] = $idReponsableSolicitud;
+        //die( var_dump( $prefijoCompleto ) );
+        if(!in_array($idReponsableSolicitud,[56,101,60])){
+           $data['prefijoCompleto'] = $prefijoCompleto;
+        }else{
+            if($idReponsableSolicitud == 56){
+                $data['prefijoCompleto'] = 'SECTURI/DS/OPER/'.$zero.$registroGo->data[0]->no_consecutivo.'/'.date('Y');
+            }else if($idReponsableSolicitud == 101){
+                $data['prefijoCompleto'] = 'SECTURI/DS/SPRIV/'.$zero.$registroGo->data[0]->no_consecutivo.'/'.date('Y');;
+            }else if($idReponsableSolicitud == 60){
+                $data['prefijoCompleto'] = 'SECTURI/DS/SPART/'.$zero.$registroGo->data[0]->no_consecutivo.'/'.date('Y');
+            }
+        }
+      
         $data['docAmpara'] = (int)$docAmpara;
         $data['fecha_tramite'] = $registroGo->data[0]->fecha_tramite;
         $idReservaGo = $registroGo->data[0]->id_reserva_go;
         $data['nombreSecretario'] = $registroGo->data[0]->secretario;
         $data['puestoSecretario'] = $registroGo->data[0]->dsc_puesto_secretario;
         $idSubsecretario = $registroGo->data[0]->id_subsecretario;
-        $idReponsableSolicitud = $registroGo->data[0]->id_reponsable_solicitud;
+      
 
         //logica para ver el responsable de la solicitud
         //vedificasmos si tiene area a cargo
