@@ -309,6 +309,92 @@
                                             </ul>
                                         </div><!--end card-body-->
                                     </div><!--end card-->
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h4 class="header-title mt-0 mb-3">PROGRAMA ANUAL DE FORMACIÓN EN GESTIÓN DOCUMENTAL Y ADMINTRACION DE ARCHIVOS 2026</h4>
+                                            <ul class="list-unsyled m-0 pl-0 transaction-history">
+                                                <a href="<?= base_url() ?>assets/documentos/Programa_Anual_de_Formación_de_Archivos_2026.pdf" target="_blank">Ver Programa Anual
+                                                  <iframe
+                                                                src="<?= base_url() ?>assets/documentos/Programa_Anual_de_Formación_de_Archivos_2026.pdf"
+                                                                title="Programa Anual" style="border:0"
+                                                                loading="lazy" width="100%">
+                                                            </iframe>
+                                         </a>
+                                            </ul>
+                                        </div><!--end card-body-->
+                                    </div><!--end card-->
+                                       <div class="card">
+                                                <div class="card-body dash-info-carousel">
+                                                    <h4 class="mt-0  mb-4">SIGAP, E-OFICIO Y E-ARCHIVO ENERO - MARZO</h4>
+                                                    <div id="carousel_1" class="carousel slide" data-ride="carousel">
+                                                        <div class="carousel-inner">
+                                                            <div class="carousel-item">
+                                                                <a href="<?= base_url() . 'assets/documentos/Programa_capacitacion_enero_marzo_2026.pdf' ?>"
+                                                                    target="_black">
+                                                                    <div class="media">
+                                                                        <div class="icon-info mb-3">
+                                                                            <!-- Constitución, leyes, normas -->
+                                                                            <i
+                                                                                class="fas fa-balance-scale bg-soft-primary"></i>
+                                                                        </div>
+                                                                        <div class="media-body align-self-center">
+                                                                            <h4 class="mt-0 mb-1 title-text text-dark">
+                                                                                PROGRAMA ANUAL </h4>
+                                                                            <p class="text-muted mb-0">Ver más</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </a>
+                                                            </div>
+
+                                                            <div class="carousel-item">
+                                                                <a href="<?= base_url() . 'assets/pdf/plantillas/reglas.pdf' ?>"
+                                                                    target="_black">
+                                                                    <div class="media">
+                                                                        <div class="icon-info mb-3">
+                                                                            <!-- Reglas, integridad, lineamientos -->
+                                                                            <i class="fas fa-gavel bg-soft-success"></i>
+                                                                        </div>
+                                                                        <div class="media-body align-self-center">
+                                                                            <h4 class="mt-0 mb-1">E-OFICIO</h4>
+                                                                            <p class="text-muted mb-0">Saber más</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </a>
+                                                            </div>
+
+                                                            <div class="carousel-item active">
+                                                                <a href="<?= base_url() . 'assets/pdf/plantillas/valores2.pdf' ?>"
+                                                                    target="_black">
+                                                                    <div class="media">
+                                                                        <div class="icon-info mb-3">
+                                                                            <!-- Valores, ética, principios -->
+                                                                            <i
+                                                                                class="fas fa-hand-holding-heart bg-soft-warning"></i>
+                                                                        </div>
+                                                                        <div class="media-body align-self-center">
+                                                                            <h4 class="mt-0 mb-1 title-text">E-ARCHIVO
+                                                                            </h4>
+                                                                            <p class="text-muted mb-0">Saber más</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                        <a class="carousel-control-prev" href="#carousel_1"
+                                                            role="button" data-slide="prev">
+                                                            <span class="carousel-control-prev-icon"
+                                                                aria-hidden="true"></span>
+                                                            <span class="sr-only">Previous</span>
+                                                        </a>
+                                                        <a class="carousel-control-next" href="#carousel_1"
+                                                            role="button" data-slide="next">
+                                                            <span class="carousel-control-next-icon"
+                                                                aria-hidden="true"></span>
+                                                            <span class="sr-only">Next</span>
+                                                        </a>
+                                                    </div>
+                                                </div><!--end card-body-->
+                                            </div><!--end card-->
 
 
                                 </div><!--end col-->
@@ -509,7 +595,7 @@
                                         <div class="col-lg-6">
                                              <div class="card">
                                                 <div class="card-body">
-                                                    <h4 class="mt-0  mb-4">DISPOSICIONES ADMINISTRATAS</h4>
+                                                    <h4 class="mt-0  mb-4">DISPOSICIONES ADMINISTRATIVAS</h4>
                                                     <div class="blog-card">
                                                         <div class="ratio ratio-16x9"> <!-- BS5 -->
                                                             <iframe
