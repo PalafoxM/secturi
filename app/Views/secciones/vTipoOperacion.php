@@ -22,7 +22,7 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="button-items mb-3">
-                            <button type="button" class="btn btn-primary" onclick="ini.inicio.tipoOperacion.nuevo()">
+                            <button type="button" class="btn btn-primary" onclick="nuevaOperacionWrapper()">
                                 <i class="fas fa-plus"></i> Nueva Operación
                             </button>
                         </div>
@@ -34,6 +34,7 @@
                                         <th>Tipo</th>
                                         <th>Detalles</th>
                                         <th>Importe/Periodo</th>
+                                        <th>SEGUIMIENTO</th>
                                         <th>Estado/Comprobante</th>
                                         <th>Fecha Reg</th>
                                         <th>Acciones</th>
@@ -63,15 +64,44 @@
                                             $detalles = $op->estado_cuenta;
                                             $extra = $op->periodo;
                                         }
+
+                                        // SEGUIMIENTO LOGIC
+                                        $seguimientoHtml = '';
+                                        $seguimientoVal = isset($op->seguimiento) ? $op->seguimiento : '';
+                                        $archivoSeg = isset($op->seguimiento_formato) ? $op->seguimiento_formato : '';
+                                        
+                                        if(in_array($session->get('id_perfil'), [1, 2])){
+                                             $btnArchivo = '';
+                                             if($archivoSeg && file_exists(FCPATH . $archivoSeg)){
+                                                 $btnArchivo = '<a href="'.base_url($archivoSeg).'" target="_blank" class="btn btn-xs btn-outline-info ml-1" title="Ver Formato"><i class="fas fa-file-pdf"></i></a>';
+                                             }
+                                             
+                                             $seguimientoHtml = '
+                                             <div class="input-group input-group-sm">
+                                                <input type="text" class="form-control" id="seg_'.$op->id_operacion.'" value="'.$seguimientoVal.'" placeholder="Seguimiento...">
+                                                <input type="file" id="file_seg_'.$op->id_operacion.'" style="display:none;" accept=".pdf,.jpg,.png,.jpeg">
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-outline-secondary" type="button" onclick="$(\'#file_seg_'.$op->id_operacion.'\').click()" title="Adjuntar Archivo"><i class="fas fa-paperclip"></i></button>
+                                                    <button class="btn btn-primary" type="button" onclick="prepararGuardadoSeguimiento('.$op->id_operacion.')"><i class="fas fa-save"></i></button>
+                                                </div>
+                                             </div>
+                                             <div id="info_file_'.$op->id_operacion.'" class="text-xs text-muted mt-1">'.$btnArchivo.'</div>';
+                                        } else {
+                                            $seguimientoHtml = $seguimientoVal;
+                                            if($archivoSeg && file_exists(FCPATH . $archivoSeg)){
+                                                 $seguimientoHtml .= ' <a href="'.base_url($archivoSeg).'" target="_blank" class="text-info"><i class="fas fa-file-pdf"></i></a>';
+                                            }
+                                        }
                                     ?>
                                     <tr>
                                         <td><?= $tipo ?></td>
                                         <td><?= $detalles ?></td>
                                         <td><?= $extra ?></td>
+                                        <td><?= $seguimientoHtml ?></td>
                                         <td><?= $estado ?></td>
                                         <td><?= date('d/m/Y', strtotime($op->fec_reg)) ?></td>
                                         <td>
-                                            <button class="btn btn-sm btn-outline-warning" onclick="ini.inicio.tipoOperacion.editar(<?= $op->id_operacion ?>)"><i class="fas fa-edit"></i></button>
+                                            <button class="btn btn-sm btn-outline-warning" onclick="editarOperacionWrapper(<?= $op->id_operacion ?>)"><i class="fas fa-edit"></i></button>
                                             <button class="btn btn-sm btn-outline-danger" onclick="ini.inicio.tipoOperacion.eliminar(<?= $op->id_operacion ?>)"><i class="fas fa-trash-alt"></i></button>
                                         </td>
                                     </tr>
@@ -99,9 +129,9 @@
                             <input type="hidden" name="id_operacion" id="id_operacion">
 
                             <div class="form-group row">
-                                <label class="col-sm-3 col-form-label">TIPO DE OPERACIÓN</label>
+                                <label class="col-sm-3 col-form-label">TIPO DE OPERACIÓN <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <select class="form-control" id="id_tipo_operacion" name="id_tipo_operacion" onchange="ini.inicio.tipoOperacion.cambioTipo(this.value)" required>
+                                    <select class="form-control required-field" id="id_tipo_operacion" name="id_tipo_operacion" onchange="ini.inicio.tipoOperacion.cambioTipo(this.value)" required>
                                         <option value="">Seleccione...</option>
                                         <option value="1">Depósito</option>
                                         <option value="2">Traspaso</option>
@@ -115,7 +145,7 @@
                             <!-- DEPOSITO -->
                             <div id="div_deposito" class="seccion-op" style="display:none;">
                                 <div class="form-group row">
-                                    <label class="col-sm-3 col-form-label">Abono a tarjeta:</label>
+                                    <label class="col-sm-3 col-form-label">Abono a tarjeta: <span class="text-danger">*</span></label>
                                     <div class="col-sm-9">
                                         <select class="form-control" name="id_deposito" id="id_deposito">
                                             <option value="">Seleccione Cuenta/Depósito...</option>
@@ -132,7 +162,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label class="col-sm-3 col-form-label">Comprobante (PDF/Img)</label>
+                                    <label class="col-sm-3 col-form-label">Comprobante (PDF/Img) <span class="text-danger">*</span></label>
                                     <div class="col-sm-9">
                                         <input type="file" class="form-control" name="comprobante" id="comprobante_deposito" accept=".pdf,.jpg,.jpeg,.png">
                                         <small class="text-muted" id="link_comprobante"></small>
@@ -143,45 +173,115 @@
                             <!-- TRASPASO -->
                             <div id="div_traspaso" class="seccion-op" style="display:none;">
                                 <div class="form-group row">
-                                    <label class="col-sm-3 col-form-label">Traspaso, Cuenta Origen:</label>
+                                    <label class="col-sm-3 col-form-label">Traspaso, Cuenta Origen: <span class="text-danger">*</span></label>
                                     <div class="col-sm-9">
-                                        <select class="form-control" name="cuenta_traspaso" id="cuenta_traspaso">
+                                        <select class="form-control" name="cuenta_traspaso" id="cuenta_traspaso_origen">
                                             <option value="">Seleccione Cuenta...</option>
                                             <?php foreach ($cat_deposito as $d): ?>
-                                                <option value="<?= $d->id_deposito ?>"><?= $d->dsc_cuenta ?></option>
+                                                <option value="<?= $d->id_deposito ?>"><?= $d->nombre_completo.'-'. $d->dsc_cuenta ?></option>
                                             <?php endforeach; ?>
                                         </select>
                                     </div>
                                 </div>
-                                <div class="form-group row">
-                                    <label class="col-sm-3 col-form-label">Traspaso, Cuenta Destino:</label>
+
+                                <!-- Cantidad de Destinos Selector -->
+                                <div class="form-group row" id="row_cant_destinos">
+                                    <label class="col-sm-3 col-form-label">Cantidad de Destinos:</label>
                                     <div class="col-sm-9">
-                                        <select class="form-control" name="cuenta_traspaso" id="cuenta_traspaso">
-                                            <option value="">Seleccione Cuenta...</option>
-                                            <?php foreach ($cat_deposito as $d): ?>
-                                                <option value="<?= $d->id_deposito ?>"><?= $d->dsc_cuenta ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="cant_destinos" id="dest_1" value="1" checked onchange="cambiarDestinos(1)">
+                                            <label class="form-check-label" for="dest_1">1</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="cant_destinos" id="dest_2" value="2" onchange="cambiarDestinos(2)">
+                                            <label class="form-check-label" for="dest_2">2</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="cant_destinos" id="dest_3" value="3" onchange="cambiarDestinos(3)">
+                                            <label class="form-check-label" for="dest_3">3</label>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="form-group row">
-                                    <label class="col-sm-3 col-form-label">Importe $</label>
-                                    <div class="col-sm-9">
-                                        <input type="number" step="0.01" class="form-control" name="importe" id="importe_traspaso">
+
+                                <!-- Destino 1 -->
+                                <div id="div_destino_1" class="border p-2 mb-2 rounded border-light">
+                                    <h6 class="text-muted">Destino 1</h6>
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Cuenta Destino: <span class="text-danger">*</span></label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control" name="cuenta_destino[]" id="cuenta_traspaso_destino">
+                                                <option value="">Seleccione Cuenta...</option>
+                                                <?php foreach ($cat_deposito as $d): ?>
+                                                    <option value="<?= $d->id_deposito ?>"><?= $d->nombre_completo.'-'. $d->dsc_cuenta ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Importe $ <span class="text-danger">*</span></label>
+                                        <div class="col-sm-9">
+                                            <input type="number" step="0.01" class="form-control" name="importe[]" id="importe_traspaso">
+                                        </div>
                                     </div>
                                 </div>
+
+                                <!-- Destino 2 -->
+                                <div id="div_destino_2" class="border p-2 mb-2 rounded border-light" style="display:none;">
+                                    <h6 class="text-muted">Destino 2</h6>
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Cuenta Destino: <span class="text-danger">*</span></label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control" name="cuenta_destino[]" id="cuenta_traspaso_destino_2">
+                                                <option value="">Seleccione Cuenta...</option>
+                                                <?php foreach ($cat_deposito as $d): ?>
+                                                    <option value="<?= $d->id_deposito ?>"><?= $d->nombre_completo.'-'. $d->dsc_cuenta ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Importe $ <span class="text-danger">*</span></label>
+                                        <div class="col-sm-9">
+                                            <input type="number" step="0.01" class="form-control" name="importe[]" id="importe_traspaso_2">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Destino 3 -->
+                                <div id="div_destino_3" class="border p-2 mb-2 rounded border-light" style="display:none;">
+                                    <h6 class="text-muted">Destino 3</h6>
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Cuenta Destino: <span class="text-danger">*</span></label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control" name="cuenta_destino[]" id="cuenta_traspaso_destino_3">
+                                                <option value="">Seleccione Cuenta...</option>
+                                                <?php foreach ($cat_deposito as $d): ?>
+                                                    <option value="<?= $d->id_deposito ?>"><?= $d->nombre_completo.'-'. $d->dsc_cuenta ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Importe $ <span class="text-danger">*</span></label>
+                                        <div class="col-sm-9">
+                                            <input type="number" step="0.01" class="form-control" name="importe[]" id="importe_traspaso_3">
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="form-group row">
-                                    <label class="col-sm-3 col-form-label">Justificación</label>
+                                    <label class="col-sm-3 col-form-label">Justificación <span class="text-danger">*</span></label>
                                     <div class="col-sm-9">
                                         <textarea class="form-control" name="justificaciones" id="justificaciones" rows="3"></textarea>
                                     </div>
                                 </div>
                             </div>
+
                             
                              <!-- CONSULTA CORTE -->
                              <div id="div_corte" class="seccion-op" style="display:none;">
                                 <div class="form-group row">
-                                    <label class="col-sm-3 col-form-label">Consulta Corte (Estado):</label>
+                                    <label class="col-sm-3 col-form-label">Consulta Corte (Estado): <span class="text-danger">*</span></label>
                                     <div class="col-sm-9">
                                         <select class="form-control" name="estado_cuenta" id="estado_cuenta">
                                             <option value="Pendiente">Pendiente</option>
@@ -191,7 +291,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label class="col-sm-3 col-form-label">Periodo</label>
+                                    <label class="col-sm-3 col-form-label">Periodo <span class="text-danger">*</span></label>
                                     <div class="col-sm-9">
                                         <input type="date" class="form-control" name="periodo" id="periodo">
                                     </div>
@@ -201,7 +301,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                            <button type="button" class="btn btn-primary" onclick="ini.inicio.tipoOperacion.guardar()">Guardar</button>
+                            <button type="button" class="btn btn-primary" onclick="guardarOperacionValidada()">Guardar</button>
                         </div>
                     </form>
                 </div>
@@ -255,4 +355,186 @@
 <script src="<?= base_url() ?>plugins/bootstrap-touchspin/js/jquery.bootstrap-touchspin.min.js"></script>
 
 <script src="<?= base_url() ?>assets/pages/jquery.forms-advanced.js"></script>
+
+<script>
+    // Script para Guardar Seguimiento
+    // Script para Guardar Seguimiento
+    function prepararGuardadoSeguimiento(idOperacion) {
+        var seguimiento = $('#seg_' + idOperacion).val();
+        var fileInput = document.getElementById('file_seg_' + idOperacion);
+        var file = fileInput.files[0];
+        
+        // Validación básica
+        if(seguimiento.trim() == "" && !file) {
+            Swal.fire("Atención", "Ingrese un comentario o adjunte un archivo.", "warning");
+            return;
+        }
+
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "Se guardará el seguimiento y se enviará un correo de notificación.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, guardar y enviar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                enviarSeguimiento(idOperacion, seguimiento, file);
+            }
+        });
+    }
+
+    function enviarSeguimiento(idOperacion, seguimiento, file) {
+        var formData = new FormData();
+        formData.append('id_operacion', idOperacion);
+        formData.append('seguimiento', seguimiento);
+        if(file) {
+            formData.append('archivo', file);
+        }
+
+        Swal.fire({
+            title: 'Procesando...',
+            text: 'Subiendo archivo y enviando correo...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        $.ajax({
+            url: '<?= base_url() ?>index.php/Inicio/guardarSeguimiento',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            dataType: 'json',
+            success: function(response) {
+                if (!response.error) {
+                    Swal.fire("Correcto", response.respuesta, "success").then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire("Error", response.respuesta, "error");
+                }
+            },
+            error: function() {
+                Swal.fire("Error", "Ocurrió un error en la solicitud", "error");
+            }
+        });
+    }
+    
+    // Listener para mostrar nombre del archivo seleccionado
+    $(document).on('change', 'input[type="file"][id^="file_seg_"]', function() {
+        var id = this.id.replace('file_seg_', '');
+        var fileName = this.files[0] ? this.files[0].name : '';
+        if(fileName) {
+            $('#info_file_' + id).append(' <span class="badge badge-secondary">'+fileName+'</span>');
+        }
+    });
+
+    // Script para Validar y Guardar Operación (Reemplaza ini.inicio.tipoOperacion.guardar)
+    function guardarOperacionValidada() {
+        var tipo = $('#id_tipo_operacion').val();
+        var isValid = true;
+        var msg = "";
+
+        if (tipo == "") {
+            isValid = false; msg = "Seleccione un TIPO DE OPERACIÓN.";
+        } else if (tipo == "1") { // Depósito
+            if ($('#id_deposito').val() == "") { isValid = false; msg = "Seleccione Abono a tarjeta."; }
+            else if ($('#importe_deposito').val() == "") { isValid = false; msg = "Ingrese el Importe."; }
+             else if ($('#id_operacion').val() == "" && $('#comprobante_deposito').val() == "") { isValid = false; msg = "Adjunte el Comprobante."; }
+        } else if (tipo == "2") { // Traspaso
+            if ($('#cuenta_traspaso_origen').val() == "") { isValid = false; msg = "Seleccione Cuenta Origen."; }
+            
+            // Multiple Destinations
+            var cant = 1;
+            if($('#row_cant_destinos').is(':visible')) {
+                 cant = $('input[name=cant_destinos]:checked').val();
+            }
+
+            // Destino 1 (Always required)
+            if ($('#cuenta_traspaso_destino').val() == "") { isValid = false; msg = "Seleccione Cuenta Destino 1."; }
+            else if ($('#importe_traspaso').val() == "") { isValid = false; msg = "Ingrese el Importe 1."; }
+            
+            // Destino 2
+            if(cant >= 2) {
+                 if ($('#cuenta_traspaso_destino_2').val() == "") { isValid = false; msg = "Seleccione Cuenta Destino 2."; }
+                 else if ($('#importe_traspaso_2').val() == "") { isValid = false; msg = "Ingrese el Importe 2."; }
+            }
+            // Destino 3
+            if(cant >= 3) {
+                 if ($('#cuenta_traspaso_destino_3').val() == "") { isValid = false; msg = "Seleccione Cuenta Destino 3."; }
+                 else if ($('#importe_traspaso_3').val() == "") { isValid = false; msg = "Ingrese el Importe 3."; }
+            }
+
+            if (isValid && $('#justificaciones').val() == "") { isValid = false; msg = "Ingrese Justificación."; }
+
+        } else if (tipo == "3") { // Corte
+            if ($('#estado_cuenta').val() == "") { isValid = false; msg = "Seleccione Estado."; }
+            else if ($('#periodo').val() == "") { isValid = false; msg = "Seleccione Periodo."; }
+        }
+
+        if (!isValid) {
+            Swal.fire("Atención", "Todos los campos son requeridos. " + msg, "warning");
+            return;
+        }
+        
+        var formData = new FormData(document.getElementById("formTipoOperacion"));
+        
+        $.ajax({
+            url: '<?= base_url() ?>index.php/Inicio/guardarTipoOperacion',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            dataType: 'json',
+            success: function(response) {
+                if (!response.error) {
+                    Swal.fire("Correcto", response.respuesta, "success").then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire("Error", response.respuesta, "error");
+                }
+            },
+            error: function() {
+                Swal.fire("Error", "Error al guardar operación", "error");
+            }
+        });
+    }
+
+    function nuevaOperacionWrapper() {
+        $('#row_cant_destinos').show();
+        // Reset destinations
+        $('#dest_1').prop('checked', true);
+        cambiarDestinos(1);
+        
+        if(typeof ini !== 'undefined' && ini.inicio && ini.inicio.tipoOperacion) {
+            ini.inicio.tipoOperacion.nuevo();
+        }
+    }
+
+    function editarOperacionWrapper(id) {
+        $('#row_cant_destinos').hide();
+        cambiarDestinos(1);
+         if(typeof ini !== 'undefined' && ini.inicio && ini.inicio.tipoOperacion) {
+            ini.inicio.tipoOperacion.editar(id);
+        }
+    }
+
+    function cambiarDestinos(cant) {
+        if(cant == 1) {
+            $('#div_destino_2').hide();
+            $('#div_destino_3').hide();
+        } else if(cant == 2) {
+            $('#div_destino_2').show();
+            $('#div_destino_3').hide();
+        } else {
+            $('#div_destino_2').show();
+            $('#div_destino_3').show();
+        }
+    }
+</script>
 

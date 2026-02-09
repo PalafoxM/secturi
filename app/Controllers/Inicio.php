@@ -808,8 +808,8 @@ class Inicio extends BaseController
         $id_operacion = $this->request->getPost('id_operacion');
         $id_tipo_operacion = $this->request->getPost('id_tipo_operacion'); // 1=Deposito, 2=Traspaso, 3=Consulta Corte
         
-        // Common fields
-        $dataSave = [
+        // Base Data
+        $dataBase = [
             'id_tipo_operacion' => $id_tipo_operacion,
             'visible' => 1,
             'usu_reg' => $session->id_usuario ?? 0,
@@ -818,6 +818,7 @@ class Inicio extends BaseController
 
         // Specific fields based on type
         if ($id_tipo_operacion == 1) { // Deposito
+            $dataSave = $dataBase;
             $dataSave['id_deposito'] = $this->request->getPost('id_deposito');
             $dataSave['importe'] = $this->request->getPost('importe2');
             
@@ -832,33 +833,152 @@ class Inicio extends BaseController
                 $file->move($uploadPath, $newName);
                 $dataSave['comprobante'] = 'assets/uploads/comprobantes/' . $newName;
             }
-        
+            
+            $dataConfig = [
+                'tabla' => 'operaciones',
+                'editar' => !empty($id_operacion),
+                'idEditar' => ['id_operacion' => $id_operacion]
+            ];
+            $result = $globals->saveTabla($dataSave, $dataConfig, ['script' => 'Inicio.guardarTipoOperacion']);
+
         } elseif ($id_tipo_operacion == 2) { // Traspaso
-            $dataSave['id_deposito'] = $this->request->getPost('cuenta_traspaso'); // Reusing field or new one?
-            $dataSave['importe'] = $this->request->getPost('importe');
-            $dataSave['justificaciones'] = $this->request->getPost('justificaciones');
+            // Recibimos arrays para destinos e importes
+            $cuentas_dest = $this->request->getPost('cuenta_destino');
+            $importes = $this->request->getPost('importe');
+            $origen = $this->request->getPost('cuenta_traspaso'); 
+            $justificacionBase = $this->request->getPost('justificaciones');
+
+            if(!is_array($cuentas_dest)) { $cuentas_dest = [$cuentas_dest]; }
+            if(!is_array($importes)) { $importes = [$importes]; }
+
+            $errors = 0;
+            foreach($cuentas_dest as $idx => $destino) {
+                if(empty($destino)) continue;
+                $monto = isset($importes[$idx]) ? $importes[$idx] : 0;
+                
+                $dataSave = $dataBase;
+                $dataSave['id_deposito'] = $origen; // La cuenta origen
+                $dataSave['importe'] = $monto;
+                // Guardamos el destino en justificación para referencia
+                $dataSave['justificaciones'] = "Destino ID: " . $destino . ". " . $justificacionBase;
+
+                // Si es edición, se asume que solo viene 1 registro (el array tiene tamaño 1)
+                // y usamos $id_operacion. Si es nuevo, $id_operacion es vacio.
+                $esEdicion = !empty($id_operacion);
+                
+                $dataConfig = [
+                    'tabla' => 'operaciones',
+                    'editar' => $esEdicion,
+                    'idEditar' => ['id_operacion' => $id_operacion]
+                ];
+                
+                $res = $globals->saveTabla($dataSave, $dataConfig, ['script' => 'Inicio.guardarTraspaso']);
+                if($res->error) $errors++;
+                
+                // Si es edición, rompemos el ciclo tras el primero para no crear duplicados por error
+                if($esEdicion) break;
+            }
+            
+            $result = new \stdClass();
+            $result->error = ($errors > 0);
 
         } elseif ($id_tipo_operacion == 3) { // Consulta Corte
+            $dataSave = $dataBase;
             $dataSave['estado_cuenta'] = $this->request->getPost('estado_cuenta');
             $dataSave['periodo'] = $this->request->getPost('periodo');
+            
+            $dataConfig = [
+                'tabla' => 'operaciones',
+                'editar' => !empty($id_operacion),
+                'idEditar' => ['id_operacion' => $id_operacion]
+            ];
+            $result = $globals->saveTabla($dataSave, $dataConfig, ['script' => 'Inicio.guardarTipoOperacion']);
         }
-
-        $dataConfig = [
-            'tabla' => 'operaciones',
-            'editar' => !empty($id_operacion),
-            'idEditar' => ['id_operacion' => $id_operacion]
-        ];
-
     
-        //var_dump($dataSave);
-        $result = $globals->saveTabla($dataSave, $dataConfig, ['script' => 'Inicio.guardarTipoOperacion']);
-        //var_dump($result); 
-        //die();
         if (!$result->error) {
             $response->error = false;
             $response->respuesta = "Operación guardada correctamente.";
         } else {
             $response->respuesta = "Error al guardar la operación.";
+        }
+
+        return $this->respond($response);
+    }
+    public function guardarSeguimiento()
+    {
+        $response = new \stdClass();
+        $globals = new Mglobal;
+        $email = \Config\Services::email();
+        $session = \Config\Services::session();
+        $response->error = true;
+
+        $id_operacion = $this->request->getPost('id_operacion');
+        $seguimiento = $this->request->getPost('seguimiento');
+
+        if(empty($id_operacion)){
+             $response->respuesta = "ID de operación no válido.";
+             return $this->respond($response);
+        }
+
+        $dataSave = [
+            'seguimiento' => $seguimiento
+        ];
+
+        // Manejo de archivo
+        $file = $this->request->getFile('archivo');
+        $filePath = '';
+        if ($file && $file->isValid() && !$file->hasMoved()) {
+            $uploadPath = FCPATH . 'assets/uploads/seguimiento';
+            if (!is_dir($uploadPath)) {
+                mkdir($uploadPath, 0777, true);
+            }
+            $newName = $file->getRandomName();
+            $file->move($uploadPath, $newName);
+            $filePath = 'assets/uploads/seguimiento/' . $newName;
+            $dataSave['seguimiento_formato'] = $filePath;
+        }
+
+        $dataConfig = [
+            'tabla' => 'operaciones',
+            'editar' => true,
+            'idEditar' => ['id_operacion' => $id_operacion]
+        ];
+       $correo = '';
+        $usuRegistra = $globals->getTabla(['tabla' => 'operaciones', 'where' => ['id_operacion' => $id_operacion]])->data;
+        if(isset($usuRegistra[0]->usu_reg) && !empty($usuRegistra[0]->usu_reg) ){
+            $correo = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['id_usuario' => $usuRegistra[0]->usu_reg]])->data[0]->correo;
+        }
+
+        $result = $globals->saveTabla($dataSave, $dataConfig, ['script' => 'Inicio.guardarSeguimiento']);
+
+        if (!$result->error) {
+            $response->error = false;
+            $response->respuesta = "Seguimiento guardado.";
+
+            // Envio de Correo
+            try {
+                $destinatario = $correo ?? 'susi@guanajuato.gob.mx'; // Fallback
+                $email->setFrom('a.palafoxm@guanajuato.gob.mx', 'SUSI - Sistema Unificado SECTURI');
+                $email->setTo($destinatario); 
+                $email->setSubject('Actualización de Seguimiento - Operación #' . $id_operacion);
+                
+                $mensaje = "<h3>Se ha actualizado el seguimiento de la operación #{$id_operacion}</h3>";
+                $mensaje .= "<p><strong>Seguimiento:</strong> {$seguimiento}</p>";
+                $mensaje .= "<p><strong>Usuario:</strong> " . ($session->nombre_completo ?? 'Sistema') . "</p>";
+                
+                if($filePath) {
+                    $mensaje .= "<p>Se ha adjuntado un archivo de soporte.</p>";
+                    $email->attach(FCPATH . $filePath);
+                }
+
+                $email->setMessage($mensaje);
+                $email->send();
+            } catch (\Exception $e) {
+                log_message('error', 'Error enviando correo seguimiento: ' . $e->getMessage());
+            }
+
+        } else {
+            $response->respuesta = "Error al guardar seguimiento.";
         }
 
         return $this->respond($response);
