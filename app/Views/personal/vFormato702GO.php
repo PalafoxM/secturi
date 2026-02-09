@@ -260,7 +260,7 @@
     <?php elseif(isset($total) && !empty($total)): ?>
         <span><?= '$' . number_format($total, 2) .' ('.$monto.')' ?></span>
     <?php else: ?>
-        <span></span>
+        <span>No disponible</span>
     <?php endif; ?>
 </div>
 
