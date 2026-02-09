@@ -115,7 +115,7 @@
                             <!-- DEPOSITO -->
                             <div id="div_deposito" class="seccion-op" style="display:none;">
                                 <div class="form-group row">
-                                    <label class="col-sm-3 col-form-label">Depósito A:</label>
+                                    <label class="col-sm-3 col-form-label">Abono a tarjeta:</label>
                                     <div class="col-sm-9">
                                         <select class="form-control" name="id_deposito" id="id_deposito">
                                             <option value="">Seleccione Cuenta/Depósito...</option>
@@ -143,7 +143,18 @@
                             <!-- TRASPASO -->
                             <div id="div_traspaso" class="seccion-op" style="display:none;">
                                 <div class="form-group row">
-                                    <label class="col-sm-3 col-form-label">Traspaso, Cuenta:</label>
+                                    <label class="col-sm-3 col-form-label">Traspaso, Cuenta Origen:</label>
+                                    <div class="col-sm-9">
+                                        <select class="form-control" name="cuenta_traspaso" id="cuenta_traspaso">
+                                            <option value="">Seleccione Cuenta...</option>
+                                            <?php foreach ($cat_deposito as $d): ?>
+                                                <option value="<?= $d->id_deposito ?>"><?= $d->dsc_cuenta ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Traspaso, Cuenta Destino:</label>
                                     <div class="col-sm-9">
                                         <select class="form-control" name="cuenta_traspaso" id="cuenta_traspaso">
                                             <option value="">Seleccione Cuenta...</option>
