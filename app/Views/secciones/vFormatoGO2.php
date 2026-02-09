@@ -37,7 +37,7 @@ $fechaFormateada = $dia . ' de ' . $mes . ' del ' . $anio;
                 Por medio de la presente, me permito solicitar su apoyo para que se realice el tramite de Gasto de Operación
                 con folio <strong><?= 'GO';?> <?= strtoupper($prefijoCompleto);?></strong> por la cantidad de 
                 <strong>$<?=number_format($total_importe, 2); ?> (<?= mb_strtoupper($numero_texto, 'UTF-8'); ?>)</strong>,
-                por concepto de <?= $concepto ?>.
+                por concepto de <?= (isset($registro->concepto_pago) && !empty($registro->concepto_pago))?$registro->concepto_pago:$concepto ?>.
             </span>
         </div>
        
