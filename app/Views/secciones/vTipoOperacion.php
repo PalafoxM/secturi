@@ -32,8 +32,10 @@
                                 <thead>
                                     <tr>
                                         <th>Tipo</th>
+                                        <th>Solicitante</th>
                                         <th>Detalles</th>
-                                        <th>Importe/Periodo</th>
+                                        <th>Importe</th>
+                                        <th>Periodo</th>
                                         <th>SEGUIMIENTO</th>
                                         <th>Estado/Comprobante</th>
                                         <th>Fecha Reg</th>
@@ -44,25 +46,43 @@
                                     <?php foreach ($operaciones as $op): 
                                         $tipo = '';
                                         $detalles = '';
-                                        $extra = '';
-                                        $estado = '';
+                                        $importe = '';
+                                        $periodo = '';
+                                        $solicitante = '';
+                                        $estado = ''; 
+
+                                        // Find solicitante
+                                        if(isset($usuarios)){
+                                            foreach($usuarios as $u){
+                                                if($u->id_usuario == $op->usu_reg){
+                                                    $solicitante = isset($u->parte_nombre_completo) ? $u->parte_nombre_completo : (isset($u->nombre_completo) ? $u->nombre_completo : $u->nombre);
+                                                    break;
+                                                }
+                                            }
+                                        }
                                         
                                         if($op->id_tipo_operacion == 1){ 
-                                            $tipo = '<span class="badge badge-success">Depósito</span>';
-                                            // Find nombre deposito in $cat_deposito
+                                            $tipo = '<span class="badge badge-success">Abono a tarjeta</span>';
                                             foreach($cat_deposito as $dep){ if($dep->id_deposito == $op->id_deposito) $detalles = $dep->dsc_cuenta; }
-                                            $extra = '$' . number_format($op->importe, 2);
+                                            $importe = '$' . number_format($op->importe, 2);
+                                            $periodo = '-';
                                             if($op->comprobante) {
                                                 $estado = '<a href="'.base_url($op->comprobante).'" target="_blank" class="btn btn-xs btn-info"><i class="fas fa-file-alt"></i> Ver Comp.</a>';
+                                            } else {
+                                                $estado = '<span class="badge badge-secondary">Pendiente</span>';
                                             }
                                         } elseif($op->id_tipo_operacion == 2){
                                             $tipo = '<span class="badge badge-warning">Traspaso</span>';
                                              foreach($cat_deposito as $dep){ if($dep->id_deposito == $op->id_deposito) $detalles = "Cuenta: " . $dep->dsc_cuenta; }
-                                            $extra = '$' . number_format($op->importe, 2);
+                                            $importe = '$' . number_format($op->importe, 2);
+                                            $periodo = '-';
+                                            $estado = '<span class="badge badge-secondary">N/A</span>';
                                         } elseif($op->id_tipo_operacion == 3){
                                             $tipo = '<span class="badge badge-info">Consulta Corte</span>';
-                                            $detalles = $op->estado_cuenta;
-                                            $extra = $op->periodo;
+                                            $detalles = "Estado: " . $op->estado_cuenta;
+                                            $importe = '-';
+                                            $periodo = $op->periodo;
+                                            $estado = '<span class="badge badge-secondary">N/A</span>';
                                         }
 
                                         // SEGUIMIENTO LOGIC
@@ -95,8 +115,10 @@
                                     ?>
                                     <tr>
                                         <td><?= $tipo ?></td>
+                                        <td><?= $solicitante ?></td>
                                         <td><?= $detalles ?></td>
-                                        <td><?= $extra ?></td>
+                                        <td><?= $importe ?></td>
+                                        <td><?= $periodo ?></td>
                                         <td><?= $seguimientoHtml ?></td>
                                         <td><?= $estado ?></td>
                                         <td><?= date('d/m/Y', strtotime($op->fec_reg)) ?></td>
@@ -134,7 +156,7 @@
                                 <div class="col-sm-9">
                                     <select class="form-control required-field" id="id_tipo_operacion" name="id_tipo_operacion" onchange="ini.inicio.tipoOperacion.cambioTipo(this.value)" required>
                                         <option value="">Seleccione...</option>
-                                        <option value="1">Depósito</option>
+                                        <option value="1">Abono a tarjeta</option>
                                         <option value="2">Traspaso</option>
                                         <option value="3">Consulta Corte</option>
                                     </select>

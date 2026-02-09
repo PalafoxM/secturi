@@ -793,9 +793,13 @@ class Inicio extends BaseController
         }else{
             $operaciones = $globals->getTabla(['tabla' => 'operaciones', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]]);
         }
+        
+        // Load Users for Solicitante name
+        $usuarios = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
 
         $data['cat_deposito'] = $cat_deposito->data ?? [];
         $data['operaciones'] = $operaciones->data ?? [];
+        $data['usuarios'] = $usuarios->data ?? [];
         
         $data['scripts'] = ['principal', 'inicio']; 
         $data['contentView'] = 'secciones/vTipoOperacion';
@@ -915,6 +919,7 @@ class Inicio extends BaseController
                 $mensaje = "<h3>Nueva Solicitud de Operación</h3>";
                 $mensaje .= "<p>El usuario <strong>{$nombreCompleto}</strong> ha subido una nueva solicitud de operación.</p>";
                 $mensaje .= "<p>Por favor revise el sistema para más detalles.</p>";
+                $mensaje .= "<a href='https://secturnet.guanajuato.gob.mx/susi/index.php/Inicio/TipoOperacion'>Por favor revise el sistema para más detalles.</a>";
 
                 $email->setMessage($mensaje);
                 if(!$email->send()){
