@@ -103,6 +103,7 @@
                                         <td>
                                             <button class="btn btn-sm btn-outline-warning" onclick="editarOperacionWrapper(<?= $op->id_operacion ?>)"><i class="fas fa-edit"></i></button>
                                             <button class="btn btn-sm btn-outline-danger" onclick="ini.inicio.tipoOperacion.eliminar(<?= $op->id_operacion ?>)"><i class="fas fa-trash-alt"></i></button>
+                                         
                                         </td>
                                     </tr>
                                     <?php endforeach; ?>
@@ -200,7 +201,7 @@
                                             <input class="form-check-input" type="radio" name="cant_destinos" id="dest_3" value="3" onchange="cambiarDestinos(3)">
                                             <label class="form-check-label" for="dest_3">3</label>
                                         </div>
-                                    </div>
+                                     
                                 </div>
 
                                 <!-- Destino 1 -->

@@ -788,7 +788,11 @@ class Inicio extends BaseController
         
         // Load existing operations
         // Assuming table 'operaciones' exists.
-        $operaciones = $globals->getTabla(['tabla' => 'operaciones', 'where' => ['visible' => 1]]);
+        if(in_array($session->get('id_perfil'), [1, 2])){
+            $operaciones = $globals->getTabla(['tabla' => 'operaciones', 'where' => ['visible' => 1]]);
+        }else{
+            $operaciones = $globals->getTabla(['tabla' => 'operaciones', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]]);
+        }
 
         $data['cat_deposito'] = $cat_deposito->data ?? [];
         $data['operaciones'] = $operaciones->data ?? [];
@@ -898,9 +902,32 @@ class Inicio extends BaseController
         if (!$result->error) {
             $response->error = false;
             $response->respuesta = "Operación guardada correctamente.";
+
+            // Envio de Correo Notificación
+            try {
+                $email = \Config\Services::email();
+                $destinatario = 'negonzalez@guanajuato.gob.mx';
+                $email->setFrom('a.palafoxm@guanajuato.gob.mx', 'SUSI - Sistema Unificado SECTURI');
+                $email->setTo($destinatario); 
+                $email->setSubject('Nueva Solicitud de Operación - SUSI');
+                
+                $nombreCompleto = $session->nombre_completo ?? 'Usuario Desconocido';
+                $mensaje = "<h3>Nueva Solicitud de Operación</h3>";
+                $mensaje .= "<p>El usuario <strong>{$nombreCompleto}</strong> ha subido una nueva solicitud de operación.</p>";
+                $mensaje .= "<p>Por favor revise el sistema para más detalles.</p>";
+
+                $email->setMessage($mensaje);
+                if(!$email->send()){
+                    log_message('error', 'Error enviando correo: ' . $email->printDebugger(['headers']));
+                }
+            } catch (\Exception $e) {
+                log_message('error', 'Error enviando correo notificación operación: ' . $e->getMessage());
+            }
         } else {
             $response->respuesta = "Error al guardar la operación.";
         }
+
+        
 
         return $this->respond($response);
     }
