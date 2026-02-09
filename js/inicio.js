@@ -5749,22 +5749,24 @@ ini.inicio = (function () {
             });
         },
         tipoOperacion: {
-            nuevo: function(){
+            nuevo: function () {
                 $('#formTipoOperacion')[0].reset();
                 $('#id_operacion').val('');
                 $('.seccion-op').hide();
                 $('#link_comprobante').html('');
                 $('#modalTipoOperacion').modal('show');
             },
-            cambioTipo: function(tipo){
+            cambioTipo: function (tipo) {
+                console.log(tipo);
                 $('.seccion-op').hide();
-                if(tipo == 1) $('#div_deposito').show();
-                if(tipo == 2) $('#div_traspaso').show();
-                if(tipo == 3) $('#div_corte').show();
+                if (tipo == 3) $('#div_corte').show();
+                if (tipo == 1) $('#div_deposito').show();
+                if (tipo == 2) $('#div_traspaso').show();
+                //if (tipo == 3) console.log(tipo);
             },
-            guardar: function(){
-                 var formData = new FormData(document.getElementById("formTipoOperacion"));
-                 $.ajax({
+            guardar: function () {
+                var formData = new FormData(document.getElementById("formTipoOperacion"));
+                $.ajax({
                     url: base_url + "index.php/Inicio/guardarTipoOperacion",
                     type: "POST",
                     data: formData,
@@ -5783,11 +5785,11 @@ ini.inicio = (function () {
                     error: function () {
                         Swal.fire("Error", "Error de conexión", "error");
                     }
-                 });
+                });
             },
-            editar: function(id){
-                $.post(base_url + "index.php/Inicio/getTipoOperacion", {id_operacion: id}, function(data){
-                    if(data.error){
+            editar: function (id) {
+                $.post(base_url + "index.php/Inicio/getTipoOperacion", { id_operacion: id }, function (data) {
+                    if (data.error) {
                         Swal.fire("Error", "No encontrado", "error");
                         return;
                     }
@@ -5797,27 +5799,30 @@ ini.inicio = (function () {
 
                     $('#id_operacion').val(data.id_operacion);
                     $('#id_tipo_operacion').val(data.id_tipo_operacion).trigger('change');
-                    
+
+                    // Manually trigger visibility based on type
+                    ini.inicio.tipoOperacion.cambioTipo(data.id_tipo_operacion);
+
                     // Populate specific fields
-                    if(data.id_tipo_operacion == 1){
+                    if (data.id_tipo_operacion == 1) {
                         $('#id_deposito').val(data.id_deposito);
                         $('#importe_deposito').val(data.importe);
-                        if(data.comprobante){
-                             $('#link_comprobante').html('<a href="'+base_url+data.comprobante+'" target="_blank">Ver Comprobante Actual</a>');
+                        if (data.comprobante) {
+                            $('#link_comprobante').html('<a href="' + base_url + data.comprobante + '" target="_blank">Ver Comprobante Actual</a>');
                         }
-                    } else if(data.id_tipo_operacion == 2){
+                    } else if (data.id_tipo_operacion == 2) {
                         $('#cuenta_traspaso').val(data.id_deposito); // id_deposito acts as account for traspaso
                         $('#importe_traspaso').val(data.importe);
                         $('#justificaciones').val(data.justificaciones);
-                    } else if(data.id_tipo_operacion == 3){
+                    } else if (data.id_tipo_operacion == 3) {
                         $('#estado_cuenta').val(data.estado_cuenta);
                         $('#periodo').val(data.periodo);
                     }
-                    
+
                     $('#modalTipoOperacion').modal('show');
                 }, 'json');
             },
-            eliminar: function(id){
+            eliminar: function (id) {
                 Swal.fire({
                     title: '¿Estás seguro?',
                     text: "No podrás revertir esto!",
@@ -5826,15 +5831,15 @@ ini.inicio = (function () {
                     confirmButtonText: 'Sí, eliminarlo!'
                 }).then((result) => {
                     if (result.value) {
-                         $.post(base_url + "index.php/Inicio/eliminarTipoOperacion", {id_operacion: id}, function(response){
-                             if (!response.error) {
+                        $.post(base_url + "index.php/Inicio/eliminarTipoOperacion", { id_operacion: id }, function (response) {
+                            if (!response.error) {
                                 Swal.fire("Eliminado!", "El registro ha sido eliminado.", "success").then(() => {
                                     window.location.reload();
                                 });
                             } else {
                                 Swal.fire("Error", response.respuesta, "error");
                             }
-                         }, 'json');
+                        }, 'json');
                     }
                 })
             }

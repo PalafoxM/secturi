@@ -303,6 +303,7 @@
                             
                              <!-- CONSULTA CORTE -->
                              <div id="div_corte" class="seccion-op" style="display:none;">
+                                <h4 class="text-danger">DEBUG: SI SE VE ESTO, EL DIV ESTA RENDERIZANDO</h4>
                                 <div class="form-group row">
                                     <label class="col-sm-3 col-form-label">Consulta Corte (Estado): <span class="text-danger">*</span></label>
                                     <div class="col-sm-9">

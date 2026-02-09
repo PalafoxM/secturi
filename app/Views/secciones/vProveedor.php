@@ -277,6 +277,7 @@
                                                 <div class="form-row">
                                                     <div class="col-md-2 mb-3">
                                                         <label for="partida_<?= $i ?>">Partida<span style="color:red;">*</span></label>
+                                                        <input type="hidden" name="id_presupuesto[]" value="<?= $p->id_presupuesto ?>">
                                                         <select class="form-control" id="partida_<?= $i ?>" name="partida[]" disabled>
                                                             <?php foreach($cat_partida as $o): ?>
                                                                 <option value="<?= $o->id_partida ?>" <?= (isset($p->id_partida) && $p->id_partida == $o->id_partida) ? 'selected' : '' ?>>
@@ -315,37 +316,96 @@
                                                     <?php endif; ?>
                                                 </div>
 
-                                                <!-- SECCIÓN DE FACTURA UNIFICADA -->
+                                                <!-- Card con Tabla Dinámica (Replicado de vRegistroGo) -->
                                                 <div id="<?= $section_id ?>">
-                                                    <div class="form-row">
-                                                        <div class="col-md-4 mb-3">
-                                                            <?php if( isset($factura_pdf[$i]) && !empty($factura_pdf[$i])): ?>
-                                                                <input type="hidden" id="editarPDF_<?= $i; ?>"  name="editarPDF[]" value="<?= $factura_pdf[$i]->id_factura_pdf ?>"  >
-                                                                <input type="hidden" id="editarXML_<?= $i; ?>" name="editarXML[]" value="<?= $factura[$i]->id_factura ?>"  >
-                                                                <input type="hidden" id="editarPeriodo_<?= $i; ?>" name="editarPe[]" value="<?= $p->id_periodo_factura ?>"  >
-                                                            <?php endif; ?>
-                                                            <p class="text-muted mb-3">Factura PDF (Máx 100MB)</p> <?= (isset($factura_pdf) && !empty($factura_pdf))? '<a target="_blank" href='.base_url().$factura_pdf[$i]->ruta_relativa.'><i class="mdi dripicons-preview"></i></a>':'' ?>
-                                                            <input id="factura_pdf_input_<?= $i; ?>" type="file" name="factura_pdf_<?= $i; ?>[]" class="dropify" multiple accept=".pdf" />   
+                                                    <div class="row">
+                                                        <div class="col-12">
+                                                            <div class="card">
+                                                                <div class="card-body">
+                                                                    <h4 class="mt-0 header-title">REFERENCIA</h4>
+                                                                    <div class="table-responsive">
+                                                                        <table class="table table-bordered" id="makeEditable<?= $i ?>">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th style="width: 12%">PROPINA</th>
+                                                                                    <th style="width: 30%">DESCRIPCIÓN</th>
+                                                                                    <th style="width: 15%">VIGENCIA</th>
+                                                                                    <th style="width: 20%">ARCHIVOS</th>
+                                                                                    <th style="width: 15%">ACCIONES</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                <tr>
+                                                                                    <!-- Propina -->
+                                                                                    <td>
+                                                                                        <div class="input-group">
+                                                                                            <div class="input-group-prepend">
+                                                                                                <span class="input-group-text">$</span>
+                                                                                            </div>
+                                                                                            <input autocomplete="off" type="text" class="form-control propina-input" name="propina_<?= $i ?>[]" placeholder="0.00">
+                                                                                        </div>
+                                                                                    </td>
+                                                                                    <!-- Descripción -->
+                                                                                    <td>
+                                                                                        <textarea autocomplete="off" class="form-control mb-1" name="concepto_<?= $i ?>[]" placeholder="Concepto" rows="2" style="font-size: 0.85rem;"></textarea>
+                                                                                        <textarea autocomplete="off" class="form-control" name="comision_<?= $i ?>[]" placeholder="Comisión / Evento" rows="2" style="font-size: 0.85rem; background-color: #f8f9fa;"></textarea>
+                                                                                    </td>
+                                                                                    <!-- Vigencia -->
+                                                                                    <td>
+                                                                                        <div class="input-group input-group-sm mb-1">
+                                                                                            <div class="input-group-prepend"><span class="input-group-text">Del</span></div>
+                                                                                            <input autocomplete="off" type="date" class="form-control" name="periodo_inicio_<?= $i ?>[]">
+                                                                                        </div>
+                                                                                        <div class="input-group input-group-sm">
+                                                                                            <div class="input-group-prepend"><span class="input-group-text">Al </span></div>
+                                                                                            <input autocomplete="off" type="date" class="form-control" name="periodo_fin_<?= $i ?>[]">
+                                                                                        </div>
+                                                                                    </td>
+                                                                                    <!-- Archivos -->
+                                                                                    <td>
+                                                                                        <div class="archivos-seleccionados" id="archivos_<?= $i ?>">
+                                                                                            <small class="text-muted">Sin archivos</small>
+                                                                                        </div>
+                                                                                    </td>
+                                                                                    <!-- Acciones -->
+                                                                                    <td>
+                                                                                        <div class="btn-group-vertical btn-group-sm w-100">
+                                                                                            <button type="button" class="btn btn-success btn-seleccionar-pdf mb-1" data-row="<?= $i ?>">
+                                                                                                <i class="fas fa-file-pdf"></i> PDF
+                                                                                            </button>
+                                                                                            <button type="button" class="btn btn-warning btn-seleccionar-xml mb-1" data-row="<?= $i ?>">
+                                                                                                <i class="mdi mdi-code-tags"></i> XML
+                                                                                            </button>
+                                                                                            <button type="button" class="btn btn-danger remove-row">
+                                                                                                <i class="fas fa-trash"></i> Eliminar
+                                                                                            </button>
+                                                                                        </div>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            </tbody>
+                                                                        </table>
+                                                                        <div class="text-right mt-2">
+                                                                            <a onclick="addRow(<?= $i ?>)" class="btn btn-primary text-white">
+                                                                                <i class="fas fa-plus"></i> Agregar Fila
+                                                                            </a>
+                                                                        </div>
+                                                                        <div class="row mt-3" style="visibility: visible;"> <!-- Visibility changed to visible for PT if needed, or keep hidden -->
+                                                                            <div class="col-md-8"></div>
+                                                                            <div class="col-md-4">
+                                                                                <div class="form-group">
+                                                                                    <label>TOTAL:</label>
+                                                                                    <input type="text" name="total_importe" class="form-control font-weight-bold text-right" id="total_importe_<?= $i ?>" value="0.00" readonly>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        <div class="col-md-4 mb-3">
-                                                            <p class="text-muted mb-3">Factura XML (Máx 100MB)</p> <?= (isset($factura) && !empty($factura))? '<a target="_blank" href='.base_url().'index.php/Inicio/VerXML/'.$factura[$i]->id_factura.'><i class="mdi dripicons-preview"></i></a>':'' ?>
-                                                            <input id="factura_xml_input_<?= $i; ?>" type="file" name="factura_xml_<?= $i; ?>[]" multiple class="dropify" accept=".xml">
-                                                        </div>
-                                                        <div class="col-md-2 mb-3">
-                                                            <label for="fecha_gasto_inicio">Fec. Inicio <span style="color:red;">*</span></label>
-                                                            <input type="date" class="form-control" id="fecha_gasto_inicio" name="fecha_gasto_inicio[]" 
-                                                            value="<?= isset($importe[$i]->periodo_inicio) ? date('Y-m-d', strtotime($importe[$i]->periodo_inicio)) : date('Y-m-d') ?>" 
-                                                            required>
-                                                        </div><!--end col-->
-                                                        <div class="col-md-2 mb-3">
-                                                            <label for="fecha_gasto_fin">Fec. Fin <span style="color:red;">*</span></label>
-                                                            <input type="date" class="form-control" id="fecha_gasto_fin" name="fecha_gasto_fin[]" 
-                                                            value="<?= isset($importe[$i]->periodo_fin) ? date('Y-m-d', strtotime($importe[$i]->periodo_fin)) : date('Y-m-d') ?>" 
-                                                            required>
-                                                        </div><!--end col-->
                                                     </div>
                                                 </div>
                                             <?php endforeach; ?>
+                                            <div id="hidden-file-inputs-container"></div>
 
                          
 
@@ -408,65 +468,403 @@
         <script src="<?= base_url()?>plugins/bootstrap-touchspin/js/jquery.bootstrap-touchspin.min.js"></script>
 
         <script>
-            ini.inicio.formPT();
-             $('.add-file').on('click', function(e) {
+            // Definir globales explícitamente en window
+            window.archivosPorFila = {};
+            window.deletedRows = [];
+            window.base_url = "<?= base_url() ?>";
+
+            // --- Lógica Original de vProveedor (Mantener) con manejo de errores ---
+            try {
+                if (window.ini && window.ini.inicio && typeof window.ini.inicio.formPT === 'function') {
+                    ini.inicio.formPT();
+                } else {
+                    console.warn('ini.inicio.formPT no está disponible o no es una función.');
+                }
+            } catch (e) {
+                console.error('Error al inicializar formPT:', e);
+            }
+
+            $('.add-file').on('click', function(e) {
                 e.preventDefault();
                 const inputId = $(this).data('target');
-                $(inputId).click();
-            });
-            $('input[name="datetimes[]"]').daterangepicker({
-                timePicker: true,
-                timePicker24Hour: true,
-                locale: {
-                    format: 'YYYY-MM-DD HH:mm:ss'
+                if ($(inputId).length) {
+                    $(inputId).click();
                 }
             });
+
+            if ($.fn.daterangepicker) {
+                $('input[name="datetimes[]"]').daterangepicker({
+                    timePicker: true,
+                    timePicker24Hour: true,
+                    locale: {
+                        format: 'YYYY-MM-DD HH:mm:ss'
+                    }
+                });
+            }
+
             $(document).ready(function() {
-    $('.select2').select2({
-                placeholder: "Selecciona un responsable",
-                allowClear: true,
-                width: '100%', // Para que ocupe todo el ancho
-                language: {
-                    noResults: function() {
-                        return "No se encontraron resultados";
+                if ($.fn.select2) {
+                    $('.select2').select2({
+                        placeholder: "Selecciona un responsable",
+                        allowClear: true,
+                        width: '100%',
+                        language: {
+                            noResults: function() {
+                                return "No se encontraron resultados";
+                            }
+                        }
+                    });
+                }
+
+                // Lógica para checkbox "No Agregar Factura"
+                function actualizarVisibilidadFactura(checkbox) {
+                    var targetSelector = $(checkbox).data('target');
+                    var $targetSection = $(targetSelector);
+                    var $encabezadoInput = $(checkbox).closest('.form-row').find('input[name="encabezado[]"]');
+                    
+                    if ($(checkbox).is(':checked')) {
+                        $targetSection.hide();
+                        $encabezadoInput.prop('readonly', true); 
+                    } else {
+                        $targetSection.show();
+                        $encabezadoInput.prop('readonly', false);
                     }
                 }
+            
+                $('.toggle-factura-section').each(function() {
+                    actualizarVisibilidadFactura(this);
+                });
+
+                $(document).on('change', '.toggle-factura-section', function() {
+                    actualizarVisibilidadFactura(this);
+                });
             });
-        });
- 
-      
-    
-        $(document).ready(function() {
-        
-        // Función para actualizar la visibilidad de la sección de factura
-        function actualizarVisibilidadFactura(checkbox) {
-            // Obtiene el selector del data-target (ej: "#factura-section-0")
-            var targetSelector = $(checkbox).data('target');
-            var $targetSection = $(targetSelector);
-             var $encabezadoInput = $(checkbox).closest('.form-row').find('input[name="encabezado[]"]');
-            // Si el checkbox está MARCADO ("No Agregar Factura")...
-            if ($(checkbox).is(':checked')) {
-                $targetSection.hide(); // ...oculta la sección
-                $encabezadoInput.prop('readonly', true); 
-            } else {
-                $targetSection.show(); // ...muestra la sección
-                $encabezadoInput.prop('readonly', false);
-            }
-        }
-      
-        // 1. Ejecuta la función para cada checkbox cuando la página carga
-        //    (Esto oculta las secciones de los checkboxes que ya vienen marcados)
-        $('.toggle-factura-section').each(function() {
-            actualizarVisibilidadFactura(this);
-        });
 
-        // 2. Asigna el evento 'change' a todos los checkboxes con esa clase
-        //    Usamos 'on()' para que funcione incluso si se añaden filas dinámicamente
-        $(document).on('change', '.toggle-factura-section', function() {
-            actualizarVisibilidadFactura(this);
-        });
+            // --- Nueva Lógica Replicada de vRegistroGo ---
 
-    });
+            // Función para inicializar fila en el objeto de archivos
+            window.inicializarFilaEnArchivos = function(rowIndex) {
+                if (!window.archivosPorFila[rowIndex]) {
+                    window.archivosPorFila[rowIndex] = {
+                        pdf: [],
+                        xml: []
+                    };
+                }
+            };
 
+            // Función para agregar fila
+            window.addRow = function(sectionIndex) {
+                const table = document.getElementById(`makeEditable${sectionIndex}`);
+                if (!table) {
+                    console.error(`Tabla makeEditable${sectionIndex} no encontrada`);
+                    return;
+                }
+                const tbody = table.getElementsByTagName('tbody')[0];
+                const rowCount = tbody.rows.length;
+                const newRowIndex = `tabla_${sectionIndex}_${Date.now()}`;
+                
+                const tr = document.createElement('tr');
+                tr.setAttribute('data-row-index', newRowIndex);
+                
+                tr.innerHTML = `
+                    <td>
+                        <input type="hidden" name="id_identificador_${sectionIndex}[]" value="${newRowIndex}">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">$</span>
+                            </div>
+                            <input autocomplete="off" type="text" class="form-control propina-input" name="propina_${sectionIndex}[]" placeholder="0.00">
+                        </div>
+                    </td>
+                    <td>
+                        <textarea autocomplete="off" class="form-control mb-1" name="concepto_${sectionIndex}[]" placeholder="Concepto" rows="2" style="font-size: 0.85rem;"></textarea>
+                        <textarea autocomplete="off" class="form-control" name="comision_${sectionIndex}[]" placeholder="Comisión / Evento" rows="2" style="font-size: 0.85rem; background-color: #f8f9fa;"></textarea>
+                    </td>
+                    <td>
+                        <div class="input-group input-group-sm mb-1">
+                            <div class="input-group-prepend"><span class="input-group-text">Del</span></div>
+                            <input autocomplete="off" type="date" class="form-control" name="periodo_inicio_${sectionIndex}[]">
+                        </div>
+                        <div class="input-group input-group-sm">
+                            <div class="input-group-prepend"><span class="input-group-text">Al </span></div>
+                            <input autocomplete="off" type="date" class="form-control" name="periodo_fin_${sectionIndex}[]">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="archivos-seleccionados" id="archivos_${newRowIndex}">
+                            <small class="text-muted">Sin archivos</small>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="btn-group-vertical btn-group-sm w-100">
+                            <button type="button" class="btn btn-success btn-seleccionar-pdf mb-1" data-row="${newRowIndex}">
+                                <i class="fas fa-file-pdf"></i> PDF
+                            </button>
+                            <button type="button" class="btn btn-warning btn-seleccionar-xml mb-1" data-row="${newRowIndex}">
+                                <i class="mdi mdi-code-tags"></i> XML
+                            </button>
+                            <button type="button" class="btn btn-danger remove-row">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </button>
+                        </div>
+                    </td>
+                `;
+                
+                tbody.appendChild(tr);
+                window.inicializarFilaEnArchivos(newRowIndex);
+                
+                // Reinicializar inputmask para la nueva fila
+                if ($.fn.inputmask) {
+                    $(`#makeEditable${sectionIndex} tbody tr[data-row-index="${newRowIndex}"] .propina-input`).inputmask('numeric', {
+                        radixPoint: ".",
+                        groupSeparator: ",",
+                        digits: 2,
+                        autoGroup: true,
+                        prefix: '$ ',
+                        rightAlign: false
+                    });
+                }
+            };
 
+            // Eliminar fila
+            $(document).on('click', '.remove-row', function () {
+                const row = $(this).closest('tr');
+                const rowIndex = row.attr('data-row-index');
+                const tableId = row.closest('table').attr('id');
+                const sectionIndex = tableId.replace('makeEditable', '');
+
+                if (row.closest('tbody').find('tr').length === 1) {
+                    Swal.fire("Atención", "No se puede eliminar la única fila. Debe haber al menos un registro.", "warning");
+                    return;
+                }
+
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: "Se eliminará esta fila.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sí, eliminar!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        if (rowIndex && !rowIndex.includes('new_')) {
+                             window.deletedRows.push({
+                                index: rowIndex,
+                                section: sectionIndex
+                            });
+                        }
+                        delete window.archivosPorFila[rowIndex];
+                        row.remove();
+                        window.calcularTotal(sectionIndex);
+                        Swal.fire('Eliminado!', 'La fila ha sido eliminada.', 'success');
+                    }
+                })
+            });
+
+            // Seleccionar PDF
+            $(document).on('click', '.btn-seleccionar-pdf', function() {
+                const rowIndex = $(this).data('row');
+                window.inicializarFilaEnArchivos(rowIndex);
+
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.pdf';
+                input.multiple = true;
+
+                input.onchange = e => {
+                    const files = Array.from(e.target.files);
+                    const maxSize = 100 * 1024 * 1024;
+                    const archivosValidos = files.filter(file => file.size <= maxSize);
+                    
+                    if (archivosValidos.length === 0) return;
+
+                    Swal.fire({
+                        title: 'Confirmar PDF',
+                        html: `<p>Se agregarán ${archivosValidos.length} archivo(s).</p>`,
+                        icon: 'info',
+                        showCancelButton: true,
+                        confirmButtonText: 'Confirmar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.inicializarFilaEnArchivos(rowIndex);
+                            window.archivosPorFila[rowIndex].pdf = archivosValidos;
+                            window.actualizarVistaArchivos(rowIndex);
+                            Swal.fire('PDF Guardados', '', 'success');
+                        }
+                    });
+                };
+                input.click();
+            });
+
+            // Seleccionar XML
+            $(document).on('click', '.btn-seleccionar-xml', function() {
+                const rowIndex = $(this).data('row');
+                window.inicializarFilaEnArchivos(rowIndex);
+
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.xml';
+                input.multiple = true;
+
+                input.onchange = e => {
+                    const files = Array.from(e.target.files);
+                    const maxSize = 100 * 1024 * 1024;
+                    const archivosValidos = files.filter(file => file.size <= maxSize);
+                    
+                    if (archivosValidos.length === 0) return;
+
+                    Swal.fire({
+                        title: 'Confirmar XML',
+                        html: `<p>Se agregarán ${archivosValidos.length} archivo(s).</p>`,
+                        icon: 'info',
+                        showCancelButton: true,
+                        confirmButtonText: 'Confirmar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.inicializarFilaEnArchivos(rowIndex);
+                            window.archivosPorFila[rowIndex].xml = archivosValidos;
+                            window.actualizarVistaArchivos(rowIndex);
+                            Swal.fire('XML Guardados', '', 'success');
+                        }
+                    });
+                };
+                input.click();
+            });
+
+            // Actualizar vista archivos
+            window.actualizarVistaArchivos = function(rowIndex) {
+                const container = $(`#archivos_${rowIndex}`);
+                if (!window.archivosPorFila[rowIndex]) {
+                    container.html('<small class="text-muted">No hay archivos</small>');
+                    return;
+                }
+                const archivos = window.archivosPorFila[rowIndex];
+                let count = (archivos.pdf ? archivos.pdf.length : 0) + (archivos.xml ? archivos.xml.length : 0);
+                
+                if (count === 0) {
+                    container.html('<small class="text-muted">No hay archivos</small>');
+                } else {
+                    container.html(`<div><small class="text-info"><strong>Total:</strong> ${count} archivo(s)</small></div>`);
+                }
+            };
+
+            // Cálculo de totales
+            window.calcularTotal = function(i) {
+                let total = 0;
+                $(`input[name="propina_${i}[]"]`).each(function() {
+                    let valor = $(this).val().replace(/[$,]/g, '') || 0;
+                    total += parseFloat(valor);
+                });
+                $(`#total_importe_${i}`).val('$ ' + total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'));
+            };
+
+            $(document).on('input', 'input[class*="propina-input"]', function() {
+                const tableId = $(this).closest('table').attr('id');
+                const i = tableId.replace('makeEditable', '');
+                window.calcularTotal(i);
+            });
+
+            // Preparar FormData
+            window.prepararFormData = function() {
+                console.log("Preparando FormData...");
+                console.log("Archivos en memoria:", window.archivosPorFila);
+                const formData = new FormData($('#form_proveedor')[0]);
+                
+                // Agregar archivos
+                Object.keys(window.archivosPorFila).forEach(rowIndex => {
+                    const archivos = window.archivosPorFila[rowIndex];
+                    if (archivos && archivos.pdf) {
+                        archivos.pdf.forEach((file, fileIndex) => {
+                            console.log(`Adjuntando PDF para fila ${rowIndex}:`, file.name);
+                            formData.append(`archivos[pdf_${rowIndex}][pdf][${fileIndex}]`, file);
+                        });
+                    }
+                    if (archivos && archivos.xml) {
+                        archivos.xml.forEach((file, fileIndex) => {
+                            console.log(`Adjuntando XML para fila ${rowIndex}:`, file.name);
+                            formData.append(`archivos[xml_${rowIndex}][xml][${fileIndex}]`, file);
+                        });
+                    }
+                });
+                return formData;
+            };
+
+            // Envío del formulario
+            $('#form_proveedor').off('submit').on('submit', function(e) {
+                e.preventDefault();
+                e.stopImmediatePropagation(); // Detener otros handlers si los hay
+                
+                const formData = window.prepararFormData();
+                formData.append('deleted_rows', JSON.stringify(window.deletedRows));
+
+                // Validaciones básicas
+                let isValid = true;
+                $('input[type="date"]').each(function() {
+                     // Solo validar si es visible
+                     if($(this).is(':visible') && $(this).val() === ''){
+                         isValid = false;
+                         $(this).addClass('is-invalid');
+                     } else {
+                         $(this).removeClass('is-invalid');
+                     }
+                });
+
+                if (!isValid) {
+                    Swal.fire("Atención", "Complete las fechas requeridas.", "warning");
+                    return;
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: "<?= base_url()?>index.php/Agregar/guardaPT", 
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    dataType: "json",
+                    success: function (response) {
+                        if(!response.error){
+                            Swal.fire("Correcto", response.respuesta, 'success');  
+                            setTimeout(() => {
+                                window.location.href = base_url + "index.php/Principal/tablaArchivos/"+response.idRegistro+'/PT';
+                            }, 1500);
+                        }else{
+                            Swal.fire("Atención", response.respuesta, 'info');  
+                        }
+                    },
+                    beforeSend: function (){
+                        $('button[type="submit"]').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                    },
+                    complete: function (){
+                        $('button[type="submit"]').prop('disabled', false).html('Guardar');
+                    },
+                    error: function () {
+                        Swal.fire("Error", "Ocurrió un error al guardar.", "error"); 
+                    }
+                });
+            });
+
+            // Inicialización de filas existentes
+            $(document).ready(function() {
+                <?php foreach ($presupuesto as $i => $p): ?>
+                const initialRowIndex<?= $i ?> = '<?= $i ?>';
+                const tableId<?= $i ?> = 'makeEditable<?= $i ?>';
+                
+                if ($(`#` + tableId<?= $i ?>).length) {
+                    $(`#` + tableId<?= $i ?> + ` tbody tr`).first().attr('data-row-index', initialRowIndex<?= $i ?>);
+                    window.inicializarFilaEnArchivos(initialRowIndex<?= $i ?>);
+                    
+                    if ($.fn.inputmask) {
+                        $(`#` + tableId<?= $i ?> + ` tbody tr .propina-input`).inputmask('numeric', {
+                            radixPoint: ".",
+                            groupSeparator: ",",
+                            digits: 2,
+                            autoGroup: true,
+                            prefix: '$ ',
+                            rightAlign: false
+                        });
+                    }
+                }
+                <?php endforeach; ?>
+            });
         </script>
