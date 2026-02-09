@@ -71,8 +71,8 @@
                                         <td><?= $estado ?></td>
                                         <td><?= date('d/m/Y', strtotime($op->fec_reg)) ?></td>
                                         <td>
-                                            <button class="btn btn-sm btn-outline-warning" onclick="ini.tipoOperacion.editar(<?= $op->id_operacion ?>)"><i class="fas fa-edit"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger" onclick="ini.tipoOperacion.eliminar(<?= $op->id_operacion ?>)"><i class="fas fa-trash-alt"></i></button>
+                                            <button class="btn btn-sm btn-outline-warning" onclick="ini.inicio.tipoOperacion.editar(<?= $op->id_operacion ?>)"><i class="fas fa-edit"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger" onclick="ini.inicio.tipoOperacion.eliminar(<?= $op->id_operacion ?>)"><i class="fas fa-trash-alt"></i></button>
                                         </td>
                                     </tr>
                                     <?php endforeach; ?>
@@ -120,7 +120,7 @@
                                         <select class="form-control" name="id_deposito" id="id_deposito">
                                             <option value="">Seleccione Cuenta/Depósito...</option>
                                             <?php foreach ($cat_deposito as $d): ?>
-                                                <option value="<?= $d->id_deposito ?>"><?= $d->dsc_cuenta ?></option>
+                                                <option value="<?= $d->id_deposito ?>"><?= $d->nombre_completo.'-'. $d->dsc_cuenta ?></option>
                                             <?php endforeach; ?>
                                         </select>
                                     </div>
@@ -128,7 +128,7 @@
                                 <div class="form-group row">
                                     <label class="col-sm-3 col-form-label">Importe $</label>
                                     <div class="col-sm-9">
-                                        <input type="number" step="0.01" class="form-control" name="importe" id="importe_deposito">
+                                        <input type="number" step="0.01" class="form-control" name="importe2" id="importe_deposito">
                                     </div>
                                 </div>
                                 <div class="form-group row">

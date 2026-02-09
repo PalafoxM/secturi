@@ -768,7 +768,7 @@ class Inicio extends BaseController {
 
         // Load Catalog for Deposito/Traspaso
         // Assuming cat_deposito exists. If not, user might need to create it.
-        $cat_deposito = $globals->getTabla(['tabla' => 'cat_deposito', 'where' => ['visible' => 1]]);
+        $cat_deposito = $globals->getTabla(['tabla' => 'vw_deposito', 'where' => ['visible' => 1]]);
         
         // Load existing operations
         // Assuming table 'operaciones' exists.
@@ -803,7 +803,7 @@ class Inicio extends BaseController {
         // Specific fields based on type
         if ($id_tipo_operacion == 1) { // Deposito
             $dataSave['id_deposito'] = $this->request->getPost('id_deposito');
-            $dataSave['importe'] = $this->request->getPost('importe');
+            $dataSave['importe'] = $this->request->getPost('importe2');
             
             // File Upload
             $file = $this->request->getFile('comprobante');
@@ -833,9 +833,12 @@ class Inicio extends BaseController {
             'idEditar' => ['id_operacion' => $id_operacion]
         ];
 
+    
+        //var_dump($dataSave);
         $result = $globals->saveTabla($dataSave, $dataConfig, ['script' => 'Inicio.guardarTipoOperacion']);
-
-        if ($result) {
+        //var_dump($result); 
+        //die();
+        if (!$result->error) {
             $response->error = false;
             $response->respuesta = "Operación guardada correctamente.";
         } else {
