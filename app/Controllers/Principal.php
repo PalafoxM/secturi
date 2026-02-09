@@ -5542,16 +5542,14 @@ class Principal extends BaseController
             $data['encabezado'] = $periodo->encabezado;
             $data['concepto'] = (isset($periodo->concepto)) ? $periodo->concepto : ''; // NUEVO CAMPO
             $data['comision'] = (isset($periodo->comision)) ? $periodo->comision : ''; // NUEVO CAMPO COMISION
-            $data['total'] = $facturaItem->total;
-            
-            $monto          = $importe_float + (float)$periodo->propina;
-            $data['total2']  = $monto;
-            $data['monto2']  = $this->numeroEnLetras($monto);
+            $data['total'] = '';
+            $data['total2']  = '';
+            $data['monto2']  = '';
         } else {
              $data['encabezado'] = '';
              $data['concepto'] = '';
-             $data['total'] = $facturaItem->total;
-             $data['monto'] = $this->numeroEnLetras((float) str_replace(',', '', $facturaItem->total));
+             $data['total'] ='';
+             $data['monto'] = '';
              $data['total2'] = '';
              $data['monto2'] = '';
         }
