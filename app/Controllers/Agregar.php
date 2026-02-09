@@ -2057,10 +2057,11 @@ class Agregar extends BaseController
             }
             
       
-        }
+        
+        
 
         // Si era insert, recuperamos el ID
-        if (!$id_registro_go) {
+        if(!$id_registro_go){
             $id_registro_go = $responsePrincipal->idRegistro;
         }
 
