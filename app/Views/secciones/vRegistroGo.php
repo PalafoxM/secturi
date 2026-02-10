@@ -434,6 +434,7 @@
                                                                                 <i class="fas fa-trash"></i> Eliminar
                                                                             </button>
                                                                         </div>
+                                                                        <input type="hidden" name="rowIndex_<?= $i ?>[]" value="<?= $i ?>">
                                                                     </td>
                                                                 </tr>
                                                             </tbody>
@@ -623,7 +624,7 @@ function addRow(i) {
                     <i class="fas fa-trash"></i> Eliminar
                 </button>
             </div>
-        </td>
+            <input type="hidden" name="rowIndex_${i}[]" value="${rowIndex}">
         </td>
     </tr>`;
 
