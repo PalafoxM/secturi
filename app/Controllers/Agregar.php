@@ -3574,7 +3574,7 @@ class Agregar extends BaseController
                                             "editar" => true, 
                                             "idEditar" => ['id_factura' => $existeXML->data[0]->id_factura]
                                         ];
-                                       
+                                     
                                     } 
                                     
                                     $this->globals->saveTabla($dataInsertXML, $dataConfigXml, []);
