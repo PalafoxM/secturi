@@ -5922,14 +5922,21 @@ class Principal extends BaseController
                                 if (file_exists($facturaPath)) {
                                     $facturaPageCount = $mpdf->SetSourceFile($facturaPath);
                                     for ($pageNum = 1; $pageNum <= $facturaPageCount; $pageNum++) {
-                                        $mpdf->AddPage(); // Separar cada hoja
+                                        
+                                        $yPos = 10;
+                                        if($pageNum == 1){
+                                            $yPos = 55;
+                                        }else{
+                                            $mpdf->AddPage(); // Separar cada hoja
+                                        }
+
                                         $tplFactura = $mpdf->ImportPage($pageNum);
                                         $templateSize = $mpdf->GetTemplateSize($tplFactura);
                                         $scaleFactor = 0.6;
                                         $width = $templateSize['width'] * $scaleFactor;
                                         $height = $templateSize['height'] * $scaleFactor;
                                         $xPos = ($mpdf->w - $width) / 2;
-                                        $yPos = 40; 
+                                        //$yPos = 40; 
                                         $mpdf->UseTemplate($tplFactura, $xPos, $yPos, $width, $height);
                                     }
                                 }

@@ -3490,19 +3490,32 @@ class Agregar extends BaseController
                                     'id_identificador' => $id_identificador,
                                     'ruta_absoluta' => $ruta_absoluta,
                                     'ruta_relativa' => $ruta_relativa,
-                                    'fec_reg' => date('Y-m-d H:i:s'),
-                                    'usu_reg' => $session->id_usuario,
-                                    'visible' => 1
+                                    
                                 ];
                             $existePDF = $this->globals->getTabla([
                                 'tabla' => 'factura_pdf',
                                 'where' => ['id_identificador' => $id_identificador, 'id_registro_pt' => $id_registro_pt]
                             ]);
-                    
-                        // UPDATE
-                            $id_factura_pdf_real = $existePDF->data[0]->id_factura_pdf;
-                            $this->globals->saveTabla($dataInsertPDF, ["tabla" => "factura_pdf", "editar" => true, 'idEditar' => ['id_factura_pdf' => $id_factura_pdf_real]], []); 
-                                
+                            
+                            $dataConfigPdf = ["tabla" => "factura_pdf", "editar" => false];
+
+                            if (isset($existePDF->data) && !empty($existePDF->data)) { // UPDATE
+                                $id_factura_pdf_real = $existePDF->data[0]->id_factura_pdf;
+                                $dataConfigPdf = [
+                                    "tabla" => "factura_pdf", 
+                                    "editar" => true, 
+                                    "idEditar" => ['id_factura_pdf' => $id_factura_pdf_real]
+                                ];
+
+                                // Mantener fecha registro original si se desea, o actualizar
+                                unset($dataInsertPDF['usu_reg']);
+                                unset($dataInsertPDF['fec_reg']);
+                             
+
+                            } 
+                            // ELSE (Insertar) se maneja por defecto con dataConfigPdf edit=false
+
+                            $this->globals->saveTabla($dataInsertPDF, $dataConfigPdf, []);
                             } elseif ($type === 'xml') {
                                 // Procesar XML
                                 $contenido = file_get_contents($ruta_destino . $fileName);
@@ -3545,14 +3558,26 @@ class Agregar extends BaseController
                                         'emisor_nombre' => $nombreEmisor,
                                         'receptor_rfc' => $rfcReceptor,
                                         'receptor_nombre' => $nombreReceptor,
-                                        'fec_reg' => date('Y-m-d H:i:s'),
-                                        'usu_reg' => $session->id_usuario
+                                     
                                     ];
-                                     $existeXML = $this->globals->getTabla([
+                                    $existeXML = $this->globals->getTabla([
                                         'tabla' => 'factura',
                                         'where' => ['id_identificador' => $id_identificador, 'id_registro_pt' => $id_registro_pt]
                                     ]);
-                                    $this->globals->saveTabla($dataInsertXML, ["tabla" => "factura", "editar" => true, 'idEditar' => ['id_factura' => $existeXML->data[0]->id_factura]], []);
+
+                                    $dataConfigXml = ["tabla" => "factura", "editar" => false];
+                                    
+                                    if (isset($existeXML->data) && !empty($existeXML->data)) {
+                                         // Update existing XML record
+                                         $dataConfigXml = [
+                                            "tabla" => "factura", 
+                                            "editar" => true, 
+                                            "idEditar" => ['id_factura' => $existeXML->data[0]->id_factura]
+                                        ];
+                                       
+                                    } 
+                                    
+                                    $this->globals->saveTabla($dataInsertXML, $dataConfigXml, []);
                                 }
                             }
                          }
@@ -3560,7 +3585,7 @@ class Agregar extends BaseController
                 } // Fin for filas
              } // Fin foreach tablas
         }
-        
+       // die();
         $response->error = false;
         $response->respuesta = "Éxito|Se ha actualizado correctamente.";
         $response->idRegistro = $id_registro_pt;

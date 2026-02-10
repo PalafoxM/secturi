@@ -370,10 +370,10 @@
                                                                                     <!-- Acciones -->
                                                                                     <td>
                                                                                         <div class="btn-group-vertical btn-group-sm w-100">
-                                                                                            <button type="button" class="btn btn-success btn-seleccionar-pdf mb-1" data-row="<?= $i ?>">
+                                                                                            <button type="button" class="btn btn-success btn-seleccionar-pdf mb-1" data-row="<?= $uniqueId ?>">
                                                                                                 <i class="fas fa-file-pdf"></i> PDF
                                                                                             </button>
-                                                                                            <button type="button" class="btn btn-warning btn-seleccionar-xml mb-1" data-row="<?= $i ?>">
+                                                                                            <button type="button" class="btn btn-warning btn-seleccionar-xml mb-1" data-row="<?= $uniqueId ?>">
                                                                                                 <i class="mdi mdi-code-tags"></i> XML
                                                                                             </button>
                                                                                             <button type="button" class="btn btn-danger remove-row">
