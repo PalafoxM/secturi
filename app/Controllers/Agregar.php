@@ -3111,9 +3111,9 @@ class Agregar extends BaseController
             'evidencia_entrega' => $data['evidencia_entrega'],
             'otros' => $data['otros'],
             'clausula_contrato' => $data['clausula_contrato'],
-            'concepto_pago' => $data['concepto_pago'],
+            'concepto_pago' =>'Sin Concepto',
             'comision' => $data['comision'],
-            'dividido' => isset($data['dividido']) && !empty($data['dividido']) ? $data['dividido'] : 0,
+            'dividido' => 0,
             'no_reserva' => $data['no_reserva']
         ];
 
@@ -3173,11 +3173,13 @@ class Agregar extends BaseController
                 
                 for ($i = 0; $i < $num_filas; $i++) {
                     $fila_data = [
-                        'propina' => $data['propina_' . $table_key][$i] ?? '',
+                        //'propina' => $data['propina_' . $table_key][$i] ?? '',
                         'concepto' => $data['concepto_' . $table_key][$i] ?? '',
-                        'comision' => $data['comision_' . $table_key][$i] ?? '',
+                        //'comision' => $data['comision_' . $table_key][$i] ?? '',
                         'periodo_inicio' => $data['periodo_inicio_' . $table_key][$i] ?? '',
                         'periodo_fin' => $data['periodo_fin_' . $table_key][$i] ?? '',
+                        'proyecto' => $data['proyecto'][$table_key] ?? '', 
+                        'partida' => $data['partida'][$table_key] ?? '', 
                         'id_identificador' => $data['id_identificador_' . $table_key][$i] ?? '',
                         'archivos' => []
                     ];
@@ -3206,8 +3208,8 @@ class Agregar extends BaseController
                         'periodo_inicio' => $fila['periodo_inicio'],
                         'periodo_fin' => $fila['periodo_fin'],
                         'concepto' => $fila['concepto'] ?? '',
-                       // 'comision' => $fila['comision'] ?? '',
-                       // 'propina' => $fila['propina'] ?? '',
+                        'id_proyecto' => $fila['proyecto'] ?? '',
+                        'id_partida' => $fila['partida'] ?? '',
                         'id_identificador' => $fila['id_identificador'] ?? '', 
                         'usu_reg' => $session->id_usuario,
                         'fec_reg' => date('Y-m-d H:i:s'),

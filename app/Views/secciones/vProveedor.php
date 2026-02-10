@@ -223,14 +223,8 @@
                                                     Campo no Valido
                                                 </div>
                                             </div><!--end col-->
-                                            <div class="col-md-4 mb-3">
-                                                <label for="concepto_pago">Concepto del pago.<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control"  autocomplete="off" id="concepto_pago" name="concepto_pago" value="<?= (isset($registro_pt->concepto_pago))?$registro_pt->concepto_pago:'' ?>" >
-                                                <div class="invalid-feedback">
-                                                    Please provide a valid state.
-                                                </div>
-                                            </div><!--end col-->
-                                            <div class="col-md-4 mb-3">
+    
+                                            <div class="col-md-8 mb-3">
                                                 <label for="comision">Comisión / Reunión / Evento / Programa</label>
                                                 <input type="text" class="form-control" id="comision"  name="comision" value="<?= (isset($registro_pt->comision))?$registro_pt->comision:'Comisión / Reunión / Evento / Programa' ?>" >
                                                 <div class="invalid-feedback">
@@ -249,13 +243,7 @@
                                                 <input type="text" class="form-control" readonly autocomplete="off" id="no_consecutivo" name="no_consecutivo" value="<?= (isset($registro_pt->no_consecutivo))?$registro_pt->no_consecutivo: $no_consecutivo ?>"  >
                                             </div><!--end col-->
                                      
-                                            <div class="col-md-4 mb-3">
-                                               <label for="dividido">Encabezado dividido  <span style="color:red;"></span></label>
-                                                <select class="form-control" id="dividido"  name="dividido" >
-                                                   <option value="0" <?=(isset($registro_pt->dividido) && !empty($registro_pt->dividido) && $registro_pt->dividido == 0)?'selected':'' ?>>NO</option>
-                                                   <option value="1" <?=(isset($registro_pt->dividido) && !empty($registro_pt->dividido) && $registro_pt->dividido == 1)?'selected':'' ?>>SI</option>
-                                               </select>
-                                            </div><!--end col-->
+                                            
                                          
                                         </div><!--end form-row-->
                                         <?php
@@ -279,6 +267,7 @@
                                                     <div class="col-md-2 mb-3">
                                                         <label for="partida_<?= $i ?>">Partida<span style="color:red;">*</span></label>
                                                         <input type="hidden" name="id_presupuesto[]" value="<?= $p->id_presupuesto ?>">
+                                                        <input type="hidden" name="partida[]" value="<?= $p->id_partida ?>">
                                                         <select class="form-control" id="partida_<?= $i ?>" name="partida[]" disabled>
                                                             <?php foreach($cat_partida as $o): ?>
                                                                 <option value="<?= $o->id_partida ?>" <?= (isset($p->id_partida) && $p->id_partida == $o->id_partida) ? 'selected' : '' ?>>
@@ -289,6 +278,7 @@
                                                     </div>
                                                     <div class="col-md-2 mb-3">
                                                         <label for="proyecto_<?= $i ?>">Proyecto<span style="color:red;">*</span></label>
+                                                        <input type="hidden" name="proyecto[]" value="<?= $p->id_proyecto ?>">
                                                         <select class="form-control" id="proyecto_<?= $i ?>" name="proyecto[]" disabled>
                                                             <?php foreach($cat_proyecto as $o): ?>
                                                                 <option value="<?= $o->id_proyecto ?>" <?= (isset($p->id_proyecto) && $p->id_proyecto == $o->id_proyecto) ? 'selected' : '' ?>>
@@ -328,7 +318,7 @@
                                                                         <table class="table table-bordered" id="makeEditable<?= $i ?>">
                                                                             <thead>
                                                                                 <tr>
-                                                                                    <th style="width: 12%">PROPINA</th>
+                                                                                   
                                                                                     <th style="width: 30%">DESCRIPCIÓN</th>
                                                                                     <th style="width: 15%">VIGENCIA</th>
                                                                                     <th style="width: 20%">ARCHIVOS</th>
@@ -338,18 +328,10 @@
                                                                             <tbody>
                                                                                 <tr>
                                                                                     <!-- Propina -->
-                                                                                    <td>
-                                                                                        <div class="input-group">
-                                                                                            <div class="input-group-prepend">
-                                                                                                <span class="input-group-text">$</span>
-                                                                                            </div>
-                                                                                            <input autocomplete="off" type="text" class="form-control propina-input" name="propina_<?= $i ?>[]" placeholder="0.00">
-                                                                                        </div>
-                                                                                    </td>
+                                                                                 
                                                                                     <!-- Descripción -->
                                                                                     <td>
                                                                                         <textarea autocomplete="off" class="form-control mb-1" name="concepto_<?= $i ?>[]" placeholder="Concepto" rows="2" style="font-size: 0.85rem;"></textarea>
-                                                                                        <textarea autocomplete="off" class="form-control" name="comision_<?= $i ?>[]" placeholder="Comisión / Evento" rows="2" style="font-size: 0.85rem; background-color: #f8f9fa;"></textarea>
                                                                                     </td>
                                                                                     <!-- Vigencia -->
                                                                                     <td>
@@ -390,7 +372,7 @@
                                                                                 <i class="fas fa-plus"></i> Agregar Fila
                                                                             </a>
                                                                         </div>
-                                                                        <div class="row mt-3" style="visibility: visible;"> <!-- Visibility changed to visible for PT if needed, or keep hidden -->
+                                                                        <div class="row mt-3" style="visibility: hidden"> <!-- Visibility changed to visible for PT if needed, or keep hidden -->
                                                                             <div class="col-md-8"></div>
                                                                             <div class="col-md-4">
                                                                                 <div class="form-group">
@@ -568,18 +550,10 @@
                 tr.setAttribute('data-row-index', newRowIndex);
                 
                 tr.innerHTML = `
+
                     <td>
-                        <input type="hidden" name="id_identificador_${sectionIndex}[]" value="${newRowIndex}">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">$</span>
-                            </div>
-                            <input autocomplete="off" type="text" class="form-control propina-input" name="propina_${sectionIndex}[]" placeholder="0.00">
-                        </div>
-                    </td>
-                    <td>
+                    <input type="hidden" name="id_identificador_${sectionIndex}[]" value="${newRowIndex}">
                         <textarea autocomplete="off" class="form-control mb-1" name="concepto_${sectionIndex}[]" placeholder="Concepto" rows="2" style="font-size: 0.85rem;"></textarea>
-                        <textarea autocomplete="off" class="form-control" name="comision_${sectionIndex}[]" placeholder="Comisión / Evento" rows="2" style="font-size: 0.85rem; background-color: #f8f9fa;"></textarea>
                     </td>
                     <td>
                         <div class="input-group input-group-sm mb-1">

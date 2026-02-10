@@ -5854,6 +5854,7 @@ class Principal extends BaseController
                                 $dataLoop['fecha_gasto_inicio'] = $periodo_factura->data[$index]->periodo_inicio;
                                 $dataLoop['fecha_gasto_fin'] = $periodo_factura->data[$index]->periodo_fin;
                                 $dataLoop['partida2'] = $periodo_factura->data[$index]->partida; // Assuming partida is here
+                                $dataLoop['registro']->concepto_pago = $periodo_factura->data[$index]->concepto;
                             } else {
                                 // Fallback to global or leaving empty if not available specific
                                 $dataLoop['fecha_gasto_inicio'] = $data['periodo_inicio'] ?? '';
@@ -5902,6 +5903,7 @@ class Principal extends BaseController
                           $data['partida2']           =  $periodo_factura->data[$index]->partida;
                           $data['fecha_gasto_inicio'] =  $periodo_factura->data[$index]->periodo_inicio;
                           $data['fecha_gasto_fin']    =  $periodo_factura->data[$index]->periodo_fin;
+                          $data['registro']->concepto_pago = $periodo_factura->data[$index]->concepto;
                           $data['uuid2']              = $xml->data[$index]->uuid;
                           $data['total2'] = "";
                           $data['monto2'] = "";
