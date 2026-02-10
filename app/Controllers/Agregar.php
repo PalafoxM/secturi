@@ -3119,22 +3119,18 @@ class Agregar extends BaseController
         ];
 
           $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaPT'];
-        if ($data['editar'] == 0) {
+        
             $dataInsert['usu_reg'] = $session->get('id_usuario');
             $dataInsert['fec_reg'] = date('Y-m-d H:i:s');
             $dataConfig = [
                 "tabla" => "registro_pt",
                 "editar" => false
             ];
-        } else {
-            $dataConfig = [
-                "tabla" => "registro_pt",
-                "editar" => true,
-                'idEditar' => ['id_registro_pt' => $data['id_registro_pt']]
-            ];
-            $dataInsert['usu_act'] = $session->get('id_usuario');
-        }
+   
+        
         $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+      
+       
         $id_registro_pt = $response->idRegistro;
             $archivos_por_fila = [];
 
@@ -3182,7 +3178,7 @@ class Agregar extends BaseController
                         'proyecto' => $data['proyecto'][$table_key] ?? '', 
                         'partida' => $data['partida'][$table_key] ?? '', 
                         'id_identificador' => $data['id_identificador_' . $table_key][$i] ?? '',
-                        'id_presupuesto' => $data['id_presupuesto_' . $table_key][$i] ?? '',
+                        'id_presupuesto' => $value ?? '',
                         'archivos' => []
                     ];
                     
@@ -3221,7 +3217,7 @@ class Agregar extends BaseController
 
                     $dataConfigPeriodo = ["tabla" => "periodo_factura", "editar" => false];
                     $periodoResult = $this->globals->saveTabla($dataPeriodo, $dataConfigPeriodo, ["script" => "Agregar.php/guardaPT/periodo"]);
-                    
+                        //  var_dump($periodoResult); 
                     $id_periodo_factura = $periodoResult->idRegistro ?? 0;
 
                      foreach ($fila['archivos'] as $key => $archivo) {
@@ -3257,10 +3253,12 @@ class Agregar extends BaseController
                                 "tabla" => "factura_pdf",
                                 "editar" => false
                             ];
-                            $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora); 
+                            $resPDF = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora); 
+                             
                         } elseif (in_array($tipo, ['text/xml', 'application/xml'])) {
+                           
                             $contenido = file_get_contents($ruta_destino . $fileName);
-
+                            
                                 // ... (Tu código de parseo de XML va aquí, es correcto) ...
                                 libxml_use_internal_errors(true);
                                 $xml = simplexml_load_string($contenido);
@@ -3326,7 +3324,7 @@ class Agregar extends BaseController
 
                                 // Guardamos la info del XML
                                 $responseXML = $this->globals->saveTabla($dataInsertXml, $dataConfigXml, $dataBitacoraXml);
-
+                                // var_dump($responseXML);
                                 // Importante: Asignar la respuesta final solo si no hay error
                                 if (!$responseXML->error) {
                                     $response->error = false;
@@ -3334,13 +3332,15 @@ class Agregar extends BaseController
                                 }
                             //$this->globals->saveTabla($dataFactura, $dataConfig, $dataBitacora); 
                         
-                }
+                        }
+                   }
             }
         }
-    }
-        
+
+    
+      
         // --- ENVIAR CORREO ---
-        if (!empty($finalAttachments)) {
+         if (!empty($finalAttachments)) {
              $idDireccion = $data['direccion_responsable'];
              $direccionObj = $this->globals->getTabla(["tabla"=>"direccion", "where"=>["id_director"=>$idDireccion]]);
              $direccionStr = "";
@@ -3392,7 +3392,9 @@ class Agregar extends BaseController
                 false, // name
                 $userEmail // bcc
             );
-        }
+        } 
+
+          
        
         return $this->respond($response);
 
