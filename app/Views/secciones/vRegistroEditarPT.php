@@ -259,7 +259,7 @@
 
                                                 // Generamos un ID único para la sección de factura
                                                 $section_id = "factura-section-" . $i;
-                                            ?><input type="hidden" id="id_presupuesto_<?= $i ?>" name="id_presupuesto[]" value="<?= $p->id_presupuesto ;?>" >
+                                            ?><input type="hidden" id="id_presupuesto_<?= $i ?>" name="id_presupuesto[<?= $i ?>]" value="<?= $p->id_presupuesto ;?>" >
                                                 <p class="text-muted mb-4 text-center">Agregar Factura PT.</p>
                                                
                                                 <hr>

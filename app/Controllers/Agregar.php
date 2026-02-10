@@ -3363,7 +3363,7 @@ class Agregar extends BaseController
 
         // 2. Actualizar registro_pt
         // Asumimos que id_reserva es el ID del registro_pt que estamos editando
-        $id_registro_pt = $data['id_reserva']; 
+        $id_registro_pt = $data['id_registro_pt']; 
         
         $dataUpdatePT = [
             'id_direccion_responsable' => $data['direccion_responsable'],
@@ -3451,9 +3451,8 @@ class Agregar extends BaseController
                         'where' => ['id_identificador' => $id_identificador, 'id_registro_pt' => $id_registro_pt]
                     ]);
                     
-                    $es_edicion_fila = (isset($existe->data) && !empty($existe->data));
 
-                    if ($es_edicion_fila) {
+
                         // UPDATE
                          $id_periodo_factura_real = $existe->data[0]->id_periodo_factura;
                          
@@ -3462,11 +3461,7 @@ class Agregar extends BaseController
                             "editar" => true,
                             "idEditar" => ['id_periodo_factura' => $id_periodo_factura_real]
                         ];
-                    } else {
-                        // INSERT
-                        $dataConfigPeriodo = ["tabla" => "periodo_factura", "editar" => false];
-                       
-                    }
+                    
                     
                     $this->globals->saveTabla($fila_data, $dataConfigPeriodo, ["script" => "Agregar.php/guardaPTEditar/periodo"]);
 
