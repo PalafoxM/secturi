@@ -1897,7 +1897,7 @@ class Agregar extends BaseController
             // === FIN NUEVO CÓDIGO DE PROCESAMIENTO ===
 
              // Enviar correos si hay adjuntos
-        /*      if(isset($data['es_borrador']) && $data['es_borrador'] != 1){
+              if(isset($data['es_borrador']) && $data['es_borrador'] != 1){
                 
              
                 if (!empty($finalAttachments)) {
@@ -1937,7 +1937,7 @@ class Agregar extends BaseController
                     );
                 }  
 
-            }  */
+            }  
         }
 
         return $this->respond($responsePrincipal);
