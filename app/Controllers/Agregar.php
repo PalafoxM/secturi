@@ -3181,6 +3181,7 @@ class Agregar extends BaseController
                         'proyecto' => $data['proyecto'][$table_key] ?? '', 
                         'partida' => $data['partida'][$table_key] ?? '', 
                         'id_identificador' => $data['id_identificador_' . $table_key][$i] ?? '',
+                        'id_presupuesto' => $data['id_presupuesto_' . $table_key][$i] ?? '',
                         'archivos' => []
                     ];
                     
@@ -3211,6 +3212,7 @@ class Agregar extends BaseController
                         'id_proyecto' => $fila['proyecto'] ?? '',
                         'id_partida' => $fila['partida'] ?? '',
                         'id_identificador' => $fila['id_identificador'] ?? '', 
+                        'id_presupuesto' => $fila['id_presupuesto'] ?? '', 
                         'usu_reg' => $session->id_usuario,
                         'fec_reg' => date('Y-m-d H:i:s'),
                         'visible' => 1

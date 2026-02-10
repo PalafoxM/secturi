@@ -262,6 +262,7 @@
                                             ?>
                                                 <p class="text-muted mb-4 text-center">Agregar Factura PT.</p>
                                                 <input type="hidden" name="id_identificador_<?= $i ?>[]" value="<?= $i ?>">
+                                                <input type="hidden" name="id_presupuesto_<?= $i ?>[]" value="<?= $p->id_presupuesto ?>">
                                                 <hr>
                                                 <div class="form-row">
                                                     <div class="col-md-2 mb-3">

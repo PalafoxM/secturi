@@ -7024,11 +7024,11 @@ class Principal extends BaseController
           
         }
         if (!empty($id_registro_pt)) {
-            $data['registro_pt'] = (!empty($registro_pt->data)) ? $registro_pt->data[0] : [];
+            $data['presupuesto'] = (!empty($registro_pt->data)) ? $registro_pt->data[0] : [];
         }
 
 
-        // die( var_dump(  $data['registro_pt'] ) );
+   // die( var_dump(  $data['presupuesto'] ) );
         $data['dsc_director_general'] = (!empty($cat_director_general->data)) ? $cat_director_general->data[0]->dsc_director_general : [];
         $data['cat_area'] = (!empty($cat_area->data)) ? $cat_area->data : [];
         $data['cat_tipo'] = (!empty($cat_tipo->data)) ? $cat_tipo->data : [];
