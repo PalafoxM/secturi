@@ -3006,6 +3006,7 @@ class Agregar extends BaseController
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
         $archivos_post = $this->request->getFiles();
+        $finalAttachments = [];
 
         if ($data['secretario'] == 0) {
             $response->error = true;
@@ -3237,6 +3238,7 @@ class Agregar extends BaseController
                             mkdir($ruta_destino, 0755, true);
                         }
                         $archivo->move($ruta_destino, $fileName);
+                        $finalAttachments[] = $ruta_destino . $fileName;
                         $ruta_relativa = 'assets/pdf/' . $fileName;
                         $ruta_absoluta = base_url($ruta_relativa);
 
@@ -3332,11 +3334,65 @@ class Agregar extends BaseController
                                 }
                             //$this->globals->saveTabla($dataFactura, $dataConfig, $dataBitacora); 
                         
-                    }
                 }
             }
         }
 
+        // --- ENVIAR CORREO ---
+        if (!empty($finalAttachments)) {
+             $idDireccion = $data['direccion_responsable'];
+             $direccionObj = $this->globals->getTabla(["tabla"=>"direccion", "where"=>["id_director"=>$idDireccion]]);
+             $direccionStr = "";
+
+             if(isset($direccionObj->data) && !empty($direccionObj->data)){
+                  $direccionStr = isset($direccionObj->data[0]->folio_prefijo) ? $direccionObj->data[0]->folio_prefijo : (isset($direccionObj->data[0]->dscfolio_prefijo) ? $direccionObj->data[0]->dscfolio_prefijo : '');
+             }
+             
+             $folioCompleto = $direccionStr . str_pad($no_consecutivo, 3, "0", STR_PAD_LEFT).'/'.date('Y');
+             
+             // Obtener correo del usuario para BCC
+             $userObj = $this->globals->getTabla(["tabla"=>"vw_usuario", "where"=>["id_usuario"=>$session->id_usuario]]);
+             $userEmail = (isset($userObj->data) && !empty($userObj->data)) ? $userObj->data[0]->correo : false;
+
+            $mailer = new \App\Libraries\Mailer();
+            
+            $mensajeHTML = '
+            <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+                <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+                    <div style="background-color: #004080; padding: 20px; text-align: center;">
+                        <h2 style="color: #ffffff; margin: 0;">Facturas PT Generadas</h2>
+                    </div>
+                    <div style="padding: 30px; color: #333;">
+                        <p style="font-size: 16px;">Estimado usuario,</p>
+                        <p style="font-size: 16px;">Se adjuntan a este correo los archivos <strong>XML</strong> y <strong>PDF</strong> correspondientes a las facturas de <strong>Pago a Terceros (PT)</strong> generadas en el sistema SUSI.</p>
+                        <p style="font-size: 16px;"><strong>Folio: ' . $folioCompleto . '</strong></p>
+                        <p style="font-size: 14px; color: #666;">Por favor, conserve estos comprobantes para su control administrativo.</p>
+                        
+                        <div style="margin-top: 25px; padding: 15px; background-color: #e3f2fd; border-left: 5px solid #2196f3; border-radius: 4px;">
+                            <p style="margin: 0; font-size: 14px; color: #0d47a1;"><strong>Nota:</strong> Este es un mensaje automático, favor de no responder a esta dirección.</p>
+                        </div>
+                    </div>
+                    <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 12px; color: #666;">
+                        © ' . date('Y') . ' Sistema de Atención SUSI. Todos los derechos reservados.
+                    </div>
+                </div>
+            </div>';
+
+            $mailer->send(
+                $mensajeHTML, 
+                $session->get('id_usuario'), 
+               ['dasedetur@guanajuato.gob.mx'], 
+               2,
+                false, 
+                $finalAttachments, 
+                "Facturas PT Generadas - SUSI - Folio: " . $folioCompleto,
+                false, // header
+                false, // footer
+                false, // name
+                $userEmail // bcc
+            );
+          }
+        }
        
         return $this->respond($response);
 

@@ -32,7 +32,8 @@ class Mailer {
         $title       = false, 
         $header      = false, 
         $footer      = false, 
-        $name        = false)
+        $name        = false,
+        $bcc         = false)
     {
         if (!is_array($recipients) && $recipients) {
             return "Sin destinatarios";
@@ -46,7 +47,8 @@ class Mailer {
                 $body,
                 $recipients,
                 $attachments,
-                $header
+                $header,
+                $bcc
             );
 
         //custom
@@ -58,7 +60,8 @@ class Mailer {
                 $recipients,
                 $attachments,
                 $header,
-                $footer
+                $footer,
+                $bcc
             );
 
         //boletin
@@ -67,7 +70,8 @@ class Mailer {
                 $title,
                 $name,
                 $recipients,
-                $attachments
+                $attachments,
+                $bcc
             );
 
         $query = new Mglobal();
@@ -112,7 +116,7 @@ class Mailer {
         }
     }
 
-    private function default_template($title, $name, $body, $recipients, $attachments, $header)
+    private function default_template($title, $name, $body, $recipients, $attachments, $header, $bcc = false)
     {
         $title  = ($title) ? $title : "Notificaciones DTIC";
         $name   = ($name) ? $name : "Notificaciones DTIC";
@@ -124,6 +128,10 @@ class Mailer {
 
         foreach ($recipients as $recipient) {
             $email->setTo($recipients);
+        }
+
+        if ($bcc) {
+            $email->setBCC($bcc);
         }
 
         if ($attachments) {
@@ -145,7 +153,7 @@ class Mailer {
         }       
     }
 
-    private function custom_template($title, $name, $body, $recipients, $attachments, $header, $footer)
+    private function custom_template($title, $name, $body, $recipients, $attachments, $header, $footer, $bcc = false)
     {
         $title = ($title) ? $title : "Notificaciones DTIC";
         $name  = ($name) ? $name : "Notificaciones DTIC";
@@ -160,6 +168,10 @@ class Mailer {
             $email->setTo($recipients);
         }
         
+        if ($bcc) {
+            $email->setBCC($bcc);
+        }
+
         if ($attachments) {
             foreach ($attachments as $attachment) {
                 $email->attach($attachment);
@@ -182,7 +194,7 @@ class Mailer {
         }
     }
 
-    private function boletin($title, $name, $recipients, $attachments)
+    private function boletin($title, $name, $recipients, $attachments, $bcc = false)
     {
         $title = ($title) ? $title : "Notificaciones DTIC";
         $name  = ($name) ? $name : "Notificaciones DTIC";
@@ -196,6 +208,10 @@ class Mailer {
             $email->setTo($recipients);
         }        
         
+        if ($bcc) {
+            $email->setBCC($bcc);
+        }
+
         $message ='';
 
         foreach ($attachments as $attachment) {
