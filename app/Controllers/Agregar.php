@@ -3337,7 +3337,8 @@ class Agregar extends BaseController
                 }
             }
         }
-
+    }
+        
         // --- ENVIAR CORREO ---
         if (!empty($finalAttachments)) {
              $idDireccion = $data['direccion_responsable'];
@@ -3363,8 +3364,8 @@ class Agregar extends BaseController
                         <h2 style="color: #ffffff; margin: 0;">Facturas PT Generadas</h2>
                     </div>
                     <div style="padding: 30px; color: #333;">
-                        <p style="font-size: 16px;">Estimado usuario,</p>
-                        <p style="font-size: 16px;">Se adjuntan a este correo los archivos <strong>XML</strong> y <strong>PDF</strong> correspondientes a las facturas de <strong>Pago a Terceros (PT)</strong> generadas en el sistema SUSI.</p>
+                        <p style="font-size: 16px;">Estimado usuario, </p>
+                        <p style="font-size: 16px;">El personal administrativo '.$session->nombre_completo.' ha generado las facturas de <strong>Pago a Terceros (PT)</strong> en el sistema SUSI.</p>
                         <p style="font-size: 16px;"><strong>Folio: ' . $folioCompleto . '</strong></p>
                         <p style="font-size: 14px; color: #666;">Por favor, conserve estos comprobantes para su control administrativo.</p>
                         
@@ -3391,7 +3392,6 @@ class Agregar extends BaseController
                 false, // name
                 $userEmail // bcc
             );
-          }
         }
        
         return $this->respond($response);
