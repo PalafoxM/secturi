@@ -273,6 +273,7 @@
                                                 $section_id = "factura-section-" . $i;
                                             ?>
                                                 <p class="text-muted mb-4 text-center">Agregar Factura PT.</p>
+                                                <input type="hidden" name="id_identificador_<?= $i ?>[]" value="<?= $i ?>">
                                                 <hr>
                                                 <div class="form-row">
                                                     <div class="col-md-2 mb-3">

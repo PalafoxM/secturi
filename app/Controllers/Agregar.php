@@ -3005,9 +3005,7 @@ class Agregar extends BaseController
         $response->respuesta = "Error|Error al guardar PT";
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
-        $archivos = $this->request->getFiles();
-
-            //die(var_dump($data));
+        $archivos_post = $this->request->getFiles();
 
         if ($data['secretario'] == 0) {
             $response->error = true;
@@ -3087,12 +3085,12 @@ class Agregar extends BaseController
             $response->respuesta = "Es requerido el no_consecutivo";
             return $this->respond($response);
         }
-        if ($data['editar'] != 1) {
+
+         if ($data['editar'] != 1) {
             $no_consecutivo = $this->registrarFolio($data['no_consecutivo'], $data['id_reponsable_solicitud'], $data['direccion_responsable']);
         }
 
-
-        $dataInsert = [
+          $dataInsert = [
             'id_reserva' => (int) $data['id_reserva'],
             'id_direccion_responsable' => $data['direccion_responsable'],
             'tipo_pt' => $data['tipo_pt'],
@@ -3118,7 +3116,8 @@ class Agregar extends BaseController
             'dividido' => isset($data['dividido']) && !empty($data['dividido']) ? $data['dividido'] : 0,
             'no_reserva' => $data['no_reserva']
         ];
-        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaPT'];
+
+          $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaPT'];
         if ($data['editar'] == 0) {
             $dataInsert['usu_reg'] = $session->get('id_usuario');
             $dataInsert['fec_reg'] = date('Y-m-d H:i:s');
@@ -3134,296 +3133,211 @@ class Agregar extends BaseController
             ];
             $dataInsert['usu_act'] = $session->get('id_usuario');
         }
-
-
         $response = $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+        $id_registro_pt = $response->idRegistro;
+            $archivos_por_fila = [];
 
-        if (!$response->error) {
-            $id_registro_pt = $response->idRegistro;
-            $idPdf = [];
-            $idXml = [];
-            $archivosPdf = [];
-            $archivosXml = [];
-            $finalAttachments = []; // Initialize attachments
-            $periodo = [];
-            $datosXML = "";
-            $datosPDF = "";
-            $response->idRegistro = $response->idRegistro;
-            $this->cambiarStatusPT($data['id_reserva']);
-
-            // ==== PRIMERO: Procesar TODOS los datos del formulario para construir la estructura base ====
-            foreach ($data as $key => $p) {
-                if (strpos($key, 'encabezado') === 0) {
-                    $index = str_replace('encabezado', '', $key);
-                    $index = $index === '' ? 0 : $index;
-                    if (!isset($periodo[$index])) {
-                        $periodo[$index] = [];
-                    }
-                    $periodo[$index]['encabezado'] = $p;
-                }
-
-                if (strpos($key, 'partida') === 0) {
-                    $index = str_replace('partida', '', $key);
-                    $index = $index === '' ? 0 : $index;
-                    if (!isset($periodo[$index])) {
-                        $periodo[$index] = [];
-                    }
-                    $periodo[$index]['partida'] = $p;
-                }
-                if (strpos($key, 'proyecto') === 0) {
-                    $index = str_replace('proyecto', '', $key);
-                    $index = $index === '' ? 0 : $index;
-                    if (!isset($periodo[$index])) {
-                        $periodo[$index] = [];
-                    }
-                    $periodo[$index]['proyecto'] = $p;
-                }
-                if (strpos($key, 'fecha_gasto_inicio') === 0) {
-                    $index = str_replace('fecha_gasto_inicio', '', $key);
-                    $index = $index === '' ? 0 : $index;
-                    if (!isset($periodo[$index])) {
-                        $periodo[$index] = [];
-                    }
-                    $periodo[$index]['periodo_inicio'] = $p;
-                }
-                if (strpos($key, 'fecha_gasto_fin') === 0) {
-                    $index = str_replace('fecha_gasto_fin', '', $key);
-                    $index = $index === '' ? 0 : $index;
-                    if (!isset($periodo[$index])) {
-                        $periodo[$index] = [];
-                    }
-                    $periodo[$index]['periodo_fin'] = $p;
-                }
-                if (strpos($key, 'editarPe') === 0) {
-                    $index = str_replace('editarPe', '', $key);
-                    $index = $index === '' ? 0 : $index;
-                    if (!isset($periodo[$index])) {
-                        $periodo[$index] = [];
-                    }
-                    $periodo[$index]['editarPe'] = $p;
-                }
-                if (strpos($key, 'editarPDF') === 0) {
-                    $index = str_replace('editarPDF', '', $key);
-                    $index = $index === '' ? 0 : $index;
-                    $idPdf[$index] = $p; // Guardar referencia para edición
-                }
-                if (strpos($key, 'editarXML') === 0) {
-                    $index = str_replace('editarXML', '', $key);
-                    $index = $index === '' ? 0 : $index;
-                    $idXml[$index] = $p; // Guardar referencia para edición
-                }
-            }
-
-            // ==== SEGUNDO: Procesar archivos subidos DESPUÉS de tener la estructura base ====
-            foreach ($archivos as $nombreCampo => $archivoArray) {
-                foreach ($archivoArray as $archivo) {
-                    if (!$archivo->isValid()) {
-                        continue;
-                    }
-
-                    $tipo = $archivo->getMimeType();
-
-                    // === XML ===
-                    if (in_array($tipo, ['text/xml', 'application/xml'])) {
-                        $indice = str_replace('factura_xml_', '', $nombreCampo);
-                        $indice = $indice === '' ? 0 : $indice;
-                        $archivosXml[$indice][] = $archivo;
-                    }
-
-                    // === PDF ===
-                    if (in_array($tipo, ['application/pdf'])) {
-                        $indice = str_replace('factura_pdf_', '', $nombreCampo);
-                        $indice = $indice === '' ? 0 : $indice;
-                        $archivosPdf[$indice][] = $archivo;
-                    }
-                }
-            }
-
-            // ==== TERCERO: Ordenar el array periodo por índices numéricos ====
-            ksort($periodo);
-
-            if ($data['editar'] == 1) {
-                //validamos a que funcion va entrar
-
-                $dataDB = array('tabla' => 'presupuesto', 'where' => ['visible' => 1, 'id_reserva' => $data['id_reserva']]);
-                $dobles = $this->globals->getTabla($dataDB);
-                $valor = count($dobles->data);
-
-                if ($valor == 1) {
-                    if (!empty($archivosXml)) {
-                        foreach ($archivosXml as $key => $value) {
-                            $datosXML = $this->procesarXMLeditar($archivosXml[$key], $idXml[$key], $id_registro_pt, );
-                            $datosPDF = $this->procesarPDFeditar($archivosPdf[$key], $idPdf[$key], $id_registro_pt);
-                            
-                            // Collect attachments
-                            if (isset($datosPDF->savedFiles)) {
-                                $finalAttachments = array_merge($finalAttachments, $datosPDF->savedFiles);
-                            }
-                            // Save XML copy manually 
-                            foreach($archivosXml[$key] as $xml) {
-                                if($xml->isValid()) {
-                                    $content = file_get_contents($xml->getTempName());
-                                    $xmlpath = FCPATH . 'assets/pdf/Factura_pt_xml_' . uniqid() . '.xml';
-                                    file_put_contents($xmlpath, $content);
-                                    $finalAttachments[] = $xmlpath;
-                                }
-                            }
-                        }
-
-                    }
-
-                } else {
-                    if (!empty($archivosXml)) {
-                        foreach ($archivosXml as $indexGrupo => $archivosDelGrupo) {
-
-                            foreach ($archivosDelGrupo as $posArchivo => $archivo) {
-
-                                // El ID que corresponde al archivo actual:
-                                $idFactura = $idXml[$posArchivo][$indexGrupo] ?? null;
-
-                                if (!$idFactura) {
-                                    continue; // no hay ID para este archivo
-                                }
-
-                                $datosXML = $this->procesarXMLeditar(
-                                    [$archivo],        // archivo individual
-                                    [$idFactura],      // ID individual
-                                    $id_registro_pt
-                                );
-                                
-                                // Save XML copy
-                                if($archivo->isValid()) {
-                                    $content = file_get_contents($archivo->getTempName());
-                                    $xmlpath = FCPATH . 'assets/pdf/Factura_pt_xml_' . uniqid() . '.xml';
-                                    file_put_contents($xmlpath, $content);
-                                    $finalAttachments[] = $xmlpath;
-                                }
-
-                            }
-                        }
-                    }
-                }
-                if (!empty($archivosPdf)) {
-                    foreach ($archivosPdf as $indexGrupo => $archivosDelGrupo) {
-
-                        foreach ($archivosDelGrupo as $posArchivo => $archivo) {
-
-                            // El ID que corresponde al archivo actual:
-                            $idFactura = $idXml[$posArchivo][$indexGrupo] ?? null;
-
-                            if (!$idFactura) {
-                                continue; // no hay ID para este archivo
-                            }
-
-                            $datosPDF = $this->procesarPDFeditar(
-                                [$archivo],        // archivo individual
-                                [$idFactura],      // ID individual
-                                $id_registro_pt
-                            );
-
-                            // Collect PDF attachments
-                             if (isset($datosPDF->savedFiles)) {
-                                $finalAttachments = array_merge($finalAttachments, $datosPDF->savedFiles);
-                            }
-
-                        }
-                    }
-                }
-
-                $datosP = $this->procesarPediodoEditar($periodo, $id_registro_pt);
-            } else {
-                foreach ($archivosXml as $key => $value) {
-                    $datosXML = $this->procesarXML($archivosXml[$key], $id_registro_pt);
-                    $datosPDF = $this->procesarPDF($archivosPdf[$key], $id_registro_pt);
+                foreach ($archivos_post['archivos'] as $key => $file_data) {
+                    $parts = explode('_', $key);
                     
-                    // Collect PDF attachments
-                    if (isset($datosPDF->savedFiles)) {
-                        $finalAttachments = array_merge($finalAttachments, $datosPDF->savedFiles);
-                    }
-                    // Save XML copy manually
-                    foreach($archivosXml[$key] as $xml) {
-                        if($xml->isValid()) {
-                            $content = file_get_contents($xml->getTempName());
-                            $xmlpath = FCPATH . 'assets/pdf/Factura_pt_xml_' . uniqid() . '.xml';
-                            file_put_contents($xmlpath, $content);
-                            $finalAttachments[] = $xmlpath;
+                    if (count($parts) >= 2) {
+                        $type = $parts[0]; // 'pdf' o 'xml'
+                        
+                        // Reconstruir identificador completo
+                        if (count($parts) === 2) {
+                            // Formato simple: pdf_0
+                            $row_id = $parts[1]; // '0'
+                        } elseif ($parts[1] === 'tabla') {
+                            // Formato tabla: pdf_tabla_0_1770688871443
+                            $row_id = $parts[1] . '_' . $parts[2] . '_' . $parts[3];
+                        } else {
+                            // Otro formato, usar toda la clave después del tipo
+                            $row_id = substr($key, strlen($type) + 1);
+                        }
+                        
+                        if (!isset($archivos_por_fila[$row_id])) {
+                            $archivos_por_fila[$row_id] = [];
+                        }
+                        
+                        if (isset($file_data[$type][0])) {
+                            $archivos_por_fila[$row_id][$type] = $file_data[$type][0];
                         }
                     }
                 }
-                $datosP = $this->procesarPediodo($periodo, $id_registro_pt);
 
+            $insertar_presupuesto = [];
+
+            foreach ($data['id_presupuesto'] as $table_key => $value) {
+                $table_data = [];
+                $num_filas = count($data['concepto_' . $table_key] ?? []);
+                
+                for ($i = 0; $i < $num_filas; $i++) {
+                    $fila_data = [
+                        'propina' => $data['propina_' . $table_key][$i] ?? '',
+                        'concepto' => $data['concepto_' . $table_key][$i] ?? '',
+                        'comision' => $data['comision_' . $table_key][$i] ?? '',
+                        'periodo_inicio' => $data['periodo_inicio_' . $table_key][$i] ?? '',
+                        'periodo_fin' => $data['periodo_fin_' . $table_key][$i] ?? '',
+                        'id_identificador' => $data['id_identificador_' . $table_key][$i] ?? '',
+                        'archivos' => []
+                    ];
+                    
+                    // Buscar archivos
+                    $file_key = $fila_data['id_identificador'];
+                    
+                    if (isset($archivos_por_fila[$file_key])) {
+                        $fila_data['archivos'] = $archivos_por_fila[$file_key];
+                    }
+                    
+                    $table_data[] = $fila_data;
+                }
+                
+                $insertar_presupuesto[$table_key] = $table_data;
             }
 
-            if (!$datosXML) {
-                $response->errorXML = true;
-                $response->respuestaXML = "XML inválido o no se encontró.";
-            }
-            if (!$datosPDF) {
-                $response->errorPDF = true;
-                $response->respuestaPDF = "PDF inválido o no se encontró.";
+
+
+             foreach($insertar_presupuesto as $key => $tabla){
+                foreach($tabla as $fila){
+
+                    // 1. Insertar en periodo_factura
+                    $dataPeriodo = [
+                        'id_registro_pt' => $id_registro_pt,
+                        'periodo_inicio' => $fila['periodo_inicio'],
+                        'periodo_fin' => $fila['periodo_fin'],
+                        'concepto' => $fila['concepto'] ?? '',
+                       // 'comision' => $fila['comision'] ?? '',
+                       // 'propina' => $fila['propina'] ?? '',
+                        'id_identificador' => $fila['id_identificador'] ?? '', 
+                        'usu_reg' => $session->id_usuario,
+                        'fec_reg' => date('Y-m-d H:i:s'),
+                        'visible' => 1
+                    ];
+
+                    $dataConfigPeriodo = ["tabla" => "periodo_factura", "editar" => false];
+                    $periodoResult = $this->globals->saveTabla($dataPeriodo, $dataConfigPeriodo, ["script" => "Agregar.php/guardaPT/periodo"]);
+                    
+                    $id_periodo_factura = $periodoResult->idRegistro ?? 0;
+
+                     foreach ($fila['archivos'] as $key => $archivo) {
+                        if(!$archivo->isValid()) continue;
+
+                        $tipo = $archivo->getMimeType();
+                        $timestamp = date('Ymd_His');
+                        $extension = $archivo->getClientExtension();
+                        $originalName = pathinfo($archivo->getName(), PATHINFO_FILENAME);
+                        $fileName = '03_CFDI_' . $id_registro_pt . '_' . $timestamp . '_' . uniqid() . '.' . $extension;
+                        // Ruta absoluta
+                        $ruta_destino = FCPATH . 'assets/pdf/';
+                        if (!is_dir($ruta_destino)) {
+                            mkdir($ruta_destino, 0755, true);
+                        }
+                        $archivo->move($ruta_destino, $fileName);
+                        $ruta_relativa = 'assets/pdf/' . $fileName;
+                        $ruta_absoluta = base_url($ruta_relativa);
+
+                        if (in_array($tipo, ['text/pdf', 'application/pdf'])) {
+                            $dataInsert = [
+                                'id_registro_pt' =>  $id_registro_pt,
+                                'id_identificador' => $fila['id_identificador'],
+                               // 'nombre_archivo' => $originalName,
+                                'ruta_absoluta' => $ruta_absoluta,
+                                'ruta_relativa' => $ruta_relativa,
+                                'fec_reg' => date('Y-m-d H:i:s'),
+                                'usu_reg' => $session->id_usuario,
+                                'visible' => 1
+                            ];
+                            $dataConfig = [
+                                "tabla" => "factura_pdf",
+                                "editar" => false
+                            ];
+                            $this->globals->saveTabla($dataInsert, $dataConfig, $dataBitacora); 
+                        } elseif (in_array($tipo, ['text/xml', 'application/xml'])) {
+                            $contenido = file_get_contents($ruta_destino . $fileName);
+
+                                // ... (Tu código de parseo de XML va aquí, es correcto) ...
+                                libxml_use_internal_errors(true);
+                                $xml = simplexml_load_string($contenido);
+                                if ($xml === false) {
+                                    continue;
+                                } // Saltar si el XML está mal
+
+                                $namespaces = $xml->getNamespaces(true);
+                                $cfdi = $xml->children($namespaces['cfdi']);
+
+                                // ... (extracción de $version, $fecha, $total, $rfcEmisor, $uuid, etc.)
+
+                                $attrs = $xml->attributes();
+                                $version = (string) $attrs['Version'];
+                                $fecha = (string) $attrs['Fecha'];
+                                $total = (string) $attrs['Total'];
+                                $moneda = (string) $attrs['Moneda'];
+                                $Folio = (string) $attrs['Folio'];
+
+                                $emisor = $cfdi->Emisor->attributes();
+                                $rfcEmisor = (string) $emisor['Rfc'];
+                                $nombreEmisor = (string) $emisor['Nombre'];
+
+                                $receptor = $cfdi->Receptor->attributes();
+                                $rfcReceptor = (string) $receptor['Rfc'];
+                                $nombreReceptor = (string) $receptor['Nombre'];
+
+                                $uuid = '';
+                                $NoCertificadoSAT = ''; // Renombrado para claridad
+                                if (isset($cfdi->Complemento)) {
+                                    $tfdNamespace = isset($namespaces['tfd']) ? $namespaces['tfd'] : 'http://www.sat.gob.mx/TimbreFiscalDigital';
+                                    if (isset($cfdi->Complemento->children($tfdNamespace)->TimbreFiscalDigital)) {
+                                        $tfdAttributes = $cfdi->Complemento->children($tfdNamespace)->TimbreFiscalDigital->attributes();
+                                        $uuid = (string) $tfdAttributes['UUID'];
+                                        $NoCertificadoSAT = (string) $tfdAttributes['NoCertificadoSAT'];
+                                    }
+                                }
+                                // ... Fin del parseo ...
+
+                                $dataConfigXml = [
+                                    "tabla" => "factura",
+                                    "editar" => false
+                                ];
+                                $dataInsertXml = [
+                                    'id_registro_pt' => (int) $id_registro_pt, // Enlace al registro maestro
+                                    'version' => $version,
+                                    'fecha' => date('Y-m-d H:i:s', strtotime($fecha)),
+                                    'total' => $total,
+                                    'moneda' => $moneda,
+                                    'id_identificador' => $fila['id_identificador'], // <-- CORREGIDO: EL ENLACE DE FILA
+                                    'folio' => $Folio,
+                                    'no_certificado' => $NoCertificadoSAT, // Usar el del timbre
+                                    'emisor_rfc' => $rfcEmisor,
+                                    'emisor_nombre' => $nombreEmisor,
+                                    'receptor_rfc' => $rfcReceptor,
+                                    'receptor_nombre' => $nombreReceptor,
+                                    'uuid' => $uuid,
+                                    'fec_reg' => date('Y-m-d H:i:s'),
+                                    'usu_reg' => $session->get('id_usuario')
+                                ];
+
+                                $dataBitacoraXml = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardarFacturaGO'];
+
+                                // Guardamos la info del XML
+                                $responseXML = $this->globals->saveTabla($dataInsertXml, $dataConfigXml, $dataBitacoraXml);
+
+                                // Importante: Asignar la respuesta final solo si no hay error
+                                if (!$responseXML->error) {
+                                    $response->error = false;
+                                    $response->respuesta = 'Archivos XML y PDF guardados correctamente';
+                                }
+                            //$this->globals->saveTabla($dataFactura, $dataConfig, $dataBitacora); 
+                        
+                    }
+                }
             }
         }
 
-        // Enviar correos si hay adjuntos
-           if (!empty($finalAttachments)) {
-            $folioCompleto = "";
-            // Recuperar el ID del folio direccion (PK) guardado anteriormente
-            $id_folio_direccion = isset($dataInsert['no_consecutivo']) ? $dataInsert['no_consecutivo'] : 0;
-            
-            if($id_folio_direccion > 0){
-                 $folio = $this->globals->getTabla(['tabla'=>'folio_direccion', 'where'=>['id_folio_direccion' => $id_folio_direccion]]);
-                 if(isset($folio->data) && !empty($folio->data)){
-                     $idDireccion = $folio->data[0]->id_direccion;
-                     $no_consecutivo_val = $folio->data[0]->no_consecutivo;
-                     $direccionObj = $this->globals->getTabla(["tabla"=>"direccion", "where"=>["id_director"=>$idDireccion]]);
-                     
-                     $direccionStr = "";
-                     if(isset($direccionObj->data) && !empty($direccionObj->data)){
-                          $direccionStr = isset($direccionObj->data[0]->folio_prefijo) ? $direccionObj->data[0]->folio_prefijo : (isset($direccionObj->data[0]->dscfolio_prefijo) ? $direccionObj->data[0]->dscfolio_prefijo : '');
-                     }
-                     $folioCompleto = $direccionStr . str_pad($no_consecutivo_val, 3, "0", STR_PAD_LEFT).'/'.date('Y');
-                 }
-            }
-     
-         if (isset($data['editar']) && $data['editar'] != 1) {
-            $mailer = new \App\Libraries\Mailer();
-            
-                $mensajeHTML = '
-                <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
-                    <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-                        <div style="background-color: #004080; padding: 20px; text-align: center;">
-                            <h2 style="color: #ffffff; margin: 0;">Facturas Generadas</h2>
-                        </div>
-                        <div style="padding: 30px; color: #333;">
-                            <p style="font-size: 16px;">Estimado usuario,</p>
-                            <p style="font-size: 16px;">Se adjuntan a este correo los archivos <strong>XML</strong> y <strong>PDF</strong> correspondientes a las facturas de <strong>Gastos PT</strong> generadas en el sistema SUSI.</p>
-                            <p style="font-size: 16px;"><strong>Folio: ' . $folioCompleto . '</strong></p>
-                            <p style="font-size: 14px; color: #666;">Por favor, conserve estos comprobantes para su control administrativo.</p>
-                            
-                            <div style="margin-top: 25px; padding: 15px; background-color: #e3f2fd; border-left: 5px solid #2196f3; border-radius: 4px;">
-                                <p style="margin: 0; font-size: 14px; color: #0d47a1;"><strong>Nota:</strong> Este es un mensaje automático, favor de no responder a esta dirección.</p>
-                            </div>
-                        </div>
-                        <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 12px; color: #666;">
-                            © ' . date('Y') . ' Sistema de Atención SUSI. Todos los derechos reservados.
-                        </div>
-                    </div>
-                </div>';
-
-                $mailer->send(
-                    $mensajeHTML, 
-                    $session->get('id_usuario'), 
-                    ['dasedetur@guanajuato.gob.mx'], 
-                    2, 
-                    false, 
-                    $finalAttachments, 
-                    "Facturas PT Generadas - SUSI - Folio: " . $folioCompleto
-                );
-            }  
-        }   
-
-        //die( var_dump( $response ) );
+       
         return $this->respond($response);
+
+
+    
     }
     public function guardaVe()
     {
