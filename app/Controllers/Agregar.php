@@ -3341,6 +3341,223 @@ class Agregar extends BaseController
 
     
     }
+
+    public function guardaPTEditar()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = "Error|Error al guardar PT";
+        $this->globals = new Mglobal();
+        $data = $this->request->getPost();
+        $archivos_post = $this->request->getFiles();
+
+        // 1. Validaciones Básicas
+         if ($data['secretario'] == 0) {
+            $response->error = true;
+            $response->respuesta = "Es requerido el Secretario o Director";
+            return $this->respond($response);
+        }
+
+        // 2. Actualizar registro_pt
+        // Asumimos que id_reserva es el ID del registro_pt que estamos editando
+        $id_registro_pt = $data['id_reserva']; 
+        
+        $dataUpdatePT = [
+            'id_direccion_responsable' => $data['direccion_responsable'],
+            'tipo_pt' => $data['tipo_pt'],
+            'no_consecutivo' => $data['no_consecutivo'],
+            'id_proveedor' => $data['id_proveedor'],
+            'fecha_tramite' => $data['fecha_tramite'],
+            'id_reponsable_solicitud' => (int) $data['id_reponsable_solicitud'],
+            'secretario' => $data['secretario'],
+            'id_subsecretario' => $data['id_subsecretario'],
+            'cuenta_bancaria' => $data['cuenta_bancaria'],
+            'documentacion_comprobatoria' => $data['documentacion_comprobatoria'],
+            'poliza' => ($data['poliza'] == 'SI') ? 1 : 2,
+            'formato_conformidad' => ($data['formato_conformidad'] == 'SI') ? 1 : 2,
+            'contrato_convenio' => $data['contrato_convenio'],
+            'documentacion_requerida' => $data['documentacion_requerida'],
+            'evidencia_entrega' => $data['evidencia_entrega'],
+            'otros' => $data['otros'],
+            'clausula_contrato' => $data['clausula_contrato'],
+            'comision' => $data['comision'],
+            'no_reserva' => $data['no_reserva'],
+            'usu_act' => $session->get('id_usuario'),
+            'fec_act' => date('Y-m-d H:i:s')
+        ];
+
+        
+        $dataConfigPT = [
+            "tabla" => "registro_pt",
+            "editar" => true,
+            "idEditar" => ['id_registro_pt' => $id_registro_pt] 
+        ];
+        
+        $this->globals->saveTabla($dataUpdatePT, $dataConfigPT, ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaPTEditar']);
+
+
+        // 3. Procesar Archivos (Parsing de claves complejas)
+        $archivos_por_fila = [];
+        if(isset($archivos_post['archivos'])){
+            foreach ($archivos_post['archivos'] as $key => $file_data) {
+                $parts = explode('_', $key);
+                if (count($parts) >= 2) {
+                    $type = $parts[0]; // pdf o xml
+                    
+                    // Lógica para extraer ID de fila igual que en guardaPT
+                    if (count($parts) === 2) { 
+                        $row_id = $parts[1]; 
+                    } elseif ($parts[1] === 'tabla') { 
+                        $row_id = $parts[1] . '_' . $parts[2] . '_' . $parts[3]; 
+                    } else { 
+                        $row_id = substr($key, strlen($type) + 1); 
+                    }
+                    
+                    if (!isset($archivos_por_fila[$row_id])) { $archivos_por_fila[$row_id] = []; }
+                    if (isset($file_data[$type][0])) { $archivos_por_fila[$row_id][$type] = $file_data[$type][0]; }
+                }
+            }
+        }
+
+        // 4. Procesar Filas (Presupuestos / Facturas)
+        if(isset($data['id_presupuesto'])){
+             foreach ($data['id_presupuesto'] as $table_key => $value) {
+                // Iterar sobre los arrays de datos de cada tabla (presupuesto)
+                $num_filas = count($data['concepto_' . $table_key] ?? []);
+                
+                for ($i = 0; $i < $num_filas; $i++) {
+                    // ID Identificador para vincular archivos y buscar registro existente
+                    $id_identificador = $data['id_identificador_' . $table_key][$i] ?? '';
+                    
+                    // Datos básicos de la fila
+                    $fila_data = [
+                        'id_registro_pt' => $id_registro_pt,
+                        'periodo_inicio' => $data['periodo_inicio_' . $table_key][$i] ?? '',
+                        'periodo_fin' => $data['periodo_fin_' . $table_key][$i] ?? '',
+                        'concepto' => $data['concepto_' . $table_key][$i] ?? '',
+                        'id_proyecto' => $data['proyecto'][$table_key] ?? '', 
+                        'id_partida' => $data['partida'][$table_key] ?? '', 
+                        'id_identificador' => $id_identificador
+                       
+                    ];
+
+                    // Determinar si existe la fila (UPDATE) o es nueva (INSERT)
+                    // Usamos getTabla para buscar por id_identificador Y id_registro_pt para seguridad
+                    $existe = $this->globals->getTabla([
+                        'tabla' => 'periodo_factura',
+                        'where' => ['id_identificador' => $id_identificador, 'id_registro_pt' => $id_registro_pt]
+                    ]);
+                    
+                    $es_edicion_fila = (isset($existe->data) && !empty($existe->data));
+
+                    if ($es_edicion_fila) {
+                        // UPDATE
+                         $id_periodo_factura_real = $existe->data[0]->id_periodo_factura;
+                         
+                         $dataConfigPeriodo = [
+                            "tabla" => "periodo_factura", 
+                            "editar" => true,
+                            "idEditar" => ['id_periodo_factura' => $id_periodo_factura_real]
+                        ];
+                    } else {
+                        // INSERT
+                        $dataConfigPeriodo = ["tabla" => "periodo_factura", "editar" => false];
+                       
+                    }
+                    
+                    $this->globals->saveTabla($fila_data, $dataConfigPeriodo, ["script" => "Agregar.php/guardaPTEditar/periodo"]);
+
+
+                    // 5. Procesar Archivos de la Fila
+                    // Los archivos nuevos se insertan. No borramos los anteriores automáticamente.
+                    if (isset($archivos_por_fila[$id_identificador])) {
+                         foreach ($archivos_por_fila[$id_identificador] as $type => $archivo) {
+                            if(!$archivo->isValid()) continue;
+
+                            $timestamp = date('Ymd_His');
+                            $extension = $archivo->getClientExtension();
+                            // Generar nombre archivo
+                            $fileName = '03_CFDI_' . $id_registro_pt . '_' . $timestamp . '_' . uniqid() . '.' . $extension;
+                            
+                            $ruta_destino = FCPATH . 'assets/pdf/';
+                            if (!is_dir($ruta_destino)) { mkdir($ruta_destino, 0755, true); }
+                            
+                            $archivo->move($ruta_destino, $fileName);
+                            $ruta_relativa = 'assets/pdf/' . $fileName;
+                            $ruta_absoluta = base_url($ruta_relativa);
+
+                            if ($type === 'pdf') {
+                                // Guardar PDF
+                                $dataInsertPDF = [
+                                    'id_registro_pt' =>  $id_registro_pt,
+                                    'id_identificador' => $id_identificador,
+                                    'ruta_absoluta' => $ruta_absoluta,
+                                    'ruta_relativa' => $ruta_relativa,
+                                    'fec_reg' => date('Y-m-d H:i:s'),
+                                    'usu_reg' => $session->id_usuario,
+                                    'visible' => 1
+                                ];
+                                $this->globals->saveTabla($dataInsertPDF, ["tabla" => "factura_pdf", "editar" => false], []); 
+                                
+                            } elseif ($type === 'xml') {
+                                // Procesar XML
+                                $contenido = file_get_contents($ruta_destino . $fileName);
+                                libxml_use_internal_errors(true);
+                                $xml = simplexml_load_string($contenido);
+                                
+                                if ($xml !== false) {
+                                    $namespaces = $xml->getNamespaces(true);
+                                    $cfdi = $xml->children($namespaces['cfdi']);
+                                    $attrs = $xml->attributes();
+                                    $tfdNamespace = isset($namespaces['tfd']) ? $namespaces['tfd'] : 'http://www.sat.gob.mx/TimbreFiscalDigital';
+                                    
+                                    $uuid = '';
+                                    if (isset($cfdi->Complemento) && isset($cfdi->Complemento->children($tfdNamespace)->TimbreFiscalDigital)) {
+                                        $uuid = (string) $cfdi->Complemento->children($tfdNamespace)->TimbreFiscalDigital->attributes()['UUID'];
+                                    }
+                                    
+                                    // Datos XML
+                                    $fol = isset($attrs['Folio']) ? (string)$attrs['Folio'] : '';
+
+                                     // Emisor y Receptor para verificar
+                                    $emisor = $cfdi->Emisor->attributes();
+                                    $rfcEmisor = (string) $emisor['Rfc'];
+                                    $nombreEmisor = (string) $emisor['Nombre'];
+
+                                    $receptor = $cfdi->Receptor->attributes();
+                                    $rfcReceptor = (string) $receptor['Rfc'];
+                                    $nombreReceptor = (string) $receptor['Nombre'];
+                                    
+                                    $dataInsertXML = [
+                                        'id_registro_pt' => $id_registro_pt,
+                                        'version' => (string) $attrs['Version'],
+                                        'fecha' => date('Y-m-d H:i:s', strtotime((string) $attrs['Fecha'])),
+                                        'total' => (string) $attrs['Total'],
+                                        'moneda' => (string) $attrs['Moneda'],
+                                        'id_identificador' => $id_identificador,
+                                        'folio' => $fol,
+                                        'uuid' => $uuid,
+                                        'emisor_rfc' => $rfcEmisor,
+                                        'emisor_nombre' => $nombreEmisor,
+                                        'receptor_rfc' => $rfcReceptor,
+                                        'receptor_nombre' => $nombreReceptor,
+                                        'fec_reg' => date('Y-m-d H:i:s'),
+                                        'usu_reg' => $session->id_usuario
+                                    ];
+                                    $this->globals->saveTabla($dataInsertXML, ["tabla" => "factura", "editar" => false], []);
+                                }
+                            }
+                         }
+                    } // Fin procesamiento archivos de fila
+                } // Fin for filas
+             } // Fin foreach tablas
+        }
+
+        $response->error = false;
+        $response->respuesta = "Éxito|Se ha actualizado correctamente.";
+        return $this->respond($response);
+    }
     public function guardaVe()
     {
         $session = \Config\Services::session();

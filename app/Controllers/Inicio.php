@@ -1244,7 +1244,7 @@ class Inicio extends BaseController
                 $datosGrupal[] = $item;
             }
         }
-
+        
         $data['datosGrupal']        = $datosGrupal;
         $data['dsc_director_general'] = (!empty($cat_director_general->data)) ? $cat_director_general->data[0]->dsc_director_general : [];
         $data['cat_area'] = (!empty($cat_area->data)) ? $cat_area->data : [];

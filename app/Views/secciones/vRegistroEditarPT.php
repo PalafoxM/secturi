@@ -31,7 +31,7 @@
                                     <p class="text-muted mb-3" >
                                         <?= (isset($proveedor->no_proveedor) && !empty($proveedor->no_proveedor))?'No. Proveedor '.$proveedor->no_proveedor:'' ?>
                                     </p>
-                                   <form id="form_proveedor" enctype="multipart/form-data">
+                                   <form id="form_proveedor_editar" enctype="multipart/form-data">
                                         <input type="hidden" name="id_proveedor" id="id_proveedor" value="<?= (isset($reserva->id_proveedor) && !empty($reserva->id_proveedor))?$reserva->id_proveedor:$registro_pt->id_proveedor?>" >
                                         <input type="hidden" name="editar" id="editar" value="<?= $editar?>">
                                         <input type="hidden" name="id_reserva" id="id_reserva" value="<?= $id_reserva?>">
@@ -290,7 +290,7 @@
                                                     
                                                     <div class="col-md-6 mb-3">
                                                         <label for="encabezado_<?= $i ?>">Encabezado<span style="color:red;">*</span></label>
-                                                        <input type="text" class="form-control" autocomplete="off" id="encabezado_<?= $i ?>" name="encabezado[]" value="<?= (isset($p->encabezado) && !empty($p->encabezado)?$p->encabezado:'') ?>" >
+                                                        <input type="text" class="form-control" autocomplete="off" id="encabezado_<?= $i ?>" name="encabezado[]" value="<?= (isset($p->dsc_partida) && !empty($p->dsc_partida)?$p->dsc_partida:'') ?>" >
                                                     </div>
                                                     
                                                     <!-- CHECKBOX CORREGIDO: Aparece en todos menos el primero cuando hay más de un elemento -->
@@ -333,26 +333,40 @@
                                                                                   <input type="hidden" name="id_identificador_<?= $i ?>[]" value="<?= $r['id_identificador'] ?>" >
                                                                                  
                                                                                     <!-- Descripción -->
-                                                                                    <td>
-                                                                                        <textarea autocomplete="off" class="form-control mb-1" name="concepto_<?= $i ?>[]" placeholder="Concepto" rows="2" style="font-size: 0.85rem;"></textarea>
-                                                                                    </td>
-                                                                                    <!-- Vigencia -->
-                                                                                    <td>
-                                                                                        <div class="input-group input-group-sm mb-1">
-                                                                                            <div class="input-group-prepend"><span class="input-group-text">Del</span></div>
-                                                                                            <input autocomplete="off" type="date" class="form-control" name="periodo_inicio_<?= $i ?>[]">
-                                                                                        </div>
-                                                                                        <div class="input-group input-group-sm">
-                                                                                            <div class="input-group-prepend"><span class="input-group-text">Al </span></div>
-                                                                                            <input autocomplete="off" type="date" class="form-control" name="periodo_fin_<?= $i ?>[]">
-                                                                                        </div>
-                                                                                    </td>
-                                                                                    <!-- Archivos -->
-                                                                                    <td>
-                                                                                        <div class="archivos-seleccionados" id="archivos_<?= $i ?>">
-                                                                                            <small class="text-muted">Sin archivos</small>
-                                                                                        </div>
-                                                                                    </td>
+                                                                                     <td>
+                                                                                         <textarea autocomplete="off" class="form-control mb-1" name="concepto_<?= $i ?>[]" placeholder="Concepto" rows="2" style="font-size: 0.85rem;"><?= (isset($r['concepto'])) ? $r['concepto'] : '' ?></textarea>
+                                                                                     </td>
+                                                                                     <!-- Vigencia -->
+                                                                                     <td>
+                                                                                         <div class="input-group input-group-sm mb-1">
+                                                                                             <div class="input-group-prepend"><span class="input-group-text">Del</span></div>
+                                                                                             <input autocomplete="off" type="date" class="form-control" name="periodo_inicio_<?= $i ?>[]" value="<?= (isset($r['periodo_inicio'])) ? date('Y-m-d', strtotime($r['periodo_inicio'])) : '' ?>">
+                                                                                         </div>
+                                                                                         <div class="input-group input-group-sm">
+                                                                                             <div class="input-group-prepend"><span class="input-group-text">Al </span></div>
+                                                                                             <input autocomplete="off" type="date" class="form-control" name="periodo_fin_<?= $i ?>[]" value="<?= (isset($r['periodo_fin'])) ? date('Y-m-d', strtotime($r['periodo_fin'])) : '' ?>">
+                                                                                         </div>
+                                                                                     </td>
+                                                                                     <!-- Archivos -->
+                                                                                     <td>
+                                                                                         <div class="archivos-seleccionados" id="archivos_<?= $uniqueId ?>"> <!-- Usar uniqueId para evitar conflicto con i -->
+                                                                                             <?php if(!empty($r['ruta_relativa'])): ?>
+                                                                                                <div class="mb-1">
+                                                                                                    <a href="<?= base_url() . $r['ruta_relativa'] ?>" target="_blank" class="text-danger">
+                                                                                                        <i class="fas fa-file-pdf"></i> Ver PDF
+                                                                                                    </a>
+                                                                                                </div>
+                                                                                             <?php else: ?>
+                                                                                                <small class="text-muted">Sin PDF</small><br>
+                                                                                             <?php endif; ?>
+
+                                                                                             <?php if(!empty($r['total'])): ?>
+                                                                                                <div class="mt-1">
+                                                                                                    <span class="badge badge-soft-success">XML: $ <?= number_format($r['total'], 2) ?></span>
+                                                                                                </div>
+                                                                                             <?php endif; ?>
+                                                                                         </div>
+                                                                                     </td>
                                                                                     <!-- Acciones -->
                                                                                     <td>
                                                                                         <div class="btn-group-vertical btn-group-sm w-100">
@@ -753,7 +767,7 @@
             window.prepararFormData = function() {
                 console.log("Preparando FormData...");
                 console.log("Archivos en memoria:", window.archivosPorFila);
-                const formData = new FormData($('#form_proveedor')[0]);
+                const formData = new FormData($('#form_proveedor_editar')[0]);
                 
                 // Agregar archivos
                 Object.keys(window.archivosPorFila).forEach(rowIndex => {
@@ -775,7 +789,7 @@
             };
 
             // Envío del formulario
-            $('#form_proveedor').off('submit').on('submit', function(e) {
+            $('#form_proveedor_editar').off('submit').on('submit', function(e) {
                 e.preventDefault();
                 e.stopImmediatePropagation(); // Detener otros handlers si los hay
                 
@@ -801,7 +815,7 @@
 
                 $.ajax({
                     type: "POST",
-                    url: "<?= base_url()?>index.php/Agregar/guardaPT", 
+                    url: "<?= base_url()?>index.php/Agregar/guardaPTEditar", 
                     data: formData,
                     processData: false,
                     contentType: false,
