@@ -1203,9 +1203,49 @@ class Inicio extends BaseController
         if (!empty($id_registro_pt)) {
             $data['registro_pt'] = (!empty($registro_pt->data)) ? $registro_pt->data[0] : [];
         }
+        $datosGrupal = [];
+        if (!empty($data['presupuesto'])) {
+            foreach($data['presupuesto'] as $key => $p){
+                // Clone the object to avoid modifying the original reference if it matters, 
+                // but since we are building a new array $datosGrupal, we can just work with $p or a copy.
+                // Let's use a new object to be safe and clean.
+                $item = clone $p;
+                
+                $datos = $globals->getTabla(['tabla' => 'periodo_factura', 'where' => ['id_presupuesto' => $p->id_presupuesto, 'visible' => 1]]);
+                
+                $item->datos = [];
+                
+                if (isset($datos->data) && !empty($datos->data)) {
+                    // Use the header from the first invoice if available
+                    $item->encabezado = $datos->data[0]->encabezado ?? '';
 
+                    foreach($datos->data as $j => $d){
+                         $xml      = $globals->getTabla(['tabla' => 'factura', 'where' => ['id_registro_pt' => $id_registro_pt, 'id_identificador' => $d->id_identificador, 'visible' => 1]]);
+                         $factura  = $globals->getTabla(['tabla' => 'factura_pdf', 'where' => ['id_registro_pt' => $id_registro_pt, 'id_identificador' => $d->id_identificador, 'visible' => 1]]);
+                        
+                         $invoiceData =  [
+                              'id_periodo_factura' => $d->id_periodo_factura,
+                              'id_registro_pt' => $d->id_registro_pt,
+                              'id_presupuesto' => $d->id_presupuesto,
+                              'encabezado' => $d->encabezado,
+                              'importe' => $d->importe,
+                              'concepto' => (isset($d->concepto)) ? $d->concepto : '',
+                              'visible' => $d->visible,
+                              'periodo_fin' => $d->periodo_fin,
+                              'periodo_inicio' => $d->periodo_inicio,
+                              'id_identificador' => $d->id_identificador,
+                              'usu_reg' => $d->usu_reg,
+                              'total' => (!empty($xml->data) && isset($xml->data[0]->total)) ? $xml->data[0]->total : 0,
+                              'ruta_relativa' => (!empty($factura->data) && isset($factura->data[0]->ruta_relativa)) ? $factura->data[0]->ruta_relativa : ''
+                         ];
+                         $item->datos[] = $invoiceData;
+                    }
+                }
+                $datosGrupal[] = $item;
+            }
+        }
 
-        // die( var_dump(  $data['registro_pt'] ) );
+        $data['datosGrupal']        = $datosGrupal;
         $data['dsc_director_general'] = (!empty($cat_director_general->data)) ? $cat_director_general->data[0]->dsc_director_general : [];
         $data['cat_area'] = (!empty($cat_area->data)) ? $cat_area->data : [];
         $data['cat_tipo'] = (!empty($cat_tipo->data)) ? $cat_tipo->data : [];
@@ -1221,7 +1261,7 @@ class Inicio extends BaseController
         $data['scripts'] = array('inicio');
         $data['edita'] = $btn;
         $data['partida4000'] = $partida4000;
-        $data['contentView'] = 'secciones/vProveedor';
+        $data['contentView'] = 'secciones/vRegistroEditarPT';
         // die( var_dump( $data['importe'])  );
         $this->_renderView($data);
     }
