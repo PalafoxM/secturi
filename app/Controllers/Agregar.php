@@ -3438,12 +3438,12 @@ class Agregar extends BaseController
                         'periodo_inicio' => $data['periodo_inicio_' . $table_key][$i] ?? '',
                         'periodo_fin' => $data['periodo_fin_' . $table_key][$i] ?? '',
                         'concepto' => $data['concepto_' . $table_key][$i] ?? '',
-                        'id_proyecto' => $data['proyecto'][$table_key] ?? '', 
-                        'id_partida' => $data['partida'][$table_key] ?? '', 
+                        //'id_proyecto' => $data['proyecto'][$table_key] ?? '', 
+                        //'id_partida' => $data['partida'][$table_key] ?? '', 
                         'id_identificador' => $id_identificador
                        
                     ];
-
+                  
                     // Determinar si existe la fila (UPDATE) o es nueva (INSERT)
                     // Usamos getTabla para buscar por id_identificador Y id_registro_pt para seguridad
                     $existe = $this->globals->getTabla([
@@ -3451,8 +3451,6 @@ class Agregar extends BaseController
                         'where' => ['id_identificador' => $id_identificador, 'id_registro_pt' => $id_registro_pt]
                     ]);
                     
-
-
                         // UPDATE
                          $id_periodo_factura_real = $existe->data[0]->id_periodo_factura;
                          
@@ -3461,10 +3459,11 @@ class Agregar extends BaseController
                             "editar" => true,
                             "idEditar" => ['id_periodo_factura' => $id_periodo_factura_real]
                         ];
+                  
                     
-                    
-                    $this->globals->saveTabla($fila_data, $dataConfigPeriodo, ["script" => "Agregar.php/guardaPTEditar/periodo"]);
-
+                    $res = $this->globals->saveTabla($fila_data, $dataConfigPeriodo, ["script" => "Agregar.php/guardaPTEditar/periodo"]);
+                 
+                   
 
                     // 5. Procesar Archivos de la Fila
                     // Los archivos nuevos se insertan. No borramos los anteriores automáticamente.
@@ -3495,7 +3494,14 @@ class Agregar extends BaseController
                                     'usu_reg' => $session->id_usuario,
                                     'visible' => 1
                                 ];
-                                $this->globals->saveTabla($dataInsertPDF, ["tabla" => "factura_pdf", "editar" => false], []); 
+                            $existePDF = $this->globals->getTabla([
+                                'tabla' => 'factura_pdf',
+                                'where' => ['id_identificador' => $id_identificador, 'id_registro_pt' => $id_registro_pt]
+                            ]);
+                    
+                        // UPDATE
+                            $id_factura_pdf_real = $existePDF->data[0]->id_factura_pdf;
+                            $this->globals->saveTabla($dataInsertPDF, ["tabla" => "factura_pdf", "editar" => true, 'idEditar' => ['id_factura_pdf' => $id_factura_pdf_real]], []); 
                                 
                             } elseif ($type === 'xml') {
                                 // Procesar XML
@@ -3542,7 +3548,11 @@ class Agregar extends BaseController
                                         'fec_reg' => date('Y-m-d H:i:s'),
                                         'usu_reg' => $session->id_usuario
                                     ];
-                                    $this->globals->saveTabla($dataInsertXML, ["tabla" => "factura", "editar" => false], []);
+                                     $existeXML = $this->globals->getTabla([
+                                        'tabla' => 'factura',
+                                        'where' => ['id_identificador' => $id_identificador, 'id_registro_pt' => $id_registro_pt]
+                                    ]);
+                                    $this->globals->saveTabla($dataInsertXML, ["tabla" => "factura", "editar" => true, 'idEditar' => ['id_factura' => $existeXML->data[0]->id_factura]], []);
                                 }
                             }
                          }
@@ -3550,9 +3560,10 @@ class Agregar extends BaseController
                 } // Fin for filas
              } // Fin foreach tablas
         }
-
+        
         $response->error = false;
         $response->respuesta = "Éxito|Se ha actualizado correctamente.";
+        $response->idRegistro = $id_registro_pt;
         return $this->respond($response);
     }
     public function guardaVe()
