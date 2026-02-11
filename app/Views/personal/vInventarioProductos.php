@@ -7,12 +7,11 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-body">
-                            
                             <div class="row mb-3">
                                 <div class="col-md-9">
                                     <div class="alert alert-secondary d-flex justify-content-around align-items-center mb-0">
                                         <span class="font-14"><i class="mdi mdi-paperclip mr-1"></i> Total Oficina: <strong><?= $total_stock_art_ofi ?? 0 ?></strong></span>
-                                        <span class="font-14"><i class="mdi mdi-pen mr-1"></i> Total Papelerí­a: <strong><?= $total_stock_art_papel ?? 0 ?></strong></span>
+                                        <span class="font-14"><i class="mdi mdi-pen mr-1"></i> Total PapelerÍ­a: <strong><?= $total_stock_art_papel ?? 0 ?></strong></span>
                                         <span class="font-14"><i class="mdi mdi-file-outline mr-1"></i> Total Papel: <strong><?= $total_stock_papel ?? 0 ?></strong></span>
                                     </div>
                                 </div>
@@ -31,7 +30,7 @@
                             <ul class="nav nav-tabs nav-tabs-custom" role="tablist">
                                 <li class="nav-item">
                                     <a class="nav-link active font-weight-semibold" data-toggle="tab" href="#oficina" role="tab">
-                                        <i class="mdi mdi-paperclip mr-1"></i> Artí­culos de Oficina
+                                        <i class="mdi mdi-paperclip mr-1"></i> ArtÍ­culos de Oficina
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -110,7 +109,7 @@
                                     </div>
                                 </div>
 
-                                <!-- ===== PAPELERÍA ===== -->
+                                <!-- ===== PAPELERÍA ===== -->
                                 <div class="tab-pane fade" id="papeleria" role="tabpanel">
                                     <div class="table-responsive">
                                         <table class="table table-hover table-bordered table-striped dt-responsive nowrap tabla-inventario" style="width:100%">

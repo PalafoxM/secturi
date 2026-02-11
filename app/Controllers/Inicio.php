@@ -286,7 +286,7 @@ class Inicio extends BaseController
         $data['cat_inventario_papel'] = $globas->getTabla(['tabla' => 'cat_inventario_papel', 'where' => ['visible' => 1]])->data;
         $data['cat_inventario_art_papel'] = $globas->getTabla(['tabla' => 'cat_inventario_art_papel', 'where' => ['visible' => 1]])->data;
         $data['cat_inventario_art_ofi'] = $globas->getTabla(['tabla' => 'cat_inventario_art_ofi', 'where' => ['visible' => 1]])->data;
-
+        
         // Totales
         $data['total_stock_papel'] = array_sum(array_column($data['cat_inventario_papel'] ?? [], 'stock'));
         $data['total_stock_art_papel'] = array_sum(array_column($data['cat_inventario_art_papel'] ?? [], 'stock'));
@@ -317,7 +317,34 @@ class Inicio extends BaseController
         $data['contentView'] = 'personal/vInventarioLimpieza';
         $this->_renderView($data);
     }
+    public function InventarioPromocion()
+    {
+        $globas = new Mglobal;
 
+        $data['cat_inventario_promo'] = $globas->getTabla([
+            'tabla' => 'cat_inventario_promo', 'where' => ['visible' => 1]
+        ])->data;
+
+        $data['total_stock_promo'] = array_sum(array_column($data['cat_inventario_art_ofi'] ?? [], 'stock'));
+
+        // MÉTRICAS UX
+        $data['total_stock'] = 0;
+        $data['total_valor'] = 0;
+        $data['total_productos'] = 0;
+
+        $data['total_stock_promo'] = 0;
+        if (!empty($data['cat_inventario_promocion'])) {
+            foreach ($data['cat_inventario_promocion'] as $item) {
+                $data['total_stock_promo'] += (int)$item->stock;
+            }
+        }
+
+        $data['total_movimientos'] = 0;
+
+        $data['scripts'] = array('principal', 'inicio');
+        $data['contentView'] = 'personal/vInventarioPromocion';
+        $this->_renderView($data);
+    }
     // ==========================================
     // PROCESOS (AJAX)
     // ==========================================
@@ -352,6 +379,9 @@ class Inicio extends BaseController
             case 'cat_inventario_limpieza':
                 $idGenerico = 'id_inventario_lim';
                 break;
+            case 'cat_inventario_promo':
+                $idGenerico = 'id_inventario_promo';
+                break;
             default:
                 $idGenerico = '';
                 break;
@@ -369,8 +399,13 @@ class Inicio extends BaseController
             return $this->respond($response);
         }
 
-        $stockActual = (int)$producto->data[0]->stock;
-        $nuevoStock = ($tipo_movimiento == 'salida') ? $stockActual - $cantidad : $stockActual + $cantidad;
+        $registro = $producto->data[0];
+
+        $stockActual = (int)(
+            is_array($registro)
+                ? ($registro['stock'] ?? $registro['stock'] ?? 0)
+                : ($registro->stock ?? $registro->stock ?? 0)
+        );
 
         if ($nuevoStock < 0) {
             $response->respuesta = "No hay suficiente stock.";
@@ -420,6 +455,9 @@ class Inicio extends BaseController
             case 'cat_inventario_limpieza':
                 $idGenerico = 'id_inventario_lim';
                 break;
+            case 'cat_inventario_promo':
+                $idGenerico = 'id_inventario_promo';
+                break;
             default:
                 $idGenerico = '';
                 break;
@@ -438,6 +476,14 @@ class Inicio extends BaseController
             $response->error = false;
             $response->respuesta = "Producto guardado correctamente.";
         }
+
+        $campoStock = isset($registro->stock) ? 'stock' : 'stock';
+
+        $globals->saveTabla([$campoStock => $nuevoStock], [
+            'tabla' => $tabla,
+            'editar' => true,
+            'idEditar' => [$idGenerico => $id_producto]
+        ]);
 
         return $this->respond($response);
     }
@@ -463,6 +509,9 @@ class Inicio extends BaseController
                 break;
             case 'cat_inventario_limpieza':
                 $idGenerico = 'id_inventario_lim';
+                break;
+            case 'cat_inventario_promo':
+                $idGenerico = 'id_inventario_promo';
                 break;
             default:
                 $idGenerico = '';
