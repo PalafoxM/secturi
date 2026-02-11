@@ -3276,7 +3276,7 @@ class Principal extends BaseController
         if (in_array($session->get('id_perfil'), [1, 2])) {
             $registro_pt = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1]]);
         } else {
-            $registro_pt = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1, 'id_estatus' =>4, 'usu_reg' => $session->get('id_usuario')]]);
+            $registro_pt = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1, 'id_estatus' =>3, 'usu_reg' => $session->get('id_usuario')]]);
         }
         //var_dump($registro_pt);
         //die();
