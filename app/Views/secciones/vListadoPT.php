@@ -182,8 +182,6 @@
                                                                             </button>
                                                                             <div class="dropdown-menu">
                                                                                 <a class="dropdown-item"  onclick="setAnio('/2026')">2026</a>
-                                                                                <a class="dropdown-item"  onclick="setAnio('/2025')">2025</a>
-                                                                                <a class="dropdown-item"  onclick="setAnio('/2024')">2024</a>
                                                                             </div>
                                                                         </div>
                                                                     </div>

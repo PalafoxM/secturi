@@ -390,11 +390,6 @@
                                                                 <?php endif; ?>
                                                                             </tbody>
                                                                         </table>
-                                                                        <div class="text-right mt-2">
-                                                                            <a onclick="addRow(<?= $i ?>)" class="btn btn-primary text-white">
-                                                                                <i class="fas fa-plus"></i> Agregar Fila
-                                                                            </a>
-                                                                        </div>
                                                                         <div class="row mt-3" style="visibility: hidden"> <!-- Visibility changed to visible for PT if needed, or keep hidden -->
                                                                             <div class="col-md-8"></div>
                                                                             <div class="col-md-4">
