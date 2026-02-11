@@ -322,19 +322,19 @@ class Inicio extends BaseController
         $globas = new Mglobal;
 
         $data['cat_inventario_promo'] = $globas->getTabla([
-            'tabla' => 'cat_inventario_promo', 'where' => ['visible' => 1]
+            'tabla' => 'cat_inventario_promo', 
+            'where' => ['visible' => 1]
         ])->data;
 
-        $data['total_stock_promo'] = array_sum(array_column($data['cat_inventario_art_ofi'] ?? [], 'stock'));
-
         // MÉTRICAS UX
-        $data['total_stock'] = 0;
-        $data['total_valor'] = 0;
-        $data['total_productos'] = 0;
+        $data['total_stock_promo'] = 0;
+        $data['total_productos']  = count($data['cat_inventario_promo']);
+        $data['total_valor']      = 0; // por si después lo calculas
+        $data['total_stock']      = 0;
 
         $data['total_stock_promo'] = 0;
-        if (!empty($data['cat_inventario_promocion'])) {
-            foreach ($data['cat_inventario_promocion'] as $item) {
+        if (!empty($data['cat_inventario_promo'])) {
+            foreach ($data['cat_inventario_promo'] as $item) {
                 $data['total_stock_promo'] += (int)$item->stock;
             }
         }

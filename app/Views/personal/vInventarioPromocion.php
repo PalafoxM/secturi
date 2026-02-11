@@ -5,8 +5,8 @@
 
             <!-- ===================== tittle ===================== -->
             <div class="row mt-4">
-                <div class="col-lg-9 col-md-8 mb-3">
-                    <div class="card shadow-sm border-0 h-100">
+                <div class="col-lg-9">
+                     <div class="card shadow-sm border-0 h-100">
                         <div class="card-body">
                             <div class="row align-items-center">
                                 <div class="col-auto">
@@ -28,12 +28,9 @@
                     </div>
                 </div>
                                 
-                <div class="col-lg-3 col-md-4 mb-3">
+                <div class="col-lg-3">                            
                     <div class="card shadow-sm border-0 h-100">
                         <div class="card-body d-flex flex-column justify-content-center text-center">
-                            <div class="icon-info mb-3">
-                                <i data-feather="plus-square" class="icon-lg icon-dual-primary"></i>
-                            </div>
                             <div class="col-sm-8 col-8 align-self-center text-right">
                                 <div class="ml-2">
                                     <button class="btn btn-primary px-4 btn-movimiento shadow-sm"
@@ -53,13 +50,10 @@
             
             <div class="row">
                 <div class="card-body">
-                    
-                
-                    <div class="tab-content pt-4">
-
+                    <div class="tab-content pt-2">
                         <!-- ===== Promocion ==== -->
                         <div class="row">
-                            <div class="col-lg-8">
+                            <div class="col-lg-9">
                                 <div class="card shadow-sm border-0 h-100">
                                     <div class="card-body">
                                         <h4 class="header-title mt-0 mb-4 text-dark border-bottom pb-2">Inventario Promoción</h4>
@@ -98,6 +92,13 @@
                                                                 $stock = (int) ($item->stock ?? 0); 
                                                                 $badgeClass = ($stock < 5) ? 'badge-soft-danger' : 'badge-soft-success'; 
                                                             ?>
+                                                            <?php
+                                                                static $productoTmp = '';
+                                                                    if (!empty($item->dsc_producto)) {
+                                                                    $productoTmp = $item->dsc_producto;
+                                                                }
+                                                            ?>
+
                                                             <tr class="align-middle">
                                                                 <!-- Producto -->
                                                                 <td class="font-weight-medium text-dark py-3">
@@ -155,6 +156,7 @@
                                                                             data-id="<?= $item->id_inventario_promo ?>"
                                                                             data-tabla="cat_inventario_promo"
                                                                             data-nombre="<?= $item->dsc_producto ?>"
+                                                                            data-nombre="<?= $productoTmp ?>"
                                                                             data-stock="<?= $stock ?>"
                                                                             data-tipo="editar"
                                                                             title="Editar">
@@ -198,11 +200,24 @@
                             </div><!--end col-lg-8-->
 
                             <!--Carrusel-->
-                            <div class="col-lg-4">                            
+                            <div class="col-lg-3">                            
                                 <div class="card shadow-sm border-0 h-100">
                                     <div class="card-body">
-                                        <h4 class="mt-0 header-title mb-4 text-dark border-bottom pb-2">Resumen Inventario</h4>
-                                        <div id="carousel_stats" class="carousel slide" data-ride="carousel">
+                                        <h4 class="mt-0 header-title mb-4 text-dark border-bottom pb-2">
+                                            Resumen Inventario
+                                        </h4>
+                                        <div id="carousel_stats" 
+                                            class="carousel slide" 
+                                            data-ride="carousel"
+                                            data-interval="3500"
+                                            data-pause="hover">
+
+                                            <ol class="carousel-indicators">
+                                                <li data-target="#carousel_stats" data-slide-to="0" class="active"></li>
+                                                <li data-target="#carousel_stats" data-slide-to="1"></li>
+                                                <li data-target="#carousel_stats" data-slide-to="2"></li>
+                                            </ol>
+                                            
                                             <div class="carousel-inner">
                                                 <!-- Item 1: Stock Total -->
                                                 <div class="carousel-item active">
@@ -217,7 +232,7 @@
                                                     </div>
                                                 </div>
                                                 <!-- Item 2: Total -->
-                                                <div class="carousel-item active">
+                                                <div class="carousel-item">
                                                     <div class="media p-3 bg-light rounded align-items-center">
                                                         <div class="avatar-md bg-soft-success rounded-circle mr-3 d-flex align-items-center justify-content-center">
                                                             <i class="mdi mdi-currency-mxn font-24"></i>
@@ -233,7 +248,6 @@
                                                     <div class="media p-3 bg-light rounded align-items-center">
                                                         <div class="avatar-md bg-soft-warning rounded-circle mr-3 d-flex align-items-center justify-content-center">
                                                             <i class="mdi mdi-history font-24"></i>
-                                                            <img src="../assets/images/users/user-3.jpg" class="mr-2 thumb-lg rounded-circle" alt="...">
                                                             <div class="media-body">
                                                                 <p class="text-muted mb-1 font-weight-medium text-uppercase font-11">Movimientos</p>
                                                                 <h3 class="m-0 font-weight-bold text-dark"><?= $total_movimientos ?? 0 ?></h3>
@@ -241,26 +255,26 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <a class="carousel-control-prev" href="#carousel_2" role="button" data-slide="prev">
-                                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                                    <span class="sr-only">Anterior</span>
-                                                </a>
-                                                <a class="carousel-control-next" href="#carousel_2" role="button" data-slide="next">
-                                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                                    <span class="sr-only">Siguiente</span>
-                                                </a>
+                                            </div>
+                                            <a class="carousel-control-prev" href="#carousel_stats" role="button" data-slide="prev">
+                                                <span class="carousel-control-prev-icon"></span>
+                                            </a>
+                                            <a class="carousel-control-next" href="#carousel_stats" role="button" data-slide="next">
+                                                <span class="carousel-control-next-icon"></span>
+                                            </a>
+                                            <div class="m-0">
+                                                <div id="apex_radialbar3" class="apex-charts"></div>
+                                            </div> 
+                                            <div class="bg-light p-3 d-flex justify-content-between">
+                                                <div>
+                                                    <h2 class="mb-1 font-weight-semibold" id="contadorMovimientos">
+                                                        <?= $total_movimientos ?? 0 ?>
+                                                    </h2>
+                                                    <p class="text-muted mb-0">Movimientos recientes</p>
                                                 </div>
-                                                <div class="m-0">
-                                                    <div id="apex_radialbar3" class="apex-charts"></div>
-                                                </div> 
-                                                <div class="bg-light p-3 d-flex justify-content-between">
-                                                    <div>
-                                                        <h2 class="mb-1 font-weight-semibold">222</h2>
-                                                        <p class="text-muted mb-0">Entradas recientes</p>
-                                                    </div>
-                                                </div>
-                                                <div class="media mt-5 mb-3 align-items-center">
-                                                    <div class="avatar-md bg-soft-primary rounded shadow-none mr-3 d-flex align-items-center justify-content-center h-100">
+                                            </div>
+                                            <div class="media mt-5 mb-3 align-items-center">
+                                                <div class="avatar-md bg-soft-primary rounded shadow-none mr-3 d-flex align-items-center justify-content-center h-100">
                                                     <i class="mdi mdi-file-document-outline font-26 text-primary"></i>
                                                 </div>                                     
                                                 <div class="media-body text-truncate">
@@ -270,6 +284,7 @@
                                                     </a>
                                                 </div>
                                             </div>
+                                        </div>    
                                         <hr class="hr-dashed mt-4">
                                     </div><!--end card-body-->
                                 </div><!--end card-->
@@ -310,18 +325,8 @@
                                             </div>
 
                                             <div class="form-group">
-                                                <label class="font-weight-bold text-dark text-uppercase font-12">Color / Especificación</label>
-                                                <input type="text" class="form-control" id="color_producto" name="color">
-                                            </div>
-
-                                            <div class="form-group">
                                                 <label class="font-weight-bold text-dark text-uppercase font-12" id="label_cantidad">Stock / Cantidad</label>
                                                 <input type="number" class="form-control" id="cantidad" name="stock" min="0" required>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label class="font-weight-bold text-dark text-uppercase font-12">Imagen (URL)</label>
-                                                <input type="text" class="form-control" id="imagen_producto" name="imagen">
                                             </div>
                                         </div>
 
@@ -370,6 +375,11 @@
 
 <script>
 $(document).ready(function() {
+
+    function setProductoReadonly(estado) {
+    $('#nombre_producto').prop('readonly', estado);
+    }
+
     // 1. Inicializar DataTable
     if ($.fn.DataTable.isDataTable('.tabla-inventario')) {
         $('.tabla-inventario').DataTable().destroy();
@@ -379,6 +389,11 @@ $(document).ready(function() {
         responsive: true,
         order: [[ 0, "asc" ]]
     });
+
+    // RESET TOTAL DEL MODAL
+    setProductoReadonly(false);
+        $('#label_cantidad').text('Stock / Cantidad');
+        $('#cantidad').prop('readonly', false);
 
     // 2. Abrir Modal y Configurar Datos
     $(document).on('click', '.btn-movimiento', function() {
@@ -452,7 +467,7 @@ $(document).ready(function() {
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
             confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar'
+            cancelButtonText: 'Cancelar',
             icon: 'warning',
             showCancelButton: true,
         }).then((result) => {
