@@ -1250,6 +1250,46 @@ class Usuario extends BaseController
 
 
     }
+    public function enviarCorreoAceptacion($correo, $datos)
+    {
+        $email = \Config\Services::email();
+        $response = new \stdClass();
+
+        $email->setTo($correo);
+        $email->setSubject('RESERVA ACEPTADA');
+        $email->setMessage('
+                    <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+                        <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+                            <div style="background-color: #004080; padding: 20px; text-align: center;">
+                                <img src="' . base_url('assets/images/logo-sm.png') . '" alt="Logo" style="height: 60px;">
+                            </div>
+                            <div style="padding: 30px; color: #333;">
+                                <h1 style="color: #004080;">¡Su reserva ha sido ACEPTADA!</h1>
+                                <p style="font-size: 16px;">Detalles de la reserva:</p>
+                                <ul>
+                                    <li><strong>No. Reserva:</strong> ' . $datos['no_reserva'] . '</li>
+                                    <li><strong>No. Convenio:</strong> ' . $datos['no_convenio'] . '</li>
+                                    <li><strong>Importe:</strong> ' . $datos['total_importe'] . '</li>
+                                </ul>
+                                <p style="font-size: 15px;">Favor de <strong> Ingresar a SUSI</strong> para más detalles.</p>
+                                <p style="font-size: 15px;"><a href="' . base_url() . 'index.php/Principal/listaReservaPT"><strong>Seguimiento Reserva</strong></a></p>
+                            </div>
+                            <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 13px; color: #666;">
+                                © ' . date('Y') . ' Sistema de Atención SUSI. Todos los derechos reservados.
+                            </div>
+                        </div>
+                    </div>
+                ');
+
+        if ($email->send()) {
+            $response->error = false;
+            $response->respuesta = "Correo enviado correctamente.";
+        } else {
+            $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
+        }
+        return $response;
+    }
+
     public function estatusReserva()
     {
         $session = \Config\Services::session();
@@ -1276,7 +1316,17 @@ class Usuario extends BaseController
         if ($usuReg) {
             $id_usuario = $usuReg[0]->usu_reg;
             $correo = $principal->getTabla(['tabla' => 'vw_usuario', 'where' => ['id_usuario' => $id_usuario, 'visible' => 1]])->data[0]->correo;
-            $this->enviarCorreoPagos($correo);
+
+            if (isset($data['motivo']) && (int)$data['motivo'] === 3) {
+                 $datosCorreo = [
+                    'no_reserva' => $usuReg[0]->no_reserva,
+                    'no_convenio' => $usuReg[0]->no_convenio,
+                    'total_importe' => $usuReg[0]->total_importe
+                 ];
+                 $this->enviarCorreoAceptacion($correo, $datosCorreo);
+            } else {
+                $this->enviarCorreoPagos($correo);
+            }
         }
 
         if (!$result->error) {

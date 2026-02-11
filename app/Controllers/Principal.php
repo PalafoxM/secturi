@@ -1384,7 +1384,9 @@ class Principal extends BaseController
                 }
             }
         }
-   //$this->enviarEmail(0);
+        if($session->get('id_perfil')!=1){
+            $this->enviarEmail(0);
+        }
        
 
         return $this->respond($response);
