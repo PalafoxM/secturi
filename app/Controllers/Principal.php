@@ -3273,9 +3273,13 @@ class Principal extends BaseController
     {
         $session = \Config\Services::session();
         $globals = new Mglobal;
-        if (in_array($session->get('id_perfil'), [1, 2])) {
+        if ($session->get('id_perfil') == 1) {
             $registro_pt = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1]]);
-        } else {
+        } 
+        if ($session->get('id_perfil') == 2) {
+            $registro_pt = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1, 'id_estatus' =>4]]);
+        }
+        if (!in_array($session->get('id_perfil'), [1,2])){
             $registro_pt = $globals->getTabla(['tabla' => 'vw_registro_pt', 'where' => ['visible' => 1, 'id_estatus' =>3, 'usu_reg' => $session->get('id_usuario')]]);
         }
         //var_dump($registro_pt);
