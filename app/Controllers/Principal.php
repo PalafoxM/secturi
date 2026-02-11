@@ -1272,6 +1272,28 @@ class Principal extends BaseController
         $ruta_relativa = "";
         $file = $this->request->getFile('instrumento');
 
+         if (isset($data['no_convenio']) && empty($data['no_convenio'])) {
+            $response->error = true;
+            $response->respuesta = "El campo No. Convenio es requerido";
+            return $this->respond($response);
+        }
+
+        // Validación de unicidad para no_convenio
+        if (isset($data['no_convenio']) && strtoupper($data['no_convenio']) !== 'NO APLICA') {
+            $dataCheck = [
+                'tabla' => 'reserva',
+                'where' => ['no_convenio' => $data['no_convenio']]
+            ];
+            $exists = $globals->getTabla($dataCheck);
+            
+            // Si existe algún registros y no es error
+            if (!$exists->error && !empty($exists->data)) {
+                $response->error = true;
+                $response->respuesta = "El No. Convenio '" . $data['no_convenio'] . "' ya existe.";
+                return $this->respond($response);
+            }
+        }
+
         if ($file && $file->isValid() && !$file->hasMoved()) {
 
             $maxSize = 100 * 1024 * 1024; // 100 MB
@@ -1295,11 +1317,7 @@ class Principal extends BaseController
         }
 
 
-        if (isset($data['no_convenio']) && empty($data['no_convenio'])) {
-            $response->error = true;
-            $response->respuesta = "El campo No. Convenio es requerido";
-            return $this->respond($response);
-        }
+       
         $hoy = date("Y-m-d H:i:s");
         $folio = 'PT-' . date('YmdHis'); // Ejemplo: FOL-20250725133045
 
@@ -1366,7 +1384,7 @@ class Principal extends BaseController
                 }
             }
         }
-   $this->enviarEmail(0);
+   //$this->enviarEmail(0);
        
 
         return $this->respond($response);
