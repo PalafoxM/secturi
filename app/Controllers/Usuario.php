@@ -1312,21 +1312,42 @@ class Usuario extends BaseController
         ];
 
         $result = $principal->saveTabla($dataInsert, $dataConfig, ['id_user' => $session->get('id_usuario'), "script" => "estatus.Reserva"]);
+
+        // Actualizar tabla presupuesto
+        if (isset($data['id_presupuesto_estatus']) && is_array($data['id_presupuesto_estatus'])) {
+            foreach ($data['id_presupuesto_estatus'] as $key => $id_presupuesto) {
+                if(!empty($id_presupuesto)){
+                     $dataPresupuesto = [
+                        'id_proyecto' => (isset($data['id_proyecto_estatus'][$key]) && !empty($data['id_proyecto_estatus'][$key])) ? $data['id_proyecto_estatus'][$key] : null,
+                        'id_partida' => (isset($data['id_partida_estatus'][$key]) && !empty($data['id_partida_estatus'][$key])) ? $data['id_partida_estatus'][$key] : null,
+                    ];
+                    
+                    $dataConfigPresupuesto = [
+                        "tabla" => "presupuesto",
+                        "editar" => true,
+                        "idEditar" => ['id_presupuesto' => $id_presupuesto]
+                    ];
+                    $principal->saveTabla($dataPresupuesto, $dataConfigPresupuesto, ['id_user' => $session->get('id_usuario'), "script" => "estatus.Reserva.UpdatePresupuesto"]);
+                }
+            }
+        }
         $usuReg = $principal->getTabla(['tabla' => 'reserva', 'where' => ['id_reserva' => $data['id_reserva'], 'visible' => 1]])->data;
         if ($usuReg) {
             $id_usuario = $usuReg[0]->usu_reg;
             $correo = $principal->getTabla(['tabla' => 'vw_usuario', 'where' => ['id_usuario' => $id_usuario, 'visible' => 1]])->data[0]->correo;
-
-            if (isset($data['motivo']) && (int)$data['motivo'] === 3) {
-                 $datosCorreo = [
-                    'no_reserva' => $usuReg[0]->no_reserva,
-                    'no_convenio' => $usuReg[0]->no_convenio,
-                    'total_importe' => $usuReg[0]->total_importe
-                 ];
-                 $this->enviarCorreoAceptacion($correo, $datosCorreo);
-            } else {
-                $this->enviarCorreoPagos($correo);
-            }
+       
+           if($session->get('id_usuario')!=1){
+                if (isset($data['motivo']) && (int)$data['motivo'] === 3) {
+                    $datosCorreo = [
+                        'no_reserva' => $usuReg[0]->no_reserva,
+                        'no_convenio' => $usuReg[0]->no_convenio,
+                        'total_importe' => $usuReg[0]->total_importe
+                    ];
+                    $this->enviarCorreoAceptacion($correo, $datosCorreo);
+                } else {
+                    $this->enviarCorreoPagos($correo);
+                }
+           }
         }
 
         if (!$result->error) {

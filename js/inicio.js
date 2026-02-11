@@ -1359,13 +1359,13 @@ ini.inicio = (function () {
                             const fila = `
                                     <tr>
                                         <td>
-                                            <select class="select2 form-control"  readonly>
+                                            <select class="select2 form-control" id="id_proyecto_estatus" name="id_proyecto_estatus[]" >
                                                 ${opcionesProyecto}
                                             </select>
-                                            <input type="hidden" value="${p.id_presupuesto}" readonly>
+                                            <input type="hidden" name="id_presupuesto_estatus[]" value="${p.id_presupuesto}" >
                                         </td>
                                         <td>
-                                            <select class="select2 form-control" readonly>
+                                            <select class="select2 form-control" id="id_partida_estatus" name="id_partida_estatus[]" >
                                                 ${opcionesPartida}
                                             </select>
                                         </td>
@@ -1440,6 +1440,11 @@ ini.inicio = (function () {
                 const observaciones = $('#validar_observaciones').val();
                 const numero_reserva = $('#validar_no_reserva').val();
 
+                const id_presupuesto_estatus = $('input[name="id_presupuesto_estatus[]"]').map(function () { return $(this).val(); }).get();
+                const id_proyecto_estatus = $('select[name="id_proyecto_estatus[]"]').map(function () { return $(this).val(); }).get();
+                const id_partida_estatus = $('select[name="id_partida_estatus[]"]').map(function () { return $(this).val(); }).get();
+
+
                 if (!motivo) {
                     Swal.fire("Estatus", "Debe seleccionar un motivo para eliminar la reserva.", "error");
                     return;
@@ -1456,7 +1461,10 @@ ini.inicio = (function () {
                         id_reserva: id,
                         motivo: motivo,
                         observaciones: observaciones,
-                        numero_reserva: numero_reserva
+                        numero_reserva: numero_reserva,
+                        id_presupuesto_estatus: id_presupuesto_estatus,
+                        id_proyecto_estatus: id_proyecto_estatus,
+                        id_partida_estatus: id_partida_estatus
                     },
                     beforeSend: function () {
                         $('#btnConfirmarReserva').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
@@ -1465,15 +1473,16 @@ ini.inicio = (function () {
                         console.log(response);
                         if (response.error) {
                             Swal.fire("Atención", response.respuesta, "warning");
+
                         } else {
                             Swal.fire("Correcto", response.respuesta, "success");
+                            setTimeout(() => window.location.reload(), 1500);
                         }
                     },
                     complete: function () {
                         $('#modalEstatusReserva').modal('hide');
                         $('#btnConfirmarReserva').prop('disabled', false).html('Guardar');
-                        Swal.fire("Correcto", 'se guardo correctamente', "success");
-                        setTimeout(() => window.location.reload(), 1500);
+
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
                         // alert("Error al eliminar");

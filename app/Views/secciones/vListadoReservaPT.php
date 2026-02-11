@@ -345,7 +345,7 @@
                               <div class="col-lg-6">
                                     <div class="form-group">
                                         <label for="motivo" class="form-label">Estatus</label>
-                                        <select class="form-control" id="motivo" name="motivo" onchange="ini.inicio.selectMotivo();" required>
+                                        <select class="form-control" id="motivo" name="motivo" onchange="ini.inicio.selectMotivo();"  >
                                             <option value="1">EN PROCESO</option>
                                             <option value="2">DECLINADO</option>
                                             <option value="3">ACEPTADO</option>
