@@ -988,6 +988,27 @@
                                                             </ol>
                                                              <ol class="dd-list">
                                                                  <p class="text-muted mb-4">Coordinación de Recursos Humanos</p>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/Manual Captura Solicitud Apoyo para Estudios.pdf" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                         <i class="far fa-file-pdf text-danger"></i> Manual Captura Solicitud Apoyo para Estudios
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-RH-01-R-RH-01-2026_Apoyo_para_estudios_y_formación_básica.pdf" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                         <i class="far fa-file-pdf text-danger"></i> Apoyo para estudios y formación básica
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-RH-01-2026_Solicitud_Apoyo_para_Estudios.docx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Solicitud de Apoyo para Estudios
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
                                                                  <a target="_blank" href="<?= base_url()?>assets/documentos/CALENDARIO DIAS INHABILES 2026-1.pdf" > 
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
