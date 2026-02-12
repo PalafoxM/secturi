@@ -376,9 +376,7 @@
                                                                                             <button type="button" class="btn btn-warning btn-seleccionar-xml mb-1" data-row="<?= $uniqueId ?>">
                                                                                                 <i class="mdi mdi-code-tags"></i> XML
                                                                                             </button>
-                                                                                            <button type="button" class="btn btn-danger remove-row">
-                                                                                                <i class="fas fa-trash"></i> Eliminar
-                                                                                            </button>
+                                                                                           
                                                                                         </div>
                                                                                     </td>
                                                                                 </tr>

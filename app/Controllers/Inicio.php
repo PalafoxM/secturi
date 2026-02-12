@@ -464,7 +464,12 @@ class Inicio extends BaseController
             return $this->respond($response);
         }
 
-        $result = $globals->saveTabla(['stock' => $nuevoStock], [
+        $dataUpdate = ['stock' => $nuevoStock];
+        if ($tipo_movimiento == 'salida') {
+             $dataUpdate['fecha_salida'] = date('Y-m-d H:i:s');
+        }
+
+        $result = $globals->saveTabla($dataUpdate, [
             'tabla' => $tabla,
             'editar' => true,
             'idEditar' => [$idGenerico => $id_producto]
@@ -486,11 +491,13 @@ class Inicio extends BaseController
 
         $id_producto = $this->request->getPost('id_producto');
         $tipo_movimiento = $this->request->getPost('tipo_movimiento'); // 'nuevo' o 'editar'
-        $tabla = 'cat_inventario_promo';
+        $tabla = 'cat_inventario_promo'; 
 
         $nombre = $this->request->getPost('nombre');
         $cantidad = $this->request->getPost('cantidad');
-        $stock = $this->request->getPost('stock');
+        // $stock = $this->request->getPost('stock'); // Replaced by calculation
+        $subtotal = $this->request->getPost('subtotal'); // New field
+
         $total_existencia = $this->request->getPost('total_existencia');
         $colores = $this->request->getPost('colores');
         $cantidades = $this->request->getPost('cantidades');
@@ -500,16 +507,26 @@ class Inicio extends BaseController
             return $this->respond($response);
         }
 
+        // Calculate Stock from Colors
+        $stockCalculado = 0;
+        if(is_array($cantidades)){
+            $stockCalculado = array_sum($cantidades);
+        }
+        
         // Base data
         $dataSave = [
             'dsc_producto' => $nombre,
             'cantidad' => $cantidad,
-            'stock' => $stock,
+            'stock' => $stockCalculado, // Save calculated stock
+            'subtotal' => $subtotal,    // Save subtotal
             'total_existencia' => $total_existencia,
             'visible' => 1
         ];
 
-       
+        // Set fecha_entrada for new products if not present
+        if ($tipo_movimiento == 'nuevo') {
+             $dataSave['fecha_entrada'] = date('Y-m-d H:i:s');
+        }
 
         // === PROCESAR IMAGEN ===
         $file = $this->request->getFile('imagen');
@@ -517,17 +534,16 @@ class Inicio extends BaseController
             // Nombre aleatorio para evitar conflictos
             $newName = $file->getRandomName();
             $uploadPath = 'assets/img_productos/';
-
+            
             // Verificar y crear directorio si no existe
             if (!is_dir(FCPATH . $uploadPath)) {
                 mkdir(FCPATH . $uploadPath, 0777, true);
             }
-
+            
             // Mover archivo
             if ($file->move(FCPATH . $uploadPath, $newName)) {
                 $dataSave['imagen'] = $uploadPath . $newName;
-            }
-            else {
+            } else {
                 $response->respuesta = "Error al mover el archivo de imagen.";
                 return $this->respond($response);
             }
@@ -547,19 +563,47 @@ class Inicio extends BaseController
 
         // Guardar en BD
         $result = $globals->saveTabla($dataSave, $dataConfig, ['script' => 'Inicio.guardarProducto']);
+        
         if(!$result->error){
-            foreach($colores as $key => $color){
-               $res = $globals->saveTabla([
-                    'id_inventario' => $result->idRegistro,
-                    'hexadecimal' => $color,
-                    'cantidad' => $cantidades[$key]
-                ], [
-                    'tabla' => 'colores',
-                    'editar' => false
-                ], ['script' => 'Inicio.guardarProducto']);
-
+            // Save Colors
+            // First, maybe clear existing colors if simple logic? 
+            // Or just append/update. Mglobal saveTabla usually inserts or updates.
+            // For simplicity in this specialized setup, if we want to sync strictly:
+            // The user logic separates colors into a separate table.
+            
+            // IMPORTANT: If editing, we might need to delete old colors or update them.
+            // For now, we'll assume the user interface manages the list and we just save new entries 
+            // or update existing if we had IDs. But here we receive arrays of scalars.
+            // A simple strategy: Delete previous colors for this product and re-insert. 
+            // But checking if Mglobal supports delete? Or we just insert new ones (duplicates?).
+            // Given the complexity of Mglobal without docs, I'll stick to the previous loop 
+            // but add a check or assume the user wants to add/update.
+            // Actually, the previous code just looped and saved. It didn't delete. 
+            // This might cause duplicates if not handled. 
+            // However, let's stick to the previous pattern but enable the loop.
+            
+            $db = \Config\Database::connect();
+            // Optional: Clean up old colors for this product to avoid duplicates
+            if($tipo_movimiento == 'editar'){
+                 $db->query("DELETE FROM colores WHERE id_inventario = ?", [$id_producto]);
+                 $saveId = $id_producto;
+            } else {
+                 $saveId = $result->idRegistro;
             }
 
+            if(is_array($colores)){
+                foreach($colores as $key => $color){
+                   $res = $globals->saveTabla([
+                        'id_inventario' => $saveId,
+                        'hexadecimal' => $color,
+                        'cantidad' => $cantidades[$key] ?? 0,
+                        'visible' => 1
+                    ], [
+                        'tabla' => 'colores',
+                        'editar' => false
+                    ], ['script' => 'Inicio.guardarProducto']);
+                }
+            }
         }
 
         if($result->error){
