@@ -14,11 +14,11 @@
                                     <div class="row align-items-center">
                                         <div class="col-auto">
                                             <div class="icon-info">
-                                                <i class="mdi mdi-cube-outline bg-soft-primary rounded-circle p-2 font-20"></i>
+                                                <i class="mdi mdi-file-document-outline bg-soft-primary rounded-circle p-2 font-20"></i>
                                             </div>
                                         </div>
                                         <div class="col pl-0">
-                                            <h5 class="text-muted text-uppercase font-10 font-weight-bold mt-0 mb-2">Total Unidades</h5>
+                                            <h5 class="text-muted text-uppercase font-10 font-weight-bold mt-0 mb-2">No. de Contraro</h5>
                                             <h3 class="m-0 font-weight-bold"><?= number_format($total_stock_promo ?? 0) ?></h3>
                                         </div>
                                     </div>
@@ -113,15 +113,18 @@
                                                             <small class="text-muted d-block">Colores</small></th>
                                               
                                                         <th class="py-3">
-                                                            <i class="mdi mdi-calendar-check text-success d-block mb-1"></i>
-                                                            <small class="text-muted d-block">Fec. Entrada</small></th>
-                                                        <th class="py-3">
-                                                            <i class="mdi mdi-calendar-remove text-dark d-block mb-0"></i>
-                                                            <small class="text-muted d-block">Fec. Salida</small></th>
-                                                        <th class="py-3">
                                                             <i class="mdi mdi-currency-usd text-primary d-block mb-1"></i>
                                                             <small class="text-muted d-block">Precio</small></th>
-                                                        <th  class="py-3" style="width:15%;">
+
+                                                        <th class="py-3">
+                                                            <i class="mdi mdi-calendar-remove text-dark d-block mb-0"></i>
+                                                            <small class="text-muted d-block">Fecha contrato</small></th>
+
+                                                        <th class="py-3">
+                                                            <i class="mdi mdi-calendar-check text-success d-block mb-1"></i>
+                                                            <small class="text-muted d-block">Nombre</small></th>
+                                                        
+                                                        <th class="py-3" style="width:15%;">
                                                             <i class="mdi mdi-cog-outline text-secondary d-block mb-0"></i>
                                                             <small class="text-muted d-block">Acciones</small>
                                                         </th>
@@ -170,31 +173,31 @@
                                                                 <!-- Colores -->
                                                                 <td class="text-center">
                                                                     <?php if(isset($item->colores) && !empty($item->colores)): ?>
-                                                                        <?php foreach($item->colores as $color): ?>
-                                                                            <i class="mdi mdi-circle font-18" 
-                                                                               style="color: <?= $color->hexadecimal ?>;" 
-                                                                               data-toggle="tooltip" 
-                                                                               data-placement="top" 
-                                                                               title="<?= 'Cantidad: ' ?>: <?= $color->cantidad ?? 0 ?>">
+                                                                        <?php foreach($item->colores as $index => $color): ?>
+                                                                            
+                                                                            <!-- Icono visible -->
+                                                                            <i class="mdi mdi-circle font-18 color-picker-trigger"
+                                                                                style="color: <?= $color->hexadecimal ?>; cursor:pointer;"
+                                                                                data-index="<?= $item->id_inventario_promo ?>_<?= $index ?>"
+                                                                                data-toggle="tooltip"
+                                                                                data-placement="top"
+                                                                                title="Cantidad: <?= $color->cantidad ?? 0 ?>">
                                                                             </i>
+
+                                                                            <!-- Input color oculto -->
+                                                                            <input type="color"
+                                                                                class="color-picker-input d-none"
+                                                                                id="color_<?= $item->id_inventario_promo ?>_<?= $index ?>"
+                                                                                value="<?= $color->hexadecimal ?>"
+                                                                                data-id="<?= $item->id_inventario_promo ?>"
+                                                                                data-index="<?= $index ?>">
+
                                                                         <?php endforeach; ?>
                                                                     <?php else: ?>
                                                                         <span class="text-muted font-12">Sin colores</span>
-                                                                    <?php endif; ?>
+                                                                    <?php endif; ?> 
                                                                 </td>
-
-                                                                <!-- Fec. Entrada -->
-                                                                <td class="text-center">
-                                                                    <span class="badge badge-soft-success font-13">
-                                                                        <?= $item->fecha_entrada ?? date('d/m/Y', strtotime($item->created_at ?? 'now')) ?>
-                                                                    </span>
-                                                                </td>
-
-                                                                <!-- Fec. Salida -->
-                                                                <td class="text-center font-weight-bold text-dark">
-                                                                    <?= !empty($item->fecha_salida) ? date('d/m/Y', strtotime($item->fecha_salida)) : '-' ?>
-                                                                </td>
-
+                                                                
                                                                 <!-- Precio -->
                                                                 <td class="text-center">
                                                                     <div class="font-weight-bold text-dark">
@@ -209,7 +212,21 @@
                                                                     <div class="text-muted font-11 mt-1">
                                                                         Total: <span class="font-weight-semibold text-primary">$<?= number_format((float)($item->total ?? 0), 2) ?></span>
                                                                     </div>
-                                                                </td>  
+                                                                </td>
+
+                                                                <!-- Fec. Entrada -->
+                                                                <td class="text-center">
+                                                                    <span class="badge badge-soft-success font-13">
+                                                                        <?= $item->fecha_entrada ?? date('d/m/Y', strtotime($item->created_at ?? 'now')) ?>
+                                                                    </span>
+                                                                </td>
+
+                                                                <!-- Fec. Salida -->
+                                                                <td class="text-center font-weight-bold text-dark">
+                                                                    <?= !empty($item->fecha_salida) ? date('d/m/Y', strtotime($item->fecha_salida)) : '-' ?>
+                                                                </td>
+
+                                                                  
 
                                                                 <!-- Acciones -->
                                                                 <td class="text-center text-nowrap">
@@ -228,18 +245,18 @@
                                                                         data-tabla="cat_inventario_promo"
                                                                         data-tipo="editar"
                                                                         title="Editar">
-                                                                        <i class="mdi mdi-pencil"></i>
-                                                                    </button>
+                                                                        📁 Form.
+                                                                    </button> <!-- lleva a formulario-->
 
-                                                                        <button class="btn btn-sm btn-outline-warning btn-movimiento border-0 mx-1 p-2"
-                                                                            data-id="<?= $item->id_inventario_promo ?>"
-                                                                            data-tabla="cat_inventario_promo"
-                                                                            data-nombre="<?= $item->dsc_producto ?>"
-                                                                            data-stock="<?= $stock ?>"
-                                                                            data-tipo="salida"
-                                                                            title="Baja">
-                                                                            ➖ Baja
-                                                                        </button>
+                                                                    <button class="btn btn-sm btn-outline-warning btn-movimiento border-0 mx-1 p-2"
+                                                                        data-id="<?= $item->id_inventario_promo ?>"
+                                                                        data-tabla="cat_inventario_promo"
+                                                                        data-nombre="<?= $item->dsc_producto ?>"
+                                                                        data-stock="<?= $stock ?>"
+                                                                        data-tipo="salida"
+                                                                        title="Baja">
+                                                                        🌎 Compl. <!-- lleva a INE, oficio, evidencias -->
+                                                                    </button>
 
                                                                         <button class="btn btn-sm btn-outline-danger btn-eliminar border-0 p-2"
                                                                             data-id="<?= $item->id_inventario_promo ?>"
@@ -247,7 +264,7 @@
                                                                             data-nombre="<?= $item->dsc_producto ?>"
                                                                             data-stock="<?= $stock ?>"
                                                                             title="Eliminar">
-                                                                            🗑 Eliminar
+                                                                            ⛔ Elim.
                                                                         </button>
                                                                     </div>    
                                                                 </td>
@@ -499,309 +516,259 @@
 <script src="<?= base_url(); ?>plugins/select2/select2.min.js"></script>
 
 <script>
-$(document).ready(function() {
+$(document).ready(function () {
+
+    /* ==========================================================
+       UTILIDADES
+    ========================================================== */
 
     function setProductoReadonly(estado) {
-    $('#nombre_producto').prop('readonly', estado);
+        $('#nombre_producto').prop('readonly', estado);
     }
 
-    // 1. Inicializar DataTable
-    if ($.fn.DataTable.isDataTable('.tabla-inventario')) {
-        $('.tabla-inventario').DataTable().destroy();
-    }
-    $('.tabla-inventario').DataTable({
-        language: { url: "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json" },
-        responsive: true,
-        order: [[ 0, "asc" ]]
-    });
+    function resetModal() {
+        $('#formMovimientoInventario')[0].reset();
+        $('#colores_container').empty();
 
-    // Custom file input label change
-    $(".custom-file-input").on("change", function() {
-        var fileName = $(this).val().split("\\").pop();
-        $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
-        
-        // Image preview logic
-        var input = this;
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                $('#preview_imagen').attr('src', e.target.result).show();
-                $('#placeholder_imagen').hide();
-            }
-            reader.readAsDataURL(input.files[0]);
-        } else {
-             $('#preview_imagen').attr('src', '').hide();
-             $('#placeholder_imagen').show();
-        }
-    });
-
-    // RESET TOTAL DEL MODAL
-    setProductoReadonly(false);
+        setProductoReadonly(false);
         $('#label_cantidad').text('Stock / Cantidad');
         $('#cantidad').prop('readonly', false);
 
-    // 2. Abrir Modal y Configurar Datos
-    $(document).on('click', '.btn-movimiento', function() {
-        var d = $(this).data();
-        
-        $('#id_producto').val(d.id);
-        $('#tipo_movimiento').val(d.tipo);
-        $('#nombre_producto').val(d.nombre);
-        $('#tabla_hidden').val(d.tabla);
-        
-        // Reset de campos
-        $('#nombre_producto').prop('readonly', false);
-        // Removed: $('#div_tabla_select').hide(); 
-        $('#subtotal').val(d.subtotal || '');
-        
-        // Asignar los nuevos campos
-        $('#cantidad_producto').val(d.cantidad || '');
-        $('#total_existencia').val(d.total_existencia || '');
+        $('#preview_imagen').hide();
+        $('#placeholder_imagen').show();
+        $('.custom-file-label').html('Seleccionar Archivo');
+    }
 
-        // Limpiar contenedor de colores
-        $('#colores_container').empty();
-        
-        // Populate colors if editing and has dynamic colors
-        var dynamicColores = d.colores; // Should be object/array from json_encode
+    function parseColores(colores) {
+        if (!colores) return [];
+        if (Array.isArray(colores)) return colores;
 
-        if (d.tipo == 'editar') {
-            var colorsAdded = 0;
+        try {
+            return JSON.parse(colores);
+        } catch (e) {
+            return [];
+        }
+    }
 
-            if (dynamicColores && dynamicColores.length > 0) {
-                // New dynamic logic
-                dynamicColores.forEach(function(c) {
-                    // c.hexadecimal and c.cantidad
+    /* ==========================================================
+       DATATABLE
+    ========================================================== */
+
+    if ($.fn.DataTable.isDataTable('.tabla-inventario')) {
+        $('.tabla-inventario').DataTable().destroy();
+    }
+
+    $('.tabla-inventario').DataTable({
+        language: {
+            url: "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json"
+        },
+        responsive: true,
+        order: [[0, "asc"]]
+    });
+
+    /* ==========================================================
+       INPUT FILE + PREVIEW
+    ========================================================== */
+
+    $(document).on('change', '.custom-file-input', function () {
+        const fileName = $(this).val().split("\\").pop();
+        $(this).siblings(".custom-file-label")
+            .addClass("selected")
+            .html(fileName);
+
+        const input = this;
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                $('#preview_imagen').attr('src', e.target.result).show();
+                $('#placeholder_imagen').hide();
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    });
+
+    /* ==========================================================
+       MODAL – ABRIR
+    ========================================================== */
+
+    $(document).on('click', '.btn-movimiento', function () {
+        const d = $(this).data();
+
+        resetModal();
+
+        $('#id_producto').val(d.id || '');
+        $('#tipo_movimiento').val(d.tipo || '');
+        $('#nombre_producto').val(d.nombre || '');
+        $('#tabla_hidden').val(d.tabla || 'cat_inventario_promo');
+
+        const colores = parseColores(d.colores);
+
+        if (d.tipo === 'editar') {
+            $('#label_cantidad').text('Stock Actual');
+
+            if (colores.length > 0) {
+                colores.forEach(c => {
                     addColorRow(c.hexadecimal, c.cantidad);
-                    colorsAdded++;
-                });
-            } else {
-                // Fallback / Legacy Logic (if data-colores is empty but has old attributes)
-                // List of supported colors in DB
-                var dbColors = ['Negro', 'Blanco', 'Azul', 'Verde', 'Amarillo', 'Rojo', 'Gris', 'Naranja'];
-                
-                dbColors.forEach(function(color) {
-                    // Construct attribute name e.g., d.negro_cantidad
-                    var key = color.toLowerCase() + '_cantidad';
-                    var qty = d[key]; 
-                    
-                    // Also check the boolean flag e.g., d.negro
-                    var flag = d[color.toLowerCase()];
-
-                    if ((qty && qty > 0) || (flag && flag == 1)) {
-                        addColorRow(color, qty || 0); // This will use the legacy name mapping
-                        colorsAdded++;
-                    }
                 });
             }
+        }
 
-            // If no colors found (legacy or empty), maybe add one empty row or none
-            if (colorsAdded === 0) {
-                 // Optional: addColorRow(); 
-            }
-        } else {
-            // New product: add one empty row
+        if (d.tipo === 'nuevo') {
+            $('#label_cantidad').text('Stock Inicial');
+            $('#tabla_hidden').val('cat_inventario_promo');
             addColorRow();
         }
-        
-        // Limpiar el input file y preview por defecto
-        $('#imagen_producto').val('');
-        $('.custom-file-label').html('Seleccionar Archivo');
-        
-        if (d.imagen && d.imagen.trim() !== '') {
-            $('#preview_imagen').attr('src', '<?= base_url() ?>' + d.imagen).show();
-            $('#placeholder_imagen').hide();
-        } else {
-            $('#preview_imagen').attr('src', '').hide();
-            $('#placeholder_imagen').show();
-        }
 
-
-        var titulo = 'Movimiento';
-            title = 'Nuevo Producto';
-            // Removed: $('#div_tabla_select').show();
-            $('#tabla_hidden').val('cat_inventario_promo'); // Force default table
-            $('#label_cantidad').text('Subtotal');
-        } else if(d.tipo == 'editar'){
-            titulo = 'Editar Producto';
-            $('#label_cantidad').text('Subtotal');
-        } else if(d.tipo == 'salida'){
-            titulo = 'Baja de Stock';
-            $('#nombre_producto').prop('readonly', true);
+        if (d.tipo === 'salida') {
             $('#label_cantidad').text('Cantidad a retirar');
-            $('#cantidad').val(''); // Keep #cantidad for salida if strictly needed, or handle differently
+            setProductoReadonly(true);
+            $('#cantidad').val('');
         }
-        
-        $('#modalTitulo').text(titulo);
+
+        if (d.imagen && d.imagen.trim() !== '') {
+            $('#preview_imagen')
+                .attr('src', '<?= base_url() ?>' + d.imagen)
+                .show();
+            $('#placeholder_imagen').hide();
+        }
+
+        const titulos = {
+            nuevo: 'Nuevo Producto',
+            editar: 'Editar Producto',
+            salida: 'Baja de Stock'
+        };
+
+        $('#modalTitulo').text(titulos[d.tipo] || 'Movimiento');
         $('#modalMovimientoInventario').modal('show');
     });
 
-    // 3. ENVIAR FORMULARIO 
-    $('#formMovimientoInventario').on('submit', function(e) {
-        e.preventDefault(); 
-        
-        // Validación básica HTML5
+    /* ==========================================================
+       FORM – SUBMIT
+    ========================================================== */
+
+    $('#formMovimientoInventario').on('submit', function (e) {
+        e.preventDefault();
+
         if (!this.checkValidity()) {
             this.reportValidity();
             return;
         }
 
-        console.log("Intentando enviar formulario...");
+        const tipo = $('#tipo_movimiento').val();
+        const url = (tipo === 'salida')
+            ? '<?= base_url("index.php/Inicio/actualizarInventario") ?>'
+            : '<?= base_url("index.php/Inicio/guardarProducto") ?>';
 
-        var tipo = $('#tipo_movimiento').val();
-        var urlInfo = (tipo == 'salida') ? 
-            '<?= base_url("index.php/Inicio/actualizarInventario") ?>' : 
-            '<?= base_url("index.php/Inicio/guardarProducto") ?>';
-
-        var formData = new FormData(this);
-        var $btnSubmit = $(this).find('button[type="submit"]');
-        var btnText = $btnSubmit.text();
+        const formData = new FormData(this);
+        const $btn = $(this).find('button[type="submit"]');
+        const originalText = $btn.text();
 
         $.ajax({
-            url: urlInfo,
+            url: url,
             type: 'POST',
             data: formData,
             dataType: 'json',
-            processData: false, // Importante para envío de archivos
-            contentType: false, // Importante para envío de archivos
-            beforeSend: function() {
-                $btnSubmit.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Guardando...');
+            processData: false,
+            contentType: false,
+            beforeSend: function () {
+                $btn.prop('disabled', true)
+                    .html('<span class="spinner-border spinner-border-sm"></span> Guardando...');
             },
-            success: function(res) {
+            success: function (res) {
                 if (!res.error) {
                     Swal.fire({
-                        title: "¡Éxito!",
+                        icon: 'success',
+                        title: '¡Éxito!',
                         text: res.respuesta,
-                        icon: "success",
                         timer: 1500,
                         showConfirmButton: false
                     }).then(() => {
-                        $('#modalMovimientoInventario').modal('hide');
-                        // Recargar tabla sin recargar página
-                        // Reload the current page content in background and replace table body
-                        $.get(location.href, function(data) {
-                            var newBody = $(data).find('#tablaPromo').html();
-                            var $table = $('.tabla-inventario').DataTable();
-                            $table.destroy();
-                            $('#tablaPromo').html(newBody);
-                            
-                            // Reinitialize DataTable
-                            $('.tabla-inventario').DataTable({
-                                language: { url: "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json" },
-                                responsive: true,
-                                order: [[ 0, "asc" ]]
-                            });
-                             // Update metrics carousel also if possible (optional but good)
-                             var newCarousel = $(data).find('#carousel_stats').html();
-                             $('#carousel_stats').html(newCarousel);
-                        });
+                        location.reload();
                     });
                 } else {
-                    Swal.fire("Error", res.respuesta, "error");
+                    Swal.fire('Error', res.respuesta, 'error');
                 }
             },
-            error: function() {
-                Swal.fire("Error", "No se pudo procesar la petición en el servidor.", "error");
+            error: function () {
+                Swal.fire('Error', 'No se pudo procesar la petición.', 'error');
             },
-            complete: function() {
-                $btnSubmit.prop('disabled', false).text(btnText);
+            complete: function () {
+                $btn.prop('disabled', false).text(originalText);
             }
         });
     });
 
-    // 4. Eliminar producto
-    $(document).on('click', '.btn-eliminar', function() {
-        var d = $(this).data();
+    /* ==========================================================
+       ELIMINAR
+    ========================================================== */
+
+    $(document).on('click', '.btn-eliminar', function () {
+        const d = $(this).data();
+
         Swal.fire({
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
+            icon: 'warning',
+            title: '¿Eliminar producto?',
+            showCancelButton: true,
             confirmButtonText: 'Sí, eliminar',
             cancelButtonText: 'Cancelar',
-            icon: 'warning',
-            showCancelButton: true,
+            confirmButtonColor: '#d33'
         }).then((result) => {
             if (result.isConfirmed) {
-                $.post('<?= base_url("index.php/Inicio/eliminarProducto") ?>', {id: d.id, tabla: d.tabla}, function(res) {
-                    if(!res.error) {
-                        Swal.fire("¡Eliminado!", res.respuesta, "success").then(() => location.reload());
-                    } else {
-                        Swal.fire("Error", res.respuesta, "error");
-                    }
-                }, 'json');
+                $.post(
+                    '<?= base_url("index.php/Inicio/eliminarProducto") ?>',
+                    { id: d.id, tabla: d.tabla },
+                    function (res) {
+                        if (!res.error) {
+                            Swal.fire('Eliminado', res.respuesta, 'success')
+                                .then(() => location.reload());
+                        } else {
+                            Swal.fire('Error', res.respuesta, 'error');
+                        }
+                    },
+                    'json'
+                );
             }
         });
     });
 
-    // --- Dynamic Color Logic ---
-    function addColorRow(color = '', cantidad = '') {
-        var rowId = Date.now();
-        
-        // Mapa de colores legacy a Hex
-        var colorMap = {
-            'Negro': '#000000',
-            'Blanco': '#ffffff',
-            'Azul': '#0000ff',
-            'Verde': '#008000',
-            'Amarillo': '#ffff00',
-            'Rojo': '#ff0000',
-            'Gris': '#808080',
-            'Naranja': '#ffa500'
-        };
+    /* ==========================================================
+       COLORES DINÁMICOS
+    ========================================================== */
 
-        // Si el color viene como nombre (legacy), convertir a hex. Si no, usar tal cual (o default negro)
-        var colorValue = colorMap[color] || color || '#000000';
+    let colorRowIndex = 0;
 
-        var html = `
-            <div class="row align-items-center mb-2 color-row" id="row_${rowId}">
+    function addColorRow(color = '#000000', cantidad = '') {
+        colorRowIndex++;
+        const rowId = `color_row_${colorRowIndex}`;
+
+        $('#colores_container').append(`
+            <div class="row align-items-center mb-2" id="${rowId}">
                 <div class="col-6">
-                    <div class="input-group">
-                        <input type="color" class="form-control form-control-sm form-control-color" 
-                               name="colores[]" 
-                               value="${colorValue}" 
-                               title="Elige un color">
-                    </div>
+                    <input type="color" class="form-control form-control-sm"
+                           name="colores[]" value="${color}">
                 </div>
                 <div class="col-4">
-                    <input type="number" class="form-control form-control-sm input-cantidad" name="cantidades[]" placeholder="Cant." value="${cantidad}" min="0" required>
+                    <input type="number" class="form-control form-control-sm input-cantidad"
+                           name="cantidades[]" value="${cantidad}" min="0">
                 </div>
                 <div class="col-2">
-                    <button type="button" class="btn btn-sm btn-outline-danger btn-remove-color" data-row="row_${rowId}">
+                    <button type="button"
+                            class="btn btn-sm btn-outline-danger btn-remove-color"
+                            data-row="${rowId}">
                         <i class="mdi mdi-delete"></i>
                     </button>
                 </div>
             </div>
-        `;
-        $('#colores_container').append(html);
+        `);
     }
 
-    $('#btn_add_color').click(function() {
+    $('#btn_add_color').on('click', function () {
         addColorRow();
     });
 
-    $(document).on('click', '.btn-remove-color', function() {
-        var rowId = $(this).data('row');
-        $('#' + rowId).remove();
-        updateTotalCantidad();
+    $(document).on('click', '.btn-remove-color', function () {
+        $('#' + $(this).data('row')).remove();
     });
 
-    $(document).on('input', '.input-cantidad', function() {
-        updateTotalCantidad();
-    });
-
-    function updateTotalCantidad() {
-        var total = 0;
-        $('.input-cantidad').each(function() {
-            var val = parseInt($(this).val()) || 0;
-            total += val;
-        });
-        // Optional: Update total stock field if needed, but currently logic might be separate
-        // $('#cantidad').val(total); 
-    }
-
-    // 5. Ver imagen grande
-    $(document).on('click', '.btn-ver-imagen', function() {
-        var src = $(this).data('src');
-        $('#imagenGrande').attr('src', src);
-        $('#modalImagen').modal('show');
-    });
-}); // <--- Solo un cierre de ready
+});
 </script>
