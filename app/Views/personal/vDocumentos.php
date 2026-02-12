@@ -825,6 +825,13 @@
                                                                         </div>
                                                                     </li>
                                                                  </a> 
+                                                                   <a target="_blank" href="<?= base_url()?>assets/documentos/Investigacion_de_Mercado_servicios.xlsx" > 
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Investigacion de Mercado servicios
+                                                                        </div>
+                                                                    </li>
+                                                                 </a> 
                                                                  <a target="_blank" href="<?= base_url()?>assets/documentos/ANEXO_EDOCOMB.xlsx" > 
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
