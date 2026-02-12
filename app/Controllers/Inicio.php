@@ -426,69 +426,78 @@ class Inicio extends BaseController
         return $this->respond($response);
     }
 
-  public function guardarProducto()
+    public function guardarProducto()
     {
         $response = new \stdClass();
         $globals = new Mglobal;
         $response->error = true;
 
-        $data = $this->request->getPost();
-        $archivo = $this->request->getFile('imagen');
-        
-        // Validar datos básicos
-        if (!$data || !isset($data['nombre'])) {
-            $response->respuesta = "Datos incompletos.";
+        $id_producto = $this->request->getPost('id_producto');
+        $tipo_movimiento = $this->request->getPost('tipo_movimiento'); // 'nuevo' o 'editar'
+        $tabla = 'cat_inventario_promo'; 
+
+        $nombre = $this->request->getPost('nombre');
+        $cantidad = $this->request->getPost('cantidad');
+        $stock = $this->request->getPost('stock');
+        $color = $this->request->getPost('color'); // Especificaciones
+        $total_existencia = $this->request->getPost('total_existencia');
+
+        if (empty($nombre)) {
+            $response->respuesta = "El nombre del producto es obligatorio.";
             return $this->respond($response);
-        }
-        
-        $nombreImagen = '';
-        
-        // Procesar la imagen si se subió correctamente
-        if ($archivo && $archivo->isValid() && !$archivo->hasMoved()) {
-            // Validar tipo de archivo
-            $tipoPermitido = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
-            if (in_array($archivo->getClientMimeType(), $tipoPermitido)) {
-                // Generar nombre único para la imagen
-                $nombreImagen = $archivo->getRandomName();
-                
-                // Mover la imagen a la carpeta de uploads
-                $ruta = 'uploads/productos/'; // Ajusta esta ruta según tu proyecto
-                $archivo->move($ruta, $nombreImagen);
-            } else {
-                $response->respuesta = "Tipo de archivo no permitido. Solo imágenes JPG, PNG, GIF y WEBP.";
-                return $this->respond($response);
-            }
-        } else {
-            // Si no hay imagen, puedes manejarlo de estas formas:
-            // Opción 1: No permitir producto sin imagen
-            $response->respuesta = "Debe seleccionar una imagen.";
-            return $this->respond($response);
-            
-            // Opción 2: Usar imagen por defecto (comenta la opción 1 y descomenta esta)
-            // $nombreImagen = 'default-product.png';
         }
 
-        $dataInsert = [
-            'dsc_producto' => $data['nombre'],
-            'cantidad' => $data['cantidad'] ?? 0,
-            'stock' => $data['stock'] ?? 0,
-           // 'especificaciones' => $data['color'] ?? '',
-            'total_existencia' => $data['total_existencia'] ?? 0,
-            'imagen' => $nombreImagen // Guardamos solo el nombre, no el objeto
+        // Preparar arreglo de datos a guardar
+        $dataSave = [
+            'dsc_producto' => $nombre,
+            'cantidad' => $cantidad,
+            'stock' => $stock,
+            'negro' => $color, 
+            'total_existencia' => $total_existencia,
+            'visible' => 1
         ];
 
+        // === PROCESAR IMAGEN ===
+        $file = $this->request->getFile('imagen');
+        if ($file && $file->isValid() && !$file->hasMoved()) {
+            // Nombre aleatorio para evitar conflictos
+            $newName = $file->getRandomName();
+            $uploadPath = 'assets/img_productos/';
+            
+            // Verificar y crear directorio si no existe
+            if (!is_dir(FCPATH . $uploadPath)) {
+                mkdir(FCPATH . $uploadPath, 0777, true);
+            }
+            
+            // Mover archivo
+            if ($file->move(FCPATH . $uploadPath, $newName)) {
+                $dataSave['imagen'] = $uploadPath . $newName;
+            } else {
+                $response->respuesta = "Error al mover el archivo de imagen.";
+                return $this->respond($response);
+            }
+        }
+
+        // Configuración para saveTabla
         $dataConfig = [
-            'tabla' => 'cat_inventario_promo',
+            'tabla' => $tabla,
             'editar' => false
         ];
 
-        $result = $globals->saveTabla($dataInsert, $dataConfig, ['script' => 'Inicio.guardarProducto']);
+        // Lógica Editar vs Nuevo
+        if ($tipo_movimiento == 'editar' && !empty($id_producto)) {
+            $dataConfig['editar'] = true;
+            $dataConfig['idEditar'] = ['id_inventario_promo' => $id_producto];
+        }
 
-        if ($result) {
+        // Guardar en BD
+        $result = $globals->saveTabla($dataSave, $dataConfig, ['script' => 'Inicio.guardarProducto']);
+
+        if ($result && isset($result->error) && $result->error === false) {
             $response->error = false;
-            $response->respuesta = "Producto guardado correctamente.";
+            $response->respuesta = ($tipo_movimiento == 'editar') ? "Producto actualizado correctamente." : "Producto guardado correctamente.";
         } else {
-            $response->respuesta = (isset($result->respuesta)) ? $result->respuesta : "Error al guardar.";
+            $response->respuesta = $result->respuesta ?? "Error al guardar la información.";
         }
 
         return $this->respond($response);

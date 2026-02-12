@@ -190,18 +190,19 @@
                                                                 <!-- Acciones -->
                                                                 <td class="text-center text-nowrap">
                                                                     <div class="d-flex justify-content-center">
-                                                                        <button class="btn btn-sm btn-outline-primary btn-movimiento border-0 p-2"
-                                                                            data-id="<?= $item->id_inventario_promo ?>"
-                                                                            data-tabla="cat_inventario_promo"
-                                                                            data-nombre="<?= $item->dsc_producto ?>"
-                                                                            data-stock="<?= $stock ?>"
-                                                                            data-cantidad="<?= $item->cantidad ?>"
-                                                                            data-color="<?= $item->negro ?? $item->color ?? '' ?>"
-                                                                            data-total_existencia="<?= $item->total_existencia ?>"
-                                                                            data-tipo="editar"
-                                                                            title="Editar">
-                                                                            ✏️ Editar
-                                                                        </button>
+                                                                        <button type="button" class="btn btn-outline-secondary btn-sm btn-movimiento" 
+                                                                        data-id="<?= $item->id_inventario_promo ?>"
+                                                                        data-nombre="<?= $productoTmp ?>"
+                                                                        data-cantidad="<?= $item->cantidad ?>"
+                                                                        data-stock="<?= $item->stock ?>"
+                                                                        data-color="<?= $item->negro ?>"
+                                                                        data-total_existencia="<?= $item->total_existencia ?>"
+                                                                        data-imagen="<?= $item->imagen ?? '' ?>" 
+                                                                        data-tabla="cat_inventario_promo"
+                                                                        data-tipo="editar"
+                                                                        title="Editar">
+                                                                        <i class="mdi mdi-pencil"></i>
+                                                                    </button>
 
                                                                         <button class="btn btn-sm btn-outline-warning btn-movimiento border-0 mx-1 p-2"
                                                                             data-id="<?= $item->id_inventario_promo ?>"
@@ -378,8 +379,18 @@
                                                     </div>
 
                                                     <div class="form-group">
-                                                        <label class="font-weight-bold text-dark text-uppercase font-12">Especificaciones</label>
-                                                        <input type="text" class="form-control" id="color_producto" name="color">
+                                                        <label class="font-weight-bold text-dark text-uppercase font-12">Especificaciones / Color</label>
+                                                        <select class="form-control" id="color_producto" name="color">
+                                                            <option value="">Seleccione una opción</option>
+                                                            <option value="Negro">Negro</option>
+                                                            <option value="Blanco">Blanco</option>
+                                                            <option value="Azul">Azul</option>
+                                                            <option value="Verde">Verde</option>
+                                                            <option value="Amarillo">Amarillo</option>
+                                                            <option value="Rojo">Rojo</option>
+                                                            <option value="Gris">Gris</option>
+                                                            <option value="Naranja">Naranja</option>
+                                                        </select>
                                                     </div>
 
                                                     <div class="form-group">
@@ -526,11 +537,17 @@ $(document).ready(function() {
         $('#color_producto').val(d.color || '');
         $('#total_existencia').val(d.total_existencia || '');
         
-        // Limpiar el input file y preview
+        // Limpiar el input file y preview por defecto
         $('#imagen_producto').val('');
         $('.custom-file-label').html('Seleccionar Archivo');
-        $('#preview_imagen').attr('src', '').hide();
-        $('#placeholder_imagen').show();
+        
+        if (d.imagen && d.imagen.trim() !== '') {
+            $('#preview_imagen').attr('src', '<?= base_url() ?>' + d.imagen).show();
+            $('#placeholder_imagen').hide();
+        } else {
+            $('#preview_imagen').attr('src', '').hide();
+            $('#placeholder_imagen').show();
+        }
 
 
         var titulo = 'Movimiento';
