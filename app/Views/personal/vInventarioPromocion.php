@@ -133,30 +133,23 @@
 
                                                                 <!-- Colores -->
                                                                 <td class="text-center">
-                                                                    <?php if(isset($item->negro) && $item->negro == 1): ?>
-                                                                        <i class="mdi mdi-circle text-dark font-18" data-toggle="tooltip" data-placement="top" title="Negro: <?= $item->negro_cantidad ?? 0 ?>"></i>
-                                                                    <?php endif; ?>
-                                                                    
-                                                                    <?php if(isset($item->blanco) && $item->blanco == 1): ?>
-                                                                        <i class="mdi mdi-circle text-white font-18 border rounded-circle" style="border: 1px solid #ccc !important;" data-toggle="tooltip" data-placement="top" title="Blanco: <?= $item->blanco_cantidad ?? 0 ?>"></i>
-                                                                    <?php endif; ?>
-
-                                                                    <?php if(isset($item->azul) && $item->azul == 1): ?>
-                                                                        <i class="mdi mdi-circle text-primary font-18" data-toggle="tooltip" data-placement="top" title="Azul: <?= $item->azul_cantidad ?? 0 ?>"></i>
-                                                                    <?php endif; ?>
-
-                                                                    <?php if(isset($item->verde) && $item->verde == 1): ?>
-                                                                        <i class="mdi mdi-circle text-success font-18" data-toggle="tooltip" data-placement="top" title="Verde: <?= $item->verde_cantidad ?? 0 ?>"></i>
-                                                                    <?php endif; ?>
-
-                                                                    <?php if(isset($item->amarillo) && $item->amarillo == 1): ?>
-                                                                        <i class="mdi mdi-circle text-warning font-18" data-toggle="tooltip" data-placement="top" title="Amarillo: <?= $item->amarillo_cantidad ?? 0 ?>"></i>
+                                                                    <?php if(isset($item->colores) && !empty($item->colores)): ?>
+                                                                        <?php foreach($item->colores as $color): ?>
+                                                                            <i class="mdi mdi-circle font-18" 
+                                                                               style="color: <?= $color->hexadecimal ?>;" 
+                                                                               data-toggle="tooltip" 
+                                                                               data-placement="top" 
+                                                                               title="<?= ($color->nombre ?? $color->hexadecimal) ?>: <?= $color->cantidad ?? 0 ?>">
+                                                                            </i>
+                                                                        <?php endforeach; ?>
+                                                                    <?php else: ?>
+                                                                        <span class="text-muted font-12">Sin colores</span>
                                                                     <?php endif; ?>
                                                                 </td>
 
                                                                 <!-- Especificaciones -->
                                                                 <td class="text-center text-muted">
-                                                                    <?= $item->negro ?>
+                                                                    <?= $item->negro ?? '' // Mantener por si acaso, o quitar si ya no se usa ?>
                                                                 </td>
 
                                                                 <!-- Stock -->
@@ -198,22 +191,7 @@
                                                                         data-total_existencia="<?= $item->total_existencia ?>"
                                                                         data-imagen="<?= $item->imagen ?? '' ?>" 
                                                                         
-                                                                        data-negro="<?= $item->negro ?? 0 ?>"
-                                                                        data-negro_cantidad="<?= $item->negro_cantidad ?? 0 ?>"
-                                                                        data-blanco="<?= $item->blanco ?? 0 ?>"
-                                                                        data-blanco_cantidad="<?= $item->blanco_cantidad ?? 0 ?>"
-                                                                        data-azul="<?= $item->azul ?? 0 ?>"
-                                                                        data-azul_cantidad="<?= $item->azul_cantidad ?? 0 ?>"
-                                                                        data-verde="<?= $item->verde ?? 0 ?>"
-                                                                        data-verde_cantidad="<?= $item->verde_cantidad ?? 0 ?>"
-                                                                        data-amarillo="<?= $item->amarillo ?? 0 ?>"
-                                                                        data-amarillo_cantidad="<?= $item->amarillo_cantidad ?? 0 ?>"
-                                                                        data-rojo="<?= $item->rojo ?? 0 ?>"
-                                                                        data-rojo_cantidad="<?= $item->rojo_cantidad ?? 0 ?>"
-                                                                        data-gris="<?= $item->gris ?? 0 ?>"
-                                                                        data-gris_cantidad="<?= $item->gris_cantidad ?? 0 ?>"
-                                                                        data-naranja="<?= $item->naranja ?? 0 ?>"
-                                                                        data-naranja_cantidad="<?= $item->naranja_cantidad ?? 0 ?>"
+                                                                        data-colores='<?= json_encode($item->colores ?? []) ?>'
 
                                                                         data-tabla="cat_inventario_promo"
                                                                         data-tipo="editar"
@@ -551,31 +529,38 @@ $(document).ready(function() {
         // Limpiar contenedor de colores
         $('#colores_container').empty();
         
-        // Populate colors if editing
-        if (d.tipo == 'editar') {
-            // Check specific color columns if available in 'd'
-            // We need to ensure 'd' contains these values. 
-            // The button currently has data-color (which was the old logic). 
-            // We need to update the button generation in PHP to include data-negro_cantidad, etc.
-            // For now, let's assume we will pass a JSON object or individual attributes.
-            
-            var colorsAdded = 0;
-            // List of supported colors in DB
-            var dbColors = ['Negro', 'Blanco', 'Azul', 'Verde', 'Amarillo', 'Rojo', 'Gris', 'Naranja'];
-            
-            dbColors.forEach(function(color) {
-                // Construct attribute name e.g., d.negro_cantidad
-                var key = color.toLowerCase() + '_cantidad';
-                var qty = d[key]; 
-                
-                // Also check the boolean flag e.g., d.negro
-                var flag = d[color.toLowerCase()];
+        // Populate colors if editing and has dynamic colors
+        var dynamicColores = d.colores; // Should be object/array from json_encode
 
-                if ((qty && qty > 0) || (flag && flag == 1)) {
-                    addColorRow(color, qty || 0);
+        if (d.tipo == 'editar') {
+            var colorsAdded = 0;
+
+            if (dynamicColores && dynamicColores.length > 0) {
+                // New dynamic logic
+                dynamicColores.forEach(function(c) {
+                    // c.hexadecimal and c.cantidad
+                    addColorRow(c.hexadecimal, c.cantidad);
                     colorsAdded++;
-                }
-            });
+                });
+            } else {
+                // Fallback / Legacy Logic (if data-colores is empty but has old attributes)
+                // List of supported colors in DB
+                var dbColors = ['Negro', 'Blanco', 'Azul', 'Verde', 'Amarillo', 'Rojo', 'Gris', 'Naranja'];
+                
+                dbColors.forEach(function(color) {
+                    // Construct attribute name e.g., d.negro_cantidad
+                    var key = color.toLowerCase() + '_cantidad';
+                    var qty = d[key]; 
+                    
+                    // Also check the boolean flag e.g., d.negro
+                    var flag = d[color.toLowerCase()];
+
+                    if ((qty && qty > 0) || (flag && flag == 1)) {
+                        addColorRow(color, qty || 0); // This will use the legacy name mapping
+                        colorsAdded++;
+                    }
+                });
+            }
 
             // If no colors found (legacy or empty), maybe add one empty row or none
             if (colorsAdded === 0) {
@@ -679,20 +664,31 @@ $(document).ready(function() {
     // --- Dynamic Color Logic ---
     function addColorRow(color = '', cantidad = '') {
         var rowId = Date.now();
+        
+        // Mapa de colores legacy a Hex
+        var colorMap = {
+            'Negro': '#000000',
+            'Blanco': '#ffffff',
+            'Azul': '#0000ff',
+            'Verde': '#008000',
+            'Amarillo': '#ffff00',
+            'Rojo': '#ff0000',
+            'Gris': '#808080',
+            'Naranja': '#ffa500'
+        };
+
+        // Si el color viene como nombre (legacy), convertir a hex. Si no, usar tal cual (o default negro)
+        var colorValue = colorMap[color] || color || '#000000';
+
         var html = `
             <div class="row align-items-center mb-2 color-row" id="row_${rowId}">
                 <div class="col-6">
-                    <select class="form-control form-control-sm select-color" name="colores[]">
-                        <option value="">Color...</option>
-                        <option value="Negro" ${color == 'Negro' ? 'selected' : ''}>Negro</option>
-                        <option value="Blanco" ${color == 'Blanco' ? 'selected' : ''}>Blanco</option>
-                        <option value="Azul" ${color == 'Azul' ? 'selected' : ''}>Azul</option>
-                        <option value="Verde" ${color == 'Verde' ? 'selected' : ''}>Verde</option>
-                        <option value="Amarillo" ${color == 'Amarillo' ? 'selected' : ''}>Amarillo</option>
-                        <option value="Rojo" ${color == 'Rojo' ? 'selected' : ''}>Rojo</option>
-                        <option value="Gris" ${color == 'Gris' ? 'selected' : ''}>Gris</option>
-                        <option value="Naranja" ${color == 'Naranja' ? 'selected' : ''}>Naranja</option>
-                    </select>
+                    <div class="input-group">
+                        <input type="color" class="form-control form-control-sm form-control-color" 
+                               name="colores[]" 
+                               value="${colorValue}" 
+                               title="Elige un color">
+                    </div>
                 </div>
                 <div class="col-4">
                     <input type="number" class="form-control form-control-sm input-cantidad" name="cantidades[]" placeholder="Cant." value="${cantidad}" min="0">

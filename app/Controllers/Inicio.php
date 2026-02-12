@@ -139,6 +139,38 @@ class Inicio extends BaseController
         $this->_renderView($data);
 
     }
+
+    public function setupColorDB()
+    {
+        $db = \Config\Database::connect();
+        
+        $sql1 = "CREATE TABLE IF NOT EXISTS colores (
+            id_color INT AUTO_INCREMENT PRIMARY KEY,
+            codigo_hex VARCHAR(10) NOT NULL,
+            nombre VARCHAR(50),
+            visible INT DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );";
+
+        $sql2 = "CREATE TABLE IF NOT EXISTS rel_producto_color (
+            id_rel INT AUTO_INCREMENT PRIMARY KEY,
+            id_producto INT NOT NULL,
+            id_color INT NOT NULL,
+            cantidad INT DEFAULT 0,
+            visible INT DEFAULT 1,
+            FOREIGN KEY (id_producto) REFERENCES cat_inventario_promo(id_inventario_promo),
+            FOREIGN KEY (id_color) REFERENCES colores(id_color)
+        );";
+
+        try {
+            $db->query($sql1);
+            $db->query($sql2);
+            echo "Tablas creadas correctamente.";
+        } catch (\Throwable $th) {
+            echo "Error al crear tablas: " . $th->getMessage();
+        }
+    }
+
     public function Perfil()
     {
         $session = \Config\Services::session();
@@ -326,6 +358,18 @@ class Inicio extends BaseController
             'where' => ['visible' => 1]
         ])->data;
 
+        // Fetch colors for each product
+        if (!empty($data['cat_inventario_promo'])) {
+            foreach ($data['cat_inventario_promo'] as &$item) {
+                $colores = $globas->getTabla([
+                    'tabla' => 'colores',
+                    'where' => ['id_inventario' => $item->id_inventario_promo, 'visible' => 1]
+                ]);
+                
+                $item->colores = $colores->data ?? [];
+            }
+        }
+
         // MÉTRICAS UX
         $data['total_stock_promo'] = 0;
         $data['total_productos']  = count($data['cat_inventario_promo']);
@@ -440,6 +484,8 @@ class Inicio extends BaseController
         $cantidad = $this->request->getPost('cantidad');
         $stock = $this->request->getPost('stock');
         $total_existencia = $this->request->getPost('total_existencia');
+        $colores = $this->request->getPost('colores');
+        $cantidades = $this->request->getPost('cantidades');
 
         if (empty($nombre)) {
             $response->respuesta = "El nombre del producto es obligatorio.";
@@ -455,30 +501,7 @@ class Inicio extends BaseController
             'visible' => 1
         ];
 
-        // === PROCESAR COLORES ===
-        // Reset all color columns first to ensure clean state
-        $allColors = ['negro', 'blanco', 'azul', 'verde', 'amarillo', 'rojo', 'gris', 'naranja'];
-        foreach ($allColors as $c) {
-            $dataSave[$c] = 0;
-            $dataSave[$c . '_cantidad'] = 0;
-        }
-
-        $colores = $this->request->getPost('colores'); // Array
-        $cantidades = $this->request->getPost('cantidades'); // Array
-
-        if (is_array($colores)) {
-            foreach ($colores as $index => $colorName) {
-                if (!empty($colorName)) {
-                    $cKey = strtolower($colorName);
-                    // Verify if this color is in our supported list
-                    if (in_array($cKey, $allColors)) {
-                        $qty = isset($cantidades[$index]) ? (int)$cantidades[$index] : 0;
-                        $dataSave[$cKey] = 1; // Set flag
-                        $dataSave[$cKey . '_cantidad'] = $qty;
-                    }
-                }
-            }
-        }
+       
 
         // === PROCESAR IMAGEN ===
         $file = $this->request->getFile('imagen');
@@ -515,14 +538,29 @@ class Inicio extends BaseController
 
         // Guardar en BD
         $result = $globals->saveTabla($dataSave, $dataConfig, ['script' => 'Inicio.guardarProducto']);
+        if(!$result->error){
+            foreach($colores as $key => $color){
+               $res = $globals->saveTabla([
+                    'id_inventario' => $result->idRegistro,
+                    'hexadecimal' => $color,
+                    'cantidad' => $cantidades[$key]
+                ], [
+                    'tabla' => 'colores',
+                    'editar' => false
+                ], ['script' => 'Inicio.guardarProducto']);
 
-        if ($result && isset($result->error) && $result->error === false) {
-            $response->error = false;
-            $response->respuesta = ($tipo_movimiento == 'editar') ? "Producto actualizado correctamente." : "Producto guardado correctamente.";
-        } else {
-            $response->respuesta = $result->respuesta ?? "Error al guardar la información.";
+            }
+
         }
 
+        if($result->error){
+            $response->respuesta = "Error al guardar el producto.";
+        }else{
+            $response->error = false;
+            $response->respuesta = "Producto guardado correctamente.";
+        }
+
+ 
         return $this->respond($response);
     }
 
