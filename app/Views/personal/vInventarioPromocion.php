@@ -111,9 +111,7 @@
                                                         <th class="py-3">
                                                             <i class="mdi mdi-palette text-pink d-block mb-1"></i>
                                                             <small class="text-muted d-block">Colores</small></th>
-                                                        <th class="py-3">
-                                                            <i class="mdi mdi-palette-outline text-warning d-block mb-1"></i>
-                                                            <small class="text-muted d-block">Especificaciones</small></th>
+                                              
                                                         <th class="py-3">
                                                             <i class="mdi mdi-warehouse text-success d-block mb-1"></i>
                                                             <small class="text-muted d-block">Stock</small></th>
