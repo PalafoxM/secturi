@@ -49,6 +49,7 @@
                                                     <tr>
                                                         
                                                         <th class="text-center">PROVEEDOR</th>
+                                                        <th class="text-center">RESERVA</th>
                                                         <th class="text-center">No. PROVEEDOR</th>
                                                         <th class="text-center">No. CONVENIO</th>
                                                         <?php if(isset($es_declinado) && $es_declinado): ?>
@@ -69,6 +70,7 @@
                                                     <tr>
                                                
                                                         <td class="text-center"><?= $p->razon_social?></td>
+                                                        <td class="text-center"><?= $p->no_reserva?></td>
                                                         <td class="text-center"><?= $p->no_proveedor?></td>
                                                         <td class="text-center"><?= $p->no_convenio?></td>
                                                        
