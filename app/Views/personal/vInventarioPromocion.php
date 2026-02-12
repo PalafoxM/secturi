@@ -113,11 +113,11 @@
                                                             <small class="text-muted d-block">Colores</small></th>
                                               
                                                         <th class="py-3">
-                                                            <i class="mdi mdi-warehouse text-success d-block mb-1"></i>
-                                                            <small class="text-muted d-block">Stock</small></th>
+                                                            <i class="mdi mdi-calendar-check text-success d-block mb-1"></i>
+                                                            <small class="text-muted d-block">Fec. Entrada</small></th>
                                                         <th class="py-3">
-                                                            <i class="mdi mdi-database-outline text-dark d-block mb-0"></i>
-                                                            <small class="text-muted d-block">Tot. Exist.</small></th>
+                                                            <i class="mdi mdi-calendar-remove text-dark d-block mb-0"></i>
+                                                            <small class="text-muted d-block">Fec. Salida</small></th>
                                                         <th class="py-3">
                                                             <i class="mdi mdi-currency-usd text-primary d-block mb-1"></i>
                                                             <small class="text-muted d-block">Precio</small></th>
@@ -183,16 +183,16 @@
                                                                     <?php endif; ?>
                                                                 </td>
 
-                                                                <!-- Stock -->
+                                                                <!-- Fec. Entrada -->
                                                                 <td class="text-center">
-                                                                    <span class="badge <?= $badgeClass ?> font-13">
-                                                                        <?= $stock ?>
+                                                                    <span class="badge badge-soft-success font-13">
+                                                                        <?= $item->fecha_entrada ?? date('d/m/Y', strtotime($item->created_at ?? 'now')) ?>
                                                                     </span>
                                                                 </td>
 
-                                                                <!-- Total Existencia -->
+                                                                <!-- Fec. Salida -->
                                                                 <td class="text-center font-weight-bold text-dark">
-                                                                    <?= $item->total_existencia ?>
+                                                                    <?= !empty($item->fecha_salida) ? date('d/m/Y', strtotime($item->fecha_salida)) : '-' ?>
                                                                 </td>
 
                                                                 <!-- Precio -->
@@ -219,6 +219,7 @@
                                                                         data-nombre="<?= $productoTmp ?>"
                                                                         data-cantidad="<?= $item->cantidad ?>"
                                                                         data-stock="<?= $item->stock ?>"
+                                                                        data-subtotal="<?= $item->subtotal ?? 0 ?>"
                                                                         data-total_existencia="<?= $item->total_existencia ?>"
                                                                         data-imagen="<?= $item->imagen ?? '' ?>" 
                                                                         
@@ -398,8 +399,8 @@
                                                         </div>
                                                         <div class="col-md-6">
                                                             <div class="form-group">
-                                                                <label class="font-weight-bold text-dark text-uppercase font-12" id="label_cantidad">Stock</label>
-                                                                <input type="number" class="form-control" id="cantidad" name="stock" min="0" required>
+                                                                <label class="font-weight-bold text-dark text-uppercase font-12" id="label_cantidad">Subtotal</label>
+                                                                <input type="number" class="form-control" id="subtotal" name="subtotal" min="0" step="0.01" required>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -551,7 +552,7 @@ $(document).ready(function() {
         // Reset de campos
         $('#nombre_producto').prop('readonly', false);
         // Removed: $('#div_tabla_select').hide(); 
-        $('#cantidad').val(d.stock || '');
+        $('#subtotal').val(d.subtotal || '');
         
         // Asignar los nuevos campos
         $('#cantidad_producto').val(d.cantidad || '');
@@ -616,19 +617,18 @@ $(document).ready(function() {
 
 
         var titulo = 'Movimiento';
-        if(d.tipo == 'nuevo'){
-            titulo = 'Nuevo Producto';
+            title = 'Nuevo Producto';
             // Removed: $('#div_tabla_select').show();
             $('#tabla_hidden').val('cat_inventario_promo'); // Force default table
-            $('#label_cantidad').text('Stock Inicial');
+            $('#label_cantidad').text('Subtotal');
         } else if(d.tipo == 'editar'){
             titulo = 'Editar Producto';
-            $('#label_cantidad').text('Stock Actual');
+            $('#label_cantidad').text('Subtotal');
         } else if(d.tipo == 'salida'){
             titulo = 'Baja de Stock';
             $('#nombre_producto').prop('readonly', true);
             $('#label_cantidad').text('Cantidad a retirar');
-            $('#cantidad').val('');
+            $('#cantidad').val(''); // Keep #cantidad for salida if strictly needed, or handle differently
         }
         
         $('#modalTitulo').text(titulo);
