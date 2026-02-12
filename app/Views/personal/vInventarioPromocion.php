@@ -68,6 +68,9 @@
                                                             <i class="mdi mdi-counter text-info d-block mb-1"></i>
                                                             <small class="text-muted d-block">Cantidad</small></th>
                                                         <th class="py-3">
+                                                            <i class="mdi mdi-palette text-pink d-block mb-1"></i>
+                                                            <small class="text-muted d-block">Colores</small></th>
+                                                        <th class="py-3">
                                                             <i class="mdi mdi-palette-outline text-warning d-block mb-1"></i>
                                                             <small class="text-muted d-block">Especificaciones</small></th>
                                                         <th class="py-3">
@@ -116,9 +119,32 @@
                                                                     </span>
                                                                 </td>
 
+                                                                <!-- Colores -->
+                                                                <td class="text-center">
+                                                                    <?php if(isset($item->negro) && $item->negro == 1): ?>
+                                                                        <i class="mdi mdi-circle text-dark font-18" data-toggle="tooltip" data-placement="top" title="Negro: <?= $item->negro_cantidad ?? 0 ?>"></i>
+                                                                    <?php endif; ?>
+                                                                    
+                                                                    <?php if(isset($item->blanco) && $item->blanco == 1): ?>
+                                                                        <i class="mdi mdi-circle text-white font-18 border rounded-circle" style="border: 1px solid #ccc !important;" data-toggle="tooltip" data-placement="top" title="Blanco: <?= $item->blanco_cantidad ?? 0 ?>"></i>
+                                                                    <?php endif; ?>
+
+                                                                    <?php if(isset($item->azul) && $item->azul == 1): ?>
+                                                                        <i class="mdi mdi-circle text-primary font-18" data-toggle="tooltip" data-placement="top" title="Azul: <?= $item->azul_cantidad ?? 0 ?>"></i>
+                                                                    <?php endif; ?>
+
+                                                                    <?php if(isset($item->verde) && $item->verde == 1): ?>
+                                                                        <i class="mdi mdi-circle text-success font-18" data-toggle="tooltip" data-placement="top" title="Verde: <?= $item->verde_cantidad ?? 0 ?>"></i>
+                                                                    <?php endif; ?>
+
+                                                                    <?php if(isset($item->amarillo) && $item->amarillo == 1): ?>
+                                                                        <i class="mdi mdi-circle text-warning font-18" data-toggle="tooltip" data-placement="top" title="Amarillo: <?= $item->amarillo_cantidad ?? 0 ?>"></i>
+                                                                    <?php endif; ?>
+                                                                </td>
+
                                                                 <!-- Especificaciones -->
                                                                 <td class="text-center text-muted">
-                                                                    <?= $item->color ?>
+                                                                    <?= $item->negro ?>
                                                                 </td>
 
                                                                 <!-- Stock -->
@@ -156,8 +182,10 @@
                                                                             data-id="<?= $item->id_inventario_promo ?>"
                                                                             data-tabla="cat_inventario_promo"
                                                                             data-nombre="<?= $item->dsc_producto ?>"
-                                                                            data-nombre="<?= $productoTmp ?>"
                                                                             data-stock="<?= $stock ?>"
+                                                                            data-cantidad="<?= $item->cantidad ?>"
+                                                                            data-color="<?= $item->negro ?? $item->color ?? '' ?>"
+                                                                            data-total_existencia="<?= $item->total_existencia ?>"
                                                                             data-tipo="editar"
                                                                             title="Editar">
                                                                             ✏️ Editar
@@ -292,9 +320,9 @@
                         </div><!--end row principal-->
 
                         
-                        <!-- ===================== MODAL RIGHTBAR ===================== -->
-                        <div class="modal fade modal-rightbar" id="modalMovimientoInventario" tabindex="-1" role="dialog">
-                            <div class="modal-dialog modal-sm modal-dialog-right" role="document">
+                        <!-- ===================== MODAL STANDARD ===================== -->
+                        <div class="modal fade" id="modalMovimientoInventario" tabindex="-1" role="dialog">
+                            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header bg-light">
                                         <h5 class="modal-title font-16" id="modalTitulo">
@@ -312,21 +340,59 @@
                                             <!-- Hidden field for table name when editing or fixed -->
                                             <input type="hidden" id="tabla_hidden" name="tabla"> 
                                             
-                                            <div class="form-group" id="div_tabla_select" style="display:none;">
-                                                <label class="font-weight-bold  text-dark text-uppercase font-12">Categoría</label>
-                                                <select class="form-control" id="tabla_select">
-                                                    <option value="cat_inventario_promo">Artículos de Promoción</option>
-                                                </select>
-                                            </div>
+                                            <div class="row">
+                                                <!-- LEFT COLUMN: Form Fields -->
+                                                <div class="col-md-7">
+                                                    <!-- Removed Category Select -->
 
-                                            <div class="form-group">
-                                                <label class="font-weight-bold text-dark text-uppercase font-12">Producto</label>
-                                                <input type="text" class="form-control" id="nombre_producto" name="nombre" required>
-                                            </div>
+                                                    <div class="form-group">
+                                                        <label class="font-weight-bold text-dark text-uppercase font-12">Producto</label>
+                                                        <input type="text" class="form-control" id="nombre_producto" name="nombre" required>
+                                                    </div>
 
-                                            <div class="form-group">
-                                                <label class="font-weight-bold text-dark text-uppercase font-12" id="label_cantidad">Stock / Cantidad</label>
-                                                <input type="number" class="form-control" id="cantidad" name="stock" min="0" required>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                             <div class="form-group">
+                                                                <label class="font-weight-bold text-dark text-uppercase font-12">Cantidad</label>
+                                                                <input type="number" class="form-control" id="cantidad_producto" name="cantidad" min="0">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label class="font-weight-bold text-dark text-uppercase font-12" id="label_cantidad">Stock</label>
+                                                                <input type="number" class="form-control" id="cantidad" name="stock" min="0" required>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="font-weight-bold text-dark text-uppercase font-12">Especificaciones</label>
+                                                        <input type="text" class="form-control" id="color_producto" name="color">
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="font-weight-bold text-dark text-uppercase font-12">Total Existencia</label>
+                                                        <input type="number" class="form-control" id="total_existencia" name="total_existencia" min="0">
+                                                    </div>
+                                                </div>
+
+                                                <!-- RIGHT COLUMN: Image Upload -->
+                                                <div class="col-md-5">
+                                                    <div class="form-group text-center">
+                                                        <label class="font-weight-bold text-dark text-uppercase font-12 w-100">Imagen</label>
+                                                        
+                                                        <div class="mt-2 mb-3 border rounded d-flex align-items-center justify-content-center bg-light" style="height: 180px; overflow: hidden;">
+                                                            <img id="preview_imagen" src="" alt="Vista previa" class="img-fluid" style="max-height: 100%; display: none;">
+                                                            <span id="placeholder_imagen" class="text-muted small">Sin imagen seleccionada</span>
+                                                        </div>
+
+                                                        <div class="custom-file text-left">
+                                                            <input type="file" class="custom-file-input" id="imagen_producto" name="imagen" accept="image/*">
+                                                            <label class="custom-file-label" for="imagen_producto" data-browse="Elegir">Seleccionar Archivo</label>
+                                                        </div>
+                                                        <small class="form-text text-muted text-left mt-1">Formatos: JPG, PNG, GIF</small>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -390,6 +456,26 @@ $(document).ready(function() {
         order: [[ 0, "asc" ]]
     });
 
+    // Custom file input label change
+    $(".custom-file-input").on("change", function() {
+        var fileName = $(this).val().split("\\").pop();
+        $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        
+        // Image preview logic
+        var input = this;
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                $('#preview_imagen').attr('src', e.target.result).show();
+                $('#placeholder_imagen').hide();
+            }
+            reader.readAsDataURL(input.files[0]);
+        } else {
+             $('#preview_imagen').attr('src', '').hide();
+             $('#placeholder_imagen').show();
+        }
+    });
+
     // RESET TOTAL DEL MODAL
     setProductoReadonly(false);
         $('#label_cantidad').text('Stock / Cantidad');
@@ -406,15 +492,26 @@ $(document).ready(function() {
         
         // Reset de campos
         $('#nombre_producto').prop('readonly', false);
-        $('#div_tabla_select').hide();
+        // Removed: $('#div_tabla_select').hide(); 
         $('#cantidad').val(d.stock || '');
+        
+        // Asignar los nuevos campos
+        $('#cantidad_producto').val(d.cantidad || '');
         $('#color_producto').val(d.color || '');
-        $('#imagen_producto').val(d.imagen || '');
+        $('#total_existencia').val(d.total_existencia || '');
+        
+        // Limpiar el input file y preview
+        $('#imagen_producto').val('');
+        $('.custom-file-label').html('Seleccionar Archivo');
+        $('#preview_imagen').attr('src', '').hide();
+        $('#placeholder_imagen').show();
+
 
         var titulo = 'Movimiento';
         if(d.tipo == 'nuevo'){
             titulo = 'Nuevo Producto';
-            $('#div_tabla_select').show();
+            // Removed: $('#div_tabla_select').show();
+            $('#tabla_hidden').val('cat_inventario_promo'); // Force default table
             $('#label_cantidad').text('Stock Inicial');
         } else if(d.tipo == 'editar'){
             titulo = 'Editar Producto';
@@ -440,13 +537,17 @@ $(document).ready(function() {
             '<?= base_url("index.php/Inicio/actualizarInventario") ?>' : 
             '<?= base_url("index.php/Inicio/guardarProducto") ?>';
 
-        if(tipo == 'nuevo') $('#tabla_hidden').val($('#tabla_select').val());
+        // Removed: if(tipo == 'nuevo') $('#tabla_hidden').val($('#tabla_select').val());
+
+        var formData = new FormData(this);
 
         $.ajax({
             url: urlInfo,
             type: 'POST',
-            data: $(this).serialize(),
+            data: formData,
             dataType: 'json',
+            processData: false, // Importante para envío de archivos
+            contentType: false, // Importante para envío de archivos
             success: function(res) {
                 if (!res.error) {
                     Swal.fire("¡Éxito!", res.respuesta, "success").then(() => location.reload());
