@@ -370,16 +370,23 @@ class Inicio extends BaseController
             }
         }
 
-        // MÉTRICAS UX
         $data['total_stock_promo'] = 0;
-        $data['total_productos']  = count($data['cat_inventario_promo']);
-        $data['total_valor']      = 0; // por si después lo calculas
-        $data['total_stock']      = 0;
+        $data['total_subtotal_promo'] = 0;
+        $data['total_dinero_promo'] = 0;
 
-        $data['total_stock_promo'] = 0;
         if (!empty($data['cat_inventario_promo'])) {
             foreach ($data['cat_inventario_promo'] as $item) {
-                $data['total_stock_promo'] += (int)$item->stock;
+                $stock = (int)$item->stock;
+                $data['total_stock_promo'] += $stock;
+                
+                // Asegurar que existan las propiedades o calcularlas
+                // Asumiendo que vienen de BD, si no, calcular:
+                // $subtotal = $item->precio_unitario * $stock; // Ejemplo si no existe
+                $subtotal = isset($item->subtotal) ? (float)$item->subtotal : 0;
+                $total = isset($item->total) ? (float)$item->total : 0;
+
+                $data['total_subtotal_promo'] += $subtotal;
+                $data['total_dinero_promo'] += $total;
             }
         }
 

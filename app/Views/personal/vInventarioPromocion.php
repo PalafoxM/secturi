@@ -6,21 +6,59 @@
             <!-- ===================== tittle ===================== -->
             <div class="row mt-4">
                 <div class="col-lg-9">
-                     <div class="card shadow-sm border-0 h-100">
-                        <div class="card-body">
-                            <div class="row align-items-center">
-                                <div class="col-auto">
-                                    <div class="icon-info">
-                                        <i data-feather="smile" class="align-self-center icon-lg icon-dual-warning"></i>
+                    <div class="row">
+                        <!-- Card 1: Total Unidades -->
+                        <div class="col-lg-4">
+                            <div class="card shadow-sm border-0 h-100">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-auto">
+                                            <div class="icon-info">
+                                                <i class="mdi mdi-cube-outline bg-soft-primary rounded-circle p-2 font-20"></i>
+                                            </div>
+                                        </div>
+                                        <div class="col pl-0">
+                                            <h5 class="text-muted text-uppercase font-10 font-weight-bold mt-0 mb-2">Total Unidades</h5>
+                                            <h3 class="m-0 font-weight-bold"><?= number_format($total_stock_promo ?? 0) ?></h3>
+                                        </div>
                                     </div>
-                                </div> 
-                                <div class="col">
-                                    <div class="ml-2 font-13">
-                                        <p class="mb-1 text-muted">Material Promocional:</p>
-                                        <?= count($inventario ?? []) ?>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Subtotal -->
+                        <div class="col-lg-4">
+                            <div class="card shadow-sm border-0 h-100">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                         <div class="col-auto">
+                                            <div class="icon-info">
+                                                <i class="mdi mdi-currency-usd bg-soft-success rounded-circle p-2 font-20"></i>
+                                            </div>
+                                        </div>
+                                        <div class="col pl-0">
+                                            <h5 class="text-muted text-uppercase font-10 font-weight-bold mt-0 mb-2">Total Subtotal</h5>
+                                             <h3 class="m-0 font-weight-bold">$<?= number_format($total_subtotal_promo ?? 0, 2) ?></h3>
+                                        </div>
                                     </div>
-                                    <div class="progress mt-2" style="height:4px;">
-                                        <div class="progress-bar bg-pink" role="progressbar" style="width: 22%;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Total -->
+                        <div class="col-lg-4">
+                            <div class="card shadow-sm border-0 h-100">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-auto">
+                                            <div class="icon-info">
+                                                <i class="mdi mdi-cash-multiple bg-soft-warning rounded-circle p-2 font-20"></i>
+                                            </div>
+                                        </div>
+                                        <div class="col pl-0">
+                                            <h5 class="text-muted text-uppercase font-10 font-weight-bold mt-0 mb-2">Total Importe</h5>
+                                            <h3 class="m-0 font-weight-bold">$<?= number_format($total_dinero_promo ?? 0, 2) ?></h3>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
