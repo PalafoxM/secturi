@@ -5728,7 +5728,7 @@ class Principal extends BaseController
                     'id_director' => $registro_pt->data[0]->id_reponsable_solicitud
                 ]
             ]);
-          //die( var_dump($direccion->data) );
+         // die( var_dump($direccion->data) );
             if (empty($direccion->data)) {
                 $jefe = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_pt->data[0]->id_reponsable_solicitud]]);
                 if (!empty($jefe->data)) {
@@ -5793,7 +5793,7 @@ class Principal extends BaseController
        
         $subsecretario = $area = $globals->getTabla(['tabla' => 'cat_subsecretario', 'where' => ['visible' => 1, 'id_subsecretario' => $registro_pt->data[0]->id_subsecretario]]);
         $data['usu_sub'] = $subsecretario->data[0];
-        
+        // die( var_dump( $data['usu_sub']  ) );
         if($registros >= 15){
             $html = view('secciones/vFormatoPTExtra.php', $data);
             $templateFile = 'assets/pdf/plantillas/FormatoPTExtra_merged.pdf';
