@@ -294,7 +294,7 @@
                                                         </div>
                                                         <div class="media-body">                                                           
                                                             <p class="text-muted mb-1 font-weight-medium">Stock Total</p>
-                                                            <h3 class="m-0 font-weight-bold text-dark"><?= number_format($total_valor ?? 0) ?></h3>
+                                                            <h3 class="m-0 font-weight-bold text-dark"><?= number_format($total_stock_promo ?? 0) ?></h3>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -315,10 +315,10 @@
                                                     <div class="media p-3 bg-light rounded align-items-center">
                                                         <div class="avatar-md bg-soft-warning rounded-circle mr-3 d-flex align-items-center justify-content-center">
                                                             <i class="mdi mdi-history font-24"></i>
-                                                            <div class="media-body">
-                                                                <p class="text-muted mb-1 font-weight-medium text-uppercase font-11">Movimientos</p>
-                                                                <h3 class="m-0 font-weight-bold text-dark"><?= $total_movimientos ?? 0 ?></h3>
-                                                            </div>
+                                                        </div>    
+                                                        <div class="media-body">
+                                                            <p class="text-muted mb-1 font-weight-medium text-uppercase font-11">Movimientos</p>
+                                                            <h3 class="m-0 font-weight-bold text-dark"><?= $total_movimientos ?? 0 ?></h3>
                                                         </div>
                                                     </div>
                                                 </div>

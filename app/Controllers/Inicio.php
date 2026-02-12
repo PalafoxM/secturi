@@ -318,7 +318,7 @@ class Inicio extends BaseController
         $data['cat_inventario_papel'] = $globas->getTabla(['tabla' => 'cat_inventario_papel', 'where' => ['visible' => 1]])->data;
         $data['cat_inventario_art_papel'] = $globas->getTabla(['tabla' => 'cat_inventario_art_papel', 'where' => ['visible' => 1]])->data;
         $data['cat_inventario_art_ofi'] = $globas->getTabla(['tabla' => 'cat_inventario_art_ofi', 'where' => ['visible' => 1]])->data;
-        
+
         // Totales
         $data['total_stock_papel'] = array_sum(array_column($data['cat_inventario_papel'] ?? [], 'stock'));
         $data['total_stock_art_papel'] = array_sum(array_column($data['cat_inventario_art_papel'] ?? [], 'stock'));
@@ -354,7 +354,7 @@ class Inicio extends BaseController
         $globas = new Mglobal;
 
         $data['cat_inventario_promo'] = $globas->getTabla([
-            'tabla' => 'cat_inventario_promo', 
+            'tabla' => 'cat_inventario_promo',
             'where' => ['visible' => 1]
         ])->data;
 
@@ -454,9 +454,10 @@ class Inicio extends BaseController
 
         $stockActual = (int)(
             is_array($registro)
-                ? ($registro['stock'] ?? $registro['stock'] ?? 0)
-                : ($registro->stock ?? $registro->stock ?? 0)
-        );
+            ? ($registro['stock'] ?? $registro['stock'] ?? 0)
+            : ($registro->stock ?? $registro->stock ?? 0)
+            );
+        $nuevoStock = ($tipo_movimiento == 'salida') ? ($stockActual - $cantidad) : ($stockActual + $cantidad);
 
         if ($nuevoStock < 0) {
             $response->respuesta = "No hay suficiente stock.";
@@ -485,7 +486,7 @@ class Inicio extends BaseController
 
         $id_producto = $this->request->getPost('id_producto');
         $tipo_movimiento = $this->request->getPost('tipo_movimiento'); // 'nuevo' o 'editar'
-        $tabla = 'cat_inventario_promo'; 
+        $tabla = 'cat_inventario_promo';
 
         $nombre = $this->request->getPost('nombre');
         $cantidad = $this->request->getPost('cantidad');
@@ -516,16 +517,17 @@ class Inicio extends BaseController
             // Nombre aleatorio para evitar conflictos
             $newName = $file->getRandomName();
             $uploadPath = 'assets/img_productos/';
-            
+
             // Verificar y crear directorio si no existe
             if (!is_dir(FCPATH . $uploadPath)) {
                 mkdir(FCPATH . $uploadPath, 0777, true);
             }
-            
+
             // Mover archivo
             if ($file->move(FCPATH . $uploadPath, $newName)) {
                 $dataSave['imagen'] = $uploadPath . $newName;
-            } else {
+            }
+            else {
                 $response->respuesta = "Error al mover el archivo de imagen.";
                 return $this->respond($response);
             }
@@ -917,23 +919,24 @@ class Inicio extends BaseController
         // Load Catalog for Deposito/Traspaso
         // Assuming cat_deposito exists. If not, user might need to create it.
         $cat_deposito = $globals->getTabla(['tabla' => 'vw_deposito', 'where' => ['visible' => 1]]);
-        
+
         // Load existing operations
         // Assuming table 'operaciones' exists.
-        if(in_array($session->get('id_perfil'), [1, 2])){
+        if (in_array($session->get('id_perfil'), [1, 2])) {
             $operaciones = $globals->getTabla(['tabla' => 'operaciones', 'where' => ['visible' => 1]]);
-        }else{
+        }
+        else {
             $operaciones = $globals->getTabla(['tabla' => 'operaciones', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]]);
         }
-        
+
         // Load Users for Solicitante name
         $usuarios = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
 
         $data['cat_deposito'] = $cat_deposito->data ?? [];
         $data['operaciones'] = $operaciones->data ?? [];
         $data['usuarios'] = $usuarios->data ?? [];
-        
-        $data['scripts'] = ['principal', 'inicio']; 
+
+        $data['scripts'] = ['principal', 'inicio'];
         $data['contentView'] = 'secciones/vTipoOperacion';
         $this->_renderView($data);
     }
@@ -947,7 +950,7 @@ class Inicio extends BaseController
 
         $id_operacion = $this->request->getPost('id_operacion');
         $id_tipo_operacion = $this->request->getPost('id_tipo_operacion'); // 1=Deposito, 2=Traspaso, 3=Consulta Corte
-        
+
         // Base Data
         $dataBase = [
             'id_tipo_operacion' => $id_tipo_operacion,
@@ -961,7 +964,7 @@ class Inicio extends BaseController
             $dataSave = $dataBase;
             $dataSave['id_deposito'] = $this->request->getPost('id_deposito');
             $dataSave['importe'] = $this->request->getPost('importe2');
-            
+
             // File Upload
             $file = $this->request->getFile('comprobante');
             if ($file && $file->isValid() && !$file->hasMoved()) {
@@ -973,7 +976,7 @@ class Inicio extends BaseController
                 $file->move($uploadPath, $newName);
                 $dataSave['comprobante'] = 'assets/uploads/comprobantes/' . $newName;
             }
-            
+
             $dataConfig = [
                 'tabla' => 'operaciones',
                 'editar' => !empty($id_operacion),
@@ -981,21 +984,27 @@ class Inicio extends BaseController
             ];
             $result = $globals->saveTabla($dataSave, $dataConfig, ['script' => 'Inicio.guardarTipoOperacion']);
 
-        } elseif ($id_tipo_operacion == 2) { // Traspaso
+        }
+        elseif ($id_tipo_operacion == 2) { // Traspaso
             // Recibimos arrays para destinos e importes
             $cuentas_dest = $this->request->getPost('cuenta_destino');
             $importes = $this->request->getPost('importe');
-            $origen = $this->request->getPost('cuenta_traspaso'); 
+            $origen = $this->request->getPost('cuenta_traspaso');
             $justificacionBase = $this->request->getPost('justificaciones');
 
-            if(!is_array($cuentas_dest)) { $cuentas_dest = [$cuentas_dest]; }
-            if(!is_array($importes)) { $importes = [$importes]; }
+            if (!is_array($cuentas_dest)) {
+                $cuentas_dest = [$cuentas_dest];
+            }
+            if (!is_array($importes)) {
+                $importes = [$importes];
+            }
 
             $errors = 0;
-            foreach($cuentas_dest as $idx => $destino) {
-                if(empty($destino)) continue;
+            foreach ($cuentas_dest as $idx => $destino) {
+                if (empty($destino))
+                    continue;
                 $monto = isset($importes[$idx]) ? $importes[$idx] : 0;
-                
+
                 $dataSave = $dataBase;
                 $dataSave['id_deposito'] = $origen; // La cuenta origen
                 $dataSave['importe'] = $monto;
@@ -1005,28 +1014,31 @@ class Inicio extends BaseController
                 // Si es edición, se asume que solo viene 1 registro (el array tiene tamaño 1)
                 // y usamos $id_operacion. Si es nuevo, $id_operacion es vacio.
                 $esEdicion = !empty($id_operacion);
-                
+
                 $dataConfig = [
                     'tabla' => 'operaciones',
                     'editar' => $esEdicion,
                     'idEditar' => ['id_operacion' => $id_operacion]
                 ];
-                
+
                 $res = $globals->saveTabla($dataSave, $dataConfig, ['script' => 'Inicio.guardarTraspaso']);
-                if($res->error) $errors++;
-                
+                if ($res->error)
+                    $errors++;
+
                 // Si es edición, rompemos el ciclo tras el primero para no crear duplicados por error
-                if($esEdicion) break;
+                if ($esEdicion)
+                    break;
             }
-            
+
             $result = new \stdClass();
             $result->error = ($errors > 0);
 
-        } elseif ($id_tipo_operacion == 3) { // Consulta Corte
+        }
+        elseif ($id_tipo_operacion == 3) { // Consulta Corte
             $dataSave = $dataBase;
             $dataSave['estado_cuenta'] = $this->request->getPost('estado_cuenta');
             $dataSave['periodo'] = $this->request->getPost('periodo');
-            
+
             $dataConfig = [
                 'tabla' => 'operaciones',
                 'editar' => !empty($id_operacion),
@@ -1034,7 +1046,7 @@ class Inicio extends BaseController
             ];
             $result = $globals->saveTabla($dataSave, $dataConfig, ['script' => 'Inicio.guardarTipoOperacion']);
         }
-    
+
         if (!$result->error) {
             $response->error = false;
             $response->respuesta = "Operación guardada correctamente.";
@@ -1044,9 +1056,9 @@ class Inicio extends BaseController
                 $email = \Config\Services::email();
                 $destinatario = 'negonzalez@guanajuato.gob.mx';
                 $email->setFrom('a.palafoxm@guanajuato.gob.mx', 'SUSI - Sistema Unificado SECTURI');
-                $email->setTo($destinatario); 
+                $email->setTo($destinatario);
                 $email->setSubject('Nueva Solicitud de Operación - SUSI');
-                
+
                 $nombreCompleto = $session->nombre_completo ?? 'Usuario Desconocido';
                 $mensaje = "<h3>Nueva Solicitud de Operación</h3>";
                 $mensaje .= "<p>El usuario <strong>{$nombreCompleto}</strong> ha subido una nueva solicitud de operación.</p>";
@@ -1054,17 +1066,19 @@ class Inicio extends BaseController
                 $mensaje .= "<a href='https://secturnet.guanajuato.gob.mx/susi/index.php/Inicio/TipoOperacion'>Por favor revise el sistema para más detalles.</a>";
 
                 $email->setMessage($mensaje);
-                if(!$email->send()){
+                if (!$email->send()) {
                     log_message('error', 'Error enviando correo: ' . $email->printDebugger(['headers']));
                 }
-            } catch (\Exception $e) {
+            }
+            catch (\Exception $e) {
                 log_message('error', 'Error enviando correo notificación operación: ' . $e->getMessage());
             }
-        } else {
+        }
+        else {
             $response->respuesta = "Error al guardar la operación.";
         }
 
-        
+
 
         return $this->respond($response);
     }
@@ -1079,9 +1093,9 @@ class Inicio extends BaseController
         $id_operacion = $this->request->getPost('id_operacion');
         $seguimiento = $this->request->getPost('seguimiento');
 
-        if(empty($id_operacion)){
-             $response->respuesta = "ID de operación no válido.";
-             return $this->respond($response);
+        if (empty($id_operacion)) {
+            $response->respuesta = "ID de operación no válido.";
+            return $this->respond($response);
         }
 
         $dataSave = [
@@ -1107,9 +1121,9 @@ class Inicio extends BaseController
             'editar' => true,
             'idEditar' => ['id_operacion' => $id_operacion]
         ];
-       $correo = '';
+        $correo = '';
         $usuRegistra = $globals->getTabla(['tabla' => 'operaciones', 'where' => ['id_operacion' => $id_operacion]])->data;
-        if(isset($usuRegistra[0]->usu_reg) && !empty($usuRegistra[0]->usu_reg) ){
+        if (isset($usuRegistra[0]->usu_reg) && !empty($usuRegistra[0]->usu_reg)) {
             $correo = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['id_usuario' => $usuRegistra[0]->usu_reg]])->data[0]->correo;
         }
 
@@ -1123,25 +1137,27 @@ class Inicio extends BaseController
             try {
                 $destinatario = $correo ?? 'susi@guanajuato.gob.mx'; // Fallback
                 $email->setFrom('a.palafoxm@guanajuato.gob.mx', 'SUSI - Sistema Unificado SECTURI');
-                $email->setTo($destinatario); 
+                $email->setTo($destinatario);
                 $email->setSubject('Actualización de Seguimiento - Operación #' . $id_operacion);
-                
+
                 $mensaje = "<h3>Se ha actualizado el seguimiento de la operación #{$id_operacion}</h3>";
                 $mensaje .= "<p><strong>Seguimiento:</strong> {$seguimiento}</p>";
                 $mensaje .= "<p><strong>Usuario:</strong> " . ($session->nombre_completo ?? 'Sistema') . "</p>";
-                
-                if($filePath) {
+
+                if ($filePath) {
                     $mensaje .= "<p>Se ha adjuntado un archivo de soporte.</p>";
                     $email->attach(FCPATH . $filePath);
                 }
 
                 $email->setMessage($mensaje);
                 $email->send();
-            } catch (\Exception $e) {
+            }
+            catch (\Exception $e) {
                 log_message('error', 'Error enviando correo seguimiento: ' . $e->getMessage());
             }
 
-        } else {
+        }
+        else {
             $response->respuesta = "Error al guardar seguimiento.";
         }
 
@@ -1165,8 +1181,9 @@ class Inicio extends BaseController
         if ($result) {
             $response->error = false;
             $response->respuesta = "Eliminado correctamente.";
-        } else {
-             $response->respuesta = "Error al eliminar.";
+        }
+        else {
+            $response->respuesta = "Error al eliminar.";
         }
 
         return $this->respond($response);
@@ -1176,73 +1193,65 @@ class Inicio extends BaseController
     {
         $globals = new Mglobal;
         $id = $this->request->getPost('id_operacion');
-        
+
         $data = $globals->getTabla(['tabla' => 'operaciones', 'where' => ['id_operacion' => $id]]);
 
         if (!empty($data->data[0])) {
             return $this->response->setJSON($data->data[0]);
-        } else {
+        }
+        else {
             return $this->response->setJSON(['error' => 'No encontrado']);
         }
-    }
-/*   public function subirAsistencia()
-    {
-        $session     = \Config\Services::session();
-        $principal   = new Mglobal;
-        $cat_usuario = $principal->getTabla([
-            'tabla' => 'vw_usuario',
-            'where' => ['visible' => 1]
-        ]);
-
-        if (isset($cat_usuario->data) && !empty($cat_usuario->data)) {
-              $anio = $anio ?? date('Y');
-
-            foreach ($cat_usuario->data as &$usuario) {
-                $id_usuario = $usuario->id_usuario;
-                $asistenciasPorMes = [];
-
-                for ($mes = 1; $mes <= 12; $mes++) {
-                    $fecha_inicio = date("Y-m-01", strtotime("$anio-$mes-01"));
-                    $fecha_fin    = date("Y-m-t", strtotime($fecha_inicio));
-
-                    $tabla = [
-                        'tabla' => 'asistencia',
-                        'where' => [
-                            'visible' => 1,
-                            'id_usuario' => $id_usuario
-                        ],
-                        'whereBetween' => [
-                            ['fecha', $fecha_inicio, $fecha_fin]
-                        ]
-                    ];
-
-                    $asistencia = $principal->getTabla($tabla);
-
-                    if (isset($asistencia->data) && !empty($asistencia->data)) {
-                        $diasTrabajados = count($asistencia->data);
-                        $asistenciasPorMes[$mes] = [
-                            'dias' => $diasTrabajados,
-                            'cumplio' => ($diasTrabajados >= 20) ? 1 : 0
-                        ];
-                    } else {
-                        $asistenciasPorMes[$mes] = [
-                            'dias' => 0,
-                            'cumplio' => 0
-                        ];
-                    }
-                }
-
-                // Agrega los datos de asistencia al objeto de usuario
-                $usuario->asistencias = $asistenciasPorMes;
-            }
-        }
-
-        // Enviar datos a la vista
-        $data['cat_usuario']   = $cat_usuario->data ?? [];  
-        $data['scripts']       = ['principal', 'inicio'];
-        $data['contentView']   = 'secciones/vSubirAsistencia';
-        $this->_renderView($data);
-    } */
+    }    /*   public function subirAsistencia()
+     {
+     $session     = \Config\Services::session();
+     $principal   = new Mglobal;
+     $cat_usuario = $principal->getTabla([
+     'tabla' => 'vw_usuario',
+     'where' => ['visible' => 1]
+     ]);
+     if (isset($cat_usuario->data) && !empty($cat_usuario->data)) {
+     $anio = $anio ?? date('Y');
+     foreach ($cat_usuario->data as &$usuario) {
+     $id_usuario = $usuario->id_usuario;
+     $asistenciasPorMes = [];
+     for ($mes = 1; $mes <= 12; $mes++) {
+     $fecha_inicio = date("Y-m-01", strtotime("$anio-$mes-01"));
+     $fecha_fin    = date("Y-m-t", strtotime($fecha_inicio));
+     $tabla = [
+     'tabla' => 'asistencia',
+     'where' => [
+     'visible' => 1,
+     'id_usuario' => $id_usuario
+     ],
+     'whereBetween' => [
+     ['fecha', $fecha_inicio, $fecha_fin]
+     ]
+     ];
+     $asistencia = $principal->getTabla($tabla);
+     if (isset($asistencia->data) && !empty($asistencia->data)) {
+     $diasTrabajados = count($asistencia->data);
+     $asistenciasPorMes[$mes] = [
+     'dias' => $diasTrabajados,
+     'cumplio' => ($diasTrabajados >= 20) ? 1 : 0
+     ];
+     } else {
+     $asistenciasPorMes[$mes] = [
+     'dias' => 0,
+     'cumplio' => 0
+     ];
+     }
+     }
+     // Agrega los datos de asistencia al objeto de usuario
+     $usuario->asistencias = $asistenciasPorMes;
+     }
+     }
+     // Enviar datos a la vista
+     $data['cat_usuario']   = $cat_usuario->data ?? [];  
+     $data['scripts']       = ['principal', 'inicio'];
+     $data['contentView']   = 'secciones/vSubirAsistencia';
+     $this->_renderView($data);
+     } */
 
     public function listaPuesto()
     {
@@ -1337,47 +1346,47 @@ class Inicio extends BaseController
         }
         $datosGrupal = [];
         if (!empty($data['presupuesto'])) {
-            foreach($data['presupuesto'] as $key => $p){
+            foreach ($data['presupuesto'] as $key => $p) {
                 // Clone the object to avoid modifying the original reference if it matters, 
                 // but since we are building a new array $datosGrupal, we can just work with $p or a copy.
                 // Let's use a new object to be safe and clean.
                 $item = clone $p;
-                
+
                 $datos = $globals->getTabla(['tabla' => 'periodo_factura', 'where' => ['id_presupuesto' => $p->id_presupuesto, 'visible' => 1]]);
-                
+
                 $item->datos = [];
-                
+
                 if (isset($datos->data) && !empty($datos->data)) {
                     // Use the header from the first invoice if available
                     $item->encabezado = $datos->data[0]->encabezado ?? '';
 
-                    foreach($datos->data as $j => $d){
-                         $xml      = $globals->getTabla(['tabla' => 'factura', 'where' => ['id_registro_pt' => $id_registro_pt, 'id_identificador' => $d->id_identificador, 'visible' => 1]]);
-                         $factura  = $globals->getTabla(['tabla' => 'factura_pdf', 'where' => ['id_registro_pt' => $id_registro_pt, 'id_identificador' => $d->id_identificador, 'visible' => 1]]);
-                        
-                         $invoiceData =  [
-                              'id_periodo_factura' => $d->id_periodo_factura,
-                              'id_registro_pt' => $d->id_registro_pt,
-                              'id_presupuesto' => $d->id_presupuesto,
-                              'encabezado' => $d->encabezado,
-                              'importe' => $d->importe,
-                              'concepto' => (isset($d->concepto)) ? $d->concepto : '',
-                              'visible' => $d->visible,
-                              'periodo_fin' => $d->periodo_fin,
-                              'periodo_inicio' => $d->periodo_inicio,
-                              'id_identificador' => $d->id_identificador,
-                              'usu_reg' => $d->usu_reg,
-                              'total' => (!empty($xml->data) && isset($xml->data[0]->total)) ? $xml->data[0]->total : 0,
-                              'ruta_relativa' => (!empty($factura->data) && isset($factura->data[0]->ruta_relativa)) ? $factura->data[0]->ruta_relativa : ''
-                         ];
-                         $item->datos[] = $invoiceData;
+                    foreach ($datos->data as $j => $d) {
+                        $xml = $globals->getTabla(['tabla' => 'factura', 'where' => ['id_registro_pt' => $id_registro_pt, 'id_identificador' => $d->id_identificador, 'visible' => 1]]);
+                        $factura = $globals->getTabla(['tabla' => 'factura_pdf', 'where' => ['id_registro_pt' => $id_registro_pt, 'id_identificador' => $d->id_identificador, 'visible' => 1]]);
+
+                        $invoiceData = [
+                            'id_periodo_factura' => $d->id_periodo_factura,
+                            'id_registro_pt' => $d->id_registro_pt,
+                            'id_presupuesto' => $d->id_presupuesto,
+                            'encabezado' => $d->encabezado,
+                            'importe' => $d->importe,
+                            'concepto' => (isset($d->concepto)) ? $d->concepto : '',
+                            'visible' => $d->visible,
+                            'periodo_fin' => $d->periodo_fin,
+                            'periodo_inicio' => $d->periodo_inicio,
+                            'id_identificador' => $d->id_identificador,
+                            'usu_reg' => $d->usu_reg,
+                            'total' => (!empty($xml->data) && isset($xml->data[0]->total)) ? $xml->data[0]->total : 0,
+                            'ruta_relativa' => (!empty($factura->data) && isset($factura->data[0]->ruta_relativa)) ? $factura->data[0]->ruta_relativa : ''
+                        ];
+                        $item->datos[] = $invoiceData;
                     }
                 }
                 $datosGrupal[] = $item;
             }
         }
-        
-        $data['datosGrupal']        = $datosGrupal;
+
+        $data['datosGrupal'] = $datosGrupal;
         $data['dsc_director_general'] = (!empty($cat_director_general->data)) ? $cat_director_general->data[0]->dsc_director_general : [];
         $data['cat_area'] = (!empty($cat_area->data)) ? $cat_area->data : [];
         $data['cat_tipo'] = (!empty($cat_tipo->data)) ? $cat_tipo->data : [];
