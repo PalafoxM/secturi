@@ -1540,7 +1540,7 @@ class Usuario extends BaseController
             $sheet->setCellValue('G' . $fila, $row->texto_cabecera);
             $sheet->setCellValue('H' . $fila, $row->no_convenio);
             $sheet->setCellValue('I' . $fila, $row->importe);
-            $sheet->getStyle('I' . $fila)->getNumberFormat()->setFormatCode('"$"#,##0.00');
+            $sheet->getStyle('I' . $fila)->getNumberFormat()->setFormatCode('#,##0.00');
             $sheet->setCellValue('J' . $fila, $row->no_convenio);
             $sheet->setCellValue('K' . $fila, $row->partida);
             $sheet->setCellValueExplicit('L' . $fila, $row->centro_gestor, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
