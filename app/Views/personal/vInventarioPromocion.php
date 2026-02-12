@@ -139,17 +139,12 @@
                                                                                style="color: <?= $color->hexadecimal ?>;" 
                                                                                data-toggle="tooltip" 
                                                                                data-placement="top" 
-                                                                               title="<?= ($color->nombre ?? $color->hexadecimal) ?>: <?= $color->cantidad ?? 0 ?>">
+                                                                               title="<?= 'Cantidad: ' ?>: <?= $color->cantidad ?? 0 ?>">
                                                                             </i>
                                                                         <?php endforeach; ?>
                                                                     <?php else: ?>
                                                                         <span class="text-muted font-12">Sin colores</span>
                                                                     <?php endif; ?>
-                                                                </td>
-
-                                                                <!-- Especificaciones -->
-                                                                <td class="text-center text-muted">
-                                                                    <?= $item->negro ?? '' // Mantener por si acaso, o quitar si ya no se usa ?>
                                                                 </td>
 
                                                                 <!-- Stock -->
