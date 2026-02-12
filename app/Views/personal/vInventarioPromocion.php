@@ -64,6 +64,9 @@
                                                         <th class="py-3" style="width:50%;">
                                                             <i class="mdi mdi-tag-outline text-primary d-block mb-1"></i>
                                                             <small class="text-muted d-block">Producto</small></th>
+                                                        <th class="py-3 text-center">
+                                                            <i class="mdi mdi-image text-purple d-block mb-1"></i>
+                                                            <small class="text-muted d-block">Imagen</small></th>
                                                         <th class="py-3">
                                                             <i class="mdi mdi-counter text-info d-block mb-1"></i>
                                                             <small class="text-muted d-block">Cantidad</small></th>
@@ -106,6 +109,15 @@
                                                                 <!-- Producto -->
                                                                 <td class="font-weight-medium text-dark py-3">
                                                                     <?= $item->dsc_producto ?>
+                                                                </td>
+
+                                                                <!-- Imagen -->
+                                                                <td class="text-center">
+                                                                    <?php if (!empty($item->imagen)): ?>
+                                                                        <img src="<?= base_url($item->imagen) ?>" alt="Prod" class="rounded btn-ver-imagen" style="height: 40px; cursor: pointer;" data-src="<?= base_url($item->imagen) ?>">
+                                                                    <?php else: ?>
+                                                                        <span class="text-muted">-</span>
+                                                                    <?php endif; ?>
                                                                 </td>
 
                                                                 <!-- Cantidad (badge) -->
@@ -411,6 +423,20 @@
     </div>
 </div>
 
+<!-- Modal para ver imagen grande -->
+<div class="modal fade" id="modalImagen" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center p-3">
+                 <button type="button" class="close mb-2" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <img id="imagenGrande" src="" class="img-fluid rounded" alt="Imagen Producto">
+            </div>
+        </div>
+    </div>
+</div>
+
 <link href="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
 <link href="<?php echo base_url(); ?>plugins/datatables/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
 
@@ -582,6 +608,12 @@ $(document).ready(function() {
                 }, 'json');
             }
         });
+    });
+    // 5. Ver imagen grande
+    $(document).on('click', '.btn-ver-imagen', function() {
+        var src = $(this).data('src');
+        $('#imagenGrande').attr('src', src);
+        $('#modalImagen').modal('show');
     });
 }); // <--- Solo un cierre de ready
 </script>
