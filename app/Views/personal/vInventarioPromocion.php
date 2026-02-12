@@ -362,7 +362,7 @@
                                                         <div class="col-md-6">
                                                              <div class="form-group">
                                                                 <label class="font-weight-bold text-dark text-uppercase font-12">Cantidad</label>
-                                                                <input type="number" class="form-control" id="cantidad_producto" name="cantidad" min="0">
+                                                                <input type="number" class="form-control" id="cantidad_producto" name="cantidad" min="0" required>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6">
@@ -385,7 +385,7 @@
 
                                                     <div class="form-group">
                                                         <label class="font-weight-bold text-dark text-uppercase font-12">Total Existencia</label>
-                                                        <input type="number" class="form-control" id="total_existencia" name="total_existencia" min="0">
+                                                        <input type="number" class="form-control" id="total_existencia" name="total_existencia" min="0" required>
                                                     </div>
                                                 </div>
 
@@ -607,6 +607,13 @@ $(document).ready(function() {
     // 3. ENVIAR FORMULARIO 
     $('#formMovimientoInventario').on('submit', function(e) {
         e.preventDefault(); 
+        
+        // Validación básica HTML5
+        if (!this.checkValidity()) {
+            this.reportValidity();
+            return;
+        }
+
         console.log("Intentando enviar formulario...");
 
         var tipo = $('#tipo_movimiento').val();
@@ -614,9 +621,9 @@ $(document).ready(function() {
             '<?= base_url("index.php/Inicio/actualizarInventario") ?>' : 
             '<?= base_url("index.php/Inicio/guardarProducto") ?>';
 
-        // Removed: if(tipo == 'nuevo') $('#tabla_hidden').val($('#tabla_select').val());
-
         var formData = new FormData(this);
+        var $btnSubmit = $(this).find('button[type="submit"]');
+        var btnText = $btnSubmit.text();
 
         $.ajax({
             url: urlInfo,
@@ -625,15 +632,47 @@ $(document).ready(function() {
             dataType: 'json',
             processData: false, // Importante para envío de archivos
             contentType: false, // Importante para envío de archivos
+            beforeSend: function() {
+                $btnSubmit.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Guardando...');
+            },
             success: function(res) {
                 if (!res.error) {
-                    Swal.fire("¡Éxito!", res.respuesta, "success").then(() => location.reload());
+                    Swal.fire({
+                        title: "¡Éxito!",
+                        text: res.respuesta,
+                        icon: "success",
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        $('#modalMovimientoInventario').modal('hide');
+                        // Recargar tabla sin recargar página
+                        // Reload the current page content in background and replace table body
+                        $.get(location.href, function(data) {
+                            var newBody = $(data).find('#tablaPromo').html();
+                            var $table = $('.tabla-inventario').DataTable();
+                            $table.destroy();
+                            $('#tablaPromo').html(newBody);
+                            
+                            // Reinitialize DataTable
+                            $('.tabla-inventario').DataTable({
+                                language: { url: "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json" },
+                                responsive: true,
+                                order: [[ 0, "asc" ]]
+                            });
+                             // Update metrics carousel also if possible (optional but good)
+                             var newCarousel = $(data).find('#carousel_stats').html();
+                             $('#carousel_stats').html(newCarousel);
+                        });
+                    });
                 } else {
                     Swal.fire("Error", res.respuesta, "error");
                 }
             },
             error: function() {
                 Swal.fire("Error", "No se pudo procesar la petición en el servidor.", "error");
+            },
+            complete: function() {
+                $btnSubmit.prop('disabled', false).text(btnText);
             }
         });
     });
@@ -691,7 +730,7 @@ $(document).ready(function() {
                     </div>
                 </div>
                 <div class="col-4">
-                    <input type="number" class="form-control form-control-sm input-cantidad" name="cantidades[]" placeholder="Cant." value="${cantidad}" min="0">
+                    <input type="number" class="form-control form-control-sm input-cantidad" name="cantidades[]" placeholder="Cant." value="${cantidad}" min="0" required>
                 </div>
                 <div class="col-2">
                     <button type="button" class="btn btn-sm btn-outline-danger btn-remove-color" data-row="row_${rowId}">
