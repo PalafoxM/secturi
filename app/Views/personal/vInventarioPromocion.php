@@ -195,9 +195,26 @@
                                                                         data-nombre="<?= $productoTmp ?>"
                                                                         data-cantidad="<?= $item->cantidad ?>"
                                                                         data-stock="<?= $item->stock ?>"
-                                                                        data-color="<?= $item->negro ?>"
                                                                         data-total_existencia="<?= $item->total_existencia ?>"
                                                                         data-imagen="<?= $item->imagen ?? '' ?>" 
+                                                                        
+                                                                        data-negro="<?= $item->negro ?? 0 ?>"
+                                                                        data-negro_cantidad="<?= $item->negro_cantidad ?? 0 ?>"
+                                                                        data-blanco="<?= $item->blanco ?? 0 ?>"
+                                                                        data-blanco_cantidad="<?= $item->blanco_cantidad ?? 0 ?>"
+                                                                        data-azul="<?= $item->azul ?? 0 ?>"
+                                                                        data-azul_cantidad="<?= $item->azul_cantidad ?? 0 ?>"
+                                                                        data-verde="<?= $item->verde ?? 0 ?>"
+                                                                        data-verde_cantidad="<?= $item->verde_cantidad ?? 0 ?>"
+                                                                        data-amarillo="<?= $item->amarillo ?? 0 ?>"
+                                                                        data-amarillo_cantidad="<?= $item->amarillo_cantidad ?? 0 ?>"
+                                                                        data-rojo="<?= $item->rojo ?? 0 ?>"
+                                                                        data-rojo_cantidad="<?= $item->rojo_cantidad ?? 0 ?>"
+                                                                        data-gris="<?= $item->gris ?? 0 ?>"
+                                                                        data-gris_cantidad="<?= $item->gris_cantidad ?? 0 ?>"
+                                                                        data-naranja="<?= $item->naranja ?? 0 ?>"
+                                                                        data-naranja_cantidad="<?= $item->naranja_cantidad ?? 0 ?>"
+
                                                                         data-tabla="cat_inventario_promo"
                                                                         data-tipo="editar"
                                                                         title="Editar">
@@ -379,18 +396,13 @@
                                                     </div>
 
                                                     <div class="form-group">
-                                                        <label class="font-weight-bold text-dark text-uppercase font-12">Especificaciones / Color</label>
-                                                        <select class="form-control" id="color_producto" name="color">
-                                                            <option value="">Seleccione una opción</option>
-                                                            <option value="Negro">Negro</option>
-                                                            <option value="Blanco">Blanco</option>
-                                                            <option value="Azul">Azul</option>
-                                                            <option value="Verde">Verde</option>
-                                                            <option value="Amarillo">Amarillo</option>
-                                                            <option value="Rojo">Rojo</option>
-                                                            <option value="Gris">Gris</option>
-                                                            <option value="Naranja">Naranja</option>
-                                                        </select>
+                                                        <label class="font-weight-bold text-dark text-uppercase font-12">Colores y Cantidades</label>
+                                                        <div id="colores_container">
+                                                            <!-- Dynamic rows will be added here -->
+                                                        </div>
+                                                        <button type="button" class="btn btn-sm btn-outline-info mt-1" id="btn_add_color">
+                                                            <i class="mdi mdi-plus"></i> Agregar Color
+                                                        </button>
                                                     </div>
 
                                                     <div class="form-group">
@@ -534,8 +546,45 @@ $(document).ready(function() {
         
         // Asignar los nuevos campos
         $('#cantidad_producto').val(d.cantidad || '');
-        $('#color_producto').val(d.color || '');
         $('#total_existencia').val(d.total_existencia || '');
+
+        // Limpiar contenedor de colores
+        $('#colores_container').empty();
+        
+        // Populate colors if editing
+        if (d.tipo == 'editar') {
+            // Check specific color columns if available in 'd'
+            // We need to ensure 'd' contains these values. 
+            // The button currently has data-color (which was the old logic). 
+            // We need to update the button generation in PHP to include data-negro_cantidad, etc.
+            // For now, let's assume we will pass a JSON object or individual attributes.
+            
+            var colorsAdded = 0;
+            // List of supported colors in DB
+            var dbColors = ['Negro', 'Blanco', 'Azul', 'Verde', 'Amarillo', 'Rojo', 'Gris', 'Naranja'];
+            
+            dbColors.forEach(function(color) {
+                // Construct attribute name e.g., d.negro_cantidad
+                var key = color.toLowerCase() + '_cantidad';
+                var qty = d[key]; 
+                
+                // Also check the boolean flag e.g., d.negro
+                var flag = d[color.toLowerCase()];
+
+                if ((qty && qty > 0) || (flag && flag == 1)) {
+                    addColorRow(color, qty || 0);
+                    colorsAdded++;
+                }
+            });
+
+            // If no colors found (legacy or empty), maybe add one empty row or none
+            if (colorsAdded === 0) {
+                 // Optional: addColorRow(); 
+            }
+        } else {
+            // New product: add one empty row
+            addColorRow();
+        }
         
         // Limpiar el input file y preview por defecto
         $('#imagen_producto').val('');
@@ -626,6 +675,62 @@ $(document).ready(function() {
             }
         });
     });
+
+    // --- Dynamic Color Logic ---
+    function addColorRow(color = '', cantidad = '') {
+        var rowId = Date.now();
+        var html = `
+            <div class="row align-items-center mb-2 color-row" id="row_${rowId}">
+                <div class="col-6">
+                    <select class="form-control form-control-sm select-color" name="colores[]">
+                        <option value="">Color...</option>
+                        <option value="Negro" ${color == 'Negro' ? 'selected' : ''}>Negro</option>
+                        <option value="Blanco" ${color == 'Blanco' ? 'selected' : ''}>Blanco</option>
+                        <option value="Azul" ${color == 'Azul' ? 'selected' : ''}>Azul</option>
+                        <option value="Verde" ${color == 'Verde' ? 'selected' : ''}>Verde</option>
+                        <option value="Amarillo" ${color == 'Amarillo' ? 'selected' : ''}>Amarillo</option>
+                        <option value="Rojo" ${color == 'Rojo' ? 'selected' : ''}>Rojo</option>
+                        <option value="Gris" ${color == 'Gris' ? 'selected' : ''}>Gris</option>
+                        <option value="Naranja" ${color == 'Naranja' ? 'selected' : ''}>Naranja</option>
+                    </select>
+                </div>
+                <div class="col-4">
+                    <input type="number" class="form-control form-control-sm input-cantidad" name="cantidades[]" placeholder="Cant." value="${cantidad}" min="0">
+                </div>
+                <div class="col-2">
+                    <button type="button" class="btn btn-sm btn-outline-danger btn-remove-color" data-row="row_${rowId}">
+                        <i class="mdi mdi-delete"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        $('#colores_container').append(html);
+    }
+
+    $('#btn_add_color').click(function() {
+        addColorRow();
+    });
+
+    $(document).on('click', '.btn-remove-color', function() {
+        var rowId = $(this).data('row');
+        $('#' + rowId).remove();
+        updateTotalCantidad();
+    });
+
+    $(document).on('input', '.input-cantidad', function() {
+        updateTotalCantidad();
+    });
+
+    function updateTotalCantidad() {
+        var total = 0;
+        $('.input-cantidad').each(function() {
+            var val = parseInt($(this).val()) || 0;
+            total += val;
+        });
+        // Optional: Update total stock field if needed, but currently logic might be separate
+        // $('#cantidad').val(total); 
+    }
+
     // 5. Ver imagen grande
     $(document).on('click', '.btn-ver-imagen', function() {
         var src = $(this).data('src');

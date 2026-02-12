@@ -439,7 +439,6 @@ class Inicio extends BaseController
         $nombre = $this->request->getPost('nombre');
         $cantidad = $this->request->getPost('cantidad');
         $stock = $this->request->getPost('stock');
-        $color = $this->request->getPost('color'); // Especificaciones
         $total_existencia = $this->request->getPost('total_existencia');
 
         if (empty($nombre)) {
@@ -447,15 +446,39 @@ class Inicio extends BaseController
             return $this->respond($response);
         }
 
-        // Preparar arreglo de datos a guardar
+        // Base data
         $dataSave = [
             'dsc_producto' => $nombre,
             'cantidad' => $cantidad,
             'stock' => $stock,
-            'negro' => $color, 
             'total_existencia' => $total_existencia,
             'visible' => 1
         ];
+
+        // === PROCESAR COLORES ===
+        // Reset all color columns first to ensure clean state
+        $allColors = ['negro', 'blanco', 'azul', 'verde', 'amarillo', 'rojo', 'gris', 'naranja'];
+        foreach ($allColors as $c) {
+            $dataSave[$c] = 0;
+            $dataSave[$c . '_cantidad'] = 0;
+        }
+
+        $colores = $this->request->getPost('colores'); // Array
+        $cantidades = $this->request->getPost('cantidades'); // Array
+
+        if (is_array($colores)) {
+            foreach ($colores as $index => $colorName) {
+                if (!empty($colorName)) {
+                    $cKey = strtolower($colorName);
+                    // Verify if this color is in our supported list
+                    if (in_array($cKey, $allColors)) {
+                        $qty = isset($cantidades[$index]) ? (int)$cantidades[$index] : 0;
+                        $dataSave[$cKey] = 1; // Set flag
+                        $dataSave[$cKey . '_cantidad'] = $qty;
+                    }
+                }
+            }
+        }
 
         // === PROCESAR IMAGEN ===
         $file = $this->request->getFile('imagen');
