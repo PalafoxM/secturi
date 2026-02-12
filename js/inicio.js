@@ -1370,7 +1370,16 @@ ini.inicio = (function () {
                                             </select>
                                         </td>
                                         <td>
-                                            <input type="text" autocomplete="off" class="form-control" name="importe[]" value=${p.importe} readonly>
+                                           <input 
+                                                    type="text" 
+                                                    autocomplete="off" 
+                                                    class="form-control" 
+                                                    name="importe[]" 
+                                                    value="${new Intl.NumberFormat('es-MX', {
+                                style: 'currency',
+                                currency: 'MXN'
+                            }).format(p.importe)}" 
+                                                    readonly>
                                         </td>
                                         <td>
                                             <button type="button" class="btn btn-sm btn-danger remove-row">
