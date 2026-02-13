@@ -6088,7 +6088,7 @@ class Agregar extends BaseController
         $response = new \stdClass();
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
-        $archivos_post = $this->request->getFiles();
+       // $archivos_post = $this->request->getFiles();
 
         // 1. Validaciones Básicas
         if (isset($data['no_consecutivo']) && empty($data['no_consecutivo'])) {
@@ -6118,7 +6118,7 @@ class Agregar extends BaseController
         }
         if(!$id_proveedor) $id_proveedor = 0; 
 
-
+        die( var_dump($data) );
         // 2. Insertar/Actualizar Registro PT
         $no_consecutivo = $data['no_consecutivo'];
         if ($data['editar'] != 1) {
@@ -6147,12 +6147,12 @@ class Agregar extends BaseController
         $id_registro_pt = null;
         if($data['editar'] == 1 && isset($data['id_registro_pt'])){
             $id_registro_pt = $data['id_registro_pt'];
-            $dataConfig = ["tabla" => "registro_pt", "editar" => true, "idEditar" => ['id_registro_pt' => $id_registro_pt]];
+            $dataConfig = ["tabla" => "formulario_pt", "editar" => true, "idEditar" => ['id_registro_pt' => $id_registro_pt]];
             $dataInsert['usu_act'] = $session->get('id_usuario');
             $dataInsert['fec_act'] = date('Y-m-d H:i:s');
              $this->globals->saveTabla($dataInsert, $dataConfig, ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFormatoPT_Upd']);
         } else {
-            $dataConfig = ["tabla" => "registro_pt", "editar" => false];
+            $dataConfig = ["tabla" => "formulario_pt", "editar" => false];
             $dataInsert['usu_reg'] = $session->get('id_usuario');
             $dataInsert['fec_reg'] = date('Y-m-d H:i:s');
             $responseMain = $this->globals->saveTabla($dataInsert, $dataConfig, ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFormatoPT_Ins']);
@@ -6164,7 +6164,7 @@ class Agregar extends BaseController
         // para manejar eliminaciones, y luego re-insertar/actualizar.
         // O más simple: Borrar todo y reinsertar. Soft delete es mejor.
         
-        $filasActuales = $this->globals->getTabla(['tabla' => 'periodo_factura', 'where' => ['id_registro_pt' => $id_registro_pt, 'visible' => 1]]);
+        $filasActuales = $this->globals->getTabla(['tabla' => 'manual_factura', 'where' => ['id_registro_pt' => $id_registro_pt, 'visible' => 1]]);
         if(!empty($filasActuales->data)){
              foreach($filasActuales->data as $f){
                  $this->globals->saveTabla(
@@ -6205,68 +6205,12 @@ class Agregar extends BaseController
                       'usu_reg' => $session->get('id_usuario'),
                       'fec_reg' => date('Y-m-d H:i:s')
                 ];
-                $this->globals->saveTabla($dataFila, ["tabla" => "periodo_factura", "editar" => false], []);
+                $this->globals->saveTabla($dataFila, ["tabla" => "manual_factura", "editar" => false], []);
             }
         }
 
-        // 4. Guardar Archivos (PDF/XML) - Solo una vez por registro PT (asumido global)
-        if(isset($archivos_post['archivos_pdf'])){
-             $archivo = $archivos_post['archivos_pdf'];
-             if($archivo->isValid()){
-                 $extension = $archivo->getClientExtension();
-                 $fileName = 'PT_PDF_' . $id_registro_pt . '_' . date('Ymd_His') . '.' . $extension;
-                 $ruta_destino = FCPATH . 'assets/pdf/';
-                 if (!is_dir($ruta_destino)) { mkdir($ruta_destino, 0755, true); }
-                 $archivo->move($ruta_destino, $fileName);
-                 
-                 $dataPDF = [
-                       'id_registro_pt' => $id_registro_pt,
-                       'id_identificador' => 0,
-                       'ruta_relativa' => 'assets/pdf/' . $fileName,
-                       'ruta_absoluta' => base_url('assets/pdf/' . $fileName),
-                       'visible' => 1,
-                       'usu_reg' => $session->get('id_usuario'),
-                       'fec_reg' => date('Y-m-d H:i:s')
-                 ];
-                 $this->globals->saveTabla($dataPDF, ["tabla" => "factura_pdf", "editar" => false], []);
-             }
-        }
+
         
-        if(isset($archivos_post['archivos_xml'])){
-             $archivo = $archivos_post['archivos_xml'];
-             if($archivo->isValid()){
-                  $extension = $archivo->getClientExtension();
-                 $fileName = 'PT_XML_' . $id_registro_pt . '_' . date('Ymd_His') . '.' . $extension;
-                 $ruta_destino = FCPATH . 'assets/pdf/';
-                 if (!is_dir($ruta_destino)) { mkdir($ruta_destino, 0755, true); }
-                 $archivo->move($ruta_destino, $fileName);
-                 
-                 $contenido = file_get_contents($ruta_destino . $fileName);
-                 libxml_use_internal_errors(true);
-                 $xml = simplexml_load_string($contenido);
-                 $uuid = '';
-                 $total = '';
-                 $fecha = '';
-                 
-                 if ($xml !== false) {
-                     $attrs = $xml->attributes();
-                     $total = (string)$attrs['Total'];
-                     $fecha = (string)$attrs['Fecha'];
-                 }
-
-                 $dataXML = [
-                      'id_registro_pt' => $id_registro_pt,
-                      'id_identificador' => 0,
-                      'uuid' => $uuid, 
-                      'total' => $total,
-                      'fecha' => !empty($fecha) ? date('Y-m-d H:i:s', strtotime($fecha)) : null,
-                      'usu_reg' => $session->get('id_usuario'),
-                      'fec_reg' => date('Y-m-d H:i:s')
-                  ];
-                  $this->globals->saveTabla($dataXML, ["tabla" => "factura", "editar" => false], []);
-             }
-        }
-
 
         $response->error = false;
         $response->respuesta = "Éxito|La información se guardó correctamente.";

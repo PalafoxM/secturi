@@ -137,19 +137,6 @@
                                 <!-- No. COMPROBANTE -->
                                 <td style="vertical-align: top;">
                                     <input type="text" name="no_comprobante[]" class="form-control-plaintext mb-2" value="<?= isset($row->encabezado) ? $row->encabezado : '' ?>" placeholder="3220">
-                                    
-                                    <!-- Archivos (Solo en la primera fila o por fila? Idealmente por fila pero el diseño es compacto. 
-                                         Si el usuario quiere agrupar facturas, quizas solo un set de archivos global o uno por linea.
-                                         La imagen tiene UNA sola celda para archivos. Asumiremos global para el trámite o adjuntar en la primera fila.) 
-                                         UPDATE: Dejaremos los archivos en la primera fila para no saturar, o moveremos a otra sección.
-                                         Por ahora, solo visible en la primera fila. -->
-                                    <?php if($index === 0): ?>
-                                    <div class="mt-2 text-left">
-                                        <small>Archivos XML/PDF</small>
-                                        <input type="file" name="archivos_pdf" accept=".pdf" class="form-control form-control-sm mb-1">
-                                        <input type="file" name="archivos_xml" accept=".xml" class="form-control form-control-sm">
-                                    </div>
-                                    <?php endif; ?>
                                 </td>
 
                                 <!-- PROYECTO META -->
@@ -436,7 +423,7 @@
              var formData = new FormData(document.getElementById("formPagoTerceros"));
              
              $.ajax({
-                url: "<?php echo base_url(); ?>Agregar/guardaFormatoPT",
+                url: "<?php echo base_url(); ?>index.php/Agregar/guardaFormatoPT",
                 type: "post",
                 dataType: "html",
                 data: formData,
