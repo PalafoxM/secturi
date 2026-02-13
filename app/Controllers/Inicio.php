@@ -353,47 +353,54 @@ class Inicio extends BaseController
     {
         $globas = new Mglobal;
 
-        $data['cat_inventario_promo'] = $globas->getTabla([
+        $productos = $globas->getTabla([
             'tabla' => 'cat_inventario_promo',
             'where' => ['visible' => 1]
         ])->data;
 
-        // Fetch colors for each product
-        if (!empty($data['cat_inventario_promo'])) {
-            foreach ($data['cat_inventario_promo'] as &$item) {
-                $colores = $globas->getTabla([
-                    'tabla' => 'colores',
-                    'where' => ['id_inventario' => $item->id_inventario_promo, 'visible' => 1]
-                ]);
-                
-                $item->colores = $colores->data ?? [];
-            }
+        // 2. Colores e imágenes por producto
+        foreach ($productos as &$item) {
+
+            // COLORES
+            $item->colores = $globas->getTabla([
+                'tabla' => 'colores',
+                'where' => [
+                    'id_inventario' => $item->id_inventario_promo,
+                    'visible' => 1
+                ]
+            ])->data ?? [];
+
+            // IMÁGENES (múltiples)
+            $imagenes = $globas->getTabla([
+                'tabla' => 'imagen',
+                'where' => [
+                    'id_inventario_promo' => $item->id_inventario_promo,
+                    'visible' => 1
+                ]
+            ]);
+
+            $item->imagenes = $imagenes->data ?? [];
+        }
+    
+
+        $data['cat_inventario_promo'] = $productos;
+
+        // 3. Totales
+        $data['total_stock_promo']     = 0;
+        $data['total_subtotal_promo']  = 0;
+        $data['total_dinero_promo']    = 0;
+
+        foreach ($productos as $item) {
+            $data['total_stock_promo']    += (int) ($item->stock ?? 0);
+            $data['total_subtotal_promo'] += (float) ($item->subtotal ?? 0);
+            $data['total_dinero_promo']   += (float) ($item->total ?? 0);
         }
 
-        $data['total_stock_promo'] = 0;
-        $data['total_subtotal_promo'] = 0;
-        $data['total_dinero_promo'] = 0;
-
-        if (!empty($data['cat_inventario_promo'])) {
-            foreach ($data['cat_inventario_promo'] as $item) {
-                $stock = (int)$item->stock;
-                $data['total_stock_promo'] += $stock;
-                
-                // Asegurar que existan las propiedades o calcularlas
-                // Asumiendo que vienen de BD, si no, calcular:
-                // $subtotal = $item->precio_unitario * $stock; // Ejemplo si no existe
-                $subtotal = isset($item->subtotal) ? (float)$item->subtotal : 0;
-                $total = isset($item->total) ? (float)$item->total : 0;
-
-                $data['total_subtotal_promo'] += $subtotal;
-                $data['total_dinero_promo'] += $total;
-            }
-        }
-
+        // 4. Otros datos
         $data['total_movimientos'] = 0;
-
-        $data['scripts'] = array('principal', 'inicio');
+        $data['scripts'] = ['principal', 'inicio'];
         $data['contentView'] = 'personal/vInventarioPromocion';
+
         $this->_renderView($data);
     }
     // ==========================================
