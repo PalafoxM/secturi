@@ -6012,6 +6012,7 @@ class Agregar extends BaseController
         return $this->respond($response);
     }
 
+
     public function guardarComprobacion()
     {
         $session = \Config\Services::session();
@@ -6077,6 +6078,198 @@ class Agregar extends BaseController
             $response->respuesta = "Ocurrió un error al guardar algunos comprobantes. Verifique la tabla solicitud_grc_comprobacion.";
         }
 
+        return $this->respond($response);
+    }
+
+
+    public function guardaFormatoPT()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $this->globals = new Mglobal();
+        $data = $this->request->getPost();
+        $archivos_post = $this->request->getFiles();
+
+        // 1. Validaciones Básicas
+        if (isset($data['no_consecutivo']) && empty($data['no_consecutivo'])) {
+            $response->error = true;
+            $response->respuesta = "Es requerido el no_consecutivo";
+            return $this->respond($response);
+        }
+        
+        $id_proveedor = null; // Default null
+        
+        // Buscar por RFC primero (más exacto)
+        if (!empty($data['rfc_proveedor'])) {
+             $prov = $this->globals->getTabla(["tabla" => "proveedor", "where" => ["rfc" => $data['rfc_proveedor'], "visible" => 1]]);
+             if(!empty($prov->data)) $id_proveedor = $prov->data[0]->id_proveedor;
+        }
+        
+        // Si no, buscar por Nombre (aproximado o exacto)
+        if (!$id_proveedor && !empty($data['nombre_proveedor_1'])) {
+              $prov = $this->globals->getTabla(["tabla" => "proveedor", "where" => ["razon_social" => $data['nombre_proveedor_1'], "visible" => 1]]);
+              if(!empty($prov->data)) $id_proveedor = $prov->data[0]->id_proveedor;
+        }
+
+        if(!$id_proveedor){
+             if(!empty($data['no_proveedor']) && is_numeric($data['no_proveedor'])){
+                   $prov = $this->globals->getTabla(["tabla" => "proveedor", "where" => ["id_proveedor" => $data['no_proveedor'], "visible" => 1]]); 
+             }
+        }
+        if(!$id_proveedor) $id_proveedor = 0; 
+
+
+        // 2. Insertar/Actualizar Registro PT
+        $no_consecutivo = $data['no_consecutivo'];
+        if ($data['editar'] != 1) {
+             $existe = $this->globals->getTabla(["tabla" => "registro_pt", "where" => ["no_consecutivo" => $no_consecutivo, "visible" => 1]]);
+             if(!empty($existe->data)){
+                  $ultimo = $this->globals->getTabla(["tabla" => "registro_pt", "select" => "MAX(no_consecutivo) as max_consecutivo", "where" => ["visible" => 1]]);
+                  $consecutivo_num = 1;
+                   if(!empty($ultimo->data) && $ultimo->data[0]->max_consecutivo){
+                         $consecutivo_num = $ultimo->data[0]->max_consecutivo + 1;
+                   }
+                   $no_consecutivo = str_pad($consecutivo_num, 3, "0", STR_PAD_LEFT);
+             }
+        }
+
+        $dataInsert = [
+            'id_reserva' => (int) $data['id_reserva'],
+            'no_consecutivo' => $no_consecutivo,
+            'id_proveedor' => $id_proveedor,
+            'fecha_tramite' => $data['fecha_tramite'],
+            'id_reponsable_solicitud' => $session->get('id_usuario'), 
+            'director_general' => 1,
+            'no_reserva' => $data['no_reserva_visual'] ?? 0,
+            'contrato_convenio' => $data['contrato_convenio'] ?? ''
+        ];
+        
+        $id_registro_pt = null;
+        if($data['editar'] == 1 && isset($data['id_registro_pt'])){
+            $id_registro_pt = $data['id_registro_pt'];
+            $dataConfig = ["tabla" => "registro_pt", "editar" => true, "idEditar" => ['id_registro_pt' => $id_registro_pt]];
+            $dataInsert['usu_act'] = $session->get('id_usuario');
+            $dataInsert['fec_act'] = date('Y-m-d H:i:s');
+             $this->globals->saveTabla($dataInsert, $dataConfig, ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFormatoPT_Upd']);
+        } else {
+            $dataConfig = ["tabla" => "registro_pt", "editar" => false];
+            $dataInsert['usu_reg'] = $session->get('id_usuario');
+            $dataInsert['fec_reg'] = date('Y-m-d H:i:s');
+            $responseMain = $this->globals->saveTabla($dataInsert, $dataConfig, ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFormatoPT_Ins']);
+            $id_registro_pt = $responseMain->idRegistro;
+        }
+
+        // 3. Insertar/Actualizar Filas (periodo_factura) - MULTIPLE
+        // Primero, marcar como invisibles todas las filas actuales (soft delete style) 
+        // para manejar eliminaciones, y luego re-insertar/actualizar.
+        // O más simple: Borrar todo y reinsertar. Soft delete es mejor.
+        
+        $filasActuales = $this->globals->getTabla(['tabla' => 'periodo_factura', 'where' => ['id_registro_pt' => $id_registro_pt, 'visible' => 1]]);
+        if(!empty($filasActuales->data)){
+             foreach($filasActuales->data as $f){
+                 $this->globals->saveTabla(
+                     ['visible' => 0, 'usu_act' => $session->get('id_usuario'), 'fec_act' => date('Y-m-d H:i:s')], 
+                     ["tabla" => "periodo_factura", "editar" => true, "idEditar" => ['id_periodo_factura' => $f->id_periodo_factura]], 
+                     []
+                 );
+             }
+        }
+
+        // Arrays de inputs
+        if(isset($data['no_comprobante']) && is_array($data['no_comprobante'])){
+            for($i=0; $i < count($data['no_comprobante']); $i++){
+                 // Skip empty rows if necessary, or just save empty strings as user entered
+                 
+                 // Resolve IDs per row
+                 $id_proyecto = 0;
+                 if(!empty($data['proyecto_meta'][$i])){
+                      $p = $this->globals->getTabla(["tabla" => "cat_proyecto", "where" => ["clave" => $data['proyecto_meta'][$i], "visible" => 1]]);
+                      if(!empty($p->data)) $id_proyecto = $p->data[0]->id_proyecto;
+                 }
+
+                 $id_partida = 0;
+                 if(!empty($data['no_partida'][$i])){
+                      $pa = $this->globals->getTabla(["tabla" => "cat_partida", "where" => ["clave" => $data['no_partida'][$i], "visible" => 1]]);
+                      if(!empty($pa->data)) $id_partida = $pa->data[0]->id_partida;
+                 }
+                
+                $dataFila = [
+                      'id_registro_pt' => $id_registro_pt,
+                      'id_presupuesto' => 0, 
+                      'encabezado' => $data['no_comprobante'][$i], 
+                      'importe' => $data['importe'][$i],
+                      'id_proyecto' => $id_proyecto,
+                      'id_partida' => $id_partida,
+                      'id_identificador' => 0, 
+                      'visible' => 1,
+                      'usu_reg' => $session->get('id_usuario'),
+                      'fec_reg' => date('Y-m-d H:i:s')
+                ];
+                $this->globals->saveTabla($dataFila, ["tabla" => "periodo_factura", "editar" => false], []);
+            }
+        }
+
+        // 4. Guardar Archivos (PDF/XML) - Solo una vez por registro PT (asumido global)
+        if(isset($archivos_post['archivos_pdf'])){
+             $archivo = $archivos_post['archivos_pdf'];
+             if($archivo->isValid()){
+                 $extension = $archivo->getClientExtension();
+                 $fileName = 'PT_PDF_' . $id_registro_pt . '_' . date('Ymd_His') . '.' . $extension;
+                 $ruta_destino = FCPATH . 'assets/pdf/';
+                 if (!is_dir($ruta_destino)) { mkdir($ruta_destino, 0755, true); }
+                 $archivo->move($ruta_destino, $fileName);
+                 
+                 $dataPDF = [
+                       'id_registro_pt' => $id_registro_pt,
+                       'id_identificador' => 0,
+                       'ruta_relativa' => 'assets/pdf/' . $fileName,
+                       'ruta_absoluta' => base_url('assets/pdf/' . $fileName),
+                       'visible' => 1,
+                       'usu_reg' => $session->get('id_usuario'),
+                       'fec_reg' => date('Y-m-d H:i:s')
+                 ];
+                 $this->globals->saveTabla($dataPDF, ["tabla" => "factura_pdf", "editar" => false], []);
+             }
+        }
+        
+        if(isset($archivos_post['archivos_xml'])){
+             $archivo = $archivos_post['archivos_xml'];
+             if($archivo->isValid()){
+                  $extension = $archivo->getClientExtension();
+                 $fileName = 'PT_XML_' . $id_registro_pt . '_' . date('Ymd_His') . '.' . $extension;
+                 $ruta_destino = FCPATH . 'assets/pdf/';
+                 if (!is_dir($ruta_destino)) { mkdir($ruta_destino, 0755, true); }
+                 $archivo->move($ruta_destino, $fileName);
+                 
+                 $contenido = file_get_contents($ruta_destino . $fileName);
+                 libxml_use_internal_errors(true);
+                 $xml = simplexml_load_string($contenido);
+                 $uuid = '';
+                 $total = '';
+                 $fecha = '';
+                 
+                 if ($xml !== false) {
+                     $attrs = $xml->attributes();
+                     $total = (string)$attrs['Total'];
+                     $fecha = (string)$attrs['Fecha'];
+                 }
+
+                 $dataXML = [
+                      'id_registro_pt' => $id_registro_pt,
+                      'id_identificador' => 0,
+                      'uuid' => $uuid, 
+                      'total' => $total,
+                      'fecha' => !empty($fecha) ? date('Y-m-d H:i:s', strtotime($fecha)) : null,
+                      'usu_reg' => $session->get('id_usuario'),
+                      'fec_reg' => date('Y-m-d H:i:s')
+                  ];
+                  $this->globals->saveTabla($dataXML, ["tabla" => "factura", "editar" => false], []);
+             }
+        }
+
+
+        $response->error = false;
+        $response->respuesta = "Éxito|La información se guardó correctamente.";
         return $this->respond($response);
     }
 }
