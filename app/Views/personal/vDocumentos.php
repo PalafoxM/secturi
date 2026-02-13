@@ -1002,7 +1002,7 @@
                                                                         </div>
                                                                     </li>
                                                                 </a>
-                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/F-RH-01-R-RH-01-2026_Apoyo_para_estudios_y_formación_básica.pdf" > 
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/R-RH-01-2026_Apoyo_para_estudios_y_formación_básica.pdf" > 
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
                                                                          <i class="far fa-file-pdf text-danger"></i> Apoyo para estudios y formación básica

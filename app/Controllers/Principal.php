@@ -3583,8 +3583,8 @@ class Principal extends BaseController
             ]
         ]);
 
-     
-
+       // var_dump( $registro_go->data[0]->id_reponsable_solicitud );
+       // die();
         if (empty($direccion->data)) {
             $jefe = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_go->data[0]->id_reponsable_solicitud]]);
             if (!empty($jefe->data)) {
@@ -3837,7 +3837,7 @@ class Principal extends BaseController
             'tabla' => 'vw_reserva',
             'where' => ['visible' => 1, 'id_reserva' => $registro_pt->data[0]->id_reserva]
         ]);
-        //die( var_dump($presupuesto) );
+        die( var_dump($presupuesto) );
         $direccion = $globals->getTabla([
             'tabla' => 'vw_direccion',
             'where' => [
@@ -3930,8 +3930,6 @@ class Principal extends BaseController
             if ($reserva[0]->partida >= '4000' && $reserva[0]->partida < '5000') {
                 $data['es4000'] = true;
             }
-
-
         }
   
         $uuid = $globals->getTabla(['tabla' => 'factura', 'where' => ['id_registro_pt' => $id_registro_pt, 'visible' => 1]]);
