@@ -654,7 +654,7 @@
                                                                         </div>
                                                                     </li> 
                                                                  </a>
-                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/F-RF-02-2026 Encabezado Factura.xlsx" >
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/F-RF-02-2026 Encabezado Factura.xlsm" >
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
                                                                         Encabezado Factura
