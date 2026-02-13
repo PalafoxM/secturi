@@ -215,7 +215,7 @@
                                         }
                                         $partidas_mostradas[] = $p[$i]->id_partida;
                                         ?>
-                                        <input type="hidden" id="id_presupuesto_<?= $i ?>" name="id_presupuesto[]" value="<?= $p[$i]->id_presupuesto_go ;?>" >
+                                        <input type="hidden" id="id_presupuesto_<?= $i ?>" name="id_presupuesto[<?= $i ?>]" value="<?= $p[$i]->id_presupuesto_go ;?>" >
                                         <p class="text-muted mb-4 text-center">Agregar Factura GO.</p>
                                         <hr>
                                         <div class="form-row"> <!-- presupuesto -->
@@ -245,7 +245,7 @@
                                             <div class="col-md-4 mb-3">
                                                 <label for="encabezado_<?= $i ?>">Encabezado<span style="color:red;">*</span></label>
                                                 <input type="text" class="form-control" autocomplete="off"
-                                                    id="encabezado_<?= $i ?>" name="encabezado[]"
+                                                    id="encabezado_<?= $i ?>" name="encabezado[<?= $i ?>]"
                                                     value="<?= (isset($p[$i]->encabezado) && !empty($p[$i]->encabezado)) ? $p[$i]->encabezado : '' ?>">
                                             </div>
                                         </div>
