@@ -331,10 +331,6 @@
                                                                                     data-row="<?= $uniqueId ?>">
                                                                                     <i class="mdi mdi-code-tags"></i> XML
                                                                                 </button>
-                                                                                <button type="button" class="btn btn-danger remove-row" 
-                                                                                    data-row="<?= $uniqueId ?>">
-                                                                                    <i class="fas fa-trash"></i> Eliminar
-                                                                                </button>
                                                                             </div>
                                                                         </td>
                                                                     </tr>
