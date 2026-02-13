@@ -1381,10 +1381,8 @@ ini.inicio = (function () {
                             }).format(p.importe)}" 
                                                     readonly>
                                         </td>
-                                        <td>
-                                            <button type="button" class="btn btn-sm btn-danger remove-row">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
+                                         <td>
+                                            <input class="form-control" type="number" name="fondo[]"  >
                                         </td>
                                     </tr>
                                 `;
@@ -1452,6 +1450,7 @@ ini.inicio = (function () {
                 const id_presupuesto_estatus = $('input[name="id_presupuesto_estatus[]"]').map(function () { return $(this).val(); }).get();
                 const id_proyecto_estatus = $('select[name="id_proyecto_estatus[]"]').map(function () { return $(this).val(); }).get();
                 const id_partida_estatus = $('select[name="id_partida_estatus[]"]').map(function () { return $(this).val(); }).get();
+                const ampliacion = $('input[name="fondo[]"]').map(function () { return $(this).val(); }).get();
 
 
                 if (!motivo) {
@@ -1473,7 +1472,8 @@ ini.inicio = (function () {
                         numero_reserva: numero_reserva,
                         id_presupuesto_estatus: id_presupuesto_estatus,
                         id_proyecto_estatus: id_proyecto_estatus,
-                        id_partida_estatus: id_partida_estatus
+                        id_partida_estatus: id_partida_estatus,
+                        fondo: ampliacion
                     },
                     beforeSend: function () {
                         $('#btnConfirmarReserva').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');

@@ -335,7 +335,8 @@
                                             <th>PROYECTO-META</th>
                                             <th>PARTIDA</th>
                                             <th>IMPORTE</th>
-                                            <th>ACCIONES</th>
+                                            <th>AMPLIACION</th>
+                
                                         </tr>
                                     </thead>
                                     <tbody> 

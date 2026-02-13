@@ -1298,6 +1298,7 @@ class Usuario extends BaseController
         $response->error = true;
         $response->respuesta = 'Error! Error al guardar en la base de datos';
         $data = $this->request->getPost();
+       
 
         $dataConfig = [
             "tabla" => "reserva",
@@ -1320,6 +1321,7 @@ class Usuario extends BaseController
                      $dataPresupuesto = [
                         'id_proyecto' => (isset($data['id_proyecto_estatus'][$key]) && !empty($data['id_proyecto_estatus'][$key])) ? $data['id_proyecto_estatus'][$key] : null,
                         'id_partida' => (isset($data['id_partida_estatus'][$key]) && !empty($data['id_partida_estatus'][$key])) ? $data['id_partida_estatus'][$key] : null,
+                        'fondo' => (isset($data['fondo'][$key]) && !empty($data['fondo'][$key])) ? $data['fondo'][$key] : null,
                     ];
                     
                     $dataConfigPresupuesto = [
@@ -1544,7 +1546,7 @@ class Usuario extends BaseController
             $sheet->setCellValue('J' . $fila, $row->no_convenio);
             $sheet->setCellValue('K' . $fila, $row->partida);
             $sheet->setCellValueExplicit('L' . $fila, $row->centro_gestor, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-            $sheet->setCellValueExplicit('M' . $fila, $row->fondo, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+            $sheet->setCellValueExplicit('M' . $fila, ($row->nuevo_fondo)?$row->nuevo_fondo:$row->fondo, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
             $sheet->setCellValue('N' . $fila, $row->area);
             $sheet->setCellValueExplicit('O' . $fila, $row->cuenta_mayor, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
             $sheet->setCellValue('P' . $fila, '21');
