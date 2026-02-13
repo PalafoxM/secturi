@@ -57,7 +57,7 @@ $fechaFormateada = $dia . ' DE ' . $mes . ' DEL ' . $anio;
                     ?>
                 </strong> 
     
-                por concepto de <?= $registro->concepto_pago ?> 
+                por concepto de <?= (isset($concepto) && !empty($concepto))?$concepto:$registro->concepto_pago ?> 
                 al proveedor <?= $registro->dsc_proveedor ?>.
             </span>
         </div>

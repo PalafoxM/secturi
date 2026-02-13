@@ -5663,7 +5663,7 @@ class Principal extends BaseController
                 $total += (float) $f->total; 
             }
         }
-        
+       // die( var_dump($periodo_factura) );
         if (isset($presupuesto->data) && !empty($presupuesto->data)) {
             $data['presupuesto'] = $presupuesto->data;
         }
@@ -5673,6 +5673,7 @@ class Principal extends BaseController
             $data['periodo_factura'] = $periodo_factura->data;
             $data['periodo_inicio'] = $periodo_factura->data[0]->periodo_inicio;
             $data['periodo_fin'] = $periodo_factura->data[0]->periodo_fin;
+            $data['concepto'] = $periodo_factura->data[0]->concepto;
             $registros = count($periodo_factura->data);
         }
 
@@ -5928,6 +5929,7 @@ class Principal extends BaseController
                           $data['fecha_gasto_inicio'] =  $periodo_factura->data[$index]->periodo_inicio;
                           $data['fecha_gasto_fin']    =  $periodo_factura->data[$index]->periodo_fin;
                           $data['registro']->concepto_pago = $periodo_factura->data[$index]->concepto;
+                         // die( var_dump($data['registro']->concepto_pago) );
                           $data['uuid2']              = $xml->data[$index]->uuid;
                           $data['total2'] = "";
                           $data['monto2'] = "";
