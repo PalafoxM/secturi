@@ -4083,7 +4083,7 @@ class Agregar extends BaseController
             $timestamp = date('Ymd_His');
             $extension = $file->getClientExtension();
             $originalName = pathinfo($file->getName(), PATHINFO_FILENAME);
-            $archivo = $data['usuario'] . '.' . $extension;
+            $archivo = $data['usuario'] . '_' . $timestamp . '.' . $extension;
             $ruta_destino = FCPATH . 'assets/images/fotos/';
             $file->move($ruta_destino, $archivo);
             $ruta_relativa = 'assets/images/fotos/' . $archivo;
