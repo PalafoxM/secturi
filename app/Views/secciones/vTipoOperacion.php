@@ -300,10 +300,10 @@
                                 </div>
                             </div>
 
-                            
-                             <!-- CONSULTA CORTE -->
-                             <div id="div_corte" class="seccion-op" style="display:none;">
-                                <h4 class="text-danger">DEBUG: SI SE VE ESTO, EL DIV ESTA RENDERIZANDO</h4>
+                        </div>
+                            <!-- CONSULTA CORTE -->
+                             <div id="div_corte" class="seccion-op" >
+
                                 <div class="form-group row">
                                     <label class="col-sm-3 col-form-label">Consulta Corte (Estado): <span class="text-danger">*</span></label>
                                     <div class="col-sm-9">
@@ -321,8 +321,6 @@
                                     </div>
                                 </div>
                             </div>
-
-                        </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                             <button type="button" class="btn btn-primary" onclick="guardarOperacionValidada()">Guardar</button>
