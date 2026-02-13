@@ -143,7 +143,7 @@ $fechaFormateada = $dia . ' DE ' . $mes . ' DEL ' . $anio;
              <strong> <?= (isset($responsableGasto->nombre_completo) && !empty($responsableGasto->nombre_completo))?$responsableGasto->nombre_completo:''  ?> </strong>
             </span>
         </div>
-           <div style="position:absolute; top:87%; left:14%; width:75%; height:20px; background-color:white; font-size:13px; text-align:center;">
+           <div style="position:absolute; top:87.5%; left:14%; width:75%; height:30px; background-color:white; font-size:13px; text-align:center;">
             <span class="proxima">
               <strong> <?= (isset($responsableGasto->dsc_puesto) && !empty($responsableGasto->dsc_puesto))?$responsableGasto->dsc_puesto:'' ?></strong>
             </span>
