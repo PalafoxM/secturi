@@ -1148,15 +1148,47 @@ class Principal extends BaseController
         $response = new \stdClass();
         $response->error = true;
         $response->respuesta = 'Error al Guardar los datos';
+        
         $foto = $this->request->getFile('foto');
-        $extension = $foto->getClientExtension();
-        //$originalName = pathinfo($foto->getName(), PATHINFO_FILENAME);
-       $exten = date('Ymd_His'); // "20241210_143025"
-       $archivo = $session->usuario.'_'.$exten.'.' . $extension;
+
+        if (!$foto->isValid()) {
+             $response->respuesta = $foto->getErrorString() . '(' . $foto->getError() . ')';
+             return $this->respond($response);
+        }
+
+        // Validar tamaño (Max 2MB)
+        if ($foto->getSize() > 2048 * 1024) {
+             $response->respuesta = "El archivo excede el tamaño máximo permitido de 2MB.";
+             return $this->respond($response);
+        }
+
+        // Validar tipo de archivo
+        $mimeType = $foto->getMimeType();
+        $allowedMimes = ['image/jpg', 'image/jpeg', 'image/gif', 'image/png', 'image/webp'];
+        
+        if (!in_array($mimeType, $allowedMimes)) {
+             $response->respuesta = "Formato de archivo no válido. Solo se permiten imágenes (JPG, PNG, GIF, WEBP).";
+             return $this->respond($response);
+        }
+
+        if ($foto->hasMoved()) {
+             $response->respuesta = "El archivo ya ha sido procesado.";
+             return $this->respond($response);
+        }
+
+        $timestamp = date('Ymd_His');
+        $extension = $foto->getExtension(); // Obtener extensión basada en el tipo MIME real
+        $archivo = $session->usuario . '_' . $timestamp . '.' . $extension;
 
         $ruta_destino = FCPATH . 'assets/images/fotos/';
 
-        $foto->move($ruta_destino, $archivo);
+        try {
+            $foto->move($ruta_destino, $archivo);
+        } catch (\Exception $e) {
+            $response->respuesta = "Error al mover el archivo: " . $e->getMessage();
+            return $this->respond($response);
+        }
+
         $ruta_absoluta = base_url('assets/images/fotos/' . $archivo);
         $ruta_relativa = 'assets/images/fotos/' . $archivo;
 
@@ -1171,11 +1203,17 @@ class Principal extends BaseController
             "editar" => true,
             "idEditar" => ['id_usuario' => $session->get('id_usuario')]
         ];
+        
         $res = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+        
         if (!$res->error) {
             $response->error = $res->error;
             $response->respuesta = $res->respuesta;
+            $response->nueva_foto = $ruta_relativa;
+        } else {
+             $response->respuesta = $res->respuesta;
         }
+        
         return $this->respond($response);
     }
     public function guardarReservaGO()
