@@ -3832,7 +3832,7 @@ class Principal extends BaseController
             'tabla' => 'vw_reserva',
             'where' => ['visible' => 1, 'id_reserva' => $registro_pt->data[0]->id_reserva]
         ]);
-        die( var_dump($presupuesto) );
+        //die( var_dump($registro_pt) );
         $direccion = $globals->getTabla([
             'tabla' => 'vw_direccion',
             'where' => [
@@ -3844,21 +3844,20 @@ class Principal extends BaseController
         if( isset($presupuesto->data) && !empty($presupuesto->data)){
              $data['presupuesto'] = $presupuesto->data;
         }
-      
-        if (empty($direccion->data)) {
-        
-            $jefe = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_pt->data[0]->id_reponsable_solicitud]]);
+       $direccionResponsable  = '';
+       if(isset($registro_pt->data[0]->id_direccion_responsable) && !empty($registro_pt->data[0]->id_direccion_responsable)){
+        $direccionResponsable = $globals->getTabla([
+            'tabla' => 'cat_area',
+            'where' => [
+                'visible' => 1,
+                'id_area' => $registro_pt->data[0]->id_direccion_responsable
+            ]
+        ]);
+       }
+       if($direccionResponsable->data[0]->prefijo){
+        $folio = $direccionResponsable->data[0]->prefijo;
+       }
        
-            if (!empty($jefe->data)) {
-                $idJefe = $jefe->data[0]->id_jefe_inmediato;
-                $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_director' => $idJefe]]);
-           
-            } else {
-                $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_pt->data[0]->id_reponsable_solicitud]]);
-                $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_area' => $area->data[0]->id_area]]);
-            }
-        }
-
         $no_consecutivo = "";
         if (strlen($registro_pt->data[0]->no_consecutivo) == 1) {
             $no_consecutivo = '00' . $registro_pt->data[0]->no_consecutivo;
@@ -3870,7 +3869,7 @@ class Principal extends BaseController
             $no_consecutivo = $registro_pt->data[0]->no_consecutivo;
         }
         
-         $folio =(isset( $direccion->data) && !empty( $direccion->data))? $direccion->data[0]->folio_prefijo:'S/N/';
+         //$folio =(isset( $direccion->data) && !empty( $direccion->data))? $direccion->data[0]->folio_prefijo:'S/N/';
       
         $folio_prefijo = $folio . $no_consecutivo . '/' . date('Y'); //ESTO HAY QUE OREGUNTAR
 
