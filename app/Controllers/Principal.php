@@ -3583,17 +3583,11 @@ class Principal extends BaseController
             ]
         ]);
 
-       // var_dump( $registro_go->data[0]->id_reponsable_solicitud );
-       // die();
-        if (empty($direccion->data)) {
-            $jefe = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_go->data[0]->id_reponsable_solicitud]]);
-            if (!empty($jefe->data)) {
-                $idJefe = $jefe->data[0]->id_jefe_inmediato;
-                $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_director' => $idJefe]]);
-            } else {
-                $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_go->data[0]->id_reponsable_solicitud]]);
-                $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_area' => $area->data[0]->id_area]]);
-            }
+        $prefijoArea = '';
+        if($registro_go->data){
+           $res =  $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1, 'id_area' => $registro_go->data[0]->id_direccion_responsable]]);
+           $prefijoArea = $res->data[0]->prefijo;
+         
         }
 
         $data['responsableGasto'] = (isset($direccion->data) && !empty($direccion)) ? $direccion->data[0] : '';
@@ -3659,9 +3653,10 @@ class Principal extends BaseController
                 $no_consecutivo = $registro_go->data[0]->no_consecutivo;
             }
             
-            $folio =(isset( $direccion->data) && !empty( $direccion->data))? $direccion->data[0]->folio_prefijo:'S/N/';
+          //  $folio =(isset( $direccion->data) && !empty( $direccion->data))? $direccion->data[0]->folio_prefijo:'S/N/';
         
-            $folio_prefijo = $folio . $no_consecutivo . '/' . date('Y'); //ESTO HAY QUE OREGUNTAR
+            $folio_prefijo = $prefijoArea. $no_consecutivo . '/' . date('Y'); //ESTO HAY QUE OREGUNTAR
+           // die( var_dump( $folio_prefijo ) );
             //==================================
             $data['folio'] = $folio_prefijo;
 
