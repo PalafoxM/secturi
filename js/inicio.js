@@ -5860,6 +5860,27 @@ ini.inicio = (function () {
                         }, 'json');
                     }
                 })
+            },
+            eliminarHojaAzul: function (id) {
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: "No podrás revertir esto!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, eliminarlo!'
+                }).then((result) => {
+                    if (result.value) {
+                        $.post(base_url + "index.php/Inicio/eliminarHojaAzul", { id_registro_pt: id }, function (response) {
+                            if (!response.error) {
+                                Swal.fire("Eliminado!", "El registro ha sido eliminado.", "success").then(() => {
+                                    $('#table_hoja_azul').bootstrapTable('refresh');
+                                });
+                            } else {
+                                Swal.fire("Error", response.respuesta, "error");
+                            }
+                        }, 'json');
+                    }
+                })
             }
         },
     }

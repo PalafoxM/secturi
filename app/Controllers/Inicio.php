@@ -1802,4 +1802,23 @@ class Inicio extends BaseController
 
 
 
+    public function ListaHojaAzul()
+    {
+        $session = \Config\Services::session();
+        $globas = new Mglobal;
+        if(in_array($session->get('id_perfil'), [1,2])){
+            $dataDB = array('tabla' => 'formulario_pt', 'where' => ['visible' => 1]);
+        }else{
+            $dataDB = array('tabla' => 'formulario_pt', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]);
+        }
+        $response = $globas->getTabla($dataDB);
+        $data['dataHojaAzul'] = $response->data;
+        
+        $data['scripts'] = array('principal', 'inicio');
+        $data['edita'] = 0;
+        $data['contentView'] = 'secciones/vListaHojaAzul';
+        $this->_renderView($data);
+    }
+
+
 }

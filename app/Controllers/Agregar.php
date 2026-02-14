@@ -6096,54 +6096,32 @@ class Agregar extends BaseController
             $response->respuesta = "Es requerido el no_consecutivo";
             return $this->respond($response);
         }
-        
-        $id_proveedor = null; // Default null
-        
-        // Buscar por RFC primero (más exacto)
-        if (!empty($data['rfc_proveedor'])) {
-             $prov = $this->globals->getTabla(["tabla" => "proveedor", "where" => ["rfc" => $data['rfc_proveedor'], "visible" => 1]]);
-             if(!empty($prov->data)) $id_proveedor = $prov->data[0]->id_proveedor;
-        }
-        
-        // Si no, buscar por Nombre (aproximado o exacto)
-        if (!$id_proveedor && !empty($data['nombre_proveedor_1'])) {
-              $prov = $this->globals->getTabla(["tabla" => "proveedor", "where" => ["razon_social" => $data['nombre_proveedor_1'], "visible" => 1]]);
-              if(!empty($prov->data)) $id_proveedor = $prov->data[0]->id_proveedor;
-        }
-
-        if(!$id_proveedor){
-             if(!empty($data['no_proveedor']) && is_numeric($data['no_proveedor'])){
-                   $prov = $this->globals->getTabla(["tabla" => "proveedor", "where" => ["id_proveedor" => $data['no_proveedor'], "visible" => 1]]); 
-             }
-        }
-        if(!$id_proveedor) $id_proveedor = 0; 
-
-        die( var_dump($data) );
-        // 2. Insertar/Actualizar Registro PT
-        $no_consecutivo = $data['no_consecutivo'];
-        if ($data['editar'] != 1) {
-             $existe = $this->globals->getTabla(["tabla" => "registro_pt", "where" => ["no_consecutivo" => $no_consecutivo, "visible" => 1]]);
-             if(!empty($existe->data)){
-                  $ultimo = $this->globals->getTabla(["tabla" => "registro_pt", "select" => "MAX(no_consecutivo) as max_consecutivo", "where" => ["visible" => 1]]);
-                  $consecutivo_num = 1;
-                   if(!empty($ultimo->data) && $ultimo->data[0]->max_consecutivo){
-                         $consecutivo_num = $ultimo->data[0]->max_consecutivo + 1;
-                   }
-                   $no_consecutivo = str_pad($consecutivo_num, 3, "0", STR_PAD_LEFT);
-             }
-        }
-
+           
+        // die( var_dump($data) );
+       
         $dataInsert = [
-            'id_reserva' => (int) $data['id_reserva'],
-            'no_consecutivo' => $no_consecutivo,
-            'id_proveedor' => $id_proveedor,
+            'no_consecutivo' => $data['no_consecutivo'],
+            'nombre_proveedor_1' => $data['nombre_proveedor_1'],
+            'rfc_proveedor' => $data['rfc_proveedor'],
+            'nombre_proveedor_2' => $data['nombre_proveedor_2'],
+            'no_cuenta' => $data['no_cuenta'],
+            'banco' => $data['banco'],
+            'clabe' => $data['clabe'],
             'fecha_tramite' => $data['fecha_tramite'],
-            'id_reponsable_solicitud' => $session->get('id_usuario'), 
-            'director_general' => 1,
+            'nombre_responsable_2' => $data['nombre_responsable_2'], 
+            'nombre_responsable' => $data['nombre_responsable'], 
+            'cargo_responsable' => $data['cargo_responsable'], 
+            'cargo_responsable_2' => $data['cargo_responsable_2'], 
+            'cargo_director_general' => $data['cargo_director_general'], 
+            'nombre_director_general' => $data['nombre_director_general'],
+            'importe_total_num' => $data['importe_total_num'],
+            'nombre_autoriza' => $data['nombre_autoriza'],
+            'cargo_autoriza' => $data['cargo_autoriza'],
             'no_reserva' => $data['no_reserva_visual'] ?? 0,
-            'contrato_convenio' => $data['contrato_convenio'] ?? ''
+            'contrato_convenio' => $data['contrato_convenio'] ?? '',
+            'importe_letra' => $data['importe_letra'] ?? ''
         ];
-        
+       
         $id_registro_pt = null;
         if($data['editar'] == 1 && isset($data['id_registro_pt'])){
             $id_registro_pt = $data['id_registro_pt'];
@@ -6180,40 +6158,32 @@ class Agregar extends BaseController
             for($i=0; $i < count($data['no_comprobante']); $i++){
                  // Skip empty rows if necessary, or just save empty strings as user entered
                  
-                 // Resolve IDs per row
-                 $id_proyecto = 0;
-                 if(!empty($data['proyecto_meta'][$i])){
-                      $p = $this->globals->getTabla(["tabla" => "cat_proyecto", "where" => ["clave" => $data['proyecto_meta'][$i], "visible" => 1]]);
-                      if(!empty($p->data)) $id_proyecto = $p->data[0]->id_proyecto;
-                 }
-
-                 $id_partida = 0;
-                 if(!empty($data['no_partida'][$i])){
-                      $pa = $this->globals->getTabla(["tabla" => "cat_partida", "where" => ["clave" => $data['no_partida'][$i], "visible" => 1]]);
-                      if(!empty($pa->data)) $id_partida = $pa->data[0]->id_partida;
-                 }
+                
                 
                 $dataFila = [
                       'id_registro_pt' => $id_registro_pt,
-                      'id_presupuesto' => 0, 
-                      'encabezado' => $data['no_comprobante'][$i], 
+                      //'id_presupuesto' => 0, 
+                      'importe' => $data['no_comprobante'][$i], 
                       'importe' => $data['importe'][$i],
-                      'id_proyecto' => $id_proyecto,
-                      'id_partida' => $id_partida,
-                      'id_identificador' => 0, 
-                      'visible' => 1,
+                      'proyecto' =>  $data['proyecto_meta'][$i],
+                      'partida' => $data['no_partida'][$i],
                       'usu_reg' => $session->get('id_usuario'),
                       'fec_reg' => date('Y-m-d H:i:s')
                 ];
-                $this->globals->saveTabla($dataFila, ["tabla" => "manual_factura", "editar" => false], []);
+              $response =  $this->globals->saveTabla($dataFila, ["tabla" => "manual_factura", "editar" => false], []);
             }
         }
 
-
-        
+       if($response->error){
+           $response->error = true;
+           $response->respuesta = "Error|".$response->respuesta;
+           return $this->respond($response);
+       }
+               
 
         $response->error = false;
         $response->respuesta = "Éxito|La información se guardó correctamente.";
+
         return $this->respond($response);
     }
 }

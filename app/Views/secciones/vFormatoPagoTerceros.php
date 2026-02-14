@@ -255,7 +255,7 @@
                     <table class="table table-bordered text-center mt-4">
                         <thead>
                             <tr class="bg-black">
-                                <th colspan="3" class="text-uppercase">AUTORIZACIONES</th>
+                                <th colspan="3" class="text-uppercase" style="color: white;">AUTORIZACIONES</th>
                             </tr>
                             <tr class="bg-grey">
                                 <th width="33%">DIRECTOR/A GENERAL ADMINISTRATIVO/A</th>
@@ -414,7 +414,171 @@
             $('input[name="importe_total_num"]').val(total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
             
             // Here you could convert to letters via AJAX if needed, or leave blank for user
+            if(total > 0){
+                 $('input[name="importe_letra"]').val(numeroALetras(total));
+            } else {
+                 $('input[name="importe_letra"]').val('');
+            }
         }
+
+        function numeroALetras(amount) {
+            var data = {
+                unidades: ['', 'UN ', 'DOS ', 'TRES ', 'CUATRO ', 'CINCO ', 'SEIS ', 'SIETE ', 'OCHO ', 'NUEVE '],
+                decenas: ['', 'DIEZ ', 'VEINTE ', 'TREINTA ', 'CUARENTA ', 'CINCUENTA ', 'SESENTA ', 'SETENTA ', 'OCHENTA ', 'NOVENTA '],
+                diez: ['DIEZ ', 'ONCE ', 'DOCE ', 'TRECE ', 'CATORCE ', 'QUINCE ', 'DIECISEIS ', 'DIECISIETE ', 'DIECIOCHO ', 'DIECINUEVE '],
+                centenas: ['', 'CIENTO ', 'DOSCIENTOS ', 'TRESCIENTOS ', 'CUATROCIENTOS ', 'QUINIENTOS ', 'SEISCIENTOS ', 'SETECIENTOS ', 'OCHOCIENTOS ', 'NOVECIENTOS '],
+                unidad: ['', 'UN ', 'DOS ', 'TRES ', 'CUATRO ', 'CINCO ', 'SEIS ', 'SIETE ', 'OCHO ', 'NUEVE '],
+            };
+
+            var pesos = Math.floor(amount);
+            var centavos = Math.round((amount - pesos) * 100);
+            var letras = '';
+
+            if (pesos === 0) {
+                letras = 'CERO ';
+            } else if (pesos === 1) {
+                letras = 'UN ';
+            } else {
+                letras = convertirGrupo(pesos);
+            }
+
+            letras += 'PESOS ';
+
+            if (centavos < 10) {
+                centavos = '0' + centavos;
+            }
+
+            letras += centavos + '/100 M.N.';
+
+            return letras.trim();
+        }
+
+        function convertirGrupo(n) {
+            var output = '';
+            var millones = Math.floor(n / 1000000);
+            var miles = Math.floor((n % 1000000) / 1000);
+            var unidades = n % 1000;
+
+            if (millones > 0) {
+                if (millones === 1) {
+                    output += 'UN MILLON ';
+                } else {
+                    output += convertirCentenas(millones) + 'MILLONES ';
+                }
+            }
+
+            if (miles > 0) {
+                if (miles === 1) {
+                    output += 'UN MIL ';
+                } else {
+                    output += convertirCentenas(miles) + 'MIL ';
+                }
+            }
+
+            if (unidades > 0) {
+                output += convertirCentenas(unidades);
+            }
+
+            return output;
+        }
+
+        function convertirCentenas(n) {
+            var output = '';
+            var centenas = Math.floor(n / 100);
+            var decenas = Math.floor((n % 100) / 10);
+            var unidades = n % 10;
+            var data = {
+                unidades: ['', 'UN ', 'DOS ', 'TRES ', 'CUATRO ', 'CINCO ', 'SEIS ', 'SIETE ', 'OCHO ', 'NUEVE '],
+                decenas: ['', 'DIEZ ', 'VEINTE ', 'TREINTA ', 'CUARENTA ', 'CINCUENTA ', 'SESENTA ', 'SETENTA ', 'OCHENTA ', 'NOVENTA '],
+                diez: ['DIEZ ', 'ONCE ', 'DOCE ', 'TRECE ', 'CATORCE ', 'QUINCE ', 'DIECISEIS ', 'DIECISIETE ', 'DIECIOCHO ', 'DIECINUEVE '],
+                centenas: ['', 'CIENTO ', 'DOSCIENTOS ', 'TRESCIENTOS ', 'CUATROCIENTOS ', 'QUINIENTOS ', 'SEISCIENTOS ', 'SETECIENTOS ', 'OCHOCIENTOS ', 'NOVECIENTOS '],
+            };
+
+            if (centenas > 0) {
+                if (centenas === 1 && decenas === 0 && unidades === 0) {
+                    output += 'CIEN ';
+                } else {
+                    output += data.centenas[centenas];
+                }
+            }
+
+            if (decenas > 0) {
+                if (decenas === 1) {
+                    output += data.diez[unidades];
+                } else if (decenas === 2 && unidades > 0) {
+                    output += 'VEINTI' + data.unidades[unidades].trim(); // Veintiuno, veintidos... pero aqui simplificamos
+                    // Correccion rapida para veinti:
+                    // VEINTIUN, VEINTIDOS...
+                    // Dejemoslo simple:
+                     output += 'VEINTI' + data.unidades[unidades].replace('UN ', 'UNO ').trim() + ' ';
+                } else {
+                    output += data.decenas[decenas];
+                    if (unidades > 0) {
+                        output += 'Y ' + data.unidades[unidades];
+                    }
+                }
+            } else if (unidades > 0) {
+                // Special check for 10-19 handled above
+                // If decenas was 0, just units
+                if(centenas > 0 || miles > 0 || millones > 0) { // If there was something before
+                     output += data.unidades[unidades];
+                } else {
+                    output += data.unidades[unidades];
+                }
+            }
+            
+            // Fix for VEINTI logic above which is a bit messy in quick JS
+            // Let's use a simpler standard approach for 0-99
+            return convertirDecenas(n % 100, (Math.floor(n/100) == 1 && (n%100)==0)); // Pass if it was exactly 100 for 'CIEN' handling check? NO, handled before.
+            
+            // Re-writing convertCentenas to be cleaner
+        }
+        
+        // Better implementation for converting 0-999
+        function convertirCentenas(n) {
+             var output = '';
+             var c = Math.floor(n / 100);
+             var resto = n % 100;
+             
+             if (c === 1) {
+                 if (resto > 0) output += 'CIENTO ';
+                 else output += 'CIEN ';
+             } else if (c > 1) {
+                 var centenasArr = ['', 'CIENTO ', 'DOSCIENTOS ', 'TRESCIENTOS ', 'CUATROCIENTOS ', 'QUINIENTOS ', 'SEISCIENTOS ', 'SETECIENTOS ', 'OCHOCIENTOS ', 'NOVECIENTOS '];
+                 output += centenasArr[c];
+             }
+             
+             if (resto > 0) {
+                 output += convertirDecenas(resto);
+             }
+             
+             return output;
+        }
+
+        function convertirDecenas(n) {
+            var output = '';
+            var d = Math.floor(n / 10);
+            var u = n % 10;
+            var unidadesArr = ['', 'UN ', 'DOS ', 'TRES ', 'CUATRO ', 'CINCO ', 'SEIS ', 'SIETE ', 'OCHO ', 'NUEVE '];
+            var decenasArr = ['', 'DIEZ ', 'VEINTE ', 'TREINTA ', 'CUARENTA ', 'CINCUENTA ', 'SESENTA ', 'SETENTA ', 'OCHENTA ', 'NOVENTA '];
+            var diezArr = ['DIEZ ', 'ONCE ', 'DOCE ', 'TRECE ', 'CATORCE ', 'QUINCE ', 'DIECISÉIS ', 'DIECISIETE ', 'DIECIOCHO ', 'DIECINUEVE '];
+
+            if (d === 0) {
+                output += unidadesArr[u];
+            } else if (d === 1) {
+                output += diezArr[u];
+            } else if (d === 2) {
+                 if (u === 0) output += 'VEINTE ';
+                 else output += 'VEINTI' + unidadesArr[u].trim() + ' '; // VEINTIUN? VEINTIUNO? usually VEINTIUN for amounts.
+            } else {
+                output += decenasArr[d];
+                if (u > 0) {
+                    output += 'Y ' + unidadesArr[u];
+                }
+            }
+            return output;
+        }
+
 
         // Initial Total Calculation
         calcularTotal();
@@ -424,28 +588,25 @@
              
              $.ajax({
                 url: "<?php echo base_url(); ?>index.php/Agregar/guardaFormatoPT",
-                type: "post",
-                dataType: "html",
+                type: "POST",
                 data: formData,
-                cache: false,
-                contentType: false,
                 processData: false,
+                contentType: false,
                 success: function(data) {
-                    var obj = JSON.parse(data);
-                    if (obj.error) {
+                    if (data.error) {
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: obj.respuesta
+                            text: data.respuesta
                         });
                     } else {
                         Swal.fire({
                             icon: 'success',
                             title: 'Éxito',
-                            text: obj.respuesta,
+                            text: data.respuesta,
                             confirmButtonText: 'Aceptar'
                         }).then((result) => {
-                            window.location.reload(); 
+                            window.location.href = "<?php echo base_url(); ?>index.php/Inicio/ListaHojaAzul";
                         });
                         Swal.fire({
                             icon: 'error',
