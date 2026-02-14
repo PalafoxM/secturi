@@ -1820,5 +1820,125 @@ class Inicio extends BaseController
         $this->_renderView($data);
     }
 
+    public function generarFormatoPT()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $data = array();
+        
+        $id = $this->request->getGet('id');
+        $editar = $this->request->getGet('editar');
+        
+        $data['editar'] = ($editar == 1) ? 1 : 0;
+        $data['id_reserva'] = 0; // Default or fetch if needed
+        $data['no_consecutivo'] = ''; // Logic to generate new consecutive if needed, or leave blank
+
+        if ($data['editar'] == 1 && $id) {
+            // Fetch main record
+            $registro = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["id_registro_pt" => $id]]);
+            if (!empty($registro->data)) {
+                $data['registro_pt'] = $registro->data[0];
+                
+                // Fetch items
+                $items = $globals->getTabla(["tabla" => "periodo_factura_pt", "where" => ["id_registro_pt" => $id, "visible" => 1]]);
+                $data['periodo_factura_rows'] = $items->data;
+                
+                // Fetch provider data (assuming it comes from the first item or stored in main record?
+                // View shows provider inputs are in the first row's "Datos del Proveedor".
+                // But normally this data is fetched from a provider catalog or stored.
+                // In Step 5 view, it uses $proveedor->razon_social etc.
+                // Let's assume we need to fetch 'proveedor' and 'proveedor_banco' if relevant.
+                // Or maybe the view expects empty if not found.
+                // If I look at the view, it uses properties of $proveedor and $proveedor_banco.
+                // I will initialize them as empty objects if not found to avoid errors.
+                $data['proveedor'] = new \stdClass();
+                $data['proveedor_banco'] = new \stdClass();
+                
+                // Check if we have provider info stored or linked.
+                // If not, maybe passed empty.
+            }
+        } else {
+             // New record logic
+             // Generate consecutive?
+             $last = $globals->getTabla(["tabla" => "formulario_pt", "order_by" => "id_registro_pt DESC", "limit" => 1]);
+             $next_id = 1;
+             if(!empty($last->data)){
+                 $next_id = $last->data[0]->id_formulario_pt + 1;
+             }
+             $data['no_consecutivo'] = 'PT ' . str_pad($next_id, 3, "0", STR_PAD_LEFT) . '/' . date('Y');
+             
+             $data['periodo_factura_rows'] = [];
+             $data['proveedor'] = new \stdClass();
+             $data['proveedor_banco'] = new \stdClass();
+        }
+
+        $data['scripts'] = array('principal', 'inicio');
+        $data['edita'] = $data['editar'];
+        $data['contentView'] = 'secciones/vFormatoPagoTerceros';
+        $this->_renderView($data);
+    }
+
+    public function eliminarHojaAzul()
+    {
+        $response = new \stdClass();
+        $globals = new Mglobal;
+        $id = $this->request->getPost('id_registro_pt');
+        
+        if ($id) {
+            $result = $globals->saveTabla(
+                ['visible' => 0], 
+                ['tabla' => 'formulario_pt', 'editar' => true, 'idEditar' => ['id_registro_pt' => $id]]
+            );
+            
+            if (!$result->error) {
+                $response->error = false;
+                $response->respuesta = "Registro eliminado correctamente.";
+            } else {
+                $response->error = true;
+                $response->respuesta = "Error al eliminar el registro.";
+            }
+        } else {
+            $response->error = true;
+            $response->respuesta = "ID no válido.";
+        }
+        
+        return $this->response->setJSON($response);
+    }
+
+    public function pdfPagoTerceros()
+    {
+        $globals = new Mglobal;
+        $id = $this->request->getGet('id');
+        $data = [];
+
+        if ($id) {
+            $registro = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["id_formulario_pt" => $id]]);
+        
+            if (!empty($registro->data)) {
+                $data['registro_pt'] = $registro->data[0];
+                $items = $globals->getTabla(["tabla" => "manual_factura", "where" => ["id_registro_pt" => $id , "visible" => 1]]);
+                $data['periodo_factura_rows'] = $items->data;
+                $data['edit'] = 1; // For view logic if reused
+            }
+        }
+
+        $dataImagen = $this->encode_img_base64(FCPATH . 'assets/images/formato.png', 'png'); // Example logo
+        $data['logo'] = $dataImagen;
+        //die( var_dump($data) );
+        $html = view('pdfs/vPdfFormatoPT', $data);
+
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 10,
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_bottom' => 10,
+            'format' => 'Letter'
+        ]);
+        
+        $mpdf->WriteHTML($html);
+        $mpdf->Output('FormatPagoTerceros_' . $id . '.pdf', 'I');
+        exit;
+    }
+
 
 }

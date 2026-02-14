@@ -50,17 +50,14 @@
                                            
                    
                                             <td  class="text-center" class="text-center">
-                                          
-                                              
-                                                <a class="btn btn-outline-info btn-round" href="<?php echo base_url().'index.php/Inicio/Viaticos/'.$e->id_formulario_pt ?>"  ><i
-                                                        class="mdi mdi-check text-success font-18"></i></a> 
+                                                <a class="btn btn-outline-secondary btn-round" href="<?php echo base_url().'index.php/Inicio/pdfPagoTerceros?id='.$e->id_formulario_pt ?>" target="_blank" title="Ver PDF" ><i
+                                                        class="mdi mdi-file-pdf font-18"></i></a> 
                                                
-                                                <a class="btn btn-outline-info btn-round" href="<?php echo base_url().'index.php/Inicio/EditarFIC/'.$e->id_formulario_pt?>"  ><i
-                                                        class="mdi dripicons-pencil text-warning font-18"></i></a> 
+                                                <a class="btn btn-outline-warning btn-round" href="<?php echo base_url().'index.php/Inicio/generarFormatoPT?id='.$e->id_formulario_pt.'&editar=1'?>" title="Editar" ><i
+                                                        class="mdi mdi-lead-pencil font-18"></i></a> 
                                              
-                                                <a title="Continuar Pago" class="btn btn-outline-info btn-round" href="<?php echo base_url().'index.php/Principal/continuarPago/'.$e->id_formulario_pt ?>"  ><i
-                                                        class="mdi dripicons-media-next text-danger font-18"></i></a> 
-                                               
+                                                <button type="button" class="btn btn-outline-danger btn-round" onclick="ini.inicio.eliminarHojaAzul(<?= $e->id_formulario_pt ?>)" title="Eliminar"><i
+                                                        class="mdi mdi-delete font-18"></i></button>
                                             </td>
                                         </tr>
                                         <?php endforeach; ?>
