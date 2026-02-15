@@ -6107,6 +6107,7 @@ class Agregar extends BaseController
             'no_cuenta' => $data['no_cuenta'],
             'banco' => $data['banco'],
             'clabe' => $data['clabe'],
+            'no_proveedor' => $data['no_proveedor'],
             'fecha_tramite' => $data['fecha_tramite'],
             'nombre_responsable_2' => $data['nombre_responsable_2'], 
             'nombre_responsable' => $data['nombre_responsable'], 
