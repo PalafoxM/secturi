@@ -71,7 +71,7 @@
                     <input type="hidden" name="id_reserva" value="<?= $id_reserva ?>">
                     <input type="hidden" name="editar" value="<?= $editar ?>">
                     <?php if($editar == 1): ?>
-                    <input type="hidden" name="id_registro_pt" value="<?= isset($registro_pt->id_registro_pt) ? $registro_pt->id_registro_pt : '' ?>">
+                    <input type="hidden" name="id_formulario_pt" value="<?= isset($registro_pt->id_formulario_pt) ? $registro_pt->id_formulario_pt : '' ?>">
                     <?php endif; ?>
 
                     <!-- HEADER -->
@@ -104,7 +104,7 @@
                                     <input type="text" name="division" class="form-control-plaintext" value="21">
                                 </td>
                                 <td>
-                                    <input type="date" name="fecha_tramite" class="form-control-plaintext" value="<?= isset($registro_pt->fecha_tramite) ? $registro_pt->fecha_tramite : date('Y-m-d') ?>">
+                                    <input type="date" name="fecha_tramite" class="form-control-plaintext" value="<?= isset($registro_pt->fecha_tramite) ? date('Y-m-d', strtotime($registro_pt->fecha_tramite)) : date('Y-m-d') ?>">
                                 </td>
                                 <td>
                                     <input type="text" name="no_consecutivo" class="form-control-plaintext" value="<?= isset($registro_pt->no_consecutivo) ? $registro_pt->no_consecutivo : $no_consecutivo ?>" placeholder="PT 001/2026">
@@ -140,23 +140,23 @@
                             <tr class="item-row">
                                 <!-- No. COMPROBANTE -->
                                 <td style="vertical-align: top;">
-                                    <input type="text" name="no_comprobante[]" class="form-control-plaintext mb-2" value="<?= isset($row->encabezado) ? $row->encabezado : '' ?>" placeholder="3220">
+                                    <input type="text" name="no_comprobante[]" class="form-control-plaintext mb-2" value="<?= isset($row->no_comprobante) ? $row->no_comprobante : '' ?>" placeholder="3220">
                                 </td>
 
                                 <!-- PROYECTO META -->
                                 <td style="vertical-align: top;">
-                                    <input type="text" name="proyecto_meta[]" class="form-control-plaintext" value="<?= isset($row->proyecto_clave) ? $row->proyecto_clave : '' ?>" placeholder="E027QC32142602">
+                                    <input type="text" name="proyecto_meta[]" class="form-control-plaintext" value="<?= isset($row->proyecto) ? $row->proyecto : '' ?>" placeholder="E027QC32142602">
                                 </td>
 
                                 <!-- No. PARTIDA -->
                                 <td style="vertical-align: top;">
-                                    <input type="text" name="no_partida[]" class="form-control-plaintext" value="<?= isset($row->partida_clave) ? $row->partida_clave : '' ?>" placeholder="3990">
+                                    <input type="text" name="no_partida[]" class="form-control-plaintext" value="<?= isset($row->partida) ? $row->partida : '' ?>" placeholder="3990">
                                 </td>
 
                                 <!-- IMPORTE -->
                                 <td style="vertical-align: top;">
-                                    <input type="text" name="importe[]" class="form-control-plaintext input-importe" value="" placeholder="$0.00">
-                                    <?php if($index > 0): // Botón eliminar para filas extra ?>
+                                    <input type="text" name="importe[]" class="form-control-plaintext input-importe" value="<?= isset($row->importe) ? $row->importe : '' ?>" placeholder="$0.00">
+                                    <?php if($index > 0 && $editar != 1): // Botón eliminar para filas extra ?>
                                         <button type="button" class="btn btn-sm btn-danger mt-1 btn-remove-row" style="padding: 0px 5px;">&times;</button>
                                     <?php endif; ?>
                                 </td>
@@ -169,43 +169,43 @@
                                     <div class="provider-section">
                                         <!-- Organization Name -->
                                         <div class="mb-2">
-                                            <input type="text" name="nombre_proveedor_1" class="form-control-plaintext" placeholder="ORGANIZACION MUNDIAL DEL TURISMO" value="<?= isset($proveedor->razon_social) ? $proveedor->razon_social : '' ?>">
+                                            <input type="text" name="nombre_proveedor_1" class="form-control-plaintext" placeholder="ORGANIZACION MUNDIAL DEL TURISMO" value="<?= isset($registro_pt->nombre_proveedor_1) ? $registro_pt->nombre_proveedor_1 : '' ?>">
                                         </div>
 
                                         <!-- No. Proveedor -->
                                         <div class="d-flex mb-1 align-items-center">
                                             <span class="label-bold me-2 align-self-start">No. PROVEEDOR:</span>
-                                            <input type="text" name="no_proveedor" class="flex-grow-1" placeholder="103156" value="<?= isset($proveedor->no_proveedor) ? $proveedor->no_proveedor : '' ?>">
+                                            <input type="text" name="no_proveedor" class="flex-grow-1" placeholder="103156" value="<?= isset($registro_pt->no_proveedor) ? $registro_pt->no_proveedor : '' ?>">
                                         </div>
 
                                         <!-- RFC -->
                                         <div class="d-flex mb-1 align-items-center">
                                             <span class="label-bold me-2">RFC:</span>
-                                            <input type="text" name="rfc_proveedor" class="flex-grow-1" placeholder="N0011499A" value="<?= isset($proveedor->rfc) ? $proveedor->rfc : '' ?>">
+                                            <input type="text" name="rfc_proveedor" class="flex-grow-1" placeholder="N0011499A" value="<?= isset($registro_pt->rfc_proveedor) ? $registro_pt->rfc_proveedor : '' ?>">
                                         </div>
 
                                         <!-- Nombre Proveedor (Repetido en imagen) -->
                                         <div class="d-flex mb-1 align-items-center">
                                             <span class="label-bold me-2 align-self-start">NOMBRE:</span>
-                                            <input type="text" name="nombre_proveedor_2" class="flex-grow-1" placeholder="ORGANIZACION MUNDIAL DEL TURISMO" value="<?= isset($proveedor->razon_social) ? $proveedor->razon_social : '' ?>">
+                                            <input type="text" name="nombre_proveedor_2" class="flex-grow-1" placeholder="ORGANIZACION MUNDIAL DEL TURISMO" value="<?= isset($registro_pt->nombre_proveedor_2) ? $registro_pt->nombre_proveedor_2 : '' ?>">
                                         </div>
 
                                         <!-- No. Cuenta -->
                                         <div class="d-flex mb-1 align-items-center">
                                             <span class="label-bold me-2">NO. CUENTA:</span>
-                                            <input type="text" name="no_cuenta" class="flex-grow-1" placeholder="610081057237000168" value="<?= isset($proveedor_banco->cuenta) ? $proveedor_banco->cuenta : '' ?>">
+                                            <input type="text" name="no_cuenta" class="flex-grow-1" placeholder="610081057237000168" value="<?= isset($registro_pt->no_cuenta) ? $registro_pt->no_cuenta : '' ?>">
                                         </div>
 
                                         <!-- Banco -->
                                         <div class="d-flex mb-1 align-items-center">
                                             <span class="label-bold me-2">BANCO:</span>
-                                            <input type="text" name="banco" class="flex-grow-1" placeholder="B&B" value="<?= isset($proveedor_banco->banco) ? $proveedor_banco->banco : '' ?>">
+                                            <input type="text" name="banco" class="flex-grow-1" placeholder="B&B" value="<?= isset($registro_pt->banco) ? $registro_pt->banco : '' ?>">
                                         </div>
 
                                         <!-- CLABE -->
                                         <div class="d-flex mb-1 align-items-center">
                                             <span class="label-bold me-2">CLABE:</span>
-                                            <input type="text" name="clabe" class="flex-grow-1" placeholder="610081057237000168" value="<?= isset($proveedor_banco->clabe) ? $proveedor_banco->clabe : '' ?>">
+                                            <input type="text" name="clabe" class="flex-grow-1" placeholder="610081057237000168" value="<?= isset($registro_pt->clabe) ? $registro_pt->clabe : '' ?>">
                                         </div>
 
                                     </div>
@@ -215,11 +215,13 @@
                             <?php endforeach; ?>
                         </tbody>
                         <tfoot>
+                            <?php if($editar != 1): ?>
                              <tr>
                                  <td colspan="4" class="text-left">
                                      <button type="button" class="btn btn-info btn-sm" id="btnAddRow">+ Agregar Fila</button>
                                  </td>
                              </tr>
+                            <?php endif; ?>
                         </tfoot>
                     </table>
 

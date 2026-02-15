@@ -6123,12 +6123,12 @@ class Agregar extends BaseController
         ];
        
         $id_registro_pt = null;
-        if($data['editar'] == 1 && isset($data['id_registro_pt'])){
-            $id_registro_pt = $data['id_registro_pt'];
-            $dataConfig = ["tabla" => "formulario_pt", "editar" => true, "idEditar" => ['id_registro_pt' => $id_registro_pt]];
+        if($data['editar'] == 1 && isset($data['id_formulario_pt'])){
+            $id_registro_pt = $data['id_formulario_pt'];
+            $dataConfig = ["tabla" => "formulario_pt", "editar" => true, "idEditar" => ['id_formulario_pt' => $id_registro_pt]];
             $dataInsert['usu_act'] = $session->get('id_usuario');
             $dataInsert['fec_act'] = date('Y-m-d H:i:s');
-             $this->globals->saveTabla($dataInsert, $dataConfig, ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFormatoPT_Upd']);
+            $responseMain = $this->globals->saveTabla($dataInsert, $dataConfig, ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFormatoPT_Upd']);
         } else {
             $dataConfig = ["tabla" => "formulario_pt", "editar" => false];
             $dataInsert['usu_reg'] = $session->get('id_usuario');
@@ -6136,7 +6136,7 @@ class Agregar extends BaseController
             $responseMain = $this->globals->saveTabla($dataInsert, $dataConfig, ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFormatoPT_Ins']);
             $id_registro_pt = $responseMain->idRegistro;
         }
-
+       
         // 3. Insertar/Actualizar Filas (periodo_factura) - MULTIPLE
         // Primero, marcar como invisibles todas las filas actuales (soft delete style) 
         // para manejar eliminaciones, y luego re-insertar/actualizar.
@@ -6147,7 +6147,7 @@ class Agregar extends BaseController
              foreach($filasActuales->data as $f){
                  $this->globals->saveTabla(
                      ['visible' => 0, 'usu_act' => $session->get('id_usuario'), 'fec_act' => date('Y-m-d H:i:s')], 
-                     ["tabla" => "periodo_factura", "editar" => true, "idEditar" => ['id_periodo_factura' => $f->id_periodo_factura]], 
+                     ["tabla" => "manual_factura", "editar" => true, "idEditar" => ['id_registro_pt' => $f->id_manual_factura]], 
                      []
                  );
              }
@@ -6156,9 +6156,7 @@ class Agregar extends BaseController
         // Arrays de inputs
         if(isset($data['no_comprobante']) && is_array($data['no_comprobante'])){
             for($i=0; $i < count($data['no_comprobante']); $i++){
-                 // Skip empty rows if necessary, or just save empty strings as user entered
-                 
-                
+                 // Skip empty rows if necessary, or just save empty strings as user entered 
                 
                 $dataFila = [
                       'id_registro_pt' => $id_registro_pt,
