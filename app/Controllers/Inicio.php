@@ -1887,7 +1887,7 @@ class Inicio extends BaseController
         if ($id) {
             $result = $globals->saveTabla(
                 ['visible' => 0], 
-                ['tabla' => 'formulario_pt', 'editar' => true, 'idEditar' => ['id_registro_pt' => $id]]
+                ['tabla' => 'formulario_pt', 'editar' => true, 'idEditar' => ['id_formulario_pt' => $id]] // Also fix id_registro_pt -> id_formulario_pt based on user edits
             );
             
             if (!$result->error) {
@@ -1922,9 +1922,10 @@ class Inicio extends BaseController
             }
         }
 
-        $dataImagen = $this->encode_img_base64(FCPATH . 'assets/images/formato.png', 'png'); // Example logo
-        $data['logo'] = $dataImagen;
-        //die( var_dump($data) );
+        // For mPDF, passing local absolute path is better and avoids base64 issues
+        $data['logo'] = FCPATH . 'assets/logo.png';
+        // die( var_dump($data['logo']) ); // Debug if needed
+        
         $html = view('pdfs/vPdfFormatoPT', $data);
 
         $mpdf = new \Mpdf\Mpdf([
@@ -1932,7 +1933,8 @@ class Inicio extends BaseController
             'margin_left' => 10,
             'margin_right' => 10,
             'margin_bottom' => 10,
-            'format' => 'Letter'
+            'format' => 'Letter',
+            'tempDir' => sys_get_temp_dir().DIRECTORY_SEPARATOR.'mpdf'
         ]);
         
         $mpdf->WriteHTML($html);

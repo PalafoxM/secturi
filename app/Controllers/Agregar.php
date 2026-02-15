@@ -6163,7 +6163,7 @@ class Agregar extends BaseController
                 $dataFila = [
                       'id_registro_pt' => $id_registro_pt,
                       //'id_presupuesto' => 0, 
-                      'importe' => $data['no_comprobante'][$i], 
+                      'no_comprobante' => $data['no_comprobante'][$i], 
                       'importe' => $data['importe'][$i],
                       'proyecto' =>  $data['proyecto_meta'][$i],
                       'partida' => $data['no_partida'][$i],

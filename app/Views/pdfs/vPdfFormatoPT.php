@@ -35,10 +35,20 @@
             margin-bottom: 20px;
         }
     </style>
-</head>
-<body>
-
-    <div class="header-title">FORMATO DE PAGO A TERCEROS</div>
+    <table width="100%" style="border: none; margin-bottom: 20px;">
+        <tr>
+            <td width="30%" style="border: none; vertical-align: middle; text-align: left;">
+                <div style="width: 150px; height: 80px; background-image: url('<?= str_replace('\\', '/', $logo) ?>'); background-size: contain; background-repeat: no-repeat; background-position: left center;"></div>
+            </td>
+            <td width="70%" style="border: none; vertical-align: top;">
+                <div style="text-align: right; font-size: 9px; color: #999; margin-bottom: 5px;">FORMATO PT - 25</div>
+                <div style="text-align: center;">
+                    <div style="font-weight: bold; font-size: 12pt; color: #000;">GOBIERNO DEL ESTADO DE GUANAJUATO</div>
+                    <div style="font-size: 10pt; color: #000; margin-top: 5px;">FORMATO DE PAGO A TERCEROS</div>
+                </div>
+            </td>
+        </tr>
+    </table>
 
     <!-- TABLA 1: RAMO -->
     <table>
@@ -74,11 +84,11 @@
                 <td colspan="5">REFERENCIA AL DOCUMENTO</td>
             </tr>
             <tr>
-                <th width="10%">No. COMP.</th>
+                <th width="15%">No. COMPROBANTE</th>
                 <th width="15%">PROYECTO META</th>
-                <th width="10%">No. PARTIDA</th>
+                <th width="15%">No. PARTIDA</th>
                 <th width="15%">IMPORTE</th>
-                <th width="50%">OBSERVACIONES</th>
+                <th width="40%">OBSERVACIONES</th>
             </tr>
         </thead>
         <tbody>
@@ -92,7 +102,7 @@
             foreach($rows as $index => $row): 
             ?>
             <tr>
-                <td><?= isset($row->encabezado) ? $row->encabezado : '' ?></td>
+                <td><?= isset($row->no_comprobante) ? $row->no_comprobante : '' ?></td>
                 <td><?= isset($row->proyecto) ? $row->proyecto : '' ?></td>
                 <td><?= isset($row->partida) ? $row->partida : '' ?></td>
                 <td>$<?= isset($row->importe) ? ($row->importe) : '0.00' ?></td>

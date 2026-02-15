@@ -34,6 +34,10 @@
         font-weight: bold;
         font-size: 0.9em;
     }
+    .is-invalid {
+        border-color: red !important;
+        background-color: #ffcccc !important;
+    }
 </style>
 
 
@@ -245,7 +249,7 @@
                             </tr>
                              <tr>
                                 <td colspan="4" class="text-center font-weight-bold">
-                                     <input type="text" name="importe_letra" class="form-control-plaintext" value="" placeholder="Sesenta y dos mil seiscientos diez pesos 00/100 M.N.">
+                                    <input type="text" name="importe_letra" class="form-control-plaintext" value="" placeholder="Sesenta y dos mil seiscientos diez pesos 00/100 M.N." readonly>
                                 </td>
                             </tr>
                         </tbody>
@@ -583,7 +587,51 @@
         // Initial Total Calculation
         calcularTotal();
 
+        // Auto-remove invalid class on input
+        $('#formPagoTerceros').on('input change', '.is-invalid', function() {
+            $(this).removeClass('is-invalid');
+            if($(this).attr('name') == 'importe_total_num') calcularTotal();
+        });
+
         $('#btnGuardarPT').click(function() {
+            var isValid = true;
+            
+            // Validate all visible inputs that are not readonly
+            $('#formPagoTerceros input[type="text"], #formPagoTerceros input[type="date"]').each(function() {
+                var val = $(this).val().trim();
+                // Special check for money inputs
+                if ($(this).hasClass('input-importe')) {
+                     val = val.replace(/[^0-9.]/g, '');
+                }
+                
+                if (!$(this).prop('readonly') && (val === '' || val === null)) {
+                    console.log('Invalid field:', $(this).attr('name'));
+                    isValid = false;
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+
+            // Specific check for total amount
+            var total = $('input[name="importe_total_num"]').val().replace(/,/g, '');
+            if (total == 0 || total === '') {
+                console.log('Total is 0 or empty');
+                isValid = false;
+                $('input[name="importe_total_num"]').addClass('is-invalid'); // Highlight total even if readonly
+            } else {
+                $('input[name="importe_total_num"]').removeClass('is-invalid');
+            }
+
+            if (!isValid) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Atención',
+                    text: 'Por favor, complete todos los campos requeridos.'
+                });
+                return;
+            }
+
              var formData = new FormData(document.getElementById("formPagoTerceros"));
              
              $.ajax({
@@ -606,12 +654,7 @@
                             text: data.respuesta,
                             confirmButtonText: 'Aceptar'
                         }).then((result) => {
-                            window.location.href = "<?php echo base_url(); ?>index.php/Inicio/ListaHojaAzul";
-                        });
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: response.respuesta
+                             window.location.href = "<?php echo base_url(); ?>index.php/Inicio/ListaHojaAzul";
                         });
                     }
                 },
