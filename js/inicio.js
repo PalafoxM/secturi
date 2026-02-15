@@ -5873,7 +5873,7 @@ ini.inicio = (function () {
                         $.post(base_url + "index.php/Inicio/eliminarHojaAzul", { id_registro_pt: id }, function (response) {
                             if (!response.error) {
                                 Swal.fire("Eliminado!", "El registro ha sido eliminado.", "success").then(() => {
-                                    $('#table_hoja_azul').bootstrapTable('refresh');
+                                    window.location.reload();
                                 });
                             } else {
                                 Swal.fire("Error", response.respuesta, "error");

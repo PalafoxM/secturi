@@ -34,14 +34,30 @@
             font-weight: bold;
             margin-bottom: 20px;
         }
+         .logo{
+            /* border:3px solid red; */
+            margin: 0;
+            padding: 0;
+            left:2%;
+            top:0;
+            position: absolute;
+            width:32%;
+            height: 10%;
+            background-image: url('<?= $logo ?>');
+            background-size:100% 100%;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
     </style>
+    <div style="position: absolute;text-align: left;left:85%; font-size: 9px; color: #999; margin-bottom: 5px;">FORMATO PT - 25</div>
     <table width="100%" style="border: none; margin-bottom: 20px;">
         <tr>
             <td width="30%" style="border: none; vertical-align: middle; text-align: left;">
-                <div style="width: 150px; height: 80px; background-image: url('<?= str_replace('\\', '/', $logo) ?>'); background-size: contain; background-repeat: no-repeat; background-position: left center;"></div>
+                <div class="logo"></div>
             </td>
             <td width="70%" style="border: none; vertical-align: top;">
-                <div style="text-align: right; font-size: 9px; color: #999; margin-bottom: 5px;">FORMATO PT - 25</div>
+                
                 <div style="text-align: center;">
                     <div style="font-weight: bold; font-size: 12pt; color: #000;">GOBIERNO DEL ESTADO DE GUANAJUATO</div>
                     <div style="font-size: 10pt; color: #000; margin-top: 5px;">FORMATO DE PAGO A TERCEROS</div>
@@ -195,5 +211,8 @@
         </tbody>
     </table>
 
+    <div style="margin-top: 30px; font-size: 8pt; text-align: justify; font-style: italic;">
+        El presente documento fue recibido y firmado de conformidad con la Ley sobre el uso de medios electrónicos y firma electrónica para el Estado de Guanajuato y sus Municipios. En virtud de la equivalencia funcional, la firma electrónica certificada se equipara a la firma autógrafa. Se privilegian las políticas de ahorro, racionalidad y austeridad del gasto público, contenidas en el artículo 55, de la Ley para el Ejercicio y Control de los Recursos Públicos para el Estado y los Municipios de Guanajuato; y, Artículos 1 y 15, segundo párrafo de los Lineamientos Generales de Racionalidad, Austeridad y Disciplina Presupuestal de la Administración Pública Estatal para el Ejercicio Fiscal 2025.
+    </div>
 </body>
 </html>

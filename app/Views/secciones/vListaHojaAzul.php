@@ -56,7 +56,7 @@
                                                 <a class="btn btn-outline-warning btn-round" href="<?php echo base_url().'index.php/Inicio/generarFormatoPT?id='.$e->id_formulario_pt.'&editar=1'?>" title="Editar" ><i
                                                         class="mdi mdi-lead-pencil font-18"></i></a> 
                                              
-                                                <button type="button" class="btn btn-outline-danger btn-round" onclick="ini.inicio.eliminarHojaAzul(<?= $e->id_formulario_pt ?>)" title="Eliminar"><i
+                                                <button type="button" class="btn btn-outline-danger btn-round" onclick="ini.inicio.tipoOperacion.eliminarHojaAzul(<?= $e->id_formulario_pt ?>)" title="Eliminar"><i
                                                         class="mdi mdi-delete font-18"></i></button>
                                             </td>
                                         </tr>

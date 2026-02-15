@@ -1814,7 +1814,7 @@ class Inicio extends BaseController
         $response = $globas->getTabla($dataDB);
         $data['dataHojaAzul'] = $response->data;
         
-        $data['scripts'] = array('principal', 'inicio');
+        $data['scripts'] = array('inicio');
         $data['edita'] = 0;
         $data['contentView'] = 'secciones/vListaHojaAzul';
         $this->_renderView($data);
@@ -1835,12 +1835,12 @@ class Inicio extends BaseController
 
         if ($data['editar'] == 1 && $id) {
             // Fetch main record
-            $registro = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["id_registro_pt" => $id]]);
+            $registro = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["id_formulario_pt" => $id]]);
             if (!empty($registro->data)) {
                 $data['registro_pt'] = $registro->data[0];
-                
+              //  die(var_dump($data['registro_pt']));
                 // Fetch items
-                $items = $globals->getTabla(["tabla" => "periodo_factura_pt", "where" => ["id_registro_pt" => $id, "visible" => 1]]);
+                $items = $globals->getTabla(["tabla" => "manual_factura", "where" => ["id_registro_pt" => $id, "visible" => 1]]);
                 $data['periodo_factura_rows'] = $items->data;
                 
                 // Fetch provider data (assuming it comes from the first item or stored in main record?
@@ -1882,12 +1882,14 @@ class Inicio extends BaseController
     {
         $response = new \stdClass();
         $globals = new Mglobal;
+        $session = \Config\Services::session();
         $id = $this->request->getPost('id_registro_pt');
         
         if ($id) {
             $result = $globals->saveTabla(
                 ['visible' => 0], 
-                ['tabla' => 'formulario_pt', 'editar' => true, 'idEditar' => ['id_formulario_pt' => $id]] // Also fix id_registro_pt -> id_formulario_pt based on user edits
+                ['tabla' => 'formulario_pt', 'editar' => true, 'idEditar' => ['id_formulario_pt' => $id]],
+                ['id_user' => $session->id_usuario, 'script' => 'Agregar.php/guardaSala'] // Also fix id_registro_pt -> id_formulario_pt based on user edits
             );
             
             if (!$result->error) {
@@ -1923,8 +1925,8 @@ class Inicio extends BaseController
         }
 
         // For mPDF, passing local absolute path is better and avoids base64 issues
-        $data['logo'] = FCPATH . 'assets/logo.png';
-        // die( var_dump($data['logo']) ); // Debug if needed
+        $data['logo'] = FCPATH . 'assets/logo-guanajuato.png';
+        //die( var_dump($data['logo']) ); // Debug if needed
         
         $html = view('pdfs/vPdfFormatoPT', $data);
 
