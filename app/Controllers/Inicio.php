@@ -1822,6 +1822,7 @@ class Inicio extends BaseController
 
         // For mPDF, passing local absolute path is better and avoids base64 issues
         $data['logo'] = FCPATH . 'assets/logo-guanajuato.png';
+        $data['norma'] = FCPATH . 'assets/Norma.png';
         //die( var_dump($data['logo']) ); // Debug if needed
         
         $html = view('pdfs/vPdfLiberacionPago', $data);

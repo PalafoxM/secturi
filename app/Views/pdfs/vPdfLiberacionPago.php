@@ -22,6 +22,7 @@
             text-align: right;
             font-weight: bold;
             margin-bottom: 30px;
+            margin-top:10%;
         }
         .recipient {
             font-weight: bold;
@@ -41,6 +42,34 @@
             width: 60%;
             margin: 10px auto;
         }
+         .logo{
+            /* border:3px solid red; */
+            margin: 0;
+            padding: 0;
+            left:2%;
+            top:0;
+            position: absolute;
+            width:32%;
+            height: 10%;
+            background-image: url('<?= $logo ?>');
+            background-size:100% 100%;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+         .norma{
+            /* border:3px solid red; */
+            margin: 0;
+            padding: 0;
+            left:55%;
+            top:0;
+            position: absolute;
+            width:17%;
+            height: 10%;
+            background-image: url('<?= $norma ?>');
+            background-size:100% 100%;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
     </style>
 </head>
 <body>
@@ -48,15 +77,11 @@
     <!-- Header with ロゴ -->
     <table class="header-table">
         <tr>
-            <td style="width: 50%;">
-                <!-- Logo Guanajuato (Left) -->
-                 <div style="width: 250px; height: 80px; background-image: url('<?= str_replace('\\', '/', $logo) ?>'); background-size: contain; background-repeat: no-repeat; background-position: left center;"></div>
+              <td width="50%" style="border: none; vertical-align: middle; text-align: left;">
+                <div class="logo"></div>
             </td>
             <td style="width: 50%; text-align: right;">
-                <!-- Logo Equality (Right) - Placeholder if not available, or use same logo logic -->
-                <!-- Assuming logo-igualdad.png or similar. Using placeholder for now or checking if passed separately. -->
-                 <!-- If user provided image has it, maybe it's part of the header image? -->
-                 <!-- I'll leave empty or add a placeholder comment -->
+                <div class="norma"></div>
             </td>
         </tr>
     </table>

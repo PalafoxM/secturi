@@ -6143,16 +6143,18 @@ class Agregar extends BaseController
         // para manejar eliminaciones, y luego re-insertar/actualizar.
         // O más simple: Borrar todo y reinsertar. Soft delete es mejor.
          if($data['editar'] == 1 && isset($data['id_formulario_pt'])){
-            $filasActuales = $this->globals->getTabla(['tabla' => 'manual_factura', 'where' => ['id_registro_pt' => $id_registro_pt, 'visible' => 1]]);
-            if(!empty($filasActuales->data)){
-                foreach($filasActuales->data as $f){
-                    $this->globals->saveTabla(
+          //  $filasActuales = $this->globals->getTabla(['tabla' => 'manual_factura', 'where' => ['id_registro_pt' => $id_registro_pt, 'visible' => 1]]);
+
+    
+                   $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFormatoPT_Upd'];
+                  $res =  $this->globals->saveTabla(
                         ['visible' => 0, 'usu_act' => $session->get('id_usuario'), 'fec_act' => date('Y-m-d H:i:s')], 
-                        ["tabla" => "manual_factura", "editar" => true, "idEditar" => ['id_registro_pt' => $f->id_manual_factura]], 
-                        []
+                        ["tabla" => "manual_factura", "editar" => true, "idEditar" => ['id_registro_pt' => $data['id_formulario_pt']]], 
+                        $dataBitacora
                     );
-                }
-            }
+                
+                //var_dump($res);
+            
         }
 
         // Arrays de inputs
@@ -6179,7 +6181,8 @@ class Agregar extends BaseController
            $response->respuesta = "Error|".$response->respuesta;
            return $this->respond($response);
        }
-               
+
+      //  die();
 
         $response->error = false;
         $response->respuesta = "Éxito|La información se guardó correctamente.";
