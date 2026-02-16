@@ -2115,7 +2115,7 @@ class Principal extends BaseController
         $email = \Config\Services::email();
         $result = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_tipo_empleado' => 1]])->data;
 
-       $email->setTo([
+       /*$email->setTo([
             'agascag@guanajuato.gob.mx',
             'ccampos@guanajuato.gob.mx',
             'sandag@guanajuato.gob.mx',
@@ -2130,9 +2130,9 @@ class Principal extends BaseController
             'rgonzalezgu@guanajuato.gob.mx',
             'yjimenez@guanajuato.gob.mx',
             'mamoralesg@guanajuato.gob.mx',
-        ]);
+        ]);*/
  
-            /*    $email->setTo([
+                $email->setTo([
                     'alopez@guanajuato.gob.mx',
                     'cchernandezp@guanajuato.gob.mx',
                     'csoto@guanajuato.gob.mx',
@@ -2157,7 +2157,6 @@ class Principal extends BaseController
                     'david.gonzalez@guanajuato.gob.mx',
                     'dhernandezq@guanajuato.gob.mx',
                     'dmontiello@guanajuato.gob.mx',
-                    'e.salazarmo@guanajuato.gob.mx',
                     'jacostap@guanajuato.gob.mx',
                     'jrojas@guanajuato.gob.mx',
                     'miguel.salazarc@guanajuato.gob.mx',
@@ -2175,9 +2174,8 @@ class Principal extends BaseController
                     'jmazavala@guanajuato.gob.mx',
                     'lebalderas@guanajuato.gob.mx',
                     'rantonio@guanajuato.gob.mx',
-                    'alvarezp@guanajuato.gob.mx',
                     'jrodriguezgo@guanajuato.gob.mx',
-                ]);  */
+                ]);  
         $email->setSubject('Recordatorio: Revisión de Asistencias - Sistema SUSI');
         $email->setMessage('
             <!DOCTYPE html>
@@ -2210,9 +2208,9 @@ class Principal extends BaseController
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Estimado personal,</p>
                         
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-                            En caso de que aún no hayas realizado las <strong>justificaciones de tu personal a tu cargo correspondientes a la quincena 02/2026</strong>, 
-                            la cual comprende el periodo del <strong>16 al 31 de enero de 2026</strong>, 
-                            tienes hasta el día <strong>martes 10 de febrero hasta las 16:00 hrs</strong> para realizarlas.
+                            En caso de que aún no hayas realizado las <strong>justificaciones correspondientes a la quincena 03/2026</strong>, 
+                            la cual comprende el periodo del <strong>01 al 15 de febrero de 2026</strong>, 
+                            tienes hasta el día <strong>viernes 20 de febrero hasta las 16:00 hrs</strong> para realizarlas.
                         </p>
 
                         <div class="highlight-box">
