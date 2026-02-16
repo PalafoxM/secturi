@@ -6189,4 +6189,93 @@ class Agregar extends BaseController
 
         return $this->respond($response);
     }
+
+    public function guardaConvenio()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $this->globals = new Mglobal();
+        $data = $this->request->getPost();
+
+        // Validaciones
+        if (empty($data['convenio'])) {
+            $response->error = true;
+            $response->respuesta = "Error|El convenio es requerido";
+            return $this->respond($response);
+        }
+        if (empty($data['monto'])) {
+            $response->error = true;
+            $response->respuesta = "Error|El monto es requerido";
+            return $this->respond($response);
+        }
+        if (empty($data['id_proveedor'])) {
+            $response->error = true;
+            $response->respuesta = "Error|El proveedor es requerido";
+            return $this->respond($response);
+        }
+
+        $id_material_promo = isset($data['id_material_promo']) ? $data['id_material_promo'] : 0;
+
+        $dataInsert = [
+            'convenio' => $data['convenio'],
+            'monto' => $data['monto'],
+            'id_proveedor' => $data['id_proveedor'],
+            'visible' => 1
+        ];
+
+        if ($id_material_promo > 0) {
+            $dataConfig = ["tabla" => "material_promo", "editar" => true, "idEditar" => ['id_material_promo' => $id_material_promo]];
+            $dataInsert['usu_act'] = $session->get('id_usuario');
+            $dataInsert['fec_act'] = date('Y-m-d H:i:s');
+            $res = $this->globals->saveTabla($dataInsert, $dataConfig, ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaConvenio_Upd']);
+        } else {
+            $dataConfig = ["tabla" => "material_promo", "editar" => false];
+            $dataInsert['usu_reg'] = $session->get('id_usuario');
+            $dataInsert['fec_reg'] = date('Y-m-d H:i:s');
+            $res = $this->globals->saveTabla($dataInsert, $dataConfig, ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaConvenio_Ins']);
+        }
+
+        if (!$res->error) {
+            $response->error = false;
+            $response->respuesta = "Éxito|Guardado correctamente";
+        } else {
+            $response->error = true;
+            $response->respuesta = "Error|Error al guardar: " . $res->respuesta;
+        }
+
+        return $this->respond($response);
+    }
+
+    public function eliminarConvenio()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $this->globals = new Mglobal();
+        $id = $this->request->getPost('id_material_promo');
+
+        if ($id) {
+            $dataUpdate = [
+                'visible' => 0,
+                'usu_act' => $session->get('id_usuario'),
+                'fec_act' => date('Y-m-d H:i:s')
+            ];
+            
+            $dataConfig = ["tabla" => "material_promo", "editar" => true, "idEditar" => ['id_material_promo' => $id]];
+            
+            $res = $this->globals->saveTabla($dataUpdate, $dataConfig, ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/eliminarConvenio']);
+
+            if (!$res->error) {
+                $response->error = false;
+                $response->respuesta = "Registro eliminado correctamente";
+            } else {
+                $response->error = true;
+                $response->respuesta = "Error al eliminar";
+            }
+        } else {
+            $response->error = true;
+            $response->respuesta = "ID inválido";
+        }
+
+        return $this->respond($response);
+    }
 }

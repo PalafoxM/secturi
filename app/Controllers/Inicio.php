@@ -358,19 +358,19 @@ class Inicio extends BaseController
             'tabla' => 'vw_material_promo',
             'where' => ['visible' => 1]
         ])->data;
-
+       
 
         $data['scripts'] = array('principal', 'inicio');
         $data['contentView'] = 'personal/vListaConvenio';
         $this->_renderView($data);
     }
-    public function InventarioPromocion()
+    public function InventarioPromocion($id = null)
     {
         $globas = new Mglobal;
 
         $productos = $globas->getTabla([
             'tabla' => 'cat_inventario_promo',
-            'where' => ['visible' => 1]
+            'where' => ['visible' => 1, 'id_inventario' => $id]
         ])->data;
 
         // 2. Colores e imágenes por producto
