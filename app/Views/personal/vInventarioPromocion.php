@@ -151,12 +151,12 @@
                                                                 <!-- Imagen -->
                                                                 <td class="text-center">
                                                                     <?php if (!empty($item->imagenes)): ?>
-                                                                        <?php foreach ($item->imagenes as $img): ?>
-                                                                            <img src="<?= base_url($img->imagen) ?>"
+                                                                   
+                                                                            <img src="<?= base_url($item->imagenes) ?>"
                                                                             class="rounded btn-ver-imagen mr-1"
                                                                             style="height:40px; cursor:pointer;"
-                                                                            data-src="<?= base_url($img->imagen) ?>">
-                                                                    <?php endforeach; ?>
+                                                                            data-src="<?= base_url($item->imagenes) ?>">
+                                                         
                                                                     <?php else: ?>
                                                                             <img src="<?= base_url('assets/images/no-image.png') ?>"
                                                                             style="height:40px; opacity:.4;">
@@ -245,7 +245,17 @@
                                                                             class="btn btn-sm btn-outline-warning btn-sm"
                                                                             title="Complementos del contrato">
                                                                             🌎 Compl. <!-- lleva a INE, oficio, evidencias -->
-                                                                        </a>    
+                                                                        </a>  
+                                                                        
+                                                                        <button class="btn btn-sm btn-outline-primary btn-movimiento border-0 p-2"
+                                                                            data-id="<?= $item->id_inventario_promo ?>"
+                                                                            data-tabla="cat_inventario_promo"
+                                                                            data-nombre="<?= $item->dsc_producto ?>"
+                                                                            data-stock="<?= $stock ?>"
+                                                                            data-tipo="editar"
+                                                                            title="Editar">
+                                                                            ✏️ Editar
+                                                                        </button>
 
                                                                         <button class="btn btn-sm btn-outline-danger btn-eliminar btn-sm"
                                                                             data-id="<?= $item->id_inventario_promo ?>"
