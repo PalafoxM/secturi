@@ -3587,10 +3587,16 @@ class Principal extends BaseController
            $prefijoArea = $res->data[0]->prefijo;
          
         }
+         $id_reponsable_solicitud = $registro_go->data[0]->id_reponsable_solicitud;
+         $data['responsableGasto'] = "";
+        if(isset($id_reponsable_solicitud) && !empty($id_reponsable_solicitud)){
 
-        $data['responsableGasto'] = (isset($direccion->data) && !empty($direccion)) ? $direccion->data[0] : '';
-        //var_dump($data['responsableGasto']  );
-        //die();
+             $res = $globals->getTabla(['tabla' => 'vw_usuario', 'where' =>["id_usuario" => $id_reponsable_solicitud ] ]);
+             $data['responsableGasto'] = (isset($res->data) && !empty($res->data)) ? $res->data[0] : '';
+        }
+
+        
+      
         $id_reserva_go = (isset($pdf[0]->id_reserva_go) && !empty($pdf[0]->id_reserva_go)) ? $pdf[0]->id_reserva_go : '';
         $data['es4000'] = false;
         if (!empty($id_reserva_go)) {
@@ -3625,20 +3631,7 @@ class Principal extends BaseController
                 'where' => ['visible' => 1, 'id_area' => $data['registro']->id_direccion_responsable]
             ]);
 
-            //==================================
-              if (empty($direccion->data)) {
-            
-                $jefe = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_pt->data[0]->id_reponsable_solicitud]]);
-        
-                if (!empty($jefe->data)) {
-                    $idJefe = $jefe->data[0]->id_jefe_inmediato;
-                    $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_director' => $idJefe]]);
-            
-                } else {
-                    $area = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $registro_pt->data[0]->id_reponsable_solicitud]]);
-                    $direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1, 'id_area' => $area->data[0]->id_area]]);
-                }
-            }
+           
 
             $no_consecutivo = "";
             if (strlen($registro_go->data[0]->no_consecutivo) == 1) {
@@ -3764,55 +3757,6 @@ class Principal extends BaseController
         }
         
        
-        switch ($id_archivo) {
-            case 4:
-                if ($savePath) {
-                    $source = FCPATH . $instrumento;
-                    if (file_exists($source)) {
-                        copy($source, $savePath);
-                        return $savePath;
-                    }
-                    return null;
-                } else {
-                    // Solo si se quiere mostrar directo en navegador
-                    return redirect()->to(base_url() . $instrumento);
-                }
-                break;
-        }
-        //echo "<pre>";
-        //print_r( $data['reserva']  );
-        //echo "</pre>";
-        //die();
-
-        $html = view($formato, $data);
-        // Crear instancia de mPDF
-        $mpdf = new \Mpdf\Mpdf([
-            'margin_top' => 0,
-            'margin_left' => 1,
-            'margin_right' => 1,
-            'format' => [213, 268],
-            'mirrorMargins' => false,
-        ]);
-
-        //die( var_dump($doc) );
-        $pagecount = $mpdf->SetSourceFile(FCPATH . $doc);
-
-
-            $mpdf->AddPage();
-            $tplId = $mpdf->ImportPage(1);
-            $mpdf->UseTemplate($tplId);
-           $mpdf->WriteHTML($html);
-          
-          
-        
-
-
-        if ($savePath) {
-            $mpdf->Output($savePath, 'F'); // F = write to file
-            return $savePath;
-        }
-        $mpdf->Output('Formato_pt.pdf', 'I');
-        exit();
 
     }
     public function Archivo($id_registro_pt = null, $id_archivo = null, $savePath = null)
