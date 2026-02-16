@@ -92,16 +92,15 @@
                             <input type="text" class="form-control input-importe" name="monto" id="monto" placeholder="$0.00" required>
                         </div>
                         <div class="col-md-6 form-group">
-                            <label for="id_proveedor">Proveedor <span class="text-danger">*</span></label>
-                            <select class="form-control" name="id_proveedor" id="id_proveedor" style="width: 100%;" required>
-                                <option value="">Seleccione un proveedor</option>
-                            </select>
+                            <label for="no_proveedor">No. Proveedor <span class="text-danger">*</span></label>
+                             <input type="text" class="form-control" name="no_proveedor" id="no_proveedor" required>
+                            
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-primary" onclick="guardaConvenio()">Guardar</button>
                 </div>
             </form>
         </div>
@@ -174,35 +173,9 @@
             minimumInputLength: 1
         });
 
-        $('#formConvenio').submit(function(e) {
-            e.preventDefault();
-            
-            // Unmask monto for saving
-            let montoVal = $('#monto').val().replace(/,/g, '');
-            let formData = new FormData(this);
-            formData.set('monto', montoVal);
+        
 
-            $.ajax({
-                url: '<?= base_url("Agregar/guardaConvenio") ?>',
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    if (!response.error) {
-                        Swal.fire('Éxito', response.respuesta.split('|')[1], 'success').then(() => {
-                            location.reload();
-                        });
-                    } else {
-                        Swal.fire('Error', response.respuesta.split('|')[1], 'error');
-                    }
-                },
-                error: function() {
-                    Swal.fire('Error', 'Ocurrió un error al guardar.', 'error');
-                }
-            });
-        });
-    });
+     });
 
     function agregarConvenio() {
         $('#formConvenio')[0].reset();
@@ -216,15 +189,42 @@
         $('#formConvenio')[0].reset();
         $('#id_material_promo').val(item.id_material_promo);
         $('#convenio').val(item.convenio);
-        $('#monto').val(parseFloat(item.monto).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
-        
-        // Pre-fill Select2
-        var option = new Option(item.razon_social + ' / ' + item.dsc_tiket, item.id_proveedor, true, true);
-        $('#id_proveedor').append(option).trigger('change');
+        $('#monto').val(item.monto);
+        $('#no_proveedor').val(item.no_proveedor);
+
 
         $('#modalConvenioLabel').text('Editar Convenio');
         $('#modalConvenio').modal('show');
     }
+
+    function guardaConvenio()
+        { 
+            //e.preventDefault(); 
+            // Unmask monto for saving
+            let montoVal = $('#monto').val().replace(/,/g, '');
+
+            $.ajax({
+                url: '<?= base_url("index.php/Agregar/guardaConvenio") ?>',
+                type: 'POST',
+                data: {
+                    'montoVal': montoVal,
+                    'convenio': $('#convenio').val(),
+                    'no_proveedor': $('#no_proveedor').val(),
+                },
+                success: function(response) {
+                    if (!response.error) {
+                        Swal.fire('Éxito', response.respuesta.split('|')[1], 'success').then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire('Error', response.respuesta.split('|')[1], 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Error', 'Ocurrió un error al guardar.', 'error');
+                }
+            });
+         }
 
     function eliminarConvenio(id) {
         Swal.fire({

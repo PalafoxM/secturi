@@ -6203,37 +6203,46 @@ class Agregar extends BaseController
             $response->respuesta = "Error|El convenio es requerido";
             return $this->respond($response);
         }
-        if (empty($data['monto'])) {
+        if (empty($data['montoVal'])) {
             $response->error = true;
             $response->respuesta = "Error|El monto es requerido";
             return $this->respond($response);
         }
-        if (empty($data['id_proveedor'])) {
+        if (empty($data['no_proveedor'])) {
             $response->error = true;
             $response->respuesta = "Error|El proveedor es requerido";
             return $this->respond($response);
         }
 
-        $id_material_promo = isset($data['id_material_promo']) ? $data['id_material_promo'] : 0;
+    //validar si existeel proveedor
+
+       $ExisteProveedor = $this->globals->getTabla(["tabla"=> "proveedor", "where"=>["no_proveedor"=>$data['no_proveedor']], "limit"=>1]);
+      
+        if(isset($ExisteProveedor->data) && empty($ExisteProveedor->data)){
+            $response->error = true;
+            $response->respuesta = "Error|El proveedor no existe";
+            return $this->respond($response);
+        }
+       $ExisteConvenio = $this->globals->getTabla(["tabla"=> "cat_material_promo", "where"=>["convenio"=>$data['convenio']]]);
+
+        if(isset($ExisteConvenio->data) && !empty($ExisteConvenio->data)){
+            $response->error = true;
+            $response->respuesta = "Error|El convenio ya existe";
+            return $this->respond($response);
+        }
 
         $dataInsert = [
             'convenio' => $data['convenio'],
-            'monto' => $data['monto'],
-            'id_proveedor' => $data['id_proveedor'],
-            'visible' => 1
+            'monto' => $data['montoVal'],
+            'id_proveedor' => $ExisteProveedor->data[0]->id_proveedor,
+            'usu_reg' => $session->get('id_usuario'),
+            'fec_reg' => date('Y-m-d H:i:s')
         ];
 
-        if ($id_material_promo > 0) {
-            $dataConfig = ["tabla" => "material_promo", "editar" => true, "idEditar" => ['id_material_promo' => $id_material_promo]];
-            $dataInsert['usu_act'] = $session->get('id_usuario');
-            $dataInsert['fec_act'] = date('Y-m-d H:i:s');
-            $res = $this->globals->saveTabla($dataInsert, $dataConfig, ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaConvenio_Upd']);
-        } else {
-            $dataConfig = ["tabla" => "material_promo", "editar" => false];
-            $dataInsert['usu_reg'] = $session->get('id_usuario');
-            $dataInsert['fec_reg'] = date('Y-m-d H:i:s');
+       
+            $dataConfig = ["tabla" => "cat_material_promo", "editar" => false];
             $res = $this->globals->saveTabla($dataInsert, $dataConfig, ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaConvenio_Ins']);
-        }
+        
 
         if (!$res->error) {
             $response->error = false;
