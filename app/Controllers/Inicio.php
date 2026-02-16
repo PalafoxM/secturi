@@ -349,6 +349,21 @@ class Inicio extends BaseController
         $data['contentView'] = 'personal/vInventarioLimpieza';
         $this->_renderView($data);
     }
+
+    public function ListaConvenio()
+    {
+        $globas = new Mglobal;
+
+        $data['material_promo'] = $globas->getTabla([
+            'tabla' => 'vw_material_promo',
+            'where' => ['visible' => 1]
+        ])->data;
+
+
+        $data['scripts'] = array('principal', 'inicio');
+        $data['contentView'] = 'personal/vListaConvenio';
+        $this->_renderView($data);
+    }
     public function InventarioPromocion()
     {
         $globas = new Mglobal;

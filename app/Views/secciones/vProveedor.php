@@ -175,7 +175,7 @@
                                             </div><!--end col-->
                                             <div class="col-md-4 mb-3">
                                                 <label for="formato_conformidad">Formato de conformidad del producto recibido.<span style="color:red;">*</span></label>
-                                                <input type="text" class="form-control" id="formato_conformidad" value="<?=($partida4000)?'NO':'SI'?>" name="formato_conformidad" readonly>
+                                                <input type="text" class="form-control" id="formato_conformidad" value="<?=($partida4000)?'NO':'SI'?>" name="formato_conformidad" >
                                                 <div class="invalid-feedback">
                                                     Please provide a valid state.
                                                 </div>
