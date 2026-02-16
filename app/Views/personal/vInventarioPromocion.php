@@ -100,7 +100,7 @@
                                                         <th class="py-3">
                                                             <i class="mdi mdi-tag-outline text-primary d-block mb-1"></i>
                                                             <small class="text-muted d-block">Producto</small></th>
-                                                        <th class="py-3" style="width:50%;">
+                                                        <th class="py-3">
                                                             <i class="mdi mdi-image text-purple d-block mb-1"></i>
                                                             <small class="text-muted d-block">Imagen</small></th>
                                                         <th class="py-3">
@@ -546,11 +546,6 @@ $(window).on('load', function () {
                 $('#cantidad').val('');
             }
 
-            ('click', '.btn-ver-imagen', function () {
-                const src = $(this).data('src');
-                $('#imagenGrande').attr('src', src);
-                $('#modalImagen').modal('show');
-            });
 
             const titulos = {
                 nuevo: 'Nuevo Producto',
@@ -561,6 +556,15 @@ $(window).on('load', function () {
             $('#modalTitulo').text(titulos[d.tipo] || 'Movimiento');
             $('#modalMovimientoInventario').modal('show');
         });
+
+        // Image Preview Handler - Moved outside
+        $(document).on('click', '.btn-ver-imagen', function () {
+            const src = $(this).data('src');
+            $('#imagenGrande').attr('src', src);
+            $('#modalImagen').modal('show');
+        });
+
+
 
         /* ==========================================================
             FORM – SUBMIT
