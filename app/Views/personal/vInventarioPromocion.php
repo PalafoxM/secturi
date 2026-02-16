@@ -150,12 +150,12 @@
 
                                                                 <!-- Imagen -->
                                                                 <td class="text-center">
-                                                                    <?php if (!empty($item->imagenes)): ?>
+                                                                    <?php if (!empty($item->imagen)): ?>
                                                                    
-                                                                            <img src="<?= base_url($item->imagenes) ?>"
+                                                                            <img src="<?= base_url($item->imagen) ?>"
                                                                             class="rounded btn-ver-imagen mr-1"
                                                                             style="height:40px; cursor:pointer;"
-                                                                            data-src="<?= base_url($item->imagenes) ?>">
+                                                                            data-src="<?= base_url($item->imagen) ?>">
                                                          
                                                                     <?php else: ?>
                                                                             <img src="<?= base_url('assets/images/no-image.png') ?>"
