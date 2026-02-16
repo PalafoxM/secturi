@@ -6142,16 +6142,17 @@ class Agregar extends BaseController
         // Primero, marcar como invisibles todas las filas actuales (soft delete style) 
         // para manejar eliminaciones, y luego re-insertar/actualizar.
         // O más simple: Borrar todo y reinsertar. Soft delete es mejor.
-        
-        $filasActuales = $this->globals->getTabla(['tabla' => 'manual_factura', 'where' => ['id_registro_pt' => $id_registro_pt, 'visible' => 1]]);
-        if(!empty($filasActuales->data)){
-             foreach($filasActuales->data as $f){
-                 $this->globals->saveTabla(
-                     ['visible' => 0, 'usu_act' => $session->get('id_usuario'), 'fec_act' => date('Y-m-d H:i:s')], 
-                     ["tabla" => "manual_factura", "editar" => true, "idEditar" => ['id_registro_pt' => $f->id_manual_factura]], 
-                     []
-                 );
-             }
+         if($data['editar'] == 1 && isset($data['id_formulario_pt'])){
+            $filasActuales = $this->globals->getTabla(['tabla' => 'manual_factura', 'where' => ['id_registro_pt' => $id_registro_pt, 'visible' => 1]]);
+            if(!empty($filasActuales->data)){
+                foreach($filasActuales->data as $f){
+                    $this->globals->saveTabla(
+                        ['visible' => 0, 'usu_act' => $session->get('id_usuario'), 'fec_act' => date('Y-m-d H:i:s')], 
+                        ["tabla" => "manual_factura", "editar" => true, "idEditar" => ['id_registro_pt' => $f->id_manual_factura]], 
+                        []
+                    );
+                }
+            }
         }
 
         // Arrays de inputs

@@ -50,7 +50,9 @@
                                            
                    
                                             <td  class="text-center" class="text-center">
-                                                <a class="btn btn-outline-secondary btn-round" href="<?php echo base_url().'index.php/Inicio/pdfPagoTerceros?id='.$e->id_formulario_pt ?>" target="_blank" title="Ver PDF" ><i
+                                                <a class="btn btn-outline-secondary btn-round" href="<?php echo base_url().'index.php/Inicio/pdfPagoTerceros?id='.$e->id_formulario_pt ?>" target="_blank" title="Hoja Azul" ><i
+                                                        class="mdi mdi-file-pdf font-18"></i></a> 
+                                                <a class="btn btn-outline-primary btn-round" href="<?php echo base_url().'index.php/Inicio/pdfLiberacionPago?id='.$e->id_formulario_pt ?>" target="_blank" title="Liberacion de Pago" ><i
                                                         class="mdi mdi-file-pdf font-18"></i></a> 
                                                
                                                 <a class="btn btn-outline-warning btn-round" href="<?php echo base_url().'index.php/Inicio/generarFormatoPT?id='.$e->id_formulario_pt.'&editar=1'?>" title="Editar" ><i

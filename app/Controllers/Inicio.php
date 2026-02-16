@@ -1802,6 +1802,44 @@ class Inicio extends BaseController
 
 
 
+    public function pdfLiberacionPago()
+    {
+        {
+        $globals = new Mglobal;
+        $id = $this->request->getGet('id');
+        $data = [];
+
+        if ($id) {
+            $registro = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["id_formulario_pt" => $id]]);
+        
+            if (!empty($registro->data)) {
+                $data['registro_pt'] = $registro->data[0];
+                $items = $globals->getTabla(["tabla" => "manual_factura", "where" => ["id_registro_pt" => $id , "visible" => 1]]);
+                $data['periodo_factura_rows'] = $items->data;
+                $data['edit'] = 1; // For view logic if reused
+            }
+        }
+
+        // For mPDF, passing local absolute path is better and avoids base64 issues
+        $data['logo'] = FCPATH . 'assets/logo-guanajuato.png';
+        //die( var_dump($data['logo']) ); // Debug if needed
+        
+        $html = view('pdfs/vPdfLiberacionPago', $data);
+
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 10,
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_bottom' => 10,
+            'format' => 'Letter',
+            'tempDir' => sys_get_temp_dir().DIRECTORY_SEPARATOR.'mpdf'
+        ]);
+        
+        $mpdf->WriteHTML($html);
+        $mpdf->Output('LiberacionPago_' . $id . '.pdf', 'I');
+        exit;
+    }
+    }
     public function ListaHojaAzul()
     {
         $session = \Config\Services::session();

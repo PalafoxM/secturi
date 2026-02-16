@@ -156,7 +156,7 @@
                                 <!-- IMPORTE -->
                                 <td style="vertical-align: top;">
                                     <input type="text" name="importe[]" class="form-control-plaintext input-importe" value="<?= isset($row->importe) ? $row->importe : '' ?>" placeholder="$0.00">
-                                    <?php if($index > 0 && $editar != 1): // Botón eliminar para filas extra ?>
+                                    <?php if($index > 0): // Botón eliminar para filas extra ?>
                                         <button type="button" class="btn btn-sm btn-danger mt-1 btn-remove-row" style="padding: 0px 5px;">&times;</button>
                                     <?php endif; ?>
                                 </td>
@@ -215,13 +215,13 @@
                             <?php endforeach; ?>
                         </tbody>
                         <tfoot>
-                            <?php if($editar != 1): ?>
+                           
                              <tr>
                                  <td colspan="4" class="text-left">
                                      <button type="button" class="btn btn-info btn-sm" id="btnAddRow">+ Agregar Fila</button>
                                  </td>
                              </tr>
-                            <?php endif; ?>
+                           
                         </tfoot>
                     </table>
 
@@ -634,6 +634,12 @@
                 return;
             }
 
+            // Disable button and show loading spinner
+            var $btn = $('#btnGuardarPT');
+            var originalText = $btn.html();
+            $btn.prop('disabled', true);
+            $btn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando...');
+
              var formData = new FormData(document.getElementById("formPagoTerceros"));
              
              $.ajax({
@@ -649,6 +655,9 @@
                             title: 'Error',
                             text: data.respuesta
                         });
+                        // Re-enable button on error
+                        $btn.prop('disabled', false);
+                        $btn.html(originalText);
                     } else {
                         Swal.fire({
                             icon: 'success',
@@ -666,6 +675,9 @@
                         title: 'Error',
                         text: 'Ocurrió un error inesperado.'
                     });
+                     // Re-enable button on error
+                     $btn.prop('disabled', false);
+                     $btn.html(originalText);
                 }
             });
         });
