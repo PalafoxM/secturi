@@ -38,11 +38,7 @@
                                                         <label>Denominación del puesto <span style="color:red;">*</span></label>
                                                         <select class="form-control select2" name="denominacion_puesto" required>
                                                             <option value="">Seleccione...</option>
-                                                            <?php foreach ($deno_puesto as $d): ?>
-                                                            <option value="<?= $d->id_denominacion ?>">
-                                                            <?= $d->dsc_denominacion ?>
-                                                            </option>
-                                                            <?php endforeach; ?>
+                                                         
                                                         </select>
                                                     </div>
 
@@ -50,23 +46,14 @@
                                                         <label>Denominación del cargo <span style="color:red;">*</span></label>
                                                         <select class="form-control select2" name="denominacion_cargo" required>
                                                             <option value="">Seleccione...</option>
-                                                                <?php foreach ($deno_cargo as $d): ?>
-                                                            <option value="<?= $d->id_cargo ?>">
-                                                                <?= $d->dsc_cargo ?>
-                                                            </option>   
-                                                            <?php endforeach; ?>
+                                                         
                                                         </select>
                                                     </div>
 
                                                     <div class="col-md-4 mb-3">
                                                         <label>Área de adscripción <span style="color:red;">*</span></label>
                                                         <select class="form-control" name="area_adscripcion" required>
-                                                            <option value="">Seleccione...</option>
-                                                                <?php foreach ($cat_area as $c): ?>
-                                                            <option value="<?= $c->id_area_adscripcion ?>">
-                                                                <?= $c->dsc_adscripcion ?>
-                                                            </option>
-                                                                <?php endforeach; ?>
+                                                         
                                                         </select>
                                                     </div>
                                                 </div>
@@ -77,12 +64,7 @@
                                                     <div class="col-md-6 mb-3">
                                                         <label>Nombre completo del solicitante <span style="color:red;">*</span></label>
                                                         <select class="form-control select2" name="id_usuario" required>
-                                                            <?php foreach ($usuarios as $p): ?>
-                                                                <option value="<?= $p->id_usuario ?>"
-                                                                    <?= session()->get('id_usuario') == $p->id_usuario ? 'selected' : '' ?>>
-                                                                    <?= $p->nombre_completo ?>
-                                                                </option>
-                                                            <?php endforeach; ?>
+                                                         
                                                         </select>
                                                     </div>
 

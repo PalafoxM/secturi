@@ -18,8 +18,8 @@
                                             </div>
                                         </div>
                                         <div class="col pl-0">
-                                            <h5 class="text-muted text-uppercase font-10 font-weight-bold mt-0 mb-2">No. de Contrato</h5>
-                                            <h3 class="m-0 font-weight-bold"><?= number_format($total_stock_promo ?? 0) ?></h3>
+                                            <h5 class="text-muted text-uppercase font-10 font-weight-bold mt-0 mb-2">No. de Articulos</h5>
+                                            <h3 class="m-0 font-weight-bold"><?= number_format($items ?? 0) ?></h3>
                                         </div>
                                     </div>
                                 </div>
@@ -92,9 +92,9 @@
                             <div class="col-lg-12">
                                 <div class="card shadow-sm border-0 h-100">
                                     <div class="card-body">
-                                        <h4 class="header-title mt-0 mb-4 text-dark border-bottom pb-2">Inventario Promoción</h4>
+                                        <h4 class="header-title mt-0 mb-4 text-dark border-bottom pb-2">Inventario Promoción <strong id="nombre_material"><?= $materiales->convenio . " - ". $materiales->razon_social ?></strong></h4>
                                         <div class="table-responsive dash-social">
-                                            <table class="table table-hover sm mb-0 tabla-inventario w-100">    
+                                             <table id="tablaConvenios" class="table table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">   
                                                 <thead class="thead-light">
                                                     <tr class="text-center">
                                                         <th class="py-3">
@@ -229,7 +229,7 @@
                                                                 <!-- Link a formulario -->
                                                                 <td class="text-center font-weight-bold text-dark">
                                                                     <div class="d-flex justify-content-center">
-                                                                        <a href="<?= base_url('vFormularioPromo?id=' . $item->id_inventario_promo) ?>"
+                                                                        <a href="<?= base_url('index.php/Inicio/FormularioPromo/' . $item->id_inventario_promo) ?>"
                                                                             class="btn btn-outline-secondary btn-sm"
                                                                             title="Formulario de requisición">
                                                                             📁 Form.
@@ -395,40 +395,50 @@
     </div>
 </div>
 
-<link href="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
-<link href="<?php echo base_url(); ?>plugins/datatables/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
-
+<link href="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet"
+    type="text/css" />
 <!-- App css -->
 <link href="<?php echo base_url(); ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 <link href="<?php echo base_url(); ?>assets/css/jquery-ui.min.css" rel="stylesheet">
 <link href="<?php echo base_url(); ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
-<link href="<?= base_url()?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
-<link href="<?= base_url()?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
-
+<link href="<?= base_url() ?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+<link href="<?= base_url() ?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
 <!-- jQuery  -->
+ 
 <script src="<?php echo base_url(); ?>assets/js/jquery.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/js/jquery-ui.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/js/bootstrap.bundle.min.js"></script>
-<script src="<?php echo base_url(); ?>assets/js/jquery.spromoscroll.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/jquery.slimscroll.min.js"></script>
+
 
 <!-- Required datatable js -->
 <script src="<?php echo base_url(); ?>plugins/datatables/jquery.dataTables.min.js"></script>
 <script src="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.js"></script>
-<script src="<?php echo base_url(); ?>plugins/datatables/dataTables.responsive.min.js"></script>
-<script src="<?php echo base_url(); ?>plugins/datatables/responsive.bootstrap4.min.js"></script>
 
 <!-- App js -->
-<script src="<?= base_url()?>assets/js/app.js"></script>
-<script src="<?= base_url()?>assets/js/waves.js"></script>
-<script src="<?= base_url()?>assets/js/feather.min.js"></script>
+<script src="<?= base_url() ?>assets/js/app.js"></script>
+<script src="<?= base_url() ?>assets/js/waves.js"></script>
+<script src="<?= base_url() ?>assets/js/feather.min.js"></script>
+
+<script src="<?= base_url() ?>plugins/tiny-editable/mindmup-editabletable.js"></script>
+<script src="<?= base_url() ?>plugins/tiny-editable/numeric-input-example.js"></script>
+<script src="<?= base_url() ?>plugins/bootable/bootstable.js"></script> 
+<link href="<?php echo base_url(); ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
+
 <script src="<?= base_url(); ?>plugins/select2/select2.min.js"></script>
 
-<script>
-$(window).on('load', function () {
 
-    if ($.fn.DataTable.isDataTable('.tabla-inventario')) {
-        $('.tabla-inventario').DataTable().destroy();
-    }
+<script>
+
+    $(document).ready(function() {
+     $('#tablaConvenios').DataTable({
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json' // Ruta al archivo de localización
+            },
+            destroy: true,
+        searching: true,
+        });
+
 
     $('.tabla-inventario').DataTable({
         language: {

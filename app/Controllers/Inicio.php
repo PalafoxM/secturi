@@ -364,6 +364,17 @@ class Inicio extends BaseController
         $data['contentView'] = 'personal/vListaConvenio';
         $this->_renderView($data);
     }
+    public function FormularioPromo($id = null, $idFila = null)
+    {
+        $globas = new Mglobal;
+
+     
+       
+        $data['folio_preliminar'] = $id;
+        $data['scripts'] = array('principal', 'inicio');
+        $data['contentView'] = 'personal/vFormularioPromo';
+        $this->_renderView($data);
+    }
     public function InventarioPromocion($id = null)
     {
         $globas = new Mglobal;
@@ -372,7 +383,12 @@ class Inicio extends BaseController
             'tabla' => 'cat_inventario_promo',
             'where' => ['visible' => 1, 'id_inventario' => $id]
         ])->data;
+        $materiales = $globas->getTabla([
+            'tabla' => 'vw_material_promo',
+            'where' => ['visible' => 1, 'id_material_promo' => $id]
+        ])->data;
 
+      
         // 2. Colores e imágenes por producto
         foreach ($productos as &$item) {
 
@@ -398,7 +414,9 @@ class Inicio extends BaseController
         }
     
 
+        $data['items'] = count($productos);
         $data['cat_inventario_promo'] = $productos;
+        $data['materiales'] = $materiales[0];
 
         // 3. Totales
         $data['total_stock_promo']     = 0;

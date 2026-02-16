@@ -112,35 +112,43 @@
 <!-- App css -->
 <link href="<?php echo base_url(); ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 <link href="<?php echo base_url(); ?>assets/css/jquery-ui.min.css" rel="stylesheet">
-<link href="<?php echo base_url(); ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
 <link href="<?php echo base_url(); ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
 <link href="<?= base_url() ?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+<link href="<?= base_url() ?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
 <!-- jQuery  -->
+ 
 <script src="<?php echo base_url(); ?>assets/js/jquery.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/js/jquery-ui.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/js/bootstrap.bundle.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/js/jquery.slimscroll.min.js"></script>
+
+
 <!-- Required datatable js -->
 <script src="<?php echo base_url(); ?>plugins/datatables/jquery.dataTables.min.js"></script>
 <script src="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.js"></script>
-<script src="<?php echo base_url(); ?>assets/pages/jquery.analytics_customers.init.js"></script>
-
-<script src="<?= base_url() ?>plugins/apexcharts/apexcharts.min.js"></script>
 
 <!-- App js -->
 <script src="<?= base_url() ?>assets/js/app.js"></script>
-
-
-<script src="<?= base_url() ?>assets/js/metismenu.min.js"></script>
 <script src="<?= base_url() ?>assets/js/waves.js"></script>
 <script src="<?= base_url() ?>assets/js/feather.min.js"></script>
 
+<script src="<?= base_url() ?>plugins/tiny-editable/mindmup-editabletable.js"></script>
+<script src="<?= base_url() ?>plugins/tiny-editable/numeric-input-example.js"></script>
+<script src="<?= base_url() ?>plugins/bootable/bootstable.js"></script> 
+<link href="<?php echo base_url(); ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
+
+<script src="<?= base_url(); ?>plugins/select2/select2.min.js"></script>
+
+
 <script>
+
     $(document).ready(function() {
         $('#tablaConvenios').DataTable({
             language: {
-                url: "//cdn.datatables.net/plug-ins/1.10.20/i18n/Spanish.json"
-            }
+                url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json' // Ruta al archivo de localización
+            },
+            destroy: true,
+        searching: true,
         });
 
         $('.input-importe').on('blur', function() {
