@@ -6260,7 +6260,7 @@ class Agregar extends BaseController
                 'fec_act' => date('Y-m-d H:i:s')
             ];
             
-            $dataConfig = ["tabla" => "material_promo", "editar" => true, "idEditar" => ['id_material_promo' => $id]];
+            $dataConfig = ["tabla" => "cat_material_promo", "editar" => true, "idEditar" => ['id_material_promo' => $id]];
             
             $res = $this->globals->saveTabla($dataUpdate, $dataConfig, ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/eliminarConvenio']);
 

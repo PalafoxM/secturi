@@ -89,7 +89,7 @@
                     <div class="tab-content pt-2">
                         <!-- ===== Promocion ==== -->
                         <div class="row">
-                            <div class="col-lg-13">
+                            <div class="col-lg-12">
                                 <div class="card shadow-sm border-0 h-100">
                                     <div class="card-body">
                                         <h4 class="header-title mt-0 mb-4 text-dark border-bottom pb-2">Inventario Promoción</h4>
