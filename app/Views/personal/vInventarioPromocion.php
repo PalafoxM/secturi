@@ -4,7 +4,7 @@
         <div class="container-fluid">
 
             <!-- ===================== tittle ===================== -->
-            <div class="row mt-4">
+            <div class="row mt-3">
                 <div class="col-lg-12">
                     <div class="row">
                         <!-- Card 1: Total Unidades -->
@@ -70,303 +70,290 @@
             <div class="row mt-4">
                 <div class="col-lg-12">
                     <div class="card shadow-sm border-0 h-100">
-                        <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-4">
-                                        <h4 class="header-title mt-0 mb-0 text-dark">Inventario Promoción <strong id="nombre_material"><?= $materiales->convenio . " - ". $materiales->razon_social ?></strong></h4>
-                                        <button class="btn btn-primary px-4 btn-movimiento shadow-sm"
-                                            data-id=""
-                                            data-tabla=""
-                                            data-nombre=""
-                                            data-stock=""
-                                            data-tipo="nuevo">
-                                            <i class="mdi mdi-plus-box mr-2"></i> Nuevo producto
-                                        </button>
-                                    </div>
-                                        <div class="table-responsive dash-social">
-                                             <table id="tablaConvenios" class="table table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">   
-                                                <thead class="thead-light">
-                                                    <tr class="text-center">
-                                                        <th class="py-3">
-                                                            <i class="mdi mdi-tag-outline text-primary d-block mb-1"></i>
-                                                            <small class="text-muted d-block">Producto</small></th>
-                                                        <th class="py-3">
-                                                            <i class="mdi mdi-image text-purple d-block mb-1"></i>
-                                                            <small class="text-muted d-block">Imagen</small></th>
-                                                        <th class="py-3">
-                                                            <i class="mdi mdi-counter text-info d-block mb-1"></i>
-                                                            <small class="text-muted d-block">Cantidad</small></th>
-                                                        <th class="py-3">
-                                                            <i class="mdi mdi-palette text-pink d-block mb-1"></i>
-                                                            <small class="text-muted d-block">Colores</small></th>
-                                              
-                                                        <th class="py-3">
-                                                            <i class="mdi mdi-currency-usd text-primary d-block mb-1"></i>
-                                                            <small class="text-muted d-block">Precio</small></th>
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
+                                <h4 class="header-title mt-0 mb-0 text-dark">Inventario Promoción <strong id="nombre_material"><?= $materiales->convenio . " - ". $materiales->razon_social ?></strong></h4>
+                                <button class="btn btn-primary px-4 btn-movimiento shadow-sm"
+                                    data-id=""
+                                    data-tabla="cat_inventario_promo"
+                                    data-nombre=""
+                                    data-stock="0"
+                                    data-tipo="nuevo">
+                                    <i class="mdi mdi-plus-box mr-2"></i> Nuevo producto
+                                </button>
+                            </div>
+                            <div class="table-responsive dash-social">
+                                <table id="tablaConvenios" class="table table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                                    <thead class="thead-light">
+                                        <tr class="text-center">
+                                            <th class="py-3">
+                                                <i class="mdi mdi-tag-outline text-primary d-block mb-1"></i>
+                                                <small class="text-muted d-block">Producto</small></th>
+                                            <th class="py-3">
+                                                <i class="mdi mdi-image text-purple d-block mb-1"></i>
+                                                <small class="text-muted d-block">Imagen</small></th>
+                                            <th class="py-3">
+                                                <i class="mdi mdi-counter text-info d-block mb-1"></i>
+                                                <small class="text-muted d-block">Cantidad</small></th>
+                                            <th class="py-3">
+                                                <i class="mdi mdi-palette text-pink d-block mb-1"></i>
+                                                <small class="text-muted d-block">Colores</small></th>
+                                    
+                                            <th class="py-3">
+                                                <i class="mdi mdi-currency-usd text-primary d-block mb-1"></i>
+                                                <small class="text-muted d-block">Precio</small></th>
 
-                                                        <th class="py-3">
-                                                            <i class="mdi mdi-calendar-remove text-dark d-block mb-0"></i>
-                                                            <small class="text-muted d-block">Fecha contrato</small></th>
+                                            <th class="py-3">
+                                                <i class="mdi mdi-calendar-remove text-dark d-block mb-0"></i>
+                                                <small class="text-muted d-block">Fecha contrato</small></th>
 
-                                                        <th class="py-3">
-                                                            <i class="mdi mdi-calendar-check text-success d-block mb-1"></i>
-                                                            <small class="text-muted d-block">Formulario</small></th>
+                                            <th class="py-3">
+                                                <i class="mdi mdi-calendar-check text-success d-block mb-1"></i>
+                                                <small class="text-muted d-block">Formulario</small></th>
+                                            
+                                            <th class="py-3" style="width:15%;">
+                                                <i class="mdi mdi-cog-outline text-secondary d-block mb-0"></i>
+                                                <small class="text-muted d-block">Acciones</small>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tablaPromo">
+                                        <?php if(isset($cat_inventario_promo) && !empty($cat_inventario_promo)): ?>
+                                            <?php foreach($cat_inventario_promo as $item): ?>
+                                                <?php 
+                                                    $stock = (int) ($item->stock ?? 0); 
+                                                    $badgeClass = ($stock < 5) ? 'badge-soft-danger' : 'badge-soft-success'; 
+                                                ?>
+                                                <?php
+                                                    static $productoTmp = '';
+                                                        if (!empty($item->dsc_producto)) {
+                                                        $productoTmp = $item->dsc_producto;
+                                                    }
+                                                ?>
+
+                                                <tr class="align-middle">
+                                                    <!-- Producto -->
+                                                    <td class="font-weight-medium text-dark py-3 text-center">
+                                                        <?= $item->dsc_producto ?>
+                                                    </td>
+
+                                                    <!-- Imagen -->
+                                                    <td class="text-center">
+                                                        <?php if (!empty($item->imagen)): ?>
                                                         
-                                                        <th class="py-3" style="width:15%;">
-                                                            <i class="mdi mdi-cog-outline text-secondary d-block mb-0"></i>
-                                                            <small class="text-muted d-block">Acciones</small>
-                                                        </th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="tablaPromo">
-                                                    <?php if(isset($cat_inventario_promo) && !empty($cat_inventario_promo)): ?>
-                                                        <?php foreach($cat_inventario_promo as $item): ?>
-                                                            <?php 
-                                                                $stock = (int) ($item->stock ?? 0); 
-                                                                $badgeClass = ($stock < 5) ? 'badge-soft-danger' : 'badge-soft-success'; 
-                                                            ?>
-                                                            <?php
-                                                                static $productoTmp = '';
-                                                                    if (!empty($item->dsc_producto)) {
-                                                                    $productoTmp = $item->dsc_producto;
-                                                                }
-                                                            ?>
-
-                                                            <tr class="align-middle">
-                                                                <!-- Producto -->
-                                                                <td class="font-weight-medium text-dark py-3 text-center">
-                                                                    <?= $item->dsc_producto ?>
-                                                                </td>
-
-                                                                <!-- Imagen -->
-                                                                <td class="text-center">
-                                                                    <?php if (!empty($item->imagen)): ?>
-                                                                   
-                                                                            <img src="<?= base_url($item->imagen) ?>"
-                                                                            class="rounded btn-ver-imagen mr-1"
-                                                                            style="height:40px; cursor:pointer;"
-                                                                            data-src="<?= base_url($item->imagen) ?>">
-                                                         
-                                                                    <?php else: ?>
-                                                                            <img src="<?= base_url('assets/images/no-image.png') ?>"
-                                                                            style="height:40px; opacity:.4;">
-                                                                    <?php endif; ?>
-                                                                </td>
+                                                                <img src="<?= base_url($item->imagen) ?>"
+                                                                class="rounded btn-ver-imagen mr-1"
+                                                                style="height:40px; cursor:pointer;"
+                                                                data-src="<?= base_url($item->imagen) ?>">
+                                                
+                                                        <?php else: ?>
+                                                                <img src="<?= base_url('assets/images/no-image.png') ?>"
+                                                                style="height:40px; opacity:.4;">
+                                                        <?php endif; ?>
+                                                    </td>
 
 
-                                                                <!-- Cantidad (badge) -->
-                                                                <?php
-                                                                    $stock = (int) $item->stock;
-                                                                    $badgeClass = ($stock < 5) ? 'badge-soft-danger' : 'badge-soft-success';
-                                                                ?>
-                                                                <td class="text-center">
-                                                                    <span class="badge badge-soft-info font-13 p-2 px-3">
-                                                                        <?= $item->cantidad ?>
-                                                                    </span>
-                                                                </td>
+                                                    <!-- Cantidad (badge) -->
+                                                    <?php
+                                                        $stock = (int) $item->stock;
+                                                        $badgeClass = ($stock < 5) ? 'badge-soft-danger' : 'badge-soft-success';
+                                                    ?>
+                                                    <td class="text-center">
+                                                        <span class="badge badge-soft-info font-13 p-2 px-3">
+                                                            <?= $item->cantidad ?>
+                                                        </span>
+                                                    </td>
 
-                                                                <!-- Colores -->
-                                                                <td class="text-center">
-                                                                    <?php if(isset($item->colores) && !empty($item->colores)): ?>
-                                                                        <?php foreach($item->colores as $index => $color): ?>
-                                                                            
-                                                                            <!-- Icono visible -->
-                                                                            <i class="mdi mdi-circle font-18 color-picker-trigger"
-                                                                                style="color: <?= $color->hexadecimal ?>; cursor:pointer;"
-                                                                                data-index="<?= $item->id_inventario_promo ?>_<?= $index ?>"
-                                                                                data-toggle="tooltip"
-                                                                                data-placement="top"
-                                                                                title="Cantidad: <?= $color->cantidad ?? 0 ?>">
-                                                                            </i>
-
-                                                                            <!-- Input color oculto -->
-                                                                            <input type="color"
-                                                                                class="color-picker-input d-none"
-                                                                                id="color_<?= $item->id_inventario_promo ?>_<?= $index ?>"
-                                                                                value="<?= $color->hexadecimal ?>"
-                                                                                data-id="<?= $item->id_inventario_promo ?>"
-                                                                                data-index="<?= $index ?>">
-
-                                                                        <?php endforeach; ?>
-                                                                    <?php else: ?>
-                                                                        <span class="text-muted font-12">Sin colores</span>
-                                                                    <?php endif; ?> 
-                                                                </td>
+                                                    <!-- Colores -->
+                                                    <td class="text-center">
+                                                        <?php if(isset($item->colores) && !empty($item->colores)): ?>
+                                                            <?php foreach($item->colores as $index => $color): ?>
                                                                 
-                                                                <!-- Precio -->
-                                                                <td class="text-center">
-                                                                    <div class="font-weight-bold text-dark">
-                                                                        $<?= number_format((float)($item->precio_unitario ?? 0), 2) ?>
-                                                                    </div>
+                                                                <!-- Icono visible -->
+                                                                <i class="mdi mdi-circle font-18 color-picker-trigger"
+                                                                    style="color: <?= $color->hexadecimal ?>; cursor:pointer;"
+                                                                    data-index="<?= $item->id_inventario_promo ?>_<?= $index ?>"
+                                                                    data-toggle="tooltip"
+                                                                    data-placement="top"
+                                                                    title="Cantidad: <?= $color->cantidad ?? 0 ?>">
+                                                                </i>
 
-                                                                    <div class="text-muted font-12">
-                                                                        Subtotal:
-                                                                        $<?= number_format((float)($item->subtotal ?? 0), 2) ?>
-                                                                    </div>
+                                                                <!-- Input color oculto -->
+                                                                <input type="color"
+                                                                    class="color-picker-input d-none"
+                                                                    id="color_<?= $item->id_inventario_promo ?>_<?= $index ?>"
+                                                                    value="<?= $color->hexadecimal ?>"
+                                                                    data-id="<?= $item->id_inventario_promo ?>"
+                                                                    data-index="<?= $index ?>">
 
-                                                                    <div class="text-muted font-11 mt-1">
-                                                                        Total: <span class="font-weight-semibold text-primary">$<?= number_format((float)($item->total ?? 0), 2) ?></span>
-                                                                    </div>
-                                                                </td>
+                                                            <?php endforeach; ?>
+                                                        <?php else: ?>
+                                                            <span class="text-muted font-12">Sin colores</span>
+                                                        <?php endif; ?> 
+                                                    </td>
+                                                    
+                                                    <!-- Precio -->
+                                                    <td class="text-center">
+                                                        <div class="font-weight-bold text-dark">
+                                                            $<?= number_format((float)($item->precio_unitario ?? 0), 2) ?>
+                                                        </div>
 
-                                                                <!-- Fec. Entrada -->
-                                                                <td class="text-center">
-                                                                    <span class="badge badge-soft-success font-13">
-                                                                        <?= $item->fecha_entrada ?? date('d/m/Y', strtotime($item->created_at ?? 'now')) ?>
-                                                                    </span>
-                                                                </td>
+                                                        <div class="text-muted font-12">
+                                                            Subtotal:
+                                                            $<?= number_format((float)($item->subtotal ?? 0), 2) ?>
+                                                        </div>
 
-                                                                <!-- Link a formulario -->
-                                                                <td class="text-center font-weight-bold text-dark">
-                                                                    <div class="d-flex justify-content-center">
-                                                                        <a href="<?= base_url('index.php/Inicio/FormularioPromo/'. $id_convenio. "/" . $item->id_inventario_promo) ?>"
-                                                                            class="btn btn-outline-secondary btn-sm"
-                                                                            title="Formulario de requisición">
-                                                                            📁 Form.
-                                                                        </a> <!-- lleva a formulario-->
-                                                                    </div>
-                                                                </td>
+                                                        <div class="text-muted font-11 mt-1">
+                                                            Total: <span class="font-weight-semibold text-primary">$<?= number_format((float)($item->total ?? 0), 2) ?></span>
+                                                        </div>
+                                                    </td>
 
-                                                                <!-- Acciones -->
-                                                                <td class="text-center text-nowrap">
-                                                                    <div class="d-flex justify-content-center">
-                                                                        
-                                                                        <a href="<?= base_url('index.php/Inicio/ListaSalidasPromo/' . $item->id_inventario_promo) ?>"
-                                                                            class="btn btn-sm btn-outline-warning btn-sm"
-                                                                            title="Complementos del contrato">
-                                                                            🌎 Compl. <!-- lleva a INE, oficio, evidencias -->
-                                                                        </a>  
-                                                                        
-                                                                        <button class="btn btn-sm btn-outline-primary btn-movimiento border-0 p-2"
-                                                                            data-id="<?= $item->id_inventario_promo ?>"
-                                                                            data-tabla="cat_inventario_promo"
-                                                                            data-nombre="<?= $item->dsc_producto ?>"
-                                                                            data-stock="<?= $stock ?>"
-                                                                            data-tipo="editar"
-                                                                            title="Editar">
-                                                                            ✏️ Editar
-                                                                        </button>
+                                                    <!-- Fec. Entrada -->
+                                                    <td class="text-center">
+                                                        <span class="badge badge-soft-success font-13">
+                                                            <?= $item->fecha_entrada ?? date('d/m/Y', strtotime($item->created_at ?? 'now')) ?>
+                                                        </span>
+                                                    </td>
 
-                                                                        <button class="btn btn-sm btn-outline-danger btn-eliminar btn-sm"
-                                                                            data-id="<?= $item->id_inventario_promo ?>"
-                                                                            data-tabla="cat_inventario_promo"
-                                                                            data-nombre="<?= $item->dsc_producto ?>"
-                                                                            data-stock="<?= $stock ?>"
-                                                                            title="Eliminar">
-                                                                            ⛔ Elim.
-                                                                        </button>
-                                                                    </div>    
-                                                                </td>
-                                                            </tr>
-                                                        <?php endforeach; ?>
-                                                    <?php else: ?>
-                                                        <tr>
-                                                            <td colspan="8" class="text-center text-muted py-4">
-                                                                No hay productos registrados
-                                                            </td>
-                                                        </tr>
-                                                    <?php endif; ?>
-                                                </tbody>
-                                            </table>
-                                        </div> <!-- end table responsive -->
-                                    </div><!--end card-body-->
-                                </div><!--end card-->
-                            </div><!--end col-lg-8-->
-                        </div><!--end row principal-->
+                                                    <!-- Link a formulario -->
+                                                    <td class="text-center font-weight-bold text-dark">
+                                                        <div class="d-flex justify-content-center">
+                                                            <a href="<?= base_url('index.php/Inicio/FormularioPromo/'. $id_convenio. "/" . $item->id_inventario_promo) ?>"
+                                                                class="btn btn-outline-secondary btn-sm"
+                                                                title="Formulario de requisición">
+                                                                📁 Form.
+                                                            </a> <!-- lleva a formulario-->
+                                                        </div>
+                                                    </td>
+
+                                                    <!-- Acciones -->
+                                                    <td class="text-center text-nowrap">
+                                                        <div class="d-flex justify-content-center">
+                                                            
+                                                            <a href="<?= base_url('index.php/Inicio/ListaSalidasPromo/' . $item->id_inventario_promo) ?>"
+                                                                class="btn btn-sm btn-outline-warning btn-sm"
+                                                                title="Complementos del contrato">
+                                                                🌎 Compl. <!-- lleva a INE, oficio, evidencias -->
+                                                            </a>  
+                                                            
+                                                            <button class="btn btn-sm btn-outline-danger btn-eliminar btn-sm"
+                                                                data-id="<?= $item->id_inventario_promo ?>"
+                                                                data-tabla="cat_inventario_promo"
+                                                                data-nombre="<?= $item->dsc_producto ?>"
+                                                                data-stock="<?= $stock ?>"
+                                                                title="Eliminar">
+                                                                ⛔ Elim.
+                                                            </button>
+                                                        </div>    
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <tr>
+                                                <td colspan="8" class="text-center text-muted py-4">
+                                                    No hay productos registrados
+                                                </td>
+                                            </tr>
+                                        <?php endif; ?>
+                                    </tbody>
+                                </table>
+                            </div> <!-- end table responsive -->
+                        </div><!--end card-body-->
+                    </div><!--end card-->
+                </div><!--end col-lg-8-->
+            </div><!--end row principal-->
 
                         
-                        <!-- ===================== MODAL STANDARD ===================== -->
-                        <div class="modal fade" id="modalMovimientoInventario" tabindex="-1" role="dialog">
-                            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header bg-light">
-                                        <h5 class="modal-title font-16" id="modalTitulo">
-                                            <i class="mdi mdi-database-plus mr-2"></i> Movimiento
-                                        </h5>
-                                        <button type="button" class="close" data-dismiss="modal">
-                                            <span>&times;</span>
-                                        </button>
-                                    </div>
+            <!-- ===================== MODAL STANDARD ===================== -->
+            <div class="modal fade" id="modalMovimientoInventario" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header bg-light">
+                            <h5 class="modal-title font-16" id="modalTitulo">
+                                <i class="mdi mdi-database-plus mr-2"></i> Movimiento
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span>&times;</span>
+                            </button>
+                        </div>
 
-                                    <form id="formMovimientoInventario">
-                                        <div class="modal-body">
-                                            <input type="hidden" id="id_producto" name="id_producto">
-                                            <input type="hidden" id="tipo_movimiento" name="tipo_movimiento">
-                                            <!-- Hidden field for table name when editing or fixed -->
-                                            <input type="hidden" id="tabla_hidden" name="tabla"> 
-                                            
-                                            <div class="row">
-                                                <!-- LEFT COLUMN: Form Fields -->
-                                                <div class="col-md-7">
-                                                    <!-- Removed Category Select -->
+                        <form id="formMovimientoInventario">
+                            <div class="modal-body">
+                                <input type="hidden" name="id_convenio" value="<?= $id_convenio ?>">
+                                <input type="hidden" id="id_producto" name="id_producto">
+                                <input type="hidden" id="tipo_movimiento" name="tipo_movimiento">
+                                <!-- Hidden field for table name when editing or fixed -->
+                                <input type="hidden" id="tabla_hidden" name="tabla"> 
+                                
+                                <div class="row">
+                                    <!-- LEFT COLUMN: Form Fields -->
+                                    <div class="col-md-7">
+                                        <!-- Removed Category Select -->
 
+                                        <div class="form-group">
+                                            <label class="font-weight-bold text-dark text-uppercase font-12">Producto</label>
+                                            <input type="text" class="form-control" id="nombre_producto" name="nombre" required>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label class="font-weight-bold text-dark text-uppercase font-12">Producto</label>
-                                                        <input type="text" class="form-control" id="nombre_producto" name="nombre" required>
-                                                    </div>
-
-                                                    <div class="row">
-                                                        <div class="col-md-6">
-                                                             <div class="form-group">
-                                                                <label class="font-weight-bold text-dark text-uppercase font-12">Cantidad</label>
-                                                                <input type="number" class="form-control" id="cantidad_producto" name="cantidad" min="0" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="form-group">
-                                                                <label class="font-weight-bold text-dark text-uppercase font-12" id="label_cantidad">Subtotal</label>
-                                                                <input type="number" class="form-control" id="subtotal" name="subtotal" min="0" step="0.01" required>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="form-group">
-                                                        <label class="font-weight-bold text-dark text-uppercase font-12">Colores y Cantidades</label>
-                                                        <div id="colores_container">
-                                                            <!-- Dynamic rows will be added here -->
-                                                        </div>
-                                                        <button type="button" class="btn btn-sm btn-outline-info mt-1" id="btn_add_color">
-                                                            <i class="mdi mdi-plus"></i> Agregar Color
-                                                        </button>
-                                                    </div>
-
-                                                    <div class="form-group">
-                                                        <label class="font-weight-bold text-dark text-uppercase font-12">Total Existencia</label>
-                                                        <input type="number" class="form-control" id="total_existencia" name="total_existencia" min="0" required>
-                                                    </div>
+                                                    <label class="font-weight-bold text-dark text-uppercase font-12">Cantidad</label>
+                                                    <input type="number" class="form-control" id="cantidad_producto" name="cantidad" min="0" required>
                                                 </div>
-
-                                                <!-- RIGHT COLUMN: Image Upload -->
-                                                <div class="col-md-5">
-                                                    <div class="form-group text-center">
-                                                        <label class="font-weight-bold text-dark text-uppercase font-12 w-100">Imagen</label>
-                                                        
-                                                        <div class="mt-2 mb-3 border rounded d-flex align-items-center justify-content-center bg-light" style="height: 180px; overflow: hidden;">
-                                                            <img id="preview_imagen" src="" alt="Vista previa" class="img-fluid" style="max-height: 100%; display: none;">
-                                                            <span id="placeholder_imagen" class="text-muted small">Sin imagen seleccionada</span>
-                                                        </div>
-
-                                                        <div class="custom-file text-left">
-                                                            <input type="file" class="custom-file-input" id="imagen_producto" name="imagen" accept="image/*">
-                                                            <label class="custom-file-label" for="imagen_producto" data-browse="Elegir">Seleccionar Archivo</label>
-                                                        </div>
-                                                        <small class="form-text text-muted text-left mt-1">Formatos: JPG, PNG, GIF</small>
-                                                    </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="font-weight-bold text-dark text-uppercase font-12" id="label_cantidad">Subtotal</label>
+                                                    <input type="number" class="form-control" id="subtotal" name="subtotal" min="0" step="0.01" required>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div class="modal-footer bg-light">
-                                            <button type="button" class="btn btn-secondary btn-sm px-3" data-dismiss="modal">Cerrar</button>
-                                            <button type="submit" class="btn btn-primary btn-sm px-4">Guardar</button>
+                                        <div class="form-group">
+                                            <label class="font-weight-bold text-dark text-uppercase font-12">Colores y Cantidades</label>
+                                            <div id="colores_container">
+                                                <!-- Dynamic rows will be added here -->
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-outline-info mt-1" id="btn_add_color">
+                                                <i class="mdi mdi-plus"></i> Agregar Color
+                                            </button>
                                         </div>
-                                    </form>
+
+                                        <div class="form-group">
+                                            <label class="font-weight-bold text-dark text-uppercase font-12">Total Existencia</label>
+                                            <input type="number" class="form-control" id="total_existencia" name="total_existencia" min="0" required>
+                                        </div>
+                                    </div>
+
+                                    <!-- RIGHT COLUMN: Image Upload -->
+                                    <div class="col-md-5">
+                                        <div class="form-group text-center">
+                                            <label class="font-weight-bold text-dark text-uppercase font-12 w-100">Imagen</label>
+                                            
+                                            <div class="mt-2 mb-3 border rounded d-flex align-items-center justify-content-center bg-light" style="height: 180px; overflow: hidden;">
+                                                <img id="preview_imagen" src="" alt="Vista previa" class="img-fluid" style="max-height: 100%; display: none;">
+                                                <span id="placeholder_imagen" class="text-muted small">Sin imagen seleccionada</span>
+                                            </div>
+
+                                            <div class="custom-file text-left">
+                                                <input type="file" class="custom-file-input" id="imagen_producto" name="imagen" accept="image/*">
+                                                <label class="custom-file-label" for="imagen_producto" data-browse="Elegir">Seleccionar Archivo</label>
+                                            </div>
+                                            <small class="form-text text-muted text-left mt-1">Formatos: JPG, PNG, GIF</small>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        </div>
-                    </div> 
-                </div> 
-            </div> 
+
+                            <div class="modal-footer bg-light">
+                                <button type="button" class="btn btn-secondary btn-sm px-3" data-dismiss="modal">Cerrar</button>
+                                <button type="submit" class="btn btn-primary btn-sm px-4">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -419,34 +406,37 @@
 
 
 <script>
-
     $(document).ready(function() {
-     $('#tablaConvenios').DataTable({
+        function inicializarTabla(selector, opciones) {
+            if ($.fn.DataTable.isDataTable(selector)) {
+                return;
+            }
+            $(selector).DataTable(opciones);
+        }
+
+        if ($('#tablaConvenios tbody tr').length > 1 || 
+            !$('#tablaConvenios tbody tr td').attr('colspan')) {
+
+            inicializarTabla('#tablaConvenios', {
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json'
+                },
+                searching: true
+            });
+        }
+
+        inicializarTabla('.tabla-inventario', {
             language: {
-                url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json' // Ruta al archivo de localización
+                url: "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json"
             },
-            destroy: true,
-        searching: true,
+            responsive: true,
+            autoWidth: false,
+            order: [[0, "asc"]]
         });
 
-
-    $('.tabla-inventario').DataTable({
-        language: {
-            url: "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json"
-        },
-        responsive: true,
-        autoWidth: false,
-        order: [[0, "asc"]],
-        initComplete: function () {
-            this.api().columns.adjust().draw(false);
-        }
-    });
-
-    $(document).ready(function () {
-
         /* ==========================================================
-        UTILIDADES
-        ========================================================== */
+            UTILIDADES
+           ========================================================== */
 
         function setProductoReadonly(estado) {
             $('#nombre_producto').prop('readonly', estado);
@@ -478,16 +468,13 @@
 
         /* ==========================================================
             DATATABLE
-        ========================================================== */
+        ========================================================== 
 
         if ($.fn.DataTable.isDataTable('.tabla-inventario')) {
             $('.tabla-inventario').DataTable().destroy();
         }
 
-    
-
-
-        /* ==========================================================
+        ==========================================================
             INPUT FILE + PREVIEW
         ========================================================== */
 
@@ -507,13 +494,15 @@
                 reader.readAsDataURL(input.files[0]);
             }
         });
-
+        
         /* ==========================================================
             MODAL – ABRIR
         ========================================================== */
 
         $(document).on('click', '.btn-movimiento', function () {
             const d = $(this).data();
+            $('#tabla_hidden').val(d.tabla || 'cat_inventario_promo');
+
 
             resetModal();
 
@@ -563,8 +552,6 @@
             $('#imagenGrande').attr('src', src);
             $('#modalImagen').modal('show');
         });
-
-
 
         /* ==========================================================
             FORM – SUBMIT
@@ -669,11 +656,11 @@
                 <div class="d-flex align-items-center w-100 mb-2" id="${rowId}">
                     <div class="col-6">
                         <input type="color" class="form-control form-control-sm"
-                               name="colores[]" value="${color}">
+                            name="colores[]" value="${color}">
                     </div>
                     <div class="col-4">
                         <input type="number" class="form-control form-control-sm input-cantidad"
-                               name="cantidades[]" value="${cantidad}" min="0">
+                            name="cantidades[]" value="${cantidad}" min="0">
                     </div>
                     <div class="col-2">
                         <button type="button"
@@ -693,7 +680,5 @@
         $(document).on('click', '.btn-remove-color', function () {
             $('#' + $(this).data('row')).remove();
         });
-
     });
-});
 </script>
