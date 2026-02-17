@@ -724,17 +724,17 @@
                                        
                                         <div class="col-lg-6">
                                             <div class="card">
-                                                <a href="<?= base_url() ?>assets/documentos/Of_332_2026_Capacitaciones SIGAP.pdf" target="_blank" >
+                                                <a href="<?= base_url() ?>assets/documentos/Of_496_2026_Capacitaciones SIGAP.docx.pdf" target="_blank" >
                                                 <div class="card-body">
                                                     <div class="blog-card">
-                                                        <h4 class="header-title mt-0 mb-4">Semana del 03 de febrero al 06 de febrero, acciones SIGAP</h4>
-                                                        <iframe src="<?= base_url() ?>assets/documentos/Of_332_2026_Capacitaciones SIGAP.pdf" alt=""
+                                                        <h4 class="header-title mt-0 mb-4">Semana del 16 de febrero al 20 de febrero, acciones SIGAP</h4>
+                                                        <iframe src="<?= base_url() ?>assets/documentos/Of_496_2026_Capacitaciones SIGAP.docx.pdf" alt=""
                                                             class="img-fluid" ></iframe>
                                                     </div><!--end blog-card-->
-                                                       <a href="https://meet.google.com/hvq-xgph-hdu"
+                                                       <a href="https://meet.google.com/gqy-jmee-jta"
                                                                     target="_blank" class="text-primary">Unirse a la reunión 11:00 a 12:00 horas <i
                                                                         class="fas fa-long-arrow-alt-right"></i></a><br>
-                                                                        <a href="https://meet.google.com/jzc-wpog-xtk"
+                                                                        <a href="https://meet.google.com/hjm-nphd-pns"
                                                                     target="_blank" class="text-primary">Unirse a la reunión 13:00 a 14:00 horas <i
                                                                         class="fas fa-long-arrow-alt-right"></i></a>
 
