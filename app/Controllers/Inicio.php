@@ -1568,6 +1568,7 @@ class Inicio extends BaseController
                     $item->encabezado = $datos->data[0]->encabezado ?? '';
 
                     foreach ($datos->data as $j => $d) {
+                       // var_dump( $d->id_identificador);
                         $xml = $globals->getTabla(['tabla' => 'factura', 'where' => ['id_registro_pt' => $id_registro_pt, 'id_identificador' => $d->id_identificador, 'visible' => 1]]);
                         $factura = $globals->getTabla(['tabla' => 'factura_pdf', 'where' => ['id_registro_pt' => $id_registro_pt, 'id_identificador' => $d->id_identificador, 'visible' => 1]]);
 
@@ -1592,7 +1593,7 @@ class Inicio extends BaseController
                 $datosGrupal[] = $item;
             }
         }
-
+       // die(   );
         $data['datosGrupal'] = $datosGrupal;
         $data['dsc_director_general'] = (!empty($cat_director_general->data)) ? $cat_director_general->data[0]->dsc_director_general : [];
         $data['cat_area'] = (!empty($cat_area->data)) ? $cat_area->data : [];
