@@ -230,7 +230,12 @@
                                         <!-- Banco -->
                                         <div class="d-flex mb-1 align-items-center">
                                             <span class="label-bold me-2">BANCO:</span>
-                                            <input type="text" id="banco" name="banco" class="flex-grow-1" placeholder="B&B" value="<?= isset($registro_pt->banco) ? $registro_pt->banco : '' ?>">
+                                            <select id="banco" name="banco" class="form-control-plaintext flex-grow-1">
+                                                <option value="">Seleccione un banco</option>
+                                                <?php if(isset($registro_pt->banco)): ?>
+                                                    <option value="<?= $registro_pt->banco ?>" selected><?= $registro_pt->banco ?></option>
+                                                <?php endif; ?>
+                                            </select>
                                         </div>
 
                                         <!-- CLABE -->
@@ -330,7 +335,7 @@
                                          <option value="NO APLICA">NO APLICA</option>
                                     </select>
 
-                                    <input type="text" name="cargo_responsable" class="form-control-plaintext small" value="DIRECTOR/A GENERAL DE INNOVACIÓN E INTELIGENCIA TURÍSTICA">
+                                    <input type="text" name="cargo_responsable_1" class="form-control-plaintext small" value="DIRECTOR/A GENERAL DE INNOVACIÓN E INTELIGENCIA TURÍSTICA">
                                 </td>
                             </tr>
                              <tr>
@@ -452,7 +457,7 @@
       });
 
       $('#nombre_responsable_1').on('change', function() {
-          updateCargo('#nombre_responsable_1', 'cargo_responsable');
+          updateCargo('#nombre_responsable_1', 'cargo_responsable_1');
       });
 
       $('#nombre_responsable_2').on('change', function() {
@@ -486,6 +491,9 @@
           }
       });
       
+      // Global variable to store current provider banks
+      var currentProviderBanks = [];
+
       // AJAX to fetch provider details
       $('#nombre_proveedor_1').on('change', function() {
           var id_proveedor = $(this).val();
@@ -499,20 +507,27 @@
                       if(!response.error) {
                           var proveedor = response.data.proveedor;
                           var bancos = response.data.proveedor_banco;
+                          currentProviderBanks = bancos || []; // Store banks
 
                           $('#no_proveedor').val(proveedor.no_proveedor);
                           $('#rfc_proveedor').val(proveedor.rfc);
                           $('#nombre_proveedor_2').val(proveedor.razon_social);
 
+                          // Populate Bank Dropdown
+                          var $bancoSelect = $('#banco');
+                          $bancoSelect.empty();
+                          $bancoSelect.append('<option value="">Seleccione un banco</option>');
+
                           if(bancos && bancos.length > 0) {
-                              // Take the first bank account found
-                              var banco = bancos[0];
-                              $('#no_cuenta').val(banco.no_cuenta);
-                              $('#banco').val(banco.banco);
-                              $('#clabe').val(banco.clabe);
+                              bancos.forEach(function(banco) {
+                                  $bancoSelect.append(`<option value="${banco.banco}">${banco.banco} - ${banco.no_cuenta}</option>`);
+                              });
+                              
+                              // Automatically select the first one and trigger change
+                              $bancoSelect.val(bancos[0].banco).trigger('change');
                           } else {
+                              // Clear dependent fields if no banks
                               $('#no_cuenta').val('');
-                              $('#banco').val('');
                               $('#clabe').val('');
                           }
                       } else {
@@ -529,8 +544,90 @@
               $('#rfc_proveedor').val('');
               $('#nombre_proveedor_2').val('');
               $('#no_cuenta').val('');
-              $('#banco').val('');
+              $('#banco').empty().append('<option value="">Seleccione un banco</option>');;
               $('#clabe').val('');
+              currentProviderBanks = [];
+          }
+      });
+
+      // Handle Bank Selection Change
+      $('#banco').on('change', function() {
+          var selectedBancoName = $(this).val();
+          if (selectedBancoName && currentProviderBanks.length > 0) {
+              var selectedBank = currentProviderBanks.find(function(b) {
+                  return b.banco === selectedBancoName;
+              });
+
+              if (selectedBank) {
+                  $('#no_cuenta').val(selectedBank.no_cuenta);
+                  $('#clabe').val(selectedBank.clabe);
+              }
+          } else {
+               $('#no_cuenta').val('');
+               $('#clabe').val('');
+          }
+      });
+
+      // XML Amount Extraction
+      $(document).on('change', 'input[accept=".xml"]', function(e) {
+          var file = e.target.files[0];
+          var $input = $(this);
+          
+          if (file) {
+              var reader = new FileReader();
+              reader.onload = function(e) {
+                  try {
+                      var parser = new DOMParser();
+                      var xmlDoc = parser.parseFromString(e.target.result, "text/xml");
+                      
+                      // Try with namespace and without
+                      var comprobante = xmlDoc.getElementsByTagName("cfdi:Comprobante")[0];
+                      if (!comprobante) {
+                          comprobante = xmlDoc.getElementsByTagName("Comprobante")[0];
+                      }
+                      
+                      if (comprobante) {
+                          var total = comprobante.getAttribute('Total');
+                          if (total) {
+                              // Format total
+                              var floatTotal = parseFloat(total);
+                              var formattedTotal = floatTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                              
+                              // Find closest importe input. 
+                              // Structure: td > div > input[file]. Closest td contains input[name="importe[]"]
+                              var $importeInput = $input.closest('td').find('.input-importe');
+                              $importeInput.val(formattedTotal);
+                              
+                              // Trigger calculation
+                              calcularTotal();
+                          }
+
+                          // Extract Folio or UUID
+                          var folio = comprobante.getAttribute('Folio');
+                          if (!folio) {
+                              // Try to find UUID in TimbreFiscalDigital
+                              var timbre = xmlDoc.getElementsByTagName("tfd:TimbreFiscalDigital")[0];
+                              if (!timbre) {
+                                  timbre = xmlDoc.getElementsByTagName("TimbreFiscalDigital")[0];
+                              }
+                              if (timbre) {
+                                  folio = timbre.getAttribute('UUID');
+                              }
+                          }
+
+                          if (folio) {
+                              // Find closest row and then the no_comprobante input
+                              // $input is in the last td of the row. 
+                              var $row = $input.closest('tr');
+                              var $folioInput = $row.find('input[name="no_comprobante[]"]');
+                              $folioInput.val(folio);
+                          }
+                      }
+                  } catch (err) {
+                      console.error("Error parsing XML:", err);
+                  }
+              };
+              reader.readAsText(file);
           }
       });
 
