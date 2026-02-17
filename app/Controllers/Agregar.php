@@ -6097,6 +6097,18 @@ class Agregar extends BaseController
             return $this->respond($response);
         }
            
+        // Concatenate Folio Prefix + Consecutivo
+        // User sends 'folio' (id_area) and 'no_consecutivo' (number part)
+        if(isset($data['folio']) && !empty($data['folio'])){
+            $area = $this->globals->getTabla(['tabla' => 'cat_area', 'where' => ['id_area' => $data['folio']]]);
+            if(!$area->error && !empty($area->data)){
+                $prefijo = $area->data[0]->prefijo;
+                // Combine: "PT 001/2026" format based on user request "concatenar lo que selecionen del folio y los del no_consecutivo"
+                // Assuming space separator.
+                $data['no_consecutivo'] = $prefijo . ' ' . $data['no_consecutivo'];
+            }
+        }
+
         // die( var_dump($data) );
        
         $dataInsert = [

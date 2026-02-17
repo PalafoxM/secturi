@@ -2029,6 +2029,9 @@ class Inicio extends BaseController
         $data['id_reserva'] = 0; // Default or fetch if needed
         $data['no_consecutivo'] = ''; // Logic to generate new consecutive if needed, or leave blank
 
+         $proveedores = $globals->getTabla(["tabla" => "proveedor", "where" => ["visible" => 1],'limit' => 10]);
+        $data['proveedores'] = $proveedores->data;
+
         if ($data['editar'] == 1 && $id) {
             // Fetch main record
             $registro = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["id_formulario_pt" => $id]]);

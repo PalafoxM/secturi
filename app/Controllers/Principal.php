@@ -1885,6 +1885,23 @@ class Principal extends BaseController
         }
         return $this->respond($response);
     }
+
+    public function buscarProveedorSelect2()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $request = \Config\Services::request();
+        
+        $term = $request->getGet('term') ?? ''; // Select2 sends 'term'
+
+
+        $like = ['razon_social' => "%$term%"];
+        $dataDB = array('tabla' => 'proveedor', 'where' => ['visible' => 1], 'orlike' => $like, );
+        $response = $globals->getTabla($dataDB);
+        
+        
+        return $this->respond($response->data);
+    }
     public function listadoProveedores()
     {
         $session = \Config\Services::session();
@@ -6397,6 +6414,18 @@ class Principal extends BaseController
 
         $proveedores = $globals->getTabla(["tabla" => "proveedor", "where" => ["visible" => 1],'limit' => 10]);
         $data['proveedores'] = $proveedores->data;
+
+        $cat_area = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'id_pago' => 1]]);
+        $data['cat_area'] = $cat_area->data;
+        
+        $cat_proyecto = $globals->getTabla(["tabla" => "cat_proyecto", "where" => ["visible" => 1]]);
+        $data['cat_proyecto'] = $cat_proyecto->data;
+
+        $cat_partida = $globals->getTabla(["tabla" => "cat_partida", "where" => ["visible" => 1]]);
+        $data['cat_partida'] = $cat_partida->data;
+
+        $usuarios = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["visible" => 1]]);
+        $data['usuarios'] = $usuarios->data;
 
         if($id_reserva){
              // 1. Obtener Datos Generales (Si existe registro previo)

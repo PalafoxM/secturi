@@ -107,7 +107,13 @@
                                     <input type="date" name="fecha_tramite" class="form-control-plaintext" value="<?= isset($registro_pt->fecha_tramite) ? date('Y-m-d', strtotime($registro_pt->fecha_tramite)) : date('Y-m-d') ?>">
                                 </td>
                                 <td>
-                                    <input type="text" name="no_consecutivo" class="form-control-plaintext" value="<?= isset($registro_pt->no_consecutivo) ? $registro_pt->no_consecutivo : $no_consecutivo ?>" placeholder="PT 001/2026">
+                                    <select id="folio" name="folio" class="folio">
+                                        <?php foreach($cat_area as $area): ?>
+                                            <option value="<?= $area->id_area ?>"><?= $area->prefijo ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <input type="text" name="no_consecutivo" autocomplete="off" class="form-control-plaintext" value="<?= isset($registro_pt->no_consecutivo) ? $registro_pt->no_consecutivo : $no_consecutivo ?>" placeholder="001/2026">
+                                    <spam id="folio_error" class="text-danger"></spam>
                                 </td>
                             </tr>
                         </tbody>
@@ -145,12 +151,20 @@
 
                                 <!-- PROYECTO META -->
                                 <td style="vertical-align: top;">
-                                    <input type="text" name="proyecto_meta[]" class="form-control-plaintext" value="<?= isset($row->proyecto) ? $row->proyecto : '' ?>" placeholder="E027QC32142602">
+                                    <select id="proyecto_meta" name="proyecto_meta[]" class="form-control-plaintext">
+                                        <?php foreach($cat_proyecto as $proyecto): ?>
+                                            <option value="<?= $proyecto->id_proyecto ?>"><?= $proyecto->proyecto ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
                                 </td>
 
                                 <!-- No. PARTIDA -->
                                 <td style="vertical-align: top;">
-                                    <input type="text" name="no_partida[]" class="form-control-plaintext" value="<?= isset($row->partida) ? $row->partida : '' ?>" placeholder="3990">
+                                    <select id="partida" name="no_partida[]" class="form-control-plaintext">
+                                        <?php foreach($cat_partida as $partida): ?>
+                                            <option value="<?= $partida->id_partida ?>"><?= $partida->cuenta_cable ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
                                 </td>
 
                                 <!-- IMPORTE -->
@@ -181,7 +195,7 @@
                                     <div class="provider-section">
                                         <!-- Organization Name -->
                                         <div class="mb-2">
-                                            <select name="nombre_proveedor_1" class="form-control-plaintext select2" placeholder="ORGANIZACION MUNDIAL DEL TURISMO" value="<?= isset($registro_pt->nombre_proveedor_1) ? $registro_pt->nombre_proveedor_1 : '' ?>">
+                                            <select id="nombre_proveedor_1" name="nombre_proveedor_1" class="form-control-plaintext select2" placeholder="ORGANIZACION MUNDIAL DEL TURISMO" value="<?= isset($registro_pt->nombre_proveedor_1) ? $registro_pt->nombre_proveedor_1 : '' ?>">
                                                 <option value="">Seleccione un proveedor</option>
                                                 <?php foreach($proveedores as $proveedor): ?>
                                                     <option value="<?= $proveedor->id_proveedor ?>"><?= $proveedor->razon_social ?></option>
@@ -192,37 +206,37 @@
                                         <!-- No. Proveedor -->
                                         <div class="d-flex mb-1 align-items-center">
                                             <span class="label-bold me-2 align-self-start">No. PROVEEDOR:</span>
-                                            <input type="text" name="no_proveedor" class="flex-grow-1" placeholder="103156" value="<?= isset($registro_pt->no_proveedor) ? $registro_pt->no_proveedor : '' ?>">
+                                            <input type="text" id="no_proveedor" name="no_proveedor" class="flex-grow-1" placeholder="103156" value="<?= isset($registro_pt->no_proveedor) ? $registro_pt->no_proveedor : '' ?>">
                                         </div>
 
                                         <!-- RFC -->
                                         <div class="d-flex mb-1 align-items-center">
                                             <span class="label-bold me-2">RFC:</span>
-                                            <input type="text" name="rfc_proveedor" class="flex-grow-1" placeholder="N0011499A" value="<?= isset($registro_pt->rfc_proveedor) ? $registro_pt->rfc_proveedor : '' ?>">
+                                            <input type="text" id="rfc_proveedor" name="rfc_proveedor" class="flex-grow-1" placeholder="N0011499A" value="<?= isset($registro_pt->rfc_proveedor) ? $registro_pt->rfc_proveedor : '' ?>">
                                         </div>
 
                                         <!-- Nombre Proveedor (Repetido en imagen) -->
                                         <div class="d-flex mb-1 align-items-center">
                                             <span class="label-bold me-2 align-self-start">NOMBRE:</span>
-                                            <input type="text" name="nombre_proveedor_2" class="flex-grow-1" placeholder="ORGANIZACION MUNDIAL DEL TURISMO" value="<?= isset($registro_pt->nombre_proveedor_2) ? $registro_pt->nombre_proveedor_2 : '' ?>">
+                                            <input type="text" id="nombre_proveedor_2" name="nombre_proveedor_2" class="flex-grow-1" placeholder="ORGANIZACION MUNDIAL DEL TURISMO" value="<?= isset($registro_pt->nombre_proveedor_2) ? $registro_pt->nombre_proveedor_2 : '' ?>">
                                         </div>
 
                                         <!-- No. Cuenta -->
                                         <div class="d-flex mb-1 align-items-center">
                                             <span class="label-bold me-2">NO. CUENTA:</span>
-                                            <input type="text" name="no_cuenta" class="flex-grow-1" placeholder="610081057237000168" value="<?= isset($registro_pt->no_cuenta) ? $registro_pt->no_cuenta : '' ?>">
+                                            <input type="text" id="no_cuenta" name="no_cuenta" class="flex-grow-1" placeholder="610081057237000168" value="<?= isset($registro_pt->no_cuenta) ? $registro_pt->no_cuenta : '' ?>">
                                         </div>
 
                                         <!-- Banco -->
                                         <div class="d-flex mb-1 align-items-center">
                                             <span class="label-bold me-2">BANCO:</span>
-                                            <input type="text" name="banco" class="flex-grow-1" placeholder="B&B" value="<?= isset($registro_pt->banco) ? $registro_pt->banco : '' ?>">
+                                            <input type="text" id="banco" name="banco" class="flex-grow-1" placeholder="B&B" value="<?= isset($registro_pt->banco) ? $registro_pt->banco : '' ?>">
                                         </div>
 
                                         <!-- CLABE -->
                                         <div class="d-flex mb-1 align-items-center">
                                             <span class="label-bold me-2">CLABE:</span>
-                                            <input type="text" name="clabe" class="flex-grow-1" placeholder="610081057237000168" value="<?= isset($registro_pt->clabe) ? $registro_pt->clabe : '' ?>">
+                                            <input type="text" id="clabe" name="clabe" class="flex-grow-1" placeholder="610081057237000168" value="<?= isset($registro_pt->clabe) ? $registro_pt->clabe : '' ?>">
                                         </div>
 
                                     </div>
@@ -301,12 +315,6 @@
                                     <input type="text" name="cargo_responsable" class="form-control-plaintext small" value="DIRECTOR/A GENERAL DE INNOVACIÓN E INTELIGENCIA TURÍSTICA">
                                 </td>
                             </tr>
-                            <!-- Second Row for Responsable del Proyecto (Repetido en imagen?) 
-                                 La imagen muestra una celda doble altura o dos filas para Responsable.
-                                 Parece que hay un bloque extra abajo a la derecha. Añadiremos una fila extra solo con esa celda si es necesario, 
-                                 pero la imagen parece mostrar 3 columnas principales y luego una celda abajo a la derecha. 
-                                 Vamos a replicar la estructura de la imagen donde 'RESPONSABLE DEL PROYECTO' tiene un bloque extra abajo.
-                            -->
                              <tr>
                                 <td colspan="2" style="border: none;"></td>
                                 <td class="bg-grey font-weight-bold border">RESPONSABLE DEL PROYECTO</td>
@@ -342,35 +350,140 @@
 <!-- App css -->
 <link href="<?php echo base_url(); ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 <link href="<?php echo base_url(); ?>assets/css/jquery-ui.min.css" rel="stylesheet">
-<link href="<?php echo base_url(); ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
 <link href="<?php echo base_url(); ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
-<link href="<?= base_url()?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+<link href="<?= base_url() ?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+<link href="<?= base_url() ?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
 <!-- jQuery  -->
+ 
 <script src="<?php echo base_url(); ?>assets/js/jquery.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/js/jquery-ui.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/js/bootstrap.bundle.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/js/jquery.slimscroll.min.js"></script>
+
+
 <!-- Required datatable js -->
 <script src="<?php echo base_url(); ?>plugins/datatables/jquery.dataTables.min.js"></script>
 <script src="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.js"></script>
-<script src="<?php echo base_url(); ?>assets/pages/jquery.analytics_customers.init.js"></script>
-
-<script src="<?= base_url()?>plugins/apexcharts/apexcharts.min.js"></script>
 
 <!-- App js -->
-<script src="<?= base_url()?>assets/js/app.js"></script>
+<script src="<?= base_url() ?>assets/js/app.js"></script>
+<script src="<?= base_url() ?>assets/js/waves.js"></script>
+<script src="<?= base_url() ?>assets/js/feather.min.js"></script>
 
+<script src="<?= base_url() ?>plugins/tiny-editable/mindmup-editabletable.js"></script>
+<script src="<?= base_url() ?>plugins/tiny-editable/numeric-input-example.js"></script>
+<script src="<?= base_url() ?>plugins/bootable/bootstable.js"></script> 
+<link href="<?php echo base_url(); ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
 
-<script src="<?= base_url()?>assets/js/metismenu.min.js"></script>
-<script src="<?= base_url()?>assets/js/waves.js"></script>
-```
-<script src="<?= base_url()?>assets/js/feather.min.js"></script>
+<script src="<?= base_url(); ?>plugins/select2/select2.min.js"></script>
 
 
 
 <script>
 
+    // Inject PHP data for Select2
+    var cat_proyecto = <?= json_encode($cat_proyecto) ?>;
+    var cat_partida = <?= json_encode($cat_partida) ?>;
+    
     var globalRowIndex = <?= $totalRows ?>;
+
+      $('#folio,#proyecto_meta,#partida').select2({
+          placeholder: "Selecciona una opción",
+          allowClear: true,
+          width: 'resolve'
+      });
+      $('#nombre_proveedor_1').select2({
+          placeholder: "Busque un proveedor...",
+          allowClear: true,
+          width: 'resolve',
+          minimumInputLength: 3, // Start searching after 3 chars
+          ajax: {
+              url: '<?= base_url() ?>index.php/Principal/buscarProveedorSelect2',
+              dataType: 'json',
+              delay: 250,
+              data: function (params) {
+                  return {
+                      term: params.term // search term
+                  };
+              },
+              processResults: function (data) {
+                  return {
+                      results: $.map(data, function(item) {
+                          return {
+                              id: item.id_proveedor,
+                              text: item.razon_social + ' (' + item.rfc + ')'
+                          }
+                      })
+                  };
+              },
+              cache: true
+          }
+      });
+      
+      // AJAX to fetch provider details
+      $('#nombre_proveedor_1').on('change', function() {
+          var id_proveedor = $(this).val();
+          if(id_proveedor) {
+              $.ajax({
+                  url: '<?= base_url() ?>index.php/Principal/getProveedor',
+                  type: 'POST',
+                  data: { id_proveedor: id_proveedor },
+                  dataType: 'json',
+                  success: function(response) {
+                      if(!response.error) {
+                          var proveedor = response.data.proveedor;
+                          var bancos = response.data.proveedor_banco;
+
+                          $('#no_proveedor').val(proveedor.no_proveedor);
+                          $('#rfc_proveedor').val(proveedor.rfc);
+                          $('#nombre_proveedor_2').val(proveedor.razon_social);
+
+                          if(bancos && bancos.length > 0) {
+                              // Take the first bank account found
+                              var banco = bancos[0];
+                              $('#no_cuenta').val(banco.no_cuenta);
+                              $('#banco').val(banco.banco);
+                              $('#clabe').val(banco.clabe);
+                          } else {
+                              $('#no_cuenta').val('');
+                              $('#banco').val('');
+                              $('#clabe').val('');
+                          }
+                      } else {
+                          console.log(response.respuesta);
+                      }
+                  },
+                  error: function(xhr, status, error) {
+                      console.error("Error fetching provider details:", error);
+                  }
+              });
+          } else {
+              // Clear fields if no provider selected
+              $('#no_proveedor').val('');
+              $('#rfc_proveedor').val('');
+              $('#nombre_proveedor_2').val('');
+              $('#no_cuenta').val('');
+              $('#banco').val('');
+              $('#clabe').val('');
+          }
+      });
+
+      // Concatenate Folio and Consecutivo
+      function updateFolio() {
+          var prefix = $('#folio option:selected').text();
+          var consecutivo = $('input[name="no_consecutivo"]').val();
+          if(prefix && consecutivo) {
+              $('#folio_error').text(prefix + ' ' + consecutivo);
+          } else {
+              $('#folio_error').text('');
+          }
+      }
+
+      $('#folio').on('change', updateFolio);
+      $('input[name="no_consecutivo"]').on('input change', updateFolio);
+      
+      // Initialize validation/concatenation logic
+      updateFolio();
 
     $(document).ready(function() {
 
@@ -385,18 +498,34 @@
 
         // Add Row
         $('#btnAddRow').click(function(){
-            // Create new row
-            // Note: We don't include the Provider cell, just the first 4 columns.
+            globalRowIndex++; // Increment index for next row
+
+            // Build Options for Proyecto
+            var optionsProyecto = '<option value="">Seleccione...</option>';
+            cat_proyecto.forEach(function(item) {
+                optionsProyecto += `<option value="${item.id_proyecto}">${item.proyecto}</option>`;
+            });
+
+            // Build Options for Partida
+            var optionsPartida = '<option value="">Seleccione...</option>';
+            cat_partida.forEach(function(item) {
+                optionsPartida += `<option value="${item.id_partida}">${item.cuenta_cable}</option>`;
+            });
+
             var newRow = `
                 <tr class="item-row">
                      <td style="vertical-align: top;">
                         <input type="text" name="no_comprobante[]" class="form-control-plaintext mb-2" placeholder="3220">
                     </td>
                     <td style="vertical-align: top;">
-                        <input type="text" name="proyecto_meta[]" class="form-control-plaintext" placeholder="E027QC32142602">
+                        <select name="proyecto_meta[]" class="form-control-plaintext select2-dynamic" style="width: 100%;">
+                            ${optionsProyecto}
+                        </select>
                     </td>
                     <td style="vertical-align: top;">
-                        <input type="text" name="no_partida[]" class="form-control-plaintext" placeholder="3990">
+                        <select name="no_partida[]" class="form-control-plaintext select2-dynamic" style="width: 100%;">
+                            ${optionsPartida}
+                        </select>
                     </td>
                     <td style="vertical-align: top;">
                         <input type="text" name="importe[]" class="form-control-plaintext input-importe" placeholder="$0.00">
@@ -416,14 +545,16 @@
                 </tr>
             `;
             
-            globalRowIndex++; // Increment index for next row
+            var $newRow = $(newRow);
+            $('#pagoterceros_items_table tbody').append($newRow);
+            
+            // Initialize Select2 on new elements
+            $newRow.find('.select2-dynamic').select2({
+                placeholder: "Selecciona una opción",
+                allowClear: true,
+                width: 'resolve'
+            });
 
-            
-            // Insert before the LAST row? No, append to tbody. BUT the last row might have the Provider cell rowspan set.
-            // Actually, we just append to tbody. The "Provider" cell is in the *first* tr.
-            // We just need to update its rowspan.
-            
-            $('#pagoterceros_items_table tbody').append(newRow);
             updateRowspan();
         });
 
