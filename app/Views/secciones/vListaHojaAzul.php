@@ -24,7 +24,7 @@
                         <div class="card-body">
                             <div class="table-responsive">
                                 <div id="toolbar">
-                                     <a href="<?= base_url() ?>index.php/Inicio/generarFormatoPT" class="btn btn-primary"><i class="mdi mdi-plus"></i> Nuevo</a>
+                                     <a href="<?= base_url() ?>index.php/Principal/generarFormatoPT" class="btn btn-primary"><i class="mdi mdi-plus"></i> Nuevo</a>
                                 </div>
                                 <table id="datatableUsuario" class="table">
                                     <thead class="thead-light">

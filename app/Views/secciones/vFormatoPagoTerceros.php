@@ -307,7 +307,7 @@
                                     <input type="text" name="cargo_director_general" class="form-control-plaintext small" value="DIRECTOR/A GENERAL ADMINISTRATIVO/A">
                                 </td>
                                 <td class="align-bottom pb-3">
-                                    <select name="autoriza" id="autoriza">
+                                    <select name="nombre_autoriza" id="nombre_autoriza">
                                         <option value="">Seleccione una opción</option>
                                         <?php foreach ($usuarios as $usuario): ?>
                                             <?php if(in_array($usuario->id_usuario, [95, 105])): ?>
@@ -320,15 +320,16 @@
                                     
                                 </td>
                                 <td class="align-bottom pb-3">
-                                    <select name="responsable" id="responsable">
+                                    <select name="nombre_responsable_1" id="nombre_responsable_1">
                                         <option value="">Seleccione una opción</option>
                                         <?php foreach ($usuarios as $usuario): ?>
-                                            <?php if(in_array($usuario->id_usuario, [95, 105])): ?>
+                                            <?php if(in_array($usuario->id_usuario, [152, 40, 105,18, 99, 120 ])): ?>
                                             <option value="<?= $usuario->nombre_completo ?>"><?= $usuario->nombre_completo ?></option>
                                             <?php endif ?>
                                         <?php endforeach; ?>
+                                         <option value="NO APLICA">NO APLICA</option>
                                     </select>
-                                    <input type="text" name="nombre_responsable" class="form-control-plaintext font-weight-bold mb-1" value="MARCO ANTONIO MORALES GARCÍA">
+
                                     <input type="text" name="cargo_responsable" class="form-control-plaintext small" value="DIRECTOR/A GENERAL DE INNOVACIÓN E INTELIGENCIA TURÍSTICA">
                                 </td>
                             </tr>
@@ -339,7 +340,16 @@
                              <tr>
                                 <td colspan="2" style="border: none;"></td>
                                 <td class="align-bottom pb-3 border" style="height: 100px;">
-                                    <input type="text" name="nombre_responsable_2" class="form-control-plaintext font-weight-bold mb-1" value="MARCO ANTONIO MORALES GARCÍA">
+                                     <select name="nombre_responsable_2" id="nombre_responsable_2">
+                                        <option value="">Seleccione una opción</option>
+                                        <?php foreach ($usuarios as $usuario): ?>
+                                         
+                                            <option value="<?= $usuario->nombre_completo ?>"><?= $usuario->nombre_completo ?></option>
+                                        
+                                        <?php endforeach; ?>
+                                         <option value="NO APLICA">NO APLICA</option>
+                                    </select>
+                                  
                                     <input type="text" name="cargo_responsable_2" class="form-control-plaintext small" value="DIRECTOR/A GENERAL DE INNOVACIÓN E INTELIGENCIA TURÍSTICA">
                                 </td>
                             </tr>
@@ -401,13 +411,52 @@
     // Inject PHP data for Select2
     var cat_proyecto = <?= json_encode($cat_proyecto) ?>;
     var cat_partida = <?= json_encode($cat_partida) ?>;
+    var usuarios = <?= json_encode($usuarios) ?>;
     
     var globalRowIndex = <?= $totalRows ?>;
 
-      $('#folio,#proyecto_meta,#partida,#autoriza').select2({
+      $('#folio,#proyecto_meta,#partida,#nombre_autoriza,#nombre_responsable_1,#nombre_responsable_2').select2({
           placeholder: "Selecciona una opción",
           allowClear: true,
           width: 'resolve'
+      });
+
+      // Function to update cargo based on selected user
+      function updateCargo(selectId, inputName) {
+          var selectedName = $(selectId).val();
+          var cargoInput = $('input[name="' + inputName + '"]');
+          
+          if (selectedName && selectedName !== "NO APLICA") {
+              var user = usuarios.find(function(u) {
+                  return u.nombre_completo === selectedName;
+              });
+              
+              if (user) {
+                  cargoInput.val(user.dsc_puesto);
+              } else {
+                  // Keep existing or clear? User might type something else if Select2 allows tagging (it doesn't here mostly).
+                  // If not found in list (e.g. initial load might have text not in list?), leave it.
+                  // But here we are selecting FROM list.
+                  cargoInput.val(''); 
+              }
+          } else if (selectedName === "NO APLICA") {
+               cargoInput.val("NO APLICA");
+          } else {
+              cargoInput.val('');
+          }
+      }
+
+      // Listeners for Job Title Updates
+      $('#nombre_autoriza').on('change', function() {
+          updateCargo('#nombre_autoriza', 'cargo_autoriza');
+      });
+
+      $('#nombre_responsable_1').on('change', function() {
+          updateCargo('#nombre_responsable_1', 'cargo_responsable');
+      });
+
+      $('#nombre_responsable_2').on('change', function() {
+          updateCargo('#nombre_responsable_2', 'cargo_responsable_2');
       });
       $('#nombre_proveedor_1').select2({
           placeholder: "Busque un proveedor...",
@@ -520,13 +569,13 @@
             // Build Options for Proyecto
             var optionsProyecto = '<option value="">Seleccione...</option>';
             cat_proyecto.forEach(function(item) {
-                optionsProyecto += `<option value="${item.id_proyecto}">${item.proyecto}</option>`;
+                optionsProyecto += `<option value="${item.proyecto}">${item.proyecto}</option>`;
             });
 
             // Build Options for Partida
             var optionsPartida = '<option value="">Seleccione...</option>';
             cat_partida.forEach(function(item) {
-                optionsPartida += `<option value="${item.id_partida}">${item.cuenta_cable}</option>`;
+                optionsPartida += `<option value="${item.cuenta_cable}">${item.cuenta_cable}</option>`;
             });
 
             var newRow = `
