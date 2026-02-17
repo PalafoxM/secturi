@@ -23,75 +23,70 @@
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="alert alert-info text-center font-weight-bold">
-                                                Folio preliminar: <?= $folio_preliminar ?>
+                                                Folio preliminar: <?= $idConvenio ?>
                                             </div>
 
-                                            <input type="hidden" name="id_inve" value="<?= isset($id_inve) ? $id_inve : '' ?>">
-
-
+                                        
                                             <form id="formConvenio" method="post" enctype="multipart/form-data">
+                                            <input type="hidden" name="idConvenio" value="<?= isset($idConvenio) ? $idConvenio : '' ?>">
+                                            <input type="hidden" name="idArticulo" value="<?= isset($idArticulo) ? $idArticulo : '' ?>">
+                                            <input type="hidden" name="idSalida" value="<?= isset($idSalida) ? $idSalida : '' ?>">
+
 
                                                 <!-- ===================== DATOS ADMINISTRATIVOS ===================== -->
 
                                                 <div class="form-row">
-                                                    <div class="col-md-4 mb-3">
-                                                        <label>Denominación del puesto <span style="color:red;">*</span></label>
-                                                        <select class="form-control select2" name="denominacion_puesto" required>
-                                                            <option value="">Seleccione...</option>
-                                                         
-                                                        </select>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label>Cantidad <span style="color:red;">*</span></label>
+                                                         <input class="form-control" type="number" name="cantidad" value="<?= isset($registro) ? $registro->cantidad : '' ?>" required>
                                                     </div>
 
+                                                
+
+                                                   
+                                                    <div class="col-md-6 mb-3">
+                                                        <label>Lugar de entrega <span style="color:red;">*</span></label>
+                                                        <input class="form-control" type="text" name="lugar_entrega" value="<?= isset($registro) ? $registro->lugar : '' ?>" required>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-row">
                                                     <div class="col-md-4 mb-3">
-                                                        <label>Denominación del cargo <span style="color:red;">*</span></label>
-                                                        <select class="form-control select2" name="denominacion_cargo" required>
-                                                            <option value="">Seleccione...</option>
-                                                         
-                                                        </select>
+                                                        <label>Puesto</label>
+                                                        <input class="form-control" type="text" name="puesto" value="<?= isset($registro) ? $registro->puesto : '' ?>" >
+                                                    </div>
+                                                    <div class="col-md-8 mb-3">
+                                                        <label>Nombre completo del solicitante <span style="color:red;">*</span></label>
+                                                        <input class="form-control" type="text" name="nombre_solicitante" value="<?= isset($registro) ? $registro->nombre_solicitante : '' ?>" required>
                                                     </div>
 
-                                                    <div class="col-md-4 mb-3">
-                                                        <label>Área de adscripción <span style="color:red;">*</span></label>
-                                                        <select class="form-control" name="area_adscripcion" required>
-                                                         
-                                                        </select>
-                                                    </div>
                                                 </div>
 
                                                 <!-- ===================== RESPONSABLE ===================== -->
 
-                                                <div class="form-row">
-                                                    <div class="col-md-6 mb-3">
-                                                        <label>Nombre completo del solicitante <span style="color:red;">*</span></label>
-                                                        <select class="form-control select2" name="id_usuario" required>
-                                                         
-                                                        </select>
-                                                    </div>
-
-                                                    <div class="col-md-6 mb-3">
-                                                        <label>Fecha del evento <span style="color:red;">*</span></label>
-                                                        <input type="date" class="form-control" name="fec_eve" required>
-                                                    </div>
-                                                </div>
 
                                                 <!-- ===================== DATOS DEL SOLICITANTE ===================== -->
 
                                                 <div class="form-row">
-                                                    <div class="col-md-3 mb-3">
+                                                    <div class="col-md-4 mb-3">
                                                         <label>Teléfono <span style="color:red;">*</span></label>
-                                                        <input type="text" class="form-control" name="telefono" required>
+                                                        <input type="text" class="form-control" name="telefono" value="<?= isset($registro) ? $registro->telefono : '' ?>" required>
                                                     </div>
 
-                                                    <div class="col-md-3 mb-3">
+                                                    <div class="col-md-4 mb-3">
                                                         <label>Correo <span style="color:red;">*</span></label>
-                                                        <input type="email" class="form-control" name="correo" required>
+                                                        <input type="email" class="form-control" name="correo" value="<?= isset($registro) ? $registro->correo : '' ?>" required>
+                                                    </div>
+                                                     <div class="col-md-4 mb-3">
+                                                        <label>Fecha del evento <span style="color:red;">*</span></label>
+                                                        <input type="date" class="form-control" name="fec_eve" value="<?= isset($registro) && $registro->fec_eve ? date('Y-m-d', strtotime($registro->fec_eve)) : '' ?>" required>
                                                     </div>
                                                 </div>
 
                                                 <div class="form-row">
                                                     <div class="col-md-12 mb-3">
                                                         <label>Concepto <span style="color:red;">*</span></label>
-                                                        <input type="text" class="form-control" name="concepto" required>
+                                                        <input type="text" class="form-control" name="concepto" value="<?= isset($registro) ? $registro->concepto : '' ?>" required>
                                                     </div>
                                                 </div>
 
@@ -216,6 +211,7 @@ $(document).ready(function () {
 
         const formData = new FormData($('#formConvenio')[0]);
         const $btn = $(this);
+        const idConvenio = $('#idConvenio').val();
 
         $.ajax({
             url: '<?= base_url("index.php/Inicio/guardarConvenio") ?>',
@@ -241,7 +237,7 @@ $(document).ready(function () {
                             window.open(res.pdf_url, '_blank');
                         }
 
-                        window.location.href = '<?= base_url("index.php/Inicio/vInventarioPromocion") ?>';
+                        window.location.href = '<?= base_url("index.php/Inicio/ListaSalidasPromo/") ?>' + '/' + $('input[name="idArticulo"]').val(); 
                     });
 
                 } else {

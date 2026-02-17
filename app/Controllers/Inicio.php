@@ -364,16 +364,138 @@ class Inicio extends BaseController
         $data['contentView'] = 'personal/vListaConvenio';
         $this->_renderView($data);
     }
-    public function FormularioPromo($id = null, $idFila = null)
+    public function FormularioPromo($id = null, $idFila = null, $idSalida = null)
     {
         $globas = new Mglobal;
 
-     
-       
-        $data['folio_preliminar'] = $id;
+        $data['idConvenio'] = $id;
+        $data['idArticulo'] = $idFila;
+        $data['idSalida'] = $idSalida;
+        
+        if($idSalida){
+            $registro = $globas->getTabla(['tabla' => 'salida_inventario', 'where' => ['id_salida_inventario' => $idSalida]]);
+            $data['registro'] = $registro->data[0] ?? null;
+        }
+
         $data['scripts'] = array('principal', 'inicio');
         $data['contentView'] = 'personal/vFormularioPromo';
         $this->_renderView($data);
+    }
+
+    public function guardarConvenio()
+    {
+        $globas = new Mglobal;
+        $session = \Config\Services::session();
+        $idConvenio = $this->request->getPost('idConvenio');
+        $idArticulo = $this->request->getPost('idArticulo');
+        $idSalida   = $this->request->getPost('idSalida');
+        $data =  $this->request->getPost();
+
+        
+        $dataCommon = [
+            'id_convenio' => $idConvenio,
+            'id_articulo' => $idArticulo,
+            'cantidad' => $data['cantidad'],
+            'lugar' => $data['lugar_entrega'],
+            'puesto' => $data['puesto'],
+            'nombre_solicitante' => $data['nombre_solicitante'],
+            'telefono' => $data['telefono'],
+            'correo' => $data['correo'] ?? null,
+            'fec_eve' => $data['fec_eve'],
+            'concepto' => $data['concepto'],
+        ];
+
+        if(!empty($idSalida)){
+            // Editar
+            $dataUpdate = $dataCommon;
+            $dataUpdate['usu_act'] = $session->get('id_usuario');
+            $dataUpdate['fec_act'] = date('Y-m-d H:i:s');
+            
+            $dataConfig = [
+                'tabla' => 'salida_inventario',
+                'editar' =>true,
+                'idEditar' => ['id_salida_inventario' => $idSalida]
+            ];
+            $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFormatoPT_Upd'];
+            
+            $result = $globas->saveTabla($dataUpdate, $dataConfig, $dataBitacora);
+
+        } else {
+            // Insertar
+            $dataInsert = $dataCommon;
+            $dataInsert['usu_reg'] = $session->get('id_usuario');
+            $dataInsert['fec_reg'] = date('Y-m-d H:i:s');
+          
+            $dataConfig = [
+                'tabla' => 'salida_inventario',
+                'editar' =>false
+            ];
+            $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFormatoPT_Upd'];
+            
+            $result = $globas->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+        }
+
+        if ($result && !isset($result->error)) { // saveTabla standard return check
+             // Si saveTabla regresa el objeto con error=true/false
+             // Ajustar segun implementacion Mglobal. Asumimos retorno estandar.
+             // Pero usando logic anterior:
+             return $this->response->setJSON(['success' => true]);
+        } elseif(isset($result->error) && $result->error == false){
+             return $this->response->setJSON(['success' => true]);
+        } else {
+            return $this->response->setJSON(['success' => false]);
+        }
+    }
+
+    public function ListaSalidasPromo($idArticulo = null)
+    {
+        $globas = new Mglobal;
+        $session = \Config\Services::session();
+
+         // Datos Articulo
+         $articulo = $globas->getTabla(['tabla' => 'cat_inventario_promo', 'where' => ['id_inventario_promo' => $idArticulo]])->data[0] ?? null;
+         $data['articulo'] = $articulo;
+         $data['idArticulo'] = $idArticulo;
+        
+         // Depende de la logica, tal vez necesitemos el id_convenio del articulo para links
+         // $data['idConvenio'] = ... (buscarlo o pasarlo?)
+         // Lo sacamos del articulo si tiene relacion o del historial. 
+         // En vInventarioPromocion se usaba $materiales->convenio. 
+         // Pero aqui solo tenemos idArticulo. 
+         
+         // Lista Salidas
+         $salidas = $globas->getTabla([
+             'tabla' => 'salida_inventario', 
+             'where' => ['id_articulo' => $idArticulo, 'visible' => 1]
+         ])->data;
+         $data['salidas'] = $salidas;
+
+        $data['scripts'] = array('principal', 'inicio');
+        $data['contentView'] = 'personal/vListaSalidasPromo';
+        $this->_renderView($data);
+    }
+
+    public function eliminarSalida()
+    {
+        $globas = new Mglobal;
+        $session = \Config\Services::session();
+        $id = $this->request->getPost('id');
+
+        $dataUpdate = [
+            'visible' => 0,
+            'usu_act' => $session->get('id_usuario'),
+            'fec_act' => date('Y-m-d H:i:s')
+        ];
+        
+        $dataConfig = [
+            'tabla' => 'salida_inventario',
+            'editar' => true,
+            'idEditar' => ['id_salida_inventario' => $id]
+        ];
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Inicio.php/eliminarSalida'];
+
+        $result = $globas->saveTabla($dataUpdate, $dataConfig, $dataBitacora);
+        return $this->response->setJSON($result);
     }
     public function InventarioPromocion($id = null)
     {
@@ -430,6 +552,7 @@ class Inicio extends BaseController
         }
 
         // 4. Otros datos
+        $data['id_convenio'] = $id;
         $data['total_movimientos'] = 0;
         $data['scripts'] = ['principal', 'inicio'];
         $data['contentView'] = 'personal/vInventarioPromocion';

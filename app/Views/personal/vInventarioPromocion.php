@@ -5,7 +5,7 @@
 
             <!-- ===================== tittle ===================== -->
             <div class="row mt-4">
-                <div class="col-lg-9">
+                <div class="col-lg-12">
                     <div class="row">
                         <!-- Card 1: Total Unidades -->
                         <div class="col-lg-4">
@@ -65,34 +65,23 @@
                         </div>
                     </div>
                 </div>
-                                
-                <div class="col-lg-3">                            
-                    <div class="card shadow-sm border-0 h-100 card-metric">
-                        <div class="card-body d-flex flex-column justify-content-center text-center">
-                            <div class="text-center">
-                                <button class="btn btn-primary px-4 btn-movimiento shadow-sm"
-                                    data-id=""
-                                    data-tabla=""
-                                    data-nombre=""
-                                    data-stock=""
-                                    data-tipo="nuevo">
-                                    <i class="mdi mdi-plus-box mr-2"></i> Nuevo producto
-                                </button>                            
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>     
             
-            <div class="row">
-                <div class="card-body">
-                    <div class="tab-content pt-2">
-                        <!-- ===== Promocion ==== -->
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <div class="card shadow-sm border-0 h-100">
-                                    <div class="card-body">
-                                        <h4 class="header-title mt-0 mb-4 text-dark border-bottom pb-2">Inventario Promoción <strong id="nombre_material"><?= $materiales->convenio . " - ". $materiales->razon_social ?></strong></h4>
+            <div class="row mt-4">
+                <div class="col-lg-12">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-4">
+                                        <h4 class="header-title mt-0 mb-0 text-dark">Inventario Promoción <strong id="nombre_material"><?= $materiales->convenio . " - ". $materiales->razon_social ?></strong></h4>
+                                        <button class="btn btn-primary px-4 btn-movimiento shadow-sm"
+                                            data-id=""
+                                            data-tabla=""
+                                            data-nombre=""
+                                            data-stock=""
+                                            data-tipo="nuevo">
+                                            <i class="mdi mdi-plus-box mr-2"></i> Nuevo producto
+                                        </button>
+                                    </div>
                                         <div class="table-responsive dash-social">
                                              <table id="tablaConvenios" class="table table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">   
                                                 <thead class="thead-light">
@@ -229,7 +218,7 @@
                                                                 <!-- Link a formulario -->
                                                                 <td class="text-center font-weight-bold text-dark">
                                                                     <div class="d-flex justify-content-center">
-                                                                        <a href="<?= base_url('index.php/Inicio/FormularioPromo/' . $item->id_inventario_promo) ?>"
+                                                                        <a href="<?= base_url('index.php/Inicio/FormularioPromo/'. $id_convenio. "/" . $item->id_inventario_promo) ?>"
                                                                             class="btn btn-outline-secondary btn-sm"
                                                                             title="Formulario de requisición">
                                                                             📁 Form.
@@ -241,7 +230,7 @@
                                                                 <td class="text-center text-nowrap">
                                                                     <div class="d-flex justify-content-center">
                                                                         
-                                                                        <a href="<?= base_url('vComplementosPromo?id=' . $item->id_inventario_promo) ?>"
+                                                                        <a href="<?= base_url('index.php/Inicio/ListaSalidasPromo/' . $item->id_inventario_promo) ?>"
                                                                             class="btn btn-sm btn-outline-warning btn-sm"
                                                                             title="Complementos del contrato">
                                                                             🌎 Compl. <!-- lleva a INE, oficio, evidencias -->
@@ -373,6 +362,7 @@
                                     </form>
                                 </div>
                             </div>
+                        </div>
                         </div>
                     </div> 
                 </div> 
