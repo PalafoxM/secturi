@@ -153,7 +153,7 @@
                                 <td style="vertical-align: top;">
                                     <select id="proyecto_meta" name="proyecto_meta[]" class="form-control-plaintext">
                                         <?php foreach($cat_proyecto as $proyecto): ?>
-                                            <option value="<?= $proyecto->id_proyecto ?>"><?= $proyecto->proyecto ?></option>
+                                            <option value="<?= $proyecto->proyecto ?>"><?= $proyecto->proyecto ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                 </td>
@@ -162,7 +162,7 @@
                                 <td style="vertical-align: top;">
                                     <select id="partida" name="no_partida[]" class="form-control-plaintext">
                                         <?php foreach($cat_partida as $partida): ?>
-                                            <option value="<?= $partida->id_partida ?>"><?= $partida->cuenta_cable ?></option>
+                                            <option value="<?= $partida->cuenta_cable ?>"><?= $partida->cuenta_cable ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                 </td>
@@ -198,7 +198,7 @@
                                             <select id="nombre_proveedor_1" name="nombre_proveedor_1" class="form-control-plaintext select2" placeholder="ORGANIZACION MUNDIAL DEL TURISMO" value="<?= isset($registro_pt->nombre_proveedor_1) ? $registro_pt->nombre_proveedor_1 : '' ?>">
                                                 <option value="">Seleccione un proveedor</option>
                                                 <?php foreach($proveedores as $proveedor): ?>
-                                                    <option value="<?= $proveedor->id_proveedor ?>"><?= $proveedor->razon_social ?></option>
+                                                    <option value="<?= $proveedor->razon_social ?>"><?= $proveedor->razon_social ?></option>
                                                 <?php endforeach; ?>
                                             </select>
                                         </div>
@@ -307,10 +307,27 @@
                                     <input type="text" name="cargo_director_general" class="form-control-plaintext small" value="DIRECTOR/A GENERAL ADMINISTRATIVO/A">
                                 </td>
                                 <td class="align-bottom pb-3">
-                                    <input type="text" name="nombre_autoriza" class="form-control-plaintext font-weight-bold mb-1" value="JAVIER PACHECO CANO">
-                                    <input type="text" name="cargo_autoriza" class="form-control-plaintext small" value="DIRECTOR/A GENERAL JURÍDICO">
+                                    <select name="autoriza" id="autoriza">
+                                        <option value="">Seleccione una opción</option>
+                                        <?php foreach ($usuarios as $usuario): ?>
+                                            <?php if(in_array($usuario->id_usuario, [95, 105])): ?>
+                                            <option value="<?= $usuario->nombre_completo ?>"><?= $usuario->nombre_completo ?></option>
+                                            <?php endif ?>
+                                        <?php endforeach; ?>
+                                    </select>
+                                   
+                                    <input type="text" name="cargo_autoriza" class="form-control-plaintext small" value="<?= $usuario->dsc_puesto ?>">
+                                    
                                 </td>
                                 <td class="align-bottom pb-3">
+                                    <select name="responsable" id="responsable">
+                                        <option value="">Seleccione una opción</option>
+                                        <?php foreach ($usuarios as $usuario): ?>
+                                            <?php if(in_array($usuario->id_usuario, [95, 105])): ?>
+                                            <option value="<?= $usuario->nombre_completo ?>"><?= $usuario->nombre_completo ?></option>
+                                            <?php endif ?>
+                                        <?php endforeach; ?>
+                                    </select>
                                     <input type="text" name="nombre_responsable" class="form-control-plaintext font-weight-bold mb-1" value="MARCO ANTONIO MORALES GARCÍA">
                                     <input type="text" name="cargo_responsable" class="form-control-plaintext small" value="DIRECTOR/A GENERAL DE INNOVACIÓN E INTELIGENCIA TURÍSTICA">
                                 </td>
@@ -387,7 +404,7 @@
     
     var globalRowIndex = <?= $totalRows ?>;
 
-      $('#folio,#proyecto_meta,#partida').select2({
+      $('#folio,#proyecto_meta,#partida,#autoriza').select2({
           placeholder: "Selecciona una opción",
           allowClear: true,
           width: 'resolve'

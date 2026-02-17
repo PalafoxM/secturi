@@ -834,7 +834,11 @@ class Inicio extends BaseController
         $session = \Config\Services::session();
         $globas = new Mglobal;
         $vista = 'personal/vInicio';
-        $data['datos'] = $globas->getTabla(['tabla' => 'vw_solicitud_grc', 'where' => ['visible' => 1]])->data;
+        if(in_array($session->get('id_perfil'), [1,2])){
+            $data['datos'] = $globas->getTabla(['tabla' => 'vw_solicitud_grc', 'where' => ['visible' => 1]])->data;
+        }else{
+            $data['datos'] = $globas->getTabla(['tabla' => 'vw_solicitud_grc', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]])->data;
+        }
         $data['scripts'] = array('principal', 'inicio');
         $data['edita'] = 0;
         $data['contentView'] = 'personal/vListaSolicitudes';
