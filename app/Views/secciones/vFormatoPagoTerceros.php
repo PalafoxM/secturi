@@ -156,6 +156,18 @@
                                 <!-- IMPORTE -->
                                 <td style="vertical-align: top;">
                                     <input type="text" name="importe[]" class="form-control-plaintext input-importe" value="<?= isset($row->importe) ? $row->importe : '' ?>" placeholder="$0.00">
+                                    
+                                    <!-- File Inputs -->
+                                    <div class="mt-2 text-left">
+                                        <label class="small text-muted mb-0">PDF:</label>
+                                        <input type="file" name="pdf_pt_<?= $index ?>[]" class="form-control-sm border-0 mb-1" accept=".pdf" style="width: 100%;">
+                                        
+                                        <label class="small text-muted mb-0">XML:</label>
+                                        <input type="file" name="xml_pt_<?= $index ?>[]" class="form-control-sm border-0" accept=".xml" style="width: 100%;">
+                                        
+                                        <input type="hidden" name="row_index[]" value="<?= $index ?>">
+                                    </div>
+
                                     <?php if($index > 0): // Botón eliminar para filas extra ?>
                                         <button type="button" class="btn btn-sm btn-danger mt-1 btn-remove-row" style="padding: 0px 5px;">&times;</button>
                                     <?php endif; ?>
@@ -169,7 +181,12 @@
                                     <div class="provider-section">
                                         <!-- Organization Name -->
                                         <div class="mb-2">
-                                            <input type="text" name="nombre_proveedor_1" class="form-control-plaintext" placeholder="ORGANIZACION MUNDIAL DEL TURISMO" value="<?= isset($registro_pt->nombre_proveedor_1) ? $registro_pt->nombre_proveedor_1 : '' ?>">
+                                            <select name="nombre_proveedor_1" class="form-control-plaintext select2" placeholder="ORGANIZACION MUNDIAL DEL TURISMO" value="<?= isset($registro_pt->nombre_proveedor_1) ? $registro_pt->nombre_proveedor_1 : '' ?>">
+                                                <option value="">Seleccione un proveedor</option>
+                                                <?php foreach($proveedores as $proveedor): ?>
+                                                    <option value="<?= $proveedor->id_proveedor ?>"><?= $proveedor->razon_social ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
                                         </div>
 
                                         <!-- No. Proveedor -->
@@ -353,7 +370,10 @@
 
 <script>
 
+    var globalRowIndex = <?= $totalRows ?>;
+
     $(document).ready(function() {
+
         // Importe formatting
         $(document).on('blur', '.input-importe', function() {
             let val = $(this).val().replace(/[^0-9.]/g, ''); 
@@ -380,10 +400,24 @@
                     </td>
                     <td style="vertical-align: top;">
                         <input type="text" name="importe[]" class="form-control-plaintext input-importe" placeholder="$0.00">
+                        
+                        <div class="mt-2 text-left">
+                            <label class="small text-muted mb-0">PDF:</label>
+                            <input type="file" name="pdf_pt_${globalRowIndex}[]" class="form-control-sm border-0 mb-1" accept=".pdf" style="width: 100%;">
+                            
+                            <label class="small text-muted mb-0">XML:</label>
+                            <input type="file" name="xml_pt_${globalRowIndex}[]" class="form-control-sm border-0" accept=".xml" style="width: 100%;">
+                            
+                            <input type="hidden" name="row_index[]" value="${globalRowIndex}">
+                        </div>
+
                         <button type="button" class="btn btn-sm btn-danger mt-1 btn-remove-row" style="padding: 0px 5px;">&times;</button>
                     </td>
                 </tr>
             `;
+            
+            globalRowIndex++; // Increment index for next row
+
             
             // Insert before the LAST row? No, append to tbody. BUT the last row might have the Provider cell rowspan set.
             // Actually, we just append to tbody. The "Provider" cell is in the *first* tr.

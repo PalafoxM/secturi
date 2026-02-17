@@ -6162,6 +6162,68 @@ class Agregar extends BaseController
             for($i=0; $i < count($data['no_comprobante']); $i++){
                  // Skip empty rows if necessary, or just save empty strings as user entered 
                 
+                $pdfPath = null;
+                $xmlPath = null;
+                
+                // Handle File Uploads (PDF/XML)
+                if(isset($data['row_index'][$i])){
+                    $rIdx = $data['row_index'][$i];
+                    
+                    // 1. Process PDF
+                    $inputNamePdf = 'pdf_pt_' . $rIdx;
+                    if(isset($_FILES[$inputNamePdf])){
+                        $files = $_FILES[$inputNamePdf];
+                        // With multiple, it is $_FILES['inputName']['name'][0]... but we expect single file per type per row usually, 
+                        // but input name is array [] so it comes as array. We take the first one or loop.
+                        // Given input name="pdf_pt_X[]", $_FILES['pdf_pt_X']['name'][0] is the file.
+                        
+                        $countFiles = count($files['name']);
+                        for($f=0; $f < $countFiles; $f++){
+                            if($files['error'][$f] == 0){
+                                $tmpName = $files['tmp_name'][$f];
+                                $name = $files['name'][$f];
+                                $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+                                
+                                if($ext == 'pdf'){
+                                    $newName = 'PT_' . $id_registro_pt . '_ROW_' . $rIdx . '_' . uniqid() . '.pdf';
+                                    $destDir = FCPATH . 'assets/pdf/';
+                                    if (!is_dir($destDir)) mkdir($destDir, 0755, true);
+                                    
+                                    $dest = $destDir . $newName;
+                                    if(move_uploaded_file($tmpName, $dest)){
+                                        $pdfPath = 'assets/pdf/' . $newName;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // 2. Process XML
+                    $inputNameXml = 'xml_pt_' . $rIdx;
+                    if(isset($_FILES[$inputNameXml])){
+                        $files = $_FILES[$inputNameXml];
+                         $countFiles = count($files['name']);
+                        for($f=0; $f < $countFiles; $f++){
+                            if($files['error'][$f] == 0){
+                                $tmpName = $files['tmp_name'][$f];
+                                $name = $files['name'][$f];
+                                $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+                                
+                                if($ext == 'xml'){
+                                    $newName = 'PT_' . $id_registro_pt . '_ROW_' . $rIdx . '_' . uniqid() . '.xml';
+                                    $destDir = FCPATH . 'assets/pdf/'; // Keeping same dir as before
+                                    if (!is_dir($destDir)) mkdir($destDir, 0755, true);
+                                    
+                                    $dest = $destDir . $newName;
+                                    if(move_uploaded_file($tmpName, $dest)){
+                                        $xmlPath = 'assets/pdf/' . $newName;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
                 $dataFila = [
                       'id_registro_pt' => $id_registro_pt,
                       //'id_presupuesto' => 0, 
@@ -6172,6 +6234,9 @@ class Agregar extends BaseController
                       'usu_reg' => $session->get('id_usuario'),
                       'fec_reg' => date('Y-m-d H:i:s')
                 ];
+                
+                if($pdfPath) $dataFila['pdf'] = $pdfPath;
+                if($xmlPath) $dataFila['xml'] = $xmlPath;
               $response =  $this->globals->saveTabla($dataFila, ["tabla" => "manual_factura", "editar" => false], []);
             }
         }

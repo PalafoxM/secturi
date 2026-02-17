@@ -6395,6 +6395,9 @@ class Principal extends BaseController
         $data['periodo_factura']->partida_clave = '';
         $data['periodo_factura']->importe = '';
 
+        $proveedores = $globals->getTabla(["tabla" => "proveedor", "where" => ["visible" => 1],'limit' => 10]);
+        $data['proveedores'] = $proveedores->data;
+
         if($id_reserva){
              // 1. Obtener Datos Generales (Si existe registro previo)
              if($edita == 1){
