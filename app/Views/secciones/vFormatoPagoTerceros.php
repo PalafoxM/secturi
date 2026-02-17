@@ -568,68 +568,7 @@
           }
       });
 
-      // XML Amount Extraction
-      $(document).on('change', 'input[accept=".xml"]', function(e) {
-          var file = e.target.files[0];
-          var $input = $(this);
-          
-          if (file) {
-              var reader = new FileReader();
-              reader.onload = function(e) {
-                  try {
-                      var parser = new DOMParser();
-                      var xmlDoc = parser.parseFromString(e.target.result, "text/xml");
-                      
-                      // Try with namespace and without
-                      var comprobante = xmlDoc.getElementsByTagName("cfdi:Comprobante")[0];
-                      if (!comprobante) {
-                          comprobante = xmlDoc.getElementsByTagName("Comprobante")[0];
-                      }
-                      
-                      if (comprobante) {
-                          var total = comprobante.getAttribute('Total');
-                          if (total) {
-                              // Format total
-                              var floatTotal = parseFloat(total);
-                              var formattedTotal = floatTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                              
-                              // Find closest importe input. 
-                              // Structure: td > div > input[file]. Closest td contains input[name="importe[]"]
-                              var $importeInput = $input.closest('td').find('.input-importe');
-                              $importeInput.val(formattedTotal);
-                              
-                              // Trigger calculation
-                              calcularTotal();
-                          }
 
-                          // Extract Folio or UUID
-                          var folio = comprobante.getAttribute('Folio');
-                          if (!folio) {
-                              // Try to find UUID in TimbreFiscalDigital
-                              var timbre = xmlDoc.getElementsByTagName("tfd:TimbreFiscalDigital")[0];
-                              if (!timbre) {
-                                  timbre = xmlDoc.getElementsByTagName("TimbreFiscalDigital")[0];
-                              }
-                              if (timbre) {
-                                  folio = timbre.getAttribute('UUID');
-                              }
-                          }
-
-                          if (folio) {
-                              // Find closest row and then the no_comprobante input
-                              // $input is in the last td of the row. 
-                              var $row = $input.closest('tr');
-                              var $folioInput = $row.find('input[name="no_comprobante[]"]');
-                              $folioInput.val(folio);
-                          }
-                      }
-                  } catch (err) {
-                      console.error("Error parsing XML:", err);
-                  }
-              };
-              reader.readAsText(file);
-          }
-      });
 
       // Concatenate Folio and Consecutivo
       function updateFolio() {
@@ -728,6 +667,69 @@
             updateRowspan();
             calcularTotal();
         });
+
+      // XML Amount Extraction
+      $(document).on('change', 'input[accept=".xml"]', function(e) {
+          var file = e.target.files[0];
+          var $input = $(this);
+          
+          if (file) {
+              var reader = new FileReader();
+              reader.onload = function(e) {
+                  try {
+                      var parser = new DOMParser();
+                      var xmlDoc = parser.parseFromString(e.target.result, "text/xml");
+                      
+                      // Try with namespace and without
+                      var comprobante = xmlDoc.getElementsByTagName("cfdi:Comprobante")[0];
+                      if (!comprobante) {
+                          comprobante = xmlDoc.getElementsByTagName("Comprobante")[0];
+                      }
+                      
+                      if (comprobante) {
+                          var total = comprobante.getAttribute('Total');
+                          if (total) {
+                              // Format total
+                              var floatTotal = parseFloat(total);
+                              var formattedTotal = floatTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                              
+                              // Find closest importe input. 
+                              // Structure: td > div > input[file]. Closest td contains input[name="importe[]"]
+                              var $importeInput = $input.closest('td').find('.input-importe');
+                              $importeInput.val(formattedTotal);
+                              
+                              // Trigger calculation
+                              calcularTotal();
+                          }
+
+                          // Extract Folio or UUID
+                          var folio = comprobante.getAttribute('Folio');
+                          if (!folio) {
+                              // Try to find UUID in TimbreFiscalDigital
+                              var timbre = xmlDoc.getElementsByTagName("tfd:TimbreFiscalDigital")[0];
+                              if (!timbre) {
+                                  timbre = xmlDoc.getElementsByTagName("TimbreFiscalDigital")[0];
+                              }
+                              if (timbre) {
+                                  folio = timbre.getAttribute('UUID');
+                              }
+                          }
+
+                          if (folio) {
+                              // Find closest row and then the no_comprobante input
+                              // $input is in the last td of the row. 
+                              var $row = $input.closest('tr');
+                              var $folioInput = $row.find('input[name="no_comprobante[]"]');
+                              $folioInput.val(folio);
+                          }
+                      }
+                  } catch (err) {
+                      console.error("Error parsing XML:", err);
+                  }
+              };
+              reader.readAsText(file);
+          }
+      });
 
         function updateRowspan(){
             var rowCount = $('#pagoterceros_items_table tbody tr.item-row').length;
