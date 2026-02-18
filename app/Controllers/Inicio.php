@@ -1974,6 +1974,8 @@ class Inicio extends BaseController
             $registro = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["id_formulario_pt" => $id]]);
         
             if (!empty($registro->data)) {
+                $proveedor = $globals->getTabla(["tabla" => "proveedor", "where" => ["id_proveedor" => $registro->data[0]->nombre_proveedor_1]]);
+                $registro->data[0]->nombre_proveedor_1 = $proveedor->data[0]->razon_social;
                 $data['registro_pt'] = $registro->data[0];
                 $items = $globals->getTabla(["tabla" => "manual_factura", "where" => ["id_registro_pt" => $id , "visible" => 1]]);
                 $data['periodo_factura_rows'] = $items->data;
@@ -2118,8 +2120,12 @@ class Inicio extends BaseController
 
         if ($id) {
             $registro = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["id_formulario_pt" => $id]]);
-        
+            //die(var_dump($registro));
             if (!empty($registro->data)) {
+           
+                $proveedor = $globals->getTabla(["tabla" => "proveedor", "where" => ["id_proveedor" => $registro->data[0]->nombre_proveedor_1]]);
+                $registro->data[0]->nombre_proveedor_1 = $proveedor->data[0]->razon_social;
+                $data['proveedor'] = $proveedor->data[0];
                 $data['registro_pt'] = $registro->data[0];
                 $items = $globals->getTabla(["tabla" => "manual_factura", "where" => ["id_registro_pt" => $id , "visible" => 1]]);
                 $data['periodo_factura_rows'] = $items->data;
@@ -2130,7 +2136,7 @@ class Inicio extends BaseController
         // For mPDF, passing local absolute path is better and avoids base64 issues
         $data['logo'] = FCPATH . 'assets/logo-guanajuato.png';
         //die( var_dump($data['logo']) ); // Debug if needed
-        
+       // die(var_dump($data));
         $html = view('pdfs/vPdfFormatoPT', $data);
 
         $mpdf = new \Mpdf\Mpdf([
@@ -2147,5 +2153,96 @@ class Inicio extends BaseController
         exit;
     }
 
+
+
+    public function pdfEncabezadoFactura()
+    {
+        $globals = new Mglobal;
+        $id = $this->request->getGet('id');
+        $data = [];
+
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 10,
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_bottom' => 10,
+            'format' => 'Letter',
+            'tempDir' => sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'mpdf'
+        ]);
+
+        if ($id) {
+            $registro = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["id_formulario_pt" => $id]]);
+            if (!empty($registro->data)) {
+                $data['registro_pt'] = $registro->data[0];
+                $items = $globals->getTabla(["tabla" => "manual_factura", "where" => ["id_registro_pt" => $id, "visible" => 1]]);
+                
+                $itemCount = count($items->data);
+                $currentIndex = 0;
+
+                foreach($items->data as $item){
+                    $currentIndex++;
+                    $item->importe_letra = $this->numeroALetras($item->importe);
+                    
+                    if ($currentIndex > 1) {
+                         $mpdf->AddPage();
+                    }
+                    
+                    // 1. Write Header
+                    $data['row'] = $item; 
+                    $html = view('pdfs/vPdfEncabezadoFactura', $data);
+                    $mpdf->WriteHTML($html);
+
+                    // 2. Append PDF INVOICE below header (y=80mm approx)
+                    if (!empty($item->pdf)) {
+                        $fullPath = FCPATH . $item->pdf;
+                        if (file_exists($fullPath)) {
+                             $pagecount = $mpdf->SetSourceFile($fullPath);
+                             
+                             // Import Page 1 and place below header
+                             if ($pagecount >= 1) {
+                                 $tplId = $mpdf->ImportPage(1);
+                                 // usage: UseTemplate($tplId, x, y, w, h)
+                                 // Place at x=5mm, y=80mm. 
+                                 // Adjust width/height as needed. 
+                                 // Let's try width=205 (full width) and let height auto-scale (or limit it).
+                                 // If height > ~180mm it might cut off. 
+                                 // Let's try fitting into box W=200, H=190.
+                                 $mpdf->UseTemplate($tplId, 5, 80, 205, 190);
+                             }
+
+                             // Append remaining pages as new pages
+                             for ($i = 2; $i <= $pagecount; $i++) {
+                                 $mpdf->AddPage(); 
+                                 $tplId = $mpdf->ImportPage($i);
+                                 $mpdf->UseTemplate($tplId); // Full page normal size
+                             }
+                        }
+                    }
+                }
+            }
+        }
+
+        $mpdf->Output('EncabezadoFactura_' . $id . '.pdf', 'I');
+        exit;
+    }
+
+    private function numeroALetras($amount)
+    {
+        // Simple PHP implementation of number to words (Mexican Pesos) or reuse existing if available in library
+        // Since I don't have a library handy, I'll implementing a basic one or look for one.
+        // Actually, let's use a simplified version for now or check if there is a helper.
+        // I will implement a basic one here to ensure it works.
+        
+        $amount = (float)$amount;
+        $pesos = floor($amount);
+        $centavos = round(($amount - $pesos) * 100);
+        
+        $formatter = new \NumberFormatter("es", \NumberFormatter::SPELLOUT);
+        $letras = strtoupper($formatter->format($pesos));
+        
+        $letras .= " PESOS " . str_pad($centavos, 2, '0', STR_PAD_LEFT) . "/100 M.N.";
+        
+        return $letras;
+    }
 
 }

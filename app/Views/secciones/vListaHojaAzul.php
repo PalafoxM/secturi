@@ -55,6 +55,9 @@
                                                 <a class="btn btn-outline-primary btn-round" href="<?php echo base_url().'index.php/Inicio/pdfLiberacionPago?id='.$e->id_formulario_pt ?>" target="_blank" title="Liberacion de Pago" ><i
                                                         class="mdi mdi-file-pdf font-18"></i></a> 
                                                
+                                                <a class="btn btn-outline-info btn-round" href="<?php echo base_url().'index.php/Inicio/pdfEncabezadoFactura?id='.$e->id_formulario_pt ?>" target="_blank" title="Encabezado de Factura" ><i
+                                                        class="mdi mdi-file-document-box-multiple font-18"></i></a>
+                                               
                                                 <a class="btn btn-outline-warning btn-round" href="<?php echo base_url().'index.php/Inicio/generarFormatoPT?id='.$e->id_formulario_pt.'&editar=1'?>" title="Editar" ><i
                                                         class="mdi mdi-lead-pencil font-18"></i></a> 
                                              

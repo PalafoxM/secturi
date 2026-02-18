@@ -1,4 +1,4 @@
-<style>
+    <style>
     .bg-black {
         background-color: #000 !important;
         color: #fff !important;
@@ -37,6 +37,60 @@
     .is-invalid {
         border-color: red !important;
         background-color: #ffcccc !important;
+    }
+    
+    /* Custom File Input Styles */
+    .file-upload-btn {
+        display: inline-block;
+        padding: 6px 12px;
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+        color: white;
+        margin-right: 5px;
+        margin-bottom: 5px;
+        transition: all 0.3s ease;
+        text-align: center;
+        width: 80px;
+    }
+    
+    .btn-pdf {
+        background-color: #dc3545; /* Red for PDF */
+        border: 1px solid #dc3545;
+    }
+    
+    .btn-pdf:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+    }
+
+    .btn-xml {
+        background-color: #28a745; /* Green for XML */
+        border: 1px solid #28a745;
+    }
+
+    .btn-xml:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+
+    .file-name-display {
+        font-size: 10px;
+        color: #666;
+        display: block;
+        margin-top: -4px;
+        margin-bottom: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100px; 
+    }
+    
+    .commission-container {
+        margin-top: 8px;
+        border-top: 1px dashed #ccc;
+        padding-top: 5px;
     }
 </style>
 
@@ -172,14 +226,28 @@
                                     <input type="text" name="importe[]" class="form-control-plaintext input-importe" value="<?= isset($row->importe) ? $row->importe : '' ?>" placeholder="$0.00">
                                     
                                     <!-- File Inputs -->
-                                    <div class="mt-2 text-left">
-                                        <label class="small text-muted mb-0">PDF:</label>
-                                        <input type="file" name="pdf_pt_<?= $index ?>[]" class="form-control-sm border-0 mb-1" accept=".pdf" style="width: 100%;">
-                                        
-                                        <label class="small text-muted mb-0">XML:</label>
-                                        <input type="file" name="xml_pt_<?= $index ?>[]" class="form-control-sm border-0" accept=".xml" style="width: 100%;">
+                                    <div class="mt-2 text-center">
+                                        <!-- PDF Button -->
+                                        <label for="pdf_pt_<?= $index ?>" class="file-upload-btn btn-pdf">
+                                            <i class="feather icon-file-text"></i> PDF
+                                        </label>
+                                        <input type="file" id="pdf_pt_<?= $index ?>" name="pdf_pt_<?= $index ?>[]" class="d-none input-pdf" accept=".pdf" onchange="updateFileName(this)">
+                                        <span class="file-name-display" id="name_pdf_pt_<?= $index ?>"></span>
+
+                                        <!-- XML Button -->
+                                        <label for="xml_pt_<?= $index ?>" class="file-upload-btn btn-xml">
+                                            <i class="feather icon-code"></i> XML
+                                        </label>
+                                        <input type="file" id="xml_pt_<?= $index ?>" name="xml_pt_<?= $index ?>[]" class="d-none input-xml" accept=".xml" onchange="updateFileName(this)">
+                                        <span class="file-name-display" id="name_xml_pt_<?= $index ?>"></span>
                                         
                                         <input type="hidden" name="row_index[]" value="<?= $index ?>">
+                                    </div>
+
+                                    <!-- Commission Field -->
+                                    <div class="commission-container">
+                                        <label class="small text-muted mb-0 font-weight-bold"><i class="feather icon-map-pin"></i> LUGAR COMISIÓN:</label>
+                                        <input type="text" name="comision[]" class="form-control-plaintext" placeholder="Lugar de comisión...">
                                     </div>
 
                                     <?php if($index > 0): // Botón eliminar para filas extra ?>
@@ -269,11 +337,15 @@
                                 <td colspan="4" class="text-left bg-white" style="border-bottom: none !important;">
                                     <div class="d-flex align-items-center">
                                         <span class="label-bold me-2">No. CONTRATO y/o CONVENIO:</span>
-                                        <input type="text" name="contrato_convenio" class="form-control-plaintext text-left w-50" value="<?= isset($registro_pt->contrato_convenio) ? $registro_pt->contrato_convenio : '' ?>">
+                                        <input type="text" name="contrato_convenio" class="form-control-plaintext text-left w-50" value="<?= isset($no_convenio) ? $no_convenio : '' ?>">
                                     </div>
                                     <div class="d-flex align-items-center">
                                         <span class="label-bold me-2">No. RESERVA:</span>
-                                        <input type="text" name="no_reserva_visual" class="form-control-plaintext text-left w-50" value="<?= isset($registro_pt->no_reserva) ? $registro_pt->no_reserva : '' ?>" placeholder="4798053">
+                                        <input type="text" name="no_reserva_visual" class="form-control-plaintext text-left w-50" value="<?= isset($no_reserva) ? $no_reserva : '' ?>" placeholder="4798053">
+                                    </div>
+                                    <div class="d-flex align-items-center mt-2">
+                                        <span class="label-bold me-2">CONCEPTO SOLICITUD:</span>
+                                        <input type="text" name="concepto" class="form-control-plaintext text-left w-50" rows="2" placeholder="Concepto de la solicitud..."><?= isset($registro_pt->concepto) ? $registro_pt->concepto : '' ?>
                                     </div>
                                 </td>
                             </tr>
@@ -632,14 +704,28 @@
                     <td style="vertical-align: top;">
                         <input type="text" name="importe[]" class="form-control-plaintext input-importe" placeholder="$0.00">
                         
-                        <div class="mt-2 text-left">
-                            <label class="small text-muted mb-0">PDF:</label>
-                            <input type="file" name="pdf_pt_${globalRowIndex}[]" class="form-control-sm border-0 mb-1" accept=".pdf" style="width: 100%;">
-                            
-                            <label class="small text-muted mb-0">XML:</label>
-                            <input type="file" name="xml_pt_${globalRowIndex}[]" class="form-control-sm border-0" accept=".xml" style="width: 100%;">
+                        <div class="mt-2 text-center">
+                            <!-- PDF Button -->
+                            <label for="pdf_pt_${globalRowIndex}" class="file-upload-btn btn-pdf">
+                                <i class="feather icon-file-text"></i> PDF
+                            </label>
+                            <input type="file" id="pdf_pt_${globalRowIndex}" name="pdf_pt_${globalRowIndex}[]" class="d-none input-pdf" accept=".pdf" onchange="updateFileName(this)">
+                            <span class="file-name-display" id="name_pdf_pt_${globalRowIndex}"></span>
+
+                            <!-- XML Button -->
+                            <label for="xml_pt_${globalRowIndex}" class="file-upload-btn btn-xml">
+                                <i class="feather icon-code"></i> XML
+                            </label>
+                            <input type="file" id="xml_pt_${globalRowIndex}" name="xml_pt_${globalRowIndex}[]" class="d-none input-xml" accept=".xml" onchange="updateFileName(this)">
+                            <span class="file-name-display" id="name_xml_pt_${globalRowIndex}"></span>
                             
                             <input type="hidden" name="row_index[]" value="${globalRowIndex}">
+                        </div>
+
+                        <!-- Commission Field -->
+                        <div class="commission-container">
+                            <label class="small text-muted mb-0 font-weight-bold"><i class="feather icon-map-pin"></i> LUGAR COMISIÓN:</label>
+                            <input type="text" name="comision[]" class="form-control-plaintext" placeholder="Lugar de comisión...">
                         </div>
 
                         <button type="button" class="btn btn-sm btn-danger mt-1 btn-remove-row" style="padding: 0px 5px;">&times;</button>
@@ -799,15 +885,15 @@
                 if (millones === 1) {
                     output += 'UN MILLON ';
                 } else {
-                    output += convertirCentenas(millones) + 'MILLONES ';
+                    output += convertirCentenas(millones) + ' MILLONES ';
                 }
             }
 
             if (miles > 0) {
                 if (miles === 1) {
-                    output += 'UN MIL ';
+                    output += 'MIL ';
                 } else {
-                    output += convertirCentenas(miles) + 'MIL ';
+                    output += convertirCentenas(miles) + ' MIL ';
                 }
             }
 
@@ -818,59 +904,6 @@
             return output;
         }
 
-        function convertirCentenas(n) {
-            var output = '';
-            var centenas = Math.floor(n / 100);
-            var decenas = Math.floor((n % 100) / 10);
-            var unidades = n % 10;
-            var data = {
-                unidades: ['', 'UN ', 'DOS ', 'TRES ', 'CUATRO ', 'CINCO ', 'SEIS ', 'SIETE ', 'OCHO ', 'NUEVE '],
-                decenas: ['', 'DIEZ ', 'VEINTE ', 'TREINTA ', 'CUARENTA ', 'CINCUENTA ', 'SESENTA ', 'SETENTA ', 'OCHENTA ', 'NOVENTA '],
-                diez: ['DIEZ ', 'ONCE ', 'DOCE ', 'TRECE ', 'CATORCE ', 'QUINCE ', 'DIECISEIS ', 'DIECISIETE ', 'DIECIOCHO ', 'DIECINUEVE '],
-                centenas: ['', 'CIENTO ', 'DOSCIENTOS ', 'TRESCIENTOS ', 'CUATROCIENTOS ', 'QUINIENTOS ', 'SEISCIENTOS ', 'SETECIENTOS ', 'OCHOCIENTOS ', 'NOVECIENTOS '],
-            };
-
-            if (centenas > 0) {
-                if (centenas === 1 && decenas === 0 && unidades === 0) {
-                    output += 'CIEN ';
-                } else {
-                    output += data.centenas[centenas];
-                }
-            }
-
-            if (decenas > 0) {
-                if (decenas === 1) {
-                    output += data.diez[unidades];
-                } else if (decenas === 2 && unidades > 0) {
-                    output += 'VEINTI' + data.unidades[unidades].trim(); // Veintiuno, veintidos... pero aqui simplificamos
-                    // Correccion rapida para veinti:
-                    // VEINTIUN, VEINTIDOS...
-                    // Dejemoslo simple:
-                     output += 'VEINTI' + data.unidades[unidades].replace('UN ', 'UNO ').trim() + ' ';
-                } else {
-                    output += data.decenas[decenas];
-                    if (unidades > 0) {
-                        output += 'Y ' + data.unidades[unidades];
-                    }
-                }
-            } else if (unidades > 0) {
-                // Special check for 10-19 handled above
-                // If decenas was 0, just units
-                if(centenas > 0 || miles > 0 || millones > 0) { // If there was something before
-                     output += data.unidades[unidades];
-                } else {
-                    output += data.unidades[unidades];
-                }
-            }
-            
-            // Fix for VEINTI logic above which is a bit messy in quick JS
-            // Let's use a simpler standard approach for 0-99
-            return convertirDecenas(n % 100, (Math.floor(n/100) == 1 && (n%100)==0)); // Pass if it was exactly 100 for 'CIEN' handling check? NO, handled before.
-            
-            // Re-writing convertCentenas to be cleaner
-        }
-        
-        // Better implementation for converting 0-999
         function convertirCentenas(n) {
              var output = '';
              var c = Math.floor(n / 100);
@@ -1012,5 +1045,12 @@
             });
         });
     });
+
+    function updateFileName(input) {
+        var fileName = input.files[0] ? input.files[0].name : '';
+        var displayId = 'name_' + input.id;
+        $('#' + displayId).text(fileName);
+        $('#' + displayId).attr('title', fileName); // Add tooltip
+    }
 </script>
 

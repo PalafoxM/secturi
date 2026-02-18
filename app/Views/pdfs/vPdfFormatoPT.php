@@ -187,13 +187,13 @@
                 </td>
                 <td style="height: 80px; vertical-align: bottom;">
                     <br><br><br>
-                     <strong>JAVIER PACHECO CANO</strong><br>
-                    <span style="font-size: 8pt;">DIRECTOR/A GENERAL JURÍDICO</span>
+                     <strong><?= isset($registro_pt->nombre_autoriza) ? $registro_pt->nombre_autoriza : '' ?></strong><br>
+                    <span style="font-size: 8pt;"><?= isset($registro_pt->cargo_autoriza) ? $registro_pt->cargo_autoriza : '' ?></span>
                 </td>
                 <td style="height: 80px; vertical-align: bottom;">
                     <br><br><br>
-                     <strong>MARCO ANTONIO MORALES GARCÍA</strong><br>
-                    <span style="font-size: 8pt;">DIRECTOR/A GENERAL DE INNOVACIÓN E INTELIGENCIA TURÍSTICA</span>
+                     <strong><?= isset($registro_pt->nombre_responsable) ? $registro_pt->nombre_responsable : '' ?></strong><br>
+                    <span style="font-size: 8pt;"><?= isset($registro_pt->cargo_responsable) ? $registro_pt->cargo_responsable : '' ?></span>
                 </td>
             </tr>
             <tr>
@@ -204,8 +204,8 @@
                  <td colspan="2" class="no-border"></td>
                  <td style="height: 80px; vertical-align: bottom;">
                       <br><br><br>
-                     <strong>MARCO ANTONIO MORALES GARCÍA</strong><br>
-                    <span style="font-size: 8pt;">DIRECTOR/A GENERAL DE INNOVACIÓN E INTELIGENCIA TURÍSTICA</span>
+                     <strong><?= isset($registro_pt->nombre_responsable_2) ? $registro_pt->nombre_responsable_2 : '' ?></strong><br>
+                    <span style="font-size: 8pt;"><?= isset($registro_pt->cargo_responsable_2) ? $registro_pt->cargo_responsable_2 : '' ?></span>
                  </td>
             </tr>
         </tbody>

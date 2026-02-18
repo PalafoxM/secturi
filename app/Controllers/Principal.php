@@ -6412,6 +6412,9 @@ class Principal extends BaseController
         $data['periodo_factura']->partida_clave = '';
         $data['periodo_factura']->importe = '';
 
+         $data['no_reserva']="";
+         $data['no_convenio']="";
+
         $proveedores = $globals->getTabla(["tabla" => "proveedor", "where" => ["visible" => 1],'limit' => 10]);
         $data['proveedores'] = $proveedores->data;
 
@@ -6428,6 +6431,11 @@ class Principal extends BaseController
         $data['usuarios'] = $usuarios->data;
 
         if($id_reserva){
+
+            $registro_pt = $globals->getTabla(["tabla" => "reserva", "where" => ["id_reserva" => $id_reserva, "visible" => 1]]);
+            $data['no_reserva'] = $registro_pt->data[0]->no_reserva;
+            $data['no_convenio'] = $registro_pt->data[0]->no_convenio;
+
              // 1. Obtener Datos Generales (Si existe registro previo)
              if($edita == 1){
                  $registro_pt = $globals->getTabla(["tabla" => "registro_pt", "where" => ["id_reserva" => $id_reserva, "visible" => 1]]);

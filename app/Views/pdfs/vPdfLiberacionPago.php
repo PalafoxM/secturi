@@ -130,7 +130,7 @@
         
         $proveedor_nombre = isset($registro_pt->nombre_proveedor_1) ? $registro_pt->nombre_proveedor_1 : 'PROVEEDOR';
         // Note: Concepto is missing in input form, check if 'contrato_convenio' is used or leave placeholder
-        $concepto_text = isset($registro_pt->contrato_convenio) ? $registro_pt->contrato_convenio : '[CONCEPTO PENDIENTE]'; 
+        $concepto_text = isset($registro_pt->concepto) ? $registro_pt->concepto : '[CONCEPTO PENDIENTE]'; 
     ?>
     <div class="content">
         Por medio del presente, me permito solicitar su apoyo para que se realice el trámite de Pago a Tercero pago a terceros de

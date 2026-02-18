@@ -141,10 +141,14 @@
                                                             <?php endif; ?>
                                                              <?php if(in_array($p->id_estatus, [3,4]) && $session->get('id_perfil') !=2): ?>
                                                              
-                                                            <a href="<?= base_url().'index.php/Principal/generarTramitePago/'.$p->id_reserva ?>" style="color:white;"  data-toggle="tooltip" data-placement="left" data-original-title="<?= (!empty($p->id_registro_pt) )?'Ver Tramite de Pago':'Generar Tramite de Pago' ?>"
+                                                            <a href="<?= base_url().'index.php/Principal/generarFormatoPT/'.$p->id_reserva ?>" style="color:white;"  data-toggle="tooltip" data-placement="left" data-original-title="<?= (!empty($p->id_registro_pt) )?'Ver Tramite de Pago':'Generar Tramite de Pago' ?>"
                                                                 class="btn <?= (!empty($p->id_registro_pt) )?'btn-gradient-info':'btn-gradient-primary' ?> px-4 uitooltip"><i
                                                                     class="mdi mdi-arrow-right-bold font-21"></i>
                                                             </a>
+                                                           <!--  <a href="<?= base_url().'index.php/Principal/generarTramitePago/'.$p->id_reserva ?>" style="color:white;"  data-toggle="tooltip" data-placement="left" data-original-title="<?= (!empty($p->id_registro_pt) )?'Ver Tramite de Pago':'Generar Tramite de Pago' ?>"
+                                                                class="btn <?= (!empty($p->id_registro_pt) )?'btn-gradient-info':'btn-gradient-primary' ?> px-4 uitooltip"><i
+                                                                    class="mdi mdi-arrow-right-bold font-21"></i>
+                                                            </a> -->
                                                             <?php endif; ?>
                                                         </td>
                                                     </tr>
