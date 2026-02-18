@@ -6440,4 +6440,172 @@ class Agregar extends BaseController
 
         return $this->respond($response);
     }
+    public function guardaFormatoGO(){
+        $session = \Config\Services::session();
+        $this->globals = new Mglobal;
+        $data = $this->request->getPost();
+        
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = "";
+        
+        // Validation (Basic)
+        if(!isset($data['row_index'])){
+             $response->respuesta = "Error|Debe agregar al menos un registro.";
+             return $this->respond($response);
+        }
+
+        $folioFinal = isset($data['folioCompleto']) ? $data['folioCompleto'] : (isset($data['no_consecutivo']) ? $data['no_consecutivo'] : '');
+
+        // Main Record (Reuse formulario_pt for now as structure is similar)
+        // If user wants separate table later, we change this.
+        $dataInsert = [
+            'no_consecutivo' => $folioFinal,
+            // Fallback for main provider if needed by not null constraint?
+            'nombre_proveedor_1' => isset($data['proveedor_id'][0]) ? $data['proveedor_id'][0] : (isset($data['nombre_proveedor_1']) ? $data['nombre_proveedor_1'] : 0), 
+            'no_cuenta' => isset($data['no_cuenta']) ? $data['no_cuenta'] : '', 
+            'banco' => isset($data['banco']) ? $data['banco'] : '',
+            'clabe' => isset($data['clabe']) ? $data['clabe'] : '',
+            'clausula' => isset($data['clausula']) ? $data['clausula'] : '',
+            'no_proveedor' => isset($data['no_proveedor']) ? $data['no_proveedor'] : '',
+            'fecha_tramite' => isset($data['fecha_tramite']) ? $data['fecha_tramite'] : date('Y-m-d'),
+            
+            // Signatures
+            'nombre_responsable_2' => $data['nombre_responsable_2'], 
+            'nombre_responsable' => $data['nombre_responsable_1'], 
+            'cargo_responsable_2' => $data['cargo_responsable_2'], 
+            'cargo_responsable' => $data['cargo_responsable_1'], 
+            'cargo_director_general' => isset($data['cargo_director_general']) ? $data['cargo_director_general'] : '', 
+            'nombre_director_general' => isset($data['nombre_director_general']) ? $data['nombre_director_general'] : '',
+            'nombre_autoriza' => $data['nombre_autoriza'],
+            'cargo_autoriza' => $data['cargo_autoriza'],
+            
+            'importe_total_num' => $data['importe_total_num'],
+            'no_reserva' => isset($data['no_reserva_visual']) ? $data['no_reserva_visual'] : 0,
+            'no_convenio' => isset($data['no_convenio']) ? $data['no_convenio'] : '',
+            'importe_letra' => isset($data['importe_letra']) ? $data['importe_letra'] : '',
+            'concepto' => isset($data['concepto']) ? $data['concepto'] : '',
+            
+            'tipo_formato' => 'GO' // Discriminator if using same table?
+        ];
+       
+        $id_registro_pt = null;
+        if(isset($data['editar']) && $data['editar'] == 1 && isset($data['id_formulario_pt'])){
+            $id_registro_pt = $data['id_formulario_pt'];
+            $dataConfig = ["tabla" => "formulario_pt", "editar" => true, "idEditar" => ['id_formulario_pt' => $id_registro_pt]];
+            $dataInsert['usu_act'] = $session->get('id_usuario');
+            $dataInsert['fec_act'] = date('Y-m-d H:i:s');
+            $responseMain = $this->globals->saveTabla($dataInsert, $dataConfig, ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFormatoGO_Upd']);
+        } else {
+            $dataConfig = ["tabla" => "formulario_pt", "editar" => false];
+            $dataInsert['usu_reg'] = $session->get('id_usuario');
+            $dataInsert['fec_reg'] = date('Y-m-d H:i:s');
+            $responseMain = $this->globals->saveTabla($dataInsert, $dataConfig, ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFormatoGO_Ins']);
+            if(isset($responseMain->idRegistro)) $id_registro_pt = $responseMain->idRegistro;
+        }
+       
+        if(isset($responseMain->error) && $responseMain->error){
+            $response->error = true;
+            $response->respuesta = "Error Principal|".$responseMain->respuesta;
+            return $this->respond($response);
+        }
+
+        // Items
+        if(isset($data['editar']) && $data['editar'] == 1 && isset($data['id_formulario_pt'])){
+             // Soft delete old items
+             $this->globals->saveTabla(
+                ['visible' => 0, 'usu_act' => $session->get('id_usuario'), 'fec_act' => date('Y-m-d H:i:s')], 
+                ["tabla" => "manual_factura", "editar" => true, "idEditar" => ['id_registro_pt' => $data['id_formulario_pt']]], 
+                ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFormatoGO_Upd']
+            );
+        }
+
+        if(isset($data['no_comprobante']) && is_array($data['no_comprobante'])){
+            for($i=0; $i < count($data['no_comprobante']); $i++){
+                
+                $pdfPath = null;
+                $xmlPath = null;
+                
+                if(isset($data['row_index'][$i])){
+                    $rIdx = $data['row_index'][$i];
+                    
+                    // PDF
+                    $inputNamePdf = 'pdf_pt_' . $rIdx;
+                    if(isset($_FILES[$inputNamePdf])){
+                        $files = $_FILES[$inputNamePdf];
+                        // Handle potential array structure if multiple files, but here expecting one per input name
+                        // Check if name is array
+                        if(is_array($files['name'])){ 
+                             $countFiles = count($files['name']);
+                             for($f=0; $f < $countFiles; $f++){
+                                if($files['error'][$f] == 0 && strtolower(pathinfo($files['name'][$f], PATHINFO_EXTENSION)) == 'pdf'){
+                                    $newName = 'GO_' . $id_registro_pt . '_ROW_' . $rIdx . '_' . uniqid() . '.pdf';
+                                    $destDir = FCPATH . 'assets/pdf/';
+                                    if (!is_dir($destDir)) mkdir($destDir, 0755, true);
+                                    if(move_uploaded_file($files['tmp_name'][$f], $destDir . $newName)){
+                                        $pdfPath = 'assets/pdf/' . $newName;
+                                    }
+                                }
+                             }
+                        } 
+                    }
+
+                    // XML
+                    $inputNameXml = 'xml_pt_' . $rIdx;
+                    if(isset($_FILES[$inputNameXml])){
+                        $files = $_FILES[$inputNameXml];
+                         if(is_array($files['name'])){ 
+                            $countFiles = count($files['name']);
+                            for($f=0; $f < $countFiles; $f++){
+                                if($files['error'][$f] == 0 && strtolower(pathinfo($files['name'][$f], PATHINFO_EXTENSION)) == 'xml'){
+                                    $newName = 'GO_' . $id_registro_pt . '_ROW_' . $rIdx . '_' . uniqid() . '.xml';
+                                    $destDir = FCPATH . 'assets/xml/';  // Better folder? Old used pdf. Let's keep consistent? Original was pdf folder.
+                                    if (!is_dir($destDir)) mkdir($destDir, 0755, true);
+                                    if(move_uploaded_file($files['tmp_name'][$f], $destDir . $newName)){
+                                        $xmlPath = 'assets/xml/' . $newName; // Storing there
+                                    }
+                                }
+                            }
+                         }
+                    }
+                }
+
+                $dataFila = [
+                      'id_registro_pt' => $id_registro_pt,
+                      'no_comprobante' => $data['no_comprobante'][$i], 
+                      'importe' => $data['importe'][$i],
+                      'proyecto' =>  $data['proyecto_meta'][$i],
+                      'partida' => $data['no_partida'][$i],
+                      'comision' => isset($data['comision'][$i]) ? trim($data['comision'][$i]) : '',
+                      'concepto_gasto' => isset($data['concepto_gasto'][$i]) ? trim($data['concepto_gasto'][$i]) : '',
+                      'fechas' => isset($data['fechas'][$i]) ? trim($data['fechas'][$i]) : '',
+                      
+                      // Provider Info (For GO)
+                      'rfc' => isset($data['proveedor_rfc'][$i]) ? $data['proveedor_rfc'][$i] : '', 
+                      'proveedor' => isset($data['proveedor_nombre'][$i]) ? $data['proveedor_nombre'][$i] : '',
+                    //  'id_proveedor' => (isset($data['proveedor_id'][$i]) && is_numeric($data['proveedor_id'][$i])) ? $data['proveedor_id'][$i] : 0,
+
+                      'usu_reg' => $session->get('id_usuario'),
+                      'fec_reg' => date('Y-m-d H:i:s')
+                ];
+                
+                if($pdfPath) $dataFila['pdf'] = $pdfPath;
+                if($xmlPath) $dataFila['xml'] = $xmlPath;
+                
+                $resItem = $this->globals->saveTabla($dataFila, ["tabla" => "manual_factura", "editar" => false], []);
+            }
+        }
+
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFormatoGO'];
+        // Update status of reserva if needed
+        if(isset($data['id_reserva'])){
+             $this->globals->saveTabla(['id_estatus' => 4], ["tabla" => "reserva", "editar" => true, 'idEditar' => ['id_reserva' => $data['id_reserva']]], $dataBitacora);
+        }
+
+        $response->error = false;
+        $response->respuesta = "Éxito|La información de Gastos de Operación se guardó correctamente.";
+
+        return $this->respond($response);
+    }
+
 }

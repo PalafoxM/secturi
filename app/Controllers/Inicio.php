@@ -2367,4 +2367,75 @@ class Inicio extends BaseController
         return $letras;
     }
 
+
+    public function listaGastosOperacion()
+    {
+        $session = \Config\Services::session();
+        $globas = new Mglobal;
+        if(in_array($session->get('id_perfil'), [1,2])){
+            $dataDB = array('tabla' => 'formulario_pt', 'where' => ['visible' => 1, 'tipo_formato' => 'GO']);
+        }else{
+            $dataDB = array('tabla' => 'formulario_pt', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario'), 'tipo_formato' => 'GO']);
+        }
+        $response = $globas->getTabla($dataDB);
+        $data['dataHojaAzul'] = $response->data; // Reuse var name for ease in view or change
+        
+        $data['scripts'] = array('inicio');
+        $data['edita'] = 0;
+        $data['title'] = 'Lista de Gastos de Operación';
+        $data['contentView'] = 'secciones/vListaGastosOperacion';
+        $this->_renderView($data);
+    }
+    public function pdfGastosOperacion()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $id = $this->request->getGet('id');
+        $data = [];
+
+        // For mPDF, passing local absolute path is better and avoids base64 issues
+        $data['logo'] = FCPATH . 'assets/logo-guanajuato.png';
+
+        if ($id) {
+            $registro = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["id_formulario_pt" => $id]]);
+            if (!empty($registro->data)) {
+                $data['registro_pt'] = $registro->data[0];
+                
+                // Fetch items
+                $items = $globals->getTabla(["tabla" => "manual_factura", "where" => ["id_registro_pt" => $id, "visible" => 1]]);
+                $data['periodo_factura_rows'] = $items->data;
+
+                // Data for View Headers (Areas, default banks, etc)
+                 if(isset($data['registro_pt']->nombre_proveedor_1) && is_numeric($data['registro_pt']->nombre_proveedor_1) && $data['registro_pt']->nombre_proveedor_1 > 0){
+                      $prov = $globals->getTabla(["tabla" => "proveedor", "where" => ["id_proveedor" => $data['registro_pt']->nombre_proveedor_1]]);
+                      if(!empty($prov->data)) $data['proveedor'] = $prov->data[0];
+                       
+                       // Bank
+                       $bancos = $globals->getTabla(["tabla" => "proveedor_banco", "where" => ["id_proveedor" => $data['registro_pt']->nombre_proveedor_1, "visible" => 1]]);
+                       if(!empty($bancos->data)) $data['proveedor_banco'] = $bancos->data[0];
+                 }
+                
+                // Fetch Area for Prefix if needed 
+                 $cat_area = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'id_pago' => 1]]);
+                $data['cat_area'] = $cat_area->data;
+            }
+        }
+
+        $html = view('pdfs/vPdfGastosOperacion', $data);
+
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 5,
+            'margin_left' => 5,
+            'margin_right' => 5,
+            'margin_bottom' => 5,
+            'format' => 'Letter',
+            'tempDir' => sys_get_temp_dir().DIRECTORY_SEPARATOR.'mpdf'
+        ]);
+        
+        $mpdf->WriteHTML($html);
+        $mpdf->Output('FormatGO_' . $id . '.pdf', 'I');
+        exit;
+    }
 }
+
+

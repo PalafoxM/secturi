@@ -6403,6 +6403,168 @@ class Principal extends BaseController
         $data['contentView'] = 'secciones/vFormatoPagoTerceros';
         $this->_renderView($data);
     }
+    public function generarFormatoGO($id_reserva = null, $edita = null)
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $data = array();
+        
+        $data['id_reserva'] = $id_reserva;
+        $data['editar'] = $edita;
+
+        if ($id_reserva === null) {
+            $id_reserva = $this->request->getGet('id');
+            $data['id_reserva'] = $id_reserva;
+        }
+        if ($edita === null) {
+            $edita = $this->request->getGet('editar');
+            $data['editar'] = $edita;
+        }
+        $data['registro_pt'] = new stdClass();
+        $data['periodo_factura'] = new stdClass();
+        $data['proveedor'] = new stdClass();
+        $data['proveedor_banco'] = []; 
+        $data['periodo_factura_rows'] = [];
+
+        if ($edita && $id_reserva) {
+             $registro = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["id_formulario_pt" => $id_reserva]]);
+             if (!empty($registro->data)) {
+                 $data['registro_pt'] = $registro->data[0];
+                 $items = $globals->getTabla(["tabla" => "manual_factura", "where" => ["id_registro_pt" => $id_reserva, "visible" => 1]]);
+                 $data['periodo_factura_rows'] = $items->data;
+                 
+                  // Fetch provider data
+                 if(isset($data['registro_pt']->nombre_proveedor_1) && is_numeric($data['registro_pt']->nombre_proveedor_1) && $data['registro_pt']->nombre_proveedor_1 > 0){
+                      $prov = $globals->getTabla(["tabla" => "proveedor", "where" => ["id_proveedor" => $data['registro_pt']->nombre_proveedor_1]]);
+                      if(!empty($prov->data)) $data['proveedor'] = $prov->data[0];
+                       $bancos = $globals->getTabla(["tabla" => "proveedor_banco", "where" => ["id_proveedor" => $data['registro_pt']->nombre_proveedor_1, "visible" => 1]]);
+                       if(!empty($bancos->data)) $data['proveedor_banco'] = $bancos->data[0];
+                 }
+                 // If provider info is manual (text), we rely on $items which have provider details per row.
+                 // But $data['proveedor'] might be needed for header/footer if used.
+             }
+        } elseif ($id_reserva) {
+             // We need to fetch the form data first to get the provider name/id
+             // The code below line 6418 fetches $formulario_pt but it's for consecutive?
+             // Ah, checking line 6449, it fetches $registro_pt from 'reserva' table?
+             // Wait, the view uses $registro_pt which comes from... table 'formulario_pt' in Inicio.php, but here 'reserva'?
+             // Let's look closer at line 6449 in the file.
+             // It fetches from 'reserva' table.
+             // But 'formulario_pt' table has 'nombre_proveedor_1'.
+             // 'reserva' table has 'id_proveedor'. 
+             // If this function uses 'reserva' table, then $registro_pt has 'id_proveedor'.
+        }
+        $data['no_consecutivo'] = '';
+
+        // Default values to avoid errors in view
+        $data['periodo_factura']->encabezado = '';
+        $data['periodo_factura']->proyecto_clave = ''; 
+        $data['periodo_factura']->partida_clave = '';
+        $data['periodo_factura']->importe = '';
+
+         $data['no_reserva']="";
+         $data['no_convenio']="";
+
+          $formulario_pt = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["visible" => 1, 'usu_reg' => $session->get('id_usuario')]]);
+            $no_consecutivo = count($formulario_pt->data) + 1 ;
+            if (strlen($no_consecutivo) == 1) {
+                $no_consecutivo = '00' . $no_consecutivo;
+            }
+            if (strlen($no_consecutivo) == 2) {
+                $no_consecutivo = '0' . $no_consecutivo;
+            }
+            if (strlen($no_consecutivo) >= 3) {
+                $no_consecutivo = $no_consecutivo;
+            }
+          $data['consecutivo'] = $no_consecutivo;
+
+        $proveedores = $globals->getTabla(["tabla" => "proveedor", "where" => ["visible" => 1],'limit' => 10]);
+        $data['proveedores'] = $proveedores->data;
+
+        $cat_area = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'id_pago' => 1]]);
+        $data['cat_area'] = $cat_area->data;
+        
+        $cat_proyecto = $globals->getTabla(["tabla" => "cat_proyecto", "where" => ["visible" => 1]]);
+        $data['cat_proyecto'] = $cat_proyecto->data;
+
+        $cat_partida = $globals->getTabla(["tabla" => "cat_partida", "where" => ["visible" => 1]]);
+        $data['cat_partida'] = $cat_partida->data;
+
+        $usuarios = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["visible" => 1]]);
+        $data['usuarios'] = $usuarios->data;
+        $usu = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["visible" => 1, 'id_usuario' => $session->get('id_usuario')]]);
+
+
+        if($usu->data[0]->id_usuario){
+            $tieneArea = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'titular' => $usu->data[0]->id_usuario]]);
+            if(isset($tieneArea->data) && !empty($tieneArea->data)){
+                $data['id_area'] = $tieneArea->data[0]->id_area;
+            }else{
+                $tieneArea = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'titular' => $usu->data[0]->id_jefe_inmediato]]);
+                if(isset($tieneArea->data) && !empty($tieneArea->data)){
+                    $data['id_area'] = $tieneArea->data[0]->id_area;
+                }else{
+                        $data['id_area'] = $cat_area->data[0]->id_area;
+                }
+            }
+        }
+
+        if($id_reserva){
+
+            $registro_pt = $globals->getTabla(["tabla" => "reserva", "where" => ["id_reserva" => $id_reserva, "visible" => 1]]);
+            $data['no_reserva'] = $registro_pt->data[0]->no_reserva;
+            $data['no_convenio'] = $registro_pt->data[0]->no_convenio;
+            $data['id_proveedor'] = $registro_pt->data[0]->id_proveedor;
+            $data['id_proveedor_banco'] = $registro_pt->data[0]->id_proveedor_banco;
+            // Fetch Provider Data (Handle ID or Name)
+            $provIdOrName = $data['id_proveedor'];
+            if(!empty($provIdOrName)){
+                $whereProv = [];
+                if(is_numeric($provIdOrName)){
+                    $whereProv = ["id_proveedor" => $provIdOrName];
+                } else {
+                    $whereProv = ["razon_social" => $provIdOrName];
+                }
+
+                 $prov = $globals->getTabla(["tabla" => "proveedor", "where" => $whereProv]);
+                 if(!empty($prov->data)){
+                      $data['proveedor'] = $prov->data[0];
+                      $realIdProveedor = $data['proveedor']->id_proveedor;
+
+                      // Ensure in dropdown list
+                      $inList = false;
+                      if (!empty($data['proveedores'])) {
+                           foreach ($data['proveedores'] as $pList) {
+                               if ($pList->id_proveedor == $realIdProveedor) {
+                                   $inList = true;
+                                   break;
+                               }
+                           }
+                      }
+                      if (!$inList) {
+                          $data['proveedores'][] = $data['proveedor'];
+                      }
+                 }
+            }
+            
+            // Fetch Bank Data (Linked or Default)
+            if(!empty($data['id_proveedor_banco'])){
+                 $banco = $globals->getTabla(["tabla" => "proveedor_banco", "where" => ["id_proveedor_banco" => $data['id_proveedor_banco']]]);
+                 if(!empty($banco->data)) $data['proveedor_banco'] = $banco->data[0];
+            } elseif(isset($realIdProveedor)) {
+                 // Fallback to default bank
+                 $banco = $globals->getTabla(["tabla" => "proveedor_banco", "where" => ["idproveedor" => $realIdProveedor, "fic" => 1]]);
+                 if(!empty($banco->data)) $data['proveedor_banco'] = $banco->data[0];
+            }
+
+
+
+        }
+        
+        $data['scripts'] = array('principal');
+        $data['contentView'] = 'secciones/vFormatoGastosOperacion';
+        $this->_renderView($data);
+    }
 
     public function obtenerBancosProveedor()
     {
