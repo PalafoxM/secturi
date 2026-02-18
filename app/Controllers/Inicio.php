@@ -2187,19 +2187,29 @@ class Inicio extends BaseController
             if (!empty($registro->data)) {
                 $data['registro_pt'] = $registro->data[0];
                 $items = $globals->getTabla(["tabla" => "manual_factura", "where" => ["id_registro_pt" => $id, "visible" => 1]]);
-                
+                //die( var_dump( $items->data ) );
                 $itemCount = count($items->data);
                 $currentIndex = 0;
 
-                foreach($items->data as $item){
+                foreach($items->data as $key => $item){
                     $currentIndex++;
                     $item->importe_letra = $this->numeroALetras($item->importe);
                     
                     if ($currentIndex > 1) {
                          $mpdf->AddPage();
                     }
+
+                 
+                        $partida = $globals->getTabla([
+                            "tabla" => "cat_partida",
+                            "where" => ["cuenta_cable" => $item->partida, 'visible' => 1]
+                        ]);
+                        $item->dsc_partida = (isset($partida->data[0])) ? $partida->data[0]->nombre_fondo : '';
+                     
+                    
                     
                     // 1. Write Header
+                    //die(var_dump($item));
                     $data['row'] = $item; 
                     $html = view('pdfs/vPdfEncabezadoFactura', $data);
                     $mpdf->WriteHTML($html);

@@ -48,14 +48,14 @@
             <tr>
                 <td class="label-cell">RESPONSABLE / CARGO / AREA:</td>
                 <td class="value-cell">
-                    <?= !empty($registro_pt->nombre_responsable) ? strtoupper($registro_pt->nombre_responsable) : '' ?> - 
-                    <?= !empty($registro_pt->cargo_responsable) ? strtoupper($registro_pt->cargo_responsable) : '' ?> - 
-                    <?= !empty($registro_pt->area_responsable) ? strtoupper($registro_pt->area_responsable) : 'DIRECCIÓN DE DESARROLLO DE PROYECTOS' ?>
+                    <?= !empty($registro_pt->nombre_responsable_2) ? strtoupper($registro_pt->nombre_responsable_2) : '' ?> - 
+                    <?= !empty($registro_pt->cargo_responsable_2) ? strtoupper($registro_pt->cargo_responsable_2) : '' ?> - 
+                    <?= !empty($registro_pt->area_responsable_2) ? strtoupper($registro_pt->area_responsable_2) : '' ?>
                 </td>
             </tr>
             <tr>
                 <td class="label-cell">COMISION / REUNION / EVENTO:</td>
-                <td class="value-cell"><?= isset($registro_pt->concepto) ? strtoupper($registro_pt->concepto) : '' ?></td>
+                <td class="value-cell"><?= isset($row->comision) ? strtoupper($row->comision) : '' ?></td>
             </tr>
             <tr>
                 <td class="label-cell">CONCEPTO DEL PAGO:</td>
@@ -79,7 +79,7 @@
             <tr>
                 <td class="label-cell">IMPORTANTE EN PESOS (MXN):</td>
                 <td class="value-cell">
-                    $<?= number_format((float)$row->importe, 2) ?> 
+                    $<?= $row->importe ?> 
                     (<?= isset($row->importe_letra) ? $row->importe_letra : '' ?>)
                 </td>
             </tr>
