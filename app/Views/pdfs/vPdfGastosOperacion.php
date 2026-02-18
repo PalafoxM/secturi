@@ -2,221 +2,246 @@
 <html>
 <head>
     <style>
+        @page {
+            margin: 0.5cm 1cm;
+        }
         body {
             font-family: Arial, sans-serif;
-            font-size: 10pt;
+            font-size: 7.5pt;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 10px;
         }
         th, td {
             border: 1px solid #000;
-            padding: 5px;
-            text-align: center;
+            padding: 2px;
+            vertical-align: middle;
         }
-        .bg-black {
-            background-color: #000;
-            color: #fff;
-        }
-        .bg-grey {
-            background-color: #e0e0e0;
-            font-weight: bold;
-        }
-        .text-left { text-align: left; }
+        .no-border { border: none !important; }
+        .text-center { text-align: center; }
         .text-right { text-align: right; }
         .font-bold { font-weight: bold; }
-        .no-border { border: none; }
-        .header-title {
-            text-align: center;
-            font-size: 14pt;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-         .logo{
-            /* border:3px solid red; */
-            margin: 0;
+        .bg-black { background-color: #000; color: #fff; }
+        .header-bg { background-color: #000; color: #fff; text-align: center; font-weight: bold; }
+        .section-header { text-align: center; border: 1px solid #000; background-color: #fff; font-weight: bold; padding: 2px; }
+        
+        .signature-cell {
+            vertical-align: top;
             padding: 0;
-            left:2%;
-            top:0;
-            position: absolute;
-            width:32%;
-            height: 10%;
-            background-image: url('<?= $logo ?>');
-            background-size:100% 100%;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
         }
-
+        .signature-box {
+            height: 80px;
+            position: relative;
+            border: 1px solid #000;
+            border-bottom: none; 
+        }
+        .signature-title-box {
+            border: 1px solid #000; 
+            text-align: center; 
+            padding: 3px; 
+            font-weight: bold;
+        }
     </style>
-    <div style="position: absolute;text-align: left;left:85%; font-size: 9px; color: #999; margin-bottom: 5px;">FORMATO GO - 1 25</div>
-    <table width="100%" style="border: none; margin-bottom: 20px;">
+</head>
+<body>
+
+    <!-- HEADER SECTION -->
+    <table class="no-border" style="margin-bottom: 2px;">
         <tr>
-            <td width="30%" style="border: none; vertical-align: middle; text-align: left;">
-                <div class="logo"></div>
+            <!-- LOGO -->
+            <td width="10%" class="no-border" style="vertical-align: top;">
+                <img src="<?= $logo ?>" style="width: 150px; height: auto;">
             </td>
-            <td width="70%" style="border: none; vertical-align: top;">
+            <!-- SECRETARIA + DOC REL -->
+            <td width="35%" class="no-border" style="vertical-align: top; color: #888; font-size: 7pt;">
+                <div style="color: #666; font-weight: bold; margin-bottom: 5px;">SECRETARÍA DE TURISMO E IDENTIDAD</div>
+            </td>
+             <td width="55%" class="no-border" style="vertical-align: top; text-align: right; font-size: 8pt;">
+                Relación de <span style="border-bottom: 1px solid #000; padding: 0 5px;">&nbsp;1&nbsp;</span> documentos que amparan un importe de <span style="border-bottom: 1px solid #000; padding: 0 5px;">&nbsp;<?= isset($registro_pt->importe_total_num) ? $registro_pt->importe_total_num : '0.00' ?>&nbsp;</span><br>
+                que se envían para su revisión y trámite de pago
+            </td>
+        </tr>
+    </table>
+
+    <!-- BANK INFO & RAMO -->
+    <table class="no-border" style="margin-bottom: 5px;">
+        <tr>
+            <!-- Left: Bank Info -->
+            <td width="50%" class="no-border" style="vertical-align: bottom; font-size: 7pt;">
+                Favor de depositar a nombre de:<br>
+                <div style="margin-left: 20px; font-weight: bold; margin-top: 2px; margin-bottom: 2px;">GOBIERNO DEL ESTADO DE GUANAJUATO</div>
                 
-                <div style="text-align: center;">
-                    <div style="font-weight: bold; font-size: 12pt; color: #000;">GOBIERNO DEL ESTADO DE GUANAJUATO</div>
-                    <div style="font-size: 10pt; color: #000; margin-top: 5px;">FORMATO DE GASTO DE OPERACIÓN</div>
+                <table class="no-border" style="width: 100%;">
+                    <tr>
+                        <td class="no-border" width="15%"><strong>CUENTA:</strong></td>
+                        <td class="no-border" width="20%">5185913</td>
+                        <td class="no-border" width="15%" class="text-right"><strong>SUCURSAL:</strong></td>
+                        <td class="no-border" width="50%">MARFIL</td>
+                    </tr>
+                    <tr>
+                        <td class="no-border"><strong>CLABE:</strong></td>
+                        <td class="no-border" colspan="3">030 21051859130201 9</td>
+                    </tr>
+                    <tr>
+                        <td class="no-border"><strong>BANCO:</strong></td>
+                        <td class="no-border" colspan="3">BANCO DEL BAJÍO</td>
+                    </tr>
+                </table>
+            </td>
+
+            <!-- Right: Ramo Table -->
+            <td width="50%" class="no-border" style="vertical-align: bottom; padding-left: 5px;">
+                <div style="text-align: right; font-size: 7pt; margin-bottom: 1px;">RAMO O ENTIDAD REMITENTE</div>
+                <table style="border: 1px solid #000;">
+                    <tr>
+                        <td class="bg-black text-center" style="padding: 3px;">21 SECRETARIA DE TURISMO E IDENTIDAD</td>
+                    </tr>
+                </table>
+                <table style="border: 1px solid #000; border-top: none;">
+                    <tr>
+                        <td class="text-center font-bold" width="20%">DIVISIÓN</td>
+                        <td class="text-center font-bold" width="30%">FECHA</td>
+                        <td class="text-center font-bold" width="50%">FOLIO</td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">21</td>
+                        <td class="text-center"><?= isset($registro_pt->fecha_tramite) ? date('d/m/Y', strtotime($registro_pt->fecha_tramite)) : '' ?></td>
+                        <td class="text-center">GO SECTURI/DGA/CRMYSG/<?= isset($registro_pt->no_consecutivo) ? $registro_pt->no_consecutivo : '002' ?>/2026</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <!-- SECTIONS -->
+    <div class="section-header" style="border-bottom: none;">DATOS PROPORCIONADOS POR LA DEPENDENCIA</div>
+    <div style="background-color: #f0f0f0; text-align: center; border: 1px solid #000; font-size: 7pt; font-weight: bold; border-bottom: none;">REFERENCIA AL DOCUMENTO</div>
+
+    <!-- MAIN TABLE -->
+    <table style="border-top: 1px solid #000;">
+        <thead>
+            <tr>
+                <th width="10%">COMPROBANTE</th>
+                <th width="15%">PROYECTO META</th>
+                <th width="10%">PARTIDA No.</th>
+                <th width="12%">IMPORTE</th>
+                <th width="53%" colspan="2">OBSERVACIONES</th>
+            </tr>
+            <tr>
+                <td colspan="4" class="no-border"></td> <!-- Spacer for proper rendering of rowspan/colspan mix in some pdf engines, but standard is different -->
+                <td width="35%" class="text-center font-bold">DATOS DEL CONTRIBUYENTE</td>
+                <td width="18%" class="text-center font-bold">RFC</td>
+            </tr>
+        </thead>
+        <tbody>
+             <?php 
+                $rows = isset($periodo_factura_rows) ? $periodo_factura_rows : [];
+                if(empty($rows)) $rows = [(object)['encabezado' => '', 'proyecto' => '', 'partida' => '', 'importe' => '0.00', 'no_comprobante' => '']];
+            ?>
+            <tr style="height: 450px;">
+                <td style="vertical-align: top; text-align: center; font-weight: bold;">
+                    <?php foreach($rows as $r): ?>
+                        <div><?= $r->no_comprobante ?? '' ?></div>
+                    <?php endforeach; ?>
+                </td>
+                <td style="vertical-align: top; text-align: center;">
+                    <?php foreach($rows as $r): ?>
+                        <div><?= $r->proyecto ?? '' ?></div>
+                    <?php endforeach; ?>
+                </td>
+                <td style="vertical-align: top; text-align: center;">
+                    <?php foreach($rows as $r): ?>
+                        <div><?= $r->partida ?? '' ?></div>
+                    <?php endforeach; ?>
+                </td>
+                <td style="vertical-align: top; text-align: center; font-weight: bold;">
+                     <?php foreach($rows as $r): ?>
+                        <div>$<?= isset($r->importe) ? number_format((float)$r->importe, 2) : '0.00' ?></div>
+                    <?php endforeach; ?>
+                </td>
+                
+                <!-- Expanded columns (no nested table) -->
+                <td style="vertical-align: top; padding: 5px;">
+                     <?php if(isset($proveedor)): ?>
+                        <?= $proveedor->razon_social ?>
+                    <?php elseif(isset($registro_pt->nombre_proveedor_1)): ?>
+                        <?= $registro_pt->nombre_proveedor_1 ?>
+                    <?php endif; ?>
+                </td>
+                <td style="vertical-align: top; padding: 5px;">
+                    <?php if(isset($proveedor)): ?>
+                        <?= $proveedor->rfc ?>
+                    <?php endif; ?>
+                </td>
+            </tr>
+        </tbody>
+        <!-- TOTALS FOOTER -->
+        <tfoot>
+            <tr>
+                <td colspan="3" class="text-center font-bold" style="border-right: 1px solid #000; border-top: 1px solid #000;">
+                    IMPORTE TOTAL
+                </td>
+                <td class="text-center font-bold" style="border-top: 1px solid #000;">
+                    <?= isset($registro_pt->importe_total_num) ? $registro_pt->importe_total_num : '0.00' ?>
+                </td>
+                <td colspan="2" class="text-center font-bold" style="background-color: #f9f9f9; border-top: 1px solid #000;">
+                    <?= isset($registro_pt->importe_letra) ? $registro_pt->importe_letra : '' ?>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <!-- SIGNATURES SECTION -->
+    <table class="no-border" style="margin-top: 10px;">
+        <tr>
+            <!-- COL 1 -->
+            <td width="33%" class="signature-cell">
+                <div style="border: 1px solid #000; text-align: center; font-size: 7pt; padding: 1px;">DIRECTOR GENERAL ADMINISTRATIVO</div>
+                <div style="border: 1px solid #000; border-top: none; height: 60px; position: relative;">
+                    <div style="position: absolute; bottom: 2px; width: 100%; text-align: center; font-weight: bold; font-size: 8pt;">
+                         L.R.I. RODRIGO GONZALEZ GUERRERO
+                    </div>
+                </div>
+                <div class="signature-title-box" style="border-top: none;">
+                    DIRECTOR GENERAL ADMINISTRATIVO
+                </div>
+            </td>
+
+            <!-- COL 2 -->
+             <td width="33%" class="signature-cell">
+                <div style="border: 1px solid #000; border-left: none; text-align: center; font-size: 7pt; padding: 1px;">AUTORIZA</div>
+                <div style="border: 1px solid #000; border-left: none; border-top: none; height: 60px; position: relative;">
+                    <div style="position: absolute; bottom: 2px; width: 100%; text-align: center; font-weight: bold; font-size: 8pt;">
+                        <?= (isset($registro_pt->nombre_autoriza) && $registro_pt->nombre_autoriza != 'NO APLICA') ? $registro_pt->nombre_autoriza : 'JAVIER PACHECO CANO' ?>
+                    </div>
+                </div>
+                <div class="signature-title-box" style="border-left: none; border-top: none;">
+                     DIRECTOR/A GENERAL JURÍDICO
+                </div>
+            </td>
+
+            <!-- COL 3 -->
+             <td width="34%" class="signature-cell">
+                 <!-- Top Empty Box -->
+                <div style="border: 1px solid #000; border-left: none; text-align: center; font-size: 7pt; padding: 1px;">RESPONSABLE DEL PROYECTO</div>
+                <div style="border: 1px solid #000; border-left: none; border-top: none; height: 60px;"></div>
+                
+                <!-- Bottom Box (Actual Signature) -->
+                 <div style="border: 1px solid #000; border-top: none; border-left: none; text-align: center; font-size: 7pt; padding: 1px; background-color: #fff; margin-top: -1px;">RESPONSABLE DEL PROYECTO</div> <!-- margin hack to overlap bold borders -->
+                 
+                 <div style="border: 1px solid #000; border-left: none; border-top: none; height: 35px; position: relative;">
+                      <div style="position: absolute; bottom: 2px; width: 100%; text-align: center; font-weight: bold; font-size: 7pt;">
+                        <?= (isset($registro_pt->nombre_responsable_2) && $registro_pt->nombre_responsable_2 != 'NO APLICA') ? $registro_pt->nombre_responsable_2 : '&nbsp;' ?>
+                    </div>
+                 </div>
+                 
+                 <div class="signature-title-box" style="border-left: none; border-top: none; font-size: 6pt;">
+                     <?= (isset($registro_pt->cargo_responsable_2) && $registro_pt->cargo_responsable_2 != 'NO APLICA') ? $registro_pt->cargo_responsable_2 : 'COORDINADOR/A DE RECURSOS MATERIALES Y SERVICIOS GENERALES' ?>
                 </div>
             </td>
         </tr>
     </table>
 
-    <!-- TABLA 1: RAMO -->
-    <table>
-        <thead>
-            <tr class="bg-black">
-                <th colspan="3" style="color:white;">RAMO O ENTIDAD REMITENTE</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr class="bg-grey">
-                <td colspan="3">21 SECRETARIA DE TURISMO E IDENTIDAD</td>
-            </tr>
-            <tr class="bg-grey">
-                <td width="33%">DIVISIÓN</td>
-                <td width="33%">FECHA TRÁMITE</td>
-                <td width="33%">FOLIO</td>
-            </tr>
-            <tr>
-                <td>21</td>
-                <td><?= isset($registro_pt->fecha_tramite) ? date('d/m/Y', strtotime($registro_pt->fecha_tramite)) : '' ?></td>
-                <td>GO <?= isset($registro_pt->no_consecutivo) ? $registro_pt->no_consecutivo : '' ?></td>
-            </tr>
-        </tbody>
-    </table>
-
-    <!-- TABLA 2: ITEMS -->
-    <table>
-        <thead>
-            <tr class="bg-black">
-                <th colspan="5" style="color:white;">DATOS PROPORCIONADOS POR LA DEPENDENCIA</th>
-            </tr>
-            <tr class="bg-grey">
-                <td colspan="5">REFERENCIA AL DOCUMENTO</td>
-            </tr>
-            <tr>
-                <th width="15%">No. COMPROBANTE</th>
-                <th width="15%">PROYECTO META</th>
-                <th width="15%">No. PARTIDA</th>
-                <th width="15%">IMPORTE</th>
-                <th width="25%">DATOS DEL CONTRIBUYENTE</th>
-                <th width="15%">RFC</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php 
-            $rows = isset($periodo_factura_rows) && !empty($periodo_factura_rows) ? $periodo_factura_rows : [];
-            $total_rows = count($rows) > 0 ? count($rows) : 1;
-            
-            // Dummy row if empty
-            if(empty($rows)) $rows = [(object)['encabezado' => '', 'proyecto_clave' => '', 'partida_clave' => '', 'importe' => '']];
-
-            foreach($rows as $index => $row): 
-            ?>
-            <tr>
-                <td><?= isset($row->no_comprobante) ? $row->no_comprobante : '' ?></td>
-                <td><?= isset($row->proyecto) ? $row->proyecto : '' ?></td>
-                <td><?= isset($row->partida) ? $row->partida : '' ?></td>
-                <td>$<?= isset($row->importe) ? ($row->importe) : '0.00' ?></td>
-                
-                <?php if($index === 0): ?>
-                <?php if($index === 0): ?>
-                <td rowspan="<?= count($rows) ?>" class="text-left" style="vertical-align: top;">
-                   <!-- Provider Data for GO -->
-                   <div style="font-size: 9pt;">
-                       <?php if(isset($proveedor)): ?>
-                           <div><span class="font-bold">NOMBRE:</span> <?= $proveedor->razon_social ?></div>
-                           <div><span class="font-bold">RFC:</span> <?= $proveedor->rfc ?></div>
-                       <?php elseif(isset($registro_pt->nombre_proveedor_1)): ?>
-                            <div><span class="font-bold">NOMBRE:</span> <?= $registro_pt->nombre_proveedor_1 ?></div>
-                       <?php endif; ?>
-                   </div>
-                </td>
-                 <td rowspan="<?= count($rows) ?>" class="text-center" style="vertical-align: top;">
-                     <div style="font-size: 9pt;">
-                       <?php if(isset($proveedor)): ?>
-                           <?= $proveedor->rfc ?>
-                       <?php endif; ?>
-                   </div>
-                </td>
-                <?php endif; ?>
-                <?php endif; ?>
-            </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-
-    <!-- TABLE 3: TOTALS -->
-    <table>
-        <tr>
-            <td colspan="3" class="text-left no-border">
-                <span class="font-bold">No. CONTRATO y/o CONVENIO:</span> <?= isset($registro_pt->no_convenio) ? $registro_pt->no_convenio : '' ?>
-                <br>
-                <span class="font-bold">No. RESERVA:</span> <?= isset($registro_pt->no_reserva) ? $registro_pt->no_reserva : '' ?>
-            </td>
-            <td width="30%" class="font-bold">
-                 $<?= isset($registro_pt->importe_total_num) ? $registro_pt->importe_total_num : '' ?>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="4" class="text-center font-bold">
-                <?= isset($registro_pt->importe_letra) ? $registro_pt->importe_letra : '' ?>
-            </td>
-        </tr>
-    </table>
-
-    <!-- TABLE 4: SIGNATURES -->
-    <table style="margin-top: 20px;">
-        <thead>
-            <tr class="bg-black">
-                <th colspan="3" style="color:white;">AUTORIZACIONES</th>
-            </tr>
-            <tr class="bg-grey">
-                <th width="33%">DIRECTOR/A GENERAL ADMINISTRATIVO/A</th>
-                <th width="33%">AUTORIZA</th>
-                <th width="33%">RESPONSABLE DEL PROYECTO</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr style="height: 100px;">
-                <td style="height: 80px; vertical-align: bottom;">
-                    <br><br><br>
-                    <strong>RODRIGO GONZALEZ GUERRERO</strong><br>
-                    <span style="font-size: 8pt;">DIRECTOR/A GENERAL ADMINISTRATIVO/A</span>
-                </td>
-                <td style="height: 80px; vertical-align: bottom;">
-                    <br><br><br>
-                     <strong><?= (isset($registro_pt->nombre_autoriza) && $registro_pt->nombre_autoriza != 'NO APLICA') ? $registro_pt->nombre_autoriza : '' ?></strong><br>
-                    <span style="font-size: 8pt;"><?= (isset($registro_pt->cargo_autoriza) && $registro_pt->cargo_autoriza != 'NO APLICA') ? $registro_pt->cargo_autoriza : '' ?></span>
-                </td>
-                <td style="height: 80px; vertical-align: bottom;">
-                    <br><br><br>
-                     <strong><?= (isset($registro_pt->nombre_responsable) && $registro_pt->nombre_responsable != 'NO APLICA') ? $registro_pt->nombre_responsable : '' ?></strong><br>
-                    <span style="font-size: 8pt;"><?= (isset($registro_pt->cargo_responsable) && $registro_pt->cargo_responsable != 'NO APLICA') ? $registro_pt->cargo_responsable : '' ?></span>
-                </td>
-            </tr>
-            <tr>
-                 <td colspan="2" class="no-border"></td>
-                 <td class="bg-grey font-bold">RESPONSABLE DEL PROYECTO</td>
-            </tr>
-             <tr>
-                 <td colspan="2" class="no-border"></td>
-                 <td style="height: 80px; vertical-align: bottom;">
-                      <br><br><br>
-                     <strong><?= (isset($registro_pt->nombre_responsable_2) && $registro_pt->nombre_responsable_2 != 'NO APLICA') ? $registro_pt->nombre_responsable_2 : '' ?></strong><br>
-                    <span style="font-size: 8pt;"><?= (isset($registro_pt->cargo_responsable_2) && $registro_pt->cargo_responsable_2 != 'NO APLICA') ? $registro_pt->cargo_responsable_2 : '' ?></span>
-                 </td>
-            </tr>
-        </tbody>
-    </table>
-
-    <div style="margin-top: 30px; font-size: 8pt; text-align: justify; font-style: italic;">
-        El presente documento fue recibido y firmado de conformidad con la Ley sobre el uso de medios electrónicos y firma electrónica para el Estado de Guanajuato y sus Municipios. En virtud de la equivalencia funcional, la firma electrónica certificada se equipara a la firma autógrafa. Se privilegian las políticas de ahorro, racionalidad y austeridad del gasto público, contenidas en el artículo 55, de la Ley para el Ejercicio y Control de los Recursos Públicos para el Estado y los Municipios de Guanajuato; y, Artículos 1 y 15, segundo párrafo de los Lineamientos Generales de Racionalidad, Austeridad y Disciplina Presupuestal de la Administración Pública Estatal para el Ejercicio Fiscal 2025.
-    </div>
 </body>
 </html>
