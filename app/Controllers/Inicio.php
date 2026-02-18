@@ -2081,7 +2081,16 @@ class Inicio extends BaseController
  
                 
                 // Check if we have provider info stored or linked.
-                // If not, maybe passed empty.
+                if (isset($data['registro_pt']->nombre_proveedor_1) && is_numeric($data['registro_pt']->nombre_proveedor_1)) {
+                    $prov = $globals->getTabla(["tabla" => "proveedor", "where" => ["id_proveedor" => $data['registro_pt']->nombre_proveedor_1]]);
+                    if (!empty($prov->data)) {
+                        $data['proveedor'] = $prov->data[0];
+                        
+                         // Fetch banks for this provider
+                        $bancos = $globals->getTabla(["tabla" => "proveedor_banco", "where" => ["id_proveedor" => $data['registro_pt']->nombre_proveedor_1, "visible" => 1]]);
+                        $data['proveedor_banco'] = (!empty($bancos->data)) ? $bancos->data[0] : null; // Pass first bank or null, and maybe list for JS?
+                    }
+                }
             }
         } 
 

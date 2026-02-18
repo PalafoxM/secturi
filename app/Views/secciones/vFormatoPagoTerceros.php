@@ -97,6 +97,19 @@
 
 
 <div class="page-wrapper">
+    <?php
+    // Helper to extract no_consecutivo from full folio string if editing
+    // Expected format: PT [PREFIX] [NUMBER]/[YEAR]
+    if (isset($registro_pt->no_consecutivo) && (!isset($no_consecutivo) || empty($no_consecutivo))) {
+        // Try to match the number before the slash part
+        if (preg_match('/([0-9]+)\/[0-9]{4}$/', $registro_pt->no_consecutivo, $matches)) {
+            $no_consecutivo = $matches[1];
+        } else {
+             // Fallback: try to find the last occurring number logic if format differs?
+             // For now assume the standard format described in JS.
+        }
+    }
+    ?>
 
             <!-- Page Content-->
     <div class="page-content-tab">
@@ -167,11 +180,9 @@
                                         <?php endforeach; ?>
                                     </select>
                                     <input type="text" name="no_consecutivo" autocomplete="off" class="form-control-plaintext" value="<?= isset($no_consecutivo) ? $no_consecutivo : '' ?>" placeholder="001/2026">
-                                   <?php if($editar == 1 && isset($registro_pt->no_consecutivo)): ?>
-                                    <spam class="text-success"><?= isset($registro_pt->no_consecutivo) ? $registro_pt->no_consecutivo : '' ?></spam>
-                                   <?php else: ?>
-                                    <spam id="folio_error" class="text-success"></spam>
-                                   <?php endif; ?>
+                                
+                                    <spam id="folio_error" class="text-success"> <?= isset($registro_pt->no_consecutivo) ? $registro_pt->no_consecutivo : '' ?></spam>
+                              
                                     <input type="hidden" name="folioCompleto" id="folioCompleto">
                                 </td>
                             </tr>
@@ -284,19 +295,20 @@
                                         <div class="mb-2">
                                             <select id="nombre_proveedor_1" name="nombre_proveedor_1" class="form-control-plaintext select2" placeholder="ORGANIZACION MUNDIAL DEL TURISMO">
                                                 <option value="">Seleccione un proveedor</option>
-                                                <?php foreach ($proveedores as $p) { ?>
-                                                    <?php 
-                                                        $isSelected = false;
-                                                        // Check by ID (Preferred)
-                                                        if (isset($proveedor->id_proveedor) && $proveedor->id_proveedor == $p->id_proveedor) {
-                                                            $isSelected = true;
-                                                        } 
-                                                        // Fallback: Check by Name (Legacy)
-                                                        elseif (isset($registro_pt->nombre_proveedor_1) && $registro_pt->nombre_proveedor_1 == $p->razon_social) {
-                                                            $isSelected = true;
-                                                        }
-                                                    ?>
-                                                    <option value="<?= $p->id_proveedor ?>" <?= ($isSelected) ? 'selected' : '' ?>>
+                                                <?php 
+                                                    // Ensure the selected provider is always an option, even if not in the initial loop
+                                                    if(isset($proveedor) && !empty($proveedor->id_proveedor)): 
+                                                ?>
+                                                    <option value="<?= $proveedor->id_proveedor ?>" selected>
+                                                        <?= $proveedor->razon_social ?>
+                                                    </option>
+                                                <?php endif; ?>
+
+                                                <?php foreach ($proveedores as $p) { 
+                                                    // Skip if it's the same as the one we just added manually
+                                                    if(isset($proveedor) && $proveedor->id_proveedor == $p->id_proveedor) continue; 
+                                                ?>
+                                                    <option value="<?= $p->id_proveedor ?>">
                                                         <?= $p->razon_social ?>
                                                     </option>
                                                 <?php } ?>
