@@ -245,10 +245,12 @@
                                         <input type="hidden" name="row_index[]" value="<?= $index ?>">
                                     </div>
 
-                                    <!-- Commission Field -->
-                                    <div class="commission-container">
-                                        <label class="small text-muted mb-0 font-weight-bold"><i class="feather icon-map-pin"></i> LUGAR COMISIÓN:</label>
-                                        <input type="text" name="comision[]" class="form-control-plaintext" placeholder="Lugar de comisión...">
+                                    <!-- Commission Field (Refactored) -->
+                                    <div class="commission-container mt-2 text-center">
+                                        <input type="hidden" name="comision[]" class="commission-value" value="<?= isset($row->comision) ? $row->comision : '' ?>">
+                                        <button type="button" class="btn btn-sm <?= (isset($row->comision) && !empty($row->comision)) ? 'btn-success' : 'btn-secondary' ?> btn-commission" onclick="editComision(this)" title="Lugar de Comisión">
+                                            <i class="feather icon-map-pin"></i> Comisión
+                                        </button>
                                     </div>
 
                                     <?php if($index > 0): // Botón eliminar para filas extra ?>
@@ -751,10 +753,12 @@
                             <input type="hidden" name="row_index[]" value="${globalRowIndex}">
                         </div>
 
-                        <!-- Commission Field -->
-                        <div class="commission-container">
-                            <label class="small text-muted mb-0 font-weight-bold"><i class="feather icon-map-pin"></i> LUGAR COMISIÓN:</label>
-                            <input type="text" name="comision[]" class="form-control-plaintext" placeholder="Lugar de comisión...">
+                        <!-- Commission Field (Refactored) -->
+                        <div class="commission-container mt-2 text-center">
+                            <input type="hidden" name="comision[]" class="commission-value" value="">
+                            <button type="button" class="btn btn-sm btn-secondary btn-commission" onclick="editComision(this)" title="Lugar de Comisión">
+                                <i class="feather icon-map-pin"></i> Comisión
+                            </button>
                         </div>
 
                         <button type="button" class="btn btn-sm btn-danger mt-1 btn-remove-row" style="padding: 0px 5px;">&times;</button>
@@ -1080,6 +1084,41 @@
         var displayId = 'name_' + input.id;
         $('#' + displayId).text(fileName);
         $('#' + displayId).attr('title', fileName); // Add tooltip
+    }
+
+    function editComision(btn) {
+        // Find the hidden input associated with this button
+        var $btn = $(btn);
+        var $container = $btn.closest('.commission-container');
+        var $hiddenInput = $container.find('input[name="comision[]"]');
+        var currentValue = $hiddenInput.val();
+
+        Swal.fire({
+            title: 'Lugar de Comisión',
+            input: 'text',
+            inputValue: currentValue,
+            inputPlaceholder: 'Escriba el lugar de comisión...',
+            showCancelButton: true,
+            confirmButtonText: 'Guardar',
+            cancelButtonText: 'Cancelar',
+            inputValidator: (value) => {
+                // Optional: verification if needed
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var newValue = result.value;
+                $hiddenInput.val(newValue);
+                
+                // Visual feedback & Tooltip Update
+                if(newValue && newValue.trim() !== '') {
+                    $btn.removeClass('btn-secondary').addClass('btn-success');
+                    $btn.attr('title', newValue); // Show value on hover
+                } else {
+                    $btn.removeClass('btn-success').addClass('btn-secondary');
+                    $btn.attr('title', 'Lugar de Comisión'); // Default tooltip
+                }
+            }
+        });
     }
 </script>
 
