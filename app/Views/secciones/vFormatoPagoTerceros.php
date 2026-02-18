@@ -166,7 +166,7 @@
                                             <option value="<?= $area->id_area ?>" <?= $area->id_area == $id_area ? 'selected' : '' ?>><?= $area->prefijo ?></option>
                                         <?php endforeach; ?>
                                     </select>
-                                    <input type="text" name="no_consecutivo" autocomplete="off" class="form-control-plaintext" value="<?= isset($consecutivo) ? $consecutivo : '' ?>" placeholder="001/2026">
+                                    <input type="text" name="no_consecutivo" autocomplete="off" class="form-control-plaintext" value="<?= isset($no_consecutivo) ? $no_consecutivo : '' ?>" placeholder="001/2026">
                                    <?php if($editar == 1 && isset($registro_pt->no_consecutivo)): ?>
                                     <spam class="text-success"><?= isset($registro_pt->no_consecutivo) ? $registro_pt->no_consecutivo : '' ?></spam>
                                    <?php else: ?>
@@ -254,6 +254,12 @@
                                         <input type="hidden" name="comision[]" class="commission-value" value="<?= isset($row->comision) ? $row->comision : '' ?>">
                                         <button type="button" class="btn btn-sm <?= (isset($row->comision) && !empty($row->comision)) ? 'btn-success' : 'btn-secondary' ?> btn-commission" onclick="editComision(this)" title="Lugar de Comisión">
                                             <i class="feather icon-map-pin"></i> Comisión
+                                        </button>
+
+                                        <!-- Concepto Gasto Field -->
+                                        <input type="hidden" name="concepto_gasto[]" class="concepto-gasto-value" value="<?= isset($row->concepto_gasto) ? $row->concepto_gasto : '' ?>">
+                                        <button type="button" class="btn btn-sm <?= (isset($row->concepto_gasto) && !empty($row->concepto_gasto)) ? 'btn-success' : 'btn-secondary' ?> btn-concepto-gasto ms-1" onclick="editConcepto(this)" title="Concepto Gasto">
+                                            <i class="feather icon-list"></i> Concepto
                                         </button>
                                     </div>
 
@@ -371,11 +377,11 @@
                                 <td colspan="4" class="text-left bg-white" style="border-bottom: none !important;">
                                     <div class="d-flex align-items-center">
                                         <span class="label-bold me-2">No. CONTRATO y/o CONVENIO:</span>
-                                        <input type="text" name="contrato_convenio" class="form-control-plaintext text-left w-50" value="<?= isset($registro_pt->no_convenio) ? $registro_pt->no_convenio : 'NO APLICA' ?>">
+                                        <input type="text" name="no_convenio" readonly class="form-control-plaintext text-left w-50" value="<?= isset($registro_pt->no_convenio) ? $registro_pt->no_convenio : $no_convenio ?>">
                                     </div>
                                     <div class="d-flex align-items-center">
                                         <span class="label-bold me-2">No. RESERVA:</span>
-                                        <input type="text" name="no_reserva_visual" class="form-control-plaintext text-left w-50" value="<?= isset($registro_pt->no_reserva) ? $registro_pt->no_reserva : $no_reserva ?>" placeholder="4798053">
+                                        <input type="text" name="no_reserva_visual" readonly class="form-control-plaintext text-left w-50" value="<?= isset($registro_pt->no_reserva) ? $registro_pt->no_reserva : $no_reserva ?>" placeholder="4798053">
                                     </div>
                                     <div class="d-flex align-items-center mt-2">
                                         <span class="label-bold me-2">CONCEPTO SOLICITUD:</span>
@@ -427,7 +433,7 @@
                                         <?php endforeach; ?>
                                     </select>
                                    
-                                    <input type="text" name="cargo_autoriza" class="form-control-plaintext small" value="<?= $usuario->dsc_puesto ?>">
+                                    <input type="text" name="cargo_autoriza" class="form-control-plaintext small" value="<?= isset($registro_pt->cargo_autoriza) ? $registro_pt->cargo_autoriza : '' ?>">
                                     
                                 </td>
                                 <td class="align-bottom pb-3">
@@ -441,7 +447,7 @@
                                          <option value="NO APLICA" <?= isset($registro_pt->nombre_responsable) ? ($registro_pt->nombre_responsable == 'NO APLICA' ? 'selected' : '') : '' ?>>NO APLICA</option>
                                     </select>
 
-                                    <input type="text" name="cargo_responsable_1" class="form-control-plaintext small" value="DIRECTOR/A GENERAL DE INNOVACIÓN E INTELIGENCIA TURÍSTICA">
+                                    <input type="text" name="cargo_responsable_1" class="form-control-plaintext small" value="<?= isset($registro_pt->cargo_responsable) ? $registro_pt->cargo_responsable : '' ?>">
                                 </td>
                             </tr>
                              <tr>
@@ -461,7 +467,7 @@
                                          <option value="NO APLICA" <?= isset($registro_pt->nombre_responsable_2) ? ($registro_pt->nombre_responsable_2 == 'NO APLICA' ? 'selected' : '') : '' ?>>NO APLICA</option>
                                     </select>
                                   
-                                    <input type="text" name="cargo_responsable_2" class="form-control-plaintext small" value="DIRECTOR/A GENERAL DE INNOVACIÓN E INTELIGENCIA TURÍSTICA">
+                                    <input type="text" name="cargo_responsable_2" class="form-control-plaintext small" value="<?= isset($registro_pt->cargo_responsable_2) ? $registro_pt->cargo_responsable_2 : '' ?>">
                                 </td>
                             </tr>
                         </tbody>
@@ -762,6 +768,12 @@
                             <input type="hidden" name="comision[]" class="commission-value" value="">
                             <button type="button" class="btn btn-sm btn-secondary btn-commission" onclick="editComision(this)" title="Lugar de Comisión">
                                 <i class="feather icon-map-pin"></i> Comisión
+                            </button>
+
+                            <!-- Concepto Gasto Field -->
+                            <input type="hidden" name="concepto_gasto[]" class="concepto-gasto-value" value="">
+                            <button type="button" class="btn btn-sm btn-secondary btn-concepto-gasto ms-1" onclick="editConcepto(this)" title="Concepto Gasto">
+                                <i class="feather icon-list"></i> Concepto
                             </button>
                         </div>
 
@@ -1120,6 +1132,41 @@
                 } else {
                     $btn.removeClass('btn-success').addClass('btn-secondary');
                     $btn.attr('title', 'Lugar de Comisión'); // Default tooltip
+                }
+            }
+        });
+    }
+
+    function editConcepto(btn) {
+        // Find the hidden input associated with this button
+        var $btn = $(btn);
+        var $container = $btn.closest('.commission-container');
+        var $hiddenInput = $container.find('input[name="concepto_gasto[]"]');
+        var currentValue = $hiddenInput.val();
+
+        Swal.fire({
+            title: 'Concepto Gasto',
+            input: 'textarea',
+            inputValue: currentValue,
+            inputPlaceholder: 'Escriba el concepto del gasto...',
+            showCancelButton: true,
+            confirmButtonText: 'Guardar',
+            cancelButtonText: 'Cancelar',
+            inputValidator: (value) => {
+                // Optional: verification if needed
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var newValue = result.value;
+                $hiddenInput.val(newValue);
+                
+                // Visual feedback & Tooltip Update
+                if(newValue && newValue.trim() !== '') {
+                    $btn.removeClass('btn-secondary').addClass('btn-success');
+                    $btn.attr('title', newValue); // Show value on hover
+                } else {
+                    $btn.removeClass('btn-success').addClass('btn-secondary');
+                    $btn.attr('title', 'Concepto Gasto'); // Default tooltip
                 }
             }
         });

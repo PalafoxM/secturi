@@ -59,7 +59,7 @@
             </tr>
             <tr>
                 <td class="label-cell">CONCEPTO DEL PAGO:</td>
-                <td class="value-cell"><?= isset($registro_pt->concepto_pago) ? strtoupper($registro_pt->concepto_pago) : 'Peajes' ?></td>
+                <td class="value-cell"><?= isset($row->concepto_gasto) ? strtoupper($row->concepto_gasto) : 'Peajes' ?></td>
             </tr>
             <tr>
                 <td class="label-cell">PARTIDA:</td>

@@ -6132,7 +6132,7 @@ class Agregar extends BaseController
             'nombre_autoriza' => $data['nombre_autoriza'],
             'cargo_autoriza' => $data['cargo_autoriza'],
             'no_reserva' => $data['no_reserva_visual'] ?? 0,
-            'contrato_convenio' => $data['contrato_convenio'] ?? '',
+            'no_convenio' => $data['no_convenio'] ?? '',
             'importe_letra' => $data['importe_letra'] ?? '',
             'concepto' => $data['concepto'] ?? ''
         ];
@@ -6246,6 +6246,7 @@ class Agregar extends BaseController
                       'proyecto' =>  $data['proyecto_meta'][$i],
                       'partida' => $data['no_partida'][$i],
                       'comision' => isset($data['comision'][$i]) ? trim($data['comision'][$i]) : '',
+                      'concepto_gasto' => isset($data['concepto_gasto'][$i]) ? trim($data['concepto_gasto'][$i]) : '',
                       'usu_reg' => $session->get('id_usuario'),
                       'fec_reg' => date('Y-m-d H:i:s')
                 ];

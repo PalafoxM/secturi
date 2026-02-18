@@ -2045,6 +2045,9 @@ class Inicio extends BaseController
 
         if ($data['editar'] == 1 && $id) {
             // Fetch main record
+            $registroNumero = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["id_formulario_pt" => $id, 'usu_reg' => $session->get('id_usuario')]]);
+            $data['no_consecutivo'] = count($registroNumero->data);
+           
             $registro = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["id_formulario_pt" => $id]]);
             if (!empty($registro->data)) {
                 $data['registro_pt'] = $registro->data[0];

@@ -151,7 +151,7 @@
     <table>
         <tr>
             <td colspan="3" class="text-left no-border">
-                <span class="font-bold">No. CONTRATO y/o CONVENIO:</span> <?= isset($registro_pt->contrato_convenio) ? $registro_pt->contrato_convenio : '' ?>
+                <span class="font-bold">No. CONTRATO y/o CONVENIO:</span> <?= isset($registro_pt->no_convenio) ? $registro_pt->no_convenio : '' ?>
                 <br>
                 <span class="font-bold">No. RESERVA:</span> <?= isset($registro_pt->no_reserva) ? $registro_pt->no_reserva : '' ?>
             </td>

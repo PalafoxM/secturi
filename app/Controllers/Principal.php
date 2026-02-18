@@ -6455,7 +6455,20 @@ class Principal extends BaseController
 
         $usuarios = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["visible" => 1]]);
         $data['usuarios'] = $usuarios->data;
-        $data['id_area'] = $usuarios->data[0]->id_area;
+
+        if($usuarios->data[0]->id_usuario){
+            $tieneArea = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'titular' => $usuarios->data[0]->id_usuario]]);
+            if(isset($tieneArea->data) && !empty($tieneArea->data)){
+                $data['id_area'] = $tieneArea->data[0]->id_area;
+            }else{
+                $tieneArea = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'titular' => $usuarios->data[0]->id_jefe_inmediato]]);
+                if(isset($tieneArea->data) && !empty($tieneArea->data)){
+                    $data['id_area'] = $tieneArea->data[0]->id_area;
+                }else{
+                        $data['id_area'] = $cat_area->data[0]->id_area;
+                }
+            }
+        }
 
         if($id_reserva){
 
