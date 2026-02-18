@@ -261,6 +261,12 @@
                                         <button type="button" class="btn btn-sm <?= (isset($row->concepto_gasto) && !empty($row->concepto_gasto)) ? 'btn-success' : 'btn-secondary' ?> btn-concepto-gasto ms-1" onclick="editConcepto(this)" title="Concepto Gasto">
                                             <i class="feather icon-list"></i> Concepto
                                         </button>
+
+                                        <!-- Fechas Field -->
+                                        <input type="hidden" name="fechas[]" class="fechas-value" value="<?= isset($row->fechas) ? $row->fechas : '' ?>">
+                                        <button type="button" class="btn btn-sm <?= (isset($row->fechas) && !empty($row->fechas)) ? 'btn-success' : 'btn-secondary' ?> btn-fechas ms-1" onclick="editFechas(this)" title="Fechas">
+                                            <i class="feather icon-calendar"></i> Fechas
+                                        </button>
                                     </div>
 
                                     <?php if($index > 0): // Botón eliminar para filas extra ?>
@@ -359,6 +365,7 @@
                                         <option value="PRIMERA">PRIMERA</option>
                                         <option value="SEGUNDA">SEGUNDA</option>
                                         <option value="TERCERA">TERCERA</option>
+                                        <option value="NO APLICA">NO APLICA</option>
                                     </select>
                                  </td>
                                  
@@ -775,6 +782,12 @@
                             <button type="button" class="btn btn-sm btn-secondary btn-concepto-gasto ms-1" onclick="editConcepto(this)" title="Concepto Gasto">
                                 <i class="feather icon-list"></i> Concepto
                             </button>
+
+                            <!-- Fechas Field -->
+                            <input type="hidden" name="fechas[]" class="fechas-value" value="">
+                            <button type="button" class="btn btn-sm btn-secondary btn-fechas ms-1" onclick="editFechas(this)" title="Fechas">
+                                <i class="feather icon-calendar"></i> Fechas
+                            </button>
                         </div>
 
                         <button type="button" class="btn btn-sm btn-danger mt-1 btn-remove-row" style="padding: 0px 5px;">&times;</button>
@@ -1167,6 +1180,67 @@
                 } else {
                     $btn.removeClass('btn-success').addClass('btn-secondary');
                     $btn.attr('title', 'Concepto Gasto'); // Default tooltip
+                }
+            }
+        });
+    }
+    
+
+    function editFechas(btn) {
+        // Find the hidden input associated with this button
+        var $btn = $(btn);
+        var $container = $btn.closest('.commission-container');
+        var $hiddenInput = $container.find('input[name="fechas[]"]');
+        var currentValue = $hiddenInput.val();
+        
+        var fechaInicio = '';
+        var fechaFin = '';
+        
+        // Try to parse existing value if it matches our format
+        if (currentValue && currentValue.indexOf(' / ') !== -1) {
+             var parts = currentValue.split(' / ');
+             fechaInicio = parts[0];
+             fechaFin = parts[1];
+        } else if (currentValue) {
+            // Fallback for random text: maybe put it in comments or ignore?
+            // For now, let's assume it's one date or just clear it if format doesn't match
+        }
+
+        Swal.fire({
+            title: 'Fechas',
+            html:
+                '<div class="row">' +
+                '<div class="col-md-6"><label>Inicio</label><input type="date" id="swal-input-inicio" class="form-control" value="' + fechaInicio + '"></div>' +
+                '<div class="col-md-6"><label>Fin</label><input type="date" id="swal-input-fin" class="form-control" value="' + fechaFin + '"></div>' +
+                '</div>',
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: 'Guardar',
+            cancelButtonText: 'Cancelar',
+            preConfirm: () => {
+                var inicio = document.getElementById('swal-input-inicio').value;
+                var fin = document.getElementById('swal-input-fin').value;
+                
+                if (!inicio || !fin) {
+                    Swal.showValidationMessage('Por favor seleccione ambas fechas');
+                }
+                return { inicio: inicio, fin: fin };
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var inicio = result.value.inicio;
+                var fin = result.value.fin;
+                var newValue = inicio + ' / ' + fin;
+                
+                $hiddenInput.val(newValue);
+                
+                // Visual feedback & Tooltip Update
+                if(newValue && newValue.trim() !== ' / ') {
+                    $btn.removeClass('btn-secondary').addClass('btn-success');
+                    $btn.attr('title', newValue); // Show value on hover
+                } else {
+                    $btn.removeClass('btn-success').addClass('btn-secondary');
+                    $btn.attr('title', 'Fechas'); // Default tooltip
                 }
             }
         });

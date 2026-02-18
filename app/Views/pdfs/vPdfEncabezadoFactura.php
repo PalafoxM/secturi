@@ -72,8 +72,19 @@
             <tr>
                 <td class="label-cell">FECHA DEL GASTO:</td>
                 <td class="value-cell">
-                    DEL <?= isset($row->fecha_gasto) ? date('d-m-Y', strtotime($row->fecha_gasto)) : date('d-m-Y', strtotime($registro_pt->fecha_tramite)) ?> 
-                    AL <?= isset($row->fecha_gasto) ? date('d-m-Y', strtotime($row->fecha_gasto)) : date('d-m-Y', strtotime($registro_pt->fecha_tramite)) ?>
+                    <?php 
+                        $meses = array("01","02","03","04","05","06","07","08","09","10","11","12");
+                        if(isset($row->fechas) && strpos($row->fechas, ' / ') !== false){
+                            list($inicio, $fin) = explode(' / ', $row->fechas);
+                            $f_inicio = strtotime($inicio);
+                            $f_fin = strtotime($fin);
+                            echo "DEL " . date("d", $f_inicio) . "/" . $meses[date("n", $f_inicio)-1] . "/" . date("Y", $f_inicio);
+                            echo " AL " . date("d", $f_fin) . "/" . $meses[date("n", $f_fin)-1] . "/" . date("Y", $f_fin);
+                        } else {
+                             $f_tramite = strtotime($registro_pt->fecha_tramite);
+                             echo "DEL " . date("d", $f_tramite) . "/" . $meses[date("n", $f_tramite)-1] . "/" . date("Y", $f_tramite);
+                        }
+                    ?>
                 </td>
             </tr>
             <tr>
