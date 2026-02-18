@@ -252,7 +252,7 @@
                                     <!-- Commission Field (Refactored) -->
                                     <div class="commission-container mt-2 text-center">
                                         <input type="hidden" name="comision[]" class="commission-value" value="<?= isset($row->comision) ? $row->comision : '' ?>">
-                                        <button type="button" class="btn btn-sm <?= (isset($row->comision) && !empty($row->comision)) ? 'btn-success' : 'btn-secondary' ?> btn-commission" onclick="editComision(this)" title="Lugar de Comisión">
+                                        <button type="button" class="btn btn-sm <?= (isset($row->comision) && !empty($row->comision)) ? 'btn-success' : 'btn-secondary' ?> btn-commission" onclick="editComision(this)" title="Comisión / Evento">
                                             <i class="feather icon-map-pin"></i> Comisión
                                         </button>
 
@@ -766,7 +766,7 @@
                         <!-- Commission Field (Refactored) -->
                         <div class="commission-container mt-2 text-center">
                             <input type="hidden" name="comision[]" class="commission-value" value="">
-                            <button type="button" class="btn btn-sm btn-secondary btn-commission" onclick="editComision(this)" title="Lugar de Comisión">
+                            <button type="button" class="btn btn-sm btn-secondary btn-commission" onclick="editComision(this)" title="Comisión / Evento">
                                 <i class="feather icon-map-pin"></i> Comisión
                             </button>
 
@@ -1110,7 +1110,7 @@
         var currentValue = $hiddenInput.val();
 
         Swal.fire({
-            title: 'Lugar de Comisión',
+            title: 'Comisión / Evento',
             input: 'text',
             inputValue: currentValue,
             inputPlaceholder: 'Escriba el lugar de comisión...',
