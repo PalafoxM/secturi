@@ -4,7 +4,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            font-size: 10 pt;
+            font-size: 10pt;
         }
         table {
             width: 100%;
@@ -15,7 +15,7 @@
             border: 1px solid #000;
             padding: 5px;
             text-align: left;
-            vertical-align: top;
+            vertical-align: middle;
         }
         .header-bg {
             background-color: #000;
@@ -23,14 +23,17 @@
             text-align: center;
             font-weight: bold;
             padding: 8px;
+            font-size: 12pt;
         }
         .label-cell {
             background-color: #ccc;
             font-weight: bold;
             width: 30%;
+            font-size: 9pt;
         }
         .value-cell {
             width: 70%;
+            font-size: 9pt;
         }
     </style>
 </head>
@@ -45,8 +48,9 @@
             <tr>
                 <td class="label-cell">RESPONSABLE / CARGO / AREA:</td>
                 <td class="value-cell">
-                    <?= !empty($registro_pt->nombre_responsable) ? strtoupper($registro_pt->nombre_responsable) : '' ?>
-                    <?= !empty($registro_pt->cargo_responsable) ? ' - ' . strtoupper($registro_pt->cargo_responsable) : '' ?>
+                    <?= !empty($registro_pt->nombre_responsable) ? strtoupper($registro_pt->nombre_responsable) : '' ?> - 
+                    <?= !empty($registro_pt->cargo_responsable) ? strtoupper($registro_pt->cargo_responsable) : '' ?> - 
+                    <?= !empty($registro_pt->area_responsable) ? strtoupper($registro_pt->area_responsable) : 'DIRECCIÓN DE DESARROLLO DE PROYECTOS' ?>
                 </td>
             </tr>
             <tr>
@@ -55,11 +59,11 @@
             </tr>
             <tr>
                 <td class="label-cell">CONCEPTO DEL PAGO:</td>
-                <td class="value-cell"><?= isset($row->comision) ? strtoupper($row->comision) : '' ?></td>
+                <td class="value-cell"><?= isset($registro_pt->concepto_pago) ? strtoupper($registro_pt->concepto_pago) : 'Peajes' ?></td>
             </tr>
             <tr>
                 <td class="label-cell">PARTIDA:</td>
-                <td class="value-cell"><?= isset($row->partida) ? $row->partida : '' ?></td>
+                <td class="value-cell"><?= isset($row->partida) ? $row->partida : '' ?> - <?= isset($row->dsc_partida) ? $row->dsc_partida : '' ?></td>
             </tr>
             <tr>
                 <td class="label-cell">FACTURA / RECIBO No:</td>
@@ -68,14 +72,15 @@
             <tr>
                 <td class="label-cell">FECHA DEL GASTO:</td>
                 <td class="value-cell">
-                    DEL <?= date('d-m-Y', strtotime($registro_pt->fecha_tramite)) ?> AL <?= date('d-m-Y', strtotime($registro_pt->fecha_tramite)) ?>
+                    DEL <?= isset($row->fecha_gasto) ? date('d-m-Y', strtotime($row->fecha_gasto)) : date('d-m-Y', strtotime($registro_pt->fecha_tramite)) ?> 
+                    AL <?= isset($row->fecha_gasto) ? date('d-m-Y', strtotime($row->fecha_gasto)) : date('d-m-Y', strtotime($registro_pt->fecha_tramite)) ?>
                 </td>
             </tr>
             <tr>
-                <td class="label-cell">IMPORTE EN PESOS (MXN):</td>
+                <td class="label-cell">IMPORTANTE EN PESOS (MXN):</td>
                 <td class="value-cell">
                     $<?= number_format((float)$row->importe, 2) ?> 
-                    (<?= $row->importe_letra ?>)
+                    (<?= isset($row->importe_letra) ? $row->importe_letra : '' ?>)
                 </td>
             </tr>
         </tbody>

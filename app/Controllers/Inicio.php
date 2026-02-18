@@ -2196,26 +2196,41 @@ class Inicio extends BaseController
                     if (!empty($item->pdf)) {
                         $fullPath = FCPATH . $item->pdf;
                         if (file_exists($fullPath)) {
-                             $pagecount = $mpdf->SetSourceFile($fullPath);
-                             
-                             // Import Page 1 and place below header
-                             if ($pagecount >= 1) {
-                                 $tplId = $mpdf->ImportPage(1);
-                                 // usage: UseTemplate($tplId, x, y, w, h)
-                                 // Place at x=5mm, y=80mm. 
-                                 // Adjust width/height as needed. 
-                                 // Let's try width=205 (full width) and let height auto-scale (or limit it).
-                                 // If height > ~180mm it might cut off. 
-                                 // Let's try fitting into box W=200, H=190.
-                                 $mpdf->UseTemplate($tplId, 5, 80, 205, 190);
-                             }
+                            try {
+                                $pagecount = $mpdf->SetSourceFile($fullPath);
+                                
+                                // Import Page 1 and place below header
+                                if ($pagecount >= 1) {
+                                    $tplId = $mpdf->ImportPage(1);
+                                    // usage: UseTemplate($tplId, x, y, w, h)
+                                    // Place at x=5mm, y=80mm. 
+                                    // Adjust width/height as needed. 
+                                    // Let's try width=205 (full width) and let height auto-scale (or limit it).
+                                    // If height > ~180mm it might cut off. 
+                                    // Let's try fitting into box W=200, H=190.
+                                    $mpdf->UseTemplate($tplId, 5, 80, 205, 190);
+                                }
 
-                             // Append remaining pages as new pages
-                             for ($i = 2; $i <= $pagecount; $i++) {
-                                 $mpdf->AddPage(); 
-                                 $tplId = $mpdf->ImportPage($i);
-                                 $mpdf->UseTemplate($tplId); // Full page normal size
-                             }
+                                // Append remaining pages as new pages
+                                for ($i = 2; $i <= $pagecount; $i++) {
+                                    $mpdf->AddPage(); 
+                                    $tplId = $mpdf->ImportPage($i);
+                                    $mpdf->UseTemplate($tplId); // Full page normal size
+                                }
+                            } catch (\Throwable $e) {
+                                // If PDF is corrupted or has CrossReferenceException
+                                // Add a message on the current page (below header) or a new page
+                                // Since we already added a page for the header, let's write on it.
+                                $mpdf->SetXY(10, 100);
+                                $mpdf->SetFont('Arial', 'B', 12);
+                                $mpdf->SetTextColor(255, 0, 0);
+                                $mpdf->WriteCell(190, 10, "ERROR: No se pudo cargar el archivo PDF adjunto.", 0, 1, 'C');
+                                $mpdf->SetFont('Arial', '', 10);
+                                $mpdf->SetTextColor(0, 0, 0);
+                                $mpdf->WriteCell(190, 10, "Archivo: " . basename($item->pdf), 0, 1, 'C');
+                                $mpdf->WriteCell(190, 10, "Detalle: El archivo parece estar dañado o tiene un formato no válido.", 0, 1, 'C');
+                                $mpdf->WriteCell(190, 10, "Error técnico: " . $e->getMessage(), 0, 1, 'C');
+                            }
                         }
                     }
                 }
