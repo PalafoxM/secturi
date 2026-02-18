@@ -12,7 +12,7 @@
                                 <li class="breadcrumb-item active">Lista Hoja Azul</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Lista Hoja Azul</h4>
+                        <h4 class="page-title">Lista de Formatos PT</h4>
                     </div><!--end page-title-box-->
                 </div><!--end col-->
             </div>
@@ -57,9 +57,15 @@
                                                
                                                 <a class="btn btn-outline-info btn-round" href="<?php echo base_url().'index.php/Inicio/pdfEncabezadoFactura?id='.$e->id_formulario_pt ?>" target="_blank" title="Encabezado de Factura" ><i
                                                         class="mdi mdi-file-document-box-multiple font-18"></i></a>
-                                               
+
+                                                <a class="btn btn-outline-success btn-round" href="<?php echo base_url().'index.php/Inicio/pdfEncabezadoFacturaTicket?id='.$e->id_formulario_pt ?>" target="_blank" title="Encabezado de Ticket" ><i
+                                                        class="mdi mdi-ballot-outline font-18"></i></a>
+                                                 <a class="btn btn-outline-warning btn-round" onclick="descargarExcel(<?= $e->id_formulario_pt ?>)" title="Eliminar"><i
+                                                        class="mdi mdi-file-excel font-18"></i></a> 
                                                 <a class="btn btn-outline-warning btn-round" href="<?php echo base_url().'index.php/Inicio/generarFormatoPT?id='.$e->id_formulario_pt.'&editar=1'?>" title="Editar" ><i
                                                         class="mdi mdi-lead-pencil font-18"></i></a> 
+
+                                              
                                              
                                                 <button type="button" class="btn btn-outline-danger btn-round" onclick="ini.inicio.tipoOperacion.eliminarHojaAzul(<?= $e->id_formulario_pt ?>)" title="Eliminar"><i
                                                         class="mdi mdi-delete font-18"></i></button>
@@ -99,3 +105,20 @@
 <script src="<?= base_url()?>assets/js/metismenu.min.js"></script>
 <script src="<?= base_url()?>assets/js/waves.js"></script>
 <script src="<?= base_url()?>assets/js/feather.min.js"></script>
+
+<script>
+    function descargarExcel(id){
+         Swal.fire({
+            title: 'Atención',
+            text: "Estimado Personal, el llenado del Anexo 01 se realiza manualmente dependiendo de las necesidades del pago",
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Ir a Archivos',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '<?= base_url() ?>index.php/Principal/Archivo/' + id + '/1';
+            }
+        });
+    }
+</script>

@@ -2132,10 +2132,9 @@ class Principal extends BaseController
         $email = \Config\Services::email();
         $result = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_tipo_empleado' => 1]])->data;
 
-       /*$email->setTo([
+       $email->setTo([
             'agascag@guanajuato.gob.mx',
             'ccampos@guanajuato.gob.mx',
-            'sandag@guanajuato.gob.mx',
             'ztorrest@guanajuato.gob.mx',
             'ajassome@guanajuato.gob.mx',
             'apenriquez@guanajuato.gob.mx',
@@ -2147,9 +2146,9 @@ class Principal extends BaseController
             'rgonzalezgu@guanajuato.gob.mx',
             'yjimenez@guanajuato.gob.mx',
             'mamoralesg@guanajuato.gob.mx',
-        ]);*/
+        ]);
  
-                $email->setTo([
+            /*    $email->setTo([
                     'alopez@guanajuato.gob.mx',
                     'cchernandezp@guanajuato.gob.mx',
                     'csoto@guanajuato.gob.mx',
@@ -2192,7 +2191,7 @@ class Principal extends BaseController
                     'lebalderas@guanajuato.gob.mx',
                     'rantonio@guanajuato.gob.mx',
                     'jrodriguezgo@guanajuato.gob.mx',
-                ]);  
+                ]);  */
         $email->setSubject('Recordatorio: Revisión de Asistencias - Sistema SUSI');
         $email->setMessage('
             <!DOCTYPE html>
@@ -2225,9 +2224,9 @@ class Principal extends BaseController
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Estimado personal,</p>
                         
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-                            En caso de que aún no hayas realizado las <strong>justificaciones correspondientes a la quincena 03/2026</strong>, 
+                            En caso de que aún no hayas realizado las <strong>justificaciones de tu personal correspondientes a la quincena 03/2026</strong>, 
                             la cual comprende el periodo del <strong>01 al 15 de febrero de 2026</strong>, 
-                            tienes hasta el día <strong>viernes 20 de febrero hasta las 16:00 hrs</strong> para realizarlas.
+                            tienes hasta el día <strong>Lunes 23 de febrero hasta las 16:00 hrs</strong> para realizarlas.
                         </p>
 
                         <div class="highlight-box">
@@ -3776,120 +3775,25 @@ class Principal extends BaseController
        
 
     }
-    public function Archivo($id_registro_pt = null, $id_archivo = null, $savePath = null)
+    public function Archivo($id = null, $id_archivo = null, $savePath = null)
     {
         $session = \Config\Services::session();
         $globals = new Mglobal;
-        $data['reserva'] = "";
-        $registro_pt = $globals->getTabla([
-            'tabla' => 'vw_registro_pt',
-            'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
+
+        $res = $globals->getTabla([
+            'tabla' => 'formulario_pt',
+            'where' => ['id_formulario_pt' => $id, 'visible' => 1]
         ]);
 
-        //die( var_dump($registro_pt) );
-        $presupuesto = $globals->getTabla([
-            'tabla' => 'vw_reserva',
-            'where' => ['visible' => 1, 'id_reserva' => $registro_pt->data[0]->id_reserva]
-        ]);
-        //die( var_dump($registro_pt) );
-        $direccion = $globals->getTabla([
-            'tabla' => 'vw_direccion',
-            'where' => [
-                'visible' => 1,
-                'id_director' => $registro_pt->data[0]->id_reponsable_solicitud
-            ]
-        ]);
-        
-        if( isset($presupuesto->data) && !empty($presupuesto->data)){
-             $data['presupuesto'] = $presupuesto->data;
+        $registro = $res->data[0];
+
+        if($registro->nombre_proveedor_1 > 0){
+
+            $proveedor = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['id_proveedor' => $registro->nombre_proveedor_1]])->data[0];
+            $registro->nombre_proveedor_1 = $proveedor->razon_social;
         }
-       $direccionResponsable  = '';
-       if(isset($registro_pt->data[0]->id_direccion_responsable) && !empty($registro_pt->data[0]->id_direccion_responsable)){
-        $direccionResponsable = $globals->getTabla([
-            'tabla' => 'cat_area',
-            'where' => [
-                'visible' => 1,
-                'id_area' => $registro_pt->data[0]->id_direccion_responsable
-            ]
-        ]);
-       }
-       if($direccionResponsable->data[0]->prefijo){
-        $folio = $direccionResponsable->data[0]->prefijo;
-       }
-       
-        $no_consecutivo = "";
-        if (strlen($registro_pt->data[0]->no_consecutivo) == 1) {
-            $no_consecutivo = '00' . $registro_pt->data[0]->no_consecutivo;
-        }
-        if (strlen($registro_pt->data[0]->no_consecutivo) == 2) {
-            $no_consecutivo = '0' . $registro_pt->data[0]->no_consecutivo;
-        }
-        if (strlen($registro_pt->data[0]->no_consecutivo) >= 3) {
-            $no_consecutivo = $registro_pt->data[0]->no_consecutivo;
-        }
-        
-         //$folio =(isset( $direccion->data) && !empty( $direccion->data))? $direccion->data[0]->folio_prefijo:'S/N/';
       
-        $folio_prefijo = $folio . $no_consecutivo . '/' . date('Y'); //ESTO HAY QUE OREGUNTAR
-
-        $data['direccion'] = (isset( $direccion->data[0]) && !empty( $direccion->data[0]))? $direccion->data[0]:[];
-        $pdf = $globals->getTabla([
-            'tabla' => 'vw_pdf_reserva',
-            'where' => ['visible' => 1, 'id_registro_pt' => $id_registro_pt]
-        ])->data;
-
-        $instrumento = (isset($pdf[0]->instrumento) && !empty($pdf[0]->instrumento)) ? $pdf[0]->instrumento : '';
-        $id_reserva = (isset($pdf[0]->id_reserva) && !empty($pdf[0]->id_reserva)) ? $pdf[0]->id_reserva : '';
-       
-         $importe = "";
-        if (!empty($registro_pt->data)) {
-            $data['registro'] = $registro_pt->data[0];
-            $data['responsable'] = $registro_pt->data[0]->responsable;
-            $data['dsc_puesto'] = $registro_pt->data[0]->dsc_puesto;
-            $importe = $registro_pt->data[0]->total_importe;
-            $folio = $globals->getTabla([
-                'tabla' => 'direccion',
-                'where' => ['visible' => 1, 'id_area' => $data['registro']->id_direccion_responsable]
-            ]);
-            $data['fic'] = false;
-            if ($registro_pt->data[0]->no_reserva == '4327278') {
-                $data['folio'] = "SECTURI/DGDT/DCT/FIC-TH/" . $no_consecutivo . '/' . date('Y');
-                $data['fic'] = true;
-            } else if ($registro_pt->data[0]->no_reserva == '4327279') {
-                $data['folio'] = "SECTURI/DGDT/DCT/FIC-TA/" . $no_consecutivo . '/' . date('Y');
-                $data['fic'] = true;
-            } else if ($registro_pt->data[0]->no_reserva == '4327277') {
-                $data['folio'] = "SECTURI/DGDT/DCT/FIC-TA/" . $no_consecutivo . '/' . date('Y');
-                $data['fic'] = true;
-            } else {
-                $data['folio'] = $folio_prefijo;
-            }
-
-        } else {
-            echo '<h2>Error al encontrar registro, favor de revisar el id del registro PT</h2>';
-            die();
-        }
-         if (!empty($id_reserva)) {
-            $reserva = $globals->getTabla([
-                'tabla' => 'vw_reserva',
-                'where' => ['visible' => 1, 'id_reserva' => $id_reserva]
-            ])->data;
-            $data['reserva'] = $reserva[0];
-           
-            $importe_str = ($data['fic'])?$reserva[0]->total_importe:$importe;
-            $importe_float = (float) str_replace(',', '', $importe_str); // quita coma y convierte
-            $data['numero_texto'] = $this->numeroEnLetras($importe_float);
-            $data['es4000'] = false;
-            if ($reserva[0]->partida >= '4000' && $reserva[0]->partida < '5000') {
-                $data['es4000'] = true;
-            }
-        }
-  
-        $uuid = $globals->getTabla(['tabla' => 'factura', 'where' => ['id_registro_pt' => $id_registro_pt, 'visible' => 1]]);
-       //die(var_dump($uuid));
-        if(isset($uuid->data) && !empty($uuid->data)) {
-            $data['uuid'] = ($data['fic'])?$uuid->data[0]->uuid:$uuid->data;
-        }
+      // die(var_dump($registro));
        
         if ($id_archivo == 1) {
             $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load(FCPATH . 'assets/documentos/Anexo1_Reporte_d_ integracion_documental_2026.xlsx');
@@ -3912,72 +3816,43 @@ class Principal extends BaseController
              ->getStartColor()->setARGB('FFFFFFFF');
            // die(var_dump($spreadsheet));
             // Populate Excel Cells
-            // Header Data
-            $sheet->setCellValue('H7', date('d/m/Y', strtotime($data['registro']->fecha_tramite)));
-            $folioText = (isset($data['GO']) && !empty($data['GO']) ? 'GO' : 'PT') . ' ' . $folio_prefijo;
-            if ($data['fic']) {
-                 $folioText = 'PT ' . $data['folio'];
-            }
-            $sheet->setCellValue('H9', $folioText);
+            // Header Data  
+            $sheet->setCellValue('H7', date('d/m/Y', strtotime($registro->fecha_tramite)));
+           
+            $sheet->setCellValue('H9', $registro->no_consecutivo);
 
             // Checkboxes (using 'X' or 'Si' as per template logic - assuming 'Si'/'No' text based on image)
             // 02_Póliza
             //die( var_dump(  $data['registro']) );
-            $sheet->setCellValue('B15', ($data['registro']->poliza == 1) ? 'Si' : 'No');
-            $sheet->setCellValue('B17', ($data['registro']->contrato_convenio == 1) ? 'Si' : 'No');  
+            $sheet->setCellValue('B15', '');
+            $sheet->setCellValue('B17', '');  
             
             // 14_Otros - Logic from vFormato01 implies this might be dynamic or 'Si'
-            $sheet->setCellValue('F19', 'Si'); // Defaulting to Si based on current usage or map from DB
-            $sheet->setCellValue('D32', 'Si');
-            $sheet->setCellValue('D33', 'Si');
-            $sheet->setCellValue('D34', 'Si');
+            $sheet->setCellValue('F19', ''); // Defaulting to Si based on current usage or map from DB
+            $sheet->setCellValue('D32', '');
+            $sheet->setCellValue('D33', '');
+            $sheet->setCellValue('D34', '');
             // Footer / Payment Data
-            $sheet->setCellValue('B24', isset($data['registro']->dsc_proveedor) ? $data['registro']->dsc_proveedor : '');
+            $sheet->setCellValue('B24', isset($registro->nombre_proveedor_1) ? $registro->nombre_proveedor_1 : '');
             
             // Partida Presupuestal
             //die( var_dump($data['presupuesto']) );
-            $arrPartida = [];
-            if (isset($data['presupuesto']) && is_array($data['presupuesto'])) {
-                foreach ($data['presupuesto'] as $p) {
-                    $arrPartida[] = $p->partida;
-                }
-            } elseif (isset($data['presupuesto']->partida)) {
-                $arrPartida[] = $data['presupuesto']->partida;
-            }
-            $sheet->setCellValue('H24', implode(', ', $arrPartida));
+          
+            $sheet->setCellValue('H24', '');
 
-            $sheet->setCellValue('B25', isset($data['registro']->concepto_pago) ? $data['registro']->concepto_pago : '');
+            $sheet->setCellValue('B25', isset($registro->concepto_pago) ? $registro->concepto_pago : '');
             
-            // Contrato o convenio No.
-            $noConvenio = isset($data['presupuesto'][0]->no_convenio) ? $data['presupuesto'][0]->no_convenio : '';
-            $sheet->setCellValue('H26', $noConvenio);
+   
+            $sheet->setCellValue('H26', $registro->no_convenio);
 
-            // Folio Fiscal (UUIDs)
-             $arrUuid = [];
-             $sumaTotal = 0;
-            if (isset($data['uuid'])) {
-                 $uuids = is_array($data['uuid']) ? $data['uuid'] : [$data['uuid']];
-                foreach ($uuids as $u) {
-                     $val = is_object($u) ? ((isset($u->folio) && $u->folio) ? $u->folio : $u->uuid) : $u;
-                    $arrUuid[] = $val;
-                    $sumaTotal += (float)(is_object($u) ? $u->total : 0);
-                }
-            }
-            $sheet->setCellValue('B26', implode(', ', $arrUuid));
-            
-            // Importe Total
-             $fn = new \App\Libraries\Funciones();
-             $importeTexto = '$' . number_format($sumaTotal, 2) . ' ' . $fn->numeroALetras($sumaTotal);
-             $sheet->setCellValue('B27', $importeTexto);
 
 
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-            header('Content-Disposition: attachment;filename="Anexo1_' . $folioText . '.xlsx"');
+            header('Content-Disposition: attachment;filename="Anexo1_' . $registro->no_consecutivo . '.xlsx"');
             header('Cache-Control: max-age=0');
             $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
             $writer->save('php://output');
             exit();
-            die();
         }
 
         if (!empty($instrumento)) {
@@ -6455,13 +6330,15 @@ class Principal extends BaseController
 
         $usuarios = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["visible" => 1]]);
         $data['usuarios'] = $usuarios->data;
+        $usu = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["visible" => 1, 'id_usuario' => $session->get('id_usuario')]]);
 
-        if($usuarios->data[0]->id_usuario){
-            $tieneArea = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'titular' => $usuarios->data[0]->id_usuario]]);
+
+        if($usu->data[0]->id_usuario){
+            $tieneArea = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'titular' => $usu->data[0]->id_usuario]]);
             if(isset($tieneArea->data) && !empty($tieneArea->data)){
                 $data['id_area'] = $tieneArea->data[0]->id_area;
             }else{
-                $tieneArea = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'titular' => $usuarios->data[0]->id_jefe_inmediato]]);
+                $tieneArea = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'titular' => $usu->data[0]->id_jefe_inmediato]]);
                 if(isset($tieneArea->data) && !empty($tieneArea->data)){
                     $data['id_area'] = $tieneArea->data[0]->id_area;
                 }else{

@@ -2291,6 +2291,62 @@ class Inicio extends BaseController
         $mpdf->Output('EncabezadoFactura_' . $id . '.pdf', 'I');
         exit;
     }
+    public function pdfEncabezadoFacturaTicket()
+    {
+        $globals = new Mglobal;
+        $id = $this->request->getGet('id');
+        $data = [];
+
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 10,
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_bottom' => 10,
+            'format' => 'Letter',
+            'tempDir' => sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'mpdf'
+        ]);
+
+        if ($id) {
+            $registro = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["id_formulario_pt" => $id]]);
+            if (!empty($registro->data)) {
+                $data['registro_pt'] = $registro->data[0];
+                $items = $globals->getTabla(["tabla" => "manual_factura", "where" => ["id_registro_pt" => $id, "visible" => 1]]);
+                //die( var_dump( $items->data ) );
+                $itemCount = count($items->data);
+                $currentIndex = 0;
+
+                foreach($items->data as $key => $item){
+                    $currentIndex++;
+                    $item->importe_letra = $this->numeroALetras($item->importe);
+                    
+                    if ($currentIndex > 1) {
+                         $mpdf->AddPage();
+                    }
+
+                 
+                        $partida = $globals->getTabla([
+                            "tabla" => "cat_partida",
+                            "where" => ["cuenta_cable" => $item->partida, 'visible' => 1]
+                        ]);
+                        $item->dsc_partida = (isset($partida->data[0])) ? $partida->data[0]->nombre_fondo : '';
+                     
+                    
+                    
+                    // 1. Write Header
+                    //die(var_dump($item));
+                    $data['row'] = $item; 
+                    $html = view('pdfs/vPdfEncabezadoFactura', $data);
+                    $mpdf->WriteHTML($html);
+
+                    // 2. Append PDF INVOICE below header
+             
+                }
+            }
+        }
+
+        $mpdf->Output('EncabezadoFactura_' . $id . '.pdf', 'I');
+        exit;
+    }
 
     private function numeroALetras($amount)
     {
