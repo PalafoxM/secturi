@@ -266,12 +266,22 @@
                                         <div class="mb-2">
                                             <select id="nombre_proveedor_1" name="nombre_proveedor_1" class="form-control-plaintext select2" placeholder="ORGANIZACION MUNDIAL DEL TURISMO">
                                                 <option value="">Seleccione un proveedor</option>
-                                                <?php 
-                                                    $selectedProv = isset($registro_pt->nombre_proveedor_1) ? $registro_pt->nombre_proveedor_1 : (isset($proveedor->razon_social) ? $proveedor->razon_social : '');
-                                                ?>
-                                                <?php foreach($proveedores as $p): ?>
-                                                    <option value="<?= $p->razon_social ?>" <?= ($p->razon_social == $selectedProv) ? 'selected' : '' ?>><?= $p->razon_social ?></option>
-                                                <?php endforeach; ?>
+                                                <?php foreach ($proveedores as $p) { ?>
+                                                    <?php 
+                                                        $isSelected = false;
+                                                        // Check by ID (Preferred)
+                                                        if (isset($proveedor->id_proveedor) && $proveedor->id_proveedor == $p->id_proveedor) {
+                                                            $isSelected = true;
+                                                        } 
+                                                        // Fallback: Check by Name (Legacy)
+                                                        elseif (isset($registro_pt->nombre_proveedor_1) && $registro_pt->nombre_proveedor_1 == $p->razon_social) {
+                                                            $isSelected = true;
+                                                        }
+                                                    ?>
+                                                    <option value="<?= $p->id_proveedor ?>" <?= ($isSelected) ? 'selected' : '' ?>>
+                                                        <?= $p->razon_social ?>
+                                                    </option>
+                                                <?php } ?>
                                             </select>
                                         </div>
 
@@ -355,7 +365,7 @@
                                 <td colspan="4" class="text-left bg-white" style="border-bottom: none !important;">
                                     <div class="d-flex align-items-center">
                                         <span class="label-bold me-2">No. CONTRATO y/o CONVENIO:</span>
-                                        <input type="text" name="contrato_convenio" class="form-control-plaintext text-left w-50" value="<?= isset($no_convenio) ? $no_convenio : '' ?>">
+                                        <input type="text" name="contrato_convenio" class="form-control-plaintext text-left w-50" value="<?= isset($no_convenio) ? $no_convenio : 'NO APLICA' ?>">
                                     </div>
                                     <div class="d-flex align-items-center">
                                         <span class="label-bold me-2">No. RESERVA:</span>

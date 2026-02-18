@@ -6403,7 +6403,20 @@ class Principal extends BaseController
         $data['registro_pt'] = new stdClass();
         $data['periodo_factura'] = new stdClass();
         $data['proveedor'] = new stdClass();
-        $data['proveedor_banco'] = new stdClass();
+        $data['proveedor_banco'] = []; // Initialized as array to match view expectations
+
+        // Logic to fetch provider if editing
+        if ($id_reserva) {
+             // We need to fetch the form data first to get the provider name/id
+             // The code below line 6418 fetches $formulario_pt but it's for consecutive?
+             // Ah, checking line 6449, it fetches $registro_pt from 'reserva' table?
+             // Wait, the view uses $registro_pt which comes from... table 'formulario_pt' in Inicio.php, but here 'reserva'?
+             // Let's look closer at line 6449 in the file.
+             // It fetches from 'reserva' table.
+             // But 'formulario_pt' table has 'nombre_proveedor_1'.
+             // 'reserva' table has 'id_proveedor'. 
+             // If this function uses 'reserva' table, then $registro_pt has 'id_proveedor'.
+        }
         $data['no_consecutivo'] = '';
 
         // Default values to avoid errors in view
@@ -6451,16 +6464,44 @@ class Principal extends BaseController
             $data['no_convenio'] = $registro_pt->data[0]->no_convenio;
             $data['id_proveedor'] = $registro_pt->data[0]->id_proveedor;
             $data['id_proveedor_banco'] = $registro_pt->data[0]->id_proveedor_banco;
-            
-            // Fetch Provider Data
-            if(!empty($data['id_proveedor'])){
-                 $prov = $globals->getTabla(["tabla" => "proveedor", "where" => ["id_proveedor" => $data['id_proveedor']]]);
-                 if(!empty($prov->data)) $data['proveedor'] = $prov->data[0];
+            // Fetch Provider Data (Handle ID or Name)
+            $provIdOrName = $data['id_proveedor'];
+            if(!empty($provIdOrName)){
+                $whereProv = [];
+                if(is_numeric($provIdOrName)){
+                    $whereProv = ["id_proveedor" => $provIdOrName];
+                } else {
+                    $whereProv = ["razon_social" => $provIdOrName];
+                }
+
+                 $prov = $globals->getTabla(["tabla" => "proveedor", "where" => $whereProv]);
+                 if(!empty($prov->data)){
+                      $data['proveedor'] = $prov->data[0];
+                      $realIdProveedor = $data['proveedor']->id_proveedor;
+
+                      // Ensure in dropdown list
+                      $inList = false;
+                      if (!empty($data['proveedores'])) {
+                           foreach ($data['proveedores'] as $pList) {
+                               if ($pList->id_proveedor == $realIdProveedor) {
+                                   $inList = true;
+                                   break;
+                               }
+                           }
+                      }
+                      if (!$inList) {
+                          $data['proveedores'][] = $data['proveedor'];
+                      }
+                 }
             }
             
-            // Fetch Bank Data
+            // Fetch Bank Data (Linked or Default)
             if(!empty($data['id_proveedor_banco'])){
                  $banco = $globals->getTabla(["tabla" => "proveedor_banco", "where" => ["id_proveedor_banco" => $data['id_proveedor_banco']]]);
+                 if(!empty($banco->data)) $data['proveedor_banco'] = $banco->data[0];
+            } elseif(isset($realIdProveedor)) {
+                 // Fallback to default bank
+                 $banco = $globals->getTabla(["tabla" => "proveedor_banco", "where" => ["idproveedor" => $realIdProveedor, "fic" => 1]]);
                  if(!empty($banco->data)) $data['proveedor_banco'] = $banco->data[0];
             }
 

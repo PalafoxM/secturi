@@ -172,7 +172,7 @@
     <?php
         $responsable = isset($registro_pt->nombre_responsable_2) ? $registro_pt->nombre_responsable_2 : 'MARCO ANTONIO MORALES GARCÍA';
         // Title hardcoded in image or use variable if available? Image: DIRECTOR/A GENERAL DE INNOVACIÓN E INTELIGENCIA TURÍSTICA
-        $cargo_responsable = "DIRECTOR/A GENERAL DE INNOVACIÓN E INTELIGENCIA TURÍSTICA"; // Hardcoded default based on image
+        $cargo_responsable = $registro_pt->cargo_responsable_2; // Hardcoded default based on image
     ?>
     <div class="signature-section">
         ATENTAMENTE
