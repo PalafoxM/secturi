@@ -167,7 +167,11 @@
                                         <?php endforeach; ?>
                                     </select>
                                     <input type="text" name="no_consecutivo" autocomplete="off" class="form-control-plaintext" value="<?= isset($consecutivo) ? $consecutivo : '' ?>" placeholder="001/2026">
+                                   <?php if($editar == 1 && isset($registro_pt->no_consecutivo)): ?>
+                                    <spam class="text-success"><?= isset($registro_pt->no_consecutivo) ? $registro_pt->no_consecutivo : '' ?></spam>
+                                   <?php else: ?>
                                     <spam id="folio_error" class="text-success"></spam>
+                                   <?php endif; ?>
                                     <input type="hidden" name="folioCompleto" id="folioCompleto">
                                 </td>
                             </tr>
@@ -367,15 +371,15 @@
                                 <td colspan="4" class="text-left bg-white" style="border-bottom: none !important;">
                                     <div class="d-flex align-items-center">
                                         <span class="label-bold me-2">No. CONTRATO y/o CONVENIO:</span>
-                                        <input type="text" name="contrato_convenio" class="form-control-plaintext text-left w-50" value="<?= isset($no_convenio) ? $no_convenio : 'NO APLICA' ?>">
+                                        <input type="text" name="contrato_convenio" class="form-control-plaintext text-left w-50" value="<?= isset($registro_pt->no_convenio) ? $registro_pt->no_convenio : 'NO APLICA' ?>">
                                     </div>
                                     <div class="d-flex align-items-center">
                                         <span class="label-bold me-2">No. RESERVA:</span>
-                                        <input type="text" name="no_reserva_visual" class="form-control-plaintext text-left w-50" value="<?= isset($no_reserva) ? $no_reserva : '' ?>" placeholder="4798053">
+                                        <input type="text" name="no_reserva_visual" class="form-control-plaintext text-left w-50" value="<?= isset($registro_pt->no_reserva) ? $registro_pt->no_reserva : $no_reserva ?>" placeholder="4798053">
                                     </div>
                                     <div class="d-flex align-items-center mt-2">
                                         <span class="label-bold me-2">CONCEPTO SOLICITUD:</span>
-                                        <input type="text" name="concepto" class="form-control-plaintext text-left w-50" rows="2" placeholder="Concepto de la solicitud..."><?= isset($registro_pt->concepto) ? $registro_pt->concepto : '' ?>
+                                        <input type="text" name="concepto" class="form-control-plaintext text-left w-50" rows="2" placeholder="Concepto de la solicitud..." value="<?= isset($registro_pt->concepto) ? $registro_pt->concepto : '' ?>">
                                     </div>
                                 </td>
                             </tr>
@@ -418,7 +422,7 @@
                                         <option value="">Seleccione una opción</option>
                                         <?php foreach ($usuarios as $usuario): ?>
                                             <?php if(in_array($usuario->id_usuario, [95, 105])): ?>
-                                            <option value="<?= $usuario->nombre_completo ?>"><?= $usuario->nombre_completo ?></option>
+                                            <option value="<?= $usuario->nombre_completo ?>" <?= isset($registro_pt->nombre_autoriza) ? ($registro_pt->nombre_autoriza == $usuario->nombre_completo ? 'selected' : '') : '' ?>><?= $usuario->nombre_completo ?></option>
                                             <?php endif ?>
                                         <?php endforeach; ?>
                                     </select>
@@ -431,10 +435,10 @@
                                         <option value="">Seleccione una opción</option>
                                         <?php foreach ($usuarios as $usuario): ?>
                                             <?php if(in_array($usuario->id_usuario, [152, 40, 105,18, 99, 120 ])): ?>
-                                            <option value="<?= $usuario->nombre_completo ?>"><?= $usuario->nombre_completo ?></option>
+                                            <option value="<?= $usuario->nombre_completo ?>" <?= isset($registro_pt->nombre_responsable) ? ($registro_pt->nombre_responsable == $usuario->nombre_completo ? 'selected' : '') : '' ?>><?= $usuario->nombre_completo ?></option>
                                             <?php endif ?>
                                         <?php endforeach; ?>
-                                         <option value="NO APLICA">NO APLICA</option>
+                                         <option value="NO APLICA" <?= isset($registro_pt->nombre_responsable) ? ($registro_pt->nombre_responsable == 'NO APLICA' ? 'selected' : '') : '' ?>>NO APLICA</option>
                                     </select>
 
                                     <input type="text" name="cargo_responsable_1" class="form-control-plaintext small" value="DIRECTOR/A GENERAL DE INNOVACIÓN E INTELIGENCIA TURÍSTICA">
@@ -451,10 +455,10 @@
                                         <option value="">Seleccione una opción</option>
                                         <?php foreach ($usuarios as $usuario): ?>
                                          
-                                            <option value="<?= $usuario->nombre_completo ?>"><?= $usuario->nombre_completo ?></option>
+                                            <option value="<?= $usuario->nombre_completo ?>" <?= isset($registro_pt->nombre_responsable_2) ? ($registro_pt->nombre_responsable_2 == $usuario->nombre_completo ? 'selected' : '') : '' ?>><?= $usuario->nombre_completo ?></option>
                                         
                                         <?php endforeach; ?>
-                                         <option value="NO APLICA">NO APLICA</option>
+                                         <option value="NO APLICA" <?= isset($registro_pt->nombre_responsable_2) ? ($registro_pt->nombre_responsable_2 == 'NO APLICA' ? 'selected' : '') : '' ?>>NO APLICA</option>
                                     </select>
                                   
                                     <input type="text" name="cargo_responsable_2" class="form-control-plaintext small" value="DIRECTOR/A GENERAL DE INNOVACIÓN E INTELIGENCIA TURÍSTICA">

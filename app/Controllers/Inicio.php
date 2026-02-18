@@ -2048,7 +2048,7 @@ class Inicio extends BaseController
             $registro = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["id_formulario_pt" => $id]]);
             if (!empty($registro->data)) {
                 $data['registro_pt'] = $registro->data[0];
-              //  die(var_dump($data['registro_pt']));
+                //die(var_dump($data['registro_pt']));
                 // Fetch items
                 $items = $globals->getTabla(["tabla" => "manual_factura", "where" => ["id_registro_pt" => $id, "visible" => 1]]);
                 $data['periodo_factura_rows'] = $items->data;
@@ -2064,28 +2064,16 @@ class Inicio extends BaseController
 
                 $usuarios = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["visible" => 1]]);
                 $data['usuarios'] = $usuarios->data;
-                 $data['id_area'] = $usuarios->data[0]->id_area;
+                $data['id_area'] = $usuarios->data[0]->id_area;
 
-                $data['proveedor'] = new \stdClass();
-                $data['proveedor_banco'] = new \stdClass();
+ 
                 
                 // Check if we have provider info stored or linked.
                 // If not, maybe passed empty.
             }
-        } else {
-             // New record logic
-             // Generate consecutive?
-             $last = $globals->getTabla(["tabla" => "formulario_pt", "order_by" => "id_registro_pt DESC", "limit" => 1]);
-             $next_id = 1;
-             if(!empty($last->data)){
-                 $next_id = $last->data[0]->id_formulario_pt + 1;
-             }
-             $data['no_consecutivo'] = 'PT ' . str_pad($next_id, 3, "0", STR_PAD_LEFT) . '/' . date('Y');
-             
-             $data['periodo_factura_rows'] = [];
-             $data['proveedor'] = new \stdClass();
-             $data['proveedor_banco'] = new \stdClass();
-        }
+        } 
+
+        //die( var_dump($data['registro_pt']) );
 
         $data['scripts'] = array('principal', 'inicio');
         $data['edita'] = $data['editar'];
