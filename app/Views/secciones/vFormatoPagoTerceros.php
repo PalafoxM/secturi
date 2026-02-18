@@ -331,7 +331,18 @@
                                  <td colspan="4" class="text-left">
                                      <button type="button" class="btn btn-info btn-sm" id="btnAddRow">+ Agregar Fila</button>
                                  </td>
+                                 <td colspan="4" class="text-left">
+                                     <span class="label-bold me-2">CLAUSULA</span>
+                                    <select class="form-control-plaintext flex-grow-1" name="clausula">
+                                        <option value="PRIMERA">PRIMERA</option>
+                                        <option value="SEGUNDA">SEGUNDA</option>
+                                        <option value="TERCERA">TERCERA</option>
+                                    </select>
+                                 </td>
+                                 
+                                    
                              </tr>
+                          
                            
                         </tfoot>
                     </table>

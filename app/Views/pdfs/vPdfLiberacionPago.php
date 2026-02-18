@@ -145,7 +145,7 @@
 
     <!-- Content Body 3 - Legal -->
     <div class="content">
-        Hago de su conocimiento que de acuerdo a lo que establece la cláusula <strong>TERCERA</strong> de instrumento jurídico recibí
+        Hago de su conocimiento que de acuerdo a lo que establece la cláusula <strong><?= ($registro_pt->clausula)?$registro_pt->clausula:'PRIMERA' ?></strong> de instrumento jurídico recibí
         el producto, atendiendo lo que establece el marco normativo aplicable. El producto recibido se nos ha
         entregado a entera satisfacción en tiempo y forma, quedando bajo mi responsabilidad el uso y/o
         distribución, así como el resguardo y custodia de los expedientes originales y entregables correspondientes.

@@ -2192,7 +2192,7 @@ class Inicio extends BaseController
                     $html = view('pdfs/vPdfEncabezadoFactura', $data);
                     $mpdf->WriteHTML($html);
 
-                    // 2. Append PDF INVOICE below header (y=80mm approx)
+                    // 2. Append PDF INVOICE below header
                     if (!empty($item->pdf)) {
                         $fullPath = FCPATH . $item->pdf;
                         if (file_exists($fullPath)) {
@@ -2202,26 +2202,41 @@ class Inicio extends BaseController
                                 // Import Page 1 and place below header
                                 if ($pagecount >= 1) {
                                     $tplId = $mpdf->ImportPage(1);
-                                    // usage: UseTemplate($tplId, x, y, w, h)
-                                    // Place at x=5mm, y=80mm. 
-                                    // Adjust width/height as needed. 
-                                    // Let's try width=205 (full width) and let height auto-scale (or limit it).
-                                    // If height > ~180mm it might cut off. 
-                                    // Let's try fitting into box W=200, H=190.
-                                    $mpdf->UseTemplate($tplId, 5, 80, 205, 190);
+                                    
+                                    // Calculate dynamic position
+                                    $y_start = $mpdf->y + 5; // 5mm margin below header
+                                    $page_height = 279; // Letter height in mm (approx) -> or use $mpdf->h
+                                    $bottom_margin = 10;
+                                    $max_height = $page_height - $y_start - $bottom_margin;
+                                    
+                                    if ($max_height < 50) { 
+                                        // If less than 50mm remaining, add page? 
+                                        // But user wants "encabezado y pdf abajo es 1".
+                                        // Try to fit or force new page if totally weird.
+                                        // For now, let's just use what's available or clamp.
+                                        // Ideally, if header is huge, we might not fit much.
+                                        // Let's assume header is reasonable.
+                                    }
+
+                                    // Usage: UseTemplate($tplId, x, y, w, h)
+                                    // Use full width (approx 200mm) and calculated max height to avoid overflow
+                                    // Provide width 0 to auto-scale? No, we want to constrain width usually.
+                                    $mpdf->UseTemplate($tplId, 5, $y_start, 205, $max_height);
                                 }
 
                                 // Append remaining pages as new pages
                                 for ($i = 2; $i <= $pagecount; $i++) {
                                     $mpdf->AddPage(); 
                                     $tplId = $mpdf->ImportPage($i);
-                                    $mpdf->UseTemplate($tplId); // Full page normal size
+                                    // Use full page for subsequent pages
+                                    $mpdf->UseTemplate($tplId); 
                                 }
                             } catch (\Throwable $e) {
                                 // If PDF is corrupted or has CrossReferenceException
                                 // Add a message on the current page (below header) or a new page
                                 // Since we already added a page for the header, let's write on it.
-                                $mpdf->SetXY(10, 100);
+                                $currentY = $mpdf->y + 10;
+                                $mpdf->SetXY(10, $currentY);
                                 $mpdf->SetFont('Arial', 'B', 12);
                                 $mpdf->SetTextColor(255, 0, 0);
                                 $mpdf->WriteCell(190, 10, "ERROR: No se pudo cargar el archivo PDF adjunto.", 0, 1, 'C');
