@@ -1972,17 +1972,26 @@ class Inicio extends BaseController
 
         if ($id) {
             $registro = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["id_formulario_pt" => $id]]);
-        
+       
             if (!empty($registro->data)) {
                  if($registro->data[0]->nombre_proveedor_1 > 0){
                         $proveedor = $globals->getTabla(["tabla" => "proveedor", "where" => ["id_proveedor" => $registro->data[0]->nombre_proveedor_1]]);
                         $registro->data[0]->nombre_proveedor_1 = $proveedor->data[0]->razon_social;
                         $data['proveedor'] = $proveedor->data[0];
+
+                     
                     }
                // $proveedor = $globals->getTabla(["tabla" => "proveedor", "where" => ["id_proveedor" => $registro->data[0]->nombre_proveedor_1]]);
                 //$registro->data[0]->nombre_proveedor_1 = $proveedor->data[0]->razon_social;
                 $data['registro_pt'] = $registro->data[0];
                 $items = $globals->getTabla(["tabla" => "manual_factura", "where" => ["id_registro_pt" => $id , "visible" => 1]]);
+                   foreach($items->data as $item){
+                            $partida = $globals->getTabla([
+                                "tabla" => "cat_partida",
+                                "where" => ["cuenta_cable" => $item->partida, 'visible' => 1]
+                            ]);
+                            $item->dsc_partida = (isset($partida->data[0])) ? $partida->data[0]->nombre_fondo : '';
+                        }
                 $data['periodo_factura_rows'] = $items->data;
                 $data['edit'] = 1; // For view logic if reused
             }
@@ -1992,7 +2001,7 @@ class Inicio extends BaseController
         $data['logo'] = FCPATH . 'assets/logo-guanajuato.png';
         $data['norma'] = FCPATH . 'assets/Norma.png';
         //die( var_dump($data['logo']) ); // Debug if needed
-        
+       // die( var_dump($data) );
         $html = view('pdfs/vPdfLiberacionPago', $data);
 
         $mpdf = new \Mpdf\Mpdf([

@@ -56,20 +56,7 @@
             background-repeat: no-repeat;
             background-attachment: fixed;
         }
-         .norma{
-            /* border:3px solid red; */
-            margin: 0;
-            padding: 0;
-            left:55%;
-            top:0;
-            position: absolute;
-            width:17%;
-            height: 10%;
-            background-image: url('<?= $norma ?>');
-            background-size:100% 100%;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-        }
+        
     </style>
 </head>
 <body>
@@ -79,9 +66,6 @@
         <tr>
               <td width="50%" style="border: none; vertical-align: middle; text-align: left;">
                 <div class="logo"></div>
-            </td>
-            <td style="width: 50%; text-align: right;">
-                <div class="norma"></div>
             </td>
         </tr>
     </table>
@@ -120,8 +104,11 @@
         if(isset($periodo_factura_rows) && !empty($periodo_factura_rows)){
             foreach($periodo_factura_rows as $row){
                 if(isset($row->no_comprobante) && $row->no_comprobante) $comprobantes[] = $row->no_comprobante;
-                if(isset($row->proyecto) && $row->proyecto) $proyectos[] = $row->proyecto; // Check field name 'proyecto' or 'proyecto_meta'
-                if(isset($row->partida) && $row->partida) $partidas[] = $row->partida; // Check field name
+                if(isset($row->proyecto) && $row->proyecto) $proyectos[] = $row->proyecto; 
+                if(isset($row->partida) && $row->partida) {
+                     $desc = (isset($row->dsc_partida) && $row->dsc_partida) ? ' (' . $row->dsc_partida . ')' : '';
+                     $partidas[] = $row->partida . $desc;
+                }
             }
         }
         $comprobantes_text = implode(', ', array_unique($comprobantes));
@@ -145,7 +132,7 @@
 
     <!-- Content Body 3 - Legal -->
     <div class="content">
-        Hago de su conocimiento que de acuerdo a lo que establece la cláusula <strong><?= ($registro_pt->clausula)?$registro_pt->clausula:'PRIMERA' ?></strong> de instrumento jurídico recibí
+        Hago de su conocimiento que de acuerdo a lo que establece la cláusula <strong><?= ($registro_pt->clausula)?$registro_pt->clausula:'PRIMERA' ?></strong> de instrumento jurídico <strong><?= $registro_pt->no_convenio ?></strong> recibí
         el producto, atendiendo lo que establece el marco normativo aplicable. El producto recibido se nos ha
         entregado a entera satisfacción en tiempo y forma, quedando bajo mi responsabilidad el uso y/o
         distribución, así como el resguardo y custodia de los expedientes originales y entregables correspondientes.
