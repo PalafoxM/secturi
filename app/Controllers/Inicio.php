@@ -2053,14 +2053,19 @@ class Inicio extends BaseController
                 $items = $globals->getTabla(["tabla" => "manual_factura", "where" => ["id_registro_pt" => $id, "visible" => 1]]);
                 $data['periodo_factura_rows'] = $items->data;
                 
-                // Fetch provider data (assuming it comes from the first item or stored in main record?
-                // View shows provider inputs are in the first row's "Datos del Proveedor".
-                // But normally this data is fetched from a provider catalog or stored.
-                // In Step 5 view, it uses $proveedor->razon_social etc.
-                // Let's assume we need to fetch 'proveedor' and 'proveedor_banco' if relevant.
-                // Or maybe the view expects empty if not found.
-                // If I look at the view, it uses properties of $proveedor and $proveedor_banco.
-                // I will initialize them as empty objects if not found to avoid errors.
+                  $cat_area = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'id_pago' => 1]]);
+                $data['cat_area'] = $cat_area->data;
+                
+                $cat_proyecto = $globals->getTabla(["tabla" => "cat_proyecto", "where" => ["visible" => 1]]);
+                $data['cat_proyecto'] = $cat_proyecto->data;
+
+                $cat_partida = $globals->getTabla(["tabla" => "cat_partida", "where" => ["visible" => 1]]);
+                $data['cat_partida'] = $cat_partida->data;
+
+                $usuarios = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["visible" => 1]]);
+                $data['usuarios'] = $usuarios->data;
+                 $data['id_area'] = $usuarios->data[0]->id_area;
+
                 $data['proveedor'] = new \stdClass();
                 $data['proveedor_banco'] = new \stdClass();
                 
