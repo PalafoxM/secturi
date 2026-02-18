@@ -6415,6 +6415,19 @@ class Principal extends BaseController
          $data['no_reserva']="";
          $data['no_convenio']="";
 
+          $formulario_pt = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["visible" => 1, 'usu_reg' => $session->get('id_usuario')]]);
+            $no_consecutivo = count($formulario_pt->data) + 1 ;
+            if (strlen($no_consecutivo) == 1) {
+                $no_consecutivo = '00' . $no_consecutivo;
+            }
+            if (strlen($no_consecutivo) == 2) {
+                $no_consecutivo = '0' . $no_consecutivo;
+            }
+            if (strlen($no_consecutivo) >= 3) {
+                $no_consecutivo = $no_consecutivo;
+            }
+          $data['consecutivo'] = $no_consecutivo;
+
         $proveedores = $globals->getTabla(["tabla" => "proveedor", "where" => ["visible" => 1],'limit' => 10]);
         $data['proveedores'] = $proveedores->data;
 
@@ -6429,70 +6442,30 @@ class Principal extends BaseController
 
         $usuarios = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["visible" => 1]]);
         $data['usuarios'] = $usuarios->data;
+        $data['id_area'] = $usuarios->data[0]->id_area;
 
         if($id_reserva){
 
             $registro_pt = $globals->getTabla(["tabla" => "reserva", "where" => ["id_reserva" => $id_reserva, "visible" => 1]]);
             $data['no_reserva'] = $registro_pt->data[0]->no_reserva;
             $data['no_convenio'] = $registro_pt->data[0]->no_convenio;
+            $data['id_proveedor'] = $registro_pt->data[0]->id_proveedor;
+            $data['id_proveedor_banco'] = $registro_pt->data[0]->id_proveedor_banco;
+            
+            // Fetch Provider Data
+            if(!empty($data['id_proveedor'])){
+                 $prov = $globals->getTabla(["tabla" => "proveedor", "where" => ["id_proveedor" => $data['id_proveedor']]]);
+                 if(!empty($prov->data)) $data['proveedor'] = $prov->data[0];
+            }
+            
+            // Fetch Bank Data
+            if(!empty($data['id_proveedor_banco'])){
+                 $banco = $globals->getTabla(["tabla" => "proveedor_banco", "where" => ["id_proveedor_banco" => $data['id_proveedor_banco']]]);
+                 if(!empty($banco->data)) $data['proveedor_banco'] = $banco->data[0];
+            }
 
-             // 1. Obtener Datos Generales (Si existe registro previo)
-             if($edita == 1){
-                 $registro_pt = $globals->getTabla(["tabla" => "registro_pt", "where" => ["id_reserva" => $id_reserva, "visible" => 1]]);
-                 if(!empty($registro_pt->data)){
-                     $data['registro_pt'] = $registro_pt->data[0];
-                     
-                     // Obtener detalles de todas las filas (periodo_factura)
-                     $filas = $globals->getTabla(["tabla" => "periodo_factura", "where" => ["id_registro_pt" => $registro_pt->data[0]->id_registro_pt, "visible" => 1]]);
-                     $data['periodo_factura_rows'] = [];
-                     
-                     if(!empty($filas->data)){
-                         foreach($filas->data as $fila){
-                            // Intentar recuperar claves de proyecto/partida
-                            $proyecto_clave = '';
-                            $partida_clave = '';
-                            
-                            if(isset($fila->id_proyecto)){
-                                 $p = $globals->getTabla(["tabla" => "cat_proyecto", "where" => ["id_proyecto" => $fila->id_proyecto]]);
-                                 if(!empty($p->data)) $proyecto_clave = $p->data[0]->clave; 
-                            }
-                            if(isset($fila->id_partida)){
-                                 $pa = $globals->getTabla(["tabla" => "cat_partida", "where" => ["id_partida" => $fila->id_partida]]);
-                                 if(!empty($pa->data)) $partida_clave = $pa->data[0]->clave; 
-                            }
-                            
-                            // Añadir claves al objeto fila para usar en vista
-                            $fila->proyecto_clave = $proyecto_clave;
-                            $fila->partida_clave = $partida_clave;
-                            
-                            $data['periodo_factura_rows'][] = $fila;
-                         }
-                         
-                         // Mantener compatibilidad con vista anterior si se usa un solo objeto (opcional, pero mejor usar rows)
-                         $data['periodo_factura'] = $filas->data[0];
-                         $data['periodo_factura']->proyecto_clave = $data['periodo_factura_rows'][0]->proyecto_clave;
-                         $data['periodo_factura']->partida_clave = $data['periodo_factura_rows'][0]->partida_clave;
-                     }
 
-                     // Obtener Proveedor
-                     if(isset($registro_pt->data[0]->id_proveedor)){
-                          $prov = $globals->getTabla(["tabla" => "proveedor", "where" => ["id_proveedor" => $registro_pt->data[0]->id_proveedor]]);
-                          if(!empty($prov->data)) $data['proveedor'] = $prov->data[0];
-                          
-                          // Banco
-                          $banco = $globals->getTabla(["tabla" => "proveedor_banco", "where" => ["id_proveedor" => $registro_pt->data[0]->id_proveedor]]);
-                           if(!empty($banco->data)) $data['proveedor_banco'] = $banco->data[0];
-                     }
-                 }
-             } else {
-                 // Nuevo registro - Consecutivo
-                  $ultimo = $globals->getTabla(["tabla" => "registro_pt", "select" => "MAX(no_consecutivo) as max_consecutivo", "where" => ["visible" => 1]]);
-                  $consecutivo = 1;
-                  if (!empty($ultimo->data) && isset($ultimo->data[0]->max_consecutivo)) {
-                      $consecutivo = $ultimo->data[0]->max_consecutivo + 1;
-                  }
-                  $data['no_consecutivo'] = str_pad($consecutivo, 3, "0", STR_PAD_LEFT);
-             }
+
         }
         
         $data['scripts'] = array('principal');

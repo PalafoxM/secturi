@@ -163,11 +163,12 @@
                                 <td>
                                     <select id="folio" name="folio" class="folio">
                                         <?php foreach($cat_area as $area): ?>
-                                            <option value="<?= $area->id_area ?>"><?= $area->prefijo ?></option>
+                                            <option value="<?= $area->id_area ?>" <?= $area->id_area == $id_area ? 'selected' : '' ?>><?= $area->prefijo ?></option>
                                         <?php endforeach; ?>
                                     </select>
-                                    <input type="text" name="no_consecutivo" autocomplete="off" class="form-control-plaintext" value="<?= isset($registro_pt->no_consecutivo) ? $registro_pt->no_consecutivo : $no_consecutivo ?>" placeholder="001/2026">
-                                    <spam id="folio_error" class="text-danger"></spam>
+                                    <input type="text" name="no_consecutivo" autocomplete="off" class="form-control-plaintext" value="<?= isset($consecutivo) ? $consecutivo : '' ?>" placeholder="001/2026">
+                                    <spam id="folio_error" class="text-success"></spam>
+                                    <input type="hidden" name="folioCompleto" id="folioCompleto">
                                 </td>
                             </tr>
                         </tbody>
@@ -263,10 +264,13 @@
                                     <div class="provider-section">
                                         <!-- Organization Name -->
                                         <div class="mb-2">
-                                            <select id="nombre_proveedor_1" name="nombre_proveedor_1" class="form-control-plaintext select2" placeholder="ORGANIZACION MUNDIAL DEL TURISMO" value="<?= isset($registro_pt->nombre_proveedor_1) ? $registro_pt->nombre_proveedor_1 : '' ?>">
+                                            <select id="nombre_proveedor_1" name="nombre_proveedor_1" class="form-control-plaintext select2" placeholder="ORGANIZACION MUNDIAL DEL TURISMO">
                                                 <option value="">Seleccione un proveedor</option>
-                                                <?php foreach($proveedores as $proveedor): ?>
-                                                    <option value="<?= $proveedor->razon_social ?>"><?= $proveedor->razon_social ?></option>
+                                                <?php 
+                                                    $selectedProv = isset($registro_pt->nombre_proveedor_1) ? $registro_pt->nombre_proveedor_1 : (isset($proveedor->razon_social) ? $proveedor->razon_social : '');
+                                                ?>
+                                                <?php foreach($proveedores as $p): ?>
+                                                    <option value="<?= $p->razon_social ?>" <?= ($p->razon_social == $selectedProv) ? 'selected' : '' ?>><?= $p->razon_social ?></option>
                                                 <?php endforeach; ?>
                                             </select>
                                         </div>
@@ -274,25 +278,25 @@
                                         <!-- No. Proveedor -->
                                         <div class="d-flex mb-1 align-items-center">
                                             <span class="label-bold me-2 align-self-start">No. PROVEEDOR:</span>
-                                            <input type="text" id="no_proveedor" name="no_proveedor" class="flex-grow-1" placeholder="103156" value="<?= isset($registro_pt->no_proveedor) ? $registro_pt->no_proveedor : '' ?>">
+                                            <input type="text" id="no_proveedor" name="no_proveedor" class="flex-grow-1" placeholder="103156" value="<?= isset($registro_pt->no_proveedor) ? $registro_pt->no_proveedor : (isset($proveedor->no_proveedor) ? $proveedor->no_proveedor : '') ?>">
                                         </div>
 
                                         <!-- RFC -->
                                         <div class="d-flex mb-1 align-items-center">
                                             <span class="label-bold me-2">RFC:</span>
-                                            <input type="text" id="rfc_proveedor" name="rfc_proveedor" class="flex-grow-1" placeholder="N0011499A" value="<?= isset($registro_pt->rfc_proveedor) ? $registro_pt->rfc_proveedor : '' ?>">
+                                            <input type="text" id="rfc_proveedor" name="rfc_proveedor" class="flex-grow-1" placeholder="N0011499A" value="<?= isset($registro_pt->rfc_proveedor) ? $registro_pt->rfc_proveedor : (isset($proveedor->rfc) ? $proveedor->rfc : '') ?>">
                                         </div>
 
                                         <!-- Nombre Proveedor (Repetido en imagen) -->
                                         <div class="d-flex mb-1 align-items-center">
                                             <span class="label-bold me-2 align-self-start">NOMBRE:</span>
-                                            <input type="text" id="nombre_proveedor_2" name="nombre_proveedor_2" class="flex-grow-1" placeholder="ORGANIZACION MUNDIAL DEL TURISMO" value="<?= isset($registro_pt->nombre_proveedor_2) ? $registro_pt->nombre_proveedor_2 : '' ?>">
+                                            <input type="text" id="nombre_proveedor_2" name="nombre_proveedor_2" class="flex-grow-1" placeholder="ORGANIZACION MUNDIAL DEL TURISMO" value="<?= isset($registro_pt->nombre_proveedor_2) ? $registro_pt->nombre_proveedor_2 : (isset($proveedor->razon_social) ? $proveedor->razon_social : '') ?>">
                                         </div>
 
                                         <!-- No. Cuenta -->
                                         <div class="d-flex mb-1 align-items-center">
                                             <span class="label-bold me-2">NO. CUENTA:</span>
-                                            <input type="text" id="no_cuenta" name="no_cuenta" class="flex-grow-1" placeholder="610081057237000168" value="<?= isset($registro_pt->no_cuenta) ? $registro_pt->no_cuenta : '' ?>">
+                                            <input type="text" id="no_cuenta" name="no_cuenta" class="flex-grow-1" placeholder="610081057237000168" value="<?= isset($registro_pt->no_cuenta) ? $registro_pt->no_cuenta : (isset($proveedor_banco->no_cuenta) ? $proveedor_banco->no_cuenta : (isset($proveedor_banco->cuenta) ? $proveedor_banco->cuenta : '')) ?>">
                                         </div>
 
                                         <!-- Banco -->
@@ -300,8 +304,11 @@
                                             <span class="label-bold me-2">BANCO:</span>
                                             <select id="banco" name="banco" class="form-control-plaintext flex-grow-1">
                                                 <option value="">Seleccione un banco</option>
-                                                <?php if(isset($registro_pt->banco)): ?>
-                                                    <option value="<?= $registro_pt->banco ?>" selected><?= $registro_pt->banco ?></option>
+                                                <?php 
+                                                    $selectedBanco = isset($registro_pt->banco) ? $registro_pt->banco : (isset($proveedor_banco->banco) ? $proveedor_banco->banco : '');
+                                                ?>
+                                                <?php if($selectedBanco): ?>
+                                                    <option value="<?= $selectedBanco ?>" selected><?= $selectedBanco ?></option>
                                                 <?php endif; ?>
                                             </select>
                                         </div>
@@ -309,7 +316,7 @@
                                         <!-- CLABE -->
                                         <div class="d-flex mb-1 align-items-center">
                                             <span class="label-bold me-2">CLABE:</span>
-                                            <input type="text" id="clabe" name="clabe" class="flex-grow-1" placeholder="610081057237000168" value="<?= isset($registro_pt->clabe) ? $registro_pt->clabe : '' ?>">
+                                            <input type="text" id="clabe" name="clabe" class="flex-grow-1" placeholder="012180001057237008" value="<?= isset($registro_pt->clabe) ? $registro_pt->clabe : (isset($proveedor_banco->clabe) ? $proveedor_banco->clabe : '') ?>">
                                         </div>
 
                                     </div>
@@ -647,7 +654,8 @@
           var prefix = $('#folio option:selected').text();
           var consecutivo = $('input[name="no_consecutivo"]').val();
           if(prefix && consecutivo) {
-              $('#folio_error').text(prefix + ' ' + consecutivo);
+              $('#folio_error').text('PT '+prefix + '' + consecutivo+'/2026');
+              $('#folioCompleto').val('PT '+prefix + '' + consecutivo+'/2026');
           } else {
               $('#folio_error').text('');
           }

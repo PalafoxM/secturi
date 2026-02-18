@@ -1974,8 +1974,8 @@ class Inicio extends BaseController
             $registro = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["id_formulario_pt" => $id]]);
         
             if (!empty($registro->data)) {
-                $proveedor = $globals->getTabla(["tabla" => "proveedor", "where" => ["id_proveedor" => $registro->data[0]->nombre_proveedor_1]]);
-                $registro->data[0]->nombre_proveedor_1 = $proveedor->data[0]->razon_social;
+               // $proveedor = $globals->getTabla(["tabla" => "proveedor", "where" => ["id_proveedor" => $registro->data[0]->nombre_proveedor_1]]);
+                //$registro->data[0]->nombre_proveedor_1 = $proveedor->data[0]->razon_social;
                 $data['registro_pt'] = $registro->data[0];
                 $items = $globals->getTabla(["tabla" => "manual_factura", "where" => ["id_registro_pt" => $id , "visible" => 1]]);
                 $data['periodo_factura_rows'] = $items->data;
@@ -2120,12 +2120,12 @@ class Inicio extends BaseController
 
         if ($id) {
             $registro = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["id_formulario_pt" => $id]]);
-            //die(var_dump($registro));
+          //  die(var_dump($registro));
             if (!empty($registro->data)) {
            
-                $proveedor = $globals->getTabla(["tabla" => "proveedor", "where" => ["id_proveedor" => $registro->data[0]->nombre_proveedor_1]]);
-                $registro->data[0]->nombre_proveedor_1 = $proveedor->data[0]->razon_social;
-                $data['proveedor'] = $proveedor->data[0];
+               // $proveedor = $globals->getTabla(["tabla" => "proveedor", "where" => ["id_proveedor" => $registro->data[0]->nombre_proveedor_1]]);
+               // $registro->data[0]->nombre_proveedor_1 = $proveedor->data[0]->razon_social;
+              //  $data['proveedor'] = $proveedor->data[0];
                 $data['registro_pt'] = $registro->data[0];
                 $items = $globals->getTabla(["tabla" => "manual_factura", "where" => ["id_registro_pt" => $id , "visible" => 1]]);
                 $data['periodo_factura_rows'] = $items->data;

@@ -23,9 +23,9 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="table-responsive">
-                                <div id="toolbar">
+                                <!-- <div id="toolbar">
                                      <a href="<?= base_url() ?>index.php/Principal/generarFormatoPT" class="btn btn-primary"><i class="mdi mdi-plus"></i> Nuevo</a>
-                                </div>
+                                </div> -->
                                 <table id="datatableUsuario" class="table">
                                     <thead class="thead-light">
                                         <tr>

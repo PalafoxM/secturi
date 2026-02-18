@@ -6112,7 +6112,7 @@ class Agregar extends BaseController
         // die( var_dump($data) );
        
         $dataInsert = [
-            'no_consecutivo' => $data['no_consecutivo'],
+            'no_consecutivo' => $data['folioCompleto'],
             'nombre_proveedor_1' => $data['nombre_proveedor_1'],
             'rfc_proveedor' => $data['rfc_proveedor'],
             'nombre_proveedor_2' => $data['nombre_proveedor_2'],
