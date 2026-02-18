@@ -6276,66 +6276,68 @@ class Agregar extends BaseController
         $response->respuesta = "Éxito|La información se guardó correctamente.";
 
         // --- EMAIL SENDING LOGIC ---
-        try {
-            $email = \Config\Services::email();
-            $globals = new Mglobal; // Ensure instance matches if needed, usually $this->globals
-            
-            // 1. Get User Name
-            $nombreUsuario = $session->get('nombre_completo');
-            if(!$nombreUsuario){
-                // Fallback: Query if not in session
-                $u = $this->globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['id_usuario' => $session->get('id_usuario')]]);
-                if(isset($u->data[0])) $nombreUsuario = $u->data[0]->nombre_completo;
-                else $nombreUsuario = "Usuario System";
-            }
-            
-            // 2. Get Files to Attach
-            $filesToAttach = [];
-            // Query active rows for this record
-            $activeRows = $this->globals->getTabla(['tabla' => 'manual_factura', 'where' => ['id_registro_pt' => $id_registro_pt, 'visible' => 1]]);
-            
-            if(isset($activeRows->data)){
-                foreach($activeRows->data as $row){
-                    if(!empty($row->pdf) && file_exists(FCPATH . $row->pdf)){
-                         $filesToAttach[] = FCPATH . $row->pdf;
-                    }
-                    if(!empty($row->xml) && file_exists(FCPATH . $row->xml)){
-                         $filesToAttach[] = FCPATH . $row->xml;
+        if($session->get('id_usuario') != 1){
+            try {
+                $email = \Config\Services::email();
+                $globals = new Mglobal; // Ensure instance matches if needed, usually $this->globals
+                
+                // 1. Get User Name
+                $nombreUsuario = $session->get('nombre_completo');
+                if(!$nombreUsuario){
+                    // Fallback: Query if not in session
+                    $u = $this->globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['id_usuario' => $session->get('id_usuario')]]);
+                    if(isset($u->data[0])) $nombreUsuario = $u->data[0]->nombre_completo;
+                    else $nombreUsuario = "Usuario System";
+                }
+                
+                // 2. Get Files to Attach
+                $filesToAttach = [];
+                // Query active rows for this record
+                $activeRows = $this->globals->getTabla(['tabla' => 'manual_factura', 'where' => ['id_registro_pt' => $id_registro_pt, 'visible' => 1]]);
+                
+                if(isset($activeRows->data)){
+                    foreach($activeRows->data as $row){
+                        if(!empty($row->pdf) && file_exists(FCPATH . $row->pdf)){
+                            $filesToAttach[] = FCPATH . $row->pdf;
+                        }
+                        if(!empty($row->xml) && file_exists(FCPATH . $row->xml)){
+                            $filesToAttach[] = FCPATH . $row->xml;
+                        }
                     }
                 }
+
+                // 3. Configure Email
+                $email->setFrom('a.palafox@guanajuato.gob.mx', $nombreUsuario); // Sending ON BEHALF of user
+                $email->setTo('dasedetur@guanajuato.gob.mx');
+                $email->setCC($session->get('correo')); 
+                
+                $subject = 'Registro Formato ' . $dataInsert['no_consecutivo'];
+                $body = 'Estimado usuario,<br><br>';
+                $body .= 'Se ha realizado el registro del <strong>Formato PT</strong> con consecutivo <strong>' . $dataInsert['no_consecutivo'] . '</strong>.<br>';
+                $body .= 'Registrado por: <strong>' . $nombreUsuario . '</strong>.<br><br>';
+                $body .= 'Se adjuntan los archivos correspondientes (PDF/XML).<br>';
+                $body .= '<br>Saludos cordiales.';
+
+                $email->setSubject($subject);
+                $email->setMessage($body);
+
+                // 4. Attach Files
+                foreach($filesToAttach as $filePath){
+                    $email->attach($filePath);
+                }
+
+                // 5. Send
+                if($email->send()){
+                    // Success logging or modify response if needed
+                // log_message('info', 'Email sent for PT ' . $id_registro_pt);
+                } else {
+                // log_message('error', 'Email failed: ' . $email->printDebugger(['headers']));
+                }
+
+            } catch (\Exception $e) {
+                // Do not fail the main save operation if email fails
+            // log_message('error', 'Email exception: ' . $e->getMessage());
             }
-
-            // 3. Configure Email
-            $email->setFrom('a.palafox@guanajuato.gob.mx', $nombreUsuario); // Sending ON BEHALF of user
-            //$email->setTo('dasedetur@guanajuato.gob.mx');
-             $email->setCC('palafox.marin31@gmail.com.mx'); 
-            
-            $subject = 'Registro Formato ' . $dataInsert['no_consecutivo'];
-            $body = 'Estimado usuario,<br><br>';
-            $body .= 'Se ha realizado el registro del <strong>Formato PT</strong> con consecutivo <strong>' . $dataInsert['no_consecutivo'] . '</strong>.<br>';
-            $body .= 'Registrado por: <strong>' . $nombreUsuario . '</strong>.<br><br>';
-            $body .= 'Se adjuntan los archivos correspondientes (PDF/XML).<br>';
-            $body .= '<br>Saludos cordiales.';
-
-            $email->setSubject($subject);
-            $email->setMessage($body);
-
-            // 4. Attach Files
-            foreach($filesToAttach as $filePath){
-                $email->attach($filePath);
-            }
-
-            // 5. Send
-            if($email->send()){
-                // Success logging or modify response if needed
-               // log_message('info', 'Email sent for PT ' . $id_registro_pt);
-            } else {
-               // log_message('error', 'Email failed: ' . $email->printDebugger(['headers']));
-            }
-
-        } catch (\Exception $e) {
-            // Do not fail the main save operation if email fails
-           // log_message('error', 'Email exception: ' . $e->getMessage());
         }
 
         return $this->respond($response);
