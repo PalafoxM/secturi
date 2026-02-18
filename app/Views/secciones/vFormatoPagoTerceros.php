@@ -1131,7 +1131,7 @@
                     $btn.attr('title', newValue); // Show value on hover
                 } else {
                     $btn.removeClass('btn-success').addClass('btn-secondary');
-                    $btn.attr('title', 'Lugar de Comisión'); // Default tooltip
+                    $btn.attr('title', 'Comisión / Evento'); // Default tooltip
                 }
             }
         });

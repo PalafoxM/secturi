@@ -339,7 +339,7 @@
                                             <th>PROYECTO-META</th>
                                             <th>PARTIDA</th>
                                             <th>IMPORTE</th>
-                                            <th>AMPLIACION</th>
+                                            <th>FONDO</th>
                 
                                         </tr>
                                     </thead>
