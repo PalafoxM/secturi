@@ -6518,6 +6518,13 @@ class Agregar extends BaseController
                 ["tabla" => "manual_factura", "editar" => true, "idEditar" => ['id_registro_pt' => $data['id_formulario_pt']]], 
                 ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFormatoGO_Upd']
             );
+            
+             // Soft delete old viaticos
+             $this->globals->saveTabla(
+                ['visible' => 0, 'usu_act' => $session->get('id_usuario'), 'fec_act' => date('Y-m-d H:i:s')], 
+                ["tabla" => "viaticos_go", "editar" => true, "idEditar" => ['id_registro_go' => $data['id_formulario_pt']]], 
+                ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFormatoGO_Upd_Viat']
+            );
         }
 
         if(isset($data['no_comprobante']) && is_array($data['no_comprobante'])){
@@ -6602,6 +6609,29 @@ class Agregar extends BaseController
                 if($xmlPath) $dataFila['xml'] = $xmlPath;
                 
                 $resItem = $this->globals->saveTabla($dataFila, ["tabla" => "manual_factura", "editar" => false], []);
+
+                // --- SAVE VIATICOS ---
+                if(!$resItem->error && isset($resItem->idRegistro) && isset($data['viaticos_json'][$i])){
+                    $viaticosJson = $data['viaticos_json'][$i];
+                    $viaticosArr = json_decode($viaticosJson, true);
+                    
+                    if(is_array($viaticosArr) && count($viaticosArr) > 0){
+                        foreach($viaticosArr as $viat){
+                            $datos_viatico = [
+                                'id_registro_go' => $id_registro_pt, // Main Header ID
+                                'id_presupuesto' => 0, // Manual form doesn't track budget ID strictly
+                                'nombre'         => $viat['nombre'],
+                                'rfc'            => '', // Not captured in modal
+                                'importe'        => $viat['monto'],
+                                'id_identificador' => $resItem->idRegistro, // Link to manual_factura ID
+                                'usu_reg'        => $session->get('id_usuario'),
+                                'fec_reg'        => date('Y-m-d H:i:s')
+                            ];
+    
+                            $this->globals->saveTabla($datos_viatico, ["tabla" => "viaticos_go", "editar" => false], []);
+                        }
+                    }
+                }
             }
         }
 

@@ -49,24 +49,28 @@
                    
                                             <td  class="text-center" class="text-center">
                                                 <a class="btn btn-outline-secondary btn-round" href="<?php echo base_url().'index.php/Inicio/pdfGastosOperacion?id='.$e->id_formulario_pt ?>" target="_blank" title="Formato GO" ><i
-                                                        class="mdi mdi-file-pdf font-18"></i></a> 
+                                                        class="mdi mdi-file-pdf font-18"  data-toggle="tooltip" data-placement="top" title="Formato GO" ></i></a> 
                                                 <a class="btn btn-outline-primary btn-round" href="<?php echo base_url().'index.php/Inicio/pdfOficioLiberacion?id='.$e->id_formulario_pt ?>" target="_blank" title="Liberacion de Pago" ><i
-                                                        class="mdi mdi-file-pdf font-18"></i></a> 
+                                                        class="mdi mdi-file-pdf font-18"  data-toggle="tooltip" data-placement="top" title="Liberacion de Pago" ></i></a> 
                                                
                                                 <a class="btn btn-outline-info btn-round" href="<?php echo base_url().'index.php/Inicio/pdfEncabezadoFacturaGO?id='.$e->id_formulario_pt ?>" target="_blank" title="Encabezado de Factura" ><i
-                                                        class="mdi mdi-file-document-box-multiple font-18"></i></a>
+                                                        class="mdi mdi-file-document-box-multiple font-18"  data-toggle="tooltip" data-placement="top" title="Encabezado de Factura" ></i></a>
 
                                                 <a class="btn btn-outline-success btn-round" href="<?php echo base_url().'index.php/Inicio/pdfEncabezadoFacturaTicket?id='.$e->id_formulario_pt ?>" target="_blank" title="Encabezado de Ticket" ><i
-                                                        class="mdi mdi-ballot-outline font-18"></i></a>
-                                                 <a class="btn btn-outline-warning btn-round" onclick="descargarExcel(<?= $e->id_formulario_pt ?>)" title="Eliminar"><i
-                                                        class="mdi mdi-file-excel font-18"></i></a> 
+                                                        class="mdi mdi-ballot-outline font-18"  data-toggle="tooltip" data-placement="top" title="Encabezado de Ticket" ></i></a>
+                                                 <a class="btn btn-outline-warning btn-round" onclick="descargarExcel(<?= $e->id_formulario_pt ?>)" title="Descargar Excel"><i
+                                                        class="mdi mdi-file-excel font-18"  data-toggle="tooltip" data-placement="top" title="Descargar Excel" ></i></a> 
                                                 <a class="btn btn-outline-warning btn-round" href="<?php echo base_url().'index.php/Principal/generarFormatoGO?id='.$e->id_formulario_pt.'&editar=1'?>" title="Editar" ><i
-                                                        class="mdi mdi-lead-pencil font-18"></i></a> 
+                                                        class="mdi mdi-lead-pencil font-18"  data-toggle="tooltip" data-placement="top" title="Editar" ></i></a> 
 
                                               
                                              
                                                 <button type="button" class="btn btn-outline-danger btn-round" onclick="ini.inicio.tipoOperacion.eliminarHojaAzul(<?= $e->id_formulario_pt ?>)" title="Eliminar"><i
-                                                        class="mdi mdi-delete font-18"></i></button>
+                                                        class="mdi mdi-delete font-18"  data-toggle="tooltip" data-placement="top" title="Eliminar" ></i></button>
+
+                                                <?php if(isset($e->tiene_viaticos) && $e->tiene_viaticos): ?>
+                                                    <a class="btn btn-outline-info btn-round" href="javascript:void(0);" title="Contiene Viáticos" style="cursor: default; border-color: #17a2b8; color: #17a2b8;"><i class="fas fa-users font-18"></i></a>
+                                                <?php endif; ?>
                                             </td>
                                         </tr>
                                         <?php endforeach; ?>

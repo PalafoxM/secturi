@@ -2469,6 +2469,20 @@ class Inicio extends BaseController
             $dataDB = array('tabla' => 'formulario_pt', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario'), 'tipo_formato' => 'GO']);
         }
         $response = $globas->getTabla($dataDB);
+        
+        // Check for Viaticos
+        if (!empty($response->data)) {
+            foreach ($response->data as &$row) {
+                 $check = $globas->getTabla([
+                     "tabla" => "viaticos_go", 
+                     "where" => ["id_registro_go" => $row->id_formulario_pt, "visible" => 1],
+                     "limit" => 1,
+                     "select" => "id_viaticos_go"
+                 ]);
+                 $row->tiene_viaticos = !empty($check->data);
+            }
+        }
+
         $data['dataHojaAzul'] = $response->data; // Reuse var name for ease in view or change
         
         $data['scripts'] = array('inicio');

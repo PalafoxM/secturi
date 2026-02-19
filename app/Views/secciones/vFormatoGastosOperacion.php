@@ -339,6 +339,14 @@
                                             <option value="<?= $partida->cuenta_cable ?>" <?= (isset($row->partida) && $row->partida == $partida->cuenta_cable) ? 'selected' : '' ?>><?= $partida->cuenta_cable ?></option>
                                         <?php endforeach; ?>
                                     </select>
+                                    
+                                    <!-- Viaticos Button (Moved here) -->
+                                    <div class="mt-1 text-center">
+                                        <input type="hidden" name="viaticos_json[]" value="<?= isset($row->viaticos_json) ? htmlspecialchars($row->viaticos_json) : '' ?>">
+                                        <button type="button" class="btn btn-icon-custom btn-viaticos d-none" onclick="openViaticosModal(this)" title="Desglose Viáticos" style="background-color: #17a2b8 !important; color: white;">
+                                            <i class="fas fa-users"></i>
+                                        </button>
+                                    </div>
                                 </td>
 
                                 <!-- IMPORTE -->
@@ -369,22 +377,22 @@
                                     <!-- Extra Buttons Container (Hidden by default or smaller) -->
                                     <div class="commission-container d-flex justify-content-center">
                                         <input type="hidden" name="comision[]" value="<?= isset($row->comision) ? $row->comision : '' ?>">
-                                        <button type="button" class="btn btn-icon-custom btn-comision" onclick="editComision(this)" title="Comisión">
+                                        <button type="button" class="btn btn-icon-custom btn-comision" onclick="editComision(this)" data-toggle="tooltip" data-placement="top" title="Comisión">
                                             <i class="fas fa-briefcase"></i>
                                         </button>
 
                                         <input type="hidden" name="concepto_gasto[]" value="<?= isset($row->concepto_gasto) ? $row->concepto_gasto : '' ?>">
-                                        <button type="button" class="btn btn-icon-custom btn-concepto" onclick="editConcepto(this)" title="Concepto">
+                                        <button type="button" class="btn btn-icon-custom btn-concepto" onclick="editConcepto(this)" data-toggle="tooltip" data-placement="top" title="Concepto">
                                             <i class="fas fa-file-alt"></i>
                                         </button>
 
                                         <input type="hidden" name="fechas[]" value="<?= isset($row->fechas) ? $row->fechas : '' ?>">
-                                        <button type="button" class="btn btn-icon-custom btn-fechas" onclick="editFechas(this)" title="Fechas">
+                                        <button type="button" class="btn btn-icon-custom btn-fechas" onclick="editFechas(this)" data-toggle="tooltip" data-placement="top" title="Fechas">
                                             <i class="fas fa-calendar-alt"></i>
                                         </button>
                                         
                                         <input type="hidden" name="propinas[]" value="<?= isset($row->propinas) ? $row->propinas : '' ?>">
-                                        <button type="button" class="btn btn-icon-custom btn-propinas" onclick="editPropinas(this)" title="Propinas">
+                                        <button type="button" class="btn btn-icon-custom btn-propinas" onclick="editPropinas(this)" data-toggle="tooltip" data-placement="top" title="Propinas">
                                             <i class="fas fa-coins"></i>
                                         </button>
                                          <?php if($index > 0): ?>
@@ -625,6 +633,48 @@
 <script src="<?= base_url() ?>assets/js/feather.min.js"></script>
 <script src="<?= base_url(); ?>plugins/select2/select2.min.js"></script>
 
+<!-- Modal Viaticos Global -->
+<div class="modal fade" id="modalViaticos" tabindex="-1" role="dialog" aria-labelledby="modalViaticosLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title" id="modalViaticosLabel">Desglose de Viáticos (Partida 3750 / 3760)</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> Agregue las personas y sus montos. Al guardar, el <strong>Importe Total</strong> de la fila se actualizará automáticamente y el detalle se agregará al campo <strong>Descripción</strong>.
+                </div>
+                <input type="hidden" id="current_viaticos_row_index">
+                <table class="table table-bordered table-sm" id="tblViaticos">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Nombre de la Persona</th>
+                            <th width="150">Monto</th>
+                            <th width="50"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows will be added here -->
+                    </tbody>
+                </table>
+                <button type="button" class="btn btn-sm btn-primary" onclick="addViaticoRow()">
+                    <i class="fas fa-plus"></i> Agregar Persona
+                </button>
+            </div>
+            <div class="modal-footer">
+                <div class="mr-auto font-weight-bold">
+                    Total Viáticos: <span id="totalViaticosDisplay">$0.00</span>
+                </div>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="saveViaticos()">Guardar y Aplicar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     // Data Injection
     var cat_proyecto = <?= json_encode($cat_proyecto) ?>;
@@ -640,6 +690,14 @@
         
         // Initialize Row Select2s
         initRowSelect2($('body'));
+
+        // Check initial visibility for Viaticos buttons
+        $('select[name="no_partida[]"]').each(function() {
+            var text = $(this).find('option:selected').text();
+            if(text.includes('3750') || text.includes('3760')) {
+                $(this).closest('tr').find('.btn-viaticos').removeClass('d-none');
+            }
+        });
 
         // Initialize Validation/Totals
         calcularTotal();
@@ -816,6 +874,24 @@
             width: '100%'
         });
 
+        // Partida Change Event for Viaticos
+        $container.find('select[name="no_partida[]"]').on('select2:select', function(e) {
+            var data = e.params.data;
+            var $row = $(this).closest('tr');
+            var $btnViaticos = $row.find('.btn-viaticos');
+          
+            var text = data.text; 
+            if(text.includes('3750') || text.includes('3760')) {
+                $btnViaticos.removeClass('d-none');
+                console.log( 'entro a ala clase' );
+            } else {
+                $btnViaticos.addClass('d-none');
+                // Optional: Clear viaticos data if changed?
+            }
+        }).on('select2:unselect', function(e){
+             $(this).closest('tr').find('.btn-viaticos').addClass('d-none');
+        });
+
         // Initialize Provider Search Select2
         $container.find('.select2-proveedor-dynamic').select2({
             placeholder: "Buscar...",
@@ -908,7 +984,7 @@
                         <button type="button" class="btn btn-icon-custom btn-fechas" onclick="editFechas(this)" title="Fechas">
                             <i class="fas fa-calendar-alt"></i>
                         </button>
-                        
+
                         <button type="button" class="btn btn-sm btn-danger py-0 px-1 ml-1 btn-remove-row">&times;</button>
                     </div>
                 </td>
@@ -947,6 +1023,13 @@
             var val = $(this).val().replace(/[^0-9.]/g, '');
             if(val) total += parseFloat(val);
         });
+        
+        // Add Propinas
+        $('input[name="propinas[]"]').each(function(){
+            var val = $(this).val();
+            if(val && !isNaN(val)) total += parseFloat(val);
+        });
+
         return total;
     }
 
@@ -1367,8 +1450,151 @@
                 step: 0.01
             }
         }).then((result) => {
-            if(result.isConfirmed) $hidden.val(result.value);
+            if(result.isConfirmed) {
+                $hidden.val(result.value);
+                calcularTotal(); // Update Total
+            }
         });
+    }
+
+    // --- VIATICOS MODAL LOGIC ---
+
+    function openViaticosModal(btn) {
+        var $row = $(btn).closest('tr');
+        // If it's a new row, it has arowIndex. If loaded, it might use index.
+        // We need a reliable way to identify the row to push data back.
+        // Let's use the row's DOM element index or add a unique ID if needed.
+        // The buttons have onclick="openViaticosModal(this)"
+        
+        // Store current row reference
+        $('#current_viaticos_row_index').val($row.index());
+        
+        // Load existing data
+        var jsonStr = $row.find('input[name="viaticos_json[]"]').val();
+        var data = [];
+        try {
+            data = jsonStr ? JSON.parse(jsonStr) : [];
+        } catch(e) { console.error("Error parsing viaticos JSON", e); }
+        
+        // Clear and Repopulate Table
+        var $tbody = $('#tblViaticos tbody');
+        $tbody.empty();
+        
+        if(data.length > 0) {
+            data.forEach(function(item) {
+                addViaticoRow(item.nombre, item.monto);
+            });
+        } else {
+            // Add one empty row by default
+            addViaticoRow();
+        }
+        
+        calculateViaticosTotal();
+        $('#modalViaticos').modal('show');
+    }
+
+    function addViaticoRow(nombre = '', monto = '') {
+        var tr = `
+            <tr>
+                <td><input type="text" class="form-control form-control-sm viatico-nombre" placeholder="Nombre completo" value="${nombre}"></td>
+                <td>
+                    <div class="input-group input-group-sm">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">$</span>
+                        </div>
+                        <input type="number" class="form-control viatico-monto" placeholder="0.00" value="${monto}" step="0.01" oninput="calculateViaticosTotal()">
+                    </div>
+                </td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-sm btn-danger px-2" onclick="removeViaticoRow(this)">&times;</button>
+                </td>
+            </tr>
+        `;
+        $('#tblViaticos tbody').append(tr);
+    }
+
+    function removeViaticoRow(btn) {
+        $(btn).closest('tr').remove();
+        calculateViaticosTotal();
+    }
+
+    function calculateViaticosTotal() {
+        var total = 0;
+        $('.viatico-monto').each(function() {
+            var val = parseFloat($(this).val()) || 0;
+            total += val;
+        });
+        $('#totalViaticosDisplay').text(total.toLocaleString('en-US', {style: 'currency', currency: 'USD'}));
+        return total;
+    }
+
+    function saveViaticos() {
+        var rowIndex = $('#current_viaticos_row_index').val();
+
+        
+        if(!window.currentRowElement) return;
+        
+        var $row = $(window.currentRowElement);
+        var viaticosData = [];
+        var total = 0;
+        var descriptionParts = [];
+        
+        $('#tblViaticos tbody tr').each(function() {
+            var nombre = $(this).find('.viatico-nombre').val().trim();
+            var monto = parseFloat($(this).find('.viatico-monto').val()) || 0;
+            
+            if(nombre && monto > 0) {
+                viaticosData.push({nombre: nombre, monto: monto});
+                total += monto;
+                descriptionParts.push(`${nombre} ($${monto.toFixed(2)})`);
+            }
+        });
+        
+        // 1. Save JSON
+        $row.find('input[name="viaticos_json[]"]').val(JSON.stringify(viaticosData));
+        
+
+        var descText = "VIÁTICOS: " + descriptionParts.join(', ');
+        $row.find('input[name="concepto_gasto[]"]').val(descText);
+        $row.find('button.btn-concepto').addClass('btn-info').removeClass('btn-warning'); // Visual cue (optional)
+        
+        // 4. Update Commission? Maybe set to "REUNION DE TRABAJO" or similar default?
+        // $row.find('input[name="comision[]"]').val("VIATICOS");
+        
+        // Update Totals
+        calcularTotal();
+        
+        $('#modalViaticos').modal('hide');
+    }
+    
+    // Override openViaticosModal to set global element
+    var originalOpen = openViaticosModal;
+    openViaticosModal = function(btn) {
+        window.currentRowElement = $(btn).closest('tr');
+        // Call logic
+        // Duplicate logic here or call helper?
+        // Let's just put logic here directly since I defined openViaticosModal above but need to fix it.
+        
+        var $row = $(window.currentRowElement);
+        var jsonStr = $row.find('input[name="viaticos_json[]"]').val();
+        var data = [];
+        try {
+            data = jsonStr ? JSON.parse(jsonStr) : [];
+        } catch(e) { console.error("JSON Error", e); }
+        
+        var $tbody = $('#tblViaticos tbody');
+        $tbody.empty();
+        
+        if(data.length > 0) {
+            data.forEach(function(item) {
+                addViaticoRow(item.nombre, item.monto);
+            });
+        } else {
+            addViaticoRow();
+        }
+        
+        calculateViaticosTotal();
+        $('#modalViaticos').modal('show');
     }
 
 
