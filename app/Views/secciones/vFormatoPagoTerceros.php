@@ -75,6 +75,12 @@
         border-color: #1e7e34;
     }
 
+    .btn-loaded {
+        background-color: #6c757d !important;
+        border-color: #6c757d !important;
+        color: white !important;
+    }
+
     .file-name-display {
         font-size: 10px;
         color: #666;
@@ -244,14 +250,14 @@
                                     <!-- File Inputs -->
                                     <div class="mt-2 text-center">
                                         <!-- PDF Button -->
-                                        <label for="pdf_pt_<?= $index ?>" class="file-upload-btn btn-pdf">
+                                        <label for="pdf_pt_<?= $index ?>" class="file-upload-btn btn-pdf <?= !empty($row->pdf) ? 'btn-loaded' : '' ?>">
                                             <i class="feather icon-file-text"></i> PDF
                                         </label>
                                         <input type="file" id="pdf_pt_<?= $index ?>" name="pdf_pt_<?= $index ?>[]" class="d-none input-pdf" accept=".pdf" onchange="updateFileName(this)">
                                         <span class="file-name-display" id="name_pdf_pt_<?= $index ?>"></span>
 
                                         <!-- XML Button -->
-                                        <label for="xml_pt_<?= $index ?>" class="file-upload-btn btn-xml">
+                                        <label for="xml_pt_<?= $index ?>" class="file-upload-btn btn-xml <?= !empty($row->xml) ? 'btn-loaded' : '' ?>">
                                             <i class="feather icon-code"></i> XML
                                         </label>
                                         <input type="file" id="xml_pt_<?= $index ?>" name="xml_pt_<?= $index ?>[]" class="d-none input-xml" accept=".xml" onchange="updateFileName(this)">
@@ -263,19 +269,19 @@
                                     <!-- Commission Field (Refactored) -->
                                     <div class="commission-container mt-2 text-center">
                                         <input type="hidden" name="comision[]" class="commission-value" value="<?= isset($row->comision) ? $row->comision : '' ?>">
-                                        <button type="button" class="btn btn-sm <?= (isset($row->comision) && !empty($row->comision)) ? 'btn-success' : 'btn-secondary' ?> btn-commission" onclick="editComision(this)" title="Comisión / Evento">
+                                        <button type="button" class="btn btn-sm <?= (isset($row->comision) && !empty($row->comision)) ? 'btn-loaded' : 'btn-secondary' ?> btn-commission" onclick="editComision(this)" title="Comisión / Evento">
                                             <i class="feather icon-map-pin"></i> Comisión
                                         </button>
 
                                         <!-- Concepto Gasto Field -->
                                         <input type="hidden" name="concepto_gasto[]" class="concepto-gasto-value" value="<?= isset($row->concepto_gasto) ? $row->concepto_gasto : '' ?>">
-                                        <button type="button" class="btn btn-sm <?= (isset($row->concepto_gasto) && !empty($row->concepto_gasto)) ? 'btn-success' : 'btn-secondary' ?> btn-concepto-gasto ms-1" onclick="editConcepto(this)" title="Concepto Gasto">
+                                        <button type="button" class="btn btn-sm <?= (isset($row->concepto_gasto) && !empty($row->concepto_gasto)) ? 'btn-loaded' : 'btn-secondary' ?> btn-concepto-gasto ms-1" onclick="editConcepto(this)" title="Concepto Gasto">
                                             <i class="feather icon-list"></i> Concepto
                                         </button>
 
                                         <!-- Fechas Field -->
                                         <input type="hidden" name="fechas[]" class="fechas-value" value="<?= isset($row->fechas) ? $row->fechas : '' ?>">
-                                        <button type="button" class="btn btn-sm <?= (isset($row->fechas) && !empty($row->fechas)) ? 'btn-success' : 'btn-secondary' ?> btn-fechas ms-1" onclick="editFechas(this)" title="Fechas">
+                                        <button type="button" class="btn btn-sm <?= (isset($row->fechas) && !empty($row->fechas)) ? 'btn-loaded' : 'btn-secondary' ?> btn-fechas ms-1" onclick="editFechas(this)" title="Fechas">
                                             <i class="feather icon-calendar"></i> Fechas
                                         </button>
                                     </div>
@@ -1125,6 +1131,23 @@
         var displayId = 'name_' + input.id;
         $('#' + displayId).text(fileName);
         $('#' + displayId).attr('title', fileName); // Add tooltip
+        
+        var $label = $('label[for="' + input.id + '"]');
+        var originalHtml = $label.data('original-html') || $label.html();
+        
+        if (!$label.data('original-html')) {
+            $label.data('original-html', originalHtml);
+        }
+
+        if(fileName) {
+            $label.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
+            $label.removeClass('btn-loaded');
+            setTimeout(function() {
+                $label.html(originalHtml).addClass('btn-loaded');
+            }, 600);
+        } else {
+            $label.html(originalHtml).removeClass('btn-loaded');
+        }
     }
 
     function editComision(btn) {
@@ -1152,10 +1175,10 @@
                 
                 // Visual feedback & Tooltip Update
                 if(newValue && newValue.trim() !== '') {
-                    $btn.removeClass('btn-secondary').addClass('btn-success');
+                    $btn.removeClass('btn-secondary').addClass('btn-loaded');
                     $btn.attr('title', newValue); // Show value on hover
                 } else {
-                    $btn.removeClass('btn-success').addClass('btn-secondary');
+                    $btn.removeClass('btn-loaded').addClass('btn-secondary');
                     $btn.attr('title', 'Comisión / Evento'); // Default tooltip
                 }
             }
@@ -1187,10 +1210,10 @@
                 
                 // Visual feedback & Tooltip Update
                 if(newValue && newValue.trim() !== '') {
-                    $btn.removeClass('btn-secondary').addClass('btn-success');
+                    $btn.removeClass('btn-secondary').addClass('btn-loaded');
                     $btn.attr('title', newValue); // Show value on hover
                 } else {
-                    $btn.removeClass('btn-success').addClass('btn-secondary');
+                    $btn.removeClass('btn-loaded').addClass('btn-secondary');
                     $btn.attr('title', 'Concepto Gasto'); // Default tooltip
                 }
             }
@@ -1248,10 +1271,10 @@
                 
                 // Visual feedback & Tooltip Update
                 if(newValue && newValue.trim() !== ' / ') {
-                    $btn.removeClass('btn-secondary').addClass('btn-success');
+                    $btn.removeClass('btn-secondary').addClass('btn-loaded');
                     $btn.attr('title', newValue); // Show value on hover
                 } else {
-                    $btn.removeClass('btn-success').addClass('btn-secondary');
+                    $btn.removeClass('btn-loaded').addClass('btn-secondary');
                     $btn.attr('title', 'Fechas'); // Default tooltip
                 }
             }

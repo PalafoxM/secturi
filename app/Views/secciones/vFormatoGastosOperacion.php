@@ -153,6 +153,11 @@
     } 
     .btn-propinas:hover { background-color: #218838 !important; }
     
+    .btn-loaded { 
+        background-color: #6c757d !important; 
+        color: white !important; 
+        border-color: #6c757d !important; 
+    }
     .file-name-display {
         margin-bottom: 3px;
         font-size: 10px;
@@ -343,7 +348,7 @@
                                     <!-- Viaticos Button (Moved here) -->
                                     <div class="mt-1 text-center">
                                         <input type="hidden" name="viaticos_json[]" value="<?= isset($row->viaticos_json) ? htmlspecialchars($row->viaticos_json) : '' ?>">
-                                        <button type="button" class="btn btn-icon-custom btn-viaticos d-none" onclick="openViaticosModal(this)" title="Desglose Viáticos" style="background-color: #17a2b8 !important; color: white;">
+                                        <button type="button" class="btn btn-icon-custom btn-viaticos d-none <?= (!empty($row->viaticos_json) && $row->viaticos_json != '[]' && $row->viaticos_json != 'null') ? 'btn-loaded' : '' ?>" onclick="openViaticosModal(this)" title="Desglose Viáticos" style="background-color: #17a2b8 !important; color: white;">
                                             <i class="fas fa-users"></i>
                                         </button>
                                     </div>
@@ -355,13 +360,13 @@
                                     
                                     <!-- Buttons (PDF/XML/Extras) -->
                                     <div class="mt-1 d-flex justify-content-center flex-wrap">
-                                        <label for="pdf_pt_<?= $index ?>" class="file-upload-btn btn-pdf" title="Subir PDF">
+                                        <label for="pdf_pt_<?= $index ?>" class="file-upload-btn btn-pdf <?= !empty($row->pdf) ? 'btn-loaded' : '' ?>" title="Subir PDF">
                                             PDF
                                         </label>
                                         <input type="file" id="pdf_pt_<?= $index ?>" name="pdf_pt_<?= $index ?>[]" class="d-none input-pdf" accept=".pdf" onchange="updateFileName(this)">
                                         <input type="hidden" name="pdf_current_<?= $index ?>[]" value="<?= isset($row->pdf) ? $row->pdf : '' ?>">
                                         
-                                        <label for="xml_pt_<?= $index ?>" class="file-upload-btn btn-xml" title="Subir XML">
+                                        <label for="xml_pt_<?= $index ?>" class="file-upload-btn btn-xml <?= !empty($row->xml) ? 'btn-loaded' : '' ?>" title="Subir XML">
                                             XML
                                         </label>
                                         <input type="file" id="xml_pt_<?= $index ?>" name="xml_pt_<?= $index ?>[]" class="d-none input-xml" accept=".xml" onchange="updateFileName(this)">
@@ -377,22 +382,22 @@
                                     <!-- Extra Buttons Container (Hidden by default or smaller) -->
                                     <div class="commission-container d-flex justify-content-center">
                                         <input type="hidden" name="comision[]" value="<?= isset($row->comision) ? $row->comision : '' ?>">
-                                        <button type="button" class="btn btn-icon-custom btn-comision" onclick="editComision(this)" data-toggle="tooltip" data-placement="top" title="Comisión">
+                                        <button type="button" class="btn btn-icon-custom btn-comision <?= !empty($row->comision) ? 'btn-loaded' : '' ?>" onclick="editComision(this)" data-toggle="tooltip" data-placement="top" title="Comisión">
                                             <i class="fas fa-briefcase"></i>
                                         </button>
 
                                         <input type="hidden" name="concepto_gasto[]" value="<?= isset($row->concepto_gasto) ? $row->concepto_gasto : '' ?>">
-                                        <button type="button" class="btn btn-icon-custom btn-concepto" onclick="editConcepto(this)" data-toggle="tooltip" data-placement="top" title="Concepto">
+                                        <button type="button" class="btn btn-icon-custom btn-concepto <?= !empty($row->concepto_gasto) ? 'btn-loaded' : '' ?>" onclick="editConcepto(this)" data-toggle="tooltip" data-placement="top" title="Concepto">
                                             <i class="fas fa-file-alt"></i>
                                         </button>
 
                                         <input type="hidden" name="fechas[]" value="<?= isset($row->fechas) ? $row->fechas : '' ?>">
-                                        <button type="button" class="btn btn-icon-custom btn-fechas" onclick="editFechas(this)" data-toggle="tooltip" data-placement="top" title="Fechas">
+                                        <button type="button" class="btn btn-icon-custom btn-fechas <?= !empty($row->fechas) ? 'btn-loaded' : '' ?>" onclick="editFechas(this)" data-toggle="tooltip" data-placement="top" title="Fechas">
                                             <i class="fas fa-calendar-alt"></i>
                                         </button>
                                         
                                         <input type="hidden" name="propinas[]" value="<?= isset($row->propinas) ? $row->propinas : '' ?>">
-                                        <button type="button" class="btn btn-icon-custom btn-propinas" onclick="editPropinas(this)" data-toggle="tooltip" data-placement="top" title="Propinas">
+                                        <button type="button" class="btn btn-icon-custom btn-propinas <?= !empty($row->propinas) ? 'btn-loaded' : '' ?>" onclick="editPropinas(this)" data-toggle="tooltip" data-placement="top" title="Propinas">
                                             <i class="fas fa-coins"></i>
                                         </button>
                                          <?php if($index > 0): ?>
@@ -1041,7 +1046,7 @@
         
         // Number to Letters
         if(total > 0) {
-             $('input[name="importe_letra"]').val(numeroALetras(total, { plural: 'PESOS 00/100 M.N.', singular: 'PESO 00/100 M.N.', centPlural: 'CENTAVOS', centSingular: 'CENTAVO' }));
+             $('input[name="importe_letra"]').val(numeroALetras(total, { plural: 'PESOS', singular: 'PESO', centPlural: 'CENTAVOS', centSingular: 'CENTAVO' }));
         } else {
              $('input[name="importe_letra"]').val('CERO PESOS 00/100 M.N.');
         }
@@ -1180,6 +1185,23 @@
     window.updateFileName = function(input) {
         var fileName = input.files[0] ? input.files[0].name : '';
         $('#' + 'name_' + input.id).text(fileName);
+        
+        var $label = $('label[for="' + input.id + '"]');
+        var originalHtml = $label.data('original-html') || $label.html();
+        
+        if (!$label.data('original-html')) {
+            $label.data('original-html', originalHtml);
+        }
+
+        if(fileName) {
+            $label.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
+            $label.removeClass('btn-loaded');
+            setTimeout(function() {
+                $label.html(originalHtml).addClass('btn-loaded');
+            }, 600);
+        } else {
+            $label.html(originalHtml).removeClass('btn-loaded');
+        }
     }
     
     function handleXmlUpload(input) {
@@ -1341,12 +1363,16 @@
             return; // Stop submission
         }
 
-       // e.preventDefault();
         var formData = new FormData($('#formPagoTerceros')[0]);
         
         // Append Main Provider ID from first row as fallback if backend requires 'nombre_proveedor_1'
         var firstProvId = $('input[name="proveedor_id[]"]').first().val();
         if(firstProvId) formData.append('nombre_proveedor_1', firstProvId);
+
+        var $btn = $('#btnGuardarPT');
+        var originalText = $btn.html();
+        $btn.prop('disabled', true);
+        $btn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Guardando...');
 
         $.ajax({
             url: '<?= base_url() ?>index.php/Agregar/guardaFormatoGO', 
@@ -1361,10 +1387,12 @@
                         window.location.href = "<?= base_url('index.php/Inicio/listaGastosOperacion') ?>";
                     });
                 } else {
+                     $btn.prop('disabled', false).html(originalText);
                      Swal.fire("Error", response.respuesta.split('|')[1], "error");
                 }
             },
             error: function() {
+                 $btn.prop('disabled', false).html(originalText);
                  Swal.fire("Error", "Ocurrió un error al guardar.", "error");
             }
         });
@@ -1379,7 +1407,8 @@
     });
 
     function editConcepto(btn) { 
-        var $hidden = $(btn).closest('.commission-container').find('input[name="concepto_gasto[]"]');
+        var $btn = $(btn);
+        var $hidden = $btn.closest('.commission-container').find('input[name="concepto_gasto[]"]');
         Swal.fire({
             title: 'Concepto Gasto',
             input: 'textarea',
@@ -1388,12 +1417,20 @@
              confirmButtonText: 'Guardar',
             cancelButtonText: 'Cancelar'
         }).then((result) => {
-            if(result.isConfirmed) $hidden.val(result.value);
+            if(result.isConfirmed) {
+                $hidden.val(result.value);
+                if(result.value.trim() !== '') {
+                    $btn.addClass('btn-loaded');
+                } else {
+                    $btn.removeClass('btn-loaded');
+                }
+            }
         });
     }
     
     function editComision(btn) { 
-        var $hidden = $(btn).closest('.commission-container').find('input[name="comision[]"]');
+        var $btn = $(btn);
+        var $hidden = $btn.closest('.commission-container').find('input[name="comision[]"]');
          Swal.fire({
             title: 'Comisión / Evento',
             input: 'textarea',
@@ -1402,12 +1439,20 @@
             confirmButtonText: 'Guardar',
             cancelButtonText: 'Cancelar'
         }).then((result) => {
-            if(result.isConfirmed) $hidden.val(result.value);
+            if(result.isConfirmed) {
+                $hidden.val(result.value);
+                if(result.value.trim() !== '') {
+                    $btn.addClass('btn-loaded');
+                } else {
+                    $btn.removeClass('btn-loaded');
+                }
+            }
         });
     }
 
     function editFechas(btn) {
-        var $hidden = $(btn).closest('.commission-container').find('input[name="fechas[]"]');
+        var $btn = $(btn);
+        var $hidden = $btn.closest('.commission-container').find('input[name="fechas[]"]');
         var currentVal = $hidden.val() || '';
         var parts = currentVal.split(' / ');
         var start = parts[0] || '';
@@ -1429,15 +1474,28 @@
             confirmButtonText: 'Guardar',
             cancelButtonText: 'Cancelar',
             preConfirm: () => {
-                return document.getElementById('swal-start').value + ' / ' + document.getElementById('swal-end').value;
+                var s = document.getElementById('swal-start').value;
+                var e = document.getElementById('swal-end').value;
+                if(s && e) return s + ' / ' + e;
+                if(s) return s;
+                if(e) return e;
+                return '';
             }
         }).then((result) => {
-            if(result.isConfirmed) $hidden.val(result.value);
+            if(result.isConfirmed) {
+                $hidden.val(result.value);
+                if(result.value.trim() !== '') {
+                    $btn.addClass('btn-loaded');
+                } else {
+                    $btn.removeClass('btn-loaded');
+                }
+            }
         });
     }
 
     function editPropinas(btn) { 
-        var $hidden = $(btn).closest('.commission-container').find('input[name="propinas[]"]');
+        var $btn = $(btn);
+        var $hidden = $btn.closest('.commission-container').find('input[name="propinas[]"]');
         Swal.fire({
             title: 'Propinas',
             input: 'number',
@@ -1453,6 +1511,11 @@
             if(result.isConfirmed) {
                 $hidden.val(result.value);
                 calcularTotal(); // Update Total
+                if(result.value && parseFloat(result.value) > 0) {
+                    $btn.addClass('btn-loaded');
+                } else {
+                    $btn.removeClass('btn-loaded');
+                }
             }
         });
     }
@@ -1556,7 +1619,16 @@
 
         var descText = "VIÁTICOS: " + descriptionParts.join(', ');
         $row.find('input[name="concepto_gasto[]"]').val(descText);
-        $row.find('button.btn-concepto').addClass('btn-info').removeClass('btn-warning'); // Visual cue (optional)
+        $row.find('button.btn-concepto').addClass('btn-loaded'); 
+        
+        if(viaticosData.length > 0) {
+            $row.find('button.btn-viaticos').addClass('btn-loaded');
+        } else {
+            $row.find('button.btn-viaticos').removeClass('btn-loaded');
+            // If empty, remove the viáticos from concepto too
+            $row.find('input[name="concepto_gasto[]"]').val('');
+            $row.find('button.btn-concepto').removeClass('btn-loaded');
+        }
         
         // 4. Update Commission? Maybe set to "REUNION DE TRABAJO" or similar default?
         // $row.find('input[name="comision[]"]').val("VIATICOS");
