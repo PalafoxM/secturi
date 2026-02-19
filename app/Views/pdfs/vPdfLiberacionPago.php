@@ -121,7 +121,7 @@
     ?>
     <div class="content">
         Por medio del presente, me permito solicitar su apoyo para que se realice el trámite de Pago a Tercero pago a terceros de
-        folio <strong><?= $folio ?></strong> por la cantidad de <strong>$<?= $importe_total ?> (<?= $importe_letra ?>)</strong>,
+        folio <strong><?= $folio ?></strong> por la cantidad de <strong><?= $importe_total ?> (<?= $importe_letra ?>)</strong>,
         de comprobante(s) fiscal(es) No. <strong><?= $comprobantes_text ?></strong> por concepto de <strong><?= $concepto_text ?></strong> al proveedor <strong><?= $proveedor_nombre ?></strong>.
     </div>
 
