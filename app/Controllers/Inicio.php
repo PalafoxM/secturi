@@ -2446,6 +2446,11 @@ class Inicio extends BaseController
         // Actually, let's use a simplified version for now or check if there is a helper.
         // I will implement a basic one here to ensure it works.
         
+        // Remove commas before casting to float
+        if (is_string($amount)) {
+            $amount = str_replace(',', '', $amount);
+        }
+        
         $amount = (float)$amount;
         $pesos = floor($amount);
         $centavos = round(($amount - $pesos) * 100);
