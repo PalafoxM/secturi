@@ -6579,6 +6579,7 @@ class Agregar extends BaseController
                       'comision' => isset($data['comision'][$i]) ? trim($data['comision'][$i]) : '',
                       'concepto_gasto' => isset($data['concepto_gasto'][$i]) ? trim($data['concepto_gasto'][$i]) : '',
                       'fechas' => isset($data['fechas'][$i]) ? trim($data['fechas'][$i]) : '',
+                      'propinas' => isset($data['propinas'][$i]) ? trim((float)$data['propinas'][$i]) : '',
                       
                       // Provider Info (For GO)
                       'rfc' => isset($data['proveedor_rfc'][$i]) ? $data['proveedor_rfc'][$i] : '', 

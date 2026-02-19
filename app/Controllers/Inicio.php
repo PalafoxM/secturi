@@ -2291,6 +2291,97 @@ class Inicio extends BaseController
         $mpdf->Output('EncabezadoFactura_' . $id . '.pdf', 'I');
         exit;
     }
+
+    public function pdfEncabezadoFacturaGO()
+    {
+        $globals = new Mglobal;
+        $id = $this->request->getGet('id');
+        $data = [];
+
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 10,
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_bottom' => 10,
+            'format' => 'Letter',
+            'tempDir' => sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'mpdf'
+        ]);
+
+        if ($id) {
+            $registro = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["id_formulario_pt" => $id]]);
+            if (!empty($registro->data)) {
+                $data['registro_pt'] = $registro->data[0];
+                $items = $globals->getTabla(["tabla" => "manual_factura", "where" => ["id_registro_pt" => $id, "visible" => 1]]);
+                
+                $itemCount = count($items->data);
+                $currentIndex = 0;
+
+                foreach($items->data as $item){
+                    $currentIndex++;
+                    $item->importe_letra = $this->numeroALetras($item->importe);
+                    
+                    if ($currentIndex > 1) {
+                         $mpdf->AddPage();
+                    }
+
+                    $partida = $globals->getTabla([
+                        "tabla" => "cat_partida",
+                        "where" => ["cuenta_cable" => $item->partida, 'visible' => 1]
+                    ]);
+                    $item->dsc_partida = (isset($partida->data[0])) ? $partida->data[0]->nombre_fondo : '';
+                    
+                    // 1. Write Header
+                    $data['row'] = $item; 
+                    $html = view('pdfs/vPdfEncabezadoFacturaGO', $data);
+                    $mpdf->WriteHTML($html);
+
+                    // 2. Append PDF INVOICE below header
+                    if (!empty($item->pdf)) {
+                        $fullPath = FCPATH . $item->pdf;
+                        if (file_exists($fullPath)) {
+                            try {
+                                $pagecount = $mpdf->SetSourceFile($fullPath);
+                                
+                                // Import Page 1 and place below header
+                                if ($pagecount >= 1) {
+                                    $tplId = $mpdf->ImportPage(1);
+                                    
+                                    // Calculate dynamic position
+                                    $y_start = $mpdf->y + 5; // 5mm margin below header
+                                    $page_height = 279; 
+                                    $bottom_margin = 10;
+                                    $max_height = $page_height - $y_start - $bottom_margin;
+                                    
+                                    $mpdf->UseTemplate($tplId, 5, $y_start, 205, $max_height);
+                                }
+
+                                // Append remaining pages as new pages
+                                for ($i = 2; $i <= $pagecount; $i++) {
+                                    $mpdf->AddPage(); 
+                                    $tplId = $mpdf->ImportPage($i);
+                                    // Use full page for subsequent pages
+                                    $mpdf->UseTemplate($tplId); 
+                                }
+                            } catch (\Throwable $e) {
+                                // If PDF is corrupted or has CrossReferenceException
+                                $currentY = $mpdf->y + 10;
+                                $mpdf->SetXY(10, $currentY);
+                                $mpdf->SetFont('Arial', 'B', 12);
+                                $mpdf->SetTextColor(255, 0, 0);
+                                $mpdf->WriteCell(190, 10, "ERROR: No se pudo cargar el archivo PDF adjunto.", 0, 1, 'C');
+                                $mpdf->SetFont('Arial', '', 10);
+                                $mpdf->SetTextColor(0, 0, 0);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        $mpdf->Output('EncabezadoFacturaGO_' . $id . '.pdf', 'I');
+        exit;
+    }
+
     public function pdfEncabezadoFacturaTicket()
     {
         $globals = new Mglobal;

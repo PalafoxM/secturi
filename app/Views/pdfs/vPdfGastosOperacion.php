@@ -157,7 +157,7 @@
                 </td>
                 <td style="vertical-align: top; text-align: center; font-weight: bold;">
                      <?php foreach($rows as $r): ?>
-                        <div>$<?= isset($r->importe) ? $r->importe : '0.00' ?></div>
+                        <div>$<?= number_format((float)str_replace(',', '', $r->importe ?? 0) + (float)str_replace(',', '', $r->propinas ?? 0), 2) ?></div>
                     <?php endforeach; ?>
                 </td>
                 

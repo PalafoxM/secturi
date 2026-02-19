@@ -146,6 +146,12 @@
         border-color: #6f42c1 !important;
     } 
     .btn-fechas:hover { background-color: #5a32a3 !important; }
+
+    .btn-propinas { 
+        background-color: #28a745 !important; /* Green */
+        border-color: #28a745 !important;
+    } 
+    .btn-propinas:hover { background-color: #218838 !important; }
     
     .file-name-display {
         margin-bottom: 3px;
@@ -375,6 +381,11 @@
                                         <input type="hidden" name="fechas[]" value="<?= isset($row->fechas) ? $row->fechas : '' ?>">
                                         <button type="button" class="btn btn-icon-custom btn-fechas" onclick="editFechas(this)" title="Fechas">
                                             <i class="fas fa-calendar-alt"></i>
+                                        </button>
+                                        
+                                        <input type="hidden" name="propinas[]" value="<?= isset($row->propinas) ? $row->propinas : '' ?>">
+                                        <button type="button" class="btn btn-icon-custom btn-propinas" onclick="editPropinas(this)" title="Propinas">
+                                            <i class="fas fa-coins"></i>
                                         </button>
                                          <?php if($index > 0): ?>
                                             <button type="button" class="btn btn-sm btn-danger py-0 px-1 ml-1 btn-remove-row">&times;</button>
@@ -1336,6 +1347,24 @@
             cancelButtonText: 'Cancelar',
             preConfirm: () => {
                 return document.getElementById('swal-start').value + ' / ' + document.getElementById('swal-end').value;
+            }
+        }).then((result) => {
+            if(result.isConfirmed) $hidden.val(result.value);
+        });
+    }
+
+    function editPropinas(btn) { 
+        var $hidden = $(btn).closest('.commission-container').find('input[name="propinas[]"]');
+        Swal.fire({
+            title: 'Propinas',
+            input: 'number',
+            inputValue: $hidden.val(),
+            showCancelButton: true,
+            confirmButtonText: 'Guardar',
+            cancelButtonText: 'Cancelar',
+            inputAttributes: {
+                min: 0,
+                step: 0.01
             }
         }).then((result) => {
             if(result.isConfirmed) $hidden.val(result.value);
