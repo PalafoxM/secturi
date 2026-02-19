@@ -321,7 +321,7 @@
                                 <td>
                                     <select name="proyecto_meta[]" class="form-control-plaintext select2-dynamic">
                                         <?php foreach($cat_proyecto as $proyecto): ?>
-                                            <option value="<?= $proyecto->proyecto ?>" <?= (isset($row->proyecto_meta) && $row->proyecto == $proyecto->proyecto) ? 'selected' : '' ?>><?= $proyecto->proyecto ?></option>
+                                            <option value="<?= $proyecto->proyecto ?>" <?= (isset($row->proyecto) && $row->proyecto == $proyecto->proyecto) ? 'selected' : '' ?>><?= $proyecto->proyecto ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                 </td>
