@@ -217,7 +217,7 @@
                     <div class="row mb-3">
                          <div class="col-md-12 text-center">
                             Relación de <span id="count_docs" class="font-weight-bold border-bottom px-2"> <?= isset($registro_pt->relacion) ? $registro_pt->relacion : '1' ?> </span> documentos que amparan un importe de <span id="header_total" class="font-weight-bold border-bottom px-2">$0.00</span>
-                            <input type="hidden" name="relacion_documentos" id="relacion_documentos" value="1">
+                            <input type="hidden" name="relacion_documentos" id="relacion_documentos">
                         </div>
                     </div>
 

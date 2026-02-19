@@ -2509,6 +2509,8 @@ class Inicio extends BaseController
                 // Fetch items
                 $items = $globals->getTabla(["tabla" => "manual_factura", "where" => ["id_registro_pt" => $id, "visible" => 1]]);
                 $data['periodo_factura_rows'] = $items->data;
+                $rows = count( $items->data);
+                $data['rows'] = $rows;
 
                 // Data for View Headers (Areas, default banks, etc)
                  if(isset($data['registro_pt']->nombre_proveedor_1) && is_numeric($data['registro_pt']->nombre_proveedor_1) && $data['registro_pt']->nombre_proveedor_1 > 0){

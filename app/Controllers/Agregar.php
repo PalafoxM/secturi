@@ -6485,6 +6485,7 @@ class Agregar extends BaseController
             'no_convenio' => isset($data['no_convenio']) ? $data['no_convenio'] : '',
             'importe_letra' => isset($data['importe_letra']) ? $data['importe_letra'] : '',
             'concepto' => isset($data['concepto']) ? $data['concepto'] : '',
+            'relacion' => isset($data['relacion_documentos']) ? $data['relacion_documentos'] : '',
             
             'tipo_formato' => 'GO' // Discriminator if using same table?
         ];
