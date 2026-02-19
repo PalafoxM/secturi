@@ -31,8 +31,7 @@
                                         <tr>
                                             <th class="text-center">FEC. TRAMITE</th>
                                             <th class="text-center">FOLIO</th>
-                                            <th class="text-center">NO. RESERVA</th>
-                                            <th class="text-center">PROVEEDOR</th>
+                                       
                                             <th class="text-center">IMPORTE</th>
                                             <th class="text-center">ACCIONES</th>
                                         </tr>
@@ -44,8 +43,7 @@
                                         <tr>
                                             <td  class="text-center"><?= date('d/m/Y', strtotime($e->fecha_tramite)) ?></td>
                                             <td  class="text-center"><?= $e->no_consecutivo?></td>
-                                            <td  class="text-center"><?= $e->no_reserva?></td>
-                                            <td  class="text-center"><?= $e->nombre_proveedor_1?></td>
+                                        
                                             <td  class="text-center"><?= $e->importe_total_num?></td>
                                            
                    
