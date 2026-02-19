@@ -321,7 +321,7 @@
                                 <td>
                                     <select name="proyecto_meta[]" class="form-control-plaintext select2-dynamic">
                                         <?php foreach($cat_proyecto as $proyecto): ?>
-                                            <option value="<?= $proyecto->proyecto ?>" <?= (isset($row->proyecto_meta) && $row->proyecto_meta == $proyecto->proyecto) ? 'selected' : '' ?>><?= $proyecto->proyecto ?></option>
+                                            <option value="<?= $proyecto->proyecto ?>" <?= (isset($row->proyecto_meta) && $row->proyecto == $proyecto->proyecto) ? 'selected' : '' ?>><?= $proyecto->proyecto ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                 </td>
@@ -330,7 +330,7 @@
                                 <td>
                                     <select name="no_partida[]" class="form-control-plaintext select2-dynamic">
                                         <?php foreach($cat_partida as $partida): ?>
-                                            <option value="<?= $partida->cuenta_cable ?>" <?= (isset($row->no_partida) && $row->no_partida == $partida->cuenta_cable) ? 'selected' : '' ?>><?= $partida->cuenta_cable ?></option>
+                                            <option value="<?= $partida->cuenta_cable ?>" <?= (isset($row->partida) && $row->partida == $partida->cuenta_cable) ? 'selected' : '' ?>><?= $partida->cuenta_cable ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                 </td>
