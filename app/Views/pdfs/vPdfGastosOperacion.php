@@ -107,7 +107,7 @@
                     <tr>
                         <td class="text-center">21</td>
                         <td class="text-center"><?= isset($registro_pt->fecha_tramite) ? date('d/m/Y', strtotime($registro_pt->fecha_tramite)) : '' ?></td>
-                        <td class="text-center">GO SECTURI/DGA/CRMYSG/<?= isset($registro_pt->no_consecutivo) ? $registro_pt->no_consecutivo : '002' ?>/2026</td>
+                        <td class="text-center"><?= isset($registro_pt->no_consecutivo) ? $registro_pt->no_consecutivo : '002' ?>/2026</td>
                     </tr>
                 </table>
             </td>
@@ -157,22 +157,20 @@
                 </td>
                 <td style="vertical-align: top; text-align: center; font-weight: bold;">
                      <?php foreach($rows as $r): ?>
-                        <div>$<?= isset($r->importe) ? number_format((float)$r->importe, 2) : '0.00' ?></div>
+                        <div>$<?= isset($r->importe) ? $r->importe : '0.00' ?></div>
                     <?php endforeach; ?>
                 </td>
                 
                 <!-- Expanded columns (no nested table) -->
-                <td style="vertical-align: top; padding: 5px;">
-                     <?php if(isset($proveedor)): ?>
-                        <?= $proveedor->razon_social ?>
-                    <?php elseif(isset($registro_pt->nombre_proveedor_1)): ?>
-                        <?= $registro_pt->nombre_proveedor_1 ?>
-                    <?php endif; ?>
+                <td style="vertical-align: top; padding: 5px;  text-align: center; ">
+                     <?php foreach($rows as $r): ?>
+                        <div><?= $r->proveedor ?? '' ?></div>
+                    <?php endforeach; ?>
                 </td>
-                <td style="vertical-align: top; padding: 5px;">
-                    <?php if(isset($proveedor)): ?>
-                        <?= $proveedor->rfc ?>
-                    <?php endif; ?>
+                <td style="vertical-align: top; padding: 5px;  text-align: center; ">
+                  <?php foreach($rows as $r): ?>
+                        <?= $r->rfc ?>
+                    <?php endforeach; ?>
                 </td>
             </tr>
         </tbody>

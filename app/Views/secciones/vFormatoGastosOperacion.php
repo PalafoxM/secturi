@@ -103,6 +103,54 @@
     .table-sm td, .table-sm th {
         padding: 0.3rem;
     }
+
+    /* Custom Icon Buttons */
+    .btn-icon-custom {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px; /* Slightly larger */
+        height: 32px;
+        padding: 0;
+        border-radius: 4px;
+        color: white !important;
+        border: none;
+        transition: all 0.2s;
+        margin-right: 4px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .btn-icon-custom i {
+        font-size: 16px; /* Icon font size */
+        margin: 0;
+        color: white !important;
+    }
+    .btn-icon-custom:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 5px rgba(0,0,0,0.3);
+    }
+    .btn-comision { 
+        background-color: #17a2b8 !important; /* Info Blue */
+        border-color: #17a2b8 !important;
+    } 
+    .btn-comision:hover { background-color: #138496 !important; }
+
+    .btn-concepto { 
+        background-color: #ffc107 !important; /* Warning Orange */
+        border-color: #ffc107 !important;
+        color: white !important; /* Ensure white text */
+    } 
+    .btn-concepto:hover { background-color: #e0a800 !important; }
+
+    .btn-fechas { 
+        background-color: #6f42c1 !important; /* Purple */
+        border-color: #6f42c1 !important;
+    } 
+    .btn-fechas:hover { background-color: #5a32a3 !important; }
+    
+    .file-name-display {
+        margin-bottom: 3px;
+        font-size: 10px;
+    }
 </style>
 
 <div class="page-wrapper">
@@ -312,18 +360,18 @@
                                     <!-- Extra Buttons Container (Hidden by default or smaller) -->
                                     <div class="commission-container d-flex justify-content-center">
                                         <input type="hidden" name="comision[]" value="<?= isset($row->comision) ? $row->comision : '' ?>">
-                                        <button type="button" class="btn btn-sm btn-light py-0 px-1 border mr-1" onclick="editComision(this)" title="Comisión">
-                                            <i class="feather icon-map-pin small"></i>
+                                        <button type="button" class="btn btn-icon-custom btn-comision" onclick="editComision(this)" title="Comisión">
+                                            <i class="fas fa-briefcase"></i>
                                         </button>
 
                                         <input type="hidden" name="concepto_gasto[]" value="<?= isset($row->concepto_gasto) ? $row->concepto_gasto : '' ?>">
-                                        <button type="button" class="btn btn-sm btn-light py-0 px-1 border mr-1" onclick="editConcepto(this)" title="Concepto">
-                                            <i class="feather icon-list small"></i>
+                                        <button type="button" class="btn btn-icon-custom btn-concepto" onclick="editConcepto(this)" title="Concepto">
+                                            <i class="fas fa-file-alt"></i>
                                         </button>
 
                                         <input type="hidden" name="fechas[]" value="<?= isset($row->fechas) ? $row->fechas : '' ?>">
-                                        <button type="button" class="btn btn-sm btn-light py-0 px-1 border" onclick="editFechas(this)" title="Fechas">
-                                            <i class="feather icon-calendar small"></i>
+                                        <button type="button" class="btn btn-icon-custom btn-fechas" onclick="editFechas(this)" title="Fechas">
+                                            <i class="fas fa-calendar-alt"></i>
                                         </button>
                                          <?php if($index > 0): ?>
                                             <button type="button" class="btn btn-sm btn-danger py-0 px-1 ml-1 btn-remove-row">&times;</button>
@@ -458,6 +506,78 @@
     </div>
 </div>
 
+<!-- MODALS -->
+
+<!-- Modal Comisión -->
+<div class="modal fade" id="modalComision" tabindex="-1" role="dialog" aria-labelledby="modalComisionLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalComisionLabel">Editar Comisión</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <textarea id="txtComision" class="form-control" rows="4" placeholder="Ingrese la comisión..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="saveComision()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Concepto -->
+<div class="modal fade" id="modalConcepto" tabindex="-1" role="dialog" aria-labelledby="modalConceptoLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalConceptoLabel">Editar Concepto</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <textarea id="txtConcepto" class="form-control" rows="4" placeholder="Ingrese el concepto..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="saveConcepto()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Fechas -->
+<div class="modal fade" id="modalFechas" tabindex="-1" role="dialog" aria-labelledby="modalFechasLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalFechasLabel">Editar Fechas</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Fecha Inicio</label>
+                    <input type="date" id="dateInicio" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Fecha Fin</label>
+                    <input type="date" id="dateFin" class="form-control">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="saveFechas()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- SCRIPTS (Re-using existing CSS links but ensuring scripts block matches) -->
 <!-- ... (Keep CSS links from previous file) ... -->
 
@@ -562,6 +682,85 @@
         });
 
     });
+    
+    // Global variable to track which button/row triggered the modal
+    var currentEditingInput = null;
+
+    function editComision(btn) {
+        // Find hidden input relative to button
+        var hiddenInput = $(btn).siblings('input[name="comision[]"]');
+        currentEditingInput = hiddenInput;
+        
+        // Fill modal
+        $('#txtComision').val(hiddenInput.val());
+        $('#modalComision').modal('show');
+    }
+
+    function saveComision() {
+        if(currentEditingInput) {
+            currentEditingInput.val($('#txtComision').val());
+            $('#modalComision').modal('hide');
+        }
+    }
+
+    function editConcepto(btn) {
+        var hiddenInput = $(btn).siblings('input[name="concepto_gasto[]"]');
+        currentEditingInput = hiddenInput;
+        
+        $('#txtConcepto').val(hiddenInput.val());
+        $('#modalConcepto').modal('show');
+    }
+
+    function saveConcepto() {
+         if(currentEditingInput) {
+            currentEditingInput.val($('#txtConcepto').val());
+            $('#modalConcepto').modal('hide');
+        }
+    }
+
+    function editFechas(btn) {
+        var hiddenInput = $(btn).siblings('input[name="fechas[]"]');
+        currentEditingInput = hiddenInput;
+        
+        // Parse existing value if any. Format assumed: "Del YYYY-MM-DD al YYYY-MM-DD" or just text
+        var val = hiddenInput.val();
+        $('#dateInicio').val('');
+        $('#dateFin').val('');
+        
+        if(val) {
+            // Try simple regex to extract dates
+            // Match pattern like "YYYY-MM-DD"
+            var dates = val.match(/\d{4}-\d{2}-\d{2}/g);
+            if(dates && dates.length >= 1) {
+                $('#dateInicio').val(dates[0]);
+            }
+            if(dates && dates.length >= 2) {
+                $('#dateFin').val(dates[1]);
+            }
+        }
+        
+        $('#modalFechas').modal('show');
+    }
+
+    function saveFechas() {
+        if(currentEditingInput) {
+            var i = $('#dateInicio').val();
+            var f = $('#dateFin').val();
+            
+            // Construct string
+            var str = "";
+            if(i && f) {
+                str = "Del " + i + " al " + f;
+            } else if(i) {
+                 str = "Del " + i;
+            } else if(f) {
+                str = "Al " + f;
+            }
+            
+            currentEditingInput.val(str);
+            $('#modalFechas').modal('hide');
+        }
+    }
 
     // -------------------------------------------------------------------------
     // Functions
@@ -674,19 +873,25 @@
                     
                      <div class="commission-container d-flex justify-content-center">
                         <input type="hidden" name="comision[]" value="">
-                        <button type="button" class="btn btn-sm btn-light py-0 px-1 border mr-1" onclick="editComision(this)"><i class="feather icon-map-pin small"></i></button>
+                        <button type="button" class="btn btn-icon-custom btn-comision" onclick="editComision(this)" title="Comisión">
+                            <i class="fas fa-briefcase"></i>
+                        </button>
 
                         <input type="hidden" name="concepto_gasto[]" value="">
-                        <button type="button" class="btn btn-sm btn-light py-0 px-1 border mr-1" onclick="editConcepto(this)"><i class="feather icon-list small"></i></button>
+                        <button type="button" class="btn btn-icon-custom btn-concepto" onclick="editConcepto(this)" title="Concepto">
+                            <i class="fas fa-file-alt"></i>
+                        </button>
 
                         <input type="hidden" name="fechas[]" value="">
-                        <button type="button" class="btn btn-sm btn-light py-0 px-1 border" onclick="editFechas(this)"><i class="feather icon-calendar small"></i></button>
+                        <button type="button" class="btn btn-icon-custom btn-fechas" onclick="editFechas(this)" title="Fechas">
+                            <i class="fas fa-calendar-alt"></i>
+                        </button>
                         
                         <button type="button" class="btn btn-sm btn-danger py-0 px-1 ml-1 btn-remove-row">&times;</button>
                     </div>
                 </td>
                 <td>
-                    <select class="form-control-plaintext select2-proveedor-dynamic"></select>
+                   
                     <input type="text" name="proveedor_nombre[]" class="form-control-plaintext mt-1 small font-weight-bold provider-name-display" readonly>
                     <input type="hidden" name="proveedor_id[]" class="provider-id-hidden">
                 </td>
