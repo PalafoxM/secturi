@@ -6454,6 +6454,8 @@ class Principal extends BaseController
              // 'reserva' table has 'id_proveedor'. 
              // If this function uses 'reserva' table, then $registro_pt has 'id_proveedor'.
         }
+
+        //die( var_dump(   $data['periodo_factura_rows'] ) );
         $data['no_consecutivo'] = '';
 
         // Default values to avoid errors in view

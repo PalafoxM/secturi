@@ -6529,6 +6529,14 @@ class Agregar extends BaseController
                 if(isset($data['row_index'][$i])){
                     $rIdx = $data['row_index'][$i];
                     
+                    // Default to existing file if present
+                    if(isset($data['pdf_current_' . $rIdx][0]) && !empty($data['pdf_current_' . $rIdx][0])){
+                        $pdfPath = $data['pdf_current_' . $rIdx][0];
+                    }
+                     if(isset($data['xml_current_' . $rIdx][0]) && !empty($data['xml_current_' . $rIdx][0])){
+                        $xmlPath = $data['xml_current_' . $rIdx][0];
+                    }
+
                     // PDF
                     $inputNamePdf = 'pdf_pt_' . $rIdx;
                     if(isset($_FILES[$inputNamePdf])){
