@@ -348,7 +348,7 @@
                                     <!-- Viaticos Button (Moved here) -->
                                     <div class="mt-1 text-center">
                                         <input type="hidden" name="viaticos_json[]" value="<?= isset($row->viaticos_json) ? htmlspecialchars($row->viaticos_json) : '' ?>">
-                                        <button type="button" class="btn btn-icon-custom btn-viaticos d-none <?= (!empty($row->viaticos_json) && $row->viaticos_json != '[]' && $row->viaticos_json != 'null') ? 'btn-loaded' : '' ?>" onclick="openViaticosModal(this)" title="Desglose Viáticos" style="background-color: #17a2b8 !important; color: white;">
+                                        <button type="button" class="btn btn-icon-custom btn-viaticos <?= (isset($row->partida) && (strpos($row->partida, '3750') !== false || strpos($row->partida, '3760') !== false)) ? '' : 'd-none' ?> <?= (!empty($row->viaticos_json) && $row->viaticos_json != '[]' && $row->viaticos_json != 'null') ? 'btn-loaded' : '' ?>" onclick="openViaticosModal(this)" title="Desglose Viáticos" style="background-color: #17a2b8 !important; color: white;">
                                             <i class="fas fa-users"></i>
                                         </button>
                                     </div>
@@ -958,7 +958,15 @@
             <tr class="item-row">
                 <td><input type="text" name="no_comprobante[]" class="form-control-plaintext" placeholder="Folio"></td>
                 <td><select name="proyecto_meta[]" class="form-control-plaintext select2-dynamic">${optsProj}</select></td>
-                <td><select name="no_partida[]" class="form-control-plaintext select2-dynamic">${optsPart}</select></td>
+                <td>
+                    <select name="no_partida[]" class="form-control-plaintext select2-dynamic">${optsPart}</select>
+                    <div class="mt-1 text-center">
+                        <input type="hidden" name="viaticos_json[]" value="">
+                        <button type="button" class="btn btn-icon-custom btn-viaticos d-none" onclick="openViaticosModal(this)" title="Desglose Viáticos" style="background-color: #17a2b8 !important; color: white;">
+                            <i class="fas fa-users"></i>
+                        </button>
+                    </div>
+                </td>
                 <td>
                     <input type="text" name="importe[]" class="form-control-plaintext input-importe font-weight-bold" placeholder="$0.00">
                      <div class="mt-1 d-flex justify-content-center flex-wrap">
@@ -988,6 +996,11 @@
                         <input type="hidden" name="fechas[]" value="">
                         <button type="button" class="btn btn-icon-custom btn-fechas" onclick="editFechas(this)" title="Fechas">
                             <i class="fas fa-calendar-alt"></i>
+                        </button>
+
+                        <input type="hidden" name="propinas[]" value="">
+                        <button type="button" class="btn btn-icon-custom btn-propinas" onclick="editPropinas(this)" title="Propinas">
+                            <i class="fas fa-coins"></i>
                         </button>
 
                         <button type="button" class="btn btn-sm btn-danger py-0 px-1 ml-1 btn-remove-row">&times;</button>
