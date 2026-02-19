@@ -2476,13 +2476,12 @@ class Inicio extends BaseController
                  $check = $globas->getTabla([
                      "tabla" => "viaticos_go", 
                      "where" => ["id_registro_go" => $row->id_formulario_pt, "visible" => 1],
-                     "limit" => 1,
-                     "select" => "id_viaticos_go"
+                     "limit" => 1
                  ]);
                  $row->tiene_viaticos = !empty($check->data);
             }
         }
-
+       // die(var_dump($response->data));
         $data['dataHojaAzul'] = $response->data; // Reuse var name for ease in view or change
         
         $data['scripts'] = array('inicio');

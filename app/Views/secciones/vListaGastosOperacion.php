@@ -69,7 +69,7 @@
                                                         class="mdi mdi-delete font-18"  data-toggle="tooltip" data-placement="top" title="Eliminar" ></i></button>
 
                                                 <?php if(isset($e->tiene_viaticos) && $e->tiene_viaticos): ?>
-                                                    <a class="btn btn-outline-info btn-round" href="javascript:void(0);" title="Contiene Viáticos" style="cursor: default; border-color: #17a2b8; color: #17a2b8;"><i class="fas fa-users font-18"></i></a>
+                                                    <a  class="btn btn-outline-info btn-round" target="_blank" href="<?= base_url().'index.php/Principal/viaticoPersona/'.$e->id_formulario_pt.'/3' ?>" title="Contiene Viáticos" style="cursor: default; border-color: #17a2b8; color: #17a2b8;"><i class="fas fa-users font-18"></i></a>
                                                 <?php endif; ?>
                                             </td>
                                         </tr>
