@@ -465,7 +465,7 @@
                             <ul class="nav-second-level" aria-expanded="false">
                                 <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaHojaAzul">Envio PT</a>
                                 </li>
-                                <li><a href="<?php echo base_url(); ?>index.php/Principal/listadoEnvioGO">Envio GO</a>
+                                <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaGastosOperacion">Envio GO</a>
                                 </li>
                                 <!--  <li><a href="../apps/email-read.html">Envio GRC</a></li>     -->
                             </ul>

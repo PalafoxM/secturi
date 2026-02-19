@@ -210,8 +210,9 @@
                     
                     <div class="row mb-3">
                          <div class="col-md-12 text-center">
-                            Relación de <span id="count_docs" class="font-weight-bold border-bottom px-2">1</span> documentos que amparan un importe de <span id="header_total" class="font-weight-bold border-bottom px-2">$0.00</span>
-                         </div>
+                            Relación de <span id="count_docs" class="font-weight-bold border-bottom px-2"> <?= isset($registro_pt->relacion) ? $registro_pt->relacion : '1' ?> </span> documentos que amparan un importe de <span id="header_total" class="font-weight-bold border-bottom px-2">$0.00</span>
+                            <input type="hidden" name="relacion_documentos" id="relacion_documentos" value="1">
+                        </div>
                     </div>
 
                     <!-- TOP SECTION: BANK INFO (Left) & RAMO INFO (Right) -->
@@ -344,11 +345,13 @@
                                             PDF
                                         </label>
                                         <input type="file" id="pdf_pt_<?= $index ?>" name="pdf_pt_<?= $index ?>[]" class="d-none input-pdf" accept=".pdf" onchange="updateFileName(this)">
+                                        <input type="hidden" name="pdf_current_<?= $index ?>[]" value="<?= isset($row->pdf) ? $row->pdf : '' ?>">
                                         
                                         <label for="xml_pt_<?= $index ?>" class="file-upload-btn btn-xml" title="Subir XML">
                                             XML
                                         </label>
                                         <input type="file" id="xml_pt_<?= $index ?>" name="xml_pt_<?= $index ?>[]" class="d-none input-xml" accept=".xml" onchange="updateFileName(this)">
+                                        <input type="hidden" name="xml_current_<?= $index ?>[]" value="<?= isset($row->xml) ? $row->xml : '' ?>">
                                         
                                         <input type="hidden" name="row_index[]" value="<?= $index ?>">
                                     </div>
@@ -383,13 +386,13 @@
                                 <td>
                                      
                                      <!-- Hidden input to store Name for display/save if needed -->
-                                     <input type="text" name="proveedor_nombre[]" class="form-control-plaintext mt-1 small font-weight-bold provider-name-display" placeholder="BEBIDAS PURIFICADAS" readonly>
+                                     <input type="text" name="proveedor_nombre[]" class="form-control-plaintext mt-1 small font-weight-bold provider-name-display" value="<?= isset($row->proveedor) ? $row->proveedor : '' ?>" placeholder="BEBIDAS PURIFICADAS" readonly>
                                      <input type="hidden" name="proveedor_id[]" class="provider-id-hidden">
                                 </td>
 
                                 <!-- RFC -->
                                 <td>
-                                    <input type="text" name="proveedor_rfc[]" class="form-control-plaintext" placeholder="RFC" readonly>
+                                    <input type="text" name="proveedor_rfc[]" class="form-control-plaintext" placeholder="RFC" value="<?= isset($row->rfc) ? $row->rfc : '' ?>" readonly>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
@@ -399,6 +402,14 @@
                                  <td colspan="6" class="text-left">
                                      <button type="button" class="btn btn-info btn-sm" id="btnAddRow">+ Agregar Fila</button>
                                  </td>
+                             </tr>
+                             <tr>
+                                <td colspan="6" class="text-left bg-light">
+                                    <div class="form-group mb-0">
+                                        <label class="font-weight-bold">Concepto general:</label>
+                                        <textarea name="concepto" class="form-control" rows="2" placeholder="Describa el concepto general del gasto..."><?= isset($registro_pt->concepto) ? $registro_pt->concepto : '' ?></textarea>
+                                    </div>
+                                </td>
                              </tr>
                         </tfoot>
                     </table>
@@ -916,6 +927,7 @@
     function updateCountDocs() {
         var count = $('.item-row').length;
         $('#count_docs').text(count);
+        $('#relacion_documentos').val(count);
     }
 
     function calculateTotalOnly() {
@@ -1122,6 +1134,119 @@
     }
 
     function saveForm() {
+        // Validation
+        let isValid = true;
+        let missingFields = 0;
+
+        // Reset previous errors
+        $('.is-invalid').removeClass('is-invalid');
+        $('.border-danger').removeClass('border-danger');
+        $('.select2-selection').removeClass('border border-danger');
+
+        // --- HEADER VALIDATION ---
+        
+        // Folio Select
+        let $folio = $('select[name="folio"]');
+        if($folio.val() === '' || $folio.val() === null) {
+             $folio.next('.select2-container').find('.select2-selection').addClass('border border-danger');
+             isValid = false;
+             missingFields++;
+        }
+        
+        // Consecutivo Input
+        let $consecutivo = $('input[name="no_consecutivo"]');
+        if($consecutivo.val().trim() === '') {
+            $consecutivo.addClass('is-invalid border border-danger');
+            isValid = false;
+            missingFields++;
+        }
+        
+        // Fecha Tramite
+        let $fecha = $('input[name="fecha_tramite"]');
+        if($fecha.val().trim() === '') {
+            $fecha.addClass('is-invalid border border-danger');
+            isValid = false;
+            missingFields++;
+        }
+
+        // --- FOOTER VALIDATION ---
+        
+        // Concepto General
+        let $concepto = $('textarea[name="concepto"]');
+        if($concepto.length > 0 && $concepto.val().trim() === '') {
+            $concepto.addClass('is-invalid border border-danger');
+            isValid = false;
+            missingFields++;
+        }
+        
+        // Signatures
+        let $autoriza = $('select[name="nombre_autoriza"]');
+        if($autoriza.val() === '' || $autoriza.val() === null) {
+             $autoriza.next('.select2-container').find('.select2-selection').addClass('border border-danger');
+             isValid = false;
+             missingFields++;
+        }
+        
+        let $resp1 = $('select[name="nombre_responsable_1"]');
+         if($resp1.val() === '' || $resp1.val() === null) {
+             $resp1.next('.select2-container').find('.select2-selection').addClass('border border-danger');
+             isValid = false;
+             missingFields++;
+        }
+        
+        let $resp2 = $('select[name="nombre_responsable_2"]');
+        if($resp2.length > 0 && ($resp2.val() === '' || $resp2.val() === null)) {
+             $resp2.next('.select2-container').find('.select2-selection').addClass('border border-danger');
+             isValid = false;
+             missingFields++;
+        }
+
+        // --- ROWS VALIDATION ---
+        $('#tblDetalle tbody tr').each(function() {
+            let $row = $(this);
+            
+            // Validate Comprobante
+            let $comprobante = $row.find('input[name="no_comprobante[]"]');
+            if($comprobante.val().trim() === '') {
+                $comprobante.addClass('is-invalid border border-danger');
+                isValid = false;
+                missingFields++;
+            }
+
+            // Validate Proyecto
+            let $proyecto = $row.find('select[name="proyecto_meta[]"]');
+            if($proyecto.val() === '' || $proyecto.val() === null) {
+                $proyecto.next('.select2-container').find('.select2-selection').addClass('border border-danger');
+                isValid = false;
+                 missingFields++;
+            }
+
+            // Validate Partida
+            let $partida = $row.find('select[name="no_partida[]"]');
+             if($partida.val() === '' || $partida.val() === null) {
+                 $partida.next('.select2-container').find('.select2-selection').addClass('border border-danger');
+                isValid = false;
+                 missingFields++;
+            }
+
+            // Validate Importe
+            let $importe = $row.find('input[name="importe[]"]');
+             if($importe.val().trim() === '') {
+                $importe.addClass('is-invalid border border-danger');
+                isValid = false;
+                 missingFields++;
+            }
+        });
+
+        if (!isValid) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Campos Incompletos',
+                text: 'Por favor, llena todos los campos obligatorios marcados en rojo.',
+            });
+            return; // Stop submission
+        }
+
        // e.preventDefault();
         var formData = new FormData($('#formPagoTerceros')[0]);
         
@@ -1150,6 +1275,14 @@
             }
         });
     }
+
+    // Clear validation error on input
+    $(document).on('input change', '.is-invalid, .select2-hidden-accessible', function() {
+        $(this).removeClass('is-invalid border border-danger');
+        if($(this).hasClass('select2-hidden-accessible')) {
+             $(this).next('.select2-container').find('.select2-selection').removeClass('border border-danger');
+        }
+    });
 
     function editConcepto(btn) { 
         var $hidden = $(btn).closest('.commission-container').find('input[name="concepto_gasto[]"]');

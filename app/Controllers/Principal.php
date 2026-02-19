@@ -6509,57 +6509,7 @@ class Principal extends BaseController
             }
         }
 
-        if($id_reserva){
-
-            $registro_pt = $globals->getTabla(["tabla" => "reserva", "where" => ["id_reserva" => $id_reserva, "visible" => 1]]);
-            $data['no_reserva'] = $registro_pt->data[0]->no_reserva;
-            $data['no_convenio'] = $registro_pt->data[0]->no_convenio;
-            $data['id_proveedor'] = $registro_pt->data[0]->id_proveedor;
-            $data['id_proveedor_banco'] = $registro_pt->data[0]->id_proveedor_banco;
-            // Fetch Provider Data (Handle ID or Name)
-            $provIdOrName = $data['id_proveedor'];
-            if(!empty($provIdOrName)){
-                $whereProv = [];
-                if(is_numeric($provIdOrName)){
-                    $whereProv = ["id_proveedor" => $provIdOrName];
-                } else {
-                    $whereProv = ["razon_social" => $provIdOrName];
-                }
-
-                 $prov = $globals->getTabla(["tabla" => "proveedor", "where" => $whereProv]);
-                 if(!empty($prov->data)){
-                      $data['proveedor'] = $prov->data[0];
-                      $realIdProveedor = $data['proveedor']->id_proveedor;
-
-                      // Ensure in dropdown list
-                      $inList = false;
-                      if (!empty($data['proveedores'])) {
-                           foreach ($data['proveedores'] as $pList) {
-                               if ($pList->id_proveedor == $realIdProveedor) {
-                                   $inList = true;
-                                   break;
-                               }
-                           }
-                      }
-                      if (!$inList) {
-                          $data['proveedores'][] = $data['proveedor'];
-                      }
-                 }
-            }
-            
-            // Fetch Bank Data (Linked or Default)
-            if(!empty($data['id_proveedor_banco'])){
-                 $banco = $globals->getTabla(["tabla" => "proveedor_banco", "where" => ["id_proveedor_banco" => $data['id_proveedor_banco']]]);
-                 if(!empty($banco->data)) $data['proveedor_banco'] = $banco->data[0];
-            } elseif(isset($realIdProveedor)) {
-                 // Fallback to default bank
-                 $banco = $globals->getTabla(["tabla" => "proveedor_banco", "where" => ["idproveedor" => $realIdProveedor, "fic" => 1]]);
-                 if(!empty($banco->data)) $data['proveedor_banco'] = $banco->data[0];
-            }
-
-
-
-        }
+   
         
         $data['scripts'] = array('principal');
         $data['contentView'] = 'secciones/vFormatoGastosOperacion';

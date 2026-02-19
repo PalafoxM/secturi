@@ -58,7 +58,7 @@
                 <div style="color: #666; font-weight: bold; margin-bottom: 5px;">SECRETARÍA DE TURISMO E IDENTIDAD</div>
             </td>
              <td width="55%" class="no-border" style="vertical-align: top; text-align: right; font-size: 8pt;">
-                Relación de <span style="border-bottom: 1px solid #000; padding: 0 5px;">&nbsp;1&nbsp;</span> documentos que amparan un importe de <span style="border-bottom: 1px solid #000; padding: 0 5px;">&nbsp;<?= isset($registro_pt->importe_total_num) ? $registro_pt->importe_total_num : '0.00' ?>&nbsp;</span><br>
+                Relación de <span style="border-bottom: 1px solid #000; padding: 0 5px;">&nbsp;<?= $registro_pt->relacion ?>&nbsp;</span> documentos que amparan un importe de <span style="border-bottom: 1px solid #000; padding: 0 5px;">&nbsp;<?= isset($registro_pt->importe_total_num) ? $registro_pt->importe_total_num : '0.00' ?>&nbsp;</span><br>
                 que se envían para su revisión y trámite de pago
             </td>
         </tr>
@@ -107,7 +107,7 @@
                     <tr>
                         <td class="text-center">21</td>
                         <td class="text-center"><?= isset($registro_pt->fecha_tramite) ? date('d/m/Y', strtotime($registro_pt->fecha_tramite)) : '' ?></td>
-                        <td class="text-center"><?= isset($registro_pt->no_consecutivo) ? $registro_pt->no_consecutivo : '002' ?>/2026</td>
+                        <td class="text-center"><?= isset($registro_pt->no_consecutivo) ? $registro_pt->no_consecutivo : '' ?></td>
                     </tr>
                 </table>
             </td>
@@ -196,11 +196,13 @@
             <!-- COL 1 -->
             <td width="33%" class="signature-cell">
                 <div style="border: 1px solid #000; text-align: center; font-size: 7pt; padding: 1px;">DIRECTOR GENERAL ADMINISTRATIVO</div>
-                <div style="border: 1px solid #000; border-top: none; height: 60px; position: relative;">
-                    <div style="position: absolute; bottom: 2px; width: 100%; text-align: center; font-weight: bold; font-size: 8pt;">
-                         L.R.I. RODRIGO GONZALEZ GUERRERO
-                    </div>
-                </div>
+                <table style="width: 100%; border-collapse: collapse; border: 1px solid #000; border-top: none;">
+                    <tr>
+                         <td style="height: 60px; vertical-align: bottom; text-align: center; font-weight: bold; font-size: 8pt; border: none; padding-bottom: 2px;">
+                             L.R.I. RODRIGO GONZALEZ GUERRERO
+                        </td>
+                    </tr>
+                </table>
                 <div class="signature-title-box" style="border-top: none;">
                     DIRECTOR GENERAL ADMINISTRATIVO
                 </div>
@@ -209,31 +211,44 @@
             <!-- COL 2 -->
              <td width="33%" class="signature-cell">
                 <div style="border: 1px solid #000; border-left: none; text-align: center; font-size: 7pt; padding: 1px;">AUTORIZA</div>
-                <div style="border: 1px solid #000; border-left: none; border-top: none; height: 60px; position: relative;">
-                    <div style="position: absolute; bottom: 2px; width: 100%; text-align: center; font-weight: bold; font-size: 8pt;">
-                        <?= (isset($registro_pt->nombre_autoriza) && $registro_pt->nombre_autoriza != 'NO APLICA') ? $registro_pt->nombre_autoriza : 'JAVIER PACHECO CANO' ?>
-                    </div>
-                </div>
-                <div class="signature-title-box" style="border-left: none; border-top: none;">
-                     DIRECTOR/A GENERAL JURÍDICO
+                 <table style="width: 100%; border-collapse: collapse; border: 1px solid #000; border-left: none; border-top: none;">
+                    <tr>
+                         <td style="height: 60px; vertical-align: bottom; text-align: center; font-weight: bold; font-size: 8pt; border: none; padding-bottom: 2px;">
+                            <?= (isset($registro_pt->nombre_autoriza) && $registro_pt->nombre_autoriza != 'NO APLICA') ? $registro_pt->nombre_autoriza : 'JAVIER PACHECO CANO' ?>
+                        </td>
+                    </tr>
+                </table>
+                <div class="signature-title-box" style="border-left: none; border-top: none; text-align: center;">
+                      <?= (isset($registro_pt->cargo_autoriza) && $registro_pt->cargo_autoriza != 'NO APLICA') ? $registro_pt->cargo_autoriza : 'JAVIER PACHECO CANO' ?>
                 </div>
             </td>
 
             <!-- COL 3 -->
              <td width="34%" class="signature-cell">
-                 <!-- Top Empty Box -->
+                 <!-- Top Box (Responsable 1) -->
                 <div style="border: 1px solid #000; border-left: none; text-align: center; font-size: 7pt; padding: 1px;">RESPONSABLE DEL PROYECTO</div>
-                <div style="border: 1px solid #000; border-left: none; border-top: none; height: 60px;"></div>
                 
-                <!-- Bottom Box (Actual Signature) -->
-                 <div style="border: 1px solid #000; border-top: none; border-left: none; text-align: center; font-size: 7pt; padding: 1px; background-color: #fff; margin-top: -1px;">RESPONSABLE DEL PROYECTO</div> <!-- margin hack to overlap bold borders -->
-                 
-                 <div style="border: 1px solid #000; border-left: none; border-top: none; height: 35px; position: relative;">
-                      <div style="position: absolute; bottom: 2px; width: 100%; text-align: center; font-weight: bold; font-size: 7pt;">
-                        <?= (isset($registro_pt->nombre_responsable_2) && $registro_pt->nombre_responsable_2 != 'NO APLICA') ? $registro_pt->nombre_responsable_2 : '&nbsp;' ?>
-                    </div>
-                 </div>
-                 
+                 <table style="width: 100%; border-collapse: collapse; border: 1px solid #000; border-left: none; border-top: none;">
+                    <tr>
+                         <td style="height: 60px; vertical-align: bottom; text-align: center; font-weight: bold; font-size: 8pt; border: none; padding-bottom: 2px;">
+                            <?= (isset($registro_pt->nombre_responsable) && $registro_pt->nombre_responsable != 'NO APLICA') ? $registro_pt->nombre_responsable : '' ?>
+                        </td>
+                    </tr>
+                </table>
+                
+                <div class="signature-title-box" style="border-left: none; border-top: none; text-align: center;">
+                     <?= (isset($registro_pt->cargo_responsable) && $registro_pt->cargo_responsable != 'NO APLICA') ? $registro_pt->cargo_responsable : 'RESPONSABLE DEL PROYECTO' ?>
+                </div>
+
+               
+                  <table style="width: 100%; border-collapse: collapse; border: 1px solid #000; border-left: none; border-top: none;">
+                    <tr>
+                         <td style="height: 35px; vertical-align: bottom; text-align: center; font-weight: bold; font-size: 7pt; border: none; padding-bottom: 2px;">
+                            <?= (isset($registro_pt->nombre_responsable_2) && $registro_pt->nombre_responsable_2 != 'NO APLICA') ? $registro_pt->nombre_responsable_2 : '&nbsp;' ?>
+                        </td>
+                    </tr>
+                </table>
+                
                  <div class="signature-title-box" style="border-left: none; border-top: none; font-size: 6pt;">
                      <?= (isset($registro_pt->cargo_responsable_2) && $registro_pt->cargo_responsable_2 != 'NO APLICA') ? $registro_pt->cargo_responsable_2 : 'COORDINADOR/A DE RECURSOS MATERIALES Y SERVICIOS GENERALES' ?>
                 </div>

@@ -2436,6 +2436,48 @@ class Inicio extends BaseController
         $mpdf->Output('FormatGO_' . $id . '.pdf', 'I');
         exit;
     }
+    public function pdfOficioLiberacion()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $id = $this->request->getGet('id');
+        $data = [];
+
+        // Logo
+        $data['logo'] = FCPATH . 'assets/logo-guanajuato.png';
+
+        // Meses for date formatting
+        $data['meses'] = [
+            1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril', 
+            5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto', 
+            9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
+        ];
+
+        if ($id) {
+            $registro = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["id_formulario_pt" => $id]]);
+            if (!empty($registro->data)) {
+                $data['registro_pt'] = $registro->data[0];
+                
+                // Helper to convert number to letters (reuse existing logic or simple one)
+              
+            }
+        }
+
+        $html = view('pdfs/vPdfOficioLiberacion', $data);
+
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 20,
+            'margin_left' => 20,
+            'margin_right' => 20,
+            'margin_bottom' => 20,
+            'format' => 'Letter',
+            'tempDir' => sys_get_temp_dir().DIRECTORY_SEPARATOR.'mpdf'
+        ]);
+        
+        $mpdf->WriteHTML($html);
+        $mpdf->Output('OficioLiberacion_' . $id . '.pdf', 'I');
+        exit;
+    }
 }
 
 
