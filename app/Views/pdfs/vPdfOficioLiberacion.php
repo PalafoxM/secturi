@@ -28,7 +28,7 @@
     </div>
     
     <div class="folio">
-        FOLIO: <?= isset($registro_pt->no_consecutivo) ? $registro_pt->no_consecutivo : '000' ?>/<?= date('Y') ?>
+        FOLIO: <?= isset($registro_pt->no_consecutivo) ? $registro_pt->no_consecutivo : '000' ?>
     </div>
 
     <div class="addressee">
