@@ -6622,7 +6622,7 @@ class Agregar extends BaseController
                                 'id_registro_go' => $id_registro_pt, // Main Header ID
                                 'id_presupuesto' => 0, // Manual form doesn't track budget ID strictly
                                 'nombre'         => $viat['nombre'],
-                                'rfc'            => '', // Not captured in modal
+                                'rfc'            => isset($viat['rfc']) ? $viat['rfc'] : '', 
                                 'importe'        => $viat['monto'],
                                 'id_identificador' => $resItem->idRegistro, // Link to manual_factura ID
                                 'usu_reg'        => $session->get('id_usuario'),

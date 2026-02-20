@@ -688,6 +688,7 @@
 <script>
     // Data Injection
     var cat_proyecto = <?= json_encode($cat_proyecto) ?>;
+    var cat_usuarios = <?= isset($usuarios) ? json_encode($usuarios) : '[]' ?>;
     var cat_partida = <?= json_encode($cat_partida) ?>;
     var usuarios = <?= json_encode($usuarios) ?>;
     var globalRowIndex = <?= count($rows) ?>;
@@ -1565,7 +1566,7 @@
         
         if(data.length > 0) {
             data.forEach(function(item) {
-                addViaticoRow(item.nombre, item.monto);
+                addViaticoRow(item.nombre, item.monto, item.rfc);
             });
         } else {
             // Add one empty row by default
@@ -1576,10 +1577,34 @@
         $('#modalViaticos').modal('show');
     }
 
-    function addViaticoRow(nombre = '', monto = '') {
+    // Auto-populate RFC when user is selected from dropdown
+    $(document).on('change', '.select2-viaticos', function() {
+        var selectedOption = $(this).find('option:selected');
+        var rfc = selectedOption.data('rfc');
+        if (rfc) {
+            $(this).closest('tr').find('.viatico-rfc').val(rfc);
+        }
+    });
+
+    function addViaticoRow(nombre = '', monto = '', rfc = '') {
+        var optsUsuarios = '<option value="">Seleccione o escriba...</option>';
+        if (typeof usuarios !== 'undefined' && usuarios.length > 0) {
+            usuarios.forEach(u => {
+                var selected = (u.nombre + ' ' + u.primer_apellido + ' ' + u.segundo_apellido === nombre) ? 'selected' : '';
+                optsUsuarios += `<option value="${u.nombre} ${u.primer_apellido} ${u.segundo_apellido}" data-rfc="${u.rfc || ''}" ${selected}>${u.nombre} ${u.primer_apellido} ${u.segundo_apellido}</option>`;
+            });
+        }
+        
         var tr = `
             <tr>
-                <td><input type="text" class="form-control form-control-sm viatico-nombre" placeholder="Nombre completo" value="${nombre}"></td>
+                <td>
+                    <select class="form-control viatico-nombre select2-viaticos" style="width: 100%;">
+                        ${optsUsuarios}
+                    </select>
+                </td>
+                <td>
+                   <input type="text" class="form-control viatico-rfc" name="viatico-rfc[]" placeholder="RFC" value="${rfc}">
+                </td>
                 <td>
                     <div class="input-group input-group-sm">
                         <div class="input-group-prepend">
@@ -1594,6 +1619,17 @@
             </tr>
         `;
         $('#tblViaticos tbody').append(tr);
+        // Initialize Select2 on the newly added element with tagging enabled so users can still type a name
+        $('#tblViaticos tbody').find('.select2-viaticos').last().select2({
+            tags: true,
+            dropdownParent: $('#modalViaticos')
+        });
+        
+        // If a name was passed but it wasn't in the list, set it as a new tag
+        if (nombre && !$('#tblViaticos tbody').find('.select2-viaticos').last().find('option[value="' + nombre + '"]').length) {
+            var newOption = new Option(nombre, nombre, true, true);
+            $('#tblViaticos tbody').find('.select2-viaticos').last().append(newOption).trigger('change');
+        }
     }
 
     function removeViaticoRow(btn) {
@@ -1624,10 +1660,11 @@
         
         $('#tblViaticos tbody tr').each(function() {
             var nombre = $(this).find('.viatico-nombre').val().trim();
+            var rfc = $(this).find('.viatico-rfc').val().trim();
             var monto = parseFloat($(this).find('.viatico-monto').val()) || 0;
             
             if(nombre && monto > 0) {
-                viaticosData.push({nombre: nombre, monto: monto});
+                viaticosData.push({nombre: nombre, monto: monto, rfc: rfc});
                 total += monto;
                 descriptionParts.push(`${nombre} ($${monto.toFixed(2)})`);
             }
