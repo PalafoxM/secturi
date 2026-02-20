@@ -168,11 +168,16 @@
     <?php
     // Format Consecutivo
     if (isset($registro_pt->no_consecutivo) && (!isset($no_consecutivo) || empty($no_consecutivo))) {
-         if (preg_match('/([0-9]+)\/[0-9]{4}$/', $registro_pt->no_consecutivo, $matches)) {
+         if (preg_match('/([0-9]{3,})\/[0-9]{4}$/', trim($registro_pt->no_consecutivo), $matches)) {
             $no_consecutivo = $matches[1];
+        } else if (preg_match('/([0-9]{3,})/', trim($registro_pt->no_consecutivo), $matches)) {
+            $no_consecutivo = $matches[1];
+        } else {
+            $no_consecutivo = $registro_pt->no_consecutivo;
         }
+    } else if (isset($consecutivo) && (!isset($no_consecutivo) || empty($no_consecutivo))) {
+        $no_consecutivo = $consecutivo;
     }
-    // Set default bank values if new
     $default_bank_account = "5185913";
     $default_bank_branch = "MARFIL";
     $default_bank_clabe = "030 21051859130201 9";
@@ -972,9 +977,11 @@
                      <div class="mt-1 d-flex justify-content-center flex-wrap">
                         <label for="pdf_pt_${index}" class="file-upload-btn btn-pdf" title="Subir PDF">PDF</label>
                         <input type="file" id="pdf_pt_${index}" name="pdf_pt_${index}[]" class="d-none input-pdf" accept=".pdf" onchange="updateFileName(this)">
+                        <input type="hidden" name="pdf_current_${index}[]" value="">
                         
                         <label for="xml_pt_${index}" class="file-upload-btn btn-xml" title="Subir XML">XML</label>
                         <input type="file" id="xml_pt_${index}" name="xml_pt_${index}[]" class="d-none input-xml" accept=".xml" onchange="updateFileName(this)">
+                        <input type="hidden" name="xml_current_${index}[]" value="">
                         <input type="hidden" name="row_index[]" value="${index}">
                     </div>
                     <div class="mt-0">

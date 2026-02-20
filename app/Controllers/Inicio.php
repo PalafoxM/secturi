@@ -2055,12 +2055,12 @@ class Inicio extends BaseController
         if ($data['editar'] == 1 && $id) {
             // Fetch main record
             $registroNumero = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["id_formulario_pt" => $id, 'usu_reg' => $session->get('id_usuario')]]);
-            $data['no_consecutivo'] = count($registroNumero->data);
+            // We don't overwrite no_consecutivo here with count() because it corrupts the read value from the db.
            
             $registro = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["id_formulario_pt" => $id]]);
             if (!empty($registro->data)) {
                 $data['registro_pt'] = $registro->data[0];
-                //die(var_dump($data['registro_pt']));
+            //die(var_dump($data['registro_pt']));
                 // Fetch items
                 $items = $globals->getTabla(["tabla" => "manual_factura", "where" => ["id_registro_pt" => $id, "visible" => 1]]);
                 $data['periodo_factura_rows'] = $items->data;

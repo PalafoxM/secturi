@@ -108,12 +108,17 @@
     // Expected format: PT [PREFIX] [NUMBER]/[YEAR]
     if (isset($registro_pt->no_consecutivo) && (!isset($no_consecutivo) || empty($no_consecutivo))) {
         // Try to match the number before the slash part
-        if (preg_match('/([0-9]+)\/[0-9]{4}$/', $registro_pt->no_consecutivo, $matches)) {
+        if (preg_match('/([0-9]{3,})\/[0-9]{4}$/', trim($registro_pt->no_consecutivo), $matches)) {
+            $no_consecutivo = $matches[1];
+        } else if (preg_match('/([0-9]{3,})/', trim($registro_pt->no_consecutivo), $matches)) {
             $no_consecutivo = $matches[1];
         } else {
              // Fallback: try to find the last occurring number logic if format differs?
              // For now assume the standard format described in JS.
+             $no_consecutivo = $registro_pt->no_consecutivo;
         }
+    } else if (isset($consecutivo) && (!isset($no_consecutivo) || empty($no_consecutivo))) {
+        $no_consecutivo = $consecutivo;
     }
     ?>
 
@@ -187,7 +192,7 @@
                                     </select>
                                     <input type="text" name="no_consecutivo" autocomplete="off" class="form-control-plaintext" value="<?= isset($no_consecutivo) ? $no_consecutivo : '' ?>" placeholder="001/2026">
                                 
-                                    <spam id="folio_error" class="text-success"> <?= isset($registro_pt->no_consecutivo) ? $registro_pt->no_consecutivo : '' ?></spam>
+                                    <spam id="folio_error" class="text-success"></spam>
                               
                                     <input type="hidden" name="folioCompleto" id="folioCompleto">
                                 </td>
@@ -229,7 +234,7 @@
                                 <td style="vertical-align: top;">
                                     <select id="proyecto_meta" name="proyecto_meta[]" class="form-control-plaintext">
                                         <?php foreach($cat_proyecto as $proyecto): ?>
-                                            <option value="<?= $proyecto->proyecto ?>"><?= $proyecto->proyecto ?></option>
+                                            <option value="<?= $proyecto->proyecto ?>" <?= isset($row->proyecto) && $row->proyecto == $proyecto->proyecto ? 'selected' : '' ?>><?= $proyecto->proyecto ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                 </td>
@@ -238,7 +243,7 @@
                                 <td style="vertical-align: top;">
                                     <select id="partida" name="no_partida[]" class="form-control-plaintext">
                                         <?php foreach($cat_partida as $partida): ?>
-                                            <option value="<?= $partida->cuenta_cable ?>"><?= $partida->cuenta_cable ?></option>
+                                            <option value="<?= $partida->cuenta_cable ?>" <?= isset($row->partida) && $row->partida == $partida->cuenta_cable ? 'selected' : '' ?> ><?= $partida->cuenta_cable ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                 </td>
@@ -254,6 +259,7 @@
                                             <i class="feather icon-file-text"></i> PDF
                                         </label>
                                         <input type="file" id="pdf_pt_<?= $index ?>" name="pdf_pt_<?= $index ?>[]" class="d-none input-pdf" accept=".pdf" onchange="updateFileName(this)">
+                                        <input type="hidden" name="pdf_current_<?= $index ?>[]" value="<?= isset($row->pdf) ? $row->pdf : '' ?>">
                                         <span class="file-name-display" id="name_pdf_pt_<?= $index ?>"></span>
 
                                         <!-- XML Button -->
@@ -261,6 +267,7 @@
                                             <i class="feather icon-code"></i> XML
                                         </label>
                                         <input type="file" id="xml_pt_<?= $index ?>" name="xml_pt_<?= $index ?>[]" class="d-none input-xml" accept=".xml" onchange="updateFileName(this)">
+                                        <input type="hidden" name="xml_current_<?= $index ?>[]" value="<?= isset($row->xml) ? $row->xml : '' ?>">
                                         <span class="file-name-display" id="name_xml_pt_<?= $index ?>"></span>
                                         
                                         <input type="hidden" name="row_index[]" value="<?= $index ?>">
@@ -776,6 +783,7 @@
                                 <i class="feather icon-file-text"></i> PDF
                             </label>
                             <input type="file" id="pdf_pt_${globalRowIndex}" name="pdf_pt_${globalRowIndex}[]" class="d-none input-pdf" accept=".pdf" onchange="updateFileName(this)">
+                            <input type="hidden" name="pdf_current_${globalRowIndex}[]" value="">
                             <span class="file-name-display" id="name_pdf_pt_${globalRowIndex}"></span>
 
                             <!-- XML Button -->
@@ -783,6 +791,7 @@
                                 <i class="feather icon-code"></i> XML
                             </label>
                             <input type="file" id="xml_pt_${globalRowIndex}" name="xml_pt_${globalRowIndex}[]" class="d-none input-xml" accept=".xml" onchange="updateFileName(this)">
+                            <input type="hidden" name="xml_current_${globalRowIndex}[]" value="">
                             <span class="file-name-display" id="name_xml_pt_${globalRowIndex}"></span>
                             
                             <input type="hidden" name="row_index[]" value="${globalRowIndex}">

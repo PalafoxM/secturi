@@ -121,7 +121,7 @@
     ?>
     <div class="content">
         Por medio del presente, me permito solicitar su apoyo para que se realice el trámite de Pago a Tercero pago a terceros de
-        folio <strong><?= $folio ?></strong> por la cantidad de <strong><?= $importe_total ?> (<?= $importe_letra ?>)</strong>,
+        folio <strong><?= $folio ?></strong> por la cantidad de <strong>$<?= $importe_total ?> (<?= $importe_letra ?>)</strong>,
         de comprobante(s) fiscal(es) No. <strong><?= $comprobantes_text ?></strong> por concepto de <strong><?= $concepto_text ?></strong> al proveedor <strong><?= $proveedor_nombre ?></strong>.
     </div>
 
@@ -132,7 +132,7 @@
 
     <!-- Content Body 3 - Legal -->
     <div class="content">
-        Hago de su conocimiento que de acuerdo a lo que establece la cláusula <strong><?= ($registro_pt->clausula)?$registro_pt->clausula:'PRIMERA' ?></strong> de instrumento jurídico <strong><?= $registro_pt->no_convenio ?></strong> recibí
+        Hago de su conocimiento que de acuerdo a lo que establece la cláusula <strong><?= ($registro_pt->clausula)?$registro_pt->clausula:'NO APLICA' ?></strong> de instrumento jurídico <strong><?= (!empty($registro_pt->no_convenio))?$registro_pt->no_convenio:'NO APLICA' ?></strong> recibí
         el producto, atendiendo lo que establece el marco normativo aplicable. El producto recibido se nos ha
         entregado a entera satisfacción en tiempo y forma, quedando bajo mi responsabilidad el uso y/o
         distribución, así como el resguardo y custodia de los expedientes originales y entregables correspondientes.
