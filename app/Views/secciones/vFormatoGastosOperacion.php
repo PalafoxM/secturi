@@ -158,6 +158,19 @@
         color: white !important; 
         border-color: #6c757d !important; 
     }
+
+    @keyframes pulse-viaticos {
+        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(23, 162, 184, 0.7); }
+        50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(23, 162, 184, 0); }
+        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(23, 162, 184, 0); }
+    }
+    
+    .btn-anim-viaticos {
+        animation: pulse-viaticos 2s infinite;
+        font-weight: bold;
+        width: auto !important;
+        padding: 4px 12px !important;
+    }
     .file-name-display {
         margin-bottom: 3px;
         font-size: 10px;
@@ -350,14 +363,6 @@
                                             <option value="<?= $partida->cuenta_cable ?>" <?= (isset($row->partida) && $row->partida == $partida->cuenta_cable) ? 'selected' : '' ?>><?= $partida->cuenta_cable ?></option>
                                         <?php endforeach; ?>
                                     </select>
-                                    
-                                    <!-- Viaticos Button (Moved here) -->
-                                    <div class="mt-1 text-center">
-                                        <input type="hidden" name="viaticos_json[]" value="<?= isset($row->viaticos_json) ? htmlspecialchars($row->viaticos_json) : '' ?>">
-                                        <button type="button" class="btn btn-icon-custom btn-viaticos <?= (isset($row->partida) && (strpos($row->partida, '3750') !== false || strpos($row->partida, '3760') !== false)) ? '' : 'd-none' ?> <?= (!empty($row->viaticos_json) && $row->viaticos_json != '[]' && $row->viaticos_json != 'null') ? 'btn-loaded' : '' ?>" onclick="openViaticosModal(this)" title="Desglose Viáticos" style="background-color: #17a2b8 !important; color: white;">
-                                            <i class="fas fa-users"></i>
-                                        </button>
-                                    </div>
                                 </td>
 
                                 <!-- IMPORTE -->
@@ -441,6 +446,10 @@
                              <tr>
                                  <td colspan="7" class="text-left">
                                      <button type="button" class="btn btn-info btn-sm" id="btnAddRow">+ Agregar Fila</button>
+                                     <input type="hidden" name="viaticos_global_json" id="viaticos_global_json" value="<?= isset($registro_pt->viaticos_json) ? htmlspecialchars($registro_pt->viaticos_json) : '[]' ?>">
+                                     <button type="button" class="btn btn-icon-custom d-none" id="btnGlobalViaticos" onclick="openGlobalViaticosModal()" title="Desglose Viáticos" style="background-color: #17a2b8 !important; color: white;">
+                                         <i class="fas fa-users"></i> VIÁTICOS POR PERSONA
+                                     </button>
                                  </td>
                              </tr>
                              <tr>
@@ -901,20 +910,9 @@
 
         // Partida Change Event for Viaticos
         $container.find('select[name="no_partida[]"]').on('select2:select', function(e) {
-            var data = e.params.data;
-            var $row = $(this).closest('tr');
-            var $btnViaticos = $row.find('.btn-viaticos');
-          
-            var text = data.text; 
-            if(text.includes('3750') || text.includes('3760')) {
-                $btnViaticos.removeClass('d-none');
-                console.log( 'entro a ala clase' );
-            } else {
-                $btnViaticos.addClass('d-none');
-                // Optional: Clear viaticos data if changed?
-            }
+            checkGlobalViaticos();
         }).on('select2:unselect', function(e){
-             $(this).closest('tr').find('.btn-viaticos').addClass('d-none');
+             checkGlobalViaticos();
         });
 
         // Initialize Provider Search Select2
@@ -983,12 +981,6 @@
                 <td><select name="proyecto_meta[]" class="form-control-plaintext select2-dynamic">${optsProj}</select></td>
                 <td>
                     <select name="no_partida[]" class="form-control-plaintext select2-dynamic">${optsPart}</select>
-                    <div class="mt-1 text-center">
-                        <input type="hidden" name="viaticos_json[]" value="">
-                        <button type="button" class="btn btn-icon-custom btn-viaticos d-none" onclick="openViaticosModal(this)" title="Desglose Viáticos" style="background-color: #17a2b8 !important; color: white;">
-                            <i class="fas fa-users"></i>
-                        </button>
-                    </div>
                 </td>
                 <td>
                     <input type="text" name="importe[]" class="form-control-plaintext input-importe font-weight-bold" placeholder="$0.00">
@@ -1559,24 +1551,31 @@
         });
     }
 
-    // --- VIATICOS MODAL LOGIC ---
+    // --- VIATICOS GLOBAL LOGIC ---
+    function checkGlobalViaticos() {
+        var needsViaticos = false;
+        $('#pagoterceros_items_table select[name="no_partida[]"]').each(function() {
+            var text = $(this).find('option:selected').text();
+            if(text.includes('3750') || text.includes('3760')) {
+                needsViaticos = true;
+            }
+        });
 
-    function openViaticosModal(btn) {
-        var $row = $(btn).closest('tr');
-        // If it's a new row, it has arowIndex. If loaded, it might use index.
-        // We need a reliable way to identify the row to push data back.
-        // Let's use the row's DOM element index or add a unique ID if needed.
-        // The buttons have onclick="openViaticosModal(this)"
-        
-        // Store current row reference
-        $('#current_viaticos_row_index').val($row.index());
-        
-        // Load existing data
-        var jsonStr = $row.find('input[name="viaticos_json[]"]').val();
+        var $btnGlobal = $('#btnGlobalViaticos');
+        if(needsViaticos) {
+            $btnGlobal.removeClass('d-none').addClass('btn-anim-viaticos');
+        } else {
+            $btnGlobal.addClass('d-none').removeClass('btn-anim-viaticos');
+        }
+    }
+
+    function openGlobalViaticosModal() {
+        // Load existing global data
+        var jsonStr = $('#viaticos_global_json').val();
         var data = [];
         try {
             data = jsonStr ? JSON.parse(jsonStr) : [];
-        } catch(e) { console.error("Error parsing viaticos JSON", e); }
+        } catch(e) { console.error("Error parsing global viaticos JSON", e); }
         
         // Clear and Repopulate Table
         var $tbody = $('#tblViaticos tbody');
@@ -1666,15 +1665,8 @@
     }
 
     function saveViaticos() {
-        var rowIndex = $('#current_viaticos_row_index').val();
-
-        
-        if(!window.currentRowElement) return;
-        
-        var $row = $(window.currentRowElement);
         var viaticosData = [];
         var total = 0;
-        var descriptionParts = [];
         
         $('#tblViaticos tbody tr').each(function() {
             var nombre = $(this).find('.viatico-nombre').val().trim();
@@ -1684,32 +1676,19 @@
             if(nombre && monto > 0) {
                 viaticosData.push({nombre: nombre, monto: monto, rfc: rfc});
                 total += monto;
-                descriptionParts.push(`${nombre} ($${monto.toFixed(2)})`);
             }
         });
         
-        // 1. Save JSON
-        $row.find('input[name="viaticos_json[]"]').val(JSON.stringify(viaticosData));
+        // Save back to global hidden input
+        $('#viaticos_global_json').val(JSON.stringify(viaticosData));
         
-
-        var descText = "VIÁTICOS: " + descriptionParts.join(', ');
-        $row.find('input[name="concepto_gasto[]"]').val(descText);
-        $row.find('button.btn-concepto').addClass('btn-loaded'); 
-        
+        // Toggle btn formatting to indicate data loaded
+        // Toggle btn formatting to indicate data loaded
         if(viaticosData.length > 0) {
-            $row.find('button.btn-viaticos').addClass('btn-loaded');
+            $('#btnGlobalViaticos').addClass('btn-loaded').removeClass('btn-anim-viaticos');
         } else {
-            $row.find('button.btn-viaticos').removeClass('btn-loaded');
-            // If empty, remove the viáticos from concepto too
-            $row.find('input[name="concepto_gasto[]"]').val('');
-            $row.find('button.btn-concepto').removeClass('btn-loaded');
+            $('#btnGlobalViaticos').removeClass('btn-loaded').addClass('btn-anim-viaticos');
         }
-        
-        // 4. Update Commission? Maybe set to "REUNION DE TRABAJO" or similar default?
-        // $row.find('input[name="comision[]"]').val("VIATICOS");
-        
-        // Update Totals
-        calcularTotal();
         
         $('#modalViaticos').modal('hide');
     }
