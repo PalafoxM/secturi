@@ -6645,6 +6645,68 @@ class Agregar extends BaseController
         $response->error = false;
         $response->respuesta = "Éxito|La información de Gastos de Operación se guardó correctamente.";
 
+        // --- EMAIL SENDING LOGIC ---
+        if($session->get('id_usuario') != 1){
+            try {
+                $email = \Config\Services::email();
+                $globals = new Mglobal; 
+                
+                // 1. Get User Name
+                $nombreUsuario = $session->get('nombre_completo');
+                if(!$nombreUsuario){
+                    // Fallback: Query if not in session
+                    $u = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['id_usuario' => $session->get('id_usuario')]]);
+                    if(isset($u->data[0])) $nombreUsuario = $u->data[0]->nombre_completo;
+                    else $nombreUsuario = "Usuario System";
+                }
+                
+                // 2. Get Files to Attach
+                $filesToAttach = [];
+                // Query active rows for this record
+                $activeRows = $globals->getTabla(['tabla' => 'manual_factura', 'where' => ['id_registro_pt' => $id_registro_pt, 'visible' => 1]]);
+                
+                if(isset($activeRows->data)){
+                    foreach($activeRows->data as $row){
+                        if(!empty($row->pdf) && file_exists(FCPATH . $row->pdf)){
+                            $filesToAttach[] = FCPATH . $row->pdf;
+                        }
+                        if(!empty($row->xml) && file_exists(FCPATH . $row->xml)){
+                            $filesToAttach[] = FCPATH . $row->xml;
+                        }
+                    }
+                }
+
+                // 3. Configure Email
+                $email->setFrom('a.palafox@guanajuato.gob.mx', $nombreUsuario); 
+                $email->setTo('dasedetur@guanajuato.gob.mx');
+                $email->setCC($session->get('correo')); 
+                
+                $subject = 'Registro Formato GO ' . $folioFinal;
+                $body = 'Estimado usuario,<br><br>';
+                $body .= 'Se ha realizado el registro del <strong>Formato GO (Gastos de Operación)</strong> con consecutivo <strong>' . $folioFinal . '</strong>.<br>';
+                $body .= 'Registrado por: <strong>' . $nombreUsuario . '</strong>.<br><br>';
+                $body .= 'Se adjuntan los archivos correspondientes (PDF/XML).<br>';
+                $body .= '<br>Saludos cordiales.';
+
+                $email->setSubject($subject);
+                $email->setMessage($body);
+
+                // 4. Attach Files
+                foreach($filesToAttach as $filePath){
+                    $email->attach($filePath);
+                }
+
+                // 5. Send
+                if($email->send()){
+                    // Success logging or modify response if needed
+                } else {
+                }
+
+            } catch (\Exception $e) {
+                // Do not fail the main save operation if email fails
+            }
+        }
+
         return $this->respond($response);
     }
 
