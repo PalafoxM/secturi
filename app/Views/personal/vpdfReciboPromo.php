@@ -80,7 +80,6 @@
 
         <!-- ================== PAGE 1 ================== -->
         <div class="page">
-            <img src="<?= $membrete ?>" style="position:absolute; top:0; left:0; width:100%;">
             <div class="content">
 
                 <h1>RECIBO</h1>
@@ -115,12 +114,12 @@
 
                 <table>
                     <tr>
-                        <td class="bold">Acción</td>
+                        <td class="bold">Concepto</td>
                         <td><?= $concepto ?></td>
                     </tr>
                     <tr>
-                        <td class="bold">Contrato</td>
-                        <td><?= $concepto ?></td>
+                        <td class="bold" style="width: 25%;">Artículo</td>
+                        <td><?= $nombre_articulo ?></td>
                     </tr>
                     <tr>
                         <td class="bold">Cantidad</td>
@@ -150,13 +149,12 @@
 
         <!-- ================== PAGE 2 ================== -->
         <div class="page">
-            <img src="<?= $membrete ?>" style="position:absolute; top:0; left:0; width:100%;">
             <div class="content">
 
                 <table>
                     <tr>
-                        <td class="bold">Acción</td>
-                        <td><?= $nombre_solicitante ?></td>
+                        <td class="bold" style="width: 25%;">Acción</td>
+                        <td><?= $concepto ?></td>
                     </tr>
                     <tr>
                         <td class="bold">Nombre</td>

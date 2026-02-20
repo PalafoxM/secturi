@@ -72,6 +72,10 @@
                                                     <td><?= $s->lugar ?></td>
                                                     <td><span class="badge badge-soft-info p-2 font-13"><?= $s->cantidad ?></span></td>
                                                     <td>
+                                                        <a href="<?= base_url("index.php/Inicio/generarPDFConvenio/{$s->id_salida_inventario}") ?>" 
+                                                           class="btn btn-sm btn-outline-info" title="Generar PDF" target="_blank">
+                                                            <i class="mdi mdi-file-pdf"></i>
+                                                        </a>
                                                         <a href="<?= base_url("index.php/Inicio/FormularioPromo/{$s->id_convenio}/{$s->id_articulo}/{$s->id_salida_inventario}") ?>" 
                                                            class="btn btn-sm btn-outline-primary" title="Editar">
                                                             <i class="mdi mdi-pencil"></i>

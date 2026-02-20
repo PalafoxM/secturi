@@ -485,11 +485,7 @@ class Inicio extends BaseController
 
         if (empty($idSalida) && !empty($folio)) {
 
-            $dataPDF = array_merge($dataCommon, [
-                'folio' => $folio
-            ]);
-
-            $pdf_url = $this->generarPDFConvenio($dataPDF);
+            $pdf_url = base_url("index.php/Inicio/generarPDFConvenio/" . $result->idRegistro);
 
         } else {
             $pdf_url = null;
@@ -510,49 +506,65 @@ class Inicio extends BaseController
             ]);
         }
     }
-    private function generarPDFConvenio($datos)
-{
-    $mpdf = new \Mpdf\Mpdf([
-        'mode' => 'utf-8',
-        'format' => 'A4',
-        'margin_top' => 10,
-        'margin_bottom' => 10,
-        'margin_left' => 10,
-        'margin_right' => 10
-    ]);
+    public function generarPDFConvenio($id)
+    {
+        $globas = new Mglobal;
+        $registro = $globas->getTabla([
+            'tabla' => 'salida_inventario',
+            'where' => ['id_salida_inventario' => $id]
+        ])->data[0] ?? null;
 
-    $mpdf->showImageErrors = true;
+        if (!$registro) {
+            echo "Registro no encontrado.";
+            return;
+        }
 
-    // 👇 Ruta real del sistema (100% segura)
-    $path = ROOTPATH . 'public/assets/images/membrete.jpg';
+        $articulo = $globas->getTabla([
+            'tabla' => 'cat_inventario_promo',
+            'where' => ['id_inventario_promo' => $registro->id_articulo]
+        ])->data[0] ?? null;
 
-    if (!file_exists($path)) {
-        throw new \Exception("No existe el membrete en: " . $path);
+        $datos = [
+            'folio' => $registro->folio,
+            'concepto' => $registro->concepto,
+            'cantidad' => $registro->cantidad,
+            'nombre_solicitante' => $registro->nombre_solicitante,
+            'puesto' => $registro->puesto,
+            'telefono' => $registro->telefono,
+            'correo' => $registro->correo,
+            'fec_eve' => $registro->fec_eve,
+            'lugar' => $registro->lugar,
+            'nombre_articulo' => $articulo ? $articulo->dsc_producto : 'Desconocido'
+        ];
+
+        $mpdf = new \Mpdf\Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4',
+            'margin_top' => 10,
+            'margin_bottom' => 10,
+            'margin_left' => 10,
+            'margin_right' => 10
+        ]);
+
+        $mpdf->showImageErrors = true;
+
+        $path = ROOTPATH . 'public/assets/images/membrete.pdf';
+        if (!file_exists($path)) {
+            throw new \Exception("No existe el membrete en: " . $path);
+        }
+
+        // Asignar el PDF como plantilla de fondo para todas las páginas
+        $mpdf->SetDocTemplate($path, true);
+
+        $html = view('personal/vpdfReciboPromo', $datos);
+
+        $mpdf->WriteHTML($html);
+
+        $nombreArchivo = 'Convenio_' . $datos['folio'] . '.pdf';
+        
+        $mpdf->Output($nombreArchivo, \Mpdf\Output\Destination::INLINE);
+        exit;
     }
-
-    $type = pathinfo($path, PATHINFO_EXTENSION);
-    $data = file_get_contents($path);
-    $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-
-    $datos['membrete'] = $base64;
-
-    $html = view('personal/vpdfReciboPromo', $datos);
-
-    $mpdf->WriteHTML($html);
-
-    $rutaCarpeta = ROOTPATH . 'public/convenios_pdf/';
-
-    if (!is_dir($rutaCarpeta)) {
-        mkdir($rutaCarpeta, 0777, true);
-    }
-
-    $nombreArchivo = 'Convenio_' . $datos['folio'] . '.pdf';
-    $rutaCompleta  = $rutaCarpeta . $nombreArchivo;
-
-    $mpdf->Output($rutaCompleta, \Mpdf\Output\Destination::FILE);
-
-    return base_url('convenios_pdf/' . $nombreArchivo);
-}
     public function ListaSalidasPromo($idArticulo = null)
     {
         $globas = new Mglobal;
