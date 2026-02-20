@@ -6594,6 +6594,7 @@ class Agregar extends BaseController
                       'partida' => $data['no_partida'][$i],
                       'comision' => isset($data['comision'][$i]) ? trim($data['comision'][$i]) : '',
                       'concepto_gasto' => isset($data['concepto_gasto'][$i]) ? trim($data['concepto_gasto'][$i]) : '',
+                      'responsable' => isset($data['responsable_gasto'][$i]) ? trim($data['responsable_gasto'][$i]) : '',
                       'fechas' => isset($data['fechas'][$i]) ? trim($data['fechas'][$i]) : '',
                       'propinas' => isset($data['propinas'][$i]) ? trim((float)$data['propinas'][$i]) : '',
                       

@@ -2501,8 +2501,14 @@ class Inicio extends BaseController
                         "tabla" => "cat_partida",
                         "where" => ["cuenta_cable" => $item->partida, 'visible' => 1]
                     ]);
+                    $usuario = $globals->getTabla([
+                        "tabla" => "vw_usuario",
+                        "where" => ["nombre_completo" => $item->responsable]
+                    ]);
+                    //die(json_encode($usuario));
                     $item->dsc_partida = (isset($partida->data[0])) ? $partida->data[0]->nombre_fondo : '';
-                    
+                    $item->nombre_responsable = (isset($usuario->data[0])) ? $usuario->data[0]->nombre_completo.'-'.$usuario->data[0]->dsc_puesto.'-'.$usuario->data[0]->dsc_area : '';
+                  //  die(var_dump($item->nombre_responsable));
                     // 1. Write Header
                     $data['row'] = $item; 
                     $html = view('pdfs/vPdfEncabezadoFacturaGO', $data);

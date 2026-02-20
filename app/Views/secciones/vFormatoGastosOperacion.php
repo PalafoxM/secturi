@@ -306,19 +306,20 @@
                     <table id="pagoterceros_items_table" class="table table-bordered text-center table-sm">
                         <thead>
                             <tr class="bg-grey" style="font-size: 0.8rem;">
-                                <th colspan="6">DATOS PROPORCIONADOS POR LA DEPENDENCIA</th>
+                                <th colspan="7">DATOS PROPORCIONADOS POR LA DEPENDENCIA</th>
                             </tr>
                             <tr class="bg-white" style="font-size: 0.8rem;">
                                 <th colspan="4" class="border-bottom-0">REFERENCIA AL DOCUMENTO</th>
-                                <th colspan="2" class="border-bottom-0">OBSERVACIONES</th>
+                                <th colspan="3" class="border-bottom-0">OBSERVACIONES</th>
                             </tr>
                             <tr style="font-size: 0.75rem;">
                                 <th style="width: 10%;">COMPROBANTE</th>
                                 <th style="width: 15%;">PROYECTO META</th>
                                 <th style="width: 10%;">PARTIDA No.</th>
                                 <th style="width: 15%;">IMPORTE</th>
-                                <th style="width: 30%;">DATOS DEL CONTRIBUYENTE</th>
-                                <th style="width: 20%;">RFC</th>
+                                <th style="width: 15%;">RESPONSABLE GASTO</th>
+                                <th style="width: 20%;">DATOS DEL CONTRIBUYENTE</th>
+                                <th style="width: 15%;">RFC</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -411,6 +412,16 @@
                                     </div>
                                 </td>
 
+                                <!-- RESPONSABLE -->
+                                <td>
+                                    <select name="responsable_gasto[]" class="form-control-plaintext select2-dynamic">
+                                        <option value="">Seleccione...</option>
+                                        <?php foreach ($usuarios as $usuario): ?>
+                                            <option value="<?= $usuario->nombre_completo ?>" <?= (isset($row->responsable) && $row->responsable == $usuario->nombre_completo) ? 'selected' : '' ?>><?= $usuario->nombre_completo ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </td>
+
                                 <!-- DATOS DEL CONTRIBUYENTE (Provider Select) -->
                                 <td>
                                      
@@ -428,12 +439,12 @@
                         </tbody>
                          <tfoot>
                              <tr>
-                                 <td colspan="6" class="text-left">
+                                 <td colspan="7" class="text-left">
                                      <button type="button" class="btn btn-info btn-sm" id="btnAddRow">+ Agregar Fila</button>
                                  </td>
                              </tr>
                              <tr>
-                                <td colspan="6" class="text-left bg-light">
+                                <td colspan="7" class="text-left bg-light">
                                     <div class="form-group mb-0">
                                         <label class="font-weight-bold">Concepto general:</label>
                                         <textarea name="concepto" class="form-control" rows="2" placeholder="Describa el concepto general del gasto..."><?= isset($registro_pt->concepto) ? $registro_pt->concepto : '' ?></textarea>
@@ -765,6 +776,9 @@
         $('#nombre_autoriza').on('select2:select change', function() {
             updateCargo(this, 'cargo_autoriza');
         });
+        $('#nombre_responsable_gasto').on('select2:select change', function() {
+            updateCargo(this, 'cargo_responsable_gasto');
+        });
         $('#nombre_responsable_1').on('select2:select change', function() {
             updateCargo(this, 'cargo_responsable_1');
         });
@@ -960,6 +974,9 @@
         var optsPart = '<option value="">Seleccione...</option>';
         cat_partida.forEach(p => optsPart += `<option value="${p.cuenta_cable}">${p.cuenta_cable}</option>`);
 
+        var optsResp = '<option value="">Seleccione...</option>';
+        cat_usuarios.forEach(u => optsResp += `<option value="${u.nombre_completo}">${u.nombre_completo}</option>`);
+
         return `
             <tr class="item-row">
                 <td><input type="text" name="no_comprobante[]" class="form-control-plaintext" placeholder="Folio"></td>
@@ -1014,6 +1031,7 @@
                         <button type="button" class="btn btn-sm btn-danger py-0 px-1 ml-1 btn-remove-row">&times;</button>
                     </div>
                 </td>
+                <td><select name="responsable_gasto[]" class="form-control-plaintext select2-dynamic">${optsResp}</select></td>
                 <td>
                    
                     <input type="text" name="proveedor_nombre[]" class="form-control-plaintext mt-1 small font-weight-bold provider-name-display" readonly>
