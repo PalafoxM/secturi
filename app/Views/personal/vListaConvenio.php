@@ -51,9 +51,14 @@
                                                     <td><?= $item->razon_social ?></td>
                                                     <td><?= $item->no_proveedor ?></td>
                                                     <td>
+                                                        <a href="<?= base_url('index.php/Inicio/FormularioPromo/' . $item->id_material_promo) ?>" class="btn btn-primary btn-sm"><i class="fas fa-file-alt"></i></a>
+                                                        <a title="Formulario de registro"></a>
                                                         <button class="btn btn-warning btn-sm" onclick='editarConvenio(<?= json_encode($item) ?>)'><i class="fas fa-edit"></i></button>
+                                                        <a title="Editar"></a>
                                                         <button class="btn btn-danger btn-sm" onclick="eliminarConvenio(<?= $item->id_material_promo ?>)"><i class="fas fa-trash"></i></button>
+                                                        <a title="Eliminar"></a>
                                                         <a href="<?= base_url('index.php/Inicio/InventarioPromocion/' . $item->id_material_promo) ?>" class="btn btn-success btn-sm"><i class="fas fa-eye"></i></a>
+                                                        <a title="Ver detalles"></a>
                                                     </td>
                                                 </tr>
                                             <?php endforeach; ?>
@@ -181,9 +186,7 @@
             minimumInputLength: 1
         });
 
-        
-
-     });
+    });
 
     function agregarConvenio() {
         $('#formConvenio')[0].reset();
@@ -206,34 +209,52 @@
     }
 
     function guardaConvenio()
-        { 
-            //e.preventDefault(); 
-            // Unmask monto for saving
-            let montoVal = $('#monto').val().replace(/,/g, '');
+    { 
+        let montoVal = $('#monto').val().replace(/,/g, '');
 
-            $.ajax({
-                url: '<?= base_url("index.php/Agregar/guardaConvenio") ?>',
-                type: 'POST',
-                data: {
-                    'montoVal': montoVal,
-                    'convenio': $('#convenio').val(),
-                    'no_proveedor': $('#no_proveedor').val(),
-                },
-                success: function(response) {
-                    if (!response.error) {
-                        Swal.fire('Éxito', response.respuesta.split('|')[1], 'success').then(() => {
+        $.ajax({
+            url: '<?= base_url("index.php/Agregar/guardaConvenio") ?>',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                id_material_promo: $('#id_material_promo').val(),
+                monto: montoVal,
+                convenio: $('#convenio').val(),
+                no_proveedor: $('#no_proveedor').val(),
+            },
+            success: function(response) {
+                
+                if (!response.error) {
+
+                    Swal.fire({
+                        title: 'Folio generado correctamente',
+                        text: '¿Desea continuar al formulario?',
+                        icon: 'success',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sí, continuar'
+                    }).then((result) => {
+
+                        if (result.isConfirmed) {
+
+                            window.location.href =
+                            "<?= base_url('index.php/Inicio/FormularioPromo/') ?>" 
+                            + response.id_material_promo;
+
+                        } else {
                             location.reload();
-                        });
-                    } else {
-                        Swal.fire('Error', response.respuesta.split('|')[1], 'error');
-                    }
-                },
-                error: function() {
-                    Swal.fire('Error', 'Ocurrió un error al guardar.', 'error');
-                }
-            });
-         }
+                        }
 
+                    });
+
+                } else {
+                    Swal.fire('Error', response.respuesta, 'error');
+                }
+            },
+            error: function() {
+                Swal.fire('Error', 'Ocurrió un error al guardar.', 'error');
+            }
+        });
+    }
     function eliminarConvenio(id) {
         Swal.fire({
             title: '¿Estás seguro?',
@@ -262,4 +283,15 @@
             }
         })
     }
+    function abrirModal(id) {
+        document.getElementById("idMaterialPromo").value = id;
+        $('#miModal').modal('show');
+    }
+    document.getElementById("btnConfirmarGuardar").addEventListener("click", function() {
+
+        let id = document.getElementById("idMaterialPromo").value;
+
+        window.location.href = "<?= base_url('index.php/Inicio/FormularioPromo/') ?>" + id;
+
+    });
 </script>

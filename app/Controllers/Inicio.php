@@ -349,7 +349,6 @@ class Inicio extends BaseController
         $data['contentView'] = 'personal/vInventarioLimpieza';
         $this->_renderView($data);
     }
-
     public function ListaConvenio()
     {
         $globas = new Mglobal;
@@ -408,7 +407,7 @@ class Inicio extends BaseController
         $globas  = new Mglobal;
         $session = \Config\Services::session();
 
-        $idConvenio = $this->request->getPost('idConvenio');
+        $idConvenio = $this->request->getPost('id_material_promo');
         $idArticulo = $this->request->getPost('idArticulo');
         $idSalida   = $this->request->getPost('idSalida');
         $data = $this->request->getPost() ?? [];
@@ -499,7 +498,8 @@ class Inicio extends BaseController
         return $this->response->setJSON([
             'error'     => false,
             'respuesta' => 'Convenio registrado correctamente',
-            'pdf_url'   => $pdf_url
+            'pdf_url'   => $pdf_url,
+            'id_material_promo' => $idConvenio,
         ]);
 
         } else {
