@@ -381,72 +381,178 @@ class Inicio extends BaseController
         $data['contentView'] = 'personal/vFormularioPromo';
         $this->_renderView($data);
     }
-
-    public function guardarConvenio()
+    private function generarFolio()
     {
         $globas = new Mglobal;
+        $anio = date('Y');
+
+        $result = $globas->getTabla([
+            'tabla' => 'salida_inventario',
+            'like'  => ['folio' => "PROMO-$anio-"],
+            'order' => ['id_salida_inventario' => 'DESC'],
+            'limit' => 1
+        ]);
+
+        if (!empty($result->data)) {
+            $ultimo = $result->data[0]->folio;
+            $partes = explode('-', $ultimo);
+            $consecutivo = (int) end($partes) + 1;
+        } else {
+            $consecutivo = 1;
+        }
+
+        return "PROMO-$anio-" . str_pad($consecutivo, 4, '0', STR_PAD_LEFT);
+    }
+    public function guardarConvenio()
+    {
+        $globas  = new Mglobal;
         $session = \Config\Services::session();
+
         $idConvenio = $this->request->getPost('idConvenio');
         $idArticulo = $this->request->getPost('idArticulo');
         $idSalida   = $this->request->getPost('idSalida');
-        $data =  $this->request->getPost();
+        $data = $this->request->getPost() ?? [];
 
-        
+
         $dataCommon = [
-            'id_convenio' => $idConvenio,
-            'id_articulo' => $idArticulo,
-            'cantidad' => $data['cantidad'],
-            'lugar' => $data['lugar_entrega'],
-            'puesto' => $data['puesto'],
-            'nombre_solicitante' => $data['nombre_solicitante'],
-            'telefono' => $data['telefono'],
-            'correo' => $data['correo'] ?? null,
-            'fec_eve' => $data['fec_eve'],
-            'concepto' => $data['concepto'],
+            'id_convenio'        => $idConvenio,
+            'id_articulo'        => $idArticulo,
+            'cantidad'           => $this->request->getPost('cantidad'),
+            'lugar'              => $this->request->getPost('lugar_entrega'),
+            'puesto'             => $this->request->getPost('puesto'),
+            'nombre_solicitante' => $this->request->getPost('nombre_solicitante'),
+            'telefono'           => $this->request->getPost('telefono'),
+            'correo'             => $this->request->getPost('correo'),
+            'fec_eve'            => $this->request->getPost('fec_eve'),
+            'concepto'           => $this->request->getPost('concepto'),
         ];
 
-        if(!empty($idSalida)){
-            // Editar
+        // ============================
+        // EDITAR
+        // ============================
+        if (!empty($idSalida)) {
+
             $dataUpdate = $dataCommon;
             $dataUpdate['usu_act'] = $session->get('id_usuario');
             $dataUpdate['fec_act'] = date('Y-m-d H:i:s');
-            
+
             $dataConfig = [
-                'tabla' => 'salida_inventario',
-                'editar' =>true,
+                'tabla'    => 'salida_inventario',
+                'editar'   => true,
                 'idEditar' => ['id_salida_inventario' => $idSalida]
             ];
-            $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFormatoPT_Upd'];
-            
+
+            $dataBitacora = [
+                'id_user' => $session->get('id_usuario'),
+                'script'  => 'Inicio.php/guardarConvenio_UPD'
+            ];
+
             $result = $globas->saveTabla($dataUpdate, $dataConfig, $dataBitacora);
 
-        } else {
-            // Insertar
+            $folio = null;
+
+        } 
+        // ============================
+        // INSERTAR
+        // ============================
+        else {
+
+            // 🔥 Generar folio consecutivo
+            $folio = $this->generarFolio();
+
             $dataInsert = $dataCommon;
+            $dataInsert['folio']   = $folio;
             $dataInsert['usu_reg'] = $session->get('id_usuario');
             $dataInsert['fec_reg'] = date('Y-m-d H:i:s');
-          
+
             $dataConfig = [
-                'tabla' => 'salida_inventario',
-                'editar' =>false
+                'tabla'  => 'salida_inventario',
+                'editar' => false
             ];
-            $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFormatoPT_Upd'];
-            
+
+            $dataBitacora = [
+                'id_user' => $session->get('id_usuario'),
+                'script'  => 'Inicio.php/guardarConvenio_INS'
+            ];
+
             $result = $globas->saveTabla($dataInsert, $dataConfig, $dataBitacora);
         }
 
-        if ($result && !isset($result->error)) { // saveTabla standard return check
-             // Si saveTabla regresa el objeto con error=true/false
-             // Ajustar segun implementacion Mglobal. Asumimos retorno estandar.
-             // Pero usando logic anterior:
-             return $this->response->setJSON(['success' => true]);
-        } elseif(isset($result->error) && $result->error == false){
-             return $this->response->setJSON(['success' => true]);
+        // ============================
+        // VALIDACIÓN RESULTADO
+        // ============================
+
+        if ($result && isset($result->error) && $result->error === false) {
+
+        if (empty($idSalida) && !empty($folio)) {
+
+            $dataPDF = array_merge($dataCommon, [
+                'folio' => $folio
+            ]);
+
+            $pdf_url = $this->generarPDFConvenio($dataPDF);
+
         } else {
-            return $this->response->setJSON(['success' => false]);
+            $pdf_url = null;
+        }
+
+        return $this->response->setJSON([
+            'error'     => false,
+            'respuesta' => 'Convenio registrado correctamente',
+            'pdf_url'   => $pdf_url
+        ]);
+
+        } else {
+
+            return $this->response->setJSON([
+                'error' => true,
+                'respuesta' => 'No se pudo guardar el convenio'
+            ]);
         }
     }
+    private function generarPDFConvenio($datos)
+{
+    $mpdf = new \Mpdf\Mpdf([
+        'mode' => 'utf-8',
+        'format' => 'A4',
+        'margin_top' => 10,
+        'margin_bottom' => 10,
+        'margin_left' => 10,
+        'margin_right' => 10
+    ]);
 
+    $mpdf->showImageErrors = true;
+
+    // 👇 Ruta real del sistema (100% segura)
+    $path = ROOTPATH . 'public/assets/images/membrete.jpg';
+
+    if (!file_exists($path)) {
+        throw new \Exception("No existe el membrete en: " . $path);
+    }
+
+    $type = pathinfo($path, PATHINFO_EXTENSION);
+    $data = file_get_contents($path);
+    $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+
+    $datos['membrete'] = $base64;
+
+    $html = view('personal/vpdfReciboPromo', $datos);
+
+    $mpdf->WriteHTML($html);
+
+    $rutaCarpeta = ROOTPATH . 'public/convenios_pdf/';
+
+    if (!is_dir($rutaCarpeta)) {
+        mkdir($rutaCarpeta, 0777, true);
+    }
+
+    $nombreArchivo = 'Convenio_' . $datos['folio'] . '.pdf';
+    $rutaCompleta  = $rutaCarpeta . $nombreArchivo;
+
+    $mpdf->Output($rutaCompleta, \Mpdf\Output\Destination::FILE);
+
+    return base_url('convenios_pdf/' . $nombreArchivo);
+}
     public function ListaSalidasPromo($idArticulo = null)
     {
         $globas = new Mglobal;
@@ -474,7 +580,6 @@ class Inicio extends BaseController
         $data['contentView'] = 'personal/vListaSalidasPromo';
         $this->_renderView($data);
     }
-
     public function eliminarSalida()
     {
         $globas = new Mglobal;
@@ -496,6 +601,67 @@ class Inicio extends BaseController
 
         $result = $globas->saveTabla($dataUpdate, $dataConfig, $dataBitacora);
         return $this->response->setJSON($result);
+    }
+    public function InvMadrePromocion()
+    {
+        $globas = new Mglobal;
+
+        $productos = $globas->getTabla([
+            'tabla' => 'cat_invmadre_promo',
+            'where' => ['visible' => 1]
+        ])->data;
+
+        $materiales = $globas->getTabla([
+            'tabla' => 'vw_material_promo',
+            'where' => ['visible' => 1, 'id_material_promo' => $id]
+        ])->data;
+
+        // 2. Colores e imágenes por producto
+        foreach ($productos as &$item) {
+
+            // COLORES
+            $item->colores = $globas->getTabla([
+                'tabla' => 'colores',
+                'where' => [
+                    'id_invmadre_promo' => $item->id_invmadre_promo,
+                    'visible' => 1
+                ]
+            ])->data ?? [];
+
+            // IMÁGENES (múltiples)
+            $imagenes = $globas->getTabla([
+                'tabla' => 'imagen',
+                'where' => [
+                    'id_inventario_promo' => $item->id_invmadre_promo,
+                    'visible' => 1
+                ]
+            ]);
+
+            $item->imagenes = $imagenes->data ?? [];
+        }
+
+        $data['items'] = count($productos);
+        $data['cat_inventario_promo'] = $productos;
+        $data['materiales'] = $materiales[0];
+
+        // 3. Totales
+        $data['total_stock_promo']     = 0;
+        $data['total_subtotal_promo']  = 0;
+        $data['total_dinero_promo']    = 0;
+
+        foreach ($productos as $item) {
+            $data['total_stock_promo']    += (int) ($item->stock ?? 0);
+            $data['total_subtotal_promo'] += (float) ($item->subtotal ?? 0);
+            $data['total_dinero_promo']   += (float) ($item->total ?? 0);
+        }
+
+        // 4. Otros datos
+        $data['id_convenio'] = $id;
+        $data['total_movimientos'] = 0;
+        $data['scripts'] = ['principal', 'inicio'];
+        $data['contentView'] = 'personal/vInvMadrePromo';
+
+        $this->_renderView($data);
     }
     public function InventarioPromocion($id = null)
     {
@@ -535,7 +701,6 @@ class Inicio extends BaseController
             $item->imagenes = $imagenes->data ?? [];
         }
     
-
         $data['items'] = count($productos);
         $data['cat_inventario_promo'] = $productos;
         $data['materiales'] = $materiales[0];
@@ -562,7 +727,6 @@ class Inicio extends BaseController
     // ==========================================
     // PROCESOS (AJAX)
     // ==========================================
-
     public function actualizarInventario()
     {
         $response = new \stdClass();
@@ -645,7 +809,6 @@ class Inicio extends BaseController
 
         return $this->respond($response);
     }
-
     public function guardarProducto()
     {
         $response = new \stdClass();
@@ -779,7 +942,6 @@ class Inicio extends BaseController
  
         return $this->respond($response);
     }
-
     public function eliminarProducto()
     {
         $response = new \stdClass();
@@ -828,7 +990,6 @@ class Inicio extends BaseController
 
         return $this->respond($response);
     }
-
     public function ListadoSolicitudes()
     {
         $session = \Config\Services::session();

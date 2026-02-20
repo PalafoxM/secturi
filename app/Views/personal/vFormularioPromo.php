@@ -28,25 +28,22 @@
 
                                         
                                             <form id="formConvenio" method="post" enctype="multipart/form-data">
-                                            <input type="hidden" name="idConvenio" value="<?= isset($idConvenio) ? $idConvenio : '' ?>">
-                                            <input type="hidden" name="idArticulo" value="<?= isset($idArticulo) ? $idArticulo : '' ?>">
-                                            <input type="hidden" name="idSalida" value="<?= isset($idSalida) ? $idSalida : '' ?>">
+                                                <input type="hidden" id="idConvenio" name="idConvenio" value="<?= isset($idConvenio) ? $idConvenio : '' ?>">
+                                                <input type="hidden" name="idArticulo" value="<?= isset($idArticulo) ? $idArticulo : '' ?>">
+                                                <input type="hidden" name="idSalida" value="<?= isset($idSalida) ? $idSalida : '' ?>">
 
 
                                                 <!-- ===================== DATOS ADMINISTRATIVOS ===================== -->
 
                                                 <div class="form-row">
                                                     <div class="col-md-6 mb-3">
-                                                        <label>Cantidad <span style="color:red;">*</span></label>
-                                                         <input class="form-control" type="number" name="cantidad" value="<?= isset($registro) ? $registro->cantidad : '' ?>" required>
+                                                        <label>Cantidad </label>
+                                                         <input class="form-control" type="number" name="cantidad" value="<?= isset($registro) ? $registro->cantidad : '' ?>" >
                                                     </div>
 
-                                                
-
-                                                   
                                                     <div class="col-md-6 mb-3">
-                                                        <label>Lugar de entrega <span style="color:red;">*</span></label>
-                                                        <input class="form-control" type="text" name="lugar_entrega" value="<?= isset($registro) ? $registro->lugar : '' ?>" required>
+                                                        <label>Lugar de entrega </label>
+                                                        <input class="form-control" type="text" name="lugar_entrega" value="<?= isset($registro) ? $registro->lugar : '' ?>" >
                                                     </div>
                                                 </div>
 
@@ -56,8 +53,8 @@
                                                         <input class="form-control" type="text" name="puesto" value="<?= isset($registro) ? $registro->puesto : '' ?>" >
                                                     </div>
                                                     <div class="col-md-8 mb-3">
-                                                        <label>Nombre completo del solicitante <span style="color:red;">*</span></label>
-                                                        <input class="form-control" type="text" name="nombre_solicitante" value="<?= isset($registro) ? $registro->nombre_solicitante : '' ?>" required>
+                                                        <label>Nombre completo del solicitante </label>
+                                                        <input class="form-control" type="text" name="nombre_solicitante" value="<?= isset($registro) ? $registro->nombre_solicitante : '' ?>" >
                                                     </div>
 
                                                 </div>
@@ -69,24 +66,24 @@
 
                                                 <div class="form-row">
                                                     <div class="col-md-4 mb-3">
-                                                        <label>Teléfono <span style="color:red;">*</span></label>
-                                                        <input type="text" class="form-control" name="telefono" value="<?= isset($registro) ? $registro->telefono : '' ?>" required>
+                                                        <label>Teléfono </label>
+                                                        <input type="text" class="form-control" name="telefono" value="<?= isset($registro) ? $registro->telefono : '' ?>" >
                                                     </div>
 
                                                     <div class="col-md-4 mb-3">
-                                                        <label>Correo <span style="color:red;">*</span></label>
-                                                        <input type="email" class="form-control" name="correo" value="<?= isset($registro) ? $registro->correo : '' ?>" required>
+                                                        <label>Correo </label>
+                                                        <input type="email" class="form-control" name="correo" value="<?= isset($registro) ? $registro->correo : '' ?>" >
                                                     </div>
                                                      <div class="col-md-4 mb-3">
-                                                        <label>Fecha del evento <span style="color:red;">*</span></label>
-                                                        <input type="date" class="form-control" name="fec_eve" value="<?= isset($registro) && $registro->fec_eve ? date('Y-m-d', strtotime($registro->fec_eve)) : '' ?>" required>
+                                                        <label>Fecha del evento </label>
+                                                        <input type="date" class="form-control" name="fec_eve" value="<?= isset($registro) && $registro->fec_eve ? date('Y-m-d', strtotime($registro->fec_eve)) : '' ?>" >
                                                     </div>
                                                 </div>
 
                                                 <div class="form-row">
                                                     <div class="col-md-12 mb-3">
-                                                        <label>Concepto <span style="color:red;">*</span></label>
-                                                        <input type="text" class="form-control" name="concepto" value="<?= isset($registro) ? $registro->concepto : '' ?>" required>
+                                                        <label>Concepto </label>
+                                                        <input type="text" class="form-control" name="concepto" value="<?= isset($registro) ? $registro->concepto : '' ?>" >
                                                     </div>
                                                 </div>
 
@@ -94,8 +91,8 @@
 
                                                 <div class="form-row">
                                                     <div class="col-md-6 mb-3">
-                                                        <label>INE (Obligatorio) <span style="color:red;">*</span></label>
-                                                        <input type="file" class="form-control" name="ine" accept="image/*,application/pdf" required>
+                                                        <label>INE (Obligatorio) </label>
+                                                        <input type="file" class="form-control" name="ine" accept="image/*,application/pdf" >
                                                     </div>
 
                                                     <div class="col-md-6 mb-3">
@@ -122,7 +119,7 @@
 
                                                 <div class="text-right mt-4">
                                                     <button type="submit" class="btn btn-primary px-4">
-                                                        Guardar Convenio
+                                                        Generar Recibo
                                                     </button>
                                                 </div>
                                             </form>
@@ -144,14 +141,14 @@
         <div class="modal-content">
             <div class="modal-header bg-light">
                 <h5 class="modal-title">
-                    Confirmar registro
+                    Generar recibo
                 </h5>
                 <button type="button" class="close" data-dismiss="modal">
                     <span>&times;</span>
                 </button>
             </div>
             <div class="modal-body text-center">
-                ¿Desea registrar el convenio?
+                ¿Desea registrar el folio?
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancelar</button>
@@ -179,7 +176,7 @@
 <script src="<?php echo base_url(); ?>assets/js/bootstrap.bundle.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/js/jquery.spromoscroll.min.js"></script>
 
-<!-- Required datatable js -->
+<!--  datatable js -->
 <script src="<?php echo base_url(); ?>plugins/datatables/jquery.dataTables.min.js"></script>
 <script src="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.js"></script>
 <script src="<?php echo base_url(); ?>plugins/datatables/dataTables.responsive.min.js"></script>
@@ -192,70 +189,51 @@
 <script src="<?= base_url(); ?>plugins/select2/select2.min.js"></script>
 
 <script>
-$(document).ready(function () {
+    $(document).ready(function () {
 
-    $('.select2').select2();
+        $('.select2').select2();
 
-    $('#formConvenio').on('submit', function (e) {
-        e.preventDefault();
-
-        if (!this.checkValidity()) {
-            this.reportValidity();
-            return;
-        }
-
-        $('#modalConfirmarConvenio').modal('show');
-    });
-
-    $('#btnConfirmarGuardar').on('click', function () {
-
-        const formData = new FormData($('#formConvenio')[0]);
-        const $btn = $(this);
-        const idConvenio = $('#idConvenio').val();
-
-        $.ajax({
-            url: '<?= base_url("index.php/Inicio/guardarConvenio") ?>',
-            type: 'POST',
-            data: formData,
-            dataType: 'json',
-            processData: false,
-            contentType: false,
-            beforeSend: function () {
-                $btn.prop('disabled', true).text('Guardando...');
-            },
-            success: function (res) {
-
-                if (!res.error) {
-
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Convenio registrado',
-                        text: res.respuesta
-                    }).then(() => {
-
-                        if (res.pdf_url) {
-                            window.open(res.pdf_url, '_blank');
-                        }
-
-                        window.location.href = '<?= base_url("index.php/Inicio/ListaSalidasPromo/") ?>' + '/' + $('input[name="idArticulo"]').val(); 
-                    });
-
-                } else {
-                    console.log(res);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: res.detalle ?? res.respuesta
-                    });
-                }
-            },
-            complete: function () {
-                $btn.prop('disabled', false).text('Sí, registrar');
-                $('#modalConfirmarConvenio').modal('hide');
-            }
+        $('#formConvenio').on('submit', function (e) {
+            e.preventDefault();
+            $('#modalConfirmarConvenio').modal('show');
         });
 
-    });
+       $(document).on('click', '#btnConfirmarGuardar', function (e) {
 
-});
+            e.preventDefault(); // 🔥 ESTO ES CLAVE
+
+            const formData = new FormData($('#formConvenio')[0]);
+            const $btn = $(this);
+
+            for (let pair of formData.entries()) {
+                console.log(pair[0] + ': ' + pair[1]);
+            }
+
+            $.ajax({
+                url: '<?= base_url("index.php/Inicio/guardarConvenio") ?>',
+                type: 'POST',
+                data: formData,
+                dataType: 'json',
+                processData: false,
+                contentType: false,
+
+                beforeSend: function () {
+                    $btn.prop('disabled', true).text('Guardando...');
+                },
+
+                success: function (res) {
+                    console.log("RESPUESTA:", res);
+                },
+
+                error: function (xhr, status, error) {
+                    console.log("ERROR AJAX:", xhr.responseText);
+                },
+
+                complete: function () {
+                    $btn.prop('disabled', false).text('Sí, registrar');
+                    $('#modalConfirmarConvenio').modal('hide');
+                }
+            });
+        });
+    });
 </script>
