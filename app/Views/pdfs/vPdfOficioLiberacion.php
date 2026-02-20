@@ -60,10 +60,10 @@
         
         <div class="signature-line"></div>
         <div class="signature-name">
-            <?= (isset($registro_pt->nombre_responsable) && $registro_pt->nombre_responsable != 'NO APLICA') ? $registro_pt->nombre_responsable : 'NOMBRE DEL RESPONSABLE' ?>
+            <?= (isset($registro_pt->nombre_responsable_2) && $registro_pt->nombre_responsable_2 != 'NO APLICA') ? $registro_pt->nombre_responsable_2 : 'NOMBRE DEL RESPONSABLE' ?>
         </div>
         <div class="signature-title">
-            <?= (isset($registro_pt->cargo_responsable) && $registro_pt->cargo_responsable != 'NO APLICA') ? $registro_pt->cargo_responsable : 'CARGO DEL RESPONSABLE' ?>
+            <?= (isset($registro_pt->cargo_responsable_2) && $registro_pt->cargo_responsable_2 != 'NO APLICA') ? $registro_pt->cargo_responsable_2 : 'CARGO DEL RESPONSABLE' ?>
         </div>
     </div>
 
