@@ -1627,7 +1627,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text">$</span>
                         </div>
-                        <input type="number" class="form-control viatico-monto" placeholder="0.00" value="${monto}" step="0.01" oninput="calculateViaticosTotal()">
+                        <input type="number" class="form-control viatico-monto" style="min-width: 100px;" placeholder="0.00" value="${monto}" step="0.01" oninput="calculateViaticosTotal()">
                     </div>
                 </td>
                 <td class="text-center">
