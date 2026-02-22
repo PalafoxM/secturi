@@ -6611,32 +6611,39 @@ class Agregar extends BaseController
                 if($xmlPath) $dataFila['xml'] = $xmlPath;
                 
                 $resItem = $this->globals->saveTabla($dataFila, ["tabla" => "manual_factura", "editar" => false], []);
+            }
+        } // End of manual_factura loop
 
-                // --- SAVE VIATICOS ---
-                if(!$resItem->error && isset($resItem->idRegistro) && isset($data['viaticos_json'][$i])){
-                    $viaticosJson = $data['viaticos_json'][$i];
-                    $viaticosArr = json_decode($viaticosJson, true);
-                    
-                    if(is_array($viaticosArr) && count($viaticosArr) > 0){
-                        foreach($viaticosArr as $viat){
-                            $datos_viatico = [
-                                'id_registro_go' => $id_registro_pt, // Main Header ID
-                                'id_presupuesto' => 0, // Manual form doesn't track budget ID strictly
-                                'nombre'         => $viat['nombre'],
-                                'rfc'            => isset($viat['rfc']) ? $viat['rfc'] : '', 
-                                'importe'        => $viat['monto'],
-                                'id_identificador' => $resItem->idRegistro, // Link to manual_factura ID
-                                'usu_reg'        => $session->get('id_usuario'),
-                                'fec_reg'        => date('Y-m-d H:i:s')
-                            ];
-    
-                            $this->globals->saveTabla($datos_viatico, ["tabla" => "viaticos_go", "editar" => false], []);
-                        }
-                    }
+        // --- SAVE GLOBAL VIATICOS ---
+        if(isset($data['viaticos_global_json']) && !empty($data['viaticos_global_json'])) {
+            $viaticosJson = $data['viaticos_global_json'];
+            
+            // Handle if it's sent as an array with one element (depending on form encoding) or just a string
+            if (is_array($viaticosJson)) {
+                $viaticosJson = $viaticosJson[0]; 
+            }
+            
+            $viaticosArr = json_decode($viaticosJson, true);
+           
+            if(is_array($viaticosArr) && count($viaticosArr) > 0){
+   
+                foreach($viaticosArr as $viat){
+                    $datos_viatico = [
+                        'id_registro_go' => $id_registro_pt, // Main Header ID
+                        'id_presupuesto' => 0, // Manual form doesn't track budget ID strictly
+                        'nombre'         => $viat['nombre'],
+                        'rfc'            => isset($viat['rfc']) ? $viat['rfc'] : '', 
+                        'importe'        => $viat['monto'],
+                        'id_identificador' => 0, // No specific item, global
+                        'usu_reg'        => $session->get('id_usuario'),
+                        'fec_reg'        => date('Y-m-d H:i:s')
+                    ];
+
+               $this->globals->saveTabla($datos_viatico, ["tabla" => "viaticos_go", "editar" => false], ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFormatoGO']);
                 }
             }
         }
-
+        
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFormatoGO'];
         // Update status of reserva if needed
         if(isset($data['id_reserva'])){

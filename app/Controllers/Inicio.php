@@ -2465,6 +2465,63 @@ class Inicio extends BaseController
         exit;
     }
 
+      public function pdfEncabezadoTiketGO()
+    {
+        $globals = new Mglobal;
+        $id = $this->request->getGet('id');
+        $data = [];
+
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 10,
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_bottom' => 10,
+            'format' => 'Letter',
+            'tempDir' => sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'mpdf'
+        ]);
+
+        if ($id) {
+            $registro = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["id_formulario_pt" => $id]]);
+            if (!empty($registro->data)) {
+                $data['registro_pt'] = $registro->data[0];
+                $items = $globals->getTabla(["tabla" => "manual_factura", "where" => ["id_registro_pt" => $id, "visible" => 1]]);
+                
+                $itemCount = count($items->data);
+                $currentIndex = 0;
+
+                foreach($items->data as $item){
+                    $currentIndex++;
+                    $item->importe_letra = $this->numeroALetras($item->importe);
+                    
+                    if ($currentIndex > 1) {
+                         $mpdf->AddPage();
+                    }
+
+                    $partida = $globals->getTabla([
+                        "tabla" => "cat_partida",
+                        "where" => ["cuenta_cable" => $item->partida, 'visible' => 1]
+                    ]);
+                    $usuario = $globals->getTabla([
+                        "tabla" => "vw_usuario",
+                        "where" => ["nombre_completo" => $item->responsable]
+                    ]);
+                    //die(json_encode($usuario));
+                    $item->dsc_partida = (isset($partida->data[0])) ? $partida->data[0]->nombre_fondo : '';
+                    $item->nombre_responsable = (isset($usuario->data[0])) ? $usuario->data[0]->nombre_completo.'-'.$usuario->data[0]->dsc_puesto.'-'.$usuario->data[0]->dsc_area : '';
+                  //  die(var_dump($item->nombre_responsable));
+                    // 1. Write Header
+                    $data['row'] = $item; 
+                    $html = view('pdfs/vPdfEncabezadoFacturaGO', $data);
+                    $mpdf->WriteHTML($html);
+
+                }
+            }
+        }
+
+        $mpdf->Output('EncabezadoFacturaGO_' . $id . '.pdf', 'I');
+        exit;
+    }
+
     public function pdfEncabezadoFacturaGO()
     {
         $globals = new Mglobal;
@@ -2528,10 +2585,28 @@ class Inicio extends BaseController
                                     // Calculate dynamic position
                                     $y_start = $mpdf->y + 5; // 5mm margin below header
                                     $page_height = 279; 
+                                    $page_width = 216;
                                     $bottom_margin = 10;
+                                    $left_margin = 5;
+                                    $max_width = 205;
                                     $max_height = $page_height - $y_start - $bottom_margin;
                                     
-                                    $mpdf->UseTemplate($tplId, 5, $y_start, 205, $max_height);
+                                    // Get original dimensions to scale proportionally
+                                    $size = $mpdf->getTemplateSize($tplId);
+                                    $orig_w = $size['width'];
+                                    $orig_h = $size['height'];
+                                    
+                                    $ratio_w = $max_width / $orig_w;
+                                    $ratio_h = $max_height / $orig_h;
+                                    $ratio = min($ratio_w, $ratio_h);
+                                    
+                                    $new_w = $orig_w * $ratio;
+                                    $new_h = $orig_h * $ratio;
+                                    
+                                    // Center horizontally
+                                    $x_pos = $left_margin + (($max_width - $new_w) / 2);
+                                    
+                                    $mpdf->UseTemplate($tplId, $x_pos, $y_start, $new_w, $new_h);
                                 }
 
                                 // Append remaining pages as new pages
@@ -2710,7 +2785,7 @@ class Inicio extends BaseController
                 $data['cat_area'] = $cat_area->data;
             }
         }
-
+        die(var_dump($data));
         $html = view('pdfs/vPdfGastosOperacion', $data);
 
         $mpdf = new \Mpdf\Mpdf([
@@ -2752,7 +2827,7 @@ class Inicio extends BaseController
               
             }
         }
-
+        //die(var_dump($data));
         $html = view('pdfs/vPdfOficioLiberacion', $data);
 
         $mpdf = new \Mpdf\Mpdf([

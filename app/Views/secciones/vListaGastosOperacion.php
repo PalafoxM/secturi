@@ -56,7 +56,7 @@
                                                 <a class="btn btn-outline-info btn-round" href="<?php echo base_url().'index.php/Inicio/pdfEncabezadoFacturaGO?id='.$e->id_formulario_pt ?>" target="_blank" title="Encabezado de Factura" ><i
                                                         class="mdi mdi-file-document-box-multiple font-18"  data-toggle="tooltip" data-placement="top" title="Encabezado de Factura" ></i></a>
 
-                                                <a class="btn btn-outline-success btn-round" href="<?php echo base_url().'index.php/Inicio/pdfEncabezadoFacturaTicket?id='.$e->id_formulario_pt ?>" target="_blank" title="Encabezado de Ticket" ><i
+                                                <a class="btn btn-outline-success btn-round" href="<?php echo base_url().'index.php/Inicio/pdfEncabezadoTiketGO?id='.$e->id_formulario_pt ?>" target="_blank" title="Encabezado de Ticket" ><i
                                                         class="mdi mdi-ballot-outline font-18"  data-toggle="tooltip" data-placement="top" title="Encabezado de Ticket" ></i></a>
                                                  <a class="btn btn-outline-warning btn-round" onclick="descargarExcel(<?= $e->id_formulario_pt ?>)" title="Descargar Excel"><i
                                                         class="mdi mdi-file-excel font-18"  data-toggle="tooltip" data-placement="top" title="Descargar Excel" ></i></a> 
