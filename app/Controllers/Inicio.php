@@ -2785,7 +2785,7 @@ class Inicio extends BaseController
                 $data['cat_area'] = $cat_area->data;
             }
         }
-        die(var_dump($data));
+      //  die(var_dump($data));
         $html = view('pdfs/vPdfGastosOperacion', $data);
 
         $mpdf = new \Mpdf\Mpdf([

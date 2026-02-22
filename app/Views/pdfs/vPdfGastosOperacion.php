@@ -122,11 +122,11 @@
     <table style="border-top: 1px solid #000;">
         <thead>
             <tr>
-                <th width="10%">COMPROBANTE</th>
+                <th width="13%">COMPROBANTE</th>
                 <th width="15%">PROYECTO META</th>
                 <th width="10%">PARTIDA No.</th>
                 <th width="12%">IMPORTE</th>
-                <th width="53%" colspan="2">OBSERVACIONES</th>
+                <th width="50%" colspan="2">OBSERVACIONES</th>
             </tr>
             <tr>
                 <td colspan="4" class="no-border"></td> <!-- Spacer for proper rendering of rowspan/colspan mix in some pdf engines, but standard is different -->

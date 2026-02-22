@@ -199,119 +199,105 @@ class Funciones {
         
     }
 
-    public function numeroALetras($xcifra)
+    public function numeroALetras($number)
     {
-        $xarray = array(
-            0 => "Cero",
-            1 => "UN", "DOS", "TRES", "CUATRO", "CINCO", "SEIS", "SIETE", "OCHO", "NUEVE",
-            "DIEZ", "ONCE", "DOCE", "TRECE", "CATORCE", "QUINCE", "DIECISEIS", "DIECISIETE", "DIECIOCHO", "DIECINUEVE",
-            "VEINTI", 30 => "TREINTA", 40 => "CUARENTA", 50 => "CINCUENTA", 60 => "SESENTA", 70 => "SETENTA", 80 => "OCHENTA", 90 => "NOVENTA",
-            100 => "CIENTO", 200 => "DOSCIENTOS", 300 => "TRESCIENTOS", 400 => "CUATROCIENTOS", 500 => "QUINIENTOS", 600 => "SEISCIENTOS", 700 => "SETECIENTOS", 800 => "OCHOCIENTOS", 900 => "NOVECIENTOS"
-        );
-        $xcifra = trim($xcifra);
-        $xlength = strlen($xcifra);
-        $xpos_punto = strpos($xcifra, ".");
-        $xaux_int = $xcifra;
-        $xdecimales = "00";
-        if (!($xpos_punto === false)) {
-            if ($xpos_punto == 0) {
-                $xcifra = "0" . $xcifra;
-                $xpos_punto = strpos($xcifra, ".");
-            }
-            $xaux_int = substr($xcifra, 0, $xpos_punto); 
-            $xdecimales = substr($xcifra . "00", $xpos_punto + 1, 2);
+        $number = trim($number);
+        $number = str_replace(',', '', $number);
+        $xpos_punto = strpos($number, ".");
+        if ($xpos_punto === false) {
+            $entero = $number;
+            $decimales = "00";
+        } else {
+            $entero = substr($number, 0, $xpos_punto);
+            $decimales = substr($number . "00", $xpos_punto + 1, 2);
         }
 
-        $XAUX = str_pad($xaux_int, 18, " ", STR_PAD_LEFT); 
-        $xcadena = "";
-        for ($xz = 0; $xz < 3; $xz++) {
-            $xaux = substr($XAUX, $xz * 6, 6);
-            $xi = trim(substr($xaux, 0, 3));
-            $xbox = "";
-            if ($xi > 0) {
-                $x3digitos = ($xi % 100);
-                $xaux_num = $xi;
-                if ($x3digitos > 0 && $x3digitos < 21) $xbox = $xarray[$x3digitos];
-                else {
-                    $x2digitos = ($xi % 10);
-                    if ($x2digitos == 0) $xbox = $xarray[$x3digitos];
-                    else $xbox = $xarray[$x3digitos - $x2digitos] . " Y " . $xarray[$x2digitos];
-                }
-                $x3digitos = $xi; 
-                if ($x3digitos > 99) {
-                    $xcentenas = floor($x3digitos / 100);
-                    $xresto = ($x3digitos % 100);
-                    if ($xcentenas == 1 && $xresto == 0) $xbox = "CIEN";
-                    else $xbox = $xarray[$xcentenas * 100] . " " . $xbox;
-                }
-                if ($xz == 0) $xcadena = $xbox . " BILLONES " . $xcadena;
-                elseif ($xz == 1) $xcadena = $xbox . " MILLONES " . $xcadena;
-                elseif ($xz == 2) $xcadena = $xbox . " MILES " . $xcadena;
-            }
-            $xbox = "";
-            $xaux = substr($xaux, 3, 3);
-            $xi = trim($xaux);
-            if ($xi > 0) {
-                $x3digitos = ($xi % 100);
-                $xaux_num = $xi;
-                if ($x3digitos > 0 && $x3digitos < 21) $xbox = $xarray[$x3digitos];
-                else {
-                    $x2digitos = ($xi % 10);
-                    if ($x2digitos == 0) $xbox = $xarray[$x3digitos];
-                    else $xbox = $xarray[$x3digitos - $x2digitos] . " Y " . $xarray[$x2digitos];
-                }
-                $x3digitos = $xi; 
-                if ($x3digitos > 99) {
-                    $xcentenas = floor($x3digitos / 100);
-                    $xresto = ($x3digitos % 100);
-                    if ($xcentenas == 1 && $xresto == 0) $xbox = "CIEN";
-                    else $xbox = $xarray[$xcentenas * 100] . " " . $xbox;
-                }
-            } else $xbox = ""; 
-            if ($xz == 0) {
-                if ($xi > 0) $xcadena = $xbox . " MIL MILLONES " . $xcadena;
-            } elseif ($xz == 1) {
-                if ($xi > 0) {
-                    if ($xi == 1) $xbox = "UN"; 
-                    $xcadena = $xcadena . " " . $xbox . " MILLONES ";
-                }
-            } elseif ($xz == 2) {
-                if ($xi > 0) {
-                    if ($xi == 1) $xbox = "UN"; 
-                    $xcadena = $xcadena . " " . $xbox . " MIL ";
+        $entero = ltrim($entero, "0");
+        if ($entero == "") $entero = "0";
+
+        $unidades = ["", "UN", "DOS", "TRES", "CUATRO", "CINCO", "SEIS", "SIETE", "OCHO", "NUEVE", "DIEZ", "ONCE", "DOCE", "TRECE", "CATORCE", "QUINCE", "DIECISEIS", "DIECISIETE", "DIECIOCHO", "DIECINUEVE", "VEINTE", "VEINTIUN", "VEINTIDOS", "VEINTITRES", "VEINTICUATRO", "VEINTICINCO", "VEINTISEIS", "VEINTISIETE", "VEINTIOCHO", "VEINTINUEVE"];
+        $decenas = ["", "DIEZ", "VEINTE", "TREINTA", "CUARENTA", "CINCUENTA", "SESENTA", "SETENTA", "OCHENTA", "NOVENTA"];
+        $centenas = ["", "CIENTO", "DOSCIENTOS", "TRESCIENTOS", "CUATROCIENTOS", "QUINIENTOS", "SEISCIENTOS", "SETECIENTOS", "OCHOCIENTOS", "NOVECIENTOS"];
+
+        $convertirGrupo = function($n) use ($unidades, $decenas, $centenas) {
+            $n = (int)$n;
+            $c = floor($n / 100);
+            $d = floor(($n % 100) / 10);
+            $u = $n % 10;
+            $res = "";
+            if ($c == 1 && $d == 0 && $u == 0) $res .= "CIEN";
+            else if ($c > 0) $res .= $centenas[$c];
+
+            $du = $n % 100;
+            if ($du > 0) {
+                if ($res != "") $res .= " ";
+                if ($du < 30) {
+                    $res .= $unidades[$du];
+                } else {
+                    $res .= $decenas[$d];
+                    if ($u > 0) $res .= " Y " . $unidades[$u];
                 }
             }
+            return $res;
+        };
+
+        if ($entero == "0") {
+            $resultado = "CERO";
+        } else {
+            $entero = str_pad($entero, 18, "0", STR_PAD_LEFT);
+            $b2 = substr($entero, 0, 6);
+            $m2 = substr($entero, 6, 6);
+            $u2 = substr($entero, 12, 6);
+
+            $resultado = "";
+
+            if ((int)$b2 > 0) {
+                $bg1 = substr($b2, 0, 3);
+                $bg2 = substr($b2, 3, 3);
+                if ((int)$bg1 > 0) {
+                    $g = $convertirGrupo($bg1);
+                    if ($g == "UN") $g = "";
+                    $resultado .= trim($g . " MIL") . " ";
+                }
+                if ((int)$bg2 > 0) {
+                    $resultado .= $convertirGrupo($bg2) . " ";
+                }
+                if ((int)$b2 == 1) $resultado .= "BILLON ";
+                else $resultado .= "BILLONES ";
+            }
+
+            if ((int)$m2 > 0) {
+                $mg1 = substr($m2, 0, 3);
+                $mg2 = substr($m2, 3, 3);
+                if ((int)$mg1 > 0) {
+                    $g = $convertirGrupo($mg1);
+                    if ($g == "UN") $g = "";
+                    $resultado .= trim($g . " MIL") . " ";
+                }
+                if ((int)$mg2 > 0) {
+                    $resultado .= $convertirGrupo($mg2) . " ";
+                }
+                if ((int)$m2 == 1) $resultado .= "MILLON ";
+                else $resultado .= "MILLONES ";
+            }
+
+            if ((int)$u2 > 0) {
+                $ug1 = substr($u2, 0, 3);
+                $ug2 = substr($u2, 3, 3);
+                if ((int)$ug1 > 0) {
+                    $g = $convertirGrupo($ug1);
+                    if ($g == "UN") $g = ""; 
+                    $resultado .= trim($g . " MIL") . " ";
+                }
+                if ((int)$ug2 > 0) {
+                    $resultado .= $convertirGrupo($ug2);
+                }
+            }
+            
+            $resultado = trim(preg_replace('/\s+/', ' ', $resultado));
         }
-        
-        $xi = trim(substr($XAUX, -3));
-        $xbox = "";
-        if ($xi > 0) {
-            $x3digitos = ($xi % 100);
-            if ($x3digitos > 0 && $x3digitos < 21) $xbox = $xarray[$x3digitos];
-            else {
-                $x2digitos = ($xi % 10);
-                if ($x2digitos == 0) $xbox = $xarray[$x3digitos];
-                else $xbox = $xarray[$x3digitos - $x2digitos] . " Y " . $xarray[$x2digitos];
-            }
-            $x3digitos = $xi; 
-            if ($x3digitos > 99) {
-                $xcentenas = floor($x3digitos / 100);
-                $xresto = ($x3digitos % 100);
-                if ($xcentenas == 1 && $xresto == 0) $xbox = "CIEN";
-                else $xbox = $xarray[$xcentenas * 100] . " " . $xbox;
-            }
-        } else $xbox = "CERO";
-        $xcadena = $xcadena . " " . $xbox;
-        $xcadena = str_replace("VEINTI ", "VEINTI", $xcadena); 
-        $xcadena = str_replace("  ", " ", $xcadena); 
-        $xcadena = str_replace("UN UN", "UN", $xcadena);
-        $xcadena = str_replace("  ", " ", $xcadena);
-        $xcadena = str_replace("BILLONES MILLONES MILES", "BILLONES", $xcadena);
-        $xcadena = str_replace("MILLONES MILES", "MILLONES", $xcadena);
-        $xcadena = str_replace("UN MIL", "MIL", $xcadena); 
-        $xcadena = trim($xcadena);
-        
-        return "(" . $xcadena . " PESOS " . $xdecimales . "/100 M.N.)";
+
+        return "(" . $resultado . " PESOS " . $decimales . "/100 M.N.)";
     }
 
 }

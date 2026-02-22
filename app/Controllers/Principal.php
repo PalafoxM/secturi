@@ -3347,47 +3347,13 @@ class Principal extends BaseController
         $session = \Config\Services::session();
         $globals = new Mglobal;
         
+        $folio = $globals->getTabla(['tabla' => 'formulario_pt', 'where' => ['visible' => 1, 'id_formulario_pt' => $id]]);
+        $data['folio'] = $folio->data[0]->no_consecutivo;
         // Obtener datos de viaticos
         $viaticos = $globals->getTabla(['tabla' => 'viaticos_go', 'where' => ['visible' => 1, 'id_registro_go' => $id]]);
-        
-        // Obtener datos del registro principal para el folio (si es necesario)
-        $registro_go = $globals->getTabla(['tabla' => 'registro_go', 'where' => ['id_registro_go' => $id]]);
-        
-        $data = [];
-        $data['viaticos'] = (!empty($viaticos->data)) ? $viaticos->data : [];
-        if (!empty($registro_go->data)) {
-            $direccion = $globals->getTabla([
-                'tabla' => 'cat_area',
-                'where' => [
-                    'visible' => 1,
-                    //'id_director' => 110
-                    'id_area' => $registro_go->data[0]->id_direccion_responsable
-                ]
-            ]);
-
-    
-       // die( var_dump($direccion) );
-            $no_consecutivo = "";
-            if (strlen($registro_go->data[0]->no_consecutivo) == 1) {
-                $no_consecutivo = '00' . $registro_go->data[0]->no_consecutivo;
-            }
-            if (strlen($registro_go->data[0]->no_consecutivo) == 2) {
-                $no_consecutivo = '0' . $registro_go->data[0]->no_consecutivo;
-            }
-            if (strlen($registro_go->data[0]->no_consecutivo) >= 3) {
-                $no_consecutivo = $registro_go->data[0]->no_consecutivo;
-            }
-            
-            $folio =(isset( $direccion->data) && !empty( $direccion->data))? $direccion->data[0]->prefijo:'S/N/';
-        
-            $folio_prefijo = $folio . $no_consecutivo . '/' . date('Y'); //ESTO HAY QUE OREGUNTAR
-
-            $data['folio'] = $folio_prefijo;
-        } else {
-             $data['folio'] = 'N/A';
-        }
 
         // Cargar vista HTML
+        $data['viaticos'] = (!empty($viaticos->data)) ? $viaticos->data : [];
         $html = view('secciones/vFormatoViaticosDesglose', $data);
 
         // Generar PDF
