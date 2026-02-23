@@ -48,9 +48,7 @@
             <tr>
                 <td class="label-cell">RESPONSABLE / CARGO / AREA:</td>
                 <td class="value-cell">
-                    <?= !empty($registro_pt->nombre_responsable_2) ? strtoupper($registro_pt->nombre_responsable_2) : '' ?> - 
-                    <?= !empty($registro_pt->cargo_responsable_2) ? strtoupper($registro_pt->cargo_responsable_2) : '' ?> - 
-                    <?= !empty($registro_pt->area_responsable_2) ? strtoupper($registro_pt->area_responsable_2) : '' ?>
+                    <?= !empty($registro_pt->nombre_responsable) ? strtoupper($registro_pt->nombre_responsable) : '' ?>
                 </td>
             </tr>
             <tr>

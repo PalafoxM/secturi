@@ -2196,9 +2196,9 @@ class Inicio extends BaseController
         $session = \Config\Services::session();
         $globas = new Mglobal;
         if(in_array($session->get('id_perfil'), [1,2])){
-            $dataDB = array('tabla' => 'formulario_pt', 'where' => ['visible' => 1]);
+            $dataDB = array('tabla' => 'formulario_pt', 'where' => ['visible' => 1, 'tipo_formato' => 'PT']);
         }else{
-            $dataDB = array('tabla' => 'formulario_pt', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]);
+            $dataDB = array('tabla' => 'formulario_pt', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario'), 'tipo_formato' => 'PT']);
         }
         $response = $globas->getTabla($dataDB);
         $data['dataHojaAzul'] = $response->data;
@@ -2377,7 +2377,14 @@ class Inicio extends BaseController
                 //die( var_dump( $items->data ) );
                 $itemCount = count($items->data);
                 $currentIndex = 0;
-
+              //  die(var_dump($items->data));
+                    $usuario = $globals->getTabla([
+                            "tabla" => "vw_usuario",
+                            "where" => ["nombre_completo" => $registro->data[0]->nombre_responsable_2]
+                        ]);
+                        $registro->data[0]->nombre_responsable = (isset($usuario->data[0])) ? $usuario->data[0]->nombre_completo.'-'.$usuario->data[0]->dsc_puesto.'-'.$usuario->data[0]->dsc_area : '';
+                     
+                    
                 foreach($items->data as $key => $item){
                     $currentIndex++;
                     $item->importe_letra = $this->numeroALetras($item->importe);
@@ -2392,7 +2399,7 @@ class Inicio extends BaseController
                             "where" => ["cuenta_cable" => $item->partida, 'visible' => 1]
                         ]);
                         $item->dsc_partida = (isset($partida->data[0])) ? $partida->data[0]->nombre_fondo : '';
-                     
+
                     
                     
                     // 1. Write Header
@@ -2659,6 +2666,13 @@ class Inicio extends BaseController
                 //die( var_dump( $items->data ) );
                 $itemCount = count($items->data);
                 $currentIndex = 0;
+
+                   $usuario = $globals->getTabla([
+                            "tabla" => "vw_usuario",
+                            "where" => ["nombre_completo" => $registro->data[0]->nombre_responsable_2]
+                        ]);
+                        $registro->data[0]->nombre_responsable = (isset($usuario->data[0])) ? $usuario->data[0]->nombre_completo.'-'.$usuario->data[0]->dsc_puesto.'-'.$usuario->data[0]->dsc_area : '';
+                     
 
                 foreach($items->data as $key => $item){
                     $currentIndex++;
