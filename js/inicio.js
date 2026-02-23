@@ -5432,10 +5432,11 @@ ini.inicio = (function () {
             let periodoInicio = $('#periodoInicio').val();
             let periodoFin = $('#periodoFin').val();
             let usuario = $('#usuarioIncidencia').val();
+            let incidencia = $('#incidencias').val();
             $.ajax({
                 type: "POST",
                 url: base_url + "index.php/Agregar/validarReporte",
-                data: { periodoInicio, periodoFin, usuario },
+                data: { periodoInicio, periodoFin, usuario, incidencia },
                 dataType: "json",
                 beforeSend: function () {
                     $('#btnReporte').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Generando...');
@@ -5445,7 +5446,7 @@ ini.inicio = (function () {
                         Swal.fire("Atención", '<p> ' + response.respuesta + '</p>', 'info');
                     } else {
                         setTimeout(() => {
-                            const url = base_url + "index.php/Agregar/ReporteUsuario/" + periodoInicio + '/' + periodoFin + '/' + usuario;
+                            const url = base_url + "index.php/Agregar/ReporteUsuario/" + periodoInicio + '/' + periodoFin + '/' + usuario + '/' + incidencia;
                             window.open(url, '_blank');
                         }, 500);
                     }

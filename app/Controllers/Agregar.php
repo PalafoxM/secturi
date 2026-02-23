@@ -5217,7 +5217,7 @@ class Agregar extends BaseController
         }
         return false;
     }
-    public function ReporteUsuario($fec_inicio = null, $fec_fin = null, $usuario = null)
+    public function ReporteUsuario($fec_inicio = null, $fec_fin = null, $usuario = null, $id_incidencia = null)
     {
         $session = \Config\Services::session();
         $response = new stdClass();
@@ -5228,24 +5228,46 @@ class Agregar extends BaseController
         $fechaFin = date('Y-m-d', strtotime($fec_fin));
 
         $data = array();
+        $incidenciaUsuario = null;
+
         if ($usuario == 'todos') {
-            $incidencia = $globals->getTabla([
+            $incidenciaUsuario = $globals->getTabla([
                 'tabla' => 'vw_incidenica',
                 'where' => ['id_estatus' => 3],
                 'whereBetween' => [['fecha_inicio', $fechaInicio, $fechaFin]]
             ]);
         } else {
-            $incidencia = $globals->getTabla([
+            $incidenciaUsuario = $globals->getTabla([
                 'tabla' => 'vw_incidenica',
                 'where' => ['id_usuario' => $usuario, 'id_estatus' => 3],
                 'whereBetween' => [['fecha_inicio', $fechaInicio, $fechaFin]]
             ]);
-
+            
+            if (empty($incidenciaUsuario->data)) {
+                $incidenciaUsuario = $globals->getTabla([
+                    'tabla' => 'vw_incidenica',
+                    'where' => ['id_usuario' => $usuario, 'id_estatus' => 3],
+                    'whereBetween' => [['fecha_fin', $fechaInicio, $fechaFin]]
+                ]);
+            }
         }
-        //die( var_dump( $incidencia->data ) );
-        $data['incidencia'] = (isset($incidencia->data) && !empty($incidencia->data)) ? $incidencia->data : '';
+
+        $incidenciaData = [];
+        if (isset($incidenciaUsuario->data) && !empty($incidenciaUsuario->data)) {
+            if ($id_incidencia != 'todos') {
+                foreach ($incidenciaUsuario->data as $i) {
+                    if ($i->cat_id_incidencia == $id_incidencia) {
+                        $incidenciaData[] = $i;
+                    }
+                }
+            } else {
+                $incidenciaData = $incidenciaUsuario->data;
+            }
+        }
+
+        $data['incidencia'] = $incidenciaData;
         if ($usuario == 'todos') {
-            $data['usuario'] = (isset($incidencia->data) && !empty($incidencia->data)) ? $incidencia->data : '';
+            $data['usuario'] = !empty($incidenciaData) ? $incidenciaData : '';
             $usuariosAgrupados = [];
 
             foreach ($data['incidencia'] as $key => $i) {
@@ -5278,7 +5300,7 @@ class Agregar extends BaseController
 
 
         } else {
-            $data['usuario'] = (isset($incidencia->data) && !empty($incidencia->data)) ? $incidencia->data[0] : '';
+            $data['usuario'] = !empty($incidenciaData) ? $incidenciaData[0] : '';
         }
 
 
@@ -5351,6 +5373,7 @@ class Agregar extends BaseController
         $periodoInicio = $this->request->getPost('periodoInicio');
         $periodoFin = $this->request->getPost('periodoFin');
         $id_usuario = $this->request->getPost('usuario');
+        $id_incidencia = $this->request->getPost('incidencia');
         $fec_ini = date('Y-m-d', strtotime($periodoInicio));
         $fec_fin = date('Y-m-d', strtotime($periodoFin));
         if ($id_usuario == 'todos') {
@@ -5358,13 +5381,38 @@ class Agregar extends BaseController
             $response->respuesta = 'Si existen incidencia del usuario';
             return $this->respond($response);
         }
+    
         $tabla = [
             'tabla' => 'incidencia',
             'where' => ['id_usuario' => $id_usuario],
             'whereBetween' => [['fecha_inicio', $fec_ini, $fec_fin]]
         ];
         $incidencias = $globals->getTabla($tabla);
-        if (!empty($incidencias->data)) {
+        
+        if (empty($incidencias->data)) {
+            $tabla = [
+                'tabla' => 'incidencia',
+                'where' => ['id_usuario' => $id_usuario],
+                'whereBetween' => [['fecha_fin', $fec_ini, $fec_fin]]
+            ];
+            $incidencias = $globals->getTabla($tabla);
+        }
+
+        $tiene_incidencias = false;
+        if (isset($incidencias->data) && !empty($incidencias->data)) {
+            if ($id_incidencia != 'todos') {
+                foreach ($incidencias->data as $i) {
+                    if ($i->cat_id_incidencia == $id_incidencia) {
+                        $tiene_incidencias = true;
+                        break;
+                    }
+                }
+            } else {
+                $tiene_incidencias = true;
+            }
+        }
+
+        if ($tiene_incidencias) {
             $response->error = false;
             $response->respuesta = 'Si existen incidencia del usuario';
         }

@@ -1134,6 +1134,7 @@ class Inicio extends BaseController
         // Obtener categorías desde la base de datos
         $Periodo = ['tabla' => 'cat_periodo', 'where' => ['visible' => 1]];
         $dataDB = ['tabla' => 'vw_incidenica', 'where' => ['visible' => 1]];
+        $dataInci = ['tabla' => 'cat_incidencia', 'where' => ['visible' => 1]];
         $usuario = [
             'tabla' => 'vw_incidenica',
             'select' => ['id_usuario', 'nombre_completo'],
@@ -1143,13 +1144,15 @@ class Inicio extends BaseController
 
 
         $response = $principal->getTabla($dataDB);
+        $incidencia = $principal->getTabla($dataInci);
         $periodo = $principal->getTabla($Periodo);
         $usuario = $principal->getTabla($usuario);
 
         $data['incidencia'] = (isset($response->data) && !empty($response->data)) ? $response->data : [];
+        $data['cat_incidencia'] = (isset($incidencia->data) && !empty($incidencia->data)) ? $incidencia->data : [];
         $data['periodo'] = (isset($periodo->data) && !empty($periodo->data)) ? $periodo->data : [];
         $data['usuario'] = (isset($usuario->data) && !empty($usuario->data)) ? $usuario->data : [];
-        //die( var_dump($data['usuario']) );
+       // die( var_dump($data['incidencia']) );
         $data['scripts'] = ['principal', 'inicio'];
         $data['contentView'] = 'secciones/vListaIncidencia';
         $this->_renderView($data);

@@ -74,7 +74,16 @@
                                                               <option value="todos" > TODO EL PERSONAL </option>
                                                         </select>
                                                 </div>
-                                                  <div class="col-md-3">
+                                                <div class="col-md-3">
+                                                       <label for="fecha_inicio">Usuario</label>
+                                                        <select class="form-control select2" id="incidencias" data-toggle="select2">
+                                                            <?php foreach($cat_incidencia as $i): ?>
+                                                            <option value="<?= $i->id_incidencia ?>" > <?= $i->dsc_incidencia ?> </option>
+                                                            <?php endforeach; ?>
+                                                              <option value="todos" > TODO LAS INCIDENCIA </option>
+                                                        </select>
+                                                </div>
+                                                  <div class="col-md-2">
                                                     <div class="form-group">
                                                         <label for="fecha_fin">Enviar</label><br>
                                                         <button id="btnReporte" class="btn btn-info mb-3" onclick="ini.inicio.generarReporteIndividual();" >PDF</button>

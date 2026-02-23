@@ -2701,22 +2701,16 @@ class Principal extends BaseController
         $data['fecha_texto'] = "Silao, Gto., a " . date('d', $fecha) . " de " . $meses[date('n', $fecha)-1] . " de " . date('Y', $fecha);
 
         $html = view('personal/vFormatoGRC', $data);
-        $doc = 'assets/documentos/SOLICITUD_GRC.pdf';
+        //$doc = 'public/assets/images/membrete.png'; // Reference only, not used anymore
         
         // Crear PDF
         $mpdf = new \Mpdf\Mpdf([
-            'margin_top' => 0,
-            'margin_left' => 0,
-            'margin_right' => 0,
-            'margin_bottom' => 0,
+            'margin_top' => 15,
+            'margin_left' => 15,
+            'margin_right' => 15,
+            'margin_bottom' => 15,
             'format' => 'Letter'
         ]);
-
-        if (file_exists(FCPATH . $doc)) {
-            $mpdf->SetSourceFile(FCPATH . $doc);
-            $tplId = $mpdf->ImportPage(1);
-            $mpdf->UseTemplate($tplId);
-        }
 
         $mpdf->WriteHTML($html);
         $mpdf->Output('Solicitud_GRC_' . $id_solicitud . '.pdf', 'I');
