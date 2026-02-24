@@ -471,7 +471,7 @@
                             </ul>
                         </li><!--end nav-item-->
 
-                        <?php if (in_array($session->id_perfil, [1, 2])): ?>
+                     
                         <li class="nav-item">
                              <a class="nav-link" href="javascript: void(0);"><span class="w-100">Concluidos</span><span
                                      class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
@@ -480,13 +480,10 @@
                                  </li>
                                  <li><a href="<?php echo base_url(); ?>index.php/Principal/concluidosDeclinados">Declinados PT</a>
                                  </li>
-                                 <li><a href="<?php echo base_url(); ?>index.php/Principal/concluidosAceptadosGO">Aceptados GO</a>
-                                 </li>
-                                 <li><a href="<?php echo base_url(); ?>index.php/Principal/concluidosDeclinadosGO">Declinados GO</a>
-                                 </li>
+                          
                              </ul>
                          </li>
-                         <?php endif; ?>                       <!--end nav-item-->
+                                        <!--end nav-item-->
                          <li class="nav-item">
                             <a class="nav-link" href="javascript: void(0);"><span class="w-100">Sin enviar</span>
                             <span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
