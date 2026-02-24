@@ -100,9 +100,9 @@
                 <td colspan="5">REFERENCIA AL DOCUMENTO</td>
             </tr>
             <tr>
-                <th width="15%">No. COMPROBANTE</th>
+                <th width="20%">No. COMPROBANTE</th>
                 <th width="15%">PROYECTO META</th>
-                <th width="15%">No. PARTIDA</th>
+                <th width="10%">No. PARTIDA</th>
                 <th width="15%">IMPORTE</th>
                 <th width="40%">OBSERVACIONES</th>
             </tr>
