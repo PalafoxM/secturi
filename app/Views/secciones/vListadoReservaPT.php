@@ -66,7 +66,7 @@
 
                                                 <tbody>
                                                     <?php foreach($reserva as $p): ?>
-                                                        <?php if(!in_array($p->id_estatus, [1,2])): ?>
+                                                       
                                                     <tr>
                                                
                                                         <td class="text-center"><?= $p->razon_social?></td>
@@ -152,7 +152,7 @@
                                                             <?php endif; ?>
                                                         </td>
                                                     </tr>
-                                                    <?php endif; ?>
+                                                   
                                                     <?php endforeach; ?>
                                                 </tbody>
                                             </table>
