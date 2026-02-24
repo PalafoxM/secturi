@@ -101,7 +101,7 @@
             </tr>
             <tr>
                 <th width="20%">COMPROBANTE</th>
-                <th width="15%">PROYECTO META</th>
+                <th width="15%">PROYECTO</th>
                 <th width="10%">PARTIDA</th>
                 <th width="15%">IMPORTE</th>
                 <th width="40%">OBSERVACIONES</th>
