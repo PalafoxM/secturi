@@ -1,3 +1,4 @@
+<?php $session = \Config\Services::session(); ?>
 <div class="page-wrapper">
     <div class="page-content-tab">
         <div class="container-fluid">
@@ -33,6 +34,9 @@
                                             <th class="text-center">FOLIO</th>
                                        
                                             <th class="text-center">IMPORTE</th>
+                                            <?php if($session->get('id_perfil') == 1): ?>
+                                            <th class="text-center">RESPONSABLE</th>
+                                            <?php endif; ?>
                                             <th class="text-center">ACCIONES</th>
                                         </tr>
                                         <!--end tr-->
@@ -45,7 +49,9 @@
                                             <td  class="text-center"><?= $e->no_consecutivo?></td>
                                         
                                             <td  class="text-center"><?= $e->importe_total_num?></td>
-                                           
+                                            <?php if($session->get('id_perfil') == 1): ?>
+                                            <td  class="text-center"><?= $e->nombre_responsable?></td>
+                                            <?php endif; ?>
                    
                                             <td  class="text-center" class="text-center">
                                                 <a class="btn btn-outline-secondary btn-round" href="<?php echo base_url().'index.php/Inicio/pdfGastosOperacion?id='.$e->id_formulario_pt ?>" target="_blank" title="Formato GO" ><i

@@ -2696,7 +2696,13 @@ class Inicio extends BaseController
                      "where" => ["id_registro_go" => $row->id_formulario_pt, "visible" => 1],
                      "limit" => 1
                  ]);
+                 $usuario = $globas->getTabla([
+                     "tabla" => "vw_usuario", 
+                     "where" => ["id_usuario" => $row->usu_reg],
+                     "limit" => 1
+                 ]);
                  $row->tiene_viaticos = !empty($check->data);
+                 $row->nombre_responsable = !empty($usuario->data[0]) ? $usuario->data[0]->nombre_completo : '';
             }
         }
        // die(var_dump($response->data));
