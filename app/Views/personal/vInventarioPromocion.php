@@ -94,7 +94,10 @@
                                                 <small class="text-muted d-block">Imagen</small></th>
                                             <th class="py-3">
                                                 <i class="mdi mdi-counter text-info d-block mb-1"></i>
-                                                <small class="text-muted d-block">Cantidad</small></th>
+                                                <small class="text-muted d-block">Cantidad solicitada</small></th>
+                                            <th class="py-3">
+                                                <i class="mdi mdi-counter text-info d-block mb-1"></i>
+                                                <small class="text-muted d-block">Stock</small></th>
                                             <th class="py-3">
                                                 <i class="mdi mdi-palette text-pink d-block mb-1"></i>
                                                 <small class="text-muted d-block">Colores</small></th>
@@ -109,7 +112,7 @@
 
                                             <th class="py-3">
                                                 <i class="mdi mdi-calendar-check text-success d-block mb-1"></i>
-                                                <small class="text-muted d-block">Formulario</small></th>
+                                                <small class="text-muted d-block">Regresar a formulario</small></th>
                                             
                                             <th class="py-3" style="width:15%;">
                                                 <i class="mdi mdi-cog-outline text-secondary d-block mb-0"></i>
@@ -154,6 +157,17 @@
 
 
                                                     <!-- Cantidad (badge) -->
+                                                    <?php
+                                                        $stock = (int) $item->stock;
+                                                        $badgeClass = ($stock < 5) ? 'badge-soft-danger' : 'badge-soft-success';
+                                                    ?>
+                                                    <td class="text-center">
+                                                        <span class="badge badge-soft-info font-13 p-2 px-3">
+                                                            <?= $item->cantidad ?>
+                                                        </span>
+                                                    </td>
+
+                                                    <!-- Stock -->
                                                     <?php
                                                         $stock = (int) $item->stock;
                                                         $badgeClass = ($stock < 5) ? 'badge-soft-danger' : 'badge-soft-success';
@@ -233,7 +247,7 @@
                                                             <a href="<?= base_url('index.php/Inicio/ListaSalidasPromo/' . $item->id_inventario_promo) ?>"
                                                                 class="btn btn-sm btn-outline-warning btn-sm"
                                                                 title="Complementos del contrato">
-                                                                🌎 Compl. <!-- lleva a INE, oficio, evidencias -->
+                                                                🌎 Consultar Recibo <!-- lleve a vpdfReciboPromo -->
                                                             </a>  
                                                             
                                                             <button class="btn btn-sm btn-outline-danger btn-eliminar btn-sm"
@@ -246,14 +260,14 @@
                                                             </button>
                                                         </div>    
                                                     </td>
+                                                    <tr>
+                                                        <td colspan="8" class="text-center text-muted py-4">
+                                                            No hay productos registrados
+                                                        </td>
+                                                    </tr>
                                                 </tr>
                                             <?php endforeach; ?>
                                         <?php else: ?>
-                                            <tr>
-                                                <td colspan="8" class="text-center text-muted py-4">
-                                                    No hay productos registrados
-                                                </td>
-                                            </tr>
                                         <?php endif; ?>
                                     </tbody>
                                 </table>
@@ -298,8 +312,23 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                     <div class="form-group">
-                                                    <label class="font-weight-bold text-dark text-uppercase font-12">Cantidad</label>
+                                                    <label class="font-weight-bold text-dark text-uppercase font-12">Cantidad solicitada</label>
                                                     <input type="number" class="form-control" id="cantidad_producto" name="cantidad" min="0" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="font-weight-bold text-dark text-uppercase font-12" id="label_cantidad">Stock</label>
+                                                    <input type="number" class="form-control" id="stock" name="stock" min="0" step="0.01" required>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                    <div class="form-group">
+                                                    <label class="font-weight-bold text-dark text-uppercase font-12">Precio unitario</label>
+                                                    <input type="number" class="form-control" id="precio_unitario" name="cantidad" min="0" step= "0.01" required>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -318,11 +347,6 @@
                                             <button type="button" class="btn btn-sm btn-outline-info mt-1" id="btn_add_color">
                                                 <i class="mdi mdi-plus"></i> Agregar Color
                                             </button>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label class="font-weight-bold text-dark text-uppercase font-12">Total Existencia</label>
-                                            <input type="number" class="form-control" id="total_existencia" name="total_existencia" min="0" required>
                                         </div>
                                     </div>
 
@@ -524,7 +548,7 @@
             }
 
             if (d.tipo === 'nuevo') {
-                $('#label_cantidad').text('Stock Inicial');
+                $('#label_cantidad').text('Stock activo');
                 $('#tabla_hidden').val('cat_inventario_promo');
                 addColorRow();
             }

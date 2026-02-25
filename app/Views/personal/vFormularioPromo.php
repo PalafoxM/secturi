@@ -32,39 +32,12 @@
                                                 <input type="hidden" name="idArticulo" value="<?= isset($idArticulo) ? $idArticulo : '' ?>">
                                                 <input type="hidden" name="idSalida" value="<?= isset($idSalida) ? $idSalida : '' ?>">
 
-
-                                                <!-- ===================== DATOS ADMINISTRATIVOS ===================== -->
-
                                                 <div class="form-row">
-                                                    <div class="col-md-6 mb-3">
-                                                        <label>Cantidad </label>
-                                                         <input class="form-control" type="number" name="cantidad" value="<?= isset($registro) ? $registro->cantidad : '' ?>" >
-                                                    </div>
 
-                                                    <div class="col-md-6 mb-3">
-                                                        <label>Lugar de entrega </label>
-                                                        <input class="form-control" type="text" name="lugar_entrega" value="<?= isset($registro) ? $registro->lugar : '' ?>" >
-                                                    </div>
-                                                </div>
-
-                                                <div class="form-row">
                                                     <div class="col-md-4 mb-3">
-                                                        <label>Puesto</label>
-                                                        <input class="form-control" type="text" name="puesto" value="<?= isset($registro) ? $registro->puesto : '' ?>" >
-                                                    </div>
-                                                    <div class="col-md-8 mb-3">
                                                         <label>Nombre completo del solicitante </label>
                                                         <input class="form-control" type="text" name="nombre_solicitante" value="<?= isset($registro) ? $registro->nombre_solicitante : '' ?>" >
                                                     </div>
-
-                                                </div>
-
-                                                <!-- ===================== RESPONSABLE ===================== -->
-
-
-                                                <!-- ===================== DATOS DEL SOLICITANTE ===================== -->
-
-                                                <div class="form-row">
                                                     <div class="col-md-4 mb-3">
                                                         <label>Teléfono </label>
                                                         <input type="text" class="form-control" name="telefono" value="<?= isset($registro) ? $registro->telefono : '' ?>" >
@@ -74,48 +47,31 @@
                                                         <label>Correo </label>
                                                         <input type="email" class="form-control" name="correo" value="<?= isset($registro) ? $registro->correo : '' ?>" >
                                                     </div>
-                                                     <div class="col-md-4 mb-3">
+                                                </div>
+
+                                                <div class="form-row">
+                                                    <div class="col-md-4 mb-3">
+                                                        <label>Puesto</label>
+                                                        <input class="form-control" type="text" name="puesto" value="<?= isset($registro) ? $registro->puesto : '' ?>" >
+                                                    </div>
+                                                                                                
+                                                    <div class="col-md-4 mb-3">
+                                                        <label>Cantidad </label>
+                                                        <input class="form-control" type="number" name="cantidad" value="<?= isset($registro) ? $registro->cantidad : '' ?>" >
+                                                    </div>
+
+                                                    <div class="col-md-4 mb-3">
+                                                        <label>Lugar de entrega </label>
+                                                        <input class="form-control" type="text" name="lugar_entrega" value="<?= isset($registro) ? $registro->lugar : '' ?>" >
+                                                    </div>
+                                            
+                                                    <div class="col-md-4 mb-3">
                                                         <label>Fecha del evento </label>
                                                         <input type="date" class="form-control" name="fec_eve" value="<?= isset($registro) && $registro->fec_eve ? date('Y-m-d', strtotime($registro->fec_eve)) : '' ?>" >
                                                     </div>
                                                 </div>
 
-                                                <div class="form-row">
-                                                    <div class="col-md-12 mb-3">
-                                                        <label>Concepto </label>
-                                                        <input type="text" class="form-control" name="concepto" value="<?= isset($registro) ? $registro->concepto : '' ?>" >
-                                                    </div>
-                                                </div>
-
-                                                <!-- ===================== ARCHIVOS ===================== -->
-
-                                                <div class="form-row">
-                                                    <div class="col-md-6 mb-3">
-                                                        <label>INE (Obligatorio) </label>
-                                                        <input type="file" class="form-control" name="ine" accept="image/*,application/pdf" >
-                                                    </div>
-
-                                                    <div class="col-md-6 mb-3">
-                                                        <label>Recibo firmado</label>
-                                                        <input type="file" class="form-control" name="recibo" accept="image/*,application/pdf">
-                                                    </div>
-                                                </div>
-
-                                                <!-- ===================== EVIDENCIAS ===================== -->
-
-                                                <div class="form-row">
-                                                    <div class="col-md-12 mb-2">
-                                                        <label>Evidencias de entrega (máximo 8)</label>
-                                                    </div>
-
-                                                    <?php for ($i = 1; $i <= 8; $i++): ?>
-                                                        <div class="col-md-3 mb-2">
-                                                            <input type="file" class="form-control" name="evidencias[]" accept="image/*">
-                                                        </div>
-                                                    <?php endfor; ?>
-                                                </div>
-
-                                                <!-- ===================== BOTÓN ===================== -->
+                                                <!-- PESTAÑAS PARA  DOCUMENTOS -->
 
                                                 <div class="text-right mt-4">
                                                     <button type="submit" class="btn btn-primary px-4">

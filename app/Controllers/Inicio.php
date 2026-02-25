@@ -614,85 +614,32 @@ class Inicio extends BaseController
         $result = $globas->saveTabla($dataUpdate, $dataConfig, $dataBitacora);
         return $this->response->setJSON($result);
     }
-    public function InvMadrePromocion()
-    {
-        $globas = new Mglobal;
-
-        $productos = $globas->getTabla([
-            'tabla' => 'cat_invmadre_promo',
-            'where' => ['visible' => 1]
-        ])->data;
-
-        $materiales = $globas->getTabla([
-            'tabla' => 'vw_material_promo',
-            'where' => ['visible' => 1, 'id_material_promo' => $id]
-        ])->data;
-
-        // 2. Colores e imágenes por producto
-        foreach ($productos as &$item) {
-
-            // COLORES
-            $item->colores = $globas->getTabla([
-                'tabla' => 'colores',
-                'where' => [
-                    'id_invmadre_promo' => $item->id_invmadre_promo,
-                    'visible' => 1
-                ]
-            ])->data ?? [];
-
-            // IMÁGENES (múltiples)
-            $imagenes = $globas->getTabla([
-                'tabla' => 'imagen',
-                'where' => [
-                    'id_inventario_promo' => $item->id_invmadre_promo,
-                    'visible' => 1
-                ]
-            ]);
-
-            $item->imagenes = $imagenes->data ?? [];
-        }
-
-        $data['items'] = count($productos);
-        $data['cat_inventario_promo'] = $productos;
-        $data['materiales'] = $materiales[0];
-
-        // 3. Totales
-        $data['total_stock_promo']     = 0;
-        $data['total_subtotal_promo']  = 0;
-        $data['total_dinero_promo']    = 0;
-
-        foreach ($productos as $item) {
-            $data['total_stock_promo']    += (int) ($item->stock ?? 0);
-            $data['total_subtotal_promo'] += (float) ($item->subtotal ?? 0);
-            $data['total_dinero_promo']   += (float) ($item->total ?? 0);
-        }
-
-        // 4. Otros datos
-        $data['id_convenio'] = $id;
-        $data['total_movimientos'] = 0;
-        $data['scripts'] = ['principal', 'inicio'];
-        $data['contentView'] = 'personal/vInvMadrePromo';
-
-        $this->_renderView($data);
-    }
     public function InventarioPromocion($id = null)
     {
+        if (!$id) {
+            show_404();
+        }
+
         $globas = new Mglobal;
 
         $productos = $globas->getTabla([
             'tabla' => 'cat_inventario_promo',
-            'where' => ['visible' => 1, 'id_inventario' => $id]
-        ])->data;
+            'where' => [
+                'visible' => 1,
+                'id_inventario' => (int)$id
+            ]
+        ])->data ?? [];
+
         $materiales = $globas->getTabla([
             'tabla' => 'vw_material_promo',
-            'where' => ['visible' => 1, 'id_material_promo' => $id]
-        ])->data;
+            'where' => [
+                'visible' => 1,
+                'id_material_promo' => (int)$id
+            ]
+        ])->data ?? [];
 
-      
-        // 2. Colores e imágenes por producto
         foreach ($productos as &$item) {
 
-            // COLORES
             $item->colores = $globas->getTabla([
                 'tabla' => 'colores',
                 'where' => [
@@ -701,34 +648,29 @@ class Inicio extends BaseController
                 ]
             ])->data ?? [];
 
-            // IMÁGENES (múltiples)
-            $imagenes = $globas->getTabla([
+            $item->imagenes = $globas->getTabla([
                 'tabla' => 'imagen',
                 'where' => [
                     'id_inventario_promo' => $item->id_inventario_promo,
                     'visible' => 1
                 ]
-            ]);
-
-            $item->imagenes = $imagenes->data ?? [];
+            ])->data ?? [];
         }
-    
+
         $data['items'] = count($productos);
         $data['cat_inventario_promo'] = $productos;
-        $data['materiales'] = $materiales[0];
+        $data['materiales'] = $materiales[0] ?? null;
 
-        // 3. Totales
-        $data['total_stock_promo']     = 0;
-        $data['total_subtotal_promo']  = 0;
-        $data['total_dinero_promo']    = 0;
+        $data['total_stock_promo'] = 0;
+        $data['total_subtotal_promo'] = 0;
+        $data['total_dinero_promo'] = 0;
 
         foreach ($productos as $item) {
-            $data['total_stock_promo']    += (int) ($item->stock ?? 0);
+            $data['total_stock_promo'] += (int) ($item->stock ?? 0);
             $data['total_subtotal_promo'] += (float) ($item->subtotal ?? 0);
-            $data['total_dinero_promo']   += (float) ($item->total ?? 0);
+            $data['total_dinero_promo'] += (float) ($item->total ?? 0);
         }
 
-        // 4. Otros datos
         $data['id_convenio'] = $id;
         $data['total_movimientos'] = 0;
         $data['scripts'] = ['principal', 'inicio'];
