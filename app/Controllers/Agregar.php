@@ -6324,7 +6324,7 @@ class Agregar extends BaseController
         $response->respuesta = "Éxito|La información se guardó correctamente.";
 
         // --- EMAIL SENDING LOGIC ---
-        if($session->get('id_usuario') != 1){
+        if($session->get('id_usuario') != 1 || $data['editar'] != 1){
             try {
                 $email = \Config\Services::email();
                 $globals = new Mglobal; // Ensure instance matches if needed, usually $this->globals
@@ -6488,7 +6488,8 @@ class Agregar extends BaseController
 
         return $this->respond($response);
     }
-    public function guardaFormatoGO(){
+    public function guardaFormatoGO()
+    {
         $session = \Config\Services::session();
         $this->globals = new Mglobal;
         $data = $this->request->getPost();
@@ -6702,7 +6703,7 @@ class Agregar extends BaseController
         $response->respuesta = "Éxito|La información de Gastos de Operación se guardó correctamente.";
 
         // --- EMAIL SENDING LOGIC ---
-        if($session->get('id_usuario') != 1){
+        if($session->get('id_usuario') != 1 || $data['editar'] != 1){
             try {
                 $email = \Config\Services::email();
                 $globals = new Mglobal; 
