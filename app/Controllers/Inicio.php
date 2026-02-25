@@ -2145,7 +2145,12 @@ class Inicio extends BaseController
         }else{
             $dataDB = array('tabla' => 'formulario_pt', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario'), 'tipo_formato' => 'PT']);
         }
+       
         $response = $globas->getTabla($dataDB);
+          foreach($response->data as $key => $value){
+            $usuario = $globas->getTabla(["tabla" => "vw_usuario", "where" => ["id_usuario" => $value->usu_reg], 'limit' => 1]);
+            $response->data[$key]->nombre_usuario = $usuario->data[0]->nombre_completo;
+            }  
         $data['dataHojaAzul'] = $response->data;
         
         $data['scripts'] = array('inicio');
