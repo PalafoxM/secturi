@@ -24,9 +24,9 @@
     <div class="title">Oficio de Liberación de Pago</div>
 
     <div class="date">
-        Silao de la Victoria, Gto, <?= date('d') ?> de <?= $meses[date('n')] ?> de <?= date('Y') ?>
+        Silao de la Victoria, Gto,<?= date('d', strtotime($registro_pt->fec_reg)) ?> de <?= $meses[date('n', strtotime($registro_pt->fec_reg))] ?> de <?= date('Y', strtotime($registro_pt->fec_reg)) ?>
+   
     </div>
-    
     <div class="folio">
         FOLIO: <?= isset($registro_pt->no_consecutivo) ? $registro_pt->no_consecutivo : '000' ?>
     </div>
