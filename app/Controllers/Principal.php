@@ -2065,6 +2065,7 @@ class Principal extends BaseController
         ]);
 
         $Periodo = ['tabla' => 'cat_periodo', 'where' => ['visible' => 1]];
+        $cat_incidencia = ['tabla' => 'cat_incidencia', 'where' => ['visible' => 1]];
         $usuario = [
             'tabla' => 'vw_incidenica',
             'select' => ['id_usuario', 'nombre_completo'],
@@ -2075,6 +2076,7 @@ class Principal extends BaseController
         $usuario = $globals->getTabla($usuario);
         $data['periodo'] = (isset($periodo->data) && !empty($periodo->data)) ? $periodo->data : [];
         $data['usuario'] = (isset($usuario->data) && !empty($usuario->data)) ? $usuario->data : [];
+        $data['cat_incidencia'] = (isset($cat_incidencia->data) && !empty($cat_incidencia->data)) ? $cat_incidencia->data : [];
 
         $data['incidencia'] = [];
 
