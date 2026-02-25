@@ -74,7 +74,7 @@
     <?php
         $meses = array("ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE");
         $fecha = strtotime($registro_pt->fecha_tramite);
-        $fecha_texto = "SILAO, GTO. " . date("d", $fecha) . " DE " . $meses[date("n", $fecha)-1] . " DEL " . date("Y", $fecha);
+        $fecha_texto = "SILAO, GTO. " . date("d", strtotime($registro_pt->fec_reg)) . " DE " . $meses[date("n", strtotime($registro_pt->fec_reg))-1] . " DEL " . date("Y", strtotime($registro_pt->fec_reg));
         
         $folio = isset($registro_pt->no_consecutivo) ? $registro_pt->no_consecutivo : 'SIN FOLIO';
     ?>
