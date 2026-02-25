@@ -47,7 +47,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text bg-light border-right-0"><i class="fas fa-dollar-sign text-muted"></i></span>
                                             </div>
-                                            <input type="number" step="0.01" class="form-control" id="cantidad" name="cantidad" value="<?= isset($solicitud) ? $solicitud->cantidad : '' ?>" required placeholder="0.00" style="border-left: 0; box-shadow: none;">
+                                            <input type="text" class="form-control" id="cantidad" name="cantidad" value="<?= isset($solicitud) ? $solicitud->cantidad : '' ?>" required placeholder="0.00" style="border-left: 0; box-shadow: none;">
                                         </div>
                                     </div>
                                 </div>

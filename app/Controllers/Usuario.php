@@ -461,6 +461,64 @@ class Usuario extends BaseController
         $datos = $globals->getTabla($tabla);
         $resul = (isset($datos->data) && !empty($datos->data)) ? $datos->data : [];
 
+        // RECUPERAR INCIDENCIAS MULTIPLES (TIPO 2) QUE CRUZAN ESTE PERIODO
+        // Como 'fecha' en tipo 2 es un string ("12/22/2025 - 01/06/2026"), whereBetween en SQL las omite.
+        $fecIniTs = strtotime($fec_ini);
+        $fecFinTs = strtotime($fec_fin);
+
+        $tablaMulti = [
+            'tabla' => 'vw_asistencia_incidencia',
+            'where' => ['visible' => 1, 'id_tipo_empleado' => 1, 'tipo' => 2],
+        ];
+        $datosMulti = $globals->getTabla($tablaMulti);
+        $resulMulti = (isset($datosMulti->data) && !empty($datosMulti->data)) ? $datosMulti->data : [];
+
+        foreach ($resulMulti as $rm) {
+            $overlap = false;
+            if (!empty($rm->fecha) && strpos($rm->fecha, ' - ') !== false) {
+                $parts = explode(' - ', $rm->fecha);
+                $dStart = \DateTime::createFromFormat('m/d/Y', trim($parts[0]));
+                $dEnd   = \DateTime::createFromFormat('m/d/Y', trim($parts[1]));
+                if ($dStart && $dEnd) {
+                    $tsStart = $dStart->getTimestamp();
+                    $tsEnd   = $dEnd->getTimestamp();
+                    if ($tsStart <= $fecFinTs && $tsEnd >= $fecIniTs) {
+                        $overlap = true;
+                    }
+                }
+            } else {
+                if (!empty($rm->fecha_inicio_incidencia) && !empty($rm->fecha_fin_incidencia)) {
+                    $tsStart = strtotime($rm->fecha_inicio_incidencia);
+                    $tsEnd   = strtotime($rm->fecha_fin_incidencia);
+                    if ($tsStart && $tsEnd) {
+                        if ($tsStart <= $fecFinTs && $tsEnd >= $fecIniTs) {
+                            $overlap = true;
+                        }
+                    }
+                }
+            }
+            
+            if ($overlap) {
+                // Verificar duplicados para no procesarlo dos veces si el query original sí lo trajo
+                $duplicado = false;
+                foreach ($resul as $r) {
+                    if (isset($r->id) && isset($rm->id) && $r->id === $rm->id) {
+                        $duplicado = true;
+                        break;
+                    } elseif (
+                        $r->nombre_completo === $rm->nombre_completo &&
+                        $r->fecha === $rm->fecha && 
+                        $r->tipo == 2
+                    ) {
+                        $duplicado = true;
+                        break;
+                    }
+                }
+                if (!$duplicado) {
+                    $resul[] = $rm;
+                }
+            }
+        }
         // Fechas laborales del periodo
         $start = new \DateTime($fec_ini);
         $end = new \DateTime($fec_fin);
@@ -486,9 +544,21 @@ class Usuario extends BaseController
             // Verificar si es una incidencia de tipo 2 (por semana)
             if (!empty($r->tipo) && $r->tipo == 2) {
 
-                // Procesar todas las fechas del rango de la incidencia
-                $startIncidencia = new \DateTime($r->fecha_inicio_incidencia);
-                $endIncidencia = new \DateTime($r->fecha_fin_incidencia);
+                // Intentar extraer de $r->fecha si tiene formato "12/22/2025 - 01/06/2026"
+                if (!empty($r->fecha) && strpos($r->fecha, ' - ') !== false) {
+                    $parts = explode(' - ', $r->fecha);
+                    $startIncidencia = \DateTime::createFromFormat('m/d/Y', trim($parts[0]));
+                    $endIncidencia = \DateTime::createFromFormat('m/d/Y', trim($parts[1]));
+                } 
+                
+                // Fallback a columnas separadas si existen
+                if (!isset($startIncidencia) || !$startIncidencia) {
+                    $startIncidencia = new \DateTime($r->fecha_inicio_incidencia);
+                }
+                if (!isset($endIncidencia) || !$endIncidencia) {
+                    $endIncidencia = new \DateTime($r->fecha_fin_incidencia);
+                }
+
                 $endIncidencia->modify('+1 day');
                 $intervalIncidencia = new \DateInterval('P1D');
                 $periodIncidencia = new \DatePeriod($startIncidencia, $intervalIncidencia, $endIncidencia);
@@ -520,6 +590,9 @@ class Usuario extends BaseController
                     if (isset($r->id_estatus)) {
                         $usuarios[$nombre][$fechaYmd]['incidencias'][] = [
                             'estatus' => $r->id_estatus,
+                            'cat_incidencia' => isset($r->cat_incidencia) ? $r->cat_incidencia : null,
+                            'hora_inicio' => isset($r->hora_inicio) ? $r->hora_inicio : '',
+                            'hora_fin' => isset($r->hora_fin) ? $r->hora_fin : '',
                             'nombre' => $r->nombre_incidencia,
                             'tipo' => $r->tipo // Guardar el tipo para referencia
                         ];
