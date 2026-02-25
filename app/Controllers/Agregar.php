@@ -6233,6 +6233,17 @@ class Agregar extends BaseController
                 if(isset($data['row_index'][$i])){
                     $rIdx = $data['row_index'][$i];
                     
+                    // FALLBACK a los archivos actuales si estamos editando
+                    $currentPdfName = "pdf_current_" . $rIdx;
+                    $currentXmlName = "xml_current_" . $rIdx;
+                    
+                    if (isset($data[$currentPdfName]) && is_array($data[$currentPdfName]) && !empty($data[$currentPdfName][0])) {
+                        $pdfPath = $data[$currentPdfName][0];
+                    }
+                    if (isset($data[$currentXmlName]) && is_array($data[$currentXmlName]) && !empty($data[$currentXmlName][0])) {
+                        $xmlPath = $data[$currentXmlName][0];
+                    }
+
                     // 1. Process PDF
                     $inputNamePdf = 'pdf_pt_' . $rIdx;
                     if(isset($_FILES[$inputNamePdf])){
@@ -6324,7 +6335,7 @@ class Agregar extends BaseController
         $response->respuesta = "Éxito|La información se guardó correctamente.";
 
         // --- EMAIL SENDING LOGIC ---
-        if($session->get('id_usuario') != 1 || $data['editar'] != 1){
+        if($session->get('id_usuario') != 1 && $data['editar'] != 1){
             try {
                 $email = \Config\Services::email();
                 $globals = new Mglobal; // Ensure instance matches if needed, usually $this->globals
@@ -6386,6 +6397,7 @@ class Agregar extends BaseController
                 // Do not fail the main save operation if email fails
             // log_message('error', 'Email exception: ' . $e->getMessage());
             }
+           
         }
 
         return $this->respond($response);
@@ -6703,7 +6715,7 @@ class Agregar extends BaseController
         $response->respuesta = "Éxito|La información de Gastos de Operación se guardó correctamente.";
 
         // --- EMAIL SENDING LOGIC ---
-        if($session->get('id_usuario') != 1 || $data['editar'] != 1){
+        if($session->get('id_usuario') != 1 && $data['editar'] != 1){
             try {
                 $email = \Config\Services::email();
                 $globals = new Mglobal; 
