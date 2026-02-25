@@ -1441,6 +1441,7 @@ class Usuario extends BaseController
             'SEGUNDO APELLIDO',
             'CORREO',
             'AREA',
+            'PUESTO',
             'EXTENCION'
         ];
 
@@ -1462,7 +1463,8 @@ class Usuario extends BaseController
             $sheet->setCellValue('D' . $fila, $row->segundo_apellido);
             $sheet->setCellValue('E' . $fila, $row->correo);
             $sheet->setCellValue('F' . $fila, $row->dsc_area);
-            $sheet->setCellValue('G' . $fila, $row->extencion);
+            $sheet->setCellValue('G' . $fila, $row->dsc_puesto);
+            $sheet->setCellValue('H' . $fila, $row->extencion);
             $fila++;
         }
 
