@@ -1359,6 +1359,8 @@ class Principal extends BaseController
         $hoy = date("Y-m-d H:i:s");
         $folio = 'PT-' . date('YmdHis'); // Ejemplo: FOL-20250725133045
 
+        $reviucionInterna = (in_array($session->get('id_usuario'), [80,17,14,59,38])) ? true : false;
+
         $dataInsert = [
             "id_proveedor" => (int) $data['id_proveedor'],
             "total_importe" => $data['total_importe'],
@@ -1367,6 +1369,10 @@ class Principal extends BaseController
             "usu_reg" => $session->get('id_usuario'),
             "folio" => $folio
         ];
+
+        if($reviucionInterna){
+            $dataInsert['id_estatus'] = 5;
+        }
         if (!empty($ruta_relativa)) {
             $dataInsert['instrumento'] = $ruta_relativa;
             $dataInsert['ruta_absoluta'] = $ruta_absoluta;
@@ -2391,7 +2397,11 @@ class Principal extends BaseController
         if (in_array($session->get('id_perfil'), [1, 2])) {
             $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1, "id_estatus"=> 1]]);
         } else {
-            $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['usu_reg' => $session->get('id_usuario'), 'visible' => 1, "id_estatus"=> 1 ]]);
+            if($session->get('id_usuario')==80){
+                $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1, "id_estatus"=> 5]]);
+            }else{
+                $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['usu_reg' => $session->get('id_usuario'), 'visible' => 1, "id_estatus"=> 1 ]]);
+            }
         }
        // die( var_dump($reserva ) );
         $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);

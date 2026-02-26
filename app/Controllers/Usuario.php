@@ -1432,6 +1432,32 @@ class Usuario extends BaseController
         }
         return $this->respond($response);
     }
+    public function validarReserva()
+    {
+        $session = \Config\Services::session();
+        $principal = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error! Error al guardar en la base de datos';
+        $data = $this->request->getPost();
+       
+
+        $dataConfig = [
+            "tabla" => "reserva",
+            "editar" => true,
+            "idEditar" => ['id_reserva' => (int)$data['id_reserva']]
+        ];
+    
+
+        $result = $principal->saveTabla(['id_estatus' => 1], $dataConfig, ['id_user' => $session->get('id_usuario'), "script" => "estatus.Reserva"]);
+
+        if (!$result->error) {
+            $response->error = false;
+            $response->respuesta = $result->respuesta;
+
+        }
+        return $this->respond($response);
+    }
     public function deleteReservaGo()
     {
         $session = \Config\Services::session();

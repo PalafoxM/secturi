@@ -105,6 +105,10 @@
                                                                 $color = 'badge-soft-warning';
                                                                 $texto = 'Enviado';
                                                                 break;
+                                                           case 5:
+                                                                $color = 'badge-soft-primary';
+                                                                $texto = 'Revisión Interna';
+                                                                break;
                                                             default:
                                                                 $color = 'badge-soft-warning';
                                                                 $texto = 'Desconocido';
@@ -117,6 +121,7 @@
                                                                 <span class="badge badge-md <?= $color ?>"><?= $texto ?></span>
                                                             <?php endif; ?>
                                                         </td>
+                                                        
                                                         
                                                         <td class="text-center">
                                                             <?php if($session->id_perfil != 2 && empty($p->id_registro_pt) ): ?>
@@ -150,6 +155,14 @@
                                                                     class="mdi mdi-arrow-right-bold font-21"></i>
                                                             </a> -->
                                                             <?php endif; ?>
+                                                        <!-- Validacion Interna -->
+                                                             <?php if($session->get('id_usuario') == 80): ?>
+                                                            <a style="color:white;"  onclick="ini.inicio.estatusReservaInterna(<?=$p->id_reserva?>);" data-toggle="tooltip" data-placement="top" title="" data-original-title="Revisar reserva"
+                                                                class="btn <?= (in_array($p->id_estatus,[3,4]))?'btn-gradient-info':'btn-gradient-warning'?> px-4"><i
+                                                                    class="mdi mdi-lock-open font-21"></i>
+                                                            </a>
+
+                                                             <?php endif;  ?>
                                                         </td>
                                                     </tr>
                                                    
@@ -348,6 +361,7 @@
                                 </table>                                                                      
                               </div>                                                                                                                       
                          </div>
+                         <?php if($session->get('id_usuario') != 80): ?>
                             <div class="row">
                               <div class="col-lg-6">
                                     <div class="form-group">
@@ -375,6 +389,7 @@
                               </div>                                                             
                                                                                            
                          </div>
+                         <?php endif; ?>
                   </div><!--end card-->
               </div><!--end col-->
           </div><!--end col-->    
@@ -383,7 +398,12 @@
         </form>
       </div>
       <div class="modal-footer">
+          <?php if($session->get('id_usuario') != 80): ?>
           <button type="button" class="btn btn-primary" id="btnConfirmarReserva">Guardar</button>
+          <?php endif; ?>
+          <?php if($session->get('id_usuario') == 80): ?>
+          <button type="button" class="btn btn-primary" id="btnValidarReserva">Validar Reserva</button>
+          <?php endif; ?>
         <button type="button" onclick="ini.inicio.cerrarModalAdmin()" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
       </div>
     </div>
@@ -428,6 +448,40 @@ $(document).ready(function() {
         destroy: true,
         searching: true,
     });
+
+      $('#btnValidarReserva').on('click', function () {
+                const id = $('#id_reserva_estatus').val();
+                $.ajax({
+                    url: base_url + "index.php/Usuario/validarReserva",
+                    type: "POST",
+                    dataType: "json",
+                    data: {
+                        id_reserva: id,
+                    },
+                    beforeSend: function () {
+                        $('#btnValidarReserva').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                    },
+                    success: function (response) {
+                        console.log(response);
+                        if (response.error) {
+                            Swal.fire("Atención", response.respuesta, "warning");
+
+                        } else {
+                            Swal.fire("Correcto", response.respuesta, "success");
+                            setTimeout(() => window.location.reload(), 1500);
+                        }
+                    },
+                    complete: function () {
+                        $('#modalEstatusReserva').modal('hide');
+                        $('#btnValidarReserva').prop('disabled', false).html('Guardar');
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        // alert("Error al eliminar");
+                        console.log("Error(s):", textStatus, errorThrown);
+                    }
+                });
+            });
         // Función debounce para retrasar la ejecución
     });
 
