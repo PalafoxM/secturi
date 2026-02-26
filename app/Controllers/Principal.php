@@ -2695,8 +2695,8 @@ class Principal extends BaseController
         $data['detalles'] = (!empty($detalles->data)) ? $detalles->data : [];
         
         // Convertir cantidad a letras
-        // Convertir cantidad a letras
-        $data['cantidad_letra'] = $this->numeroEnLetras($data['solicitud']->cantidad);
+        $data['solicitud']->cantidad_letra = $this->numeroEnLetras($data['solicitud']->cantidad);
+        $data['cantidad_letra'] = $data['solicitud']->cantidad_letra;
 
         // Fecha creación texto
         $meses = array("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
@@ -2704,9 +2704,10 @@ class Principal extends BaseController
         $data['fecha_texto'] = "Silao, Gto., a " . date('d', $fecha) . " de " . $meses[date('n', $fecha)-1] . " de " . date('Y', $fecha);
 
         $html = view('personal/vFormatoGRC', $data);
-        //$doc = 'public/assets/images/membrete.png'; // Reference only, not used anymore
-        
+        $doc = 'public/assets/images/archivo_grc.pdf'; // Reference only, not used anymore
+       // 110943
         // Crear PDF
+      
         $mpdf = new \Mpdf\Mpdf([
             'margin_top' => 15,
             'margin_left' => 15,
@@ -2715,6 +2716,9 @@ class Principal extends BaseController
             'format' => 'Letter'
         ]);
 
+         $pagecount = $mpdf->SetSourceFile(FCPATH . $doc);
+        $templateId = $mpdf->ImportPage($pagecount);
+        $mpdf->UseTemplate($templateId);
         $mpdf->WriteHTML($html);
         $mpdf->Output('Solicitud_GRC_' . $id_solicitud . '.pdf', 'I');
         exit();

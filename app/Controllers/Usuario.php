@@ -1345,7 +1345,7 @@ class Usuario extends BaseController
                                     <li><strong>Importe:</strong> ' . $datos['total_importe'] . '</li>
                                 </ul>
                                 <p style="font-size: 15px;">Favor de <strong> Ingresar a SUSI</strong> para más detalles.</p>
-                                <p style="font-size: 15px;"><a href="' . base_url() . 'index.php/Principal/listaReservaPT"><strong>Seguimiento Reserva</strong></a></p>
+                                <p style="font-size: 15px;"><a href="' . base_url() . 'index.php/Principal/concluidosAceptados"><strong>Seguimiento Reserva</strong></a></p>
                             </div>
                             <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 13px; color: #666;">
                                 © ' . date('Y') . ' Sistema de Atención SUSI. Todos los derechos reservados.
@@ -1614,7 +1614,11 @@ class Usuario extends BaseController
             $sheet->setCellValue('D' . $fila, 'RF');
             $sheet->setCellValue('E' . $fila, date('dmY', strtotime($row->fec_reg)));
             $sheet->setCellValue('F' . $fila, date('dmY', strtotime($row->fec_reg)));
-            $sheet->setCellValue('G' . $fila, $row->texto_cabecera);
+            
+            $unwanted_array = array('á'=>'a', 'é'=>'e', 'í'=>'i', 'ó'=>'o', 'ú'=>'u', 'Á'=>'A', 'É'=>'E', 'Í'=>'I', 'Ó'=>'O', 'Ú'=>'U', 'ñ'=>'n', 'Ñ'=>'N');
+            $texto_cabecera = mb_strtoupper(strtr($row->texto_cabecera, $unwanted_array), 'UTF-8');
+            $sheet->setCellValue('G' . $fila, $texto_cabecera);
+            
             $sheet->setCellValue('H' . $fila, $row->no_convenio);
             $sheet->setCellValue('I' . $fila, $row->importe);
             $sheet->getStyle('I' . $fila)->getNumberFormat()->setFormatCode('#,##0.00');
