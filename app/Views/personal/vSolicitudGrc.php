@@ -329,6 +329,32 @@
         if(form){
             form.addEventListener('submit', function(e){
                 e.preventDefault();
+
+                // Validar que Cantidad M.N. sea igual a la suma de los Importes
+                let cantidadStr = document.getElementById('cantidad').value.replace(/[^0-9.-]/g, '');
+                let cantidadTotal = parseFloat(cantidadStr) || 0;
+                
+                let sumaImportes = 0;
+                const importeInputs = document.querySelectorAll('input[name^="detalles"][name$="[importe]"]');
+                importeInputs.forEach(input => {
+                    let valStr = input.value.replace(/[^0-9.-]/g, '');
+                    sumaImportes += parseFloat(valStr) || 0;
+                });
+                
+                // Redondear a 2 decimales para evitar problemas de precisión en JS
+                cantidadTotal = Math.round(cantidadTotal * 100) / 100;
+                sumaImportes = Math.round(sumaImportes * 100) / 100;
+
+                if (cantidadTotal !== sumaImportes) {
+                    let mensaje = 'La Cantidad M.N. ($' + cantidadTotal.toFixed(2) + ') debe ser igual a la suma de los Importes ($' + sumaImportes.toFixed(2) + '). Revise los datos e intente nuevamente.';
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire('Atención', mensaje, 'warning');
+                    } else {
+                        alert(mensaje);
+                    }
+                    return; // Detener guardado
+                }
+
                 if(typeof ini.inicio.guardarSolicitud === 'function'){
                     ini.inicio.guardarSolicitud();
                 } else {

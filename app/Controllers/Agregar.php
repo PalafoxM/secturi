@@ -6115,6 +6115,7 @@ class Agregar extends BaseController
             // Actualizar estatus de solicitud a 3 (Comprobado) y registrar quien actualizó
             $dataUpdate = [
                 'id_estatus' => 3,
+                'no_consecutivo' => $data['folioCompleto'],
                 'usu_act' => $session->get('id_usuario'),
                 'fec_act' => date('Y-m-d H:i:s')
             ]; 

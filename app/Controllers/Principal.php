@@ -7522,6 +7522,35 @@ class Principal extends BaseController
         $data['solicitud'] = $solicitudQuery->data[0];
         $data['detalles'] = (!empty($detallesQuery->data)) ? $detallesQuery->data : [];
         $data['usuarios'] = (!empty($usuariosQuery->data)) ? $usuariosQuery->data : [];
+        
+        // Variables añadidas para el "no_consecutivo" estilo Formato GO
+        $cat_area = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'id_pago' => 1]]);
+        $data['cat_area'] = isset($cat_area->data) ? $cat_area->data : [];
+        
+        $usu = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["visible" => 1, 'id_usuario' => $session->get('id_usuario')]]);
+        $data['id_area'] = 1; // fallback
+        if(isset($usu->data[0]->id_usuario)){
+            $tieneArea = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'titular' => $usu->data[0]->id_usuario]]);
+            if(isset($tieneArea->data) && !empty($tieneArea->data)){
+                $data['id_area'] = $tieneArea->data[0]->id_area;
+            }else{
+                $tieneArea = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'titular' => $usu->data[0]->id_jefe_inmediato]]);
+                if(isset($tieneArea->data) && !empty($tieneArea->data)){
+                    $data['id_area'] = $tieneArea->data[0]->id_area;
+                }else{
+                    if(isset($cat_area->data[0])) {
+                        $data['id_area'] = $cat_area->data[0]->id_area;
+                    }
+                }
+            }
+        }
+        
+        // Calcular consecutivo básico basado en la tabla solicitud_grc (o otra de comprobaciones)
+        $comprobaciones = $globals->getTabla(["tabla" => "solicitud_grc_comprobacion", "where" => ["visible" => 1, 'usu_reg' => $session->get('id_usuario')]]);
+        $no_consecutivo = isset($comprobaciones->data) ? count($comprobaciones->data) + 1 : 1;
+        $no_consecutivo = str_pad($no_consecutivo, 3, "0", STR_PAD_LEFT);
+        $data['no_consecutivo'] = $no_consecutivo;
+        
         $data['scripts'] = ['principal', 'inicio']; // Ensure necessary scripts are loaded
         $data['contentView'] = 'personal/vComprobarGastos';
 

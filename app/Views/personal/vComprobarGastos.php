@@ -69,6 +69,25 @@
                             <form id="form_comprobacion_gastos">
                                 <input type="hidden" name="id_solicitud_grc" value="<?= isset($solicitud) ? $solicitud->id_solicitud_grc : '' ?>">
                                 
+                                <div class="form-row mb-3">
+                                    <div class="col-md-6 d-flex align-items-center">
+                                        <label class="font-weight-bold mr-2 mb-0">No. Consecutivo:</label>
+                                        <div class="d-flex align-items-center border rounded p-1" style="background: #f8f9fa;">
+                                            <span class="mr-1 small font-weight-bold">GRC</span>
+                                            <select name="folio" id="folio" class="form-control form-control-sm select2 mr-1" style="width: auto; max-width: 250px;">
+                                                <?php if(isset($cat_area) && is_array($cat_area)): ?>
+                                                    <?php foreach($cat_area as $area): ?>
+                                                        <option value="<?=  $area->prefijo ?>" <?= (isset($id_area) && $area->id_area == $id_area) ? 'selected' : '' ?>><?= $area->prefijo ?></option>
+                                                    <?php endforeach; ?>
+                                                <?php endif; ?>
+                                            </select>
+                                            <input type="text" name="no_consecutivo" id="no_consecutivo" class="form-control form-control-sm text-center font-weight-bold ml-1" style="width: 60px;" value="<?= isset($no_consecutivo) ? $no_consecutivo : '' ?>" placeholder="001">
+                                            <span class="ml-1 small font-weight-bold">/<?= date('Y') ?></span>
+                                            <input type="hidden" name="folioCompleto" id="folioCompleto">
+                                        </div>
+                                    </div>
+                                </div>
+                                
                                 <div class="table-responsive">
                                     <table class="table table-bordered" id="tabla_comprobacion">
                                         <thead>
@@ -243,14 +262,32 @@
         document.getElementById('total_comprobado').innerText = new Intl.NumberFormat('es-MX', {style: 'currency', currency: 'MXN'}).format(total);
     }
 
+    function updateFolioCompleto() {
+        let area_prefix = document.getElementById('folio').options[document.getElementById('folio').selectedIndex].text;
+        let cons = document.getElementById('no_consecutivo').value;
+        let year = new Date().getFullYear();
+        let completo = area_prefix + ' ' + cons + '/' + year;
+        document.getElementById('folioCompleto').value = completo;
+    }
+
     // Inicializar con una fila
     document.addEventListener('DOMContentLoaded', function() {
         agregarFilaComprobacion();
+
+        // Inicializar Folio Completo
+        updateFolioCompleto();
+        document.getElementById('no_consecutivo').addEventListener('input', updateFolioCompleto);
+        
+        // El select de folio usaba Select2, si cambia, debemos capturarlo
+        $('#folio').on('change', function() {
+            updateFolioCompleto();
+        });
 
         const form = document.getElementById('form_comprobacion_gastos');
         if(form){
             form.addEventListener('submit', function(e){
                 e.preventDefault();
+                updateFolioCompleto(); // Ensure it's updated before submit
                 if(typeof ini.inicio.guardarComprobacion === 'function'){
                     ini.inicio.guardarComprobacion();
                 } else {

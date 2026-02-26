@@ -16,7 +16,7 @@
 
  <img src="<?= base_url() ?>assets/logo-guanajuato.png" alt="Logo" style="width: 300px;">
 <div class="header-info">
-    <p><strong>FOLIO: </strong> $<?= number_format($solicitud->cantidad, 2) ?></p>
+    <p><strong>FOLIO: </strong> <?= $solicitud->no_consecutivo ?></p>
 </div>
 
 <h4 class="text-align-center">DESGLOSE DE GASTOS (VIATICOS POR PERSONA)</h4>
