@@ -24,7 +24,7 @@
     <div class="title">Oficio de Liberación de Pago</div>
 
      <div class="date">
-        Silao de la Victoria, Gto, <?= date('d', strtotime($registro_pt->fecha_tramite)) ?> de <?= $meses[date('n', strtotime($registro_pt->fecha_tramite))-1] ?> de <?= date('Y', strtotime($registro_pt->fecha_tramite)) ?>
+        Silao de la Victoria, Gto, <?= date('d', strtotime($registro_pt->fecha_tramite)) ?> de <?= $meses[date('n', strtotime($registro_pt->fecha_tramite))] ?> de <?= date('Y', strtotime($registro_pt->fecha_tramite)) ?>
     </div>
     
     <div class="folio">

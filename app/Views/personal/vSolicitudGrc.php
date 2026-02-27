@@ -324,6 +324,48 @@
             aplicarFormatoMoneda(inputCantidad);
         }
 
+        // Validación de anticipación para fechas
+        function verificarDiasAnticipacion(e) {
+            let hoy = new Date();
+            hoy.setHours(0,0,0,0);
+            
+            let fechaForm = e.target.value;
+            if (!fechaForm) return;
+            
+            let partes = fechaForm.split('-');
+            let fInput = new Date(partes[0], partes[1] - 1, partes[2]);
+            fInput.setHours(0,0,0,0);
+            
+            let diasHabiles = 0;
+            if (fInput >= hoy) {
+                let tempDate = new Date(hoy.getTime());
+                while (tempDate < fInput) {
+                    tempDate.setDate(tempDate.getDate() + 1);
+                    if (tempDate.getDay() !== 0 && tempDate.getDay() !== 6) {
+                        diasHabiles++;
+                    }
+                }
+            }
+            
+            if (fInput < hoy || diasHabiles < 4) {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Aviso',
+                        text: 'Artículo 50 I. Deberán solicitarse en un término de cuatro días hábiles de anticipación a celebrarse el evento o comisión correspondiente. Con excepción de aquellas comisiones y eventos urgentes, siempre y cuando estén plenamente justificados.',
+                        icon: 'info',
+                        confirmButtonText: 'Enterado'
+                    });
+                } else {
+                    alert('Artículo 50 I. Deberán solicitarse en un término de cuatro días hábiles de anticipación a celebrarse el evento o comisión correspondiente. Con excepción de aquellas comisiones y eventos urgentes, siempre y cuando estén plenamente justificados.');
+                }
+            }
+        }
+        
+        let dpInicio = document.getElementById('fecha_incicio');
+        if(dpInicio) dpInicio.addEventListener('change', verificarDiasAnticipacion);
+        let dpFin = document.getElementById('fecha_fin');
+        if(dpFin) dpFin.addEventListener('change', verificarDiasAnticipacion);
+
         // Evento submit del formulario
         const form = document.getElementById('form_solicitud_grc');
         if(form){
