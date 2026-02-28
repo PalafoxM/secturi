@@ -6244,7 +6244,7 @@ class Principal extends BaseController
 
     }
 
-    public function generarFormatoPT($id_reserva = null, $edita = null)
+    public function generarFormatoPT($id_reserva = null, $edita = null, $anio = null)
     {
         $session = \Config\Services::session();
         $globals = new Mglobal;
@@ -6252,6 +6252,7 @@ class Principal extends BaseController
         
         $data['id_reserva'] = $id_reserva;
         $data['editar'] = $edita;
+        $data['es2025'] = ($anio == '2025')?true:false;
         $data['registro_pt'] = new stdClass();
         $data['periodo_factura'] = new stdClass();
         $data['proveedor'] = new stdClass();
@@ -6327,8 +6328,8 @@ class Principal extends BaseController
         if($id_reserva){
 
             $registro_pt = $globals->getTabla(["tabla" => "reserva", "where" => ["id_reserva" => $id_reserva, "visible" => 1]]);
-            $data['no_reserva'] = $registro_pt->data[0]->no_reserva;
-            $data['no_convenio'] = $registro_pt->data[0]->no_convenio;
+            $data['no_reserva'] = (!empty($anio) && $anio == '2025')?'':$registro_pt->data[0]->no_reserva;
+            $data['no_convenio'] =  (!empty($anio) && $anio == '2025')?'':$registro_pt->data[0]->no_convenio;
             $data['id_proveedor'] = $registro_pt->data[0]->id_proveedor;
             $data['id_proveedor_banco'] = $registro_pt->data[0]->id_proveedor_banco;
             // Fetch Provider Data (Handle ID or Name)
