@@ -409,11 +409,11 @@
                                 <td colspan="4" class="text-left bg-white" style="border-bottom: none !important;">
                                     <div class="d-flex align-items-center">
                                         <span class="label-bold me-2">No. CONTRATO y/o CONVENIO:</span>
-                                        <input type="text" name="no_convenio" readonly class="form-control-plaintext text-left w-50" value="<?= isset($registro_pt->no_convenio) ? $registro_pt->no_convenio : $no_convenio ?>">
+                                        <input type="text" name="no_convenio" <?=(!$es2025)?'readonly':'' ?> class="form-control-plaintext text-left w-50" value="<?= isset($registro_pt->no_convenio) ? $registro_pt->no_convenio : $no_convenio ?>">
                                     </div>
                                     <div class="d-flex align-items-center">
                                         <span class="label-bold me-2">No. RESERVA:</span>
-                                        <input type="text" name="no_reserva_visual" readonly class="form-control-plaintext text-left w-50" value="<?= isset($registro_pt->no_reserva) ? $registro_pt->no_reserva : $no_reserva ?>" placeholder="4798053">
+                                        <input type="text" name="no_reserva_visual" <?=(!$es2025)?'readonly':'' ?> class="form-control-plaintext text-left w-50" value="<?= isset($registro_pt->no_reserva) ? $registro_pt->no_reserva : $no_reserva ?>" placeholder="4798053">
                                     </div>
                                     <div class="d-flex align-items-center mt-2">
                                         <span class="label-bold me-2">CONCEPTO SOLICITUD:</span>
