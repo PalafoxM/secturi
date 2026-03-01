@@ -3931,10 +3931,12 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
 			$cw = $this->fontCache->load($fontkey . '.cw.dat');
 			$glyphIDtoUni = $this->fontCache->load($fontkey . '.gid.dat');
 		} else {
+			$cw = '';
 			if ($this->fontCache->has($fontkey . '.cw.dat')) {
 				$cw = $this->fontCache->load($fontkey . '.cw.dat');
 			}
 
+			$glyphIDtoUni = '';
 			if ($this->fontCache->has($fontkey . '.gid.dat')) {
 				$glyphIDtoUni = $this->fontCache->load($fontkey . '.gid.dat');
 			}

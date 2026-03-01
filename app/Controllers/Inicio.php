@@ -10,6 +10,7 @@ use DateTime;
 use stdClass;
 use CodeIgniter\API\ResponseTrait;
 require_once FCPATH . '/mpdf/autoload.php';
+
 class Inicio extends BaseController
 {
 
@@ -2317,7 +2318,7 @@ class Inicio extends BaseController
             'margin_right' => 10,
             'margin_bottom' => 10,
             'format' => 'Letter',
-            'tempDir' => sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'mpdf'
+            'tempDir' => sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'mpdf_merge_new'
         ]);
 
         if ($id) {
@@ -2325,17 +2326,15 @@ class Inicio extends BaseController
             if (!empty($registro->data)) {
                 $data['registro_pt'] = $registro->data[0];
                 $items = $globals->getTabla(["tabla" => "manual_factura", "where" => ["id_registro_pt" => $id, "visible" => 1]]);
-                //die( var_dump( $items->data ) );
                 $itemCount = count($items->data);
                 $currentIndex = 0;
-              //  die(var_dump($items->data));
-                    $usuario = $globals->getTabla([
-                            "tabla" => "vw_usuario",
-                            "where" => ["nombre_completo" => $registro->data[0]->nombre_responsable_2]
-                        ]);
-                        $registro->data[0]->nombre_responsable = (isset($usuario->data[0])) ? $usuario->data[0]->nombre_completo.'-'.$usuario->data[0]->dsc_puesto.'-'.$usuario->data[0]->dsc_area : '';
+
+                $usuario = $globals->getTabla([
+                    "tabla" => "vw_usuario",
+                    "where" => ["nombre_completo" => $registro->data[0]->nombre_responsable_2]
+                ]);
+                $registro->data[0]->nombre_responsable = (isset($usuario->data[0])) ? $usuario->data[0]->nombre_completo.'-'.$usuario->data[0]->dsc_puesto.'-'.$usuario->data[0]->dsc_area : '';
                      
-                    
                 foreach($items->data as $key => $item){
                     $currentIndex++;
                     $item->importe_letra = $this->numeroALetras($item->importe);
@@ -2344,17 +2343,13 @@ class Inicio extends BaseController
                          $mpdf->AddPage();
                     }
 
-                 
-                        $partida = $globals->getTabla([
-                            "tabla" => "cat_partida",
-                            "where" => ["cuenta_cable" => $item->partida, 'visible' => 1]
-                        ]);
-                        $item->dsc_partida = (isset($partida->data[0])) ? $partida->data[0]->nombre_fondo : '';
-
-                    
+                    $partida = $globals->getTabla([
+                        "tabla" => "cat_partida",
+                        "where" => ["cuenta_cable" => $item->partida, 'visible' => 1]
+                    ]);
+                    $item->dsc_partida = (isset($partida->data[0])) ? $partida->data[0]->nombre_fondo : '';
                     
                     // 1. Write Header
-                    //die(var_dump($item));
                     $data['row'] = $item; 
                     $html = view('pdfs/vPdfEncabezadoFactura', $data);
                     $mpdf->WriteHTML($html);
@@ -2363,8 +2358,26 @@ class Inicio extends BaseController
                     if (!empty($item->pdf)) {
                         $fullPath = FCPATH . $item->pdf;
                         if (file_exists($fullPath)) {
+                            
+                            // GS Conversion: Down-convert to PDF 1.4 to assure FPDI compatibility
+                            $gsTempFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'mpdf_merge_new' . DIRECTORY_SEPARATOR . 'gs_' . uniqid() . '.pdf';
+                            
+                            // Validar sistema operativo para elegir el ejecutable Ghostscript
+                            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                                $gsPath = '"C:\Program Files (x86)\gs\gs10.06.0\bin\gswin32c.exe"';
+                            } else {
+                                $gsPath = 'gs'; // Ruta universal del comando en Linux
+                            }
+                            
+                            // Command to convert PDF down to 1.4
+                            $cmd = $gsPath . ' -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH -sOutputFile="' . $gsTempFile . '" "' . $fullPath . '"';
+                            shell_exec($cmd);
+
+                            // If conversion succeeded, use it; otherwise fallback to original
+                            $importFile = file_exists($gsTempFile) && filesize($gsTempFile) > 0 ? $gsTempFile : $fullPath;
+
                             try {
-                                $pagecount = $mpdf->SetSourceFile($fullPath);
+                                $pagecount = $mpdf->SetSourceFile($importFile);
                                 
                                 // Import Page 1 and place below header
                                 if ($pagecount >= 1) {
@@ -2372,22 +2385,12 @@ class Inicio extends BaseController
                                     
                                     // Calculate dynamic position
                                     $y_start = $mpdf->y + 5; // 5mm margin below header
-                                    $page_height = 279; // Letter height in mm (approx) -> or use $mpdf->h
+                                    $page_height = 279; // Letter height in mm (approx)
                                     $bottom_margin = 10;
                                     $max_height = $page_height - $y_start - $bottom_margin;
-                                    
-                                    if ($max_height < 50) { 
-                                        // If less than 50mm remaining, add page? 
-                                        // But user wants "encabezado y pdf abajo es 1".
-                                        // Try to fit or force new page if totally weird.
-                                        // For now, let's just use what's available or clamp.
-                                        // Ideally, if header is huge, we might not fit much.
-                                        // Let's assume header is reasonable.
-                                    }
 
                                     // Usage: UseTemplate($tplId, x, y, w, h)
                                     // Use full width (approx 200mm) and calculated max height to avoid overflow
-                                    // Provide width 0 to auto-scale? No, we want to constrain width usually.
                                     $mpdf->UseTemplate($tplId, 5, $y_start, 205, $max_height);
                                 }
 
@@ -2400,8 +2403,6 @@ class Inicio extends BaseController
                                 }
                             } catch (\Throwable $e) {
                                 // If PDF is corrupted or has CrossReferenceException
-                                // Add a message on the current page (below header) or a new page
-                                // Since we already added a page for the header, let's write on it.
                                 $currentY = $mpdf->y + 10;
                                 $mpdf->SetXY(10, $currentY);
                                 $mpdf->SetFont('Arial', 'B', 12);
@@ -2413,6 +2414,8 @@ class Inicio extends BaseController
                                 $mpdf->WriteCell(190, 10, "Detalle: El archivo parece estar dañado o tiene un formato no válido.", 0, 1, 'C');
                                 $mpdf->WriteCell(190, 10, "Error técnico: " . $e->getMessage(), 0, 1, 'C');
                             }
+                            
+                            @unlink($gsTempFile); // Cleanup ghostscript file
                         }
                     }
                 }
