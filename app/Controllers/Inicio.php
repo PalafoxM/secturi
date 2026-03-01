@@ -2536,8 +2536,26 @@ class Inicio extends BaseController
                     if (!empty($item->pdf)) {
                         $fullPath = FCPATH . $item->pdf;
                         if (file_exists($fullPath)) {
+                            
+                            // GS Conversion: Down-convert to PDF 1.4 to assure FPDI compatibility
+                            $gsTempFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'mpdf_merge_new' . DIRECTORY_SEPARATOR . 'gs_' . uniqid() . '.pdf';
+                            
+                            // Validar sistema operativo para elegir el ejecutable Ghostscript
+                            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                                $gsPath = '"C:\Program Files (x86)\gs\gs10.06.0\bin\gswin32c.exe"';
+                            } else {
+                                $gsPath = 'gs'; // Ruta universal del comando en Linux
+                            }
+                            
+                            // Command to convert PDF down to 1.4
+                            $cmd = $gsPath . ' -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH -sOutputFile="' . $gsTempFile . '" "' . $fullPath . '"';
+                            shell_exec($cmd);
+
+                            // If conversion succeeded, use it; otherwise fallback to original
+                            $importFile = file_exists($gsTempFile) && filesize($gsTempFile) > 0 ? $gsTempFile : $fullPath;
+
                             try {
-                                $pagecount = $mpdf->SetSourceFile($fullPath);
+                                $pagecount = $mpdf->SetSourceFile($importFile);
                                 
                                 // Import Page 1 and place below header
                                 if ($pagecount >= 1) {
@@ -2586,7 +2604,12 @@ class Inicio extends BaseController
                                 $mpdf->WriteCell(190, 10, "ERROR: No se pudo cargar el archivo PDF adjunto.", 0, 1, 'C');
                                 $mpdf->SetFont('Arial', '', 10);
                                 $mpdf->SetTextColor(0, 0, 0);
+                                $mpdf->WriteCell(190, 10, "Archivo: " . basename($item->pdf), 0, 1, 'C');
+                                $mpdf->WriteCell(190, 10, "Detalle: El archivo parece estar dañado o tiene un formato no válido.", 0, 1, 'C');
+                                $mpdf->WriteCell(190, 10, "Error técnico: " . $e->getMessage(), 0, 1, 'C');
                             }
+                            
+                            @unlink($gsTempFile); // Cleanup ghostscript file
                         }
                     }
                 }
