@@ -2164,6 +2164,7 @@ class Inicio extends BaseController
         $session = \Config\Services::session();
         $globals = new Mglobal;
         $data = array();
+        $data['es2025'] = false;
         
         $id = $this->request->getGet('id');
         $editar = $this->request->getGet('editar');

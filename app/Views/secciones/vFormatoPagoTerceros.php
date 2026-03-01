@@ -98,6 +98,18 @@
         border-top: 1px dashed #ccc;
         padding-top: 5px;
     }
+    
+    /* Fix para visualización de textos largos en Select2 */
+    .select2-container .select2-selection--single {
+        height: auto !important;
+        min-height: 32px;
+    }
+    .select2-container .select2-selection--single .select2-selection__rendered {
+        white-space: normal !important;
+        word-wrap: break-word !important;
+        padding-right: 35px !important; /* Espacio para la 'x' y la flecha '▼' */
+        text-align: left; /* Mejor para textos que hacen salto de línea */
+    }
 </style>
 
 
@@ -211,10 +223,10 @@
                             </tr>
                             <tr>
                                 <th style="width: 10%;">No. COMPROBANTE</th>
-                                <th style="width: 15%;">PROYECTO META</th>
-                                <th style="width: 10%;">No. PARTIDA</th>
+                                <th style="width: 25%;">PROYECTO META</th>
+                                <th style="width: 15%;">No. PARTIDA</th>
                                 <th style="width: 15%;">IMPORTE</th>
-                                <th style="width: 50%;">OBSERVACIONES</th>
+                                <th style="width: 35%;">OBSERVACIONES</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -384,7 +396,7 @@
                                  <td colspan="4" class="text-left">
                                      <button type="button" class="btn btn-info btn-sm" id="btnAddRow">+ Agregar Fila</button>
                                  </td>
-                                 <td colspan="4" class="text-left">
+                                 <td colspan="1" class="text-left">
                                      <span class="label-bold me-2">CLAUSULA</span>
                                     <select class="form-control-plaintext flex-grow-1" name="clausula">
                                         <option value="PRIMERA">PRIMERA</option>
@@ -409,11 +421,11 @@
                                 <td colspan="4" class="text-left bg-white" style="border-bottom: none !important;">
                                     <div class="d-flex align-items-center">
                                         <span class="label-bold me-2">No. CONTRATO y/o CONVENIO:</span>
-                                        <input type="text" name="no_convenio" <?=(!$es2025)?'readonly':'' ?> class="form-control-plaintext text-left w-50" value="<?= isset($registro_pt->no_convenio) ? $registro_pt->no_convenio : $no_convenio ?>">
+                                        <input type="text" name="no_convenio" <?=(isset($es2025)&& !$es2025)?'readonly':'' ?> class="form-control-plaintext text-left w-50" value="<?= isset($registro_pt->no_convenio) ? $registro_pt->no_convenio : $no_convenio ?>">
                                     </div>
                                     <div class="d-flex align-items-center">
                                         <span class="label-bold me-2">No. RESERVA:</span>
-                                        <input type="text" name="no_reserva_visual" <?=(!$es2025)?'readonly':'' ?> class="form-control-plaintext text-left w-50" value="<?= isset($registro_pt->no_reserva) ? $registro_pt->no_reserva : $no_reserva ?>" placeholder="4798053">
+                                        <input type="text" name="no_reserva_visual" <?=(isset($es2025)&& !$es2025)?'readonly':'' ?> class="form-control-plaintext text-left w-50" value="<?= isset($registro_pt->no_reserva) ? $registro_pt->no_reserva : $no_reserva ?>" placeholder="4798053">
                                     </div>
                                     <div class="d-flex align-items-center mt-2">
                                         <span class="label-bold me-2">CONCEPTO SOLICITUD:</span>
@@ -718,9 +730,10 @@
       function updateFolio() {
           var prefix = $('#folio option:selected').text();
           var consecutivo = $('input[name="no_consecutivo"]').val();
+          var es2025 = <?= isset($es2025)&& !$es2025 ?>;
           if(prefix && consecutivo) {
-              $('#folio_error').text('PT '+prefix + '' + consecutivo+'/2026');
-              $('#folioCompleto').val('PT '+prefix + '' + consecutivo+'/2026');
+              $('#folio_error').text('PT '+prefix + '' + consecutivo+'/'+(es2025?'2025':'2026'));
+              $('#folioCompleto').val('PT '+prefix + '' + consecutivo+'/'+(es2025?'2025':'2026'));
           } else {
               $('#folio_error').text('');
           }

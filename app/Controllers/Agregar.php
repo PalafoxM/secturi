@@ -6158,7 +6158,14 @@ class Agregar extends BaseController
             }
         }
 
-
+      //validar que no se repita el no_consecutivo
+      $existe = $this->globals->getTabla(['tabla' => 'formulario_pt', 'where' => ['no_consecutivo' => $data['folioCompleto'], 'visible' => 1]]);
+      if(!$existe->error && !empty($existe->data)){
+          $usuario = $this->globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['id_usuario' => $existe->data[0]->usu_reg]])->data[0]->nombre_completo;
+          $response->error = true;
+          $response->respuesta = "El No. Consecutivo ya existe, creado por: ".$usuario;
+          return $this->respond($response);
+      }
 
         // die( var_dump($data) );
        
