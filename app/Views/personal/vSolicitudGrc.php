@@ -269,11 +269,11 @@
                 </select>
             </td>
             <td class="align-middle py-2">
-                <div class="input-group input-group-sm">
+                <div class="input-group input-group-sm mb-0">
                     <div class="input-group-prepend">
                         <span class="input-group-text border-0 bg-light text-muted"><i class="fas fa-dollar-sign"></i></span>
                     </div>
-                    <input type="text" class="form-control border-0 bg-light text-right" name="detalles[${rowIndex}][importe]" placeholder="0.00" value="${importeValue}" required>
+                    <input type="text" class="form-control border-0 bg-light text-right" name="detalles[${rowIndex}][importe]" placeholder="0.00" value="${importeValue}" style="min-width: 120px;" required>
                 </div>
             </td>
             <td class="align-middle py-2">
@@ -281,7 +281,7 @@
                     ${options2}
                 </select>
             </td>
-            <td class="align-middle text-center pr-0 py-2">
+            <td class="align-middle text-center pr-0 py-2" style="width: 50px;">
                 <button type="button" class="btn btn-outline-danger btn-sm rounded-circle" onclick="eliminarFila(this)" title="Eliminar Concepto">
                     <i class="fas fa-trash-alt"></i>
                 </button>
@@ -325,14 +325,27 @@
         }
 
         // Validación de anticipación para fechas
-        function verificarDiasAnticipacion(e) {
+        let lastAlertedStart = null;
+
+        function verificarDiasAnticipacion() {
+            let dpInicio = document.getElementById('fecha_incicio');
+            let dpFin = document.getElementById('fecha_fin');
+            
+            if (!dpInicio || !dpFin) return;
+            
+            let fInicioStr = dpInicio.value;
+            let fFinStr = dpFin.value;
+            
+            // Wait until both fields have a date selected
+            if (!fInicioStr || !fFinStr) return;
+            
+            // If we already warned about this exact start date, don't spam the user
+            if (lastAlertedStart === fInicioStr) return;
+
             let hoy = new Date();
             hoy.setHours(0,0,0,0);
             
-            let fechaForm = e.target.value;
-            if (!fechaForm) return;
-            
-            let partes = fechaForm.split('-');
+            let partes = fInicioStr.split('-');
             let fInput = new Date(partes[0], partes[1] - 1, partes[2]);
             fInput.setHours(0,0,0,0);
             
@@ -345,9 +358,12 @@
                         diasHabiles++;
                     }
                 }
+            } else {
+                diasHabiles = -1; // Force the alert for past dates
             }
-            
-            if (fInput < hoy || diasHabiles < 4) {
+
+            if (diasHabiles < 4) {
+                lastAlertedStart = fInicioStr; // Register this start date as warned
                 if (typeof Swal !== 'undefined') {
                     Swal.fire({
                         title: 'Aviso',
@@ -358,6 +374,8 @@
                 } else {
                     alert('Artículo 50 I. Deberán solicitarse en un término de cuatro días hábiles de anticipación a celebrarse el evento o comisión correspondiente. Con excepción de aquellas comisiones y eventos urgentes, siempre y cuando estén plenamente justificados.');
                 }
+            } else {
+                lastAlertedStart = null; // Reset if they pick a valid date
             }
         }
         

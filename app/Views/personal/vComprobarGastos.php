@@ -10,7 +10,7 @@
                                 <li class="breadcrumb-item active">Comprobación de Gastos</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Comprobación de Gastos - Solicitud #<?= isset($solicitud) ? $solicitud->id_solicitud_grc : '' ?></h4>
+                        <h4 class="page-title">Formato de Desglose de Viaticos - Solicitud #<?= isset($solicitud) ? $solicitud->id_solicitud_grc : '' ?></h4>
                     </div>
                 </div>
             </div>

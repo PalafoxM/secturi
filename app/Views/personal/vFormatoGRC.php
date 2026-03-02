@@ -80,7 +80,7 @@
             </td>
             <td width="70%" style="text-align: right; font-size: 8pt; vertical-align: top; padding-top: -27px;">
                 Lineamientos Generales de Racionalidad, Austeridad y Disciplina Presupuestal de la Administración Pública Estatal<br>
-                para el Ejercicio Fiscal de 2025<br>
+                para el Ejercicio Fiscal de 2026<br>
                 «Anexo 3»<br>
                 Secretaría de Finanzas
             </td>
@@ -91,7 +91,7 @@
         <span style="font-size: 9pt; font-weight: bold;">SECRETARÍA DE TURISMO E IDENTIDAD</span><br>
         <span style="font-size: 7pt;">UNIDAD RESPONSABLE</span><br>
         <span style="font-size: 10pt; font-weight: bold;">SOLICITUD DE GASTOS A RESERVA DE COMPROBAR</span><br>
-        <span style="font-size: 9pt; font-weight: bold;">GRC SECTURI/SSPT/DRP/010/2025</span><br>
+        <span style="font-size: 9pt; font-weight: bold;">GRC SECTURI/SSPT/DRP/010/2026</span><br>
         <span style="font-size: 8pt; font-weight: bold;">DATOS GENERALES DE SOLICITUD</span>
     </div>
 <BR>

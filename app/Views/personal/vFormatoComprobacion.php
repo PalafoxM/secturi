@@ -19,7 +19,7 @@
     <p><strong>FOLIO: </strong> <?= $solicitud->no_consecutivo ?></p>
 </div>
 
-<h4 class="text-align-center">DESGLOSE DE GASTOS (VIATICOS POR PERSONA)</h4>
+<h4 class="text-align-center">FORMATO DE DESGLOSE DE VIATICOS</h4>
 <table>
     <thead>
         <tr>

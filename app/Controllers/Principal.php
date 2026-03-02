@@ -7518,7 +7518,6 @@ class Principal extends BaseController
             echo "ID no válido";
             return;
         }
-
         // Obtener datos de la solicitud
         $solicitudQuery = $globals->getTabla(['tabla' => 'vw_solicitud_grc', 'where' => ['id_solicitud_grc' => $id_solicitud, 'visible' => 1]]);
         
@@ -7526,7 +7525,6 @@ class Principal extends BaseController
             echo "Solicitud no encontrada";
             return;
         }
-
         // Obtener detalles
         $detallesQuery = $globals->getTabla(['tabla' => 'vw_solicitud_grc_detalle', 'where' => ['id_solicitud_grc' => $id_solicitud, 'visible' => 1]]);
 

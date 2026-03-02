@@ -41,7 +41,7 @@
                                             <th>Fechas</th>
                                             <th>Clave</th>
                                             <th>Responsable</th>
-                                            <th>Fecha Registro</th>
+                                            <th>Formulario</th>
                                             <th>Acciones</th>
                                         </tr>
                                     </thead>
@@ -57,7 +57,9 @@
                                                     <td><?= date('d/m/Y', strtotime($row->fecha_inicio)) ?> - <?= date('d/m/Y', strtotime($row->fecha_fin)) ?></td>
                                                     <td><?= $row->clave ?></td>
                                                     <td><?= $row->nombre_completo ?></td>
-                                                    <td><?= date('d/m/Y', strtotime($row->fec_reg)) ?></td>
+                                                    <td>
+                                                        <a href="<?= base_url('index.php/Principal/comprobarGastos/' . $row->id_solicitud_grc) ?>" class="btn btn-sm btn-warning" title="Ir a Formulario" style="white-space: nowrap;"><i class="fas fa-file-invoice-dollar mr-1"></i> Ir a Formulario</a>
+                                                    </td>
                                                     <td>
                                                         <a href="<?= base_url('index.php/Principal/editarSolicitudGrc/' . $row->id_solicitud_grc) ?>" class="btn btn-sm btn-info" title="Editar"><i class="fas fa-edit"></i></a>
                                                         <a href="<?= base_url('index.php/Principal/ArchivoGRC/' . $row->id_solicitud_grc) ?>" class="btn btn-sm btn-secondary" title="Imprimir" target="_blank"><i class="fas fa-print"></i></a>
@@ -66,7 +68,7 @@
                                                            
                                                              <!--    <a href="javascript:void(0);" class="btn btn-sm btn-success" title="Validar" onclick="ini.inicio.validarSolicitudGrc(<?= $row->id_solicitud_grc ?>)"><i class="fas fa-check"></i></a>-->
                                                             
-                                                                <a href="<?= base_url('index.php/Principal/comprobarGastos/' . $row->id_solicitud_grc) ?>" class="btn btn-sm btn-warning" title="Comprobar Gastos"><i class="fas fa-file-invoice-dollar"></i></a>
+                                                                
                                                             <?php if ($row->id_estatus == 3): ?>
                                                                 <a href="<?= base_url('index.php/Principal/ArchivoComprobacion/' . $row->id_solicitud_grc) ?>" class="btn btn-sm btn-primary" title="Ver Comprobación" target="_blank"><i class="fas fa-file-pdf"></i></a>
                                                             <?php endif; ?>
