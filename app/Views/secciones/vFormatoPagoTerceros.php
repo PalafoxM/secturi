@@ -730,7 +730,8 @@
       function updateFolio() {
           var prefix = $('#folio option:selected').text();
           var consecutivo = $('input[name="no_consecutivo"]').val();
-          var es2025 = <?= isset($es2025)&& !$es2025 ?>;
+          var es2025 = <?= (isset($es2025) && $es2025) ? 'true' : 'false' ?>;
+          console.log(es2025);
           if(prefix && consecutivo) {
               $('#folio_error').text('PT '+prefix + '' + consecutivo+'/'+(es2025?'2025':'2026'));
               $('#folioCompleto').val('PT '+prefix + '' + consecutivo+'/'+(es2025?'2025':'2026'));
