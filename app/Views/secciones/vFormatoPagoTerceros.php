@@ -740,8 +740,8 @@
           var consecutivo = $('input[name="no_consecutivo"]').val();
           var anio = $('#anio_consecutivo').val();
           if(prefix && consecutivo) {
-              $('#folio_error').text('PT '+prefix + ' ' + consecutivo+'/'+anio);
-              $('#folioCompleto').val('PT '+prefix + ' ' + consecutivo+'/'+anio);
+              $('#folio_error').text('PT '+prefix + consecutivo+'/'+anio);
+              $('#folioCompleto').val('PT '+prefix  + consecutivo+'/'+anio);
           } else {
               $('#folio_error').text('');
           }
