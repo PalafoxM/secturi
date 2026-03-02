@@ -6089,7 +6089,7 @@ class Agregar extends BaseController
         
         if (isset($detallesActuales->data)) {
             foreach($detallesActuales->data as $d){
-                 $this->globals->saveTabla(['visible' => 0], ['tabla' => 'solicitud_grc_comprobacion', 'idEditar' => ['id_solicitud_grc_comprobacion' => $d->id_solicitud_grc_comprobacion]], $dataBitacora);
+                 $this->globals->saveTabla(['visible' => 0], ['tabla' => 'solicitud_grc_comprobacion', 'editar' => true, 'idEditar' => ['id_solicitud_grc_comprobacion' => $d->id_solicitud_grc_comprobacion]], $dataBitacora);
             }
         }
 

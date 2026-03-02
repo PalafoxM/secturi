@@ -2140,7 +2140,7 @@ class Principal extends BaseController
         $email = \Config\Services::email();
         $result = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_tipo_empleado' => 1]])->data;
 
-       $email->setTo([
+       /*$email->setTo([
             'agascag@guanajuato.gob.mx',
             'ccampos@guanajuato.gob.mx',
             'ztorrest@guanajuato.gob.mx',
@@ -2154,9 +2154,9 @@ class Principal extends BaseController
             'rgonzalezgu@guanajuato.gob.mx',
             'yjimenez@guanajuato.gob.mx',
             'mamoralesg@guanajuato.gob.mx',
-        ]);
+        ]);*/
  
-            /*    $email->setTo([
+            $email->setTo([
                     'alopez@guanajuato.gob.mx',
                     'cchernandezp@guanajuato.gob.mx',
                     'csoto@guanajuato.gob.mx',
@@ -2199,7 +2199,7 @@ class Principal extends BaseController
                     'lebalderas@guanajuato.gob.mx',
                     'rantonio@guanajuato.gob.mx',
                     'jrodriguezgo@guanajuato.gob.mx',
-                ]);  */
+                ]);
         $email->setSubject('Recordatorio: Revisión de Asistencias - Sistema SUSI');
         $email->setMessage('
             <!DOCTYPE html>
@@ -2232,9 +2232,9 @@ class Principal extends BaseController
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Estimado personal,</p>
                         
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-                            En caso de que aún no hayas realizado las <strong>justificaciones de tu personal correspondientes a la quincena 03/2026</strong>, 
-                            la cual comprende el periodo del <strong>01 al 15 de febrero de 2026</strong>, 
-                            tienes hasta el día <strong>Lunes 23 de febrero hasta las 16:00 hrs</strong> para realizarlas.
+                            En caso de que aún no hayas realizado las <strong>justificaciones correspondientes a la quincena 04/2026</strong>, 
+                            la cual comprende el periodo del <strong>16 al 28 de febrero de 2026</strong>, 
+                            tienes hasta el día <strong>Lunes 06 de marzo hasta las 16:00 hrs</strong> para realizarlas.
                         </p>
 
                         <div class="highlight-box">
@@ -7557,9 +7557,23 @@ class Principal extends BaseController
             }
         }
         
-        // Calcular consecutivo básico basado en la tabla solicitud_grc (o otra de comprobaciones)
+        // Obtener comprobantes guardados previamente si existen
+        $comprobantesGuardados = $globals->getTabla(['tabla' => 'solicitud_grc_comprobacion', 'where' => ['id_solicitud_grc' => $id_solicitud, 'visible' => 1]]);
+        $data['comprobantes_guardados'] = (!empty($comprobantesGuardados->data)) ? $comprobantesGuardados->data : [];
+
+        // Calcular o retomar consecutivo
+        if (!empty($data['solicitud']->no_consecutivo)) {
+            // "GRC XXX/2026" - extract the middle part or pass it down
+            $data['no_consecutivo_completo'] = $data['solicitud']->no_consecutivo;
+            // Let the JS handle it or we strip it. Better to pass it raw if we need.
+            // Extraer solo dígitos de "GRC SSPT 005/2026" (it might be tricky). Mantenemos el cálculo como fallback.
+        }
+
         $comprobaciones = $globals->getTabla(["tabla" => "solicitud_grc_comprobacion", "where" => ["visible" => 1, 'usu_reg' => $session->get('id_usuario')]]);
         $no_consecutivo = isset($comprobaciones->data) ? count($comprobaciones->data) + 1 : 1;
+        
+        // Si ya hay comprobantes guardados para ESTA sol, el número ya fue consumido. 
+        // Idealmente restamos o le damos prioridad al que ya guardaron
         $no_consecutivo = str_pad($no_consecutivo, 3, "0", STR_PAD_LEFT);
         $data['no_consecutivo'] = $no_consecutivo;
         

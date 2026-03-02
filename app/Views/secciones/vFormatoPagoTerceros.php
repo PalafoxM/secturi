@@ -116,12 +116,14 @@
 
 <div class="page-wrapper">
     <?php
+    $anio_actual = (isset($es2025) && $es2025) ? '2025' : '2026';
     // Helper to extract no_consecutivo from full folio string if editing
     // Expected format: PT [PREFIX] [NUMBER]/[YEAR]
     if (isset($registro_pt->no_consecutivo) && (!isset($no_consecutivo) || empty($no_consecutivo))) {
         // Try to match the number before the slash part
-        if (preg_match('/([0-9]{3,})\/[0-9]{4}$/', trim($registro_pt->no_consecutivo), $matches)) {
+        if (preg_match('/([0-9]{3,})\/([0-9]{4})$/', trim($registro_pt->no_consecutivo), $matches)) {
             $no_consecutivo = $matches[1];
+            $anio_actual = $matches[2];
         } else if (preg_match('/([0-9]{3,})/', trim($registro_pt->no_consecutivo), $matches)) {
             $no_consecutivo = $matches[1];
         } else {
@@ -197,14 +199,20 @@
                                     <input type="date" name="fecha_tramite" class="form-control-plaintext" value="<?= isset($registro_pt->fecha_tramite) ? date('Y-m-d', strtotime($registro_pt->fecha_tramite)) : date('Y-m-d') ?>">
                                 </td>
                                 <td>
-                                    <select id="folio" name="folio" class="folio">
-                                        <?php foreach($cat_area as $area): ?>
-                                            <option value="<?= $area->id_area ?>" <?= $area->id_area == $id_area ? 'selected' : '' ?>><?= $area->prefijo ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                    <input type="text" name="no_consecutivo" autocomplete="off" class="form-control-plaintext" value="<?= isset($no_consecutivo) ? $no_consecutivo : '' ?>" placeholder="001/2026">
-                                
-                                    <spam id="folio_error" class="text-success"></spam>
+                                    <div class="d-flex align-items-center justify-content-center">
+                                        <select id="folio" name="folio" class="folio">
+                                            <?php foreach($cat_area as $area): ?>
+                                                <option value="<?= $area->id_area ?>" <?= $area->id_area == $id_area ? 'selected' : '' ?>><?= $area->prefijo ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <input type="text" name="no_consecutivo" autocomplete="off" class="form-control-plaintext mx-1" style="width: 80px;" value="<?= isset($no_consecutivo) ? $no_consecutivo : '' ?>" placeholder="001">
+                                        <span style="font-weight:bold; font-size: 1.2em;">/</span>
+                                        <select id="anio_consecutivo" name="anio_consecutivo" class="form-control-plaintext mx-1" style="width: 70px;">
+                                            <option value="2025" <?= $anio_actual == '2025' ? 'selected' : '' ?>>2025</option>
+                                            <option value="2026" <?= $anio_actual == '2026' ? 'selected' : '' ?>>2026</option>
+                                        </select>
+                                    </div>
+                                    <span id="folio_error" class="text-success d-block mt-1"></span>
                               
                                     <input type="hidden" name="folioCompleto" id="folioCompleto">
                                 </td>
@@ -730,11 +738,10 @@
       function updateFolio() {
           var prefix = $('#folio option:selected').text();
           var consecutivo = $('input[name="no_consecutivo"]').val();
-          var es2025 = <?= (isset($es2025) && $es2025) ? 'true' : 'false' ?>;
-          console.log(es2025);
+          var anio = $('#anio_consecutivo').val();
           if(prefix && consecutivo) {
-              $('#folio_error').text('PT '+prefix + '' + consecutivo+'/'+(es2025?'2025':'2026'));
-              $('#folioCompleto').val('PT '+prefix + '' + consecutivo+'/'+(es2025?'2025':'2026'));
+              $('#folio_error').text('PT '+prefix + ' ' + consecutivo+'/'+anio);
+              $('#folioCompleto').val('PT '+prefix + ' ' + consecutivo+'/'+anio);
           } else {
               $('#folio_error').text('');
           }
@@ -742,6 +749,7 @@
 
       $('#folio').on('change', updateFolio);
       $('input[name="no_consecutivo"]').on('input change', updateFolio);
+      $('#anio_consecutivo').on('change', updateFolio);
       
       // Initialize validation/concatenation logic
       updateFolio();

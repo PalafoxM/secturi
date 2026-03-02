@@ -178,6 +178,7 @@
 <script>
     // Pasar usuarios a JS
     const catalogoUsuarios = <?= json_encode(isset($usuarios) ? $usuarios : []) ?>;
+    const comprobantesGuardados = <?= json_encode(isset($comprobantes_guardados) ? $comprobantes_guardados : []) ?>;
 
     function agregarFilaComprobacion(data = null) {
         const tbody = document.querySelector('#tabla_comprobacion tbody');
@@ -186,7 +187,8 @@
         // Construir opciones de usuario
         let optionsUsuarios = '<option value="">Seleccione un usuario</option>';
         catalogoUsuarios.forEach(u => {
-            optionsUsuarios += `<option value="${u.nombre}" data-rfc="${u.rfc || ''}">${u.nombre}</option>`;
+            let isSelected = (data && data.nombre_emisor === u.nombre) ? 'selected' : '';
+            optionsUsuarios += `<option value="${u.nombre}" data-rfc="${u.rfc || ''}" ${isSelected}>${u.nombre}</option>`;
         });
 
 
@@ -198,10 +200,10 @@
                 </select>
             </td>
             <td>
-                <input type="text" class="form-control rfc-input" name="comprobacion[${rowIndex}][rfc]" required placeholder="RFC" style="text-transform: uppercase;" readonly>
+                <input type="text" class="form-control rfc-input" name="comprobacion[${rowIndex}][rfc]" required placeholder="RFC" style="text-transform: uppercase;" value="${data ? data.rfc : ''}" readonly>
             </td>
             <td>
-                <input type="text" class="form-control input-importe" name="comprobacion[${rowIndex}][importe]" required placeholder="0.00" onblur="calcularTotalComprobado()">
+                <input type="text" class="form-control input-importe" name="comprobacion[${rowIndex}][importe]" required placeholder="0.00" value="${data ? data.importe : ''}" onblur="calcularTotalComprobado()">
             </td>
             <td class="text-center">
                 <button type="button" class="btn btn-danger btn-sm" onclick="eliminarFilaComprobacion(this)">
@@ -221,6 +223,9 @@
         // Formato moneda
         const inputImporte = row.querySelector('.input-importe');
         if (inputImporte) {
+            if (data && data.importe) {
+                inputImporte.value = new Intl.NumberFormat('es-MX', {style: 'currency', currency: 'MXN'}).format(data.importe);
+            }
             aplicarFormatoMoneda(inputImporte);
         }
     }
@@ -270,9 +275,14 @@
         document.getElementById('folioCompleto').value = completo;
     }
 
-    // Inicializar con una fila
+    // Inicializar con una o más filas
     document.addEventListener('DOMContentLoaded', function() {
-        agregarFilaComprobacion();
+        if (comprobantesGuardados && comprobantesGuardados.length > 0) {
+            comprobantesGuardados.forEach(c => agregarFilaComprobacion(c));
+            setTimeout(calcularTotalComprobado, 200); // Wait for inputs to inject
+        } else {
+            agregarFilaComprobacion();
+        }
 
         // Inicializar Folio Completo
         updateFolioCompleto();
