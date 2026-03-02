@@ -162,6 +162,7 @@
                 <form id="formPagoTerceros" enctype="multipart/form-data">
                     <input type="hidden" name="id_reserva" value="<?= $id_reserva ?>">
                     <input type="hidden" name="editar" value="<?= $editar ?>">
+                  
                     <?php if($editar == 1): ?>
                     <input type="hidden" name="id_formulario_pt" value="<?= isset($registro_pt->id_formulario_pt) ? $registro_pt->id_formulario_pt : '' ?>">
                     <?php endif; ?>
@@ -739,9 +740,18 @@
           var prefix = $('#folio option:selected').text();
           var consecutivo = $('input[name="no_consecutivo"]').val();
           var anio = $('#anio_consecutivo').val();
+          let refrendo = '';
+          if(anio == '2025'){
+              refrendo = 'REFRENDO';
+          }
           if(prefix && consecutivo) {
-              $('#folio_error').text('PT '+prefix + consecutivo+'/'+anio);
-              $('#folioCompleto').val('PT '+prefix  + consecutivo+'/'+anio);
+             if(refrendo != ''){
+                $('#folio_error').text(refrendo+' PT '+prefix + consecutivo+'/'+anio);
+                $('#folioCompleto').val(refrendo+' PT '+prefix  + consecutivo+'/'+anio);
+             }else{
+                $('#folio_error').text('PT '+prefix + consecutivo+'/'+anio);
+                $('#folioCompleto').val('PT '+prefix  + consecutivo+'/'+anio);
+             }
           } else {
               $('#folio_error').text('');
           }
@@ -1272,13 +1282,36 @@
             // For now, let's assume it's one date or just clear it if format doesn't match
         }
 
+        var is2025 = <?= (isset($es2025) && $es2025) ? 'true' : 'false' ?>;
+        var htmlContent = '';
+        
+        if (is2025) {
+            var getSelectMes = function(idName, selectedValue) {
+                var sel = '<select id="' + idName + '" class="form-control">';
+                sel += '<option value="">Seleccione...</option>';
+                var meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+                meses.forEach(function(m) {
+                    var selected = (m === selectedValue || m.toLowerCase() === selectedValue.toLowerCase()) ? ' selected' : '';
+                    sel += '<option value="' + m + '"' + selected + '>' + m + '</option>';
+                });
+                sel += '</select>';
+                return sel;
+            };
+            
+            htmlContent = '<div class="row">' +
+                          '<div class="col-md-6"><label>Mes Inicio</label>' + getSelectMes('swal-input-inicio', fechaInicio) + '</div>' +
+                          '<div class="col-md-6"><label>Mes Fin</label>' + getSelectMes('swal-input-fin', fechaFin) + '</div>' +
+                          '</div>';
+        } else {
+            htmlContent = '<div class="row">' +
+                          '<div class="col-md-6"><label>Inicio</label><input type="date" id="swal-input-inicio" class="form-control" value="' + fechaInicio + '"></div>' +
+                          '<div class="col-md-6"><label>Fin</label><input type="date" id="swal-input-fin" class="form-control" value="' + fechaFin + '"></div>' +
+                          '</div>';
+        }
+
         Swal.fire({
-            title: 'Fechas',
-            html:
-                '<div class="row">' +
-                '<div class="col-md-6"><label>Inicio</label><input type="date" id="swal-input-inicio" class="form-control" value="' + fechaInicio + '"></div>' +
-                '<div class="col-md-6"><label>Fin</label><input type="date" id="swal-input-fin" class="form-control" value="' + fechaFin + '"></div>' +
-                '</div>',
+            title: is2025 ? 'Meses' : 'Fechas',
+            html: htmlContent,
             focusConfirm: false,
             showCancelButton: true,
             confirmButtonText: 'Guardar',
@@ -1288,7 +1321,7 @@
                 var fin = document.getElementById('swal-input-fin').value;
                 
                 if (!inicio || !fin) {
-                    Swal.showValidationMessage('Por favor seleccione ambas fechas');
+                    Swal.showValidationMessage(is2025 ? 'Por favor seleccione ambos meses' : 'Por favor seleccione ambas fechas');
                 }
                 return { inicio: inicio, fin: fin };
             }
