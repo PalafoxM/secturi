@@ -73,15 +73,19 @@
                     <?php 
                         $meses = array("01","02","03","04","05","06","07","08","09","10","11","12");
                         
-                        if(isset($registro_pt->tipo_formato) && $registro_pt->tipo_formato == 'REFRENDO' && isset($row->fechas) && $row->fechas == 'Enero / Diciembre'){
-                            $anio_refrendo = isset($registro_pt->anio) ? $registro_pt->anio : ((isset($es2025) && $es2025) ? '2025' : '2026');
-                            echo "ENERO 2025"  . " A DICIEMBRE " . $anio_refrendo;
+                        if(isset($registro_pt->tipo_formato) && $registro_pt->tipo_formato == 'REFRENDO' && isset($row->fechas) && strpos($row->fechas, ' / ') !== false){
+                            list($inicio, $fin) = explode(' / ', $row->fechas);
+                            echo mb_strtoupper(trim($inicio), 'UTF-8') . " 2025 A " . mb_strtoupper(trim($fin), 'UTF-8') . " 2026";
                         } else if(isset($row->fechas) && strpos($row->fechas, ' / ') !== false){
                             list($inicio, $fin) = explode(' / ', $row->fechas);
                             $f_inicio = strtotime($inicio);
                             $f_fin = strtotime($fin);
-                            echo "DEL " . date("d", $f_inicio) . "/" . $meses[date("n", $f_inicio)-1] . "/" . date("Y", $f_inicio);
-                            echo " AL " . date("d", $f_fin) . "/" . $meses[date("n", $f_fin)-1] . "/" . date("Y", $f_fin);
+                            if ($f_inicio !== false && $f_fin !== false) {
+                                echo "DEL " . date("d", $f_inicio) . "/" . $meses[date("n", $f_inicio)-1] . "/" . date("Y", $f_inicio);
+                                echo " AL " . date("d", $f_fin) . "/" . $meses[date("n", $f_fin)-1] . "/" . date("Y", $f_fin);
+                            } else {
+                                echo mb_strtoupper($row->fechas, 'UTF-8');
+                            }
                         } else {
                              $f_tramite = strtotime($registro_pt->fecha_tramite);
                              echo "DEL " . date("d", $f_tramite) . "/" . $meses[date("n", $f_tramite)-1] . "/" . date("Y", $f_tramite);
