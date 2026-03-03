@@ -48,16 +48,16 @@
             <tr>
                 <td class="label-cell">RESPONSABLE / CARGO / AREA:</td>
                 <td class="value-cell">
-                    <?= !empty($registro_pt->nombre_responsable) ? strtoupper($registro_pt->nombre_responsable) : '' ?>
+                    <?= !empty($registro_pt->nombre_responsable) ? mb_strtoupper($registro_pt->nombre_responsable, 'UTF-8') : '' ?>
                 </td>
             </tr>
             <tr>
                 <td class="label-cell">COMISION / REUNION / EVENTO:</td>
-                <td class="value-cell"><?= isset($row->comision) ? strtoupper($row->comision) : '' ?></td>
+                <td class="value-cell"><?= isset($row->comision) ? mb_strtoupper($row->comision, 'UTF-8') : '' ?></td>
             </tr>
             <tr>
                 <td class="label-cell">CONCEPTO DEL PAGO:</td>
-                <td class="value-cell"><?= isset($row->concepto_gasto) ? strtoupper($row->concepto_gasto) : 'Peajes' ?></td>
+                <td class="value-cell"><?= isset($row->concepto_gasto) ? mb_strtoupper($row->concepto_gasto, 'UTF-8') : 'PEAJES' ?></td>
             </tr>
             <tr>
                 <td class="label-cell">PARTIDA:</td>
@@ -72,7 +72,11 @@
                 <td class="value-cell">
                     <?php 
                         $meses = array("01","02","03","04","05","06","07","08","09","10","11","12");
-                        if(isset($row->fechas) && strpos($row->fechas, ' / ') !== false){
+                        
+                        if(isset($registro_pt->tipo_formato) && $registro_pt->tipo_formato == 'REFRENDO' && isset($row->fechas) && $row->fechas == 'Enero / Diciembre'){
+                            $anio_refrendo = isset($registro_pt->anio) ? $registro_pt->anio : ((isset($es2025) && $es2025) ? '2025' : '2026');
+                            echo "ENERO 2025"  . " A DICIEMBRE " . $anio_refrendo;
+                        } else if(isset($row->fechas) && strpos($row->fechas, ' / ') !== false){
                             list($inicio, $fin) = explode(' / ', $row->fechas);
                             $f_inicio = strtotime($inicio);
                             $f_fin = strtotime($fin);

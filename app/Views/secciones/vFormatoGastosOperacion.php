@@ -179,9 +179,14 @@
 
 <div class="page-wrapper">
     <?php
+    $prefix_found = '';
     // Format Consecutivo
     if (isset($registro_pt->no_consecutivo) && (!isset($no_consecutivo) || empty($no_consecutivo))) {
-         if (preg_match('/([0-9]{3,})\/[0-9]{4}$/', trim($registro_pt->no_consecutivo), $matches)) {
+        // Try to match the prefix, number and year. (Prefix can contain slashes!)
+        if (preg_match('/(?:PT|GO|REFRENDO\s*GO|REFRENDO\s*PT)\s+(.*?)\/([0-9]{3,})\/([0-9]{4})$/i', trim($registro_pt->no_consecutivo), $matches)) {
+            $prefix_found = trim($matches[1]);
+            $no_consecutivo = $matches[2];
+        } else if (preg_match('/([0-9]{3,})\/[0-9]{4}$/', trim($registro_pt->no_consecutivo), $matches)) {
             $no_consecutivo = $matches[1];
         } else if (preg_match('/([0-9]{3,})/', trim($registro_pt->no_consecutivo), $matches)) {
             $no_consecutivo = $matches[1];
@@ -190,6 +195,16 @@
         }
     } else if (isset($consecutivo) && (!isset($no_consecutivo) || empty($no_consecutivo))) {
         $no_consecutivo = $consecutivo;
+    }
+
+    // Attempt to recover id_area from the parsed prefix if editing an existing record
+    if (!empty($prefix_found) && isset($cat_area) && is_array($cat_area)) {
+        foreach ($cat_area as $area) {
+            if (strtoupper(trim($area->prefijo)) === strtoupper($prefix_found)) {
+                $id_area = $area->id_area;
+                break;
+            }
+        }
     }
     $default_bank_account = "5185913";
     $default_bank_branch = "MARFIL";
@@ -1036,14 +1051,14 @@
 
     function updateFolioDisplay() {
         var num = $('input[name="no_consecutivo"]').val();
-        var prefijo = $('#folio option:selected').text();
-        // If prefijo is just the text inside option, use it. Usually SECTURI/DGA...
-        // Format: GO [The Select Text] [Num] / 2026
-        // Note: Check if prefijo ends with /
-        if(!prefijo.endsWith('/')) prefijo += '/';
+        var prefijo = $('#folio option:selected').text().trim();
+        var anio = '2026'; // Assuming static or from another field
+        let refrendo = "<?= isset($es2025) && !empty($es2025)?'REFRENDO ':'' ?>";
         
-        var full = "GO " + prefijo + (num ? num : "001") + "/2026";
-        $('#folio_error').text(full); // If used elsewhere
+        var separador = prefijo.endsWith('/') ? '' : ' ';
+        var full = refrendo + "GO " + prefijo + separador + (num ? num : "001") + "/" + anio;
+        
+        $('#folio_error').text(full); 
         $('#folioCompleto').val(full);
     }
     

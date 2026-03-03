@@ -117,11 +117,16 @@
 <div class="page-wrapper">
     <?php
     $anio_actual = (isset($es2025) && $es2025) ? '2025' : '2026';
-    // Helper to extract no_consecutivo from full folio string if editing
+    $prefix_found = '';
+    // Helper to extract no_consecutivo and prefix from full folio string if editing
     // Expected format: PT [PREFIX] [NUMBER]/[YEAR]
     if (isset($registro_pt->no_consecutivo) && (!isset($no_consecutivo) || empty($no_consecutivo))) {
-        // Try to match the number before the slash part
-        if (preg_match('/([0-9]{3,})\/([0-9]{4})$/', trim($registro_pt->no_consecutivo), $matches)) {
+        // Try to match the prefix, number and year
+        if (preg_match('/(?:PT|GO|REFRENDO\s*GO|REFRENDO\s*PT)\s+(.*?)\/([0-9]{3,})\/([0-9]{4})$/i', trim($registro_pt->no_consecutivo), $matches)) {
+            $prefix_found = trim($matches[1]);
+            $no_consecutivo = $matches[2];
+            $anio_actual = $matches[3];
+        } else if (preg_match('/([0-9]{3,})\/([0-9]{4})$/', trim($registro_pt->no_consecutivo), $matches)) {
             $no_consecutivo = $matches[1];
             $anio_actual = $matches[2];
         } else if (preg_match('/([0-9]{3,})/', trim($registro_pt->no_consecutivo), $matches)) {
@@ -133,6 +138,16 @@
         }
     } else if (isset($consecutivo) && (!isset($no_consecutivo) || empty($no_consecutivo))) {
         $no_consecutivo = $consecutivo;
+    }
+
+    // Attempt to recover id_area from the parsed prefix if editing an existing record
+    if (!empty($prefix_found) && isset($cat_area) && is_array($cat_area)) {
+        foreach ($cat_area as $area) {
+            if (strtoupper(trim($area->prefijo)) === strtoupper($prefix_found)) {
+                $id_area = $area->id_area;
+                break;
+            }
+        }
     }
     ?>
 
@@ -162,6 +177,7 @@
                 <form id="formPagoTerceros" enctype="multipart/form-data">
                     <input type="hidden" name="id_reserva" value="<?= $id_reserva ?>">
                     <input type="hidden" name="editar" value="<?= $editar ?>">
+                    <input type="hidden" name="es2025" value="<?= $es2025 ?>">
                   
                     <?php if($editar == 1): ?>
                     <input type="hidden" name="id_formulario_pt" value="<?= isset($registro_pt->id_formulario_pt) ? $registro_pt->id_formulario_pt : '' ?>">
@@ -737,21 +753,20 @@
 
       // Concatenate Folio and Consecutivo
       function updateFolio() {
-          var prefix = $('#folio option:selected').text();
+          var prefix = $('#folio option:selected').text().trim();
           var consecutivo = $('input[name="no_consecutivo"]').val();
           var anio = $('#anio_consecutivo').val();
-          let refrendo = '';
-          if(anio == '2025'){
-              refrendo = 'REFRENDO';
-          }
+          let refrendo = "<?= isset($es2025) && !empty($es2025)?'REFRENDO ':'' ?>";
+        
           if(prefix && consecutivo) {
-             if(refrendo != ''){
-                $('#folio_error').text(refrendo+' PT '+prefix + consecutivo+'/'+anio);
-                $('#folioCompleto').val(refrendo+' PT '+prefix  + consecutivo+'/'+anio);
-             }else{
-                $('#folio_error').text('PT '+prefix + consecutivo+'/'+anio);
-                $('#folioCompleto').val('PT '+prefix  + consecutivo+'/'+anio);
-             }
+              // Si el prefijo termina en diagonal (ej. "SECTURI/DGA/"), no le agregamos espacio antes del consecutivo.
+              // Si no termina en diagonal (ej. "SSPT"), le agregamos un espacio.
+              var separador = prefix.endsWith('/') ? '' : ' ';
+              var txtVal = refrendo + 'PT ' + prefix + separador + consecutivo + '/' + anio;
+              
+              $('#folio_error').text(txtVal);
+              $('#folioCompleto').val(txtVal);
+             
           } else {
               $('#folio_error').text('');
           }
@@ -1125,7 +1140,7 @@
             $btn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando...');
 
              var formData = new FormData(document.getElementById("formPagoTerceros"));
-             
+             var is2025 = <?= (isset($es2025) && $es2025) ? 'true' : 'false' ?>;
              $.ajax({
                 url: "<?php echo base_url(); ?>index.php/Agregar/guardaFormatoPT",
                 type: "POST",
@@ -1149,7 +1164,11 @@
                             text: data.respuesta,
                             confirmButtonText: 'Aceptar'
                         }).then((result) => {
-                             window.location.href = "<?php echo base_url(); ?>index.php/Inicio/ListaHojaAzul";
+                            if(is2025){
+                                window.location.href = "<?php echo base_url(); ?>index.php/Inicio/ListaHojaAzulRefrendo";
+                            }else{
+                                window.location.href = "<?php echo base_url(); ?>index.php/Inicio/ListaHojaAzul";
+                            }
                         });
                     }
                 },
@@ -1299,8 +1318,8 @@
             };
             
             htmlContent = '<div class="row">' +
-                          '<div class="col-md-6"><label>Mes Inicio</label>' + getSelectMes('swal-input-inicio', fechaInicio) + '</div>' +
-                          '<div class="col-md-6"><label>Mes Fin</label>' + getSelectMes('swal-input-fin', fechaFin) + '</div>' +
+                          '<div class="col-md-6"><label>Mes Inicio 2025</label>' + getSelectMes('swal-input-inicio', fechaInicio) + '</div>' +
+                          '<div class="col-md-6"><label>Mes Fin 2026</label>' + getSelectMes('swal-input-fin', fechaFin) + '</div>' +
                           '</div>';
         } else {
             htmlContent = '<div class="row">' +

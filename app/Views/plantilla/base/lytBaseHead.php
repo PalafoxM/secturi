@@ -503,7 +503,7 @@
                               
                                 <li><a href="<?php echo base_url(); ?>index.php/Principal/generarFormatoPT/1/0/2025">Hoja Azul</a>
                                 </li>
-                                <li><a href="<?php echo base_url(); ?>index.php/Inicio/ListaHojaAzul">Lista Hoja Azul</a>
+                                <li><a href="<?php echo base_url(); ?>index.php/Inicio/ListaHojaAzulRefrendo/2025">Lista Hoja Azul</a>
                                 </li>
                           
                             </ul>

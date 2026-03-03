@@ -6280,8 +6280,11 @@ class Principal extends BaseController
 
          $data['no_reserva']="";
          $data['no_convenio']="";
-
-          $formulario_pt = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["visible" => 1, 'usu_reg' => $session->get('id_usuario')]]);
+         if(!$data['es2025'] ){
+            $formulario_pt = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["visible" => 1, 'usu_reg' => $session->get('id_usuario')], 'tipo_formato' => 'PT']);
+         }else{
+            $formulario_pt = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["visible" => 1, 'usu_reg' => $session->get('id_usuario')], 'tipo_formato' => 'REFRENDO']);
+         }
             $no_consecutivo = count($formulario_pt->data) + 1 ;
             if (strlen($no_consecutivo) == 1) {
                 $no_consecutivo = '00' . $no_consecutivo;

@@ -70,8 +70,13 @@ $session = \Config\Services::session();
                                                         class="mdi mdi-ballot-outline font-18"></i></a>
                                                  <a class="btn btn-outline-warning btn-round" onclick="descargarExcel(<?= $e->id_formulario_pt ?>)" title="Eliminar"><i
                                                         class="mdi mdi-file-excel font-18"></i></a> 
-                                                <a class="btn btn-outline-warning btn-round" href="<?php echo base_url().'index.php/Inicio/generarFormatoPT?id='.$e->id_formulario_pt.'&editar=1'?>" title="Editar" ><i
+                                                <?php if(isset($anio) && $anio == 2025): ?>
+                                                <a class="btn btn-outline-warning btn-round" href="<?php echo base_url().'index.php/Inicio/generarFormatoPT?id='.$e->id_formulario_pt.'&editar=1&anio=2025'?>" title="Editar" ><i
                                                         class="mdi mdi-lead-pencil font-18"></i></a> 
+                                                <?php else: ?>
+                                                <a class="btn btn-outline-warning btn-round" href="<?php echo base_url().'index.php/Inicio/generarFormatoPT?id='.$e->id_formulario_pt.'&editar=1&anio=2026'?>" title="Editar" ><i
+                                                        class="mdi mdi-lead-pencil font-18"></i></a> 
+                                                <?php endif; ?>
 
                                               
                                              

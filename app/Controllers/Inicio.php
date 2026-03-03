@@ -2159,6 +2159,29 @@ class Inicio extends BaseController
         $data['contentView'] = 'secciones/vListaHojaAzul';
         $this->_renderView($data);
     }
+    public function ListaHojaAzulRefrendo($anio = null )
+    {
+        $session = \Config\Services::session();
+        $globas = new Mglobal;
+        if(in_array($session->get('id_perfil'), [1,2])){
+            $dataDB = array('tabla' => 'formulario_pt', 'where' => ['visible' => 1, 'tipo_formato' => 'REFRENDO']);
+        }else{
+            $dataDB = array('tabla' => 'formulario_pt', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario'), 'tipo_formato' => 'REFRENDO']);
+        }
+       
+        $response = $globas->getTabla($dataDB);
+          foreach($response->data as $key => $value){
+            $usuario = $globas->getTabla(["tabla" => "vw_usuario", "where" => ["id_usuario" => $value->usu_reg], 'limit' => 1]);
+            $response->data[$key]->nombre_usuario = $usuario->data[0]->nombre_completo;
+            }  
+        $data['dataHojaAzul'] = $response->data;
+        $data['anio'] = $anio;
+        
+        $data['scripts'] = array('inicio');
+        $data['edita'] = 0;
+        $data['contentView'] = 'secciones/vListaHojaAzul';
+        $this->_renderView($data);
+    }
 
     public function generarFormatoPT()
     {
@@ -2169,8 +2192,10 @@ class Inicio extends BaseController
         
         $id = $this->request->getGet('id');
         $editar = $this->request->getGet('editar');
+        $anio = $this->request->getGet('anio');
         
         $data['editar'] = ($editar == 1) ? 1 : 0;
+        $data['es2025'] = ($anio == 2025) ? true : false;
         $data['id_reserva'] = 0; // Default or fetch if needed
         $data['no_consecutivo'] = ''; // Logic to generate new consecutive if needed, or leave blank
 
