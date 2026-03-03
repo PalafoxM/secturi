@@ -2140,7 +2140,7 @@ class Principal extends BaseController
         $email = \Config\Services::email();
         $result = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_tipo_empleado' => 1]])->data;
 
-       /*$email->setTo([
+       $email->setTo([
             'agascag@guanajuato.gob.mx',
             'ccampos@guanajuato.gob.mx',
             'ztorrest@guanajuato.gob.mx',
@@ -2154,9 +2154,9 @@ class Principal extends BaseController
             'rgonzalezgu@guanajuato.gob.mx',
             'yjimenez@guanajuato.gob.mx',
             'mamoralesg@guanajuato.gob.mx',
-        ]);*/
+        ]);
  
-            $email->setTo([
+          /*  $email->setTo([
                     'alopez@guanajuato.gob.mx',
                     'cchernandezp@guanajuato.gob.mx',
                     'csoto@guanajuato.gob.mx',
@@ -2199,7 +2199,7 @@ class Principal extends BaseController
                     'lebalderas@guanajuato.gob.mx',
                     'rantonio@guanajuato.gob.mx',
                     'jrodriguezgo@guanajuato.gob.mx',
-                ]);
+                ]);*/
         $email->setSubject('Recordatorio: Revisión de Asistencias - Sistema SUSI');
         $email->setMessage('
             <!DOCTYPE html>
@@ -2232,9 +2232,9 @@ class Principal extends BaseController
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Estimado personal,</p>
                         
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-                            En caso de que aún no hayas realizado las <strong>justificaciones correspondientes a la quincena 04/2026</strong>, 
+                            En caso de que aún no hayas realizado las <strong>justificaciones de tu personal a cargo correspondientes a la quincena 04/2026</strong>, 
                             la cual comprende el periodo del <strong>16 al 28 de febrero de 2026</strong>, 
-                            tienes hasta el día <strong>Lunes 06 de marzo hasta las 16:00 hrs</strong> para realizarlas.
+                            tienes hasta el día <strong>Lunes 09 de marzo hasta las 16:00 hrs</strong> para realizarlas.
                         </p>
 
                         <div class="highlight-box">
