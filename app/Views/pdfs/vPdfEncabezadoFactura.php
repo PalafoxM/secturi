@@ -97,7 +97,7 @@
                 <td class="label-cell">IMPORTANTE EN PESOS (MXN):</td>
                 <td class="value-cell">
                     $<?= $row->importe ?> 
-                    (<?= isset($row->importe_letra) ? $row->importe_letra : '' ?>)
+                    (<?= isset($row->importe_letra) ? mb_strtoupper($row->importe_letra, 'UTF-8') : '' ?>)
                 </td>
             </tr>
         </tbody>
