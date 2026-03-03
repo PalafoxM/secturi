@@ -442,7 +442,7 @@
                                         class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span></a>
                                 <ul class="nav-second-level" aria-expanded="false">
                                     <li><a href="<?php echo base_url(); ?>index.php/Principal/listadoPT">Reserva PT</a></li>
-                                    <li><a href="<?php echo base_url(); ?>index.php/Principal/generarFormatoGO">Reserva GO</a></li>
+                                    <li><a href="<?php echo base_url(); ?>index.php/Principal/generarFormatoGO">Regristo GO</a></li>
                                     <li><a href="<?php echo base_url(); ?>index.php/Principal/listadoGrc">Solicitud GRC</a></li>
                                 </ul>
                             </li><!--end nav-item-->
