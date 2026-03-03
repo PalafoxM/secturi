@@ -122,8 +122,14 @@
     // Expected format: PT [PREFIX] [NUMBER]/[YEAR]
     if (isset($registro_pt->no_consecutivo) && (!isset($no_consecutivo) || empty($no_consecutivo))) {
         // Try to match the prefix, number and year
-        if (preg_match('/(?:PT|GO|REFRENDO\s*GO|REFRENDO\s*PT)\s+(.*?)\/([0-9]{3,})\/([0-9]{4})$/i', trim($registro_pt->no_consecutivo), $matches)) {
+        if (preg_match('/(?:PT|GO|REFRENDO\s*GO|REFRENDO\s*PT)\s+(.*?)\s*([0-9]{3,})\/([0-9]{4})$/i', trim($registro_pt->no_consecutivo), $matches)) {
             $prefix_found = trim($matches[1]);
+            // Si el prefijo capturado tiene un '/' al final por el greedy match o no,
+            // (ej. "SECTURI/DGA/001" el (.*?) con slash puede haber dejado un slash extra o quitado).
+            // Limpiamos.
+            if (substr($prefix_found, -1) === '/') {
+                $prefix_found = substr($prefix_found, 0, -1);
+            }
             $no_consecutivo = $matches[2];
             $anio_actual = $matches[3];
         } else if (preg_match('/([0-9]{3,})\/([0-9]{4})$/', trim($registro_pt->no_consecutivo), $matches)) {
@@ -143,7 +149,11 @@
     // Attempt to recover id_area from the parsed prefix if editing an existing record
     if (!empty($prefix_found) && isset($cat_area) && is_array($cat_area)) {
         foreach ($cat_area as $area) {
-            if (strtoupper(trim($area->prefijo)) === strtoupper($prefix_found)) {
+            $clean_area = trim($area->prefijo);
+            if (substr($clean_area, -1) === '/') {
+                $clean_area = substr($clean_area, 0, -1);
+            }
+            if (strtoupper($clean_area) === strtoupper($prefix_found)) {
                 $id_area = $area->id_area;
                 break;
             }

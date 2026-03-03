@@ -2448,7 +2448,7 @@ class Principal extends BaseController
         if (in_array($session->get('id_perfil'), [1, 2])) {
             $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1, "id_estatus"=> 2]]);
         } else {
-             return redirect()->to(base_url() . 'index.php/Inicio');
+             $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1, "id_estatus"=> 2, 'usu_reg' => $session->get('id_usuario')]]);
         }
        // die( var_dump($reserva ) );
         $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
