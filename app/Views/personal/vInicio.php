@@ -727,8 +727,8 @@
                                                 <a href="<?= base_url() ?>assets/mike.png" target="_blank" >
                                                 <div class="card-body">
                                                     <div class="blog-card">
-                                                        <h4 class="header-title mt-0 mb-4">Semana del 16 de febrero al 20 de febrero, acciones SIGAP</h4>
-                                                        <iframe src="<?= base_url() ?>assets/mike.png" alt="" width="100%"
+                                                        <h4 class="header-title mt-0 mb-4">Semana del 2 de marzo al 6 de marzo, acciones SIGAP</h4>
+                                                        <iframe src="<?= base_url() ?>assets/mike.png" alt="" width="100%" height="500px"
                                                             class="img-fluid" ></iframe>
                                                     </div><!--end blog-card-->
                                                        <a href="https://meet.google.com/pdv-qzjy-bga"
