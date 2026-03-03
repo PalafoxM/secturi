@@ -6197,6 +6197,10 @@ class Agregar extends BaseController
             'importe_letra' => $data['importe_letra'] ?? '',
             'concepto' => $data['concepto'] ?? ''
         ];
+
+        if(isset($data['es2025']) && $data['es2025']){
+            $dataInsert['tipo_formato'] = 'REFRENDO';
+        }
        
         $id_registro_pt = null;
         if($data['editar'] == 1 && isset($data['id_formulario_pt'])){
