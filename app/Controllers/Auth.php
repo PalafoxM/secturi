@@ -70,6 +70,7 @@ class Auth extends Controller
         $storedState = $session->get('oauth2state');
 
         if (!$state || $state !== $storedState) {
+            log_message('error', 'Google Auth Error: State mismatch. Received state: ' . ($state ?: 'null') . ', Stored state: ' . ($storedState ?: 'null'));
             $session->remove('oauth2state');
             return redirect()->to('/Login')
                             ->with('error', 'Estado de seguridad inválido. Inténtalo de nuevo.');
@@ -86,6 +87,7 @@ class Auth extends Controller
             $email = $ownerDetails->getEmail();
 
             if (!$email) {
+                log_message('error', 'Google Auth Error: No email obtained from token.');
                 return redirect()->to('/login')
                                 ->with('error', 'No se pudo obtener tu correo de Google. ¿Permitiste el acceso?');
             }
@@ -135,6 +137,7 @@ class Auth extends Controller
 
             } else {
                 // Usuario no registrado → mensaje claro
+                log_message('error', 'Google Auth Error: Email not registered -> ' . $email);
                 return redirect()->to('/login')
                                 ->with('error', "Tu cuenta de Google (<strong>" . esc($email) . "</strong>) no está registrada en el sistema.");
             }
