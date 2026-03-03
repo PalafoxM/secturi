@@ -2147,6 +2147,7 @@ class Inicio extends BaseController
             $dataDB = array('tabla' => 'formulario_pt', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario'), 'tipo_formato' => 'PT']);
         }
        
+       // die( var_dump( $dataDB ) );
         $response = $globas->getTabla($dataDB);
           foreach($response->data as $key => $value){
             $usuario = $globas->getTabla(["tabla" => "vw_usuario", "where" => ["id_usuario" => $value->usu_reg], 'limit' => 1]);
