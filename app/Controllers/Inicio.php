@@ -354,33 +354,37 @@ class Inicio extends BaseController
     {
         $globas = new Mglobal;
 
-        $data['material_promo'] = $globas->getTabla([
+        $result = $globas->getTabla([
             'tabla' => 'vw_material_promo',
             'where' => ['visible' => 1]
-        ])->data;
-       
+        ]);
+
+        $data['material_promo'] = $result->data ?? [];
 
         $data['scripts'] = array('principal', 'inicio');
         $data['contentView'] = 'personal/vListaConvenio';
         $this->_renderView($data);
     }
     public function FormularioPromo($id = null, $idFila = null, $idSalida = null)
-    {
-        $globas = new Mglobal;
+{
+    $session = \Config\Services::session();
 
-        $data['idConvenio'] = $id;
-        $data['idArticulo'] = $idFila;
-        $data['idSalida'] = $idSalida;
-        
-        if($idSalida){
-            $registro = $globas->getTabla(['tabla' => 'salida_inventario', 'where' => ['id_salida_inventario' => $idSalida]]);
-            $data['registro'] = $registro->data[0] ?? null;
-        }
+    // (opcional) guardar en sesión si quieres, pero ya no dependeremos de ello
+    $session->set('formPromo_id_material_promo', $id);
+    $session->set('formPromo_idArticulo', $idFila);
+    $session->set('formPromo_idSalida', $idSalida);
 
-        $data['scripts'] = array('principal', 'inicio');
-        $data['contentView'] = 'personal/vFormularioPromo';
-        $this->_renderView($data);
-    }
+    $data = [];
+    $data['scripts'] = array('principal', 'inicio');
+    $data['contentView'] = 'personal/vFormularioPromo';
+
+    // ✅ PASAR IDs a la vista con los nombres que el form ya usa
+    $data['id_material_promo'] = $id;
+    $data['idArticulo'] = $idFila;
+    $data['id_salida_inventario'] = $idSalida;
+
+    $this->_renderView($data);
+}
     private function generarFolio()
     {
         $globas = new Mglobal;
@@ -408,11 +412,44 @@ class Inicio extends BaseController
         $globas  = new Mglobal;
         $session = \Config\Services::session();
 
+        // ============================
+        // IDS (mantener tu lógica)
+        // ============================
         $idConvenio = $this->request->getPost('id_material_promo');
+        if ($idConvenio === null || $idConvenio === '') {
+            $idConvenio = $this->request->getPost('idConvenio'); // fallback
+        }
+
         $idArticulo = $this->request->getPost('idArticulo');
         $idSalida   = $this->request->getPost('idSalida');
-        $data = $this->request->getPost() ?? [];
 
+        // Validación mínima de IDs requeridos
+        if ($idConvenio === null || $idConvenio === '' || $idArticulo === null || $idArticulo === '') {
+            return $this->response->setJSON([
+                'error' => true,
+                'respuesta' => 'Faltan IDs: id_material_promo / idArticulo'
+            ]);
+        }
+
+        // ============================
+        // Normalización de campos opcionales
+        // ============================
+        $fecEveRaw = trim((string)$this->request->getPost('fec_eve')); // 'YYYY-MM-DD' o ''
+        $fecEve = ($fecEveRaw !== '') ? ($fecEveRaw . ' 00:00:00') : null;
+
+        $conceptoRaw = trim((string)$this->request->getPost('concepto'));
+        $concepto = ($conceptoRaw !== '') ? $conceptoRaw : null;
+
+        // ============================
+        // Datos comunes
+        // ============================
+        // Normalizar fec_eve (viene de input type="date": YYYY-MM-DD o vacío)
+        $fecEveRaw = trim((string)$this->request->getPost('fec_eve'));
+        $fecEve = ($fecEveRaw !== '') ? ($fecEveRaw . ' 00:00:00') : null;
+
+        // Normalizar concepto (texto libre o vacío)
+        $conceptoRaw = trim((string)$this->request->getPost('concepto'));
+        $concepto = ($conceptoRaw !== '') ? $conceptoRaw : null;
 
         $dataCommon = [
             'id_convenio'        => $idConvenio,
@@ -423,8 +460,8 @@ class Inicio extends BaseController
             'nombre_solicitante' => $this->request->getPost('nombre_solicitante'),
             'telefono'           => $this->request->getPost('telefono'),
             'correo'             => $this->request->getPost('correo'),
-            'fec_eve'            => $this->request->getPost('fec_eve'),
-            'concepto'           => $this->request->getPost('concepto'),
+            'fec_eve'            => $fecEve,       // ✅ NULL si viene vacío
+            'concepto'           => $concepto,     // ✅ NULL si viene vacío
         ];
 
         // ============================
@@ -449,15 +486,12 @@ class Inicio extends BaseController
 
             $result = $globas->saveTabla($dataUpdate, $dataConfig, $dataBitacora);
 
-            $folio = null;
-
-        } 
+        }
         // ============================
         // INSERTAR
         // ============================
         else {
 
-            // 🔥 Generar folio consecutivo
             $folio = $this->generarFolio();
 
             $dataInsert = $dataCommon;
@@ -479,37 +513,77 @@ class Inicio extends BaseController
         }
 
         // ============================
-        // VALIDACIÓN RESULTADO
+        // VALIDACIÓN RESULTADO + PDF URL
         // ============================
-
         if ($result && isset($result->error) && $result->error === false) {
 
-        if (empty($idSalida) && !empty($folio)) {
+            // Determinar el ID del recibo (salida_inventario)
+            $idRecibo = null;
 
-            $pdf_url = base_url("index.php/Inicio/generarPDFConvenio/" . $result->idRegistro);
+            if (!empty($idSalida)) {
+                // edición: el id ya venía del form
+                $idRecibo = (int)$idSalida;
+            } else {
+                // insert: viene del helper (depende tu implementación)
+                $idRecibo = (int)($result->idRegistro ?? $result->insertId ?? 0);
+            }
 
-        } else {
-            $pdf_url = null;
+            $pdf_url = $idRecibo
+                ? base_url("index.php/Inicio/generarPDFConvenio/" . $idRecibo)
+                : null;
+
+            return $this->response->setJSON([
+                'error' => false,
+                'respuesta' => 'Convenio registrado correctamente',
+                'pdf_url' => $pdf_url,
+                'id_material_promo' => $idConvenio,
+                'id_salida_inventario' => $idRecibo
+            ]);
+        }
+
+        // Si falló, devuelve lo que venga para debug rápido (puedes quitarlo luego)
+        return $this->response->setJSON([
+            'error' => true,
+            'respuesta' => 'No se pudo guardar el convenio',
+            'debug' => $result
+        ]);
+    }
+    public function buscarProveedor2()
+    {
+        $term = $this->request->getGet('q');
+
+        $this->globals = new Mglobal();
+
+        $res = $this->globals->getTabla([
+            "tabla" => "proveedor",
+            "like"  => [
+                "razon_social" => $term
+            ],
+            "limit" => 10
+        ]);
+
+        $results = [];
+
+        if (!empty($res->data)) {
+            foreach ($res->data as $row) {
+                $results[] = [
+                    "id"   => $row->id_proveedor, // 🔥 ESTO ES LO QUE SE ENVÍA
+                    "text" => $row->razon_social . " - " . $row->no_proveedor
+                ];
+            }
         }
 
         return $this->response->setJSON([
-            'error'     => false,
-            'respuesta' => 'Convenio registrado correctamente',
-            'pdf_url'   => $pdf_url,
-            'id_material_promo' => $idConvenio,
+            "results" => $results
         ]);
-
-        } else {
-
-            return $this->response->setJSON([
-                'error' => true,
-                'respuesta' => 'No se pudo guardar el convenio'
-            ]);
-        }
     }
     public function generarPDFConvenio($id)
     {
         $globas = new Mglobal;
+
+        // ============================
+        // 1) Traer recibo (salida_inventario)
+        // ============================
         $registro = $globas->getTabla([
             'tabla' => 'salida_inventario',
             'where' => ['id_salida_inventario' => $id]
@@ -520,24 +594,60 @@ class Inicio extends BaseController
             return;
         }
 
-        $articulo = $globas->getTabla([
+        // ============================
+        // 2) Traer TODOS los artículos del convenio (desde inventario)
+        //    OJO: salida_inventario.id_convenio = id_convenio_promo
+        // ============================
+        $productos = $globas->getTabla([
             'tabla' => 'cat_inventario_promo',
-            'where' => ['id_inventario_promo' => $registro->id_articulo]
-        ])->data[0] ?? null;
+            'where' => [
+                'visible' => 1,
+                'id_convenio_promo' => (int)$registro->id_convenio
+            ]
+        ])->data ?? [];
 
+        // Total solicitado (suma de cantidad solicitada)
+        $totalSolicitado = 0;
+        foreach ($productos as $p) {
+            $totalSolicitado += (int)($p->cantidad ?? 0);
+        }
+
+        // (Opcional) Mantener "nombre_articulo" por compatibilidad
+        // Si tu vista aún lo usa en algún lado, ponemos uno representativo:
+        $nombreArticuloCompat = 'Desconocido';
+        if (!empty($productos)) {
+            $nombreArticuloCompat = $productos[0]->dsc_producto ?? 'Desconocido';
+        }
+
+        // ============================
+        // 3) Datos para la vista PDF
+        // ============================
         $datos = [
             'folio' => $registro->folio,
             'concepto' => $registro->concepto,
+
+            // ✅ Ya NO dependemos de $registro->cantidad para la tabla,
+            // pero lo dejamos por si lo usas en otro lado:
             'cantidad' => $registro->cantidad,
+
             'nombre_solicitante' => $registro->nombre_solicitante,
             'puesto' => $registro->puesto,
             'telefono' => $registro->telefono,
             'correo' => $registro->correo,
-            'fec_eve' => $registro->fec_eve,
+            'fec_eve' => $registro->fec_eve ? date('d/m/Y', strtotime($registro->fec_eve)) : '',
             'lugar' => $registro->lugar,
-            'nombre_articulo' => $articulo ? $articulo->dsc_producto : 'Desconocido'
+
+            // ✅ NUEVO: lista de productos + total
+            'productos' => $productos,
+            'total_solicitado' => $totalSolicitado,
+
+            // ✅ Compatibilidad
+            'nombre_articulo' => $nombreArticuloCompat
         ];
 
+        // ============================
+        // 4) mPDF + membrete (SIN CAMBIOS)
+        // ============================
         $mpdf = new \Mpdf\Mpdf([
             'mode' => 'utf-8',
             'format' => 'A4',
@@ -558,13 +668,93 @@ class Inicio extends BaseController
         $mpdf->SetDocTemplate($path, true);
 
         $html = view('personal/vpdfReciboPromo', $datos);
-
         $mpdf->WriteHTML($html);
 
         $nombreArchivo = 'Convenio_' . $datos['folio'] . '.pdf';
-        
         $mpdf->Output($nombreArchivo, \Mpdf\Output\Destination::INLINE);
         exit;
+    }
+    public function FormularioPromoPorConvenio($idConvenio = null)
+    {
+        if (empty($idConvenio)) {
+            return redirect()->back();
+        }
+
+        $globals = new Mglobal;
+
+        $producto = $globals->getTabla([
+            'tabla' => 'cat_inventario_promo',
+            'where' => [
+                'visible' => 1,
+                'id_convenio_promo' => (int)$idConvenio
+            ],
+            // si tu getTabla soporta orden:
+            // 'orderBy' => 'id_inventario_promo ASC'
+        ])->data ?? [];
+
+        if (empty($producto)) {
+            // si no hay productos, mandamos a inventario para que agreguen
+            return redirect()->to(base_url('index.php/Inicio/InventarioPromocion/' . $idConvenio));
+        }
+
+        $idArticulo = $producto[0]->id_inventario_promo;
+
+        return redirect()->to(base_url('index.php/Inicio/FormularioPromo/' . $idConvenio . '/' . $idArticulo));
+    }
+    public function consultarReciboPromo()
+    {
+        $globals = new Mglobal;
+
+        $idConvenio = (int)$this->request->getPost('id_convenio_promo');
+        $idArticulo = (int)$this->request->getPost('id_inventario_promo'); // puede venir 0
+
+        if (!$idConvenio) {
+            return $this->response->setJSON([
+                'error' => true,
+                'respuesta' => 'Datos incompletos: falta convenio.'
+            ]);
+        }
+
+        // WHERE base: siempre por convenio + visible
+        $where = [
+            'id_convenio' => $idConvenio,
+            'visible'     => 1
+        ];
+
+        // Si viene artículo válido (>0), lo aplicamos. Si no, se busca "general" por convenio.
+        if ($idArticulo > 0) {
+            $where['id_articulo'] = $idArticulo;
+        }
+
+        $rows = $globals->getTabla([
+            'tabla' => 'salida_inventario',
+            'where' => $where,
+            'orderBy' => 'id_salida_inventario DESC'
+        ])->data ?? [];
+
+        if (empty($rows)) {
+            return $this->response->setJSON([
+                'error' => false,
+                'existe' => false,
+                'respuesta' => 'Recibo no generado.'
+            ]);
+        }
+
+        $registro = $rows[0];
+        $idSalida = $registro->id_salida_inventario ?? null;
+
+        if (!$idSalida) {
+            return $this->response->setJSON([
+                'error' => true,
+                'respuesta' => 'No se pudo determinar el ID del recibo.'
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'error' => false,
+            'existe' => true,
+            'pdf_url' => base_url('index.php/Inicio/generarPDFConvenio/' . $idSalida)
+        ]);
     }
     public function ListaSalidasPromo($idArticulo = null)
     {
@@ -618,20 +808,34 @@ class Inicio extends BaseController
     public function InventarioPromocion($id = null)
     {
         if (!$id) {
-            show_404();
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
 
-        $globas = new Mglobal;
+        $globals = new Mglobal;
 
-        $productos = $globas->getTabla([
+        $idConvenio = (int)$id;
+
+        $info = $globals->getTabla([
+        'tabla' => 'vw_material_promo',
+        'where' => [
+            'visible' => 1,
+            'id_material_promo' => (int)$id
+        ]
+        ])->data ?? [];
+
+        $data['materiales'] = $info[0] ?? null;
+
+        // Productos del convenio
+        $productos = $globals->getTabla([
             'tabla' => 'cat_inventario_promo',
             'where' => [
                 'visible' => 1,
-                'id_inventario' => (int)$id
+                'id_convenio_promo' => (int)$id
             ]
         ])->data ?? [];
 
-        $materiales = $globas->getTabla([
+        // Datos del convenio (padre)
+        $convenio = $globals->getTabla([
             'tabla' => 'vw_material_promo',
             'where' => [
                 'visible' => 1,
@@ -639,46 +843,93 @@ class Inicio extends BaseController
             ]
         ])->data ?? [];
 
-        foreach ($productos as &$item) {
+        $data['cat_inventario_promo'] = $productos;
 
-            $item->colores = $globas->getTabla([
-                'tabla' => 'colores',
-                'where' => [
-                    'id_inventario' => $item->id_inventario_promo,
-                    'visible' => 1
-                ]
-            ])->data ?? [];
+        // IDs homologados (nuevo + compatibilidad)
+        $data['id_convenio_promo']  = (int)$id;
+        $data['id_convenio']        = (int)$id; // legacy
+        $data['id_material_promo']  = (int)$id; // legacy
 
-            $item->imagenes = $globas->getTabla([
-                'tabla' => 'imagen',
-                'where' => [
-                    'id_inventario_promo' => $item->id_inventario_promo,
-                    'visible' => 1
-                ]
-            ])->data ?? [];
+        foreach ($productos as $key => $item) {
+
+            // ===== Variantes (JSON) =====
+            $varsJson = is_array($item) ? ($item['variantes'] ?? '') : ($item->variantes ?? '');
+            $varsArr = json_decode((string)$varsJson, true);
+            if (is_array($item)) {
+                $item['variantes'] = is_array($varsArr) ? $varsArr : [];
+            } else {
+                $item->variantes = is_array($varsArr) ? $varsArr : [];
+            }
+
+            // ===== Colores (JSON) =====
+            $colJson = is_array($item) ? ($item['color'] ?? '') : ($item->color ?? '');
+            $colArr = json_decode((string)$colJson, true);
+            if (is_array($item)) {
+                $item['color'] = is_array($colArr) ? $colArr : [];
+            } else {
+                $item->color = is_array($colArr) ? $colArr : [];
+            }
+
+            // ===== Cálculos =====
+            $cantidad = (int)(is_array($item) ? ($item['cantidad'] ?? 0) : ($item->cantidad ?? 0));
+            $stock    = (int)(is_array($item) ? ($item['stock'] ?? 0) : ($item->stock ?? 0));
+
+            if (is_array($item)) {
+                $item['cantidad_contratada'] = $cantidad;
+                $item['total_existencia']    = $stock;  // si stock ya es total
+            } else {
+                $item->cantidad_contratada = $cantidad;
+                $item->total_existencia    = $stock;
+            }
+
+            // ===== Imágenes (si todavía usas tabla imagen) =====
+            $idInv = is_array($item) ? ($item['id_inventario_promo'] ?? null) : ($item->id_inventario_promo ?? null);
+            if ($idInv) {
+                $imagenes = $globals->getTabla([
+                    'tabla' => 'imagen',
+                    'where' => [
+                        'id_inventario_promo' => $idInv,
+                        'visible' => 1
+                    ]
+                ])->data ?? [];
+
+                if (is_array($item)) $item['imagenes'] = $imagenes;
+                else $item->imagenes = $imagenes;
+            }
+
+            $productos[$key] = $item;
         }
+
+        // =============================
+        // MÉTRICAS
+        // =============================
 
         $data['items'] = count($productos);
         $data['cat_inventario_promo'] = $productos;
-        $data['materiales'] = $materiales[0] ?? null;
+       // $data['materiales'] = $materiales[0] ?? null;
 
         $data['total_stock_promo'] = 0;
         $data['total_subtotal_promo'] = 0;
         $data['total_dinero_promo'] = 0;
 
         foreach ($productos as $item) {
-            $data['total_stock_promo'] += (int) ($item->stock ?? 0);
-            $data['total_subtotal_promo'] += (float) ($item->subtotal ?? 0);
-            $data['total_dinero_promo'] += (float) ($item->total ?? 0);
+
+            $data['total_stock_promo'] += (int) ($item->total_existencia ?? 0);
+
+            $subtotal = (float)($item->cantidad ?? 0) * (float)($item->precio_unitario ?? 0);
+
+            $data['total_subtotal_promo'] += $subtotal;
+            $data['total_dinero_promo'] += $subtotal;
         }
 
-        $data['id_convenio'] = $id;
+        $data['id_convenio'] = (int)$id;
         $data['total_movimientos'] = 0;
         $data['scripts'] = ['principal', 'inicio'];
         $data['contentView'] = 'personal/vInventarioPromocion';
 
         $this->_renderView($data);
     }
+        
     // ==========================================
     // PROCESOS (AJAX)
     // ==========================================
@@ -688,12 +939,20 @@ class Inicio extends BaseController
         $globals = new Mglobal;
         $response->error = true;
 
-        $id_producto = $this->request->getPost('id_producto');
-        $tabla = $this->request->getPost('tabla');
-        $tipo_movimiento = $this->request->getPost('tipo_movimiento');
-        $cantidad = (int)($this->request->getPost('cantidad') ?: $this->request->getPost('stock'));
+        $id_producto     = (int)$this->request->getPost('id_producto');
+        $tabla           = (string)$this->request->getPost('tabla');
+        $tipo_movimiento = (string)$this->request->getPost('tipo_movimiento');
 
-        if (!$id_producto || !$tabla || !$cantidad) {
+        // Para movimientos tradicionales (entrada/salida) puede venir 'cantidad'
+        // Para recalcular stock por colores, puede venir 'stock' (lo mandas desde JS)
+        $cantidad = $this->request->getPost('cantidad');
+        $stockPost = $this->request->getPost('stock');
+
+        // Colores (arrays)
+        $coloresPost    = $this->request->getPost('colores');      // ['#ffffff', ...]
+        $cantidadesPost = $this->request->getPost('cantidades');   // ['2', '5', ...]
+
+        if ($id_producto <= 0 || $tabla === '') {
             $response->respuesta = "Datos incompletos.";
             return $this->respond($response);
         }
@@ -720,12 +979,16 @@ class Inicio extends BaseController
                 break;
         }
 
-        if (!$idGenerico) {
+        if ($idGenerico === '') {
             $response->respuesta = "Tabla no reconocida.";
             return $this->respond($response);
         }
 
-        $producto = $globals->getTabla(['tabla' => $tabla, 'where' => [$idGenerico => $id_producto]]);
+        // Obtener producto
+        $producto = $globals->getTabla([
+            'tabla' => $tabla,
+            'where' => [$idGenerico => $id_producto]
+        ]);
 
         if (empty($producto->data)) {
             $response->respuesta = "Producto no encontrado.";
@@ -733,33 +996,110 @@ class Inicio extends BaseController
         }
 
         $registro = $producto->data[0];
+        $stockActual = (int)(is_array($registro) ? ($registro['stock'] ?? 0) : ($registro->stock ?? 0));
 
-        $stockActual = (int)(
-            is_array($registro)
-            ? ($registro['stock'] ?? $registro['stock'] ?? 0)
-            : ($registro->stock ?? $registro->stock ?? 0)
-            );
-        $nuevoStock = ($tipo_movimiento == 'salida') ? ($stockActual - $cantidad) : ($stockActual + $cantidad);
+        // =========================================================
+        // 1) LIMPIAR/ACTUALIZAR COLORES (SI LLEGAN)
+        // =========================================================
+        $dataUpdate = [];
 
-        if ($nuevoStock < 0) {
-            $response->respuesta = "No hay suficiente stock.";
+        $coloresJsonArr = [];
+        $stockDesdeColores = 0;
+
+        if (is_array($coloresPost) && is_array($cantidadesPost)) {
+
+            foreach ($coloresPost as $i => $hex) {
+                $hex = trim((string)$hex);
+                if ($hex === '') continue;
+
+                $qty = (int)($cantidadesPost[$i] ?? 0);
+                if ($qty < 0) $qty = 0;
+
+                $coloresJsonArr[] = [
+                    'hexadecimal' => $hex,
+                    'cantidad'    => $qty
+                ];
+
+                $stockDesdeColores += $qty;
+            }
+
+            $colorJson = json_encode($coloresJsonArr, JSON_UNESCAPED_UNICODE);
+            if ($colorJson === false) $colorJson = '[]';
+
+            // Guardamos el JSON de colores
+            $dataUpdate['color'] = $colorJson;
+
+            // Si tu regla es: "stock = suma de cantidades por color", entonces:
+            // (esto normalmente aplica en editar/nuevo, NO en salida)
+            if ($tipo_movimiento !== 'salida') {
+                $dataUpdate['stock'] = $stockDesdeColores;
+                $dataUpdate['total_existencia'] = $stockDesdeColores;
+            }
+        }
+
+        // =========================================================
+        // 2) MOVIMIENTO CLÁSICO DE STOCK (entrada/salida)
+        // =========================================================
+        // Si llega cantidad explícita, úsala, si no, usa stockPost
+        $cantidadMov = null;
+        if ($cantidad !== null && $cantidad !== '') {
+            $cantidadMov = (int)$cantidad;
+        } elseif ($stockPost !== null && $stockPost !== '') {
+            $cantidadMov = (int)$stockPost;
+        }
+
+        // Si NO llegó nada y tampoco hay update por colores, no hacemos nada
+        if ($cantidadMov === null && empty($dataUpdate)) {
+            $response->respuesta = "No se recibió ningún cambio.";
             return $this->respond($response);
         }
 
-        $dataUpdate = ['stock' => $nuevoStock];
-        if ($tipo_movimiento == 'salida') {
-             $dataUpdate['fecha_salida'] = date('Y-m-d H:i:s');
+        // Si hay movimiento salida/entrada, ajusta stockActual.
+        // Ojo: si estás editando por colores, ya pudimos setear stock directamente arriba.
+        if ($cantidadMov !== null && $tipo_movimiento !== '') {
+
+            if ($cantidadMov <= 0) {
+                $response->respuesta = "Cantidad inválida.";
+                return $this->respond($response);
+            }
+
+            // Si ya se recalculó stock por colores, parte desde ese valor.
+            $baseStock = array_key_exists('stock', $dataUpdate) ? (int)$dataUpdate['stock'] : $stockActual;
+
+            $nuevoStock = ($tipo_movimiento === 'salida')
+                ? ($baseStock - $cantidadMov)
+                : ($baseStock + $cantidadMov);
+
+            if ($nuevoStock < 0) {
+                $response->respuesta = "No hay suficiente stock.";
+                return $this->respond($response);
+            }
+
+            $dataUpdate['stock'] = $nuevoStock;
+            $dataUpdate['total_existencia'] = $nuevoStock;
+
+            if ($tipo_movimiento === 'salida') {
+                $dataUpdate['fecha_salida'] = date('Y-m-d H:i:s'); // asegúrate que exista esa columna
+            }
+            if ($tipo_movimiento === 'entrada') {
+                $dataUpdate['fecha_entrada'] = date('Y-m-d H:i:s');
+            }
         }
 
+        // =========================================================
+        // GUARDAR
+        // =========================================================
         $result = $globals->saveTabla($dataUpdate, [
-            'tabla' => $tabla,
-            'editar' => true,
-            'idEditar' => [$idGenerico => $id_producto]
+            'tabla'   => $tabla,
+            'editar'  => true,
+            'idEditar'=> [$idGenerico => $id_producto]
         ], ['script' => 'Inicio.actualizarInventario']);
 
         if ($result) {
             $response->error = false;
-            $response->respuesta = "Stock actualizado. Nuevo total: $nuevoStock";
+            $response->respuesta = "Actualizado correctamente.";
+        } else {
+            $response->respuesta = "No se pudo actualizar.";
         }
 
         return $this->respond($response);
@@ -767,134 +1107,143 @@ class Inicio extends BaseController
     public function guardarProducto()
     {
         $response = new \stdClass();
-        $globals = new Mglobal;
+        $globals  = new Mglobal;
+        //$db       = \Config\Database::connect();
+
         $response->error = true;
 
-        $id_producto = $this->request->getPost('id_producto');
-        $tipo_movimiento = $this->request->getPost('tipo_movimiento'); // 'nuevo' o 'editar'
-        $tabla = 'cat_inventario_promo'; 
+        $id_producto     = $this->request->getPost('id_producto');
+        $tipo_movimiento = (string)$this->request->getPost('tipo_movimiento');
+        $tabla           = 'cat_inventario_promo';
 
-        $nombre = $this->request->getPost('nombre');
-        $cantidad = $this->request->getPost('cantidad');
-        // $stock = $this->request->getPost('stock'); // Replaced by calculation
-        $subtotal = $this->request->getPost('subtotal'); // New field
+        // =============================
+        // DATOS
+        // =============================
+        $dsc_producto    = trim((string)$this->request->getPost('dsc_producto'));
+        $cantidad        = (int)$this->request->getPost('cantidad');
+        $precio_unitario = (float)$this->request->getPost('precio_unitario');
 
-        $total_existencia = $this->request->getPost('total_existencia');
-        $colores = $this->request->getPost('colores');
-        $cantidades = $this->request->getPost('cantidades');
+        $id_convenio     = (int)$this->request->getPost('id_convenio');
 
-        if (empty($nombre)) {
+        $color     = (string)$this->request->getPost('color');       // JSON string
+        $variantes = (string)$this->request->getPost('variantes');   // JSON string
+        $stock     = (int)$this->request->getPost('stock');          // calculado en JS
+
+        if ($dsc_producto === '') {
             $response->respuesta = "El nombre del producto es obligatorio.";
             return $this->respond($response);
         }
 
-        // Calculate Stock from Colors
-        $stockCalculado = 0;
-        if(is_array($cantidades)){
-            $stockCalculado = array_sum($cantidades);
+        if ($id_convenio <= 0) {
+            $response->respuesta = "Convenio/Requisición inválido.";
+            return $this->respond($response);
         }
-        
-        // Base data
+
+
+      
+        // =============================
+        // VALIDAR PADRE EXISTE (cat_convenio_promo)
+        // =============================
+        $padre = $globals->getTabla([
+            'tabla' => 'vw_material_promo',
+            'where' => [
+                'id_material_promo' => $id_convenio,
+                'visible' => 1
+            ]
+        ]);
+
+        if (empty($padre->data)) {
+            $response->respuesta = "No existe la requisición/convenio seleccionado.";
+            return $this->respond($response);
+        }
+       
+        // =============================
+        // NORMALIZAR JSON
+        // =============================
+        // Asegura que color sea JSON válido
+        if ($color === '' || $color === 'null') $color = '[]';
+        $tmp = json_decode($color, true);
+        if (!is_array($tmp)) $color = '[]';
+
+        // Asegura que variantes sea JSON válido
+        if ($variantes === '' || $variantes === 'null') $variantes = '[]';
+        $tmp2 = json_decode($variantes, true);
+        if (!is_array($tmp2)) $variantes = '[]';
+
+        // Si quieres recalcular stock desde color (en vez de confiar en JS), puedes hacerlo aquí:
+        // $stock = 0;
+        // foreach ($tmp as $c) { $stock += (int)($c['cantidad'] ?? 0); }
+
+        // =============================
+        // CÁLCULOS
+        // =============================
+        $subtotal = $cantidad * $precio_unitario;
+        $total    = $subtotal;
+
         $dataSave = [
-            'dsc_producto' => $nombre,
-            'cantidad' => $cantidad,
-            'stock' => $stockCalculado, // Save calculated stock
-            'subtotal' => $subtotal,    // Save subtotal
-            'total_existencia' => $total_existencia,
-            'visible' => 1
+            'id_convenio_promo'      => $id_convenio,
+            'dsc_producto'     => $dsc_producto,
+            'cantidad'         => $cantidad,
+            'stock'            => $stock,
+            'total_existencia' => $stock,
+            'precio_unitario'  => $precio_unitario,
+            'subtotal'         => $subtotal,
+            'total'            => $total,
+            'color'            => $color,
+            'variantes'        => $variantes,
+            'visible'          => 1
         ];
 
-        // Set fecha_entrada for new products if not present
-        if ($tipo_movimiento == 'nuevo') {
-             $dataSave['fecha_entrada'] = date('Y-m-d H:i:s');
+        if ($tipo_movimiento === 'nuevo') {
+            $dataSave['fecha_entrada'] = date('Y-m-d H:i:s');
         }
 
-        // === PROCESAR IMAGEN ===
+        // =============================
+        // SUBIR IMAGEN
+        // =============================
         $file = $this->request->getFile('imagen');
+
         if ($file && $file->isValid() && !$file->hasMoved()) {
-            // Nombre aleatorio para evitar conflictos
-            $newName = $file->getRandomName();
+            $newName    = $file->getRandomName();
             $uploadPath = 'assets/img_productos/';
-            
-            // Verificar y crear directorio si no existe
+
             if (!is_dir(FCPATH . $uploadPath)) {
                 mkdir(FCPATH . $uploadPath, 0777, true);
             }
-            
-            // Mover archivo
+
             if ($file->move(FCPATH . $uploadPath, $newName)) {
                 $dataSave['imagen'] = $uploadPath . $newName;
-            } else {
-                $response->respuesta = "Error al mover el archivo de imagen.";
-                return $this->respond($response);
             }
         }
 
-        // Configuración para saveTabla
-        $dataConfig = [
-            'tabla' => $tabla,
-            'editar' => false
+        // =============================
+        // CONFIG
+        // =============================
+        $dataBitacora = [
+            'id_user' => session()->get('id_user')
         ];
 
-        // Lógica Editar vs Nuevo
-        if ($tipo_movimiento == 'editar' && !empty($id_producto)) {
-            $dataConfig['editar'] = true;
-            $dataConfig['idEditar'] = ['id_inventario_promo' => $id_producto];
+        $bitacora = [];
+        $variableReferencia = 'id_inventario_promo';
+
+        $editarConfig = false;
+        if ($tipo_movimiento === 'editar' && !empty($id_producto)) {
+            $editarConfig = ['id_inventario_promo', $id_producto];
         }
 
-        // Guardar en BD
-        $result = $globals->saveTabla($dataSave, $dataConfig, ['script' => 'Inicio.guardarProducto']);
-        
-        if(!$result->error){
-            // Save Colors
-            // First, maybe clear existing colors if simple logic? 
-            // Or just append/update. Mglobal saveTabla usually inserts or updates.
-            // For simplicity in this specialized setup, if we want to sync strictly:
-            // The user logic separates colors into a separate table.
-            
-            // IMPORTANT: If editing, we might need to delete old colors or update them.
-            // For now, we'll assume the user interface manages the list and we just save new entries 
-            // or update existing if we had IDs. But here we receive arrays of scalars.
-            // A simple strategy: Delete previous colors for this product and re-insert. 
-            // But checking if Mglobal supports delete? Or we just insert new ones (duplicates?).
-            // Given the complexity of Mglobal without docs, I'll stick to the previous loop 
-            // but add a check or assume the user wants to add/update.
-            // Actually, the previous code just looped and saved. It didn't delete. 
-            // This might cause duplicates if not handled. 
-            // However, let's stick to the previous pattern but enable the loop.
-            
-            $db = \Config\Database::connect();
-            // Optional: Clean up old colors for this product to avoid duplicates
-            if($tipo_movimiento == 'editar'){
-                 $db->query("DELETE FROM colores WHERE id_inventario = ?", [$id_producto]);
-                 $saveId = $id_producto;
-            } else {
-                 $saveId = $result->idRegistro;
-            }
-
-            if(is_array($colores)){
-                foreach($colores as $key => $color){
-                   $res = $globals->saveTabla([
-                        'id_inventario' => $saveId,
-                        'hexadecimal' => $color,
-                        'cantidad' => $cantidades[$key] ?? 0,
-                        'visible' => 1
-                    ], [
-                        'tabla' => 'colores',
-                        'editar' => false
-                    ], ['script' => 'Inicio.guardarProducto']);
-                }
-            }
-        }
-
-        if($result->error){
-            $response->respuesta = "Error al guardar el producto.";
-        }else{
+         $result = $globals->saveTabla($dataSave,
+            ['tabla' => 'cat_inventario_promo',
+            'editar' => false],
+            ['script' => 'Inicio.guardarProducto']);
+  
+        if ($result) {
             $response->error = false;
             $response->respuesta = "Producto guardado correctamente.";
+        } else {
+            $response->error = true;
+            $response->respuesta = "Error al guardar el producto.";
         }
 
- 
         return $this->respond($response);
     }
     public function eliminarProducto()

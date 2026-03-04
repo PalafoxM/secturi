@@ -66,13 +66,18 @@
                     </div>
                 </div>
             </div>     
-            
+
             <div class="row mt-4">
                 <div class="col-lg-12">
                     <div class="card shadow-sm border-0 h-100">
                         <div class="card-body p-3">
                             <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
-                                <h4 class="header-title mt-0 mb-0 text-dark">Inventario Promoción <strong id="nombre_material"><?= $materiales->convenio . " - ". $materiales->razon_social ?></strong></h4>
+                                <h4 class="header-title mt-0 mb-0 text-dark">
+                                    Inventario Promoción
+                                    <strong id="nombre_material">
+                                        <?= $materiales ? ($materiales->convenio . " - " . ($materiales->razon_social ?? '')) : 'Convenio no encontrado' ?>
+                                    </strong>
+                                </h4>
                                 <button class="btn btn-primary px-4 btn-movimiento shadow-sm"
                                     data-id=""
                                     data-tabla="cat_inventario_promo"
@@ -81,39 +86,62 @@
                                     data-tipo="nuevo">
                                     <i class="mdi mdi-plus-box mr-2"></i> Nuevo producto
                                 </button>
+                                <button class="btn btn-primary px-4 shadow-sm btn-consultar-recibo"
+                                        id="btnConsultarRecibo"
+                                        data-convenio="<?= (int)($id_convenio_promo ?? $id_convenio ?? 0) ?>">
+                                    🌎 Consultar Recibo
+                                </button>
                             </div>
                             <div class="table-responsive dash-social">
                                 <table id="tablaConvenios" class="table table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                                     <thead class="thead-light">
                                         <tr class="text-center">
+
+                                            <th class="py-3" style="width:40px;">
+                                                <input type="checkbox" id="check_all">
+                                                <small class="text-muted d-block">Seleccionar</small>
+                                            </th>
+
                                             <th class="py-3">
                                                 <i class="mdi mdi-tag-outline text-primary d-block mb-1"></i>
-                                                <small class="text-muted d-block">Producto</small></th>
+                                                <small class="text-muted d-block">Producto</small>
+                                            </th>
+
                                             <th class="py-3">
                                                 <i class="mdi mdi-image text-purple d-block mb-1"></i>
-                                                <small class="text-muted d-block">Imagen</small></th>
+                                                <small class="text-muted d-block">Imagen</small>
+                                            </th>
+
                                             <th class="py-3">
                                                 <i class="mdi mdi-counter text-info d-block mb-1"></i>
-                                                <small class="text-muted d-block">Cantidad solicitada</small></th>
+                                                <small class="text-muted d-block">Cantidad solicitada</small>
+                                            </th>
+
                                             <th class="py-3">
                                                 <i class="mdi mdi-counter text-info d-block mb-1"></i>
-                                                <small class="text-muted d-block">Stock</small></th>
+                                                <small class="text-muted d-block">Stock</small>
+                                            </th>
+
                                             <th class="py-3">
                                                 <i class="mdi mdi-palette text-pink d-block mb-1"></i>
-                                                <small class="text-muted d-block">Colores</small></th>
-                                    
+                                                <small class="text-muted d-block">Colores</small>
+                                            </th>
+
+                                            <th class="py-3">
+                                                <i class="mdi mdi-format-list-bulleted text-info d-block mb-1"></i>
+                                                <small class="text-muted d-block">Variantes</small>
+                                            </th>
+
                                             <th class="py-3">
                                                 <i class="mdi mdi-currency-usd text-primary d-block mb-1"></i>
-                                                <small class="text-muted d-block">Precio</small></th>
+                                                <small class="text-muted d-block">Precio</small>
+                                            </th>
 
                                             <th class="py-3">
                                                 <i class="mdi mdi-calendar-remove text-dark d-block mb-0"></i>
-                                                <small class="text-muted d-block">Fecha contrato</small></th>
+                                                <small class="text-muted d-block">Fecha de ingreso</small>
+                                            </th>
 
-                                            <th class="py-3">
-                                                <i class="mdi mdi-calendar-check text-success d-block mb-1"></i>
-                                                <small class="text-muted d-block">Regresar a formulario</small></th>
-                                            
                                             <th class="py-3" style="width:15%;">
                                                 <i class="mdi mdi-cog-outline text-secondary d-block mb-0"></i>
                                                 <small class="text-muted d-block">Acciones</small>
@@ -122,156 +150,157 @@
                                     </thead>
                                     <tbody id="tablaPromo">
                                         <?php if(isset($cat_inventario_promo) && !empty($cat_inventario_promo)): ?>
-                                            <?php foreach($cat_inventario_promo as $item): ?>
+                                        <?php foreach($cat_inventario_promo as $item): ?>
+                                            <?php 
+                                            $stock = (int) ($item->stock ?? 0); 
+                                            $badgeClass = ($stock < 5) ? 'badge-soft-danger' : 'badge-soft-success'; 
+                                            ?>
+
+                                            <tr class="align-middle">
+
+                                            <!-- ✅ Checkbox -->
+                                            <td class="text-center align-middle">
+                                                <input type="checkbox"
+                                                    class="chk-producto"
+                                                    value="<?= (int)$item->id_inventario_promo ?>"
+                                                    data-id="<?= (int)$item->id_inventario_promo ?>"
+                                                    data-nombre="<?= esc($item->dsc_producto) ?>">
+                                            </td>
+
+                                            <!-- Producto -->
+                                            <td class="font-weight-medium text-dark py-3 text-center">
+                                                <?= esc($item->dsc_producto ?? '') ?>
+                                            </td>
+
+                                            <!-- Imagen -->
+                                            <td class="text-center">
+                                                <?php if (!empty($item->imagen)): ?>
+                                                <img src="<?= base_url($item->imagen) ?>"
+                                                    class="rounded btn-ver-imagen"
+                                                    style="height:40px; cursor:pointer;"
+                                                    data-src="<?= base_url($item->imagen) ?>">
+                                                <?php else: ?>
+                                                <img src="<?= base_url('assets/images/no-image.png') ?>"
+                                                    style="height:40px; opacity:.4;">
+                                                <?php endif; ?>
+                                            </td>
+
+                                            <!-- Cantidad solicitada -->
+                                            <td class="text-center">
+                                                <span class="badge badge-soft-info font-13 p-2 px-3">
+                                                <?= (int)($item->cantidad ?? 0) ?>
+                                                </span>
+                                            </td>
+
+                                            <!-- Stock real -->
+                                            <td class="text-center">
+                                                <span class="badge badge-soft-success font-13 p-2 px-3">
+                                                <?= (int)($item->total_existencia ?? 0) ?>
+                                                </span>
+                                            </td>
+
+                                            <!-- Colores -->
+                                            <td class="text-center">
+                                                <?php if(!empty($item->color)): ?>
                                                 <?php 
-                                                    $stock = (int) ($item->stock ?? 0); 
-                                                    $badgeClass = ($stock < 5) ? 'badge-soft-danger' : 'badge-soft-success'; 
+                                                    $colores = is_array($item->color) ? $item->color : json_decode((string)($item->color ?? '[]'), true);
+                                                    $colores = is_array($colores) ? $colores : [];
+                                                    if(is_array($colores)):
+                                                    foreach($colores as $color):
+                                                        $hex = is_array($color) ? ($color['hexadecimal'] ?? '') : $color;
+                                                        if(!empty($hex)):
                                                 ?>
-                                                <?php
-                                                    static $productoTmp = '';
-                                                        if (!empty($item->dsc_producto)) {
-                                                        $productoTmp = $item->dsc_producto;
-                                                    }
+                                                    <i class="mdi mdi-circle font-18"
+                                                    style="color: <?= esc($hex) ?>;"
+                                                    data-toggle="tooltip"
+                                                    title="<?= esc($hex) ?>"></i>
+                                                <?php 
+                                                        endif;
+                                                    endforeach;
+                                                    endif;
                                                 ?>
+                                                <?php else: ?>
+                                                <span class="text-muted font-12">Sin colores</span>
+                                                <?php endif; ?>
+                                            </td>
 
-                                                <tr class="align-middle">
-                                                    <!-- Producto -->
-                                                    <td class="font-weight-medium text-dark py-3 text-center">
-                                                        <?= $item->dsc_producto ?>
-                                                    </td>
+                                            <!-- Variantes -->
+                                            <td class="text-center">
+                                                <?php if(!empty($item->variantes)): ?>
+                                                <?php 
+                                                    $vars = is_array($item->variantes) ? $item->variantes : json_decode((string)($item->variantes ?? '[]'), true);
+                                                    $vars = is_array($vars) ? $vars : [];
+                                                    if(is_array($vars)):
+                                                    foreach($vars as $var):
+                                                        $texto = is_array($var)
+                                                        ? (($var['atributo'] ?? '') . ': ' . ($var['valor'] ?? ''))
+                                                        : $var;
+                                                ?>
+                                                    <span class="badge badge-soft-primary mr-1">
+                                                    <?= esc(trim($texto)) ?>
+                                                    </span>
+                                                <?php 
+                                                    endforeach;
+                                                    endif;
+                                                ?>
+                                                <?php else: ?>
+                                                <span class="text-muted font-12">Sin variantes</span>
+                                                <?php endif; ?>
+                                            </td>
 
-                                                    <!-- Imagen -->
-                                                    <td class="text-center">
-                                                        <?php if (!empty($item->imagen)): ?>
-                                                        
-                                                                <img src="<?= base_url($item->imagen) ?>"
-                                                                class="rounded btn-ver-imagen mr-1"
-                                                                style="height:40px; cursor:pointer;"
-                                                                data-src="<?= base_url($item->imagen) ?>">
-                                                
-                                                        <?php else: ?>
-                                                                <img src="<?= base_url('assets/images/no-image.png') ?>"
-                                                                style="height:40px; opacity:.4;">
-                                                        <?php endif; ?>
-                                                    </td>
+                                            <!-- Precio -->
+                                            <td class="text-center">
+                                                <div class="font-weight-bold text-dark">
+                                                $<?= number_format((float)($item->precio_unitario ?? 0), 2) ?>
+                                                </div>
+                                                <div class="text-muted font-12">
+                                                Subtotal: $<?= number_format((float)($item->subtotal ?? 0), 2) ?>
+                                                </div>
+                                                <div class="text-muted font-11 mt-1">
+                                                Total:
+                                                <span class="font-weight-semibold text-primary">
+                                                    $<?= number_format((float)($item->total ?? 0), 2) ?>
+                                                </span>
+                                                </div>
+                                            </td>
 
+                                            <!-- Fecha de ingreso -->
+                                            <td class="text-center">
+                                                <?php 
+                                                $fechaRaw = $item->fecha_entrada ?? $item->created_at ?? null;
+                                                if($fechaRaw):
+                                                    $fecha = new DateTime($fechaRaw);
+                                                    echo '<span class="badge badge-soft-success font-13">';
+                                                    echo $fecha->format('d/m/Y h:i A');
+                                                    echo '</span>';
+                                                endif;
+                                                ?>
+                                            </td>
 
-                                                    <!-- Cantidad (badge) -->
-                                                    <?php
-                                                        $stock = (int) $item->stock;
-                                                        $badgeClass = ($stock < 5) ? 'badge-soft-danger' : 'badge-soft-success';
-                                                    ?>
-                                                    <td class="text-center">
-                                                        <span class="badge badge-soft-info font-13 p-2 px-3">
-                                                            <?= $item->cantidad ?>
-                                                        </span>
-                                                    </td>
+                                            <!-- Acciones -->
+                                            <td class="text-center text-nowrap">
+                                                <button class="btn btn-sm btn-outline-danger btn-eliminar"
+                                                        data-id="<?= (int)$item->id_inventario_promo ?>"
+                                                        data-tabla="cat_inventario_promo"
+                                                        data-nombre="<?= esc($item->dsc_producto) ?>"
+                                                        data-stock="<?= (int)($item->total_existencia ?? 0) ?>"
+                                                        title="Eliminar">
+                                                ⛔ Elim.
+                                                </button>
+                                            </td>
 
-                                                    <!-- Stock -->
-                                                    <?php
-                                                        $stock = (int) $item->stock;
-                                                        $badgeClass = ($stock < 5) ? 'badge-soft-danger' : 'badge-soft-success';
-                                                    ?>
-                                                    <td class="text-center">
-                                                        <span class="badge badge-soft-info font-13 p-2 px-3">
-                                                            <?= $item->cantidad ?>
-                                                        </span>
-                                                    </td>
-
-                                                    <!-- Colores -->
-                                                    <td class="text-center">
-                                                        <?php if(isset($item->colores) && !empty($item->colores)): ?>
-                                                            <?php foreach($item->colores as $index => $color): ?>
-                                                                
-                                                                <!-- Icono visible -->
-                                                                <i class="mdi mdi-circle font-18 color-picker-trigger"
-                                                                    style="color: <?= $color->hexadecimal ?>; cursor:pointer;"
-                                                                    data-index="<?= $item->id_inventario_promo ?>_<?= $index ?>"
-                                                                    data-toggle="tooltip"
-                                                                    data-placement="top"
-                                                                    title="Cantidad: <?= $color->cantidad ?? 0 ?>">
-                                                                </i>
-
-                                                                <!-- Input color oculto -->
-                                                                <input type="color"
-                                                                    class="color-picker-input d-none"
-                                                                    id="color_<?= $item->id_inventario_promo ?>_<?= $index ?>"
-                                                                    value="<?= $color->hexadecimal ?>"
-                                                                    data-id="<?= $item->id_inventario_promo ?>"
-                                                                    data-index="<?= $index ?>">
-
-                                                            <?php endforeach; ?>
-                                                        <?php else: ?>
-                                                            <span class="text-muted font-12">Sin colores</span>
-                                                        <?php endif; ?> 
-                                                    </td>
-                                                    
-                                                    <!-- Precio -->
-                                                    <td class="text-center">
-                                                        <div class="font-weight-bold text-dark">
-                                                            $<?= number_format((float)($item->precio_unitario ?? 0), 2) ?>
-                                                        </div>
-
-                                                        <div class="text-muted font-12">
-                                                            Subtotal:
-                                                            $<?= number_format((float)($item->subtotal ?? 0), 2) ?>
-                                                        </div>
-
-                                                        <div class="text-muted font-11 mt-1">
-                                                            Total: <span class="font-weight-semibold text-primary">$<?= number_format((float)($item->total ?? 0), 2) ?></span>
-                                                        </div>
-                                                    </td>
-
-                                                    <!-- Fec. Entrada -->
-                                                    <td class="text-center">
-                                                        <span class="badge badge-soft-success font-13">
-                                                            <?= $item->fecha_entrada ?? date('d/m/Y', strtotime($item->created_at ?? 'now')) ?>
-                                                        </span>
-                                                    </td>
-
-                                                    <!-- Link a formulario -->
-                                                    <td class="text-center font-weight-bold text-dark">
-                                                        <div class="d-flex justify-content-center">
-                                                            <a href="<?= base_url('index.php/Inicio/FormularioPromo/'. $id_convenio. "/" . $item->id_inventario_promo) ?>"
-                                                                class="btn btn-outline-secondary btn-sm"
-                                                                title="Formulario de requisición">
-                                                                📁 Form.
-                                                            </a> <!-- lleva a formulario-->
-                                                        </div>
-                                                    </td>
-
-                                                    <!-- Acciones -->
-                                                    <td class="text-center text-nowrap">
-                                                        <div class="d-flex justify-content-center">
-                                                            
-                                                            <a href="<?= base_url('index.php/Inicio/ListaSalidasPromo/' . $item->id_inventario_promo) ?>"
-                                                                class="btn btn-sm btn-outline-warning btn-sm"
-                                                                title="Complementos del contrato">
-                                                                🌎 Consultar Recibo <!-- lleve a vpdfReciboPromo -->
-                                                            </a>  
-                                                            
-                                                            <button class="btn btn-sm btn-outline-danger btn-eliminar btn-sm"
-                                                                data-id="<?= $item->id_inventario_promo ?>"
-                                                                data-tabla="cat_inventario_promo"
-                                                                data-nombre="<?= $item->dsc_producto ?>"
-                                                                data-stock="<?= $stock ?>"
-                                                                title="Eliminar">
-                                                                ⛔ Elim.
-                                                            </button>
-                                                        </div>    
-                                                    </td>
-                                                    <tr>
-                                                        <td colspan="8" class="text-center text-muted py-4">
-                                                            No hay productos registrados
-                                                        </td>
-                                                    </tr>
-                                                </tr>
+                                            </tr>
                                             <?php endforeach; ?>
-                                        <?php else: ?>
-                                        <?php endif; ?>
-                                    </tbody>
+                                            <?php else: ?>
+                                            <tr>
+                                                <td colspan="10" class="text-center text-muted py-4">
+                                                No hay productos registrados
+                                                </td>
+                                            </tr>
+                                            <?php endif; ?>
+                                        </tbody>
                                 </table>
-                            </div> <!-- end table responsive -->
+                            </div> <!-- end table respons   ive -->
                         </div><!--end card-body-->
                     </div><!--end card-->
                 </div><!--end col-lg-8-->
@@ -291,88 +320,182 @@
                             </button>
                         </div>
 
-                        <form id="formMovimientoInventario">
+                        <form id="formMovimientoInventario"
+                            method="post"
+                            action="<?= base_url('index.php/Inicio/guardarProducto') ?>"
+                            enctype="multipart/form-data">
                             <div class="modal-body">
+
+                                <!-- Hidden -->
                                 <input type="hidden" name="id_convenio" value="<?= $id_convenio ?>">
                                 <input type="hidden" id="id_producto" name="id_producto">
                                 <input type="hidden" id="tipo_movimiento" name="tipo_movimiento">
-                                <!-- Hidden field for table name when editing or fixed -->
-                                <input type="hidden" id="tabla_hidden" name="tabla"> 
+                                <input type="hidden" name="color">
+                                <input type="hidden" name="variantes">
+                                <input type="hidden" name="stock">
+                                <input type="hidden" id="tabla_hidden" name="tabla" value="cat_inventario_promo">
                                 
                                 <div class="row">
-                                    <!-- LEFT COLUMN: Form Fields -->
+                                    <!-- LEFT COLUMN -->
                                     <div class="col-md-7">
-                                        <!-- Removed Category Select -->
 
+                                        <!-- Producto -->
                                         <div class="form-group">
-                                            <label class="font-weight-bold text-dark text-uppercase font-12">Producto</label>
-                                            <input type="text" class="form-control" id="nombre_producto" name="nombre" required>
+                                            <label class="font-weight-bold text-dark text-uppercase font-12">
+                                                Producto
+                                            </label>
+                                            <input type="text"
+                                                class="form-control"
+                                                id="dsc_producto"
+                                                name="dsc_producto"
+                                                required>
                                         </div>
 
+                                        <!-- Cantidad y Precio -->
                                         <div class="row">
-                                            <div class="col-md-6">
-                                                    <div class="form-group">
-                                                    <label class="font-weight-bold text-dark text-uppercase font-12">Cantidad solicitada</label>
-                                                    <input type="number" class="form-control" id="cantidad_producto" name="cantidad" min="0" required>
-                                                </div>
-                                            </div>
+
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label class="font-weight-bold text-dark text-uppercase font-12" id="label_cantidad">Stock</label>
-                                                    <input type="number" class="form-control" id="stock" name="stock" min="0" step="0.01" required>
+                                                    <label class="font-weight-bold text-dark text-uppercase font-12">
+                                                        Cantidad solicitada
+                                                    </label>
+                                                    <input type="number"
+                                                        class="form-control"
+                                                        id="cantidad"
+                                                        name="cantidad"
+                                                        min="0"
+                                                        required>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                    <div class="form-group">
-                                                    <label class="font-weight-bold text-dark text-uppercase font-12">Precio unitario</label>
-                                                    <input type="number" class="form-control" id="precio_unitario" name="cantidad" min="0" step= "0.01" required>
-                                                </div>
-                                            </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label class="font-weight-bold text-dark text-uppercase font-12" id="label_cantidad">Subtotal</label>
-                                                    <input type="number" class="form-control" id="subtotal" name="subtotal" min="0" step="0.01" required>
+                                                    <label class="font-weight-bold text-dark text-uppercase font-12">
+                                                        Precio unitario
+                                                    </label>
+                                                    <input type="number"
+                                                        class="form-control"
+                                                        id="precio_unitario"
+                                                        name="precio_unitario"
+                                                        min="0"
+                                                        step="0.01"
+                                                        required>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <!-- Subtotal y Total -->
+                                        <div class="row">
+
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="font-weight-bold text-dark text-uppercase font-12">
+                                                        Subtotal
+                                                    </label>
+                                                    <input type="number"
+                                                        class="form-control"
+                                                        id="subtotal"
+                                                        name="subtotal"
+                                                        min="0"
+                                                        step="0.01"
+                                                        readonly>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div class="form-group">
-                                            <label class="font-weight-bold text-dark text-uppercase font-12">Colores y Cantidades</label>
-                                            <div id="colores_container">
-                                                <!-- Dynamic rows will be added here -->
+                                        <!-- COLORES -->
+                                            <div class="form-group">
+                                                <label class="font-weight-bold text-dark text-uppercase font-12">
+                                                    Colores
+                                                </label>
+
+                                                <div id="colores_container"></div>
+
+                                                <button type="button"
+                                                        class="btn btn-sm btn-outline-info mt-2"
+                                                        id="btn_add_color">
+                                                    <i class="mdi mdi-plus"></i> Agregar Color
+                                                </button>
+
+                                                <small class="text-muted d-block mt-1">
+                                                    El stock total se calculará automáticamente desde las cantidades por color.
+                                                </small>
                                             </div>
-                                            <button type="button" class="btn btn-sm btn-outline-info mt-1" id="btn_add_color">
-                                                <i class="mdi mdi-plus"></i> Agregar Color
+
+                                        <!-- OTRAS VARIANTES -->
+                                        <div class="form-group">
+                                            <label class="font-weight-bold text-dark text-uppercase font-12">
+                                                Otras Variantes (Ej: Talla, Modelo)
+                                            </label>
+
+                                            <div id="variantes_container"></div>
+
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-secondary mt-2"
+                                                    id="btn_add_variante">
+                                                <i class="mdi mdi-plus"></i> Agregar Variante
                                             </button>
                                         </div>
                                     </div>
 
-                                    <!-- RIGHT COLUMN: Image Upload -->
+                                    <!-- RIGHT COLUMN -->
                                     <div class="col-md-5">
+
                                         <div class="form-group text-center">
-                                            <label class="font-weight-bold text-dark text-uppercase font-12 w-100">Imagen</label>
-                                            
-                                            <div class="mt-2 mb-3 border rounded d-flex align-items-center justify-content-center bg-light" style="height: 180px; overflow: hidden;">
-                                                <img id="preview_imagen" src="" alt="Vista previa" class="img-fluid" style="max-height: 100%; display: none;">
-                                                <span id="placeholder_imagen" class="text-muted small">Sin imagen seleccionada</span>
+
+                                            <label class="font-weight-bold text-dark text-uppercase font-12 w-100">
+                                                Imagen
+                                            </label>
+
+                                            <div class="mt-2 mb-3 border rounded d-flex align-items-center justify-content-center bg-light"
+                                                style="height: 180px; overflow: hidden;">
+
+                                                <img id="preview_imagen"
+                                                    src=""
+                                                    class="img-fluid"
+                                                    style="max-height: 100%; display: none;">
+
+                                                <span id="placeholder_imagen"
+                                                    class="text-muted small">
+                                                    Sin imagen seleccionada
+                                                </span>
+
                                             </div>
 
                                             <div class="custom-file text-left">
-                                                <input type="file" class="custom-file-input" id="imagen_producto" name="imagen" accept="image/*">
-                                                <label class="custom-file-label" for="imagen_producto" data-browse="Elegir">Seleccionar Archivo</label>
+                                                <input type="file"
+                                                    class="custom-file-input"
+                                                    id="imagen_producto"
+                                                    name="imagen"
+                                                    accept="image/*">
+
+                                                <label class="custom-file-label"
+                                                    for="imagen_producto"
+                                                    data-browse="Elegir">
+                                                    Seleccionar archivo
+                                                </label>
                                             </div>
-                                            <small class="form-text text-muted text-left mt-1">Formatos: JPG, PNG, GIF</small>
+
+                                            <small class="form-text text-muted text-left mt-1">
+                                                Formatos: JPG, PNG, GIF
+                                            </small>
+
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
                             <div class="modal-footer bg-light">
-                                <button type="button" class="btn btn-secondary btn-sm px-3" data-dismiss="modal">Cerrar</button>
-                                <button type="submit" class="btn btn-primary btn-sm px-4">Guardar</button>
+                                <button type="button"
+                                        class="btn btn-secondary btn-sm px-3"
+                                        data-dismiss="modal">
+                                        Cerrar
+                                </button>
+
+                                <button type="submit"
+                                        class="btn btn-primary btn-sm px-4">
+                                        Guardar
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -430,147 +553,223 @@
 
 
 <script>
-    $(document).ready(function() {
-        function inicializarTabla(selector, opciones) {
-            if ($.fn.DataTable.isDataTable(selector)) {
-                return;
-            }
-            $(selector).DataTable(opciones);
+    $(document).ready(function () {
+
+        /* ==========================================================
+            DATATABLE (opcional)
+        ========================================================== */
+        if ($.fn.DataTable && $.fn.DataTable.isDataTable('.tabla-inventario')) {
+            $('.tabla-inventario').DataTable().clear().destroy();
         }
-
-        if ($('#tablaConvenios tbody tr').length > 1 || 
-            !$('#tablaConvenios tbody tr td').attr('colspan')) {
-
-            inicializarTabla('#tablaConvenios', {
-                language: {
-                    url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json'
-                },
-                searching: true
+        if ($.fn.DataTable) {
+            $('.tabla-inventario').DataTable({
+            destroy: true,
+            stateSave: false,
+            order: [],
+            ordering: false,
+            pageLength: 10,
+            language: { url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json" }
             });
         }
 
-        inicializarTabla('.tabla-inventario', {
-            language: {
-                url: "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json"
-            },
-            responsive: true,
-            autoWidth: false,
-            order: [[0, "asc"]]
-        });
-
         /* ==========================================================
             UTILIDADES
-           ========================================================== */
-
+        ========================================================== */
         function setProductoReadonly(estado) {
-            $('#nombre_producto').prop('readonly', estado);
+            $('#dsc_producto').prop('readonly', !!estado);
         }
 
         function resetModal() {
-            $('#formMovimientoInventario')[0].reset();
+            const form = $('#formMovimientoInventario')[0];
+            if (form) form.reset();
+
             $('#colores_container').empty();
+            $('#variantes_container').empty();
 
             setProductoReadonly(false);
-            $('#label_cantidad').text('Stock / Cantidad');
-            $('#cantidad').prop('readonly', false);
 
-            $('#preview_imagen').hide();
+            $('#preview_imagen').hide().attr('src', '');
             $('#placeholder_imagen').show();
             $('.custom-file-label').html('Seleccionar Archivo');
+
+            // hidden
+            $('#id_producto').val('');
+            $('#tipo_movimiento').val('');
+            $('#tabla_hidden').val('cat_inventario_promo');
+
+            // por si acaso
+            $('input[name="color"]').val('[]');
+            $('input[name="variantes"]').val('[]');
+            $('input[name="stock"]').val('0');
         }
 
-        function parseColores(colores) {
-            if (!colores) return [];
-            if (Array.isArray(colores)) return colores;
-
+        function safeJsonParse(val, fallback) {
+            if (!val) return fallback;
+            if (Array.isArray(val)) return val;
             try {
-                return JSON.parse(colores);
+            const parsed = JSON.parse(val);
+            return (parsed === null || parsed === undefined) ? fallback : parsed;
             } catch (e) {
-                return [];
+            return fallback;
             }
         }
 
         /* ==========================================================
-            DATATABLE
-        ========================================================== 
-
-        if ($.fn.DataTable.isDataTable('.tabla-inventario')) {
-            $('.tabla-inventario').DataTable().destroy();
+            COLORES
+        ========================================================== */
+        function addColorRow(color = '#000000', cantidad = 0) {
+            let html = `
+            <div class="row mb-2 color-item">
+                <div class="col-md-6">
+                <input type="color"
+                    name="colores[]"
+                    class="form-control color_hex"
+                    value="${color}"
+                    required>
+                </div>
+                <div class="col-md-4">
+                <input type="number"
+                    name="cantidades[]"
+                    class="form-control color_cantidad"
+                    min="0"
+                    value="${cantidad}"
+                    placeholder="Cantidad"
+                    required>
+                </div>
+                <div class="col-md-2 text-center">
+                <button type="button" class="btn btn-danger btn-sm remove-item">
+                    <i class="mdi mdi-close"></i>
+                </button>
+                </div>
+            </div>
+            `;
+            $('#colores_container').append(html);
         }
 
-        ==========================================================
-            INPUT FILE + PREVIEW
-        ========================================================== */
+        $(document).on('click', '#btn_add_color', function () {
+            addColorRow();
+        });
 
+        /* ==========================================================
+            VARIANTES (JSON en hidden)
+        ========================================================== */
+        function addVarianteRow(nombre = '', valor = '') {
+            let html = `
+            <div class="row mb-2 variante-item">
+                <div class="col-md-5">
+                <input type="text"
+                    class="form-control variante_nombre"
+                    placeholder="Atributo (Ej: Talla)"
+                    value="${nombre}">
+                </div>
+                <div class="col-md-5">
+                <input type="text"
+                    class="form-control variante_valor"
+                    placeholder="Valor (Ej: M)"
+                    value="${valor}">
+                </div>
+                <div class="col-md-2 text-center">
+                <button type="button" class="btn btn-danger btn-sm remove-item">
+                    <i class="mdi mdi-close"></i>
+                </button>
+                </div>
+            </div>
+            `;
+            $('#variantes_container').append(html);
+        }
+
+        $(document).on('click', '#btn_add_variante', function () {
+            addVarianteRow();
+        });
+
+        /* ==========================================================
+            REMOVER ITEM (sirve para colores y variantes)
+        ========================================================== */
+        $(document).on('click', '.remove-item', function () {
+            $(this).closest('.row').remove();
+        });
+
+        /* ==========================================================
+            PREVIEW IMAGEN
+        ========================================================== */
         $(document).on('change', '.custom-file-input', function () {
             const fileName = $(this).val().split("\\").pop();
-            $(this).siblings(".custom-file-label")
-                .addClass("selected")
-                .html(fileName);
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
 
             const input = this;
             if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    $('#preview_imagen').attr('src', e.target.result).show();
-                    $('#placeholder_imagen').hide();
-                };
-                reader.readAsDataURL(input.files[0]);
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                $('#preview_imagen').attr('src', e.target.result).show();
+                $('#placeholder_imagen').hide();
+            };
+            reader.readAsDataURL(input.files[0]);
             }
         });
-        
-        /* ==========================================================
-            MODAL – ABRIR
-        ========================================================== */
 
+        /* ==========================================================
+            MODAL – ABRIR (nuevo / editar / salida)
+            Requiere que el botón tenga data-*
+            data-id, data-tabla, data-tipo, data-nombre, data-colores, data-variantes
+        ========================================================== */
         $(document).on('click', '.btn-movimiento', function () {
             const d = $(this).data();
-            $('#tabla_hidden').val(d.tabla || 'cat_inventario_promo');
-
 
             resetModal();
 
             $('#id_producto').val(d.id || '');
-            $('#tipo_movimiento').val(d.tipo || '');
-            $('#nombre_producto').val(d.nombre || '');
+            $('#tipo_movimiento').val(d.tipo || 'nuevo');
+            $('#dsc_producto').val(d.nombre || '');
             $('#tabla_hidden').val(d.tabla || 'cat_inventario_promo');
 
-            const colores = parseColores(d.colores);
+            // Cargar colores (si vienen)
+            const colores = safeJsonParse(d.colores, []);
+            if (Array.isArray(colores) && colores.length > 0) {
+            colores.forEach(c => {
+                // soporta {hexadecimal,cantidad} o {hex,cantidad} o string "#fff"
+                const hex = (typeof c === 'string') ? c : (c.hexadecimal || c.hex || '#000000');
+                const qty = (typeof c === 'object' && c) ? (parseInt(c.cantidad) || 0) : 0;
+                addColorRow(hex, qty);
+            });
+            } else {
+            // si es nuevo, deja al menos una fila
+            if ((d.tipo || 'nuevo') === 'nuevo') addColorRow();
+            }
 
-            if (d.tipo === 'editar') {
-                $('#label_cantidad').text('Stock Actual');
-
-                if (colores.length > 0) {
-                    colores.forEach(c => {
-                        addColorRow(c.hexadecimal, c.cantidad);
-                    });
+            // Cargar variantes (si vienen)
+            const vars = safeJsonParse(d.variantes, []);
+            if (Array.isArray(vars) && vars.length > 0) {
+            vars.forEach(v => {
+                if (typeof v === 'string') {
+                addVarianteRow(v, '');
+                } else if (v && typeof v === 'object') {
+                addVarianteRow(v.atributo || '', v.valor || '');
                 }
+            });
             }
 
-            if (d.tipo === 'nuevo') {
-                $('#label_cantidad').text('Stock activo');
-                $('#tabla_hidden').val('cat_inventario_promo');
-                addColorRow();
+            // Si es salida, bloquear nombre y vaciar cantidad solicitada
+            if ((d.tipo || '') === 'salida') {
+            setProductoReadonly(true);
+            $('#cantidad').val('');
             }
-
-            if (d.tipo === 'salida') {
-                $('#label_cantidad').text('Cantidad a retirar');
-                setProductoReadonly(true);
-                $('#cantidad').val('');
-            }
-
 
             const titulos = {
-                nuevo: 'Nuevo Producto',
-                editar: 'Editar Producto',
-                salida: 'Baja de Stock'
+            nuevo: 'Nuevo Producto',
+            editar: 'Editar Producto',
+            salida: 'Baja de Stock'
             };
-
             $('#modalTitulo').text(titulos[d.tipo] || 'Movimiento');
             $('#modalMovimientoInventario').modal('show');
         });
 
-        // Image Preview Handler - Moved outside
+        $(document).on('input', '#dsc_producto', function () {
+            this.value = (this.value || '').toUpperCase();
+        });
+
+        /* ==========================================================
+            MODAL IMAGEN GRANDE
+        ========================================================== */
         $(document).on('click', '.btn-ver-imagen', function () {
             const src = $(this).data('src');
             $('#imagenGrande').attr('src', src);
@@ -578,131 +777,186 @@
         });
 
         /* ==========================================================
-            FORM – SUBMIT
+            CÁLCULOS AUTOMÁTICOS
         ========================================================== */
+        $('#cantidad, #precio_unitario').on('input', function () {
+            let cantidad = parseFloat($('#cantidad').val()) || 0;
+            let precio   = parseFloat($('#precio_unitario').val()) || 0;
+            $('#subtotal').val((cantidad * precio).toFixed(2));
+        });
 
+        /* ==========================================================
+            FORM – SUBMIT (GUARDAR PRODUCTO)
+            - Construye JSON de color y variantes
+            - Calcula stockTotal desde colores
+            - Envía todo por AJAX
+        ========================================================== */
         $('#formMovimientoInventario').on('submit', function (e) {
             e.preventDefault();
 
-            if (!this.checkValidity()) {
-                this.reportValidity();
-                return;
+            const form = this;
+            const url = $(form).attr('action');
+            const formData = new FormData(form);
+
+            const $btn = $(form).find('button[type="submit"]');
+            const originalText = $btn.html();
+
+            let colores = [];
+            let variantes = [];
+            let stockTotal = 0;
+
+            // ===== COLORES =====
+            $('#colores_container .color-item').each(function () {
+            const hex = $(this).find('.color_hex').val();
+            const cantidad = parseInt($(this).find('.color_cantidad').val(), 10) || 0;
+
+            if (hex) {
+                colores.push({ hexadecimal: hex, cantidad: cantidad });
+                stockTotal += Math.max(0, cantidad);
             }
+            });
 
-            const tipo = $('#tipo_movimiento').val();
-            const url = (tipo === 'salida')
-                ? '<?= base_url("index.php/Inicio/actualizarInventario") ?>'
-                : '<?= base_url("index.php/Inicio/guardarProducto") ?>';
+            // ===== VARIANTES =====
+            $('#variantes_container .variante-item').each(function () {
+            const nombre = ($(this).find('.variante_nombre').val() || '').trim();
+            const valor  = ($(this).find('.variante_valor').val() || '').trim();
 
-            const formData = new FormData(this);
-            const $btn = $(this).find('button[type="submit"]');
-            const originalText = $btn.text();
+            if (nombre !== '') {
+                variantes.push({ atributo: nombre, valor: valor });
+            }
+            });
+
+            // Asignar a hidden (y al FormData por si el browser no toma hidden actualizado)
+            $('input[name="color"]').val(JSON.stringify(colores));
+            $('input[name="variantes"]').val(JSON.stringify(variantes));
+            $('input[name="stock"]').val(String(stockTotal));
+
+            formData.set('color', JSON.stringify(colores));
+            formData.set('variantes', JSON.stringify(variantes));
+            formData.set('stock', String(stockTotal));
+
+            // Asegura 'tabla' (hidden #tabla_hidden)
+            const tablaVal = $('#tabla_hidden').val() || 'cat_inventario_promo';
+            formData.set('tabla', tablaVal);
 
             $.ajax({
-                url: url,
-                type: 'POST',
-                data: formData,
-                dataType: 'json',
-                processData: false,
-                contentType: false,
-                beforeSend: function () {
-                    $btn.prop('disabled', true)
-                        .html('<span class="spinner-border spinner-border-sm"></span> Guardando...');
-                },
-                success: function (res) {
-                    if (!res.error) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: '¡Éxito!',
-                            text: res.respuesta,
-                            timer: 1500,
-                            showConfirmButton: false
-                        }).then(() => {
-                            location.reload();
-                        });
-                    } else {
-                        Swal.fire('Error', res.respuesta, 'error');
-                    }
-                },
-                error: function () {
-                    Swal.fire('Error', 'No se pudo procesar la petición.', 'error');
-                },
-                complete: function () {
-                    $btn.prop('disabled', false).text(originalText);
+            url: url,
+            type: 'POST',
+            data: formData,
+            dataType: 'json',
+            processData: false,
+            contentType: false,
+            beforeSend: function () {
+                $btn.prop('disabled', true)
+                    .html('<span class="spinner-border spinner-border-sm"></span> Guardando...');
+            },
+            success: function (res) {
+                if (res && res.error === false) {
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: res.respuesta || 'Guardado correctamente.',
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => location.reload());
+                } else {
+                Swal.fire('Error', (res && res.respuesta) ? res.respuesta : 'Error al guardar.', 'error');
                 }
+            },
+            error: function (xhr) {
+                console.log('AJAX ERROR:', xhr.status, xhr.responseText);
+                Swal.fire('Error', 'No se pudo procesar la petición. Revisa consola (Network).', 'error');
+            },
+            complete: function () {
+                $btn.prop('disabled', false).html(originalText);
+            }
             });
         });
 
         /* ==========================================================
             ELIMINAR
         ========================================================== */
-
         $(document).on('click', '.btn-eliminar', function () {
             const d = $(this).data();
 
             Swal.fire({
-                icon: 'warning',
-                title: '¿Eliminar producto?',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar',
-                confirmButtonColor: '#d33'
+            icon: 'warning',
+            title: '¿Eliminar producto?',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#d33'
             }).then((result) => {
-                if (result.isConfirmed) {
-                    $.post(
-                        '<?= base_url("index.php/Inicio/eliminarProducto") ?>',
-                        { id: d.id, tabla: d.tabla },
-                        function (res) {
-                            if (!res.error) {
-                                Swal.fire('Eliminado', res.respuesta, 'success')
-                                    .then(() => location.reload());
-                            } else {
-                                Swal.fire('Error', res.respuesta, 'error');
-                            }
-                        },
-                        'json'
-                    );
+            if (result.isConfirmed) {
+                $.post(
+                '<?= base_url("index.php/Inicio/eliminarProducto") ?>',
+                { id: d.id, tabla: d.tabla },
+                function (res) {
+                    if (res && res.error === false) {
+                    Swal.fire('Eliminado', res.respuesta || 'Eliminado.', 'success')
+                        .then(() => location.reload());
+                    } else {
+                    Swal.fire('Error', (res && res.respuesta) ? res.respuesta : 'No se pudo eliminar.', 'error');
+                    }
+                },
+                'json'
+                ).fail(function (xhr) {
+                console.log('DELETE ERROR:', xhr.status, xhr.responseText);
+                Swal.fire('Error', 'No se pudo procesar la petición. Revisa consola.', 'error');
+                });
+            }
+            });
+        });
+
+        $(document).on('click', '.btn-consultar-recibo', function () {
+            const idConvenio = parseInt($(this).data('convenio') || 0, 10);
+
+            if (!idConvenio) {
+                Swal.fire('Error', 'No se pudo determinar el convenio.', 'error');
+                return;
+            }
+
+            $.ajax({
+                url: '<?= base_url("index.php/Inicio/consultarReciboPromo") ?>',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    id_convenio_promo: idConvenio,
+                    id_inventario_promo: 0 // 👈 ya no buscamos por artículo
+                },
+                success: function(res){
+                    if (res && res.error === false) {
+                        if (res.existe && res.pdf_url) {
+                            window.open(res.pdf_url, '_blank');
+                        } else {
+                            Swal.fire('Recibo no generado', 'Aún no existe un recibo para este convenio.', 'info');
+                        }
+                    } else {
+                        Swal.fire('Error', (res && res.respuesta) ? res.respuesta : 'No se pudo consultar el recibo.', 'error');
+                    }
+                },
+                error: function(){
+                    Swal.fire('Error', 'No se pudo procesar la petición.', 'error');
                 }
             });
         });
 
-        /* ==========================================================
-            COLORES DINÁMICOS
-        ========================================================== */
+        // Seleccionar todos
+        $(document).on('change', '#check_all', function () {
+            const checked = $(this).is(':checked');
+            $('.chk-producto').prop('checked', checked);
+        });
 
-        let colorRowIndex = 0;
+        // Si desmarcan uno, desmarca el master
+        $(document).on('change', '.chk-producto', function () {
+            const total = $('.chk-producto').length;
+            const sel = $('.chk-producto:checked').length;
+            $('#check_all').prop('checked', total > 0 && total === sel);
+        });
 
-        function addColorRow(color = '#000000', cantidad = '') {
-            colorRowIndex++;
-            const rowId = `color_row_${colorRowIndex}`;
-
-            $('#colores_container').append(`
-                <div class="d-flex align-items-center w-100 mb-2" id="${rowId}">
-                    <div class="col-6">
-                        <input type="color" class="form-control form-control-sm"
-                            name="colores[]" value="${color}">
-                    </div>
-                    <div class="col-4">
-                        <input type="number" class="form-control form-control-sm input-cantidad"
-                            name="cantidades[]" value="${cantidad}" min="0">
-                    </div>
-                    <div class="col-2">
-                        <button type="button"
-                                class="btn btn-sm btn-outline-danger btn-remove-color"
-                                data-row="${rowId}">
-                            <i class="mdi mdi-delete"></i>
-                        </button>
-                    </div>
-                </div>
-            `);
+        // Helper: ids seleccionados
+        function getSelectedIds() {
+            return $('.chk-producto:checked').map(function(){ return $(this).val(); }).get();
         }
-
-        $('#btn_add_color').on('click', function () {
-            addColorRow();
-        });
-
-        $(document).on('click', '.btn-remove-color', function () {
-            $('#' + $(this).data('row')).remove();
-        });
     });
 </script>

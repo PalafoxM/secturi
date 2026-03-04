@@ -1,3 +1,16 @@
+<?php
+$session = \Config\Services::session();
+
+// Recupera desde sesión (si ya hiciste el set en el controller)
+$idConvenio = $idConvenio ?? $session->get('formPromo_id_material_promo');
+$idFila     = $idFila     ?? $session->get('formPromo_idArticulo');
+$idSalida   = $idSalida   ?? $session->get('formPromo_idSalida');
+
+// Alias homogéneos para que tu HTML no dependa del nombre
+$id_material_promo   = $id_material_promo   ?? $idConvenio;
+$idArticulo          = $idArticulo          ?? $idFila;
+$id_salida_inventario= $id_salida_inventario?? $idSalida;
+?>
 <div class="page-wrapper">
     <div class="page-content-tab">
         <div class="container-fluid">
@@ -26,11 +39,16 @@
                                                 Folio preliminar: <?= $idConvenio ?>
                                             </div>
 
-                                        
                                             <form id="formConvenio" method="post" enctype="multipart/form-data">
-                                                <input type="hidden" id="idConvenio" name="idConvenio" value="<?= isset($idConvenio) ? $idConvenio : '' ?>">
-                                                <input type="hidden" name="idArticulo" value="<?= isset($idArticulo) ? $idArticulo : '' ?>">
-                                                <input type="hidden" name="idSalida" value="<?= isset($idSalida) ? $idSalida : '' ?>">
+                                                
+                                                <input type="hidden" name="id_material_promo" id="id_material_promo"
+                                                    value="<?= esc($id_material_promo ?? $id_convenio_promo ?? $id_convenio ?? '') ?>">
+
+                                                <input type="hidden" name="idArticulo" id="idArticulo"
+                                                    value="<?= esc($idArticulo ?? $id_inventario_promo ?? '') ?>">
+
+                                                <input type="hidden" name="idSalida" id="idSalida"
+                                                    value="<?= esc($id_salida_inventario ?? $idSalida ?? '') ?>">
 
                                                 <div class="form-row">
 
@@ -56,8 +74,10 @@
                                                     </div>
                                                                                                 
                                                     <div class="col-md-4 mb-3">
-                                                        <label>Cantidad </label>
-                                                        <input class="form-control" type="number" name="cantidad" value="<?= isset($registro) ? $registro->cantidad : '' ?>" >
+                                                        <label>Concepto</label>
+                                                        <input class="form-control" type="text" name="concepto"
+                                                        value="<?= isset($registro) ? esc($registro->concepto) : '' ?>"
+                                                        placeholder="Ej. Acción por México">
                                                     </div>
 
                                                     <div class="col-md-4 mb-3">
@@ -130,7 +150,6 @@
 <script src="<?php echo base_url(); ?>assets/js/jquery.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/js/jquery-ui.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/js/bootstrap.bundle.min.js"></script>
-<script src="<?php echo base_url(); ?>assets/js/jquery.spromoscroll.min.js"></script>
 
 <!--  datatable js -->
 <script src="<?php echo base_url(); ?>plugins/datatables/jquery.dataTables.min.js"></script>
@@ -145,51 +164,107 @@
 <script src="<?= base_url(); ?>plugins/select2/select2.min.js"></script>
 
 <script>
-    $(document).ready(function () {
+$(document).ready(function () {
 
-        $('.select2').select2();
+  // Interceptar submit del form (muestra modal de confirmación)
+  $(document).on('submit', '#formConvenio', function (e) {
+    e.preventDefault();
+    $('#modalConfirmarConvenio').modal('show');
+  });
 
-        $('#formConvenio').on('submit', function (e) {
-            e.preventDefault();
-            $('#modalConfirmarConvenio').modal('show');
-        });
+  // Confirmar y guardar (AJAX)
+  $(document).on('click', '#btnConfirmarGuardar', function (e) {
+    e.preventDefault();
 
-       $(document).on('click', '#btnConfirmarGuardar', function (e) {
+    // ✅ Abrir popup en el gesto del click para evitar bloqueo
+    let pdfWindow = window.open('', '_blank');
 
-            e.preventDefault(); // 🔥 ESTO ES CLAVE
+    const $form = $('#formConvenio');
+    if (!$form.length) {
+      if (pdfWindow) pdfWindow.close();
+      return;
+    }
 
-            const formData = new FormData($('#formConvenio')[0]);
-            const $btn = $(this);
+    // ✅ FormData (debe existir antes de usarlo)
+    const formData = new FormData($form[0]);
 
-            for (let pair of formData.entries()) {
-                console.log(pair[0] + ': ' + pair[1]);
-            }
+    // ✅ Validación de IDs requeridos
+    const idConvenio = ($('#id_material_promo').val() || '').trim();
+    const idArticulo = ($('#idArticulo').val() || '').trim();
 
-            $.ajax({
-                url: '<?= base_url("index.php/Inicio/guardarConvenio") ?>',
-                type: 'POST',
-                data: formData,
-                dataType: 'json',
-                processData: false,
-                contentType: false,
+    console.log('id_material_promo:', idConvenio);
+    console.log('idArticulo:', idArticulo);
 
-                beforeSend: function () {
-                    $btn.prop('disabled', true).text('Guardando...');
-                },
+    if (!idConvenio || idConvenio === '0' || !idArticulo || idArticulo === '0') {
+      Swal.fire('Error', 'Faltan IDs: id_material_promo / idArticulo', 'error');
+      if (pdfWindow) pdfWindow.close();
+      return;
+    }
 
-                success: function (res) {
-                    console.log("RESPUESTA:", res);
-                },
+    // (Opcional) Debug de payload
+    // for (let pair of formData.entries()) console.log(pair[0] + ': ' + pair[1]);
 
-                error: function (xhr, status, error) {
-                    console.log("ERROR AJAX:", xhr.responseText);
-                },
+    const $btn = $(this);
+    const originalText = $btn.text();
 
-                complete: function () {
-                    $btn.prop('disabled', false).text('Sí, registrar');
-                    $('#modalConfirmarConvenio').modal('hide');
-                }
-            });
-        });
+    $.ajax({
+      url: '<?= base_url("index.php/Inicio/guardarConvenio") ?>',
+      type: 'POST',
+      data: formData,
+      dataType: 'json',
+      processData: false,
+      contentType: false,
+
+      beforeSend: function () {
+        $btn.prop('disabled', true).text('Guardando...');
+      },
+
+      success: function (res) {
+        console.log('RESPUESTA AJAX:', res);
+
+        if (res && res.error === false) {
+
+          // ✅ Enviar el popup al PDF
+          if (res.pdf_url) {
+            if (pdfWindow) pdfWindow.location.href = res.pdf_url;
+          } else {
+            // si no hay PDF, no dejes pestaña en blanco
+            if (pdfWindow) pdfWindow.close();
+          }
+
+          Swal.fire({
+            icon: 'success',
+            title: 'Listo',
+            text: res.respuesta || 'Registrado correctamente',
+            timer: 900,
+            showConfirmButton: false
+          });
+
+          // ✅ Redirigir a inventario del convenio
+          const idMat = (res.id_material_promo || idConvenio).toString();
+          setTimeout(function () {
+            window.location.href = '<?= base_url("index.php/Inicio/InventarioPromocion/") ?>' + idMat;
+          }, 900);
+
+        } else {
+          const msg = (res && res.respuesta) ? res.respuesta : 'No se pudo guardar';
+          Swal.fire('Error', msg, 'error');
+          if (pdfWindow) pdfWindow.close();
+        }
+      },
+
+      error: function (xhr) {
+        console.log('ERROR AJAX:', xhr.status, xhr.responseText);
+        Swal.fire('Error', 'Error AJAX. Revisa consola/network.', 'error');
+        if (pdfWindow) pdfWindow.close();
+      },
+
+      complete: function () {
+        $btn.prop('disabled', false).text(originalText);
+        $('#modalConfirmarConvenio').modal('hide');
+      }
     });
+  });
+
+});
 </script>

@@ -22,7 +22,7 @@
                 position: relative;
                 width: 100%;
                 height: 100%;
-                page-break-after: always;
+                page-break-after: auto;
             }
 
             .background {
@@ -35,6 +35,10 @@
             .content {
                 position: relative;
                 padding: 120px 60px 100px 60px;
+            }
+
+            .content.page2 { 
+                padding-top: 220px; 
             }
 
             h1 {
@@ -114,17 +118,36 @@
 
                 <table>
                     <tr>
-                        <td class="bold">Concepto</td>
-                        <td><?= $concepto ?></td>
+                        <td class="bold" style="width:25%;">Concepto</td>
+                        <td><?= esc($concepto ?? '') ?></td>
                     </tr>
+                    </table>
+
+                    <br>
+
+                    <table>
                     <tr>
-                        <td class="bold" style="width: 25%;">Artículo</td>
-                        <td><?= $nombre_articulo ?></td>
+                        <th class="bold" style="width:70%;">Artículo</th>
+                        <th class="bold center" style="width:30%;">Cantidad solicitada</th>
                     </tr>
-                    <tr>
-                        <td class="bold">Cantidad</td>
-                        <td><?= $cantidad ?></td>
-                    </tr>
+
+                    <?php if (!empty($productos) && is_array($productos)): ?>
+                        <?php foreach ($productos as $p): ?>
+                        <tr>
+                            <td><?= esc($p->dsc_producto ?? '') ?></td>
+                            <td class="center"><?= (int)($p->cantidad ?? 0) ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+
+                        <tr>
+                        <td class="bold" style="text-align:right;">TOTAL</td>
+                        <td class="bold center"><?= (int)($total_solicitado ?? 0) ?></td>
+                        </tr>
+                    <?php else: ?>
+                        <tr>
+                        <td colspan="2" class="center">Sin artículos registrados</td>
+                        </tr>
+                    <?php endif; ?>
                 </table>
 
                 <br>
@@ -149,7 +172,7 @@
 
         <!-- ================== PAGE 2 ================== -->
         <div class="page">
-            <div class="content">
+            <div class="content page2">
 
                 <table>
                     <tr>
@@ -192,10 +215,10 @@
 
                 <div class="center bold">
                     Nombre completo: <?= $nombre_solicitante ?><br>
-                    Fecha: <?= date('d/m/Y') ?><br><br>
+                    Fecha: <?= date('d/m/Y') ?><br>
                 
                     ___________________________<br>
-                    Firma
+                    Firma<br>
                 
                     Me comprometo a entregar evidencia fotográfica de la entrega <br> <!--bold-->
                 </div>

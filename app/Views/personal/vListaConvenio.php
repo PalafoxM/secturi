@@ -27,8 +27,8 @@
                                 </div>
                             </div>
                             <br>
-                            <div class="table-responsive">
-                                <table id="tablaConvenios" class="table table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                            <div class="table">
+                                <table id="tablaConvenios" class="table table-striped table-bordered" style="width: 100%;">
                                     <thead>
                                         <tr>
                                             <th>ID</th>
@@ -50,15 +50,32 @@
                                                     <td><?= $item->dsc_tiket ?></td>
                                                     <td><?= $item->razon_social ?></td>
                                                     <td><?= $item->no_proveedor ?></td>
-                                                    <td>
-                                                        <a href="<?= base_url('index.php/Inicio/FormularioPromo/' . $item->id_material_promo) ?>" class="btn btn-primary btn-sm"><i class="fas fa-file-alt"></i></a>
-                                                        <a title="Formulario de registro"></a>
-                                                        <button class="btn btn-warning btn-sm" onclick='editarConvenio(<?= json_encode($item) ?>)'><i class="fas fa-edit"></i></button>
-                                                        <a title="Editar"></a>
-                                                        <button class="btn btn-danger btn-sm" onclick="eliminarConvenio(<?= $item->id_material_promo ?>)"><i class="fas fa-trash"></i></button>
-                                                        <a title="Eliminar"></a>
-                                                        <a href="<?= base_url('index.php/Inicio/InventarioPromocion/' . $item->id_material_promo) ?>" class="btn btn-success btn-sm"><i class="fas fa-eye"></i></a>
-                                                        <a title="Ver detalles"></a>
+                                                    <td class="text-nowrap">
+                                                        <a href="<?= base_url('index.php/Inicio/FormularioPromoPorConvenio/' . (int)$item->id_material_promo) ?>"
+                                                            class="btn btn-primary btn-sm btn-form-recibo"
+                                                            title="Formulario/Recibo">
+                                                            <i class="fas fa-file-alt"></i>
+                                                        </a>
+
+                                                        <button type="button"
+                                                                class="btn btn-warning btn-sm btn-editar"
+                                                                data-item='<?= esc(json_encode($item), 'attr') ?>'
+                                                                title="Editar">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+
+                                                        <button type="button"
+                                                                class="btn btn-danger btn-sm"
+                                                                onclick="eliminarConvenio(<?= (int)$item->id_material_promo ?>)"
+                                                                title="Eliminar">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+
+                                                        <a href="<?= base_url('index.php/Inicio/InventarioPromocion/' . (int)$item->id_material_promo) ?>"
+                                                            class="btn btn-success btn-sm btn-ver-detalles"
+                                                            title="Ver detalles">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
                                                     </td>
                                                 </tr>
                                             <?php endforeach; ?>
@@ -98,8 +115,7 @@
                         </div>
                         <div class="col-md-6 form-group">
                             <label for="no_proveedor">No. Proveedor <span class="text-danger">*</span></label>
-                             <input type="text" class="form-control" name="no_proveedor" id="no_proveedor" required>
-                            
+                            <select name="id_proveedor" id="id_proveedor" style="width:100%"></select>
                         </div>
                     </div>
                 </div>
@@ -146,44 +162,95 @@
 
 
 <script>
-
     $(document).ready(function() {
-        $('#tablaConvenios').DataTable({
-            language: {
-                url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json' // Ruta al archivo de localización
-            },
-            destroy: true,
-        searching: true,
-        });
 
-        $('.input-importe').on('blur', function() {
-            let val = $(this).val().replace(/[^0-9.]/g, ''); 
-            if(val) {
-                $(this).val(parseFloat(val).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+        // Formulario / Recibo
+        $(document).off('click', '.btn-form-recibo').on('click', '.btn-form-recibo', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+
+            const url = $(this).attr('href');
+            console.log('Formulario/Recibo =>', url);
+
+            if (url) {
+                window.location.href = url;
             }
         });
 
-        // Initialize Select2 for Proveedor search
+        // Editar
+        $(document).off('click', '.btn-editar').on('click', '.btn-editar', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+
+            try {
+                const raw = $(this).attr('data-item');
+                console.log('data-item editar =>', raw);
+
+                const item = JSON.parse(raw);
+                editarConvenio(item);
+            } catch (err) {
+                console.error('Error al parsear data-item:', err, $(this).attr('data-item'));
+            }
+        });
+
+        // Ver detalles
+        $(document).off('click', '.btn-form-recibo').on('click', '.btn-form-recibo', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+
+    const url = $(this).attr('href');
+    const fila = $(this).closest('tr');
+
+    console.log('CLICK Formulario/Recibo');
+    console.log('URL =>', url);
+    console.log('ID fila =>', fila.find('td:eq(0)').text().trim());
+    console.log('Convenio =>', fila.find('td:eq(1)').text().trim());
+
+    if (url) {
+        window.location.href = url;
+    }
+});
+
+        $('#tablaConvenios').DataTable({
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json'
+            },
+            destroy: true,
+            searching: true,
+            responsive: false,
+            autoWidth: false
+        });
+
+        $('.input-importe').on('blur', function() {
+            let val = $(this).val().replace(/[^0-9.]/g, '');
+            if (val) {
+                $(this).val(parseFloat(val).toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }));
+            }
+        });
+
         $('#id_proveedor').select2({
             dropdownParent: $('#modalConvenio'),
             ajax: {
-                url: '<?= base_url("Principal/buscarProveedor2") ?>', // Re-using existing provider search
+                url: '<?= base_url("index.php/Inicio/buscarProveedor2") ?>',
                 dataType: 'json',
                 delay: 250,
-                data: function (params) {
-                    return {
-                        q: params.term // search term
-                    };
+                data: function(params) {
+                    return { q: params.term };
                 },
-                processResults: function (data) {
-                    return {
-                        results: data.results
-                    };
+                processResults: function(data) {
+                    return { results: data.results };
                 },
                 cache: true
             },
-            placeholder: 'Buscar proveedor por Razón Social o RFC',
-            minimumInputLength: 1
+            placeholder: 'Buscar proveedor por nombre',
+            minimumInputLength: 1,
+            allowClear: true
         });
 
     });
@@ -191,26 +258,53 @@
     function agregarConvenio() {
         $('#formConvenio')[0].reset();
         $('#id_material_promo').val(0);
-        $('#id_proveedor').val(null).trigger('change');
+
+        // limpia select2
+        $('#id_proveedor').empty().trigger('change');
+
         $('#modalConvenioLabel').text('Nuevo Convenio');
         $('#modalConvenio').modal('show');
     }
 
     function editarConvenio(item) {
         $('#formConvenio')[0].reset();
+
         $('#id_material_promo').val(item.id_material_promo);
         $('#convenio').val(item.convenio);
         $('#monto').val(item.monto);
-        $('#no_proveedor').val(item.no_proveedor);
 
+        // ✅ Precargar select2 (porque es AJAX)
+        const idProv = item.id_proveedor || null;
+        const textProv = (item.razon_social ? item.razon_social : '') + ' - ' + (item.no_proveedor ? item.no_proveedor : '');
+
+        $('#id_proveedor').empty().trigger('change');
+
+        if (idProv) {
+            const option = new Option(textProv.trim(), idProv, true, true);
+            $('#id_proveedor').append(option).trigger('change');
+        }
 
         $('#modalConvenioLabel').text('Editar Convenio');
         $('#modalConvenio').modal('show');
     }
 
-    function guardaConvenio()
-    { 
-        let montoVal = $('#monto').val().replace(/,/g, '');
+    function guardaConvenio() {
+
+        // ✅ Validar proveedor (Select2)
+        const idProv = $('#id_proveedor').val();
+        if (!idProv) {
+            if (window.Swal) Swal.fire('Falta proveedor', 'Selecciona un proveedor para poder guardar.', 'warning');
+            else alert('Selecciona un proveedor para poder guardar.');
+            return;
+        }
+
+        let montoVal = ($('#monto').val() || '').replace(/[^0-9.]/g, '');
+        if (!montoVal) {
+            if (window.Swal) Swal.fire('Error', 'El monto es requerido', 'error');
+            else alert('El monto es requerido');
+            return;
+        }
+        $('#monto').val(montoVal);
 
         $.ajax({
             url: '<?= base_url("index.php/Agregar/guardaConvenio") ?>',
@@ -220,41 +314,34 @@
                 id_material_promo: $('#id_material_promo').val(),
                 monto: montoVal,
                 convenio: $('#convenio').val(),
-                no_proveedor: $('#no_proveedor').val(),
+                id_proveedor: $('#id_proveedor').val()
             },
             success: function(response) {
-                
-                if (!response.error) {
-
-                    Swal.fire({
-                        title: 'Folio generado correctamente',
-                        text: '¿Desea continuar al formulario?',
-                        icon: 'success',
-                        showCancelButton: true,
-                        confirmButtonText: 'Sí, continuar'
-                    }).then((result) => {
-
-                        if (result.isConfirmed) {
-
-                            window.location.href =
-                            "<?= base_url('index.php/Inicio/FormularioPromo/') ?>" 
-                            + response.id_material_promo;
-
-                        } else {
-                            location.reload();
-                        }
-
-                    });
-
+            if (!response.error) {
+                Swal.fire({
+                title: 'Éxito',
+                text: '¿Desea continuar al formulario?',
+                icon: 'success',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, continuar'
+                }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href =
+                    "<?= base_url('index.php/Inicio/FormularioPromo/') ?>" + response.id_material_promo;
                 } else {
-                    Swal.fire('Error', response.respuesta, 'error');
+                    location.reload();
                 }
+                });
+            } else {
+                Swal.fire('Error', response.respuesta, 'error');
+            }
             },
             error: function() {
-                Swal.fire('Error', 'Ocurrió un error al guardar.', 'error');
+            Swal.fire('Error', 'Ocurrió un error al guardar.', 'error');
             }
         });
     }
+
     function eliminarConvenio(id) {
         Swal.fire({
             title: '¿Estás seguro?',
@@ -266,32 +353,21 @@
             confirmButtonText: 'Sí, eliminar!'
         }).then((result) => {
             if (result.isConfirmed) {
-                $.ajax({
-                    url: '<?= base_url("index.php/Agregar/eliminarConvenio") ?>',
-                    type: 'POST',
-                    data: { id_material_promo: id },
-                    success: function(response) {
-                        if (!response.error) {
-                            Swal.fire('Eliminado!', response.respuesta, 'success').then(() => {
-                                location.reload();
-                            });
-                        } else {
-                            Swal.fire('Error', response.respuesta, 'error');
-                        }
-                    }
-                });
+            $.ajax({
+                url: '<?= base_url("index.php/Agregar/eliminarConvenio") ?>',
+                type: 'POST',
+                data: { id_material_promo: id },
+                success: function(response) {
+                if (!response.error) {
+                    Swal.fire('Eliminado!', response.respuesta, 'success').then(() => {
+                    location.reload();
+                    });
+                } else {
+                    Swal.fire('Error', response.respuesta, 'error');
+                }
+                }
+            });
             }
-        })
+        });
     }
-    function abrirModal(id) {
-        document.getElementById("idMaterialPromo").value = id;
-        $('#miModal').modal('show');
-    }
-    document.getElementById("btnConfirmarGuardar").addEventListener("click", function() {
-
-        let id = document.getElementById("idMaterialPromo").value;
-
-        window.location.href = "<?= base_url('index.php/Inicio/FormularioPromo/') ?>" + id;
-
-    });
 </script>

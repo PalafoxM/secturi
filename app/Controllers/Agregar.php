@@ -6425,52 +6425,109 @@ class Agregar extends BaseController
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
 
-        // Validaciones
+        // =========================
+        // VALIDACIONES BÁSICAS
+        // =========================
+
         if (empty($data['convenio'])) {
             $response->error = true;
             $response->respuesta = "Error|El convenio es requerido";
             return $this->respond($response);
         }
-        if (empty($data['montoVal'])) {
+
+        $monto = trim($data['monto'] ?? '');
+            if (empty($monto))  {
             $response->error = true;
             $response->respuesta = "Error|El monto es requerido";
             return $this->respond($response);
         }
-        if (empty($data['no_proveedor'])) {
+
+        // =========================
+        // VALIDACIÓN PROVEEDOR (HÍBRIDO)
+        // =========================
+
+        $idProveedor = $data['id_proveedor'] ?? null;
+        $noProveedor = trim($data['no_proveedor'] ?? '');
+
+        if (empty($idProveedor) && empty($noProveedor)) {
             $response->error = true;
-            $response->respuesta = "Error|El proveedor es requerido";
+            $response->respuesta = "Error|Debe seleccionar o ingresar un proveedor";
             return $this->respond($response);
         }
 
-    //validar si existeel proveedor
+        // =========================
+        // BUSCAR PROVEEDOR
+        // =========================
 
-       $ExisteProveedor = $this->globals->getTabla(["tabla"=> "proveedor", "where"=>["no_proveedor"=>$data['no_proveedor']], "limit"=>1]);
-      
-        if(isset($ExisteProveedor->data) && empty($ExisteProveedor->data)){
+        if (!empty($idProveedor)) {
+
+            // Caso 1: seleccionado desde Select2
+            $ExisteProveedor = $this->globals->getTabla([
+                "tabla" => "proveedor",
+                "where" => ["id_proveedor" => $idProveedor],
+                "limit" => 1
+            ]);
+
+        } else {
+
+            // Caso 2: escrito manualmente
+            $ExisteProveedor = $this->globals->getTabla([
+                "tabla" => "proveedor",
+                "where" => ["no_proveedor" => $noProveedor],
+                "limit" => 1
+            ]);
+        }
+
+        if (empty($ExisteProveedor->data)) {
             $response->error = true;
             $response->respuesta = "Error|El proveedor no existe";
             return $this->respond($response);
         }
-       $ExisteConvenio = $this->globals->getTabla(["tabla"=> "cat_material_promo", "where"=>["convenio"=>$data['convenio']]]);
 
-        if(isset($ExisteConvenio->data) && !empty($ExisteConvenio->data)){
+        // =========================
+        // VALIDAR SI EL CONVENIO YA EXISTE
+        // =========================
+
+        $ExisteConvenio = $this->globals->getTabla([
+            "tabla" => "cat_convenio_promo",
+            "where" => ["convenio" => $data['convenio']]
+        ]);
+
+        if (!empty($ExisteConvenio->data)) {
             $response->error = true;
             $response->respuesta = "Error|El convenio ya existe";
             return $this->respond($response);
         }
 
+        // =========================
+        // INSERTAR CONVENIO
+        // =========================
+
         $dataInsert = [
-            'convenio' => $data['convenio'],
-            'monto' => $data['montoVal'],
+            'convenio'     => $data['convenio'],
+            'monto'        => $monto,
             'id_proveedor' => $ExisteProveedor->data[0]->id_proveedor,
-            'usu_reg' => $session->get('id_usuario'),
-            'fec_reg' => date('Y-m-d H:i:s')
+            'usu_reg'      => $session->get('id_usuario'),
+            'fec_reg'      => date('Y-m-d H:i:s')
         ];
 
-       
-            $dataConfig = ["tabla" => "cat_material_promo", "editar" => false];
-            $res = $this->globals->saveTabla($dataInsert, $dataConfig, ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaConvenio_Ins']);
-        
+        $dataConfig = [
+            "tabla"  => "cat_convenio_promo",
+            "editar" => false
+        ];
+
+        $res = $this->globals->saveTabla(
+            $dataInsert,
+            $dataConfig,
+            [
+                'id_user' => $session->get('id_usuario'),
+                'script'  => 'Agregar.php/guardaConvenio_Ins'
+            ]
+        );
+
+        // =========================
+        // RESPUESTA FINAL
+        // =========================
 
         if (!$res->error) {
             $response->error = false;
@@ -6497,7 +6554,7 @@ class Agregar extends BaseController
                 'fec_act' => date('Y-m-d H:i:s')
             ];
             
-            $dataConfig = ["tabla" => "cat_material_promo", "editar" => true, "idEditar" => ['id_material_promo' => $id]];
+            $dataConfig = ["tabla" => "cat_convenio_promo", "editar" => true, "idEditar" => ['id_convenio_promo' => $id]];
             
             $res = $this->globals->saveTabla($dataUpdate, $dataConfig, ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/eliminarConvenio']);
 
