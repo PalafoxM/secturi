@@ -35,7 +35,7 @@
 	<link rel="author" href="https://matthew.wagerfield.com/parallax/humans.txt">
 
 	<!-- Styles -->
-	<link rel="stylesheet" type="text/css" href="./parallax.js_files/styles.css">
+	<link rel="stylesheet" type="text/css" href="<?= base_url('parallax.js_files/') ?>styles.css">
 
 	<!-- Favicon -->
 	<link rel="shortcut icon" href="https://matthew.wagerfield.com/favicon.ico" type="image/x-icon">
@@ -57,7 +57,7 @@
 	<link rel="apple-touch-startup-image" href="https://matthew.wagerfield.com/parallax/apple-touch-startup-image-2048x1496.png" media="(device-width: 1536px) and (orientation: landscape) and (-webkit-device-pixel-ratio: 2)">
 
 	<!-- Google Analytics -->
-	<script src="./parallax.js_files/all.js.descarga" async="" crossorigin="anonymous"></script><script id="facebook-jssdk" src="./parallax.js_files/all(1).js.descarga"></script><script id="twitter-wjs" src="./parallax.js_files/widgets.js.descarga"></script><script async="" src="./parallax.js_files/analytics.js.descarga"></script><script>
+	<script src="<?= base_url('parallax.js_files/') ?>all.js.descarga" async="" crossorigin="anonymous"></script><script id="facebook-jssdk" src="<?= base_url('parallax.js_files/') ?>all(1).js.descarga"></script><script id="twitter-wjs" src="<?= base_url('parallax.js_files/') ?>widgets.js.descarga"></script><script async="" src="<?= base_url('parallax.js_files/') ?>analytics.js.descarga"></script><script>
 	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
 	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
@@ -82,4 +82,4 @@ body, html {
 a, button, .btn-google {
     cursor: url('<?= base_url("assets/raton1_32.png") ?>') 0 0, pointer !important;
 }
-</style><script charset="utf-8" src="./parallax.js_files/button.856debeac157d9669cf51e73a08fbc93.js.descarga"></script></head>
+</style><script charset="utf-8" src="<?= base_url('parallax.js_files/') ?>button.856debeac157d9669cf51e73a08fbc93.js.descarga"></script></head>

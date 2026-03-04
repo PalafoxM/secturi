@@ -105,6 +105,6 @@
 
 
 
-<iframe scrolling="no" frameborder="0" allowtransparency="true" src="./parallax.js_files/widget_iframe.2f70fb173b9000da126c79afe2098f02.html" title="Twitter settings iframe" style="display: none;"></iframe><iframe id="rufous-sandbox" scrolling="no" frameborder="0" allowtransparency="true" allowfullscreen="true" style="position: absolute; visibility: hidden; display: none; width: 0px; height: 0px; padding: 0px; border: none;" title="Twitter analytics iframe" src="./parallax.js_files/saved_resource.html"></iframe>
+<iframe scrolling="no" frameborder="0" allowtransparency="true" src="<?= base_url('parallax.js_files/') ?>widget_iframe.2f70fb173b9000da126c79afe2098f02.html" title="Twitter settings iframe" style="display: none;"></iframe><iframe id="rufous-sandbox" scrolling="no" frameborder="0" allowtransparency="true" allowfullscreen="true" style="position: absolute; visibility: hidden; display: none; width: 0px; height: 0px; padding: 0px; border: none;" title="Twitter analytics iframe" src="<?= base_url('parallax.js_files/') ?>saved_resource.html"></iframe>
 </body>
 </html>

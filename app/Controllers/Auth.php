@@ -146,7 +146,7 @@ class Auth extends Controller
             log_message('error', 'OAuth Google error: ' . $e->getMessage());
             
             return redirect()->to('/login')
-                           ->with('error', 'Error al iniciar sesión con Google. Por favor, inténtalo con tu claves de acceso.');
+                           ->with('error', 'Error al iniciar sesión con Google. Por favor, de contactar al administrador TI.');
         }
     }
 
