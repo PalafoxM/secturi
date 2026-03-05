@@ -1300,7 +1300,7 @@ class Usuario extends BaseController
                             <div style="padding: 30px; color: #333;">
                                 <h1 style="color: #004080;">¡El estatus de su pago cambio!</h1>
                                 <p style="font-size: 16px;">Favor de <strong> Ingresar a SUSI</strong>.</p>
-                                <p style="font-size: 15px;"><a href="' . base_url() . 'index.php/Principal/listaReservaPT"><strong>Seguimiento Pago</strong></a></p>
+                                <p style="font-size: 15px;"><a href="' . base_url() . 'index.php/Principal/concluidosAceptados"><strong>Seguimiento Pago</strong></a></p>
                             </div>
                             <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 13px; color: #666;">
                                 © ' . date('Y') . ' Sistema de Atención SUSI. Todos los derechos reservados.
@@ -1384,6 +1384,8 @@ class Usuario extends BaseController
             "no_reserva" => (isset($data['numero_reserva']) && !empty($data['numero_reserva'])) ? (int)$data['numero_reserva'] : '',
             "usu_act" => $session->get('id_usuario'),
         ];
+
+       // die(var_dump($dataInsert));
 
         $result = $principal->saveTabla($dataInsert, $dataConfig, ['id_user' => $session->get('id_usuario'), "script" => "estatus.Reserva"]);
 

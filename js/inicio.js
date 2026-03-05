@@ -1549,8 +1549,8 @@ ini.inicio = (function () {
                 const ampliacion = $('input[name="fondo[]"]').map(function () { return $(this).val(); }).get();
 
 
-                if (!motivo) {
-                    Swal.fire("Estatus", "Debe seleccionar un motivo para eliminar la reserva.", "error");
+                if (motivo == 2 && !observaciones) {
+                    Swal.fire("Estatus", "Debe seleccionar un motivo para declinar la reserva.", "error");
                     return;
                 }
                 if (motivo == 3 && !numero_reserva) {
