@@ -2687,7 +2687,7 @@ class Inicio extends BaseController
             }
         } 
 
-        //die( var_dump($data['registro_pt']) );
+        //die( var_dump($data['cat_partida']) );
 
         $data['scripts'] = array('principal', 'inicio');
         $data['edita'] = $data['editar'];

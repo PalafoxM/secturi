@@ -6303,7 +6303,7 @@ class Principal extends BaseController
         $cat_area = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'id_pago' => 1]]);
         $data['cat_area'] = $cat_area->data;
         if($data['es2025']){
-            $cat_proyecto = $globals->getTabla(["tabla" => "cat_proyecto", "where" => ["visible" => 0]]);
+            $cat_proyecto = $globals->getTabla(["tabla" => "cat_proyecto", "where" => ["servicios" => 1]]);
         }else{
             $cat_proyecto = $globals->getTabla(["tabla" => "cat_proyecto", "where" => ["visible" => 1]]);
         }
