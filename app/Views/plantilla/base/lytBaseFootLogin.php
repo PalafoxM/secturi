@@ -1,110 +1,130 @@
+<!-- bundle -->       
+   
+        <script src="<?php echo base_url();?>assets/js/jquery.min.js"></script>
+        <script src="<?php echo base_url();?>assets/js/jquery-ui.min.js"></script>
+        <script src="<?php echo base_url();?>assets/js/bootstrap.bundle.min.js"></script>
+        <script src="<?php echo base_url();?>assets/js/metismenu.min.js"></script>
+        <script src="<?php echo base_url();?>assets/js/waves.js"></script>
+        <script src="<?php echo base_url();?>assets/js/feather.min.js"></script>
+        <script src="<?php echo base_url();?>assets/js/jquery.slimscroll.min.js"></script>        
 
- 	<!-- Scripts -->
-	<script src="<?php echo base_url();?>parallax.js_files/libraries.min.js.descarga"></script>
-	<script src="<?php echo base_url();?>parallax.js_files/jquery.parallax.js.descarga"></script>
-	<script>
+        <!--<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->  
+    <!-- Sweet-Alert  -->
+        <script src="<?php echo base_url();?>plugins/sweet-alert2/sweetalert2.min.js"></script>
+        <script src="<?php echo base_url();?>assets/pages/jquery.sweet-alert.init.js"></script>
+        
+<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>-->
 
-  function iniciarGoogle() {
-    $('#btn_login').hide();
-    $('#btn_load').show();
+       	
+<script src="//cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script>
+particlesJS("particles-js", {
+  "particles": {
+    "number": {
+      "value": 90,
+      "density": {
+        "enable": true,
+        "value_area": 700
+      }
+    },
+    "color": {
+      "value": "#ffffff"
+    },
+    "shape": {
+      "type": "circle",
+      "stroke": {
+        "width": 0,
+        "color": "#000000"
+      },
+      "polygon": {
+        "nb_sides": 5
+      },
+    },
+    "opacity": {
+      "value": 0.5,
+      "random": false,
+      "anim": {
+        "enable": false,
+        "speed": 0.1,
+        "opacity_min": 0.1,
+        "sync": false
+      }
+    },
+    "size": {
+      "value": 3,
+      "random": true,
+      "anim": {
+        "enable": false,
+        "speed": 10,
+        "size_min": 0.1,
+        "sync": false
+      }
+    },
+    "line_linked": {
+      "enable": true,
+      "distance": 150,
+      "color": "#ffffff",
+      "opacity": 0.4,
+      "width": 1
+    },
+    "move": {
+      "enable": true,
+      "speed": 2,
+      "direction": "none",
+      "random": false,
+      "straight": false,
+      "out_mode": "out",
+      "bounce": false,
+      "attract": {
+        "enable": false,
+        "rotateX": 600,
+        "rotateY": 1200
+      }
+    }
+  },
+  "interactivity": {
+    "detect_on": "canvas",
+    "events": {
+      "onhover": {
+        "enable": true,
+        "mode": "grab"
+      },
+      "onclick": {
+        "enable": false,
+        "mode": "push"
+      },
+      "resize": true
+    },
+    "modes": {
+      "grab": {
+        "distance": 140,
+        "line_linked": {
+          "opacity": 1
+        }
+      },
+      "bubble": {
+        "distance": 400,
+        "size": 40,
+        "duration": 2,
+        "opacity": 8,
+        "speed": 3
+      },
+      "repulse": {
+        "distance": 200,
+        "duration": 0.4
+      },
+      "push": {
+        "particles_nb": 4
+      },
+      "remove": {
+        "particles_nb": 2
+      }
+    }
+  },
+  "retina_detect": true
+});
+       </script> 
 
-    // Redirigir después de un breve delay (mejora la percepción)
-    setTimeout(() => {
-        window.location.href = '<?= base_url("index.php/Auth/login") ?>';
-    }, 300);
-}
+    </body>
 
-	// jQuery Selections
-	var $html = $('html'),
-			$container = $('#container'),
-			$prompt = $('#prompt'),
-			$toggle = $('#toggle'),
-			$about = $('#about'),
-			$scene = $('#scene');
-
-	// Hide browser menu.
-	(function() {
-		setTimeout(function(){window.scrollTo(0,0);},0);
-	})();
-
-	// Setup FastClick.
-	FastClick.attach(document.body);
-
-	// Add touch functionality.
-	if (Hammer.HAS_TOUCHEVENTS) {
-		$container.hammer({drag_lock_to_axis: true});
-		_.tap($html, 'a,button,[data-tap]');
-	}
-
-	// Add touch or mouse class to html element.
-	$html.addClass(Hammer.HAS_TOUCHEVENTS ? 'touch' : 'mouse');
-
-	// Resize handler.
-	(resize = function() {
-		$scene[0].style.width = window.innerWidth + 'px';
-		$scene[0].style.height = window.innerHeight + 'px';
-		if (!$prompt.hasClass('hide')) {
-			if (window.innerWidth < 600) {
-				$toggle.addClass('hide');
-			} else {
-				$toggle.removeClass('hide');
-			}
-		}
-	})();
-
-	// Attach window listeners.
-	window.onresize = _.debounce(resize, 200);
-	window.onscroll = _.debounce(resize, 200);
-
-	function showDetails() {
-		$about.removeClass('hide');
-		$toggle.removeClass('i');
-	}
-
-	function hideDetails() {
-		$about.addClass('hide');
-		$toggle.addClass('i');
-	}
-
-	// Listen for toggle click event.
-	$toggle.on('click', function(event) {
-		$toggle.hasClass('i') ? showDetails() : hideDetails();
-	});
-
-	// Pretty simple huh?
-	$scene.parallax();
-
-	// Check for orientation support.
-	setTimeout(function() {
-		if ($scene.data('mode') === 'cursor') {
-			$prompt.removeClass('hide');
-			if (window.innerWidth < 600) $toggle.addClass('hide');
-			$prompt.on('click', function(event) {
-				$prompt.addClass('hide');
-				if (window.innerWidth < 600) {
-					setTimeout(function() {
-						$toggle.removeClass('hide');
-					},1200);
-				}
-			});
-		}
-	},1000);
-
-	// Twitter stuff.
-	!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
-
-	// Facebook stuff.
-	(function(d, s, id) {
-	var js, fjs = d.getElementsByTagName(s)[0];
-	if (d.getElementById(id)) return;
-	js = d.createElement(s); js.id = id;
-	js.src = "//connect.facebook.net/en_GB/all.js#xfbml=1&appId=709933052350821";
-	fjs.parentNode.insertBefore(js, fjs);
-	}(document, 'script', 'facebook-jssdk'));
-	</script>
-
-
-
-<iframe scrolling="no" frameborder="0" allowtransparency="true" src="<?= base_url('parallax.js_files/') ?>widget_iframe.2f70fb173b9000da126c79afe2098f02.html" title="Twitter settings iframe" style="display: none;"></iframe><iframe id="rufous-sandbox" scrolling="no" frameborder="0" allowtransparency="true" allowfullscreen="true" style="position: absolute; visibility: hidden; display: none; width: 0px; height: 0px; padding: 0px; border: none;" title="Twitter analytics iframe" src="<?= base_url('parallax.js_files/') ?>saved_resource.html"></iframe>
-</body>
 </html>
