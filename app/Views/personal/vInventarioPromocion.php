@@ -91,6 +91,10 @@
                                         data-convenio="<?= (int)($id_convenio_promo ?? $id_convenio ?? 0) ?>">
                                     🌎 Consultar Recibo
                                 </button>
+                                <button class="btn btn-success px-4 shadow-sm" id="btnExportExcel"
+                                        data-convenio="<?= (int)($id_convenio_promo ?? $id_convenio ?? 0) ?>">
+                                    📗 Exportar Excel
+                                </button>
                             </div>
                             <div class="table-responsive dash-social">
                                 <table id="tablaConvenios" class="table table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
@@ -188,14 +192,14 @@
                                             <!-- Cantidad solicitada -->
                                             <td class="text-center">
                                                 <span class="badge badge-soft-info font-13 p-2 px-3">
-                                                <?= (int)($item->cantidad ?? 0) ?>
+                                                <?= (int)($item->cantidad_solicitada ?? $item->cantidad ?? 0) ?>
                                                 </span>
                                             </td>
 
                                             <!-- Stock real -->
                                             <td class="text-center">
                                                 <span class="badge badge-soft-success font-13 p-2 px-3">
-                                                <?= (int)($item->total_existencia ?? 0) ?>
+                                                <?= (int)($item->stock_disponible ?? $item->total_existencia ?? $item->stock ?? 0) ?>
                                                 </span>
                                             </td>
 
@@ -279,22 +283,43 @@
 
                                             <!-- Acciones -->
                                             <td class="text-center text-nowrap">
+
+                                                <button class="btn btn-sm btn-outline-primary btn-movimiento"
+                                                        data-id="<?= (int)$item->id_inventario_promo ?>"
+                                                        data-tabla="cat_inventario_promo"
+                                                        data-tipo="editar"
+                                                        data-nombre="<?= esc($item->dsc_producto) ?>"
+                                                        data-colores='<?= esc(json_encode($item->color ?? []), 'attr') ?>'
+                                                        data-variantes='<?= esc(json_encode($item->variantes ?? []), 'attr') ?>'
+                                                        title="Editar producto / stock">
+                                                    ✏️ Editar
+                                                </button>
+
+                                                <button class="btn btn-sm btn-outline-warning btn-movimiento"
+                                                        data-id="<?= (int)$item->id_inventario_promo ?>"
+                                                        data-tabla="cat_inventario_promo"
+                                                        data-tipo="salida"
+                                                        data-nombre="<?= esc($item->dsc_producto) ?>"
+                                                        title="Baja de stock">
+                                                    📦 Baja
+                                                </button>
+
                                                 <button class="btn btn-sm btn-outline-danger btn-eliminar"
                                                         data-id="<?= (int)$item->id_inventario_promo ?>"
                                                         data-tabla="cat_inventario_promo"
                                                         data-nombre="<?= esc($item->dsc_producto) ?>"
-                                                        data-stock="<?= (int)($item->total_existencia ?? 0) ?>"
                                                         title="Eliminar">
-                                                ⛔ Elim.
+                                                    ⛔ Elim.
                                                 </button>
+
                                             </td>
 
                                             </tr>
-                                            <?php endforeach; ?>
-                                            <?php else: ?>
+                                                <?php endforeach; ?>
+                                                <?php else: ?>
                                             <tr>
                                                 <td colspan="10" class="text-center text-muted py-4">
-                                                No hay productos registrados
+                                                    No hay productos registrados
                                                 </td>
                                             </tr>
                                             <?php endif; ?>
@@ -750,8 +775,11 @@
 
             // Si es salida, bloquear nombre y vaciar cantidad solicitada
             if ((d.tipo || '') === 'salida') {
-            setProductoReadonly(true);
-            $('#cantidad').val('');
+                setProductoReadonly(true);
+                $('#cantidad').val('');
+                $('label[for="cantidad"]').text('Cantidad a retirar');
+            } else {
+                $('label[for="cantidad"]').text('Cantidad solicitada');
             }
 
             const titulos = {
@@ -958,5 +986,11 @@
         function getSelectedIds() {
             return $('.chk-producto:checked').map(function(){ return $(this).val(); }).get();
         }
+        $(document).on('click', '#btnExportExcel', function () {
+            const idConvenio = parseInt($(this).data('convenio') || 0, 10);
+            if (!idConvenio) return Swal.fire('Error','No se pudo determinar el convenio.','error');
+
+            window.location.href = "<?= base_url('index.php/Inicio/exportarInventarioPromoExcel/') ?>" + idConvenio;
+        });
     });
 </script>

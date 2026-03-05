@@ -366,25 +366,25 @@ class Inicio extends BaseController
         $this->_renderView($data);
     }
     public function FormularioPromo($id = null, $idFila = null, $idSalida = null)
-{
-    $session = \Config\Services::session();
+    {
+        $session = \Config\Services::session();
 
-    // (opcional) guardar en sesión si quieres, pero ya no dependeremos de ello
-    $session->set('formPromo_id_material_promo', $id);
-    $session->set('formPromo_idArticulo', $idFila);
-    $session->set('formPromo_idSalida', $idSalida);
+        // (opcional) guardar en sesión si quieres, pero ya no dependeremos de ello
+        $session->set('formPromo_id_material_promo', $id);
+        $session->set('formPromo_idArticulo', $idFila);
+        $session->set('formPromo_idSalida', $idSalida);
 
-    $data = [];
-    $data['scripts'] = array('principal', 'inicio');
-    $data['contentView'] = 'personal/vFormularioPromo';
+        $data = [];
+        $data['scripts'] = array('principal', 'inicio');
+        $data['contentView'] = 'personal/vFormularioPromo';
 
-    // ✅ PASAR IDs a la vista con los nombres que el form ya usa
-    $data['id_material_promo'] = $id;
-    $data['idArticulo'] = $idFila;
-    $data['id_salida_inventario'] = $idSalida;
+        // ✅ PASAR IDs a la vista con los nombres que el form ya usa
+        $data['id_material_promo'] = $id;
+        $data['idArticulo'] = $idFila;
+        $data['id_salida_inventario'] = $idSalida;
 
-    $this->_renderView($data);
-}
+        $this->_renderView($data);
+    }
     private function generarFolio()
     {
         $globas = new Mglobal;
@@ -875,11 +875,11 @@ class Inicio extends BaseController
             $stock    = (int)(is_array($item) ? ($item['stock'] ?? 0) : ($item->stock ?? 0));
 
             if (is_array($item)) {
-                $item['cantidad_contratada'] = $cantidad;
-                $item['total_existencia']    = $stock;  // si stock ya es total
+                $item['cantidad_solicitada'] = $cantidad;
+                $item['stock_disponible']    = $stock;
             } else {
-                $item->cantidad_contratada = $cantidad;
-                $item->total_existencia    = $stock;
+                $item->cantidad_solicitada = $cantidad;
+                $item->stock_disponible    = $stock;
             }
 
             // ===== Imágenes (si todavía usas tabla imagen) =====
@@ -1108,42 +1108,35 @@ class Inicio extends BaseController
     {
         $response = new \stdClass();
         $globals  = new Mglobal;
-        //$db       = \Config\Database::connect();
 
         $response->error = true;
 
-        $id_producto     = $this->request->getPost('id_producto');
-        $tipo_movimiento = (string)$this->request->getPost('tipo_movimiento');
+        $id_producto     = (int)$this->request->getPost('id_producto');
+        $tipo_movimiento = trim((string)$this->request->getPost('tipo_movimiento'));
         $tabla           = 'cat_inventario_promo';
 
         // =============================
         // DATOS
         // =============================
         $dsc_producto    = trim((string)$this->request->getPost('dsc_producto'));
-        $cantidad        = (int)$this->request->getPost('cantidad');
-        $precio_unitario = (float)$this->request->getPost('precio_unitario');
+        $cantidad        = (int)$this->request->getPost('cantidad');          // <- solicitado (nuevo/editar) o retiro (salida)
+        $precio_unitario = (float)$this->request->getPost('precio_unitario'); // <- requerido en nuevo/editar
 
         $id_convenio     = (int)$this->request->getPost('id_convenio');
 
         $color     = (string)$this->request->getPost('color');       // JSON string
         $variantes = (string)$this->request->getPost('variantes');   // JSON string
-        $stock     = (int)$this->request->getPost('stock');          // calculado en JS
+        $stock     = (int)$this->request->getPost('stock');          // calculado en JS (nuevo/editar)
 
-        if ($dsc_producto === '') {
-            $response->respuesta = "El nombre del producto es obligatorio.";
-            return $this->respond($response);
-        }
-
+        // =============================
+        // VALIDACIONES BÁSICAS
+        // =============================
         if ($id_convenio <= 0) {
             $response->respuesta = "Convenio/Requisición inválido.";
             return $this->respond($response);
         }
 
-
-      
-        // =============================
-        // VALIDAR PADRE EXISTE (cat_convenio_promo)
-        // =============================
+        // Validar padre existe
         $padre = $globals->getTabla([
             'tabla' => 'vw_material_promo',
             'where' => [
@@ -1156,42 +1149,129 @@ class Inicio extends BaseController
             $response->respuesta = "No existe la requisición/convenio seleccionado.";
             return $this->respond($response);
         }
-       
+
+        // Normalizar tipo_movimiento
+        if ($tipo_movimiento === '') $tipo_movimiento = 'nuevo';
+
         // =============================
-        // NORMALIZAR JSON
+        // SALIDA (baja de stock)
         // =============================
-        // Asegura que color sea JSON válido
+        if ($tipo_movimiento === 'salida') {
+
+            if ($id_producto <= 0) {
+                $response->respuesta = "Producto inválido para salida.";
+                return $this->respond($response);
+            }
+
+            $retiro = max(0, $cantidad);
+            if ($retiro <= 0) {
+                $response->respuesta = "La cantidad de salida debe ser mayor a 0.";
+                return $this->respond($response);
+            }
+
+            // Traer producto actual
+            $prod = $globals->getTabla([
+                'tabla' => $tabla,
+                'where' => [
+                    'visible' => 1,
+                    'id_inventario_promo' => $id_producto,
+                    'id_convenio_promo' => $id_convenio
+                ]
+            ]);
+
+            if (empty($prod->data)) {
+                $response->respuesta = "No se encontró el producto.";
+                return $this->respond($response);
+            }
+
+            $row = $prod->data[0];
+            $stockActual = (int)($row->stock ?? 0);
+
+            if ($retiro > $stockActual) {
+                $response->respuesta = "Stock insuficiente. Disponible: {$stockActual}.";
+                return $this->respond($response);
+            }
+
+            $nuevoStock = $stockActual - $retiro;
+
+            // Solo actualizar stock (no tocar cantidad solicitada, precio, colores, etc.)
+            $dataUpdate = [
+                'stock' => $nuevoStock
+            ];
+
+            $result = $globals->saveTabla(
+                $dataUpdate,
+                [
+                    'tabla'    => $tabla,
+                    'editar'   => true,
+                    'idEditar' => ['id_inventario_promo' => $id_producto]
+                ],
+                ['script' => 'Inicio.guardarProducto_SALIDA']
+            );
+
+            if ($result && isset($result->error) && $result->error === false) {
+                $response->error = false;
+                $response->respuesta = "Salida aplicada. Nuevo stock: {$nuevoStock}.";
+            } else {
+                $response->respuesta = "Error al aplicar salida.";
+            }
+
+            return $this->respond($response);
+        }
+
+        // =============================
+        // NUEVO / EDITAR (producto)
+        // =============================
+
+        if ($dsc_producto === '') {
+            $response->respuesta = "El nombre del producto es obligatorio.";
+            return $this->respond($response);
+        }
+
+        // Normalizar JSON
         if ($color === '' || $color === 'null') $color = '[]';
-        $tmp = json_decode($color, true);
-        if (!is_array($tmp)) $color = '[]';
+        $colorArr = json_decode($color, true);
+        if (!is_array($colorArr)) {
+            $colorArr = [];
+            $color = '[]';
+        }
 
-        // Asegura que variantes sea JSON válido
         if ($variantes === '' || $variantes === 'null') $variantes = '[]';
-        $tmp2 = json_decode($variantes, true);
-        if (!is_array($tmp2)) $variantes = '[]';
+        $varArr = json_decode($variantes, true);
+        if (!is_array($varArr)) {
+            $varArr = [];
+            $variantes = '[]';
+        }
 
-        // Si quieres recalcular stock desde color (en vez de confiar en JS), puedes hacerlo aquí:
-        // $stock = 0;
-        // foreach ($tmp as $c) { $stock += (int)($c['cantidad'] ?? 0); }
+        // Recalcular stock desde colores si quieres confiar 100% en backend:
+        // (si no hay colores, usa el stock que venga)
+        $stockCalc = 0;
+        foreach ($colorArr as $c) {
+            $stockCalc += (int)($c['cantidad'] ?? 0);
+        }
+        if ($stockCalc > 0) {
+            $stock = $stockCalc;
+        } else {
+            $stock = max(0, $stock);
+        }
 
-        // =============================
-        // CÁLCULOS
-        // =============================
+        $cantidad = max(0, $cantidad);
+        $precio_unitario = max(0, $precio_unitario);
+
         $subtotal = $cantidad * $precio_unitario;
         $total    = $subtotal;
 
         $dataSave = [
-            'id_convenio_promo'      => $id_convenio,
-            'dsc_producto'     => $dsc_producto,
-            'cantidad'         => $cantidad,
-            'stock'            => $stock,
-            'total_existencia' => $stock,
-            'precio_unitario'  => $precio_unitario,
-            'subtotal'         => $subtotal,
-            'total'            => $total,
-            'color'            => $color,
-            'variantes'        => $variantes,
-            'visible'          => 1
+            'id_convenio_promo' => $id_convenio,
+            'dsc_producto'      => $dsc_producto,
+            'cantidad'          => $cantidad,      // solicitado
+            'stock'             => $stock,         // disponible
+            'precio_unitario'   => $precio_unitario,
+            'subtotal'          => $subtotal,
+            'total'             => $total,
+            'color'             => $color,
+            'variantes'         => $variantes,
+            'visible'           => 1
         ];
 
         if ($tipo_movimiento === 'nuevo') {
@@ -1199,10 +1279,9 @@ class Inicio extends BaseController
         }
 
         // =============================
-        // SUBIR IMAGEN
+        // SUBIR IMAGEN (solo si viene)
         // =============================
         $file = $this->request->getFile('imagen');
-
         if ($file && $file->isValid() && !$file->hasMoved()) {
             $newName    = $file->getRandomName();
             $uploadPath = 'assets/img_productos/';
@@ -1217,31 +1296,45 @@ class Inicio extends BaseController
         }
 
         // =============================
-        // CONFIG
+        // GUARDAR (insert/update)
         // =============================
-        $dataBitacora = [
-            'id_user' => session()->get('id_user')
-        ];
+        if ($tipo_movimiento === 'editar') {
 
-        $bitacora = [];
-        $variableReferencia = 'id_inventario_promo';
+            if ($id_producto <= 0) {
+                $response->respuesta = "Producto inválido para editar.";
+                return $this->respond($response);
+            }
 
-        $editarConfig = false;
-        if ($tipo_movimiento === 'editar' && !empty($id_producto)) {
-            $editarConfig = ['id_inventario_promo', $id_producto];
+            $result = $globals->saveTabla(
+                $dataSave,
+                [
+                    'tabla'    => $tabla,
+                    'editar'   => true,
+                    'idEditar' => ['id_inventario_promo' => $id_producto]
+                ],
+                ['script' => 'Inicio.guardarProducto_EDITAR']
+            );
+
+        } else { // nuevo
+
+            $result = $globals->saveTabla(
+                $dataSave,
+                [
+                    'tabla'  => $tabla,
+                    'editar' => false
+                ],
+                ['script' => 'Inicio.guardarProducto_NUEVO']
+            );
         }
 
-         $result = $globals->saveTabla($dataSave,
-            ['tabla' => 'cat_inventario_promo',
-            'editar' => false],
-            ['script' => 'Inicio.guardarProducto']);
-  
-        if ($result) {
+        if ($result && isset($result->error) && $result->error === false) {
             $response->error = false;
             $response->respuesta = "Producto guardado correctamente.";
+            // opcional: devolver id insertado
+            $response->id_inventario_promo = (int)($result->idRegistro ?? $result->insertId ?? 0);
         } else {
-            $response->error = true;
             $response->respuesta = "Error al guardar el producto.";
+            $response->debug = $result;
         }
 
         return $this->respond($response);

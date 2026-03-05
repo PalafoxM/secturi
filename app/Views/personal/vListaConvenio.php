@@ -8,31 +8,37 @@
                         <div class="float-right">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="javascript:void(0);">Inicio</a></li>
-                                <li class="breadcrumb-item"><a href="javascript:void(0);">Convenios</a></li>
+                                <li class="breadcrumb-item"><a href="javascript:void(0);">Contratos</a></li>
                                 <li class="breadcrumb-item active">Lista</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Relación de Convenios</h4>
+                        <h4 class="page-title">Relación de Contratos</h4>
                     </div>
                 </div>
             </div>
             <!-- end page title end breadcrumb -->
+
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-body">
+
                             <div class="row">
                                 <div class="col-lg-12 text-right">
-                                    <button type="button" class="btn btn-primary" onclick="agregarConvenio()"><i class="fas fa-plus"></i> Nuevo Convenio</button>
+                                    <button type="button" class="btn btn-primary" onclick="agregarConvenio()">
+                                        <i class="fas fa-plus"></i> Nuevo Contrato
+                                    </button>
                                 </div>
                             </div>
+
                             <br>
+
                             <div class="table">
                                 <table id="tablaConvenios" class="table table-striped table-bordered" style="width: 100%;">
                                     <thead>
                                         <tr>
                                             <th>ID</th>
-                                            <th>Convenio</th>
+                                            <th>Contrato</th>
                                             <th>Monto</th>
                                             <th>RFC (Ticket)</th>
                                             <th>Razón Social</th>
@@ -44,18 +50,13 @@
                                         <?php if(isset($material_promo) && !empty($material_promo)): ?>
                                             <?php foreach ($material_promo as $item): ?>
                                                 <tr>
-                                                    <td><?= $item->id_material_promo ?></td>
-                                                    <td><?= $item->convenio ?></td>
-                                                    <td>$<?= $item->monto ?></td>
-                                                    <td><?= $item->dsc_tiket ?></td>
-                                                    <td><?= $item->razon_social ?></td>
-                                                    <td><?= $item->no_proveedor ?></td>
+                                                    <td><?= (int)$item->id_material_promo ?></td>
+                                                    <td><?= esc($item->convenio) ?></td>
+                                                    <td>$<?= esc($item->monto) ?></td>
+                                                    <td><?= esc($item->dsc_tiket) ?></td>
+                                                    <td><?= esc($item->razon_social) ?></td>
+                                                    <td><?= esc($item->no_proveedor) ?></td>
                                                     <td class="text-nowrap">
-                                                        <a href="<?= base_url('index.php/Inicio/FormularioPromoPorConvenio/' . (int)$item->id_material_promo) ?>"
-                                                            class="btn btn-primary btn-sm btn-form-recibo"
-                                                            title="Formulario/Recibo">
-                                                            <i class="fas fa-file-alt"></i>
-                                                        </a>
 
                                                         <button type="button"
                                                                 class="btn btn-warning btn-sm btn-editar"
@@ -72,10 +73,11 @@
                                                         </button>
 
                                                         <a href="<?= base_url('index.php/Inicio/InventarioPromocion/' . (int)$item->id_material_promo) ?>"
-                                                            class="btn btn-success btn-sm btn-ver-detalles"
-                                                            title="Ver detalles">
+                                                           class="btn btn-success btn-sm btn-ver-detalles"
+                                                           title="Ver inventario">
                                                             <i class="fas fa-eye"></i>
                                                         </a>
+
                                                     </td>
                                                 </tr>
                                             <?php endforeach; ?>
@@ -83,10 +85,12 @@
                                     </tbody>
                                 </table>
                             </div>
+
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 </div>
@@ -101,48 +105,52 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
+
             <form id="formConvenio">
                 <div class="modal-body">
                     <input type="hidden" name="id_material_promo" id="id_material_promo" value="0">
+
                     <div class="row">
                         <div class="col-md-12 form-group">
                             <label for="convenio">Convenio <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" name="convenio" id="convenio" required>
                         </div>
+
                         <div class="col-md-6 form-group">
                             <label for="monto">Monto <span class="text-danger">*</span></label>
                             <input type="text" class="form-control input-importe" name="monto" id="monto" placeholder="$0.00" required>
                         </div>
+
                         <div class="col-md-6 form-group">
                             <label for="no_proveedor">No. Proveedor <span class="text-danger">*</span></label>
                             <select name="id_proveedor" id="id_proveedor" style="width:100%"></select>
                         </div>
                     </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                     <button type="button" class="btn btn-primary" onclick="guardaConvenio()">Guardar</button>
                 </div>
             </form>
+
         </div>
     </div>
 </div>
 
-<link href="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet"
-    type="text/css" />
-<!-- App css -->
+<link href="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
 <link href="<?php echo base_url(); ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 <link href="<?php echo base_url(); ?>assets/css/jquery-ui.min.css" rel="stylesheet">
 <link href="<?php echo base_url(); ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
 <link href="<?= base_url() ?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
 <link href="<?= base_url() ?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo base_url(); ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
+
 <!-- jQuery  -->
- 
 <script src="<?php echo base_url(); ?>assets/js/jquery.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/js/jquery-ui.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/js/bootstrap.bundle.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/js/jquery.slimscroll.min.js"></script>
-
 
 <!-- Required datatable js -->
 <script src="<?php echo base_url(); ?>plugins/datatables/jquery.dataTables.min.js"></script>
@@ -151,32 +159,16 @@
 <!-- App js -->
 <script src="<?= base_url() ?>assets/js/app.js"></script>
 <script src="<?= base_url() ?>assets/js/waves.js"></script>
-<script src="<?= base_url() ?>assets/js/feather.min.js"></script>
+<!-- <script src <?= base_url() ?>assets/js/feather.min.js"></script> -->
 
 <script src="<?= base_url() ?>plugins/tiny-editable/mindmup-editabletable.js"></script>
 <script src="<?= base_url() ?>plugins/tiny-editable/numeric-input-example.js"></script>
-<script src="<?= base_url() ?>plugins/bootable/bootstable.js"></script> 
-<link href="<?php echo base_url(); ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
+<script src="<?= base_url() ?>plugins/bootable/bootstable.js"></script>
 
 <script src="<?= base_url(); ?>plugins/select2/select2.min.js"></script>
 
-
 <script>
     $(document).ready(function() {
-
-        // Formulario / Recibo
-        $(document).off('click', '.btn-form-recibo').on('click', '.btn-form-recibo', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-
-            const url = $(this).attr('href');
-            console.log('Formulario/Recibo =>', url);
-
-            if (url) {
-                window.location.href = url;
-            }
-        });
 
         // Editar
         $(document).off('click', '.btn-editar').on('click', '.btn-editar', function (e) {
@@ -195,25 +187,6 @@
             }
         });
 
-        // Ver detalles
-        $(document).off('click', '.btn-form-recibo').on('click', '.btn-form-recibo', function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-    e.stopImmediatePropagation();
-
-    const url = $(this).attr('href');
-    const fila = $(this).closest('tr');
-
-    console.log('CLICK Formulario/Recibo');
-    console.log('URL =>', url);
-    console.log('ID fila =>', fila.find('td:eq(0)').text().trim());
-    console.log('Convenio =>', fila.find('td:eq(1)').text().trim());
-
-    if (url) {
-        window.location.href = url;
-    }
-});
-
         $('#tablaConvenios').DataTable({
             language: {
                 url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json'
@@ -225,7 +198,7 @@
         });
 
         $('.input-importe').on('blur', function() {
-            let val = $(this).val().replace(/[^0-9.]/g, '');
+            let val = ($(this).val() || '').replace(/[^0-9.]/g, '');
             if (val) {
                 $(this).val(parseFloat(val).toLocaleString('en-US', {
                     minimumFractionDigits: 2,
@@ -248,7 +221,7 @@
                 },
                 cache: true
             },
-            placeholder: 'Buscar proveedor por nombre',
+            placeholder: 'Buscar proveedor por nombre, RFC o No. proveedor',
             minimumInputLength: 1,
             allowClear: true
         });
@@ -273,7 +246,7 @@
         $('#convenio').val(item.convenio);
         $('#monto').val(item.monto);
 
-        // ✅ Precargar select2 (porque es AJAX)
+        // Precargar select2 (porque es AJAX)
         const idProv = item.id_proveedor || null;
         const textProv = (item.razon_social ? item.razon_social : '') + ' - ' + (item.no_proveedor ? item.no_proveedor : '');
 
@@ -290,7 +263,10 @@
 
     function guardaConvenio() {
 
-        // ✅ Validar proveedor (Select2)
+        const idActual = parseInt($('#id_material_promo').val(), 10) || 0;
+        const esNuevo = (idActual === 0);
+
+        // Validar proveedor (Select2)
         const idProv = $('#id_proveedor').val();
         if (!idProv) {
             if (window.Swal) Swal.fire('Falta proveedor', 'Selecciona un proveedor para poder guardar.', 'warning');
@@ -304,6 +280,7 @@
             else alert('El monto es requerido');
             return;
         }
+
         $('#monto').val(montoVal);
 
         $.ajax({
@@ -311,33 +288,41 @@
             type: 'POST',
             dataType: 'json',
             data: {
-                id_material_promo: $('#id_material_promo').val(),
+                id_material_promo: idActual,
                 monto: montoVal,
                 convenio: $('#convenio').val(),
-                id_proveedor: $('#id_proveedor').val()
+                id_proveedor: idProv
             },
+            
             success: function(response) {
-            if (!response.error) {
-                Swal.fire({
-                title: 'Éxito',
-                text: '¿Desea continuar al formulario?',
-                icon: 'success',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, continuar'
-                }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href =
-                    "<?= base_url('index.php/Inicio/FormularioPromo/') ?>" + response.id_material_promo;
+                if (!response.error) {
+
+                    const idGuardado = response.id_material_promo || idActual;
+
+                    Swal.fire({
+                        title: 'Éxito',
+                        text: response.respuesta || 'Registro guardado correctamente.',
+                        icon: 'success',
+                        timer: 1200,
+                        showConfirmButton: false
+                    }).then(() => {
+
+                        // Si es nuevo, redirigir directo a inventario para alimentar artículos
+                        if (esNuevo && idGuardado) {
+                            window.location.href = "<?= base_url('index.php/Inicio/InventarioPromocion/') ?>" + idGuardado;
+                        } else {
+                            // Si fue edición, recargar lista
+                            location.reload();
+                        }
+
+                    });
+
                 } else {
-                    location.reload();
+                    Swal.fire('Error', response.respuesta || 'No se pudo guardar.', 'error');
                 }
-                });
-            } else {
-                Swal.fire('Error', response.respuesta, 'error');
-            }
             },
             error: function() {
-            Swal.fire('Error', 'Ocurrió un error al guardar.', 'error');
+                Swal.fire('Error', 'Ocurrió un error al guardar.', 'error');
             }
         });
     }
@@ -353,20 +338,24 @@
             confirmButtonText: 'Sí, eliminar!'
         }).then((result) => {
             if (result.isConfirmed) {
-            $.ajax({
-                url: '<?= base_url("index.php/Agregar/eliminarConvenio") ?>',
-                type: 'POST',
-                data: { id_material_promo: id },
-                success: function(response) {
-                if (!response.error) {
-                    Swal.fire('Eliminado!', response.respuesta, 'success').then(() => {
-                    location.reload();
-                    });
-                } else {
-                    Swal.fire('Error', response.respuesta, 'error');
-                }
-                }
-            });
+                $.ajax({
+                    url: '<?= base_url("index.php/Agregar/eliminarConvenio") ?>',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: { id_material_promo: id },
+                    success: function(response) {
+                        if (!response.error) {
+                            Swal.fire('Eliminado!', response.respuesta || 'Registro eliminado.', 'success').then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire('Error', response.respuesta || 'No se pudo eliminar.', 'error');
+                        }
+                    },
+                    error: function() {
+                        Swal.fire('Error', 'Ocurrió un error al eliminar.', 'error');
+                    }
+                });
             }
         });
     }
