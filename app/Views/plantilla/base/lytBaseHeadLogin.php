@@ -220,18 +220,18 @@ body.forest-bg #particles-js { display: none; }
 <script>
   var base_url = "<?php echo base_url(); ?>";
 
- // const FOREST_URL = "https://i.pinimg.com/originals/44/6e/3b/446e3b79395a287ca32f7977dd83b290.jpg";
+  const FOREST_URL = "https://i.pinimg.com/originals/44/6e/3b/446e3b79395a287ca32f7977dd83b290.jpg";
 
   const backgrounds = [
-    //base_url + "assets/images/backgrounds/universidad_nieve.jpg",
-    //base_url + "assets/images/backgrounds/bara.jpg",
+    base_url + "assets/images/backgrounds/guanajuato.jpg",
+    base_url + "assets/images/backgrounds/IMG8.jpg",
     //base_url + "assets/images/backgrounds/uni_ia.jpg",
-    base_url + "assets/images/backgrounds/bg5.jpg",
-    base_url + "assets/images/backgrounds/bg4.jpg",
+    base_url + "assets/images/backgrounds/baratillo.jpg",
+    base_url + "assets/images/backgrounds/IMG18.jpg",
     base_url + "assets/images/backgrounds/subterranea.webp",
-   // base_url + "assets/images/backgrounds/sopenia_nieve.jpg",
-    base_url + "assets/images/backgrounds/bg2.jpg",
-    base_url + "assets/images/backgrounds/callejon.jpg",
+    base_url + "assets/images/backgrounds/uni2.jpg",
+    base_url + "assets/images/backgrounds/bg3.jpg",
+    base_url + "assets/images/backgrounds/uni.jpg",
     base_url + "assets/images/backgrounds/uni2.jpg",
     FOREST_URL,
   ];
