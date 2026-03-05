@@ -86,13 +86,17 @@
                                     data-tipo="nuevo">
                                     <i class="mdi mdi-plus-box mr-2"></i> Nuevo producto
                                 </button>
-                                <button class="btn btn-primary px-4 shadow-sm btn-consultar-recibo"
-                                        id="btnConsultarRecibo"
-                                        data-convenio="<?= (int)($id_convenio_promo ?? $id_convenio ?? 0) ?>">
-                                    🌎 Consultar Recibo
-                                </button>
-                                <button class="btn btn-success px-4 shadow-sm" id="btnExportExcel"
-                                        data-convenio="<?= (int)($id_convenio_promo ?? $id_convenio ?? 0) ?>">
+                                <a class="btn btn-success px-4 shadow-sm ml-2"
+                                    href="<?= base_url('index.php/Inicio/FormularioPromoPorConvenio/' . intval($id_convenio_promo ?? $id_convenio ?? 0)) ?>">
+                                    ➕ Nuevo recibo
+                                </a>
+                                <a class="btn btn-primary px-4 shadow-sm"
+                                    href="<?= base_url('index.php/Inicio/InventarioRecibosPromo/' . intval($id_convenio_promo ?? $id_convenio ?? 0)) ?>">
+                                    🌎 Consultar Recibos
+                                </a>
+                                <button class="btn btn-success px-4 shadow-sm"
+                                        id="btnExportExcel"
+                                        data-convenio="<?= intval($id_convenio_promo ?? $id_convenio ?? 0) ?>">
                                     📗 Exportar Excel
                                 </button>
                             </div>
@@ -988,9 +992,11 @@
         }
         $(document).on('click', '#btnExportExcel', function () {
             const idConvenio = parseInt($(this).data('convenio') || 0, 10);
-            if (!idConvenio) return Swal.fire('Error','No se pudo determinar el convenio.','error');
-
-            window.location.href = "<?= base_url('index.php/Inicio/exportarInventarioPromoExcel/') ?>" + idConvenio;
+            if (!idConvenio) {
+                Swal.fire('Error', 'No se pudo determinar el contrato.', 'error');
+                return;
+            }
+            window.location.href = "<?= base_url('index.php/Inicio/exportarHistorialEntregasExcel/') ?>" + idConvenio;
         });
     });
 </script>

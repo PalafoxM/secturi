@@ -11,6 +11,7 @@ $id_material_promo   = $id_material_promo   ?? $idConvenio;
 $idArticulo          = $idArticulo          ?? $idFila;
 $id_salida_inventario= $id_salida_inventario?? $idSalida;
 ?>
+
 <div class="page-wrapper">
     <div class="page-content-tab">
         <div class="container-fluid">
@@ -21,7 +22,7 @@ $id_salida_inventario= $id_salida_inventario?? $idSalida;
                     <div class="page-title-box">
                         <div class="float">
                             <h4 class="header-title mt-0 mb-0 text-dark border-bottom pb-6">
-                                Formulario de Entrega y Seguimiento
+                                Formulario de Distribución y Seguimiento
                             </h4>
                         </div>
                     </div>
@@ -49,6 +50,7 @@ $id_salida_inventario= $id_salida_inventario?? $idSalida;
 
                                                 <input type="hidden" name="idSalida" id="idSalida"
                                                     value="<?= esc($id_salida_inventario ?? $idSalida ?? '') ?>">
+                                                <input type="hidden" name="items" id="items" value="">
 
                                                 <div class="form-row">
 
@@ -81,7 +83,7 @@ $id_salida_inventario= $id_salida_inventario?? $idSalida;
                                                     </div>
 
                                                     <div class="col-md-4 mb-3">
-                                                        <label>Lugar de entrega </label>
+                                                        <label>Lugar de Distribución </label>
                                                         <input class="form-control" type="text" name="lugar_entrega" value="<?= isset($registro) ? $registro->lugar : '' ?>" >
                                                     </div>
                                             
@@ -93,6 +95,45 @@ $id_salida_inventario= $id_salida_inventario?? $idSalida;
 
                                                 <!-- PESTAÑAS PARA  DOCUMENTOS -->
 
+                                                <?php if (!empty($productos)): ?>
+                                                    <hr>
+                                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                                        <h5 class="mb-0">Productos del contrato</h5>
+                                                        <small class="text-muted">Selecciona y captura cantidad distribuir</small>
+                                                    </div>
+
+                                                    <div class="table-responsive">
+                                                        <table class="table table-striped table-bordered" id="tablaProductos">
+                                                        <thead>
+                                                            <tr class="text-center">
+                                                            <th style="width:50px;"><input type="checkbox" id="check_all"></th>
+                                                            <th>Producto</th>
+                                                            <th style="width:160px;">Stock disponible</th>
+                                                            <th style="width:180px;">Cantidad a distribuir</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <?php foreach($productos as $p): ?>
+                                                            <?php
+                                                                $idInv = intval($p->id_inventario_promo ?? 0);
+                                                                $stock = intval($p->stock ?? 0);
+                                                            ?>
+                                                            <tr>
+                                                                <td class="text-center">
+                                                                <input type="checkbox" class="chk-prod" value="<?= $idInv ?>">
+                                                                </td>
+                                                                <td><?= esc($p->dsc_producto ?? '') ?></td>
+                                                                <td class="text-center"><span class="badge badge-soft-success p-2"><?= $stock ?></span></td>
+                                                                <td class="text-center">
+                                                                <input type="number" class="form-control qty-entrega"
+                                                                        data-id="<?= $idInv ?>" min="0" placeholder="0">
+                                                                </td>
+                                                            </tr>
+                                                            <?php endforeach; ?>
+                                                        </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <?php endif; ?>
                                                 <div class="text-right mt-4">
                                                     <button type="submit" class="btn btn-primary px-4">
                                                         Generar Recibo
@@ -187,6 +228,45 @@ $(document).ready(function () {
 
     // ✅ FormData (debe existir antes de usarlo)
     const formData = new FormData($form[0]);
+
+    // =======================
+    // MODO MULTI (si existe tabla de productos)
+    // =======================
+    if ($('.chk-prod').length > 0) {
+    const items = [];
+    let primerId = 0;
+    let total = 0;
+
+    $('.chk-prod:checked').each(function(){
+        const idInv = parseInt($(this).val() || 0, 10);
+        const qty = parseInt($('.qty-entrega[data-id="'+idInv+'"]').val() || 0, 10);
+
+        if (idInv > 0 && qty > 0) {
+        items.push({ id_inventario_promo: idInv, cantidad_entregada: qty });
+        if (!primerId) primerId = idInv;
+        total += qty;
+        }
+    });
+
+    if (!items.length) {
+        Swal.fire('Error', 'Selecciona al menos un producto y captura cantidad > 0.', 'error');
+        if (pdfWindow) pdfWindow.close();
+        return;
+    }
+
+    // compat: idArticulo requerido
+    $('#idArticulo').val(String(primerId));
+
+    // guardar items en hidden + en formData
+    $('#items').val(JSON.stringify(items));
+    formData.set('items', JSON.stringify(items));
+
+    // compat: cantidad total (tu backend legacy la usa en cabecera)
+    formData.set('cantidad', String(total));
+    }
+    const idConvenio = ($('#id_material_promo').val() || '').trim();
+    const idArticulo = ($('#idArticulo').val() || '').trim();
+
 
     // ✅ Validación de IDs requeridos
     const idConvenio = ($('#id_material_promo').val() || '').trim();
