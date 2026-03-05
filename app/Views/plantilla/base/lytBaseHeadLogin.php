@@ -38,7 +38,7 @@
         background-size: cover;
         background-position: center;
         transition: background-image 1s ease-in-out;
-        cursor: url('<?= base_url() ?>assets/puntero2.png') 0 0, auto;
+       /* cursor: url('<?= base_url() ?>assets/puntero2.png') 0 0, auto;*/
     }
 
     #particles-js {
@@ -166,8 +166,8 @@ body.forest-bg #particles-js { display: none; }
 </head>
 
 <body class="account-body accountbg">
-<!-- <div id="particles-js"></div> -->
-<div class="tpl-snow">
+ <div id="particles-js"></div>
+<!-- <div class="tpl-snow">
     <div></div>
     <div></div>
     <div></div>
@@ -216,24 +216,24 @@ body.forest-bg #particles-js { display: none; }
     <div></div>
     <div></div>
     <div></div>
-</div>
+</div>-->
 <script>
   var base_url = "<?php echo base_url(); ?>";
 
  // const FOREST_URL = "https://i.pinimg.com/originals/44/6e/3b/446e3b79395a287ca32f7977dd83b290.jpg";
 
   const backgrounds = [
-    base_url + "assets/images/backgrounds/universidad_nieve.jpg",
-    base_url + "assets/images/backgrounds/bara.jpg",
-    base_url + "assets/images/backgrounds/uni_ia.jpg",
-    //base_url + "assets/images/backgrounds/bg5.jpg",
-    //base_url + "assets/images/backgrounds/bg4.jpg",
-    //base_url + "assets/images/backgrounds/subterranea.webp",
-    base_url + "assets/images/backgrounds/sopenia_nieve.jpg",
-    //base_url + "assets/images/backgrounds/bg2.jpg",
+    //base_url + "assets/images/backgrounds/universidad_nieve.jpg",
+    //base_url + "assets/images/backgrounds/bara.jpg",
+    //base_url + "assets/images/backgrounds/uni_ia.jpg",
+    base_url + "assets/images/backgrounds/bg5.jpg",
+    base_url + "assets/images/backgrounds/bg4.jpg",
+    base_url + "assets/images/backgrounds/subterranea.webp",
+   // base_url + "assets/images/backgrounds/sopenia_nieve.jpg",
+    base_url + "assets/images/backgrounds/bg2.jpg",
     base_url + "assets/images/backgrounds/callejon.jpg",
-  //  base_url + "assets/images/backgrounds/uni2.jpg",
- //   FOREST_URL,
+    base_url + "assets/images/backgrounds/uni2.jpg",
+    FOREST_URL,
   ];
 
   function setRandomBackground() {
