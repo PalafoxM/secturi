@@ -40,7 +40,7 @@ $session = \Config\Services::session();
                                             <?php if($session->get('id_perfil') == 1): ?>
                                             <th class="text-center">RESPONSABLE</th>
                                             <?php endif; ?>
-                                            <th class="text-center">ACCIONES</th>
+                                            <th class="text-center text-nowrap">ACCIONES</th>
                                         </tr>
                                         <!--end tr-->
                                     </thead>
@@ -57,7 +57,7 @@ $session = \Config\Services::session();
                                             <td  class="text-center"><?= $e->nombre_usuario?></td>
                                             <?php endif; ?>           
                    
-                                            <td  class="text-center" class="text-center">
+                                            <td class="text-center text-nowrap">
                                                 <a class="btn btn-outline-secondary btn-round" href="<?php echo base_url().'index.php/Inicio/pdfPagoTerceros?id='.$e->id_formulario_pt ?>" target="_blank" title="Hoja Azul" ><i
                                                         class="mdi mdi-file-pdf font-18"></i></a> 
                                                 <a class="btn btn-outline-primary btn-round" href="<?php echo base_url().'index.php/Inicio/pdfLiberacionPago?id='.$e->id_formulario_pt ?>" target="_blank" title="Liberacion de Pago" ><i
@@ -120,20 +120,7 @@ $session = \Config\Services::session();
 <script src="<?= base_url()?>assets/js/feather.min.js"></script>
 
 <script>
-    function descargarExcel(id){
-         Swal.fire({
-            title: 'Atención',
-            text: "Estimado Personal, el llenado del Anexo 01 se realiza manualmente dependiendo de las necesidades del pago",
-            icon: 'info',
-            showCancelButton: true,
-            confirmButtonText: 'Ir a Archivos',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = '<?= base_url() ?>index.php/Principal/Archivo/' + id + '/1';
-            }
-        });
-    }
+
 
     $(document).ready(function() {
         $('#datatableUsuario').DataTable({
@@ -147,4 +134,19 @@ $session = \Config\Services::session();
             "autoWidth": false
         });
     });
+
+        function descargarExcel(id){
+         Swal.fire({
+            title: 'Atención',
+            text: "Estimado Personal, el llenado del Anexo 01 se realiza manualmente dependiendo de las necesidades del pago",
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Ir a Archivos',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '<?= base_url() ?>index.php/Principal/Archivo/' + id + '/1';
+            }
+        });
+    }
 </script>

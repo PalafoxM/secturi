@@ -52,7 +52,7 @@
                                                         <th class="text-center">FECHA</th>
                                                         <th class="text-center">USUARIO</th>
                                                          <th class="text-center">ESTATUS</th>
-                                                        <th class="text-center">ACCIONES</th>
+                                                        <th class="text-center text-nowrap">ACCIONES</th>
                                                     </tr>
                                                     <!--end tr-->
                                                 </thead>
@@ -92,7 +92,7 @@
                                                             <span class="badge badge-md <?= $color ?>"><?= $texto ?></span>
                                                         </td>
                                                         
-                                                        <td class="text-center">
+                                                        <td class="text-center text-nowrap">
                                                             <?php if($session->id_perfil != 2 && empty($p->id_registro_go)): ?>
                                                              <a style="color:white;" onclick="ini.inicio.editarReservaGo(<?=$p->id_reserva_go?>, 0);" data-toggle="tooltip" data-placement="top" title="" data-original-title="Editar"
                                                                 class="btn btn-gradient-success px-4"><i

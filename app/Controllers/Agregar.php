@@ -6138,7 +6138,7 @@ class Agregar extends BaseController
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
        // $archivos_post = $this->request->getFiles();
-
+        
         // 1. Validaciones Básicas
         if (isset($data['no_consecutivo']) && empty($data['no_consecutivo'])) {
             $response->error = true;
@@ -6146,20 +6146,11 @@ class Agregar extends BaseController
             return $this->respond($response);
         }
            
-        // Concatenate Folio Prefix + Consecutivo
-        // User sends 'folio' (id_area) and 'no_consecutivo' (number part)
-        if(isset($data['folio']) && !empty($data['folio'])){
-            $area = $this->globals->getTabla(['tabla' => 'cat_area', 'where' => ['id_area' => $data['folio']]]);
-            if(!$area->error && !empty($area->data)){
-                $prefijo = $area->data[0]->prefijo;
-                // Combine: "PT 001/2026" format based on user request "concatenar lo que selecionen del folio y los del no_consecutivo"
-                // Assuming space separator.
-                $data['no_consecutivo'] = $prefijo . ' ' . $data['no_consecutivo'];
-            }
-        }
+   
+
 
       //validar que no se repita el no_consecutivo
-      if($data['editar'] != 1){
+      if($data['editar'] != 1 ){
         $existe = $this->globals->getTabla(['tabla' => 'formulario_pt', 'where' => ['no_consecutivo' => $data['folioCompleto'], 'visible' => 1]]);
             if(!$existe->error && !empty($existe->data)){
                 $usuario = $this->globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['id_usuario' => $existe->data[0]->usu_reg]])->data[0]->nombre_completo;
@@ -6170,7 +6161,7 @@ class Agregar extends BaseController
       }
    
 
-        // die( var_dump($data) );
+        
        
         $dataInsert = [
             'no_consecutivo' => $data['folioCompleto'],
@@ -6342,7 +6333,9 @@ class Agregar extends BaseController
 
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaConvenio'];
        //cambiar estatus a 4
-       $this->globals->saveTabla(['id_estatus' => 4], ["tabla" => "reserva", "editar" => true, 'idEditar' => ['id_reserva' => $data['id_reserva']]], $dataBitacora);
+       if($data['editar'] != 1){
+            $res = $this->globals->saveTabla(['id_estatus' => 4], ["tabla" => "reserva", "editar" => true, 'idEditar' => ['id_reserva' => $data['id_reserva']]], $dataBitacora);
+       }
 
       //  die(); APL110943
 

@@ -37,7 +37,7 @@
                                             <?php if($session->get('id_perfil') == 1): ?>
                                             <th class="text-center">RESPONSABLE</th>
                                             <?php endif; ?>
-                                            <th class="text-center">ACCIONES</th>
+                                            <th class="text-center text-nowrap">ACCIONES</th>
                                         </tr>
                                         <!--end tr-->
                                     </thead>
@@ -53,7 +53,7 @@
                                             <td  class="text-center"><?= $e->nombre_responsable?></td>
                                             <?php endif; ?>
                    
-                                            <td  class="text-center" class="text-center">
+                                            <td class="text-center text-nowrap">
                                                 <a class="btn btn-outline-secondary btn-round" href="<?php echo base_url().'index.php/Inicio/pdfGastosOperacion?id='.$e->id_formulario_pt ?>" target="_blank" title="Formato GO" ><i
                                                         class="mdi mdi-file-pdf font-18"  data-toggle="tooltip" data-placement="top" title="Formato GO" ></i></a> 
                                                 <a class="btn btn-outline-primary btn-round" href="<?php echo base_url().'index.php/Inicio/pdfOficioLiberacion?id='.$e->id_formulario_pt ?>" target="_blank" title="Liberacion de Pago" ><i

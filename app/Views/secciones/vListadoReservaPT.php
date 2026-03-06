@@ -49,8 +49,6 @@
                                                     <tr>
                                                         
                                                         <th class="text-center">PROVEEDOR</th>
-                                                        <th class="text-center">RESERVA</th>
-                                                        <th class="text-center">No. PROVEEDOR</th>
                                                         <th class="text-center">No. CONVENIO</th>
                                                         <?php if(isset($es_declinado) && $es_declinado): ?>
                                                             <th class="text-center">OBSERVACIONES</th>
@@ -59,7 +57,7 @@
                                                         <?php endif; ?>
                                                         <th class="text-center">REGISTRO</th>
                                                          <th class="text-center">ESTATUS</th>
-                                                        <th class="text-center">ACCIONES</th>
+                                                        <th class="text-center text-nowrap">ACCIONES</th>
                                                     </tr>
                                                     <!--end tr-->
                                                 </thead>
@@ -70,8 +68,7 @@
                                                     <tr>
                                                
                                                         <td class="text-center"><?= $p->razon_social?></td>
-                                                        <td class="text-center"><?= $p->no_reserva?></td>
-                                                        <td class="text-center"><?= $p->no_proveedor?></td>
+                                                
                                                         <td class="text-center"><?= $p->no_convenio?></td>
                                                        
                                                         <?php if(isset($es_declinado) && $es_declinado): ?>
@@ -123,7 +120,7 @@
                                                         </td>
                                                         
                                                         
-                                                        <td class="text-center">
+                                                        <td class="text-center text-nowrap">
                                                             <?php if($session->id_perfil != 2 && empty($p->id_registro_pt) ): ?>
                                                              <a style="color:white;" onclick="ini.inicio.editarReserva(<?=$p->id_reserva?>, 0);" data-toggle="tooltip" data-placement="top" title="" data-original-title="Editar"
                                                                 class="btn btn-gradient-success px-4"><i
