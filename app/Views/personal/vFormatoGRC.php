@@ -91,7 +91,7 @@
         <span style="font-size: 9pt; font-weight: bold;">SECRETARÍA DE TURISMO E IDENTIDAD</span><br>
         <span style="font-size: 7pt;">UNIDAD RESPONSABLE</span><br>
         <span style="font-size: 10pt; font-weight: bold;">SOLICITUD DE GASTOS A RESERVA DE COMPROBAR</span><br>
-        <span style="font-size: 9pt; font-weight: bold;">GRC SECTURI/SSPT/DRP/010/2026</span><br>
+        <span style="font-size: 9pt; font-weight: bold;">GRC <?php echo $solicitud->no_consecutivo; ?></span><br>
         <span style="font-size: 8pt; font-weight: bold;">DATOS GENERALES DE SOLICITUD</span>
     </div>
 <BR>

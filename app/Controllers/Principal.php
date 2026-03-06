@@ -2609,13 +2609,11 @@ class Principal extends BaseController
 
         $session = \Config\Services::session();
         $globals = new Mglobal;
- 
-
 
         $cat_perfil = $globals->getTabla(['tabla' => 'perfil', 'where' => ['visible' => 1]]);
         $cat_director_general = $globals->getTabla(['tabla' => 'cat_director_general', 'where' => ['visible' => 1]]);
         $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
-        $cat_usuario = $globals->getTabla(['tabla' => 'cat_usuario', 'where' => ['visible' => 1]]);
+    
         $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
         $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
         $cat_tipo = $globals->getTabla(['tabla' => 'cat_tipo', 'where' => ['visible' => 1]]);
@@ -2623,6 +2621,7 @@ class Principal extends BaseController
         $cat_opcion = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1]]);
         $proveedor = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit' => 10]);
         $usuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
+       
         $data['dsc_director_general'] = (!empty($cat_director_general->data)) ? $cat_director_general->data[0]->dsc_director_general : [];
         $data['cat_tipo'] = (!empty($cat_tipo->data)) ? $cat_tipo->data : [];
         $data['cat_opcion'] = (!empty($cat_opcion->data)) ? $cat_opcion->data : [];
@@ -2633,22 +2632,24 @@ class Principal extends BaseController
         $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
         $data['cat_area'] = (!empty($cat_area->data)) ? $cat_area->data : [];
         $data['usuario'] = (!empty($usuario->data)) ? $usuario->data : [];
-        $data['cat_usuario'] = (!empty($cat_usuario->data)) ? $cat_usuario->data : [];
-        
+        $data['idArea'] = (!empty($idArea)) ? $idArea : '';
+    
         // --- Generar Folio GRC ---
-        $solicitudes_grc = $globals->getTabla(["tabla" => "solicitud_grc"]);
+        $area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1, 'titular' => $session->get('id_usuario')]]);
+       
+        if(empty($area->data)){
+            $idArea = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->get('id_usuario')]])->data[0]->id_area;
+            $area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1, 'id_area' => $idArea]]);
+            $data['prefijo'] = $area->data[0]->prefijo;
+        }else{
+           $data['prefijo'] = $area->data[0]->prefijo;
+        }
+       // die( $data['prefijo'] );
+        $solicitudes_grc = $globals->getTabla(["tabla" => "solicitud_grc", "where" => ["visible" => 1, 'usu_reg' => $session->get('id_usuario')]]);
         $no_consecutivo_num = count($solicitudes_grc->data) + 1;
         $no_consecutivo_str = str_pad($no_consecutivo_num, 3, "0", STR_PAD_LEFT);
-        
-        $siglas = "SECTURI";
-        $area_usuario = $session->get('area');
-        if (!empty($area_usuario)) {
-            $siglas = $area_usuario;
-        }
-
-        $anio = date('Y');
-        $data['folio_grc'] = "GRC SECTURI/" . $siglas . "/" . $no_consecutivo_str . "/" . $anio;
-        // -------------------------
+        $data['no_consecutivo'] = $no_consecutivo_str;
+       
 
         $data['scripts'] = array('inicio');
         $data['edita'] = 0;

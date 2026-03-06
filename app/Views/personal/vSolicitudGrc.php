@@ -22,45 +22,7 @@
                         <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4 text-center">
                            
                             
-                            <?php 
-                                $anio_actual = date('Y');
-                                $prefix_found = '';
-                                $no_consecutivo = '';
-
-                                if (isset($solicitud->no_consecutivo) && !empty($solicitud->no_consecutivo)) {
-                                    if (preg_match('/GRC\s*SECTURI\/(.*?)\/([0-9]{3,})\/([0-9]{4})$/i', trim($solicitud->no_consecutivo), $matches)) {
-                                        $prefix_found = trim($matches[1]);
-                                        if (substr($prefix_found, -1) === '/') $prefix_found = substr($prefix_found, 0, -1);
-                                        $no_consecutivo = $matches[2];
-                                        $anio_actual = $matches[3];
-                                    } else if (preg_match('/([0-9]{3,})\/([0-9]{4})$/', trim($solicitud->no_consecutivo), $matches)) {
-                                        $no_consecutivo = $matches[1];
-                                        $anio_actual = $matches[2];
-                                    } else if (preg_match('/([0-9]{3,})/', trim($solicitud->no_consecutivo), $matches)) {
-                                        $no_consecutivo = $matches[1];
-                                    } else {
-                                         $no_consecutivo = $solicitud->no_consecutivo;
-                                    }
-                                } else if (isset($folio_grc)) {
-                                    if (preg_match('/GRC\s*SECTURI\/(.*?)\/([0-9]{3,})\/([0-9]{4})$/i', trim($folio_grc), $matches)) {
-                                        $prefix_found = trim($matches[1]);
-                                        $no_consecutivo = $matches[2];
-                                        $anio_actual = $matches[3];
-                                    }
-                                }
-
-                                $id_area = '';
-                                if (!empty($prefix_found) && isset($cat_area) && is_array($cat_area)) {
-                                    foreach ($cat_area as $area) {
-                                        $clean_area = trim($area->prefijo);
-                                        if (substr($clean_area, -1) === '/') $clean_area = substr($clean_area, 0, -1);
-                                        if (strtoupper($clean_area) === strtoupper($prefix_found)) {
-                                            $id_area = $area->id_area;
-                                            break;
-                                        }
-                                    }
-                                }
-                            ?>
+                           
                         </div>
                         <div class="card-body px-4 pb-4 mt-n2">
                             <form id="form_solicitud_grc" enctype="multipart/form-data">
@@ -78,17 +40,13 @@
                                             <span class="mr-2">GRC</span>
                                             <select id="folio" class="form-control font-weight-bold p-1 mr-1 d-inline-block select2" style="width: auto; height: 35px; border: 1px solid #ccc; background: transparent; color: #000;">
                                                 <?php foreach($cat_area as $area): ?>
-                                                    <?php $pref = rtrim($area->prefijo, '/'); ?>
-                                                    <option value="<?= $pref ?>" <?= $area->id_area == $id_area ? 'selected' : '' ?>><?= $pref ?></option>
+                                                    <option value="<?= $area->prefijo ?>" <?= $area->prefijo == $prefijo ? 'selected' : '' ?>><?= $area->prefijo ?></option>
                                                 <?php endforeach; ?>
                                             </select>
                                             <span class="mx-1">/</span>
                                             <input type="text" id="no_consecutivo_input" autocomplete="off" class="form-control font-weight-bold text-center p-1 mx-1 d-inline-block" style="width: 70px; height: 35px; border: 1px solid #ccc; background: transparent; color: #000;" value="<?= $no_consecutivo ?>" placeholder="001">
-                                            <span class="mx-1">/</span>
-                                            <select id="anio_consecutivo" class="form-control font-weight-bold p-1 ml-1 d-inline-block" style="width: auto; height: 35px; border: 1px solid #ccc; background: transparent; color: #000;">
-                                                <option value="2025" <?= $anio_actual == '2025' ? 'selected' : '' ?>>2025</option>
-                                                <option value="2026" <?= $anio_actual == '2026' ? 'selected' : '' ?>>2026</option>
-                                            </select>
+                                            <span class="mx-1">/2026</span>
+                                          
                                         </div>
                                         <input type="hidden" name="no_consecutivo" id="folioCompleto">
                                     </div>
@@ -517,10 +475,10 @@
     function updateFolioGrc() {
         var prefix = $('#folio').val();
         var consecutivo = $('#no_consecutivo_input').val();
-        var anio = $('#anio_consecutivo').val();
+        var anio = '2026';
         
         if(prefix && consecutivo && anio) {
-            var txtVal = 'GRC SECTURI/' + prefix + '/' + consecutivo + '/' + anio;
+            var txtVal =  prefix + consecutivo + '/' + anio;
             $('#folioCompleto').val(txtVal);
         }
     }
@@ -528,7 +486,6 @@
     $(document).ready(function() {
         $('#folio').on('change', updateFolioGrc);
         $('#no_consecutivo_input').on('input change', updateFolioGrc);
-        $('#anio_consecutivo').on('change', updateFolioGrc);
         updateFolioGrc();
     });
 </script>

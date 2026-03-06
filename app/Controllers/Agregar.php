@@ -5953,7 +5953,8 @@ class Agregar extends BaseController
            'fecha_inicio' => $data['fecha_incicio'],
            'fecha_fin' => $data['fecha_fin'],
            'clave' => $data['clave'],
-           'nombre_responsable' => $data['nombre_resposable'], 
+           'nombre_responsable' => $data['nombre_resposable'],
+           'no_consecutivo' => $data['no_consecutivo'] ?? '',
            'fec_reg' => date('Y-m-d H:i:s'),
            'usu_reg' => $session->get('id_usuario')
         ];
