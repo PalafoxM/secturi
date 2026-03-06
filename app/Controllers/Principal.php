@@ -2634,6 +2634,22 @@ class Principal extends BaseController
         $data['cat_area'] = (!empty($cat_area->data)) ? $cat_area->data : [];
         $data['usuario'] = (!empty($usuario->data)) ? $usuario->data : [];
         $data['cat_usuario'] = (!empty($cat_usuario->data)) ? $cat_usuario->data : [];
+        
+        // --- Generar Folio GRC ---
+        $solicitudes_grc = $globals->getTabla(["tabla" => "solicitud_grc"]);
+        $no_consecutivo_num = count($solicitudes_grc->data) + 1;
+        $no_consecutivo_str = str_pad($no_consecutivo_num, 3, "0", STR_PAD_LEFT);
+        
+        $siglas = "SECTURI";
+        $area_usuario = $session->get('area');
+        if (!empty($area_usuario)) {
+            $siglas = $area_usuario;
+        }
+
+        $anio = date('Y');
+        $data['folio_grc'] = "GRC SECTURI/" . $siglas . "/" . $no_consecutivo_str . "/" . $anio;
+        // -------------------------
+
         $data['scripts'] = array('inicio');
         $data['edita'] = 0;
         $data['contentView'] = 'personal/vSolicitudGrc';
@@ -2664,11 +2680,13 @@ class Principal extends BaseController
         $cat_perfil = $globals->getTabla(['tabla' => 'perfil', 'where' => ['visible' => 1]]);
         $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
         $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
         $usuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
 
         $data['cat_perfil'] = (!empty($cat_perfil->data)) ? $cat_perfil->data : [];
         $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
         $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+        $data['cat_area'] = (!empty($cat_area->data)) ? $cat_area->data : [];
         $data['usuario'] = (!empty($usuario->data)) ? $usuario->data : [];
         
         // Datos para edición
@@ -6258,18 +6276,7 @@ class Principal extends BaseController
         $data['proveedor'] = new stdClass();
         $data['proveedor_banco'] = []; // Initialized as array to match view expectations
 
-        // Logic to fetch provider if editing
-        if ($id_reserva) {
-             // We need to fetch the form data first to get the provider name/id
-             // The code below line 6418 fetches $formulario_pt but it's for consecutive?
-             // Ah, checking line 6449, it fetches $registro_pt from 'reserva' table?
-             // Wait, the view uses $registro_pt which comes from... table 'formulario_pt' in Inicio.php, but here 'reserva'?
-             // Let's look closer at line 6449 in the file.
-             // It fetches from 'reserva' table.
-             // But 'formulario_pt' table has 'nombre_proveedor_1'.
-             // 'reserva' table has 'id_proveedor'. 
-             // If this function uses 'reserva' table, then $registro_pt has 'id_proveedor'.
-        }
+  
         $data['no_consecutivo'] = '';
 
         // Default values to avoid errors in view
@@ -6280,10 +6287,10 @@ class Principal extends BaseController
 
          $data['no_reserva']="";
          $data['no_convenio']="";
-         if(!$data['es2025'] ){
-            $formulario_pt = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["visible" => 1, 'usu_reg' => $session->get('id_usuario')], 'tipo_formato' => 'PT']);
-         }else{
+         if($data['es2025']){
             $formulario_pt = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["visible" => 1, 'usu_reg' => $session->get('id_usuario')], 'tipo_formato' => 'REFRENDO']);
+         }else{
+            $formulario_pt = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["visible" => 1, 'usu_reg' => $session->get('id_usuario')], 'tipo_formato' => 'PT']);
          }
             $no_consecutivo = count($formulario_pt->data) + 1 ;
             if (strlen($no_consecutivo) == 1) {
