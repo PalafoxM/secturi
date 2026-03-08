@@ -74,9 +74,13 @@
                                                                 <a onclick="aprobarSolicitud(<?= $sol->id_solicitud_contrato ?>);" class="btn btn-sm btn-primary" title="Aprobar"><i class="fas fa-check text-white"></i></a>
                                                         <?php endif; ?>
 
-                                                        <?php if($session->id_perfil != 7): ?>
+                                                         <?php if($sol->instrumento_juridico != ''): ?>
+                                                                <a href="<?= base_url($sol->instrumento_juridico) ?>" target="_blank" class="btn btn-sm btn-success" title="Ver Instrumento Jurídico"><i class="fas fa-file-pdf"></i></a>
+                                                        <?php endif; ?>
+
+                                                        <?php if(in_array($session->id_perfil, [1,7])): ?>
                                                             <?php if($sol->id_estatus == 4): ?>
-                                                                <button class="btn btn-sm btn-success" title="Enviado"><i class="fas fa-check"></i>Enviado</button>
+                                                                <button class="btn btn-sm btn-primary" title="Subir Instrumento Jurídico" onclick="subirInstrumentoJuridico(<?= $sol->id_solicitud_contrato ?>)"><i class="fas fa-upload"></i> Subir Instrumento</button>
                                                             <?php endif; ?>
                                                             <?php if($sol->id_estatus == 2): ?>
                                                                 <button class="btn btn-sm btn-danger" title="Declinado"><i class="fas fa-times"></i>Declinado</button>
@@ -340,5 +344,57 @@
     function enviarFormularioArchivos() {
         // Verificar que al menos un archivo o NA haya sido seleccionado (opcional)
         $('#formSeleccionArchivos').submit();
+    }
+
+    function subirInstrumentoJuridico(id) {
+        Swal.fire({
+            title: 'Subir Instrumento Jurídico',
+            input: 'file',
+            inputAttributes: {
+                'accept': 'application/pdf',
+                'aria-label': 'Subir Instrumento Jurídico en PDF'
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Subir',
+            cancelButtonText: 'Cancelar',
+            showLoaderOnConfirm: true,
+            preConfirm: (file) => {
+                if (!file) {
+                    Swal.showValidationMessage('Por favor selecciona un archivo PDF');
+                    return false;
+                }
+                
+                const formData = new FormData();
+                formData.append('archivo', file);
+                formData.append('id_solicitud', id);
+                
+                return fetch('<?= base_url("index.php/Principal/subirInstrumentoJuridico") ?>', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(response.statusText)
+                    }
+                    return response.json()
+                })
+                .catch(error => {
+                    Swal.showValidationMessage(
+                        `Error: ${error}`
+                    )
+                });
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed) {
+                if (result.value.error) {
+                    Swal.fire('Error', result.value.respuesta || 'Ocurrió un error al subir el archivo.', 'error');
+                } else {
+                    Swal.fire('¡Éxito!', 'El archivo se ha subido correctamente.', 'success').then(() => {
+                        location.reload();
+                    });
+                }
+            }
+        });
     }
 </script>

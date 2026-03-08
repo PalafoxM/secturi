@@ -3241,19 +3241,94 @@ class Principal extends BaseController
         return $this->respond($response);
     }
 
+    public function subirInstrumentoJuridico()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $emailService = \Config\Services::email();
+        $response = new \stdClass();
+        $response->error = true;
+
+        $id = $this->request->getPost('id_solicitud');
+        $archivo = $this->request->getFile('archivo');
+
+        if (!$id || !$archivo || !$archivo->isValid() || $archivo->getExtension() !== 'pdf') {
+            $response->respuesta = "Archivo o ID de solicitud no válido. Asegúrese de subir un documento PDF.";
+            return $this->respond($response);
+        }
+
+        // Subir archivo
+        $newName = $archivo->getRandomName();
+        $uploadPath = FCPATH . 'assets/instrumentos_juridicos/';
+        if (!is_dir($uploadPath)) {
+            mkdir($uploadPath, 0777, true);
+        }
+        
+        if (!$archivo->move($uploadPath, $newName)) {
+             $response->respuesta = "No se pudo guardar el archivo en el servidor.";
+             return $this->respond($response);
+        }
+
+        // Update DB
+        $dataConfig = [
+            "tabla" => "solicitud_contrato",
+            "editar" => true,
+            "idEditar" => ["id_solicitud_contrato" => $id]
+        ];
+
+        $dataUpdate = [
+            "instrumento_juridico" => 'assets/instrumentos_juridicos/' . $newName,
+            "usu_act" => $session->id_usuario ?? 0,
+            "fec_act" => date('Y-m-d H:i:s')
+        ];
+
+        $res = $globals->saveTabla($dataUpdate, $dataConfig, ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/subirInstrumentoJuridico']);
+
+        if (!$res->error) {
+            // Mandar correo
+            $solicitudQuery = $globals->getTabla(["tabla" => "solicitud_contrato", "where" => ["id_solicitud_contrato" => $id]]);
+            if(isset($solicitudQuery->data) && !empty($solicitudQuery->data)){
+               $usu_reg = $solicitudQuery->data[0]->usu_reg;
+               $usuarioQuery = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["id_usuario" => $usu_reg]]);
+               if(isset($usuarioQuery->data) && !empty($usuarioQuery->data) && !empty($usuarioQuery->data[0]->correo)){
+                   $correoDestino = $usuarioQuery->data[0]->correo;
+                   $nombreUsuario = $usuarioQuery->data[0]->nombre_completo ?? 'Usuario';
+                   
+                   $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
+                   $emailService->setTo($correoDestino);
+                   $emailService->setSubject('Instrumento Jurídico Cargado');
+                   $emailService->setMailType('html');
+                   $emailService->setMessage("
+                       <p>Buen día, <strong>{$nombreUsuario}</strong>:</p>
+                       <p>Se le notifica que se ha subido correctamente el instrumento jurídico en formato PDF para la solicitud de contrato con ID <strong>{$id}</strong>.</p>
+                       <p>Puede visualizarlo ingresando al sistema SUSI.</p>
+                       <br>
+                       <p>Saludos cordiales,</p>
+                       <p><strong>Sistema Unificado SECTURI (SUSI)</strong></p>
+                   ");
+                   $emailService->send();
+               }
+            }
+            
+            $response->error = false;
+            $response->respuesta = "Instrumento jurídico subido y guardado correctamente.";
+        } else {
+            $response->respuesta = "No se pudo actualizar la solicitud.";
+        }
+
+        return $this->respond($response);
+    }
+
     public function ListaSolicitudContrato()
     {
         $session = \Config\Services::session();
         $globals = new Mglobal;
         $data = array();
-    //die(var_dump($session->id_perfil));
         if(in_array($session->id_perfil, [1,7])) {
             $solicitudes = $globals->getTabla(["tabla" => "vw_solicitud_contrato", "where" => ["visible" => 1]]);
         } else {
             $solicitudes = $globals->getTabla(["tabla" => "vw_solicitud_contrato", "where" => ["visible" => 1, "usu_reg" => $session->id_usuario]]);
         }
-      // die( var_dump( $solicitudes ) );
-        // Verificar archivos
         if (!empty($solicitudes->data)) {
             foreach ($solicitudes->data as &$sol) {
                  $archivos = $globals->getTabla([
@@ -3263,7 +3338,6 @@ class Principal extends BaseController
                  $sol->tienen_archivos = (!empty($archivos->data));
             }
         }
-        
         $data['solicitudes'] = (!empty($solicitudes->data)) ? $solicitudes->data : [];
         $data['scripts'] = array('inicio');
         $data['contentView'] = 'personal/vListaSolicitudContrato';
