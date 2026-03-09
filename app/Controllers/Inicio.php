@@ -433,6 +433,39 @@ class Inicio extends BaseController
 
         return "PROMO-{$idConvenio}-{$anio}-" . str_pad((string)$consecutivo, 4, '0', STR_PAD_LEFT);
     }
+    private function generarFolioPorConvenio($idConvenio)
+    {
+        $globas = new Mglobal();
+
+        $anio = date('Y');
+        $idConvenio = intval($idConvenio);
+
+        // Buscamos el último folio de ESTE convenio en ESTE año
+        $result = $globas->getTabla([
+            'tabla' => 'salida_inventario',
+            'where' => [
+                'visible' => 1,
+                'id_convenio' => $idConvenio
+            ],
+            'like'  => [
+                'folio' => "PROMO-{$idConvenio}-{$anio}-"
+            ],
+            'order' => [
+                'id_salida_inventario' => 'DESC'
+            ],
+            'limit' => 1
+        ]);
+
+        if (!empty($result->data)) {
+            $ultimo = (string)($result->data[0]->folio ?? '');
+            $partes = explode('-', $ultimo);
+            $consecutivo = intval(end($partes)) + 1;
+        } else {
+            $consecutivo = 1;
+        }
+
+        return "PROMO-{$idConvenio}-{$anio}-" . str_pad((string)$consecutivo, 4, '0', STR_PAD_LEFT);
+    }
     public function guardarConvenio()
     {
         $globas  = new Mglobal();
@@ -1069,19 +1102,29 @@ class Inicio extends BaseController
                 $item->stock_disponible    = $stock;
             }
 
-            // ===== Imágenes (si todavía usas tabla imagen) =====
             $idInv = is_array($item) ? ($item['id_inventario_promo'] ?? null) : ($item->id_inventario_promo ?? null);
+
+            $sum = 0;
+
             if ($idInv) {
-                $imagenes = $globals->getTabla([
-                    'tabla' => 'imagen',
+                $det = $globals->getTabla([
+                    'tabla' => 'salida_inventario_detalle',
                     'where' => [
-                        'id_inventario_promo' => $idInv,
-                        'visible' => 1
+                        'visible' => 1,
+                        'id_inventario_promo' => intval($idInv)
                     ]
                 ])->data ?? [];
 
-                if (is_array($item)) $item['imagenes'] = $imagenes;
-                else $item->imagenes = $imagenes;
+                foreach ($det as $d) {
+                    $sum += intval($d->cantidad_entregada ?? 0);
+                }
+            }
+
+            // Guardar en el item para la vista
+            if (is_array($item)) {
+                $item['cantidad_solicitada'] = $sum;
+            } else {
+                $item->cantidad_solicitada = $sum;
             }
 
             $productos[$key] = $item;
@@ -1476,7 +1519,8 @@ class Inicio extends BaseController
 
         $dsc_producto    = trim((string)$this->request->getPost('dsc_producto'));
         $cantidad        = intval($this->request->getPost('cantidad'));          // solicitado (nuevo/editar) o retiro (salida)
-        $precio_unitario = floatval($this->request->getPost('precio_unitario')); // nuevo/editar
+        $precio_unitario = floatval($this->request->getPost('precio_unitario'));
+        if ($precio_unitario < 0) $precio_unitario = 0; // ya no es obligatorio
 
         $color     = (string)$this->request->getPost('color');       // JSON string
         $variantes = (string)$this->request->getPost('variantes');   // JSON string
@@ -1609,11 +1653,42 @@ class Inicio extends BaseController
         }
         $stock = ($stockCalc > 0) ? $stockCalc : max(0, $stock);
 
+        // Normalizar
         $cantidad = max(0, $cantidad);
         $precio_unitario = max(0, $precio_unitario);
 
-        $subtotal = $cantidad * $precio_unitario;
-        $total    = $subtotal;
+        // ✅ Subtotal/Total: si hay precio por color, se calcula por color;
+        // si no, cae al cálculo viejo
+        $subtotal = 0;
+        $colArr = $colorArr; // ya lo tienes decodificado arriba
+
+        if (is_array($colArr) && !empty($colArr)) {
+
+            $tienePrecioPorColor = false;
+            foreach ($colArr as $c) {
+                if (isset($c['precio']) && $c['precio'] !== '' && floatval($c['precio']) > 0) {
+                    $tienePrecioPorColor = true;
+                    break;
+                }
+            }
+
+            if ($tienePrecioPorColor) {
+                foreach ($colArr as $c) {
+                    $qty = intval($c['cantidad'] ?? 0);
+                    $prc = floatval($c['precio'] ?? $precio_unitario); // fallback al base
+                    $subtotal += max(0, $qty) * max(0, $prc);
+                }
+            } else {
+                // sin precios por color → cálculo viejo
+                $subtotal = $cantidad * $precio_unitario;
+            }
+
+        } else {
+            // sin colores → cálculo viejo
+            $subtotal = $cantidad * $precio_unitario;
+        }
+
+        $total = $subtotal;
 
         $dataSave = [
             'id_convenio_promo' => $id_convenio,

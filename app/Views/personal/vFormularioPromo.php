@@ -37,7 +37,8 @@ $id_salida_inventario= $id_salida_inventario?? $idSalida;
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="alert alert-info text-center font-weight-bold">
-                                                Folio preliminar: <?= $idConvenio ?>
+                                                Contrato: <?= esc($idConvenio) ?> —
+                                                Folio: <span class="text-dark">Se asignará al generar</span>
                                             </div>
 
                                             <form id="formConvenio" method="post" enctype="multipart/form-data">
@@ -205,146 +206,162 @@ $id_salida_inventario= $id_salida_inventario?? $idSalida;
 <script src="<?= base_url(); ?>plugins/select2/select2.min.js"></script>
 
 <script>
-$(document).ready(function () {
+    $(document).ready(function () {
 
-  // Interceptar submit del form (muestra modal de confirmación)
-  $(document).on('submit', '#formConvenio', function (e) {
-    e.preventDefault();
-    $('#modalConfirmarConvenio').modal('show');
-  });
+        // Interceptar submit del form (muestra modal de confirmación)
+        $(document).on('submit', '#formConvenio', function (e) {
+            e.preventDefault();
+            $('#modalConfirmarConvenio').modal('show');
+        });
 
-  // Confirmar y guardar (AJAX)
-  $(document).on('click', '#btnConfirmarGuardar', function (e) {
-    e.preventDefault();
+        // Confirmar y guardar (AJAX)
+        $(document).on('click', '#btnConfirmarGuardar', function (e) {
+            e.preventDefault();
 
-    // ✅ Abrir popup en el gesto del click para evitar bloqueo
-    let pdfWindow = window.open('', '_blank');
+            // ✅ Abrir popup en el gesto del click para evitar bloqueo
+            let pdfWindow = window.open('', '_blank');
 
-    const $form = $('#formConvenio');
-    if (!$form.length) {
-      if (pdfWindow) pdfWindow.close();
-      return;
-    }
-
-    // ✅ FormData (debe existir antes de usarlo)
-    const formData = new FormData($form[0]);
-
-    // =======================
-    // MODO MULTI (si existe tabla de productos)
-    // =======================
-    if ($('.chk-prod').length > 0) {
-    const items = [];
-    let primerId = 0;
-    let total = 0;
-
-    $('.chk-prod:checked').each(function(){
-        const idInv = parseInt($(this).val() || 0, 10);
-        const qty = parseInt($('.qty-entrega[data-id="'+idInv+'"]').val() || 0, 10);
-
-        if (idInv > 0 && qty > 0) {
-        items.push({ id_inventario_promo: idInv, cantidad_entregada: qty });
-        if (!primerId) primerId = idInv;
-        total += qty;
-        }
-    });
-
-    if (!items.length) {
-        Swal.fire('Error', 'Selecciona al menos un producto y captura cantidad > 0.', 'error');
-        if (pdfWindow) pdfWindow.close();
-        return;
-    }
-
-    // compat: idArticulo requerido
-    $('#idArticulo').val(String(primerId));
-
-    // guardar items en hidden + en formData
-    $('#items').val(JSON.stringify(items));
-    formData.set('items', JSON.stringify(items));
-
-    // compat: cantidad total (tu backend legacy la usa en cabecera)
-    formData.set('cantidad', String(total));
-    }
-    const idConvenio = ($('#id_material_promo').val() || '').trim();
-    const idArticulo = ($('#idArticulo').val() || '').trim();
-
-
-    // ✅ Validación de IDs requeridos
-    const idConvenio = ($('#id_material_promo').val() || '').trim();
-    const idArticulo = ($('#idArticulo').val() || '').trim();
-
-    console.log('id_material_promo:', idConvenio);
-    console.log('idArticulo:', idArticulo);
-
-    if (!idConvenio || idConvenio === '0' || !idArticulo || idArticulo === '0') {
-      Swal.fire('Error', 'Faltan IDs: id_material_promo / idArticulo', 'error');
-      if (pdfWindow) pdfWindow.close();
-      return;
-    }
-
-    // (Opcional) Debug de payload
-    // for (let pair of formData.entries()) console.log(pair[0] + ': ' + pair[1]);
-
-    const $btn = $(this);
-    const originalText = $btn.text();
-
-    $.ajax({
-      url: '<?= base_url("index.php/Inicio/guardarConvenio") ?>',
-      type: 'POST',
-      data: formData,
-      dataType: 'json',
-      processData: false,
-      contentType: false,
-
-      beforeSend: function () {
-        $btn.prop('disabled', true).text('Guardando...');
-      },
-
-      success: function (res) {
-        console.log('RESPUESTA AJAX:', res);
-
-        if (res && res.error === false) {
-
-          // ✅ Enviar el popup al PDF
-          if (res.pdf_url) {
-            if (pdfWindow) pdfWindow.location.href = res.pdf_url;
-          } else {
-            // si no hay PDF, no dejes pestaña en blanco
+            const $form = $('#formConvenio');
+            if (!$form.length) {
             if (pdfWindow) pdfWindow.close();
-          }
+            return;
+            }
 
-          Swal.fire({
-            icon: 'success',
-            title: 'Listo',
-            text: res.respuesta || 'Registrado correctamente',
-            timer: 900,
-            showConfirmButton: false
-          });
+            // ✅ FormData (debe existir antes de usarlo)
+            const formData = new FormData($form[0]);
 
-          // ✅ Redirigir a inventario del convenio
-          const idMat = (res.id_material_promo || idConvenio).toString();
-          setTimeout(function () {
-            window.location.href = '<?= base_url("index.php/Inicio/InventarioPromocion/") ?>' + idMat;
-          }, 900);
+            // =======================
+            // MODO MULTI (si existe tabla de productos)
+            // =======================
+            if ($('.chk-prod').length > 0) {
+            const items = [];
+            let primerId = 0;
+            let total = 0;
 
-        } else {
-          const msg = (res && res.respuesta) ? res.respuesta : 'No se pudo guardar';
-          Swal.fire('Error', msg, 'error');
-          if (pdfWindow) pdfWindow.close();
-        }
-      },
+            $('.chk-prod:checked').each(function(){
+                const idInv = parseInt($(this).val() || 0, 10);
+                const qty = parseInt($('.qty-entrega[data-id="'+idInv+'"]').val() || 0, 10);
 
-      error: function (xhr) {
-        console.log('ERROR AJAX:', xhr.status, xhr.responseText);
-        Swal.fire('Error', 'Error AJAX. Revisa consola/network.', 'error');
-        if (pdfWindow) pdfWindow.close();
-      },
+                if (idInv > 0 && qty > 0) {
+                items.push({ id_inventario_promo: idInv, cantidad_entregada: qty });
+                if (!primerId) primerId = idInv;
+                total += qty;
+                }
+            });
 
-      complete: function () {
-        $btn.prop('disabled', false).text(originalText);
-        $('#modalConfirmarConvenio').modal('hide');
-      }
+            if (!items.length) {
+                Swal.fire('Error', 'Selecciona al menos un producto y captura cantidad > 0.', 'error');
+                if (pdfWindow) pdfWindow.close();
+                return;
+            }
+
+            // compat: idArticulo requerido
+            $('#idArticulo').val(String(primerId));
+
+            // guardar items en hidden + en formData
+            $('#items').val(JSON.stringify(items));
+            formData.set('items', JSON.stringify(items));
+
+            // compat: cantidad total (tu backend legacy la usa en cabecera)
+            formData.set('cantidad', String(total));
+            }
+
+            // ✅ Validación de IDs requeridos
+            let idConvenio = ($('#id_material_promo').val() || '').trim();
+            let idArticulo = ($('#idArticulo').val() || '').trim();
+
+            console.log('id_material_promo:', idConvenio);
+            console.log('idArticulo:', idArticulo);
+
+            if (!idConvenio || idConvenio === '0' || !idArticulo || idArticulo === '0') {
+            Swal.fire('Error', 'Faltan IDs: id_material_promo / idArticulo', 'error');
+            if (pdfWindow) pdfWindow.close();
+            return;
+            }
+
+            // (Opcional) Debug de payload
+            // for (let pair of formData.entries()) console.log(pair[0] + ': ' + pair[1]);
+
+            const $btn = $(this);
+            const originalText = $btn.text();
+
+            $.ajax({
+                url: '<?= base_url("index.php/Inicio/guardarConvenio") ?>',
+                type: 'POST',
+                data: formData,
+                dataType: 'json',
+                processData: false,
+                contentType: false,
+
+                beforeSend: function () {
+                    $btn.prop('disabled', true).text('Guardando...');
+                },
+
+                success: function (res) {
+                    console.log('RESPUESTA AJAX:', res);
+
+                    if (res && res.error === false) {
+
+                    // ✅ Enviar el popup al PDF
+                    if (res.pdf_url) {
+                        if (pdfWindow) pdfWindow.location.href = res.pdf_url;
+                    } else {
+                        // si no hay PDF, no dejes pestaña en blanco
+                        if (pdfWindow) pdfWindow.close();
+                    }
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Listo',
+                        text: res.respuesta || 'Registrado correctamente',
+                        timer: 900,
+                        showConfirmButton: false
+                    });
+
+                    // ✅ Redirigir a inventario del convenio
+                    const idMat = (res.id_material_promo || idConvenio).toString();
+                    setTimeout(function () {
+                        window.location.href = '<?= base_url("index.php/Inicio/InventarioPromocion/") ?>' + idMat;
+                    }, 900);
+
+                    } else {
+                    const msg = (res && res.respuesta) ? res.respuesta : 'No se pudo guardar';
+                    Swal.fire('Error', msg, 'error');
+                    if (pdfWindow) pdfWindow.close();
+                    }
+                },
+
+                error: function (xhr) {
+                    console.log('ERROR AJAX:', xhr.status, xhr.responseText);
+                    Swal.fire('Error', 'Error AJAX. Revisa consola/network.', 'error');
+                    if (pdfWindow) pdfWindow.close();
+                },
+
+                complete: function () {
+                    $btn.prop('disabled', false).text(originalText);
+                    $('#modalConfirmarConvenio').modal('hide');
+                }
+            });
+        });
+
+        // Master: seleccionar todos
+        $(document).off('change', '#check_all').on('change', '#check_all', function () {
+            const checked = $(this).is(':checked');
+            $('.chk-prod').prop('checked', checked);
+        });
+
+        // Si desmarcan uno, desmarca el master; si todos marcados, marca master
+        $(document).off('change', '.chk-prod').on('change', '.chk-prod', function () {
+            const total = $('.chk-prod').length;
+            const sel = $('.chk-prod:checked').length;
+            $('#check_all').prop('checked', total > 0 && total === sel);
+        });
+
+        $(document).on('input', '.qty-entrega', function(){
+            const idInv = $(this).data('id');
+            const qty = parseInt($(this).val() || 0, 10);
+            const $chk = $('.chk-prod[value="'+idInv+'"]');
+            if (qty > 0) $chk.prop('checked', true).trigger('change');
+        });
     });
-  });
-
-});
 </script>

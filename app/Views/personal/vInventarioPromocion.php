@@ -70,35 +70,44 @@
             <div class="row mt-4">
                 <div class="col-lg-12">
                     <div class="card shadow-sm border-0 h-100">
-                        <div class="card-body p-3">
-                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
+                        <div class="card-body p-2">
+                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-4">
                                 <h4 class="header-title mt-0 mb-0 text-dark">
                                     Inventario Promoción
                                     <strong id="nombre_material">
-                                        <?= $materiales ? ($materiales->convenio . " - " . ($materiales->razon_social ?? '')) : 'Convenio no encontrado' ?>
+                                    <?= $materiales ? ($materiales->convenio . " - " . ($materiales->razon_social ?? '')) : 'Convenio no encontrado' ?>
                                     </strong>
                                 </h4>
-                                <button class="btn btn-primary px-4 btn-movimiento shadow-sm"
-                                    data-id=""
-                                    data-tabla="cat_inventario_promo"
-                                    data-nombre=""
-                                    data-stock="0"
-                                    data-tipo="nuevo">
-                                    <i class="mdi mdi-plus-box mr-2"></i> Nuevo producto
-                                </button>
-                                <a class="btn btn-success px-4 shadow-sm ml-2"
-                                    href="<?= base_url('index.php/Inicio/FormularioPromoPorConvenio/' . intval($id_convenio_promo ?? $id_convenio ?? 0)) ?>">
-                                    ➕ Nuevo recibo
-                                </a>
-                                <a class="btn btn-primary px-4 shadow-sm"
-                                    href="<?= base_url('index.php/Inicio/InventarioRecibosPromo/' . intval($id_convenio_promo ?? $id_convenio ?? 0)) ?>">
-                                    🌎 Consultar Recibos
-                                </a>
-                                <button class="btn btn-success px-4 shadow-sm"
+
+                                <!-- Toolbar de botones -->
+                                <div class="d-flex align-items-center flex-wrap gap-2 toolbar-acciones">
+
+                                    <button class="btn btn-primary btn-action shadow-sm btn-movimiento"
+                                        data-id=""
+                                        data-tabla="cat_inventario_promo"
+                                        data-nombre=""
+                                        data-stock="0"
+                                        data-tipo="nuevo">
+                                        <i class="mdi mdi-plus-box mr-2"></i> Nuevo producto
+                                    </button>
+
+                                    <a class="btn btn-primary btn-action shadow-sm"
+                                        href="<?= base_url('index.php/Inicio/FormularioPromoPorConvenio/' . intval($id_convenio_promo ?? $id_convenio ?? 0)) ?>">
+                                        <i class="mdi mdi-file-plus-outline mr-2"></i> Nuevo recibo
+                                    </a>
+
+                                    <a class="btn btn-primary btn-action shadow-sm"
+                                        href="<?= base_url('index.php/Inicio/InventarioRecibosPromo/' . intval($id_convenio_promo ?? $id_convenio ?? 0)) ?>">
+                                        <i class="mdi mdi-eye-outline mr-2"></i> Consultar recibos
+                                    </a>
+
+                                    <button class="btn btn-success btn-action shadow-sm"
                                         id="btnExportExcel"
                                         data-convenio="<?= intval($id_convenio_promo ?? $id_convenio ?? 0) ?>">
-                                    📗 Exportar Excel
-                                </button>
+                                        <i class="mdi mdi-file-excel-outline mr-2"></i> Exportar Excel
+                                    </button>
+
+                                </div>
                             </div>
                             <div class="table-responsive dash-social">
                                 <table id="tablaConvenios" class="table table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
@@ -158,176 +167,197 @@
                                     </thead>
                                     <tbody id="tablaPromo">
                                         <?php if(isset($cat_inventario_promo) && !empty($cat_inventario_promo)): ?>
-                                        <?php foreach($cat_inventario_promo as $item): ?>
-                                            <?php 
-                                            $stock = (int) ($item->stock ?? 0); 
-                                            $badgeClass = ($stock < 5) ? 'badge-soft-danger' : 'badge-soft-success'; 
-                                            ?>
-
-                                            <tr class="align-middle">
-
-                                            <!-- ✅ Checkbox -->
-                                            <td class="text-center align-middle">
-                                                <input type="checkbox"
-                                                    class="chk-producto"
-                                                    value="<?= (int)$item->id_inventario_promo ?>"
-                                                    data-id="<?= (int)$item->id_inventario_promo ?>"
-                                                    data-nombre="<?= esc($item->dsc_producto) ?>">
-                                            </td>
-
-                                            <!-- Producto -->
-                                            <td class="font-weight-medium text-dark py-3 text-center">
-                                                <?= esc($item->dsc_producto ?? '') ?>
-                                            </td>
-
-                                            <!-- Imagen -->
-                                            <td class="text-center">
-                                                <?php if (!empty($item->imagen)): ?>
-                                                <img src="<?= base_url($item->imagen) ?>"
-                                                    class="rounded btn-ver-imagen"
-                                                    style="height:40px; cursor:pointer;"
-                                                    data-src="<?= base_url($item->imagen) ?>">
-                                                <?php else: ?>
-                                                <img src="<?= base_url('assets/images/no-image.png') ?>"
-                                                    style="height:40px; opacity:.4;">
-                                                <?php endif; ?>
-                                            </td>
-
-                                            <!-- Cantidad solicitada -->
-                                            <td class="text-center">
-                                                <span class="badge badge-soft-info font-13 p-2 px-3">
-                                                <?= (int)($item->cantidad_solicitada ?? $item->cantidad ?? 0) ?>
-                                                </span>
-                                            </td>
-
-                                            <!-- Stock real -->
-                                            <td class="text-center">
-                                                <span class="badge badge-soft-success font-13 p-2 px-3">
-                                                <?= (int)($item->stock_disponible ?? $item->total_existencia ?? $item->stock ?? 0) ?>
-                                                </span>
-                                            </td>
-
-                                            <!-- Colores -->
-                                            <td class="text-center">
-                                                <?php if(!empty($item->color)): ?>
+                                            <?php foreach($cat_inventario_promo as $item): ?>
                                                 <?php 
-                                                    $colores = is_array($item->color) ? $item->color : json_decode((string)($item->color ?? '[]'), true);
-                                                    $colores = is_array($colores) ? $colores : [];
-                                                    if(is_array($colores)):
-                                                    foreach($colores as $color):
-                                                        $hex = is_array($color) ? ($color['hexadecimal'] ?? '') : $color;
-                                                        if(!empty($hex)):
+                                                    $stock = (int) ($item->stock ?? 0); 
+                                                    $badgeClass = ($stock < 5) ? 'badge-soft-danger' : 'badge-soft-success'; 
                                                 ?>
-                                                    <i class="mdi mdi-circle font-18"
-                                                    style="color: <?= esc($hex) ?>;"
-                                                    data-toggle="tooltip"
-                                                    title="<?= esc($hex) ?>"></i>
-                                                <?php 
+
+                                                <tr class="align-middle">
+
+                                                    <!-- ✅ Checkbox -->
+                                                    <td class="text-center align-middle">
+                                                        <input type="checkbox"
+                                                        class="chk-producto"
+                                                        value="<?= (int)$item->id_inventario_promo ?>"
+                                                        data-id="<?= (int)$item->id_inventario_promo ?>"
+                                                        data-nombre="<?= esc($item->dsc_producto) ?>">
+                                                    </td>
+
+                                                    <!-- Producto -->
+                                                    <td class="font-weight-medium text-dark py-3 text-center">
+                                                        <?= esc($item->dsc_producto ?? '') ?>
+                                                    </td>
+
+                                                    <!-- Imagen -->
+                                                    <td class="text-center">
+                                                        <?php if (!empty($item->imagen)): ?>
+                                                        <img src="<?= base_url($item->imagen) ?>"
+                                                            class="rounded btn-ver-imagen"
+                                                            style="height:40px; cursor:pointer;"
+                                                            data-src="<?= base_url($item->imagen) ?>">
+                                                        <?php else: ?>
+                                                        <img src="<?= base_url('assets/images/no-image.png') ?>"
+                                                            style="height:40px; opacity:.4;">
+                                                        <?php endif; ?>
+                                                    </td>
+
+                                                    <!-- Cantidad solicitada -->
+                                                    <td class="text-center">
+                                                        <span class="badge badge-soft-info font-13 p-2 px-3">
+                                                        <?= intval($item->cantidad_solicitada ?? $item->cantidad ?? 0) ?>
+                                                        </span>
+                                                    </td>
+
+                                                    <!-- Stock real -->
+                                                    <td class="text-center">
+                                                        <span class="badge badge-soft-success font-13 p-2 px-3">
+                                                        <?= (int)($item->stock_disponible ?? $item->total_existencia ?? $item->stock ?? 0) ?>
+                                                        </span>
+                                                    </td>
+
+                                                    <!-- Colores -->
+                                                    <td class="text-center">
+                                                        <?php if(!empty($item->color)): ?>
+                                                        <?php 
+                                                            $colores = is_array($item->color) ? $item->color : json_decode((string)($item->color ?? '[]'), true);
+                                                            $colores = is_array($colores) ? $colores : [];
+                                                            if(is_array($colores)):
+                                                            foreach($colores as $color):
+                                                                $hex = is_array($color) ? ($color['hexadecimal'] ?? '') : $color;
+                                                                if(!empty($hex)):
+                                                        ?>
+                                                            <i class="mdi mdi-circle font-18"
+                                                            style="color: <?= esc($hex) ?>;"
+                                                            data-toggle="tooltip"
+                                                            title="<?= esc($hex) ?>"></i>
+                                                        <?php 
+                                                                endif;
+                                                            endforeach;
+                                                            endif;
+                                                        ?>
+                                                        <?php else: ?>
+                                                        <span class="text-muted font-12">Sin colores</span>
+                                                        <?php endif; ?>
+                                                    </td>
+
+                                                    <!-- Variantes -->
+                                                    <td class="text-center">
+                                                        <?php if(!empty($item->variantes)): ?>
+                                                        <?php 
+                                                            $vars = is_array($item->variantes) ? $item->variantes : json_decode((string)($item->variantes ?? '[]'), true);
+                                                            $vars = is_array($vars) ? $vars : [];
+                                                            if(is_array($vars)):
+                                                            foreach($vars as $var):
+                                                                $texto = is_array($var)
+                                                                ? (($var['atributo'] ?? '') . ': ' . ($var['valor'] ?? ''))
+                                                                : $var;
+                                                        ?>
+                                                            <span class="badge badge-soft-primary mr-1">
+                                                            <?= esc(trim($texto)) ?>
+                                                            </span>
+                                                        <?php 
+                                                            endforeach;
+                                                            endif;
+                                                        ?>
+                                                        <?php else: ?>
+                                                        <span class="text-muted font-12">Sin variantes</span>
+                                                        <?php endif; ?>
+                                                    </td>
+
+                                                    <!-- Precio -->
+                                                    <td class="text-center">
+                                                        <?php
+                                                            $col = $item->color ?? [];
+                                                            $precios = [];
+
+                                                            if (is_array($col)) {
+                                                                foreach ($col as $c) {
+                                                                    $p = floatval($c['precio'] ?? 0);
+                                                                    if ($p > 0) $precios[] = $p;
+                                                                }
+                                                            }
+
+                                                            $precioLabel = '';
+                                                            if (!empty($precios)) {
+                                                                $min = min($precios);
+                                                                $max = max($precios);
+                                                                $precioLabel = ($min == $max)
+                                                                    ? ('$' . number_format($min, 2))
+                                                                    : ('$' . number_format($min, 2) . ' - $' . number_format($max, 2));
+                                                            } else {
+                                                                $precioLabel = '$' . number_format(floatval($item->precio_unitario ?? 0), 2);
+                                                            }
+                                                        ?>
+                                                        <div class="font-weight-bold text-dark">
+                                                            $<?= number_format((float)($item->precio_unitario ?? 0), 2) ?>
+                                                        </div>
+                                                        <div class="text-muted font-12">
+                                                            Subtotal: $<?= number_format((float)($item->subtotal ?? 0), 2) ?>
+                                                        </div>
+                                                        <div class="text-muted font-11 mt-1">
+                                                            Total:
+                                                            <span class="font-weight-semibold text-primary">
+                                                                $<?= number_format((float)($item->total ?? 0), 2) ?>
+                                                            </span>
+                                                        </div>
+                                                    </td>
+
+                                                    <!-- Fecha de ingreso -->
+                                                    <td class="text-center">
+                                                        <?php 
+                                                        $fechaRaw = $item->fecha_entrada ?? $item->created_at ?? null;
+                                                        if($fechaRaw):
+                                                            $fecha = new DateTime($fechaRaw);
+                                                            echo '<span class="badge badge-soft-success font-13">';
+                                                            echo $fecha->format('d/m/Y h:i A');
+                                                            echo '</span>';
                                                         endif;
-                                                    endforeach;
-                                                    endif;
-                                                ?>
-                                                <?php else: ?>
-                                                <span class="text-muted font-12">Sin colores</span>
-                                                <?php endif; ?>
-                                            </td>
+                                                        ?>
+                                                    </td>
 
-                                            <!-- Variantes -->
-                                            <td class="text-center">
-                                                <?php if(!empty($item->variantes)): ?>
-                                                <?php 
-                                                    $vars = is_array($item->variantes) ? $item->variantes : json_decode((string)($item->variantes ?? '[]'), true);
-                                                    $vars = is_array($vars) ? $vars : [];
-                                                    if(is_array($vars)):
-                                                    foreach($vars as $var):
-                                                        $texto = is_array($var)
-                                                        ? (($var['atributo'] ?? '') . ': ' . ($var['valor'] ?? ''))
-                                                        : $var;
-                                                ?>
-                                                    <span class="badge badge-soft-primary mr-1">
-                                                    <?= esc(trim($texto)) ?>
-                                                    </span>
-                                                <?php 
-                                                    endforeach;
-                                                    endif;
-                                                ?>
-                                                <?php else: ?>
-                                                <span class="text-muted font-12">Sin variantes</span>
-                                                <?php endif; ?>
-                                            </td>
+                                                    <!-- Acciones -->
+                                                    <td class="text-center text-nowrap">
 
-                                            <!-- Precio -->
-                                            <td class="text-center">
-                                                <div class="font-weight-bold text-dark">
-                                                $<?= number_format((float)($item->precio_unitario ?? 0), 2) ?>
-                                                </div>
-                                                <div class="text-muted font-12">
-                                                Subtotal: $<?= number_format((float)($item->subtotal ?? 0), 2) ?>
-                                                </div>
-                                                <div class="text-muted font-11 mt-1">
-                                                Total:
-                                                <span class="font-weight-semibold text-primary">
-                                                    $<?= number_format((float)($item->total ?? 0), 2) ?>
-                                                </span>
-                                                </div>
-                                            </td>
+                                                        <button class="btn btn-sm btn-outline-primary btn-movimiento"
+                                                                data-id="<?= (int)$item->id_inventario_promo ?>"
+                                                                data-tabla="cat_inventario_promo"
+                                                                data-tipo="editar"
+                                                                data-nombre="<?= esc($item->dsc_producto) ?>"
+                                                                data-colores='<?= esc(json_encode($item->color ?? []), 'attr') ?>'
+                                                                data-variantes='<?= esc(json_encode($item->variantes ?? []), 'attr') ?>'
+                                                                title="Editar producto / stock">
+                                                            ✏️ Editar
+                                                        </button>
 
-                                            <!-- Fecha de ingreso -->
-                                            <td class="text-center">
-                                                <?php 
-                                                $fechaRaw = $item->fecha_entrada ?? $item->created_at ?? null;
-                                                if($fechaRaw):
-                                                    $fecha = new DateTime($fechaRaw);
-                                                    echo '<span class="badge badge-soft-success font-13">';
-                                                    echo $fecha->format('d/m/Y h:i A');
-                                                    echo '</span>';
-                                                endif;
-                                                ?>
-                                            </td>
+                                                        <button class="btn btn-sm btn-outline-warning btn-movimiento"
+                                                                data-id="<?= (int)$item->id_inventario_promo ?>"
+                                                                data-tabla="cat_inventario_promo"
+                                                                data-tipo="salida"
+                                                                data-nombre="<?= esc($item->dsc_producto) ?>"
+                                                                title="Baja de stock">
+                                                            📦 Baja
+                                                        </button>
 
-                                            <!-- Acciones -->
-                                            <td class="text-center text-nowrap">
+                                                        <button class="btn btn-sm btn-outline-danger btn-eliminar"
+                                                                data-id="<?= (int)$item->id_inventario_promo ?>"
+                                                                data-tabla="cat_inventario_promo"
+                                                                data-nombre="<?= esc($item->dsc_producto) ?>"
+                                                                title="Eliminar">
+                                                            ⛔ Elim.
+                                                        </button>
+                                                    </td>
+                                                </tr>
 
-                                                <button class="btn btn-sm btn-outline-primary btn-movimiento"
-                                                        data-id="<?= (int)$item->id_inventario_promo ?>"
-                                                        data-tabla="cat_inventario_promo"
-                                                        data-tipo="editar"
-                                                        data-nombre="<?= esc($item->dsc_producto) ?>"
-                                                        data-colores='<?= esc(json_encode($item->color ?? []), 'attr') ?>'
-                                                        data-variantes='<?= esc(json_encode($item->variantes ?? []), 'attr') ?>'
-                                                        title="Editar producto / stock">
-                                                    ✏️ Editar
-                                                </button>
-
-                                                <button class="btn btn-sm btn-outline-warning btn-movimiento"
-                                                        data-id="<?= (int)$item->id_inventario_promo ?>"
-                                                        data-tabla="cat_inventario_promo"
-                                                        data-tipo="salida"
-                                                        data-nombre="<?= esc($item->dsc_producto) ?>"
-                                                        title="Baja de stock">
-                                                    📦 Baja
-                                                </button>
-
-                                                <button class="btn btn-sm btn-outline-danger btn-eliminar"
-                                                        data-id="<?= (int)$item->id_inventario_promo ?>"
-                                                        data-tabla="cat_inventario_promo"
-                                                        data-nombre="<?= esc($item->dsc_producto) ?>"
-                                                        title="Eliminar">
-                                                    ⛔ Elim.
-                                                </button>
-
-                                            </td>
-
-                                            </tr>
-                                                <?php endforeach; ?>
-                                                <?php else: ?>
+                                            <?php endforeach; ?>
+                                            <?php else: ?>
                                             <tr>
                                                 <td colspan="10" class="text-center text-muted py-4">
                                                     No hay productos registrados
                                                 </td>
                                             </tr>
-                                            <?php endif; ?>
-                                        </tbody>
+                                        <?php endif; ?>
+                                    </tbody>
                                 </table>
                             </div> <!-- end table respons   ive -->
                         </div><!--end card-body-->
@@ -353,9 +383,10 @@
                             method="post"
                             action="<?= base_url('index.php/Inicio/guardarProducto') ?>"
                             enctype="multipart/form-data">
+
                             <div class="modal-body">
 
-                                <!-- Hidden -->
+                                <!-- Hidden (NO OMITIR) -->
                                 <input type="hidden" name="id_convenio" value="<?= $id_convenio ?>">
                                 <input type="hidden" id="id_producto" name="id_producto">
                                 <input type="hidden" id="tipo_movimiento" name="tipo_movimiento">
@@ -363,8 +394,9 @@
                                 <input type="hidden" name="variantes">
                                 <input type="hidden" name="stock">
                                 <input type="hidden" id="tabla_hidden" name="tabla" value="cat_inventario_promo">
-                                
+
                                 <div class="row">
+
                                     <!-- LEFT COLUMN -->
                                     <div class="col-md-7">
 
@@ -374,48 +406,30 @@
                                                 Producto
                                             </label>
                                             <input type="text"
-                                                class="form-control"
-                                                id="dsc_producto"
-                                                name="dsc_producto"
-                                                required>
+                                            class="form-control"
+                                            id="dsc_producto"
+                                            name="dsc_producto"
+                                            placeholder="Ej. Termos, playeras, plumas...">
                                         </div>
 
-                                        <!-- Cantidad y Precio -->
+                                        <!-- Cantidad solicitada + Subtotal -->
                                         <div class="row">
-
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label class="font-weight-bold text-dark text-uppercase font-12">
                                                         Cantidad solicitada
                                                     </label>
                                                     <input type="number"
-                                                        class="form-control"
-                                                        id="cantidad"
-                                                        name="cantidad"
-                                                        min="0"
-                                                        required>
+                                                            class="form-control"
+                                                            id="cantidad"
+                                                            name="cantidad"
+                                                            min="0"
+                                                            readonly>
+                                                    <small class="text-muted d-block mt-1">
+                                                        Se calcula automáticamente según las presentaciones por color.
+                                                    </small>
                                                 </div>
                                             </div>
-
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label class="font-weight-bold text-dark text-uppercase font-12">
-                                                        Precio unitario
-                                                    </label>
-                                                    <input type="number"
-                                                        class="form-control"
-                                                        id="precio_unitario"
-                                                        name="precio_unitario"
-                                                        min="0"
-                                                        step="0.01"
-                                                        required>
-                                                </div>
-                                            </div>
-
-                                        </div>
-
-                                        <!-- Subtotal y Total -->
-                                        <div class="row">
 
                                             <div class="col-md-6">
                                                 <div class="form-group">
@@ -423,34 +437,43 @@
                                                         Subtotal
                                                     </label>
                                                     <input type="number"
-                                                        class="form-control"
-                                                        id="subtotal"
-                                                        name="subtotal"
-                                                        min="0"
-                                                        step="0.01"
-                                                        readonly>
+                                                            class="form-control"
+                                                            id="subtotal"
+                                                            name="subtotal"
+                                                            min="0"
+                                                            step="0.01"
+                                                            readonly>
+                                                    <small class="text-muted d-block mt-1">
+                                                        (unidades * precio unitario) por renglón de color.
+                                                    </small>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <!-- COLORES -->
-                                            <div class="form-group">
-                                                <label class="font-weight-bold text-dark text-uppercase font-12">
-                                                    Colores
-                                                </label>
+                                        <!-- COLORES / PRESENTACIONES -->
+                                        <div class="form-group">
+                                            <label class="font-weight-bold text-dark text-uppercase font-12">
+                                                Colores (unidades, material y precio por color)
+                                            </label>
 
-                                                <div id="colores_container"></div>
-
-                                                <button type="button"
-                                                        class="btn btn-sm btn-outline-info mt-2"
-                                                        id="btn_add_color">
-                                                    <i class="mdi mdi-plus"></i> Agregar Color
-                                                </button>
-
-                                                <small class="text-muted d-block mt-1">
-                                                    El stock total se calculará automáticamente desde las cantidades por color.
-                                                </small>
+                                            <div class="alert alert-info py-2 mb-2">
+                                                Instrucciones: agrega el color del prodcuto, las unidades y
+                                                el precio unitario. Las variantes como talla, material, tamaño, etc, se
+                                                agregan abajo.
                                             </div>
+
+                                            <div id="colores_container"></div>
+
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-info mt-2"
+                                                    id="btn_add_color">
+                                                <i class="mdi mdi-plus"></i> Agregar Color
+                                            </button>
+
+                                            <small class="text-muted d-block mt-2">
+                                                El stock total se calcula con unidades por renglón.
+                                            </small>
+                                        </div>
 
                                         <!-- OTRAS VARIANTES -->
                                         <div class="form-group">
@@ -468,9 +491,8 @@
                                         </div>
                                     </div>
 
-                                    <!-- RIGHT COLUMN -->
+                                    <!-- RIGHT COLUMN (IMAGEN) -->
                                     <div class="col-md-5">
-
                                         <div class="form-group text-center">
 
                                             <label class="font-weight-bold text-dark text-uppercase font-12 w-100">
@@ -479,17 +501,14 @@
 
                                             <div class="mt-2 mb-3 border rounded d-flex align-items-center justify-content-center bg-light"
                                                 style="height: 180px; overflow: hidden;">
-
                                                 <img id="preview_imagen"
                                                     src=""
                                                     class="img-fluid"
                                                     style="max-height: 100%; display: none;">
-
                                                 <span id="placeholder_imagen"
                                                     class="text-muted small">
-                                                    Sin imagen seleccionada
+                                                Sin imagen seleccionada
                                                 </span>
-
                                             </div>
 
                                             <div class="custom-file text-left">
@@ -498,34 +517,34 @@
                                                     id="imagen_producto"
                                                     name="imagen"
                                                     accept="image/*">
-
                                                 <label class="custom-file-label"
                                                     for="imagen_producto"
                                                     data-browse="Elegir">
-                                                    Seleccionar archivo
+                                                Seleccionar archivo
                                                 </label>
                                             </div>
 
                                             <small class="form-text text-muted text-left mt-1">
                                                 Formatos: JPG, PNG, GIF
                                             </small>
-
                                         </div>
                                     </div>
                                 </div>
                             </div>
+
                             <div class="modal-footer bg-light">
                                 <button type="button"
                                         class="btn btn-secondary btn-sm px-3"
                                         data-dismiss="modal">
-                                        Cerrar
+                                Cerrar
                                 </button>
 
                                 <button type="submit"
                                         class="btn btn-primary btn-sm px-4">
-                                        Guardar
+                                Guardar
                                 </button>
                             </div>
+
                         </form>
                     </div>
                 </div>
@@ -604,6 +623,38 @@
         /* ==========================================================
             UTILIDADES
         ========================================================== */
+        function recalcularDesdeColores() {
+            let stockTotal = 0;
+            let subtotal = 0;
+
+            $('#colores_container .color-item').each(function () {
+                const qty = parseInt($(this).find('.color_cantidad').val(), 10) || 0;
+                const prc = parseFloat($(this).find('.color_precio').val()) || 0;
+
+                stockTotal += Math.max(0, qty);
+                subtotal += Math.max(0, qty) * Math.max(0, prc);
+            });
+
+            $('#cantidad').val(String(stockTotal));
+            $('#subtotal').val(subtotal.toFixed(2));
+            $('input[name="stock"]').val(String(stockTotal));
+
+            return { stockTotal, subtotal };
+        }
+
+        $(document).on('click', '#btn_add_color', function () {
+            addColorRow('#000000', 0, '', 0);
+        });
+
+        $(document).on('input', '.color_cantidad, .color_precio', function () {
+            recalcularDesdeColores();
+        });
+
+        $(document).on('click', '.remove-item', function () {
+            $(this).closest('.color-item').remove();
+            recalcularDesdeColores();
+        });
+        
         function setProductoReadonly(estado) {
             $('#dsc_producto').prop('readonly', !!estado);
         }
@@ -617,9 +668,17 @@
 
             setProductoReadonly(false);
 
+            // limpiar preview imagen
             $('#preview_imagen').hide().attr('src', '');
             $('#placeholder_imagen').show();
-            $('.custom-file-label').html('Seleccionar Archivo');
+
+            // ✅ limpiar input file real + label
+            $('#imagen_producto').val('');
+            $('.custom-file-label').removeClass('selected').html('Seleccionar archivo');
+
+            // ✅ resetear calculados
+            $('#cantidad').val('0');
+            $('#subtotal').val('0.00');
 
             // hidden
             $('#id_producto').val('');
@@ -630,6 +689,10 @@
             $('input[name="color"]').val('[]');
             $('input[name="variantes"]').val('[]');
             $('input[name="stock"]').val('0');
+
+            // compat si lo usas en submit
+            // (si ya no existe el input, no pasa nada)
+            $('input[name="precio_unitario"]').val('0');
         }
 
         function safeJsonParse(val, fallback) {
@@ -641,73 +704,88 @@
             } catch (e) {
             return fallback;
             }
+            const colores = safeJsonParse(d.colores, []);
+            if (Array.isArray(colores) && colores.length > 0) {
+            colores.forEach(c => {
+                const hex = (typeof c === 'string') ? c : (c.hexadecimal || c.hex || '#000000');
+                const qty = (typeof c === 'object' && c) ? (parseInt(c.cantidad, 10) || 0) : 0;
+                const mat = (typeof c === 'object' && c) ? (c.material || c.variante || '') : '';
+                const prc = (typeof c === 'object' && c) ? (parseFloat(c.precio) || 0) : 0;
+                addColorRow(hex, qty, mat, prc);
+            });
+            } else {
+            if ((d.tipo || 'nuevo') === 'nuevo') addColorRow('#000000', 0, '', 0);
+            }
+
+            recalcularDesdeColores();
         }
 
         /* ==========================================================
             COLORES
         ========================================================== */
-        function addColorRow(color = '#000000', cantidad = 0) {
+        function addColorRow(color = '#000000', cantidad = 0, material = '', precio = 0) {
             let html = `
-            <div class="row mb-2 color-item">
-                <div class="col-md-6">
-                <input type="color"
-                    name="colores[]"
-                    class="form-control color_hex"
-                    value="${color}"
-                    required>
+                <div class="row mb-2 color-item">
+
+                <div class="col-md-3">
+                    <label class="font-11 text-muted mb-1">Color</label>
+                    <input type="color"
+                        class="form-control color_hex"
+                        value="${color}">
                 </div>
-                <div class="col-md-4">
-                <input type="number"
-                    name="cantidades[]"
-                    class="form-control color_cantidad"
-                    min="0"
-                    value="${cantidad}"
-                    placeholder="Cantidad"
-                    required>
+
+                <div class="col-md-3">
+                    <label class="font-11 text-muted mb-1">Unidades</label>
+                    <input type="number"
+                        class="form-control color_cantidad"
+                        min="0"
+                        value="${cantidad}">
                 </div>
-                <div class="col-md-2 text-center">
-                <button type="button" class="btn btn-danger btn-sm remove-item">
+
+                <div class="col-md-2">
+                    <label class="font-11 text-muted mb-1">Precio unitario</label>
+                    <input type="number"
+                        class="form-control color_precio"
+                        min="0"
+                        step="0.01"
+                        value="${precio}">
+                </div>
+
+                <div class="col-md-1 text-center">
+                    <label class="font-11 text-muted mb-1">&nbsp;</label>
+                    <button type="button" class="btn btn-danger btn-sm remove-item" title="Quitar">
                     <i class="mdi mdi-close"></i>
-                </button>
+                    </button>
                 </div>
-            </div>
+
+                </div>
             `;
             $('#colores_container').append(html);
         }
-
-        $(document).on('click', '#btn_add_color', function () {
-            addColorRow();
-        });
 
         /* ==========================================================
             VARIANTES (JSON en hidden)
         ========================================================== */
         function addVarianteRow(nombre = '', valor = '') {
             let html = `
-            <div class="row mb-2 variante-item">
+                <div class="row mb-2 variante-item">
                 <div class="col-md-5">
-                <input type="text"
-                    class="form-control variante_nombre"
-                    placeholder="Atributo (Ej: Talla)"
-                    value="${nombre}">
+                    <input type="text" class="form-control variante_nombre" placeholder="Atributo (Ej: Talla)" value="${nombre}">
                 </div>
                 <div class="col-md-5">
-                <input type="text"
-                    class="form-control variante_valor"
-                    placeholder="Valor (Ej: M)"
-                    value="${valor}">
+                    <input type="text" class="form-control variante_valor" placeholder="Valor (Ej: M)" value="${valor}">
                 </div>
                 <div class="col-md-2 text-center">
-                <button type="button" class="btn btn-danger btn-sm remove-item">
+                    <button type="button" class="btn btn-danger btn-sm remove-item">
                     <i class="mdi mdi-close"></i>
-                </button>
+                    </button>
                 </div>
-            </div>
+                </div>
             `;
             $('#variantes_container').append(html);
-        }
+            }
 
-        $(document).on('click', '#btn_add_variante', function () {
+            $(document).on('click', '#btn_add_variante', function () {
             addVarianteRow();
         });
 
@@ -741,7 +819,7 @@
             Requiere que el botón tenga data-*
             data-id, data-tabla, data-tipo, data-nombre, data-colores, data-variantes
         ========================================================== */
-        $(document).on('click', '.btn-movimiento', function () {
+       $(document).on('click', '.btn-movimiento', function () {
             const d = $(this).data();
 
             resetModal();
@@ -751,52 +829,99 @@
             $('#dsc_producto').val(d.nombre || '');
             $('#tabla_hidden').val(d.tabla || 'cat_inventario_promo');
 
-            // Cargar colores (si vienen)
+            // ============================
+            // COLORES / PRESENTACIONES
+            // soporta:
+            // - string "#fff"
+            // - {hexadecimal, cantidad, material, precio}
+            // - {hex, cantidad, variante, precio}
+            // ============================
             const colores = safeJsonParse(d.colores, []);
+
             if (Array.isArray(colores) && colores.length > 0) {
-            colores.forEach(c => {
-                // soporta {hexadecimal,cantidad} o {hex,cantidad} o string "#fff"
+
+                colores.forEach(c => {
                 const hex = (typeof c === 'string') ? c : (c.hexadecimal || c.hex || '#000000');
-                const qty = (typeof c === 'object' && c) ? (parseInt(c.cantidad) || 0) : 0;
-                addColorRow(hex, qty);
-            });
+                const qty = (typeof c === 'object' && c) ? (parseInt(c.cantidad, 10) || 0) : 0;
+                const mat = (typeof c === 'object' && c) ? (c.material || c.variante || '') : '';
+                const prc = (typeof c === 'object' && c) ? (parseFloat(c.precio) || 0) : 0;
+
+                addColorRow(hex, qty, mat, prc);
+                });
+
             } else {
-            // si es nuevo, deja al menos una fila
-            if ((d.tipo || 'nuevo') === 'nuevo') addColorRow();
+                // si es nuevo, deja al menos una fila lista
+                if ((d.tipo || 'nuevo') === 'nuevo') {
+                addColorRow('#000000', 0, '', 0);
+                }
             }
 
-            // Cargar variantes (si vienen)
+            // ============================
+            // VARIANTES (se mantienen aparte, NO se combinan)
+            // ============================
             const vars = safeJsonParse(d.variantes, []);
             if (Array.isArray(vars) && vars.length > 0) {
-            vars.forEach(v => {
+                vars.forEach(v => {
                 if (typeof v === 'string') {
-                addVarianteRow(v, '');
+                    addVarianteRow(v, '');
                 } else if (v && typeof v === 'object') {
-                addVarianteRow(v.atributo || '', v.valor || '');
+                    addVarianteRow(v.atributo || '', v.valor || '');
                 }
-            });
+                });
             }
 
-            // Si es salida, bloquear nombre y vaciar cantidad solicitada
+            // ============================
+            // MODO SALIDA
+            // ============================
             if ((d.tipo || '') === 'salida') {
                 setProductoReadonly(true);
-                $('#cantidad').val('');
+
+                // En salida, cantidad funciona como "cantidad a retirar"
+                $('#cantidad').prop('readonly', false).val('');
                 $('label[for="cantidad"]').text('Cantidad a retirar');
+
+                // Subtotal no aplica en salida (déjalo en 0)
+                $('#subtotal').val('0.00');
+
             } else {
+                // En nuevo/editar, cantidad es calculada por colores
+                $('#cantidad').prop('readonly', true);
                 $('label[for="cantidad"]').text('Cantidad solicitada');
+
+                // Recalcular cantidad y subtotal desde colores al abrir
+                recalcularDesdeColores();
             }
 
             const titulos = {
-            nuevo: 'Nuevo Producto',
-            editar: 'Editar Producto',
-            salida: 'Baja de Stock'
+                nuevo: 'Nuevo Producto',
+                editar: 'Editar Producto',
+                salida: 'Baja de Stock'
             };
             $('#modalTitulo').text(titulos[d.tipo] || 'Movimiento');
+
             $('#modalMovimientoInventario').modal('show');
         });
 
         $(document).on('input', '#dsc_producto', function () {
             this.value = (this.value || '').toUpperCase();
+        });
+
+        $(document).on('change', '#imagen_producto', function () {
+            const fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName || 'Seleccionar archivo');
+
+            const input = this;
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                $('#preview_imagen').attr('src', e.target.result).show();
+                $('#placeholder_imagen').hide();
+                };
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                $('#preview_imagen').hide().attr('src', '');
+                $('#placeholder_imagen').show();
+            }
         });
 
         /* ==========================================================
@@ -817,12 +942,13 @@
             $('#subtotal').val((cantidad * precio).toFixed(2));
         });
 
-        /* ==========================================================
-            FORM – SUBMIT (GUARDAR PRODUCTO)
-            - Construye JSON de color y variantes
-            - Calcula stockTotal desde colores
-            - Envía todo por AJAX
-        ========================================================== */
+        // ==========================================================
+        // FORM – SUBMIT (GUARDAR PRODUCTO)
+        // - Construye JSON de color (incluye precio) y variantes
+        // - Calcula stockTotal desde cantidades por color
+        // - Calcula subtotal/total desde (cantidad * precio) por color
+        // - Envía todo por AJAX
+        // ==========================================================
         $('#formMovimientoInventario').on('submit', function (e) {
             e.preventDefault();
 
@@ -835,30 +961,45 @@
 
             let colores = [];
             let variantes = [];
+
             let stockTotal = 0;
+            let subtotalColores = 0;
 
-            // ===== COLORES =====
+            // Colores/presentaciones
             $('#colores_container .color-item').each(function () {
-            const hex = $(this).find('.color_hex').val();
-            const cantidad = parseInt($(this).find('.color_cantidad').val(), 10) || 0;
+                const hex = $(this).find('.color_hex').val();
+                const cantidad = parseInt($(this).find('.color_cantidad').val(), 10) || 0;
+                const material = ($(this).find('.color_material').val() || '').trim();
+                const precio = parseFloat($(this).find('.color_precio').val()) || 0;
 
-            if (hex) {
-                colores.push({ hexadecimal: hex, cantidad: cantidad });
-                stockTotal += Math.max(0, cantidad);
-            }
+                if (hex) {
+                const qty = Math.max(0, cantidad);
+                const prc = Math.max(0, precio);
+
+                colores.push({ hexadecimal: hex, cantidad: qty, material: material, precio: prc });
+                stockTotal += qty;
+                subtotalColores += qty * prc;
+                }
             });
 
-            // ===== VARIANTES =====
+            // No required, pero sí validación mínima para no guardar “vacío”
+            if (!colores.length && !($('#dsc_producto').val() || '').trim()) {
+                Swal.fire('Aviso', 'Captura al menos el nombre del producto o agrega una presentación por color.', 'info');
+                return;
+            }
+
+            // Variantes (se mantienen aparte)
             $('#variantes_container .variante-item').each(function () {
-            const nombre = ($(this).find('.variante_nombre').val() || '').trim();
-            const valor  = ($(this).find('.variante_valor').val() || '').trim();
-
-            if (nombre !== '') {
-                variantes.push({ atributo: nombre, valor: valor });
-            }
+                const nombre = ($(this).find('.variante_nombre').val() || '').trim();
+                const valor  = ($(this).find('.variante_valor').val() || '').trim();
+                if (nombre !== '') variantes.push({ atributo: nombre, valor: valor });
             });
 
-            // Asignar a hidden (y al FormData por si el browser no toma hidden actualizado)
+            // cálculos
+            $('#cantidad').val(String(stockTotal));
+            $('#subtotal').val(subtotalColores.toFixed(2));
+
+            // Hidden + FormData
             $('input[name="color"]').val(JSON.stringify(colores));
             $('input[name="variantes"]').val(JSON.stringify(variantes));
             $('input[name="stock"]').val(String(stockTotal));
@@ -867,41 +1008,46 @@
             formData.set('variantes', JSON.stringify(variantes));
             formData.set('stock', String(stockTotal));
 
-            // Asegura 'tabla' (hidden #tabla_hidden)
-            const tablaVal = $('#tabla_hidden').val() || 'cat_inventario_promo';
-            formData.set('tabla', tablaVal);
+            // compat con backend
+            formData.set('cantidad', String(stockTotal));
+            formData.set('subtotal', subtotalColores.toFixed(2));
+            formData.set('total', subtotalColores.toFixed(2));
+            formData.set('precio_unitario', '0');
+
+            // tabla
+            formData.set('tabla', $('#tabla_hidden').val() || 'cat_inventario_promo');
 
             $.ajax({
-            url: url,
-            type: 'POST',
-            data: formData,
-            dataType: 'json',
-            processData: false,
-            contentType: false,
-            beforeSend: function () {
+                url: url,
+                type: 'POST',
+                data: formData,
+                dataType: 'json',
+                processData: false,
+                contentType: false,
+                beforeSend: function () {
                 $btn.prop('disabled', true)
                     .html('<span class="spinner-border spinner-border-sm"></span> Guardando...');
-            },
-            success: function (res) {
+                },
+                success: function (res) {
                 if (res && res.error === false) {
-                Swal.fire({
+                    Swal.fire({
                     icon: 'success',
                     title: '¡Éxito!',
                     text: res.respuesta || 'Guardado correctamente.',
                     timer: 1500,
                     showConfirmButton: false
-                }).then(() => location.reload());
+                    }).then(() => location.reload());
                 } else {
-                Swal.fire('Error', (res && res.respuesta) ? res.respuesta : 'Error al guardar.', 'error');
+                    Swal.fire('Error', (res && res.respuesta) ? res.respuesta : 'Error al guardar.', 'error');
                 }
-            },
-            error: function (xhr) {
+                },
+                error: function (xhr) {
                 console.log('AJAX ERROR:', xhr.status, xhr.responseText);
                 Swal.fire('Error', 'No se pudo procesar la petición. Revisa consola (Network).', 'error');
-            },
-            complete: function () {
+                },
+                complete: function () {
                 $btn.prop('disabled', false).html(originalText);
-            }
+                }
             });
         });
 

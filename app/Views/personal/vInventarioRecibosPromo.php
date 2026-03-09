@@ -9,10 +9,7 @@
 
               <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
                 <h4 class="header-title mt-0 mb-0 text-dark">
-                  Consultar Recibos —
-                  <strong>
-                    <?= $materiales ? ($materiales->convenio . " - " . ($materiales->razon_social ?? '')) : 'Contrato no encontrado' ?>
-                  </strong>
+                  Consultar Recibos 
                 </h4>
 
                 <div class="d-flex">
@@ -21,8 +18,8 @@
                     ⬅ Volver a Inventario
                   </a>
 
-                  <a class="btn btn-primary shadow-sm"
-                     href="<?= base_url('index.php/Inicio/FormularioPromoPorConvenio/' . intval($id_convenio_promo ?? $id_convenio ?? 0)) ?>">
+                  <a class="btn btn-primary shadow-sm mr-2"
+                    href="<?= base_url('index.php/Inicio/FormularioPromo/' . intval($id_convenio_promo ?? $id_convenio ?? 0)) ?>">
                     ➕ Nuevo recibo
                   </a>
                 </div>
@@ -36,10 +33,11 @@
                       <th>Fecha</th>
                       <th>Solicitante</th>
                       <th>Concepto</th>
-                      <th>PDF</th>
+                      <th>Recibo</th>
                       <th>Oficio</th>
-                      <th>Evidencia</th>
                       <th>INE</th>
+                      <th>Evidencia</th>
+                      <th>Estatus</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -65,7 +63,31 @@
                           $oficioRel = $r->archivo_oficio ?? '';
                           $evidRel   = $r->archivo_evidencia ?? '';
                           $ineRel    = $r->archivo_ine ?? '';
+                          $hasOficio = !empty($oficioRel);
+                          $hasIne    = !empty($ineRel);
+                          $hasEvid   = !empty($evidRel);
+
+                          $docsCount = ($hasOficio ? 1 : 0) + ($hasIne ? 1 : 0) + ($hasEvid ? 1 : 0);
+
+                          // Semáforo:
+                          // - Verde: todo
+                          // - Amarillo: oficio + ine (aunque falte evidencia)
+                          // - Rojo: lo demás
+                          if ($hasOficio && $hasIne && $hasEvid) {
+                              $semaforoClass = 'badge-soft-success';
+                              $semaforoText  = 'Completo';
+                              $semaforoIcon  = '🟢';
+                          } elseif ($hasOficio && $hasIne) {
+                              $semaforoClass = 'badge-soft-warning';
+                              $semaforoText  = 'En proceso';
+                              $semaforoIcon  = '🟡';
+                          } else {
+                              $semaforoClass = 'badge-soft-danger';
+                              $semaforoText  = 'Pendiente';
+                              $semaforoIcon  = '🔴';
+                          }
                         ?>
+
                         <tr class="align-middle">
                           <td class="text-center font-weight-bold"><?= $folio ?></td>
                           <td class="text-center"><?= esc($fechaFmt) ?></td>
@@ -76,7 +98,7 @@
                             <a class="btn btn-sm btn-outline-primary"
                                href="<?= $pdfUrl ?>"
                                target="_blank">
-                              📄 Ver PDF
+                              📄 Ver Recibo
                             </a>
                           </td>
 
@@ -85,33 +107,32 @@
                             <div class="mb-2">
                               <?php if(!empty($oficioRel)): ?>
                                 <a href="<?= base_url($oficioRel) ?>" target="_blank" class="btn btn-sm btn-success">✅ Ver</a>
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-secondary btn-toggle-upload"
+                                        data-target="#upload_oficio_<?= $idRecibo ?>">
+                                  ✏️ Cambiar
+                                </button>
                               <?php else: ?>
                                 <span class="text-muted">Sin archivo</span>
                               <?php endif; ?>
                             </div>
-                            <input type="file"
-                                   class="form-control form-control-sm doc-input"
-                                   data-id="<?= $idRecibo ?>"
-                                   data-tipo="oficio"
-                                   accept=".pdf,image/*">
-                            <small class="text-muted d-block mt-1">Máx 300MB</small>
-                          </td>
 
-                          <!-- Evidencia -->
-                          <td class="text-center">
-                            <div class="mb-2">
-                              <?php if(!empty($evidRel)): ?>
-                                <a href="<?= base_url($evidRel) ?>" target="_blank" class="btn btn-sm btn-success">✅ Ver</a>
-                              <?php else: ?>
-                                <span class="text-muted">Sin archivo</span>
+                            <div id="upload_oficio_<?= $idRecibo ?>" class="<?= !empty($oficioRel) ? 'd-none' : '' ?>">
+                              <input type="file"
+                                    class="form-control form-control-sm doc-input"
+                                    data-id="<?= $idRecibo ?>"
+                                    data-tipo="oficio"
+                                    accept=".pdf,image/*">
+                              <small class="text-muted d-block mt-1">Máx 300MB</small>
+
+                              <?php if(!empty($oficioRel)): ?>
+                                <button type="button"
+                                        class="btn btn-sm btn-link text-muted p-0 mt-1 btn-cancel-upload"
+                                        data-target="#upload_oficio_<?= $idRecibo ?>">
+                                  Cancelar
+                                </button>
                               <?php endif; ?>
                             </div>
-                            <input type="file"
-                                   class="form-control form-control-sm doc-input"
-                                   data-id="<?= $idRecibo ?>"
-                                   data-tipo="evidencia"
-                                   accept=".pdf,image/*">
-                            <small class="text-muted d-block mt-1">Máx 300MB</small>
                           </td>
 
                           <!-- INE -->
@@ -119,22 +140,77 @@
                             <div class="mb-2">
                               <?php if(!empty($ineRel)): ?>
                                 <a href="<?= base_url($ineRel) ?>" target="_blank" class="btn btn-sm btn-success">✅ Ver</a>
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-secondary btn-toggle-upload"
+                                        data-target="#upload_ine_<?= $idRecibo ?>">
+                                  ✏️ Cambiar
+                                </button>
                               <?php else: ?>
                                 <span class="text-muted">Sin archivo</span>
                               <?php endif; ?>
                             </div>
-                            <input type="file"
-                                   class="form-control form-control-sm doc-input"
-                                   data-id="<?= $idRecibo ?>"
-                                   data-tipo="ine"
-                                   accept=".pdf,image/*">
-                            <small class="text-muted d-block mt-1">Máx 300MB</small>
+
+                            <div id="upload_ine_<?= $idRecibo ?>" class="<?= !empty($ineRel) ? 'd-none' : '' ?>">
+                              <input type="file"
+                                    class="form-control form-control-sm doc-input"
+                                    data-id="<?= $idRecibo ?>"
+                                    data-tipo="ine"
+                                    accept=".pdf,jpg,png,image/*">
+                              <small class="text-muted d-block mt-1">Máx 300MB</small>
+
+                              <?php if(!empty($ineRel)): ?>
+                                <button type="button"
+                                        class="btn btn-sm btn-link text-muted p-0 mt-1 btn-cancel-upload"
+                                        data-target="#upload_ine_<?= $idRecibo ?>">
+                                  Cancelar
+                                </button>
+                              <?php endif; ?>
+                            </div>
+                          </td>
+
+                          <!-- Evidencia (al final) -->
+                          <td class="text-center">
+                            <div class="mb-2">
+                              <?php if(!empty($evidRel)): ?>
+                                <a href="<?= base_url($evidRel) ?>" target="_blank" class="btn btn-sm btn-success">✅ Ver</a>
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-secondary btn-toggle-upload"
+                                        data-target="#upload_evidencia_<?= $idRecibo ?>">
+                                  ✏️ Cambiar
+                                </button>
+                              <?php else: ?>
+                                <span class="text-muted">Sin archivo</span>
+                              <?php endif; ?>
+                            </div>
+
+                            <div id="upload_evidencia_<?= $idRecibo ?>" class="<?= !empty($evidRel) ? 'd-none' : '' ?>">
+                              <input type="file"
+                                    class="form-control form-control-sm doc-input"
+                                    data-id="<?= $idRecibo ?>"
+                                    data-tipo="evidencia"
+                                    accept=".pdf,jpg,pnf,image/*">
+                              <small class="text-muted d-block mt-1">Máx 300MB</small>
+
+                              <?php if(!empty($evidRel)): ?>
+                                <button type="button"
+                                        class="btn btn-sm btn-link text-muted p-0 mt-1 btn-cancel-upload"
+                                        data-target="#upload_evidencia_<?= $idRecibo ?>">
+                                  Cancelar
+                                </button>
+                              <?php endif; ?>
+                            </div>
+                          </td>
+
+                          <td class="text-center">
+                            <span class="badge <?= $semaforoClass ?> font-13 p-2 px-3">
+                              <?= $semaforoIcon ?> <?= esc($semaforoText) ?> (<?= $docsCount ?>/3)
+                            </span>
                           </td>
                         </tr>
                       <?php endforeach; ?>
                     <?php else: ?>
                       <tr>
-                        <td colspan="8" class="text-center text-muted py-4">
+                        <td colspan="9" class="text-center text-muted py-4">
                           No hay recibos generados para este contrato.
                         </td>
                       </tr>
@@ -162,72 +238,84 @@
 <script src="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.js"></script>
 
 <script>
-    $(document).ready(function(){
+  $(document).ready(function(){
 
-        // DataTable (opcional)
-        if ($.fn.DataTable) {
-            $('#tablaRecibos').DataTable({
-            destroy: true,
-            ordering: false,
-            pageLength: 10,
-            language: { url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json" }
-            });
+    // DataTable (opcional)
+    if ($.fn.DataTable) {
+        $('#tablaRecibos').DataTable({
+        destroy: true,
+        ordering: false,
+        pageLength: 10,
+        language: { url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json" }
+        });
+    }
+
+    // Upload por cambio de input
+    $(document).on('change', '.doc-input', function(){
+        const file = this.files && this.files[0] ? this.files[0] : null;
+        if (!file) return;
+
+        const idRecibo = parseInt($(this).data('id') || 0, 10);
+        const tipo = ($(this).data('tipo') || '').toString().trim();
+
+        if (!idRecibo || !tipo) {
+        Swal.fire('Error', 'Datos de carga inválidos.', 'error');
+        return;
         }
 
-        // Upload por cambio de input
-        $(document).on('change', '.doc-input', function(){
-            const file = this.files && this.files[0] ? this.files[0] : null;
-            if (!file) return;
+        // validar tamaño 300MB en cliente también
+        const maxBytes = 300 * 1024 * 1024;
+        if (file.size > maxBytes) {
+        Swal.fire('Error', 'El archivo excede 300 MB.', 'error');
+        $(this).val('');
+        return;
+        }
 
-            const idRecibo = parseInt($(this).data('id') || 0, 10);
-            const tipo = ($(this).data('tipo') || '').toString().trim();
+        const fd = new FormData();
+        fd.append('id_salida_inventario', idRecibo);
+        fd.append('tipo', tipo);
+        fd.append('archivo', file);
 
-            if (!idRecibo || !tipo) {
-            Swal.fire('Error', 'Datos de carga inválidos.', 'error');
-            return;
-            }
-
-            // validar tamaño 300MB en cliente también
-            const maxBytes = 300 * 1024 * 1024;
-            if (file.size > maxBytes) {
-            Swal.fire('Error', 'El archivo excede 300 MB.', 'error');
-            $(this).val('');
-            return;
-            }
-
-            const fd = new FormData();
-            fd.append('id_salida_inventario', idRecibo);
-            fd.append('tipo', tipo);
-            fd.append('archivo', file);
-
-            Swal.fire({
-            title: 'Subiendo...',
-            text: 'Por favor espera',
-            allowOutsideClick: false,
-            didOpen: () => Swal.showLoading()
-            });
-
-            $.ajax({
-            url: '<?= base_url("index.php/Inicio/subirDocumentoRecibo") ?>',
-            type: 'POST',
-            data: fd,
-            dataType: 'json',
-            processData: false,
-            contentType: false,
-            success: function(res){
-                if (res && res.error === false) {
-                Swal.fire('Listo', res.respuesta || 'Archivo cargado.', 'success')
-                    .then(() => location.reload());
-                } else {
-                Swal.fire('Error', (res && res.respuesta) ? res.respuesta : 'No se pudo subir.', 'error');
-                }
-            },
-            error: function(xhr){
-                console.log('UPLOAD ERROR:', xhr.status, xhr.responseText);
-                Swal.fire('Error', 'Error al subir. Revisa consola/network.', 'error');
-            }
-            });
+        Swal.fire({
+        title: 'Subiendo...',
+        text: 'Por favor espera',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
         });
 
+        $.ajax({
+        url: '<?= base_url("index.php/Inicio/subirDocumentoRecibo") ?>',
+        type: 'POST',
+        data: fd,
+        dataType: 'json',
+        processData: false,
+        contentType: false,
+        success: function(res){
+            if (res && res.error === false) {
+            Swal.fire('Listo', res.respuesta || 'Archivo cargado.', 'success')
+                .then(() => location.reload());
+            } else {
+            Swal.fire('Error', (res && res.respuesta) ? res.respuesta : 'No se pudo subir.', 'error');
+            }
+        },
+        error: function(xhr){
+            console.log('UPLOAD ERROR:', xhr.status, xhr.responseText);
+            Swal.fire('Error', 'Error al subir. Revisa consola/network.', 'error');
+        }
+        });
     });
+    
+    $(document).on('click', '.btn-toggle-upload', function(){
+      const target = $(this).data('target');
+      if (target) $(target).removeClass('d-none');
+    });
+
+    $(document).on('click', '.btn-cancel-upload', function(){
+      const target = $(this).data('target');
+      if (target) {
+        $(target).find('input[type="file"]').val('');
+        $(target).addClass('d-none');
+      }
+    });
+  });
 </script>

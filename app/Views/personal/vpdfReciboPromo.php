@@ -155,11 +155,12 @@
                 <div class="center bold">Recibe Material</div>
                 <br>
 
-                Nombre completo: <?= $nombre_solicitante ?><br>
-                Fecha: <?= date('d/m/Y') ?><br><br>
+                Nombre completo: <br>
+                Fecha: <br>
 
+                Firma <br>
                 ___________________________<br>
-                Firma
+                
 
                 <div class="footer-text">
                     Hago de su conocimiento que he recibido a entera satisfacción y todo se encuentra bajo mi resguardo, 
@@ -181,27 +182,27 @@
                     </tr>
                     <tr>
                         <td class="bold">Nombre</td>
-                        <td><?= $nombre_solicitante ?></td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td class="bold">Cargo</td>
-                        <td><?= $puesto ?></td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td class="bold">Teléfono</td>
-                        <td><?= $telefono ?></td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td class="bold">Correo</td>
-                        <td><?= $correo ?></td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td class="bold">Fecha del evento</td>
-                        <td><?= $fec_eve ?></td>
+                        <td></td>
                     </tr>
                     <tr>
-                        <td class="bold">Lugar de entrega</td>
-                        <td><?= $lugar ?></td>
+                        <td class="bold">Lugar de distribución</td>
+                        <td></td>
                     </tr>
                 </table>
 
@@ -214,13 +215,11 @@
                 Credencial de Servidor Público ☐<br><br>
 
                 <div class="center bold">
-                    Nombre completo: <?= $nombre_solicitante ?><br>
-                    Fecha: <?= date('d/m/Y') ?><br>
+                    Nombre completo: <br><br><br> 
+                    Fecha: <br><br><br>
+                    Firma <br><br><br>
                 
-                    ___________________________<br>
-                    Firma<br>
-                
-                    Me comprometo a entregar evidencia fotográfica de la entrega <br> <!--bold-->
+                    Me comprometo a entregar evidencia fotográfica de la distribución <br> <!--bold-->
                 </div>
 
                 <div class="footer-text">
