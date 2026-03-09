@@ -6527,16 +6527,6 @@ class Principal extends BaseController
                  // If provider info is manual (text), we rely on $items which have provider details per row.
                  // But $data['proveedor'] might be needed for header/footer if used.
              }
-        } elseif ($id_reserva) {
-             // We need to fetch the form data first to get the provider name/id
-             // The code below line 6418 fetches $formulario_pt but it's for consecutive?
-             // Ah, checking line 6449, it fetches $registro_pt from 'reserva' table?
-             // Wait, the view uses $registro_pt which comes from... table 'formulario_pt' in Inicio.php, but here 'reserva'?
-             // Let's look closer at line 6449 in the file.
-             // It fetches from 'reserva' table.
-             // But 'formulario_pt' table has 'nombre_proveedor_1'.
-             // 'reserva' table has 'id_proveedor'. 
-             // If this function uses 'reserva' table, then $registro_pt has 'id_proveedor'.
         }
 
         //die( var_dump(   $data['periodo_factura_rows'] ) );
