@@ -1963,6 +1963,67 @@ class Inicio extends BaseController
         $data['cat_servicio'] = $globas->getTabla(['tabla' => 'cat_servicio', 'where' => ['visible' => 1]])->data;
         $data['cat_mes'] = $globas->getTabla(['tabla' => 'cat_mes', 'where' => ['visible' => 1]])->data;
 
+        // --- NEW LOGIC FOR MATERIALES FORM ---
+        $data['id_reserva'] = null;
+        $data['editar'] = 0;
+        $data['es2025'] = false;
+        $data['registro_pt'] = new stdClass();
+        $data['periodo_factura'] = new stdClass();
+        $data['proveedor'] = new stdClass();
+        $data['proveedor_banco'] = []; 
+
+        $data['no_consecutivo'] = '';
+
+        $data['periodo_factura']->encabezado = '';
+        $data['periodo_factura']->proyecto_clave = ''; 
+        $data['periodo_factura']->partida_clave = '';
+        $data['periodo_factura']->importe = '';
+
+        $data['no_reserva']="";
+        $data['no_convenio']="";
+
+        $formulario_pt = $globas->getTabla(["tabla" => "formulario_pt", "where" => ["visible" => 1, 'usu_reg' => $session->get('id_usuario')], 'tipo_formato' => 'MATERIALES']);
+        $no_consecutivo = count(is_array($formulario_pt->data)?$formulario_pt->data:[]) + 1 ;
+        if (strlen($no_consecutivo) == 1) {
+            $no_consecutivo = '00' . $no_consecutivo;
+        }
+        if (strlen($no_consecutivo) == 2) {
+            $no_consecutivo = '0' . $no_consecutivo;
+        }
+        
+        $data['consecutivo'] = $no_consecutivo;
+
+        $proveedores = $globas->getTabla(["tabla" => "proveedor", "where" => ["visible" => 1],'limit' => 10]);
+        $data['proveedores'] = $proveedores->data;
+
+        $cat_area = $globas->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'id_pago' => 1]]);
+        $data['cat_area'] = $cat_area->data;
+        
+        $cat_proyecto = $globas->getTabla(["tabla" => "cat_proyecto", "where" => ["visible" => 1]]);
+        $data['cat_proyecto'] = $cat_proyecto->data;
+
+        $cat_partida = $globas->getTabla(["tabla" => "cat_partida", "where" => ["visible" => 1]]);
+        $data['cat_partida'] = $cat_partida->data;
+
+        $usuarios = $globas->getTabla(["tabla" => "vw_usuario", "where" => ["visible" => 1]]);
+        $data['usuarios'] = $usuarios->data;
+        $usu = $globas->getTabla(["tabla" => "vw_usuario", "where" => ["visible" => 1, 'id_usuario' => $session->get('id_usuario')]]);
+
+        if(isset($usu->data[0]->id_usuario)){
+            $tieneArea = $globas->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'titular' => $usu->data[0]->id_usuario]]);
+            if(isset($tieneArea->data) && !empty($tieneArea->data)){
+                $data['id_area'] = $tieneArea->data[0]->id_area;
+            }else{
+                $tieneArea = $globas->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'titular' => $usu->data[0]->id_jefe_inmediato]]);
+                if(isset($tieneArea->data) && !empty($tieneArea->data)){
+                    $data['id_area'] = $tieneArea->data[0]->id_area;
+                }else{
+                        $data['id_area'] = isset($cat_area->data[0]->id_area) ? $cat_area->data[0]->id_area : 0;
+                }
+            }
+        }
+        $data['anio_actual'] = date('Y');
+
         $data['scripts'] = array('principal', 'inicio');
         $data['contentView'] = 'personal/vServicios';
         $this->_renderView($data);
@@ -3095,6 +3156,29 @@ class Inicio extends BaseController
             $dataDB = array('tabla' => 'formulario_pt', 'where' => ['visible' => 1, 'tipo_formato' => 'PT']);
         }else{
             $dataDB = array('tabla' => 'formulario_pt', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario'), 'tipo_formato' => 'PT']);
+        }
+       
+       // die( var_dump( $dataDB ) );
+        $response = $globas->getTabla($dataDB);
+          foreach($response->data as $key => $value){
+            $usuario = $globas->getTabla(["tabla" => "vw_usuario", "where" => ["id_usuario" => $value->usu_reg], 'limit' => 1]);
+            $response->data[$key]->nombre_usuario = $usuario->data[0]->nombre_completo;
+            }  
+        $data['dataHojaAzul'] = $response->data;
+        
+        $data['scripts'] = array('inicio');
+        $data['edita'] = 0;
+        $data['contentView'] = 'secciones/vListaHojaAzul';
+        $this->_renderView($data);
+    }
+    public function ListaHojaAzulMateriales()
+    {
+        $session = \Config\Services::session();
+        $globas = new Mglobal;
+        if(in_array($session->get('id_perfil'), [1,2])){
+            $dataDB = array('tabla' => 'formulario_pt', 'where' => ['visible' => 1, 'tipo_formato' => 'MATERIALES']);
+        }else{
+            $dataDB = array('tabla' => 'formulario_pt', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario'), 'tipo_formato' => 'MATERIALES']);
         }
        
        // die( var_dump( $dataDB ) );

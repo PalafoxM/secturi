@@ -6131,6 +6131,216 @@ class Agregar extends BaseController
         return $this->respond($response);
     }
 
+    public function guardaFormatoMateriales()
+    {
+        $session = \Config\Services::session();
+        $response = new \stdClass();
+        $this->globals = new Mglobal();
+        $data = $this->request->getPost();
+       // $archivos_post = $this->request->getFiles();
+        
+        // 1. Validaciones Básicas
+        if (isset($data['no_consecutivo']) && empty($data['no_consecutivo'])) {
+            $response->error = true;
+            $response->respuesta = "Es requerido el no_consecutivo";
+            return $this->respond($response);
+        }
+           
+   
+
+
+      //validar que no se repita el no_consecutivo
+      if($data['editar'] != 1 ){
+        $existe = $this->globals->getTabla(['tabla' => 'formulario_pt', 'where' => ['no_consecutivo' => $data['folioCompleto'], 'visible' => 1]]);
+            if(!$existe->error && !empty($existe->data)){
+                $usuario = $this->globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['id_usuario' => $existe->data[0]->usu_reg]])->data[0]->nombre_completo;
+                $response->error = true;
+                $response->respuesta = "El No. Consecutivo ya existe, creado por: ".$usuario;
+                return $this->respond($response);
+            }
+      }
+   
+
+        
+       
+        $dataInsert = [
+            'no_consecutivo' => $data['folioCompleto'],
+            'nombre_proveedor_1' => $data['nombre_proveedor_1'],
+            'rfc_proveedor' => $data['rfc_proveedor'],
+            'nombre_proveedor_2' => $data['nombre_proveedor_2'],
+            'no_cuenta' => $data['no_cuenta'],
+            'banco' => $data['banco'],
+            'clabe' => $data['clabe'],
+            'clausula' => $data['clausula'],
+            'no_proveedor' => $data['no_proveedor'],
+            'fecha_tramite' => $data['fecha_tramite'],
+            'nombre_responsable_2' => $data['nombre_responsable_2'], 
+            'nombre_responsable' => $data['nombre_responsable_1'], 
+            'cargo_responsable_2' => $data['cargo_responsable_2'], 
+            'cargo_responsable' => $data['cargo_responsable_1'], 
+            'cargo_director_general' => $data['cargo_director_general'], 
+            'nombre_director_general' => $data['nombre_director_general'],
+            'importe_total_num' => $data['importe_total_num'],
+            'nombre_autoriza' => $data['nombre_autoriza'],
+            'cargo_autoriza' => $data['cargo_autoriza'],
+            'no_reserva' => $data['no_reserva_visual'] ?? 0,
+            'no_convenio' => $data['no_convenio'] ?? '',
+            'importe_letra' => $data['importe_letra'] ?? '',
+            'concepto' => $data['concepto'] ?? ''
+        ];
+
+        $dataInsert['tipo_formato'] = isset($data['tipo_formato']) && !empty($data['tipo_formato']) ? $data['tipo_formato'] : 'PT';
+
+        if(isset($data['es2025']) && $data['es2025']){
+            $dataInsert['tipo_formato'] = 'REFRENDO';
+        }
+       
+        $id_registro_pt = null;
+        if($data['editar'] == 1 && isset($data['id_formulario_pt'])){
+            $id_registro_pt = $data['id_formulario_pt'];
+            $dataConfig = ["tabla" => "formulario_pt", "editar" => true, "idEditar" => ['id_formulario_pt' => $id_registro_pt]];
+            $dataInsert['usu_act'] = $session->get('id_usuario');
+            $dataInsert['fec_act'] = date('Y-m-d H:i:s');
+            $responseMain = $this->globals->saveTabla($dataInsert, $dataConfig, ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFormatoPT_Upd']);
+        } else {
+            $dataConfig = ["tabla" => "formulario_pt", "editar" => false];
+            $dataInsert['usu_reg'] = $session->get('id_usuario');
+            $dataInsert['fec_reg'] = date('Y-m-d H:i:s');
+            $responseMain = $this->globals->saveTabla($dataInsert, $dataConfig, ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFormatoPT_Ins']);
+            $id_registro_pt = $responseMain->idRegistro;
+        }
+       
+         if($data['editar'] == 1 && isset($data['id_formulario_pt'])){
+          //  $filasActuales = $this->globals->getTabla(['tabla' => 'manual_factura', 'where' => ['id_registro_pt' => $id_registro_pt, 'visible' => 1]]);
+
+    
+                   $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaFormatoPT_Upd'];
+                  $res =  $this->globals->saveTabla(
+                        ['visible' => 0, 'usu_act' => $session->get('id_usuario'), 'fec_act' => date('Y-m-d H:i:s')], 
+                        ["tabla" => "manual_factura", "editar" => true, "idEditar" => ['id_registro_pt' => $data['id_formulario_pt']]], 
+                        $dataBitacora
+                    );
+                
+                //var_dump($res);
+            
+        }
+
+        // Arrays de inputs
+        if(isset($data['no_comprobante']) && is_array($data['no_comprobante'])){
+            for($i=0; $i < count($data['no_comprobante']); $i++){
+                 // Skip empty rows if necessary, or just save empty strings as user entered 
+                
+                $pdfPath = null;
+                $xmlPath = null;
+                
+                // Handle File Uploads (PDF/XML)
+                if(isset($data['row_index'][$i])){
+                    $rIdx = $data['row_index'][$i];
+                    
+                    // FALLBACK a los archivos actuales si estamos editando
+                    $currentPdfName = "pdf_current_" . $rIdx;
+                    $currentXmlName = "xml_current_" . $rIdx;
+                    
+                    if (isset($data[$currentPdfName]) && is_array($data[$currentPdfName]) && !empty($data[$currentPdfName][0])) {
+                        $pdfPath = $data[$currentPdfName][0];
+                    }
+                    if (isset($data[$currentXmlName]) && is_array($data[$currentXmlName]) && !empty($data[$currentXmlName][0])) {
+                        $xmlPath = $data[$currentXmlName][0];
+                    }
+
+                    // 1. Process PDF
+                    $inputNamePdf = 'pdf_pt_' . $rIdx;
+                    if(isset($_FILES[$inputNamePdf])){
+                        $files = $_FILES[$inputNamePdf];
+                        // With multiple, it is $_FILES['inputName']['name'][0]... but we expect single file per type per row usually, 
+                        // but input name is array [] so it comes as array. We take the first one or loop.
+                        // Given input name="pdf_pt_X[]", $_FILES['pdf_pt_X']['name'][0] is the file.
+                        
+                        $countFiles = count($files['name']);
+                        for($f=0; $f < $countFiles; $f++){
+                            if($files['error'][$f] == 0){
+                                $tmpName = $files['tmp_name'][$f];
+                                $name = $files['name'][$f];
+                                $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+                                
+                                if($ext == 'pdf'){
+                                    $newName = 'PT_' . $id_registro_pt . '_ROW_' . $rIdx . '_' . uniqid() . '.pdf';
+                                    $destDir = FCPATH . 'assets/pdf/';
+                                    if (!is_dir($destDir)) mkdir($destDir, 0755, true);
+                                    
+                                    $dest = $destDir . $newName;
+                                    if(move_uploaded_file($tmpName, $dest)){
+                                        $pdfPath = 'assets/pdf/' . $newName;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // 2. Process XML
+                    $inputNameXml = 'xml_pt_' . $rIdx;
+                    if(isset($_FILES[$inputNameXml])){
+                        $files = $_FILES[$inputNameXml];
+                         $countFiles = count($files['name']);
+                        for($f=0; $f < $countFiles; $f++){
+                            if($files['error'][$f] == 0){
+                                $tmpName = $files['tmp_name'][$f];
+                                $name = $files['name'][$f];
+                                $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+                                
+                                if($ext == 'xml'){
+                                    $newName = 'PT_' . $id_registro_pt . '_ROW_' . $rIdx . '_' . uniqid() . '.xml';
+                                    $destDir = FCPATH . 'assets/pdf/'; // Keeping same dir as before
+                                    if (!is_dir($destDir)) mkdir($destDir, 0755, true);
+                                    
+                                    $dest = $destDir . $newName;
+                                    if(move_uploaded_file($tmpName, $dest)){
+                                        $xmlPath = 'assets/pdf/' . $newName;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                $dataFila = [
+                      'id_registro_pt' => $id_registro_pt,
+                      //'id_presupuesto' => 0, 
+                      'no_comprobante' => $data['no_comprobante'][$i], 
+                      'importe' => $data['importe'][$i],
+                      'proyecto' =>  $data['proyecto_meta'][$i],
+                      'partida' => $data['no_partida'][$i],
+                      'comision' => isset($data['comision'][$i]) ? trim($data['comision'][$i]) : '',
+                      'concepto_gasto' => isset($data['concepto_gasto'][$i]) ? trim($data['concepto_gasto'][$i]) : '',
+                      'fechas' => isset($data['fechas'][$i]) ? trim($data['fechas'][$i]) : '',
+                      'usu_reg' => $session->get('id_usuario'),
+                      'fec_reg' => date('Y-m-d H:i:s')
+                ];
+                
+                if($pdfPath) $dataFila['pdf'] = $pdfPath;
+                if($xmlPath) $dataFila['xml'] = $xmlPath;
+              $response =  $this->globals->saveTabla($dataFila, ["tabla" => "manual_factura", "editar" => false], []);
+            }
+        }
+
+       if($response->error){
+           $response->error = true;
+           $response->respuesta = "Error|".$response->respuesta;
+           return $this->respond($response);
+       }
+
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaConvenio'];
+
+      //  die(); APL110943
+
+        $response->error = false;
+        $response->respuesta = "Éxito|La información se guardó correctamente.";
+
+
+
+        return $this->respond($response);
+    }
+
 
     public function guardaFormatoPT()
     {
@@ -6190,6 +6400,8 @@ class Agregar extends BaseController
             'concepto' => $data['concepto'] ?? ''
         ];
 
+        $dataInsert['tipo_formato'] = isset($data['tipo_formato']) && !empty($data['tipo_formato']) ? $data['tipo_formato'] : 'PT';
+
         if(isset($data['es2025']) && $data['es2025']){
             $dataInsert['tipo_formato'] = 'REFRENDO';
         }
@@ -6209,10 +6421,6 @@ class Agregar extends BaseController
             $id_registro_pt = $responseMain->idRegistro;
         }
        
-        // 3. Insertar/Actualizar Filas (periodo_factura) - MULTIPLE
-        // Primero, marcar como invisibles todas las filas actuales (soft delete style) 
-        // para manejar eliminaciones, y luego re-insertar/actualizar.
-        // O más simple: Borrar todo y reinsertar. Soft delete es mejor.
          if($data['editar'] == 1 && isset($data['id_formulario_pt'])){
           //  $filasActuales = $this->globals->getTabla(['tabla' => 'manual_factura', 'where' => ['id_registro_pt' => $id_registro_pt, 'visible' => 1]]);
 
@@ -6345,7 +6553,7 @@ class Agregar extends BaseController
 
         // --- EMAIL SENDING LOGIC ---
         //die( var_dump( $data ) );
-        if(isset($data['es2025']) && $data['es2025'] == 0){
+        if(isset($data['es2025']) && $data['es2025'] == 0 && $data['tipo_formato'] == 'PT'){
             if($session->get('id_usuario') != 1){
                 if($data['editar'] == 0){
                     try {

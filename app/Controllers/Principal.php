@@ -6469,6 +6469,52 @@ class Principal extends BaseController
         $data['contentView'] = 'secciones/vFormatoPagoTerceros';
         $this->_renderView($data);
     }
+    public function FormatoMateriales()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $data = array();
+        $data['editar'] = 0;
+      
+         
+        $proveedores = $globals->getTabla(["tabla" => "proveedor", "where" => ["visible" => 1],'limit' => 10]);
+        $data['proveedores'] = $proveedores->data;
+
+        $cat_area = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'id_pago' => 1]]);
+        $data['cat_area'] = $cat_area->data;
+       
+        $cat_proyecto = $globals->getTabla(["tabla" => "cat_proyecto", "where" => ["visible" => 1]]);
+        
+        $data['cat_proyecto'] = $cat_proyecto->data;
+
+        $cat_partida = $globals->getTabla(["tabla" => "cat_partida", "where" => ["visible" => 1]]);
+        $data['cat_partida'] = $cat_partida->data;
+
+        $usuarios = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["visible" => 1]]);
+        $data['usuarios'] = $usuarios->data;
+        $usu = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["visible" => 1, 'id_usuario' => $session->get('id_usuario')]]);
+
+
+        if($usu->data[0]->id_usuario){
+            $tieneArea = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'titular' => $usu->data[0]->id_usuario]]);
+            if(isset($tieneArea->data) && !empty($tieneArea->data)){
+                $data['id_area'] = $tieneArea->data[0]->id_area;
+            }else{
+                $tieneArea = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'titular' => $usu->data[0]->id_jefe_inmediato]]);
+                if(isset($tieneArea->data) && !empty($tieneArea->data)){
+                    $data['id_area'] = $tieneArea->data[0]->id_area;
+                }else{
+                        $data['id_area'] = $cat_area->data[0]->id_area;
+                }
+            }
+        }
+
+
+        
+        $data['scripts'] = array('principal');
+        $data['contentView'] = 'secciones/vFormatoMateriales';
+        $this->_renderView($data);
+    }
     public function generarFormatoGO($id_reserva = null, $edita = null)
     {
         $session = \Config\Services::session();
