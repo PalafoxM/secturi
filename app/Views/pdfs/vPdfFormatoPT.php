@@ -50,7 +50,7 @@
         }
 
     </style>
-    <div style="position: absolute;text-align: left;left:85%; font-size: 9px; color: #999; margin-bottom: 5px;">FORMATO PT - 25</div>
+    <div style="position: absolute;text-align: left;left:85%; font-size: 9px; color: #999; margin-bottom: 5px;">FORMATO PT - 26</div>
     <table width="100%" style="border: none; margin-bottom: 20px;">
         <tr>
             <td width="30%" style="border: none; vertical-align: middle; text-align: left;">
@@ -212,7 +212,7 @@
     </table>
 
     <div style="margin-top: 30px; font-size: 8pt; text-align: justify; font-style: italic;">
-        El presente documento fue recibido y firmado de conformidad con la Ley sobre el uso de medios electrónicos y firma electrónica para el Estado de Guanajuato y sus Municipios. En virtud de la equivalencia funcional, la firma electrónica certificada se equipara a la firma autógrafa. Se privilegian las políticas de ahorro, racionalidad y austeridad del gasto público, contenidas en el artículo 55, de la Ley para el Ejercicio y Control de los Recursos Públicos para el Estado y los Municipios de Guanajuato; y, Artículos 1 y 15, segundo párrafo de los Lineamientos Generales de Racionalidad, Austeridad y Disciplina Presupuestal de la Administración Pública Estatal para el Ejercicio Fiscal 2025.
+        El presente documento fue recibido y firmado de conformidad con la Ley sobre el uso de medios electrónicos y firma electrónica para el Estado de Guanajuato y sus Municipios. En virtud de la equivalencia funcional, la firma electrónica certificada se equipara a la firma autógrafa. Se privilegian las políticas de ahorro, racionalidad y austeridad del gasto público, contenidas en el artículo 55, de la Ley para el Ejercicio y Control de los Recursos Públicos para el Estado y los Municipios de Guanajuato; y, Artículos 1 y 15, segundo párrafo de los Lineamientos Generales de Racionalidad, Austeridad y Disciplina Presupuestal de la Administración Pública Estatal para el Ejercicio Fiscal 2026.
     </div>
 </body>
 </html>

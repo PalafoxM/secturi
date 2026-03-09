@@ -1299,13 +1299,20 @@
         var currentValue = $hiddenInput.val();
         
         var fechaInicio = '';
+        var anioInicio = '2025';
         var fechaFin = '';
+        var anioFin = '2026';
         
         // Try to parse existing value if it matches our format
         if (currentValue && currentValue.indexOf(' / ') !== -1) {
              var parts = currentValue.split(' / ');
-             fechaInicio = parts[0];
-             fechaFin = parts[1];
+             var inicioParts = parts[0].trim().split(' ');
+             fechaInicio = inicioParts[0] || '';
+             if(inicioParts.length > 1) anioInicio = inicioParts[1] || '2025';
+
+             var finParts = parts[1].trim().split(' ');
+             fechaFin = finParts[0] || '';
+             if(finParts.length > 1) anioFin = finParts[1] || '2026';
         } else if (currentValue) {
             // Fallback for random text: maybe put it in comments or ignore?
             // For now, let's assume it's one date or just clear it if format doesn't match
@@ -1316,8 +1323,8 @@
         
         if (is2025) {
             var getSelectMes = function(idName, selectedValue) {
-                var sel = '<select id="' + idName + '" class="form-control">';
-                sel += '<option value="">Seleccione...</option>';
+                var sel = '<select id="' + idName + '" class="form-control mb-2">';
+                sel += '<option value="">Seleccione Mes...</option>';
                 var meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
                 meses.forEach(function(m) {
                     var selected = (m === selectedValue || m.toLowerCase() === selectedValue.toLowerCase()) ? ' selected' : '';
@@ -1327,9 +1334,20 @@
                 return sel;
             };
             
+            var getSelectAnio = function(idName, selectedValue) {
+                var sel = '<select id="' + idName + '" class="form-control">';
+                var anios = ['2025', '2026'];
+                anios.forEach(function(a) {
+                    var selected = (a === selectedValue) ? ' selected' : '';
+                    sel += '<option value="' + a + '"' + selected + '>' + a + '</option>';
+                });
+                sel += '</select>';
+                return sel;
+            };
+            
             htmlContent = '<div class="row">' +
-                          '<div class="col-md-6"><label>Mes Inicio 2025</label>' + getSelectMes('swal-input-inicio', fechaInicio) + '</div>' +
-                          '<div class="col-md-6"><label>Mes Fin 2026</label>' + getSelectMes('swal-input-fin', fechaFin) + '</div>' +
+                          '<div class="col-md-6"><label>Inicio</label>' + getSelectMes('swal-input-inicio', fechaInicio) + getSelectAnio('swal-anio-inicio', anioInicio) + '</div>' +
+                          '<div class="col-md-6"><label>Fin</label>' + getSelectMes('swal-input-fin', fechaFin) + getSelectAnio('swal-anio-fin', anioFin) + '</div>' +
                           '</div>';
         } else {
             htmlContent = '<div class="row">' +
@@ -1346,13 +1364,24 @@
             confirmButtonText: 'Guardar',
             cancelButtonText: 'Cancelar',
             preConfirm: () => {
-                var inicio = document.getElementById('swal-input-inicio').value;
-                var fin = document.getElementById('swal-input-fin').value;
-                
-                if (!inicio || !fin) {
-                    Swal.showValidationMessage(is2025 ? 'Por favor seleccione ambos meses' : 'Por favor seleccione ambas fechas');
+                if (is2025) {
+                    var inicio = document.getElementById('swal-input-inicio').value;
+                    var fin = document.getElementById('swal-input-fin').value;
+                    var anioInicio = document.getElementById('swal-anio-inicio').value;
+                    var anioFin = document.getElementById('swal-anio-fin').value;
+                    
+                    if (!inicio || !fin) {
+                        Swal.showValidationMessage('Por favor seleccione ambos meses');
+                    }
+                    return { inicio: inicio + ' ' + anioInicio, fin: fin + ' ' + anioFin };
+                } else {
+                    var inicio = document.getElementById('swal-input-inicio').value;
+                    var fin = document.getElementById('swal-input-fin').value;
+                    if (!inicio || !fin) {
+                        Swal.showValidationMessage('Por favor seleccione ambas fechas');
+                    }
+                    return { inicio: inicio, fin: fin };
                 }
-                return { inicio: inicio, fin: fin };
             }
         }).then((result) => {
             if (result.isConfirmed) {

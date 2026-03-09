@@ -75,7 +75,7 @@
                         
                         if(isset($registro_pt->tipo_formato) && $registro_pt->tipo_formato == 'REFRENDO' && isset($row->fechas) && strpos($row->fechas, ' / ') !== false){
                             list($inicio, $fin) = explode(' / ', $row->fechas);
-                            echo mb_strtoupper(trim($inicio), 'UTF-8') . " 2025 A " . mb_strtoupper(trim($fin), 'UTF-8') . " 2026";
+                            echo mb_strtoupper(trim($inicio), 'UTF-8') . " A " . mb_strtoupper(trim($fin), 'UTF-8');
                         } else if(isset($row->fechas) && strpos($row->fechas, ' / ') !== false){
                             list($inicio, $fin) = explode(' / ', $row->fechas);
                             $f_inicio = strtotime($inicio);
