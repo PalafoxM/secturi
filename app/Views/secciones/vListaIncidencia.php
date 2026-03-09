@@ -36,9 +36,9 @@
 
                                         <div class="card-body">
                                             <?php if(in_array($session->get('id_perfil'), [1,3] )): ?>
-                                             <a href="<?php echo base_url().'index.php/Principal/reporteIncidencia'?>" target="_blank" class="btn btn-primary mb-3">
+                                           <!--   <a href="<?php echo base_url().'index.php/Principal/reporteIncidencia'?>" target="_blank" class="btn btn-primary mb-3">
                                                 Reporte General
-                                            </a>
+                                            </a> -->
                                            
                                             <div class="row">
                                                 <div class="col-md-3">
