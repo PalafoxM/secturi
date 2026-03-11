@@ -71,40 +71,50 @@
                 <div class="col-lg-12">
                     <div class="card shadow-sm border-0 h-100">
                         <div class="card-body p-2">
-                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-4">
-                                <h4 class="header-title mt-0 mb-0 text-dark">
-                                    Inventario Promoción
-                                    <strong id="nombre_material">
-                                    <?= $materiales ? ($materiales->convenio . " - " . ($materiales->razon_social ?? '')) : 'Convenio no encontrado' ?>
-                                    </strong>
-                                </h4>
+                            <div class="border-bottom pb-2 mb-4">
 
-                                <!-- Toolbar de botones -->
-                                <div class="d-flex align-items-center flex-wrap gap-2 toolbar-acciones">
+                                <!-- Fila 1: Título -->
+                                <div class="d-flex align-items-center mb-2 header-top">
+                                    <h4 class="header-title mt-0 mb-0 text-dark">
+                                    Inventario Promoción
+                                    <strong id="nombre_material" class="ml-1">
+                                        <?= $materiales ? ($materiales->convenio . " - " . ($materiales->razon_social ?? '')) : 'Convenio no encontrado' ?>
+                                    </strong>
+                                    </h4>
+                                </div>
+
+                                <!-- Fila 2: Toolbar -->
+                                <div class="d-flex align-items-center justify-content-end flex-wrap toolbar-acciones">
+
+                                    <a class="btn btn-secondary btn-action shadow-sm"
+                                    href="<?= base_url('index.php/Inicio/ListaConvenio') ?>"
+                                    title="Volver a Lista de Convenios">
+                                    <i class="mdi mdi-home-outline"></i>
+                                    </a>
 
                                     <button class="btn btn-primary btn-action shadow-sm btn-movimiento"
-                                        data-id=""
-                                        data-tabla="cat_inventario_promo"
-                                        data-nombre=""
-                                        data-stock="0"
-                                        data-tipo="nuevo">
-                                        <i class="mdi mdi-plus-box mr-2"></i> Nuevo producto
+                                            data-id=""
+                                            data-tabla="cat_inventario_promo"
+                                            data-nombre=""
+                                            data-stock="0"
+                                            data-tipo="nuevo">
+                                    <i class="mdi mdi-plus-box mr-2"></i> Nuevo producto
                                     </button>
 
                                     <a class="btn btn-primary btn-action shadow-sm"
-                                        href="<?= base_url('index.php/Inicio/FormularioPromoPorConvenio/' . intval($id_convenio_promo ?? $id_convenio ?? 0)) ?>">
-                                        <i class="mdi mdi-file-plus-outline mr-2"></i> Nuevo recibo
+                                    href="<?= base_url('index.php/Inicio/FormularioPromoPorConvenio/' . intval($id_convenio_promo ?? $id_convenio ?? 0)) ?>">
+                                    <i class="mdi mdi-file-plus-outline mr-2"></i> Nuevo recibo
                                     </a>
 
                                     <a class="btn btn-primary btn-action shadow-sm"
-                                        href="<?= base_url('index.php/Inicio/InventarioRecibosPromo/' . intval($id_convenio_promo ?? $id_convenio ?? 0)) ?>">
-                                        <i class="mdi mdi-eye-outline mr-2"></i> Consultar recibos
+                                    href="<?= base_url('index.php/Inicio/InventarioRecibosPromo/' . intval($id_convenio_promo ?? $id_convenio ?? 0)) ?>">
+                                    <i class="mdi mdi-eye-outline mr-2"></i> Consultar recibos
                                     </a>
 
                                     <button class="btn btn-success btn-action shadow-sm"
-                                        id="btnExportExcel"
-                                        data-convenio="<?= intval($id_convenio_promo ?? $id_convenio ?? 0) ?>">
-                                        <i class="mdi mdi-file-excel-outline mr-2"></i> Exportar Excel
+                                            id="btnExportExcel"
+                                            data-convenio="<?= intval($id_convenio_promo ?? $id_convenio ?? 0) ?>">
+                                    <i class="mdi mdi-file-excel-outline mr-2"></i> Exportar Excel
                                     </button>
 
                                 </div>
@@ -330,15 +340,6 @@
                                                             ✏️ Editar
                                                         </button>
 
-                                                        <button class="btn btn-sm btn-outline-warning btn-movimiento"
-                                                                data-id="<?= (int)$item->id_inventario_promo ?>"
-                                                                data-tabla="cat_inventario_promo"
-                                                                data-tipo="salida"
-                                                                data-nombre="<?= esc($item->dsc_producto) ?>"
-                                                                title="Baja de stock">
-                                                            📦 Baja
-                                                        </button>
-
                                                         <button class="btn btn-sm btn-outline-danger btn-eliminar"
                                                                 data-id="<?= (int)$item->id_inventario_promo ?>"
                                                                 data-tabla="cat_inventario_promo"
@@ -457,7 +458,7 @@
                                             </label>
 
                                             <div class="alert alert-info py-2 mb-2">
-                                                Instrucciones: agrega el color del prodcuto, las unidades y
+                                                Instrucciones: agrega el color del producto, las unidades y
                                                 el precio unitario. Las variantes como talla, material, tamaño, etc, se
                                                 agregan abajo.
                                             </div>
@@ -534,7 +535,7 @@
 
                             <div class="modal-footer bg-light">
                                 <button type="button"
-                                        class="btn btn-secondary btn-sm px-3"
+                                        class="btn btn-secondary btn-sm px-4"
                                         data-dismiss="modal">
                                 Cerrar
                                 </button>
@@ -575,6 +576,87 @@
 <link href="<?php echo base_url(); ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
 <link href="<?= base_url() ?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
 <link href="<?= base_url() ?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
+
+<style>
+  /* El nombre del contrato no debe romper el header */
+  #nombre_material{
+    max-width: 620px;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: bottom;
+  }
+
+  /* Toolbar: separación real (Bootstrap 4 no tiene gap) */
+  .toolbar-acciones > *{
+    margin-left: .5rem;
+    margin-bottom: .5rem;
+  }
+  .toolbar-acciones > *:first-child{
+    margin-left: 0;
+  }
+
+  /* Botones homogéneos */
+  .btn-action{
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: .375rem 1rem;
+    white-space: nowrap;
+  }
+
+  /* En pantallas chicas, alinear toolbar a la izquierda */
+  @media (max-width: 768px){
+    .toolbar-acciones{
+      justify-content: flex-start !important;
+    }
+    #nombre_material{
+      max-width: 100%;
+    }
+  }
+
+
+
+  /* Tarjeta por renglón */
+  #colores_container .color-item{
+    padding: 10px;
+    border: 1px solid rgba(0,0,0,.06);
+    border-radius: 10px;
+    background: #fff;
+  }
+
+  /* Uniformar alto de controles */
+  #colores_container .color-item .form-control{
+    height: 38px;
+    line-height: 38px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  /* El input color es especial: quita padding y fija ancho/alto */
+  #colores_container .color-item input[type="color"].form-control{
+    padding: 0;
+    height: 38px;
+    width: 100%;
+  }
+
+  /* Alinear el botón de quitar al mismo alto */
+  #colores_container .color-item .btn.remove-item{
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Evita que la label empuje raro */
+  #colores_container .color-item label{
+    display: block;
+    margin-bottom: 4px;
+  }
+</style>
+
 <!-- jQuery  -->
  
 <script src="<?php echo base_url(); ?>assets/js/jquery.min.js"></script>
@@ -724,42 +806,51 @@
             COLORES
         ========================================================== */
         function addColorRow(color = '#000000', cantidad = 0, material = '', precio = 0) {
+
+            // Para que no se vea "0" como valor inicial
+            const qtyVal = (cantidad && parseInt(cantidad, 10) > 0) ? parseInt(cantidad, 10) : '';
+            const prcVal = (precio && parseFloat(precio) > 0) ? parseFloat(precio) : '';
+
             let html = `
-                <div class="row mb-2 color-item">
+                <div class="row color-item align-items-end mb-3">
 
-                <div class="col-md-3">
-                    <label class="font-11 text-muted mb-1">Color</label>
-                    <input type="color"
-                        class="form-control color_hex"
-                        value="${color}">
-                </div>
+                    <div class="col-12 col-md-3">
+                        <label class="font-11 text-muted mb-1">Color</label>
+                        <input type="color"
+                            class="form-control color_hex"
+                            value="${color}">
+                    </div>
 
-                <div class="col-md-3">
-                    <label class="font-11 text-muted mb-1">Unidades</label>
-                    <input type="number"
-                        class="form-control color_cantidad"
-                        min="0"
-                        value="${cantidad}">
-                </div>
+                    <div class="col-12 col-md-3">
+                        <label class="font-11 text-muted mb-1">Unidades</label>
+                        <input type="number"
+                            class="form-control color_cantidad clear-on-focus"
+                            min="0"
+                            inputmode="numeric"
+                            value="${qtyVal}">
+                    </div>
 
-                <div class="col-md-2">
-                    <label class="font-11 text-muted mb-1">Precio unitario</label>
-                    <input type="number"
-                        class="form-control color_precio"
-                        min="0"
-                        step="0.01"
-                        value="${precio}">
-                </div>
+                    <div class="col-12 col-md-3">
+                        <label class="font-11 text-muted mb-1">Precio unitario</label>
+                        <input type="number"
+                            class="form-control color_precio clear-on-focus"
+                            min="0"
+                            step="0.01"
+                            inputmode="decimal"
+                            value="${prcVal}">
+                    </div>
 
-                <div class="col-md-1 text-center">
-                    <label class="font-11 text-muted mb-1">&nbsp;</label>
-                    <button type="button" class="btn btn-danger btn-sm remove-item" title="Quitar">
-                    <i class="mdi mdi-close"></i>
-                    </button>
-                </div>
+                    <div class="col-12 col-md-3">
+                        <button type="button"
+                                class="btn btn-danger btn-sm remove-item w-100"
+                                title="Quitar">
+                        <i class="mdi mdi-close"></i>
+                        </button>
+                    </div>
 
                 </div>
             `;
+
             $('#colores_container').append(html);
         }
 
@@ -787,6 +878,16 @@
 
             $(document).on('click', '#btn_add_variante', function () {
             addVarianteRow();
+        });
+
+        $(document).on('focus', '.clear-on-focus', function () {
+            const v = ($(this).val() || '').toString().trim();
+            if (v === '0' || v === '0.00') $(this).val('');
+        });
+
+        $(document).on('blur', '.color_cantidad', function () {
+            const n = parseInt($(this).val() || 0, 10);
+            $(this).val(n > 0 ? String(n) : '');
         });
 
         /* ==========================================================
@@ -895,7 +996,6 @@
             const titulos = {
                 nuevo: 'Nuevo Producto',
                 editar: 'Editar Producto',
-                salida: 'Baja de Stock'
             };
             $('#modalTitulo').text(titulos[d.tipo] || 'Movimiento');
 

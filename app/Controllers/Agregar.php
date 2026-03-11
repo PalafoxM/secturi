@@ -6625,18 +6625,22 @@ class Agregar extends BaseController
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
 
+        // ✅ PK real
+        $idActual = intval($data['id_material_promo'] ?? $data['id_convenio_promo'] ?? 0);
+        $esNuevo  = ($idActual === 0);
+
         // =========================
         // VALIDACIONES BÁSICAS
         // =========================
-
-        if (empty($data['convenio'])) {
+        $convenio = trim((string)($data['convenio'] ?? ''));
+        if ($convenio === '') {
             $response->error = true;
             $response->respuesta = "Error|El convenio es requerido";
             return $this->respond($response);
         }
 
-        $monto = trim($data['monto'] ?? '');
-            if (empty($monto))  {
+        $monto = trim((string)($data['monto'] ?? ''));
+        if ($monto === '') {
             $response->error = true;
             $response->respuesta = "Error|El monto es requerido";
             return $this->respond($response);
@@ -6645,11 +6649,10 @@ class Agregar extends BaseController
         // =========================
         // VALIDACIÓN PROVEEDOR (HÍBRIDO)
         // =========================
-
         $idProveedor = $data['id_proveedor'] ?? null;
-        $noProveedor = trim($data['no_proveedor'] ?? '');
+        $noProveedor = trim((string)($data['no_proveedor'] ?? ''));
 
-        if (empty($idProveedor) && empty($noProveedor)) {
+        if (empty($idProveedor) && $noProveedor === '') {
             $response->error = true;
             $response->respuesta = "Error|Debe seleccionar o ingresar un proveedor";
             return $this->respond($response);
@@ -6658,19 +6661,13 @@ class Agregar extends BaseController
         // =========================
         // BUSCAR PROVEEDOR
         // =========================
-
         if (!empty($idProveedor)) {
-
-            // Caso 1: seleccionado desde Select2
             $ExisteProveedor = $this->globals->getTabla([
                 "tabla" => "proveedor",
                 "where" => ["id_proveedor" => $idProveedor],
                 "limit" => 1
             ]);
-
         } else {
-
-            // Caso 2: escrito manualmente
             $ExisteProveedor = $this->globals->getTabla([
                 "tabla" => "proveedor",
                 "where" => ["no_proveedor" => $noProveedor],
@@ -6685,56 +6682,91 @@ class Agregar extends BaseController
         }
 
         // =========================
-        // VALIDAR SI EL CONVENIO YA EXISTE
+        // VALIDAR SI EL CONVENIO YA EXISTE (EXCLUYENDO EL MISMO ID)
         // =========================
-
         $ExisteConvenio = $this->globals->getTabla([
             "tabla" => "cat_convenio_promo",
-            "where" => ["convenio" => $data['convenio']]
+            "where" => [
+                "visible"  => 1,
+                "convenio" => $convenio
+            ]
         ]);
 
         if (!empty($ExisteConvenio->data)) {
-            $response->error = true;
-            $response->respuesta = "Error|El convenio ya existe";
-            return $this->respond($response);
+            foreach ($ExisteConvenio->data as $row) {
+                $otroId = intval($row->id_convenio_promo ?? 0);
+
+                // Nuevo: cualquier match duplica
+                // Editar: duplica solo si es otro registro
+                if ($esNuevo || $otroId !== $idActual) {
+                    $response->error = true;
+                    $response->respuesta = "Error|El convenio ya existe";
+                    return $this->respond($response);
+                }
+            }
         }
 
         // =========================
-        // INSERTAR CONVENIO
+        // INSERTAR / EDITAR
         // =========================
-
-        $dataInsert = [
-            'convenio'     => $data['convenio'],
+        $dataSave = [
+            'convenio'     => $convenio,
             'monto'        => $monto,
             'id_proveedor' => $ExisteProveedor->data[0]->id_proveedor,
-            'usu_reg'      => $session->get('id_usuario'),
-            'fec_reg'      => date('Y-m-d H:i:s')
+            'visible'      => 1
         ];
 
-        $dataConfig = [
-            "tabla"  => "cat_convenio_promo",
-            "editar" => false
-        ];
+        if ($esNuevo) {
+            $dataSave['usu_reg'] = $session->get('id_usuario');
+            $dataSave['fec_reg'] = date('Y-m-d H:i:s');
+
+            $dataConfig = [
+                "dataBase" => "susi",
+                "tabla"    => "cat_convenio_promo",
+                "editar"   => false
+            ];
+
+            $script = 'Agregar.php/guardaConvenio_Ins';
+        } else {
+            $dataSave['usu_act'] = $session->get('id_usuario');
+            $dataSave['fec_act'] = date('Y-m-d H:i:s');
+
+            $dataConfig = [
+                "dataBase" => "susi",
+                "tabla"    => "cat_convenio_promo",
+                "editar"   => true,
+                // ✅ PK correcto:
+                "idEditar" => ["id_convenio_promo" => $idActual]
+            ];
+
+            $script = 'Agregar.php/guardaConvenio_Upd';
+        }
 
         $res = $this->globals->saveTabla(
-            $dataInsert,
+            $dataSave,
             $dataConfig,
             [
                 'id_user' => $session->get('id_usuario'),
-                'script'  => 'Agregar.php/guardaConvenio_Ins'
+                'script'  => $script
             ]
         );
 
         // =========================
         // RESPUESTA FINAL
         // =========================
+        if ($res && isset($res->error) && $res->error === false) {
+            $nuevoId = $esNuevo ? intval($res->idRegistro ?? $res->insertId ?? 0) : $idActual;
 
-        if (!$res->error) {
             $response->error = false;
             $response->respuesta = "Éxito|Guardado correctamente";
+
+            // ✅ devolver ambos por compat con vistas antiguas
+            $response->id_convenio_promo = $nuevoId;
+            $response->id_material_promo = $nuevoId; // compat
         } else {
             $response->error = true;
-            $response->respuesta = "Error|Error al guardar: " . $res->respuesta;
+            $response->respuesta = "Error|Error al guardar: " . ($res->respuesta ?? 'desconocido');
+            $response->debug = $res;
         }
 
         return $this->respond($response);

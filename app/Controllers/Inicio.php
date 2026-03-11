@@ -401,38 +401,6 @@ class Inicio extends BaseController
 
         $this->_renderView($data);
     }
-    private function generarFolio($idConvenio)
-    {
-        $globas = new Mglobal();
-        $anio = date('Y');
-        $idConvenio = intval($idConvenio);
-
-        // Busca el último folio de ESTE convenio en ESTE año
-        $result = $globas->getTabla([
-            'tabla' => 'salida_inventario',
-            'where' => [
-                'visible' => 1,
-                'id_convenio' => $idConvenio
-            ],
-            'like'  => [
-                'folio' => "PROMO-{$idConvenio}-{$anio}-"
-            ],
-            'order' => [
-                'id_salida_inventario' => 'DESC'
-            ],
-            'limit' => 1
-        ]);
-
-        if (!empty($result->data)) {
-            $ultimo = (string)($result->data[0]->folio ?? '');
-            $partes = explode('-', $ultimo);
-            $consecutivo = intval(end($partes)) + 1;
-        } else {
-            $consecutivo = 1;
-        }
-
-        return "PROMO-{$idConvenio}-{$anio}-" . str_pad((string)$consecutivo, 4, '0', STR_PAD_LEFT);
-    }
     private function generarFolioPorConvenio($idConvenio)
     {
         $globas = new Mglobal();
@@ -440,31 +408,30 @@ class Inicio extends BaseController
         $anio = date('Y');
         $idConvenio = intval($idConvenio);
 
-        // Buscamos el último folio de ESTE convenio en ESTE año
-        $result = $globas->getTabla([
+        $res = $globas->getTabla([
             'tabla' => 'salida_inventario',
             'where' => [
                 'visible' => 1,
                 'id_convenio' => $idConvenio
-            ],
-            'like'  => [
-                'folio' => "PROMO-{$idConvenio}-{$anio}-"
-            ],
-            'order' => [
-                'id_salida_inventario' => 'DESC'
-            ],
-            'limit' => 1
+            ]
         ]);
 
-        if (!empty($result->data)) {
-            $ultimo = (string)($result->data[0]->folio ?? '');
-            $partes = explode('-', $ultimo);
-            $consecutivo = intval(end($partes)) + 1;
-        } else {
-            $consecutivo = 1;
+        $pref = "PROMO-{$idConvenio}-{$anio}-";
+        $max = 0;
+
+        if (!empty($res->data)) {
+            foreach ($res->data as $row) {
+                $folio = trim((string)($row->folio ?? ''));
+                if ($folio !== '' && strpos($folio, $pref) === 0) {
+                    $partes = explode('-', $folio);
+                    $n = intval(end($partes));
+                    if ($n > $max) $max = $n;
+                }
+            }
         }
 
-        return "PROMO-{$idConvenio}-{$anio}-" . str_pad((string)$consecutivo, 4, '0', STR_PAD_LEFT);
+        $consecutivo = $max + 1;
+        return $pref . str_pad((string)$consecutivo, 4, '0', STR_PAD_LEFT);
     }
     public function guardarConvenio()
     {
@@ -489,7 +456,6 @@ class Inicio extends BaseController
         // ============================
         $idArticulo = $this->request->getPost('idArticulo'); // puede venir vacío en flujo nuevo
         $idSalida   = $this->request->getPost('idSalida');
-
         $idSalida = ($idSalida === null || $idSalida === '') ? 0 : intval($idSalida);
 
         // ============================
@@ -519,7 +485,6 @@ class Inicio extends BaseController
         // ============================
         $itemsJson = (string)$this->request->getPost('items');
         $items = json_decode($itemsJson, true);
-
         $usaNuevo = (is_array($items) && !empty($items));
 
         // ============================
@@ -552,7 +517,6 @@ class Inicio extends BaseController
         // ============================
         // Validar items + stock antes de guardar
         // ============================
-        // Traer productos del contrato (1 llamada) para mapear stock
         $prods = $globas->getTabla([
             'tabla' => 'cat_inventario_promo',
             'where' => [
@@ -596,8 +560,7 @@ class Inicio extends BaseController
 
         // ============================
         // EDITAR cabecera (solo si idSalida viene)
-        // Nota: editar NO re-calcula ni re-aplica stock aquí para no hacer lío;
-        // si quieres editar un recibo ya emitido, sería otro flujo.
+        // (solo cabecera, no tocar stock ni detalle)
         // ============================
         if ($idSalida > 0) {
             $dataUpdate = [
@@ -629,7 +592,7 @@ class Inicio extends BaseController
 
                 return $this->response->setJSON([
                     'error' => false,
-                    'respuesta' => 'Convenio actualizado correctamente',
+                    'respuesta' => 'Recibo actualizado correctamente',
                     'pdf_url' => $pdf_url,
                     'id_material_promo' => $idConvenio,
                     'id_salida_inventario' => $idSalida
@@ -649,10 +612,13 @@ class Inicio extends BaseController
         // ============================
         $folio = $this->generarFolioPorConvenio($idConvenio);
 
-        // Compat legacy: guardar algo en id_articulo / cantidad para no romper reportes viejos
-        $primerId = intval($items[0]['id_inventario_promo']);
+        // ✅ Compat legacy: llenar id_articulo y cantidad en cabecera
+        $primerId = intval($items[0]['id_inventario_promo'] ?? 0);
+
         $totalEntrega = 0;
-        foreach ($items as $it) $totalEntrega += intval($it['cantidad_entregada']);
+        foreach ($items as $it) {
+            $totalEntrega += intval($it['cantidad_entregada'] ?? 0);
+        }
 
         $dataInsertCab = [
             'id_convenio'        => $idConvenio,
@@ -803,14 +769,20 @@ class Inicio extends BaseController
     }
     public function generarPDFConvenio($id)
     {
-        $globas = new Mglobal;
+        $globas = new Mglobal();
+
+        $id = intval($id);
 
         // ============================
-        // 1) Traer recibo (salida_inventario)
+        // 1) Cabecera (salida_inventario)
         // ============================
         $registro = $globas->getTabla([
             'tabla' => 'salida_inventario',
-            'where' => ['id_salida_inventario' => $id]
+            'where' => [
+                'id_salida_inventario' => $id,
+                'visible' => 1
+            ],
+            'limit' => 1
         ])->data[0] ?? null;
 
         if (!$registro) {
@@ -818,41 +790,72 @@ class Inicio extends BaseController
             return;
         }
 
+        $idConvenio = intval($registro->id_convenio ?? 0);
+
         // ============================
-        // 2) Traer TODOS los artículos del convenio (desde inventario)
-        //    OJO: salida_inventario.id_convenio = id_convenio_promo
+        // 2) Detalle del folio (salida_inventario_detalle)
         // ============================
-        $productos = $globas->getTabla([
-            'tabla' => 'cat_inventario_promo',
+        $detalles = $globas->getTabla([
+            'tabla' => 'salida_inventario_detalle',
             'where' => [
                 'visible' => 1,
-                'id_convenio_promo' => (int)$registro->id_convenio
+                'id_salida_inventario' => $id
             ]
         ])->data ?? [];
 
-        // Total solicitado (suma de cantidad solicitada)
-        $totalSolicitado = 0;
-        foreach ($productos as $p) {
-            $totalSolicitado += (int)($p->cantidad ?? 0);
-        }
-
-        // (Opcional) Mantener "nombre_articulo" por compatibilidad
-        // Si tu vista aún lo usa en algún lado, ponemos uno representativo:
-        $nombreArticuloCompat = 'Desconocido';
-        if (!empty($productos)) {
-            $nombreArticuloCompat = $productos[0]->dsc_producto ?? 'Desconocido';
+        if (empty($detalles)) {
+            // PDF sin renglones, pero con cabecera
+            $detalles = [];
         }
 
         // ============================
-        // 3) Datos para la vista PDF
+        // 3) Mapear nombres de productos del contrato (1 llamada)
+        // ============================
+        $productosConvenio = $globas->getTabla([
+            'tabla' => 'cat_inventario_promo',
+            'where' => [
+                'visible' => 1,
+                'id_convenio_promo' => $idConvenio
+            ]
+        ])->data ?? [];
+
+        $mapProd = []; // id_inventario_promo => dsc_producto
+        foreach ($productosConvenio as $p) {
+            $mapProd[intval($p->id_inventario_promo ?? 0)] = (string)($p->dsc_producto ?? '');
+        }
+
+        // ============================
+        // 4) Construir productos para PDF (solo lo entregado en ESTE folio)
+        // ============================
+        $productosPDF = [];
+        $totalEntregado = 0;
+
+        foreach ($detalles as $d) {
+            $idInv = intval($d->id_inventario_promo ?? 0);
+            $qty   = intval($d->cantidad_entregada ?? 0);
+
+            $totalEntregado += $qty;
+
+            $productosPDF[] = (object)[
+                'id_inventario_promo' => $idInv,
+                'dsc_producto'        => $mapProd[$idInv] ?? ('ID#' . $idInv),
+                'cantidad_entregada'  => $qty
+            ];
+        }
+
+        $nombreArticuloCompat = !empty($productosPDF)
+            ? (string)($productosPDF[0]->dsc_producto ?? 'Desconocido')
+            : 'Desconocido';
+
+        // ============================
+        // 5) Datos para la vista PDF
         // ============================
         $datos = [
             'folio' => $registro->folio,
             'concepto' => $registro->concepto,
 
-            // ✅ Ya NO dependemos de $registro->cantidad para la tabla,
-            // pero lo dejamos por si lo usas en otro lado:
-            'cantidad' => $registro->cantidad,
+            // compat (si aún lo imprimes en algún lado)
+            'cantidad' => $totalEntregado,
 
             'nombre_solicitante' => $registro->nombre_solicitante,
             'puesto' => $registro->puesto,
@@ -861,16 +864,16 @@ class Inicio extends BaseController
             'fec_eve' => $registro->fec_eve ? date('d/m/Y', strtotime($registro->fec_eve)) : '',
             'lugar' => $registro->lugar,
 
-            // ✅ NUEVO: lista de productos + total
-            'productos' => $productos,
-            'total_solicitado' => $totalSolicitado,
+            // ✅ SOLO lo del folio
+            'productos' => $productosPDF,
+            'total_entregado' => $totalEntregado,
 
-            // ✅ Compatibilidad
+            // compat
             'nombre_articulo' => $nombreArticuloCompat
         ];
 
         // ============================
-        // 4) mPDF + membrete (SIN CAMBIOS)
+        // 6) mPDF + membrete
         // ============================
         $mpdf = new \Mpdf\Mpdf([
             'mode' => 'utf-8',
@@ -888,13 +891,12 @@ class Inicio extends BaseController
             throw new \Exception("No existe el membrete en: " . $path);
         }
 
-        // Asignar el PDF como plantilla de fondo para todas las páginas
         $mpdf->SetDocTemplate($path, true);
 
         $html = view('personal/vpdfReciboPromo', $datos);
         $mpdf->WriteHTML($html);
 
-        $nombreArchivo = 'Convenio_' . $datos['folio'] . '.pdf';
+        $nombreArchivo = 'Recibo_' . ($datos['folio'] ?? $id) . '.pdf';
         $mpdf->Output($nombreArchivo, \Mpdf\Output\Destination::INLINE);
         exit;
     }
@@ -1134,22 +1136,21 @@ class Inicio extends BaseController
         // MÉTRICAS
         // =============================
 
-        $data['items'] = count($productos);
-        $data['cat_inventario_promo'] = $productos;
-       // $data['materiales'] = $materiales[0] ?? null;
-
         $data['total_stock_promo'] = 0;
         $data['total_subtotal_promo'] = 0;
         $data['total_dinero_promo'] = 0;
 
         foreach ($productos as $item) {
 
-            $data['total_stock_promo'] += (int) ($item->total_existencia ?? 0);
+            // stock disponible (según tu estructura actual)
+            $data['total_stock_promo'] += intval($item->stock ?? $item->total_existencia ?? 0);
 
-            $subtotal = (float)($item->cantidad ?? 0) * (float)($item->precio_unitario ?? 0);
+            // ✅ ahora el subtotal/total vienen guardados (calculados por color)
+            $sub = floatval($item->subtotal ?? 0);
+            $tot = floatval($item->total ?? $sub);
 
-            $data['total_subtotal_promo'] += $subtotal;
-            $data['total_dinero_promo'] += $subtotal;
+            $data['total_subtotal_promo'] += $sub;
+            $data['total_dinero_promo']   += $tot;
         }
 
         $data['id_convenio'] = (int)$id;

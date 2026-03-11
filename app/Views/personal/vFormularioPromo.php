@@ -250,7 +250,7 @@ $id_salida_inventario= $id_salida_inventario?? $idSalida;
             });
 
             if (!items.length) {
-                Swal.fire('Error', 'Selecciona al menos un producto y captura cantidad > 0.', 'error');
+                Swal.fire('Error', 'Selecciona al menos un producto y captura cantidad mayor a cero.', 'error');
                 if (pdfWindow) pdfWindow.close();
                 return;
             }
@@ -284,6 +284,8 @@ $id_salida_inventario= $id_salida_inventario?? $idSalida;
 
             const $btn = $(this);
             const originalText = $btn.text();
+
+            console.log('idSalida:', ($('#idSalida').val() || '').trim());
 
             $.ajax({
                 url: '<?= base_url("index.php/Inicio/guardarConvenio") ?>',

@@ -121,27 +121,29 @@
                         <td class="bold" style="width:25%;">Concepto</td>
                         <td><?= esc($concepto ?? '') ?></td>
                     </tr>
-                    </table>
+                </table>
 
-                    <br>
+                <br>
 
-                    <table>
+                <table>
                     <tr>
                         <th class="bold" style="width:70%;">Artículo</th>
-                        <th class="bold center" style="width:30%;">Cantidad solicitada</th>
+                        <th class="bold center" style="width:30%;">Cantidad</th>
                     </tr>
 
                     <?php if (!empty($productos) && is_array($productos)): ?>
                         <?php foreach ($productos as $p): ?>
                         <tr>
                             <td><?= esc($p->dsc_producto ?? '') ?></td>
-                            <td class="center"><?= (int)($p->cantidad ?? 0) ?></td>
+                            <td class="center"><?= intval($p->cantidad_entregada ?? 0) ?></td>
                         </tr>
                         <?php endforeach; ?>
 
                         <tr>
                         <td class="bold" style="text-align:right;">TOTAL</td>
-                        <td class="bold center"><?= (int)($total_solicitado ?? 0) ?></td>
+                        <td class="bold center">
+                            <?= intval($total_entregado ?? $total_solicitado ?? 0) ?>
+                        </td>
                         </tr>
                     <?php else: ?>
                         <tr>
@@ -177,7 +179,7 @@
 
                 <table>
                     <tr>
-                        <td class="bold" style="width: 25%;">Acción</td>
+                        <td class="bold" style="width: 25%;">Concepto</td>
                         <td><?= $concepto ?></td>
                     </tr>
                     <tr>

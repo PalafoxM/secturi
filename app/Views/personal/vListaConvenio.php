@@ -52,7 +52,7 @@
                                                 <tr>
                                                     <td><?= (int)$item->id_material_promo ?></td>
                                                     <td><?= esc($item->convenio) ?></td>
-                                                    <td>$<?= esc($item->monto) ?></td>
+                                                    <td>$<?= number_format((float)($item->monto ?? 0), 2, '.', ',') ?></td>
                                                     <td><?= esc($item->dsc_tiket) ?></td>
                                                     <td><?= esc($item->razon_social) ?></td>
                                                     <td><?= esc($item->no_proveedor) ?></td>
@@ -118,7 +118,14 @@
 
                         <div class="col-md-6 form-group">
                             <label for="monto">Monto <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control input-importe" name="monto" id="monto" placeholder="$0.00" required>
+                            <input type="text"
+                            class="form-control input-importe"
+                            name="monto"
+                            id="monto"
+                            placeholder="$0.00"
+                            inputmode="decimal"
+                            autocomplete="off"
+                            required>
                         </div>
 
                         <div class="col-md-6 form-group">
@@ -177,49 +184,33 @@
             e.stopImmediatePropagation();
 
             try {
-                const raw = $(this).attr('data-item');
-                console.log('data-item editar =>', raw);
-
-                const item = JSON.parse(raw);
-                editarConvenio(item);
+            const raw = $(this).attr('data-item');
+            console.log('data-item editar =>', raw);
+            const item = JSON.parse(raw);
+            editarConvenio(item);
             } catch (err) {
-                console.error('Error al parsear data-item:', err, $(this).attr('data-item'));
+            console.error('Error al parsear data-item:', err, $(this).attr('data-item'));
             }
         });
 
         $('#tablaConvenios').DataTable({
-            language: {
-                url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json'
-            },
+            language: { url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json' },
             destroy: true,
             searching: true,
             responsive: false,
             autoWidth: false
         });
 
-        $('.input-importe').on('blur', function() {
-            let val = ($(this).val() || '').replace(/[^0-9.]/g, '');
-            if (val) {
-                $(this).val(parseFloat(val).toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                }));
-            }
-        });
-
+        // Select2 proveedor
         $('#id_proveedor').select2({
             dropdownParent: $('#modalConvenio'),
             ajax: {
-                url: '<?= base_url("index.php/Inicio/buscarProveedor2") ?>',
-                dataType: 'json',
-                delay: 250,
-                data: function(params) {
-                    return { q: params.term };
-                },
-                processResults: function(data) {
-                    return { results: data.results };
-                },
-                cache: true
+            url: '<?= base_url("index.php/Inicio/buscarProveedor2") ?>',
+            dataType: 'json',
+            delay: 250,
+            data: function(params) { return { q: params.term }; },
+            processResults: function(data) { return { results: data.results }; },
+            cache: true
             },
             placeholder: 'Buscar proveedor por nombre, RFC o No. proveedor',
             minimumInputLength: 1,
@@ -228,13 +219,115 @@
 
     });
 
+    // =========================
+    // Formato moneda
+    // =========================
+    function toNumberString(val) {
+        val = (val || '').toString().replace(/[^0-9.]/g, '');
+        const parts = val.split('.');
+        if (parts.length > 2) val = parts.shift() + '.' + parts.join('');
+        if (val === '.') val = '0';
+        return val;
+    }
+
+    function formatCurrency(val) {
+        const clean = toNumberString(val);
+        const num = parseFloat(clean);
+        if (isNaN(num)) return '';
+        return '$' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function guardaConvenio() {
+
+        const idActual = parseInt($('#id_material_promo').val(), 10) || 0;
+        const esNuevo = (idActual === 0);
+
+        // Validar proveedor (Select2)
+        const idProv = $('#id_proveedor').val();
+        if (!idProv) {
+            Swal.fire('Falta proveedor', 'Selecciona un proveedor para poder guardar.', 'warning');
+            return;
+        }
+
+        let montoVal = toNumberString($('#monto').val());
+        if (!montoVal || parseFloat(montoVal) <= 0) {
+            Swal.fire('Error', 'El monto es requerido', 'error');
+            return;
+        }
+
+        const convenioVal = ($('#convenio').val() || '').trim();
+        if (!convenioVal) {
+            Swal.fire('Error', 'El convenio/contrato es requerido', 'error');
+            return;
+        }
+
+        // Enviar limpio
+        $('#monto').val(montoVal);
+        const montoPretty = formatCurrency(montoVal);
+        $('#monto').val(montoPretty);
+
+        $.ajax({
+            url: '<?= base_url("index.php/Agregar/guardaConvenio") ?>',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+            id_material_promo: idActual,     // compat (tu backend ya lo acepta)
+            // si quieres, también puedes mandar id_convenio_promo: idActual
+            monto: montoVal,
+            convenio: convenioVal,
+            id_proveedor: idProv
+            },
+            success: function (response) {
+            if (response && response.error === false) {
+
+                const idGuardado =
+                response.id_convenio_promo ||
+                response.id_material_promo ||
+                idActual;
+
+                Swal.fire({
+                title: 'Éxito',
+                text: response.respuesta || 'Registro guardado correctamente.',
+                icon: 'success',
+                timer: 1200,
+                showConfirmButton: false
+                }).then(() => {
+                if (esNuevo && idGuardado) {
+                    window.location.href = "<?= base_url('index.php/Inicio/InventarioPromocion/') ?>" + idGuardado;
+                } else {
+                    location.reload();
+                }
+                });
+
+            } else {
+                Swal.fire('Error', (response && response.respuesta) ? response.respuesta : 'No se pudo guardar.', 'error');
+            }
+            },
+            error: function (xhr) {
+            console.log('AJAX ERROR:', xhr.status, xhr.responseText);
+            Swal.fire('Error', 'Ocurrió un error al guardar. Revisa consola/network.', 'error');
+            }
+        });
+    }
+
+    // Formatear al perder foco
+    $(document).on('blur', '.input-importe', function () {
+        const formatted = formatCurrency($(this).val());
+        $(this).val(formatted !== '' ? formatted : '');
+    });
+
+    // Al enfocar, quita formato
+    $(document).on('focus', '.input-importe', function () {
+        $(this).val(toNumberString($(this).val()));
+    });
+
+    // =========================
+    // Modal nuevo/editar
+    // =========================
     function agregarConvenio() {
         $('#formConvenio')[0].reset();
         $('#id_material_promo').val(0);
-
-        // limpia select2
         $('#id_proveedor').empty().trigger('change');
-
         $('#modalConvenioLabel').text('Nuevo Convenio');
         $('#modalConvenio').modal('show');
     }
@@ -242,11 +335,12 @@
     function editarConvenio(item) {
         $('#formConvenio')[0].reset();
 
-        $('#id_material_promo').val(item.id_material_promo);
-        $('#convenio').val(item.convenio);
-        $('#monto').val(item.monto);
+        // ✅ OJO: tu PK real es id_convenio_promo, pero tu front usa id_material_promo como compat
+        $('#id_material_promo').val(item.id_convenio_promo || item.id_material_promo || 0);
 
-        // Precargar select2 (porque es AJAX)
+        $('#convenio').val(item.convenio);
+        $('#monto').val(formatCurrency(item.monto));
+
         const idProv = item.id_proveedor || null;
         const textProv = (item.razon_social ? item.razon_social : '') + ' - ' + (item.no_proveedor ? item.no_proveedor : '');
 
@@ -261,72 +355,9 @@
         $('#modalConvenio').modal('show');
     }
 
-    function guardaConvenio() {
-
-        const idActual = parseInt($('#id_material_promo').val(), 10) || 0;
-        const esNuevo = (idActual === 0);
-
-        // Validar proveedor (Select2)
-        const idProv = $('#id_proveedor').val();
-        if (!idProv) {
-            if (window.Swal) Swal.fire('Falta proveedor', 'Selecciona un proveedor para poder guardar.', 'warning');
-            else alert('Selecciona un proveedor para poder guardar.');
-            return;
-        }
-
-        let montoVal = ($('#monto').val() || '').replace(/[^0-9.]/g, '');
-        if (!montoVal) {
-            if (window.Swal) Swal.fire('Error', 'El monto es requerido', 'error');
-            else alert('El monto es requerido');
-            return;
-        }
-
-        $('#monto').val(montoVal);
-
-        $.ajax({
-            url: '<?= base_url("index.php/Agregar/guardaConvenio") ?>',
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                id_material_promo: idActual,
-                monto: montoVal,
-                convenio: $('#convenio').val(),
-                id_proveedor: idProv
-            },
-            
-            success: function(response) {
-                if (!response.error) {
-
-                    const idGuardado = response.id_material_promo || idActual;
-
-                    Swal.fire({
-                        title: 'Éxito',
-                        text: response.respuesta || 'Registro guardado correctamente.',
-                        icon: 'success',
-                        timer: 1200,
-                        showConfirmButton: false
-                    }).then(() => {
-
-                        // Si es nuevo, redirigir directo a inventario para alimentar artículos
-                        if (esNuevo && idGuardado) {
-                            window.location.href = "<?= base_url('index.php/Inicio/InventarioPromocion/') ?>" + idGuardado;
-                        } else {
-                            // Si fue edición, recargar lista
-                            location.reload();
-                        }
-
-                    });
-
-                } else {
-                    Swal.fire('Error', response.respuesta || 'No se pudo guardar.', 'error');
-                }
-            },
-            error: function() {
-                Swal.fire('Error', 'Ocurrió un error al guardar.', 'error');
-            }
-        });
-    }
-
+    // =========================
+    // Eliminar
+    // =========================
     function eliminarConvenio(id) {
         Swal.fire({
             title: '¿Estás seguro?',
@@ -338,24 +369,23 @@
             confirmButtonText: 'Sí, eliminar!'
         }).then((result) => {
             if (result.isConfirmed) {
-                $.ajax({
-                    url: '<?= base_url("index.php/Agregar/eliminarConvenio") ?>',
-                    type: 'POST',
-                    dataType: 'json',
-                    data: { id_material_promo: id },
-                    success: function(response) {
-                        if (!response.error) {
-                            Swal.fire('Eliminado!', response.respuesta || 'Registro eliminado.', 'success').then(() => {
-                                location.reload();
-                            });
-                        } else {
-                            Swal.fire('Error', response.respuesta || 'No se pudo eliminar.', 'error');
-                        }
-                    },
-                    error: function() {
-                        Swal.fire('Error', 'Ocurrió un error al eliminar.', 'error');
-                    }
-                });
+            $.ajax({
+                url: '<?= base_url("index.php/Agregar/eliminarConvenio") ?>',
+                type: 'POST',
+                dataType: 'json',
+                data: { id_material_promo: id },
+                success: function(response) {
+                if (!response.error) {
+                    Swal.fire('Eliminado!', response.respuesta || 'Registro eliminado.', 'success')
+                    .then(() => location.reload());
+                } else {
+                    Swal.fire('Error', response.respuesta || 'No se pudo eliminar.', 'error');
+                }
+                },
+                error: function() {
+                Swal.fire('Error', 'Ocurrió un error al eliminar.', 'error');
+                }
+            });
             }
         });
     }
