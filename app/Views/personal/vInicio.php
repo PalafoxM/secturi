@@ -727,14 +727,14 @@
                                                 <a href="<?= base_url() ?>assets/mike.png" target="_blank" >
                                                 <div class="card-body">
                                                     <div class="blog-card">
-                                                        <h4 class="header-title mt-0 mb-4">Semana del 2 de marzo al 6 de marzo, acciones SIGAP</h4>
+                                                        <h4 class="header-title mt-0 mb-4">Semana del 9 de marzo al 13 de marzo, acciones SIGAP</h4>
                                                         <iframe src="<?= base_url() ?>assets/mike.png" alt="" width="100%" height="500px"
                                                             class="img-fluid" ></iframe>
                                                     </div><!--end blog-card-->
-                                                       <a href="https://meet.google.com/pdv-qzjy-bga"
+                                                       <a href="https://meet.google.com/wkb-pvzf-zrk"
                                                                     target="_blank" class="text-primary">Unirse a la reunión 11:00 a 12:00 horas <i
                                                                         class="fas fa-long-arrow-alt-right"></i></a><br>
-                                                                        <a href="https://meet.google.com/iwg-xepo-ktg"
+                                                                        <a href="https://meet.google.com/rmb-dqrx-dsn"
                                                                     target="_blank" class="text-primary">Unirse a la reunión 13:00 a 14:00 horas <i
                                                                         class="fas fa-long-arrow-alt-right"></i></a>
 
