@@ -1323,7 +1323,7 @@ class Principal extends BaseController
         if (isset($data['no_convenio']) && strtoupper($data['no_convenio']) !== 'NO APLICA') {
             $dataCheck = [
                 'tabla' => 'reserva',
-                'where' => ['no_convenio' => $data['no_convenio']]
+                'where' => ['no_convenio' => $data['no_convenio'] , 'visible'=> 1]
             ];
             $exists = $globals->getTabla($dataCheck);
             
@@ -2902,6 +2902,7 @@ class Principal extends BaseController
             'clave_estandarizada' => $post['clave_estandarizada'],
             'monto_total' => $post['monto_total'],
             'garantia' => $post['garantia'],
+            'monto_garantia' => $post['monto_garantia'] ?? null,
             'proveedor_seguimiento' => $post['proveedor_seguimiento'],
             'objeto_contrato' => $post['objeto_contrato'],
             'fecha_inicio' => $post['fecha_inicio'],

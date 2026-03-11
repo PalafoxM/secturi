@@ -133,7 +133,11 @@
                                             <option value="PAGARE" <?= (isset($solicitud) && $solicitud->garantia == 'PAGARE') ? 'selected' : '' ?>>PAGARE</option>
                                             <option value="FIANZA" <?= (isset($solicitud) && $solicitud->garantia == 'FIANZA') ? 'selected' : '' ?>>FIANZA</option>
                                         </select>
-                                        <input type="text" class="form-control mt-2" name="monto_garantia" id="monto_garantia" value="<?= isset($solicitud) ? $solicitud->monto_total : '' ?>" readonly placeholder="12% del monto total">
+                                        <div class="custom-control custom-switch mt-2">
+                                            <input type="checkbox" class="custom-control-input" id="custom_garantia_check">
+                                            <label class="custom-control-label" for="custom_garantia_check">Ingresar otro monto o porcentaje de garantía</label>
+                                        </div>
+                                        <input type="text" class="form-control mt-2" name="monto_garantia" id="monto_garantia" value="<?= isset($solicitud) ? ($solicitud->monto_garantia ?? '') : '' ?>" readonly placeholder="12% del monto total">
                                     </div>
                                 </div>
 
@@ -379,18 +383,37 @@
             } else {
                 $('#monto_letra').val(numeroALetras(parseFloat(valor)));
                 
-                // Calcular 12%
-                var monto = parseFloat(valor);
-                var garantia = monto * 0.12;
-                var totalMonto = garantia + monto;
-                // Formatear a 2 decimales
-                $('#monto_garantia').val(totalMonto.toFixed(2));
+                if (!$('#custom_garantia_check').is(':checked')) {
+                    // Calcular 12%
+                    var monto = parseFloat(valor);
+                    var garantia = monto * 0.12;
+                    var totalMonto = garantia + monto;
+                    // Formatear a 2 decimales
+                    $('#monto_garantia').val(totalMonto.toFixed(2));
+                }
+            }
+        });
+        
+        $('#custom_garantia_check').on('change', function() {
+            if ($(this).is(':checked')) {
+                $('#monto_garantia').removeAttr('readonly');
+            } else {
+                $('#monto_garantia').attr('readonly', true);
+                $('#monto_total').trigger('input'); // Recalcular monto original
             }
         });
         
         // Trigger inicial si ya hay valor
         if($('#monto_total').val()) {
+            // Verificar si hay monto de garantia original
+            var valOriginalGarantia = "<?= isset($solicitud) ? ($solicitud->monto_garantia ?? '') : '' ?>";
             $('#monto_total').trigger('input');
+            
+            // Si el original que viene de BD es diferente al calculado o no vacio, activar checkbox
+            if (valOriginalGarantia && valOriginalGarantia !== $('#monto_garantia').val()) {
+                $('#custom_garantia_check').prop('checked', true).trigger('change');
+                $('#monto_garantia').val(valOriginalGarantia);
+            }
         }
     });
 
