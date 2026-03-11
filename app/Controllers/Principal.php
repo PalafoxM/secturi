@@ -3219,6 +3219,7 @@ class Principal extends BaseController
         $response->error = true;
 
         $id = $this->request->getPost('id_solicitud');
+        $motivo = $this->request->getPost('motivo');
 
         if (!$id) {
             $response->respuesta = "ID de solicitud no válido.";
@@ -3233,6 +3234,7 @@ class Principal extends BaseController
 
         $dataUpdate = [
             "id_estatus" => 2,
+            "motivo" => $motivo,
             "usu_act" => $session->id_usuario ?? 0,
             "fec_act" => date('Y-m-d H:i:s')
         ];

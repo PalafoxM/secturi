@@ -35,7 +35,7 @@
                                         <tr>
                                             <th>ID</th>
                                             <th>Fecha Registro</th>
-                                            <th>Proyecto</th>
+                       
                                             <th>Responsable Proyecto</th>
                                             <th>Responsable Seguimiento</th>
                                             <th>Monto</th>
@@ -48,30 +48,26 @@
                                                 <tr>
                                                     <td><?= $sol->id_solicitud_contrato ?></td>
                                                     <td><?= date('d/m/Y H:i', strtotime($sol->fec_reg)) ?></td>
-                                                    <td><?= $sol->dsc_proyecto ?></td>
                                                     <td><?= $sol->nombre_proyecto ?></td>
                                                     <td><?= $sol->nombre_seguimiento ?></td>
                                                     <td><?= $sol->monto_total ?></td>
                                                     <td class="text-center">
-                                                        <?php if($sol->id_estatus != 3 && $sol->id_estatus != 4 && $session->id_perfil != 7): ?>
+                                                        <?php if($session->id_perfil != 7): ?>
                                                             <a href="<?= base_url('index.php/Principal/editarSolicitudContrato/' . $sol->id_solicitud_contrato) ?>" class="btn btn-sm btn-warning" title="Editar"><i class="fas fa-edit"></i></a>
-                                                            <button class="btn btn-sm btn-danger" title="Eliminar" onclick="eliminarSolicitud(<?= $sol->id_solicitud_contrato ?>)"><i class="fas fa-trash"></i></button>
                                                         <?php endif; ?>
 
                                                         <?php if($session->id_perfil != 7): ?>
                                                             <a href="<?= base_url('index.php/Principal/verSolicitudContratoPDF/' . $sol->id_solicitud_contrato) ?>" target="_blank" class="btn btn-sm btn-info" title="Ver PDF"><i class="fas fa-file-pdf"></i></a>
                                                         <?php endif; ?>
 
-                                                        <?php if(in_array($sol->id_estatus, [3]) && $session->id_perfil != 7): ?>
-                                                            <button class="btn btn-sm btn-secondary" title="Adjuntar Archivos" onclick="abrirModalArchivos(<?= $sol->id_solicitud_contrato ?>)"><i class="fas fa-paperclip"></i></button>
-                                                        <?php endif; ?>
+                                                         <button class="btn btn-sm btn-secondary" title="Adjuntar Archivos" onclick="abrirModalArchivos(<?= $sol->id_solicitud_contrato ?>)"><i class="fas fa-paperclip"></i></button>
 
                                                         <?php if($sol->tienen_archivos): ?>
                                                                 <a href="<?= base_url('index.php/Principal/verArchivosSolicitud/' . $sol->id_solicitud_contrato) ?>" class="btn btn-sm btn-success" title="Ver Archivos"><i class="fas fa-eye"></i></a>
                                                         <?php endif; ?>
 
-                                                        <?php if($sol->id_estatus == 1 && in_array($session->id_perfil, [1,7])): ?>
-                                                                <a onclick="aprobarSolicitud(<?= $sol->id_solicitud_contrato ?>);" class="btn btn-sm btn-primary" title="Aprobar"><i class="fas fa-check text-white"></i></a>
+                                                        <?php if($sol->id_estatus == 4 && in_array($session->id_perfil, [1,7])): ?>
+                                                                <a onclick="declinaSolicitud(<?= $sol->id_solicitud_contrato ?>);" class="btn btn-sm btn-danger" title="Declinar"><i class="fas fa-times text-white"></i></a>
                                                         <?php endif; ?>
 
                                                          <?php if($sol->instrumento_juridico != ''): ?>
@@ -82,9 +78,12 @@
                                                             <?php if($sol->id_estatus == 4): ?>
                                                                 <button class="btn btn-sm btn-primary" title="Subir Instrumento Jurídico" onclick="subirInstrumentoJuridico(<?= $sol->id_solicitud_contrato ?>)"><i class="fas fa-upload"></i> Subir Instrumento</button>
                                                             <?php endif; ?>
-                                                            <?php if($sol->id_estatus == 2): ?>
-                                                                <button class="btn btn-sm btn-danger" title="Declinado"><i class="fas fa-times"></i>Declinado</button>
-                                                            <?php endif; ?>
+                                                        <?php endif; ?>
+                                                        <?php if($sol->id_estatus == 2): ?>
+                                                            <button class="btn btn-sm btn-danger" title="Declinado" onclick="verMotivo('<?= htmlspecialchars($sol->motivo ?? '', ENT_QUOTES) ?>')"><i class="fas fa-times"></i>Declinado</button>
+                                                        <?php endif; ?>
+                                                        <?php if($session->id_perfil != 7): ?>
+                                                            <button class="btn btn-sm btn-danger" title="Eliminar" onclick="eliminarSolicitud(<?= $sol->id_solicitud_contrato ?>)"><i class="fas fa-trash"></i></button>
                                                         <?php endif; ?>
                                                     </td>
                                                         
@@ -214,52 +213,32 @@
         });
     });
 
-    function aprobarSolicitud(id) {
+    function declinaSolicitud(id) {
         Swal.fire({
-            title: '¿Estás seguro de aprobar la solicitud?',
-            text: "No podrás revertir esto",
+            title: '¿Estás seguro de declinar la solicitud?',
+            text: "Ingresa el motivo de la declinación:",
             icon: 'warning',
+            input: 'textarea',
+            inputPlaceholder: 'Escribe el motivo aquí...',
             showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Sí, Aprobar',
-            cancelButtonText: 'No, Declinar'
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, declinar',
+            cancelButtonText: 'Cancelar',
+            preConfirm: (motivo) => {
+                if (!motivo || motivo.trim() === '') {
+                    Swal.showValidationMessage('El motivo es obligatorio');
+                    return false;
+                }
+                return motivo;
+            }
         }).then((result) => {
             if (result.isConfirmed) {
+                const motivo = result.value;
                 $.ajax({
-                    url: '<?= base_url("index.php/Principal/aprobarSolicitudContrato") ?>',
-                    type: 'POST',
-                    data: { id_solicitud: id },
-                    success: function(response) {
-                        if (!response.error) {
-                            Swal.fire(
-                                'Aprobado!',
-                                'El registro ha sido aprobado.',
-                                'success'
-                            ).then(() => {
-                                location.reload();
-                            });
-                        } else {
-                            Swal.fire(
-                                'Error!',
-                                'No se pudo eliminar el registro.',
-                                'error'
-                            );
-                        }
-                    },
-                    error: function() {
-                        Swal.fire(
-                            'Error!',
-                            'Ocurrió un error al procesar la solicitud.',
-                            'error'
-                        );
-                    }
-                });
-            }else{
-                 $.ajax({
                     url: '<?= base_url("index.php/Principal/declinarSolicitudContrato") ?>',
                     type: 'POST',
-                    data: { id_solicitud: id },
+                    data: { id_solicitud: id, motivo: motivo },
                     success: function(response) {
                         if (!response.error) {
                             Swal.fire(
@@ -272,7 +251,7 @@
                         } else {
                             Swal.fire(
                                 'Error!',
-                                'No se pudo eliminar el registro.',
+                                'No se pudo declinar el registro.',
                                 'error'
                             );
                         }
@@ -286,6 +265,16 @@
                     }
                 });
             }
+        });
+    }
+    
+    function verMotivo(motivo) {
+        Swal.fire({
+            title: 'Motivo de Declinación',
+            text: motivo || 'No se especificó un motivo.',
+            icon: 'info',
+            confirmButtonText: 'Cerrar',
+            confirmButtonColor: '#5b73e8'
         });
     }
     function eliminarSolicitud(id) {
