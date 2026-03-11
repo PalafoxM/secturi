@@ -850,6 +850,7 @@ ini.inicio = (function () {
                             $("#previews2").append(link);
                         }
                         $("#no_convenio_editar").val(reserva.no_convenio || '');
+                        $("#comentarios_instrumento_editar").val(reserva.comentarios_instrumento || '');
                         const tbody = $('#makeEditableEditar tbody');
                         tbody.empty();
 
@@ -1089,6 +1090,7 @@ ini.inicio = (function () {
                 formData.append('id_reserva', $('#id_reserva').val());
                 formData.append('total_importe', $('#total_importe_editar').val());
                 formData.append('no_convenio', $('#no_convenio_editar').val());
+                formData.append('comentarios_instrumento_editar', $('#comentarios_instrumento_editar').val());
 
                 // Agregar archivo si existe
                 var instrumentoFile = $('#instrumento_editar')[0].files[0];
@@ -1323,11 +1325,13 @@ ini.inicio = (function () {
                         const presupuesto = response.data.presupuesto;
                         const partidas = response.data.partida;
                         const proyectos = response.data.proyecto;
+                        //const comentarios_instrumento = response.data.comentarios_instrumento;
 
 
                         $("#varlidar_nombre_proveedor").val(reserva.razon_social || '');
                         $("#validar_no_proveedor").val(reserva.no_proveedor || '');
                         $("#validar_total_importe").val(reserva.total_importe || '');
+                        $("#comentarios_instrumento_estatus").val(reserva.comentarios_instrumento || '');
                         if (reserva.instrumento) {
                             const fileUrl = base_url + reserva.instrumento;
                             const link = `<a href="${fileUrl}" target="_blank" class="me-2">
@@ -1910,6 +1914,8 @@ ini.inicio = (function () {
 
                 // Obtener el estado del checkbox (true/false)
                 let sinInstrumento = $('#customSwitch1').is(':checked');
+
+                formData.append('comentarios_instrumento', $('#comentarios_instrumento').val());
 
                 if (!sinInstrumento) {
                     var instrumentoFile = $('#instrumento')[0].files[0];

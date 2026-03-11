@@ -150,11 +150,12 @@
                                                                     
                                                                 </div>
                                                                <?php if(isset($PT) && !empty($PT)): ?>
-                                                                    <div class="form-group" id="id_instrumento">
-                                                                        <label for="instrumento">Istrumento Juridico</label>
-                                                                        <input type="file" class="form-control" id="instrumento" name="instrumento" accept=".pdf">
-                                                                    </div> 
-                                                                <?php endif; ?>                                                                                     
+                                                                     <div class="form-group" id="id_instrumento">
+                                                                         <label for="instrumento">Istrumento Juridico</label>
+                                                                         <input type="file" class="form-control" id="instrumento" name="instrumento" accept=".pdf">
+                                                                     </div>
+                                                                    
+                                                                 <?php endif; ?>                                                                                      
                                                             </div>
                                                             <div class="col-lg-6" >
                                                                 <div class="form-group">
@@ -187,6 +188,10 @@
                                                                     </div>
                                                                 </div>
                                                                 <?php endif; ?> 
+                                                                 <div class="form-group" id="id_comentarios_instrumento">
+                                                                     <label for="comentarios_instrumento">Comentarios</label>
+                                                                     <textarea class="form-control" id="comentarios_instrumento" name="comentarios_instrumento" rows="3"></textarea>
+                                                                 </div>
                                                             </div>  
                                                         <div class="row">
                                                             <div class="col-12">

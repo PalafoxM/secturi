@@ -1067,6 +1067,10 @@ class Principal extends BaseController
             $dataInsert['ruta_absoluta'] = $ruta_absoluta;
         }
 
+        if (isset($data['comentarios_instrumento_editar'])) {
+            $dataInsert['comentarios_instrumento'] = $data['comentarios_instrumento_editar'];
+        }
+
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/EditarReserva'];
         $dataConfig = [
             "tabla" => "reserva",
@@ -1309,7 +1313,6 @@ class Principal extends BaseController
         $ruta_absoluta = "";
         $ruta_relativa = "";
         $file = $this->request->getFile('instrumento');
-
          if (isset($data['no_convenio']) && empty($data['no_convenio'])) {
             $response->error = true;
             $response->respuesta = "El campo No. Convenio es requerido";
@@ -1377,6 +1380,10 @@ class Principal extends BaseController
             $dataInsert['instrumento'] = $ruta_relativa;
             $dataInsert['ruta_absoluta'] = $ruta_absoluta;
             $dataInsert['no_convenio'] = ($data['no_convenio'] == 'NO APLICA') ? 'NO APLICA' : $data['no_convenio'];
+        }
+
+        if (isset($data['comentarios_instrumento'])) {
+            $dataInsert['comentarios_instrumento'] = $data['comentarios_instrumento'];
         }
 
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaReserva'];

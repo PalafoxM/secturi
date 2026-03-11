@@ -250,6 +250,10 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
+                                                                <div class="form-group" id="id_comentarios_instrumento_editar">
+                                                                    <label for="comentarios_instrumento_editar">Comentarios</label>
+                                                                    <textarea class="form-control" id="comentarios_instrumento_editar" name="comentarios_instrumento_editar" rows="3"></textarea>
+                                                                </div>
                                                             </div>  
                                                         <div class="row">
                                                             <div class="col-12">
@@ -340,6 +344,15 @@
                                         <input class="form-control" id="validar_no_convenio" autocomplete="off" name="validar_no_convenio" readonly>
                                   </div>                                                                                    
                               </div>                                                             
+                         </div>
+                          <div class="row">
+                              <div class="col-lg-12">
+                                   <div class="form-group" >
+                                        <label for="comentarios_instrumento_estatus" class="form-label">Comentarios</label>
+                                        <textarea class="form-control" id="comentarios_instrumento_estatus" name="comentarios_instrumento_estatus" rows="3"></textarea>
+                                    </div>                                                                                    
+                              </div>                                                             
+                                                                                        
                          </div>
                           <div class="row">
                               <div class="col-lg-12">
