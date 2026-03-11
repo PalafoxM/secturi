@@ -1928,7 +1928,7 @@ class Inicio extends BaseController
             'Producto',
             'Cantidad entregada',
             'Stock después',
-            'Observaciones / concepto'
+            'Concepto'
         ];
 
         $col = 1;
