@@ -581,7 +581,7 @@
                                             class="mdi mdi-chevron-right"></i></span></a>
                                 <ul class="nav-second-level" aria-expanded="false">
                                     
-                                    <li><a href="<?php echo base_url(); ?>index.php/Inicio/ListaConvenio">Inventario</a></li>
+                                    <li><a href="<?php echo base_url(); ?>index.php/Inicio/ListaConvenio">Contratos</a></li>
                                    
                                   
                                 </ul>   
