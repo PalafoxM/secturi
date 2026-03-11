@@ -39,6 +39,7 @@
                                             <th>Responsable Proyecto</th>
                                             <th>Responsable Seguimiento</th>
                                             <th>Monto</th>
+                                            <th>Estatus</th>
                                             <th>Acciones</th>
                                         </tr>
                                     </thead>
@@ -51,17 +52,42 @@
                                                     <td><?= $sol->nombre_proyecto ?></td>
                                                     <td><?= $sol->nombre_seguimiento ?></td>
                                                     <td><?= $sol->monto_total ?></td>
+                                                    <td>
+                                                        <?php if($sol->id_estatus == 2): ?>
+                                                            <button class="btn btn-sm btn-outline-danger font-weight-bold shadow-sm" title="Clic para ver motivo" onclick="verMotivo('<?= htmlspecialchars($sol->motivo ?? '', ENT_QUOTES) ?>')">
+                                                                <i class="fas fa-exclamation-triangle"></i> Declinado
+                                                            </button>
+                                                        <?php endif; ?>
+                                                        <?php if($sol->id_estatus == 4): ?>
+                                                            <button class="btn btn-sm btn-soft-warning font-weight-bold" style="cursor: default; pointer-events: none;" title="En revisión por área Jurídica">
+                                                                <i class="fas fa-circle-notch fa-spin mr-1"></i> En Espera
+                                                            </button>
+                                                        <?php endif; ?>
+
+                                                           <?php if($sol->id_estatus == 3): ?>
+                                                             <?php
+                                                                $btn_instrumentos = '';
+                                                                $decoded = json_decode($sol->instrumento_juridico, true);
+                                                                if(is_array($decoded)) {
+                                                                    foreach($decoded as $index => $ruta) {
+                                                                        $btn_instrumentos .= '<a href="'.base_url($ruta).'" target="_blank" class="btn btn-sm btn-success mb-1" title="Ver Instrumento '.($index+1).'"><i class="fas fa-file-pdf"></i> Inst. '.($index+1).'</a> ';
+                                                                    }
+                                                                } else {
+                                                                     // Fallback para antiguos strings guardados directamente
+                                                                     $btn_instrumentos = '<a href="'.base_url($sol->instrumento_juridico).'" target="_blank" class="btn btn-sm btn-success mb-1" title="Ver Instrumento Jurídico"><i class="fas fa-file-pdf"></i> Instrumento</a> ';
+                                                                }
+                                                                echo $btn_instrumentos;
+                                                             ?>
+                                                        <?php endif; ?>
+                                                    </td>
                                                     <td class="text-center">
                                                         <?php if($session->id_perfil != 7): ?>
                                                             <a href="<?= base_url('index.php/Principal/editarSolicitudContrato/' . $sol->id_solicitud_contrato) ?>" class="btn btn-sm btn-warning" title="Editar"><i class="fas fa-edit"></i></a>
                                                         <?php endif; ?>
-
-                                                        <?php if($session->id_perfil != 7): ?>
                                                             <a href="<?= base_url('index.php/Principal/verSolicitudContratoPDF/' . $sol->id_solicitud_contrato) ?>" target="_blank" class="btn btn-sm btn-info" title="Ver PDF"><i class="fas fa-file-pdf"></i></a>
-                                                        <?php endif; ?>
-
+                                                        <?php if($session->id_perfil != 7): ?>
                                                          <button class="btn btn-sm btn-secondary" title="Adjuntar Archivos" onclick="abrirModalArchivos(<?= $sol->id_solicitud_contrato ?>)"><i class="fas fa-paperclip"></i></button>
-
+                                                        <?php endif; ?>
                                                         <?php if($sol->tienen_archivos): ?>
                                                                 <a href="<?= base_url('index.php/Principal/verArchivosSolicitud/' . $sol->id_solicitud_contrato) ?>" class="btn btn-sm btn-success" title="Ver Archivos"><i class="fas fa-eye"></i></a>
                                                         <?php endif; ?>
@@ -70,18 +96,14 @@
                                                                 <a onclick="declinaSolicitud(<?= $sol->id_solicitud_contrato ?>);" class="btn btn-sm btn-danger" title="Declinar"><i class="fas fa-times text-white"></i></a>
                                                         <?php endif; ?>
 
-                                                         <?php if($sol->instrumento_juridico != ''): ?>
-                                                                <a href="<?= base_url($sol->instrumento_juridico) ?>" target="_blank" class="btn btn-sm btn-success" title="Ver Instrumento Jurídico"><i class="fas fa-file-pdf"></i></a>
-                                                        <?php endif; ?>
+                                                 
 
                                                         <?php if(in_array($session->id_perfil, [1,7])): ?>
                                                             <?php if($sol->id_estatus == 4): ?>
                                                                 <button class="btn btn-sm btn-primary" title="Subir Instrumento Jurídico" onclick="subirInstrumentoJuridico(<?= $sol->id_solicitud_contrato ?>)"><i class="fas fa-upload"></i> Subir Instrumento</button>
                                                             <?php endif; ?>
                                                         <?php endif; ?>
-                                                        <?php if($sol->id_estatus == 2): ?>
-                                                            <button class="btn btn-sm btn-danger" title="Declinado" onclick="verMotivo('<?= htmlspecialchars($sol->motivo ?? '', ENT_QUOTES) ?>')"><i class="fas fa-times"></i>Declinado</button>
-                                                        <?php endif; ?>
+                                                       
                                                         <?php if($session->id_perfil != 7): ?>
                                                             <button class="btn btn-sm btn-danger" title="Eliminar" onclick="eliminarSolicitud(<?= $sol->id_solicitud_contrato ?>)"><i class="fas fa-trash"></i></button>
                                                         <?php endif; ?>
@@ -337,24 +359,27 @@
 
     function subirInstrumentoJuridico(id) {
         Swal.fire({
-            title: 'Subir Instrumento Jurídico',
+            title: 'Subir Instrumentos Jurídicos',
             input: 'file',
             inputAttributes: {
                 'accept': 'application/pdf',
-                'aria-label': 'Subir Instrumento Jurídico en PDF'
+                'multiple': 'multiple',
+                'aria-label': 'Subir Instrumentos Jurídicos en PDF'
             },
             showCancelButton: true,
             confirmButtonText: 'Subir',
             cancelButtonText: 'Cancelar',
             showLoaderOnConfirm: true,
-            preConfirm: (file) => {
-                if (!file) {
-                    Swal.showValidationMessage('Por favor selecciona un archivo PDF');
+            preConfirm: (files) => {
+                if (!files || files.length === 0) {
+                    Swal.showValidationMessage('Por favor selecciona al menos un archivo PDF');
                     return false;
                 }
                 
                 const formData = new FormData();
-                formData.append('archivo', file);
+                for (let i = 0; i < files.length; i++) {
+                    formData.append('archivos[]', files[i]);
+                }
                 formData.append('id_solicitud', id);
                 
                 return fetch('<?= base_url("index.php/Principal/subirInstrumentoJuridico") ?>', {

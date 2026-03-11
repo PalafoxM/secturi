@@ -631,7 +631,7 @@
                         <h6 class="menu-title">GASTOS POR CONCEPTOS</h6>
                     </div>
                     <ul class="nav">
-                        <?php if (in_array($session->get('id_perfil'),[1,7])): ?>
+                        <?php if (in_array($session->get('id_perfil'),[1])): ?>
                         <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Inicio/Viaticos">viáticos/representación</a>
                         </li>

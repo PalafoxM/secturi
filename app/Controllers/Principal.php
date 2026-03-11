@@ -3163,6 +3163,27 @@ class Principal extends BaseController
         }
         
         if ($count > 0) {
+            // Enviar correo a lvelaga@guanajuato.gob.mx
+            $emailService = \Config\Services::email();
+            $usuarioQuery = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["id_usuario" => ($session->id_usuario ?? 0)]]);
+            $nombreUsuario = (isset($usuarioQuery->data) && !empty($usuarioQuery->data)) ? $usuarioQuery->data[0]->nombre_completo : 'Usuario Desconocido';
+            $enlace = base_url('index.php/Principal/ListaSolicitudContrato');
+            
+            $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
+            $emailService->setTo('lvelaga@guanajuato.gob.mx');
+            $emailService->setSubject('Nueva Solicitud de Contrato - Archivos Adjuntados');
+            $emailService->setMailType('html');
+            $emailService->setMessage("
+                <p>Buen día,</p>
+                <p>Se le notifica que se han subido documentos para la solicitud de contrato con ID <strong>{$id_solicitud}</strong>.</p>
+                <p>Los archivos fueron agregados por el usuario: <strong>{$nombreUsuario}</strong>.</p>
+                <p>Puede consultar los detalles ingresando al siguiente enlace: <a href='{$enlace}'>{$enlace}</a></p>
+                <br>
+                <p>Saludos cordiales,</p>
+                <p><strong>Sistema Unificado SECTURI (SUSI)</strong></p>
+            ");
+            $emailService->send();
+
             $response->error = false;
             $msg = "Se guardaron $count archivos correctamente.";
             if ($errores > 0) $msg .= " Hubo problemas con $errores archivos.";
@@ -3215,6 +3236,7 @@ class Principal extends BaseController
     {
         $session = \Config\Services::session();
         $globals = new Mglobal;
+        $emailService = \Config\Services::email();
         $response = new \stdClass();
         $response->error = true;
 
@@ -3242,6 +3264,32 @@ class Principal extends BaseController
         $res = $globals->saveTabla($dataUpdate, $dataConfig, ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/declinarSolicitudContrato']);
 
         if (!$res->error) {
+            // Mandar correo
+            $solicitudQuery = $globals->getTabla(["tabla" => "solicitud_contrato", "where" => ["id_solicitud_contrato" => $id]]);
+            if(isset($solicitudQuery->data) && !empty($solicitudQuery->data)){
+               $usu_reg = $solicitudQuery->data[0]->usu_reg;
+               $usuarioQuery = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["id_usuario" => $usu_reg]]);
+               if(isset($usuarioQuery->data) && !empty($usuarioQuery->data) && !empty($usuarioQuery->data[0]->correo)){
+                   $correoDestino = $usuarioQuery->data[0]->correo;
+                   $nombreUsuario = $usuarioQuery->data[0]->nombre_completo ?? 'Usuario';
+                   
+                   $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
+                   $emailService->setTo($correoDestino);
+                   $emailService->setSubject('Solicitud de Contrato Declinada');
+                   $emailService->setMailType('html');
+                   $emailService->setMessage("
+                       <p>Buen día, <strong>{$nombreUsuario}</strong>:</p>
+                       <p>Se le notifica que su solicitud de elaboración de contrato con ID <strong>{$id}</strong> ha sido <strong>declinada</strong>.</p>
+                       <p><strong>Motivo:</strong> {$motivo}</p>
+                       <p>Puede consultar mayores detalles ingresando al sistema SUSI.</p>
+                       <br>
+                       <p>Saludos cordiales,</p>
+                       <p><strong>Sistema Unificado SECTURI (SUSI)</strong></p>
+                   ");
+                   $emailService->send();
+               }
+            }
+
             $response->error = false;
             $response->respuesta = "Solicitud declinada correctamente.";
         } else {
@@ -3260,24 +3308,36 @@ class Principal extends BaseController
         $response->error = true;
 
         $id = $this->request->getPost('id_solicitud');
-        $archivo = $this->request->getFile('archivo');
+        $archivos = $this->request->getFileMultiple('archivos');
 
-        if (!$id || !$archivo || !$archivo->isValid() || $archivo->getExtension() !== 'pdf') {
-            $response->respuesta = "Archivo o ID de solicitud no válido. Asegúrese de subir un documento PDF.";
+        if (!$id || empty($archivos)) {
+            $response->respuesta = "Archivos o ID de solicitud no válido.";
             return $this->respond($response);
         }
 
-        // Subir archivo
-        $newName = $archivo->getRandomName();
+        $rutasGuardadas = [];
         $uploadPath = FCPATH . 'assets/instrumentos_juridicos/';
         if (!is_dir($uploadPath)) {
             mkdir($uploadPath, 0777, true);
         }
-        
-        if (!$archivo->move($uploadPath, $newName)) {
-             $response->respuesta = "No se pudo guardar el archivo en el servidor.";
+
+        foreach ($archivos as $archivo) {
+            if ($archivo->isValid() && !$archivo->hasMoved() && $archivo->getExtension() === 'pdf') {
+                $newName = $archivo->getRandomName();
+                if ($archivo->move($uploadPath, $newName)) {
+                    $rutasGuardadas[] = 'assets/instrumentos_juridicos/' . $newName;
+                }
+            }
+        }
+
+        if (empty($rutasGuardadas)) {
+             $response->respuesta = "No se pudieron guardar los archivos o no son PDF válidos.";
              return $this->respond($response);
         }
+
+        // Obtener posibles rutas existentes si desea acumular, o sobreecribir todo.
+        // Aquí se sobrescribirá con el arreglo nuevo en formato JSON
+        $jsonRutas = json_encode($rutasGuardadas);
 
         // Update DB
         $dataConfig = [
@@ -3287,7 +3347,8 @@ class Principal extends BaseController
         ];
 
         $dataUpdate = [
-            "instrumento_juridico" => 'assets/instrumentos_juridicos/' . $newName,
+            "id_estatus" => 3,
+            "instrumento_juridico" => $jsonRutas,
             "usu_act" => $session->id_usuario ?? 0,
             "fec_act" => date('Y-m-d H:i:s')
         ];
