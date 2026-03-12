@@ -652,6 +652,12 @@
                         <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Principal/ListaSolicitudContrato">Listado de Contratos</a>
                         </li>
+                        <li class="nav-item"><a class="nav-link"
+                                href="<?php echo base_url(); ?>index.php/Principal/SolicitudConvenio">Solicitud Convenio</a>
+                        </li>
+                        <li class="nav-item"><a class="nav-link"
+                                href="<?php echo base_url(); ?>index.php/Principal/ListaSolicitudConvenio">Listado de Convenios</a>
+                        </li>
 
                     </ul>
                 </div><!-- end Authentication-->

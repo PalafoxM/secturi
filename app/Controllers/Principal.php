@@ -7945,4 +7945,530 @@ class Principal extends BaseController
         $this->_renderView($data);
     }
 
+
+    public function SolicitudConvenio()
+    {
+        $session = \Config\Services::session();
+        $globals = new \App\Models\Mglobal;
+        $data = array();
+        
+        $vw_usuario = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1]]);
+        $data['direccion'] = $vw_usuario->data;
+        $vw_usuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
+        $data['usuario'] = $vw_usuario->data;
+
+        $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
+        $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
+
+        $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+
+        $data['scripts'] = array('inicio');
+        $data['edita'] = 0;
+        $data['contentView'] = 'personal/vSolicitudConvenio';
+        $this->_renderView($data);
+    }
+
+    public function ListaSolicitudConvenio()
+    {
+        $session = \Config\Services::session();
+        $globals = new \App\Models\Mglobal;
+        
+        // Dependiendo del perfil mostramos todo o solo lo propio
+        if (in_array($session->get('id_perfil'), [1, 7])) {
+            $solicitudes = $globals->getTabla(['tabla' => 'vw_solicitud_convenio', 'where' => ['visible' => 1]]);
+        } else {
+            // Ejemplo: Filtrar por creador o responsable
+            // $solicitudes = $globals->getTabla(['tabla' => 'vw_solicitud_convenio', 'where' => ['usu_reg' => $session->get('id_usuario'), 'visible' => 1]]);
+            // Para mantener consistencia con contrato base, veremos si allá filtran. Allá no filtran en esta versión, lo traen todo:
+            $solicitudes = $globals->getTabla(['tabla' => 'vw_solicitud_convenio', 'where' => ['visible' => 1]]);
+        }
+
+        if(isset($solicitudes->data) && !empty($solicitudes->data)){
+            foreach($solicitudes->data as &$s){
+                $archivos = $globals->getTabla(['tabla' => 'solicitud_convenio_archivos', 'where' => ['id_solicitud_convenio' => $s->id_solicitud_convenio, 'visible' => 1]]);
+                $s->tienen_archivos = !empty($archivos->data);
+            }
+        }
+
+        $data['solicitudes'] = (!empty($solicitudes->data)) ? $solicitudes->data : [];
+        $data['scripts'] = array('inicio');
+        $data['contentView'] = 'personal/vListaSolicitudConvenio';
+        $this->_renderView($data);
+    }
+
+    public function editarSolicitudConvenio($id_solicitud = null)
+    {
+        $session = \Config\Services::session();
+        $globals = new \App\Models\Mglobal;
+        
+        if (!$id_solicitud) {
+             return redirect()->to(base_url('index.php/Principal/ListaSolicitudConvenio'));
+        }
+
+        $solicitud = $globals->getTabla(['tabla' => 'solicitud_convenio', 'where' => ['id_solicitud_convenio' => $id_solicitud, 'visible' => 1]]);
+        if (empty($solicitud->data)) {
+            return redirect()->to(base_url('index.php/Principal/ListaSolicitudConvenio'));
+        }
+
+        $pagos = $globals->getTabla(['tabla' => 'solicitud_convenio_pagos', 'where' => ['id_solicitud_convenio' => $id_solicitud, 'visible' => 1]]);
+
+        $vw_usuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
+        $data['usuario'] = $vw_usuario->data;
+        $vw_direccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1]]);
+        $data['direccion'] = $vw_direccion->data;
+
+        $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
+        $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
+
+        $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+
+        $data['solicitud'] = $solicitud->data[0];
+        $data['pagos'] = (!empty($pagos->data)) ? $pagos->data : [];
+        
+        $data['scripts'] = array('inicio');
+        $data['edita'] = 1;
+        $data['contentView'] = 'personal/vSolicitudConvenio';
+        $this->_renderView($data);
+    }
+
+    public function guardarSolicitudConvenio()
+    {
+        $session = \Config\Services::session();
+        $globals = new \App\Models\Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error al guardar la solicitud';
+
+        $post = $this->request->getPost();
+        $id_solicitud_convenio = isset($post['id_solicitud_convenio']) ? $post['id_solicitud_convenio'] : null;
+
+        $archivo_suficiencia = '';
+        if($file = $this->request->getFile('archivo_suficiencia')) {
+             if ($file->isValid() && !$file->hasMoved()) {
+                $newName = $file->getRandomName();
+                $file->move(FCPATH . 'assets/uploads/convenios', $newName);
+                $archivo_suficiencia = $newName;
+             }
+        }
+
+        $dataInsert = [
+            'responsable_proyecto' => $post['responsable_proyecto'],
+            'responsable_seguimiento' => $post['responsable_seguimiento'],
+            'proyecto' => $post['proyecto'],
+            'partida' => $post['partida'],
+            'monto_secturi' => $post['monto_secturi'],
+            'monto_federal' => $post['monto_federal'],
+            'monto_otra' => $post['monto_otra'],
+            'monto_total' => $post['monto_total'],
+            'objeto_convenio' => $post['objeto_convenio'],
+            'fecha_inicio' => $post['fecha_inicio'],
+            'fecha_termino' => $post['fecha_termino'],
+            'proveedor_nombre' => $post['proveedor_nombre'],
+            'proveedor_domicilio' => $post['proveedor_domicilio'],
+            'proveedor_rfc' => $post['proveedor_rfc'],
+            'proveedor_cedula' => $post['proveedor_cedula'],
+            'proveedor_representante' => $post['proveedor_representante'],
+            'proveedor_asistente' => $post['proveedor_asistente'] ?? null,
+            'proveedor_seguimiento' => $post['proveedor_seguimiento'],
+            'proveedor_correo' => $post['proveedor_correo'],
+        ];
+
+        if (!empty($archivo_suficiencia)) {
+            $dataInsert['archivo_suficiencia'] = $archivo_suficiencia;
+        }
+
+        $dataConfig = ["tabla" => "solicitud_convenio", "editar" => false];
+        
+        if ($id_solicitud_convenio) {
+             $dataInsert['id_estatus'] = 1;
+            $dataConfig = [
+                "tabla" => "solicitud_convenio", 
+                "editar" => true, 
+                "idEditar" => ['id_solicitud_convenio' => $id_solicitud_convenio]
+            ];
+            $dataInsert['usu_act'] = $session->id_usuario ?? 0;
+            $dataInsert['fec_act'] = date('Y-m-d H:i:s');
+        } else {
+             $dataInsert['usu_reg'] = $session->id_usuario ?? 0;
+             $dataInsert['fec_reg'] = date('Y-m-d H:i:s');
+        }
+
+        $dataBitacora = ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/guardarSolicitudConvenio'];
+        $res = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+
+        if (!$res->error) {
+            $id_solicitud = $id_solicitud_convenio ? $id_solicitud_convenio : $res->idRegistro;
+            
+            if ($id_solicitud_convenio) {
+                $globals->saveTabla(
+                    ['visible' => 0], 
+                    [
+                        "tabla" => "solicitud_convenio_pagos", 
+                        "editar" => true, 
+                        "idEditar" => ['id_solicitud_convenio' => $id_solicitud_convenio]
+                    ], 
+                    ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/eliminarPagosAntiguos']
+                );
+            }
+
+            if(isset($post['pagos']) && is_array($post['pagos'])){
+                foreach($post['pagos'] as $pago){
+                    $dataPago = [
+                        'id_solicitud_convenio' => $id_solicitud,
+                        'numero_pago' => $pago['numero'],
+                        'monto' => $pago['monto'],
+                        'fecha' => $pago['fecha'],
+                        'entregable' => $pago['entregable'],
+                        'visible' => 1
+                    ];
+                    $res = $globals->saveTabla($dataPago, ["tabla" => "solicitud_convenio_pagos", "editar" => false], ["id_user" => $session->id_usuario ?? 0, 'script' => 'Principal.php/guardarSolicitudConvenio']);
+                }
+            }
+          
+            $response->error = false;
+            $response->respuesta = 'Solicitud guardada correctamente';
+        } else {
+            $response->respuesta = $res->respuesta;
+        }
+
+        return $this->respond($response);
+    }
+
+    public function eliminarSolicitudConvenio()
+    {
+        $session = \Config\Services::session();
+        $globals = new \App\Models\Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        
+        $id_solicitud = $this->request->getPost('id_solicitud');
+        
+        if($id_solicitud){
+            $dataUpdate = ['visible' => 0];
+            $dataBitacora = ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/eliminarSolicitudConvenio'];
+            $res = $globals->saveTabla($dataUpdate, ["tabla" => "solicitud_convenio", "editar" => true, "idEditar" => ['id_solicitud_convenio' => $id_solicitud]], $dataBitacora);
+            
+            if(!$res->error){
+                $response->error = false;
+                $response->respuesta = 'Solicitud eliminada correctamente';
+            } else {
+                $response->respuesta = $res->respuesta;
+            }
+        } else {
+            $response->respuesta = 'ID no válido';
+        }
+        
+        return $this->respond($response);
+    }
+
+    public function declinarSolicitudConvenio()
+    {
+        $session = \Config\Services::session();
+        $globals = new \App\Models\Mglobal;
+        $emailService = \Config\Services::email();
+        $response = new \stdClass();
+        $response->error = true;
+
+        $id = $this->request->getPost('id_solicitud');
+        $motivo = $this->request->getPost('motivo');
+
+        if (!$id) {
+            $response->respuesta = "ID de solicitud no válido.";
+            return $this->respond($response);
+        }
+
+        $dataConfig = [
+            "tabla" => "solicitud_convenio",
+            "editar" => true,
+            "idEditar" => ["id_solicitud_convenio" => $id]
+        ];
+
+        $dataUpdate = [
+            "id_estatus" => 2,
+            "motivo" => $motivo,
+            "usu_act" => $session->id_usuario ?? 0,
+            "fec_act" => date('Y-m-d H:i:s')
+        ];
+
+        $res = $globals->saveTabla($dataUpdate, $dataConfig, ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/declinarSolicitudConvenio']);
+
+        if (!$res->error) {
+            $solicitudQuery = $globals->getTabla(["tabla" => "solicitud_convenio", "where" => ["id_solicitud_convenio" => $id]]);
+            if(isset($solicitudQuery->data) && !empty($solicitudQuery->data)){
+               $usu_reg = $solicitudQuery->data[0]->usu_reg;
+               $usuarioQuery = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["id_usuario" => $usu_reg]]);
+               if(isset($usuarioQuery->data) && !empty($usuarioQuery->data) && !empty($usuarioQuery->data[0]->correo)){
+                   $correoDestino = $usuarioQuery->data[0]->correo;
+                   $nombreUsuario = $usuarioQuery->data[0]->nombre_completo ?? 'Usuario';
+                   
+                   $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
+                   $emailService->setTo($correoDestino);
+                   $emailService->setSubject('Solicitud de Convenio Declinada');
+                   $emailService->setMailType('html');
+                   $emailService->setMessage("
+                       <p>Buen día, <strong>{\$nombreUsuario}</strong>:</p>
+                       <p>Se le notifica que su solicitud de elaboración de convenio con ID <strong>{\$id}</strong> ha sido <strong>declinada</strong>.</p>
+                       <p><strong>Motivo:</strong> {\$motivo}</p>
+                       <br>
+                       <p>Saludos cordiales,</p>
+                   ");
+                   $emailService->send();
+               }
+            }
+
+            $response->error = false;
+            $response->respuesta = "Solicitud declinada correctamente.";
+        } else {
+            $response->respuesta = "No se pudo declinar la solicitud.";
+        }
+
+        return $this->respond($response);
+    }
+    
+    public function subirInstrumentoJuridicoConvenio()
+    {
+        $session = \Config\Services::session();
+        $globals = new \App\Models\Mglobal;
+        $emailService = \Config\Services::email();
+        $response = new \stdClass();
+        $response->error = true;
+
+        $id = $this->request->getPost('id_solicitud');
+        
+        if (!$id) {
+            $response->respuesta = "ID no válido.";
+            return $this->respond($response);
+        }
+
+        $exito = false;
+        $rutasGuardadas = [];
+        
+        $solicitud_bd = $globals->getTabla(['tabla' => 'solicitud_convenio', 'where' => ['id_solicitud_convenio' => $id]]);
+        if(isset($solicitud_bd->data) && !empty($solicitud_bd->data)) {
+            $antiguo_json = $solicitud_bd->data[0]->instrumento_juridico;
+            if(!empty($antiguo_json)) {
+                $decoded = json_decode($antiguo_json, true);
+                if(is_array($decoded)) {
+                    $rutasGuardadas = $decoded;
+                } else {
+                    $rutasGuardadas[] = $antiguo_json;
+                }
+            }
+        }
+
+        if (isset($_FILES['archivos']) && is_array($_FILES['archivos']['name'])) {
+            foreach ($_FILES['archivos']['name'] as $key => $originalName) {
+                if ($_FILES['archivos']['error'][$key] === UPLOAD_ERR_OK) {
+                    $tmpName = $_FILES['archivos']['tmp_name'][$key];
+                    $ext = pathinfo($originalName, PATHINFO_EXTENSION);
+                    $randHash = substr(md5(uniqid(rand(), true)), 0, 8);
+                    $newName = 'Inst_Convenio_' . $id . '_' . $randHash . '.' . $ext;
+                    $targetPath = FCPATH . 'assets/uploads/convenios/' . $newName;
+                    
+                    if (move_uploaded_file($tmpName, $targetPath)) {
+                        $rutasGuardadas[] = 'assets/uploads/convenios/' . $newName;
+                        $exito = true;
+                    }
+                }
+            }
+        }
+
+        if ($exito) {
+            $instrumento_json = json_encode($rutasGuardadas);
+            $dataConfig = [
+                "tabla" => "solicitud_convenio",
+                "editar" => true,
+                "idEditar" => ["id_solicitud_convenio" => $id]
+            ];
+
+            $dataUpdate = [
+                "id_estatus" => 3, 
+                "instrumento_juridico" => $instrumento_json,
+                "usu_act" => $session->id_usuario ?? 0,
+                "fec_act" => date('Y-m-d H:i:s')
+            ];
+
+            $res = $globals->saveTabla($dataUpdate, $dataConfig, ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/subirInstrumentoJuridicoConvenio']);
+
+            if (!$res->error) {
+                $response->error = false;
+                $response->respuesta = "Instrumento subido y solicitud aprobada.";
+                
+                $solicitudQuery = $globals->getTabla(["tabla" => "solicitud_convenio", "where" => ["id_solicitud_convenio" => $id]]);
+                if(isset($solicitudQuery->data) && !empty($solicitudQuery->data)){
+                   $usu_reg = $solicitudQuery->data[0]->usu_reg;
+                   $usuarioQuery = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["id_usuario" => $usu_reg]]);
+                   if(isset($usuarioQuery->data) && !empty($usuarioQuery->data) && !empty($usuarioQuery->data[0]->correo)){
+                       $correoDestino = $usuarioQuery->data[0]->correo;
+                       $nombreUsuario = $usuarioQuery->data[0]->nombre_completo ?? 'Usuario';
+                       
+                       $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
+                       $emailService->setTo($correoDestino);
+                       $emailService->setSubject('Solicitud de Convenio Aprobada - Instrumento Jurídico Disponible');
+                       $emailService->setMailType('html');
+                       $emailService->setMessage("
+                           <p>Buen día, <strong>{\$nombreUsuario}</strong>:</p>
+                           <p>El área Jurídica ha autorizado y adjuntado el/los instrumentos jurídicos correspondientes a su solicitud de convenio con ID <strong>{\$id}</strong>.</p>
+                           <p>Puede consultar y descargar los documentos ingresando al sistema SUSI.</p>
+                           <br>
+                           <p>Saludos cordiales,</p>
+                       ");
+                       $emailService->send();
+                   }
+                }
+
+            } else {
+                $response->respuesta = "No se pudo actualizar el estatus.";
+            }
+        } else {
+            $response->respuesta = "Hubo un error al mover los archivos adjuntos.";
+        }
+
+        return $this->respond($response);
+    }
+    
+    public function subirArchivosSolicitudConvenio()
+    {
+        $session = \Config\Services::session();
+        $globals = new \App\Models\Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+
+        $id_solicitud = $this->request->getPost('id_solicitud');
+        
+        if (!$id_solicitud) {
+            $response->respuesta = "ID de solicitud no válido.";
+            return $this->respond($response);
+        }
+
+        $count = 0;
+        $errores = 0;
+        
+        if (isset($_FILES['archivos']) && is_array($_FILES['archivos']['name'])) {
+            foreach ($_FILES['archivos']['name'] as $key => $originalName) {
+                if (empty($originalName)) continue;
+                
+                if ($_FILES['archivos']['error'][$key] === UPLOAD_ERR_OK) {
+                    $tmpName = $_FILES['archivos']['tmp_name'][$key];
+                    $ext = pathinfo($originalName, PATHINFO_EXTENSION);
+                    $newName = $id_solicitud . '_' . $key . '_' . time() . '.' . $ext;
+                    $targetPath = FCPATH . 'assets/uploads/convenios/' . $newName;
+                    
+                    if (move_uploaded_file($tmpName, $targetPath)) {
+                        $dataInsert = [
+                            'id_solicitud_convenio' => $id_solicitud,
+                            'clave_documento' => $key,
+                            'nombre_archivo' => $newName,
+                            'tipo' => $ext,
+                            'usu_reg' => $session->id_usuario ?? 0,
+                            'fec_reg' => date('Y-m-d H:i:s'),
+                            'visible' => 1
+                        ];
+                        
+                        $res = $globals->saveTabla($dataInsert, ["tabla" => "solicitud_convenio_archivos", "editar" => false], ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/subirArchivosSolicitudConvenio']);
+                        $globals->saveTabla(['id_estatus' => 4], ["tabla" => "solicitud_convenio", "editar" => true, "idEditar" => ["id_solicitud_convenio" => $id_solicitud]], ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/subirArchivosSolicitudConvenio']);
+                        if (!$res->error) {
+                            $count++;
+                        } else {
+                            $errores++;
+                        }
+                    } else {
+                        $errores++;
+                    }
+                } else {
+                     $errores++;
+                }
+            }
+        }
+        
+        if ($count > 0) {
+            $emailService = \Config\Services::email();
+            $usuarioQuery = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["id_usuario" => ($session->id_usuario ?? 0)]]);
+            $nombreUsuario = (isset($usuarioQuery->data) && !empty($usuarioQuery->data)) ? $usuarioQuery->data[0]->nombre_completo : 'Usuario Desconocido';
+            $enlace = base_url('index.php/Principal/ListaSolicitudConvenio');
+            
+            $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
+            $emailService->setTo('lvelaga@guanajuato.gob.mx');
+            $emailService->setSubject('Nueva Solicitud de Convenio - Archivos Adjuntados');
+            $emailService->setMailType('html');
+            $emailService->setMessage("
+                <p>Buen día,</p>
+                <p>Se le notifica que se han subido documentos para la solicitud de convenio con ID <strong>{\$id_solicitud}</strong>.</p>
+                <p>Los archivos fueron agregados por el usuario: <strong>{\$nombreUsuario}</strong>.</p>
+                <p>Puede consultar los detalles ingresando al siguiente enlace: <a href='{\$enlace}'>{\$enlace}</a></p>
+                <br>
+                <p>Saludos cordiales,</p>
+                <p><strong>Sistema Unificado SECTURI (SUSI)</strong></p>
+            ");
+            $emailService->send();
+
+            $response->error = false;
+            $msg = "Se guardaron $count archivos correctamente.";
+            if ($errores > 0) $msg .= " Hubo problemas con $errores archivos.";
+            $response->respuesta = $msg;
+        } else {
+            $response->respuesta = "No se guardó ningún archivo. " . ($errores > 0 ? "Hubo errores al procesar." : "No se seleccionaron archivos.");
+        }
+
+        return redirect()->to(base_url('index.php/Principal/ListaSolicitudConvenio'));
+    }
+
+    public function verArchivosSolicitudConvenio($id_solicitud)
+    {
+        $session = \Config\Services::session();
+        $globals = new \App\Models\Mglobal;
+        
+        $archivos = $globals->getTabla([
+            'tabla' => 'solicitud_convenio_archivos',
+            'where' => ['id_solicitud_convenio' => $id_solicitud, 'visible' => 1]
+        ]);
+        
+        $data['id_solicitud'] = $id_solicitud;
+        $data['archivos'] = (!empty($archivos->data)) ? $archivos->data : [];
+        $data['es_convenio'] = true;
+        $data['scripts'] = array();
+        // Reciclamos la vista de archivos pasándole si es convenio o contrato
+        // o creamos una view sencilla:
+        $data['contentView'] = 'secciones/vVerArchivosSolicitud';
+        
+        $this->_renderView($data);
+    }
+    
+    public function verSolicitudConvenioPDF($id = null)
+    {
+        if(!$id){
+            echo "ID no válido"; return;
+        }
+
+        $session = \Config\Services::session();
+        $globals = new \App\Models\Mglobal;
+        
+        $solicitud = $globals->getTabla(['tabla' => 'vw_solicitud_convenio', 'where' => ['id_solicitud_convenio' => $id]]);
+        $pagos = $globals->getTabla(['tabla' => 'solicitud_convenio_pagos', 'where' => ['id_solicitud_convenio' => $id, 'visible' => 1]]);
+        
+        if(empty($solicitud->data)){
+            echo "Solicitud no encontrada"; return;
+        }
+
+        $data['solicitud'] = $solicitud->data[0];
+        $data['pagos'] = (!empty($pagos->data)) ? $pagos->data : [];
+        
+        // Similar to Contrato PDF View
+        $html = view('personal/vPdfSolicitudConvenio', $data);
+        
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 10,
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_bottom' => 10,
+            'format' => 'Letter'
+        ]);
+
+        $mpdf->WriteHTML($html);
+        $mpdf->Output('Solicitud_Convenio_' . $id . '.pdf', 'I');
+        exit();
+    }
+
 }
