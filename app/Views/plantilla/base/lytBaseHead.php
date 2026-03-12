@@ -577,7 +577,7 @@
                             </li><!--end nav-item-->
                      
                         <?php endif; ?>
-                               <li class="nav-item">
+                            <li class="nav-item">
                                 <a class="nav-link" href="#"><span class="w-100">Promocion Tur.</span><span class="menu-arrow"><i
                                             class="mdi mdi-chevron-right"></i></span></a>
                                 <ul class="nav-second-level" aria-expanded="false">
@@ -647,17 +647,19 @@
                                 href="<?php echo base_url(); ?>index.php/Principal/ListaDenuncia">Lista Denuncia</a>
                         </li>
                         <?php endif ?>
+                        
                         <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Principal/SolicitudContrato">Solicitud Contrato</a>
                         </li>
-                        <li class="nav-item"><a class="nav-link"
-                                href="<?php echo base_url(); ?>index.php/Principal/ListaSolicitudContrato">Listado de Contratos</a>
-                        </li>
+                       
                         <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Principal/SolicitudConvenio">Solicitud Convenio</a>
                         </li>
                         <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Principal/ListaSolicitudConvenio">Listado de Convenios</a>
+                        </li>
+                         <li class="nav-item"><a class="nav-link"
+                                href="<?php echo base_url(); ?>index.php/Principal/ListaSolicitudContrato">Listado de Contratos</a>
                         </li>
 
                     </ul>
