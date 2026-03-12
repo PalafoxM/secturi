@@ -8332,6 +8332,23 @@ class Principal extends BaseController
     public function subirArchivosSolicitudConvenio()
     {
         $session = \Config\Services::session();
+        $id_solicitud = $this->request->getPost('id_solicitud');
+        $documentos_seleccionados = $this->request->getPost('documentos');
+
+        if (!$id_solicitud || empty($documentos_seleccionados)) {
+            return redirect()->to(base_url('index.php/Principal/ListaSolicitudConvenio'));
+        }
+
+        $data['id_solicitud'] = $id_solicitud;
+        $data['documentos'] = $documentos_seleccionados;
+        
+        $data['contentView'] = 'secciones/vSubirArchivosSolicitudConvenio';
+        $this->_renderView($data);
+    }
+
+    public function guardarArchivosSolicitudConvenio()
+    {
+        $session = \Config\Services::session();
         $globals = new \App\Models\Mglobal;
         $response = new \stdClass();
         $response->error = true;
@@ -8412,7 +8429,7 @@ class Principal extends BaseController
             $response->respuesta = "No se guardó ningún archivo. " . ($errores > 0 ? "Hubo errores al procesar." : "No se seleccionaron archivos.");
         }
 
-        return redirect()->to(base_url('index.php/Principal/ListaSolicitudConvenio'));
+        return $this->respond($response);
     }
 
     public function verArchivosSolicitudConvenio($id_solicitud)
