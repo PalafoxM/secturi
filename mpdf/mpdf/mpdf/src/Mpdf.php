@@ -9073,20 +9073,15 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
 	// =============================================================
 	/* -- HTML-CSS -- */
 
-		function _getObjAttr($t)
-    {
+	function _getObjAttr($t)
+	{
 		$c = explode("\xbb\xa4\xac", $t, 2);
 		$c = explode(",", $c[1], 2);
 		foreach ($c as $v) {
 			$v = explode("=", $v, 2);
 			$sp[$v[0]] = $v[1];
 		}
-		$objattr = @unserialize($sp['objattr']);
-		if ($objattr === false && $sp['objattr'] !== 'b:0;') {
-			file_put_contents('c:/wamp64/www/susi/mpdf_unserialize_error.log', date('Y-m-d H:i:s') . " - Unserialize failed. String length: " . strlen($sp['objattr']) . " Content: " . $sp['objattr'] . PHP_EOL, FILE_APPEND);
-			return [];
-		}
-		return $objattr;
+		return (unserialize($sp['objattr']));
 	}
 
 	function inlineObject($type, $x, $y, $objattr, $Lmargin, $widthUsed, $maxWidth, $lineHeight, $paint = false, $is_table = false)
