@@ -279,7 +279,7 @@ class Login extends BaseController {
 
   
         $dataDB = array('tabla' => 'usuario', 'where' =>[ "usuario" => $usuario, "contrasenia"  => md5($contrasenia), "visible" => 1]);
-       
+    
         if($usuario && $contrasenia){
             $result = $catalogos->getTabla($dataDB);
             

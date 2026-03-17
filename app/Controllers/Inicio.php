@@ -809,6 +809,20 @@ class Inicio extends BaseController
         }
 
         // ============================
+        // Datos del contrato (para mostrar en PDF)
+        // ============================
+        $infoContrato = $globas->getTabla([
+            'tabla' => 'vw_material_promo',
+            'where' => [
+                'visible' => 1,
+                'id_material_promo' => $idConvenio
+            ],
+            'limit' => 1
+        ])->data ?? [];
+
+        $materiales = $infoContrato[0] ?? null;
+
+        // ============================
         // 3) Mapear nombres de productos del contrato (1 llamada)
         // ============================
         $productosConvenio = $globas->getTabla([
@@ -853,6 +867,7 @@ class Inicio extends BaseController
         $datos = [
             'folio' => $registro->folio,
             'concepto' => $registro->concepto,
+            'materiales' => $materiales,
 
             // compat (si aún lo imprimes en algún lado)
             'cantidad' => $totalEntregado,
@@ -867,10 +882,12 @@ class Inicio extends BaseController
             // ✅ SOLO lo del folio
             'productos' => $productosPDF,
             'total_entregado' => $totalEntregado,
-
+            
             // compat
             'nombre_articulo' => $nombreArticuloCompat
+            
         ];
+
 
         // ============================
         // 6) mPDF + membrete

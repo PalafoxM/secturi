@@ -109,9 +109,14 @@
                 ?>
 
                 <div style="text-align:right;">
-                    Recibo/<?= $folio ?><br>
-                    Dirección de Promoción y Difusión<br>
-                    Silao, Gto. <?= $dia ?> de <?= $mes ?> del <?= $anio ?>
+                    <h4 style="margin:0; font-weight:700;">
+                        <?= $materiales ? esc(($materiales->convenio ?? '') . ('')) : 'Convenio no encontrado' ?>
+                    </h4>
+                    <div style="margin-top:4px;">
+                        Recibo/<?= esc($folio ?? '') ?><br>
+                        Dirección de Promoción y Difusión<br>
+                        Silao, Gto. <?= esc($dia ?? '') ?> de <?= esc($mes ?? '') ?> del <?= esc($anio ?? '') ?>
+                    </div>
                 </div>
 
                 <br>
