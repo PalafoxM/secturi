@@ -55,6 +55,13 @@ foreach ($incidencia as $i):
     <?php endif; ?>
 </div>
 <?php $top += 1.8; ?>
+<div style="position:absolute;top:<?= $top ?>%; left:11.5%; width:23%; height:20px; font-size: 12px;">
+    <span class="proxima"><strong>Persona que autoriza:</strong></span>
+</div>
+<div style="position:absolute;top:<?= $top ?>%; left:35.5%; width:50%; height:20px; font-size: 12px;">
+    <i><?= $i->nombre_completo_autoriza ?> </i>
+</div>
+<?php $top += 1.8; ?>
 <div style="position:absolute; top:<?= $top ?>%; left:11.5%; width:80%; height:1px; border-top:1px solid #000;"></div>
 
 <?php 

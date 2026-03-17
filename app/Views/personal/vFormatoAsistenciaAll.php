@@ -171,6 +171,10 @@ foreach($usuariosAgrupados as $usuario):
                                 </i>
                             </td>
                         </tr>
+                         <tr>
+                            <td class="etiqueta"><span class="proxima">Persona que autoriza:</span></td>
+                            <td class="dato"><i><?= $incidencia['nombre_completo_autoriza'] ?></i></td>
+                        </tr>
                     </table>
                     
                 </div>

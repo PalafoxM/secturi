@@ -5288,7 +5288,8 @@ class Agregar extends BaseController
                     'fecha_fin' => $i->fecha_fin,
                     'hora_fin' => $i->hora_fin,
                     'detalles' => $i->detalles,
-                    'tipo' => $i->tipo
+                    'tipo' => $i->tipo,
+                    'nombre_completo_autoriza' => $i->nombre_completo_autoriza,
                 ];
             }
 
