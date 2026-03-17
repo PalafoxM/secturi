@@ -609,7 +609,7 @@
                                                         <div class="d-flex justify-content-between">
 
                                                             <div class="align-self-center">
-                                                                <a href="<?= base_url() ?>assets/documentos/Integracion_del_tramite_SECTURI_2026.pdf"
+                                                                <a href="<?= base_url() ?>assets/documentos/Disposiciones Administrativas SECTURI 2026.pptm"
                                                                     target="_blank" class="text-primary">Leer más <i
                                                                         class="fas fa-long-arrow-alt-right"></i></a>
                                                             </div>

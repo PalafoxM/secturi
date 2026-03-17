@@ -2147,7 +2147,7 @@ class Principal extends BaseController
         $email = \Config\Services::email();
         $result = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_tipo_empleado' => 1]])->data;
 
-       $email->setTo([
+       /*$email->setTo([
             'agascag@guanajuato.gob.mx',
             'ccampos@guanajuato.gob.mx',
             'ztorrest@guanajuato.gob.mx',
@@ -2161,9 +2161,9 @@ class Principal extends BaseController
             'rgonzalezgu@guanajuato.gob.mx',
             'yjimenez@guanajuato.gob.mx',
             'mamoralesg@guanajuato.gob.mx',
-        ]);
+        ]);*/
  
-          /*  $email->setTo([
+          $email->setTo([
                     'alopez@guanajuato.gob.mx',
                     'cchernandezp@guanajuato.gob.mx',
                     'csoto@guanajuato.gob.mx',
@@ -2196,17 +2196,15 @@ class Principal extends BaseController
                     'negonzalez@guanajuato.gob.mx',
                     'nlandin@guanajuato.gob.mx',
                     'orosas@guanajuato.gob.mx',
-                    'tmares@guanajuato.gob.mx',
                     'pcortesvi@guanajuato.gob.mx',
                     'ilianacord@guanajuato.gob.mx',
                     'luis.perez@guanajuato.gob.mx',
                     'rgonzalezva@guanajuato.gob.mx',
                     'mascencio@guanajuato.gob.mx',
                     'jmazavala@guanajuato.gob.mx',
-                    'lebalderas@guanajuato.gob.mx',
                     'rantonio@guanajuato.gob.mx',
                     'jrodriguezgo@guanajuato.gob.mx',
-                ]);*/
+                ]);
         $email->setSubject('Recordatorio: Revisión de Asistencias - Sistema SUSI');
         $email->setMessage('
             <!DOCTYPE html>
@@ -2239,9 +2237,9 @@ class Principal extends BaseController
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Estimado personal,</p>
                         
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-                            En caso de que aún no hayas realizado las <strong>justificaciones de tu personal a cargo correspondientes a la quincena 04/2026</strong>, 
-                            la cual comprende el periodo del <strong>16 al 28 de febrero de 2026</strong>, 
-                            tienes hasta el día <strong>Lunes 09 de marzo hasta las 16:00 hrs</strong> para realizarlas.
+                            En caso de que aún no hayas realizado las <strong>justificaciones correspondientes a la quincena 05/2026</strong>, 
+                            la cual comprende el periodo del <strong>01 al 16 de marzo de 2026</strong>, 
+                            tienes hasta el día <strong>Lunes 26 de marzo hasta las 16:00 hrs</strong> para realizarlas.
                         </p>
 
                         <div class="highlight-box">
@@ -2253,12 +2251,12 @@ class Principal extends BaseController
                         </div>
 
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
-                            Le invitamos a revisar y validar las incidencias de su personal a cargo en el sistema SUSI.
+                            Le invitamos a revisar y validar las incidencias en el sistema SUSI.
                         </p>
 
                         <div style="text-align: center; margin: 30px 0;">
-                            <a href="https://secturnet.guanajuato.gob.mx/susi/index.php/Principal/incidenciaSubordinado" class="btn" style="color: white; text-decoration: none;">
-                                📋 Revisar Incidencias del personal a tu cargo
+                            <a href="https://secturnet.guanajuato.gob.mx/susi/index.php/Agregar/Asistencia" class="btn" style="color: white; text-decoration: none;">
+                                📋 Revisar Incidencias
                             </a>
                         </div>
 
