@@ -8328,6 +8328,57 @@ class Principal extends BaseController
 
         return $this->respond($response);
     }
+
+    public function fichaTecnica()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $fichas = $globals->getTabla(['tabla' => 'ficha_tecnica', 'where' => ['visible' => 1]]);
+        $data['fichas'] = $fichas->data;
+    
+        $data['contentView'] = 'secciones/vFichaTecnica';
+        $this->_renderView($data);
+
+    }
+    public function pdfFicha()
+    {
+        setlocale(LC_TIME, 'es_ES');
+        $id = $this->request->getGet('id_ficha_tecnica');
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = "Error al validar usuario";
+        $session = \Config\Services::session();
+        $Mglobal = new Mglobal;
+        $data = array();
+     
+        $result = $Mglobal->getTabla(["tabla"=>"ficha_tecnica",'where' => ['id_ficha_tecnica' => $id]])->data[0];
+        
+        if (!$result) {
+            die("Ficha no encontrada.");
+        }
+        
+    
+       $data['ficha'] = $result;
+      // die(var_dump($data['ficha']));
+        
+        $mpdfConfig = [
+            'mode' => 'utf-8',
+            'format' => 'Legal',
+            'orientation' => 'P',
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_top' => 10,
+            'margin_bottom' => 10,
+        ];
+        
+        $mpdf = new \Mpdf\Mpdf($mpdfConfig);
+        
+        $html = view("pdfs/vpdfFicha.php", $data);
+        $mpdf->WriteHTML($html);
+        
+        $mpdf->Output('Ficha_Tecnica_'.$id.'.pdf', 'I');
+        exit;
+    }
     
     public function subirArchivosSolicitudConvenio()
     {

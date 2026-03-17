@@ -715,7 +715,7 @@
                     item.nombre = 'Tarde';
                     icon = '😢';
                 }
-                if (entrada > '09:00:00') {
+                if (entrada > '09:01:00') {
                     eventClass = 'fc-event-tarde';
                     item.nombre = 'Falta';
                     icon = '❌';
