@@ -313,9 +313,9 @@
                                         <div class="card-body">
                                             <h4 class="header-title mt-0 mb-3">PROGRAMA ANUAL DE FORMACIÓN EN GESTIÓN DOCUMENTAL Y ADMINTRACION DE ARCHIVOS 2026</h4>
                                             <ul class="list-unsyled m-0 pl-0 transaction-history">
-                                                <a href="<?= base_url() ?>assets/documentos/Programa_Anual_de_Formación_de_Archivos_2026.pdf" target="_blank">Ver Programa Anual
+                                                <a href="<?= base_url() ?>assets/documentos/Cat_C3_A1logo_20PAFGDAA_202026_AGE.pdf" target="_blank">Ver Programa Anual
                                                   <iframe
-                                                                src="<?= base_url() ?>assets/documentos/Programa_Anual_de_Formación_de_Archivos_2026.pdf"
+                                                                src="<?= base_url() ?>assets/documentos/Cat_C3_A1logo_20PAFGDAA_202026_AGE.pdf"
                                                                 title="Programa Anual" style="border:0"
                                                                 loading="lazy" width="100%">
                                                             </iframe>
