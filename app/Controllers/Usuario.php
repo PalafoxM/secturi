@@ -438,7 +438,7 @@ class Usuario extends BaseController
             $fec_ini = date('Y-m-16', strtotime($periodoInicio));
             $fec_fin = date('Y-m-' . $ultimoDiaMes, strtotime($periodoInicio));
         }
-
+      
         $anio = date('Y');
         $diasFestivosGenerales = [
             $anio . '-01-01' => 'Año Nuevo',
@@ -454,13 +454,13 @@ class Usuario extends BaseController
 
         $tabla = [
             'tabla' => 'vw_asistencia_incidencia',
-            'where' => ['visible' => 1, 'id_tipo_empleado' => 1],
+            'where' => ['id_tipo_empleado' => 1],
             'whereBetween' => [['fecha', $fec_ini, $fec_fin]],
         ];
 
         $datos = $globals->getTabla($tabla);
         $resul = (isset($datos->data) && !empty($datos->data)) ? $datos->data : [];
-
+ //die(var_dump($resul));
         // RECUPERAR INCIDENCIAS MULTIPLES (TIPO 2) QUE CRUZAN ESTE PERIODO
         // Como 'fecha' en tipo 2 es un string ("12/22/2025 - 01/06/2026"), whereBetween en SQL las omite.
         $fecIniTs = strtotime($fec_ini);
@@ -468,7 +468,7 @@ class Usuario extends BaseController
 
         $tablaMulti = [
             'tabla' => 'vw_asistencia_incidencia',
-            'where' => ['visible' => 1, 'id_tipo_empleado' => 1, 'tipo' => 2],
+            'where' => ['id_tipo_empleado' => 1, 'tipo' => 2],
         ];
         $datosMulti = $globals->getTabla($tablaMulti);
         $resulMulti = (isset($datosMulti->data) && !empty($datosMulti->data)) ? $datosMulti->data : [];
@@ -544,6 +544,8 @@ class Usuario extends BaseController
             // Verificar si es una incidencia de tipo 2 (por semana)
             if (!empty($r->tipo) && $r->tipo == 2) {
 
+                unset($startIncidencia, $endIncidencia);
+
                 // Intentar extraer de $r->fecha si tiene formato "12/22/2025 - 01/06/2026"
                 if (!empty($r->fecha) && strpos($r->fecha, ' - ') !== false) {
                     $parts = explode(' - ', $r->fecha);
@@ -587,7 +589,7 @@ class Usuario extends BaseController
                     }
 
                     // Agregar la incidencia para esta fecha
-                    if (isset($r->id_estatus)) {
+                    if (isset($r->id_estatus) && (!isset($r->visible_incidencia) || $r->visible_incidencia != 0)) {
                         $usuarios[$nombre][$fechaYmd]['incidencias'][] = [
                             'estatus' => $r->id_estatus,
                             'cat_incidencia' => isset($r->cat_incidencia) ? $r->cat_incidencia : null,
@@ -631,7 +633,7 @@ class Usuario extends BaseController
                         $usuarios[$nombre][$fechaYmd]['salida'] = $r->hora_fin;
                 }
 
-                if (($r->tipo_registro === 'incidencia') && isset($r->id_estatus)) {
+                if (($r->tipo_registro === 'incidencia') && isset($r->id_estatus) && (!isset($r->visible_incidencia) || $r->visible_incidencia != 0)) {
                     $usuarios[$nombre][$fechaYmd]['incidencias'][] = [
                         'estatus' => $r->id_estatus,
                         'cat_incidencia' => $r->cat_incidencia,
@@ -759,6 +761,30 @@ class Usuario extends BaseController
             $colIndex += 2;
         }
 
+        // Agregar columnas finales: Retardos y Faltas
+        $colRetardos = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
+        $colFaltas = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 1);
+
+        $sheet->setCellValue($colRetardos . '4', 'Retardos');
+        $sheet->mergeCells("{$colRetardos}4:{$colRetardos}5");
+        $sheet->getStyle($colRetardos . '4')->getFont()->setBold(true);
+        $sheet->getStyle($colRetardos . '4')->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFD9D9D9');
+        $sheet->getStyle($colRetardos . '4')->getAlignment()
+            ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)
+            ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+
+        $sheet->setCellValue($colFaltas . '4', 'Faltas');
+        $sheet->mergeCells("{$colFaltas}4:{$colFaltas}5");
+        $sheet->getStyle($colFaltas . '4')->getFont()->setBold(true);
+        $sheet->getStyle($colFaltas . '4')->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFD9D9D9');
+        $sheet->getStyle($colFaltas . '4')->getAlignment()
+            ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)
+            ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+
         // Cuerpo del reporte (empieza en fila 6)
         $fila = 6;
         ksort($usuarios, SORT_STRING);
@@ -780,6 +806,9 @@ class Usuario extends BaseController
             $sheet->setCellValue('B' . $fila, $nombre);
 
             $colIndex = 3; // ← Cambiar de 2 a 3
+            
+            $total_retardos = 0;
+            $total_faltas = 0;
 
             foreach ($fechasDelPeriodo as $fecha) {
                 $colEntrada = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
@@ -811,6 +840,23 @@ class Usuario extends BaseController
                         $horaInicio = isset($inc['hora_inicio']) ? $inc['hora_inicio'] : '';
                         $horaFin = isset($inc['hora_fin']) ? $inc['hora_fin'] : '';
                         $nombreInc = isset($inc['nombre']) ? strtoupper($inc['nombre']) : '';
+                        $tipo = isset($inc['tipo']) ? (int)$inc['tipo'] : null;
+
+                        // Si es tipo 2 (multi-día) y está aprobada, cubre todo el día automáticamente
+                        if ($tipo === 2 && $estatus === 3) {
+                            $valorEntrada = $nombreInc;
+                            $valorSalida = $nombreInc;
+                            $sheet->getStyle($colEntrada . $fila)
+                                ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                ->getStartColor()->setARGB('FF00B050');
+                            $sheet->getStyle($colSalida . $fila)
+                                ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                ->getStartColor()->setARGB('FF00B050');
+                            $validadoEntrada = true;
+                            $validadoSalida = true;
+                            $stopIncProcessing = true;
+                            break;
+                        }
 
                         // Incidencia aprobada y NO cat 11 -> comportamiento original (marcar ambos campos con el nombre)
                         if ($estatus === 3 && !in_array($cat, [11, 1, 7])) {
@@ -1056,12 +1102,15 @@ class Usuario extends BaseController
                     $sheet->getStyle($colEntrada . $fila)
                         ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                         ->getStartColor()->setARGB('FFFF0000'); // rojo
+                    $total_faltas++;
                 }
                 elseif (!$validadoSalida && (empty($salida) || !$salida)) {
                     $valorSalida = 'Sin registro';
                     $sheet->getStyle($colSalida . $fila)
                         ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                         ->getStartColor()->setARGB('FFFF0000'); // rojo
+                    // si faltó a la salida, se cuenta como falta (o medio dia). Sumaremos 1 al contador
+                    $total_faltas++;
                 }
                 else {
                     // VALIDACIÓN ENTRADA
@@ -1071,11 +1120,13 @@ class Usuario extends BaseController
                                 $sheet->getStyle($colEntrada . $fila)
                                     ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                                     ->getStartColor()->setARGB('FFFFFF00'); // naranja
+                                $total_retardos++;
                             }
                             if ($entrada > '09:01:00' && $entrada < '12:00:00') {
                                 $sheet->getStyle($colEntrada . $fila)
                                     ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                                     ->getStartColor()->setARGB('FFFF0000'); // rojo
+                                $total_faltas++;
                             }
                         }
                         else if (!$validadoEntrada && $entrada === '') {
@@ -1104,6 +1155,25 @@ class Usuario extends BaseController
                 $colIndex += 2;
 
             }
+            
+            // Escribir Retardos y Faltas
+            $colRetardosVal = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
+            $colFaltasVal = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 1);
+            
+            $sheet->setCellValue($colRetardosVal . $fila, $total_retardos);
+            $sheet->setCellValue($colFaltasVal . $fila, $total_faltas);
+
+            if ($total_retardos > 0) {
+                $sheet->getStyle($colRetardosVal . $fila)
+                    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                    ->getStartColor()->setARGB('FFFFFF00'); // Amarillo
+            }
+            if ($total_faltas > 0) {
+                $sheet->getStyle($colFaltasVal . $fila)
+                    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                    ->getStartColor()->setARGB('FFFF0000'); // Rojo
+            }
+
             $fila++;
 
 
@@ -1114,7 +1184,7 @@ class Usuario extends BaseController
         // Ajustar dimensiones de columnas
         $sheet->getColumnDimension('A')->setWidth(15); // ← No. Empleado
         $sheet->getColumnDimension('B')->setWidth(40); // ← Nombre
-        $totalCols = 2 + (count($fechasDelPeriodo) * 2); // ← Cambiar de 1 a 2
+        $totalCols = 2 + (count($fechasDelPeriodo) * 2) + 2; // + 2 por las columnas de Faltas y Retardos
         for ($i = 3; $i <= $totalCols; $i++) {
             $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i);
             $sheet->getColumnDimension($colLetter)->setWidth(18);
