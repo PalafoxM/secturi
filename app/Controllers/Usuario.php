@@ -540,6 +540,13 @@ class Usuario extends BaseController
         foreach ($resul as $r) {
             $nombre = trim($r->nombre_completo ?: 'Sin nombre');
 
+            // Asegurar que el usuario siempre exista en el arreglo, aunque no tenga fechas
+            if (!isset($usuarios[$nombre])) {
+                $usuarios[$nombre] = [];
+            }
+            if (!empty($r->fec_nac) && !isset($cumpleanosUsuarios[$nombre])) {
+                $cumpleanosUsuarios[$nombre] = $r->fec_nac;
+            }
 
             // Verificar si es una incidencia de tipo 2 (por semana)
             if (!empty($r->tipo) && $r->tipo == 2) {
@@ -574,12 +581,6 @@ class Usuario extends BaseController
                     if (date('N', strtotime($fechaYmd)) >= 6)
                         continue;
 
-                    if (!empty($r->fec_nac) && !isset($cumpleanosUsuarios[$nombre])) {
-                        $cumpleanosUsuarios[$nombre] = $r->fec_nac;
-                    }
-
-                    if (!isset($usuarios[$nombre]))
-                        $usuarios[$nombre] = [];
                     if (!isset($usuarios[$nombre][$fechaYmd])) {
                         $usuarios[$nombre][$fechaYmd] = [
                             'entrada' => '',
@@ -612,12 +613,6 @@ class Usuario extends BaseController
                 if (!in_array($fechaYmd, $fechasDelPeriodo, true))
                     continue;
 
-                if (!empty($r->fec_nac) && !isset($cumpleanosUsuarios[$nombre])) {
-                    $cumpleanosUsuarios[$nombre] = $r->fec_nac;
-                }
-
-                if (!isset($usuarios[$nombre]))
-                    $usuarios[$nombre] = [];
                 if (!isset($usuarios[$nombre][$fechaYmd])) {
                     $usuarios[$nombre][$fechaYmd] = [
                         'entrada' => '',
