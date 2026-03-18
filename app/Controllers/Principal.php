@@ -2147,7 +2147,7 @@ class Principal extends BaseController
         $email = \Config\Services::email();
         $result = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_tipo_empleado' => 1]])->data;
 
-       /*$email->setTo([
+       $email->setTo([
             'agascag@guanajuato.gob.mx',
             'ccampos@guanajuato.gob.mx',
             'ztorrest@guanajuato.gob.mx',
@@ -2161,9 +2161,9 @@ class Principal extends BaseController
             'rgonzalezgu@guanajuato.gob.mx',
             'yjimenez@guanajuato.gob.mx',
             'mamoralesg@guanajuato.gob.mx',
-        ]);*/
+        ]);
  
-          $email->setTo([
+        /*  $email->setTo([
                     'alopez@guanajuato.gob.mx',
                     'cchernandezp@guanajuato.gob.mx',
                     'csoto@guanajuato.gob.mx',
@@ -2199,12 +2199,11 @@ class Principal extends BaseController
                     'pcortesvi@guanajuato.gob.mx',
                     'ilianacord@guanajuato.gob.mx',
                     'luis.perez@guanajuato.gob.mx',
-                    'rgonzalezva@guanajuato.gob.mx',
                     'mascencio@guanajuato.gob.mx',
                     'jmazavala@guanajuato.gob.mx',
                     'rantonio@guanajuato.gob.mx',
                     'jrodriguezgo@guanajuato.gob.mx',
-                ]);
+                ]);*/
         $email->setSubject('Recordatorio: Revisión de Asistencias - Sistema SUSI');
         $email->setMessage('
             <!DOCTYPE html>
@@ -2237,9 +2236,9 @@ class Principal extends BaseController
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Estimado personal,</p>
                         
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-                            En caso de que aún no hayas realizado las <strong>justificaciones correspondientes a la quincena 05/2026</strong>, 
-                            la cual comprende el periodo del <strong>01 al 16 de marzo de 2026</strong>, 
-                            tienes hasta el día <strong>Lunes 26 de marzo hasta las 16:00 hrs</strong> para realizarlas.
+                            En caso de que aún no hayas realizado las <strong>justificaciones de tu personal correspondientes a la quincena 05/2026</strong>, 
+                            la cual comprende el periodo del <strong>01 al 15 de marzo de 2026</strong>, 
+                            tienes hasta el día <strong>Martes 24 de marzo hasta las 16:00 hrs</strong> para realizarlas.
                         </p>
 
                         <div class="highlight-box">
@@ -2255,7 +2254,7 @@ class Principal extends BaseController
                         </p>
 
                         <div style="text-align: center; margin: 30px 0;">
-                            <a href="https://secturnet.guanajuato.gob.mx/susi/index.php/Agregar/Asistencia" class="btn" style="color: white; text-decoration: none;">
+                            <a href="https://secturnet.guanajuato.gob.mx/susi/index.php/Principal/incidenciaSubordinado" class="btn" style="color: white; text-decoration: none;">
                                 📋 Revisar Incidencias
                             </a>
                         </div>
@@ -2428,9 +2427,11 @@ class Principal extends BaseController
         if (in_array($session->get('id_perfil'), [1, 2])) {
             $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1, "id_estatus"=> 3]]);
         } else {
-             // Redireccionar o mostrar error si no tiene permiso, aunque el menú lo oculta.
-            // return redirect()->to(base_url() . 'index.php/Inicio');
-            $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['usu_reg' => $session->get('id_usuario'), 'visible' => 1, "id_estatus"=> 3]]);
+            if(in_array($session->get('id_usuario'), [14,80,17, 59, 11, 38])){
+                $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1, "usu_reg"=> 80]]);
+            }else{
+                $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['usu_reg' => $session->get('id_usuario'), 'visible' => 1, "id_estatus"=> 3]]);
+            }
         }
        // die( var_dump($reserva ) );
         $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);

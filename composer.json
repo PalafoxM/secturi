@@ -14,6 +14,7 @@
         "ext-intl": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
+        "aws/aws-sdk-php": "^3.337",
         "laminas/laminas-escaper": "^2.9",
         "league/oauth2-google": "^4.0",
         "phpoffice/phpspreadsheet": "^1.29",

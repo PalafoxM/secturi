@@ -7101,4 +7101,108 @@ class Agregar extends BaseController
         return $this->respond($response);
     }
 
+    /**
+     * Ejemplo de apartado para realizar guardado y consumo del BUCKET S3
+     */
+    public function pruebaS3()
+    {
+        $s3 = new \App\Libraries\S3Service();
+
+        // 1. Ejemplo de Guardado
+        $archivo = $this->request->getFile('archivo_s3');
+        if ($archivo && $archivo->isValid() && !$archivo->hasMoved()) {
+            $nuevoNombre = $archivo->getRandomName();
+            $rutaTemporal = $archivo->getTempName();
+
+            // Guardar en bucket (ej. en carpeta 'documentos/')
+            $urlPublica = $s3->uploadFile($rutaTemporal, 'documentos/' . $nuevoNombre);
+
+            if ($urlPublica) {
+                // 2. Ejemplo de Consumo
+                // Obtener URL temporal firmada para visualizar o descargar
+                $urlConsumo = $s3->getPresignedUrl('documentos/' . $nuevoNombre, '+1 hour');
+
+                return $this->response->setJSON([
+                    'success' => true,
+                    'mensaje' => 'Archivo guardado correctamente en S3',
+                    'url_publica' => $urlPublica,                 // URL directa si el bucket fuera público
+                    'url_temporal_consumo' => $urlConsumo         // URL segura de consumo
+                ]);
+            } else {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'mensaje' => 'Error al subir archivo a AWS S3. Revisa logs de CodeIgniter.'
+                ]);
+            }
+        }
+
+        return $this->response->setJSON([
+            'success' => false,
+            'mensaje' => 'No se recibió un archivo válido ("archivo_s3") o hay error en la petición.'
+        ]);
+    }
+
+    /**
+     * Muestra el formulario para prueba de AWS S3
+     */
+    public function formBucketAws()
+    {
+        $session = \Config\Services::session();
+        $data = array();
+        $data['contentView'] = 'aws/vFormBucket';
+        $this->_renderView($data);
+    }
+
+    /**
+     * Procesa la subida y guardado de datos en la tabla `bucketaws`
+     */
+    public function guardarBucketAws()
+    {
+        $session = \Config\Services::session();
+        $s3 = new \App\Libraries\S3Service();
+        $Mglobal = new \App\Models\Mglobal();
+
+        $post = $this->request->getPost();
+        $archivo = $this->request->getFile('archivo_s3');
+        
+        if ($archivo && $archivo->isValid() && !$archivo->hasMoved()) {
+            $nuevoNombre = $archivo->getRandomName();
+            $rutaTemporal = $archivo->getTempName();
+
+            // Ruta destino dentro del bucket
+            $rutaS3 = 'archivos_generales/' . $nuevoNombre;
+            $urlPublica = $s3->uploadFile($rutaTemporal, $rutaS3);
+            die(var_dump($urlPublica));
+            if ($urlPublica) {
+                // Prepara datos para BD
+                $dataInsert = [
+                    'nombre_archivo' => $post['nombre_archivo'],
+                    'descripcion' => $post['descripcion'],
+                    'id_usuario' => $session->get('id_usuario'),
+                    'ruta_s3' => $rutaS3
+                ];
+
+                $dataConfig = [
+                    "tabla" => "bucketaws",
+                    "editar" => false
+                ];
+
+                $dataBitacora = [
+                    'id_user' => $session->get('id_usuario'),
+                    'script' => 'Agregar.php/guardarBucketAws'
+                ];
+
+                $Mglobal->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+
+                $session->setFlashdata('success', '¡Éxito! El archivo se subió a S3 y la información se guardó en la tabla bucketaws.');
+            } else {
+                $session->setFlashdata('error', 'Error al subir el archivo al bucket de AWS.');
+            }
+        } else {
+            $session->setFlashdata('error', 'No se detectó un archivo válido para subir.');
+        }
+
+        return redirect()->to(base_url('index.php/Agregar/formBucketAws'));
+    }
+
 }
