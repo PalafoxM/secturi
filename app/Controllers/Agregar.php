@@ -7170,9 +7170,9 @@ class Agregar extends BaseController
             $rutaTemporal = $archivo->getTempName();
 
             // Ruta destino dentro del bucket
-            $rutaS3 = 'archivos_generales/' . $nuevoNombre;
+            $rutaS3 = 'media/' . $nuevoNombre;
             $urlPublica = $s3->uploadFile($rutaTemporal, $rutaS3);
-            die(var_dump($urlPublica));
+           // die(var_dump($urlPublica));
             if ($urlPublica) {
                 // Prepara datos para BD
                 $dataInsert = [

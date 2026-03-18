@@ -41,7 +41,7 @@ class S3Service
                 'Key'        => $keyName,
                 'SourceFile' => $sourceFile,
                 // Si deseas que los archivos sean públicos, descomenta la siguiente línea y asegúrate de que el bucket lo permita
-                'ACL'        => 'public-read',
+               // 'ACL'        => 'public-read',
             ]);
 
             return $result->get('ObjectURL');
