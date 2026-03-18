@@ -5296,12 +5296,27 @@ class Agregar extends BaseController
             // Convertir a array indexado si lo prefieres
             $usuariosAgrupados = array_values($usuariosAgrupados);
             $data['usuariosAgrupados'] = $usuariosAgrupados;
-            //die( var_dump(  $data['usuariosAgrupados']  ) );
-
-
 
         } else {
-            $data['usuario'] = !empty($incidenciaData) ? $incidenciaData[0] : '';
+            if (!empty($incidenciaData)) {
+                $data['usuario'] = $incidenciaData[0];
+            } else {
+                // Obtener datos del usuario directamente de la base de datos si no hay incidencias
+                $dbUsuario = $globals->getTabla(['tabla' => 'usuario', 'where' => ['id_usuario' => $usuario]]);
+                if (!empty($dbUsuario->data)) {
+                    $u = $dbUsuario->data[0];
+                    $nombreCompleto = trim(($u->primer_apellido ?? '') . ' ' . ($u->segundo_apellido ?? '') . ' ' . ($u->nombre ?? ''));
+                    $data['usuario'] = (object)[
+                        'nombre_completo' => $nombreCompleto,
+                        'dsc_area' => 'Sin incidencias en el periodo'
+                    ];
+                } else {
+                    $data['usuario'] = (object)[
+                        'nombre_completo' => 'Usuario no encontrado',
+                        'dsc_area' => ''
+                    ];
+                }
+            }
         }
 
 
