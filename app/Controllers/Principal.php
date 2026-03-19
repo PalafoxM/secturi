@@ -1362,7 +1362,7 @@ class Principal extends BaseController
         $hoy = date("Y-m-d H:i:s");
         $folio = 'PT-' . date('YmdHis'); // Ejemplo: FOL-20250725133045
 
-        $reviucionInterna = (in_array($session->get('id_usuario'), [80,17,14,59,38])) ? true : false;
+        $reviucionInterna = (in_array($session->get('id_usuario'), [80,17,14,59,38,11])) ? true : false;
 
         $dataInsert = [
             "id_proveedor" => (int) $data['id_proveedor'],
@@ -1375,6 +1375,45 @@ class Principal extends BaseController
 
         if($reviucionInterna){
             $dataInsert['id_estatus'] = 5;
+                $email->setTo([
+                'mamedinaher@guanajuato.gob.mx',
+                 $session->get('correo')
+                ]);  
+
+        //     $email->setTo('dasedetur@guanajuato.gob.mx'); // destinatario principal
+                // $email->setCC(['palafox.marin@hotmail.com', 'dasedetur@guanajuato.gob.mx']); // copia visible
+                //$email->setCC(['negonzalez@guanajuato.gob.mx ', 'dhernandezq@guanajuato.gob.mx']); // copia visible
+                //   $email->setBCC(['a.palafoxm@guanajuato.gob.com']); // copia oculta
+                $email->setSubject('Carga de Reserva');
+
+                $email->setMessage('
+                    <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+                        <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+                            <!-- Encabezado con logotipo -->
+                            <div style="background-color: #004080; padding: 20px; text-align: center;">
+                                <img src="' . base_url('assets/images/logo.png') . '" alt="Logo" style="height: 60px;">
+                            </div>
+                            <!-- Contenido principal -->
+                            <div style="padding: 30px; color: #333;">
+                                <h1 style="color: #004080;">El usuario <strong>' . $session->get('nombre_completo') . '</strong></h1>
+                                <p style="font-size: 16px;">ha registrado una <strong>RESERVA</strong> en el sistema SUSI.</p>
+                                <p style="font-size: 15px;">Para los labores correspondientes.</p>
+                                <p style="font-size: 15px; color: #888;">Este correo ha sido generado automáticamente por el sistema SUSI. No es necesario responder a este mensaje.</p>
+                                <p style="font-size: 15px; color: #888;">Link: ' . base_url() . 'index.php/Principal/listaReservaPT</p>
+                            </div>
+                            <!-- Pie de página -->
+                            <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 13px; color: #666;">
+                                © ' . date('Y') . ' Sistema de Atención SUSI. Todos los derechos reservados - SECTURI.
+                            </div>
+                        </div>
+                    </div>
+                ');                      // Intentar enviar el correo
+                if ($email->send()) {
+                    $response->error = false;
+                    $response->respuesta = "Correo enviado correctamente.";
+                } else {
+                    $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
+                } 
         }
         if (!empty($ruta_relativa)) {
             $dataInsert['instrumento'] = $ruta_relativa;
@@ -1435,7 +1474,7 @@ class Principal extends BaseController
                 }
             }
         }
-        if($session->get('id_perfil')!=1){
+        if($session->get('id_perfil')!=1 && !$reviucionInterna){
             $this->enviarEmail(0);
         }
        
