@@ -1375,7 +1375,8 @@ class Principal extends BaseController
 
         if($reviucionInterna){
             $dataInsert['id_estatus'] = 5;
-                $email->setTo([
+            $dataInsert['promo'] = 1;
+             /*    $email->setTo([
                 'mamedinaher@guanajuato.gob.mx',
                  $session->get('correo')
                 ]);  
@@ -1413,7 +1414,7 @@ class Principal extends BaseController
                     $response->respuesta = "Correo enviado correctamente.";
                 } else {
                     $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
-                } 
+                }  */
         }
         if (!empty($ruta_relativa)) {
             $dataInsert['instrumento'] = $ruta_relativa;
@@ -1475,7 +1476,7 @@ class Principal extends BaseController
             }
         }
         if($session->get('id_perfil')!=1 && !$reviucionInterna){
-            $this->enviarEmail(0);
+           // $this->enviarEmail(0);
         }
        
 
@@ -2441,9 +2442,23 @@ class Principal extends BaseController
             $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1, "id_estatus"=> 1]]);
         } else {
             if($session->get('id_usuario')==80){
-                $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1, "id_estatus"=> 5]]);
+                $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1, 'promo' => 1, "id_estatus"=> 5]]);
             }else{
-                $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['usu_reg' => $session->get('id_usuario'), 'visible' => 1, "id_estatus"=> 1 ]]);
+                 if(in_array($session->get('id_usuario'), [14,80,17, 59, 11, 38])){
+                $resultado = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1, 'promo' => 1]]);
+                  $datosFiltrados = [];
+                    foreach($resultado->data as $r) {
+                        if(in_array($r->id_estatus, [1,5])) {
+                            $datosFiltrados[] = $r;
+                        }
+                    }
+                    
+                    $reserva = new \stdClass();
+                    $reserva->data = $datosFiltrados;
+                                }else{
+                    $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['usu_reg' => $session->get('id_usuario'), 'visible' => 1, "id_estatus"=> 1 ]]);
+                
+                }
             }
         }
        // die( var_dump($reserva ) );
@@ -2467,7 +2482,7 @@ class Principal extends BaseController
             $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1, "id_estatus"=> 3]]);
         } else {
             if(in_array($session->get('id_usuario'), [14,80,17, 59, 11, 38])){
-                $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1, "usu_reg"=> 80]]);
+                $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1, "promo"=> 1, 'id_estatus' => 3]]);
             }else{
                 $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['usu_reg' => $session->get('id_usuario'), 'visible' => 1, "id_estatus"=> 3]]);
             }

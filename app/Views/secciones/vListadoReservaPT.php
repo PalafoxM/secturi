@@ -88,7 +88,7 @@
                                                         switch ($p->id_estatus) {
                                                             case 1:
                                                                 $color = 'badge-soft-primary';
-                                                                $texto = 'En proceso';
+                                                                $texto = 'Enviado a CRFyAP';
                                                                 break;
                                                             case 2:
                                                                 $color = 'badge-soft-danger';
@@ -160,8 +160,13 @@
                                                             </a>
 
                                                              <?php endif;  ?>
+                                                             <?php if($p->id_estatus == 1): ?>
+                                                                <div class="spinner-grow text-primary" role="status">
+                                                                </div>
+                                                             <?php endif; ?>
                                                         </td>
                                                     </tr>
+                                                    
                                                    
                                                     <?php endforeach; ?>
                                                 </tbody>
