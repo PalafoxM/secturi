@@ -748,12 +748,7 @@
         initRowSelect2($('body'));
 
         // Check initial visibility for Viaticos buttons
-        $('select[name="no_partida[]"]').each(function() {
-            var text = $(this).find('option:selected').text();
-            if(text.includes('3750') || text.includes('3760')) {
-                $(this).closest('tr').find('.btn-viaticos').removeClass('d-none');
-            }
-        });
+        checkGlobalViaticos();
 
         // Initialize Validation/Totals
         calcularTotal();

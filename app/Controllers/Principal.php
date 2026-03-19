@@ -6615,23 +6615,15 @@ class Principal extends BaseController
                  $items = $globals->getTabla(["tabla" => "manual_factura", "where" => ["id_registro_pt" => $id_reserva, "visible" => 1]]);
                  $data['periodo_factura_rows'] = $items->data;
                  
-                 // Fetch Viaticos for each row
-                 if(!empty($data['periodo_factura_rows'])){
-                     foreach($data['periodo_factura_rows'] as &$r){
-                         // Assuming PK is id_manual_factura. If failing, check table structure.
-                         // Also check by id_registro_go + id_identificador to be safe? 
-                         // id_identificador stored the item ID.
-                         $viat = $globals->getTabla(["tabla" => "viaticos_go", "where" => ["id_identificador" => $r->id_manual_factura, "visible" => 1]]);
-                         
-                         $vList = [];
-                         if(!empty($viat->data)){
-                             foreach($viat->data as $v){
-                                 $vList[] = ['nombre' => $v->nombre, 'monto' => $v->importe];
-                             }
-                         }
-                         $r->viaticos_json = !empty($vList) ? json_encode($vList) : '';
+                 // Fetch Global Viaticos
+                 $viatGlobal = $globals->getTabla(["tabla" => "viaticos_go", "where" => ["id_registro_go" => $id_reserva, "visible" => 1]]);
+                 $vListGlobal = [];
+                 if(!empty($viatGlobal->data)){
+                     foreach($viatGlobal->data as $vg){
+                         $vListGlobal[] = ['nombre' => $vg->nombre, 'monto' => $vg->importe, 'rfc' => $vg->rfc];
                      }
                  }
+                 $data['registro_pt']->viaticos_json = !empty($vListGlobal) ? json_encode($vListGlobal) : '[]';
                  
                   // Fetch provider data
                  if(isset($data['registro_pt']->nombre_proveedor_1) && is_numeric($data['registro_pt']->nombre_proveedor_1) && $data['registro_pt']->nombre_proveedor_1 > 0){
