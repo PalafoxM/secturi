@@ -68,7 +68,7 @@ $session = \Config\Services::session();
 
                                                 <a class="btn btn-outline-success btn-round" href="<?php echo base_url().'index.php/Inicio/pdfEncabezadoFacturaTicket?id='.$e->id_formulario_pt ?>" target="_blank" title="Encabezado de Ticket" ><i
                                                         class="mdi mdi-ballot-outline font-18"></i></a>
-                                                 <a class="btn btn-outline-warning btn-round" onclick="descargarExcel(<?= $e->id_formulario_pt ?>)" title="Eliminar"><i
+                                                 <a class="btn btn-outline-warning btn-round" onclick="descargarExcel(<?= $e->id_formulario_pt ?>)" title="Anexo 001"><i
                                                         class="mdi mdi-file-excel font-18"></i></a> 
                                                 <?php if(isset($anio) && $anio == 2025): ?>
                                                 <a class="btn btn-outline-warning btn-round" href="<?php echo base_url().'index.php/Inicio/generarFormatoPT?id='.$e->id_formulario_pt.'&editar=1&anio=2025'?>" title="Editar" ><i

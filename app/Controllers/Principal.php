@@ -3924,8 +3924,32 @@ class Principal extends BaseController
             'tabla' => 'formulario_pt',
             'where' => ['id_formulario_pt' => $id, 'visible' => 1]
         ]);
-
+        $partidas = $globals->getTabla([
+            'tabla' => 'manual_factura',
+            'where' => ['id_registro_pt' => $id, 'visible' => 1]
+        ]);
+      // die(var_dump($partidas));
         $registro = $res->data[0];
+       $partida = [];
+       $comprobante = [];
+
+        if (isset($partidas->data) && !empty($partidas->data)) {
+            foreach ($partidas->data as $p) {
+                $partida[] = $p->partida;
+            }
+        }
+
+        if (isset($partidas->data) && !empty($partidas->data)) {
+            foreach ($partidas->data as $p) {
+                $comprobante[] = $p->no_comprobante;
+            }
+        }
+
+        // Eliminar duplicados
+        $partida = array_unique($partida);
+
+        // Opcional: reindexar el arreglo
+        $partida = array_values($partida);
 
         if($registro->nombre_proveedor_1 > 0){
 
@@ -3960,7 +3984,7 @@ class Principal extends BaseController
             $sheet->setCellValue('H7', date('d/m/Y', strtotime($registro->fecha_tramite)));
            
             $sheet->setCellValue('H9', $registro->no_consecutivo);
-
+            $sheet->getStyle('H9')->getFont()->setSize(8);
             // Checkboxes (using 'X' or 'Si' as per template logic - assuming 'Si'/'No' text based on image)
             // 02_Póliza
             //die( var_dump(  $data['registro']) );
@@ -3978,12 +4002,14 @@ class Principal extends BaseController
             // Partida Presupuestal
             //die( var_dump($data['presupuesto']) );
           
-            $sheet->setCellValue('H24', '');
+            $sheet->setCellValue('H24', (isset($partidas->data) && !empty($partidas->data)) ? implode(', ', $partida) : '');
 
-            $sheet->setCellValue('B25', isset($registro->concepto_pago) ? $registro->concepto_pago : '');
+            $sheet->setCellValue('B25', isset($registro->concepto) ? $registro->concepto : '');
             
    
             $sheet->setCellValue('H26', $registro->no_convenio);
+            $sheet->setCellValue('B26', (isset($partidas->data) && !empty($partidas->data)) ? implode(', ', $comprobante) : '');
+            $sheet->setCellValue('B27', $registro->importe_total_num.' ('.$registro->importe_letra.')');
 
 
 
@@ -3995,70 +4021,7 @@ class Principal extends BaseController
             exit();
         }
 
-        if (!empty($instrumento)) {
-            switch ($id_archivo) {
-                case 4:
-                    if ($savePath) {
-                        $source = FCPATH . $instrumento;
-                        if (file_exists($source)) {
-                            copy($source, $savePath);
-                            return $savePath;
-                        }
-                        return null;
-                    } else {
-                        // Solo si se quiere mostrar directo en navegador
-                        return redirect()->to(base_url() . $instrumento);
-                    }
-                    break;
 
-
-            }
-
-        } else {
-            switch ($id_archivo) {
-                case 4:
-                    $data['layout'] = 'plantilla/lytVacio';
-                    $data['contentView'] = 'secciones/vError500';
-                    $this->_renderView($data);
-                    die();
-                    break;
-
-
-            }
-        }
-
-        $html = view($formato, $data);
-        $htmlSegundaHoja = view('personal/vFormato02.php', $data);
-        //Crear instancia de mPDF
-        $mpdf = new \Mpdf\Mpdf([
-            'margin_top' => 0,
-            'margin_left' => 1,
-            'margin_right' => 1,
-            'format' => [213, 268],
-            'mirrorMargins' => false,
-        ]);
-
-        $pagecount = $mpdf->SetSourceFile(FCPATH . $doc);
-        for ($i = 1; $i <= $pagecount; $i++) {
-            $mpdf->AddPage();
-            $tplId = $mpdf->ImportPage($i);
-            $mpdf->UseTemplate($tplId);
-
-            if ($i == 1) {
-                $mpdf->WriteHTML($html);
-            }
-            if ($i == 2) {
-                $mpdf->WriteHTML($htmlSegundaHoja);
-            }
-        }
-
-
-        if ($savePath) {
-            $mpdf->Output($savePath, 'F'); // F = write to file
-            return $savePath;
-        }
-        $mpdf->Output('Formato_pt.pdf', 'I');
-        exit();
 
     }
     public function ArchivoVe($id_registro_pt = null, $id_archivo = null, $savePath = null)
