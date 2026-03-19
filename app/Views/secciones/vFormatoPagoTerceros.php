@@ -235,7 +235,6 @@
                                         <input type="text" name="no_consecutivo" autocomplete="off" class="form-control-plaintext mx-1" style="width: 80px;" value="<?= isset($no_consecutivo) ? $no_consecutivo : '' ?>" placeholder="001">
                                         <span style="font-weight:bold; font-size: 1.2em;">/</span>
                                         <select id="anio_consecutivo" name="anio_consecutivo" class="form-control-plaintext mx-1" style="width: 70px;">
-                                            <option value="2025" <?= $anio_actual == '2025' ? 'selected' : '' ?>>2025</option>
                                             <option value="2026" <?= $anio_actual == '2026' ? 'selected' : '' ?>>2026</option>
                                         </select>
                                     </div>
