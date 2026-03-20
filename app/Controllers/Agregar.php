@@ -6993,6 +6993,28 @@ class Agregar extends BaseController
                 
                 if($pdfPath) $dataFila['pdf'] = $pdfPath;
                 if($xmlPath) $dataFila['xml'] = $xmlPath;
+
+                // Extraccion de ISR y Retenciones Locales desde XML
+                $isr_xml = 0.00;
+                $il_xml  = 0.00;
+                if ($xmlPath && file_exists(FCPATH . $xmlPath)) {
+                    try {
+                        $xmlContent = file_get_contents(FCPATH . $xmlPath);
+                        $xmlContent = str_replace(['cfdi:', 'implocal:', 'tfd:'], '', $xmlContent);
+                        $xmlObj = @simplexml_load_string($xmlContent);
+                        if ($xmlObj) {
+                            if (isset($xmlObj->Impuestos) && isset($xmlObj->Impuestos['TotalImpuestosRetenidos'])) {
+                                $isr_xml = (float) $xmlObj->Impuestos['TotalImpuestosRetenidos'];
+                            }
+                            if (isset($xmlObj->Complemento) && isset($xmlObj->Complemento->ImpuestosLocales) && isset($xmlObj->Complemento->ImpuestosLocales['TotaldeRetenciones'])) {
+                                $il_xml = (float) $xmlObj->Complemento->ImpuestosLocales['TotaldeRetenciones'];
+                            }
+                        }
+                    } catch (\Exception $e) { }
+                }
+
+                $dataFila['isr'] = $isr_xml;
+                $dataFila['impuesto_local'] = $il_xml;
                 
                 $resItem = $this->globals->saveTabla($dataFila, ["tabla" => "manual_factura", "editar" => false], []);
             }
