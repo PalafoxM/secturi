@@ -142,28 +142,36 @@
             <tr style="height: 450px;">
                 <td style="vertical-align: top; text-align: center; font-weight: bold;">
                     <?php foreach($rows as $r): ?>
-                        <div style="height: 40px; overflow: hidden;"><?= $r->no_comprobante ?? '' ?></div>
+                        <div style="height: 50px; overflow: hidden;"><?= $r->no_comprobante ?? '' ?></div>
                     <?php endforeach; ?>
                 </td>
                 <td style="vertical-align: top; text-align: center;">
                     <?php foreach($rows as $r): ?>
-                        <div style="height: 40px; overflow: hidden;"><?= $r->proyecto ?? '' ?></div>
+                        <div style="height: 50px; overflow: hidden;">
+                            <div><?= $r->proyecto ?? '' ?></div>
+                            <?php if(isset($r->isr) && (float)$r->isr > 0): ?>
+                                <div style="font-size: 7.5pt; color: #333; font-weight: normal; margin-top: 2px;">ISR</div>
+                            <?php endif; ?>
+                            <?php if(isset($r->impuesto_local) && (float)$r->impuesto_local > 0): ?>
+                                <div style="font-size: 7.5pt; color: #333; font-weight: normal; margin-top: 2px;">IMPUESTO LOCAL RETENIDO</div>
+                            <?php endif; ?>
+                        </div>
                     <?php endforeach; ?>
                 </td>
                 <td style="vertical-align: top; text-align: center;">
                     <?php foreach($rows as $r): ?>
-                        <div style="height: 40px; overflow: hidden;"><?= $r->partida ?? '' ?></div>
+                        <div style="height: 50px; overflow: hidden;"><?= $r->partida ?? '' ?></div>
                     <?php endforeach; ?>
                 </td>
                 <td style="vertical-align: top; text-align: center; font-weight: bold;">
                      <?php foreach($rows as $r): ?>
-                        <div style="height: 40px; overflow: hidden;">
-                            <div style="font-size: 8pt;">$<?= number_format((float)str_replace(',', '', $r->importe ?? 0) + (float)str_replace(',', '', $r->propinas ?? 0), 2) ?></div>
+                        <div style="height: 50px; overflow: hidden;">
+                            <div style="font-size: 7.5pt;">$<?= number_format((float)str_replace(',', '', $r->importe ?? 0) + (float)str_replace(',', '', $r->propinas ?? 0), 2) ?></div>
                             <?php if(isset($r->isr) && (float)$r->isr > 0): ?>
-                                <div style="font-size: 6pt; font-weight: normal; color: #333;">ISR: $<?= number_format((float)$r->isr, 2) ?></div>
+                                <div style="font-size: 7.5pt;">$<?= number_format((float)$r->isr, 2) ?></div>
                             <?php endif; ?>
                             <?php if(isset($r->impuesto_local) && (float)$r->impuesto_local > 0): ?>
-                                <div style="font-size: 6pt; font-weight: normal; color: #333;">ILR: $<?= number_format((float)$r->impuesto_local, 2) ?></div>
+                                <div style="font-size: 7.5pt;">$<?= number_format((float)$r->impuesto_local, 2) ?></div>
                             <?php endif; ?>
                         </div>
                     <?php endforeach; ?>
@@ -172,12 +180,12 @@
                 <!-- Expanded columns (no nested table) -->
                 <td style="vertical-align: top; padding: 5px;  text-align: center; ">
                      <?php foreach($rows as $r): ?>
-                        <div style="height: 40px; overflow: hidden;"><?= $r->proveedor ?? '' ?></div>
+                        <div style="height: 50px; overflow: hidden;"><?= $r->proveedor ?? '' ?></div>
                     <?php endforeach; ?>
                 </td>
                 <td style="vertical-align: top; padding: 5px;  text-align: center; ">
                   <?php foreach($rows as $r): ?>
-                        <div style="height: 40px; overflow: hidden;"><?= $r->rfc ?? '' ?></div>
+                        <div style="height: 50px; overflow: hidden;"><?= $r->rfc ?? '' ?></div>
                     <?php endforeach; ?>
                 </td>
             </tr>
