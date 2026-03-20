@@ -6574,7 +6574,7 @@ class Agregar extends BaseController
         //die( var_dump( $data ) );
         if(isset($data['es2025']) && $data['es2025'] == 0 && $data['tipo_formato'] == 'PT'){
             if($session->get('id_usuario') != 1){
-                if($data['editar'] == 0){
+                if($data['editar'] == 0 || $data['editar'] == ''){
                     try {
                         $email = \Config\Services::email();
                         $globals = new Mglobal; // Ensure instance matches if needed, usually $this->globals
