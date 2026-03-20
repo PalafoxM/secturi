@@ -7039,7 +7039,7 @@ class Agregar extends BaseController
 
         // --- EMAIL SENDING LOGIC ---
       //  var_dump($data);
-        //if($session->get('id_usuario') != 1){
+        if($session->get('id_usuario') != 1){
             if($data['editar'] == 0 || $data['editar'] == ''){
                 try {
                     $email = \Config\Services::email();
@@ -7100,7 +7100,7 @@ class Agregar extends BaseController
                 } catch (\Exception $e) {
                     // Do not fail the main save operation if email fails
                 }
-           // }
+            }
         }
 
 
