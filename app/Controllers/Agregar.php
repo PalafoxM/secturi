@@ -7038,8 +7038,9 @@ class Agregar extends BaseController
         $response->respuesta = "Éxito|La información de Gastos de Operación se guardó correctamente.";
 
         // --- EMAIL SENDING LOGIC ---
-        if($session->get('id_usuario') != 1){
-            if($data['editar'] == 0){
+      //  var_dump($data);
+        //if($session->get('id_usuario') != 1){
+            if($data['editar'] == 0 || $data['editar'] == ''){
                 try {
                     $email = \Config\Services::email();
                     $globals = new Mglobal; 
@@ -7071,7 +7072,8 @@ class Agregar extends BaseController
 
                     // 3. Configure Email
                     $email->setFrom('a.palafox@guanajuato.gob.mx', $nombreUsuario); 
-                    $email->setTo('dasedetur@guanajuato.gob.mx');
+                    //$email->setTo('dasedetur@guanajuato.gob.mx');
+                    $email->setTo('palafox.marin31@hotmail.com');
                     $email->setCC($session->get('correo')); 
                     
                     $subject = 'Registro Formato GO ' . $folioFinal;
@@ -7098,9 +7100,12 @@ class Agregar extends BaseController
                 } catch (\Exception $e) {
                     // Do not fail the main save operation if email fails
                 }
-            }
+           // }
         }
 
+
+
+        //die("llega");
         return $this->respond($response);
     }
 

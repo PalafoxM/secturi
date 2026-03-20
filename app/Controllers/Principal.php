@@ -6908,7 +6908,6 @@ class Principal extends BaseController
         }
 
         return $this->respond($response);
-
     }
     public function formActividad()
     {
