@@ -103,7 +103,7 @@
                                                                 $texto = 'Enviado';
                                                                 break;
                                                            case 5:
-                                                                $color = 'badge-soft-primary';
+                                                                $color = 'badge-soft-secundary';
                                                                 $texto = 'Revisión Interna';
                                                                 break;
                                                             default:
@@ -121,13 +121,13 @@
                                                         
                                                         
                                                         <td class="text-center text-nowrap">
-                                                            <?php if($session->id_perfil != 2 && empty($p->id_registro_pt) ): ?>
+                                                            <?php if($session->id_perfil != 2 && empty($p->id_registro_pt) && $p->id_estatus != 1): ?>
                                                              <a style="color:white;" onclick="ini.inicio.editarReserva(<?=$p->id_reserva?>, 0);" data-toggle="tooltip" data-placement="top" title="" data-original-title="Editar"
                                                                 class="btn btn-gradient-success px-4"><i
                                                                     class="mdi mdi-border-color font-21"></i>
                                                             </a>
                                                              <?php endif; ?>
-                                                             <?php if(!in_array($p->id_estatus,[3,4]) && $session->id_perfil != 2): ?>
+                                                             <?php if(!in_array($p->id_estatus,[3,4]) && $session->id_perfil != 2 && $p->id_estatus != 1): ?>
                                                             <a style="color:white;" onclick="ini.inicio.eliminarReserva(<?=$p->id_reserva?>);" data-toggle="tooltip" data-placement="top" title="" data-original-title="Eliminar"
                                                                 class="btn btn-gradient-danger px-4"><i
                                                                     class="mdi mdi-trash-can-outline font-21"></i>
@@ -160,7 +160,7 @@
                                                             </a>
 
                                                              <?php endif;  ?>
-                                                             <?php if($p->id_estatus == 1): ?>
+                                                             <?php if($p->id_estatus == 1 && !in_array($session->get('id_perfil'),[1,2])): ?>
                                                                 <div class="spinner-grow text-primary" role="status">
                                                                 </div>
                                                              <?php endif; ?>

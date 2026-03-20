@@ -3248,11 +3248,18 @@ class Inicio extends BaseController
         if(in_array($session->get('id_perfil'), [1,2])){
             $dataDB = array('tabla' => 'formulario_pt', 'where' => ['visible' => 1, 'tipo_formato' => 'PT']);
         }else{
-            $dataDB = array('tabla' => 'formulario_pt', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario'), 'tipo_formato' => 'PT']);
+              if(in_array($session->get('id_usuario'), [14,80,17, 59, 11, 38])){
+                $dataDB = array('tabla' => 'formulario_pt', 'where' => ['visible' => 1, "promo"=> 1]);
+            }else{
+                $dataDB = array('tabla' => 'formulario_pt', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario'), 'tipo_formato' => 'PT']);
+                //$reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['usu_reg' => $session->get('id_usuario'), 'visible' => 1, "id_estatus"=> 3]]);
+            }
+            
         }
        
-       // die( var_dump( $dataDB ) );
+       
         $response = $globas->getTabla($dataDB);
+         //die( var_dump( $response ) );
           foreach($response->data as $key => $value){
             $usuario = $globas->getTabla(["tabla" => "vw_usuario", "where" => ["id_usuario" => $value->usu_reg], 'limit' => 1]);
             $response->data[$key]->nombre_usuario = $usuario->data[0]->nombre_completo;

@@ -1376,7 +1376,7 @@ class Principal extends BaseController
         if($reviucionInterna){
             $dataInsert['id_estatus'] = 5;
             $dataInsert['promo'] = 1;
-             /*    $email->setTo([
+                $email->setTo([
                 'mamedinaher@guanajuato.gob.mx',
                  $session->get('correo')
                 ]);  
@@ -1414,7 +1414,7 @@ class Principal extends BaseController
                     $response->respuesta = "Correo enviado correctamente.";
                 } else {
                     $response->respuesta = 'Error al enviar: ' . $email->printDebugger();
-                }  */
+                }  
         }
         if (!empty($ruta_relativa)) {
             $dataInsert['instrumento'] = $ruta_relativa;
@@ -1476,7 +1476,7 @@ class Principal extends BaseController
             }
         }
         if($session->get('id_perfil')!=1 && !$reviucionInterna){
-           // $this->enviarEmail(0);
+            $this->enviarEmail(0);
         }
        
 
