@@ -103,7 +103,7 @@
                                                                 $texto = 'Enviado';
                                                                 break;
                                                            case 5:
-                                                                $color = 'badge-soft-secundary';
+                                                                $color = 'badge-soft-info';
                                                                 $texto = 'Revisión Interna';
                                                                 break;
                                                             default:

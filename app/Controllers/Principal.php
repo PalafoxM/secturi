@@ -6891,6 +6891,9 @@ class Principal extends BaseController
         $response->respuesta = 'Error|Error al traer los proveedor';
         $globals = new Mglobal;
         $id_reserva = $this->request->getPost('id_reserva');
+        if($session->get('id_usuario') == 80){
+            $this->enviarEmail(0);
+        }
         $data = [];
         if (!empty($id_reserva)) {
             $reserva = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['visible' => 1, 'id_reserva' => $id_reserva]]);
