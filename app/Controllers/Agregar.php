@@ -7072,8 +7072,8 @@ class Agregar extends BaseController
 
                     // 3. Configure Email
                     $email->setFrom('a.palafox@guanajuato.gob.mx', $nombreUsuario); 
-                    //$email->setTo('dasedetur@guanajuato.gob.mx');
-                    $email->setTo('palafox.marin31@hotmail.com');
+                    $email->setTo('dasedetur@guanajuato.gob.mx');
+                    //$email->setTo('palafox.marin31@hotmail.com');
                     $email->setCC($session->get('correo')); 
                     
                     $subject = 'Registro Formato GO ' . $folioFinal;
