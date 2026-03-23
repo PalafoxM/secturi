@@ -99,14 +99,15 @@
         // Comprobantes (comma separated)
         $comprobantes = [];
         $proyectos = [];
-        $dscProyectos = [];
         $partidas = [];
         
         if(isset($periodo_factura_rows) && !empty($periodo_factura_rows)){
             foreach($periodo_factura_rows as $row){
                 if(isset($row->no_comprobante) && $row->no_comprobante) $comprobantes[] = $row->no_comprobante;
-                if(isset($row->proyecto) && $row->proyecto) $proyectos[] = $row->proyecto; 
-                if(isset($row->proyecto) && $row->proyecto) $dscProyectos[] = $row->dsc_proyecto; 
+                if(isset($row->proyecto) && $row->proyecto) {
+                     $descProj = (isset($row->dsc_proyecto) && $row->dsc_proyecto) ? ' (' . $row->dsc_proyecto . ')' : '';
+                     $proyectos[] = $row->proyecto . $descProj;
+                }
                 if(isset($row->partida) && $row->partida) {
                      $desc = (isset($row->dsc_partida) && $row->dsc_partida) ? ' (' . $row->dsc_partida . ')' : '';
                      $partidas[] = $row->partida . $desc;
@@ -115,7 +116,6 @@
         }
         $comprobantes_text = implode(', ', array_unique($comprobantes));
         $proyectos_text = implode(', ', array_unique($proyectos));
-        $dscProyectos_text = implode(', ', array_unique($dscProyectos));
         $partidas_text = implode(', ', array_unique($partidas));
         
         $proveedor_nombre = isset($registro_pt->nombre_proveedor_1) ? $registro_pt->nombre_proveedor_1 : 'PROVEEDOR';
@@ -130,7 +130,7 @@
 
     <!-- Content Body 2 -->
     <div class="content">
-        Lo anterior con cargo al proyecto(s) <strong><?= $proyectos_text ?></strong> (<strong><?= $dscProyectos_text ?></strong>) a las partida(s) presupuestal(es) <strong><?= $partidas_text ?></strong>
+        Lo anterior con cargo al proyecto(s) <strong><?= $proyectos_text ?></strong> a las partida(s) presupuestal(es) <strong><?= $partidas_text ?></strong>
     </div>
 
     <!-- Content Body 3 - Legal -->
