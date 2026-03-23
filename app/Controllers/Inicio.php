@@ -3213,7 +3213,12 @@ class Inicio extends BaseController
                                 "tabla" => "cat_partida",
                                 "where" => ["cuenta_cable" => $item->partida, 'visible' => 1]
                             ]);
+                            $proyecto = $globals->getTabla([
+                                "tabla" => "cat_proyecto",
+                                "where" => ["proyecto" => $item->proyecto, 'visible' => 1]
+                            ]);
                             $item->dsc_partida = (isset($partida->data[0])) ? $partida->data[0]->nombre_fondo : '';
+                            $item->dsc_proyecto = (isset($proyecto->data[0])) ? $proyecto->data[0]->dsc_proyecto : '';
                         }
                 $data['periodo_factura_rows'] = $items->data;
                 $data['edit'] = 1; // For view logic if reused

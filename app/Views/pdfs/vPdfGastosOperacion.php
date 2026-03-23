@@ -215,7 +215,7 @@
                 <div style="border: 1px solid #000; text-align: center; font-size: 7pt; padding: 1px;">DIRECTOR GENERAL ADMINISTRATIVO</div>
                 <table style="width: 100%; border-collapse: collapse; border: 1px solid #000; border-top: none;">
                     <tr>
-                         <td style="height: 60px; vertical-align: bottom; text-align: center; font-weight: bold; font-size: 8pt; border: none; padding-bottom: 2px;">
+                         <td style="height: 100px; vertical-align: bottom; text-align: center; font-weight: bold; font-size: 8pt; border: none; padding-bottom: 2px;">
                              L.R.I. RODRIGO GONZALEZ GUERRERO
                         </td>
                     </tr>
@@ -230,7 +230,7 @@
                 <div style="border: 1px solid #000; border-left: none; text-align: center; font-size: 7pt; padding: 1px;">AUTORIZA</div>
                  <table style="width: 100%; border-collapse: collapse; border: 1px solid #000; border-left: none; border-top: none;">
                     <tr>
-                         <td style="height: 60px; vertical-align: bottom; text-align: center; font-weight: bold; font-size: 8pt; border: none; padding-bottom: 2px;">
+                         <td style="height:100px; vertical-align: bottom; text-align: center; font-weight: bold; font-size: 8pt; border: none; padding-bottom: 2px;">
                             <?= (isset($registro_pt->nombre_autoriza) && $registro_pt->nombre_autoriza != 'NO APLICA') ? $registro_pt->nombre_autoriza : 'JAVIER PACHECO CANO' ?>
                         </td>
                     </tr>
@@ -241,13 +241,13 @@
             </td>
 
             <!-- COL 3 -->
-             <td width="34%" class="signature-cell">
+             <td width="34%" height="150px" class="signature-cell">
                  <!-- Top Box (Responsable 1) -->
                 <div style="border: 1px solid #000; border-left: none; text-align: center; font-size: 7pt; padding: 1px;">RESPONSABLE DEL PROYECTO</div>
                 
                  <table style="width: 100%; border-collapse: collapse; border: 1px solid #000; border-left: none; border-top: none;">
                     <tr>
-                         <td style="height: 60px; vertical-align: bottom; text-align: center; font-weight: bold; font-size: 8pt; border: none; padding-bottom: 2px;">
+                         <td style="height: 100px; vertical-align: bottom; text-align: center; font-weight: bold; font-size: 8pt; border: none; padding-bottom: 2px;">
                             <?= (isset($registro_pt->nombre_responsable) && $registro_pt->nombre_responsable != 'NO APLICA') ? $registro_pt->nombre_responsable : '' ?>
                         </td>
                     </tr>
@@ -260,7 +260,7 @@
                
                   <table style="width: 100%; border-collapse: collapse; border: 1px solid #000; border-left: none; border-top: none;">
                     <tr>
-                         <td style="height: 35px; vertical-align: bottom; text-align: center; font-weight: bold; font-size: 7pt; border: none; padding-bottom: 2px;">
+                         <td style="height: 100px; vertical-align: bottom; text-align: center; font-weight: bold; font-size: 7pt; border: none; padding-bottom: 2px;">
                             <?= (isset($registro_pt->nombre_responsable_2) && $registro_pt->nombre_responsable_2 != 'NO APLICA') ? $registro_pt->nombre_responsable_2 : '&nbsp;' ?>
                         </td>
                     </tr>

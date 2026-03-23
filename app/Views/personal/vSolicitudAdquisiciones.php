@@ -22,8 +22,8 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="text-center mb-4">
-                                <h4 class="mt-0">DIRECCIÓN GENERAL DE ADMINISTRACIÓN</h4>
-                                <h5>SOLICITUD DE ADQUISICIONES</h5>
+                                <h5 class="mt-0">SOLICITUD DE  ELABORACIÓN DE CONTRATO DE ADQUISICIÓN</h5>
+                                <h4 >DIRECCIÓN GENERAL JURÍDICA</h4>
                             </div>
                             
                             <form id="form_solicitud_adquisiciones" enctype="multipart/form-data">
@@ -32,7 +32,7 @@
                                 <!-- SECCION 1: INFORMACIÓN DEL ÁREA SOLICITANTE -->
                                 <h5 class="bg-primary text-white p-2">INFORMACIÓN DEL ÁREA SOLICITANTE</h5>
                                 <div class="form-group row">
-                                    <label class="col-sm-3 col-form-label">Nombre y cargo del Responsable del Proyecto:</label>
+                                    <label class="col-sm-3 col-form-label">Área Solicitante::</label>
                                     <div class="col-sm-9">
                                         <select class="form-control select2" name="responsable_proyecto" required>
                                             <option value="">Seleccione una opción</option>
@@ -45,7 +45,16 @@
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label class="col-sm-3 col-form-label">Nombre y cargo del Responsable de Seguimiento:</label>
+                                    <label class="col-sm-3 col-form-label">Fecha de solicitud:</label>
+                                    <div class="col-sm-9">
+                                        <input type="date" class="form-control" name="fecha_solicitud" value="<?= isset($solicitud) && $solicitud->fecha_solicitud ? date('Y-m-d', strtotime($solicitud->fecha_solicitud)) : '' ?>" required>
+                                    </div>
+                                </div>
+
+                                <!-- SECCION 1.5: INFORMACIÓN DEL CONTRATO -->
+                                <h5 class="bg-primary text-white p-2 mt-4">INFORMACIÓN DEL CONTRATO</h5>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Responsable del seguimiento (SECTURI):</label>
                                     <div class="col-sm-9">
                                         <select class="form-control select2" name="responsable_seguimiento" required>
                                             <option value="">Seleccione una opción</option>
@@ -57,6 +66,39 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Vigencia:</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="vigencia" value="<?= isset($solicitud) ? (isset($solicitud->vigencia) ? $solicitud->vigencia : '') : '' ?>">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Objeto de Adquisición:</label>
+                                    <div class="col-sm-9">
+                                        <textarea class="form-control" name="objeto_adquisicion" rows="3"><?= isset($solicitud) ? (isset($solicitud->objeto_adquisicion) ? $solicitud->objeto_adquisicion : '') : '' ?></textarea>
+                                    </div>
+                                </div>
+
+                                <!-- SECCION 1.6: PROCESO DE CONTRATACIÓN -->
+                                <h5 class="bg-primary text-white p-2 mt-4">PROCESO DE CONTRATACIÓN</h5>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Tipo de proceso:</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="tipo_proceso" value="<?= isset($solicitud) ? (isset($solicitud->tipo_proceso) ? $solicitud->tipo_proceso : '') : '' ?>">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">No. de invitación:</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="no_invitacion" value="<?= isset($solicitud) ? (isset($solicitud->no_invitacion) ? $solicitud->no_invitacion : '') : '' ?>">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Fecha de invitación:</label>
+                                    <div class="col-sm-9">
+                                        <input type="date" class="form-control" name="fecha_invitacion" value="<?= isset($solicitud) && isset($solicitud->fecha_invitacion) && $solicitud->fecha_invitacion ? date('Y-m-d', strtotime($solicitud->fecha_invitacion)) : '' ?>">
+                                    </div>
+                                </div>
 
                                 <!-- SECCION 2: INFORMACIÓN PRESUPUESTAL -->
                                 <h5 class="bg-primary text-white p-2 mt-4">INFORMACIÓN PRESUPUESTAL</h5>
@@ -64,52 +106,44 @@
                                     <table class="table table-bordered">
                                         <thead>
                                             <tr>
-                                                <th>Proyecto</th>
-                                                <th>Partida</th>
-                                                <th>Clave estandarizada</th>
-                                                <th>Suficiencia Presupuestal</th>
+                                                <th>Código Programático</th>
+                                                <th>Fondo</th>
+                                                <th>Número de Partida</th>
+                                                <th>Nombre de la Partida</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                <td>
-                                                    <select class="form-control select2" name="proyecto">
-                                                        <option value="">Seleccione una opción</option>
-                                                        <?php if(isset($cat_proyecto)): foreach ($cat_proyecto as $p): ?>
-                                                            <option value="<?= $p->id_proyecto ?>" <?= (isset($solicitud) && $solicitud->proyecto == $p->id_proyecto) ? 'selected' : '' ?>>
-                                                                <?= $p->proyecto ?>
-                                                            </option>
-                                                        <?php endforeach; endif; ?>
-                                                    </select>
-                                                </td>
-                                                <td>
-                                                    <select class="form-control select2" name="partida">
-                                                        <option value="">Seleccione una opción</option>
-                                                        <?php if(isset($cat_partida)): foreach ($cat_partida as $p): ?>
-                                                            <option value="<?= $p->id_partida ?>" <?= (isset($solicitud) && $solicitud->partida == $p->id_partida) ? 'selected' : '' ?>>
-                                                                <?= $p->cuenta_cable ?>
-                                                            </option>
-                                                        <?php endforeach; endif; ?>
-                                                    </select>
-                                                </td>
-                                                <td><input type="text" class="form-control" name="clave_estandarizada" value="<?= isset($solicitud) ? $solicitud->clave_estandarizada : '' ?>"></td>
-                                                <td>
-                                                    <p class="small text-muted mb-0">El proyecto cuenta con la suficiencia presupuestal. Se anexa captura.</p>
-                                                    <input type="file" class="form-control-file mt-2" name="archivo_suficiencia">
-                                                    <?php if(isset($solicitud) && $solicitud->archivo_suficiencia): ?>
-                                                        <a href="<?= base_url('assets/uploads/adquisiciones/'.$solicitud->archivo_suficiencia) ?>" target="_blank" class="d-block mt-2">Ver archivo actual</a>
-                                                    <?php endif; ?>
-                                                </td>
+                                                <td><input type="text" class="form-control" name="codigo_programatico" value="<?= isset($solicitud) ? (isset($solicitud->codigo_programatico) ? $solicitud->codigo_programatico : '') : '' ?>"></td>
+                                                <td><input type="text" class="form-control" name="fondo" value="<?= isset($solicitud) ? (isset($solicitud->fondo) ? $solicitud->fondo : '') : '' ?>"></td>
+                                                <td><input type="text" class="form-control" name="numero_partida" value="<?= isset($solicitud) ? (isset($solicitud->numero_partida) ? $solicitud->numero_partida : '') : '' ?>"></td>
+                                                <td><input type="text" class="form-control" name="nombre_partida" value="<?= isset($solicitud) ? (isset($solicitud->nombre_partida) ? $solicitud->nombre_partida : '') : '' ?>"></td>
                                             </tr>
                                         </tbody>
                                     </table>
                                 </div>
-                                <div class="form-group row">
-                                    <label class="col-sm-4 col-form-label">Monto Total Estimado (con número y letra):</label>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control monto-input" id="monto_total" name="monto_total" value="<?= isset($solicitud) ? $solicitud->monto_total : '' ?>" required>
-                                        <input type="text" class="form-control mt-2 monto-letra" id="monto_letra" readonly placeholder="Monto en letra">
-                                    </div>
+                                <h5 class="bg-primary text-white p-2 mt-4">PAGOS</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered" id="tabla_pagos">
+                                        <thead>
+                                            <tr>
+                                                <th>No.</th>
+                                                <th>Monto</th>
+                                                <th>Letra</th>
+                                                <th style="width:50px;"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Dynamic rows -->
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="4" class="text-right">
+                                                    <button type="button" class="btn btn-secondary btn-sm" onclick="agregarPago()">+ Agregar Pago</button>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
                                 </div>
 
                                 <!-- SECCION 3: DESCRIPCIÓN DEL BIEN O SERVICIO -->
@@ -129,12 +163,30 @@
                                     </div>
                                 </div>
 
-                                <!-- SECCION 4: INFORMACIÓN DEL PROVEEDOR (SI APLICA) -->
-                                <h5 class="bg-primary text-white p-2 mt-4">INFORMACIÓN DEL PROVEEDOR SUGERIDO (SI APLICA)</h5>
+                                <!-- SECCION 4: INFORMACIÓN DEL PROVEEDOR -->
+                                <h5 class="bg-primary text-white p-2 mt-4">INFORMACIÓN DEL PROVEEDOR</h5>
                                 <div class="form-group row">
                                     <label class="col-sm-3 col-form-label">Nombre/Razón Social:</label>
                                     <div class="col-sm-9">
                                         <input type="text" class="form-control" name="proveedor_nombre" value="<?= isset($solicitud) ? $solicitud->proveedor_nombre : '' ?>">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Nombre Comercial:</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="proveedor_comercial" value="<?= isset($solicitud) ? (isset($solicitud->proveedor_comercial) ? $solicitud->proveedor_comercial : '') : '' ?>">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Núm. de Registro de Padrón de Proveedores:</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="proveedor_cedula" value="<?= isset($solicitud) ? $solicitud->proveedor_cedula : '' ?>">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Domicilio fiscal:</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="proveedor_domicilio" value="<?= isset($solicitud) ? $solicitud->proveedor_domicilio : '' ?>">
                                     </div>
                                 </div>
                                 <div class="form-group row">
@@ -144,68 +196,18 @@
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label class="col-sm-3 col-form-label">Correo Electrónico:</label>
+                                    <label class="col-sm-3 col-form-label">Nombre del Representante Legal:</label>
                                     <div class="col-sm-9">
-                                        <input type="email" class="form-control" name="proveedor_correo" value="<?= isset($solicitud) ? $solicitud->proveedor_correo : '' ?>">
+                                        <input type="text" class="form-control" name="proveedor_representante" value="<?= isset($solicitud) ? $solicitud->proveedor_representante : '' ?>">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Responsable de Seguimiento:</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="proveedor_seguimiento" value="<?= isset($solicitud) ? $solicitud->proveedor_seguimiento : '' ?>">
                                     </div>
                                 </div>
 
-                                <!-- SECCION 5: DOCUMENTOS Y ANEXOS -->
-                                <h5 class="bg-primary text-white p-2 mt-4 text-center">DOCUMENTOS Y ANEXOS</h5>
-                                
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-sm mt-3">
-                                        <thead class="bg-light">
-                                            <tr>
-                                                <th class="text-center" style="width: 5%;">Num.</th>
-                                                <th>DOCUMENTO</th>
-                                                <th class="text-center" style="width: 5%;">SI</th>
-                                                <th class="text-center" style="width: 5%;">N/A</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php 
-                                            $documentos = [
-                                                "Anexo Técnico (Términos de referencia)",
-                                                "Investigación de Mercado (Cotizaciones y consulta PEI)",
-                                                "Validación de partida restringida (SF)<br>Verificación de Alineación de Información Estratégica (DGIT)<br>Suficiencia presupuestal (R3)<br>Validación DGTIT/CGCS u otra",
-                                                "Justificación",
-                                                "Propuesta Técnico Económica (Anexo)",
-                                                "Aviso de privacidad integral",
-                                                "Cédula de Registro en el Padrón de Proveedores (Refrendo vigente)",
-                                                "Escritura Constitutiva/Documento que acredite la legal constitución de la persona moral (Modificaciones sustanciales e inscripción en el Registro Público)",
-                                                "Documento que acredite la representación de la persona moral (Poder)",
-                                                "Identificación oficial vigente (Personas morales Representante y Responsable de seguimiento)",
-                                                "Constancia de Situación Fiscal (RFC)",
-                                                "Comprobante de domicilio (Sólo cuando sea diferente al domicilio fiscal)",
-                                                "Opinión de cumplimiento de Obligaciones Fiscales<br>Manifiesto bajo protesta de cumplimiento de Obligaciones Fiscales",
-                                                "Manifiesto de no encontrarse impedido para Contratar",
-                                                "Carta de Declaración de intereses",
-                                                "Manifiesto de contar con infraestructura",
-                                                "Carta compromiso entrega de bienes (Excepción de Garantía)"
-                                            ];
-                                            $i = 1;
-                                            foreach($documentos as $doc): ?>
-                                            <tr>
-                                                <td class="text-center font-weight-bold align-middle"><?= $i ?></td>
-                                                <td class="align-middle"><?= $doc ?></td>
-                                                <td class="text-center align-middle">
-                                                    <div class="custom-control custom-radio">
-                                                        <input type="radio" id="doc_<?= $i ?>_si" name="documento_<?= $i ?>" value="SI" class="custom-control-input">
-                                                        <label class="custom-control-label" for="doc_<?= $i ?>_si"></label>
-                                                    </div>
-                                                </td>
-                                                <td class="text-center align-middle">
-                                                    <div class="custom-control custom-radio">
-                                                        <input type="radio" id="doc_<?= $i ?>_na" name="documento_<?= $i ?>" value="NA" class="custom-control-input" checked>
-                                                        <label class="custom-control-label" for="doc_<?= $i ?>_na"></label>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <?php $i++; endforeach; ?>
-                                        </tbody>
-                                    </table>
-                                </div>
 
                                 <div class="row mt-4">
                                     <div class="col-12 text-center">
@@ -349,29 +351,47 @@
         return "";
     }
 
+    const pagosExistentes = <?= isset($pagos) ? json_encode($pagos) : '[]' ?>;
+
+    function agregarPago(data = null) {
+        const tbody = document.querySelector('#tabla_pagos tbody');
+        const count = tbody.children.length + 1;
+        const row = document.createElement('tr');
+        
+        let numero = data ? data.numero_pago : `${count}º Pago`;
+        let monto = data ? data.monto : '';
+        
+        row.innerHTML = `
+            <td><input type="text" class="form-control" name="pagos[${count}][numero]" value="${numero}" placeholder="Ej. 1er Pago"></td>
+            <td><input type="text" class="form-control pago-monto" name="pagos[${count}][monto]" value="${monto}" placeholder="$"></td>
+            <td><input type="text" class="form-control pago-letra" readonly placeholder="Monto en letra"></td>
+            <td class="text-center">
+                <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()"><i class="mdi mdi-trash-can"></i></button>
+            </td>
+        `;
+        tbody.appendChild(row);
+        
+        if (monto) {
+            $(row).find('.pago-monto').trigger('input');
+        }
+    }
+
     $(document).ready(function() {
-        $('.monto-input').on('input', function() {
-            var inputTotal = $(this);
-            var inputLetras = inputTotal.next('.monto-letra');
-            var valor = inputTotal.val();
-            // Validación de número
+        $(document).on('input', '.pago-monto', function() {
+            var valor = $(this).val();
+            var inputLetras = $(this).closest('tr').find('.pago-letra');
             if (isNaN(valor) || valor.trim() === '') {
-                 if(valor.trim() !== '') {
-                      inputLetras.val('NUMERO NO LEGIBLE');
-                 } else {
-                      inputLetras.val('');
-                 }
+                 inputLetras.val(valor.trim() !== '' ? 'NUMERO NO LEGIBLE' : '');
             } else {
                 inputLetras.val(numeroALetras(parseFloat(valor)));
             }
         });
-        
-        // Trigger inicial si ya hay valor
-        $('.monto-input').each(function() {
-            if($(this).val()) {
-                $(this).trigger('input');
-            }
-        });
+
+        if (pagosExistentes && pagosExistentes.length > 0) {
+            pagosExistentes.forEach(pago => agregarPago(pago));
+        } else {
+            agregarPago();
+        }
 
         // Initialize Select2
         $('.select2').select2();
