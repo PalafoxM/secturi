@@ -1420,16 +1420,20 @@ ini.inicio = (function () {
                 dataType: "json",
                 data: { id_reserva: id_reserva },
                 success: function (response) {
+
                     if (response && response.data && response.data.reserva) {
                         const reserva = response.data.reserva;
+                        console.log(reserva.comentarios_instrumento);
                         const presupuesto = response.data.presupuesto;
                         const partidas = response.data.partida;
                         const proyectos = response.data.proyecto;
-
+                        const comentarios_instrumento = reserva.comentarios_instrumento;
+                        console.log(comentarios_instrumento);
 
                         $("#varlidar_nombre_proveedor").val(reserva.razon_social || '');
                         $("#validar_no_proveedor").val(reserva.no_proveedor || '');
                         $("#validar_total_importe").val(reserva.total_importe || '');
+                        $("#comentarios_instrumento_estatus").val(comentarios_instrumento || '');
                         if (reserva.instrumento) {
                             const fileUrl = base_url + reserva.instrumento;
                             const link = `<a href="${fileUrl}" target="_blank" class="me-2">
