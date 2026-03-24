@@ -6970,6 +6970,8 @@ class Agregar extends BaseController
                     }
                 }
 
+                $subTotalFormulario = isset($data['sub_total'][$i]) ? (float) str_replace(',', '', $data['sub_total'][$i]) : 0;
+
                 $dataFila = [
                       'id_registro_pt' => $id_registro_pt,
                       'no_comprobante' => $data['no_comprobante'][$i], 
@@ -6997,12 +6999,16 @@ class Agregar extends BaseController
                 // Extraccion de ISR y Retenciones Locales desde XML
                 $isr_xml = 0.00;
                 $il_xml  = 0.00;
+                $subtotal_xml = 0.00;
                 if ($xmlPath && file_exists(FCPATH . $xmlPath)) {
                     try {
                         $xmlContent = file_get_contents(FCPATH . $xmlPath);
                         $xmlContent = str_replace(['cfdi:', 'implocal:', 'tfd:'], '', $xmlContent);
                         $xmlObj = @simplexml_load_string($xmlContent);
                         if ($xmlObj) {
+                            if (isset($xmlObj['SubTotal'])) {
+                                $subtotal_xml = (float) $xmlObj['SubTotal'];
+                            }
                             if (isset($xmlObj->Impuestos) && isset($xmlObj->Impuestos['TotalImpuestosRetenidos'])) {
                                 $isr_xml = (float) $xmlObj->Impuestos['TotalImpuestosRetenidos'];
                             }
@@ -7015,6 +7021,11 @@ class Agregar extends BaseController
 
                 $dataFila['isr'] = $isr_xml;
                 $dataFila['impuesto_local'] = $il_xml;
+                $dataFila['xml_subtotal'] = $subtotal_xml;
+
+                if ($isr_xml > 0 || $il_xml > 0) {
+                    $dataFila['sub_total'] = $subTotalFormulario > 0 ? $subTotalFormulario : $subtotal_xml;
+                }
                 
                 $resItem = $this->globals->saveTabla($dataFila, ["tabla" => "manual_factura", "editar" => false], []);
             }

@@ -142,11 +142,24 @@
 
                 if (!empty($rows)) {
                     foreach ($rows as $r) {
+                        $tieneRetenciones = (isset($r->isr) && (float)$r->isr > 0) || (isset($r->impuesto_local) && (float)$r->impuesto_local > 0);
+                        $importePrincipal = (float)str_replace(',', '', $r->importe ?? 0) + (float)str_replace(',', '', $r->propinas ?? 0);
+
+                        if ($tieneRetenciones) {
+                            if (isset($r->sub_total) && $r->sub_total !== '' && $r->sub_total !== null) {
+                                $importePrincipal = (float)str_replace(',', '', $r->sub_total);
+                            } elseif (isset($r->xml_subtotal) && $r->xml_subtotal !== '' && $r->xml_subtotal !== null) {
+                                $importePrincipal = (float)str_replace(',', '', $r->xml_subtotal);
+                            } elseif (isset($r->subtotal) && $r->subtotal !== '' && $r->subtotal !== null) {
+                                $importePrincipal = (float)str_replace(',', '', $r->subtotal);
+                            }
+                        }
+
                         $detalleRows[] = [
                             'comprobante' => $r->no_comprobante ?? '',
                             'proyecto' => $r->proyecto ?? '',
                             'partida' => $r->partida ?? '',
-                            'importe' => '$' . number_format((float)str_replace(',', '', $r->importe ?? 0) + (float)str_replace(',', '', $r->propinas ?? 0), 2),
+                            'importe' => '$' . number_format($importePrincipal, 2),
                             'proveedor' => $r->proveedor ?? '',
                             'rfc' => $r->rfc ?? '',
                             'tipo' => 'principal'
@@ -190,18 +203,6 @@
                     ];
                 }
 
-                $minRows = 10;
-                while (count($detalleRows) < $minRows) {
-                    $detalleRows[] = [
-                        'comprobante' => '',
-                        'proyecto' => '',
-                        'partida' => '',
-                        'importe' => '',
-                        'proveedor' => '',
-                        'rfc' => '',
-                        'tipo' => 'vacio'
-                    ];
-                }
             ?>
             <?php foreach($detalleRows as $detalle): ?>
             <tr style="height: 26px;">
