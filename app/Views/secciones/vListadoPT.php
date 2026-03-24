@@ -323,7 +323,7 @@ $(document).ready(function() {
             url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json' // Ruta al archivo de localización
         },
         destroy: true,
-        searching: true,
+        searching: false,
     });
     // Función debounce para retrasar la ejecución
 });
