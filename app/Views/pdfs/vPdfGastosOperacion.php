@@ -167,7 +167,7 @@
                         if (isset($r->impuesto_local) && (float)$r->impuesto_local > 0) {
                             $detalleRows[] = [
                                 'comprobante' => $r->no_comprobante ?? '',
-                                'proyecto' => 'IMPUESTO LOCAL RETENIDO',
+                                'proyecto' => ' ISR CEDULAR',
                                 'partida' => '',
                                 'importe' => '$' . number_format((float)$r->impuesto_local, 2),
                                 'proveedor' => $r->proveedor ?? '',
