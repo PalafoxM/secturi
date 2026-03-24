@@ -2854,6 +2854,28 @@ class Principal extends BaseController
         $mpdf->Output('Comprobacion_GRC_' . $id_solicitud . '.pdf', 'I');
         exit();
     }
+    public function SolicitudHonorarios()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $data = array();
+        
+        $vw_usuario = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1]]);
+        $data['direccion'] = (!empty($vw_usuario->data)) ? $vw_usuario->data : [];
+        $vw_usuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
+        $data['usuario'] = (!empty($vw_usuario->data)) ? $vw_usuario->data : [];
+
+        $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
+        $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
+
+        $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+        
+        $data['scripts'] = array('inicio');
+        $data['edita'] = 0;
+        $data['contentView'] = 'personal/vSolicitudHonorarios';
+        $this->_renderView($data);
+    }
 
     public function SolicitudContrato()
     {
