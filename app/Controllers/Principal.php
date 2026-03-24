@@ -2877,6 +2877,113 @@ class Principal extends BaseController
         $this->_renderView($data);
     }
 
+    public function guardarSolicitudHonorarios()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error al guardar la solicitud';
+
+        $post = $this->request->getPost();
+        $id_solicitud_honorario = $post['id_solicitud_honorario'] ?? ($post['id_solicitud_honorarios'] ?? null);
+
+        $dataInsert = [
+            'responsable_proyecto' => $post['responsable_proyecto'] ?? null,
+            'area' => $post['area'] ?? null,
+            'informes_rendir' => $post['informes_rendir'] ?? null,
+            'vigencia_inicio' => $post['vigencia_inicio'] ?? null,
+            'vigencia_fin' => $post['vigencia_fin'] ?? null,
+            'clave_presupuestal' => $post['clave_presupuestal'] ?? null,
+            'partida' => $post['partida'] ?? null,
+            'monto_total_contrato' => $post['monto_total_contrato'] ?? null,
+            'nombre_prestador' => $post['nombre_prestador'] ?? null,
+            'rfc_prestador' => $post['rfc_prestador'] ?? null,
+            'domicilio_prestador' => $post['domicilio_prestador'] ?? null,
+            'autorizacion_sfia' => !empty($post['autorizacion_sfia']) ? 1 : 0,
+            'justificacion_oficial' => !empty($post['justificacion_oficial']) ? 1 : 0,
+            'cedula_rfc' => !empty($post['cedula_rfc']) ? 1 : 0,
+            'comprobante_domicilio' => !empty($post['comprobante_domicilio']) ? 1 : 0,
+            'autorizacion_datos' => !empty($post['autorizacion_datos']) ? 1 : 0,
+        ];
+
+        $dataConfig = ["tabla" => "solicitud_honorario", "editar" => false];
+        $script = 'Principal.php/guardarSolicitudHonorarios';
+
+        if ($id_solicitud_honorario) {
+            $dataConfig = [
+                "tabla" => "solicitud_honorario",
+                "editar" => true,
+                "idEditar" => ['id_solicitud_honorario' => $id_solicitud_honorario]
+            ];
+            $dataInsert['usu_act'] = $session->id_usuario ?? 0;
+            $dataInsert['fec_act'] = date('Y-m-d H:i:s');
+        } else {
+            $dataInsert['usu_reg'] = $session->id_usuario ?? 0;
+            $dataInsert['fec_reg'] = date('Y-m-d H:i:s');
+        }
+
+        $dataBitacora = ['id_user' => $session->id_usuario ?? 0, 'script' => $script];
+        $res = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+
+        if ($res->error) {
+            $response->respuesta = $res->respuesta;
+            return $this->respond($response);
+        }
+
+        $id_solicitud = $id_solicitud_honorario ? $id_solicitud_honorario : ($res->idRegistro ?? null);
+
+        if (!$id_solicitud) {
+            $response->respuesta = 'No fue posible identificar la solicitud guardada';
+            return $this->respond($response);
+        }
+
+        if ($id_solicitud_honorario) {
+            $globals->saveTabla(
+                ['visible' => 0],
+                [
+                    "tabla" => "actividades_honorario",
+                    "editar" => true,
+                    "idEditar" => ['id_solicitud_honorario' => $id_solicitud_honorario]
+                ],
+                ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/eliminarActividadesHonorario']
+            );
+        }
+
+        $actividades = $post['actividades'] ?? [];
+        foreach ($actividades as $actividad) {
+            $actividad = trim((string) $actividad);
+            if ($actividad === '') {
+                continue;
+            }
+
+            $dataActividad = [
+                'id_solicitud_honorario' => $id_solicitud,
+                'actividad' => $actividad,
+                'visible' => 1,
+                'usu_reg' => $session->id_usuario ?? 0,
+                'fec_reg' => date('Y-m-d H:i:s')
+            ];
+
+            $resActividad = $globals->saveTabla(
+                $dataActividad,
+                ["tabla" => "actividades_honorario", "editar" => false],
+                ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/guardarSolicitudHonorarios']
+            );
+
+            if ($resActividad->error) {
+                $response->respuesta = $resActividad->respuesta;
+                return $this->respond($response);
+            }
+        }
+
+        $response->error = false;
+        $response->respuesta = 'Solicitud guardada correctamente';
+        $response->id_solicitud_honorario = $id_solicitud;
+
+        return $this->respond($response);
+    }
+
     public function SolicitudContrato()
     {
         $session = \Config\Services::session();

@@ -43,7 +43,7 @@ $soportes = [
                     <div class="card">
                         <div class="card-body">
                             <form id="form_solicitud_honorarios" enctype="multipart/form-data">
-                                <input type="hidden" name="id_solicitud_honorarios" value="<?= isset($solicitud) ? $solicitud->id_solicitud_honorarios : '' ?>">
+                                <input type="hidden" name="id_solicitud_honorario" value="<?= isset($solicitud) ? ($solicitud->id_solicitud_honorario ?? $solicitud->id_solicitud_honorarios ?? '') : '' ?>">
 
                                 <div class="table-responsive honorarios-sheet-wrap">
                                     <table class="table table-bordered honorarios-table mb-0">
@@ -472,11 +472,50 @@ $soportes = [
 
         $('#form_solicitud_honorarios').on('submit', function(e) {
             e.preventDefault();
-            Swal.fire({
-                icon: 'info',
-                title: 'No implementado',
-                text: 'La funcionalidad de guardar esta solicitud aun no se ha implementado en el backend.',
-                showConfirmButton: true
+
+            var formData = new FormData(this);
+            var btnSubmit = $(this).find('button[type="submit"]');
+
+            btnSubmit.prop('disabled', true);
+            btnSubmit.html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+
+            $.ajax({
+                url: '<?= base_url("index.php/Principal/guardarSolicitudHonorarios") ?>',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function(data) {
+                    if (!data.error) {
+                        $('input[name="id_solicitud_honorario"]').val(data.id_solicitud_honorario || '');
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Solicitud guardada correctamente',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Error: ' + data.respuesta,
+                            showConfirmButton: true
+                        });
+                    }
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Ocurrio un error al procesar la solicitud.',
+                        showConfirmButton: true
+                    });
+                },
+                complete: function() {
+                    btnSubmit.prop('disabled', false);
+                    btnSubmit.html('<i class="mdi mdi-content-save"></i> Guardar Solicitud Honorarios');
+                }
             });
         });
     });
