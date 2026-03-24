@@ -6914,7 +6914,7 @@ class Principal extends BaseController
         $globals = new Mglobal;
         $id_reserva = $this->request->getPost('id_reserva');
         if($session->get('id_usuario') == 80){
-            $this->enviarEmail(0);
+            $this->enviarEmail(1);
         }
         $data = [];
         if (!empty($id_reserva)) {

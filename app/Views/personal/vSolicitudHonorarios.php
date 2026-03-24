@@ -1,18 +1,39 @@
+<?php
+$actividadesGuardadas = [];
+if (isset($solicitud)) {
+    foreach ((array) $solicitud as $key => $value) {
+        if (strpos($key, 'actividad_') === 0 && trim((string) $value) !== '') {
+            $actividadesGuardadas[] = $value;
+        }
+    }
+}
+if (empty($actividadesGuardadas)) {
+    $actividadesGuardadas = [''];
+}
+
+$soportes = [
+    'Autorizacion SFIA' => 'autorizacion_sfia',
+    'Justificacion Oficial' => 'justificacion_oficial',
+    'Cedula de Registro Federal de Contribuyentes' => 'cedula_rfc',
+    'Comprobante de domicilio' => 'comprobante_domicilio',
+    'Autorizacion de tratamiento datos' => 'autorizacion_datos',
+];
+?>
+
 <div class="page-wrapper">
     <div class="page-content-tab">
         <div class="container-fluid">
-            <!-- Page-Title -->
             <div class="row">
                 <div class="col-sm-12">
                     <div class="page-title-box">
                         <div class="float-right">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="javascript:void(0);">SUSI</a></li>
-                                <li class="breadcrumb-item"><a href="javascript:void(0);">Jurídico</a></li>
-                                <li class="breadcrumb-item active">Solicitud de Pago de Honorarios</li>
+                                <li class="breadcrumb-item"><a href="javascript:void(0);">Jur&iacute;dico</a></li>
+                                <li class="breadcrumb-item active">Solicitud Honorarios</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Solicitud de Pago de Honorarios</h4>
+                        <h4 class="page-title">Solicitud de Elaboraci&oacute;n de Contrato por Honorarios</h4>
                     </div>
                 </div>
             </div>
@@ -21,130 +42,154 @@
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-body">
-                            <div class="text-center mb-4">
-                                <h4 class="mt-0">DIRECCIÓN GENERAL JURÍDICA (DGJ-1)</h4>
-                                <h5>SOLICITUD DE PAGO DE HONORARIOS</h5>
-                            </div>
-                            
                             <form id="form_solicitud_honorarios" enctype="multipart/form-data">
                                 <input type="hidden" name="id_solicitud_honorarios" value="<?= isset($solicitud) ? $solicitud->id_solicitud_honorarios : '' ?>">
-                                
-                                <!-- SECCION I: LUGAR, FECHA Y TIPO DE SOLICITUD -->
-                                <h5 class="bg-primary text-white p-2">I. LUGAR, FECHA Y TIPO DE SOLICITUD</h5>
-                                
-                                <div class="form-row">
-                                    <div class="col-md-6 mb-3">
-                                        <label>Lugar de expedición:</label>
-                                        <input type="text" class="form-control" name="lugar_expedicion" value="<?= isset($solicitud) ? $solicitud->lugar_expedicion : 'Silao, Gto.' ?>" required>
-                                    </div>
-                                    <div class="col-md-2 mb-3">
-                                        <label>Día:</label>
-                                        <input type="text" class="form-control text-center" name="dia" value="<?= date('d') ?>" readonly>
-                                    </div>
-                                    <div class="col-md-2 mb-3">
-                                        <label>Mes:</label>
-                                        <input type="text" class="form-control text-center" name="mes" value="<?= date('m') ?>" readonly>
-                                    </div>
-                                    <div class="col-md-2 mb-3">
-                                        <label>Año:</label>
-                                        <input type="text" class="form-control text-center" name="anio" value="<?= date('Y') ?>" readonly>
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="col-md-6 mb-3">
-                                        <label>Tipo de solicitud:</label>
-                                        <select class="form-control" name="tipo_solicitud" required>
-                                            <option value="">Seleccione el tipo</option>
-                                            <option value="Honorario asimilado" <?= (isset($solicitud) && $solicitud->tipo_solicitud == 'Honorario asimilado') ? 'selected' : '' ?>>Honorario asimilado</option>
-                                            <option value="Honorario puro" <?= (isset($solicitud) && $solicitud->tipo_solicitud == 'Honorario puro') ? 'selected' : '' ?>>Honorario puro</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label>Núm de contrato:</label>
-                                        <input type="text" class="form-control" name="num_contrato" value="<?= isset($solicitud) ? $solicitud->num_contrato : '' ?>" required>
-                                    </div>
-                                </div>
 
-                                <!-- SECCION II: DATOS DEL PRESTADOR DE SERVICIOS -->
-                                <h5 class="bg-primary text-white p-2 mt-4">II. DATOS DEL PRESTADOR DE SERVICIOS</h5>
-                                <div class="form-group row">
-                                    <label class="col-sm-2 col-form-label">Nombre:</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" class="form-control" name="nombre_prestador" value="<?= isset($solicitud) ? $solicitud->nombre_prestador : '' ?>" required>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-sm-2 col-form-label">RFC:</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" class="form-control" name="rfc_prestador" value="<?= isset($solicitud) ? $solicitud->rfc_prestador : '' ?>" required>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-sm-2 col-form-label">Periodo de pago:</label>
-                                    <div class="col-sm-1 text-right">Del:</div>
-                                    <div class="col-sm-4">
-                                        <input type="date" class="form-control" name="periodo_del" value="<?= isset($solicitud) ? $solicitud->periodo_del : '' ?>" required>
-                                    </div>
-                                    <div class="col-sm-1 text-right">Al:</div>
-                                    <div class="col-sm-4">
-                                        <input type="date" class="form-control" name="periodo_al" value="<?= isset($solicitud) ? $solicitud->periodo_al : '' ?>" required>
-                                    </div>
-                                </div>
+                                <div class="table-responsive honorarios-sheet-wrap">
+                                    <table class="table table-bordered honorarios-table mb-0">
+                                        <tr>
+                                            <td colspan="3" class="sheet-title">
+                                                <div>SOLICITUD DE ELABORACI&Oacute;N DE CONTRATO DE PRESTACI&Oacute;N DE SERVICIOS</div>
+                                                <div>PERSONALES POR HONORARIOS ASIMILADOS A SALARIOS</div>
+                                                <div class="sheet-subtitle">DIRECCI&Oacute;N GENERAL JUR&Iacute;DICA</div>
+                                                <div class="sheet-code">DGJ-4</div>
+                                            </td>
+                                        </tr>
 
-                                <!-- SECCION III: IMPORTE -->
-                                <h5 class="bg-primary text-white p-2 mt-4">III. IMPORTE</h5>
-                                <div class="bg-light p-3 border rounded">
-                                    <div class="row align-items-center mb-3">
-                                        <div class="col-md-8 text-right font-weight-bold">Importe Neto :  $</div>
-                                        <div class="col-md-4">
-                                            <input type="text" class="form-control text-right font-weight-bold" id="importe_neto_display" readonly value="0.00">
-                                        </div>
-                                    </div>
+                                        <tr><td colspan="3" class="section-title">INFORMACI&Oacute;N DEL CONTRATO</td></tr>
+                                        <tr>
+                                            <td class="label-cell">Responsable del Proyecto</td>
+                                            <td colspan="2" class="field-cell">
+                                                <select class="form-control form-control-sm select2 field-input" id="responsable_proyecto" name="responsable_proyecto">
+                                                    <option value="">Seleccione una opci&oacute;n</option>
+                                                    <?php foreach ($direccion as $u): ?>
+                                                        <option
+                                                            value="<?= $u->id_usuario ?>"
+                                                            data-area="<?= esc($u->dsc_area ?? '', 'attr') ?>"
+                                                            <?= (isset($solicitud) && isset($solicitud->responsable_proyecto) && $solicitud->responsable_proyecto == $u->id_usuario) ? 'selected' : '' ?>
+                                                        >
+                                                            <?= esc($u->nombre_completo . ' - ' . ($u->dsc_puesto ?? '')) ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="label-cell">&Aacute;rea</td>
+                                            <td colspan="2" class="field-cell">
+                                                <input type="text" class="form-control form-control-sm field-input" id="area" name="area" value="<?= isset($solicitud->area) ? esc($solicitud->area) : '' ?>">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="label-cell">Informes a rendir</td>
+                                            <td colspan="2" class="field-cell">
+                                                <input type="text" class="form-control form-control-sm field-input" name="informes_rendir" value="<?= isset($solicitud->informes_rendir) ? esc($solicitud->informes_rendir) : '' ?>">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="label-cell">Vigencia</td>
+                                            <td colspan="2" class="field-cell">
+                                                <div class="inline-fields">
+                                                    <input type="date" class="form-control form-control-sm field-input" name="vigencia_inicio" value="<?= isset($solicitud->vigencia_inicio) ? esc($solicitud->vigencia_inicio) : '' ?>">
+                                                    <span class="inline-separator">al</span>
+                                                    <input type="date" class="form-control form-control-sm field-input" name="vigencia_fin" value="<?= isset($solicitud->vigencia_fin) ? esc($solicitud->vigencia_fin) : '' ?>">
+                                                </div>
+                                            </td>
+                                        </tr>
 
-                                    <table class="table table-bordered mb-0 bg-white">
-                                        <tbody>
+                                        <tr><td colspan="3" class="section-title">ACTIVIDADES A REALIZAR</td></tr>
+                                        <tr class="activity-header">
+                                            <td class="label-cell text-center" style="width: 9%;">No.</td>
+                                            <td colspan="2" class="label-cell text-center">Actividad</td>
+                                        </tr>
+                                        <tbody id="actividades_body">
+                                        <?php foreach ($actividadesGuardadas as $index => $actividad): ?>
                                             <tr>
-                                                <td class="align-middle font-weight-bold" style="width: 30%;">HONORARIO BRUTO</td>
-                                                <td><input type="number" step="0.01" class="form-control text-right importe-calc" id="honorario_bruto" name="honorario_bruto" value="<?= isset($solicitud) ? $solicitud->honorario_bruto : '' ?>" required></td>
+                                                <td class="field-cell text-center activity-index"><?= $index + 1 ?></td>
+                                                <td colspan="2" class="field-cell activity-cell">
+                                                    <textarea class="form-control form-control-sm field-input activity-input" name="actividades[]"><?= esc($actividad) ?></textarea>
+                                                </td>
                                             </tr>
-                                            <tr>
-                                                <td class="align-middle text-danger font-weight-bold">MENOS (-)</td>
-                                                <td></td>
-                                            </tr>
-                                            <tr>
-                                                <td class="align-middle">RETENCIÓN ISR</td>
-                                                <td><input type="number" step="0.01" class="form-control text-right importe-calc" id="retencion_isr" name="retencion_isr" value="<?= isset($solicitud) ? $solicitud->retencion_isr : '' ?>"></td>
-                                            </tr>
-                                            <tr>
-                                                <td class="align-middle">RETENCIÓN IVA</td>
-                                                <td><input type="number" step="0.01" class="form-control text-right importe-calc" id="retencion_iva" name="retencion_iva" value="<?= isset($solicitud) ? $solicitud->retencion_iva : '' ?>"></td>
-                                            </tr>
-                                            <tr>
-                                                <td class="align-middle">OTROS</td>
-                                                <td><input type="number" step="0.01" class="form-control text-right importe-calc" id="otros" name="otros" value="<?= isset($solicitud) ? $solicitud->otros : '' ?>"></td>
-                                            </tr>
-                                            <tr class="bg-light">
-                                                <td class="align-middle font-weight-bold text-primary">IGUAL (=)</td>
-                                                <td></td>
-                                            </tr>
-                                            <tr>
-                                                <td class="align-middle font-weight-bold">IMPORTE NETO</td>
-                                                <td><input type="text" class="form-control text-right font-weight-bold" id="importe_neto" name="importe_neto" value="<?= isset($solicitud) ? $solicitud->importe_neto : '' ?>" readonly></td>
-                                            </tr>
+                                        <?php endforeach; ?>
                                         </tbody>
+                                        <tr>
+                                            <td colspan="3" class="text-right">
+                                                <button type="button" class="btn btn-secondary btn-sm" id="agregar_actividad">+ Agregar actividad</button>
+                                            </td>
+                                        </tr>
+
+                                        <tr><td colspan="3" class="section-title">INFORMACI&Oacute;N PRESUPUESTAL</td></tr>
+                                        <tr class="activity-header">
+                                            <td class="label-cell text-center">Clave presupuestal</td>
+                                            <td class="label-cell text-center">N&uacute;mero y nombre de la Partida</td>
+                                            <td class="label-cell text-center">Monto total del Contrato</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="field-cell">
+                                                <input type="text" class="form-control form-control-sm field-input" name="clave_presupuestal" value="<?= isset($solicitud->clave_presupuestal) ? esc($solicitud->clave_presupuestal) : '' ?>">
+                                            </td>
+                                            <td class="field-cell">
+                                                <select class="form-control form-control-sm select2 field-input" name="partida">
+                                                    <option value="">Seleccione una opci&oacute;n</option>
+                                                    <?php foreach ($cat_partida as $p): ?>
+                                                        <option value="<?= $p->id_partida ?>" <?= (isset($solicitud) && isset($solicitud->partida) && $solicitud->partida == $p->id_partida) ? 'selected' : '' ?>>
+                                                            <?= esc(($p->cuenta_cable ?? '') . ' - ' . ($p->partida ?? $p->cuenta_cable ?? '')) ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </td>
+                                            <td class="field-cell">
+                                                <input type="number" step="0.01" class="form-control form-control-sm field-input" id="monto_total_contrato" name="monto_total_contrato" value="<?= isset($solicitud->monto_total_contrato) ? esc($solicitud->monto_total_contrato) : '' ?>">
+                                            </td>
+                                        </tr>
+
+                                        <tr><td colspan="3" class="section-title">INFORMACI&Oacute;N DEL PRESTADOR DE SERVICIOS PERSONALES POR HONORARIOS</td></tr>
+                                        <tr>
+                                            <td class="label-cell">Nombre Completo Prestaci&oacute;n de Servicios</td>
+                                            <td colspan="2" class="field-cell">
+                                                <input type="text" class="form-control form-control-sm field-input" name="nombre_prestador" value="<?= isset($solicitud->nombre_prestador) ? esc($solicitud->nombre_prestador) : '' ?>">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="label-cell">RFC</td>
+                                            <td colspan="2" class="field-cell">
+                                                <input type="text" class="form-control form-control-sm field-input" name="rfc_prestador" value="<?= isset($solicitud->rfc_prestador) ? esc($solicitud->rfc_prestador) : '' ?>">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="label-cell">Domicilio</td>
+                                            <td colspan="2" class="field-cell">
+                                                <input type="text" class="form-control form-control-sm field-input" name="domicilio_prestador" value="<?= isset($solicitud->domicilio_prestador) ? esc($solicitud->domicilio_prestador) : '' ?>">
+                                            </td>
+                                        </tr>
+
+                                        <tr><td colspan="3" class="section-title">SOPORTE DOCUMENTAL</td></tr>
+                                        <?php $chunked = array_chunk($soportes, 3, true); ?>
+                                        <?php foreach ($chunked as $row): ?>
+                                            <tr>
+                                                <?php foreach ($row as $label => $name): ?>
+                                                    <td class="support-cell">
+                                                        <label class="support-option">
+                                                            <input type="checkbox" name="<?= $name ?>" value="1" <?= (!empty($solicitud) && !empty($solicitud->$name)) ? 'checked' : '' ?>>
+                                                            <span><?= esc($label) ?></span>
+                                                        </label>
+                                                    </td>
+                                                <?php endforeach; ?>
+                                                <?php for ($fill = count($row); $fill < 3; $fill++): ?>
+                                                    <td class="support-cell"></td>
+                                                <?php endfor; ?>
+                                            </tr>
+                                        <?php endforeach; ?>
+
+                                     <
                                     </table>
-                                    
-                                    <div class="mt-3">
-                                        <input type="text" class="form-control text-center text-uppercase font-weight-bold" id="importe_neto_letra" name="importe_neto_letra" readonly placeholder="CANTIDAD EN LETRAS">
-                                    </div>
-                                </div>
-                                
-                                <div class="row mt-4">
-                                    <div class="col-12 text-center">
-                                        <button type="submit" class="btn btn-success btn-lg"><i class="mdi mdi-content-save"></i> Guardar Solicitud Honorarios</button>
-                                    </div>
                                 </div>
 
+                                <div class="text-center mt-4">
+                                    <button type="submit" class="btn btn-success btn-lg">
+                                        <i class="mdi mdi-content-save"></i> Guardar Solicitud Honorarios
+                                    </button>
+                                </div>
                             </form>
                         </div>
                     </div>
@@ -154,13 +199,204 @@
     </div>
 </div>
 
+<style>
+    .honorarios-sheet-wrap {
+        width: 100%;
+        background: #fff;
+        overflow-x: auto;
+    }
+
+    .honorarios-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 900px;
+        table-layout: fixed;
+        margin-bottom: 0;
+    }
+
+    .honorarios-table td {
+        border: 1px solid #000;
+        padding: 4px 6px;
+        vertical-align: middle;
+        font-size: 12px;
+        line-height: 1.1;
+    }
+
+    .sheet-title,
+    .section-title {
+        background: #1f4e79;
+        color: #fff;
+        text-align: center;
+        font-weight: 700;
+    }
+
+    .sheet-title {
+        padding: 14px 8px;
+        font-size: 16px;
+        line-height: 1.3;
+    }
+
+    .sheet-subtitle,
+    .sheet-code {
+        font-size: 13px;
+        margin-top: 3px;
+    }
+
+    .section-title {
+        font-size: 14px;
+        padding: 3px 8px;
+    }
+
+    .label-cell {
+        font-weight: 700;
+        text-align: center;
+        background: #fafafa;
+    }
+
+    .field-cell {
+        background: #fff;
+    }
+
+    .field-input {
+        border: 0;
+        border-radius: 0;
+        box-shadow: none !important;
+        padding: 4px 6px;
+        min-height: 30px;
+        font-size: 12px;
+        width: 100%;
+        background: transparent;
+    }
+
+    .field-input:focus {
+        border: 0;
+        background: #f6fbff;
+    }
+
+    .select2-container--default .select2-selection--single {
+        border: 0 !important;
+        border-radius: 0 !important;
+        min-height: 30px;
+        background: transparent !important;
+    }
+
+    .select2-container .select2-selection--single .select2-selection__rendered {
+        line-height: 30px;
+        font-size: 12px;
+        padding-left: 6px;
+    }
+
+    .select2-container .select2-selection--single .select2-selection__arrow {
+        height: 30px;
+    }
+
+    .inline-fields {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .inline-separator {
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .activity-cell {
+        padding: 0;
+    }
+
+    .activity-row-wrap {
+        display: flex;
+        align-items: stretch;
+        gap: 8px;
+        padding: 4px;
+    }
+
+    .activity-input {
+        resize: none;
+        height: 72px;
+        flex: 1;
+    }
+
+    .remove-activity {
+        align-self: center;
+        white-space: nowrap;
+    }
+
+    .activity-index {
+        font-weight: 700;
+        background: #fafafa;
+    }
+
+    .activity-header td {
+        background: #f0f0f0;
+    }
+
+    .support-cell {
+        padding: 8px 6px;
+        min-height: 42px;
+    }
+
+    .support-option {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 6px;
+        margin: 0;
+        font-size: 12px;
+        text-align: left;
+    }
+
+    .validation-cell {
+        position: relative;
+        height: 180px;
+        padding: 0;
+    }
+
+    .validation-grid {
+        position: absolute;
+        inset: 0;
+        background-image:
+            linear-gradient(to right, rgba(31, 78, 121, 0.12) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(31, 78, 121, 0.12) 1px, transparent 1px);
+        background-size: 16px 16px;
+    }
+
+    .signature-block {
+        position: absolute;
+        left: 50%;
+        bottom: 12px;
+        transform: translateX(-50%);
+        width: 280px;
+        text-align: center;
+        z-index: 1;
+    }
+
+    .signature-line {
+        border-top: 1px solid #000;
+        margin-bottom: 4px;
+    }
+
+    .signature-name,
+    .signature-role {
+        font-weight: 700;
+        font-size: 12px;
+        line-height: 1.2;
+    }
+
+    @media (max-width: 991px) {
+        .honorarios-table {
+            min-width: 760px;
+        }
+    }
+</style>
+
 <link href="<?= base_url() ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 <link href="<?= base_url() ?>assets/css/jquery-ui.min.css" rel="stylesheet">
 <link href="<?= base_url() ?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
 <link href="<?= base_url() ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
 <link href="<?= base_url() ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
 <link href="<?= base_url() ?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
-<!-- jQuery  -->
 <script src="<?= base_url() ?>assets/js/jquery.min.js"></script>
 <script src="<?= base_url() ?>assets/js/jquery-ui.min.js"></script>
 <script src="<?= base_url() ?>assets/js/bootstrap.bundle.min.js"></script>
@@ -171,144 +407,75 @@
 <script src="<?= base_url() ?>plugins/select2/select2.min.js"></script>
 
 <script>
-    function numeroALetras(amount) {
-        if (amount == 0) return "(CERO PESOS 00/100 M.N.)";
-        var pesos = Math.floor(amount);
-        var centavos = Math.round((amount - pesos) * 100);
-        var letras = "";
-
-        if (pesos == 0) letras = "CERO";
-        else if (pesos == 1) letras = "UN";
-        else letras = convertirGrupo(pesos);
-
-        return ("(" + letras + " PESOS " + (centavos < 10 ? "0" : "") + centavos + "/100 M.N.)").toUpperCase();
-    }
-
-    function convertirGrupo(n) {
-        var output = "";
-        if (n == 100) output = "CIEN";
-        else if (n > 100 && n < 1000) output = centenas(n);
-        else if (n >= 1000 && n < 1000000) {
-            var miles = Math.floor(n / 1000);
-            var resto = n % 1000;
-            output = (miles == 1 ? "UN" : convertirGrupo(miles)) + " MIL" + (resto > 0 ? " " + convertirGrupo(resto) : "");
-        } else if (n >= 1000000) {
-            var millones = Math.floor(n / 1000000);
-            var resto = n % 1000000;
-            output = (millones == 1 ? "UN MILLON" : convertirGrupo(millones) + " MILLONES") + (resto > 0 ? " " + convertirGrupo(resto) : "");
-        } else {
-            output = centenas(n);
-        }
-        return output;
-    }
-
-    function centenas(n) {
-        var centenas = Math.floor(n / 100);
-        var decenas = n % 100;
-        var output = "";
-        
-        switch (centenas) {
-            case 1: output = (decenas > 0 ? "CIENTO" : "CIEN"); break;
-            case 2: output = "DOSCIENTOS"; break;
-            case 3: output = "TRESCIENTOS"; break;
-            case 4: output = "CUATROCIENTOS"; break;
-            case 5: output = "QUINIENTOS"; break;
-            case 6: output = "SEISCIENTOS"; break;
-            case 7: output = "SETECIENTOS"; break;
-            case 8: output = "OCHOCIENTOS"; break;
-            case 9: output = "NOVECIENTOS"; break;
-        }
-        
-        if (decenas > 0) output += (output ? " " : "") + dec(decenas);
-        return output;
-    }
-
-    function dec(n) {
-        if (n < 10) return unidades(n);
-        var output = "";
-        if (n >= 10 && n <= 29) {
-            switch (n) {
-                case 10: output = "DIEZ"; break;
-                case 11: output = "ONCE"; break;
-                case 12: output = "DOCE"; break;
-                case 13: output = "TRECE"; break;
-                case 14: output = "CATORCE"; break;
-                case 15: output = "QUINCE"; break;
-                case 16: output = "DIECISEIS"; break;
-                case 17: output = "DIECISIETE"; break;
-                case 18: output = "DIECIOCHO"; break;
-                case 19: output = "DIECINUEVE"; break;
-                case 20: output = "VEINTE"; break;
-                case 21: output = "VEINTIUNO"; break;
-                case 22: output = "VEINTIDOS"; break;
-                case 23: output = "VEINTITRES"; break;
-                case 24: output = "VEINTICUATRO"; break;
-                case 25: output = "VEINTICINCO"; break;
-                case 26: output = "VEINTISEIS"; break;
-                case 27: output = "VEINTISIETE"; break;
-                case 28: output = "VEINTIOCHO"; break;
-                case 29: output = "VEINTINUEVE"; break;
-            }
-        } else {
-             var d = Math.floor(n / 10);
-             var u = n % 10;
-             switch(d) {
-                 case 3: output = "TREINTA"; break;
-                 case 4: output = "CUARENTA"; break;
-                 case 5: output = "CINCUENTA"; break;
-                 case 6: output = "SESENTA"; break;
-                 case 7: output = "SETENTA"; break;
-                 case 8: output = "OCHENTA"; break;
-                 case 9: output = "NOVENTA"; break;
-             }
-             if (u > 0) output += " Y " + unidades(u);
-        }
-        return output;
-    }
-
-    function unidades(n) {
-        switch(n) {
-            case 1: return "UN";
-            case 2: return "DOS";
-            case 3: return "TRES";
-            case 4: return "CUATRO";
-            case 5: return "CINCO";
-            case 6: return "SEIS";
-            case 7: return "SIETE";
-            case 8: return "OCHO";
-            case 9: return "NUEVE";
-        }
-        return "";
-    }
-
-    function calcularImporteNeto() {
-        var bruto = parseFloat($('#honorario_bruto').val()) || 0;
-        var isr = parseFloat($('#retencion_isr').val()) || 0;
-        var iva = parseFloat($('#retencion_iva').val()) || 0;
-        var otros = parseFloat($('#otros').val()) || 0;
-        
-        var neto = bruto - isr - iva - otros;
-        
-        $('#importe_neto').val(neto.toFixed(2));
-        $('#importe_neto_display').val(neto.toFixed(2));
-        $('#importe_neto_letra').val(numeroALetras(neto));
-    }
-
     $(document).ready(function() {
-        // Initial Calculation
-        calcularImporteNeto();
-        
-        $('.importe-calc').on('input', function() {
-            calcularImporteNeto();
+        $('.select2').select2({
+            width: '100%'
         });
+
+        function renumerarActividades() {
+            $('#actividades_body tr').each(function(index) {
+                $(this).find('.activity-index').text(index + 1);
+            });
+        }
+
+        function agregarFilaActividad(valor) {
+            var contenido = valor || '';
+            var fila = `
+                <tr>
+                    <td class="field-cell text-center activity-index"></td>
+                    <td colspan="2" class="field-cell activity-cell">
+                        <div class="activity-row-wrap">
+                            <textarea class="form-control form-control-sm field-input activity-input" name="actividades[]">${contenido}</textarea>
+                            <button type="button" class="btn btn-danger btn-sm remove-activity">Quitar</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            $('#actividades_body').append(fila);
+            renumerarActividades();
+        }
+
+        function actualizarArea() {
+            var areaSeleccionada = $('#responsable_proyecto option:selected').data('area') || '';
+            if (!$('#area').val()) {
+                $('#area').val(areaSeleccionada);
+            }
+        }
+
+        actualizarArea();
+
+        $('#responsable_proyecto').on('change', function() {
+            var areaSeleccionada = $(this).find('option:selected').data('area') || '';
+            $('#area').val(areaSeleccionada);
+        });
+
+        $('#agregar_actividad').on('click', function() {
+            agregarFilaActividad('');
+        });
+
+        $(document).on('click', '.remove-activity', function() {
+            if ($('#actividades_body tr').length === 1) {
+                $(this).closest('tr').find('textarea').val('');
+                return;
+            }
+            $(this).closest('tr').remove();
+            renumerarActividades();
+        });
+
+        $('#actividades_body tr').each(function(index) {
+            if (index > 0) {
+                $(this).find('.activity-cell').wrapInner('<div class="activity-row-wrap"></div>');
+                $(this).find('.activity-row-wrap').append('<button type="button" class="btn btn-danger btn-sm remove-activity">Quitar</button>');
+            }
+        });
+        renumerarActividades();
 
         $('#form_solicitud_honorarios').on('submit', function(e) {
             e.preventDefault();
-            // Implement saving logic
             Swal.fire({
                 icon: 'info',
                 title: 'No implementado',
-                text: 'La funcionalidad de guardar esta solicitud aún no se ha implementado en el backend.',
+                text: 'La funcionalidad de guardar esta solicitud aun no se ha implementado en el backend.',
                 showConfirmButton: true
             });
         });
