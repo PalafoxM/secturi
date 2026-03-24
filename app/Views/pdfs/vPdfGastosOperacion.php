@@ -138,58 +138,81 @@
         <tbody>
              <?php 
                 $rows = isset($periodo_factura_rows) ? $periodo_factura_rows : [];
-                if(empty($rows)) $rows = [(object)['encabezado' => '', 'proyecto' => '', 'partida' => '', 'importe' => '0.00', 'no_comprobante' => '']];
+                $detalleRows = [];
+
+                if (!empty($rows)) {
+                    foreach ($rows as $r) {
+                        $detalleRows[] = [
+                            'comprobante' => $r->no_comprobante ?? '',
+                            'proyecto' => $r->proyecto ?? '',
+                            'partida' => $r->partida ?? '',
+                            'importe' => '$' . number_format((float)str_replace(',', '', $r->importe ?? 0) + (float)str_replace(',', '', $r->propinas ?? 0), 2),
+                            'proveedor' => $r->proveedor ?? '',
+                            'rfc' => $r->rfc ?? '',
+                            'tipo' => 'principal'
+                        ];
+
+                        if (isset($r->isr) && (float)$r->isr > 0) {
+                            $detalleRows[] = [
+                                'comprobante' => $r->no_comprobante ?? '',
+                                'proyecto' => 'ISR',
+                                'partida' => '',
+                                'importe' => '$' . number_format((float)$r->isr, 2),
+                                'proveedor' =>   $r->proveedor ?? '',
+                                'rfc' => $r->rfc ?? '',
+                                'tipo' => 'retencion'
+                            ];
+                        }
+
+                        if (isset($r->impuesto_local) && (float)$r->impuesto_local > 0) {
+                            $detalleRows[] = [
+                                'comprobante' => $r->no_comprobante ?? '',
+                                'proyecto' => 'IMPUESTO LOCAL RETENIDO',
+                                'partida' => '',
+                                'importe' => '$' . number_format((float)$r->impuesto_local, 2),
+                                'proveedor' => $r->proveedor ?? '',
+                                'rfc' => $r->rfc ?? '',
+                                'tipo' => 'retencion'
+                            ];
+                        }
+                    }
+                }
+
+                if (empty($detalleRows)) {
+                    $detalleRows[] = [
+                        'comprobante' => '',
+                        'proyecto' => '',
+                        'partida' => '',
+                        'importe' => '',
+                        'proveedor' => '',
+                        'rfc' => '',
+                        'tipo' => 'vacio'
+                    ];
+                }
+
+                $minRows = 10;
+                while (count($detalleRows) < $minRows) {
+                    $detalleRows[] = [
+                        'comprobante' => '',
+                        'proyecto' => '',
+                        'partida' => '',
+                        'importe' => '',
+                        'proveedor' => '',
+                        'rfc' => '',
+                        'tipo' => 'vacio'
+                    ];
+                }
             ?>
-            <tr style="height: 450px;">
-                <td style="vertical-align: top; text-align: center; font-weight: bold;">
-                    <?php foreach($rows as $r): ?>
-                        <div style="height: 50px; overflow: hidden;"><?= $r->no_comprobante ?? '' ?></div>
-                    <?php endforeach; ?>
-                </td>
-                <td style="vertical-align: top; text-align: center;">
-                    <?php foreach($rows as $r): ?>
-                        <div style="height: 50px; overflow: hidden;">
-                            <div><?= $r->proyecto ?? '' ?></div>
-                            <?php if(isset($r->isr) && (float)$r->isr > 0): ?>
-                                <div style="font-size: 7.5pt; color: #333; font-weight: normal; margin-top: 2px;">ISR</div>
-                            <?php endif; ?>
-                            <?php if(isset($r->impuesto_local) && (float)$r->impuesto_local > 0): ?>
-                                <div style="font-size: 7.5pt; color: #333; font-weight: normal; margin-top: 2px;">IMPUESTO LOCAL RETENIDO</div>
-                            <?php endif; ?>
-                        </div>
-                    <?php endforeach; ?>
-                </td>
-                <td style="vertical-align: top; text-align: center;">
-                    <?php foreach($rows as $r): ?>
-                        <div style="height: 50px; overflow: hidden;"><?= $r->partida ?? '' ?></div>
-                    <?php endforeach; ?>
-                </td>
-                <td style="vertical-align: top; text-align: center; font-weight: bold;">
-                     <?php foreach($rows as $r): ?>
-                        <div style="height: 50px; overflow: hidden;">
-                            <div style="font-size: 7.5pt;">$<?= number_format((float)str_replace(',', '', $r->importe ?? 0) + (float)str_replace(',', '', $r->propinas ?? 0), 2) ?></div>
-                            <?php if(isset($r->isr) && (float)$r->isr > 0): ?>
-                                <div style="font-size: 7.5pt;">$<?= number_format((float)$r->isr, 2) ?></div>
-                            <?php endif; ?>
-                            <?php if(isset($r->impuesto_local) && (float)$r->impuesto_local > 0): ?>
-                                <div style="font-size: 7.5pt;">$<?= number_format((float)$r->impuesto_local, 2) ?></div>
-                            <?php endif; ?>
-                        </div>
-                    <?php endforeach; ?>
-                </td>
-                
-                <!-- Expanded columns (no nested table) -->
-                <td style="vertical-align: top; padding: 5px;  text-align: center; ">
-                     <?php foreach($rows as $r): ?>
-                        <div style="height: 50px; overflow: hidden;"><?= $r->proveedor ?? '' ?></div>
-                    <?php endforeach; ?>
-                </td>
-                <td style="vertical-align: top; padding: 5px;  text-align: center; ">
-                  <?php foreach($rows as $r): ?>
-                        <div style="height: 50px; overflow: hidden;"><?= $r->rfc ?? '' ?></div>
-                    <?php endforeach; ?>
-                </td>
+            <?php foreach($detalleRows as $detalle): ?>
+            <tr style="height: 26px;">
+                <td style="text-align: center; font-weight: bold;"><?= $detalle['comprobante'] ?></td>
+                <td style="text-align: center;"><?= $detalle['proyecto'] ?></td>
+                <td style="text-align: center;"><?= $detalle['partida'] ?></td>
+                <td style="text-align: center; font-weight: bold;"><?= $detalle['importe'] ?></td>
+                <td style="text-align: center;"><?= $detalle['proveedor'] ?></td>
+                <td style="text-align: center;"><?= $detalle['rfc'] ?></td>
             </tr>
+            <?php endforeach; ?>
         </tbody>
         <!-- TOTALS FOOTER -->
         <tfoot>

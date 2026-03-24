@@ -661,6 +661,9 @@
                                 href="<?php echo base_url(); ?>index.php/Principal/SolicitudAdquisiciones">Solicitud Adquisiciones</a>
                         </li>
                         <li class="nav-item"><a class="nav-link"
+                                href="<?php echo base_url(); ?>index.php/Principal/SolicitudHonorarios">Solicitud Honorarios</a>
+                        </li>
+                        <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Principal/ListaSolicitudConvenio">Listado de Convenios</a>
                         </li>
                          <li class="nav-item"><a class="nav-link"
