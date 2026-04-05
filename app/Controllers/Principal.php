@@ -8481,7 +8481,7 @@ class Principal extends BaseController
     }
     public function pdfFicha()
     {
-        setlocale(LC_TIME, 'es_ES');
+       // setlocale(LC_TIME, 'es_ES');
         $id = $this->request->getGet('id_ficha_tecnica');
         $response = new \stdClass();
         $response->error = true;
@@ -8496,9 +8496,73 @@ class Principal extends BaseController
             die("Ficha no encontrada.");
         }
         
-    
-       $data['ficha'] = $result;
-      // die(var_dump($data['ficha']));
+      
+       $data['em_domicilio']        = $result->em_domicilio;
+       $data['fecha_realizacion']   = $result->fecha_realizacion;
+       $data['nombre_evento']       = $result->nombre_evento;
+       $data['persona_solicitud']   = $result->persona_solicitud;
+       $data['municipio_sede']      = $result->municipio_sede;
+       $data['periodicidad_radio']  = $result->periodicidad_radio;
+       $data['antecedentes']        = $result->antecedentes;
+       $data['objetivo_general']    = $result->objetivo_general;
+       $data['justificacion']       = $result->justificacion;
+       $data['cadena_valor']        = $result->cadena_valor;
+       $data['nivel_habilidades']   = '';
+       $data['estrato']             = !$result->estrato?$result->estrato:'';
+       $data['asistentes_totales']  = $result->asistentes_totales;
+       $data['asistentes_local']    = $result->asistentes_local;
+       $data['asistentes_regional'] = $result->asistentes_regional;
+       $data['asistentes_nacional'] = $result->asistentes_nacional;
+       $data['asistentes_internacional']  = $result->asistentes_internacional;
+       $data['alcance']             = $result->alcance;
+       $data['derrama_total']       = $result->derrama_total;
+       $data['derrama_local']       = $result->derrama_local;
+       $data['derrama_foraneo']     = $result->derrama_foraneo;
+       $data['empleos_mujeres']     = $result->empleos_mujeres;
+       $data['empleos_hombres']     = $result->empleos_hombres;
+       $data['empleos_discapacidad']= $result->empleos_discapacidad;
+       $data['cuota_acceso']        = $result->cuota_acceso;
+       $data['cuantas_cuotas']      = (isset($result->cuantas_cuotas) && !empty($result->cuantas_cuotas))?$result->cuantas_cuotas:'N/A';
+       $data['costo_total']         = (isset($result->costo_total) && !empty($result->costo_total))?$result->costo_total:'N/A';
+       $data['desglose_costo']      = $result->desglose_costo;
+       $data['cantidades_desglose'] = (isset($result->cantidades_desglose) && !empty($result->cantidades_desglose))?$result->cantidades_desglose:'N/A';
+       $data['montos_desglose']     = $result->montos_desglose;
+       $data['antecedentes_evento'] = $result->antecedentes_evento;
+       $data['propuesta_valor']     = $result->propuesta_valor;
+       $data['inclusion_mujeres']   = $result->inclusion_mujeres;
+       $data['programa_preliminar'] = $result->programa_preliminar;
+       $data['otras_actividades']   = $result->otras_actividades;
+       $data['link_web']            = $result->link_web;
+       $data['facebook']            = $result->facebook;
+       $data['fb_seguidores']       = $result->fb_seguidores;
+       $data['twitter']             = $result->twitter;
+       $data['tw_seguidores']       = $result->tw_seguidores;
+       $data['instagram']           = $result->instagram;
+       $data['ig_seguidores']       = $result->ig_seguidores;
+       $data['youtube']             = $result->youtube;
+       $data['yt_seguidores']       = $result->yt_seguidores;
+       $data['tiktok']              = $result->tiktok;
+       $data['tk_seguidores']       = $result->tk_seguidores;
+       $data['co_nombre']           = $result->co_nombre;
+       $data['co_telefono']         = $result->co_telefono;
+       $data['co_razon_social']     = $result->co_razon_social;
+       $data['co_cargo']            = $result->co_cargo;
+       $data['co_celular']          = $result->co_celular;
+       $data['co_domicilio']        = $result->co_domicilio;
+       $data['co_ciudad_estado']    = $result->co_ciudad_estado;
+       $data['co_email']            = $result->co_email;
+       $data['em_nombre']           = $result->em_nombre;
+       $data['em_cargo']            = $result->em_cargo;
+       $data['em_celular']          = $result->em_celular;
+       $data['em_telefono_fijo']    = $result->em_telefono_fijo;
+       $data['em_ciudad_estado']    = $result->em_ciudad_estado;
+       $data['em_email']            = $result->em_email;
+       $data['apoyo_federal']       = $result->apoyo_federal;
+       $data['apoyo_municipal']     = $result->apoyo_municipal;
+       $data['apoyo_estatal']       = $result->apoyo_estatal;
+       $data['descripcion_apoyos']  = $result->descripcion_apoyos;
+     
+      // die(var_dump($data));
         
         $mpdfConfig = [
             'mode' => 'utf-8',
@@ -8513,6 +8577,7 @@ class Principal extends BaseController
         $mpdf = new \Mpdf\Mpdf($mpdfConfig);
         
         $html = view("pdfs/vpdfFicha.php", $data);
+        //die(var_dump($html));
         $mpdf->WriteHTML($html);
         
         $mpdf->Output('Ficha_Tecnica_'.$id.'.pdf', 'I');
