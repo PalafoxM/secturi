@@ -7194,6 +7194,76 @@ class Agregar extends BaseController
         $this->_renderView($data);
     }
 
+    public function listaBucketAws()
+    {
+        $session = \Config\Services::session();
+        $Mglobal = new \App\Models\Mglobal();
+        $s3 = new \App\Libraries\S3Service();
+
+        $busqueda = trim((string) $this->request->getGet('busqueda'));
+        $tipoArchivo = strtoupper(trim((string) $this->request->getGet('tipo_archivo')));
+
+        $consulta = [
+            'tabla' => 'bucketaws',
+            'where' => [
+                'visible' => 1
+            ],
+            'orderBy' => 'id_bucketaws DESC',
+            'limit' => 10
+        ];
+
+        if ($busqueda !== '') {
+            $consulta['orlike'] = [
+                'nombre_archivo' => $busqueda,
+                'descripcion' => $busqueda
+            ];
+        }
+
+        $respuesta = $Mglobal->getTabla($consulta);
+        $archivos = $respuesta->data ?? [];
+
+        foreach ($archivos as $archivo) {
+            $archivo->tipo_archivo = $this->obtenerTipoBucketAws($archivo->ruta_s3 ?? '');
+            $archivo->url_descarga = !empty($archivo->ruta_s3) ? $s3->getPresignedUrl($archivo->ruta_s3, '+20 minutes') : null;
+        }
+
+        if ($tipoArchivo !== '') {
+            $archivos = array_values(array_filter($archivos, function ($archivo) use ($tipoArchivo) {
+                return ($archivo->tipo_archivo ?? '') === $tipoArchivo;
+            }));
+        }
+
+        $data = [];
+        $data['contentView'] = 'aws/vListaBucket';
+        $data['archivos'] = $archivos;
+        $data['filtros'] = [
+            'busqueda' => $busqueda,
+            'tipo_archivo' => $tipoArchivo
+        ];
+        $this->_renderView($data);
+    }
+
+    private function obtenerTipoBucketAws(string $rutaS3): string
+    {
+        if (strpos($rutaS3, 'media/imagenes/') === 0) {
+            return 'IMG';
+        }
+
+        if (strpos($rutaS3, 'media/videos/') === 0) {
+            return 'VIDEO';
+        }
+
+        if (strpos($rutaS3, 'media/audios/') === 0) {
+            return 'AUDIO';
+        }
+
+        if (strpos($rutaS3, 'media/archivos/') === 0) {
+            return 'ARCHIVO';
+        }
+
+        return 'OTRO';
+    }
+
     /**
      * Procesa la subida y guardado de datos en la tabla `bucketaws`
      */
@@ -7205,45 +7275,87 @@ class Agregar extends BaseController
 
         $post = $this->request->getPost();
         $archivo = $this->request->getFile('archivo_s3');
-        
-        if ($archivo && $archivo->isValid() && !$archivo->hasMoved()) {
-            $nuevoNombre = $archivo->getRandomName();
-            $rutaTemporal = $archivo->getTempName();
 
-            // Ruta destino dentro del bucket
-            $rutaS3 = 'media/' . $nuevoNombre;
-            $urlPublica = $s3->uploadFile($rutaTemporal, $rutaS3);
-           // die(var_dump($urlPublica));
-            if ($urlPublica) {
-                // Prepara datos para BD
-                $dataInsert = [
-                    'nombre_archivo' => $post['nombre_archivo'],
-                    'descripcion' => $post['descripcion'],
-                    'id_usuario' => $session->get('id_usuario'),
-                    'ruta_s3' => $rutaS3
-                ];
+        $tiposArchivo = [
+            'IMG' => [
+                'carpeta' => 'imagenes',
+                'extensiones' => ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'],
+            ],
+            'VIDEO' => [
+                'carpeta' => 'videos',
+                'extensiones' => ['mp4', 'mov', 'avi', 'mkv', 'webm'],
+            ],
+            'ARCHIVO' => [
+                'carpeta' => 'archivos',
+                'extensiones' => ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'zip', 'rar'],
+            ],
+            'AUDIO' => [
+                'carpeta' => 'audios',
+                'extensiones' => ['mp3', 'wav', 'ogg', 'm4a'],
+            ],
+        ];
 
-                $dataConfig = [
-                    "tabla" => "bucketaws",
-                    "editar" => false
-                ];
+        $nombreArchivo = trim($post['nombre_archivo'] ?? '');
+        $descripcion = trim($post['descripcion'] ?? '');
+        $tipoSeleccionado = strtoupper(trim($post['tipo_archivo'] ?? ''));
 
-                $dataBitacora = [
-                    'id_user' => $session->get('id_usuario'),
-                    'script' => 'Agregar.php/guardarBucketAws'
-                ];
+        if ($nombreArchivo === '' || $descripcion === '' || $tipoSeleccionado === '') {
+            $session->setFlashdata('error', 'Debes capturar el nombre del archivo, la descripcion y el tipo.');
+            return redirect()->to(base_url('index.php/Agregar/formBucketAws'));
+        }
 
-                $Mglobal->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+        if (!isset($tiposArchivo[$tipoSeleccionado])) {
+            $session->setFlashdata('error', 'El tipo de archivo seleccionado no es valido.');
+            return redirect()->to(base_url('index.php/Agregar/formBucketAws'));
+        }
 
-                $session->setFlashdata('success', '¡Éxito! El archivo se subió a S3 y la información se guardó en la tabla bucketaws.');
-            } else {
-                $session->setFlashdata('error', 'Error al subir el archivo al bucket de AWS.');
-            }
+        if (!$archivo || !$archivo->isValid() || $archivo->hasMoved()) {
+            $session->setFlashdata('error', 'No se detecto un archivo valido para subir.');
+            return redirect()->to(base_url('index.php/Agregar/formBucketAws'));
+        }
+
+        $extension = strtolower((string) $archivo->getClientExtension());
+        $configuracionTipo = $tiposArchivo[$tipoSeleccionado];
+
+        if (!in_array($extension, $configuracionTipo['extensiones'], true)) {
+            $session->setFlashdata(
+                'error',
+                'El archivo seleccionado no coincide con el tipo indicado. Extensiones permitidas: ' . implode(', ', $configuracionTipo['extensiones'])
+            );
+            return redirect()->to(base_url('index.php/Agregar/formBucketAws'));
+        }
+
+        $carpetaS3 = 'media/' . $configuracionTipo['carpeta'];
+        $nuevoNombre = $archivo->getRandomName();
+        $rutaTemporal = $archivo->getTempName();
+        $rutaS3 = $carpetaS3 . '/' . $nuevoNombre;
+        $urlPublica = $s3->uploadFile($rutaTemporal, $rutaS3);
+
+        if ($urlPublica) {
+            $dataInsert = [
+                'nombre_archivo' => $nombreArchivo,
+                'descripcion'    => $descripcion,
+                'usu_reg'        => $session->get('id_usuario'),
+                'ruta_s3'        => $rutaS3
+            ];
+
+            $dataConfig = [
+                'tabla' => 'bucketaws',
+                'editar' => false
+            ];
+
+            $dataBitacora = [
+                'id_user' => $session->get('id_usuario'),
+                'script' => 'Agregar.php/guardarBucketAws'
+            ];
+
+            $Mglobal->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+
+            $session->setFlashdata('success', 'Archivo subido correctamente a la carpeta "' . $configuracionTipo['carpeta'] . '" en S3 y registrado en bucketaws.');
         } else {
-            $session->setFlashdata('error', 'No se detectó un archivo válido para subir.');
+            $session->setFlashdata('error', 'Error al subir el archivo al bucket de AWS.');
         }
 
         return redirect()->to(base_url('index.php/Agregar/formBucketAws'));
     }
-
 }
