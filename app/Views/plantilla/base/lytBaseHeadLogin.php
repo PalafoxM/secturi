@@ -227,7 +227,7 @@ body.forest-bg #particles-js { display: none; }
     base_url + "assets/images/backgrounds/img2.JPG",
     //base_url + "assets/images/backgrounds/uni_ia.jpg",
     base_url + "assets/images/backgrounds/img3.JPG",
-    base_url + "assets/images/backgrounds/img4.JPG",
+    base_url + "assets/images/backgrounds/img_9.JPG",
     base_url + "assets/images/backgrounds/img_5.JPG",
     base_url + "assets/images/backgrounds/img_6.JPG",
     base_url + "assets/images/backgrounds/img_7.JPG",
