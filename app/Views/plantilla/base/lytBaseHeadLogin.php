@@ -223,17 +223,17 @@ body.forest-bg #particles-js { display: none; }
   const FOREST_URL = "https://i.pinimg.com/originals/44/6e/3b/446e3b79395a287ca32f7977dd83b290.jpg";
 
   const backgrounds = [
-    base_url + "assets/images/backgrounds/guanajuato.jpg",
-    base_url + "assets/images/backgrounds/IMG8.jpg",
+    base_url + "assets/images/backgrounds/img1.JPG",
+    base_url + "assets/images/backgrounds/img2.JPG",
     //base_url + "assets/images/backgrounds/uni_ia.jpg",
-    base_url + "assets/images/backgrounds/baratillo.jpg",
-    base_url + "assets/images/backgrounds/IMG18.jpg",
-    base_url + "assets/images/backgrounds/subterranea.webp",
-    base_url + "assets/images/backgrounds/uni2.jpg",
-    base_url + "assets/images/backgrounds/bg3.jpg",
-    base_url + "assets/images/backgrounds/uni.jpg",
-    base_url + "assets/images/backgrounds/uni2.jpg",
-    FOREST_URL,
+    base_url + "assets/images/backgrounds/img3.JPG",
+    base_url + "assets/images/backgrounds/img4.JPG",
+    base_url + "assets/images/backgrounds/img_5.JPG",
+    base_url + "assets/images/backgrounds/img_6.JPG",
+    base_url + "assets/images/backgrounds/img_7.JPG",
+    base_url + "assets/images/backgrounds/img_8.JPG",
+    base_url + "assets/images/backgrounds/IMG_45.JPG",
+    //FOREST_URL,
   ];
 
   function setRandomBackground() {
