@@ -99,6 +99,32 @@ $tiposArchivo = [
         </div>
     </div>
 </div>
+<!-- jQuery  -->
+<script src="<?php echo base_url() ?>assets/js/jquery.min.js"></script>
+
+<script src='<?php echo base_url() ?>plugins/fullcalendar/packages/core/main.js'></script>
+<script src='<?php echo base_url() ?>plugins/fullcalendar/packages/daygrid/main.js'></script>
+<script src='<?php echo base_url() ?>plugins/fullcalendar/packages/timegrid/main.js'></script>
+<script src='<?php echo base_url() ?>plugins/fullcalendar/packages/interaction/main.js'></script>
+<script src='<?php echo base_url() ?>plugins/fullcalendar/packages/list/main.js'></script>
+<script src="<?php echo base_url() ?>plugins/apexcharts/apexcharts.min.js"></script>
+<!-- Plugins js -->
+<script src="<?php echo base_url() ?>plugins/moment/moment.js"></script>
+<script src="<?php echo base_url() ?>plugins/daterangepicker/daterangepicker.js"></script>
+<script src="<?php echo base_url() ?>plugins/select2/select2.min.js"></script>
+<script src="<?php echo base_url() ?>plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
+<script src="<?php echo base_url() ?>plugins/timepicker/bootstrap-material-datetimepicker.js"></script>
+<script src="<?php echo base_url() ?>plugins/bootstrap-maxlength/bootstrap-maxlength.min.js"></script>
+<script src="<?php echo base_url() ?>plugins/bootstrap-touchspin/js/jquery.bootstrap-touchspin.min.js"></script>
+<script src="<?php echo base_url() ?>assets/pages/jquery.forms-advanced.js"></script>
+<!-- App js -->
+
+<script src="<?php echo base_url() ?>assets/js/jquery-ui.min.js"></script>
+<script src="<?php echo base_url() ?>assets/js/bootstrap.bundle.min.js"></script>
+<script src="<?php echo base_url() ?>assets/js/metismenu.min.js"></script>
+<script src="<?php echo base_url() ?>assets/js/waves.js"></script>
+<script src="<?php echo base_url() ?>assets/js/feather.min.js"></script>
+<script src="<?php echo base_url() ?>assets/js/jquery.slimscroll.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const tipoArchivo = document.getElementById('tipo_archivo');

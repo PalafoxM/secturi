@@ -584,9 +584,12 @@
                                 <ul class="nav-second-level" aria-expanded="false">
                                     
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/ListaConvenio">Contratos</a></li>
+                                    <li><a href="<?php echo base_url(); ?>index.php/Agregar/formBucketAws">Agregar Buckets</a></li>
+                                    <li><a href="<?php echo base_url(); ?>index.php/Agregar/listaBucketAws">Lista Buckets</a></li>
                                    
                                   
                                 </ul>   
+                               
                             </li><!--end nav-item-->
                         <?php endif; ?>
                     </ul><!--end nav-->
