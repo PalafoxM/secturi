@@ -761,8 +761,10 @@ class Inicio extends BaseController
 
         $res = $this->globals->getTabla([
             "tabla" => "proveedor",
-            "like"  => [
-                "razon_social" => $term
+            "orlike"  => [
+                "razon_social" => $term,
+                "no_proveedor" => $term,
+                "rfc" => $term,
             ],
             "limit" => 10
         ]);
