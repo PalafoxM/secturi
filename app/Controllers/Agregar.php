@@ -62,6 +62,78 @@ class Agregar extends BaseController
         echo view($data['layout'], $data);
     }
 
+    private function uploadManualFacturaFileToS3(string $tmpName, string $extension, $idRegistroPt, $rowIndex, string $tipoArchivo, string $prefijo = 'PT')
+    {
+        $s3 = new \App\Libraries\S3Service();
+        $folder = strtoupper($tipoArchivo) === 'XML' ? 'FACTURAS/XML' : 'FACTURAS/PDF';
+        $safeExtension = strtolower($extension);
+        $fileName = sprintf(
+            '%s_%s_ROW_%s_%s.%s',
+            strtoupper($prefijo),
+            $idRegistroPt,
+            $rowIndex,
+            uniqid(),
+            $safeExtension
+        );
+
+        $s3Key = $folder . '/' . $fileName;
+        $uploaded = $s3->uploadFile($tmpName, $s3Key);
+
+        return $uploaded ? $s3Key : null;
+    }
+
+    private function resolveManualFacturaFilePath(?string $storedPath, string $prefix = 'factura_')
+    {
+        if (empty($storedPath)) {
+            return null;
+        }
+
+        if (strpos($storedPath, 'FACTURAS/') === 0) {
+            $s3 = new \App\Libraries\S3Service();
+            return $s3->downloadToTempFile($storedPath, $prefix);
+        }
+
+        $fullPath = FCPATH . ltrim($storedPath, '/\\');
+        return file_exists($fullPath) ? $fullPath : null;
+    }
+
+    private function extractManualFacturaXmlTotals(?string $xmlContent): array
+    {
+        $result = [
+            'isr' => 0.00,
+            'impuesto_local' => 0.00,
+            'xml_subtotal' => 0.00,
+        ];
+
+        if (empty($xmlContent)) {
+            return $result;
+        }
+
+        try {
+            $xmlContent = str_replace(['cfdi:', 'implocal:', 'tfd:'], '', $xmlContent);
+            $xmlObj = @simplexml_load_string($xmlContent);
+
+            if (!$xmlObj) {
+                return $result;
+            }
+
+            if (isset($xmlObj['SubTotal'])) {
+                $result['xml_subtotal'] = (float) $xmlObj['SubTotal'];
+            }
+
+            if (isset($xmlObj->Impuestos) && isset($xmlObj->Impuestos['TotalImpuestosRetenidos'])) {
+                $result['isr'] = (float) $xmlObj->Impuestos['TotalImpuestosRetenidos'];
+            }
+
+            if (isset($xmlObj->Complemento) && isset($xmlObj->Complemento->ImpuestosLocales) && isset($xmlObj->Complemento->ImpuestosLocales['TotaldeRetenciones'])) {
+                $result['impuesto_local'] = (float) $xmlObj->Complemento->ImpuestosLocales['TotaldeRetenciones'];
+            }
+        } catch (\Throwable $e) {
+        }
+
+        return $result;
+    }
+
 
     public function index()
     {
@@ -6261,13 +6333,9 @@ class Agregar extends BaseController
                                 $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
                                 
                                 if($ext == 'pdf'){
-                                    $newName = 'PT_' . $id_registro_pt . '_ROW_' . $rIdx . '_' . uniqid() . '.pdf';
-                                    $destDir = FCPATH . 'assets/pdf/';
-                                    if (!is_dir($destDir)) mkdir($destDir, 0755, true);
-                                    
-                                    $dest = $destDir . $newName;
-                                    if(move_uploaded_file($tmpName, $dest)){
-                                        $pdfPath = 'assets/pdf/' . $newName;
+                                    $uploadedPdfPath = $this->uploadManualFacturaFileToS3($tmpName, $ext, $id_registro_pt, $rIdx, 'PDF', 'PT');
+                                    if($uploadedPdfPath){
+                                        $pdfPath = $uploadedPdfPath;
                                     }
                                 }
                             }
@@ -6286,13 +6354,9 @@ class Agregar extends BaseController
                                 $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
                                 
                                 if($ext == 'xml'){
-                                    $newName = 'PT_' . $id_registro_pt . '_ROW_' . $rIdx . '_' . uniqid() . '.xml';
-                                    $destDir = FCPATH . 'assets/pdf/'; // Keeping same dir as before
-                                    if (!is_dir($destDir)) mkdir($destDir, 0755, true);
-                                    
-                                    $dest = $destDir . $newName;
-                                    if(move_uploaded_file($tmpName, $dest)){
-                                        $xmlPath = 'assets/pdf/' . $newName;
+                                    $uploadedXmlPath = $this->uploadManualFacturaFileToS3($tmpName, $ext, $id_registro_pt, $rIdx, 'XML', 'PT');
+                                    if($uploadedXmlPath){
+                                        $xmlPath = $uploadedXmlPath;
                                     }
                                 }
                             }
@@ -6475,13 +6539,9 @@ class Agregar extends BaseController
                                 $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
                                 
                                 if($ext == 'pdf'){
-                                    $newName = 'PT_' . $id_registro_pt . '_ROW_' . $rIdx . '_' . uniqid() . '.pdf';
-                                    $destDir = FCPATH . 'assets/pdf/';
-                                    if (!is_dir($destDir)) mkdir($destDir, 0755, true);
-                                    
-                                    $dest = $destDir . $newName;
-                                    if(move_uploaded_file($tmpName, $dest)){
-                                        $pdfPath = 'assets/pdf/' . $newName;
+                                    $uploadedPdfPath = $this->uploadManualFacturaFileToS3($tmpName, $ext, $id_registro_pt, $rIdx, 'PDF', 'PT');
+                                    if($uploadedPdfPath){
+                                        $pdfPath = $uploadedPdfPath;
                                     }
                                 }
                             }
@@ -6500,13 +6560,9 @@ class Agregar extends BaseController
                                 $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
                                 
                                 if($ext == 'xml'){
-                                    $newName = 'PT_' . $id_registro_pt . '_ROW_' . $rIdx . '_' . uniqid() . '.xml';
-                                    $destDir = FCPATH . 'assets/pdf/'; // Keeping same dir as before
-                                    if (!is_dir($destDir)) mkdir($destDir, 0755, true);
-                                    
-                                    $dest = $destDir . $newName;
-                                    if(move_uploaded_file($tmpName, $dest)){
-                                        $xmlPath = 'assets/pdf/' . $newName;
+                                    $uploadedXmlPath = $this->uploadManualFacturaFileToS3($tmpName, $ext, $id_registro_pt, $rIdx, 'XML', 'PT');
+                                    if($uploadedXmlPath){
+                                        $xmlPath = $uploadedXmlPath;
                                     }
                                 }
                             }
@@ -6564,16 +6620,29 @@ class Agregar extends BaseController
                         $nombreUsuario = $session->get('nombre_completo');    
                         // 2. Get Files to Attach
                         $filesToAttach = [];
+                        $tempFilesToDelete = [];
                         // Query active rows for this record
                         $activeRows = $this->globals->getTabla(['tabla' => 'manual_factura', 'where' => ['id_registro_pt' => $id_registro_pt, 'visible' => 1]]);
                         
                         if(isset($activeRows->data)){
                             foreach($activeRows->data as $row){
-                                if(!empty($row->pdf) && file_exists(FCPATH . $row->pdf)){
-                                    $filesToAttach[] = FCPATH . $row->pdf;
+                                if(!empty($row->pdf)){
+                                    $resolvedPdfPath = $this->resolveManualFacturaFilePath($row->pdf, 'mail_pdf_');
+                                    if($resolvedPdfPath){
+                                        $filesToAttach[] = $resolvedPdfPath;
+                                        if(strpos($row->pdf, 'FACTURAS/') === 0){
+                                            $tempFilesToDelete[] = $resolvedPdfPath;
+                                        }
+                                    }
                                 }
-                                if(!empty($row->xml) && file_exists(FCPATH . $row->xml)){
-                                    $filesToAttach[] = FCPATH . $row->xml;
+                                if(!empty($row->xml)){
+                                    $resolvedXmlPath = $this->resolveManualFacturaFilePath($row->xml, 'mail_xml_');
+                                    if($resolvedXmlPath){
+                                        $filesToAttach[] = $resolvedXmlPath;
+                                        if(strpos($row->xml, 'FACTURAS/') === 0){
+                                            $tempFilesToDelete[] = $resolvedXmlPath;
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -6604,6 +6673,10 @@ class Agregar extends BaseController
                         // log_message('info', 'Email sent for PT ' . $id_registro_pt);
                         } else {
                         // log_message('error', 'Email failed: ' . $email->printDebugger(['headers']));
+                        }
+
+                        foreach($tempFilesToDelete as $tempFile){
+                            @unlink($tempFile);
                         }
 
                     } catch (\Exception $e) {
@@ -6898,6 +6971,7 @@ class Agregar extends BaseController
                 
                 $pdfPath = null;
                 $xmlPath = null;
+                $xmlContentForExtraction = null;
                 
                 if(isset($data['row_index'][$i])){
                     $rIdx = $data['row_index'][$i];
@@ -6920,11 +6994,11 @@ class Agregar extends BaseController
                              $countFiles = count($files['name']);
                              for($f=0; $f < $countFiles; $f++){
                                 if($files['error'][$f] == 0 && strtolower(pathinfo($files['name'][$f], PATHINFO_EXTENSION)) == 'pdf'){
-                                    $newName = 'GO_' . $id_registro_pt . '_ROW_' . $rIdx . '_' . uniqid() . '.pdf';
-                                    $destDir = FCPATH . 'assets/pdf/';
-                                    if (!is_dir($destDir)) mkdir($destDir, 0755, true);
-                                    if(move_uploaded_file($files['tmp_name'][$f], $destDir . $newName)){
-                                        $pdfPath = 'assets/pdf/' . $newName;
+                                    $tmpName = $files['tmp_name'][$f];
+                                    $ext = pathinfo($files['name'][$f], PATHINFO_EXTENSION);
+                                    $uploadedPdfPath = $this->uploadManualFacturaFileToS3($tmpName, $ext, $id_registro_pt, $rIdx, 'PDF', 'GO');
+                                    if($uploadedPdfPath){
+                                        $pdfPath = $uploadedPdfPath;
                                     }
                                 }
                              }
@@ -6939,11 +7013,12 @@ class Agregar extends BaseController
                             $countFiles = count($files['name']);
                             for($f=0; $f < $countFiles; $f++){
                                 if($files['error'][$f] == 0 && strtolower(pathinfo($files['name'][$f], PATHINFO_EXTENSION)) == 'xml'){
-                                    $newName = 'GO_' . $id_registro_pt . '_ROW_' . $rIdx . '_' . uniqid() . '.xml';
-                                    $destDir = FCPATH . 'assets/xml/';  // Better folder? Old used pdf. Let's keep consistent? Original was pdf folder.
-                                    if (!is_dir($destDir)) mkdir($destDir, 0755, true);
-                                    if(move_uploaded_file($files['tmp_name'][$f], $destDir . $newName)){
-                                        $xmlPath = 'assets/xml/' . $newName; // Storing there
+                                    $tmpName = $files['tmp_name'][$f];
+                                    $ext = pathinfo($files['name'][$f], PATHINFO_EXTENSION);
+                                    $xmlContentForExtraction = @file_get_contents($tmpName) ?: null;
+                                    $uploadedXmlPath = $this->uploadManualFacturaFileToS3($tmpName, $ext, $id_registro_pt, $rIdx, 'XML', 'GO');
+                                    if($uploadedXmlPath){
+                                        $xmlPath = $uploadedXmlPath;
                                     }
                                 }
                             }
@@ -6981,24 +7056,20 @@ class Agregar extends BaseController
                 $isr_xml = 0.00;
                 $il_xml  = 0.00;
                 $subtotal_xml = 0.00;
-                if ($xmlPath && file_exists(FCPATH . $xmlPath)) {
-                    try {
-                        $xmlContent = file_get_contents(FCPATH . $xmlPath);
-                        $xmlContent = str_replace(['cfdi:', 'implocal:', 'tfd:'], '', $xmlContent);
-                        $xmlObj = @simplexml_load_string($xmlContent);
-                        if ($xmlObj) {
-                            if (isset($xmlObj['SubTotal'])) {
-                                $subtotal_xml = (float) $xmlObj['SubTotal'];
-                            }
-                            if (isset($xmlObj->Impuestos) && isset($xmlObj->Impuestos['TotalImpuestosRetenidos'])) {
-                                $isr_xml = (float) $xmlObj->Impuestos['TotalImpuestosRetenidos'];
-                            }
-                            if (isset($xmlObj->Complemento) && isset($xmlObj->Complemento->ImpuestosLocales) && isset($xmlObj->Complemento->ImpuestosLocales['TotaldeRetenciones'])) {
-                                $il_xml = (float) $xmlObj->Complemento->ImpuestosLocales['TotaldeRetenciones'];
-                            }
+                if (empty($xmlContentForExtraction) && !empty($xmlPath)) {
+                    $resolvedXmlPath = $this->resolveManualFacturaFilePath($xmlPath, 'factura_xml_');
+                    if ($resolvedXmlPath) {
+                        $xmlContentForExtraction = @file_get_contents($resolvedXmlPath) ?: null;
+                        if (strpos($xmlPath, 'FACTURAS/') === 0) {
+                            @unlink($resolvedXmlPath);
                         }
-                    } catch (\Exception $e) { }
+                    }
                 }
+
+                $xmlTotals = $this->extractManualFacturaXmlTotals($xmlContentForExtraction);
+                $isr_xml = $xmlTotals['isr'];
+                $il_xml = $xmlTotals['impuesto_local'];
+                $subtotal_xml = $xmlTotals['xml_subtotal'];
 
                 $dataFila['isr'] = $isr_xml;
                 $dataFila['impuesto_local'] = $il_xml;
@@ -7070,16 +7141,29 @@ class Agregar extends BaseController
                     
                     // 2. Get Files to Attach
                     $filesToAttach = [];
+                    $tempFilesToDelete = [];
                     // Query active rows for this record
                     $activeRows = $globals->getTabla(['tabla' => 'manual_factura', 'where' => ['id_registro_pt' => $id_registro_pt, 'visible' => 1]]);
                     
                     if(isset($activeRows->data)){
                         foreach($activeRows->data as $row){
-                            if(!empty($row->pdf) && file_exists(FCPATH . $row->pdf)){
-                                $filesToAttach[] = FCPATH . $row->pdf;
+                            if(!empty($row->pdf)){
+                                $resolvedPdfPath = $this->resolveManualFacturaFilePath($row->pdf, 'mail_pdf_');
+                                if($resolvedPdfPath){
+                                    $filesToAttach[] = $resolvedPdfPath;
+                                    if(strpos($row->pdf, 'FACTURAS/') === 0){
+                                        $tempFilesToDelete[] = $resolvedPdfPath;
+                                    }
+                                }
                             }
-                            if(!empty($row->xml) && file_exists(FCPATH . $row->xml)){
-                                $filesToAttach[] = FCPATH . $row->xml;
+                            if(!empty($row->xml)){
+                                $resolvedXmlPath = $this->resolveManualFacturaFilePath($row->xml, 'mail_xml_');
+                                if($resolvedXmlPath){
+                                    $filesToAttach[] = $resolvedXmlPath;
+                                    if(strpos($row->xml, 'FACTURAS/') === 0){
+                                        $tempFilesToDelete[] = $resolvedXmlPath;
+                                    }
+                                }
                             }
                         }
                     }
@@ -7109,6 +7193,10 @@ class Agregar extends BaseController
                     if($email->send()){
                         // Success logging or modify response if needed
                     } else {
+                    }
+
+                    foreach($tempFilesToDelete as $tempFile){
+                        @unlink($tempFile);
                     }
 
                 } catch (\Exception $e) {

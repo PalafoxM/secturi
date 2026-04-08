@@ -110,4 +110,29 @@ class S3Service
             return false;
         }
     }
+
+    public function downloadToTempFile($keyName, $prefix = 's3_')
+    {
+        try {
+            $extension = pathinfo($keyName, PATHINFO_EXTENSION);
+            $tempFile = tempnam(sys_get_temp_dir(), $prefix);
+
+            if ($extension) {
+                $renamedTempFile = $tempFile . '.' . $extension;
+                rename($tempFile, $renamedTempFile);
+                $tempFile = $renamedTempFile;
+            }
+
+            $this->client->getObject([
+                'Bucket' => $this->bucket,
+                'Key' => $keyName,
+                'SaveAs' => $tempFile,
+            ]);
+
+            return $tempFile;
+        } catch (AwsException $e) {
+            log_message('error', 'Error descargando archivo temporal desde S3: ' . $e->getMessage());
+            return false;
+        }
+    }
 }

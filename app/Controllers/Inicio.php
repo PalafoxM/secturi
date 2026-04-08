@@ -44,6 +44,21 @@ class Inicio extends BaseController
 
     }
 
+    private function resolveFacturaPdfPath(?string $storedPath, string $prefix = 'factura_pdf_')
+    {
+        if (empty($storedPath)) {
+            return null;
+        }
+
+        if (strpos($storedPath, 'FACTURAS/') === 0) {
+            $s3 = new \App\Libraries\S3Service();
+            return $s3->downloadToTempFile($storedPath, $prefix);
+        }
+
+        $fullPath = FCPATH . ltrim($storedPath, '/\\');
+        return file_exists($fullPath) ? $fullPath : null;
+    }
+
     public function index()
     {
         $session = \Config\Services::session();
@@ -3521,8 +3536,8 @@ class Inicio extends BaseController
 
                     // 2. Append PDF INVOICE below header
                     if (!empty($item->pdf)) {
-                        $fullPath = FCPATH . $item->pdf;
-                        if (file_exists($fullPath)) {
+                        $fullPath = $this->resolveFacturaPdfPath($item->pdf, 'factura_pt_');
+                        if ($fullPath && file_exists($fullPath)) {
                             
                             // GS Conversion: Down-convert to PDF 1.4 to assure FPDI compatibility
                             $gsTempFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'mpdf_merge_new' . DIRECTORY_SEPARATOR . 'gs_' . uniqid() . '.pdf';
@@ -3581,6 +3596,9 @@ class Inicio extends BaseController
                             }
                             
                             @unlink($gsTempFile); // Cleanup ghostscript file
+                            if (strpos($item->pdf, 'FACTURAS/') === 0) {
+                                @unlink($fullPath);
+                            }
                         }
                     }
                 }
@@ -3699,8 +3717,8 @@ class Inicio extends BaseController
 
                     // 2. Append PDF INVOICE below header
                     if (!empty($item->pdf)) {
-                        $fullPath = FCPATH . $item->pdf;
-                        if (file_exists($fullPath)) {
+                        $fullPath = $this->resolveFacturaPdfPath($item->pdf, 'factura_go_');
+                        if ($fullPath && file_exists($fullPath)) {
                             
                             // GS Conversion: Down-convert to PDF 1.4 to assure FPDI compatibility
                             $gsTempFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'mpdf_merge_new' . DIRECTORY_SEPARATOR . 'gs_' . uniqid() . '.pdf';
@@ -3775,6 +3793,9 @@ class Inicio extends BaseController
                             }
                             
                             @unlink($gsTempFile); // Cleanup ghostscript file
+                            if (strpos($item->pdf, 'FACTURAS/') === 0) {
+                                @unlink($fullPath);
+                            }
                         }
                     }
                 }
@@ -4006,5 +4027,3 @@ class Inicio extends BaseController
         exit;
     }
 }
-
-
