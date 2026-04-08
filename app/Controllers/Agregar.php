@@ -4835,10 +4835,8 @@ class Agregar extends BaseController
             ];
         }
 
-
         //die( var_dump( $registrosAgrupados ) );
         //$faltas = $this->getFaltasRangoQuincena($inicio, $fin);
-
         // $data['faltas'] = $faltas;
         $data['asistencia'] = $registrosAgrupados;
         //$data['cat_incidencia'] = $cat_incidencia->data;

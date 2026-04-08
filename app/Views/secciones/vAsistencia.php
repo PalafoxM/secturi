@@ -529,6 +529,41 @@
         const hoy = new Date();
         return hoy.toISOString().split('T')[0];
     }
+    function obtenerMotivoRegistroIncompleto(entrada, salida) {
+        const entradaValida = entrada && entrada !== '--:--';
+        const salidaValida = salida && salida !== '--:--' && salida !== 'Sin salida';
+
+        if (entradaValida && !salidaValida) {
+            return 'No es posible justificar, solo existe un registro de entrada y no se encontro una salida para este dia.';
+        }
+
+        if (!entradaValida && salidaValida) {
+            return 'No es posible justificar, solo existe un registro de salida y no se encontro una entrada para este dia.';
+        }
+
+        return 'Solo existe un registro de asistencia para este dia.';
+    }
+    function mostrarModalRegistroIncompleto(fechaLabel, entrada, salida) {
+        const motivo = obtenerMotivoRegistroIncompleto(entrada, salida);
+
+        Swal.fire({
+            title: 'Registro incompleto',
+            html: `
+                <div style="text-align:left;">
+                    <p><strong>Fecha:</strong> ${fechaLabel}</p>
+                    <p><strong>Entrada:</strong> ${entrada || '--:--'}</p>
+                    <p><strong>Salida:</strong> ${salida || '--:--'}</p>
+                    <p><strong>Motivo:</strong> ${motivo}</p>
+                </div>
+            `,
+            icon: 'info',
+            confirmButtonText: 'Aceptar',
+            customClass: {
+                confirmButton: 'btn btn-primary'
+            },
+            buttonsStyling: false
+        });
+    }
     function esHabil(date) {
         const d = date.getDay(); // 0=Dom, 6=Sáb
         return d >= 1 && d <= 5;
@@ -687,6 +722,7 @@
                 });
         }
         // Procesar los datos para FullCalendar
+        const fechasConRegistroIncompleto = new Map();
         var eventos = eventosAsistencia.map(function (item) {
             let eventClass = 'fc-event-asistencia';
             let icon = ''; // Para el emoji
@@ -822,6 +858,19 @@
 
             }
 
+            const fechaBase = normalizarFecha(item.fecha);
+            const tieneSoloUnRegistro = !esSemana && !multiple && (
+                (entrada && entrada !== '--:--' && (!salida || salida === 'Sin salida' || salida === '--:--')) ||
+                ((!entrada || entrada === '--:--') && salida && salida !== 'Sin salida' && salida !== '--:--')
+            );
+
+            if (fechaBase && tieneSoloUnRegistro && !fechasConRegistroIncompleto.has(fechaBase)) {
+                fechasConRegistroIncompleto.set(fechaBase, {
+                    entrada: entrada || '--:--',
+                    salida: (!salida) ? 'Sin salida' : salida
+                });
+            }
+
             const startDate = item.fecha_inicio ? item.fecha_inicio_incidencia.split(' ')[0] : null;
             const endDate = item.fecha_fin_incidencia ? item.fecha_fin_incidencia.split(' ')[0] : null;
 
@@ -949,6 +998,10 @@
                 const salida = info.event.extendedProps.salida;
                 const esFestivo = info.event.extendedProps.esFestivo;
                 const multiple = info.event.extendedProps.multiple;
+                const tieneSoloUnRegistro = !multiple && (
+                    (entrada && entrada !== '--:--' && (!salida || salida === 'Sin salida' || salida === '--:--')) ||
+                    ((!entrada || entrada === '--:--') && salida && salida !== 'Sin salida' && salida !== '--:--')
+                );
 
                  const fechaLabel = esSemana
                     ? `${info.event.extendedProps.rango_legible}`
@@ -966,6 +1019,10 @@
                 }
                 if (multiple && idEstatus == 3) {
                     Swal.fire('Aprobado', 'La incidencia fue aprobada', "success");
+                    return;
+                }
+                if (tieneSoloUnRegistro) {
+                    mostrarModalRegistroIncompleto(fechaLabel, entrada, salida);
                     return;
                 }
                 if(multiple){
@@ -997,6 +1054,11 @@
                     return;
                 }
                 let dia = info.dateStr;
+                if (fechasConRegistroIncompleto.has(dia)) {
+                    const registro = fechasConRegistroIncompleto.get(dia);
+                    mostrarModalRegistroIncompleto(dia, registro.entrada, registro.salida);
+                    return;
+                }
                 st.agregar.justificarFalta(dia);
 
             },
