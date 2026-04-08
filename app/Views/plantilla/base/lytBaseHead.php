@@ -577,7 +577,7 @@
                             </li><!--end nav-item-->
                      
                         <?php endif; ?>
-                        <?php if (in_array($session->id_perfil, [1, 8])): ?>
+                        <?php if (in_array($session->id_perfil, [1, 8, 9])): ?>
                             <li class="nav-item">
                                 <a class="nav-link" href="#"><span class="w-100">Promocion Tur.</span><span class="menu-arrow"><i
                                             class="mdi mdi-chevron-right"></i></span></a>
