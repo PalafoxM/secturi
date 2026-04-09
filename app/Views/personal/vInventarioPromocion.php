@@ -331,7 +331,7 @@
                                                         <div class="text-muted font-11 mt-1">
                                                             Total redondeado:
                                                             <span class="font-weight-semibold text-primary">
-                                                                $<?= esc($rawDecimal($item->total ?? 0)) ?>
+                                                                $<?= esc($formatTwoDecimals($item->total ?? 0)) ?>
                                                             </span>
                                                         </div>
                                                     </td>
