@@ -72,9 +72,9 @@
                                 <div class="form-row mb-3">
                                     <div class="col-md-6 d-flex align-items-center">
                                         <label class="font-weight-bold mr-2 mb-0">No. Consecutivo:</label>
-                                        <div class="d-flex align-items-center border rounded p-1" style="background: #f8f9fa;">
+                                        <div class="d-flex align-items-center border rounded p-1 folio-box" style="background: #f8f9fa;">
                                             <span class="mr-1 small font-weight-bold">GRC</span>
-                                            <select name="folio" id="folio" class="form-control form-control-sm select2 mr-1" style="width: auto; max-width: 250px;">
+                                            <select name="folio" id="folio" class="form-control form-control-sm mr-1" style="width: auto; min-width: 120px; max-width: 250px;">
                                                 <?php if(isset($cat_area) && is_array($cat_area)): ?>
                                                     <?php foreach($cat_area as $area): ?>
                                                         <option value="<?=  $area->prefijo ?>" <?= (isset($id_area) && $area->id_area == $id_area) ? 'selected' : '' ?>><?= $area->prefijo ?></option>
@@ -150,6 +150,16 @@
     type="text/css" />
 <link href="<?= base_url() ?>plugins/timepicker/bootstrap-material-datetimepicker.css" rel="stylesheet">
 <link href="<?= base_url() ?>plugins/bootstrap-touchspin/css/jquery.bootstrap-touchspin.min.css" rel="stylesheet" />
+<style>
+    .folio-box {
+        flex-wrap: nowrap;
+        gap: 6px;
+    }
+
+    #folio {
+        min-width: 120px;
+    }
+</style>
 
 
 
