@@ -1,3 +1,7 @@
+<?php
+$prefijo = $prefijo ?? '';
+$no_consecutivo = $no_consecutivo ?? '';
+?>
 <div class="page-wrapper" style="background-color: #f4f6f9;">
     <div class="page-content-tab">
         <div class="container-fluid">

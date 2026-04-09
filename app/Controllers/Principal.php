@@ -2755,6 +2755,38 @@ class Principal extends BaseController
         $data['detalles'] = (!empty($detalles->data)) ? $detalles->data : [];
         $data['editar'] = true;
 
+        $folioGuardado = isset($data['solicitud']->no_consecutivo) ? trim((string) $data['solicitud']->no_consecutivo) : '';
+        $prefijo = '';
+        $noConsecutivo = '';
+
+        if ($folioGuardado !== '') {
+            $folioSinAnio = preg_replace('/\/\d{4}$/', '', $folioGuardado);
+            if (preg_match('/^(.*?)(\d+)$/', $folioSinAnio, $matches)) {
+                $prefijo = $matches[1];
+                $noConsecutivo = str_pad($matches[2], 3, '0', STR_PAD_LEFT);
+            }
+        }
+
+        if ($prefijo === '') {
+            $areaUsuario = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1, 'titular' => $session->get('id_usuario')]]);
+            if (empty($areaUsuario->data)) {
+                $usuarioActual = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->get('id_usuario')]]);
+                $idAreaUsuario = (!empty($usuarioActual->data) && isset($usuarioActual->data[0]->id_area)) ? $usuarioActual->data[0]->id_area : null;
+                if (!empty($idAreaUsuario)) {
+                    $areaUsuario = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1, 'id_area' => $idAreaUsuario]]);
+                }
+            }
+
+            $prefijo = (!empty($areaUsuario->data) && isset($areaUsuario->data[0]->prefijo)) ? $areaUsuario->data[0]->prefijo : '';
+        }
+
+        if ($noConsecutivo === '') {
+            $noConsecutivo = '001';
+        }
+
+        $data['prefijo'] = $prefijo;
+        $data['no_consecutivo'] = $noConsecutivo;
+
         $data['scripts'] = array('inicio');
         $data['contentView'] = 'personal/vSolicitudGrc';
         $this->_renderView($data);
