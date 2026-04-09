@@ -1,4 +1,17 @@
 
+<?php
+    $rawDecimal = static function ($value, $default = '0') {
+        if ($value === null || $value === '') {
+            return $default;
+        }
+        return (string) $value;
+    };
+
+    $formatTwoDecimals = static function ($value) {
+        return number_format((float) ($value ?? 0), 2, '.', ',');
+    };
+?>
+
 <div class="page-wrapper">
     <div class="page-content-tab">
         <div class="container-fluid">
@@ -38,7 +51,7 @@
                                         </div>
                                         <div class="col pl-0">
                                             <h5 class="text-muted text-uppercase font-10 font-weight-bold mt-0 mb-2">Total Subtotal</h5>
-                                             <h3 class="m-0 font-weight-bold">$<?= number_format($total_subtotal_promo ?? 0, 2) ?></h3>
+                                             <h3 class="m-0 font-weight-bold">$<?= esc($formatTwoDecimals($total_subtotal_promo ?? 0)) ?></h3>
                                         </div>
                                     </div>
                                 </div>
@@ -57,7 +70,7 @@
                                         </div>
                                         <div class="col pl-0">
                                             <h5 class="text-muted text-uppercase font-10 font-weight-bold mt-0 mb-2">Total Importe</h5>
-                                            <h3 class="m-0 font-weight-bold">$<?= number_format($total_dinero_promo ?? 0, 2) ?></h3>
+                                            <h3 class="m-0 font-weight-bold">$<?= esc($formatTwoDecimals($total_dinero_promo ?? 0)) ?></h3>
                                         </div>
                                     </div>
                                 </div>
@@ -283,32 +296,42 @@
 
                                                             if (is_array($col)) {
                                                                 foreach ($col as $c) {
-                                                                    $p = floatval($c['precio'] ?? 0);
-                                                                    if ($p > 0) $precios[] = $p;
+                                                                    $precioRaw = trim((string)($c['precio'] ?? ''));
+                                                                    $p = floatval($precioRaw);
+                                                                    if ($p > 0) {
+                                                                        $precios[] = [
+                                                                            'valor' => $p,
+                                                                            'texto' => $precioRaw
+                                                                        ];
+                                                                    }
                                                                 }
                                                             }
 
                                                             $precioLabel = '';
                                                             if (!empty($precios)) {
-                                                                $min = min($precios);
-                                                                $max = max($precios);
-                                                                $precioLabel = ($min == $max)
-                                                                    ? ('$' . number_format($min, 2))
-                                                                    : ('$' . number_format($min, 2) . ' - $' . number_format($max, 2));
+                                                                usort($precios, function ($a, $b) {
+                                                                    return $a['valor'] <=> $b['valor'];
+                                                                });
+                                                                $min = $precios[0];
+                                                                $max = $precios[count($precios) - 1];
+                                                                $precioLabel = ($min['valor'] == $max['valor'])
+                                                                    ? ('$' . $rawDecimal($min['texto']))
+                                                                    : ('$' . $rawDecimal($min['texto']) . ' - $' . $rawDecimal($max['texto']));
                                                             } else {
-                                                                $precioLabel = '$' . number_format(floatval($item->precio_unitario ?? 0), 2);
+                                                                $precioLabel = '$' . $rawDecimal($item->precio_unitario ?? 0);
                                                             }
                                                         ?>
                                                         <div class="font-weight-bold text-dark">
-                                                            $<?= number_format((float)($item->precio_unitario ?? 0), 2) ?>
+                                                            <span class="text-muted font-11 d-block">Precio unitario</span>
+                                                            <?= esc($precioLabel) ?>
                                                         </div>
                                                         <div class="text-muted font-12">
-                                                            Subtotal: $<?= number_format((float)($item->subtotal ?? 0), 2) ?>
+                                                            Subtotal: $<?= esc($rawDecimal($item->subtotal ?? 0)) ?>
                                                         </div>
                                                         <div class="text-muted font-11 mt-1">
-                                                            Total:
+                                                            Total redondeado:
                                                             <span class="font-weight-semibold text-primary">
-                                                                $<?= number_format((float)($item->total ?? 0), 2) ?>
+                                                                $<?= esc($rawDecimal($item->total ?? 0)) ?>
                                                             </span>
                                                         </div>
                                                     </td>
@@ -711,7 +734,7 @@
 
             $('#colores_container .color-item').each(function () {
                 const qty = parseInt($(this).find('.color_cantidad').val(), 10) || 0;
-                const prc = parseFloat($(this).find('.color_precio').val()) || 0;
+                const prc = decimalToNumber($(this).find('.color_precio').val());
 
                 stockTotal += Math.max(0, qty);
                 subtotal += Math.max(0, qty) * Math.max(0, prc);
@@ -722,6 +745,21 @@
             $('input[name="stock"]').val(String(stockTotal));
 
             return { stockTotal, subtotal };
+        }
+
+        function normalizeDecimal(value, maxDecimals = 10) {
+            const text = (value ?? '').toString().trim().replace(',', '.');
+            if (text === '') return '';
+
+            const numeric = Number.parseFloat(text);
+            if (!Number.isFinite(numeric) || numeric <= 0) return '';
+
+            return numeric.toFixed(maxDecimals).replace(/\.?0+$/, '');
+        }
+
+        function decimalToNumber(value, maxDecimals = 10) {
+            const normalized = normalizeDecimal(value, maxDecimals);
+            return normalized === '' ? 0 : Number.parseFloat(normalized);
         }
 
         $(document).on('click', '#btn_add_color', function () {
@@ -809,7 +847,7 @@
 
             // Para que no se vea "0" como valor inicial
             const qtyVal = (cantidad && parseInt(cantidad, 10) > 0) ? parseInt(cantidad, 10) : '';
-            const prcVal = (precio && parseFloat(precio) > 0) ? parseFloat(precio) : '';
+            const prcVal = normalizeDecimal(precio, 10);
 
             let html = `
                 <div class="row color-item align-items-end mb-3">
@@ -835,7 +873,7 @@
                         <input type="number"
                             class="form-control color_precio clear-on-focus"
                             min="0"
-                            step="0.01"
+                            step="0.0000000001"
                             inputmode="decimal"
                             value="${prcVal}">
                     </div>
@@ -888,6 +926,11 @@
         $(document).on('blur', '.color_cantidad', function () {
             const n = parseInt($(this).val() || 0, 10);
             $(this).val(n > 0 ? String(n) : '');
+        });
+
+        $(document).on('blur', '.color_precio', function () {
+            $(this).val(normalizeDecimal($(this).val(), 10));
+            recalcularDesdeColores();
         });
 
         /* ==========================================================
@@ -1070,13 +1113,14 @@
                 const hex = $(this).find('.color_hex').val();
                 const cantidad = parseInt($(this).find('.color_cantidad').val(), 10) || 0;
                 const material = ($(this).find('.color_material').val() || '').trim();
-                const precio = parseFloat($(this).find('.color_precio').val()) || 0;
+                const precioNormalizado = normalizeDecimal($(this).find('.color_precio').val(), 10);
+                const precio = decimalToNumber(precioNormalizado, 10);
 
                 if (hex) {
                 const qty = Math.max(0, cantidad);
                 const prc = Math.max(0, precio);
 
-                colores.push({ hexadecimal: hex, cantidad: qty, material: material, precio: prc });
+                colores.push({ hexadecimal: hex, cantidad: qty, material: material, precio: precioNormalizado === '' ? '0' : precioNormalizado });
                 stockTotal += qty;
                 subtotalColores += qty * prc;
                 }
