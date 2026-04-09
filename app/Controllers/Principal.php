@@ -2675,7 +2675,7 @@ class Principal extends BaseController
         $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
     
         $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
-        $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
+        $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['id_pago' => 1]]);
         $cat_tipo = $globals->getTabla(['tabla' => 'cat_tipo', 'where' => ['visible' => 1]]);
         $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1]]);
         $cat_opcion = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1]]);
@@ -2695,11 +2695,11 @@ class Principal extends BaseController
         $data['idArea'] = (!empty($idArea)) ? $idArea : '';
     
         // --- Generar Folio GRC ---
-        $area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1, 'titular' => $session->get('id_usuario')]]);
+        $area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['id_pago' => 1, 'titular' => $session->get('id_usuario')]]);
        
         if(empty($area->data)){
             $idArea = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->get('id_usuario')]])->data[0]->id_area;
-            $area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1, 'id_area' => $idArea]]);
+            $area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['id_pago' => 1, 'id_area' => $idArea]]);
             $data['prefijo'] = $area->data[0]->prefijo;
         }else{
            $data['prefijo'] = $area->data[0]->prefijo;
