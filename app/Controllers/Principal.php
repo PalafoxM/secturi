@@ -2187,7 +2187,7 @@ class Principal extends BaseController
         $email = \Config\Services::email();
         $result = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_tipo_empleado' => 1]])->data;
 
-      /* $email->setTo([
+       $email->setTo([
             'agascag@guanajuato.gob.mx',
             'ccampos@guanajuato.gob.mx',
             'ztorrest@guanajuato.gob.mx',
@@ -2201,9 +2201,9 @@ class Principal extends BaseController
             'rgonzalezgu@guanajuato.gob.mx',
             'yjimenez@guanajuato.gob.mx',
             'mamoralesg@guanajuato.gob.mx',
-        ]);*/
+        ]);
  
-          $email->setTo([
+          /*$email->setTo([
                     'alopez@guanajuato.gob.mx',
                     'cchernandezp@guanajuato.gob.mx',
                     'csoto@guanajuato.gob.mx',
@@ -2243,7 +2243,7 @@ class Principal extends BaseController
                     'jmazavala@guanajuato.gob.mx',
                     'rantonio@guanajuato.gob.mx',
                     'jrodriguezgo@guanajuato.gob.mx',
-                ]);
+                ]);*/
         $email->setSubject('Recordatorio: Revisión de Asistencias - Sistema SUSI');
         $email->setMessage('
             <!DOCTYPE html>
@@ -2276,9 +2276,9 @@ class Principal extends BaseController
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Estimado personal,</p>
                         
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-                            En caso de que aún no hayas realizado las <strong>justificaciones correspondientes a la quincena 06/2026</strong>, 
+                            En caso de que aún no hayas realizado las <strong>justificaciones de tu personal a tu cargo correspondientes a la quincena 06/2026</strong>, 
                             la cual comprende el periodo del <strong>16 al 31 de marzo de 2026</strong>, 
-                            tienes hasta el día <strong>viernes 10 de abril hasta las 16:00 hrs</strong> para realizarlas.
+                            tienes hasta el día <strong>lunes 13 de abril hasta las 16:00 hrs</strong> para realizarlas.
                         </p>
 
                         <div class="highlight-box">
@@ -2294,7 +2294,7 @@ class Principal extends BaseController
                         </p>
 
                         <div style="text-align: center; margin: 30px 0;">
-                            <a href="https://secturnet.guanajuato.gob.mx/susi/index.php/Agregar/Asistencia" class="btn" style="color: white; text-decoration: none;">
+                            <a href="https://secturnet.guanajuato.gob.mx/susi/index.php/Principal/incidenciaSubordinado" class="btn" style="color: white; text-decoration: none;">
                                 📋 Revisar Incidencias
                             </a>
                         </div>
