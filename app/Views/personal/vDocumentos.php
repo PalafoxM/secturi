@@ -607,7 +607,7 @@
                                                                  </a>
                                                                 </ol>
                                                             <ol class="dd-list">
-                                                                 <p class="text-muted mb-4">Coordinación de Planeación</p>
+                                                                 <p class="text-muted mb-4">Dirección de Planeación</p>
                                                                  <a target="_blank" href="<?= base_url()?>assets/documentos/Formato_de_Verificacion_2026.xlsx">
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
@@ -615,7 +615,7 @@
                                                                         </div>
                                                                     </li> 
                                                                 </a>
-                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/F-DPE-01-2021_Formato_de_Ajuste_de_Metas_-0977.xlsx">
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/Formato_de_Afectación_a_Metas_de_Proyectos_de_Inversion.xlsx">
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
                                                                         Formato de Afectación a Metas de Proyectos de Inversión

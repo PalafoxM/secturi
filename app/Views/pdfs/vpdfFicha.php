@@ -1,9 +1,9 @@
-<?php
+﻿<?php
 //die(var_dump($ficha));
 // Helpers for arrays
-$desglose_costo = isset($ficha->desglose_costo) && $ficha->desglose_costo != '' && $ficha->desglose_costo != 'null' ? json_decode($ficha->desglose_costo, true) : [];
-$cantidades = isset($ficha->cantidades_desglose) && $ficha->cantidades_desglose != '' && $ficha->cantidades_desglose != 'null' ? json_decode($ficha->cantidades_desglose, true) : [];
-$montos = isset($ficha->montos_desglose) && $ficha->montos_desglose != '' && $ficha->montos_desglose != 'null' ? json_decode($ficha->montos_desglose, true) : [];
+$desglose_costo = isset($desglose_costo) && $desglose_costo != '' && $desglose_costo != 'null' ? json_decode($desglose_costo, true) : [];
+$cantidades = isset($cantidades_desglose) && $cantidades_desglose != '' && $cantidades_desglose != 'null' ? json_decode($cantidades_desglose, true) : [];
+$montos = isset($montos_desglose) && $montos_desglose != '' && $montos_desglose != 'null' ? json_decode($montos_desglose, true) : [];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -87,9 +87,9 @@ $montos = isset($ficha->montos_desglose) && $ficha->montos_desglose != '' && $fi
         <!-- Row 1 -->
         <tr>
             <td class="cell-label" style="width: 25%;">Nombre completo del evento</td>
-            <td class="cell-input" style="width: 35%;"><?= $ficha->nombre_evento ?? '' ?></td>
+            <td class="cell-input" style="width: 35%;"><?= $nombre_evento ?? '' ?></td>
             <td class="cell-label" style="width: 20%;">Persona que presenta la solicitud</td>
-            <td class="cell-input" style="width: 20%;"><?= $ficha->persona_solicitud ?? '' ?></td>
+            <td class="cell-input" style="width: 20%;"><?= $persona_solicitud ?? '' ?></td>
         </tr>
         
         <!-- Row 2 -->
@@ -98,44 +98,44 @@ $montos = isset($ficha->montos_desglose) && $ficha->montos_desglose != '' && $fi
             <td class="cell-input">
                 <table class="nested-table">
                     <tr>
-                        <td style="width: 50%;"><?= $ficha->fecha_realizacion ?? '' ?></td>
+                        <td style="width: 50%;"><?= $fecha_realizacion ?? '' ?></td>
                         <td class="cell-label border-left" style="width: 20%;">Edición</td>
-                        <td style="width: 30%;"><?= $ficha->edicion ?? '' ?></td>
+                        <td style="width: 30%;"><?= $edicion ?? '' ?></td>
                     </tr>
                 </table>
             </td>
             <td class="cell-label">Municipio Sede</td>
-            <td class="cell-input"><?= $ficha->municipio_sede ?? '' ?></td>
+            <td class="cell-input"><?= $municipio_sede ?? '' ?></td>
         </tr>
         
         <!-- Row 3 -->
         <tr>
             <td class="cell-label">Periodicidad</td>
-            <td colspan="3" class="cell-input"><?= $ficha->periodicidad_radio ?? '' ?></td>
+            <td colspan="3" class="cell-input"><?= $periodicidad_radio ?? '' ?></td>
         </tr>
         
         <!-- Row 4 -->
         <tr>
             <td class="cell-label">Antecedentes</td>
-            <td colspan="3" class="cell-input"><?= nl2br($ficha->antecedentes ?? '') ?></td>
+            <td colspan="3" class="cell-input"><?= nl2br($antecedentes ?? '') ?></td>
         </tr>
         
         <!-- Row 5 -->
         <tr>
             <td class="cell-label">Objetivo general del evento:</td>
-            <td colspan="3" class="cell-input"><?= nl2br($ficha->objetivo_general ?? '') ?></td>
+            <td colspan="3" class="cell-input"><?= nl2br($objetivo_general ?? '') ?></td>
         </tr>
         
         <!-- Row 6 -->
         <tr>
             <td class="cell-label">Justificación:</td>
-            <td colspan="3" class="cell-input"><?= nl2br($ficha->justificacion ?? '') ?></td>
+            <td colspan="3" class="cell-input"><?= nl2br($justificacion ?? '') ?></td>
         </tr>
         
         <!-- Row 7 -->
         <tr>
             <td class="cell-label">Incorporación de la cadena de valor:</td>
-            <td colspan="3" class="cell-input"><?= nl2br($ficha->cadena_valor ?? '') ?></td>
+            <td colspan="3" class="cell-input"><?= nl2br($cadena_valor ?? '') ?></td>
         </tr>
         
         <!-- Row 8 -->
@@ -145,9 +145,9 @@ $montos = isset($ficha->montos_desglose) && $ficha->montos_desglose != '' && $fi
                 <table class="nested-table">
                     <tr>
                         <td class="cell-label" style="width: 25%;">Número de habitantes</td>
-                        <td class="cell-input" style="width: 25%;"><?= $ficha->nivel_habilidades ?? '' ?></td>
+                        <td class="cell-input" style="width: 25%;"><?= $nivel_habilidades ?? '' ?></td>
                         <td class="cell-label border-left" style="width: 25%;">Estratificación Social:</td>
-                        <td class="cell-input" style="width: 25%;"><?= $ficha->estrato ?? '' ?></td>
+                        <td class="cell-input" style="width: 25%;"><?= $estrato ?? '' ?></td>
                     </tr>
                 </table>
             </td>
@@ -158,7 +158,7 @@ $montos = isset($ficha->montos_desglose) && $ficha->montos_desglose != '' && $fi
             <td class="cell-label text-center">
                 Periodicidad<br>
                 <div style="background: white; border: 1px solid #ccc; padding: 5px; margin-top:5px; text-align:left; min-height: 30px; font-weight:normal;">
-                    <?= nl2br($ficha->periodicidad_desc ?? '') ?>
+                    <?= nl2br($periodicidad_desc ?? '') ?>
                 </div>
             </td>
             <td class="cell-label text-center bg-gray">Asistentes estimados</td>
@@ -166,21 +166,21 @@ $montos = isset($ficha->montos_desglose) && $ficha->montos_desglose != '' && $fi
                 <table class="nested-table" style="border-collapse: collapse; width:100%;">
                     <tr>
                         <td class="cell-label text-center" style="width: 40%; border-bottom: 1px solid #1a3c7b;">Totales:<br>(acumulados)</td>
-                        <td class="cell-input text-center" style="width: 30%; border-bottom: 1px solid #1a3c7b;"><?= $ficha->asistentes_totales ?? '' ?></td>
+                        <td class="cell-input text-center" style="width: 30%; border-bottom: 1px solid #1a3c7b;"><?= $asistentes_totales ?? '' ?></td>
                         <td class="cell-label text-center border-left" style="width: 15%; border-bottom: 1px solid #1a3c7b;">Local</td>
-                        <td class="cell-input text-center" style="width: 15%; border-bottom: 1px solid #1a3c7b;"><?= $ficha->asistentes_local ?? '' ?></td>
+                        <td class="cell-input text-center" style="width: 15%; border-bottom: 1px solid #1a3c7b;"><?= $asistentes_local ?? '' ?></td>
                     </tr>
                     <tr>
                         <td colspan="3" class="cell-label text-right" style="font-weight:normal; border-bottom: 1px solid #1a3c7b;">Regional</td>
-                        <td class="cell-input text-center" style="border-bottom: 1px solid #1a3c7b;"><?= $ficha->asistentes_regional ?? '' ?></td>
+                        <td class="cell-input text-center" style="border-bottom: 1px solid #1a3c7b;"><?= $asistentes_regional ?? '' ?></td>
                     </tr>
                     <tr>
                         <td colspan="3" class="cell-label text-right" style="font-weight:normal; border-bottom: 1px solid #1a3c7b;">Nacional</td>
-                        <td class="cell-input text-center" style="border-bottom: 1px solid #1a3c7b;"><?= $ficha->asistentes_nacional ?? '' ?></td>
+                        <td class="cell-input text-center" style="border-bottom: 1px solid #1a3c7b;"><?= $asistentes_nacional ?? '' ?></td>
                     </tr>
                     <tr>
                         <td colspan="3" class="cell-label text-right" style="font-weight:normal;">Internacional</td>
-                        <td class="cell-input text-center"><?= $ficha->asistentes_internacional ?? '' ?></td>
+                        <td class="cell-input text-center"><?= $asistentes_internacional ?? '' ?></td>
                     </tr>
                 </table>
             </td>
@@ -192,7 +192,7 @@ $montos = isset($ficha->montos_desglose) && $ficha->montos_desglose != '' && $fi
                 <small style="font-weight: normal; font-size: 8px;">[Local, regional, nacional, internacional.]</small>
                 <br>
                 <div style="background: white; border: 1px solid #ccc; padding: 5px; margin-top:5px; text-align:left; min-height: 40px;">
-                    <?= nl2br($ficha->alcance ?? '') ?>
+                    <?= nl2br($alcance ?? '') ?>
                 </div>
             </td>
             <td class="cell-label text-center bg-gray">Derrama económica estimada</td>
@@ -200,15 +200,15 @@ $montos = isset($ficha->montos_desglose) && $ficha->montos_desglose != '' && $fi
                 <table class="nested-table" style="width: 100%;">
                     <tr>
                         <td class="cell-label text-center" style="border-bottom: 1px solid #1a3c7b;">Total:</td>
-                        <td class="cell-input text-center text-success" style="border-bottom: 1px solid #1a3c7b;"><?= $ficha->derrama_total ?? '' ?></td>
+                        <td class="cell-input text-center text-success" style="border-bottom: 1px solid #1a3c7b;"><?= $derrama_total ?? '' ?></td>
                     </tr>
                     <tr>
                         <td class="cell-label text-center" style="border-bottom: 1px solid #1a3c7b;">Habitante Local:</td>
-                        <td class="cell-input text-center text-success" style="border-bottom: 1px solid #1a3c7b;"><?= $ficha->derrama_local ?? '' ?></td>
+                        <td class="cell-input text-center text-success" style="border-bottom: 1px solid #1a3c7b;"><?= $derrama_local ?? '' ?></td>
                     </tr>
                     <tr>
                         <td class="cell-label text-center">Visitante Foráneo:</td>
-                        <td class="cell-input text-center text-success"><?= $ficha->derrama_foraneo ?? '' ?></td>
+                        <td class="cell-input text-center text-success"><?= $derrama_foraneo ?? '' ?></td>
                     </tr>
                 </table>
             </td>
@@ -220,15 +220,15 @@ $montos = isset($ficha->montos_desglose) && $ficha->montos_desglose != '' && $fi
                 <table class="nested-table" style="width:100%;">
                     <tr>
                         <td class="cell-label text-center" style="border-bottom: 1px solid #1a3c7b;">Mujeres</td>
-                        <td class="cell-input text-center" style="border-bottom: 1px solid #1a3c7b;"><?= $ficha->empleos_mujeres ?? '' ?></td>
+                        <td class="cell-input text-center" style="border-bottom: 1px solid #1a3c7b;"><?= $empleos_mujeres ?? '' ?></td>
                     </tr>
                     <tr>
                         <td class="cell-label text-center" style="border-bottom: 1px solid #1a3c7b;">Hombres</td>
-                        <td class="cell-input text-center" style="border-bottom: 1px solid #1a3c7b;"><?= $ficha->empleos_hombres ?? '' ?></td>
+                        <td class="cell-input text-center" style="border-bottom: 1px solid #1a3c7b;"><?= $empleos_hombres ?? '' ?></td>
                     </tr>
                     <tr>
                         <td class="cell-label text-center">Personas con discapacidad</td>
-                        <td class="cell-input text-center"><?= $ficha->empleos_discapacidad ?? '' ?></td>
+                        <td class="cell-input text-center"><?= $empleos_discapacidad ?? '' ?></td>
                     </tr>
                 </table>
             </td>
@@ -237,7 +237,7 @@ $montos = isset($ficha->montos_desglose) && $ficha->montos_desglose != '' && $fi
         <tr>
             <td class="cell-label text-center bg-gray" colspan="2">Cuota de acceso al evento</td>
             <td colspan="2" class="cell-input text-center text-success" style="font-weight: bold; font-size:12px;">
-                <?= $ficha->cuota_acceso ?? '' ?>
+                <?= $cuota_acceso ?? '' ?>
             </td>
         </tr>
         
@@ -245,11 +245,11 @@ $montos = isset($ficha->montos_desglose) && $ficha->montos_desglose != '' && $fi
         <tr>
             <td colspan="2" class="cell-label">
                 Cuartos noche <small style="font-weight: normal;">[por acción generadas por el festival/evento]</small>: &nbsp;
-                <span style="background: white; border: 1px solid #ccc; padding: 2px 10px;"><?= $ficha->cuantas_cuotas ?? '' ?></span>
+                <span style="background: white; border: 1px solid #ccc; padding: 2px 10px;"><?= $cuantas_cuotas ?? '' ?></span>
             </td>
             <td colspan="2" class="cell-label">
                 Costo total de la realización del festival/evento: &nbsp;
-                <span class="text-success" style="background: white; border: 1px solid #ccc; padding: 2px 10px; font-weight: bold;"><?= $ficha->costo_total ?? '' ?></span>
+                <span class="text-success" style="background: white; border: 1px solid #ccc; padding: 2px 10px; font-weight: bold;"><?= $costo_total ?? '' ?></span>
             </td>
         </tr>
         
@@ -284,7 +284,7 @@ $montos = isset($ficha->montos_desglose) && $ficha->montos_desglose != '' && $fi
         </tr>
         <tr>
             <td colspan="4" class="cell-input" style="height: 60px; vertical-align: top;">
-                <?= nl2br($ficha->antecedentes_evento ?? '') ?>
+                <?= nl2br($antecedentes_evento ?? '') ?>
             </td>
         </tr>
         
@@ -299,22 +299,22 @@ $montos = isset($ficha->montos_desglose) && $ficha->montos_desglose != '' && $fi
                 Propuesta de valor del evento<br>
                 <small style="font-weight: normal;">[Contenido diferenciado...]</small>
             </td>
-            <td colspan="2" class="cell-input" style="height:40px; vertical-align:top;"><?= nl2br($ficha->propuesta_valor ?? '') ?></td>
+            <td colspan="2" class="cell-input" style="height:40px; vertical-align:top;"><?= nl2br($propuesta_valor ?? '') ?></td>
         </tr>
         <tr>
             <td colspan="2" class="cell-label">
                 Inclusión y empoderamiento de las mujeres<br>
                 <small style="font-weight: normal;">[empleo, acción dirigida a mujeres]</small>
             </td>
-            <td colspan="2" class="cell-input" style="height:40px; vertical-align:top;"><?= nl2br($ficha->inclusion_mujeres ?? '') ?></td>
+            <td colspan="2" class="cell-input" style="height:40px; vertical-align:top;"><?= nl2br($inclusion_mujeres ?? '') ?></td>
         </tr>
         <tr>
             <td colspan="2" class="cell-label">Programa preliminar del evento</td>
-            <td colspan="2" class="cell-input" style="height:40px; vertical-align:top;"><?= nl2br($ficha->programa_preliminar ?? '') ?></td>
+            <td colspan="2" class="cell-input" style="height:40px; vertical-align:top;"><?= nl2br($programa_preliminar ?? '') ?></td>
         </tr>
         <tr>
             <td colspan="2" class="cell-label">Otras actividades (especificar)</td>
-            <td colspan="2" class="cell-input" style="height:40px; vertical-align:top;"><?= nl2br($ficha->otras_actividades ?? '') ?></td>
+            <td colspan="2" class="cell-input" style="height:40px; vertical-align:top;"><?= nl2br($otras_actividades ?? '') ?></td>
         </tr>
 
         <!-- Datos de Sitio Web / Redes Sociales -->
@@ -325,42 +325,42 @@ $montos = isset($ficha->montos_desglose) && $ficha->montos_desglose != '' && $fi
         </tr>
         <tr>
             <td class="cell-label text-center">Link página web</td>
-            <td colspan="3" class="cell-input"><?= $ficha->link_web ?? '' ?></td>
+            <td colspan="3" class="cell-input"><?= $link_web ?? '' ?></td>
         </tr>
         <tr>
             <td class="cell-label text-center" rowspan="5" style="vertical-align: middle;">Nombre de sus cuentas en redes sociales</td>
             <td class="cell-label text-center" style="background-color: #4a4a4a; color: white;">Facebook:</td>
-            <td class="cell-input"><?= $ficha->facebook ?? '' ?></td>
+            <td class="cell-input"><?= $facebook ?? '' ?></td>
             <td class="cell-label text-center" style="background-color: #4a4a4a; color: white; border-right: none;">
-                No. de seguidores <span style="background:#fff; color:#000; padding:2px 5px; margin-left:5px; border-radius:3px; display:inline-block;"><?= $ficha->fb_seguidores ?? '' ?></span>
+                No. de seguidores <span style="background:#fff; color:#000; padding:2px 5px; margin-left:5px; border-radius:3px; display:inline-block;"><?= $fb_seguidores ?? '' ?></span>
             </td>
         </tr>
         <tr>
             <td class="cell-label text-center" style="background-color: #4a4a4a; color: white;">Twitter:</td>
-            <td class="cell-input"><?= $ficha->twitter ?? '' ?></td>
+            <td class="cell-input"><?= $twitter ?? '' ?></td>
             <td class="cell-label text-center" style="background-color: #4a4a4a; color: white;">
-                No. de seguidores <span style="background:#fff; color:#000; padding:2px 5px; margin-left:5px; border-radius:3px; display:inline-block;"><?= $ficha->tw_seguidores ?? '' ?></span>
+                No. de seguidores <span style="background:#fff; color:#000; padding:2px 5px; margin-left:5px; border-radius:3px; display:inline-block;"><?= $tw_seguidores ?? '' ?></span>
             </td>
         </tr>
         <tr>
             <td class="cell-label text-center" style="background-color: #4a4a4a; color: white;">Instagram:</td>
-            <td class="cell-input"><?= $ficha->instagram ?? '' ?></td>
+            <td class="cell-input"><?= $instagram ?? '' ?></td>
             <td class="cell-label text-center" style="background-color: #4a4a4a; color: white;">
-                No. de seguidores <span style="background:#fff; color:#000; padding:2px 5px; margin-left:5px; border-radius:3px; display:inline-block;"><?= $ficha->ig_seguidores ?? '' ?></span>
+                No. de seguidores <span style="background:#fff; color:#000; padding:2px 5px; margin-left:5px; border-radius:3px; display:inline-block;"><?= $ig_seguidores ?? '' ?></span>
             </td>
         </tr>
         <tr>
             <td class="cell-label text-center" style="background-color: #4a4a4a; color: white;">YouTube:</td>
-            <td class="cell-input"><?= $ficha->youtube ?? '' ?></td>
+            <td class="cell-input"><?= $youtube ?? '' ?></td>
             <td class="cell-label text-center" style="background-color: #4a4a4a; color: white;">
-                No. de seguidores <span style="background:#fff; color:#000; padding:2px 5px; margin-left:5px; border-radius:3px; display:inline-block;"><?= $ficha->yt_seguidores ?? '' ?></span>
+                No. de seguidores <span style="background:#fff; color:#000; padding:2px 5px; margin-left:5px; border-radius:3px; display:inline-block;"><?= $yt_seguidores ?? '' ?></span>
             </td>
         </tr>
         <tr>
             <td class="cell-label text-center" style="background-color: #4a4a4a; color: white;">TikTok:</td>
-            <td class="cell-input"><?= $ficha->tiktok ?? '' ?></td>
+            <td class="cell-input"><?= $tiktok ?? '' ?></td>
             <td class="cell-label text-center" style="background-color: #4a4a4a; color: white;">
-                No. de seguidores <span style="background:#fff; color:#000; padding:2px 5px; margin-left:5px; border-radius:3px; display:inline-block;"><?= $ficha->tk_seguidores ?? '' ?></span>
+                No. de seguidores <span style="background:#fff; color:#000; padding:2px 5px; margin-left:5px; border-radius:3px; display:inline-block;"><?= $tk_seguidores ?? '' ?></span>
             </td>
         </tr>
 
@@ -373,33 +373,33 @@ $montos = isset($ficha->montos_desglose) && $ficha->montos_desglose != '' && $fi
         </tr>
         <tr>
             <td class="cell-label text-center">Nombre Completo</td>
-            <td class="cell-input"><?= $ficha->co_nombre ?? '' ?></td>
+            <td class="cell-input"><?= $co_nombre ?? '' ?></td>
             <td class="cell-label text-center">Teléfono</td>
-            <td class="cell-input"><?= $ficha->co_telefono ?? '' ?></td>
+            <td class="cell-input"><?= $co_telefono ?? '' ?></td>
         </tr>
         <tr>
             <td class="cell-label text-center">Razón Social</td>
-            <td class="cell-input"><?= $ficha->co_razon_social ?? '' ?></td>
+            <td class="cell-input"><?= $co_razon_social ?? '' ?></td>
             <td class="bg-gray"></td>
             <td class="bg-gray"></td>
         </tr>
         <tr>
             <td class="cell-label text-center">Cargo del comité organizador</td>
-            <td class="cell-input"><?= $ficha->co_cargo ?? '' ?></td>
+            <td class="cell-input"><?= $co_cargo ?? '' ?></td>
             <td class="cell-label text-center">Celular</td>
-            <td class="cell-input"><?= $ficha->co_celular ?? '' ?></td>
+            <td class="cell-input"><?= $co_celular ?? '' ?></td>
         </tr>
         <tr>
             <td class="cell-label text-center">Domicilio</td>
-            <td class="cell-input"><?= $ficha->co_domicilio ?? '' ?></td>
+            <td class="cell-input"><?= $co_domicilio ?? '' ?></td>
             <td class="bg-gray"></td>
             <td class="bg-gray"></td>
         </tr>
         <tr>
             <td class="cell-label text-center">Ciudad y estado</td>
-            <td class="cell-input"><?= $ficha->co_ciudad_estado ?? '' ?></td>
+            <td class="cell-input"><?= $co_ciudad_estado ?? '' ?></td>
             <td class="cell-label text-center">E-mail</td>
-            <td class="cell-input"><?= $ficha->co_email ?? '' ?></td>
+            <td class="cell-input"><?= $co_email ?? '' ?></td>
         </tr>
 
         <!-- Enlace Municipal Organizador -->
@@ -415,25 +415,25 @@ $montos = isset($ficha->montos_desglose) && $ficha->montos_desglose != '' && $fi
         </tr>
         <tr>
             <td class="cell-label text-center">Nombre Completo</td>
-            <td class="cell-input"><?= $ficha->em_nombre ?? '' ?></td>
+            <td class="cell-input"><?= $em_nombre ?? '' ?></td>
             <td class="cell-label text-center">Cargo/puesto en el evento</td>
-            <td class="cell-input"><?= $ficha->em_cargo ?? '' ?></td>
+            <td class="cell-input"><?= $em_cargo ?? '' ?></td>
         </tr>
         <tr>
             <td class="cell-label text-center" rowspan="2">Domicilio</td>
-            <td class="cell-input" rowspan="2" style="vertical-align: top;"><?= nl2br($ficha->em_domicilio ?? '') ?></td>
+            <td class="cell-input" rowspan="2" style="vertical-align: top;"><?= nl2br($em_domicilio ?? '') ?></td>
             <td class="cell-label text-center">Teléfono (celular)</td>
-            <td class="cell-input"><?= $ficha->em_celular ?? '' ?></td>
+            <td class="cell-input"><?= $em_celular ?? '' ?></td>
         </tr>
         <tr>
             <td class="cell-label text-center">Teléfono y extensión (fijo)</td>
-            <td class="cell-input"><?= $ficha->em_telefono_fijo ?? '' ?></td>
+            <td class="cell-input"><?= $em_telefono_fijo ?? '' ?></td>
         </tr>
         <tr>
             <td class="cell-label text-center">Ciudad y estado</td>
-            <td class="cell-input"><?= $ficha->em_ciudad_estado ?? '' ?></td>
+            <td class="cell-input"><?= $em_ciudad_estado ?? '' ?></td>
             <td class="cell-label text-center">E-mail</td>
-            <td class="cell-input"><?= $ficha->em_email ?? '' ?></td>
+            <td class="cell-input"><?= $em_email ?? '' ?></td>
         </tr>
 
         <!-- Apoyos Solicitados -->
@@ -449,9 +449,9 @@ $montos = isset($ficha->montos_desglose) && $ficha->montos_desglose != '' && $fi
             <td class="cell-label text-center" style="width: 33.33%;">Estatal</td>
         </tr>
         <tr>
-            <td class="cell-input text-center text-success font-weight-bold"><?= $ficha->apoyo_federal ?? '' ?></td>
-            <td colspan="2" class="cell-input text-center text-success font-weight-bold"><?= $ficha->apoyo_municipal ?? '' ?></td>
-            <td class="cell-input text-center text-success font-weight-bold"><?= $ficha->apoyo_estatal ?? '' ?></td>
+            <td class="cell-input text-center text-success font-weight-bold"><?= $apoyo_federal ?? '' ?></td>
+            <td colspan="2" class="cell-input text-center text-success font-weight-bold"><?= $apoyo_municipal ?? '' ?></td>
+            <td class="cell-input text-center text-success font-weight-bold"><?= $apoyo_estatal ?? '' ?></td>
         </tr>
         <tr>
             <td colspan="4" class="cell-label text-center bg-gray">
@@ -460,7 +460,7 @@ $montos = isset($ficha->montos_desglose) && $ficha->montos_desglose != '' && $fi
         </tr>
         <tr>
             <td colspan="4" class="cell-input" style="height: 50px; vertical-align:top;">
-                <?= nl2br($ficha->descripcion_apoyos ?? '') ?>
+                <?= nl2br($descripcion_apoyos ?? '') ?>
             </td>
         </tr>
 

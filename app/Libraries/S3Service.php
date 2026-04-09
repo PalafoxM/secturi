@@ -2,8 +2,8 @@
 
 namespace App\Libraries;
 
-use Aws\S3\S3Client;
 use Aws\Exception\AwsException;
+use Aws\S3\S3Client;
 
 class S3Service
 {
@@ -12,76 +12,126 @@ class S3Service
 
     public function __construct()
     {
-        $this->client = new S3Client([
-            'version'     => 'latest',
-            'region'      => getenv('AWS_DEFAULT_REGION'),
+        $config = [
+            'version' => 'latest',
+            'region' => getenv('AWS_DEFAULT_REGION'),
             'credentials' => [
-                'key'    => getenv('AWS_ACCESS_KEY_ID'),
+                'key' => getenv('AWS_ACCESS_KEY_ID'),
                 'secret' => getenv('AWS_SECRET_ACCESS_KEY'),
             ],
-            'http'        => [
-                'verify' => false // Desactiva la verificación SSL (Util para local WAMP)
-            ]
-        ]);
+            'suppress_php_deprecation_warning' => true,
+            'http' => [
+                'verify' => false,
+            ],
+        ];
+
+        $endpoint = getenv('AWS_ENDPOINT');
+        if (!empty($endpoint)) {
+            $config['endpoint'] = $endpoint;
+            $config['use_path_style_endpoint'] = filter_var(
+                getenv('AWS_USE_PATH_STYLE_ENDPOINT') ?: true,
+                FILTER_VALIDATE_BOOLEAN
+            );
+        }
+
+        $this->client = new S3Client($config);
         $this->bucket = getenv('AWS_BUCKET');
     }
 
-    /**
-     * Sube un archivo al bucket de S3
-     * 
-     * @param string $sourceFile Ruta temporal o local del archivo a subir
-     * @param string $keyName Nombre con el que se guardará en S3 (puede incluir carpetas ej. 'documentos/archivo.pdf')
-     * @return string|false URL pública del archivo si tiene éxito, o false si falla.
-     */
     public function uploadFile($sourceFile, $keyName)
     {
         try {
             $result = $this->client->putObject([
-                'Bucket'     => $this->bucket,
-                'Key'        => $keyName,
+                'Bucket' => $this->bucket,
+                'Key' => $keyName,
                 'SourceFile' => $sourceFile,
-                // Si deseas que los archivos sean públicos, descomenta la siguiente línea y asegúrate de que el bucket lo permita
-               // 'ACL'        => 'public-read',
             ]);
 
             return $result->get('ObjectURL');
         } catch (AwsException $e) {
-            var_dump($e->getMessage());
             log_message('error', 'Error al subir a S3: ' . $e->getMessage());
             return false;
         }
     }
 
-    /**
-     * Obtiene la URL de un archivo dentro del bucket
-     * 
-     * @param string $keyName Nombre del archivo en S3
-     * @return string URL del archivo
-     */
+    public function folderExists($folderName)
+    {
+        $folderKey = trim($folderName, '/') . '/';
+
+        try {
+            $result = $this->client->listObjectsV2([
+                'Bucket' => $this->bucket,
+                'Prefix' => $folderKey,
+                'MaxKeys' => 1,
+            ]);
+
+            return $result->get('KeyCount') > 0;
+        } catch (AwsException $e) {
+            log_message('error', 'Error al validar carpeta en S3: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function createFolder($folderName)
+    {
+        $folderKey = trim($folderName, '/') . '/';
+
+        try {
+            $this->client->putObject([
+                'Bucket' => $this->bucket,
+                'Key' => $folderKey,
+                'Body' => '',
+            ]);
+
+            return true;
+        } catch (AwsException $e) {
+            log_message('error', 'Error al crear carpeta en S3: ' . $e->getMessage());
+            return false;
+        }
+    }
+
     public function getFileUrl($keyName)
     {
         return $this->client->getObjectUrl($this->bucket, $keyName);
     }
 
-    /**
-     * Obtiene una URL temporal (firmada) para descargar o ver un archivo privado
-     * 
-     * @param string $keyName Nombre del archivo en S3
-     * @param string $expires Tiempo de expiración de la URL (ej: '+20 minutes')
-     * @return string URL temporal
-     */
     public function getPresignedUrl($keyName, $expires = '+20 minutes')
     {
         try {
             $cmd = $this->client->getCommand('GetObject', [
                 'Bucket' => $this->bucket,
-                'Key'    => $keyName
+                'Key' => $keyName
             ]);
-            
+
             $request = $this->client->createPresignedRequest($cmd, $expires);
-            return (string)$request->getUri();
+            return (string) $request->getUri();
         } catch (AwsException $e) {
             log_message('error', 'Error generando presigned URL en S3: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function downloadToTempFile($keyName, $prefix = 's3_')
+    {
+        try {
+            $extension = pathinfo($keyName, PATHINFO_EXTENSION);
+            $tempFile = tempnam(sys_get_temp_dir(), $prefix);
+
+            if ($extension) {
+                $renamedTempFile = $tempFile . '.' . $extension;
+                rename($tempFile, $renamedTempFile);
+                $tempFile = $renamedTempFile;
+            }
+
+            $this->client->getObject([
+                'Bucket' => $this->bucket,
+                'Key' => $keyName,
+                'SaveAs' => $tempFile,
+            ]);
+
+            return $tempFile;
+        } catch (AwsException $e) {
+            log_message('error', 'Error descargando archivo temporal desde S3: ' . $e->getMessage());
             return false;
         }
     }

@@ -16022,7 +16022,7 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
 		for ($i = 0; $i < $array_size; $i++) {
 			// COLS
 			$oldcolumn = $this->CurrCol;
-			$vetor = isset($arrayaux[$i]) ? $arrayaux[$i] : null;
+			$vetor = $arrayaux[$i] ?? [];
 			if ($i == 0 && $vetor[0] != "\n" && ! $this->ispre) {
 				$vetor[0] = ltrim($vetor[0]);
 				if (!empty($vetor[18])) {

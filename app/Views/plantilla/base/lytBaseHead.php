@@ -577,16 +577,19 @@
                             </li><!--end nav-item-->
                      
                         <?php endif; ?>
-                        <?php if (in_array($session->id_perfil, [1, 8])): ?>
+                        <?php if (in_array($session->id_perfil, [1, 8, 9])): ?>
                             <li class="nav-item">
                                 <a class="nav-link" href="#"><span class="w-100">Promocion Tur.</span><span class="menu-arrow"><i
                                             class="mdi mdi-chevron-right"></i></span></a>
                                 <ul class="nav-second-level" aria-expanded="false">
                                     
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/ListaConvenio">Contratos</a></li>
+                                    <li><a href="<?php echo base_url(); ?>index.php/Agregar/formBucketAws">Agregar Buckets</a></li>
+                                    <li><a href="<?php echo base_url(); ?>index.php/Agregar/listaBucketAws">Lista Buckets</a></li>
                                    
                                   
                                 </ul>   
+                               
                             </li><!--end nav-item-->
                         <?php endif; ?>
                     </ul><!--end nav-->
