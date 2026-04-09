@@ -7900,17 +7900,17 @@ class Principal extends BaseController
         $data['usuarios'] = (!empty($usuariosQuery->data)) ? $usuariosQuery->data : [];
         
         // Variables añadidas para el "no_consecutivo" estilo Formato GO
-        $cat_area = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'id_pago' => 1]]);
+        $cat_area = $globals->getTabla(["tabla" => "cat_area", "where" => ["id_pago" => 1, 'id_pago' => 1]]);
         $data['cat_area'] = isset($cat_area->data) ? $cat_area->data : [];
         
-        $usu = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["visible" => 1, 'id_usuario' => $session->get('id_usuario')]]);
+        $usu = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["id_pago" => 1, 'id_usuario' => $session->get('id_usuario')]]);
         $data['id_area'] = 1; // fallback
         if(isset($usu->data[0]->id_usuario)){
-            $tieneArea = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'titular' => $usu->data[0]->id_usuario]]);
+            $tieneArea = $globals->getTabla(["tabla" => "cat_area", "where" => ["id_pago" => 1, 'titular' => $usu->data[0]->id_usuario]]);
             if(isset($tieneArea->data) && !empty($tieneArea->data)){
                 $data['id_area'] = $tieneArea->data[0]->id_area;
             }else{
-                $tieneArea = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'titular' => $usu->data[0]->id_jefe_inmediato]]);
+                $tieneArea = $globals->getTabla(["tabla" => "cat_area", "where" => ["id_pago" => 1, 'titular' => $usu->data[0]->id_jefe_inmediato]]);
                 if(isset($tieneArea->data) && !empty($tieneArea->data)){
                     $data['id_area'] = $tieneArea->data[0]->id_area;
                 }else{
