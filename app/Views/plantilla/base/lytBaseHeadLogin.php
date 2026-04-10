@@ -234,6 +234,7 @@ body.forest-bg #particles-js { display: none; }
     base_url + "assets/images/backgrounds/img_7.JPG",
     base_url + "assets/images/backgrounds/img_8.JPG",
     base_url + "assets/images/backgrounds/IMG_45.JPG",
+    base_url + "assets/images/backgrounds/img_16.jpg",
     //FOREST_URL,
   ];
 
