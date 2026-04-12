@@ -318,27 +318,14 @@ $tarjetasError = session()->getFlashdata('tarjetas_error');
                                             </ul>
                                         </div><!--end card-body-->
                                     </div><!--end card-->
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <h4 class="header-title mt-0 mb-3">PROGRAMA ANUAL DE FORMACIÓN EN GESTIÓN DOCUMENTAL Y ADMINTRACION DE ARCHIVOS 2026</h4>
-                                            <ul class="list-unsyled m-0 pl-0 transaction-history">
-                                                <a href="<?= base_url() ?>assets/documentos/Cat_C3_A1logo_20PAFGDAA_202026_AGE.pdf" target="_blank">Ver Programa Anual
-                                                  <iframe
-                                                                src="<?= base_url() ?>assets/documentos/Cat_C3_A1logo_20PAFGDAA_202026_AGE.pdf"
-                                                                title="Programa Anual" style="border:0"
-                                                                loading="lazy" width="100%">
-                                                            </iframe>
-                                         </a>
-                                            </ul>
-                                        </div><!--end card-body-->
-                                    </div><!--end card-->
+                                    
                                      
 
                                 </div><!--end col-->
 
                                 <div class="col-lg-8">
                                     <div class="row">
-                                        <div class="col-lg-8">
+                                        <div class="col-lg-12">
                                             <div class="card dash-info-carousel">
                                                 <div class="card-body">
                                                     <h4 class="mt-0 header-title mb-4">Protocolo ALBA Guanajuato</h4>
@@ -447,82 +434,7 @@ $tarjetasError = session()->getFlashdata('tarjetas_error');
                                             </div>
                                         <?php endif; ?> -->
                                         
-                                            <div class="col-lg-4">
-                                            
-                                                    <div class="card">
-                                                        <div class="card-body dash-info-carousel">
-                                                            <h4 class="mt-0  mb-4">PADA 2026 E INFORME DE CUMPLIMIENTO 2025</h4>
-                                                            <div id="carousel_1" class="carousel slide" data-ride="carousel">
-                                                                <div class="carousel-inner">
-                                                                    <div class="carousel-item">
-                                                                        <a href="<?= base_url() . 'assets/documentos/Informe de cumplimiento 2025 JFARCHIVOS.pdf' ?>"
-                                                                            target="_black">
-                                                                            <div class="media">
-                                                                                <div class="icon-info mb-3">
-                                                                                    <!-- Constitución, leyes, normas -->
-                                                                                    <i
-                                                                                        class="fas fa-file-pdf bg-soft-primary"></i>
-                                                                                </div>
-                                                                                <div class="media-body align-self-center">
-                                                                                    <h4 class="mt-0 mb-1 title-text text-dark">
-                                                                                        Informe de Cumplimiento 2025</h4>
-                                                                                    <p class="text-muted mb-0">Ver más</p>
-                                                                                </div>
-                                                                            </div>
-                                                                        </a>
-                                                                    </div>
-
-                                                                    <div class="carousel-item">
-                                                                        <a href="<?= base_url() . 'assets/documentos/PADA 2026.pdf' ?>"
-                                                                            target="_black">
-                                                                            <div class="media">
-                                                                                <div class="icon-info mb-3">
-                                                                                    <!-- Reglas, integridad, lineamientos -->
-                                                                                    <i class="fas fa-file-pdf bg-soft-success"></i>
-                                                                                </div>
-                                                                                <div class="media-body align-self-center">
-                                                                                    <h4 class="mt-0 mb-1">PADA 2026</h4>
-                                                                                    <p class="text-muted mb-0">Saber más</p>
-                                                                                </div>
-                                                                            </div>
-                                                                        </a>
-                                                                    </div>
-
-                                                                    <div class="carousel-item active">
-                                                                        <a href="<?= base_url() . 'assets/documentos/PADA 2026.pdf' ?>"
-                                                                            target="_black">
-                                                                            <div class="media">
-                                                                                <div class="icon-info mb-3">
-                                                                                    <!-- Valores, ética, principios -->
-                                                                                    <i
-                                                                                        class="fas fa-file-pdf bg-soft-warning"></i>
-                                                                                </div>
-                                                                                <div class="media-body align-self-center">
-                                                                                    <h4 class="mt-0 mb-1 title-text">E-Archivo
-                                                                                    </h4>
-                                                                                    <p class="text-muted mb-0">Conoce los
-                                                                                        Valores</p>
-                                                                                </div>
-                                                                            </div>
-                                                                        </a>
-                                                                    </div>
-                                                                </div>
-                                                                <a class="carousel-control-prev" href="#carousel_1"
-                                                                    role="button" data-slide="prev">
-                                                                    <span class="carousel-control-prev-icon"
-                                                                        aria-hidden="true"></span>
-                                                                    <span class="sr-only">Previous</span>
-                                                                </a>
-                                                                <a class="carousel-control-next" href="#carousel_1"
-                                                                    role="button" data-slide="next">
-                                                                    <span class="carousel-control-next-icon"
-                                                                        aria-hidden="true"></span>
-                                                                    <span class="sr-only">Next</span>
-                                                                </a>
-                                                            </div>
-                                                        </div><!--end card-body-->
-                                                    </div><!--end card-->
-                                            </div>
+                                           
                                      
                                     </div><!--end row-->
 
@@ -530,105 +442,6 @@ $tarjetasError = session()->getFlashdata('tarjetas_error');
                                     <div class="row">
 
                                         <div class="col-lg-6">
-                                             <div class="card">
-                                                <div class="card-body">
-                                                    <h4 class="mt-0  mb-4">DISPOSICIONES ADMINISTRATIVAS</h4>
-                                                    <div class="blog-card">
-                                                        <div class="ratio ratio-16x9"> <!-- BS5 -->
-                                                            <iframe
-                                                                src="<?= base_url() ?>assets/documentos/Integracion_del_tramite_SECTURI_2026.pdf"
-                                                                title="Código de Conducta" style="border:0"
-                                                                loading="lazy" width="100%">
-                                                            </iframe>
-                                                        </div>
-                                                        <p class="text-muted text-truncate">SECTURI 2026</p>
-                                                        <hr class="hr-dashed">
-                                                        <div class="d-flex justify-content-between">
-
-                                                            <div class="align-self-center">
-                                                                <a href="<?= base_url() ?>assets/documentos/Disposiciones Administrativas SECTURI 2026.pptm"
-                                                                    target="_blank" class="text-primary">Leer más <i
-                                                                        class="fas fa-long-arrow-alt-right"></i></a>
-                                                            </div>
-                                                        </div>
-                                                    </div><!--end blog-card-->
-                                                </div><!--end card-body-->
-                                            </div><!--end card-->
-                                            <div class="card">
-                                                <div class="card-body dash-info-carousel">
-                                                    <h4 class="mt-0  mb-4">Código de Conducta</h4>
-                                                    <div id="carousel_1" class="carousel slide" data-ride="carousel">
-                                                        <div class="carousel-inner">
-                                                            <div class="carousel-item">
-                                                                <a href="<?= base_url() . 'assets/pdf/plantillas/principio.pdf' ?>"
-                                                                    target="_black">
-                                                                    <div class="media">
-                                                                        <div class="icon-info mb-3">
-                                                                            <!-- Constitución, leyes, normas -->
-                                                                            <i
-                                                                                class="fas fa-balance-scale bg-soft-primary"></i>
-                                                                        </div>
-                                                                        <div class="media-body align-self-center">
-                                                                            <h4 class="mt-0 mb-1 title-text text-dark">
-                                                                                Principios</h4>
-                                                                            <p class="text-muted mb-0">Ver más</p>
-                                                                        </div>
-                                                                    </div>
-                                                                </a>
-                                                            </div>
-
-                                                            <div class="carousel-item">
-                                                                <a href="<?= base_url() . 'assets/pdf/plantillas/reglas.pdf' ?>"
-                                                                    target="_black">
-                                                                    <div class="media">
-                                                                        <div class="icon-info mb-3">
-                                                                            <!-- Reglas, integridad, lineamientos -->
-                                                                            <i class="fas fa-gavel bg-soft-success"></i>
-                                                                        </div>
-                                                                        <div class="media-body align-self-center">
-                                                                            <h4 class="mt-0 mb-1">Reglas de
-                                                                                Integridad</h4>
-                                                                            <p class="text-muted mb-0">Saber más</p>
-                                                                        </div>
-                                                                    </div>
-                                                                </a>
-                                                            </div>
-
-                                                            <div class="carousel-item active">
-                                                                <a href="<?= base_url() . 'assets/pdf/plantillas/valores2.pdf' ?>"
-                                                                    target="_black">
-                                                                    <div class="media">
-                                                                        <div class="icon-info mb-3">
-                                                                            <!-- Valores, ética, principios -->
-                                                                            <i
-                                                                                class="fas fa-hand-holding-heart bg-soft-warning"></i>
-                                                                        </div>
-                                                                        <div class="media-body align-self-center">
-                                                                            <h4 class="mt-0 mb-1 title-text">Valores
-                                                                            </h4>
-                                                                            <p class="text-muted mb-0">Conoce los
-                                                                                Valores</p>
-                                                                        </div>
-                                                                    </div>
-                                                                </a>
-                                                            </div>
-                                                        </div>
-                                                        <a class="carousel-control-prev" href="#carousel_1"
-                                                            role="button" data-slide="prev">
-                                                            <span class="carousel-control-prev-icon"
-                                                                aria-hidden="true"></span>
-                                                            <span class="sr-only">Previous</span>
-                                                        </a>
-                                                        <a class="carousel-control-next" href="#carousel_1"
-                                                            role="button" data-slide="next">
-                                                            <span class="carousel-control-next-icon"
-                                                                aria-hidden="true"></span>
-                                                            <span class="sr-only">Next</span>
-                                                        </a>
-                                                    </div>
-                                                </div><!--end card-body-->
-                                            </div><!--end card-->
-
                                             <div class="card">
                                                 <div class="card-body">
                                                     <h4 class="mt-0  mb-4">Código de Ética</h4>
@@ -660,24 +473,7 @@ $tarjetasError = session()->getFlashdata('tarjetas_error');
 
                                        
                                         <div class="col-lg-6">
-                                            <div class="card">
-                                                <a href="<?= base_url() ?>assets/mike.png" target="_blank" >
-                                                <div class="card-body">
-                                                    <div class="blog-card">
-                                                        <h4 class="header-title mt-0 mb-4">Semana del 9 de marzo al 13 de marzo, acciones SIGAP</h4>
-                                                        <iframe src="<?= base_url() ?>assets/mike.png" alt="" width="100%" height="500px"
-                                                            class="img-fluid" ></iframe>
-                                                    </div><!--end blog-card-->
-                                                       <a href="https://meet.google.com/wkb-pvzf-zrk"
-                                                                    target="_blank" class="text-primary">Unirse a la reunión 11:00 a 12:00 horas <i
-                                                                        class="fas fa-long-arrow-alt-right"></i></a><br>
-                                                                        <a href="https://meet.google.com/rmb-dqrx-dsn"
-                                                                    target="_blank" class="text-primary">Unirse a la reunión 13:00 a 14:00 horas <i
-                                                                        class="fas fa-long-arrow-alt-right"></i></a>
-
-                                                </div><!--end card-body-->
-                                                </a>
-                                            </div><!--end card-->
+                                     
                                            <div class="card">
                                                     <div class="card-body">
                                                         <div class="ribbon4 rib4-warning">
