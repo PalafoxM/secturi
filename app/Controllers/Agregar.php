@@ -5687,7 +5687,7 @@ class Agregar extends BaseController
                                 <img src="' . base_url('assets/images/logo-sm.png') . '" alt="Logo" style="height: 60px;">
                             </div>
                             <div style="padding: 30px; color: #333;">
-                                <h1 style="color: #004080;">¡El estatus de su incidencia cambio!</h1>
+                                <h1 style="color: #004080;">¡El estatus de su incidencia cambió!</h1>
                                 <p style="font-size: 16px;">Favor de <strong> Ingresar a SUSI</strong>.</p>
                                 <p style="font-size: 15px;"><a href="' . base_url() . 'index.php/Agregar/Asistencia"><strong>Seguimiento Incidencia</strong></a></p>
                             </div>
