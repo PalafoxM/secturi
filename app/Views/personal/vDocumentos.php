@@ -87,6 +87,13 @@
                                                 </div>                                                
                                                 <small class="badge badge-warning ml-auto">8</small>
                                             </a>
+                                            <a class="nav-link" id="files-honorarios-tab" data-toggle="pill" href="#files-honorarios" aria-selected="false">
+                                                <span class="mr-3 text-warning d-inline-block">ðŸ“</span>
+                                                <div class="d-inline-block align-self-center">
+                                                    <h5 class="m-0">Formulario Reporte de Honorarios</h5>
+                                                    <small>Acceso al formato institucional</small>
+                                                </div>
+                                            </a>
                                           <!--   <a class="nav-link mb-0"  href="#" data-toggle="modal" data-animation="bounce" data-target=".hide-modal">
                                                 <span class="mr-3 text-warning d-inline-block">🔒</span>
                                                 <div class="d-inline-block align-self-center">
@@ -1105,6 +1112,35 @@
                                         </div> <!-- end row --> 
                                     </div><!--end tab-pen-->
 
+                                    <div class="tab-pane fade" id="files-honorarios">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <h4 class="mt-0 header-title">Formulario Reporte de Honorarios</h4>
+                                                        <p class="text-muted mb-4">Accede al formulario para crear, editar y exportar reportes de actividades por honorarios.</p>
+
+                                                        <div class="border rounded p-4 bg-light">
+                                                            <div class="row align-items-center">
+                                                                <div class="col-md-8">
+                                                                    <h5 class="mb-2">Formato institucional disponible</h5>
+                                                                    <p class="text-muted mb-0">
+                                                                        Desde aqui puedes abrir el formulario institucional para capturar el reporte y generar su PDF.
+                                                                    </p>
+                                                                </div>
+                                                                <div class="col-md-4 text-md-right mt-3 mt-md-0">
+                                                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalReporteHonorarios">
+                                                                        <i class="mdi mdi-file-document-box-outline"></i> Abrir formulario
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div><!--end card-body-->
+                                                </div><!--end card-->
+                                            </div> <!-- end col -->
+                                        </div> <!-- end row -->
+                                    </div><!--end tab-pane-->
+
                                     <div class="tab-pane fade" id="files-hide">
                                         <h4 class="mt-0 header-title mb-3">Hide</h4>
                                     </div><!--end tab-pane-->
@@ -1116,6 +1152,31 @@
                 </div><!-- container -->
 
                  <!-- Modal -->
+
+                 <div class="modal fade" id="modalReporteHonorarios" tabindex="-1" role="dialog" aria-labelledby="modalReporteHonorariosLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title mt-0" id="modalReporteHonorariosLabel">Formulario Reporte de Honorarios</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="mb-3">Se abrira la vista del formulario para capturar un nuevo reporte o consultar uno existente.</p>
+                                <div class="alert alert-info mb-0">
+                                    El formato usa la hoja membretada institucional y permite exportar el PDF desde la misma captura.
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                <a href="<?= base_url('index.php/Inicio/FormHonorarios') ?>" class="btn btn-primary">
+                                    <i class="mdi mdi-open-in-new"></i> Ir al formulario
+                                </a>
+                            </div>
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal-dialog -->
+                </div><!-- /.modal -->
 
                  <div class="modal fade hide-modal" tabindex="-1" role="dialog" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
@@ -1346,6 +1407,14 @@
 
         <!-- jQuery  -->
  <script src="<?php echo base_url() ?>assets/js/jquery.min.js"></script>
+ <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var honorariosTabIcon = document.querySelector('#files-honorarios-tab .mr-3');
+        if (honorariosTabIcon) {
+            honorariosTabIcon.innerHTML = '<i class="far fa-file-alt"></i>';
+        }
+    });
+ </script>
 
  <script src='<?php echo base_url() ?>plugins/fullcalendar/packages/core/main.js'></script>
  <script src='<?php echo base_url() ?>plugins/fullcalendar/packages/daygrid/main.js'></script>

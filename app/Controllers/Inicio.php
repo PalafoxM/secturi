@@ -382,6 +382,357 @@ class Inicio extends BaseController
         $data['contentView'] = 'personal/vListaConvenio';
         $this->_renderView($data);
     }
+    public function FormHonorarios($id = null)
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $dataBase = 'susi';
+        $data = [];
+        $data['scripts'] = array('principal', 'inicio');
+        $data['contentView'] = 'personal/vFormReporteHonorarios';
+        $data['pdf_referencia'] = base_url('assets/Reporteactividades26.pdf');
+        $data['reporte'] = null;
+        $data['actividades'] = [];
+        $data['id_usuario_session'] = $session->get('id_usuario');
+
+        if (!empty($id)) {
+            $reporte = $globals->getTabla([
+                'dataBase' => $dataBase,
+                'tabla' => 'reporte_honorarios',
+                'where' => [
+                    'id_reporte_honorarios' => intval($id),
+                    'visible' => 1
+                ]
+            ]);
+
+            if (!empty($reporte->data[0])) {
+                $data['reporte'] = $reporte->data[0];
+
+                $actividades = $globals->getTabla([
+                    'dataBase' => $dataBase,
+                    'tabla' => 'reporte_honorarios_actividad',
+                    'where' => [
+                        'id_reporte_honorarios' => intval($id),
+                        'visible' => 1
+                    ],
+                    'order' => ['orden' => 'ASC']
+                ]);
+
+                $data['actividades'] = $actividades->data ?? [];
+            }
+        }
+
+        $this->_renderView($data);
+    }
+    public function ListaReporteHonorarios()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $dataBase = 'susi';
+
+        $where = ['visible' => 1];
+        if (!in_array((int)$session->get('id_perfil'), [1, 2, 3], true)) {
+            $where['usu_reg'] = (int)$session->get('id_usuario');
+        }
+
+        $reportes = $globals->getTabla([
+            'dataBase' => $dataBase,
+            'tabla' => 'reporte_honorarios',
+            'where' => $where,
+            'order' => ['id_reporte_honorarios' => 'DESC']
+        ]);
+
+        $data = [];
+        $data['scripts'] = array('principal', 'inicio');
+        $data['contentView'] = 'personal/vListaReporteHonorarios';
+        $data['reportes'] = $reportes->data ?? [];
+
+        $this->_renderView($data);
+    }
+    public function guardarReporteHonorarios()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $dataBase = 'susi';
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'No fue posible guardar el reporte.';
+
+        $post = $this->request->getPost();
+        $idReporte = intval($post['id_reporte_honorarios'] ?? 0);
+
+        $responsable = trim((string)($post['responsable_administrativo'] ?? ''));
+        $area = trim((string)($post['area'] ?? ''));
+        $numeroContrato = trim((string)($post['numero_contrato'] ?? ''));
+        $tipoReporte = trim((string)($post['tipo_reporte'] ?? ''));
+        $fechaInicio = trim((string)($post['fecha_inicio'] ?? ''));
+        $fechaFin = trim((string)($post['fecha_fin'] ?? ''));
+        $fechaFirma = trim((string)($post['fecha_firma'] ?? ''));
+        $nombrePrestador = trim((string)($post['nombre_prestador'] ?? ''));
+        $nombreResponsableArea = trim((string)($post['nombre_responsable_area'] ?? ''));
+        $titulos = $post['actividad_titulo'] ?? [];
+        $desgloses = $post['actividad_desglose'] ?? [];
+
+        if (
+            $responsable === '' || $area === '' || $numeroContrato === '' || $tipoReporte === '' ||
+            $fechaInicio === '' || $fechaFin === '' || $fechaFirma === '' ||
+            $nombrePrestador === '' || $nombreResponsableArea === ''
+        ) {
+            $response->respuesta = 'Todos los campos del reporte son obligatorios.';
+            return $this->response->setJSON($response);
+        }
+
+        if (!in_array($tipoReporte, ['trimestral', 'final'], true)) {
+            $response->respuesta = 'El tipo de reporte es invalido.';
+            return $this->response->setJSON($response);
+        }
+
+        if ($fechaInicio > $fechaFin) {
+            $response->respuesta = 'La fecha inicial no puede ser mayor a la fecha final.';
+            return $this->response->setJSON($response);
+        }
+
+        $actividadesLimpias = [];
+        if (!is_array($titulos)) $titulos = [];
+        if (!is_array($desgloses)) $desgloses = [];
+
+        $maxActividades = max(count($titulos), count($desgloses));
+        for ($i = 0; $i < $maxActividades; $i++) {
+            $titulo = trim((string)($titulos[$i] ?? ''));
+            $desglose = trim((string)($desgloses[$i] ?? ''));
+
+            if ($titulo === '' && $desglose === '') {
+                continue;
+            }
+
+            if ($titulo === '' || $desglose === '') {
+                $response->respuesta = 'Cada actividad debe incluir titulo y desglose.';
+                return $this->response->setJSON($response);
+            }
+
+            $actividadesLimpias[] = [
+                'titulo_actividad' => $titulo,
+                'desglose_actividad' => $desglose,
+                'orden' => count($actividadesLimpias) + 1
+            ];
+        }
+
+        if (empty($actividadesLimpias)) {
+            $response->respuesta = 'Debes capturar al menos una actividad.';
+            return $this->response->setJSON($response);
+        }
+
+        $dataSave = [
+            'responsable_administrativo' => $responsable,
+            'area' => $area,
+            'numero_contrato' => $numeroContrato,
+            'tipo_reporte' => $tipoReporte,
+            'fecha_inicio' => $fechaInicio,
+            'fecha_fin' => $fechaFin,
+            'fecha_firma' => $fechaFirma,
+            'nombre_prestador' => $nombrePrestador,
+            'nombre_responsable_area' => $nombreResponsableArea,
+            'pdf_referencia' => 'assets/Reporteactividades26.pdf',
+            'visible' => 1
+        ];
+
+        $dataConfig = [
+            'dataBase' => $dataBase,
+            'tabla' => 'reporte_honorarios',
+            'editar' => false
+        ];
+
+        if ($idReporte > 0) {
+            $dataConfig = [
+                'dataBase' => $dataBase,
+                'tabla' => 'reporte_honorarios',
+                'editar' => true,
+                'idEditar' => ['id_reporte_honorarios' => $idReporte]
+            ];
+            $dataSave['usu_act'] = $session->id_usuario ?? 0;
+            $dataSave['fec_act'] = date('Y-m-d H:i:s');
+        } else {
+            $dataSave['usu_reg'] = $session->id_usuario ?? 0;
+            $dataSave['fec_reg'] = date('Y-m-d H:i:s');
+        }
+
+        $result = $globals->saveTabla(
+            $dataSave,
+            $dataConfig,
+            ['id_user' => $session->id_usuario ?? 0, 'script' => 'Inicio.guardarReporteHonorarios']
+        );
+
+        if (!isset($result->error) || $result->error) {
+            $response->respuesta = $result->respuesta ?? 'Error al guardar la cabecera del reporte.';
+            $response->debug = $result ?? null;
+            return $this->response->setJSON($response);
+        }
+
+        $idGuardado = $idReporte > 0 ? $idReporte : intval($result->idRegistro ?? 0);
+        if ($idGuardado <= 0) {
+            $response->respuesta = 'No fue posible identificar el reporte guardado.';
+            return $this->response->setJSON($response);
+        }
+
+        if ($idReporte > 0) {
+            $globals->saveTabla(
+                [
+                    'visible' => 0,
+                    'usu_act' => $session->id_usuario ?? 0,
+                    'fec_act' => date('Y-m-d H:i:s')
+                ],
+                [
+                    'dataBase' => $dataBase,
+                    'tabla' => 'reporte_honorarios_actividad',
+                    'editar' => true,
+                    'idEditar' => ['id_reporte_honorarios' => $idGuardado]
+                ],
+                ['id_user' => $session->id_usuario ?? 0, 'script' => 'Inicio.guardarReporteHonorarios.actividades_reset']
+            );
+        }
+
+        foreach ($actividadesLimpias as $actividad) {
+            $detalle = [
+                'id_reporte_honorarios' => $idGuardado,
+                'titulo_actividad' => $actividad['titulo_actividad'],
+                'desglose_actividad' => $actividad['desglose_actividad'],
+                'orden' => $actividad['orden'],
+                'visible' => 1,
+                'usu_reg' => $session->id_usuario ?? 0,
+                'fec_reg' => date('Y-m-d H:i:s')
+            ];
+
+            $saveActividad = $globals->saveTabla(
+                $detalle,
+                ['dataBase' => $dataBase, 'tabla' => 'reporte_honorarios_actividad', 'editar' => false],
+                ['id_user' => $session->id_usuario ?? 0, 'script' => 'Inicio.guardarReporteHonorarios.actividad']
+            );
+
+            if (!isset($saveActividad->error) || $saveActividad->error) {
+                $response->respuesta = $saveActividad->respuesta ?? 'Error al guardar actividades del reporte.';
+                $response->debug = $saveActividad ?? null;
+                return $this->response->setJSON($response);
+            }
+        }
+
+        $response->error = false;
+        $response->respuesta = 'Reporte guardado correctamente.';
+        $response->id_reporte_honorarios = $idGuardado;
+        $response->pdf_url = base_url('index.php/Inicio/pdfreporteHonorario/' . $idGuardado);
+
+        return $this->response->setJSON($response);
+    }
+    public function getReporteHonorariosJSON($id = null)
+    {
+        $globals = new Mglobal;
+        $dataBase = 'susi';
+        $id = intval($id ?: $this->request->getGet('id') ?: $this->request->getPost('id'));
+
+        if ($id <= 0) {
+            return $this->response->setJSON(['error' => true, 'respuesta' => 'ID invalido']);
+        }
+
+        $reporte = $globals->getTabla([
+            'dataBase' => $dataBase,
+            'tabla' => 'reporte_honorarios',
+            'where' => [
+                'id_reporte_honorarios' => $id,
+                'visible' => 1
+            ]
+        ]);
+
+        if (empty($reporte->data[0])) {
+            return $this->response->setJSON(['error' => true, 'respuesta' => 'Reporte no encontrado']);
+        }
+
+        $actividades = $globals->getTabla([
+            'dataBase' => $dataBase,
+            'tabla' => 'reporte_honorarios_actividad',
+            'where' => [
+                'id_reporte_honorarios' => $id,
+                'visible' => 1
+            ],
+            'order' => ['orden' => 'ASC']
+        ]);
+
+        return $this->response->setJSON([
+            'error' => false,
+            'data' => $reporte->data[0],
+            'actividades' => $actividades->data ?? []
+        ]);
+    }
+    public function pdfreporteHonorario($id = null)
+    {
+        $globals = new Mglobal;
+        $dataBase = 'susi';
+        $id = intval($id ?: $this->request->getGet('id'));
+
+        if ($id <= 0) {
+            exit('ID de reporte invalido.');
+        }
+
+        $reporte = $globals->getTabla([
+            'dataBase' => $dataBase,
+            'tabla' => 'reporte_honorarios',
+            'where' => [
+                'id_reporte_honorarios' => $id,
+                'visible' => 1
+            ]
+        ]);
+
+        if (empty($reporte->data[0])) {
+            exit('Reporte no encontrado.');
+        }
+
+        $actividades = $globals->getTabla([
+            'dataBase' => $dataBase,
+            'tabla' => 'reporte_honorarios_actividad',
+            'where' => [
+                'id_reporte_honorarios' => $id,
+                'visible' => 1
+            ],
+            'order' => ['orden' => 'ASC']
+        ]);
+
+        $data = [];
+        $data['reporte'] = $reporte->data[0];
+        $data['actividades'] = $actividades->data ?? [];
+        $data['pdf_referencia'] = !empty($data['reporte']->pdf_referencia)
+            ? base_url($data['reporte']->pdf_referencia)
+            : base_url('assets/Reporteactividades26.pdf');
+        $templateFile = ROOTPATH . 'public/assets/Reporteactividades26.pdf';
+
+        $html = view('pdfs/vPdfReporteHonorarios', $data);
+
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 42,
+            'margin_left' => 18,
+            'margin_right' => 18,
+            'margin_bottom' => 24,
+            'format' => 'Letter',
+            'tempDir' => sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'mpdf'
+        ]);
+
+        $mpdf->showImageErrors = true;
+
+        if (is_file($templateFile)) {
+            $mpdf->SetDocTemplate($templateFile, true);
+        } else {
+            throw new \Exception('No existe la plantilla del reporte en: ' . $templateFile);
+        }
+
+        $mpdf->SetHTMLFooter('
+            <div style="text-align:center; font-size:9.4pt; line-height:1.35;">
+                Parque Guanajuato Bicentenario. Carretera de Cuota Silao-Guanajuato Km. 3.8 Silao, Gto. C.P. 36270<br>
+                Tel. (472) 103 9900<br>
+                guanajuato.mx
+            </div>
+        ');
+
+        $mpdf->WriteHTML($html);
+        $mpdf->Output('Reporte_Honorarios_' . $id . '.pdf', 'I');
+        exit;
+    }
     public function FormularioPromo($id = null, $idFila = null, $idSalida = null)
     {
         $session = \Config\Services::session();
