@@ -37,7 +37,7 @@
                 $totalComprobado += $comp->importe;
             ?>
             <tr>
-                <td class="color-red text-align-center"><?= $comp->nombre_emisor ?></td>
+                <td class="color-red text-align-center"><?= isset($comp->nombre_emisor_completo) && !empty($comp->nombre_emisor_completo) ? $comp->nombre_emisor_completo : $comp->nombre_emisor ?></td>
                 <td class="text-align-center"><?= $comp->rfc ?></td>
                 <td class="text-right">$<?= number_format($comp->importe, 2) ?></td>
                 <td></td>

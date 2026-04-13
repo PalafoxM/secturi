@@ -383,7 +383,7 @@ ini.inicio = (function () {
                     success: function (response) {
 
                         if (response.error == false) {
-                            Swal.fire("Exitó", response.respuesta, "success");
+                            Swal.fire("Éxito", response.respuesta, "success");
 
                             //window.location.reload();
 
@@ -2089,7 +2089,7 @@ ini.inicio = (function () {
                     console.log(response);
 
                     if (response.error == false) {
-                        Swal.fire("Exitó", response.respuesta, "success");
+                        Swal.fire("Éxito", response.respuesta, "success");
                         setTimeout(() => {
                             window.location.href = `${base_url}index.php/Inicio`;
                         }, 1500);
@@ -2123,7 +2123,7 @@ ini.inicio = (function () {
                         console.log(response);
 
                         if (response.error == false) {
-                            Swal.fire("Exitó", response.respuesta, "success");
+                            Swal.fire("Éxito", response.respuesta, "success");
                             setTimeout(() => {
                                 window.location.reload();
                             }, 1500);
@@ -2159,7 +2159,7 @@ ini.inicio = (function () {
                         console.log(response);
 
                         if (response.error == false) {
-                            Swal.fire("Exitó", response.respuesta, "success");
+                            Swal.fire("Éxito", response.respuesta, "success");
 
                             window.location.reload();
 
@@ -3283,7 +3283,7 @@ ini.inicio = (function () {
                         $("#funcion").val(data.funcion);
                         $("#nivel").val(data.nivel).trigger('change');
                         $("#id_sexo").val(data.id_sexo).trigger('change');
-                        //Swal.fire("Exitó",response.respuesta , "success")
+                        //Swal.fire("Éxito",response.respuesta , "success")
                         $("#editar").val(1);
                         $("#id_detenido").val(0);
                         $("#id_participante").val(id);
@@ -3335,7 +3335,7 @@ ini.inicio = (function () {
                         $("#funcion").val(data.funcion);
                         $("#id_nivel").val(data.id_nivel).trigger('change');
                         $("#id_sexo").val(data.id_sexo).trigger('change');
-                        //Swal.fire("Exitó",response.respuesta , "success")
+                        //Swal.fire("Éxito",response.respuesta , "success")
                         $("#editar").val(1);
                         $("#id_detenido").val(id);
                         $("#id_participante").val(0);
@@ -5873,6 +5873,43 @@ ini.inicio = (function () {
                 }
             });
         },
+        eliminarTarjeta: function (idTarjeta) {
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "¡Se eliminará la tarjeta!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: base_url + "index.php/Inicio/eliminarTarjeta/" + idTarjeta,
+                        type: "POST",
+                        dataType: "json",
+                        beforeSend: function () {
+                            $('#btnEliminarTarjeta').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Eliminando...');
+                        },
+                        success: function (response) {
+                            if (!response.error) {
+                                Swal.fire("Éxito", response.respuesta, "success").then(() => {
+                                    window.location.href = base_url + "index.php/Inicio/Perfil";
+                                });
+                            } else {
+                                Swal.fire("Error", response.respuesta, "error");
+                                $('#btnEliminarTarjeta').prop('disabled', false).html('Eliminar');
+                            }
+                        },
+                        error: function () {
+                            Swal.fire("Error", "Error de conexión con el servidor", "error");
+                            $('#btnEliminarTarjeta').prop('disabled', false).html('Eliminar');
+                        }
+                    });
+                }
+            });
+        },
         tipoOperacion: {
             nuevo: function () {
                 $('#formTipoOperacion')[0].reset();
@@ -5988,6 +6025,38 @@ ini.inicio = (function () {
                         }, 'json');
                     }
                 })
+            },
+            guardarTarjeta: function (event) {
+                event.preventDefault();
+                var form = document.getElementById('formTarjeta');
+                var formData = new FormData(form);
+
+                $.ajax({
+                    type: "POST",
+                    url: base_url + "index.php/Inicio/guardarTarjeta",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    dataType: "json",
+                    beforeSend: function () {
+                        $('#btnGuardarTarjeta').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                    },
+                    success: function (data) {
+                        if (!data.error) {
+                            Swal.fire("Éxito", data.respuesta || "Tarjeta guardada correctamente", "success");
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                        } else {
+                            Swal.fire("Error", data.respuesta || "No se pudo guardar", "error");
+                            $('#btnGuardarTarjeta').prop('disabled', false).html('Guardar tarjeta');
+                        }
+                    },
+                    error: function () {
+                        Swal.fire("Error", "Ocurrió un error al intentar guardar.", "error");
+                        $('#btnGuardarTarjeta').prop('disabled', false).html('Guardar tarjeta');
+                    }
+                });
             }
         },
     }

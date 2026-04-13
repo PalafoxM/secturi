@@ -561,7 +561,7 @@ st.agregar = (function () {
                         console.log(response.error);
                         console.log(response.respuesta);
                         if (response.error == false) {
-                            Swal.fire("Exitó", response.respuesta, "success");
+                            Swal.fire("Éxito", response.respuesta, "success");
                             $('#formParticipante')[0].reset();
                             $('#modalDetenidos').modal('hide');
                             window.location.reload();
@@ -718,7 +718,7 @@ st.agregar = (function () {
                 success: function (response) {
                     console.log(response);
                     if (!response.error) {
-                        Swal.fire("Exitó", response.respuesta, "success");
+                        Swal.fire("Éxito", response.respuesta, "success");
                         window.location.reload();
 
                     } else {
@@ -768,7 +768,7 @@ st.agregar = (function () {
                 success: function (response) {
                     console.log(response);
                     if (!response.error) {
-                        Swal.fire("Exitó", response.respuesta, "success");
+                        Swal.fire("Éxito", response.respuesta, "success");
                         window.location.reload();
 
                     } else {
@@ -825,7 +825,7 @@ st.agregar = (function () {
                 success: function (response) {
                     console.log(response);
                     if (!response.error) {
-                        Swal.fire("Exitó", response.respuesta, "success");
+                        Swal.fire("Éxito", response.respuesta, "success");
                         window.location.reload();
 
                     } else {

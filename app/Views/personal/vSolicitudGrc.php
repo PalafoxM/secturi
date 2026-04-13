@@ -1,3 +1,7 @@
+<?php
+$prefijo = $prefijo ?? '';
+$no_consecutivo = $no_consecutivo ?? '';
+?>
 <div class="page-wrapper" style="background-color: #f4f6f9;">
     <div class="page-content-tab">
         <div class="container-fluid">
@@ -36,9 +40,9 @@
 
                                     <div class="row justify-content-center mb-4">
                                     <div class="col-md-auto text-center" style="padding: 7px; border-radius: 5px;">
-                                        <div class="d-flex align-items-center justify-content-center" style="font-weight: bold; font-size: 1.1rem; color: #000;">
+                                        <div class="d-flex align-items-center justify-content-center folio-grc-box" style="font-weight: bold; font-size: 1.1rem; color: #000;">
                                             <span class="mr-2">GRC</span>
-                                            <select id="folio" class="form-control font-weight-bold p-1 mr-1 d-inline-block select2" style="width: auto; height: 35px; border: 1px solid #ccc; background: transparent; color: #000;">
+                                            <select id="folio" class="select2 form-control font-weight-bold p-1 mr-1 d-inline-block" style="width: auto; min-width: 120px; height: 35px; border: 1px solid #ccc; background: transparent; color: #000;">
                                                 <?php foreach($cat_area as $area): ?>
                                                     <option value="<?= $area->prefijo ?>" <?= $area->prefijo == $prefijo ? 'selected' : '' ?>><?= $area->prefijo ?></option>
                                                 <?php endforeach; ?>
@@ -201,6 +205,13 @@
 }
 .select2-container--default .select2-selection--single .select2-selection__arrow {
     height: calc(1.5em + .75rem);
+}
+.folio-grc-box {
+    flex-wrap: nowrap;
+    gap: 6px;
+}
+.folio-grc-box #folio {
+    min-width: 120px;
 }
 .form-control:focus {
     border-color: #80bdff;

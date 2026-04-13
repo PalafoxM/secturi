@@ -58,7 +58,7 @@
                                                     <td><?= $row->clave ?></td>
                                                     <td><?= $row->nombre_completo ?></td>
                                                     <td>
-                                                        <a href="<?= base_url('index.php/Principal/comprobarGastos/' . $row->id_solicitud_grc) ?>" class="btn btn-sm btn-warning" title="Ir a Formulario" style="white-space: nowrap;"><i class="fas fa-file-invoice-dollar mr-1"></i> Ir a Formulario</a>
+                                                        <a href="<?= base_url('index.php/Principal/comprobarGastos/' . $row->id_solicitud_grc) ?>" class="btn btn-sm btn-warning" title="Ir a Formulario" style="white-space: nowrap;"><i class="fas fa-file-invoice-dollar mr-1"></i> Llenar Viaticos</a>
                                                     </td>
                                                     <td>
                                                         <a href="<?= base_url('index.php/Principal/editarSolicitudGrc/' . $row->id_solicitud_grc) ?>" class="btn btn-sm btn-info" title="Editar"><i class="fas fa-edit"></i></a>

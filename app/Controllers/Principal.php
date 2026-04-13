@@ -2187,7 +2187,7 @@ class Principal extends BaseController
         $email = \Config\Services::email();
         $result = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_tipo_empleado' => 1]])->data;
 
-      /* $email->setTo([
+       $email->setTo([
             'agascag@guanajuato.gob.mx',
             'ccampos@guanajuato.gob.mx',
             'ztorrest@guanajuato.gob.mx',
@@ -2201,9 +2201,9 @@ class Principal extends BaseController
             'rgonzalezgu@guanajuato.gob.mx',
             'yjimenez@guanajuato.gob.mx',
             'mamoralesg@guanajuato.gob.mx',
-        ]);*/
+        ]);
  
-          $email->setTo([
+          /*$email->setTo([
                     'alopez@guanajuato.gob.mx',
                     'cchernandezp@guanajuato.gob.mx',
                     'csoto@guanajuato.gob.mx',
@@ -2243,7 +2243,7 @@ class Principal extends BaseController
                     'jmazavala@guanajuato.gob.mx',
                     'rantonio@guanajuato.gob.mx',
                     'jrodriguezgo@guanajuato.gob.mx',
-                ]);
+                ]);*/
         $email->setSubject('Recordatorio: Revisión de Asistencias - Sistema SUSI');
         $email->setMessage('
             <!DOCTYPE html>
@@ -2276,9 +2276,9 @@ class Principal extends BaseController
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Estimado personal,</p>
                         
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-                            En caso de que aún no hayas realizado las <strong>justificaciones correspondientes a la quincena 06/2026</strong>, 
+                            En caso de que aún no hayas realizado las <strong>justificaciones de tu personal a tu cargo correspondientes a la quincena 06/2026</strong>, 
                             la cual comprende el periodo del <strong>16 al 31 de marzo de 2026</strong>, 
-                            tienes hasta el día <strong>viernes 10 de abril hasta las 16:00 hrs</strong> para realizarlas.
+                            tienes hasta el día <strong>lunes 13 de abril hasta las 16:00 hrs</strong> para realizarlas.
                         </p>
 
                         <div class="highlight-box">
@@ -2294,7 +2294,7 @@ class Principal extends BaseController
                         </p>
 
                         <div style="text-align: center; margin: 30px 0;">
-                            <a href="https://secturnet.guanajuato.gob.mx/susi/index.php/Agregar/Asistencia" class="btn" style="color: white; text-decoration: none;">
+                            <a href="https://secturnet.guanajuato.gob.mx/susi/index.php/Principal/incidenciaSubordinado" class="btn" style="color: white; text-decoration: none;">
                                 📋 Revisar Incidencias
                             </a>
                         </div>
@@ -2675,7 +2675,7 @@ class Principal extends BaseController
         $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
     
         $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
-        $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
+        $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['id_pago' => 1]]);
         $cat_tipo = $globals->getTabla(['tabla' => 'cat_tipo', 'where' => ['visible' => 1]]);
         $secretario = $globals->getTabla(['tabla' => 'cat_secretario', 'where' => ['visible' => 1]]);
         $cat_opcion = $globals->getTabla(['tabla' => 'cat_opcion', 'where' => ['visible' => 1]]);
@@ -2695,11 +2695,11 @@ class Principal extends BaseController
         $data['idArea'] = (!empty($idArea)) ? $idArea : '';
     
         // --- Generar Folio GRC ---
-        $area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1, 'titular' => $session->get('id_usuario')]]);
+        $area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['id_pago' => 1, 'titular' => $session->get('id_usuario')]]);
        
         if(empty($area->data)){
             $idArea = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->get('id_usuario')]])->data[0]->id_area;
-            $area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1, 'id_area' => $idArea]]);
+            $area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['id_pago' => 1, 'id_area' => $idArea]]);
             $data['prefijo'] = $area->data[0]->prefijo;
         }else{
            $data['prefijo'] = $area->data[0]->prefijo;
@@ -2754,6 +2754,38 @@ class Principal extends BaseController
         $data['solicitud'] = $solicitud->data[0];
         $data['detalles'] = (!empty($detalles->data)) ? $detalles->data : [];
         $data['editar'] = true;
+
+        $folioGuardado = isset($data['solicitud']->no_consecutivo) ? trim((string) $data['solicitud']->no_consecutivo) : '';
+        $prefijo = '';
+        $noConsecutivo = '';
+
+        if ($folioGuardado !== '') {
+            $folioSinAnio = preg_replace('/\/\d{4}$/', '', $folioGuardado);
+            if (preg_match('/^(.*?)(\d+)$/', $folioSinAnio, $matches)) {
+                $prefijo = $matches[1];
+                $noConsecutivo = str_pad($matches[2], 3, '0', STR_PAD_LEFT);
+            }
+        }
+
+        if ($prefijo === '') {
+            $areaUsuario = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1, 'titular' => $session->get('id_usuario')]]);
+            if (empty($areaUsuario->data)) {
+                $usuarioActual = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->get('id_usuario')]]);
+                $idAreaUsuario = (!empty($usuarioActual->data) && isset($usuarioActual->data[0]->id_area)) ? $usuarioActual->data[0]->id_area : null;
+                if (!empty($idAreaUsuario)) {
+                    $areaUsuario = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1, 'id_area' => $idAreaUsuario]]);
+                }
+            }
+
+            $prefijo = (!empty($areaUsuario->data) && isset($areaUsuario->data[0]->prefijo)) ? $areaUsuario->data[0]->prefijo : '';
+        }
+
+        if ($noConsecutivo === '') {
+            $noConsecutivo = '001';
+        }
+
+        $data['prefijo'] = $prefijo;
+        $data['no_consecutivo'] = $noConsecutivo;
 
         $data['scripts'] = array('inicio');
         $data['contentView'] = 'personal/vSolicitudGrc';
@@ -2834,9 +2866,48 @@ class Principal extends BaseController
         // Obtener comprobaciones
         // NOTA: Asumimos que la tabla de comprobación se llama solicitud_grc_comprobacion
         $comprobaciones = $globals->getTabla(['tabla' => 'solicitud_grc_comprobacion', 'where' => ['id_solicitud_grc' => $id_solicitud, 'visible' => 1]]);
+        $usuariosQuery = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
+        $usuariosPorRfc = [];
+        $usuariosPorNombre = [];
+
+        if (!empty($usuariosQuery->data)) {
+            foreach ($usuariosQuery->data as $usuario) {
+                $nombreCompleto = isset($usuario->nombre_completo) && !empty($usuario->nombre_completo)
+                    ? $usuario->nombre_completo
+                    : (isset($usuario->nombre) ? $usuario->nombre : '');
+
+                if (!empty($usuario->rfc)) {
+                    $usuariosPorRfc[strtoupper(trim($usuario->rfc))] = $nombreCompleto;
+                }
+
+                if (!empty($usuario->nombre)) {
+                    $usuariosPorNombre[mb_strtoupper(trim($usuario->nombre), 'UTF-8')] = $nombreCompleto;
+                }
+
+                if (!empty($usuario->nombre_completo)) {
+                    $usuariosPorNombre[mb_strtoupper(trim($usuario->nombre_completo), 'UTF-8')] = $nombreCompleto;
+                }
+            }
+        }
 
         $data['solicitud'] = $solicitud->data[0];
         $data['comprobaciones'] = (!empty($comprobaciones->data)) ? $comprobaciones->data : [];
+
+        if (!empty($data['comprobaciones'])) {
+            foreach ($data['comprobaciones'] as $comp) {
+                $nombreCompleto = isset($comp->nombre_emisor) ? $comp->nombre_emisor : '';
+                $rfcComp = isset($comp->rfc) ? strtoupper(trim($comp->rfc)) : '';
+                $nombreComp = isset($comp->nombre_emisor) ? mb_strtoupper(trim($comp->nombre_emisor), 'UTF-8') : '';
+
+                if ($rfcComp !== '' && isset($usuariosPorRfc[$rfcComp])) {
+                    $nombreCompleto = $usuariosPorRfc[$rfcComp];
+                } elseif ($nombreComp !== '' && isset($usuariosPorNombre[$nombreComp])) {
+                    $nombreCompleto = $usuariosPorNombre[$nombreComp];
+                }
+
+                $comp->nombre_emisor_completo = $nombreCompleto;
+            }
+        }
         
         $html = view('personal/vFormatoComprobacion', $data);
         $doc = 'assets/documentos/SOLICITUD_GRC.pdf'; // Template base if needed, or just plain HTML
@@ -7868,17 +7939,17 @@ class Principal extends BaseController
         $data['usuarios'] = (!empty($usuariosQuery->data)) ? $usuariosQuery->data : [];
         
         // Variables añadidas para el "no_consecutivo" estilo Formato GO
-        $cat_area = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'id_pago' => 1]]);
+        $cat_area = $globals->getTabla(["tabla" => "cat_area", "where" => ["id_pago" => 1, 'id_pago' => 1]]);
         $data['cat_area'] = isset($cat_area->data) ? $cat_area->data : [];
         
-        $usu = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["visible" => 1, 'id_usuario' => $session->get('id_usuario')]]);
+        $usu = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["id_pago" => 1, 'id_usuario' => $session->get('id_usuario')]]);
         $data['id_area'] = 1; // fallback
         if(isset($usu->data[0]->id_usuario)){
-            $tieneArea = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'titular' => $usu->data[0]->id_usuario]]);
+            $tieneArea = $globals->getTabla(["tabla" => "cat_area", "where" => ["id_pago" => 1, 'titular' => $usu->data[0]->id_usuario]]);
             if(isset($tieneArea->data) && !empty($tieneArea->data)){
                 $data['id_area'] = $tieneArea->data[0]->id_area;
             }else{
-                $tieneArea = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'titular' => $usu->data[0]->id_jefe_inmediato]]);
+                $tieneArea = $globals->getTabla(["tabla" => "cat_area", "where" => ["id_pago" => 1, 'titular' => $usu->data[0]->id_jefe_inmediato]]);
                 if(isset($tieneArea->data) && !empty($tieneArea->data)){
                     $data['id_area'] = $tieneArea->data[0]->id_area;
                 }else{

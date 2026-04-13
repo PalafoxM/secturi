@@ -820,6 +820,7 @@ class Usuario extends BaseController
                 $entrada = $dataDia['entrada'];
                 $salida = $dataDia['salida'];
                 $incArr = $dataDia['incidencias'];
+                $tieneIncidencias = !empty($incArr);
 
                 $valorEntrada = $entrada;
                 $valorSalida = $salida;
@@ -1095,8 +1096,9 @@ class Usuario extends BaseController
 
                 // 1. Caso especial: faltó todo el día (y no justificado)
                 if (!$validadoEntrada && !$validadoSalida && empty($entrada) && empty($salida)) {
-                    $valorSalida = 'Sin registro';
-                    $valorEntrada = 'Sin registro';
+                    $textoSinAsistencia = $tieneIncidencias ? 'Sin validar' : 'Sin registro';
+                    $valorSalida = $textoSinAsistencia;
+                    $valorEntrada = $textoSinAsistencia;
                     $sheet->getStyle($colSalida . $fila)
                         ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                         ->getStartColor()->setARGB('FFFF0000');
@@ -1106,7 +1108,7 @@ class Usuario extends BaseController
                     $total_faltas++;
                 }
                 elseif (!$validadoSalida && (empty($salida) || !$salida)) {
-                    $valorSalida = 'Sin registro';
+                    $valorSalida = 'Sin validar';
                     $sheet->getStyle($colSalida . $fila)
                         ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                         ->getStartColor()->setARGB('FFFF0000'); // rojo

@@ -6,7 +6,8 @@
     <title>SUSI</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Sistema de Administración de Capacitación" name="description" />
-    <meta content="SAC" name="author" />
+    <meta content="Agustin Palafox Marin" name="author" />
+    <meta name="developer" content="palafox.marin@hotmail.com">
     <!-- App favicon -->
     <link rel="shortcut icon" href="<?php echo base_url(); ?>assets/huella.png">
 
@@ -233,6 +234,7 @@ body.forest-bg #particles-js { display: none; }
     base_url + "assets/images/backgrounds/img_7.JPG",
     base_url + "assets/images/backgrounds/img_8.JPG",
     base_url + "assets/images/backgrounds/IMG_45.JPG",
+    base_url + "assets/images/backgrounds/img_16.jpg",
     //FOREST_URL,
   ];
 

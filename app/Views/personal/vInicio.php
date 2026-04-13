@@ -159,6 +159,11 @@
         }
     }
 </style>
+<?php
+$tarjetas = $tarjetas ?? [];
+$tarjetasOk = session()->getFlashdata('tarjetas_ok');
+$tarjetasError = session()->getFlashdata('tarjetas_error');
+?>
 <div class="page-wrapper">
 
     <!-- Page Content-->
@@ -249,6 +254,10 @@
                                     <a class="nav-link" id="activity_detail_tab" data-toggle="pill"
                                         href="#activity_detail">Actividad</a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="tarjetas_detail_tab" data-toggle="pill"
+                                        href="#tarjetas_detail">Tarjetas</a>
+                                </li>
 
                                 <li class="nav-item">
                                     <a class="nav-link" id="settings_detail_tab" data-toggle="pill"
@@ -309,99 +318,14 @@
                                             </ul>
                                         </div><!--end card-body-->
                                     </div><!--end card-->
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <h4 class="header-title mt-0 mb-3">PROGRAMA ANUAL DE FORMACIÓN EN GESTIÓN DOCUMENTAL Y ADMINTRACION DE ARCHIVOS 2026</h4>
-                                            <ul class="list-unsyled m-0 pl-0 transaction-history">
-                                                <a href="<?= base_url() ?>assets/documentos/Cat_C3_A1logo_20PAFGDAA_202026_AGE.pdf" target="_blank">Ver Programa Anual
-                                                  <iframe
-                                                                src="<?= base_url() ?>assets/documentos/Cat_C3_A1logo_20PAFGDAA_202026_AGE.pdf"
-                                                                title="Programa Anual" style="border:0"
-                                                                loading="lazy" width="100%">
-                                                            </iframe>
-                                         </a>
-                                            </ul>
-                                        </div><!--end card-body-->
-                                    </div><!--end card-->
-                                       <div class="card">
-                                                <div class="card-body dash-info-carousel">
-                                                    <h4 class="mt-0  mb-4">SIGAP, E-OFICIO Y E-ARCHIVO ENERO - MARZO</h4>
-                                                    <div id="carousel_1" class="carousel slide" data-ride="carousel">
-                                                        <div class="carousel-inner">
-                                                            <div class="carousel-item">
-                                                                <a href="<?= base_url() . 'assets/documentos/Programa_capacitacion_enero_marzo_2026.pdf' ?>"
-                                                                    target="_black">
-                                                                    <div class="media">
-                                                                        <div class="icon-info mb-3">
-                                                                            <!-- Constitución, leyes, normas -->
-                                                                            <i
-                                                                                class="fas fa-balance-scale bg-soft-primary"></i>
-                                                                        </div>
-                                                                        <div class="media-body align-self-center">
-                                                                            <h4 class="mt-0 mb-1 title-text text-dark">
-                                                                                PROGRAMA ANUAL </h4>
-                                                                            <p class="text-muted mb-0">Ver más</p>
-                                                                        </div>
-                                                                    </div>
-                                                                </a>
-                                                            </div>
-
-                                                            <div class="carousel-item">
-                                                                <a href="<?= base_url() . 'assets/pdf/plantillas/reglas.pdf' ?>"
-                                                                    target="_black">
-                                                                    <div class="media">
-                                                                        <div class="icon-info mb-3">
-                                                                            <!-- Reglas, integridad, lineamientos -->
-                                                                            <i class="fas fa-gavel bg-soft-success"></i>
-                                                                        </div>
-                                                                        <div class="media-body align-self-center">
-                                                                            <h4 class="mt-0 mb-1">E-OFICIO</h4>
-                                                                            <p class="text-muted mb-0">Saber más</p>
-                                                                        </div>
-                                                                    </div>
-                                                                </a>
-                                                            </div>
-
-                                                            <div class="carousel-item active">
-                                                                <a href="<?= base_url() . 'assets/pdf/plantillas/valores2.pdf' ?>"
-                                                                    target="_black">
-                                                                    <div class="media">
-                                                                        <div class="icon-info mb-3">
-                                                                            <!-- Valores, ética, principios -->
-                                                                            <i
-                                                                                class="fas fa-hand-holding-heart bg-soft-warning"></i>
-                                                                        </div>
-                                                                        <div class="media-body align-self-center">
-                                                                            <h4 class="mt-0 mb-1 title-text">E-ARCHIVO
-                                                                            </h4>
-                                                                            <p class="text-muted mb-0">Saber más</p>
-                                                                        </div>
-                                                                    </div>
-                                                                </a>
-                                                            </div>
-                                                        </div>
-                                                        <a class="carousel-control-prev" href="#carousel_1"
-                                                            role="button" data-slide="prev">
-                                                            <span class="carousel-control-prev-icon"
-                                                                aria-hidden="true"></span>
-                                                            <span class="sr-only">Previous</span>
-                                                        </a>
-                                                        <a class="carousel-control-next" href="#carousel_1"
-                                                            role="button" data-slide="next">
-                                                            <span class="carousel-control-next-icon"
-                                                                aria-hidden="true"></span>
-                                                            <span class="sr-only">Next</span>
-                                                        </a>
-                                                    </div>
-                                                </div><!--end card-body-->
-                                            </div><!--end card-->
-
+                                    
+                                     
 
                                 </div><!--end col-->
 
                                 <div class="col-lg-8">
                                     <div class="row">
-                                        <div class="col-lg-8">
+                                        <div class="col-lg-12">
                                             <div class="card dash-info-carousel">
                                                 <div class="card-body">
                                                     <h4 class="mt-0 header-title mb-4">Protocolo ALBA Guanajuato</h4>
@@ -510,82 +434,7 @@
                                             </div>
                                         <?php endif; ?> -->
                                         
-                                            <div class="col-lg-4">
-                                            
-                                                    <div class="card">
-                                                        <div class="card-body dash-info-carousel">
-                                                            <h4 class="mt-0  mb-4">PADA 2026 E INFORME DE CUMPLIMIENTO 2025</h4>
-                                                            <div id="carousel_1" class="carousel slide" data-ride="carousel">
-                                                                <div class="carousel-inner">
-                                                                    <div class="carousel-item">
-                                                                        <a href="<?= base_url() . 'assets/documentos/Informe de cumplimiento 2025 JFARCHIVOS.pdf' ?>"
-                                                                            target="_black">
-                                                                            <div class="media">
-                                                                                <div class="icon-info mb-3">
-                                                                                    <!-- Constitución, leyes, normas -->
-                                                                                    <i
-                                                                                        class="fas fa-file-pdf bg-soft-primary"></i>
-                                                                                </div>
-                                                                                <div class="media-body align-self-center">
-                                                                                    <h4 class="mt-0 mb-1 title-text text-dark">
-                                                                                        Informe de Cumplimiento 2025</h4>
-                                                                                    <p class="text-muted mb-0">Ver más</p>
-                                                                                </div>
-                                                                            </div>
-                                                                        </a>
-                                                                    </div>
-
-                                                                    <div class="carousel-item">
-                                                                        <a href="<?= base_url() . 'assets/documentos/PADA 2026.pdf' ?>"
-                                                                            target="_black">
-                                                                            <div class="media">
-                                                                                <div class="icon-info mb-3">
-                                                                                    <!-- Reglas, integridad, lineamientos -->
-                                                                                    <i class="fas fa-file-pdf bg-soft-success"></i>
-                                                                                </div>
-                                                                                <div class="media-body align-self-center">
-                                                                                    <h4 class="mt-0 mb-1">PADA 2026</h4>
-                                                                                    <p class="text-muted mb-0">Saber más</p>
-                                                                                </div>
-                                                                            </div>
-                                                                        </a>
-                                                                    </div>
-
-                                                                    <div class="carousel-item active">
-                                                                        <a href="<?= base_url() . 'assets/documentos/PADA 2026.pdf' ?>"
-                                                                            target="_black">
-                                                                            <div class="media">
-                                                                                <div class="icon-info mb-3">
-                                                                                    <!-- Valores, ética, principios -->
-                                                                                    <i
-                                                                                        class="fas fa-file-pdf bg-soft-warning"></i>
-                                                                                </div>
-                                                                                <div class="media-body align-self-center">
-                                                                                    <h4 class="mt-0 mb-1 title-text">E-Archivo
-                                                                                    </h4>
-                                                                                    <p class="text-muted mb-0">Conoce los
-                                                                                        Valores</p>
-                                                                                </div>
-                                                                            </div>
-                                                                        </a>
-                                                                    </div>
-                                                                </div>
-                                                                <a class="carousel-control-prev" href="#carousel_1"
-                                                                    role="button" data-slide="prev">
-                                                                    <span class="carousel-control-prev-icon"
-                                                                        aria-hidden="true"></span>
-                                                                    <span class="sr-only">Previous</span>
-                                                                </a>
-                                                                <a class="carousel-control-next" href="#carousel_1"
-                                                                    role="button" data-slide="next">
-                                                                    <span class="carousel-control-next-icon"
-                                                                        aria-hidden="true"></span>
-                                                                    <span class="sr-only">Next</span>
-                                                                </a>
-                                                            </div>
-                                                        </div><!--end card-body-->
-                                                    </div><!--end card-->
-                                            </div>
+                                           
                                      
                                     </div><!--end row-->
 
@@ -593,105 +442,6 @@
                                     <div class="row">
 
                                         <div class="col-lg-6">
-                                             <div class="card">
-                                                <div class="card-body">
-                                                    <h4 class="mt-0  mb-4">DISPOSICIONES ADMINISTRATIVAS</h4>
-                                                    <div class="blog-card">
-                                                        <div class="ratio ratio-16x9"> <!-- BS5 -->
-                                                            <iframe
-                                                                src="<?= base_url() ?>assets/documentos/Integracion_del_tramite_SECTURI_2026.pdf"
-                                                                title="Código de Conducta" style="border:0"
-                                                                loading="lazy" width="100%">
-                                                            </iframe>
-                                                        </div>
-                                                        <p class="text-muted text-truncate">SECTURI 2026</p>
-                                                        <hr class="hr-dashed">
-                                                        <div class="d-flex justify-content-between">
-
-                                                            <div class="align-self-center">
-                                                                <a href="<?= base_url() ?>assets/documentos/Disposiciones Administrativas SECTURI 2026.pptm"
-                                                                    target="_blank" class="text-primary">Leer más <i
-                                                                        class="fas fa-long-arrow-alt-right"></i></a>
-                                                            </div>
-                                                        </div>
-                                                    </div><!--end blog-card-->
-                                                </div><!--end card-body-->
-                                            </div><!--end card-->
-                                            <div class="card">
-                                                <div class="card-body dash-info-carousel">
-                                                    <h4 class="mt-0  mb-4">Código de Conducta</h4>
-                                                    <div id="carousel_1" class="carousel slide" data-ride="carousel">
-                                                        <div class="carousel-inner">
-                                                            <div class="carousel-item">
-                                                                <a href="<?= base_url() . 'assets/pdf/plantillas/principio.pdf' ?>"
-                                                                    target="_black">
-                                                                    <div class="media">
-                                                                        <div class="icon-info mb-3">
-                                                                            <!-- Constitución, leyes, normas -->
-                                                                            <i
-                                                                                class="fas fa-balance-scale bg-soft-primary"></i>
-                                                                        </div>
-                                                                        <div class="media-body align-self-center">
-                                                                            <h4 class="mt-0 mb-1 title-text text-dark">
-                                                                                Principios</h4>
-                                                                            <p class="text-muted mb-0">Ver más</p>
-                                                                        </div>
-                                                                    </div>
-                                                                </a>
-                                                            </div>
-
-                                                            <div class="carousel-item">
-                                                                <a href="<?= base_url() . 'assets/pdf/plantillas/reglas.pdf' ?>"
-                                                                    target="_black">
-                                                                    <div class="media">
-                                                                        <div class="icon-info mb-3">
-                                                                            <!-- Reglas, integridad, lineamientos -->
-                                                                            <i class="fas fa-gavel bg-soft-success"></i>
-                                                                        </div>
-                                                                        <div class="media-body align-self-center">
-                                                                            <h4 class="mt-0 mb-1">Reglas de
-                                                                                Integridad</h4>
-                                                                            <p class="text-muted mb-0">Saber más</p>
-                                                                        </div>
-                                                                    </div>
-                                                                </a>
-                                                            </div>
-
-                                                            <div class="carousel-item active">
-                                                                <a href="<?= base_url() . 'assets/pdf/plantillas/valores2.pdf' ?>"
-                                                                    target="_black">
-                                                                    <div class="media">
-                                                                        <div class="icon-info mb-3">
-                                                                            <!-- Valores, ética, principios -->
-                                                                            <i
-                                                                                class="fas fa-hand-holding-heart bg-soft-warning"></i>
-                                                                        </div>
-                                                                        <div class="media-body align-self-center">
-                                                                            <h4 class="mt-0 mb-1 title-text">Valores
-                                                                            </h4>
-                                                                            <p class="text-muted mb-0">Conoce los
-                                                                                Valores</p>
-                                                                        </div>
-                                                                    </div>
-                                                                </a>
-                                                            </div>
-                                                        </div>
-                                                        <a class="carousel-control-prev" href="#carousel_1"
-                                                            role="button" data-slide="prev">
-                                                            <span class="carousel-control-prev-icon"
-                                                                aria-hidden="true"></span>
-                                                            <span class="sr-only">Previous</span>
-                                                        </a>
-                                                        <a class="carousel-control-next" href="#carousel_1"
-                                                            role="button" data-slide="next">
-                                                            <span class="carousel-control-next-icon"
-                                                                aria-hidden="true"></span>
-                                                            <span class="sr-only">Next</span>
-                                                        </a>
-                                                    </div>
-                                                </div><!--end card-body-->
-                                            </div><!--end card-->
-
                                             <div class="card">
                                                 <div class="card-body">
                                                     <h4 class="mt-0  mb-4">Código de Ética</h4>
@@ -723,24 +473,7 @@
 
                                        
                                         <div class="col-lg-6">
-                                            <div class="card">
-                                                <a href="<?= base_url() ?>assets/mike.png" target="_blank" >
-                                                <div class="card-body">
-                                                    <div class="blog-card">
-                                                        <h4 class="header-title mt-0 mb-4">Semana del 9 de marzo al 13 de marzo, acciones SIGAP</h4>
-                                                        <iframe src="<?= base_url() ?>assets/mike.png" alt="" width="100%" height="500px"
-                                                            class="img-fluid" ></iframe>
-                                                    </div><!--end blog-card-->
-                                                       <a href="https://meet.google.com/wkb-pvzf-zrk"
-                                                                    target="_blank" class="text-primary">Unirse a la reunión 11:00 a 12:00 horas <i
-                                                                        class="fas fa-long-arrow-alt-right"></i></a><br>
-                                                                        <a href="https://meet.google.com/rmb-dqrx-dsn"
-                                                                    target="_blank" class="text-primary">Unirse a la reunión 13:00 a 14:00 horas <i
-                                                                        class="fas fa-long-arrow-alt-right"></i></a>
-
-                                                </div><!--end card-body-->
-                                                </a>
-                                            </div><!--end card-->
+                                     
                                            <div class="card">
                                                     <div class="card-body">
                                                         <div class="ribbon4 rib4-warning">
@@ -787,6 +520,50 @@
                                     </div><!--end row-->
                                 </div><!--end col-->
                             </div><!--end row-->
+                            <?php if (!empty($tarjetas)): ?>
+                                <div class="row mt-3">
+                                    
+                                    <?php foreach ($tarjetas as $tarjeta): ?>
+                                        <?php
+                                        $archivoTarjeta = !empty($tarjeta->archivo) ? base_url() . $tarjeta->archivo : '';
+                                        $esPdfTarjeta = isset($tarjeta->tipo_archivo) && $tarjeta->tipo_archivo === 'pdf';
+                                        ?>
+                                        <div class="col-md-6 col-xl-4">
+                                            <div class="card h-100">
+                                                <?php if ($archivoTarjeta !== ''): ?>
+                                                    <?php if ($esPdfTarjeta): ?>
+                                                        <div class="card-body border-bottom">
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="icon-info mb-0 mr-3">
+                                                                    <i class="fas fa-file-pdf bg-soft-danger"></i>
+                                                                </div>
+                                                                <div>
+                                                                    <h4 class="mt-0 mb-1"><?= esc($tarjeta->titulo) ?></h4>
+                                                                    <small class="text-muted">Archivo PDF adjunto</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    <?php else: ?>
+                                                        <img src="<?= esc($archivoTarjeta) ?>" alt="<?= esc($tarjeta->titulo) ?>" class="card-img-top" style="height:220px; object-fit:cover;">
+                                                    <?php endif; ?>
+                                                <?php endif; ?>
+                                                <div class="card-body">
+                                                    <h4 class="mt-0 mb-2"><?= esc($tarjeta->titulo) ?></h4>
+                                                    <p class="text-muted mb-3"><?= esc($tarjeta->descripcion) ?></p>
+                                                    <div class="d-flex flex-wrap">
+                                                        <?php if ($archivoTarjeta !== ''): ?>
+                                                            <a href="<?= esc($archivoTarjeta) ?>" target="_blank" class="btn btn-sm btn-soft-primary mr-2 mb-2">Abrir archivo</a>
+                                                        <?php endif; ?>
+                                                        <?php if (!empty($tarjeta->link)): ?>
+                                                            <a href="<?= esc($tarjeta->link) ?>" target="_blank" class="btn btn-sm btn-soft-success mb-2">Ir al link</a>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php endif; ?>
                         </div><!--end general detail-->
 
                         <div class="tab-pane fade" id="activity_detail">
@@ -925,6 +702,106 @@
                             </div><!--end row-->
                         </div><!--end education detail-->
 
+
+                        <div class="tab-pane fade" id="tarjetas_detail">
+                            <div class="row">
+                                <div class="col-lg-5">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h4 class="header-title mt-0 mb-3">Crear tarjeta</h4>
+
+                                            <?php if (!empty($tarjetasOk)): ?>
+                                                <div class="alert alert-success"><?= esc($tarjetasOk) ?></div>
+                                            <?php endif; ?>
+                                            <?php if (!empty($tarjetasError)): ?>
+                                                <div class="alert alert-danger"><?= esc($tarjetasError) ?></div>
+                                            <?php endif; ?>
+
+                                            <div id="tarjetasAlert"></div>
+                                            <form id="formTarjeta" enctype="multipart/form-data">
+                                                <div class="form-group">
+                                                    <label for="titulo_tarjeta">Texto</label>
+                                                    <input type="text" class="form-control" id="titulo_tarjeta" name="titulo" maxlength="255" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="archivo_tarjeta">Archivo</label>
+                                                    <input type="file" class="form-control" id="archivo_tarjeta" name="archivo" accept=".jpg,.jpeg,.png,.webp,.gif,.pdf" required>
+                                                    <small class="text-muted">Puedes subir imagen o PDF.</small>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="descripcion_tarjeta">Descripción</label>
+                                                    <textarea class="form-control" id="descripcion_tarjeta" name="descripcion" rows="4" required></textarea>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="link_tarjeta">Link</label>
+                                                    <input type="text" class="form-control" id="link_tarjeta" name="link" placeholder="https://...">
+                                                </div>
+                                                <button type="button" onclick="guardarTarjeta(event)" id="btnGuardarTarjeta" class="btn btn-gradient-primary btn-sm px-4">Guardar tarjeta</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-7">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h4 class="header-title mt-0 mb-3">Tarjetas registradas</h4>
+                                            <div class="table-responsive">
+                                                <table class="table table-hover mb-0">
+                                                    <thead class="thead-light">
+                                                        <tr>
+                                                            <th>Texto</th>
+                                                            <th>Archivo</th>
+                                                            <th>Link</th>
+                                                            <th>Acción</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <?php if (!empty($tarjetas)): ?>
+                                                            <?php foreach ($tarjetas as $tarjeta): ?>
+                                                                <?php $archivoTarjeta = !empty($tarjeta->archivo) ? base_url() . $tarjeta->archivo : ''; ?>
+                                                                <tr>
+                                                                    <td>
+                                                                        <div class="font-weight-semibold"><?= esc($tarjeta->titulo) ?></div>
+                                                                        <small class="text-muted"><?= esc(mb_strimwidth($tarjeta->descripcion ?? '', 0, 80, '...')) ?></small>
+                                                                    </td>
+                                                                    <td>
+                                                                        <?php if ($archivoTarjeta !== ''): ?>
+                                                                            <a href="<?= esc($archivoTarjeta) ?>" target="_blank">Ver archivo</a>
+                                                                        <?php else: ?>
+                                                                            <span class="text-muted">Sin archivo</span>
+                                                                        <?php endif; ?>
+                                                                    </td>
+                                                                    <td>
+                                                                        <?php if (!empty($tarjeta->link)): ?>
+                                                                            <a href="<?= esc($tarjeta->link) ?>" target="_blank">Abrir link</a>
+                                                                        <?php else: ?>
+                                                                            <span class="text-muted">Sin link</span>
+                                                                        <?php endif; ?>
+                                                                    </td>
+                                                                    <td>
+                                                                        <?php if($session->get("id_usuario") == $tarjeta->usu_reg): ?>
+                                                                        <a href="javascript:void(0)" onclick="eliminarTarjeta(<?= (int) $tarjeta->id_tarjeta ?>)" class="btn btn-sm btn-soft-danger">Eliminar</a>
+                                                                         <?php endif; ?>
+                                                                        <?php if($session->get("id_usuario") == 1): ?>
+                                                                        <a href="javascript:void(0)" onclick="eliminarTarjeta(<?= (int) $tarjeta->id_tarjeta ?>)" class="btn btn-sm btn-soft-danger">Eliminar</a>
+                                                                         <?php endif; ?>
+                                                                    </td>
+                                                                </tr>
+                                                            <?php endforeach; ?>
+                                                        <?php else: ?>
+                                                            <tr>
+                                                                <td colspan="4" class="text-center text-muted">Aún no hay tarjetas registradas.</td>
+                                                            </tr>
+                                                        <?php endif; ?>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="tab-pane fade" id="settings_detail">
                             <div class="row">
@@ -1171,4 +1048,113 @@
             }
         });
     }
+
+    function mostrarAlertaTarjetas(tipo, mensaje) {
+        const clase = tipo === 'success' ? 'alert-success' : 'alert-danger';
+        $('#tarjetasAlert').html('<div class="alert ' + clase + '">' + mensaje + '</div>');
+    }
+
+    function guardarTarjeta(event) {
+        if (event) {
+            event.preventDefault();
+        }
+
+        const form = document.getElementById('formTarjeta');
+        if (!form) {
+            Swal.fire('Error', 'No se encontró el formulario de tarjetas.', 'error');
+            return;
+        }
+
+        const formData = new FormData(form);
+        const archivo = document.getElementById('archivo_tarjeta');
+
+        if (!formData.get('titulo')) {
+            mostrarAlertaTarjetas('error', 'El campo texto es obligatorio.');
+            return;
+        }
+
+        if (!formData.get('descripcion')) {
+            mostrarAlertaTarjetas('error', 'El campo descripción es obligatorio.');
+            return;
+        }
+
+        if (!archivo || !archivo.files || archivo.files.length === 0) {
+            mostrarAlertaTarjetas('error', 'Debes seleccionar un archivo.');
+            return;
+        }
+
+        $('#btnGuardarTarjeta').prop('disabled', true).text('Guardando...');
+
+        $.ajax({
+            url: base_url + 'index.php/Inicio/guardarTarjeta',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (response) {
+                if (!response.error) {
+                    mostrarAlertaTarjetas('success', response.respuesta || 'Tarjeta guardada correctamente.');
+                    form.reset();
+                    setTimeout(function () {
+                        window.location.href = base_url + 'index.php/Inicio/Perfil#tarjetas_detail';
+                    }, 800);
+                } else {
+                    mostrarAlertaTarjetas('error', response.respuesta || 'No fue posible guardar la tarjeta.');
+                }
+            },
+            error: function () {
+                mostrarAlertaTarjetas('error', 'Ocurrió un error al guardar la tarjeta.');
+            },
+            complete: function () {
+                $('#btnGuardarTarjeta').prop('disabled', false).text('Guardar tarjeta');
+            }
+        });
+    }
+
+    function eliminarTarjeta(idTarjeta) {
+        if (!idTarjeta) {
+            Swal.fire('Error', 'No se recibió el identificador de la tarjeta.', 'error');
+            return;
+        }
+
+        Swal.fire({
+            title: '¿Eliminar tarjeta?',
+            text: 'Esta acción ocultará la tarjeta y quitará su archivo.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (!result.isConfirmed) {
+                return;
+            }
+
+            $.ajax({
+                url: base_url + 'index.php/Inicio/eliminarTarjeta/' + idTarjeta,
+                type: 'GET',
+                success: function (response) {
+                    if (!response.error) {
+                        Swal.fire('Correcto', response.respuesta || 'Tarjeta eliminada correctamente.', 'success');
+                        setTimeout(function () {
+                            window.location.href = base_url + 'index.php/Inicio/index#tarjetas_detail';
+                        }, 700);
+                    } else {
+                        Swal.fire('Error', response.respuesta || 'No fue posible eliminar la tarjeta.', 'error');
+                    }
+                },
+                error: function () {
+                    Swal.fire('Error', 'Ocurrió un error al eliminar la tarjeta.', 'error');
+                }
+            });
+        });
+    }
+
+    $(function () {
+        if (window.location.hash) {
+            const tabLink = $('a[href="' + window.location.hash + '"]');
+            if (tabLink.length) {
+                tabLink.tab('show');
+            }
+        }
+    });
 </script>

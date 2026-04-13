@@ -59,6 +59,270 @@ class Inicio extends BaseController
         return file_exists($fullPath) ? $fullPath : null;
     }
 
+    private function getTablaData(Mglobal $globals, array $config): array
+    {
+        $result = $globals->getTabla($config);
+        return (isset($result->data) && is_array($result->data)) ? $result->data : [];
+    }
+
+    private function getTimestampFromRow($row): ?int
+    {
+        $fields = [
+            'created_at',
+            'updated_at',
+            'fecha_registro',
+            'fec_registro',
+            'fecha_creacion',
+            'fec_creacion',
+            'fecha',
+            'fec_alta',
+        ];
+
+        foreach ($fields as $field) {
+            if (!empty($row->$field)) {
+                $timestamp = strtotime((string) $row->$field);
+                if ($timestamp !== false) {
+                    return $timestamp;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private function buildStatusSummary(array $rows, array $statusMap): array
+    {
+        $summary = [];
+
+        foreach ($rows as $row) {
+            $statusId = $row->id_estatus ?? $row->estatus ?? null;
+            if ($statusId === null || $statusId === '') {
+                $label = 'Sin estatus';
+            } else {
+                $label = $statusMap[(string) $statusId] ?? ('Estatus ' . $statusId);
+            }
+
+            if (!isset($summary[$label])) {
+                $summary[$label] = 0;
+            }
+
+            $summary[$label]++;
+        }
+
+        return $summary;
+    }
+
+    private function buildAdminDashboardData(Mglobal $globals): array
+    {
+        $statusRows = $this->getTablaData($globals, [
+            'tabla' => 'cat_estatus',
+            'where' => ['visible' => 1],
+        ]);
+
+        $statusMap = [];
+        foreach ($statusRows as $statusRow) {
+            $statusId = $statusRow->id_estatus ?? $statusRow->id_cat_estatus ?? null;
+            $statusLabel = $statusRow->dsc_estatus ?? $statusRow->estatus ?? $statusRow->nombre ?? null;
+            if ($statusId !== null && $statusLabel !== null) {
+                $statusMap[(string) $statusId] = $statusLabel;
+            }
+        }
+
+        $moduleConfigs = [
+            'Pagos PT' => [
+                'tabla' => 'registro_pt',
+                'id_field' => 'id_registro_pt',
+                'title_fields' => ['folio', 'concepto', 'descripcion'],
+            ],
+            'Pagos GO' => [
+                'tabla' => 'registro_go',
+                'id_field' => 'id_registro_go',
+                'title_fields' => ['folio', 'concepto', 'descripcion'],
+            ],
+            'Fichas Técnicas' => [
+                'tabla' => 'ficha_tecnica',
+                'id_field' => 'id_ficha_tecnica',
+                'title_fields' => ['folio', 'nombre_evento', 'asunto'],
+            ],
+            'Solicitudes GRC' => [
+                'tabla' => 'solicitud_grc',
+                'id_field' => 'id_solicitud_grc',
+                'title_fields' => ['folio', 'asunto', 'descripcion'],
+            ],
+            'Convenios' => [
+                'tabla' => 'solicitud_convenio',
+                'id_field' => 'id_solicitud_convenio',
+                'title_fields' => ['folio', 'asunto', 'descripcion'],
+            ],
+            'Contratos' => [
+                'tabla' => 'solicitud_contrato',
+                'id_field' => 'id_solicitud_contrato',
+                'title_fields' => ['folio', 'asunto', 'descripcion'],
+            ],
+        ];
+
+        $monthlyRows = [];
+        $dashboardModules = [];
+        $recentItems = [];
+        $currentYear = (int) date('Y');
+
+        foreach ($moduleConfigs as $label => $config) {
+            $rows = $this->getTablaData($globals, [
+                'tabla' => $config['tabla'],
+                'where' => ['visible' => 1],
+            ]);
+
+            $dashboardModules[] = [
+                'module' => $label,
+                'total' => count($rows),
+                'status' => $this->buildStatusSummary($rows, $statusMap),
+            ];
+
+            $monthlyRows[$label] = array_fill(0, 12, 0);
+
+            foreach ($rows as $row) {
+                $timestamp = $this->getTimestampFromRow($row);
+                if ($timestamp !== null && (int) date('Y', $timestamp) === $currentYear) {
+                    $monthIndex = (int) date('n', $timestamp) - 1;
+                    $monthlyRows[$label][$monthIndex]++;
+                }
+
+                $title = null;
+                foreach ($config['title_fields'] as $field) {
+                    if (!empty($row->$field)) {
+                        $title = (string) $row->$field;
+                        break;
+                    }
+                }
+
+                if ($title === null) {
+                    $idField = $config['id_field'];
+                    $title = 'Registro #' . ($row->$idField ?? 's/n');
+                }
+
+                $statusId = $row->id_estatus ?? $row->estatus ?? null;
+                $statusLabel = ($statusId !== null && $statusId !== '')
+                    ? ($statusMap[(string) $statusId] ?? ('Estatus ' . $statusId))
+                    : 'Sin estatus';
+
+                $recentItems[] = [
+                    'module' => $label,
+                    'title' => $title,
+                    'status' => $statusLabel,
+                    'timestamp' => $timestamp ?? 0,
+                    'date' => $timestamp ? date('d/m/Y H:i', $timestamp) : 'Sin fecha',
+                ];
+            }
+        }
+
+        $ticketRows = $this->getTablaData($globals, [
+            'tabla' => 'tiket',
+            'where' => ['visible' => 1],
+        ]);
+
+        $ticketMap = [
+            '0' => 'Nuevos',
+            '1' => 'Concluidos',
+            '2' => 'En proceso',
+        ];
+        $dashboardTickets = ['Nuevos' => 0, 'En proceso' => 0, 'Concluidos' => 0];
+        foreach ($ticketRows as $ticket) {
+            $key = (string) ($ticket->estatus ?? $ticket->id_estatus ?? '');
+            $label = $ticketMap[$key] ?? 'Sin clasificar';
+            if (!isset($dashboardTickets[$label])) {
+                $dashboardTickets[$label] = 0;
+            }
+            $dashboardTickets[$label]++;
+
+            $timestamp = $this->getTimestampFromRow($ticket);
+            $recentItems[] = [
+                'module' => 'Tickets',
+                'title' => !empty($ticket->asunto) ? (string) $ticket->asunto : 'Ticket #' . ($ticket->id_tiket ?? 's/n'),
+                'status' => $label,
+                'timestamp' => $timestamp ?? 0,
+                'date' => $timestamp ? date('d/m/Y H:i', $timestamp) : 'Sin fecha',
+            ];
+        }
+
+        usort($recentItems, static function ($left, $right) {
+            return ($right['timestamp'] ?? 0) <=> ($left['timestamp'] ?? 0);
+        });
+        $recentItems = array_slice($recentItems, 0, 8);
+        foreach ($recentItems as &$item) {
+            unset($item['timestamp']);
+        }
+        unset($item);
+
+        $usuarios = $this->getTablaData($globals, [
+            'tabla' => 'usuario',
+            'where' => ['visible' => 1],
+        ]);
+
+        $activeUsers = 0;
+        $inactiveUsers = 0;
+        foreach ($usuarios as $usuario) {
+            $isActive = true;
+            if (isset($usuario->activo)) {
+                $isActive = (int) $usuario->activo === 1;
+            } elseif (isset($usuario->estatus)) {
+                $isActive = in_array((int) $usuario->estatus, [1, 2], true);
+            } elseif (isset($usuario->id_estatus)) {
+                $isActive = in_array((int) $usuario->id_estatus, [1, 2], true);
+            }
+
+            if ($isActive) {
+                $activeUsers++;
+            } else {
+                $inactiveUsers++;
+            }
+        }
+
+        $dashboardCards = [
+            [
+                'title' => 'Usuarios visibles',
+                'value' => count($usuarios),
+                'subtitle' => 'Base activa del sistema',
+                'icon' => 'users',
+                'color' => 'primary',
+            ],
+            [
+                'title' => 'Módulos monitoreados',
+                'value' => count($moduleConfigs),
+                'subtitle' => 'Operación conectada al dashboard',
+                'icon' => 'grid',
+                'color' => 'success',
+            ],
+            [
+                'title' => 'Tickets abiertos',
+                'value' => ($dashboardTickets['Nuevos'] ?? 0) + ($dashboardTickets['En proceso'] ?? 0),
+                'subtitle' => 'Seguimiento pendiente',
+                'icon' => 'inbox',
+                'color' => 'warning',
+            ],
+            [
+                'title' => 'Movimientos recientes',
+                'value' => count($recentItems),
+                'subtitle' => 'Últimos registros detectados',
+                'icon' => 'activity',
+                'color' => 'info',
+            ],
+        ];
+
+        return [
+            'dashboardCards' => $dashboardCards,
+            'dashboardModules' => $dashboardModules,
+            'dashboardTickets' => $dashboardTickets,
+            'dashboardUsers' => [
+                'total' => count($usuarios),
+                'active' => $activeUsers,
+                'inactive' => $inactiveUsers,
+            ],
+            'dashboardRecentItems' => $recentItems,
+            'dashboardMonthLabels' => ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+            'dashboardMonthlyRows' => $monthlyRows,
+        ];
+    }
+
     public function index()
     {
         $session = \Config\Services::session();
@@ -78,6 +342,7 @@ class Inicio extends BaseController
         }
         if (in_array($session->get('id_perfil'), [1, 2, 3])) {
             $vista = 'secciones/vInicio';
+            $data = array_merge($data, $this->buildAdminDashboardData($globas));
         }
         else {
             $vista = 'personal/vInicio';
@@ -150,6 +415,11 @@ class Inicio extends BaseController
         $data['actividad'] = (isset($actividad) && !empty($actividad)) ? $actividad : [];
         $data['configuracion'] = (isset($configuracion[0]) && !empty($configuracion)) ? $configuracion[0] : '';
         $data['personal'] = $personal;
+        $data['tarjetas'] = $this->getTablaData($globas, [
+            'tabla' => 'tarjetas',
+            'where' => ['visible' => 1],
+            'order' => 'id_tarjeta DESC',
+        ]);
         $data['scripts'] = array('principal', 'inicio');
         $data['edita'] = 0;
         $data['nombre_completo'] = $session->nombre_completo;
@@ -278,6 +548,11 @@ class Inicio extends BaseController
         $data['personal'] = $personal;
         $data['datos'] = $globas->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario]])->data[0];
         $data['lista_alba'] = $globas->getTabla(['tabla' => 'lista_alba', 'where' => ['visible' => 1]])->data;
+        $data['tarjetas'] = $this->getTablaData($globas, [
+            'tabla' => 'tarjetas',
+            'where' => ['visible' => 1],
+            'order' => 'id_tarjeta DESC',
+        ]);
         $data['scripts'] = array('principal', 'inicio');
         $data['edita'] = 0;
         $data['nombre_completo'] = $session->nombre_completo;
@@ -366,6 +641,134 @@ class Inicio extends BaseController
         $data['scripts'] = array('principal', 'inicio');
         $data['contentView'] = 'personal/vInventarioLimpieza';
         $this->_renderView($data);
+    }
+    public function guardarTarjeta()
+    {
+        $session = \Config\Services::session();
+        $globas = new Mglobal;
+        $response = new \stdClass();
+
+        $titulo = trim((string) $this->request->getPost('titulo'));
+        $descripcion = trim((string) $this->request->getPost('descripcion'));
+        $link = trim((string) $this->request->getPost('link'));
+        $archivo = $this->request->getFile('archivo');
+    
+        if ($titulo === '') {
+            $response->error = true;
+            $response->respuesta = 'El campo título es obligatorio.';
+            return $this->respond($response);
+        }
+
+        if ($descripcion === '') {
+            $response->error = true;
+            $response->respuesta = 'El campo descripción es obligatorio.';
+            return $this->respond($response);
+        }
+
+        if ($link !== '' && !filter_var($link, FILTER_VALIDATE_URL)) {
+             return $this->response->setJSON(['error' => true, 'respuesta' => 'El link debe ser una URL válida.']);
+        }
+
+        if (!$archivo || !$archivo->isValid()) {
+             return $this->response->setJSON(['error' => true, 'respuesta' => 'Debes subir un archivo de imagen o PDF.']);
+        }
+
+        $extension = strtolower((string) $archivo->getExtension());
+        $permitidos = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'pdf'];
+        if (!in_array($extension, $permitidos, true)) {
+             return $this->response->setJSON(['error' => true, 'respuesta' => 'Solo se permiten archivos JPG, PNG, WEBP, GIF o PDF.']);
+        }
+
+        $uploadPath = FCPATH . 'assets/uploads/tarjetas/';
+        if (!is_dir($uploadPath)) {
+            mkdir($uploadPath, 0777, true);
+        }
+
+        $newName = 'tarjeta_' . date('YmdHis') . '_' . uniqid() . '.' . $extension;
+        if (!$archivo->move($uploadPath, $newName)) {
+             return $this->response->setJSON(['error' => true, 'respuesta' => 'No fue posible guardar el archivo de la tarjeta.']);
+        }
+
+        $relativePath = 'assets/uploads/tarjetas/' . $newName;
+
+        
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaTurno'];
+        $dataConfig = [
+            "tabla" => "tarjetas",
+            "editar" => 'false',
+            
+        ];
+        $dataInsert = [
+            'titulo' => $titulo,
+            'archivo' => $relativePath,
+            'tipo_archivo' => $extension,
+            'descripcion' => $descripcion,
+            'link' => $link !== '' ? $link : null,
+            'usu_reg' => (int) $session->get('id_usuario'),
+        ];
+
+        $response = $globas->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+       // die(var_dump($response));
+        if($response->error){
+             $response->respuesta = 'No fue posible guardar la tarjeta.';
+             return $this->respond($response);
+        }
+    
+        return $this->respond(['error' => false, 'respuesta' => 'Tarjeta guardada correctamente.']);
+    }
+
+    public function eliminarTarjeta($idTarjeta = null)
+    {
+        $session = \Config\Services::session();
+        $globas = new Mglobal;
+
+        $idTarjeta = (int) $idTarjeta;
+        if ($idTarjeta <= 0) {
+            return $this->response->setJSON([
+                'error' => true,
+                'respuesta' => 'No se recibió una tarjeta válida.',
+            ]);
+        }
+
+        $tarjetas = $this->getTablaData($globas, [
+            'tabla' => 'tarjetas',
+            'where' => ['visible' => 1, 'id_tarjeta' => $idTarjeta],
+        ]);
+
+        if (empty($tarjetas)) {
+            return $this->response->setJSON([
+                'error' => true,
+                'respuesta' => 'La tarjeta no existe o ya fue eliminada.',
+            ]);
+        }
+
+        $tarjeta = $tarjetas[0];
+        if (!empty($tarjeta->archivo)) {
+            $archivoPath = FCPATH . ltrim((string) $tarjeta->archivo, '/\\');
+            if (is_file($archivoPath)) {
+                @unlink($archivoPath);
+            }
+        }
+
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Inicio.php/eliminarTarjeta'];
+        $dataConfig = [
+            'tabla' => 'tarjetas',
+            'editar' => 'true',
+            'idEditar' => ['id_tarjeta' => $idTarjeta],
+        ];
+
+        $response = $globas->saveTabla(['visible' => 0], $dataConfig, $dataBitacora);
+        if (!empty($response->error)) {
+            return $this->response->setJSON([
+                'error' => true,
+                'respuesta' => 'No fue posible eliminar la tarjeta.',
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'error' => false,
+            'respuesta' => 'Tarjeta eliminada correctamente.',
+        ]);
     }
     public function ListaConvenio()
     {
