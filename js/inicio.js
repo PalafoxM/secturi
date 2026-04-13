@@ -383,7 +383,7 @@ ini.inicio = (function () {
                     success: function (response) {
 
                         if (response.error == false) {
-                            Swal.fire("Exitó", response.respuesta, "success");
+                            Swal.fire("Éxito", response.respuesta, "success");
 
                             //window.location.reload();
 
@@ -2089,7 +2089,7 @@ ini.inicio = (function () {
                     console.log(response);
 
                     if (response.error == false) {
-                        Swal.fire("Exitó", response.respuesta, "success");
+                        Swal.fire("Éxito", response.respuesta, "success");
                         setTimeout(() => {
                             window.location.href = `${base_url}index.php/Inicio`;
                         }, 1500);
@@ -2123,7 +2123,7 @@ ini.inicio = (function () {
                         console.log(response);
 
                         if (response.error == false) {
-                            Swal.fire("Exitó", response.respuesta, "success");
+                            Swal.fire("Éxito", response.respuesta, "success");
                             setTimeout(() => {
                                 window.location.reload();
                             }, 1500);
@@ -2159,7 +2159,7 @@ ini.inicio = (function () {
                         console.log(response);
 
                         if (response.error == false) {
-                            Swal.fire("Exitó", response.respuesta, "success");
+                            Swal.fire("Éxito", response.respuesta, "success");
 
                             window.location.reload();
 
@@ -3283,7 +3283,7 @@ ini.inicio = (function () {
                         $("#funcion").val(data.funcion);
                         $("#nivel").val(data.nivel).trigger('change');
                         $("#id_sexo").val(data.id_sexo).trigger('change');
-                        //Swal.fire("Exitó",response.respuesta , "success")
+                        //Swal.fire("Éxito",response.respuesta , "success")
                         $("#editar").val(1);
                         $("#id_detenido").val(0);
                         $("#id_participante").val(id);
@@ -3335,7 +3335,7 @@ ini.inicio = (function () {
                         $("#funcion").val(data.funcion);
                         $("#id_nivel").val(data.id_nivel).trigger('change');
                         $("#id_sexo").val(data.id_sexo).trigger('change');
-                        //Swal.fire("Exitó",response.respuesta , "success")
+                        //Swal.fire("Éxito",response.respuesta , "success")
                         $("#editar").val(1);
                         $("#id_detenido").val(id);
                         $("#id_participante").val(0);
