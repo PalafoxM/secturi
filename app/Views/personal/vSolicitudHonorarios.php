@@ -133,7 +133,7 @@ $soportes = [
                                                     <option value="">Seleccione una opci&oacute;n</option>
                                                     <?php foreach ($cat_partida as $p): ?>
                                                         <option value="<?= $p->id_partida ?>" <?= (isset($solicitud) && isset($solicitud->partida) && $solicitud->partida == $p->id_partida) ? 'selected' : '' ?>>
-                                                            <?= esc(($p->cuenta_cable ?? '') . ' - ' . ($p->partida ?? $p->cuenta_cable ?? '')) ?>
+                                                            <?= esc(($p->cuenta_cable ?? '') . ' - ' . ($p->partida ?? $p->nombre_fondo ?? '')) ?>
                                                         </option>
                                                     <?php endforeach; ?>
                                                 </select>
@@ -492,14 +492,10 @@ $soportes = [
                         Swal.fire({
                             icon: 'success',
                             title: 'Solicitud guardada correctamente',
-                            html: `
-                                <div class="mt-2">
-                                    <a href="${data.url_listado || '#'}" class="btn btn-outline-primary btn-sm mr-2">Ver listado</a>
-                                    <a href="${data.url_pdf || '#'}" target="_blank" class="btn btn-outline-danger btn-sm">Abrir PDF</a>
-                                </div>
-                            `,
-                            showConfirmButton: true,
-                            confirmButtonText: 'Continuar'
+                            showConfirmButton: false,
+                            timer: 1200
+                        }).then(() => {
+                            window.location.href = data.url_listado || '<?= base_url("index.php/Principal/listadoHonorarios") ?>';
                         });
                     } else {
                         Swal.fire({

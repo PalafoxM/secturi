@@ -2947,6 +2947,111 @@ class Principal extends BaseController
         $data['contentView'] = 'personal/vSolicitudHonorarios';
         $this->_renderView($data);
     }
+    public function listadoHonorarios()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $data = array();
+
+        if (in_array((int) ($session->id_perfil ?? 0), [1, 2, 3, 7], true)) {
+            $solicitudes = $globals->getTabla(['tabla' => 'solicitud_honorario', 'where' => ['visible' => 1]]);
+        } else {
+            $solicitudes = $globals->getTabla(['tabla' => 'solicitud_honorario', 'where' => ['visible' => 1, 'usu_reg' => $session->id_usuario ?? 0]]);
+        }
+
+        $responsables = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1]]);
+        $responsablesMap = [];
+        if (!empty($responsables->data)) {
+            foreach ($responsables->data as $responsable) {
+                $responsablesMap[(string) ($responsable->id_usuario ?? '')] = trim(($responsable->nombre_completo ?? '') . ' - ' . ($responsable->dsc_puesto ?? ''));
+            }
+        }
+
+        if (!empty($solicitudes->data)) {
+            foreach ($solicitudes->data as $solicitud) {
+                $solicitud->responsable_proyecto_nombre = $responsablesMap[(string) ($solicitud->responsable_proyecto ?? '')] ?? ($solicitud->responsable_proyecto ?? '');
+            }
+        }
+
+        $data['solicitudes'] = !empty($solicitudes->data) ? $solicitudes->data : [];
+        $data['scripts'] = ['inicio'];
+        $data['edita'] = 0;
+        $data['contentView'] = 'personal/vListaHonorarios';
+        $this->_renderView($data);
+    }
+
+    private function obtenerSolicitudHonorariosDetalle($idSolicitudHonorario)
+    {
+        $globals = new Mglobal;
+        $detalle = [
+            'solicitud' => null,
+            'actividades' => [],
+        ];
+
+        $solicitudQuery = $globals->getTabla([
+            'tabla' => 'solicitud_honorario',
+            'where' => ['id_solicitud_honorario' => $idSolicitudHonorario, 'visible' => 1]
+        ]);
+
+        if (empty($solicitudQuery->data)) {
+            return $detalle;
+        }
+
+        $solicitud = $solicitudQuery->data[0];
+
+        $responsables = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1]]);
+        if (!empty($responsables->data)) {
+            foreach ($responsables->data as $responsable) {
+                if ((string) ($responsable->id_usuario ?? '') === (string) ($solicitud->responsable_proyecto ?? '')) {
+                    $solicitud->responsable_proyecto_nombre = trim(($responsable->nombre_completo ?? '') . ' - ' . ($responsable->dsc_puesto ?? ''));
+                    break;
+                }
+            }
+        }
+
+        $actividadesQuery = $globals->getTabla([
+            'tabla' => 'actividades_honorario',
+            'where' => ['id_solicitud_honorario' => $idSolicitudHonorario, 'visible' => 1]
+        ]);
+
+        $detalle['solicitud'] = $solicitud;
+        $detalle['actividades'] = !empty($actividadesQuery->data) ? $actividadesQuery->data : [];
+
+        return $detalle;
+    }
+
+    public function pdfSolicitudHonorarios($id_solicitud_honorario = null)
+    {
+        if (empty($id_solicitud_honorario)) {
+            echo 'Solicitud no válida';
+            return;
+        }
+
+        $detalle = $this->obtenerSolicitudHonorariosDetalle($id_solicitud_honorario);
+        if (empty($detalle['solicitud'])) {
+            echo 'Solicitud no encontrada';
+            return;
+        }
+
+        $data = [
+            'solicitud' => $detalle['solicitud'],
+            'actividades' => $detalle['actividades'],
+        ];
+
+        $html = view('pdfs/vPdfSolicitudHonorarios', $data);
+
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 12,
+            'margin_left' => 12,
+            'margin_right' => 12,
+            'margin_bottom' => 12,
+            'format' => 'Letter'
+        ]);
+
+        $mpdf->WriteHTML($html);
+        $mpdf->Output('Solicitud_Honorarios_' . $id_solicitud_honorario . '.pdf', 'I');
+        exit();
+    }
 
     public function guardarSolicitudHonorarios()
     {
@@ -3051,6 +3156,8 @@ class Principal extends BaseController
         $response->error = false;
         $response->respuesta = 'Solicitud guardada correctamente';
         $response->id_solicitud_honorario = $id_solicitud;
+        $response->url_listado = base_url('index.php/Principal/listadoHonorarios');
+        $response->url_pdf = base_url('index.php/Principal/pdfSolicitudHonorarios/' . $id_solicitud);
 
         return $this->respond($response);
     }
