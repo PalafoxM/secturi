@@ -2866,9 +2866,48 @@ class Principal extends BaseController
         // Obtener comprobaciones
         // NOTA: Asumimos que la tabla de comprobación se llama solicitud_grc_comprobacion
         $comprobaciones = $globals->getTabla(['tabla' => 'solicitud_grc_comprobacion', 'where' => ['id_solicitud_grc' => $id_solicitud, 'visible' => 1]]);
+        $usuariosQuery = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
+        $usuariosPorRfc = [];
+        $usuariosPorNombre = [];
+
+        if (!empty($usuariosQuery->data)) {
+            foreach ($usuariosQuery->data as $usuario) {
+                $nombreCompleto = isset($usuario->nombre_completo) && !empty($usuario->nombre_completo)
+                    ? $usuario->nombre_completo
+                    : (isset($usuario->nombre) ? $usuario->nombre : '');
+
+                if (!empty($usuario->rfc)) {
+                    $usuariosPorRfc[strtoupper(trim($usuario->rfc))] = $nombreCompleto;
+                }
+
+                if (!empty($usuario->nombre)) {
+                    $usuariosPorNombre[mb_strtoupper(trim($usuario->nombre), 'UTF-8')] = $nombreCompleto;
+                }
+
+                if (!empty($usuario->nombre_completo)) {
+                    $usuariosPorNombre[mb_strtoupper(trim($usuario->nombre_completo), 'UTF-8')] = $nombreCompleto;
+                }
+            }
+        }
 
         $data['solicitud'] = $solicitud->data[0];
         $data['comprobaciones'] = (!empty($comprobaciones->data)) ? $comprobaciones->data : [];
+
+        if (!empty($data['comprobaciones'])) {
+            foreach ($data['comprobaciones'] as $comp) {
+                $nombreCompleto = isset($comp->nombre_emisor) ? $comp->nombre_emisor : '';
+                $rfcComp = isset($comp->rfc) ? strtoupper(trim($comp->rfc)) : '';
+                $nombreComp = isset($comp->nombre_emisor) ? mb_strtoupper(trim($comp->nombre_emisor), 'UTF-8') : '';
+
+                if ($rfcComp !== '' && isset($usuariosPorRfc[$rfcComp])) {
+                    $nombreCompleto = $usuariosPorRfc[$rfcComp];
+                } elseif ($nombreComp !== '' && isset($usuariosPorNombre[$nombreComp])) {
+                    $nombreCompleto = $usuariosPorNombre[$nombreComp];
+                }
+
+                $comp->nombre_emisor_completo = $nombreCompleto;
+            }
+        }
         
         $html = view('personal/vFormatoComprobacion', $data);
         $doc = 'assets/documentos/SOLICITUD_GRC.pdf'; // Template base if needed, or just plain HTML

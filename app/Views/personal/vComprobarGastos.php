@@ -197,8 +197,9 @@
         // Construir opciones de usuario
         let optionsUsuarios = '<option value="">Seleccione un usuario</option>';
         catalogoUsuarios.forEach(u => {
-            let isSelected = (data && data.nombre_emisor === u.nombre) ? 'selected' : '';
-            optionsUsuarios += `<option value="${u.nombre}" data-rfc="${u.rfc || ''}" ${isSelected}>${u.nombre}</option>`;
+            const nombreCompleto = u.nombre_completo || u.nombre || '';
+            let isSelected = (data && (data.nombre_emisor === nombreCompleto || data.nombre_emisor === u.nombre)) ? 'selected' : '';
+            optionsUsuarios += `<option value="${nombreCompleto}" data-rfc="${u.rfc || ''}" ${isSelected}>${nombreCompleto}</option>`;
         });
 
 
