@@ -522,9 +522,7 @@ $tarjetasError = session()->getFlashdata('tarjetas_error');
                             </div><!--end row-->
                             <?php if (!empty($tarjetas)): ?>
                                 <div class="row mt-3">
-                                    <div class="col-12">
-                                        <h4 class="header-title mt-0 mb-3">Tarjetas informativas</h4>
-                                    </div>
+                                    
                                     <?php foreach ($tarjetas as $tarjeta): ?>
                                         <?php
                                         $archivoTarjeta = !empty($tarjeta->archivo) ? base_url() . $tarjeta->archivo : '';
@@ -782,7 +780,12 @@ $tarjetasError = session()->getFlashdata('tarjetas_error');
                                                                         <?php endif; ?>
                                                                     </td>
                                                                     <td>
+                                                                        <?php if($session->get("id_usuario") == $tarjeta->usu_reg): ?>
                                                                         <a href="javascript:void(0)" onclick="eliminarTarjeta(<?= (int) $tarjeta->id_tarjeta ?>)" class="btn btn-sm btn-soft-danger">Eliminar</a>
+                                                                         <?php endif; ?>
+                                                                        <?php if($session->get("id_usuario") == 1): ?>
+                                                                        <a href="javascript:void(0)" onclick="eliminarTarjeta(<?= (int) $tarjeta->id_tarjeta ?>)" class="btn btn-sm btn-soft-danger">Eliminar</a>
+                                                                         <?php endif; ?>
                                                                     </td>
                                                                 </tr>
                                                             <?php endforeach; ?>
