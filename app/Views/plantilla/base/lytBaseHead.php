@@ -666,11 +666,14 @@
                         <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Principal/SolicitudHonorarios">Solicitud Honorarios</a>
                         </li>
+                         <li class="nav-item"><a class="nav-link"
+                                href="<?php echo base_url(); ?>index.php/Principal/ListaSolicitudContrato">Listado de Contratos</a>
+                        </li>
                         <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Principal/ListaSolicitudConvenio">Listado de Convenios</a>
                         </li>
-                         <li class="nav-item"><a class="nav-link"
-                                href="<?php echo base_url(); ?>index.php/Principal/ListaSolicitudContrato">Listado de Contratos</a>
+                        <li class="nav-item"><a class="nav-link"
+                                href="<?php echo base_url(); ?>index.php/Principal/listadoHonorarios">Listado de Honorarios</a>
                         </li>
                          <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Principal/ListaSolicitudAdquisiciones">Listado de Adquisiciones</a>

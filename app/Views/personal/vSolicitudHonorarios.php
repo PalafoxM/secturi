@@ -492,8 +492,14 @@ $soportes = [
                         Swal.fire({
                             icon: 'success',
                             title: 'Solicitud guardada correctamente',
-                            showConfirmButton: false,
-                            timer: 1500
+                            html: `
+                                <div class="mt-2">
+                                    <a href="${data.url_listado || '#'}" class="btn btn-outline-primary btn-sm mr-2">Ver listado</a>
+                                    <a href="${data.url_pdf || '#'}" target="_blank" class="btn btn-outline-danger btn-sm">Abrir PDF</a>
+                                </div>
+                            `,
+                            showConfirmButton: true,
+                            confirmButtonText: 'Continuar'
                         });
                     } else {
                         Swal.fire({
