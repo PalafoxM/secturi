@@ -3080,6 +3080,415 @@ class Principal extends BaseController
         $this->_renderView($data);
     }
 
+    private function documentosSolicitudAdquisiciones(): array
+    {
+        return [
+            1 => "Anexo TÃ©cnico (TÃ©rminos de referencia)",
+            2 => "InvestigaciÃ³n de Mercado (Cotizaciones y consulta PEI)",
+            3 => "ValidaciÃ³n de partida restringida (SF)\nVerificaciÃ³n de AlineaciÃ³n de InformaciÃ³n EstratÃ©gica (DGIT)\nSuficiencia presupuestal (R3)\nValidaciÃ³n DGTIT/CGCS u otra",
+            4 => "JustificaciÃ³n",
+            5 => "Propuesta TÃ©cnico EconÃ³mica (Anexo)",
+            6 => "Aviso de privacidad integral",
+            7 => "CÃ©dula de Registro en el PadrÃ³n de Proveedores (Refrendo vigente)",
+            8 => "Escritura Constitutiva/Documento que acredite la legal constituciÃ³n de la persona moral (Modificaciones sustanciales e inscripciÃ³n en el Registro PÃºblico)",
+            9 => "Documento que acredite la representaciÃ³n de la persona moral (Poder)",
+            10 => "IdentificaciÃ³n oficial vigente (Personas morales Representante y Responsable de seguimiento)",
+            11 => "Constancia de SituaciÃ³n Fiscal (RFC)",
+            12 => "Comprobante de domicilio (SÃ³lo cuando sea diferente al domicilio fiscal)",
+            13 => "OpiniÃ³n de cumplimiento de Obligaciones Fiscales\nManifiesto bajo protesta de cumplimiento de Obligaciones Fiscales",
+            14 => "Manifiesto de no encontrarse impedido para Contratar",
+            15 => "Carta de DeclaraciÃ³n de intereses",
+            16 => "Manifiesto de contar con infraestructura",
+            17 => "Carta compromiso entrega de bienes (ExcepciÃ³n de GarantÃ­a)",
+        ];
+    }
+
+    public function SolicitudAdquisiciones()
+    {
+        $globals = new Mglobal;
+        $data = [];
+
+        $vwDireccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1]]);
+        $data['direccion'] = !empty($vwDireccion->data) ? $vwDireccion->data : [];
+
+        $vwUsuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
+        $data['usuario'] = !empty($vwUsuario->data) ? $vwUsuario->data : [];
+
+        $data['scripts'] = ['inicio'];
+        $data['edita'] = 0;
+        $data['contentView'] = 'personal/vSolicitudAdquisiciones';
+        $this->_renderView($data);
+    }
+
+    public function editarSolicitudAdquisiciones($id_solicitud = null)
+    {
+        $globals = new Mglobal;
+
+        if (!$id_solicitud) {
+            return redirect()->to(base_url('index.php/Principal/ListaSolicitudAdquisiciones'));
+        }
+
+        $solicitud = $globals->getTabla([
+            'tabla' => 'solicitud_adquisiciones',
+            'where' => ['id_solicitud_adquisiciones' => $id_solicitud, 'visible' => 1]
+        ]);
+
+        if (empty($solicitud->data)) {
+            return redirect()->to(base_url('index.php/Principal/ListaSolicitudAdquisiciones'));
+        }
+
+        $pagos = $globals->getTabla([
+            'tabla' => 'solicitud_adquisiciones_pagos',
+            'where' => ['id_solicitud_adquisiciones' => $id_solicitud, 'visible' => 1]
+        ]);
+
+        $vwDireccion = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1]]);
+        $vwUsuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
+
+        $data['direccion'] = !empty($vwDireccion->data) ? $vwDireccion->data : [];
+        $data['usuario'] = !empty($vwUsuario->data) ? $vwUsuario->data : [];
+        $data['solicitud'] = $solicitud->data[0];
+        $data['pagos'] = !empty($pagos->data) ? $pagos->data : [];
+        $data['scripts'] = ['inicio'];
+        $data['edita'] = 1;
+        $data['contentView'] = 'personal/vSolicitudAdquisiciones';
+        $this->_renderView($data);
+    }
+
+    public function guardarSolicitudAdquisiciones()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error al guardar la solicitud';
+
+        $post = $this->request->getPost();
+        $idSolicitud = $post['id_solicitud_adquisiciones'] ?? null;
+
+        $dataInsert = [
+            'responsable_proyecto' => $post['responsable_proyecto'] ?? null,
+            'fecha_solicitud' => $post['fecha_solicitud'] ?? null,
+            'responsable_seguimiento' => $post['responsable_seguimiento'] ?? null,
+            'vigencia' => $post['vigencia'] ?? null,
+            'objeto_adquisicion' => $post['objeto_adquisicion'] ?? null,
+            'tipo_proceso' => $post['tipo_proceso'] ?? null,
+            'no_invitacion' => $post['no_invitacion'] ?? null,
+            'fecha_invitacion' => $post['fecha_invitacion'] ?? null,
+            'codigo_programatico' => $post['codigo_programatico'] ?? null,
+            'fondo' => $post['fondo'] ?? null,
+            'numero_partida' => $post['numero_partida'] ?? null,
+            'nombre_partida' => $post['nombre_partida'] ?? null,
+            'descripcion_bienes' => $post['descripcion_bienes'] ?? null,
+            'fecha_inicio' => $post['fecha_inicio'] ?? null,
+            'lugar_entrega' => $post['lugar_entrega'] ?? null,
+            'proveedor_nombre' => $post['proveedor_nombre'] ?? null,
+            'proveedor_comercial' => $post['proveedor_comercial'] ?? null,
+            'proveedor_cedula' => $post['proveedor_cedula'] ?? null,
+            'proveedor_domicilio' => $post['proveedor_domicilio'] ?? null,
+            'proveedor_rfc' => $post['proveedor_rfc'] ?? null,
+            'proveedor_representante' => $post['proveedor_representante'] ?? null,
+            'proveedor_seguimiento' => $post['proveedor_seguimiento'] ?? null,
+        ];
+
+        $dataConfig = ['tabla' => 'solicitud_adquisiciones', 'editar' => false];
+        $script = 'Principal.php/guardarSolicitudAdquisiciones';
+
+        if (!empty($idSolicitud)) {
+            $dataConfig = [
+                'tabla' => 'solicitud_adquisiciones',
+                'editar' => true,
+                'idEditar' => ['id_solicitud_adquisiciones' => $idSolicitud]
+            ];
+            $dataInsert['id_estatus'] = 1;
+            $dataInsert['usu_act'] = $session->id_usuario ?? 0;
+            $dataInsert['fec_act'] = date('Y-m-d H:i:s');
+        } else {
+            $dataInsert['id_estatus'] = 1;
+            $dataInsert['usu_reg'] = $session->id_usuario ?? 0;
+            $dataInsert['fec_reg'] = date('Y-m-d H:i:s');
+        }
+
+        $res = $globals->saveTabla($dataInsert, $dataConfig, [
+            'id_user' => $session->id_usuario ?? 0,
+            'script' => $script
+        ]);
+
+        if ($res->error) {
+            $response->respuesta = $res->respuesta;
+            return $this->respond($response);
+        }
+
+        $idGuardado = !empty($idSolicitud) ? $idSolicitud : ($res->idRegistro ?? null);
+        if (empty($idGuardado)) {
+            $response->respuesta = 'No fue posible identificar la solicitud guardada';
+            return $this->respond($response);
+        }
+
+        if (!empty($idSolicitud)) {
+            $globals->saveTabla(
+                ['visible' => 0],
+                [
+                    'tabla' => 'solicitud_adquisiciones_pagos',
+                    'editar' => true,
+                    'idEditar' => ['id_solicitud_adquisiciones' => $idSolicitud]
+                ],
+                ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/eliminarPagosAdquisiciones']
+            );
+        }
+
+        if (isset($post['pagos']) && is_array($post['pagos'])) {
+            foreach ($post['pagos'] as $pago) {
+                $numeroPago = trim((string) ($pago['numero'] ?? ''));
+                $montoPago = trim((string) ($pago['monto'] ?? ''));
+
+                if ($numeroPago === '' && $montoPago === '') {
+                    continue;
+                }
+
+                $resPago = $globals->saveTabla([
+                    'id_solicitud_adquisiciones' => $idGuardado,
+                    'numero_pago' => $numeroPago,
+                    'monto' => $montoPago,
+                    'visible' => 1,
+                    'usu_reg' => $session->id_usuario ?? 0,
+                    'fec_reg' => date('Y-m-d H:i:s')
+                ], [
+                    'tabla' => 'solicitud_adquisiciones_pagos',
+                    'editar' => false
+                ], [
+                    'id_user' => $session->id_usuario ?? 0,
+                    'script' => 'Principal.php/guardarSolicitudAdquisiciones'
+                ]);
+
+                if ($resPago->error) {
+                    $response->respuesta = $resPago->respuesta;
+                    return $this->respond($response);
+                }
+            }
+        }
+
+        $response->error = false;
+        $response->respuesta = 'Solicitud guardada correctamente';
+        $response->id_solicitud_adquisiciones = $idGuardado;
+        return $this->respond($response);
+    }
+
+    public function ListaSolicitudAdquisiciones()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $data = [];
+
+        $where = ['visible' => 1];
+        if (!in_array($session->id_perfil ?? 0, [1, 7])) {
+            $where['usu_reg'] = $session->id_usuario ?? 0;
+        }
+
+        $solicitudes = $globals->getTabla([
+            'tabla' => 'solicitud_adquisiciones',
+            'where' => $where
+        ]);
+
+        if (!empty($solicitudes->data)) {
+            foreach ($solicitudes->data as &$sol) {
+                $archivos = $globals->getTabla([
+                    'tabla' => 'solicitud_adquisiciones_archivos',
+                    'where' => ['visible' => 1, 'id_solicitud_adquisiciones' => $sol->id_solicitud_adquisiciones]
+                ]);
+                $sol->tienen_archivos = !empty($archivos->data);
+            }
+        }
+
+        $data['solicitudes'] = !empty($solicitudes->data) ? $solicitudes->data : [];
+        $data['scripts'] = ['inicio'];
+        $data['contentView'] = 'personal/vListaSolicitudAdquisiciones';
+        $this->_renderView($data);
+    }
+
+    public function verSolicitudAdquisicionesPDF($id = null)
+    {
+        if (empty($id)) {
+            echo 'ID no vÃ¡lido';
+            return;
+        }
+
+        $globals = new Mglobal;
+        $solicitudQuery = $globals->getTabla([
+            'tabla' => 'solicitud_adquisiciones',
+            'where' => ['id_solicitud_adquisiciones' => $id, 'visible' => 1]
+        ]);
+
+        if (empty($solicitudQuery->data)) {
+            echo 'Solicitud no encontrada';
+            return;
+        }
+
+        $pagosQuery = $globals->getTabla([
+            'tabla' => 'solicitud_adquisiciones_pagos',
+            'where' => ['id_solicitud_adquisiciones' => $id, 'visible' => 1]
+        ]);
+
+        $solicitud = $solicitudQuery->data[0];
+        $pagos = !empty($pagosQuery->data) ? $pagosQuery->data : [];
+
+        $direcciones = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1]]);
+        if (!empty($direcciones->data)) {
+            foreach ($direcciones->data as $direccion) {
+                if ((string) ($direccion->id_usuario ?? '') === (string) ($solicitud->responsable_proyecto ?? '')) {
+                    $solicitud->responsable_proyecto_nombre = trim(($direccion->nombre_completo ?? '') . ' - ' . ($direccion->dsc_puesto ?? ''));
+                    break;
+                }
+            }
+        }
+
+        $usuarios = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
+        if (!empty($usuarios->data)) {
+            foreach ($usuarios->data as $usuario) {
+                if ((string) ($usuario->id_usuario ?? '') === (string) ($solicitud->responsable_seguimiento ?? '')) {
+                    $solicitud->responsable_seguimiento_nombre = trim(($usuario->nombre_completo ?? '') . ' - ' . ($usuario->dsc_puesto ?? ''));
+                    break;
+                }
+            }
+        }
+
+        foreach ($pagos as $pago) {
+            $pago->monto_letra = $this->numeroEnLetras((float) str_replace([',', '$', ' '], '', (string) ($pago->monto ?? 0)));
+        }
+
+        $data['solicitud'] = $solicitud;
+        $data['pagos'] = $pagos;
+        $html = view('personal/vPdfSolicitudAdquisiciones', $data);
+
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 10,
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_bottom' => 10,
+            'format' => 'Letter'
+        ]);
+
+        $mpdf->WriteHTML($html);
+        $mpdf->Output('Solicitud_Adquisicion_' . $id . '.pdf', 'I');
+        exit();
+    }
+
+    public function subirArchivosSolicitudAdquisiciones()
+    {
+        $id_solicitud = $this->request->getPost('id_solicitud');
+        $documentos = $this->request->getPost('documentos');
+
+        if (!$id_solicitud || empty($documentos)) {
+            return redirect()->to(base_url('index.php/Principal/ListaSolicitudAdquisiciones'));
+        }
+
+        $data['id_solicitud'] = $id_solicitud;
+        $data['documentos'] = $documentos;
+        $data['contentView'] = 'secciones/vSubirArchivosSolicitudAdquisiciones';
+        $this->_renderView($data);
+    }
+
+    public function verArchivosSolicitudAdquisiciones($id_solicitud)
+    {
+        $globals = new Mglobal;
+
+        $archivos = $globals->getTabla([
+            'tabla' => 'solicitud_adquisiciones_archivos',
+            'where' => ['id_solicitud_adquisiciones' => $id_solicitud, 'visible' => 1]
+        ]);
+
+        $data['id_solicitud'] = $id_solicitud;
+        $data['archivos'] = !empty($archivos->data) ? $archivos->data : [];
+        $data['scripts'] = [];
+        $data['contentView'] = 'secciones/vVerArchivosSolicitudAdquisiciones';
+        $this->_renderView($data);
+    }
+
+    public function guardarArchivosSolicitudAdquisiciones()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+
+        $id_solicitud = $this->request->getPost('id_solicitud');
+        if (!$id_solicitud) {
+            $response->respuesta = 'ID de solicitud no vÃ¡lido.';
+            return $this->respond($response);
+        }
+
+        $uploadDir = FCPATH . 'assets/uploads/adquisiciones/';
+        if (!is_dir($uploadDir)) {
+            @mkdir($uploadDir, 0755, true);
+        }
+
+        $count = 0;
+        $errores = 0;
+
+        if (isset($_FILES['archivos']) && is_array($_FILES['archivos']['name'])) {
+            foreach ($_FILES['archivos']['name'] as $key => $originalName) {
+                if (empty($originalName)) {
+                    continue;
+                }
+
+                if ($_FILES['archivos']['error'][$key] === UPLOAD_ERR_OK) {
+                    $tmpName = $_FILES['archivos']['tmp_name'][$key];
+                    $ext = pathinfo($originalName, PATHINFO_EXTENSION);
+                    $newName = $id_solicitud . '_' . $key . '_' . time() . '.' . $ext;
+                    $targetPath = $uploadDir . $newName;
+
+                    if (move_uploaded_file($tmpName, $targetPath)) {
+                        $res = $globals->saveTabla([
+                            'id_solicitud_adquisiciones' => $id_solicitud,
+                            'clave_documento' => $key,
+                            'nombre_archivo' => $newName,
+                            'tipo' => $ext,
+                            'usu_reg' => $session->id_usuario ?? 0,
+                            'fec_reg' => date('Y-m-d H:i:s'),
+                            'visible' => 1
+                        ], [
+                            'tabla' => 'solicitud_adquisiciones_archivos',
+                            'editar' => false
+                        ], [
+                            'id_user' => $session->id_usuario ?? 0,
+                            'script' => 'Principal.php/guardarArchivosSolicitudAdquisiciones'
+                        ]);
+
+                        $globals->saveTabla([
+                            'id_estatus' => 4
+                        ], [
+                            'tabla' => 'solicitud_adquisiciones',
+                            'editar' => true,
+                            'idEditar' => ['id_solicitud_adquisiciones' => $id_solicitud]
+                        ], [
+                            'id_user' => $session->id_usuario ?? 0,
+                            'script' => 'Principal.php/guardarArchivosSolicitudAdquisiciones'
+                        ]);
+
+                        if (!$res->error) {
+                            $count++;
+                        } else {
+                            $errores++;
+                        }
+                    } else {
+                        $errores++;
+                    }
+                } else {
+                    $errores++;
+                }
+            }
+        }
+
+        if ($count > 0) {
+            $response->error = false;
+            $response->respuesta = "Se guardaron $count archivos correctamente." . ($errores > 0 ? " Hubo problemas con $errores archivos." : '');
+        } else {
+            $response->respuesta = "No se guardÃ³ ningÃºn archivo." . ($errores > 0 ? " Hubo errores al procesar." : '');
+        }
+
+        return $this->respond($response);
+    }
+
     public function editarSolicitudContrato($id_solicitud = null)
     {
         $session = \Config\Services::session();

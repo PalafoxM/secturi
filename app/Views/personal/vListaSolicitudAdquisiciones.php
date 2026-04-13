@@ -66,11 +66,11 @@
                                                         <?php endif; ?>
                                                     </td>
                                                     <td class="text-center">
-                                                        <?php /*
                                                         <?php if($session->id_perfil != 7): ?>
                                                             <a href="<?= base_url('index.php/Principal/editarSolicitudAdquisiciones/' . $sol->id_solicitud_adquisiciones) ?>" class="btn btn-sm btn-warning" title="Editar"><i class="fas fa-edit"></i></a>
                                                         <?php endif; ?>
-                                                        */ ?>
+
+                                                        <a href="<?= base_url('index.php/Principal/verSolicitudAdquisicionesPDF/' . $sol->id_solicitud_adquisiciones) ?>" target="_blank" class="btn btn-sm btn-info" title="Ver PDF"><i class="fas fa-file-pdf"></i></a>
 
                                                         <?php if($session->id_perfil != 7): ?>
                                                          <button class="btn btn-sm btn-secondary" title="Adjuntar Archivos" onclick="abrirModalArchivos(<?= $sol->id_solicitud_adquisiciones ?>)"><i class="fas fa-paperclip"></i></button>

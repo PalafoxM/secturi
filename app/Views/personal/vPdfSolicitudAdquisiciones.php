@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Solicitud de Adquisicion</title>
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 11px; color: #111; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #222; padding: 4px 6px; vertical-align: middle; }
+        .header-title { background: #214f7a; color: #fff; text-align: center; font-weight: bold; }
+        .section-title { background: #214f7a; color: #fff; text-align: center; font-weight: bold; }
+        .label { width: 35%; font-weight: bold; text-align: right; background: #f8f8f8; }
+        .value { width: 65%; }
+        .center { text-align: center; }
+        .right { text-align: right; }
+        .no-border { border: none; }
+    </style>
+</head>
+<body>
+    <table>
+        <tr>
+            <td class="no-border" style="width: 14%;">
+                <img src="<?= base_url('assets/logo3.png') ?>" width="90" alt="Logo">
+            </td>
+            <td class="header-title" style="width: 86%;">
+                <div style="font-size: 22px; margin-bottom: 6px;">SOLICITUD DE ELABORACION DE CONTRATO DE ADQUISICION</div>
+                <div style="font-size: 16px;">DIRECCION GENERAL JURIDICA</div>
+                <div style="font-size: 15px; margin-top: 4px;">DAJ-3</div>
+            </td>
+        </tr>
+    </table>
+
+    <table style="margin-top: 8px;">
+        <tr><td colspan="2" class="section-title">INFORMACION DEL AREA SOLICITANTE</td></tr>
+        <tr>
+            <td class="label">Area Solicitante:</td>
+            <td class="value"><?= esc($solicitud->responsable_proyecto_nombre ?? '') ?></td>
+        </tr>
+        <tr>
+            <td class="label">Fecha de solicitud:</td>
+            <td class="value"><?= !empty($solicitud->fecha_solicitud) ? date('d/m/Y', strtotime($solicitud->fecha_solicitud)) : '' ?></td>
+        </tr>
+    </table>
+
+    <table style="margin-top: 8px;">
+        <tr><td colspan="2" class="section-title">INFORMACION DEL CONTRATO</td></tr>
+        <tr>
+            <td class="label">Responsable del seguimiento (SECTURI):</td>
+            <td class="value"><?= esc($solicitud->responsable_seguimiento_nombre ?? '') ?></td>
+        </tr>
+        <tr>
+            <td class="label">Vigencia:</td>
+            <td class="value"><?= esc($solicitud->vigencia ?? '') ?></td>
+        </tr>
+        <tr>
+            <td class="label">Objeto de Adquisicion:</td>
+            <td class="value"><?= nl2br(esc($solicitud->objeto_adquisicion ?? '')) ?></td>
+        </tr>
+    </table>
+
+    <table style="margin-top: 8px;">
+        <tr><td colspan="2" class="section-title">PROCESO DE CONTRATACION</td></tr>
+        <tr>
+            <td class="label">Tipo de proceso:</td>
+            <td class="value"><?= esc($solicitud->tipo_proceso ?? '') ?></td>
+        </tr>
+        <tr>
+            <td class="label">No. de invitacion:</td>
+            <td class="value"><?= esc($solicitud->no_invitacion ?? '') ?></td>
+        </tr>
+        <tr>
+            <td class="label">Fecha de invitacion:</td>
+            <td class="value"><?= !empty($solicitud->fecha_invitacion) ? date('d/m/Y', strtotime($solicitud->fecha_invitacion)) : '' ?></td>
+        </tr>
+    </table>
+
+    <table style="margin-top: 8px;">
+        <tr><td colspan="4" class="section-title">INFORMACION PRESUPUESTAL</td></tr>
+        <tr>
+            <th>Codigo Programatico</th>
+            <th>Fondo</th>
+            <th>Numero de Partida</th>
+            <th>Nombre de la Partida</th>
+        </tr>
+        <tr>
+            <td><?= esc($solicitud->codigo_programatico ?? '') ?></td>
+            <td><?= esc($solicitud->fondo ?? '') ?></td>
+            <td><?= esc($solicitud->numero_partida ?? '') ?></td>
+            <td><?= esc($solicitud->nombre_partida ?? '') ?></td>
+        </tr>
+    </table>
+
+    <table style="margin-top: 8px;">
+        <tr><td colspan="3" class="section-title">PAGOS</td></tr>
+        <tr>
+            <th style="width: 10%;">No.</th>
+            <th style="width: 20%;">Monto</th>
+            <th>Letra</th>
+        </tr>
+        <?php if (!empty($pagos)): ?>
+            <?php foreach ($pagos as $pago): ?>
+                <tr>
+                    <td class="center"><?= esc($pago->numero_pago ?? '') ?></td>
+                    <td class="right">$<?= number_format((float) str_replace([',', '$', ' '], '', (string) ($pago->monto ?? 0)), 2) ?></td>
+                    <td><?= esc($pago->monto_letra ?? '') ?></td>
+                </tr>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <tr>
+                <td colspan="3" class="center">No hay pagos registrados</td>
+            </tr>
+        <?php endif; ?>
+    </table>
+
+    <table style="margin-top: 8px;">
+        <tr><td colspan="2" class="section-title">INFORMACION DEL PROVEEDOR</td></tr>
+        <tr>
+            <td class="label">Nombre/Razon Social:</td>
+            <td class="value"><?= esc($solicitud->proveedor_nombre ?? '') ?></td>
+        </tr>
+        <tr>
+            <td class="label">Nombre Comercial:</td>
+            <td class="value"><?= esc($solicitud->proveedor_comercial ?? '') ?></td>
+        </tr>
+        <tr>
+            <td class="label">Num. de Registro de Padron de Proveedores:</td>
+            <td class="value"><?= esc($solicitud->proveedor_cedula ?? '') ?></td>
+        </tr>
+        <tr>
+            <td class="label">Domicilio fiscal:</td>
+            <td class="value"><?= esc($solicitud->proveedor_domicilio ?? '') ?></td>
+        </tr>
+        <tr>
+            <td class="label">RFC:</td>
+            <td class="value"><?= esc($solicitud->proveedor_rfc ?? '') ?></td>
+        </tr>
+        <tr>
+            <td class="label">Nombre del Representante Legal:</td>
+            <td class="value"><?= esc($solicitud->proveedor_representante ?? '') ?></td>
+        </tr>
+        <tr>
+            <td class="label">Responsable de Seguimiento:</td>
+            <td class="value"><?= esc($solicitud->proveedor_seguimiento ?? '') ?></td>
+        </tr>
+    </table>
+
+    <table style="margin-top: 8px;">
+        <tr><td class="section-title">DOCUMENTOS Y ANEXOS</td></tr>
+        <tr><td class="center">SOPORTE DOCUMENTAL SE RELACIONA EN DOCUMENTO ANEXO</td></tr>
+    </table>
+
+    <table style="margin-top: 8px;">
+        <tr><td class="section-title">VALIDACION DE SOLICITUD</td></tr>
+        <tr>
+            <td style="height: 140px; position: relative;">
+                <div style="position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); text-align: center; width: 320px;">
+                    <div style="border-top: 1px solid #000; padding-top: 4px; font-weight: bold;">Nombre de Dir. Administrativo</div>
+                    <div style="margin-top: 2px;">Cargo</div>
+                </div>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
