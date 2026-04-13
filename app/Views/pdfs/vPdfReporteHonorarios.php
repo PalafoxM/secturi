@@ -144,6 +144,7 @@
     </style>
 </head>
 <body>
+    <br>
     <div class="sheet">
         <p class="line">Nombre y puesto del responsable de administrativo: <?= esc($reporte->responsable_administrativo ?? '') ?></p>
         <p class="line">Área: <?= esc($reporte->area ?? '') ?></p>
