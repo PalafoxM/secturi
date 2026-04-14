@@ -4277,6 +4277,8 @@ class Principal extends BaseController
                         ];
                         
                         $res = $globals->saveTabla($dataInsert, ["tabla" => "solicitud_contrato_archivos", "editar" => false], ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/guardarArchivosSolicitud']);
+                        $response->respuesta = $res->respuesta;
+                        $response->error = $res->error;
                         $globals->saveTabla(['id_estatus' => 4], ["tabla" => "solicitud_contrato", "editar" => true, "idEditar" => ["id_solicitud_contrato" => $id_solicitud]], ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/guardarArchivosSolicitud']);
                         if (!$res->error) {
                             $count++;
@@ -4292,7 +4294,7 @@ class Principal extends BaseController
             }
         }
         
-        if ($count > 0) {
+/*         if ($count > 0) {
             // Enviar correo a lvelaga@guanajuato.gob.mx
             $emailService = \Config\Services::email();
             $usuarioQuery = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["id_usuario" => ($session->id_usuario ?? 0)]]);
@@ -4320,7 +4322,7 @@ class Principal extends BaseController
             $response->respuesta = $msg;
         } else {
             $response->respuesta = "No se guardó ningún archivo. " . ($errores > 0 ? "Hubo errores al procesar." : "No se seleccionaron archivos.");
-        }
+        } */
 
         return $this->respond($response);
     }
@@ -9697,15 +9699,15 @@ class Principal extends BaseController
             $enlace = base_url('index.php/Principal/ListaSolicitudConvenio');
             
             $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
-            $emailService->setTo('lvelaga@guanajuato.gob.mx');
-            //$emailService->setTo('palafox.marin@hotmail.com');
+            //$emailService->setTo('lvelaga@guanajuato.gob.mx');
+            $emailService->setTo('palafox.marin@hotmail.com');
             $emailService->setSubject('Nueva Solicitud de Convenio - Archivos Adjuntados');
             $emailService->setMailType('html');
             $emailService->setMessage("
                 <p>Buen día,</p>
-                <p>Se le notifica que se han subido documentos para la solicitud de convenio con ID <strong>{\$id_solicitud}</strong>.</p>
-                <p>Los archivos fueron agregados por el usuario: <strong>{\$nombreUsuario}</strong>.</p>
-                <p>Puede consultar los detalles ingresando al siguiente enlace: <a href='{\$enlace}'>{\$enlace}</a></p>
+                <p>Se le notifica que se han subido documentos para la solicitud de convenio con ID <strong>'.$id_solicitud.'</strong>.</p>
+                <p>Los archivos fueron agregados por el usuario: <strong>'.$nombreUsuario.'</strong>.</p>
+                <p>Puede consultar los detalles ingresando al siguiente enlace: <a href='{$enlace}'>{$enlace}</a></p>
                 <br>
                 <p>Saludos cordiales,</p>
                 <p><strong>Sistema Unificado SECTURI (SUSI)</strong></p>
