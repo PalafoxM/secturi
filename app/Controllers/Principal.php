@@ -9286,43 +9286,7 @@ class Principal extends BaseController
         $data['cuota_acceso']     = $ficha->cuota_acceso;
         $data['cuantas_cuotas']   = $ficha->cuantas_cuotas;
         $data['costo_total']      = $ficha->costo_total;
-        $data['desglose_costo']      = $ficha->desglose_costo;
-        $data['cantidades_desglose']      = $ficha->cantidades_desglose;
-        $data['montos_desglose']      = $ficha->montos_desglose;
-        $data['antecedentes_evento']      = $ficha->antecedentes_evento;
-        $data['propuesta_valor']      = $ficha->propuesta_valor;
-        $data['inclusion_mujeres']      = $ficha->inclusion_mujeres;
-        $data['programa_preliminar']      = $ficha->programa_preliminar;
-        $data['otras_actividades']      = $ficha->otras_actividades;
-        $data['link_web']      = $ficha->link_web;
-        $data['facebook']      = $ficha->facebook;
-        $data['fb_seguidores']      = $ficha->fb_seguidores;
-        $data['twitter']      = $ficha->twitter;
-        $data['tw_seguidores']      = $ficha->tw_seguidores;
-        $data['youtube']      = $ficha->youtube;
-        $data['ig_seguidores']      = $ficha->ig_seguidores;
-        $data['twitter']      = $ficha->twitter;
-        $data['yt_seguidores']      = $ficha->yt_seguidores;
-        $data['instagram']      = $ficha->instagram;
-        $data['tiktok']      = $ficha->tiktok;
-        $data['tk_seguidores']      = $ficha->tk_seguidores;
-        $data['co_nombre']      = $ficha->co_nombre;
-        $data['co_telefono']      = $ficha->co_telefono;
-        $data['co_cargo']      = $ficha->co_cargo;
-        $data['co_celular']      = $ficha->co_celular;
-        $data['co_domicilio']      = $ficha->co_domicilio;
-        $data['co_ciudad_estado']      = $ficha->co_ciudad_estado;
-        $data['co_email']      = $ficha->co_email;
-        $data['em_nombre']      = $ficha->em_nombre;
-        $data['em_cargo']      = $ficha->em_cargo;
-        $data['em_celular']      = $ficha->em_celular;
-        $data['em_telefono_fijo']      = $ficha->em_telefono_fijo;
-        $data['em_ciudad_estado']      = $ficha->em_ciudad_estado;
-        $data['apoyo_federal']      = $ficha->apoyo_federal;
-        $data['apoyo_municipal']      = $ficha->apoyo_municipal;
-        $data['apoyo_estatal']      = $ficha->apoyo_estatal;
-        $data['descripcion_apoyos']      = $ficha->descripcion_apoyos;
-        $data['fecha_registro']      = $ficha->fecha_registro;
+ 
 
 
       
