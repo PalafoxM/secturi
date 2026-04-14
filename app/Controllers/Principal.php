@@ -9324,9 +9324,9 @@ class Principal extends BaseController
         $data['descripcion_apoyos']      = (isset($ficha->descripcion_apoyos) && !empty($ficha->descripcion_apoyos)) ? $ficha->descripcion_apoyos : 'N/A';
         $data['fecha_registro']      = (isset($ficha->fecha_registro) && !empty($ficha->fecha_registro)) ? $ficha->fecha_registro : 'N/A';
 
-       die( var_dump( $ficha ) );
+      // die( var_dump( $ficha ) );
       
-        $data['ficha'] = $ficha;
+       // $data['ficha'] = $ficha;
 
         // Similar to Contrato PDF View
         $html = view('personal/vFicha', $data);
