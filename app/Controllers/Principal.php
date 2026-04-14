@@ -9265,7 +9265,7 @@ class Principal extends BaseController
         $data['pagos'] = (!empty($pagos->data)) ? $pagos->data : [];
         
         // Similar to Contrato PDF View
-        $html = view('pdfs/vpdfFicha', $data);
+        $html = view('personal/vFicha', $data);
         
         $mpdf = new \Mpdf\Mpdf([
             'margin_top' => 10,
