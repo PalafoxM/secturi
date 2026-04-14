@@ -9254,16 +9254,80 @@ class Principal extends BaseController
         $session = \Config\Services::session();
         $globals = new \App\Models\Mglobal;
         
-        $solicitud = $globals->getTabla(['tabla' => 'vw_solicitud_convenio', 'where' => ['id_solicitud_convenio' => $id]]);
-        $pagos = $globals->getTabla(['tabla' => 'solicitud_convenio_pagos', 'where' => ['id_solicitud_convenio' => $id, 'visible' => 1]]);
-        
-        if(empty($solicitud->data)){
-            echo "Solicitud no encontrada"; return;
-        }
+        $ficha = $globals->getTabla(['tabla' => 'ficha_tecnica', 'where' => ['id_ficha_tecnica' => $id]])->data[0];
 
-        $data['solicitud'] = $solicitud->data[0];
-        $data['pagos'] = (!empty($pagos->data)) ? $pagos->data : [];
-        
+        $data = array();
+        $data['id_ficha_tecnica']   = $ficha->id_ficha_tecnica;
+        $data['em_domicilio']       = $ficha->em_domicilio;
+        $data['fecha_realizacion']  = $ficha->fecha_realizacion;
+        $data['nombre_evento']      = $ficha->nombre_evento;
+        $data['persona_solicitud']  = $ficha->persona_solicitud;
+        $data['edicion']            = $ficha->edicion;
+        $data['periodicidad_desc']  = $ficha->periodicidad_desc;
+        $data['municipio_sede']     = $ficha->municipio_sede;
+        $data['periodicidad_radio'] = $ficha->periodicidad_radio;
+        $data['antecedentes']       = $ficha->antecedentes;
+        $data['objetivo_general']   = $ficha->objetivo_general;
+        $data['justificacion']      = $ficha->justificacion;
+        $data['nivel_habilidades']  = $ficha->nivel_habilidades;
+        $data['estrato']            = $ficha->estrato;
+        $data['asistentes_totales'] = $ficha->asistentes_totales;
+        $data['asistentes_local']   = $ficha->asistentes_local;
+        $data['asistentes_regional']= $ficha->asistentes_regional;
+        $data['asistentes_nacional']= $ficha->asistentes_nacional;
+        $data['asistentes_internacional'] = $ficha->asistentes_internacional;
+        $data['alcance']           = $ficha->alcance;
+        $data['derrama_total']     = $ficha->derrama_total;
+        $data['derrama_local']     = $ficha->derrama_local;
+        $data['derrama_foraneo']   = $ficha->derrama_foraneo;
+        $data['empleos_mujeres']   = $ficha->empleos_mujeres;
+        $data['empleos_hombres']   = $ficha->empleos_hombres;
+        $data['empleos_discapacidad'] = $ficha->empleos_discapacidad;
+        $data['cuota_acceso']     = $ficha->cuota_acceso;
+        $data['cuantas_cuotas']   = $ficha->cuantas_cuotas;
+        $data['costo_total']      = $ficha->costo_total;
+        $data['desglose_costo']      = $ficha->desglose_costo;
+        $data['cantidades_desglose']      = $ficha->cantidades_desglose;
+        $data['montos_desglose']      = $ficha->montos_desglose;
+        $data['antecedentes_evento']      = $ficha->antecedentes_evento;
+        $data['propuesta_valor']      = $ficha->propuesta_valor;
+        $data['inclusion_mujeres']      = $ficha->inclusion_mujeres;
+        $data['programa_preliminar']      = $ficha->programa_preliminar;
+        $data['otras_actividades']      = $ficha->otras_actividades;
+        $data['link_web']      = $ficha->link_web;
+        $data['facebook']      = $ficha->facebook;
+        $data['fb_seguidores']      = $ficha->fb_seguidores;
+        $data['twitter']      = $ficha->twitter;
+        $data['tw_seguidores']      = $ficha->tw_seguidores;
+        $data['youtube']      = $ficha->youtube;
+        $data['ig_seguidores']      = $ficha->ig_seguidores;
+        $data['twitter']      = $ficha->twitter;
+        $data['yt_seguidores']      = $ficha->yt_seguidores;
+        $data['instagram']      = $ficha->instagram;
+        $data['tiktok']      = $ficha->tiktok;
+        $data['tk_seguidores']      = $ficha->tk_seguidores;
+        $data['co_nombre']      = $ficha->co_nombre;
+        $data['co_telefono']      = $ficha->co_telefono;
+        $data['co_cargo']      = $ficha->co_cargo;
+        $data['co_celular']      = $ficha->co_celular;
+        $data['co_domicilio']      = $ficha->co_domicilio;
+        $data['co_ciudad_estado']      = $ficha->co_ciudad_estado;
+        $data['co_email']      = $ficha->co_email;
+        $data['em_nombre']      = $ficha->em_nombre;
+        $data['em_cargo']      = $ficha->em_cargo;
+        $data['em_celular']      = $ficha->em_celular;
+        $data['em_telefono_fijo']      = $ficha->em_telefono_fijo;
+        $data['em_ciudad_estado']      = $ficha->em_ciudad_estado;
+        $data['apoyo_federal']      = $ficha->apoyo_federal;
+        $data['apoyo_municipal']      = $ficha->apoyo_municipal;
+        $data['apoyo_estatal']      = $ficha->apoyo_estatal;
+        $data['descripcion_apoyos']      = $ficha->descripcion_apoyos;
+        $data['fecha_registro']      = $ficha->fecha_registro;
+
+
+      
+        $data['ficha'] = $ficha;
+
         // Similar to Contrato PDF View
         $html = view('personal/vFicha', $data);
         
