@@ -85,7 +85,7 @@
                                                             <a href="<?= base_url('index.php/Principal/editarSolicitudContrato/' . $sol->id_solicitud_contrato) ?>" class="btn btn-sm btn-warning" title="Editar"><i class="fas fa-edit"></i></a>
                                                         <?php endif; ?>
                                                             <a href="<?= base_url('index.php/Principal/verSolicitudContratoPDF/' . $sol->id_solicitud_contrato) ?>" target="_blank" class="btn btn-sm btn-info" title="Ver PDF"><i class="fas fa-file-pdf"></i></a>
-                                                        <?php if($session->id_perfil != 7): ?>
+                                                        <?php if($session->id_perfil != 7 && in_array((int) $sol->id_estatus, [1, 2], true)): ?>
                                                          <button class="btn btn-sm btn-secondary" title="Adjuntar Archivos" onclick="abrirModalArchivos(<?= $sol->id_solicitud_contrato ?>)"><i class="fas fa-paperclip"></i></button>
                                                         <?php endif; ?>
                                                         <?php if($sol->tienen_archivos): ?>

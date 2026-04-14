@@ -133,6 +133,17 @@ class Principal extends BaseController
         return $html ?? '';
     }
 
+    private function tableHasColumn(string $table, string $column): bool
+    {
+        try {
+            $db = \Config\Database::connect();
+            $fields = $db->getFieldNames($table);
+            return in_array($column, $fields, true);
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
     private function obtenerFichaTecnicaData($result): array
     {
         return [
@@ -3767,6 +3778,180 @@ class Principal extends BaseController
             $response->respuesta = "Se guardaron $count archivos correctamente." . ($errores > 0 ? " Hubo problemas con $errores archivos." : '');
         } else {
             $response->respuesta = "No se guardÃ³ ningÃºn archivo." . ($errores > 0 ? " Hubo errores al procesar." : '');
+        }
+
+        return $this->respond($response);
+    }
+
+    public function declinarSolicitudAdquisiciones()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $emailService = \Config\Services::email();
+        $response = new \stdClass();
+        $response->error = true;
+
+        $id = $this->request->getPost('id_solicitud');
+        $motivo = $this->request->getPost('motivo');
+
+        if (!$id) {
+            $response->respuesta = "ID de solicitud no válido.";
+            return $this->respond($response);
+        }
+
+        $dataUpdate = [
+            'id_estatus' => 2,
+            'usu_act' => $session->id_usuario ?? 0,
+            'fec_act' => date('Y-m-d H:i:s')
+        ];
+
+        if ($this->tableHasColumn('solicitud_adquisiciones', 'motivo')) {
+            $dataUpdate['motivo'] = $motivo;
+        }
+
+        $res = $globals->saveTabla($dataUpdate, [
+            'tabla' => 'solicitud_adquisiciones',
+            'editar' => true,
+            'idEditar' => ['id_solicitud_adquisiciones' => $id]
+        ], [
+            'id_user' => $session->id_usuario ?? 0,
+            'script' => 'Principal.php/declinarSolicitudAdquisiciones'
+        ]);
+
+        if (!$res->error) {
+            $solicitudQuery = $globals->getTabla(["tabla" => "solicitud_adquisiciones", "where" => ["id_solicitud_adquisiciones" => $id]]);
+            if (isset($solicitudQuery->data) && !empty($solicitudQuery->data)) {
+                $usu_reg = $solicitudQuery->data[0]->usu_reg ?? 0;
+                $usuarioQuery = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["id_usuario" => $usu_reg]]);
+                if (isset($usuarioQuery->data) && !empty($usuarioQuery->data) && !empty($usuarioQuery->data[0]->correo)) {
+                    $correoDestino = $usuarioQuery->data[0]->correo;
+                    $nombreUsuario = $usuarioQuery->data[0]->nombre_completo ?? 'Usuario';
+
+                    $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
+                    $emailService->setTo($correoDestino);
+                    $emailService->setSubject('Solicitud de Adquisiciones Declinada');
+                    $emailService->setMailType('html');
+                    $emailService->setMessage("
+                        <p>Buen día, <strong>{$nombreUsuario}</strong>:</p>
+                        <p>Se le notifica que su solicitud de adquisiciones con ID <strong>{$id}</strong> ha sido <strong>declinada</strong>.</p>
+                        <p><strong>Motivo:</strong> {$motivo}</p>
+                        <p>Puede ingresar al sistema SUSI para volver a subir la documentación correspondiente.</p>
+                        <br>
+                        <p>Saludos cordiales,</p>
+                        <p><strong>Sistema Unificado SECTURI (SUSI)</strong></p>
+                    ");
+                    $emailService->send();
+                }
+            }
+
+            $response->error = false;
+            $response->respuesta = "Solicitud declinada correctamente.";
+        } else {
+            $response->respuesta = "No se pudo declinar la solicitud.";
+        }
+
+        return $this->respond($response);
+    }
+
+    public function subirInstrumentoJuridicoAdquisiciones()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $emailService = \Config\Services::email();
+        $response = new \stdClass();
+        $response->error = true;
+
+        $id = $this->request->getPost('id_solicitud');
+        $archivos = $this->request->getFileMultiple('archivos');
+
+        if (!$id || empty($archivos)) {
+            $response->respuesta = "Archivos o ID de solicitud no válido.";
+            return $this->respond($response);
+        }
+
+        $rutasGuardadas = [];
+        $uploadPath = FCPATH . 'assets/uploads/adquisiciones/instrumentos/';
+        if (!is_dir($uploadPath)) {
+            mkdir($uploadPath, 0777, true);
+        }
+
+        if ($this->tableHasColumn('solicitud_adquisiciones', 'instrumento_juridico')) {
+            $solicitudBd = $globals->getTabla(['tabla' => 'solicitud_adquisiciones', 'where' => ['id_solicitud_adquisiciones' => $id]]);
+            if (isset($solicitudBd->data) && !empty($solicitudBd->data)) {
+                $instrumentosActuales = $solicitudBd->data[0]->instrumento_juridico ?? '';
+                if (!empty($instrumentosActuales)) {
+                    $decoded = json_decode($instrumentosActuales, true);
+                    if (is_array($decoded)) {
+                        $rutasGuardadas = $decoded;
+                    } else {
+                        $rutasGuardadas[] = $instrumentosActuales;
+                    }
+                }
+            }
+        }
+
+        foreach ($archivos as $archivo) {
+            if ($archivo->isValid() && !$archivo->hasMoved() && strtolower((string) $archivo->getExtension()) === 'pdf') {
+                $newName = $archivo->getRandomName();
+                if ($archivo->move($uploadPath, $newName)) {
+                    $rutasGuardadas[] = 'assets/uploads/adquisiciones/instrumentos/' . $newName;
+                }
+            }
+        }
+
+        if (empty($rutasGuardadas)) {
+            $response->respuesta = "No se pudieron guardar los archivos o no son PDF válidos.";
+            return $this->respond($response);
+        }
+
+        $dataUpdate = [
+            'id_estatus' => 3,
+            'usu_act' => $session->id_usuario ?? 0,
+            'fec_act' => date('Y-m-d H:i:s')
+        ];
+
+        if ($this->tableHasColumn('solicitud_adquisiciones', 'instrumento_juridico')) {
+            $dataUpdate['instrumento_juridico'] = json_encode($rutasGuardadas);
+        }
+
+        $res = $globals->saveTabla($dataUpdate, [
+            'tabla' => 'solicitud_adquisiciones',
+            'editar' => true,
+            'idEditar' => ['id_solicitud_adquisiciones' => $id]
+        ], [
+            'id_user' => $session->id_usuario ?? 0,
+            'script' => 'Principal.php/subirInstrumentoJuridicoAdquisiciones'
+        ]);
+
+        if (!$res->error) {
+            $solicitudQuery = $globals->getTabla(["tabla" => "solicitud_adquisiciones", "where" => ["id_solicitud_adquisiciones" => $id]]);
+            if (isset($solicitudQuery->data) && !empty($solicitudQuery->data)) {
+                $usu_reg = $solicitudQuery->data[0]->usu_reg ?? 0;
+                $usuarioQuery = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["id_usuario" => $usu_reg]]);
+                if (isset($usuarioQuery->data) && !empty($usuarioQuery->data) && !empty($usuarioQuery->data[0]->correo)) {
+                    $correoDestino = $usuarioQuery->data[0]->correo;
+                    $nombreUsuario = $usuarioQuery->data[0]->nombre_completo ?? 'Usuario';
+
+                    $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
+                    $emailService->setTo($correoDestino);
+                    $emailService->setSubject('Solicitud de Adquisiciones Aprobada - Instrumento Disponible');
+                    $emailService->setMailType('html');
+                    $emailService->setMessage("
+                        <p>Buen día, <strong>{$nombreUsuario}</strong>:</p>
+                        <p>El área Jurídica ha autorizado y adjuntado el instrumento jurídico correspondiente a su solicitud de adquisiciones con ID <strong>{$id}</strong>.</p>
+                        <p>Puede consultar los documentos ingresando al sistema SUSI.</p>
+                        <br>
+                        <p>Saludos cordiales,</p>
+                        <p><strong>Sistema Unificado SECTURI (SUSI)</strong></p>
+                    ");
+                    $emailService->send();
+                }
+            }
+
+            $response->error = false;
+            $response->respuesta = "Instrumento jurídico subido y solicitud aprobada.";
+        } else {
+            $response->respuesta = "No se pudo actualizar la solicitud.";
         }
 
         return $this->respond($response);

@@ -1,3 +1,8 @@
+<?php
+$esConvenio = !empty($es_convenio);
+$rutaListado = $esConvenio ? 'index.php/Principal/ListaSolicitudConvenio' : 'index.php/Principal/ListaSolicitudContrato';
+$rutaArchivo = $esConvenio ? 'assets/uploads/convenios/' : 'assets/uploads/contratos/';
+?>
 <div class="page-wrapper">
     <div class="page-content-tab">
         <div class="container-fluid">
@@ -7,7 +12,7 @@
                         <div class="float-right">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="javascript:void(0);">SUSI</a></li>
-                                <li class="breadcrumb-item"><a href="<?= base_url('index.php/Principal/ListaSolicitudContrato') ?>">Listado</a></li>
+                                <li class="breadcrumb-item"><a href="<?= base_url($rutaListado) ?>">Listado</a></li>
                                 <li class="breadcrumb-item active">Ver Archivos</li>
                             </ol>
                         </div>
@@ -67,7 +72,7 @@
                                                     </td>
                                                     <td><?= $archivo->nombre_archivo ?></td>
                                                     <td class="text-center">
-                                                        <a href="<?= base_url('assets/uploads/contratos/' . $archivo->nombre_archivo) ?>" target="_blank" class="btn btn-info btn-sm">
+                                                        <a href="<?= base_url($rutaArchivo . $archivo->nombre_archivo) ?>" target="_blank" class="btn btn-info btn-sm">
                                                             <i class="fas fa-eye"></i> Ver
                                                         </a>
                                                     </td>
@@ -83,7 +88,7 @@
                             </div>
 
                             <div class="mt-4">
-                                <a href="<?= base_url('index.php/Principal/ListaSolicitudContrato') ?>" class="btn btn-secondary">Volver al Listado</a>
+                                <a href="<?= base_url($rutaListado) ?>" class="btn btn-secondary">Volver al Listado</a>
                             </div>
 
                         </div>
