@@ -9244,81 +9244,71 @@ class Principal extends BaseController
 
     }
     public function pdfFicha()
-        {
-            // setlocale(LC_TIME, 'es_ES');
-            $id = $this->request->getGet('id_ficha_tecnica');
-            $session = \Config\Services::session();
-            
-            // Verificar permisos (solo usuario administrador)
-            if ($session->id_usuario != 1) {
-                echo('<h1>Nos encontramos haciendo ajustes en el sistema, favor de intentarlo más tarde</h1>');
-                die();
-            }
-            
-            // Validar que se recibió el ID
-            if (empty($id)) {
-                die("Ficha no encontrada: ID no proporcionado.");
-            }
-            
-            // Obtener datos de la ficha
-            $Mglobal = new Mglobal;
-            $respuesta = $Mglobal->getTabla([
-                "tabla" => "ficha_tecnica",
-                'where' => ['id_ficha_tecnica' => $id]
-            ]);
-            
-            // Validar que la respuesta tenga datos
-            if (empty($respuesta->data[0])) {
-                die("Ficha no encontrada.");
-            }
-            
-            $ficha = $respuesta->data[0];
-            
-            // Construir array de datos para la vista (usando sintaxis correcta)
-            $data = [];
-            $data['id_ficha_tecnica']     = $ficha->id_ficha_tecnica ?? '';
-            $data['em_domicilio']         = $ficha->em_domicilio ?? '';
-            $data['nombre_evento']        = $ficha->nombre_evento ?? '';
-            $data['persona_solicitud']    = $ficha->persona_solicitud ?? '';
-            $data['edicion']              = $ficha->edicion ?? '';
-            $data['periodicidad_desc']    = $ficha->periodicidad_desc ?? '';
-            $data['municipio_sede']       = $ficha->municipio_sede ?? '';
-            $data['periodicidad_radio']   = $ficha->periodicidad_radio ?? '';
-            $data['antecedentes']         = $ficha->antecedentes ?? '';
-            $data['objetivo_general']     = $ficha->objetivo_general ?? '';
-            $data['justificacion']        = $ficha->justificacion ?? '';
-            $data['cadena_valor']         = $ficha->cadena_valor ?? '';
-            
-            // Opcional: Agregar más campos si existen
-            $data['asistentes_totales']   = $ficha->asistentes_totales ?? '';
-            $data['alcance']              = $ficha->alcance ?? '';
-            $data['derrama_total']        = $ficha->derrama_total ?? '';
-            // ... agrega aquí los demás campos que necesites
-            
-            // Configurar y generar PDF
-            $mpdf = new \Mpdf\Mpdf([
-                'margin_top'    => 0,
-                'margin_left'   => 1,
-                'margin_right'  => 1,
-                'format'        => 'Legal',
-                'mirrorMargins' => false,
-                'mode'          => 'utf-8',  // IMPORTANTE: forzar UTF-8
-            ]);
-            
-            $html = view("pdfs/vpdfFicha.php", $data);
-            
-            // Aplicar limpieza UTF-8 (solo si las funciones existen)
-            if (method_exists($this, 'normalizeUtf8Value')) {
-                $html = $this->normalizeUtf8Value($html);
-            }
-            if (method_exists($this, 'cleanMpdfHtml')) {
-                $html = $this->cleanMpdfHtml($html);
-            }
-            
-            $mpdf->WriteHTML($html);
-            $mpdf->Output('Ficha_Tecnica_' . $id . '.pdf', 'I');
-            exit;
+    {
+        // setlocale(LC_TIME, 'es_ES');
+        $id = $this->request->getGet('id_ficha_tecnica');
+        $session = \Config\Services::session();
+        
+        // Verificar permisos (solo usuario administrador)
+        if ($session->id_usuario != 1) {
+            echo('<h1>Nos encontramos haciendo ajustes en el sistema, favor de intentarlo más tarde</h1>');
+            die();
         }
+        
+        // Validar que se recibió el ID
+        if (empty($id)) {
+            die("Ficha no encontrada: ID no proporcionado.");
+        }
+        
+        // Obtener datos de la ficha
+        $Mglobal = new Mglobal;
+        $respuesta = $Mglobal->getTabla([
+            "tabla" => "ficha_tecnica",
+            'where' => ['id_ficha_tecnica' => $id]
+        ]);
+        
+        // Validar que la respuesta tenga datos
+        if (empty($respuesta->data[0])) {
+            die("Ficha no encontrada.");
+        }
+        
+        $ficha = $respuesta->data[0];
+        
+        // Construir array de datos para la vista (limpiando cada campo)
+        $data = [];
+       
+        
+        // Generar HTML desde la vista
+        $html = view("pdfs/vpdfFicha.php", $data);
+        
+   
+        
+        // Configurar mpdf con UTF-8
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top'    => 0,
+            'margin_left'   => 1,
+            'margin_right'  => 1,
+            'format'        => 'Legal',
+            'mirrorMargins' => false,
+            'mode'          => 'utf-8',        // Forzar UTF-8
+            'autoLangToFont' => true,          // Auto-detectar idiomas
+        ]);
+          
+        // Agregar página y escribir HTML
+        $mpdf->AddPage();
+        $mpdf->WriteHTML($html);
+        
+        // Footer en todas las páginas
+        $mpdf->SetHTMLFooter('
+            <div style="text-align: right; font-size: 10px;">
+                Página {PAGENO} de {nbpg}
+            </div>
+        ');
+        
+        // Salida del PDF
+        $mpdf->Output('Ficha_Tecnica_' . $id . '.pdf', 'I');
+        exit;
+    }
     public function enviarFichaTecnica()
     {
         $session = \Config\Services::session();
