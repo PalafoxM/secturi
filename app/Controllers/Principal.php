@@ -9276,23 +9276,9 @@ class Principal extends BaseController
         ]);
 
         $mpdf->WriteHTML($html);
-        $mpdf->Output('Solicitud_Convenio_' . $id . '.pdf', 'I');
-        exit();
-        
-        // Generar HTML desde la vista
-        $html = view("pdfs/vpdfFicha.php", $data);
-        // $html = view('personal/vPdfSolicitudConvenio', $data);
-        $mpdf = new \Mpdf\Mpdf([
-            'margin_top' => 10,
-            'margin_left' => 10,
-            'margin_right' => 10,
-            'margin_bottom' => 10,
-            'format' => 'Letter'
-        ]);
-
-        $mpdf->WriteHTML($html);
         $mpdf->Output('Ficha_Tecnica' . $id . '.pdf', 'I');
         exit();
+ 
     }
     public function enviarFichaTecnica()
     {
