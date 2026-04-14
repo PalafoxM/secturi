@@ -62,7 +62,7 @@
                                                     </td>
                                                     <td><?= $archivo->nombre_archivo ?></td>
                                                     <td class="text-center">
-                                                        <a href="<?= base_url('assets/uploads/adquisiciones/' . $archivo->nombre_archivo) ?>" target="_blank" class="btn btn-info btn-sm">
+                                                        <a href="<?= $archivo->url_descarga ?? base_url('assets/uploads/adquisiciones/' . $archivo->nombre_archivo) ?>" target="_blank" class="btn btn-info btn-sm">
                                                             <i class="fas fa-eye"></i> Ver
                                                         </a>
                                                     </td>

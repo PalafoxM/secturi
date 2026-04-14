@@ -144,6 +144,86 @@ class Principal extends BaseController
         }
     }
 
+    private function uploadFileToS3Storage(string $sourceFile, string $module, string $subfolder, string $fileName): ?string
+    {
+        try {
+            $s3 = new \App\Libraries\S3Service();
+            $baseFolder = trim($module, '/');
+            $targetFolder = $baseFolder;
+
+            if (!$s3->folderExists($baseFolder)) {
+                $s3->createFolder($baseFolder);
+            }
+
+            if ($subfolder !== '') {
+                $targetFolder .= '/' . trim($subfolder, '/');
+                if (!$s3->folderExists($targetFolder)) {
+                    $s3->createFolder($targetFolder);
+                }
+            }
+
+            $s3Key = $targetFolder . '/' . $fileName;
+            $uploaded = $s3->uploadFile($sourceFile, $s3Key);
+
+            return $uploaded ? $s3Key : null;
+        } catch (\Throwable $e) {
+            log_message('error', 'Error al subir archivo de ' . $module . ' a S3: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    private function resolveStoredFileUrl(?string $storedPath, string $localPrefix = ''): ?string
+    {
+        if (empty($storedPath)) {
+            return null;
+        }
+
+        if (preg_match('#^https?://#i', $storedPath)) {
+            return $storedPath;
+        }
+
+        if (strpos($storedPath, 'assets/') === 0) {
+            return base_url($storedPath);
+        }
+
+        if ($localPrefix !== '' && strpos($storedPath, '/') === false) {
+            return base_url(trim($localPrefix, '/') . '/' . $storedPath);
+        }
+
+        try {
+            $s3 = new \App\Libraries\S3Service();
+            return $s3->getPresignedUrl($storedPath, '+20 minutes');
+        } catch (\Throwable $e) {
+            log_message('error', 'Error al resolver URL de archivo almacenado: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    private function mapInstrumentoUrls($instrumentoRaw): array
+    {
+        if (empty($instrumentoRaw)) {
+            return [];
+        }
+
+        $instrumentos = json_decode($instrumentoRaw, true);
+        if (!is_array($instrumentos)) {
+            $instrumentos = [$instrumentoRaw];
+        }
+
+        $resultado = [];
+        foreach ($instrumentos as $ruta) {
+            $url = $this->resolveStoredFileUrl($ruta);
+            if ($url) {
+                $resultado[] = [
+                    'ruta' => $ruta,
+                    'url' => $url,
+                ];
+            }
+        }
+
+        return $resultado;
+    }
+
     private function obtenerFichaTecnicaData($result): array
     {
         return [
@@ -3595,6 +3675,11 @@ class Principal extends BaseController
         }
 
         $data['solicitudes'] = !empty($solicitudes->data) ? $solicitudes->data : [];
+        if (!empty($data['solicitudes'])) {
+            foreach ($data['solicitudes'] as &$sol) {
+                $sol->instrumento_urls = $this->mapInstrumentoUrls($sol->instrumento_juridico ?? null);
+            }
+        }
         $data['scripts'] = ['inicio'];
         $data['contentView'] = 'personal/vListaSolicitudAdquisiciones';
         $this->_renderView($data);
@@ -3691,6 +3776,12 @@ class Principal extends BaseController
             'where' => ['id_solicitud_adquisiciones' => $id_solicitud, 'visible' => 1]
         ]);
 
+        if (!empty($archivos->data)) {
+            foreach ($archivos->data as &$archivo) {
+                $archivo->url_descarga = $this->resolveStoredFileUrl($archivo->nombre_archivo ?? null, 'assets/uploads/adquisiciones');
+            }
+        }
+
         $data['id_solicitud'] = $id_solicitud;
         $data['archivos'] = !empty($archivos->data) ? $archivos->data : [];
         $data['scripts'] = [];
@@ -3711,11 +3802,6 @@ class Principal extends BaseController
             return $this->respond($response);
         }
 
-        $uploadDir = FCPATH . 'assets/uploads/adquisiciones/';
-        if (!is_dir($uploadDir)) {
-            @mkdir($uploadDir, 0755, true);
-        }
-
         $count = 0;
         $errores = 0;
 
@@ -3729,13 +3815,12 @@ class Principal extends BaseController
                     $tmpName = $_FILES['archivos']['tmp_name'][$key];
                     $ext = pathinfo($originalName, PATHINFO_EXTENSION);
                     $newName = $id_solicitud . '_' . $key . '_' . time() . '.' . $ext;
-                    $targetPath = $uploadDir . $newName;
-
-                    if (move_uploaded_file($tmpName, $targetPath)) {
+                    $s3Key = $this->uploadFileToS3Storage($tmpName, 'adquisiciones', 'documentos', $newName);
+                    if ($s3Key) {
                         $res = $globals->saveTabla([
                             'id_solicitud_adquisiciones' => $id_solicitud,
                             'clave_documento' => $key,
-                            'nombre_archivo' => $newName,
+                            'nombre_archivo' => $s3Key,
                             'tipo' => $ext,
                             'usu_reg' => $session->id_usuario ?? 0,
                             'fec_reg' => date('Y-m-d H:i:s'),
@@ -3870,10 +3955,6 @@ class Principal extends BaseController
         }
 
         $rutasGuardadas = [];
-        $uploadPath = FCPATH . 'assets/uploads/adquisiciones/instrumentos/';
-        if (!is_dir($uploadPath)) {
-            mkdir($uploadPath, 0777, true);
-        }
 
         if ($this->tableHasColumn('solicitud_adquisiciones', 'instrumento_juridico')) {
             $solicitudBd = $globals->getTabla(['tabla' => 'solicitud_adquisiciones', 'where' => ['id_solicitud_adquisiciones' => $id]]);
@@ -3893,8 +3974,9 @@ class Principal extends BaseController
         foreach ($archivos as $archivo) {
             if ($archivo->isValid() && !$archivo->hasMoved() && strtolower((string) $archivo->getExtension()) === 'pdf') {
                 $newName = $archivo->getRandomName();
-                if ($archivo->move($uploadPath, $newName)) {
-                    $rutasGuardadas[] = 'assets/uploads/adquisiciones/instrumentos/' . $newName;
+                $s3Key = $this->uploadFileToS3Storage($archivo->getTempName(), 'adquisiciones', 'instrumentos', $newName);
+                if ($s3Key) {
+                    $rutasGuardadas[] = $s3Key;
                 }
             }
         }
@@ -3988,6 +4070,7 @@ class Principal extends BaseController
         $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
 
         $data['solicitud'] = $solicitud->data[0];
+        $data['solicitud']->archivo_suficiencia_url = $this->resolveStoredFileUrl($data['solicitud']->archivo_suficiencia ?? null, 'assets/uploads/contratos');
         $data['pagos'] = (!empty($pagos->data)) ? $pagos->data : [];
 
         
@@ -4017,8 +4100,13 @@ class Principal extends BaseController
         if($file = $this->request->getFile('archivo_suficiencia')) {
              if ($file->isValid() && !$file->hasMoved()) {
                 $newName = $file->getRandomName();
-                $file->move(FCPATH . 'assets/uploads/contratos', $newName);
-                $archivo_suficiencia = $newName;
+                $uploadedKey = $this->uploadFileToS3Storage($file->getTempName(), 'contratos', 'suficiencia', $newName);
+                if ($uploadedKey) {
+                    $archivo_suficiencia = $uploadedKey;
+                } else {
+                    $response->respuesta = 'No fue posible guardar el archivo de suficiencia en AWS S3.';
+                    return $this->respond($response);
+                }
              }
         }
 
@@ -4227,6 +4315,12 @@ class Principal extends BaseController
             'tabla' => 'solicitud_contrato_archivos',
             'where' => ['id_solicitud_contrato' => $id_solicitud, 'visible' => 1]
         ]);
+
+        if (!empty($archivos->data)) {
+            foreach ($archivos->data as &$archivo) {
+                $archivo->url_descarga = $this->resolveStoredFileUrl($archivo->nombre_archivo ?? null, 'assets/uploads/contratos');
+            }
+        }
         
         $data['id_solicitud'] = $id_solicitud;
         $data['archivos'] = (!empty($archivos->data)) ? $archivos->data : [];
@@ -4262,14 +4356,14 @@ class Principal extends BaseController
                     $tmpName = $_FILES['archivos']['tmp_name'][$key];
                     $ext = pathinfo($originalName, PATHINFO_EXTENSION);
                     $newName = $id_solicitud . '_' . $key . '_' . time() . '.' . $ext;
-                    $targetPath = FCPATH . 'assets/uploads/contratos/' . $newName;
+                    $s3Key = $this->uploadFileToS3Storage($tmpName, 'contratos', 'documentos', $newName);
                     
-                    if (move_uploaded_file($tmpName, $targetPath)) {
+                    if ($s3Key) {
                         
                         $dataInsert = [
                             'id_solicitud_contrato' => $id_solicitud,
                             'clave_documento' => $key,
-                            'nombre_archivo' => $newName,
+                            'nombre_archivo' => $s3Key,
                             'tipo' => $ext,
                             'usu_reg' => $session->id_usuario ?? 0,
                             'fec_reg' => date('Y-m-d H:i:s'),
@@ -4456,8 +4550,9 @@ class Principal extends BaseController
         foreach ($archivos as $archivo) {
             if ($archivo->isValid() && !$archivo->hasMoved() && $archivo->getExtension() === 'pdf') {
                 $newName = $archivo->getRandomName();
-                if ($archivo->move($uploadPath, $newName)) {
-                    $rutasGuardadas[] = 'assets/instrumentos_juridicos/' . $newName;
+                $s3Key = $this->uploadFileToS3Storage($archivo->getTempName(), 'contratos', 'instrumentos', $newName);
+                if ($s3Key) {
+                    $rutasGuardadas[] = $s3Key;
                 }
             }
         }
@@ -4542,6 +4637,11 @@ class Principal extends BaseController
             }
         }
         $data['solicitudes'] = (!empty($solicitudes->data)) ? $solicitudes->data : [];
+        if (!empty($data['solicitudes'])) {
+            foreach ($data['solicitudes'] as &$sol) {
+                $sol->instrumento_urls = $this->mapInstrumentoUrls($sol->instrumento_juridico ?? null);
+            }
+        }
         $data['scripts'] = array('inicio');
         $data['contentView'] = 'personal/vListaSolicitudContrato';
         $this->_renderView($data);
@@ -9082,6 +9182,11 @@ class Principal extends BaseController
         }
 
         $data['solicitudes'] = (!empty($solicitudes->data)) ? $solicitudes->data : [];
+        if (!empty($data['solicitudes'])) {
+            foreach ($data['solicitudes'] as &$sol) {
+                $sol->instrumento_urls = $this->mapInstrumentoUrls($sol->instrumento_juridico ?? null);
+            }
+        }
         $data['scripts'] = array('inicio');
         $data['contentView'] = 'personal/vListaSolicitudConvenio';
         $this->_renderView($data);
@@ -9115,6 +9220,7 @@ class Principal extends BaseController
         $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
 
         $data['solicitud'] = $solicitud->data[0];
+        $data['solicitud']->archivo_suficiencia_url = $this->resolveStoredFileUrl($data['solicitud']->archivo_suficiencia ?? null, 'assets/uploads/convenios');
         $data['pagos'] = (!empty($pagos->data)) ? $pagos->data : [];
         
         $data['scripts'] = array('inicio');
@@ -9138,8 +9244,13 @@ class Principal extends BaseController
         if($file = $this->request->getFile('archivo_suficiencia')) {
              if ($file->isValid() && !$file->hasMoved()) {
                 $newName = $file->getRandomName();
-                $file->move(FCPATH . 'assets/uploads/convenios', $newName);
-                $archivo_suficiencia = $newName;
+                $uploadedKey = $this->uploadFileToS3Storage($file->getTempName(), 'convenios', 'suficiencia', $newName);
+                if ($uploadedKey) {
+                    $archivo_suficiencia = $uploadedKey;
+                } else {
+                    $response->respuesta = 'No fue posible guardar el archivo de suficiencia en AWS S3.';
+                    return $this->respond($response);
+                }
              }
         }
 
@@ -9355,10 +9466,10 @@ class Principal extends BaseController
                     $ext = pathinfo($originalName, PATHINFO_EXTENSION);
                     $randHash = substr(md5(uniqid(rand(), true)), 0, 8);
                     $newName = 'Inst_Convenio_' . $id . '_' . $randHash . '.' . $ext;
-                    $targetPath = FCPATH . 'assets/uploads/convenios/' . $newName;
+                    $s3Key = $this->uploadFileToS3Storage($tmpName, 'convenios', 'instrumentos', $newName);
                     
-                    if (move_uploaded_file($tmpName, $targetPath)) {
-                        $rutasGuardadas[] = 'assets/uploads/convenios/' . $newName;
+                    if ($s3Key) {
+                        $rutasGuardadas[] = $s3Key;
                         $exito = true;
                     }
                 }
@@ -9663,13 +9774,13 @@ class Principal extends BaseController
                     $tmpName = $_FILES['archivos']['tmp_name'][$key];
                     $ext = pathinfo($originalName, PATHINFO_EXTENSION);
                     $newName = $id_solicitud . '_' . $key . '_' . time() . '.' . $ext;
-                    $targetPath = FCPATH . 'assets/uploads/convenios/' . $newName;
+                    $s3Key = $this->uploadFileToS3Storage($tmpName, 'convenios', 'documentos', $newName);
                     
-                    if (move_uploaded_file($tmpName, $targetPath)) {
+                    if ($s3Key) {
                         $dataInsert = [
                             'id_solicitud_convenio' => $id_solicitud,
                             'clave_documento' => $key,
-                            'nombre_archivo' => $newName,
+                            'nombre_archivo' => $s3Key,
                             'tipo' => $ext,
                             'usu_reg' => $session->id_usuario ?? 0,
                             'fec_reg' => date('Y-m-d H:i:s'),
@@ -9734,6 +9845,12 @@ class Principal extends BaseController
             'tabla' => 'solicitud_convenio_archivos',
             'where' => ['id_solicitud_convenio' => $id_solicitud, 'visible' => 1]
         ]);
+
+        if (!empty($archivos->data)) {
+            foreach ($archivos->data as &$archivo) {
+                $archivo->url_descarga = $this->resolveStoredFileUrl($archivo->nombre_archivo ?? null, 'assets/uploads/convenios');
+            }
+        }
         
         $data['id_solicitud'] = $id_solicitud;
         $data['archivos'] = (!empty($archivos->data)) ? $archivos->data : [];

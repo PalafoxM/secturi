@@ -66,17 +66,9 @@
                                                             </button>
                                                         <?php endif; ?>
                                                         <?php if ((int) $sol->id_estatus === 3): ?>
-                                                            <?php
-                                                            $instrumentos = [];
-                                                            $instrumentoRaw = $sol->instrumento_juridico ?? '';
-                                                            if (!empty($instrumentoRaw)) {
-                                                                $decoded = json_decode($instrumentoRaw, true);
-                                                                $instrumentos = is_array($decoded) ? $decoded : [$instrumentoRaw];
-                                                            }
-                                                            ?>
-                                                            <?php if (!empty($instrumentos)): ?>
-                                                                <?php foreach ($instrumentos as $index => $ruta): ?>
-                                                                    <a href="<?= base_url($ruta) ?>" target="_blank" class="btn btn-sm btn-success mb-1" title="Ver Instrumento <?= $index + 1 ?>">
+                                                            <?php if (!empty($sol->instrumento_urls)): ?>
+                                                                <?php foreach ($sol->instrumento_urls as $index => $instrumento): ?>
+                                                                    <a href="<?= $instrumento['url'] ?>" target="_blank" class="btn btn-sm btn-success mb-1" title="Ver Instrumento <?= $index + 1 ?>">
                                                                         <i class="fas fa-file-pdf"></i> Inst. <?= $index + 1 ?>
                                                                     </a>
                                                                 <?php endforeach; ?>

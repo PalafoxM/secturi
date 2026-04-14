@@ -94,8 +94,8 @@
                                                 <td>
                                                     <p class="small text-muted mb-0">El proyecto cuenta con la suficiencia presupuestal para convenir las acciones solicitadas a través de la presente solicitud. Se anexa captura de pantalla Sistema SAP/R3</p>
                                                     <input type="file" class="form-control-file mt-2" name="archivo_suficiencia">
-                                                    <?php if(isset($solicitud) && $solicitud->archivo_suficiencia): ?>
-                                                        <a href="<?= base_url('assets/uploads/convenios/'.$solicitud->archivo_suficiencia) ?>" target="_blank" class="d-block mt-2">Ver archivo actual</a>
+                                                    <?php if(isset($solicitud) && !empty($solicitud->archivo_suficiencia_url)): ?>
+                                                        <a href="<?= $solicitud->archivo_suficiencia_url ?>" target="_blank" class="d-block mt-2">Ver archivo actual</a>
                                                     <?php endif; ?>
                                                 </td>
                                             </tr>
