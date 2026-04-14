@@ -9283,12 +9283,48 @@ class Principal extends BaseController
         $data['empleos_mujeres']   = $ficha->empleos_mujeres;
         $data['empleos_hombres']   = $ficha->empleos_hombres;
         $data['empleos_discapacidad'] = $ficha->empleos_discapacidad;
-        $data['cuota_acceso']     = $ficha->cuota_acceso;
-        $data['cuantas_cuotas']   = $ficha->cuantas_cuotas;
-        $data['costo_total']      = $ficha->costo_total;
- 
+        $data['cuota_acceso']     = (isset($ficha->cuota_acceso) && !empty($ficha->cuota_acceso)) ? $ficha->cuota_acceso : 'N/A';
+        $data['cuantas_cuotas']   = (isset($ficha->cuantas_cuotas) && !empty($ficha->cuantas_cuotas)) ? $ficha->cuantas_cuotas : 'N/A';
+        $data['costo_total']      = (isset($ficha->costo_total) && !empty($ficha->costo_total)) ? $ficha->costo_total : 'N/A';
+        $data['desglose_costo']      = $ficha->desglose_costo;
+        $data['cantidades_desglose']      = $ficha->cantidades_desglose;
+        $data['montos_desglose']      = $ficha->montos_desglose;
+        $data['antecedentes_evento']      = $ficha->antecedentes_evento;
+        $data['propuesta_valor']      = $ficha->propuesta_valor;
+        $data['inclusion_mujeres']      = $ficha->inclusion_mujeres;
+        $data['programa_preliminar']      = $ficha->programa_preliminar;
+        $data['otras_actividades']      = $ficha->otras_actividades;
+        $data['link_web']      = (isset($ficha->link_web) && !empty($ficha->link_web)) ? $ficha->link_web : 'N/A';
+        $data['facebook']      = (isset($ficha->facebook) && !empty($ficha->facebook)) ? $ficha->facebook : 'N/A';
+        $data['fb_seguidores']      = (isset($ficha->fb_seguidores) && !empty($ficha->fb_seguidores)) ? $ficha->fb_seguidores : 'N/A';
+        $data['twitter']      = (isset($ficha->twitter) && !empty($ficha->twitter)) ? $ficha->twitter : 'N/A';
+        $data['tw_seguidores']      = (isset($ficha->tw_seguidores) && !empty($ficha->tw_seguidores)) ? $ficha->tw_seguidores : 'N/A';
+        $data['youtube']      = (isset($ficha->youtube) && !empty($ficha->youtube)) ? $ficha->youtube : 'N/A';
+        $data['ig_seguidores']      = $ficha->ig_seguidores;
+        $data['twitter']      = $ficha->twitter;
+        $data['yt_seguidores']      = $ficha->yt_seguidores;
+        $data['instagram']      = $ficha->instagram;
+        $data['tiktok']      = $ficha->tiktok;
+        $data['tk_seguidores']      = $ficha->tk_seguidores;
+        $data['co_nombre']      = $ficha->co_nombre;
+        $data['co_telefono']      = $ficha->co_telefono;
+        $data['co_cargo']      = $ficha->co_cargo;
+        $data['co_celular']      = $ficha->co_celular;
+        $data['co_domicilio']      = $ficha->co_domicilio;
+        $data['co_ciudad_estado']      = $ficha->co_ciudad_estado;
+        $data['co_email']      = $ficha->co_email;
+        $data['em_nombre']      = $ficha->em_nombre;
+        $data['em_cargo']      = $ficha->em_cargo;
+        $data['em_celular']      = $ficha->em_celular;
+        $data['em_telefono_fijo']      = $ficha->em_telefono_fijo;
+        $data['em_ciudad_estado']      = $ficha->em_ciudad_estado;
+        $data['apoyo_federal']      = (isset($ficha->apoyo_federal) && !empty($ficha->apoyo_federal)) ? $ficha->apoyo_federal : 'N/A';
+        $data['apoyo_municipal']      = (isset($ficha->apoyo_municipal) && !empty($ficha->apoyo_municipal)) ? $ficha->apoyo_municipal : 'N/A';
+        $data['apoyo_estatal']      = (isset($ficha->apoyo_estatal) && !empty($ficha->apoyo_estatal)) ? $ficha->apoyo_estatal : 'N/A';
+        $data['descripcion_apoyos']      = (isset($ficha->descripcion_apoyos) && !empty($ficha->descripcion_apoyos)) ? $ficha->descripcion_apoyos : 'N/A';
+        $data['fecha_registro']      = (isset($ficha->fecha_registro) && !empty($ficha->fecha_registro)) ? $ficha->fecha_registro : 'N/A';
 
-
+       die( var_dump( $ficha ) );
       
         $data['ficha'] = $ficha;
 
