@@ -75,20 +75,34 @@ class Principal extends BaseController
         }
 
         if (mb_check_encoding($value, 'UTF-8')) {
+            if (function_exists('mb_scrub')) {
+                return mb_scrub($value, 'UTF-8');
+            }
             return $value;
         }
 
         $converted = @mb_convert_encoding($value, 'UTF-8', 'UTF-8, ISO-8859-1, Windows-1252');
         if ($converted !== false && $converted !== null) {
+            if (function_exists('mb_scrub')) {
+                $converted = mb_scrub($converted, 'UTF-8');
+            }
             return $converted;
         }
 
         $converted = @iconv('Windows-1252', 'UTF-8//IGNORE', $value);
         if ($converted !== false && $converted !== null) {
+            if (function_exists('mb_scrub')) {
+                $converted = mb_scrub($converted, 'UTF-8');
+            }
             return $converted;
         }
 
-        return utf8_encode($value);
+        $converted = utf8_encode($value);
+        if (function_exists('mb_scrub')) {
+            $converted = mb_scrub($converted, 'UTF-8');
+        }
+
+        return $converted;
     }
 
     private function cleanMpdfHtml(string $html): string
@@ -105,6 +119,10 @@ class Principal extends BaseController
             }
         }
 
+        if (function_exists('mb_scrub')) {
+            $html = mb_scrub($html, 'UTF-8');
+        }
+
         $iconvHtml = @iconv('UTF-8', 'UTF-8//IGNORE', $html);
         if ($iconvHtml !== false && $iconvHtml !== null) {
             $html = $iconvHtml;
@@ -113,6 +131,100 @@ class Principal extends BaseController
         $html = preg_replace('/[^\x09\x0A\x0D\x20-\x7E\x{00A0}-\x{D7FF}\x{E000}-\x{FFFD}]/u', '', $html);
 
         return $html ?? '';
+    }
+
+    private function obtenerFichaTecnicaData($result): array
+    {
+        return [
+            'em_domicilio' => $result->em_domicilio,
+            'fecha_realizacion' => $result->fecha_realizacion,
+            'nombre_evento' => $result->nombre_evento,
+            'persona_solicitud' => $result->persona_solicitud,
+            'municipio_sede' => $result->municipio_sede,
+            'periodicidad_radio' => $result->periodicidad_radio,
+            'antecedentes' => $result->antecedentes,
+            'objetivo_general' => $result->objetivo_general,
+            'justificacion' => $result->justificacion,
+            'cadena_valor' => $result->cadena_valor,
+            'nivel_habilidades' => '',
+            'estrato' => !$result->estrato ? $result->estrato : '',
+            'asistentes_totales' => $result->asistentes_totales,
+            'asistentes_local' => $result->asistentes_local,
+            'asistentes_regional' => $result->asistentes_regional,
+            'asistentes_nacional' => $result->asistentes_nacional,
+            'asistentes_internacional' => $result->asistentes_internacional,
+            'alcance' => $result->alcance,
+            'derrama_total' => $result->derrama_total,
+            'derrama_local' => $result->derrama_local,
+            'derrama_foraneo' => $result->derrama_foraneo,
+            'empleos_mujeres' => $result->empleos_mujeres,
+            'empleos_hombres' => $result->empleos_hombres,
+            'empleos_discapacidad' => $result->empleos_discapacidad,
+            'cuota_acceso' => $result->cuota_acceso,
+            'cuantas_cuotas' => (isset($result->cuantas_cuotas) && !empty($result->cuantas_cuotas)) ? $result->cuantas_cuotas : 'N/A',
+            'costo_total' => (isset($result->costo_total) && !empty($result->costo_total)) ? $result->costo_total : 'N/A',
+            'desglose_costo' => $result->desglose_costo,
+            'cantidades_desglose' => (isset($result->cantidades_desglose) && !empty($result->cantidades_desglose)) ? $result->cantidades_desglose : 'N/A',
+            'montos_desglose' => $result->montos_desglose,
+            'antecedentes_evento' => $result->antecedentes_evento,
+            'propuesta_valor' => $result->propuesta_valor,
+            'inclusion_mujeres' => $result->inclusion_mujeres,
+            'programa_preliminar' => $result->programa_preliminar,
+            'otras_actividades' => $result->otras_actividades,
+            'link_web' => $result->link_web,
+            'facebook' => $result->facebook,
+            'fb_seguidores' => $result->fb_seguidores,
+            'twitter' => $result->twitter,
+            'tw_seguidores' => $result->tw_seguidores,
+            'instagram' => $result->instagram,
+            'ig_seguidores' => $result->ig_seguidores,
+            'youtube' => $result->youtube,
+            'yt_seguidores' => $result->yt_seguidores,
+            'tiktok' => $result->tiktok,
+            'tk_seguidores' => $result->tk_seguidores,
+            'co_nombre' => $result->co_nombre,
+            'co_telefono' => $result->co_telefono,
+            'co_razon_social' => $result->co_razon_social,
+            'co_cargo' => $result->co_cargo,
+            'co_celular' => $result->co_celular,
+            'co_domicilio' => $result->co_domicilio,
+            'co_ciudad_estado' => $result->co_ciudad_estado,
+            'co_email' => $result->co_email,
+            'em_nombre' => $result->em_nombre,
+            'em_cargo' => $result->em_cargo,
+            'em_celular' => $result->em_celular,
+            'em_telefono_fijo' => $result->em_telefono_fijo,
+            'em_ciudad_estado' => $result->em_ciudad_estado,
+            'em_email' => $result->em_email,
+            'apoyo_federal' => $result->apoyo_federal,
+            'apoyo_municipal' => $result->apoyo_municipal,
+            'apoyo_estatal' => $result->apoyo_estatal,
+            'descripcion_apoyos' => $result->descripcion_apoyos,
+        ];
+    }
+
+    private function generarPdfFichaTemporal($id, array $data): string
+    {
+        $mpdfConfig = [
+            'mode' => 'utf-8',
+            'format' => 'Legal',
+            'orientation' => 'P',
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_top' => 10,
+            'margin_bottom' => 10,
+        ];
+
+        $mpdf = new \Mpdf\Mpdf($mpdfConfig);
+        $html = view("pdfs/vpdfFicha.php", $data);
+        $html = $this->normalizeUtf8Value($html);
+        $html = $this->cleanMpdfHtml($html);
+        $mpdf->WriteHTML($html);
+
+        $pdfPath = WRITEPATH . 'uploads/Ficha_Tecnica_' . $id . '_' . date('Ymd_His') . '.pdf';
+        $mpdf->Output($pdfPath, 'F');
+
+        return $pdfPath;
     }
 
     public function index()
@@ -9132,112 +9244,169 @@ class Principal extends BaseController
 
     }
     public function pdfFicha()
-    {
-       // setlocale(LC_TIME, 'es_ES');
-        $id = $this->request->getGet('id_ficha_tecnica');
-        $response = new \stdClass();
-        $response->error = true;
-        $response->respuesta = "Error al validar usuario";
-        $session = \Config\Services::session();
-        $Mglobal = new Mglobal;
-        $data = array();
-     
-        $result = $Mglobal->getTabla(["tabla"=>"ficha_tecnica",'where' => ['id_ficha_tecnica' => $id]])->data[0];
-        
-        if (!$result) {
-            die("Ficha no encontrada.");
+        {
+            // setlocale(LC_TIME, 'es_ES');
+            $id = $this->request->getGet('id_ficha_tecnica');
+            $session = \Config\Services::session();
+            
+            // Verificar permisos (solo usuario administrador)
+            if ($session->id_usuario != 1) {
+                echo('<h1>Nos encontramos haciendo ajustes en el sistema, favor de intentarlo más tarde</h1>');
+                die();
+            }
+            
+            // Validar que se recibió el ID
+            if (empty($id)) {
+                die("Ficha no encontrada: ID no proporcionado.");
+            }
+            
+            // Obtener datos de la ficha
+            $Mglobal = new Mglobal;
+            $respuesta = $Mglobal->getTabla([
+                "tabla" => "ficha_tecnica",
+                'where' => ['id_ficha_tecnica' => $id]
+            ]);
+            
+            // Validar que la respuesta tenga datos
+            if (empty($respuesta->data[0])) {
+                die("Ficha no encontrada.");
+            }
+            
+            $ficha = $respuesta->data[0];
+            
+            // Construir array de datos para la vista (usando sintaxis correcta)
+            $data = [];
+            $data['id_ficha_tecnica']     = $ficha->id_ficha_tecnica ?? '';
+            $data['em_domicilio']         = $ficha->em_domicilio ?? '';
+            $data['nombre_evento']        = $ficha->nombre_evento ?? '';
+            $data['persona_solicitud']    = $ficha->persona_solicitud ?? '';
+            $data['edicion']              = $ficha->edicion ?? '';
+            $data['periodicidad_desc']    = $ficha->periodicidad_desc ?? '';
+            $data['municipio_sede']       = $ficha->municipio_sede ?? '';
+            $data['periodicidad_radio']   = $ficha->periodicidad_radio ?? '';
+            $data['antecedentes']         = $ficha->antecedentes ?? '';
+            $data['objetivo_general']     = $ficha->objetivo_general ?? '';
+            $data['justificacion']        = $ficha->justificacion ?? '';
+            $data['cadena_valor']         = $ficha->cadena_valor ?? '';
+            
+            // Opcional: Agregar más campos si existen
+            $data['asistentes_totales']   = $ficha->asistentes_totales ?? '';
+            $data['alcance']              = $ficha->alcance ?? '';
+            $data['derrama_total']        = $ficha->derrama_total ?? '';
+            // ... agrega aquí los demás campos que necesites
+            
+            // Configurar y generar PDF
+            $mpdf = new \Mpdf\Mpdf([
+                'margin_top'    => 0,
+                'margin_left'   => 1,
+                'margin_right'  => 1,
+                'format'        => 'Legal',
+                'mirrorMargins' => false,
+                'mode'          => 'utf-8',  // IMPORTANTE: forzar UTF-8
+            ]);
+            
+            $html = view("pdfs/vpdfFicha.php", $data);
+            
+            // Aplicar limpieza UTF-8 (solo si las funciones existen)
+            if (method_exists($this, 'normalizeUtf8Value')) {
+                $html = $this->normalizeUtf8Value($html);
+            }
+            if (method_exists($this, 'cleanMpdfHtml')) {
+                $html = $this->cleanMpdfHtml($html);
+            }
+            
+            $mpdf->WriteHTML($html);
+            $mpdf->Output('Ficha_Tecnica_' . $id . '.pdf', 'I');
+            exit;
         }
-        
-      
-       $data['em_domicilio']        = $result->em_domicilio;
-       $data['fecha_realizacion']   = $result->fecha_realizacion;
-       $data['nombre_evento']       = $result->nombre_evento;
-       $data['persona_solicitud']   = $result->persona_solicitud;
-       $data['municipio_sede']      = $result->municipio_sede;
-       $data['periodicidad_radio']  = $result->periodicidad_radio;
-       $data['antecedentes']        = $result->antecedentes;
-       $data['objetivo_general']    = $result->objetivo_general;
-       $data['justificacion']       = $result->justificacion;
-       $data['cadena_valor']        = $result->cadena_valor;
-       $data['nivel_habilidades']   = '';
-       $data['estrato']             = !$result->estrato?$result->estrato:'';
-       $data['asistentes_totales']  = $result->asistentes_totales;
-       $data['asistentes_local']    = $result->asistentes_local;
-       $data['asistentes_regional'] = $result->asistentes_regional;
-       $data['asistentes_nacional'] = $result->asistentes_nacional;
-       $data['asistentes_internacional']  = $result->asistentes_internacional;
-       $data['alcance']             = $result->alcance;
-       $data['derrama_total']       = $result->derrama_total;
-       $data['derrama_local']       = $result->derrama_local;
-       $data['derrama_foraneo']     = $result->derrama_foraneo;
-       $data['empleos_mujeres']     = $result->empleos_mujeres;
-       $data['empleos_hombres']     = $result->empleos_hombres;
-       $data['empleos_discapacidad']= $result->empleos_discapacidad;
-       $data['cuota_acceso']        = $result->cuota_acceso;
-       $data['cuantas_cuotas']      = (isset($result->cuantas_cuotas) && !empty($result->cuantas_cuotas))?$result->cuantas_cuotas:'N/A';
-       $data['costo_total']         = (isset($result->costo_total) && !empty($result->costo_total))?$result->costo_total:'N/A';
-       $data['desglose_costo']      = $result->desglose_costo;
-       $data['cantidades_desglose'] = (isset($result->cantidades_desglose) && !empty($result->cantidades_desglose))?$result->cantidades_desglose:'N/A';
-       $data['montos_desglose']     = $result->montos_desglose;
-       $data['antecedentes_evento'] = $result->antecedentes_evento;
-       $data['propuesta_valor']     = $result->propuesta_valor;
-       $data['inclusion_mujeres']   = $result->inclusion_mujeres;
-       $data['programa_preliminar'] = $result->programa_preliminar;
-       $data['otras_actividades']   = $result->otras_actividades;
-       $data['link_web']            = $result->link_web;
-       $data['facebook']            = $result->facebook;
-       $data['fb_seguidores']       = $result->fb_seguidores;
-       $data['twitter']             = $result->twitter;
-       $data['tw_seguidores']       = $result->tw_seguidores;
-       $data['instagram']           = $result->instagram;
-       $data['ig_seguidores']       = $result->ig_seguidores;
-       $data['youtube']             = $result->youtube;
-       $data['yt_seguidores']       = $result->yt_seguidores;
-       $data['tiktok']              = $result->tiktok;
-       $data['tk_seguidores']       = $result->tk_seguidores;
-       $data['co_nombre']           = $result->co_nombre;
-       $data['co_telefono']         = $result->co_telefono;
-       $data['co_razon_social']     = $result->co_razon_social;
-       $data['co_cargo']            = $result->co_cargo;
-       $data['co_celular']          = $result->co_celular;
-       $data['co_domicilio']        = $result->co_domicilio;
-       $data['co_ciudad_estado']    = $result->co_ciudad_estado;
-       $data['co_email']            = $result->co_email;
-       $data['em_nombre']           = $result->em_nombre;
-       $data['em_cargo']            = $result->em_cargo;
-       $data['em_celular']          = $result->em_celular;
-       $data['em_telefono_fijo']    = $result->em_telefono_fijo;
-       $data['em_ciudad_estado']    = $result->em_ciudad_estado;
-       $data['em_email']            = $result->em_email;
-       $data['apoyo_federal']       = $result->apoyo_federal;
-       $data['apoyo_municipal']     = $result->apoyo_municipal;
-       $data['apoyo_estatal']       = $result->apoyo_estatal;
-       $data['descripcion_apoyos']  = $result->descripcion_apoyos;
+    public function enviarFichaTecnica()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $emailService = \Config\Services::email();
+        $id = $this->request->getGet('id_ficha_tecnica');
 
-        $data = $this->normalizeUtf8Value($data);
-     
-      // die(var_dump($data));
-        
-        $mpdfConfig = [
-            'mode' => 'utf-8',
-            'format' => 'Legal',
-            'orientation' => 'P',
-            'margin_left' => 10,
-            'margin_right' => 10,
-            'margin_top' => 10,
-            'margin_bottom' => 10,
-        ];
-        
-        $mpdf = new \Mpdf\Mpdf($mpdfConfig);
-        
-        $html = view("pdfs/vpdfFicha.php", $data);
-        $html = $this->normalizeUtf8Value($html);
-        $html = $this->cleanMpdfHtml($html);
-        //die(var_dump($html));
-        $mpdf->WriteHTML($html);
-        
-        $mpdf->Output('Ficha_Tecnica_'.$id.'.pdf', 'I');
-        exit;
+        if (empty($id)) {
+            return redirect()->to(base_url('index.php/Principal/fichaTecnica'))
+                ->with('error', 'No se recibió el identificador de la ficha técnica.');
+        }
+
+        $ficha = $globals->getTabla(['tabla' => 'ficha_tecnica', 'where' => ['id_ficha_tecnica' => $id, 'visible' => 1]]);
+        $result = (!empty($ficha->data)) ? $ficha->data[0] : null;
+
+        if (!$result) {
+            return redirect()->to(base_url('index.php/Principal/fichaTecnica'))
+                ->with('error', 'La ficha técnica no fue encontrada.');
+        }
+
+        if (empty($result->co_email)) {
+            return redirect()->to(base_url('index.php/Principal/fichaTecnica'))
+                ->with('error', 'La ficha técnica no cuenta con correo en el campo co_email.');
+        }
+
+        $dataFicha = $this->normalizeUtf8Value($this->obtenerFichaTecnicaData($result));
+        $pdfPath = '';
+
+        try {
+            $pdfPath = $this->generarPdfFichaTemporal($id, $dataFicha);
+
+            $nombreDestinatario = !empty($result->co_nombre) ? $result->co_nombre : 'Usuario';
+            $nombreEvento = !empty($result->nombre_evento) ? $result->nombre_evento : ('Ficha técnica ' . $id);
+
+            $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
+            $emailService->setTo($result->co_email);
+            $emailService->setSubject('Envío de ficha técnica - ' . $nombreEvento);
+            $emailService->setMailType('html');
+            $emailService->setMessage('
+                <p>Buen día, <strong>' . esc($nombreDestinatario) . '</strong>:</p>
+                <p>Por este medio se comparte la ficha técnica correspondiente al evento <strong>' . esc($nombreEvento) . '</strong>.</p>
+                <p>Se adjunta el archivo PDF para su consulta.</p>
+                <br>
+                <p>Saludos cordiales,</p>
+                <p><strong>SUSI - SECTURI</strong></p>
+            ');
+            $emailService->attach($pdfPath);
+
+            if (!$emailService->send()) {
+                if ($pdfPath !== '' && file_exists($pdfPath)) {
+                    unlink($pdfPath);
+                }
+
+                return redirect()->to(base_url('index.php/Principal/fichaTecnica'))
+                    ->with('error', 'No se pudo enviar el correo. Verifica la configuración del servidor de correo.');
+            }
+
+            if ($pdfPath !== '' && file_exists($pdfPath)) {
+                unlink($pdfPath);
+            }
+
+            $globals->saveTabla(
+                [
+                    'id_estatus' => 2,
+                    'usu_act' => $session->get('id_usuario'),
+                    'fec_act' => date('Y-m-d H:i:s'),
+                ],
+                [
+                    'tabla' => 'ficha_tecnica',
+                    'editar' => true,
+                    'idEditar' => ['id_ficha_tecnica' => $id],
+                ],
+                [
+                    'id_user' => $session->get('id_usuario'),
+                    'script' => 'Principal.php/enviarFichaTecnica',
+                ]
+            );
+
+            return redirect()->to(base_url('index.php/Principal/fichaTecnica'))
+                ->with('success', 'La ficha técnica se envió correctamente a ' . $result->co_email . '.');
+        } catch (\Throwable $e) {
+            if ($pdfPath !== '' && file_exists($pdfPath)) {
+                unlink($pdfPath);
+            }
+
+            return redirect()->to(base_url('index.php/Principal/fichaTecnica'))
+                ->with('error', 'Ocurrió un problema al generar o enviar la ficha técnica: ' . $e->getMessage());
+        }
     }
     
     public function subirArchivosSolicitudConvenio()
