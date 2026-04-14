@@ -54,6 +54,43 @@ class Principal extends BaseController
         echo view($data['layout'], $data);
     }
 
+    private function normalizeUtf8Value($value)
+    {
+        if (is_array($value)) {
+            foreach ($value as $key => $item) {
+                $value[$key] = $this->normalizeUtf8Value($item);
+            }
+            return $value;
+        }
+
+        if (is_object($value)) {
+            foreach ($value as $key => $item) {
+                $value->$key = $this->normalizeUtf8Value($item);
+            }
+            return $value;
+        }
+
+        if (!is_string($value) || $value === '') {
+            return $value;
+        }
+
+        if (mb_check_encoding($value, 'UTF-8')) {
+            return $value;
+        }
+
+        $converted = @mb_convert_encoding($value, 'UTF-8', 'UTF-8, ISO-8859-1, Windows-1252');
+        if ($converted !== false && $converted !== null) {
+            return $converted;
+        }
+
+        $converted = @iconv('Windows-1252', 'UTF-8//IGNORE', $value);
+        if ($converted !== false && $converted !== null) {
+            return $converted;
+        }
+
+        return utf8_encode($value);
+    }
+
     public function index()
     {
 
@@ -9152,6 +9189,8 @@ class Principal extends BaseController
        $data['apoyo_municipal']     = $result->apoyo_municipal;
        $data['apoyo_estatal']       = $result->apoyo_estatal;
        $data['descripcion_apoyos']  = $result->descripcion_apoyos;
+
+        $data = $this->normalizeUtf8Value($data);
      
       // die(var_dump($data));
         
@@ -9168,6 +9207,7 @@ class Principal extends BaseController
         $mpdf = new \Mpdf\Mpdf($mpdfConfig);
         
         $html = view("pdfs/vpdfFicha.php", $data);
+        $html = $this->normalizeUtf8Value($html);
         //die(var_dump($html));
         $mpdf->WriteHTML($html);
         
