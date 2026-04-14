@@ -9247,36 +9247,37 @@ class Principal extends BaseController
     {
         // setlocale(LC_TIME, 'es_ES');
         $id = $this->request->getGet('id_ficha_tecnica');
+          if(!$id){
+            echo "ID no válido"; return;
+        }
+
         $session = \Config\Services::session();
+        $globals = new \App\Models\Mglobal;
         
-        // Verificar permisos (solo usuario administrador)
-        if ($session->id_usuario != 1) {
-            echo('<h1>Nos encontramos haciendo ajustes en el sistema, favor de intentarlo más tarde</h1>');
-            die();
+        $solicitud = $globals->getTabla(['tabla' => 'vw_solicitud_convenio', 'where' => ['id_solicitud_convenio' => $id]]);
+        $pagos = $globals->getTabla(['tabla' => 'solicitud_convenio_pagos', 'where' => ['id_solicitud_convenio' => $id, 'visible' => 1]]);
+        
+        if(empty($solicitud->data)){
+            echo "Solicitud no encontrada"; return;
         }
+
+        $data['solicitud'] = $solicitud->data[0];
+        $data['pagos'] = (!empty($pagos->data)) ? $pagos->data : [];
         
-        // Validar que se recibió el ID
-        if (empty($id)) {
-            die("Ficha no encontrada: ID no proporcionado.");
-        }
+        // Similar to Contrato PDF View
+        $html = view('personal/vPdfSolicitudConvenio', $data);
         
-        // Obtener datos de la ficha
-        $Mglobal = new Mglobal;
-        $respuesta = $Mglobal->getTabla([
-            "tabla" => "ficha_tecnica",
-            'where' => ['id_ficha_tecnica' => $id]
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 10,
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_bottom' => 10,
+            'format' => 'Letter'
         ]);
-        
-        // Validar que la respuesta tenga datos
-        if (empty($respuesta->data[0])) {
-            die("Ficha no encontrada.");
-        }
-        
-        $ficha = $respuesta->data[0];
-        
-        // Construir array de datos para la vista (limpiando cada campo)
-        $data = [];
-       
+
+        $mpdf->WriteHTML($html);
+        $mpdf->Output('Solicitud_Convenio_' . $id . '.pdf', 'I');
+        exit();
         
         // Generar HTML desde la vista
         $html = view("pdfs/vpdfFicha.php", $data);
