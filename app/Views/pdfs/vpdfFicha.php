@@ -6,10 +6,8 @@ $cantidades = isset($cantidades_desglose) && $cantidades_desglose != '' && $cant
 $montos = isset($montos_desglose) && $montos_desglose != '' && $montos_desglose != 'null' ? json_decode($montos_desglose, true) : [];
 ?>
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Ficha Técnica</title>
     <style>
         body {
             font-family: Arial, sans-serif;
