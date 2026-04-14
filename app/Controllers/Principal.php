@@ -3221,6 +3221,9 @@ class Principal extends BaseController
         $vwUsuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
         $data['usuario'] = !empty($vwUsuario->data) ? $vwUsuario->data : [];
 
+        $catPartida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $data['cat_partida'] = !empty($catPartida->data) ? $catPartida->data : [];
+
         $data['scripts'] = ['inicio'];
         $data['edita'] = 0;
         $data['contentView'] = 'personal/vSolicitudAdquisiciones';
@@ -9251,6 +9254,7 @@ class Principal extends BaseController
             
             $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
             $emailService->setTo('lvelaga@guanajuato.gob.mx');
+            //$emailService->setTo('palafox.marin@hotmail.com');
             $emailService->setSubject('Nueva Solicitud de Convenio - Archivos Adjuntados');
             $emailService->setMailType('html');
             $emailService->setMessage("

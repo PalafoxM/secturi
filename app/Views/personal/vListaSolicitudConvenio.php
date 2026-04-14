@@ -63,6 +63,11 @@
                                                                 <i class="fas fa-circle-notch fa-spin mr-1"></i> En Espera
                                                             </button>
                                                         <?php endif; ?>
+                                                        <?php if($sol->id_estatus == 1): ?>
+                                                            <a onclick="abrirModalArchivos('<?= $sol->id_solicitud_convenio ?>')" class="btn btn-sm btn-soft-warning font-weight-bold" style="cursor: pointer;" title="En revisión por área Jurídica">
+                                                                <i class="fas fa-circle-notch fa-spin mr-1"></i> Subir Doc.
+                                                            </a>
+                                                        <?php endif; ?>
 
                                                            <?php if($sol->id_estatus == 3): ?>
                                                              <?php

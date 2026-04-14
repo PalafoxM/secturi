@@ -116,7 +116,16 @@
                                             <tr>
                                                 <td><input type="text" class="form-control" name="codigo_programatico" value="<?= isset($solicitud) ? (isset($solicitud->codigo_programatico) ? $solicitud->codigo_programatico : '') : '' ?>"></td>
                                                 <td><input type="text" class="form-control" name="fondo" value="<?= isset($solicitud) ? (isset($solicitud->fondo) ? $solicitud->fondo : '') : '' ?>"></td>
-                                                <td><input type="text" class="form-control" name="numero_partida" value="<?= isset($solicitud) ? (isset($solicitud->numero_partida) ? $solicitud->numero_partida : '') : '' ?>"></td>
+                                                <td>
+                                                    <select class="form-control select2" name="numero_partida" required>
+                                                        <option value="">Seleccione una opción</option>
+                                                        <?php if(isset($cat_partida)): foreach ($cat_partida as $u): ?>
+                                                            <option value="<?= $u->id_partida ?>" <?= (isset($solicitud) && $solicitud->numero_partida == $u->id_partida) ? 'selected' : '' ?>>
+                                                                <?= $u->cuenta_cable ?>
+                                                            </option>
+                                                        <?php endforeach; endif; ?>
+                                                    </select>
+                                                </td>
                                                 <td><input type="text" class="form-control" name="nombre_partida" value="<?= isset($solicitud) ? (isset($solicitud->nombre_partida) ? $solicitud->nombre_partida : '') : '' ?>"></td>
                                             </tr>
                                         </tbody>
