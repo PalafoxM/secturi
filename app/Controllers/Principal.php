@@ -91,6 +91,30 @@ class Principal extends BaseController
         return utf8_encode($value);
     }
 
+    private function cleanMpdfHtml(string $html): string
+    {
+        if ($html === '') {
+            return $html;
+        }
+
+        $encoding = mb_detect_encoding($html, ['UTF-8', 'Windows-1252', 'ISO-8859-1', 'ASCII'], true);
+        if ($encoding && $encoding !== 'UTF-8') {
+            $converted = @mb_convert_encoding($html, 'UTF-8', $encoding);
+            if ($converted !== false && $converted !== null) {
+                $html = $converted;
+            }
+        }
+
+        $iconvHtml = @iconv('UTF-8', 'UTF-8//IGNORE', $html);
+        if ($iconvHtml !== false && $iconvHtml !== null) {
+            $html = $iconvHtml;
+        }
+
+        $html = preg_replace('/[^\x09\x0A\x0D\x20-\x7E\x{00A0}-\x{D7FF}\x{E000}-\x{FFFD}]/u', '', $html);
+
+        return $html ?? '';
+    }
+
     public function index()
     {
 
@@ -9208,6 +9232,7 @@ class Principal extends BaseController
         
         $html = view("pdfs/vpdfFicha.php", $data);
         $html = $this->normalizeUtf8Value($html);
+        $html = $this->cleanMpdfHtml($html);
         //die(var_dump($html));
         $mpdf->WriteHTML($html);
         
