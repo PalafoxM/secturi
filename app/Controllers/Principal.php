@@ -9280,34 +9280,18 @@ class Principal extends BaseController
         
         // Generar HTML desde la vista
         $html = view("pdfs/vpdfFicha.php", $data);
-        
-   
-        
-        // Configurar mpdf con UTF-8
+        // $html = view('personal/vPdfSolicitudConvenio', $data);
         $mpdf = new \Mpdf\Mpdf([
-            'margin_top'    => 0,
-            'margin_left'   => 1,
-            'margin_right'  => 1,
-            'format'        => 'Legal',
-            'mirrorMargins' => false,
-            'mode'          => 'utf-8',        // Forzar UTF-8
-            'autoLangToFont' => true,          // Auto-detectar idiomas
+            'margin_top' => 10,
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_bottom' => 10,
+            'format' => 'Letter'
         ]);
-          
-        // Agregar página y escribir HTML
-        $mpdf->AddPage();
+
         $mpdf->WriteHTML($html);
-        
-        // Footer en todas las páginas
-        $mpdf->SetHTMLFooter('
-            <div style="text-align: right; font-size: 10px;">
-                Página {PAGENO} de {nbpg}
-            </div>
-        ');
-        
-        // Salida del PDF
-        $mpdf->Output('Ficha_Tecnica_' . $id . '.pdf', 'I');
-        exit;
+        $mpdf->Output('Ficha_Tecnica' . $id . '.pdf', 'I');
+        exit();
     }
     public function enviarFichaTecnica()
     {
