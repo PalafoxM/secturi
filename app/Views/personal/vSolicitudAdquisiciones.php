@@ -120,7 +120,7 @@
                                                     <select class="form-control select2" name="numero_partida" required>
                                                         <option value="">Seleccione una opción</option>
                                                         <?php if(isset($cat_partida)): foreach ($cat_partida as $u): ?>
-                                                            <option value="<?= $u->id_partida ?>" <?= (isset($solicitud) && $solicitud->numero_partida == $u->id_partida) ? 'selected' : '' ?>>
+                                                            <option value="<?= $u->cuenta_cable ?>" <?= (isset($solicitud) && $solicitud->numero_partida == $u->cuenta_cable) ? 'selected' : '' ?>>
                                                                 <?= $u->cuenta_cable ?>
                                                             </option>
                                                         <?php endforeach; endif; ?>
