@@ -5425,7 +5425,7 @@ class Agregar extends BaseController
             'mirrorMargins' => false,
         ]);
 
-          $html = view('personal/vFormatoAsistencia', $data);
+          $html = view($formato, $data);
         
         $mpdf = new \Mpdf\Mpdf([
             'margin_top' => 10,
