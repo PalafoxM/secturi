@@ -7,6 +7,13 @@
 // 4. Usamos tablas para alinear (es lo más seguro en PDF)
 //
 ?>
+<?php
+    $logoPath = FCPATH . 'assets/logo3.png';
+    $logoBase64 = '';
+    if (file_exists($logoPath)) {
+        $logoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
+    }
+?>
 <style>
     body {
         font-family: sans-serif;
@@ -32,7 +39,7 @@
     /* Contenedor principal para cada usuario */
     .usuario-bloque {
         /* page-break-inside: avoid; */ /* Intenta no romper este bloque por la mitad (a veces funciona) */
-        margin-top: 195px;
+        margin-top: 10px;
     }
 
     /* Div que FORZARÁ un salto de página después de cada usuario */
@@ -104,14 +111,11 @@
     */
     
 </style>
-
-<?php // ----- INICIO DEL HTML ----- ?>
-
-<!-- 
-  Encabezado del Documento (Folio y Fecha)
-  Visible solo en la primera página porque está fuera del loop.
-  Si lo necesitas en CADA página, debes usar las funciones Header() de mPDF.
--->
+<div style="text-align: center; margin-bottom: 8px;">
+    <?php if ($logoBase64): ?>
+        <img src="<?= $logoBase64 ?>" alt="Logo" style="width: 220px; height: auto;">
+    <?php endif; ?>
+</div>
 <table class="tabla-encabezado">
     <tr>
         <td class="folio">
@@ -122,6 +126,8 @@
         </td>
     </tr>
 </table>
+
+
 
 
 <?php 
