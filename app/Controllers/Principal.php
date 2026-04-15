@@ -111,6 +111,8 @@ class Principal extends BaseController
             return $html;
         }
 
+        $html = preg_replace('/^\xEF\xBB\xBF/', '', $html);
+
         $encoding = mb_detect_encoding($html, ['UTF-8', 'Windows-1252', 'ISO-8859-1', 'ASCII'], true);
         if ($encoding && $encoding !== 'UTF-8') {
             $converted = @mb_convert_encoding($html, 'UTF-8', $encoding);
@@ -9879,11 +9881,26 @@ class Principal extends BaseController
             echo "Solicitud no encontrada"; return;
         }
 
-        $data['solicitud'] = $solicitud->data[0];
-        $data['pagos'] = (!empty($pagos->data)) ? $pagos->data : [];
+        $data['solicitud'] = $this->normalizeUtf8Value($solicitud->data[0]);
+        $data['pagos'] = $this->normalizeUtf8Value((!empty($pagos->data)) ? $pagos->data : []);
+
+        $montoFields = [
+            'monto_secturi',
+            'monto_federal',
+            'monto_otra',
+            'monto_total',
+        ];
+
+        foreach ($montoFields as $field) {
+            $monto = (float) str_replace([',', '$', ' '], '', (string) ($data['solicitud']->$field ?? 0));
+            $textoField = $field . '_letra';
+            $data['solicitud']->$textoField = $monto > 0 ? $this->numeroEnLetras($monto) : 'CERO PESOS 00/100 M.N.';
+        }
         
         // Similar to Contrato PDF View
         $html = view('personal/vPdfSolicitudConvenio', $data);
+        $html = $this->normalizeUtf8Value($html);
+        $html = $this->cleanMpdfHtml($html);
         
         $mpdf = new \Mpdf\Mpdf([
             'margin_top' => 10,
