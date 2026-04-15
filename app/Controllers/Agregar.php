@@ -5425,7 +5425,7 @@ class Agregar extends BaseController
             'mirrorMargins' => false,
         ]);
 
-          $html = view('personal/vPdfSolicitudConvenio', $data);
+          $html = view('personal/vFormatoAsistencia', $data);
         
         $mpdf = new \Mpdf\Mpdf([
             'margin_top' => 10,
@@ -5436,7 +5436,7 @@ class Agregar extends BaseController
         ]);
 
         $mpdf->WriteHTML($html);
-        $mpdf->Output('Solicitud_Convenio_' . $id_incidencia . '.pdf', 'I');
+        $mpdf->Output('Formato_Asistencia_' . $id_incidencia . '.pdf', 'I');
         exit();
 
     }
