@@ -153,7 +153,7 @@
         <tr><td class="section-title">VALIDACION DE SOLICITUD</td></tr>
         <tr>
             <td style="height: 140px; position: relative;">
-                <div style="position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); text-align: center; width: 320px;">
+                <div style="position: absolute; bottom: 24px; left: 30%; top: 89%; transform: translateX(-50%); text-align: center; width: 320px;">
                     <div style="border-top: 1px solid #000; padding-top: 4px; font-weight: bold;">Nombre de Dir. Administrativo</div>
                     <div style="margin-top: 2px;">Cargo</div>
                 </div>
