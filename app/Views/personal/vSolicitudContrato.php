@@ -121,7 +121,7 @@
                                     <label class="col-sm-4 col-form-label">Monto Total del Contrato (con número y letra):</label>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control" id="monto_total" name="monto_total" value="<?= isset($solicitud) ? $solicitud->monto_total : '' ?>" required>
-                                        <input type="text" class="form-control mt-2" id="monto_letra" readonly placeholder="Monto en letra">
+                                        <input type="text" class="form-control mt-2" id="monto_total_texto" name="monto_total_texto" value="<?= isset($solicitud) ? esc($solicitud->monto_total_texto ?? '') : '' ?>" readonly placeholder="Monto en letra">
                                     </div>
                                 </div>
                                 <div class="form-group row">
@@ -376,12 +376,12 @@
             // Validación de número
             if (isNaN(valor) || valor.trim() === '') {
                  if(valor.trim() !== '') {
-                      $('#monto_letra').val('NUMERO NO LEGIBLE');
+                      $('#monto_total_texto').val('NUMERO NO LEGIBLE');
                  } else {
-                      $('#monto_letra').val('');
+                       $('#monto_total_texto').val('');
                  }
             } else {
-                $('#monto_letra').val(numeroALetras(parseFloat(valor)));
+                $('#monto_total_texto').val(numeroALetras(parseFloat(valor)));
                 
                 if (!$('#custom_garantia_check').is(':checked')) {
                     // Calcular 12%

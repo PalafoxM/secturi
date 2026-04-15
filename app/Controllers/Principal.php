@@ -4074,6 +4074,10 @@ class Principal extends BaseController
         $data['solicitud'] = $solicitud->data[0];
         $data['solicitud']->archivo_suficiencia_url = $this->resolveStoredFileUrl($data['solicitud']->archivo_suficiencia ?? null, 'assets/uploads/contratos');
         $data['pagos'] = (!empty($pagos->data)) ? $pagos->data : [];
+        $montoTotal = (float) str_replace([',', '$', ' '], '', (string) ($data['solicitud']->monto_total ?? 0));
+        if (empty($data['solicitud']->monto_total_texto)) {
+            $data['solicitud']->monto_total_texto = strtoupper($this->numeroEnLetras($montoTotal));
+        }
 
         
         $data['scripts'] = array('inicio');
@@ -4112,6 +4116,49 @@ class Principal extends BaseController
              }
         }
 
+        if(empty($post['monto_total'])){
+            $response->respuesta = 'El monto total es requerido.';
+            return $this->respond($response);
+        }
+        if(empty($post['proyecto'])){
+            $response->respuesta = 'El proyecto es requerido.';
+            return $this->respond($response);
+        }
+        if(empty($post['partida'])){
+            $response->respuesta = 'La partida es requerida.';
+            return $this->respond($response);
+        }
+        if(empty($post['clave_estandarizada'])){
+            $response->respuesta = 'La clave estandarizada es requerida.';
+            return $this->respond($response);
+        }
+        if(empty($post['garantia'])){
+            $response->respuesta = 'La garantia es requerida.';
+            return $this->respond($response);
+        }
+        if(empty($post['monto_garantia'])){
+            $response->respuesta = 'El monto de la garantia es requerido.';
+            return $this->respond($response);
+        }
+        if(empty($post['responsable_proyecto'])){
+            $response->respuesta = 'El responsable del proyecto es requerido.';
+            return $this->respond($response);
+        }
+        if(empty($post['responsable_seguimiento'])){
+            $response->respuesta = 'El responsable del seguimiento es requerido.';
+            return $this->respond($response);
+        }
+        if(empty($post['enlace_comunicaciones'])){
+            $response->respuesta = 'El enlace de comunicaciones es requerido.';
+            return $this->respond($response);
+        }
+
+        $montoTotal = (float) str_replace([',', '$', ' '], '', (string) ($post['monto_total'] ?? 0));
+        $montoTotalTexto = trim((string) ($post['monto_total_texto'] ?? ''));
+        if ($montoTotalTexto === '') {
+            $montoTotalTexto = strtoupper($this->numeroEnLetras($montoTotal));
+        }
+
         // Datos principales
         $dataInsert = [
             'responsable_proyecto' => $post['responsable_proyecto'],
@@ -4121,6 +4168,7 @@ class Principal extends BaseController
             'partida' => $post['partida'],
             'clave_estandarizada' => $post['clave_estandarizada'],
             'monto_total' => $post['monto_total'],
+            'monto_total_texto' => $montoTotalTexto,
             'garantia' => $post['garantia'],
             'monto_garantia' => $post['monto_garantia'] ?? null,
             'proveedor_seguimiento' => $post['proveedor_seguimiento'],
@@ -4273,6 +4321,17 @@ class Principal extends BaseController
 
         $data['solicitud'] = $solicitud->data[0];
         $data['pagos'] = (!empty($pagos->data)) ? $pagos->data : [];
+        $montoTotal = (float) str_replace([',', '$', ' '], '', (string) ($data['solicitud']->monto_total ?? 0));
+        $data['solicitud']->monto_total_formateado = '$' . number_format($montoTotal, 2, '.', ',');
+        if (empty($data['solicitud']->monto_total_texto)) {
+            $data['solicitud']->monto_total_texto = strtoupper($this->numeroEnLetras($montoTotal));
+        }
+        if (!empty($data['pagos'])) {
+            foreach ($data['pagos'] as $pago) {
+                $montoPago = (float) str_replace([',', '$', ' '], '', (string) ($pago->monto ?? 0));
+                $pago->monto_formateado = '$' . number_format($montoPago, 2, '.', ',');
+            }
+        }
         
         // Reutilizamos la vista de formulario pero en modo lectura o creamos una vista optimizada para impresión
         // Por ahora usaré una vista simple para PDF

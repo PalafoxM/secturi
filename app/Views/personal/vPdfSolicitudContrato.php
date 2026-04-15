@@ -59,7 +59,10 @@
         </tbody>
     </table>
     <div style="margin-top: 10px;">
-        <span class="label">Monto Total:</span> <span class="value"><?= $solicitud->monto_total ?></span>
+        <span class="label">Monto Total:</span> <span class="value"><?= $solicitud->monto_total_formateado ?? $solicitud->monto_total ?></span>
+    </div>
+    <div style="margin-top: 5px;">
+        <span class="label">Monto Total en letra:</span> <span class="value"><?= strtoupper($solicitud->monto_total_texto ?? '') ?></span>
     </div>
     <div>
         <span class="label">Garantía:</span> <span class="value"><?= $solicitud->garantia ?></span>
@@ -89,7 +92,7 @@
                 <?php foreach($pagos as $pago): ?>
                 <tr>
                     <td><?= $pago->numero_pago ?></td>
-                    <td><?= $pago->monto ?></td>
+                    <td><?= $pago->monto_formateado ?? $pago->monto ?></td>
                     <td><?= date('d/m/Y', strtotime($pago->fecha)) ?></td>
                     <td><?= $pago->entregable ?></td>
                 </tr>
