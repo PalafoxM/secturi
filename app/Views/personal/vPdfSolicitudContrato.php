@@ -114,8 +114,6 @@
     </div>
   
     <div class="section-title">FIRMAS</div>
-  
-    <br>
         <table style="width: 100%; border: none;">
           
             <tr>
