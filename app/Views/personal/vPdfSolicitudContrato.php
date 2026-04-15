@@ -112,10 +112,10 @@
         <div class="row"><span class="label">Nombre del Representante Legal (persona moral):</span> <span class="value"><?= $solicitud->proveedor_representante ?></span></div>
         <div class="row"><span class="label">Correo electrónico:</span> <span class="value"><?= $solicitud->proveedor_correo ?></span></div>
     </div>
-    <br>
-    <br>
+  
     <div class="section-title">FIRMAS</div>
-
+  
+    <br>
         <table style="width: 100%; border: none;">
           
             <tr>
