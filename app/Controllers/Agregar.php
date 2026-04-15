@@ -5436,7 +5436,7 @@ class Agregar extends BaseController
         ]);
 
         $mpdf->WriteHTML($html);
-        $mpdf->Output('Solicitud_Convenio_' . $id . '.pdf', 'I');
+        $mpdf->Output('Solicitud_Convenio_' . $id_incidencia . '.pdf', 'I');
         exit();
 
     }
