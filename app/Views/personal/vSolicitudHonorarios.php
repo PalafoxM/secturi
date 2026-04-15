@@ -1,6 +1,15 @@
 <?php
 $actividadesGuardadas = [];
-if (isset($solicitud)) {
+if (!empty($actividades) && is_array($actividades)) {
+    foreach ($actividades as $actividadItem) {
+        $actividadTexto = is_object($actividadItem) ? ($actividadItem->actividad ?? '') : (is_array($actividadItem) ? ($actividadItem['actividad'] ?? '') : $actividadItem);
+        $actividadTexto = trim((string) $actividadTexto);
+        if ($actividadTexto !== '') {
+            $actividadesGuardadas[] = $actividadTexto;
+        }
+    }
+}
+if (empty($actividadesGuardadas) && isset($solicitud)) {
     foreach ((array) $solicitud as $key => $value) {
         if (strpos($key, 'actividad_') === 0 && trim((string) $value) !== '') {
             $actividadesGuardadas[] = $value;
@@ -181,7 +190,6 @@ $soportes = [
                                             </tr>
                                         <?php endforeach; ?>
 
-                                     <
                                     </table>
                                 </div>
 
