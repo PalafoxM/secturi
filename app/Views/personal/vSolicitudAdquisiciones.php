@@ -117,16 +117,16 @@
                                                 <td><input type="text" class="form-control" name="codigo_programatico" value="<?= isset($solicitud) ? (isset($solicitud->codigo_programatico) ? $solicitud->codigo_programatico : '') : '' ?>"></td>
                                                 <td><input type="text" class="form-control" name="fondo" value="<?= isset($solicitud) ? (isset($solicitud->fondo) ? $solicitud->fondo : '') : '' ?>"></td>
                                                 <td>
-                                                    <select class="form-control select2" name="numero_partida" required>
+                                                    <select class="form-control select2" name="numero_partida" id="numero_partida" required>
                                                         <option value="">Seleccione una opción</option>
                                                         <?php if(isset($cat_partida)): foreach ($cat_partida as $u): ?>
-                                                            <option value="<?= $u->cuenta_cable ?>" <?= (isset($solicitud) && $solicitud->numero_partida == $u->cuenta_cable) ? 'selected' : '' ?>>
+                                                            <option value="<?= $u->cuenta_cable ?>" data-nombre="<?= htmlspecialchars($u->nombre_fondo, ENT_QUOTES) ?>" <?= (isset($solicitud) && $solicitud->numero_partida == $u->cuenta_cable) ? 'selected' : '' ?>>
                                                                 <?= $u->cuenta_cable ?>
                                                             </option>
                                                         <?php endforeach; endif; ?>
                                                     </select>
                                                 </td>
-                                                <td><input type="text" class="form-control" name="nombre_partida" value="<?= isset($solicitud) ? (isset($solicitud->nombre_partida) ? $solicitud->nombre_partida : '') : '' ?>"></td>
+                                                <td><input type="text" class="form-control" name="nombre_partida" id="nombre_partida" value="<?= isset($solicitud) ? (isset($solicitud->nombre_partida) ? $solicitud->nombre_partida : '') : '' ?>"></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -404,6 +404,18 @@
 
         // Initialize Select2
         $('.select2').select2();
+
+        // Auto-fill nombre_partida when numero_partida changes
+        $('#numero_partida').on('change', function() {
+            var nombreFondo = $(this).find('option:selected').data('nombre') || '';
+            $('#nombre_partida').val(nombreFondo);
+        });
+
+        // Set nombre_partida on page load if there is a pre-selected value
+        var selectedNombre = $('#numero_partida').find('option:selected').data('nombre');
+        if (selectedNombre) {
+            $('#nombre_partida').val(selectedNombre);
+        }
 
         $('#form_solicitud_adquisiciones').on('submit', function(e) {
             e.preventDefault();
