@@ -28,9 +28,9 @@
                     <img src="<?= base_url('assets/logo3.png') ?>" width="100" alt="Logo">
                 </td>
                 <td style="width: 90%; border: none; background-color: #213E66; color: white; text-align: center;">
-                    <h3 style="margin: 5px 0;">SOLICITUD DE ELABORACION DE CONTRATO</h3>
-                    <h4 style="margin: 5px 0;">DIRECCION GENERAL JURIDICA</h4>
-                    <h4 style="margin: 5px 0;">DGJ-1</h4>
+                    <h3 style="margin: 5px 0;">SOLICITUD DE ELABORACIÓN DE CONTRATO DE PRESTACIÓN DE SERVICIOS</h3>
+                    <h4 style="margin: 5px 0;">DIRECCIÓN GENERAL JURÍDICA</h4>
+                    <h4 style="margin: 5px 0;">DGJ-2</h4>
                 </td>
             </tr>
         </table>
