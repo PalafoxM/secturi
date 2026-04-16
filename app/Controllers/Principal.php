@@ -4735,6 +4735,8 @@ class Principal extends BaseController
                if(isset($usuarioQuery->data) && !empty($usuarioQuery->data) && !empty($usuarioQuery->data[0]->correo)){
                    $correoDestino = $usuarioQuery->data[0]->correo;
                    $nombreUsuario = $usuarioQuery->data[0]->nombre_completo ?? 'Usuario';
+                   $enlaceListado = 'https://secturnet.guanajuato.gob.mx/susi/index.php/Principal/ListaSolicitudContrato';
+                   $enlaceListado = 'https://secturnet.guanajuato.gob.mx/susi/index.php/Principal/ListaSolicitudContrato';
                    
                    $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
                    $emailService->setTo($correoDestino);
@@ -4744,7 +4746,8 @@ class Principal extends BaseController
                        <p>Buen día, <strong>{$nombreUsuario}</strong>:</p>
                        <p>Se le notifica que su solicitud de elaboración de contrato con ID <strong>{$id}</strong> ha sido <strong>declinada</strong>.</p>
                        <p><strong>Motivo:</strong> {$motivo}</p>
-                       <p>Puede consultar mayores detalles ingresando al sistema SUSI.</p>
+                        <p>Puede consultar mayores detalles ingresando al siguiente enlace:</p>
+                        <p><a href='{$enlaceListado}' target='_blank'>{$enlaceListado}</a></p>
                        <br>
                        <p>Saludos cordiales,</p>
                        <p><strong>Sistema Unificado SECTURI (SUSI)</strong></p>
@@ -4836,7 +4839,8 @@ class Principal extends BaseController
                    $emailService->setMessage("
                        <p>Buen día, <strong>{$nombreUsuario}</strong>:</p>
                        <p>Se le notifica que se ha subido correctamente el instrumento jurídico en formato PDF para la solicitud de contrato con ID <strong>{$id}</strong>.</p>
-                       <p>Puede visualizarlo ingresando al sistema SUSI.</p>
+                        <p>Puede visualizarlo ingresando al siguiente enlace:</p>
+                        <p><a href='{$enlaceListado}' target='_blank'>{$enlaceListado}</a></p>
                        <br>
                        <p>Saludos cordiales,</p>
                        <p><strong>Sistema Unificado SECTURI (SUSI)</strong></p>
