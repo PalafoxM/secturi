@@ -44,7 +44,7 @@
             <tr>
                 <th>Proyecto</th>
                 <th>Partida</th>
-                <th>Clave Estandar</th>
+                <th>Clave Estándar</th>
                 <th>Suficiencia Presupuestal</th>
             </tr>
         </thead>
@@ -53,7 +53,7 @@
                 <td style="text-align: center;"><?= $solicitud->dsc_proyecto ?></td>
                 <td style="text-align: center;"><?= $solicitud->cuenta_cable ?></td>
                 <td style="text-align: center;"><?= $solicitud->clave_estandarizada ?></td>
-                <td style="text-align: center;">El proyecto cuenta con suficiencia presupuestal para la contratacion de los servicios requeridos en la presente solicitud. Se sube captura de pantalla Sistema SAP/R3</td>
+                <td style="text-align: center;">El proyecto cuenta con suficiencia presupuestal para la contratación de los servicios requeridos en la presente solicitud. Se sube captura de pantalla Sistema SAP/R3</td>
             </tr>
         </tbody>
     </table>
@@ -108,12 +108,12 @@
 
     <div class="section-title">INFORMACION DEL PROVEEDOR</div>
     <div>
-        <div class="row"><span class="label">Nombre/Razon Social:</span> <span class="value"><?= $solicitud->proveedor_nombre ?></span></div>
+        <div class="row"><span class="label">Nombre/Razón Social:</span> <span class="value"><?= $solicitud->proveedor_nombre ?></span></div>
         <div class="row"><span class="label">Domicilio fiscal:</span> <span class="value"><?= $solicitud->proveedor_domicilio ?></span></div>
         <div class="row"><span class="label">RFC:</span> <span class="value"><?= $solicitud->proveedor_rfc ?></span></div>
         <div class="row"><span class="label">Cedula de Registro en el Padron de Proveedores:</span> <span class="value"><?= $solicitud->proveedor_cedula ?></span></div>
         <div class="row"><span class="label">Nombre del Representante Legal (persona moral):</span> <span class="value"><?= $solicitud->proveedor_representante ?></span></div>
-        <div class="row"><span class="label">Correo electronico:</span> <span class="value"><?= $solicitud->proveedor_correo ?></span></div>
+        <div class="row"><span class="label">Correo electrónico:</span> <span class="value"><?= $solicitud->proveedor_correo ?></span></div>
     </div>
 
     <div class="section-title">FIRMAS</div>
