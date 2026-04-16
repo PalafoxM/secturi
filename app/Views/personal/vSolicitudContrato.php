@@ -219,15 +219,27 @@
                                 <div class="form-group row">
                                     <label class="col-sm-3 col-form-label">Responsable de Seguimiento (correo electrónico):</label>
                                     <div class="col-sm-4">
-                                        <input type="text" class="form-control" name="proveedor_seguimiento" value="<?= isset($solicitud) ? $solicitud->proveedor_seguimiento : '' ?>">
+                                        <input type="text" class="form-control" name="proveedor_seguimiento" value="<?= isset($solicitud) ? esc($solicitud->proveedor_seguimiento ?? '') : '' ?>">
                                     </div>
                                     <div class="col-sm-4">
-                                        <input type="email" class="form-control" name="proveedor_correo" value="<?= isset($solicitud) ? $solicitud->proveedor_correo : '' ?>">
+                                        <input type="email" class="form-control" name="proveedor_correo" value="<?= isset($solicitud) ? esc($solicitud->proveedor_correo ?? '') : '' ?>">
                                     </div>
                                 </div>
 
                                 <!-- SECCION 5: DOCUMENTOS Y ANEXOS -->
-                          
+                                <?php if (!empty($edita) && !empty($solicitud->id_solicitud_contrato)): ?>
+                                <h5 class="bg-primary text-white p-2 mt-4">DOCUMENTOS Y ANEXOS</h5>
+                                <div class="mb-3">
+                                    <button type="button" class="btn btn-secondary" onclick="abrirModalArchivosEdicion(<?= (int) $solicitud->id_solicitud_contrato ?>)">
+                                        <i class="fas fa-paperclip"></i> Editar Archivos Adjuntos
+                                    </button>
+                                    <?php if (!empty($archivos_soporte)): ?>
+                                        <a href="<?= base_url('index.php/Principal/verArchivosSolicitud/' . $solicitud->id_solicitud_contrato) ?>" class="btn btn-success">
+                                            <i class="fas fa-eye"></i> Ver Archivos Actuales
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
+                                <?php endif; ?>
 
                                 <div class="row mt-4">
                                     <div class="col-12 text-center">
@@ -243,6 +255,39 @@
         </div>
     </div>
 </div>
+
+<?php if (!empty($edita) && !empty($solicitud->id_solicitud_contrato)): ?>
+<div class="modal fade" id="modalSeleccionArchivosEdicion" tabindex="-1" role="dialog" aria-labelledby="modalLabelEdicion" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabelEdicion">Seleccion de Documentos a Reemplazar</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <form id="formSeleccionArchivosEdicion" action="<?= base_url('index.php/Principal/subirArchivosSolicitud') ?>" method="POST">
+                    <input type="hidden" name="id_solicitud" id="modal_id_solicitud_edicion">
+                    <table class="table table-bordered table-sm">
+                        <thead class="thead-light">
+                            <tr><th style="width: 5%;">Num.</th><th>DOCUMENTO</th><th style="width: 10%; text-align: center;">SI</th></tr>
+                        </thead>
+                        <tbody>
+                            <?php $documentosEdicion = [1 => 'Anexo Tecnico', '2a' => 'Investigacion de Mercado', '2b' => 'Analisis de Ofertas turisticas', '2c' => 'Argumentacion Tecnica', '3a' => 'Validacion de partida', '3b' => 'Alineacion Estrategica', '3c' => 'Suficiencia presupuestal', '3d' => 'Validacion complementaria', 4 => 'Justificacion', 5 => 'Propuesta Tecnico Economica', 6 => 'Aviso de privacidad integral', 7 => 'Cedula de Proveedores', 8 => 'Escritura Constitutiva', 9 => 'Poder', 10 => 'Identificacion oficial', 11 => 'Constancia fiscal', 12 => 'Comprobante de domicilio', '13a' => 'Opinion fiscal', '13b' => 'Manifiesto fiscal', 14 => 'Manifiesto de no impedimento', 15 => 'Declaracion de intereses', 16 => 'Manifiesto de infraestructura']; ?>
+                            <?php foreach ($documentosEdicion as $key => $doc): ?>
+                                <tr><td><?= $key ?></td><td><?= $doc ?></td><td class="text-center"><div class="custom-control custom-checkbox"><input type="checkbox" class="custom-control-input check-si-edicion" id="si_edicion_<?= $key ?>" name="documentos[<?= $key ?>]" value="<?= $doc ?>"><label class="custom-control-label" for="si_edicion_<?= $key ?>"></label></div></td></tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="enviarFormularioArchivosEdicion()">Continuar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
 
        <link href="<?= base_url() ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
         <link href="<?= base_url() ?>assets/css/jquery-ui.min.css" rel="stylesheet">
@@ -599,4 +644,14 @@
             });
         });
     });
+
+    function abrirModalArchivosEdicion(id) {
+        $('#modal_id_solicitud_edicion').val(id);
+        $('.check-si-edicion').prop('checked', false);
+        $('#modalSeleccionArchivosEdicion').modal('show');
+    }
+
+    function enviarFormularioArchivosEdicion() {
+        $('#formSeleccionArchivosEdicion').submit();
+    }
 </script>

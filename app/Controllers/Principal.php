@@ -4224,7 +4224,20 @@ class Principal extends BaseController
         $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
 
         $data['solicitud'] = $solicitud->data[0];
+        $solicitudVista = $globals->getTabla(['tabla' => 'vw_solicitud_contrato', 'where' => ['id_solicitud_contrato' => $id_solicitud]]);
+        if (!empty($solicitudVista->data)) {
+            foreach ((array) $solicitudVista->data[0] as $key => $value) {
+                if ((!isset($data['solicitud']->$key) || $data['solicitud']->$key === null || $data['solicitud']->$key === '') && $value !== null && $value !== '') {
+                    $data['solicitud']->$key = $value;
+                }
+            }
+        }
         $data['solicitud']->archivo_suficiencia_url = $this->resolveStoredFileUrl($data['solicitud']->archivo_suficiencia ?? null, 'assets/uploads/contratos');
+        $archivosSoporte = $globals->getTabla([
+            'tabla' => 'solicitud_contrato_archivos',
+            'where' => ['id_solicitud_contrato' => $id_solicitud, 'visible' => 1]
+        ]);
+        $data['archivos_soporte'] = !empty($archivosSoporte->data) ? $archivosSoporte->data : [];
         $data['pagos'] = (!empty($pagos->data)) ? $pagos->data : [];
         $montoTotal = (float) str_replace([',', '$', ' '], '', (string) ($data['solicitud']->monto_total ?? 0));
         if (empty($data['solicitud']->monto_total_texto)) {
@@ -4583,6 +4596,23 @@ class Principal extends BaseController
 
         $count = 0;
         $errores = 0;
+        $tieneNuevosArchivos = false;
+        if (isset($_FILES['archivos']) && is_array($_FILES['archivos']['name'])) {
+            foreach ($_FILES['archivos']['name'] as $originalName) {
+                if (!empty($originalName)) {
+                    $tieneNuevosArchivos = true;
+                    break;
+                }
+            }
+        }
+
+        if ($tieneNuevosArchivos) {
+            $globals->saveTabla(
+                ['visible' => 0],
+                ["tabla" => "solicitud_contrato_archivos", "editar" => true, "idEditar" => ["id_solicitud_contrato" => $id_solicitud]],
+                ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/reemplazarArchivosSolicitudContrato']
+            );
+        }
         
         // Verificar si hay archivos enviados
         if (isset($_FILES['archivos']) && is_array($_FILES['archivos']['name'])) {
