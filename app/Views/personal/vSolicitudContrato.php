@@ -261,6 +261,16 @@
         <script src="<?= base_url() ?>plugins/select2/select2.min.js"></script>
 
 <script>
+    function normalizarMonto(valor) {
+        if (valor === null || valor === undefined) {
+            return 0;
+        }
+
+        var texto = String(valor).replace(/[$,\s]/g, '');
+        var numero = parseFloat(texto);
+        return isNaN(numero) ? 0 : numero;
+    }
+
     function numeroALetras(amount) {
         if (amount == 0) return "CERO PESOS 00/100 M.N.";
         var pesos = Math.floor(amount);
@@ -374,19 +384,20 @@
     $(document).ready(function() {
         $('#monto_total').on('input', function() {
             var valor = $(this).val();
+            var montoNormalizado = normalizarMonto(valor);
             // Validación de número
-            if (isNaN(valor) || valor.trim() === '') {
+            if (valor.trim() === '' || montoNormalizado <= 0) {
                  if(valor.trim() !== '') {
                       $('#monto_total_texto').val('NUMERO NO LEGIBLE');
                  } else {
                        $('#monto_total_texto').val('');
                  }
             } else {
-                $('#monto_total_texto').val(numeroALetras(parseFloat(valor)));
+                $('#monto_total_texto').val(numeroALetras(montoNormalizado));
                 
                 if (!$('#custom_garantia_check').is(':checked')) {
-                    // Calcular monto mas 12% de IVA
-                    var monto = parseFloat(valor);
+                    // Calcular monto total + 12%
+                    var monto = montoNormalizado;
                     var garantia = monto * 0.12;
                     var totalMonto = garantia + monto;
                     $('#monto_garantia').val(totalMonto.toFixed(2));
@@ -488,11 +499,11 @@
     
     // Validate payment sum
     function validarMontoPagos(mostrarError = false) {
-        var montoTotal = parseFloat($('#monto_total').val()) || 0;
+        var montoTotal = normalizarMonto($('#monto_total').val());
         var sumaPagos = 0;
 
         $('#tabla_pagos tbody input[name*="[monto]"]').each(function() {
-            sumaPagos += parseFloat($(this).val()) || 0;
+            sumaPagos += normalizarMonto($(this).val());
         });
 
         if (sumaPagos > montoTotal) {
