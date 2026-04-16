@@ -141,17 +141,17 @@
     <br>
     <div class="sheet">
         <p class="line">Nombre y puesto del responsable de administrativo: <?= esc($reporte->responsable_administrativo ?? '') ?></p>
-        <p class="line">Area: <?= esc($reporte->area ?? '') ?></p>
-        <p class="line">Secretaria de Turismo e Identidad</p>
+        <p class="line">Área: <?= esc($reporte->area ?? '') ?></p>
+        <p class="line">Secretaría de Turismo e Identidad</p>
 
         <div class="spacer-sm"></div>
 
         <p class="paragraph">
-            Por medio del presente, me dirijo a usted de la manera mas atenta, con el fin de dar cumplimiento a la CLAUSULA SEGUNDA del Contrato de Servicios Profesionales por Honorarios Asimilados a Salarios No. <?= esc($reporte->numero_contrato ?? '') ?>, que tuve a bien celebrar con la Secretaria de Turismo e Identidad del Estado de Guanajuato.
+            Por medio del presente, me dirijo a usted de la manera mas atenta, con el fin de dar cumplimiento a la CLAÚSULA SEGUNDA del Contrato de Servicios Profesionales por Honorarios Asimilados a Salarios No. <?= esc($reporte->numero_contrato ?? '') ?>, que tuve a bien celebrar con la Secretaría de Turismo e Identidad del Estado de Guanajuato.
         </p>
 
         <p class="paragraph">
-            Por lo anterior, me permito presentar el Informe <?= esc($tipoReporte) ?>, en el que se refleja la realizacion de las actividades senaladas en la CLAUSULA PRIMERA del Contrato en mencion.
+            Por lo anterior, me permito presentar el Informe <?= esc($tipoReporte) ?>, en el que se refleja la realizacion de las actividades señaladas en la CLAÚSULA PRIMERA del Contrato en mención.
         </p>
 
         <p class="title">Informe <?= esc(strtoupper($tipoReporte)) ?> de actividades</p>
@@ -170,7 +170,7 @@
 
         <div class="closing-block">
             <p class="paragraph closing-paragraph">
-                Finalmente, declaro que he dado cumplimiento a las politicas y obligaciones en materia de transparencia, rendicion de cuentas, cultura de la legalidad, integridad y participacion ciudadana para el combate a la corrupcion, enunciadas en la CLAUSULA QUINTA del Instrumento Juridico mencionado en supra lineas.
+                Finalmente, declaro que he dado cumplimiento a las políticas y obligaciones en materia de transparencia, rendición de cuentas, cultura de la legalidad, integridad y participación ciudadana para el combate a la corrupción, enunciadas en la CLAÚSULA QUINTA del Instrumento Juridico mencionado en supra líneas.
             </p>
 
             <div class="attention">A T E N T A M E N T E</div>
@@ -182,12 +182,13 @@
             <div class="signature-caption">Puesto: <?= esc($reporte->puesto_prestador ?? '') ?></div>
 
             <div class="spacer-md"></div>
-            <div class="conformidad">Recibi de Conformidad,</div>
+            <div class="conformidad">Recibí de Conformidad,</div>
 
             <div class="signature-space"></div>
             <div class="signature-line-wide"></div>
-            <div class="signature-caption">Nombre completo: <?= esc($reporte->nombre_responsable_area ?? '') ?></div>
+            <div class="signature-caption">Director de área: <?= esc($reporte->nombre_responsable_area ?? '') ?></div>
             <div class="signature-caption">Puesto: <?= esc($reporte->puesto_responsable_area ?? '') ?></div>
+            <div class="signature-caption">Responsable de administrar y verificar: <?= esc($reporte->nombre_responsable ?? '') ?></div>
         </div>
     </div>
 </body>
