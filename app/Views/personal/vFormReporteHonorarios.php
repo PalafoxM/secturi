@@ -177,12 +177,6 @@
                                                 <input type="text" class="form-control" id="puesto_responsable_area" name="puesto_responsable_area" value="<?= esc($reporte->puesto_responsable_area ?? '') ?>" required>
                                             </div>
                                         </div>
-                                        <div class="col-md-12">
-                                            <div class="form-group mb-0">
-                                                <label for="nombre_responsable">Nombre responsable de administrar y verificar el cumplimiento del contrato</label>
-                                                <input type="text" class="form-control" id="nombre_responsable" name="nombre_responsable" value="<?= esc($reporte->nombre_responsable ?? '') ?>" required>
-                                            </div>
-                                        </div>
                                     </div>
 
                                     <div class="text-right mt-4">

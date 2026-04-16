@@ -882,7 +882,7 @@ class Inicio extends BaseController
         if (
             $responsable === '' || $area === '' || $numeroContrato === '' || $tipoReporte === '' ||
             $fechaInicio === '' || $fechaFin === '' || $fechaFirma === '' ||
-            $nombrePrestador === '' || $puestoPrestador === '' || $nombreResponsableArea === '' || $puestoResponsableArea === '' || $nombreResponsable === ''
+            $nombrePrestador === '' || $puestoPrestador === '' || $nombreResponsableArea === '' || $puestoResponsableArea === ''
         ) {
             $response->respuesta = 'Todos los campos del reporte son obligatorios.';
             return $this->response->setJSON($response);
@@ -940,10 +940,13 @@ class Inicio extends BaseController
             'puesto_prestador' => $puestoPrestador,
             'nombre_responsable_area' => $nombreResponsableArea,
             'puesto_responsable_area' => $puestoResponsableArea,
-            'nombre_responsable' => $nombreResponsable,
             'pdf_referencia' => 'assets/Reporteactividades26.pdf',
             'visible' => 1
         ];
+
+        if ($nombreResponsable !== '') {
+            $dataSave['nombre_responsable'] = $nombreResponsable;
+        }
 
         $dataConfig = [
             'dataBase' => $dataBase,
