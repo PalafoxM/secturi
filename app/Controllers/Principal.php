@@ -216,6 +216,62 @@ class Principal extends BaseController
         return $resultado;
     }
 
+    private function obtenerNombreConPuesto(Mglobal $globals, $idUsuario, bool $usarDireccion = false): string
+    {
+        if (empty($idUsuario)) {
+            return '';
+        }
+
+        $tabla = $usarDireccion ? 'vw_direccion' : 'vw_usuario';
+        $consulta = $globals->getTabla([
+            'tabla' => $tabla,
+            'where' => ['id_usuario' => $idUsuario, 'visible' => 1]
+        ]);
+
+        if (empty($consulta->data)) {
+            return '';
+        }
+
+        $registro = $consulta->data[0];
+        $nombre = trim((string) ($registro->nombre_completo ?? ''));
+        $puesto = trim((string) ($registro->dsc_puesto ?? ''));
+
+        if ($nombre !== '' && $puesto !== '') {
+            return $nombre . ' - ' . $puesto;
+        }
+
+        return $nombre !== '' ? $nombre : $puesto;
+    }
+
+    private function obtenerDatosFirmaUsuario(Mglobal $globals, $idUsuario): ?object
+    {
+        if (empty($idUsuario)) {
+            return null;
+        }
+
+        $registro = null;
+        foreach (['vw_direccion', 'vw_usuario'] as $tabla) {
+            $consulta = $globals->getTabla([
+                'tabla' => $tabla,
+                'where' => ['id_usuario' => $idUsuario, 'visible' => 1]
+            ]);
+
+            if (!empty($consulta->data)) {
+                $registro = $consulta->data[0];
+                break;
+            }
+        }
+
+        if ($registro === null) {
+            return null;
+        }
+
+        return (object) [
+            'nombre' => trim((string) ($registro->nombre_completo ?? '')),
+            'cargo' => trim((string) ($registro->dsc_puesto ?? '')),
+        ];
+    }
+
     private function obtenerFichaTecnicaData($result): array
     {
         return [
@@ -3586,6 +3642,175 @@ class Principal extends BaseController
         $this->_renderView($data);
     }
 
+    private function construirCatalogoFirmantes(array $direccion = [], array $usuarios = []): array
+    {
+        $firmantes = [];
+        $agregados = [];
+
+        foreach ([$direccion, $usuarios] as $coleccion) {
+            foreach ($coleccion as $usuario) {
+                $idUsuario = (int) ($usuario->id_usuario ?? 0);
+                if ($idUsuario <= 0) {
+                    continue;
+                }
+
+                $nombre = trim((string) ($usuario->nombre_completo ?? ''));
+                $puesto = trim((string) ($usuario->dsc_puesto ?? ''));
+
+                if (isset($agregados[$idUsuario])) {
+                    if ($puesto !== '' && $firmantes[$agregados[$idUsuario]]->dsc_puesto === '') {
+                        $firmantes[$agregados[$idUsuario]]->dsc_puesto = $puesto;
+                    }
+                    continue;
+                }
+
+                $firmantes[] = (object) [
+                    'id_usuario' => $idUsuario,
+                    'nombre_completo' => $nombre,
+                    'dsc_puesto' => $puesto,
+                ];
+                $agregados[$idUsuario] = count($firmantes) - 1;
+            }
+        }
+
+        return $firmantes;
+    }
+
+    private function obtenerFirmasSolicitud($solicitud): array
+    {
+        if (empty($solicitud) || !is_object($solicitud)) {
+            return [];
+        }
+
+        $firmas = [];
+        foreach (['firmas_json', 'firmantes_json', 'firmas'] as $campoJson) {
+            if (empty($solicitud->{$campoJson}) || !is_string($solicitud->{$campoJson})) {
+                continue;
+            }
+
+            $decodificado = json_decode($solicitud->{$campoJson}, true);
+            if (!is_array($decodificado)) {
+                continue;
+            }
+
+            foreach ($decodificado as $firma) {
+                $idUsuario = is_array($firma) ? ($firma['id_usuario'] ?? null) : $firma;
+                $idUsuario = (int) $idUsuario;
+                if ($idUsuario > 0) {
+                    $firmas[] = $idUsuario;
+                }
+            }
+
+            if (!empty($firmas)) {
+                break;
+            }
+        }
+
+        foreach (['firma_1', 'firma_2', 'firma_3'] as $campoFirma) {
+            $idUsuario = (int) ($solicitud->{$campoFirma} ?? 0);
+            if ($idUsuario > 0) {
+                $firmas[] = $idUsuario;
+            }
+        }
+
+        $firmas = array_values(array_unique(array_filter($firmas)));
+        return array_slice($firmas, 0, 3);
+    }
+
+    private function obtenerColumnasTablaServicio(Mglobal $globals, string $tabla): array
+    {
+        static $cacheColumnas = [];
+
+        if (!preg_match('/^[A-Za-z0-9_]+$/', $tabla)) {
+            return [];
+        }
+
+        if (isset($cacheColumnas[$tabla])) {
+            return $cacheColumnas[$tabla];
+        }
+
+        $consulta = $globals->getTabla(['query' => "SHOW COLUMNS FROM {$tabla}"]);
+        $columnas = [];
+
+        if (!$consulta->error && !empty($consulta->data)) {
+            foreach ($consulta->data as $columna) {
+                if (is_object($columna) && !empty($columna->Field)) {
+                    $columnas[] = (string) $columna->Field;
+                    continue;
+                }
+
+                if (is_array($columna) && !empty($columna['Field'])) {
+                    $columnas[] = (string) $columna['Field'];
+                }
+            }
+        }
+
+        $cacheColumnas[$tabla] = $columnas;
+        return $columnas;
+    }
+
+    private function guardarFirmasSolicitud(Mglobal $globals, string $tabla, string $idCampo, int $idRegistro, array $firmas, int $idUsuario, string $script): ?bool
+    {
+        if ($idRegistro <= 0) {
+            return null;
+        }
+
+        $firmasNormalizadas = [];
+        foreach ($firmas as $firma) {
+            $idFirma = (int) $firma;
+            if ($idFirma > 0) {
+                $firmasNormalizadas[] = $idFirma;
+            }
+        }
+
+        $firmasNormalizadas = array_slice(array_values(array_unique($firmasNormalizadas)), 0, 3);
+        $columnas = $this->obtenerColumnasTablaServicio($globals, $tabla);
+        if (empty($columnas)) {
+            return null;
+        }
+
+        $dataUpdate = [];
+        if (in_array('firmas_json', $columnas, true)) {
+            $dataUpdate['firmas_json'] = json_encode($firmasNormalizadas);
+        } elseif (in_array('firmantes_json', $columnas, true)) {
+            $dataUpdate['firmantes_json'] = json_encode($firmasNormalizadas);
+        } elseif (in_array('firmas', $columnas, true)) {
+            $dataUpdate['firmas'] = json_encode($firmasNormalizadas);
+        } else {
+            foreach ([1, 2, 3] as $indice) {
+                $nombreColumna = 'firma_' . $indice;
+                if (in_array($nombreColumna, $columnas, true)) {
+                    $dataUpdate[$nombreColumna] = $firmasNormalizadas[$indice - 1] ?? null;
+                }
+            }
+        }
+
+        if (empty($dataUpdate)) {
+            return null;
+        }
+
+        $resultado = $globals->saveTabla(
+            $dataUpdate,
+            ['tabla' => $tabla, 'editar' => true, 'idEditar' => [$idCampo => $idRegistro]],
+            ['id_user' => $idUsuario, 'script' => $script]
+        );
+
+        return !$resultado->error;
+    }
+
+    private function obtenerFirmasSolicitudDetalle(Mglobal $globals, $solicitud): array
+    {
+        $firmas = [];
+        foreach ($this->obtenerFirmasSolicitud($solicitud) as $idUsuario) {
+            $firma = $this->obtenerDatosFirmaUsuario($globals, $idUsuario);
+            if ($firma !== null && ($firma->nombre !== '' || $firma->cargo !== '')) {
+                $firmas[] = $firma;
+            }
+        }
+
+        return array_slice($firmas, 0, 3);
+    }
+
     public function SolicitudContrato()
     {
         $session = \Config\Services::session();
@@ -3602,6 +3827,8 @@ class Principal extends BaseController
 
         $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
         $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+        $data['catalogo_firmantes'] = $this->construirCatalogoFirmantes($data['direccion'], $data['usuario']);
+        $data['firmas_seleccionadas'] = [];
        //die( var_dump( $data['cat_partida']  ) );
         // Cargar catalogos si es necesario, similar a otras vistas
         // Por ahora solo cargamos la vista básica
@@ -4243,6 +4470,8 @@ class Principal extends BaseController
         if (empty($data['solicitud']->monto_total_texto)) {
             $data['solicitud']->monto_total_texto = strtoupper($this->numeroEnLetras($montoTotal));
         }
+        $data['catalogo_firmantes'] = $this->construirCatalogoFirmantes($data['direccion'], $data['usuario']);
+        $data['firmas_seleccionadas'] = $this->obtenerFirmasSolicitud($data['solicitud']);
 
         
         $data['scripts'] = array('inicio');
@@ -4389,6 +4618,15 @@ class Principal extends BaseController
 
         if (!$res->error) {
             $id_solicitud = $id_solicitud_contrato ? $id_solicitud_contrato : $res->idRegistro;
+            $this->guardarFirmasSolicitud(
+                $globals,
+                'solicitud_contrato',
+                'id_solicitud_contrato',
+                (int) $id_solicitud,
+                $post['firmas'] ?? [],
+                (int) ($session->id_usuario ?? 0),
+                'Principal.php/guardarSolicitudContratoFirmas'
+            );
             
             // Si es edición, desactivar pagos anteriores
             if ($id_solicitud_contrato) {
@@ -4493,8 +4731,9 @@ class Principal extends BaseController
         if(empty($solicitud->data)){
             echo "Solicitud no encontrada"; return;
         }
-
+       
         $data['solicitud'] = $this->normalizeUtf8Value($solicitud->data[0]);
+       // var_dump($data['solicitud']); die();
         if (!empty($solicitudBase->data)) {
             foreach ((array) $solicitudBase->data[0] as $key => $value) {
                 if (!isset($data['solicitud']->$key) || $data['solicitud']->$key === null || $data['solicitud']->$key === '') {
@@ -4502,6 +4741,13 @@ class Principal extends BaseController
                 }
             }
         }
+        $nombreProyectoConPuesto = $this->obtenerNombreConPuesto($globals, $data['solicitud']->responsable_proyecto ?? null, true);
+        $nombreSeguimientoConPuesto = $this->obtenerNombreConPuesto($globals, $data['solicitud']->responsable_seguimiento ?? null, false);
+        $nombreEnlaceConPuesto = $this->obtenerNombreConPuesto($globals, $data['solicitud']->enlace_comunicaciones ?? null, false);
+        $data['solicitud']->nombre_proyecto_puesto = $nombreProyectoConPuesto !== '' ? $nombreProyectoConPuesto : ($data['solicitud']->nombre_proyecto ?? '');
+        $data['solicitud']->nombre_seguimiento_puesto = $nombreSeguimientoConPuesto !== '' ? $nombreSeguimientoConPuesto : ($data['solicitud']->nombre_seguimiento ?? '');
+        $data['solicitud']->nombre_enlace_puesto = $nombreEnlaceConPuesto !== '' ? $nombreEnlaceConPuesto : ($data['solicitud']->nombre_enlace ?? '');
+        $data['firmas_pdf'] = $this->obtenerFirmasSolicitudDetalle($globals, $data['solicitud']);
         $data['pagos'] = $this->normalizeUtf8Value((!empty($pagos->data)) ? $pagos->data : []);
         $montoTotal = (float) str_replace([',', '$', ' '], '', (string) ($data['solicitud']->monto_total ?? 0));
         $data['solicitud']->monto_total_formateado = '$' . number_format($montoTotal, 2, '.', ',');
@@ -9427,6 +9673,8 @@ class Principal extends BaseController
 
         $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
         $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+        $data['catalogo_firmantes'] = $this->construirCatalogoFirmantes($data['direccion'], $data['usuario']);
+        $data['firmas_seleccionadas'] = [];
 
         $data['scripts'] = array('inicio');
         $data['edita'] = 0;
@@ -9497,6 +9745,8 @@ class Principal extends BaseController
         $data['solicitud'] = $solicitud->data[0];
         $data['solicitud']->archivo_suficiencia_url = $this->resolveStoredFileUrl($data['solicitud']->archivo_suficiencia ?? null, 'assets/uploads/convenios');
         $data['pagos'] = (!empty($pagos->data)) ? $pagos->data : [];
+        $data['catalogo_firmantes'] = $this->construirCatalogoFirmantes($data['direccion'], $data['usuario']);
+        $data['firmas_seleccionadas'] = $this->obtenerFirmasSolicitud($data['solicitud']);
         
         $data['scripts'] = array('inicio');
         $data['edita'] = 1;
@@ -9576,6 +9826,15 @@ class Principal extends BaseController
 
         if (!$res->error) {
             $id_solicitud = $id_solicitud_convenio ? $id_solicitud_convenio : $res->idRegistro;
+            $this->guardarFirmasSolicitud(
+                $globals,
+                'solicitud_convenio',
+                'id_solicitud_convenio',
+                (int) $id_solicitud,
+                $post['firmas'] ?? [],
+                (int) ($session->id_usuario ?? 0),
+                'Principal.php/guardarSolicitudConvenioFirmas'
+            );
             
             if ($id_solicitud_convenio) {
                 $globals->saveTabla(
@@ -10162,6 +10421,7 @@ class Principal extends BaseController
         $globals = new \App\Models\Mglobal;
         
         $solicitud = $globals->getTabla(['tabla' => 'vw_solicitud_convenio', 'where' => ['id_solicitud_convenio' => $id]]);
+        $solicitudBase = $globals->getTabla(['tabla' => 'solicitud_convenio', 'where' => ['id_solicitud_convenio' => $id, 'visible' => 1]]);
         $pagos = $globals->getTabla(['tabla' => 'solicitud_convenio_pagos', 'where' => ['id_solicitud_convenio' => $id, 'visible' => 1]]);
         
         if(empty($solicitud->data)){
@@ -10169,7 +10429,19 @@ class Principal extends BaseController
         }
 
         $data['solicitud'] = $this->normalizeUtf8Value($solicitud->data[0]);
+        if (!empty($solicitudBase->data)) {
+            foreach ((array) $solicitudBase->data[0] as $key => $value) {
+                if (!isset($data['solicitud']->$key) || $data['solicitud']->$key === null || $data['solicitud']->$key === '') {
+                    $data['solicitud']->$key = $this->normalizeUtf8Value($value);
+                }
+            }
+        }
         $data['pagos'] = $this->normalizeUtf8Value((!empty($pagos->data)) ? $pagos->data : []);
+        $nombreProyectoConPuesto = $this->obtenerNombreConPuesto($globals, $data['solicitud']->responsable_proyecto ?? null, true);
+        $nombreSeguimientoConPuesto = $this->obtenerNombreConPuesto($globals, $data['solicitud']->responsable_seguimiento ?? null, false);
+        $data['solicitud']->nombre_proyecto_puesto = $nombreProyectoConPuesto !== '' ? $nombreProyectoConPuesto : ($data['solicitud']->nombre_proyecto ?? '');
+        $data['solicitud']->nombre_seguimiento_puesto = $nombreSeguimientoConPuesto !== '' ? $nombreSeguimientoConPuesto : ($data['solicitud']->nombre_seguimiento ?? '');
+        $data['firmas_pdf'] = $this->obtenerFirmasSolicitudDetalle($globals, $data['solicitud']);
 
         $montoFields = [
             'monto_secturi',

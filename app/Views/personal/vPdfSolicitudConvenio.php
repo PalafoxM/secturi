@@ -18,7 +18,9 @@
         .monto-letra { display: block; font-size: 9px; margin-top: 2px; }
         .firma-table { margin-top: 35px; }
         .firma-table td { border: none; text-align: center; vertical-align: bottom; padding-top: 35px; }
-        .firma-linea { display: inline-block; width: 80%; border-top: 1px solid #000; padding-top: 6px; }
+        .firma-linea { display: block; width: 72%; margin: 0 auto 4px auto; border-top: 1px solid #000; height: 1px; }
+        .firma-nombre { font-size: 11px; font-weight: bold; line-height: 1.2; text-transform: uppercase; }
+        .firma-cargo { font-size: 10px; line-height: 1.2; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -39,11 +41,11 @@
         <tr><td colspan="2" class="bg-primary text-center">INFORMACIÓN DEL ÁREA SOLICITANTE</td></tr>
         <tr>
             <td width="30%"><strong>Responsable del Proyecto:</strong></td>
-            <td><?= isset($solicitud->nombre_proyecto) ? $solicitud->nombre_proyecto : '' ?></td>
+            <td><?= isset($solicitud->nombre_proyecto_puesto) ? $solicitud->nombre_proyecto_puesto : (isset($solicitud->nombre_proyecto) ? $solicitud->nombre_proyecto : '') ?></td>
         </tr>
         <tr>
             <td><strong>Responsable de Seguimiento:</strong></td>
-            <td><?= isset($solicitud->nombre_seguimiento) ? $solicitud->nombre_seguimiento : '' ?></td>
+            <td><?= isset($solicitud->nombre_seguimiento_puesto) ? $solicitud->nombre_seguimiento_puesto : (isset($solicitud->nombre_seguimiento) ? $solicitud->nombre_seguimiento : '') ?></td>
         </tr>
     </table>
 
@@ -136,14 +138,21 @@
         <tr><td><strong>Correo Electrónico:</strong></td><td><?= isset($solicitud->proveedor_correo) ? $solicitud->proveedor_correo : '' ?></td></tr>
     </table>
 
+    <?php
+        $firmasPdf = !empty($firmas_pdf) ? $firmas_pdf : [
+            (object) ['nombre' => 'Nombre Dir. Gral/Subsecretario', 'cargo' => 'Cargo'],
+            (object) ['nombre' => 'Nombre Responsable del Proyecto', 'cargo' => 'Cargo'],
+        ];
+    ?>
     <table class="firma-table">
         <tr>
-            <td width="50%">
-                <span class="firma-linea">Nombre Dir. Gral/Subsecretario<br>Cargo</span>
-            </td>
-            <td width="50%">
-                <span class="firma-linea">Nombre Responsable del Proyecto<br>Cargo</span>
-            </td>
+            <?php foreach ($firmasPdf as $firma): ?>
+                <td width="<?= 100 / max(count($firmasPdf), 1) ?>%">
+                    <span class="firma-linea"></span>
+                    <div class="firma-nombre"><?= esc($firma->nombre ?? '') ?></div>
+                    <div class="firma-cargo"><?= esc($firma->cargo ?? '') ?></div>
+                </td>
+            <?php endforeach; ?>
         </tr>
     </table>
 </body>

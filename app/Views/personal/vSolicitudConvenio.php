@@ -230,7 +230,19 @@
                                 <!-- SECCION 6: DOCUMENTOS Y ANEXOS -->
                                 <h5 class="bg-primary text-white p-2 mt-4 text-center">DOCUMENTOS Y ANEXOS</h5>
                                 <h6 class="bg-light p-2 text-center" style="border: 1px solid #ccc;">SOPORTE DOCUMENTAL SE RELACIONA EN EL REVERSO</h6>
-                          
+
+                                <h5 class="bg-primary text-white p-2 mt-4">FIRMAS</h5>
+                                <div class="card border mb-3">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <p class="mb-0 text-muted">Agrega hasta 3 firmas para el formato del convenio.</p>
+                                            <button type="button" class="btn btn-primary btn-sm" id="btnAgregarFirmaConvenio">
+                                                <i class="fas fa-plus"></i> Agregar firma
+                                            </button>
+                                        </div>
+                                        <div id="contenedor_firmas_convenio"></div>
+                                    </div>
+                                </div>
 
                                 <div class="row mt-4">
                                     <div class="col-12 text-center">
@@ -264,6 +276,9 @@
 <script src="<?= base_url() ?>plugins/select2/select2.min.js"></script>
 
 <script>
+    const catalogoFirmantesConvenio = <?= json_encode($catalogo_firmantes ?? [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+    const firmasSeleccionadasConvenio = <?= json_encode(array_values($firmas_seleccionadas ?? []), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+
     function numeroALetras(amount) {
         if (amount == 0) return "CERO PESOS 00/100 M.N.";
         var pesos = Math.floor(amount);
@@ -372,6 +387,64 @@
             case 9: return "NUEVE";
         }
         return "";
+    }
+
+    function opcionesFirmantesConvenio(valorSeleccionado = '') {
+        let html = '<option value="">Seleccione un usuario</option>';
+        catalogoFirmantesConvenio.forEach(usuario => {
+            const seleccionado = String(usuario.id_usuario) === String(valorSeleccionado) ? 'selected' : '';
+            const puesto = usuario.dsc_puesto ? String(usuario.dsc_puesto).replace(/"/g, '&quot;') : '';
+            html += `<option value="${usuario.id_usuario}" data-puesto="${puesto}" ${seleccionado}>${usuario.nombre_completo}</option>`;
+        });
+        return html;
+    }
+
+    function actualizarPuestoFirmaConvenio(select) {
+        const puesto = $(select).find(':selected').data('puesto') || '';
+        $(select).closest('.firma-item').find('.firma-puesto').text(puesto);
+    }
+
+    function reindexarFirmasConvenio() {
+        $('#contenedor_firmas_convenio .firma-item').each(function(index) {
+            $(this).attr('data-index', index);
+            $(this).find('.firma-label').text(`Firma ${index + 1}`);
+            $(this).find('select').attr('name', `firmas[${index}]`);
+        });
+    }
+
+    function agregarFirmaConvenio(valorSeleccionado = '') {
+        const contenedor = $('#contenedor_firmas_convenio');
+        if (contenedor.find('.firma-item').length >= 3) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Límite de firmas',
+                text: 'Solo puedes agregar hasta 3 firmas.'
+            });
+            return;
+        }
+
+        const index = contenedor.find('.firma-item').length;
+        const html = `
+            <div class="firma-item border rounded p-3 mb-3" data-index="${index}">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <strong class="firma-label">Firma ${index + 1}</strong>
+                    <button type="button" class="btn btn-outline-danger btn-sm btn-eliminar-firma-convenio">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <select class="form-control select2 firma-select-convenio" name="firmas[${index}]">
+                    ${opcionesFirmantesConvenio(valorSeleccionado)}
+                </select>
+                <div class="firma-puesto text-uppercase small text-muted mt-2"></div>
+            </div>
+        `;
+
+        contenedor.append(html);
+        const nuevoItem = contenedor.find('.firma-item').last();
+        nuevoItem.find('.firma-select-convenio').select2({
+            width: '100%'
+        });
+        actualizarPuestoFirmaConvenio(nuevoItem.find('.firma-select-convenio'));
     }
 
     $(document).ready(function() {
@@ -498,6 +571,30 @@
     document.addEventListener('DOMContentLoaded', function() {
         // Initialize Select2
         $('.select2').select2();
+
+        if (firmasSeleccionadasConvenio.length > 0) {
+            firmasSeleccionadasConvenio.forEach(firma => agregarFirmaConvenio(firma));
+        } else {
+            agregarFirmaConvenio();
+        }
+
+        $('#btnAgregarFirmaConvenio').on('click', function() {
+            agregarFirmaConvenio();
+        });
+
+        $(document).on('change', '.firma-select-convenio', function() {
+            actualizarPuestoFirmaConvenio(this);
+        });
+
+        $(document).on('click', '.btn-eliminar-firma-convenio', function() {
+            const item = $(this).closest('.firma-item');
+            const select = item.find('.firma-select-convenio');
+            if (select.hasClass('select2-hidden-accessible')) {
+                select.select2('destroy');
+            }
+            item.remove();
+            reindexarFirmasConvenio();
+        });
 
         // Real-time validation
         $(document).on('input', '#monto_total, #tabla_pagos input[name*="[monto]"]', function() {

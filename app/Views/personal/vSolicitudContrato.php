@@ -108,10 +108,7 @@
                                                 <td><input type="text" class="form-control" name="clave_estandarizada" value="<?= isset($solicitud) ? $solicitud->clave_estandarizada : '' ?>"></td>
                                                 <td>
                                                     <p class="small text-muted mb-0">El proyecto cuenta con la suficiencia presupuestal para la contratación de los servicios requeridos en la presente solicitud. Se anexa captura de pantalla Sistema SAP/R3</p>
-                                                    <input type="file" class="form-control-file mt-2" name="archivo_suficiencia">
-                                                    <?php if(isset($solicitud) && !empty($solicitud->archivo_suficiencia_url)): ?>
-                                                        <a href="<?= $solicitud->archivo_suficiencia_url ?>" target="_blank" class="d-block mt-2">Ver archivo actual</a>
-                                                    <?php endif; ?>
+                                                     <input type="checkbox" class="form-control mt-2 ml-2 d-flex align-items-center justify-content-center" style="width: 20px;" name="suficiencia_presupuestal" value="1" <?= (isset($solicitud) && $solicitud->suficiencia_presupuestal == 1) ? 'checked' : '' ?>> 
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -132,6 +129,7 @@
                                             <option value="CHEQUE" <?= (isset($solicitud) && $solicitud->garantia == 'CHEQUE') ? 'selected' : '' ?>>CHEQUE</option>
                                             <option value="PAGARE" <?= (isset($solicitud) && $solicitud->garantia == 'PAGARE') ? 'selected' : '' ?>>PAGARE</option>
                                             <option value="FIANZA" <?= (isset($solicitud) && $solicitud->garantia == 'FIANZA') ? 'selected' : '' ?>>FIANZA</option>
+                                            <option value="NO APLICA" <?= (isset($solicitud) && $solicitud->garantia == 'NO APLICA') ? 'selected' : '' ?>>NO APLICA</option>
                                         </select>
                                         <div class="custom-control custom-switch mt-2">
                                             <input type="checkbox" class="custom-control-input" id="custom_garantia_check">
@@ -217,13 +215,18 @@
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label class="col-sm-3 col-form-label">Responsable de Seguimiento (correo electrónico):</label>
+                                    <label class="col-sm-3 col-form-label">Responsable de Seguimiento:</label>
                                     <div class="col-sm-4">
                                         <input type="text" class="form-control" name="proveedor_seguimiento" value="<?= isset($solicitud) ? esc($solicitud->proveedor_seguimiento ?? '') : '' ?>">
                                     </div>
-                                    <div class="col-sm-4">
+                                    
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Correo de Seguimiento:</label>
+                                   <div class="col-sm-4">
                                         <input type="email" class="form-control" name="proveedor_correo" value="<?= isset($solicitud) ? esc($solicitud->proveedor_correo ?? '') : '' ?>">
                                     </div>
+                                    
                                 </div>
 
                                 <!-- SECCION 5: DOCUMENTOS Y ANEXOS -->
@@ -240,6 +243,19 @@
                                     <?php endif; ?>
                                 </div>
                                 <?php endif; ?>
+
+                                <h5 class="bg-primary text-white p-2 mt-4">FIRMAS</h5>
+                                <div class="card border mb-3">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <p class="mb-0 text-muted">Agrega hasta 3 firmas para el formato del contrato.</p>
+                                            <button type="button" class="btn btn-primary btn-sm" id="btnAgregarFirmaContrato">
+                                                <i class="fas fa-plus"></i> Agregar firma
+                                            </button>
+                                        </div>
+                                        <div id="contenedor_firmas_contrato"></div>
+                                    </div>
+                                </div>
 
                                 <div class="row mt-4">
                                     <div class="col-12 text-center">
@@ -306,6 +322,9 @@
         <script src="<?= base_url() ?>plugins/select2/select2.min.js"></script>
 
 <script>
+    const catalogoFirmantesContrato = <?= json_encode($catalogo_firmantes ?? [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+    const firmasSeleccionadasContrato = <?= json_encode(array_values($firmas_seleccionadas ?? []), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+
     function normalizarMonto(valor) {
         if (valor === null || valor === undefined) {
             return 0;
@@ -424,6 +443,64 @@
             case 9: return "NUEVE";
         }
         return "";
+    }
+
+    function opcionesFirmantesContrato(valorSeleccionado = '') {
+        let html = '<option value="">Seleccione un usuario</option>';
+        catalogoFirmantesContrato.forEach(usuario => {
+            const seleccionado = String(usuario.id_usuario) === String(valorSeleccionado) ? 'selected' : '';
+            const puesto = usuario.dsc_puesto ? String(usuario.dsc_puesto).replace(/"/g, '&quot;') : '';
+            html += `<option value="${usuario.id_usuario}" data-puesto="${puesto}" ${seleccionado}>${usuario.nombre_completo}</option>`;
+        });
+        return html;
+    }
+
+    function actualizarPuestoFirmaContrato(select) {
+        const puesto = $(select).find(':selected').data('puesto') || '';
+        $(select).closest('.firma-item').find('.firma-puesto').text(puesto);
+    }
+
+    function reindexarFirmasContrato() {
+        $('#contenedor_firmas_contrato .firma-item').each(function(index) {
+            $(this).attr('data-index', index);
+            $(this).find('.firma-label').text(`Firma ${index + 1}`);
+            $(this).find('select').attr('name', `firmas[${index}]`);
+        });
+    }
+
+    function agregarFirmaContrato(valorSeleccionado = '') {
+        const contenedor = $('#contenedor_firmas_contrato');
+        if (contenedor.find('.firma-item').length >= 3) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Límite de firmas',
+                text: 'Solo puedes agregar hasta 3 firmas.'
+            });
+            return;
+        }
+
+        const index = contenedor.find('.firma-item').length;
+        const html = `
+            <div class="firma-item border rounded p-3 mb-3" data-index="${index}">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <strong class="firma-label">Firma ${index + 1}</strong>
+                    <button type="button" class="btn btn-outline-danger btn-sm btn-eliminar-firma">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <select class="form-control select2 firma-select" name="firmas[${index}]">
+                    ${opcionesFirmantesContrato(valorSeleccionado)}
+                </select>
+                <div class="firma-puesto text-uppercase small text-muted mt-2"></div>
+            </div>
+        `;
+
+        contenedor.append(html);
+        const nuevoItem = contenedor.find('.firma-item').last();
+        nuevoItem.find('.firma-select').select2({
+            width: '100%'
+        });
+        actualizarPuestoFirmaContrato(nuevoItem.find('.firma-select'));
     }
 
     $(document).ready(function() {
@@ -579,6 +656,30 @@
     document.addEventListener('DOMContentLoaded', function() {
         // Initialize Select2
         $('.select2').select2();
+
+        if (firmasSeleccionadasContrato.length > 0) {
+            firmasSeleccionadasContrato.forEach(firma => agregarFirmaContrato(firma));
+        } else {
+            agregarFirmaContrato();
+        }
+
+        $('#btnAgregarFirmaContrato').on('click', function() {
+            agregarFirmaContrato();
+        });
+
+        $(document).on('change', '.firma-select', function() {
+            actualizarPuestoFirmaContrato(this);
+        });
+
+        $(document).on('click', '.btn-eliminar-firma', function() {
+            const item = $(this).closest('.firma-item');
+            const select = item.find('.firma-select');
+            if (select.hasClass('select2-hidden-accessible')) {
+                select.select2('destroy');
+            }
+            item.remove();
+            reindexarFirmasContrato();
+        });
 
         // Real-time validation
         $(document).on('input', '#monto_total, #tabla_pagos input[name*="[monto]"]', function() {

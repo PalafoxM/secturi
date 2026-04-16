@@ -13,6 +13,11 @@
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { border: 1px solid #ddd; padding: 5px; text-align: left; width: 25%; }
         th { background-color: #f2f2f2; }
+        .firma-table { width: 100%; border: none; margin-top: 35px; table-layout: fixed; }
+        .firma-table td { border: none; text-align: center; vertical-align: bottom; padding: 0 10px; }
+        .firma-linea { display: block; width: 72%; margin: 0 auto 4px auto; border-top: 1px solid #000; height: 1px; }
+        .firma-nombre { font-size: 12px; font-weight: bold; line-height: 1.2; text-transform: uppercase; }
+        .firma-cargo { font-size: 11px; line-height: 1.2; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -33,9 +38,9 @@
 
     <div class="section-title">INFORMACION DEL AREA SOLICITANTE</div>
     <div>
-        <div class="row"><span class="label">Nombre y cargo del responsable del Proyecto:</span> <span class="value"><i><?= $solicitud->nombre_proyecto ?></i></span></div>
-        <div class="row"><span class="label">Nombre y cargo del responsable de Seguimiento:</span> <span class="value"><i><?= $solicitud->nombre_seguimiento ?></i></span></div>
-        <div class="row"><span class="label">Nombre y cargo del enlace de Comunicaciones:</span> <span class="value"><i><?= $solicitud->nombre_enlace ?></i></span></div>
+        <div class="row"><span class="label">Nombre y cargo del responsable del Proyecto:</span> <span class="value"><i><?= $solicitud->nombre_proyecto_puesto ?? $solicitud->nombre_proyecto ?></i></span></div>
+        <div class="row"><span class="label">Nombre y cargo del responsable de Seguimiento:</span> <span class="value"><i><?= $solicitud->nombre_seguimiento_puesto ?? $solicitud->nombre_seguimiento ?></i></span></div>
+        <div class="row"><span class="label">Nombre y cargo del enlace de Comunicaciones:</span> <span class="value"><i><?= $solicitud->nombre_enlace_puesto ?? $solicitud->nombre_enlace ?></i></span></div>
     </div>
 
     <div class="section-title">INFORMACION PRESUPUESTAL</div>
@@ -113,22 +118,25 @@
         <div class="row"><span class="label">RFC:</span> <span class="value"><?= $solicitud->proveedor_rfc ?></span></div>
         <div class="row"><span class="label">Cedula de Registro en el Padron de Proveedores:</span> <span class="value"><?= $solicitud->proveedor_cedula ?></span></div>
         <div class="row"><span class="label">Nombre del Representante Legal (persona moral):</span> <span class="value"><?= $solicitud->proveedor_representante ?></span></div>
-        <div class="row"><span class="label">Correo electrónico:</span> <span class="value"><?= $solicitud->proveedor_correo ?></span></div>
+        <div class="row"><span class="label">Correo electrónico:</span> <span class="value"><?= $solicitud->proveedor_nombre.' ('.$solicitud->proveedor_correo.')' ?></span></div>
     </div>
 
     <div class="section-title">FIRMAS</div>
-    <table style="width: 100%; border: none;">
+    <?php
+        $firmasPdf = !empty($firmas_pdf) ? $firmas_pdf : [
+            (object) ['nombre' => 'Nombre Dir. Gral/Subsecretario', 'cargo' => 'Cargo'],
+            (object) ['nombre' => 'Nombre Responsable del Proyecto', 'cargo' => 'Cargo'],
+        ];
+    ?>
+    <table class="firma-table">
         <tr>
-            <td style="width: 50%; border: none; text-align: center;">
-                <h3 style="margin: 5px 0;">_________________________________________</h3>
-                <h3 style="margin: 5px 0;">Nombre Dir. Gral/Subsecretario</h3>
-                <h4 style="margin: 5px 0;">Cargo</h4>
-            </td>
-            <td style="width: 50%; border: none; text-align: center;">
-                <h3 style="margin: 5px 0;">_________________________________________</h3>
-                <h4 style="margin: 5px 0;">Nombre Responsable del Proyecto</h4>
-                <h4 style="margin: 5px 0;">Cargo</h4>
-            </td>
+            <?php foreach ($firmasPdf as $firma): ?>
+                <td style="width: <?= 100 / max(count($firmasPdf), 1) ?>%;">
+                    <span class="firma-linea"></span>
+                    <div class="firma-nombre"><?= esc($firma->nombre ?? '') ?></div>
+                    <div class="firma-cargo"><?= esc($firma->cargo ?? '') ?></div>
+                </td>
+            <?php endforeach; ?>
         </tr>
     </table>
 </body>
