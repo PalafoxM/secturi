@@ -188,7 +188,7 @@
             <div class="signature-line-wide"></div>
             <div class="signature-caption">Director de área: <?= esc($reporte->nombre_responsable_area ?? '') ?></div>
             <div class="signature-caption">Puesto: <?= esc($reporte->puesto_responsable_area ?? '') ?></div>
-            <div class="signature-caption">Responsable de administrar y verificar: <?= esc($reporte->nombre_responsable ?? '') ?></div>
+            <div class="signature-caption">Responsable de administrar y verificar: <?= esc($reporte->nombre_responsable ?? ($reporte->nombre_responsable_area ?? '')) ?></div>
         </div>
     </div>
 </body>

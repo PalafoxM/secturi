@@ -928,6 +928,12 @@ class Inicio extends BaseController
             return $this->response->setJSON($response);
         }
 
+        // La columna nombre_responsable se alimenta desde el campo
+        // "Puesto responsable de area", segun el flujo solicitado.
+        if ($nombreResponsable === '') {
+            $nombreResponsable = $puestoResponsableArea;
+        }
+
         $dataSave = [
             'responsable_administrativo' => $responsable,
             'area' => $area,
@@ -940,13 +946,10 @@ class Inicio extends BaseController
             'puesto_prestador' => $puestoPrestador,
             'nombre_responsable_area' => $nombreResponsableArea,
             'puesto_responsable_area' => $puestoResponsableArea,
+            'nombre_responsable' => $nombreResponsable,
             'pdf_referencia' => 'assets/Reporteactividades26.pdf',
             'visible' => 1
         ];
-
-        if ($nombreResponsable !== '') {
-            $dataSave['nombre_responsable'] = $nombreResponsable;
-        }
 
         $dataConfig = [
             'dataBase' => $dataBase,
