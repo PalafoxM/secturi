@@ -537,6 +537,7 @@
                                         </li>
                                         <li><a href="<?php echo base_url(); ?>index.php/Principal/listadoProveedores">Lista de
                                                 Proveedores</a></li>
+                                        <li><a href="<?php echo base_url(); ?>index.php/Principal/fichaTecnica">Ficha Técnica</a></li>
                                         <li><a href="<?php echo base_url(); ?>index.php/Principal/bitacora">Bitacora</a></li>
                                     <?php endif; ?>
 

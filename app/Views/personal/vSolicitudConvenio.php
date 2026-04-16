@@ -94,8 +94,8 @@
                                                 <td>
                                                     <p class="small text-muted mb-0">El proyecto cuenta con la suficiencia presupuestal para convenir las acciones solicitadas a través de la presente solicitud. Se anexa captura de pantalla Sistema SAP/R3</p>
                                                     <input type="file" class="form-control-file mt-2" name="archivo_suficiencia">
-                                                    <?php if(isset($solicitud) && $solicitud->archivo_suficiencia): ?>
-                                                        <a href="<?= base_url('assets/uploads/convenios/'.$solicitud->archivo_suficiencia) ?>" target="_blank" class="d-block mt-2">Ver archivo actual</a>
+                                                    <?php if(isset($solicitud) && !empty($solicitud->archivo_suficiencia_url)): ?>
+                                                        <a href="<?= $solicitud->archivo_suficiencia_url ?>" target="_blank" class="d-block mt-2">Ver archivo actual</a>
                                                     <?php endif; ?>
                                                 </td>
                                             </tr>
@@ -127,7 +127,7 @@
                                 <div class="form-group row bg-light py-2">
                                     <label class="col-sm-4 col-form-label font-weight-bold">Monto TOTAL del Convenio (num y letra):</label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control monto-input font-weight-bold" id="monto_total" name="monto_total" value="<?= isset($solicitud) ? $solicitud->monto_total : '' ?>" required>
+                                        <input type="text" class="form-control monto-input font-weight-bold" id="monto_total" name="monto_total" value="<?= isset($solicitud) ? $solicitud->monto_total : '' ?>" required readonly title="Calculado automáticamente">
                                         <input type="text" class="form-control mt-2 monto-letra" readonly placeholder="Monto en letra">
                                     </div>
                                 </div>
@@ -391,6 +391,20 @@
             }
         });
         
+        // Función para sumar los 3 montos
+        function calcularMontoTotal() {
+            var mSecturi = parseFloat($('input[name="monto_secturi"]').val()) || 0;
+            var mFederal = parseFloat($('input[name="monto_federal"]').val()) || 0;
+            var mOtra    = parseFloat($('input[name="monto_otra"]').val()) || 0;
+            var total = mSecturi + mFederal + mOtra;
+            
+            var inputTotal = $('#monto_total');
+            inputTotal.val(total > 0 ? total : '');
+            inputTotal.trigger('input');
+        }
+
+        $('input[name="monto_secturi"], input[name="monto_federal"], input[name="monto_otra"]').on('input', calcularMontoTotal);
+
         // Trigger inicial si ya hay valor
         $('.monto-input').each(function() {
             if($(this).val()) {

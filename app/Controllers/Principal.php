@@ -54,6 +54,262 @@ class Principal extends BaseController
         echo view($data['layout'], $data);
     }
 
+    private function normalizeUtf8Value($value)
+    {
+        if (is_array($value)) {
+            foreach ($value as $key => $item) {
+                $value[$key] = $this->normalizeUtf8Value($item);
+            }
+            return $value;
+        }
+
+        if (is_object($value)) {
+            foreach ($value as $key => $item) {
+                $value->$key = $this->normalizeUtf8Value($item);
+            }
+            return $value;
+        }
+
+        if (!is_string($value) || $value === '') {
+            return $value;
+        }
+
+        if (mb_check_encoding($value, 'UTF-8')) {
+            if (function_exists('mb_scrub')) {
+                return mb_scrub($value, 'UTF-8');
+            }
+            return $value;
+        }
+
+        $converted = @mb_convert_encoding($value, 'UTF-8', 'UTF-8, ISO-8859-1, Windows-1252');
+        if ($converted !== false && $converted !== null) {
+            if (function_exists('mb_scrub')) {
+                $converted = mb_scrub($converted, 'UTF-8');
+            }
+            return $converted;
+        }
+
+        $converted = @iconv('Windows-1252', 'UTF-8//IGNORE', $value);
+        if ($converted !== false && $converted !== null) {
+            if (function_exists('mb_scrub')) {
+                $converted = mb_scrub($converted, 'UTF-8');
+            }
+            return $converted;
+        }
+
+        $converted = utf8_encode($value);
+        if (function_exists('mb_scrub')) {
+            $converted = mb_scrub($converted, 'UTF-8');
+        }
+
+        return $converted;
+    }
+
+    private function cleanMpdfHtml(string $html): string
+    {
+        if ($html === '') {
+            return $html;
+        }
+
+        $html = preg_replace('/^\xEF\xBB\xBF/', '', $html);
+
+        $encoding = mb_detect_encoding($html, ['UTF-8', 'Windows-1252', 'ISO-8859-1', 'ASCII'], true);
+        if ($encoding && $encoding !== 'UTF-8') {
+            $converted = @mb_convert_encoding($html, 'UTF-8', $encoding);
+            if ($converted !== false && $converted !== null) {
+                $html = $converted;
+            }
+        }
+
+        if (function_exists('mb_scrub')) {
+            $html = mb_scrub($html, 'UTF-8');
+        }
+
+        $iconvHtml = @iconv('UTF-8', 'UTF-8//IGNORE', $html);
+        if ($iconvHtml !== false && $iconvHtml !== null) {
+            $html = $iconvHtml;
+        }
+
+        $html = preg_replace('/[^\x09\x0A\x0D\x20-\x7E\x{00A0}-\x{D7FF}\x{E000}-\x{FFFD}]/u', '', $html);
+
+        return $html ?? '';
+    }
+
+
+    private function uploadFileToS3Storage(string $sourceFile, string $module, string $subfolder, string $fileName): ?string
+    {
+        try {
+            $s3 = new \App\Libraries\S3Service();
+            $baseFolder = trim($module, '/');
+            $targetFolder = $baseFolder;
+
+            if (!$s3->folderExists($baseFolder)) {
+                $s3->createFolder($baseFolder);
+            }
+
+            if ($subfolder !== '') {
+                $targetFolder .= '/' . trim($subfolder, '/');
+                if (!$s3->folderExists($targetFolder)) {
+                    $s3->createFolder($targetFolder);
+                }
+            }
+
+            $s3Key = $targetFolder . '/' . $fileName;
+            $uploaded = $s3->uploadFile($sourceFile, $s3Key);
+
+            return $uploaded ? $s3Key : null;
+        } catch (\Throwable $e) {
+            log_message('error', 'Error al subir archivo de ' . $module . ' a S3: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    private function resolveStoredFileUrl(?string $storedPath, string $localPrefix = ''): ?string
+    {
+        if (empty($storedPath)) {
+            return null;
+        }
+
+        if (preg_match('#^https?://#i', $storedPath)) {
+            return $storedPath;
+        }
+
+        if (strpos($storedPath, 'assets/') === 0) {
+            return base_url($storedPath);
+        }
+
+        if ($localPrefix !== '' && strpos($storedPath, '/') === false) {
+            return base_url(trim($localPrefix, '/') . '/' . $storedPath);
+        }
+
+        try {
+            $s3 = new \App\Libraries\S3Service();
+            return $s3->getPresignedUrl($storedPath, '+20 minutes');
+        } catch (\Throwable $e) {
+            log_message('error', 'Error al resolver URL de archivo almacenado: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    private function mapInstrumentoUrls($instrumentoRaw): array
+    {
+        if (empty($instrumentoRaw)) {
+            return [];
+        }
+
+        $instrumentos = json_decode($instrumentoRaw, true);
+        if (!is_array($instrumentos)) {
+            $instrumentos = [$instrumentoRaw];
+        }
+
+        $resultado = [];
+        foreach ($instrumentos as $ruta) {
+            $url = $this->resolveStoredFileUrl($ruta);
+            if ($url) {
+                $resultado[] = [
+                    'ruta' => $ruta,
+                    'url' => $url,
+                ];
+            }
+        }
+
+        return $resultado;
+    }
+
+    private function obtenerFichaTecnicaData($result): array
+    {
+        return [
+            'em_domicilio' => $result->em_domicilio,
+            'fecha_realizacion' => $result->fecha_realizacion,
+            'nombre_evento' => $result->nombre_evento,
+            'persona_solicitud' => $result->persona_solicitud,
+            'municipio_sede' => $result->municipio_sede,
+            'periodicidad_radio' => $result->periodicidad_radio,
+            'antecedentes' => $result->antecedentes,
+            'objetivo_general' => $result->objetivo_general,
+            'justificacion' => $result->justificacion,
+            'cadena_valor' => $result->cadena_valor,
+            'nivel_habilidades' => '',
+            'estrato' => !$result->estrato ? $result->estrato : '',
+            'asistentes_totales' => $result->asistentes_totales,
+            'asistentes_local' => $result->asistentes_local,
+            'asistentes_regional' => $result->asistentes_regional,
+            'asistentes_nacional' => $result->asistentes_nacional,
+            'asistentes_internacional' => $result->asistentes_internacional,
+            'alcance' => $result->alcance,
+            'derrama_total' => $result->derrama_total,
+            'derrama_local' => $result->derrama_local,
+            'derrama_foraneo' => $result->derrama_foraneo,
+            'empleos_mujeres' => $result->empleos_mujeres,
+            'empleos_hombres' => $result->empleos_hombres,
+            'empleos_discapacidad' => $result->empleos_discapacidad,
+            'cuota_acceso' => $result->cuota_acceso,
+            'cuantas_cuotas' => (isset($result->cuantas_cuotas) && !empty($result->cuantas_cuotas)) ? $result->cuantas_cuotas : 'N/A',
+            'costo_total' => (isset($result->costo_total) && !empty($result->costo_total)) ? $result->costo_total : 'N/A',
+            'desglose_costo' => $result->desglose_costo,
+            'cantidades_desglose' => (isset($result->cantidades_desglose) && !empty($result->cantidades_desglose)) ? $result->cantidades_desglose : 'N/A',
+            'montos_desglose' => $result->montos_desglose,
+            'antecedentes_evento' => $result->antecedentes_evento,
+            'propuesta_valor' => $result->propuesta_valor,
+            'inclusion_mujeres' => $result->inclusion_mujeres,
+            'programa_preliminar' => $result->programa_preliminar,
+            'otras_actividades' => $result->otras_actividades,
+            'link_web' => $result->link_web,
+            'facebook' => $result->facebook,
+            'fb_seguidores' => $result->fb_seguidores,
+            'twitter' => $result->twitter,
+            'tw_seguidores' => $result->tw_seguidores,
+            'instagram' => $result->instagram,
+            'ig_seguidores' => $result->ig_seguidores,
+            'youtube' => $result->youtube,
+            'yt_seguidores' => $result->yt_seguidores,
+            'tiktok' => $result->tiktok,
+            'tk_seguidores' => $result->tk_seguidores,
+            'co_nombre' => $result->co_nombre,
+            'co_telefono' => $result->co_telefono,
+            'co_razon_social' => $result->co_razon_social,
+            'co_cargo' => $result->co_cargo,
+            'co_celular' => $result->co_celular,
+            'co_domicilio' => $result->co_domicilio,
+            'co_ciudad_estado' => $result->co_ciudad_estado,
+            'co_email' => $result->co_email,
+            'em_nombre' => $result->em_nombre,
+            'em_cargo' => $result->em_cargo,
+            'em_celular' => $result->em_celular,
+            'em_telefono_fijo' => $result->em_telefono_fijo,
+            'em_ciudad_estado' => $result->em_ciudad_estado,
+            'em_email' => $result->em_email,
+            'apoyo_federal' => $result->apoyo_federal,
+            'apoyo_municipal' => $result->apoyo_municipal,
+            'apoyo_estatal' => $result->apoyo_estatal,
+            'descripcion_apoyos' => $result->descripcion_apoyos,
+        ];
+    }
+
+    private function generarPdfFichaTemporal($id, array $data): string
+    {
+        $mpdfConfig = [
+            'mode' => 'utf-8',
+            'format' => 'Legal',
+            'orientation' => 'P',
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_top' => 10,
+            'margin_bottom' => 10,
+        ];
+
+        $mpdf = new \Mpdf\Mpdf($mpdfConfig);
+        $html = view("pdfs/vpdfFicha.php", $data);
+        $html = $this->normalizeUtf8Value($html);
+        $html = $this->cleanMpdfHtml($html);
+        $mpdf->WriteHTML($html);
+
+        $pdfPath = WRITEPATH . 'uploads/Ficha_Tecnica_' . $id . '_' . date('Ymd_His') . '.pdf';
+        $mpdf->Output($pdfPath, 'F');
+
+        return $pdfPath;
+    }
+
     public function index()
     {
 
@@ -2947,6 +3203,156 @@ class Principal extends BaseController
         $data['contentView'] = 'personal/vSolicitudHonorarios';
         $this->_renderView($data);
     }
+    public function listadoHonorarios()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $data = array();
+
+        if (in_array((int) ($session->id_perfil ?? 0), [1, 7], true)) {
+            $solicitudes = $globals->getTabla(['tabla' => 'solicitud_honorario', 'where' => ['visible' => 1]]);
+        } else {
+            $solicitudes = $globals->getTabla(['tabla' => 'solicitud_honorario', 'where' => ['visible' => 1, 'usu_reg' => $session->id_usuario ?? 0]]);
+        }
+
+        $responsables = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1]]);
+        $responsablesMap = [];
+        if (!empty($responsables->data)) {
+            foreach ($responsables->data as $responsable) {
+                $responsablesMap[(string) ($responsable->id_usuario ?? '')] = trim(($responsable->nombre_completo ?? '') . ' - ' . ($responsable->dsc_puesto ?? ''));
+            }
+        }
+
+        if (!empty($solicitudes->data)) {
+            foreach ($solicitudes->data as $solicitud) {
+                $solicitud->responsable_proyecto_nombre = $responsablesMap[(string) ($solicitud->responsable_proyecto ?? '')] ?? ($solicitud->responsable_proyecto ?? '');
+                $solicitud->tienen_archivos = true;
+            }
+        }
+
+        $data['solicitudes'] = !empty($solicitudes->data) ? $solicitudes->data : [];
+        $data['scripts'] = ['inicio'];
+        $data['edita'] = 0;
+        $data['contentView'] = 'personal/vListaHonorarios';
+        $this->_renderView($data);
+    }
+
+    private function obtenerSolicitudHonorariosDetalle($idSolicitudHonorario)
+    {
+        $globals = new Mglobal;
+        $detalle = [
+            'solicitud' => null,
+            'actividades' => [],
+        ];
+
+        $solicitudQuery = $globals->getTabla([
+            'tabla' => 'solicitud_honorario',
+            'where' => ['id_solicitud_honorario' => $idSolicitudHonorario, 'visible' => 1]
+        ]);
+
+        if (empty($solicitudQuery->data)) {
+            return $detalle;
+        }
+
+        $solicitud = $solicitudQuery->data[0];
+
+        $responsables = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1]]);
+        if (!empty($responsables->data)) {
+            foreach ($responsables->data as $responsable) {
+                if ((string) ($responsable->id_usuario ?? '') === (string) ($solicitud->responsable_proyecto ?? '')) {
+                    $solicitud->responsable_proyecto_nombre = trim(($responsable->nombre_completo ?? '') . ' - ' . ($responsable->dsc_puesto ?? ''));
+                    break;
+                }
+            }
+        }
+
+        $actividadesQuery = $globals->getTabla([
+            'tabla' => 'actividades_honorario',
+            'where' => ['id_solicitud_honorario' => $idSolicitudHonorario, 'visible' => 1]
+        ]);
+
+        $detalle['solicitud'] = $solicitud;
+        $detalle['actividades'] = !empty($actividadesQuery->data) ? $actividadesQuery->data : [];
+
+        return $detalle;
+    }
+
+    public function pdfSolicitudHonorarios($id_solicitud_honorario = null)
+    {
+        if (empty($id_solicitud_honorario)) {
+            echo 'Solicitud no válida';
+            return;
+        }
+
+        $detalle = $this->obtenerSolicitudHonorariosDetalle($id_solicitud_honorario);
+        if (empty($detalle['solicitud'])) {
+            echo 'Solicitud no encontrada';
+            return;
+        }
+
+        $data = [
+            'solicitud' => $detalle['solicitud'],
+            'actividades' => $detalle['actividades'],
+        ];
+
+        $html = view('pdfs/vPdfSolicitudHonorarios', $data);
+
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 12,
+            'margin_left' => 12,
+            'margin_right' => 12,
+            'margin_bottom' => 12,
+            'format' => 'Letter'
+        ]);
+
+        $mpdf->WriteHTML($html);
+        $mpdf->Output('Solicitud_Honorarios_' . $id_solicitud_honorario . '.pdf', 'I');
+        exit();
+    }
+
+    private function documentosSolicitudHonorarios(): array
+    {
+        return [
+            1 => 'Oficio de solicitud',
+            2 => 'Formato de solicitud de Contrato',
+            3 => 'Validacion Proceso Ingreso de SFIA',
+            4 => 'RFC / Cedula de Identificacion Fiscal',
+            5 => 'Identificacion Oficial',
+            6 => 'Autorizacion de Tratamiento de Datos Personales en Posesion de Sujetos Obligados',
+            7 => 'Comprobante de Domicilio',
+        ];
+    }
+
+    public function editarSolicitudHonorarios($id_solicitud_honorario = null)
+    {
+        if (empty($id_solicitud_honorario)) {
+            return redirect()->to(base_url('index.php/Principal/listadoHonorarios'));
+        }
+
+        $globals = new Mglobal;
+        $detalle = $this->obtenerSolicitudHonorariosDetalle($id_solicitud_honorario);
+        if (empty($detalle['solicitud'])) {
+            return redirect()->to(base_url('index.php/Principal/listadoHonorarios'));
+        }
+
+        $vw_usuario = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1]]);
+        $data['direccion'] = (!empty($vw_usuario->data)) ? $vw_usuario->data : [];
+        $vw_usuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
+        $data['usuario'] = (!empty($vw_usuario->data)) ? $vw_usuario->data : [];
+
+        $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
+        $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
+
+        $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+
+        $data['solicitud'] = $detalle['solicitud'];
+        $data['actividades'] = $detalle['actividades'];
+        $data['scripts'] = array('inicio');
+        $data['edita'] = 1;
+        $data['contentView'] = 'personal/vSolicitudHonorarios';
+        $this->_renderView($data);
+    }
 
     public function guardarSolicitudHonorarios()
     {
@@ -3051,8 +3457,133 @@ class Principal extends BaseController
         $response->error = false;
         $response->respuesta = 'Solicitud guardada correctamente';
         $response->id_solicitud_honorario = $id_solicitud;
+        $response->url_listado = base_url('index.php/Principal/listadoHonorarios');
+        $response->url_pdf = base_url('index.php/Principal/pdfSolicitudHonorarios/' . $id_solicitud);
 
         return $this->respond($response);
+    }
+
+    public function subirArchivosSolicitudHonorarios()
+    {
+        $id_solicitud = $this->request->getPost('id_solicitud');
+        $documentos = $this->request->getPost('documentos');
+
+        if (!$id_solicitud || empty($documentos)) {
+            return redirect()->to(base_url('index.php/Principal/listadoHonorarios'));
+        }
+
+        $data['id_solicitud'] = $id_solicitud;
+        $data['documentos'] = $documentos;
+        $data['contentView'] = 'secciones/vSubirArchivosSolicitudHonorarios';
+        $this->_renderView($data);
+    }
+
+    public function guardarArchivosSolicitudHonorarios()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+
+      
+
+        $id_solicitud = $this->request->getPost('id_solicitud');
+        if (!$id_solicitud) {
+            $response->respuesta = 'ID de solicitud no valido.';
+            return $this->respond($response);
+        }
+
+        $count = 0;
+        $errores = 0;
+
+        if (isset($_FILES['archivos']) && is_array($_FILES['archivos']['name'])) {
+            foreach ($_FILES['archivos']['name'] as $key => $originalName) {
+                if (empty($originalName)) {
+                    continue;
+                }
+
+                if ($_FILES['archivos']['error'][$key] !== UPLOAD_ERR_OK) {
+                    $errores++;
+                    continue;
+                }
+
+                $tmpName = $_FILES['archivos']['tmp_name'][$key];
+                $ext = pathinfo($originalName, PATHINFO_EXTENSION);
+                $newName = 'honorario_' . $id_solicitud . '_' . preg_replace('/[^a-zA-Z0-9_-]/', '_', (string) $key) . '_' . time() . ($ext ? '.' . strtolower($ext) : '');
+                $s3Key = $this->uploadFileToS3Storage($tmpName, 'honorarios', 'documentos', $newName);
+
+                if (!$s3Key) {
+                    $errores++;
+                    continue;
+                }
+
+                $dataInsert = [
+                    'id_solicitud_honorario' => $id_solicitud,
+                    'clave_documento' => $key,
+                    'nombre_documento' => $this->documentosSolicitudHonorarios()[$key] ?? ('Documento ' . $key),
+                    'nombre_archivo' => $s3Key,
+                    'visible' => 1,
+                    'usu_reg' => $session->id_usuario ?? 0,
+                    'fec_reg' => date('Y-m-d H:i:s'),
+                ];
+
+                $res = $globals->saveTabla(
+                    $dataInsert,
+                    ["tabla" => "solicitud_honorario_archivos", "editar" => false],
+                    ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/guardarArchivosSolicitudHonorarios']
+                );
+
+                if ($res->error) {
+                    $errores++;
+                    continue;
+                }
+
+                $count++;
+            }
+        }
+
+        if ($count > 0) {
+            $globals->saveTabla(
+                ['id_estatus' => 4],
+                ["tabla" => "solicitud_honorario", "editar" => true, "idEditar" => ["id_solicitud_honorario" => $id_solicitud]],
+                ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/guardarArchivosSolicitudHonorarios']
+            );
+        }
+
+        if ($count > 0) {
+            $response->error = false;
+            $response->respuesta = $errores > 0
+                ? 'Se guardaron ' . $count . ' archivo(s), pero algunos no pudieron cargarse.'
+                : 'Archivos guardados correctamente.';
+        } else {
+            $response->respuesta = 'No se pudo guardar ningun archivo.';
+        }
+
+        return $this->respond($response);
+    }
+
+    public function verArchivosSolicitudHonorarios($id_solicitud)
+    {
+        $globals = new Mglobal;
+       
+
+        $archivos = $globals->getTabla([
+            'tabla' => 'solicitud_honorario_archivos',
+            'where' => ['id_solicitud_honorario' => $id_solicitud, 'visible' => 1]
+        ]);
+
+        if (!empty($archivos->data)) {
+            foreach ($archivos->data as &$archivo) {
+                $archivo->url_descarga = $this->resolveStoredFileUrl($archivo->nombre_archivo ?? null, 'assets/uploads/honorarios');
+            }
+        }
+
+        $data['id_solicitud'] = $id_solicitud;
+        $data['archivos'] = !empty($archivos->data) ? $archivos->data : [];
+        $data['documentos_honorarios'] = $this->documentosSolicitudHonorarios();
+        $data['scripts'] = [];
+        $data['contentView'] = 'secciones/vVerArchivosSolicitudHonorarios';
+        $this->_renderView($data);
     }
 
     public function SolicitudContrato()
@@ -3113,6 +3644,9 @@ class Principal extends BaseController
 
         $vwUsuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
         $data['usuario'] = !empty($vwUsuario->data) ? $vwUsuario->data : [];
+
+        $catPartida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $data['cat_partida'] = !empty($catPartida->data) ? $catPartida->data : [];
 
         $data['scripts'] = ['inicio'];
         $data['edita'] = 0;
@@ -3301,6 +3835,11 @@ class Principal extends BaseController
         }
 
         $data['solicitudes'] = !empty($solicitudes->data) ? $solicitudes->data : [];
+        if (!empty($data['solicitudes'])) {
+            foreach ($data['solicitudes'] as &$sol) {
+                $sol->instrumento_urls = $this->mapInstrumentoUrls($sol->instrumento_juridico ?? null);
+            }
+        }
         $data['scripts'] = ['inicio'];
         $data['contentView'] = 'personal/vListaSolicitudAdquisiciones';
         $this->_renderView($data);
@@ -3397,6 +3936,12 @@ class Principal extends BaseController
             'where' => ['id_solicitud_adquisiciones' => $id_solicitud, 'visible' => 1]
         ]);
 
+        if (!empty($archivos->data)) {
+            foreach ($archivos->data as &$archivo) {
+                $archivo->url_descarga = $this->resolveStoredFileUrl($archivo->nombre_archivo ?? null, 'assets/uploads/adquisiciones');
+            }
+        }
+
         $data['id_solicitud'] = $id_solicitud;
         $data['archivos'] = !empty($archivos->data) ? $archivos->data : [];
         $data['scripts'] = [];
@@ -3417,11 +3962,6 @@ class Principal extends BaseController
             return $this->respond($response);
         }
 
-        $uploadDir = FCPATH . 'assets/uploads/adquisiciones/';
-        if (!is_dir($uploadDir)) {
-            @mkdir($uploadDir, 0755, true);
-        }
-
         $count = 0;
         $errores = 0;
 
@@ -3435,13 +3975,12 @@ class Principal extends BaseController
                     $tmpName = $_FILES['archivos']['tmp_name'][$key];
                     $ext = pathinfo($originalName, PATHINFO_EXTENSION);
                     $newName = $id_solicitud . '_' . $key . '_' . time() . '.' . $ext;
-                    $targetPath = $uploadDir . $newName;
-
-                    if (move_uploaded_file($tmpName, $targetPath)) {
+                    $s3Key = $this->uploadFileToS3Storage($tmpName, 'adquisiciones', 'documentos', $newName);
+                    if ($s3Key) {
                         $res = $globals->saveTabla([
                             'id_solicitud_adquisiciones' => $id_solicitud,
                             'clave_documento' => $key,
-                            'nombre_archivo' => $newName,
+                            'nombre_archivo' => $s3Key,
                             'tipo' => $ext,
                             'usu_reg' => $session->id_usuario ?? 0,
                             'fec_reg' => date('Y-m-d H:i:s'),
@@ -3489,6 +4028,171 @@ class Principal extends BaseController
         return $this->respond($response);
     }
 
+    public function declinarSolicitudAdquisiciones()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $emailService = \Config\Services::email();
+        $response = new \stdClass();
+        $response->error = true;
+
+        $id = $this->request->getPost('id_solicitud');
+        $motivo = $this->request->getPost('motivo');
+
+        if (!$id) {
+            $response->respuesta = "ID de solicitud no válido.";
+            return $this->respond($response);
+        }
+
+        $dataUpdate = [
+            'id_estatus' => 2,
+            'usu_act' => $session->id_usuario ?? 0,
+            'fec_act' => date('Y-m-d H:i:s')
+        ];
+
+
+        $res = $globals->saveTabla($dataUpdate, [
+            'tabla' => 'solicitud_adquisiciones',
+            'editar' => true,
+            'idEditar' => ['id_solicitud_adquisiciones' => $id]
+        ], [
+            'id_user' => $session->id_usuario ?? 0,
+            'script' => 'Principal.php/declinarSolicitudAdquisiciones'
+        ]);
+
+        if (!$res->error) {
+            $solicitudQuery = $globals->getTabla(["tabla" => "solicitud_adquisiciones", "where" => ["id_solicitud_adquisiciones" => $id]]);
+            if (isset($solicitudQuery->data) && !empty($solicitudQuery->data)) {
+                $usu_reg = $solicitudQuery->data[0]->usu_reg ?? 0;
+                $usuarioQuery = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["id_usuario" => $usu_reg]]);
+                if (isset($usuarioQuery->data) && !empty($usuarioQuery->data) && !empty($usuarioQuery->data[0]->correo)) {
+                    $correoDestino = $usuarioQuery->data[0]->correo;
+                    $nombreUsuario = $usuarioQuery->data[0]->nombre_completo ?? 'Usuario';
+
+                    $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
+                    $emailService->setTo($correoDestino);
+                    $emailService->setSubject('Solicitud de Adquisiciones Declinada');
+                    $emailService->setMailType('html');
+                    $emailService->setMessage("
+                        <p>Buen día, <strong>{$nombreUsuario}</strong>:</p>
+                        <p>Se le notifica que su solicitud de adquisiciones con ID <strong>{$id}</strong> ha sido <strong>declinada</strong>.</p>
+                        <p><strong>Motivo:</strong> {$motivo}</p>
+                        <p>Puede ingresar al sistema SUSI para volver a subir la documentación correspondiente.</p>
+                        <br>
+                        <p>Saludos cordiales,</p>
+                        <p><strong>Sistema Unificado SECTURI (SUSI)</strong></p>
+                    ");
+                    $emailService->send();
+                }
+            }
+
+            $response->error = false;
+            $response->respuesta = "Solicitud declinada correctamente.";
+        } else {
+            $response->respuesta = "No se pudo declinar la solicitud.";
+        }
+
+        return $this->respond($response);
+    }
+
+    public function subirInstrumentoJuridicoAdquisiciones()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $emailService = \Config\Services::email();
+        $response = new \stdClass();
+        $response->error = true;
+
+        $id = $this->request->getPost('id_solicitud');
+        $archivos = $this->request->getFileMultiple('archivos');
+
+        if (!$id || empty($archivos)) {
+            $response->respuesta = "Archivos o ID de solicitud no válido.";
+            return $this->respond($response);
+        }
+
+        $rutasGuardadas = [];
+
+
+        $solicitudBd = $globals->getTabla(['tabla' => 'solicitud_adquisiciones', 'where' => ['id_solicitud_adquisiciones' => $id]]);
+        if (isset($solicitudBd->data) && !empty($solicitudBd->data)) {
+            $instrumentosActuales = $solicitudBd->data[0]->instrumento_juridico ?? '';
+            if (!empty($instrumentosActuales)) {
+                $decoded = json_decode($instrumentosActuales, true);
+                if (is_array($decoded)) {
+                    $rutasGuardadas = $decoded;
+                    } else {
+                        $rutasGuardadas[] = $instrumentosActuales;
+                    }
+                }
+            }
+        
+
+        foreach ($archivos as $archivo) {
+            if ($archivo->isValid() && !$archivo->hasMoved() && strtolower((string) $archivo->getExtension()) === 'pdf') {
+                $newName = $archivo->getRandomName();
+                $s3Key = $this->uploadFileToS3Storage($archivo->getTempName(), 'adquisiciones', 'instrumentos', $newName);
+                if ($s3Key) {
+                    $rutasGuardadas[] = $s3Key;
+                }
+            }
+        }
+
+        if (empty($rutasGuardadas)) {
+            $response->respuesta = "No se pudieron guardar los archivos o no son PDF válidos.";
+            return $this->respond($response);
+        }
+
+        $dataUpdate = [
+            'id_estatus' => 3,
+            'usu_act' => $session->id_usuario ?? 0,
+            'fec_act' => date('Y-m-d H:i:s')
+        ];
+
+
+        $res = $globals->saveTabla($dataUpdate, [
+            'tabla' => 'solicitud_adquisiciones',
+            'editar' => true,
+            'idEditar' => ['id_solicitud_adquisiciones' => $id]
+        ], [
+            'id_user' => $session->id_usuario ?? 0,
+            'script' => 'Principal.php/subirInstrumentoJuridicoAdquisiciones'
+        ]);
+
+        if (!$res->error) {
+            $solicitudQuery = $globals->getTabla(["tabla" => "solicitud_adquisiciones", "where" => ["id_solicitud_adquisiciones" => $id]]);
+            if (isset($solicitudQuery->data) && !empty($solicitudQuery->data)) {
+                $usu_reg = $solicitudQuery->data[0]->usu_reg ?? 0;
+                $usuarioQuery = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["id_usuario" => $usu_reg]]);
+                if (isset($usuarioQuery->data) && !empty($usuarioQuery->data) && !empty($usuarioQuery->data[0]->correo)) {
+                    $correoDestino = $usuarioQuery->data[0]->correo;
+                    $nombreUsuario = $usuarioQuery->data[0]->nombre_completo ?? 'Usuario';
+
+                    $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
+                    $emailService->setTo($correoDestino);
+                    $emailService->setSubject('Solicitud de Adquisiciones Aprobada - Instrumento Disponible');
+                    $emailService->setMailType('html');
+                    $emailService->setMessage("
+                        <p>Buen día, <strong>{$nombreUsuario}</strong>:</p>
+                        <p>El área Jurídica ha autorizado y adjuntado el instrumento jurídico correspondiente a su solicitud de adquisiciones con ID <strong>{$id}</strong>.</p>
+                        <p>Puede consultar los documentos ingresando al sistema SUSI.</p>
+                        <br>
+                        <p>Saludos cordiales,</p>
+                        <p><strong>Sistema Unificado SECTURI (SUSI)</strong></p>
+                    ");
+                    $emailService->send();
+                }
+            }
+
+            $response->error = false;
+            $response->respuesta = "Instrumento jurídico subido y solicitud aprobada.";
+        } else {
+            $response->respuesta = "No se pudo actualizar la solicitud.";
+        }
+
+        return $this->respond($response);
+    }
+
     public function editarSolicitudContrato($id_solicitud = null)
     {
         $session = \Config\Services::session();
@@ -3520,7 +4224,12 @@ class Principal extends BaseController
         $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
 
         $data['solicitud'] = $solicitud->data[0];
+        $data['solicitud']->archivo_suficiencia_url = $this->resolveStoredFileUrl($data['solicitud']->archivo_suficiencia ?? null, 'assets/uploads/contratos');
         $data['pagos'] = (!empty($pagos->data)) ? $pagos->data : [];
+        $montoTotal = (float) str_replace([',', '$', ' '], '', (string) ($data['solicitud']->monto_total ?? 0));
+        if (empty($data['solicitud']->monto_total_texto)) {
+            $data['solicitud']->monto_total_texto = strtoupper($this->numeroEnLetras($montoTotal));
+        }
 
         
         $data['scripts'] = array('inicio');
@@ -3549,9 +4258,63 @@ class Principal extends BaseController
         if($file = $this->request->getFile('archivo_suficiencia')) {
              if ($file->isValid() && !$file->hasMoved()) {
                 $newName = $file->getRandomName();
-                $file->move(FCPATH . 'assets/uploads/contratos', $newName);
-                $archivo_suficiencia = $newName;
+                $uploadedKey = $this->uploadFileToS3Storage($file->getTempName(), 'contratos', 'suficiencia', $newName);
+                if ($uploadedKey) {
+                    $archivo_suficiencia = $uploadedKey;
+                } else {
+                    $response->respuesta = 'No fue posible guardar el archivo de suficiencia en AWS S3.';
+                    return $this->respond($response);
+                }
              }
+        }
+
+        if(empty($post['monto_total'])){
+            $response->respuesta = 'El monto total es requerido.';
+            return $this->respond($response);
+        }
+        if(empty($post['proyecto'])){
+            $response->respuesta = 'El proyecto es requerido.';
+            return $this->respond($response);
+        }
+        if(empty($post['partida'])){
+            $response->respuesta = 'La partida es requerida.';
+            return $this->respond($response);
+        }
+        if(empty($post['clave_estandarizada'])){
+            $response->respuesta = 'La clave estandarizada es requerida.';
+            return $this->respond($response);
+        }
+        if(empty($post['garantia'])){
+            $response->respuesta = 'La garantia es requerida.';
+            return $this->respond($response);
+        }
+        if(empty($post['monto_garantia'])){
+            $response->respuesta = 'El monto de la garantia es requerido.';
+            return $this->respond($response);
+        }
+        if(empty($post['responsable_proyecto'])){
+            $response->respuesta = 'El responsable del proyecto es requerido.';
+            return $this->respond($response);
+        }
+        if(empty($post['responsable_seguimiento'])){
+            $response->respuesta = 'El responsable del seguimiento es requerido.';
+            return $this->respond($response);
+        }
+        if(empty($post['enlace_comunicaciones'])){
+            $response->respuesta = 'El enlace de comunicaciones es requerido.';
+            return $this->respond($response);
+        }
+
+        $montoTotal = (float) str_replace([',', '$', ' '], '', (string) ($post['monto_total'] ?? 0));
+        $montoTotalTexto = trim((string) ($post['monto_total_texto'] ?? ''));
+        if ($montoTotalTexto === '') {
+            $montoTotalTexto = strtoupper($this->numeroEnLetras($montoTotal));
+        }
+
+        $montoGarantia = (float) str_replace([',', '$', ' '], '', (string) ($post['monto_garantia'] ?? 0));
+        $montoGarantiaTexto = trim((string) ($post['monto_garantia_texto'] ?? ''));
+        if ($montoGarantiaTexto === '' && $montoGarantia > 0) {
+            $montoGarantiaTexto = strtoupper($this->numeroEnLetras($montoGarantia));
         }
 
         // Datos principales
@@ -3563,8 +4326,10 @@ class Principal extends BaseController
             'partida' => $post['partida'],
             'clave_estandarizada' => $post['clave_estandarizada'],
             'monto_total' => $post['monto_total'],
+            'monto_total_texto' => $montoTotalTexto,
             'garantia' => $post['garantia'],
             'monto_garantia' => $post['monto_garantia'] ?? null,
+            'monto_garantia_texto' => $montoGarantiaTexto,
             'proveedor_seguimiento' => $post['proveedor_seguimiento'],
             'objeto_contrato' => $post['objeto_contrato'],
             'fecha_inicio' => $post['fecha_inicio'],
@@ -3707,18 +4472,44 @@ class Principal extends BaseController
         
         // Cargar datos
         $solicitud = $globals->getTabla(['tabla' => 'vw_solicitud_contrato', 'where' => ['id_solicitud_contrato' => $id]]);
+        $solicitudBase = $globals->getTabla(['tabla' => 'solicitud_contrato', 'where' => ['id_solicitud_contrato' => $id, 'visible' => 1]]);
         $pagos = $globals->getTabla(['tabla' => 'solicitud_contrato_pagos', 'where' => ['id_solicitud_contrato' => $id, 'visible' => 1]]);
         
         if(empty($solicitud->data)){
             echo "Solicitud no encontrada"; return;
         }
 
-        $data['solicitud'] = $solicitud->data[0];
-        $data['pagos'] = (!empty($pagos->data)) ? $pagos->data : [];
+        $data['solicitud'] = $this->normalizeUtf8Value($solicitud->data[0]);
+        if (!empty($solicitudBase->data)) {
+            foreach ((array) $solicitudBase->data[0] as $key => $value) {
+                if (!isset($data['solicitud']->$key) || $data['solicitud']->$key === null || $data['solicitud']->$key === '') {
+                    $data['solicitud']->$key = $this->normalizeUtf8Value($value);
+                }
+            }
+        }
+        $data['pagos'] = $this->normalizeUtf8Value((!empty($pagos->data)) ? $pagos->data : []);
+        $montoTotal = (float) str_replace([',', '$', ' '], '', (string) ($data['solicitud']->monto_total ?? 0));
+        $data['solicitud']->monto_total_formateado = '$' . number_format($montoTotal, 2, '.', ',');
+        if (empty($data['solicitud']->monto_total_texto)) {
+            $data['solicitud']->monto_total_texto = strtoupper($this->numeroEnLetras($montoTotal));
+        }
+        $montoGarantia = (float) str_replace([',', '$', ' '], '', (string) ($data['solicitud']->monto_garantia ?? 0));
+        $data['solicitud']->monto_garantia_formateado = '$' . number_format($montoGarantia, 2, '.', ',');
+        if (empty($data['solicitud']->monto_garantia_texto) && $montoGarantia > 0) {
+            $data['solicitud']->monto_garantia_texto = strtoupper($this->numeroEnLetras($montoGarantia));
+        }
+        if (!empty($data['pagos'])) {
+            foreach ($data['pagos'] as $pago) {
+                $montoPago = (float) str_replace([',', '$', ' '], '', (string) ($pago->monto ?? 0));
+                $pago->monto_formateado = '$' . number_format($montoPago, 2, '.', ',');
+            }
+        }
         
         // Reutilizamos la vista de formulario pero en modo lectura o creamos una vista optimizada para impresión
         // Por ahora usaré una vista simple para PDF
         $html = view('personal/vPdfSolicitudContrato', $data);
+        $html = $this->normalizeUtf8Value($html);
+        $html = $this->cleanMpdfHtml($html);
         
         $mpdf = new \Mpdf\Mpdf([
             'margin_top' => 10,
@@ -3759,6 +4550,12 @@ class Principal extends BaseController
             'tabla' => 'solicitud_contrato_archivos',
             'where' => ['id_solicitud_contrato' => $id_solicitud, 'visible' => 1]
         ]);
+
+        if (!empty($archivos->data)) {
+            foreach ($archivos->data as &$archivo) {
+                $archivo->url_descarga = $this->resolveStoredFileUrl($archivo->nombre_archivo ?? null, 'assets/uploads/contratos');
+            }
+        }
         
         $data['id_solicitud'] = $id_solicitud;
         $data['archivos'] = (!empty($archivos->data)) ? $archivos->data : [];
@@ -3794,14 +4591,14 @@ class Principal extends BaseController
                     $tmpName = $_FILES['archivos']['tmp_name'][$key];
                     $ext = pathinfo($originalName, PATHINFO_EXTENSION);
                     $newName = $id_solicitud . '_' . $key . '_' . time() . '.' . $ext;
-                    $targetPath = FCPATH . 'assets/uploads/contratos/' . $newName;
+                    $s3Key = $this->uploadFileToS3Storage($tmpName, 'contratos', 'documentos', $newName);
                     
-                    if (move_uploaded_file($tmpName, $targetPath)) {
+                    if ($s3Key) {
                         
                         $dataInsert = [
                             'id_solicitud_contrato' => $id_solicitud,
                             'clave_documento' => $key,
-                            'nombre_archivo' => $newName,
+                            'nombre_archivo' => $s3Key,
                             'tipo' => $ext,
                             'usu_reg' => $session->id_usuario ?? 0,
                             'fec_reg' => date('Y-m-d H:i:s'),
@@ -3809,6 +4606,8 @@ class Principal extends BaseController
                         ];
                         
                         $res = $globals->saveTabla($dataInsert, ["tabla" => "solicitud_contrato_archivos", "editar" => false], ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/guardarArchivosSolicitud']);
+                        $response->respuesta = $res->respuesta;
+                        $response->error = $res->error;
                         $globals->saveTabla(['id_estatus' => 4], ["tabla" => "solicitud_contrato", "editar" => true, "idEditar" => ["id_solicitud_contrato" => $id_solicitud]], ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/guardarArchivosSolicitud']);
                         if (!$res->error) {
                             $count++;
@@ -3824,7 +4623,7 @@ class Principal extends BaseController
             }
         }
         
-        if ($count > 0) {
+/*         if ($count > 0) {
             // Enviar correo a lvelaga@guanajuato.gob.mx
             $emailService = \Config\Services::email();
             $usuarioQuery = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["id_usuario" => ($session->id_usuario ?? 0)]]);
@@ -3852,7 +4651,7 @@ class Principal extends BaseController
             $response->respuesta = $msg;
         } else {
             $response->respuesta = "No se guardó ningún archivo. " . ($errores > 0 ? "Hubo errores al procesar." : "No se seleccionaron archivos.");
-        }
+        } */
 
         return $this->respond($response);
     }
@@ -3986,8 +4785,9 @@ class Principal extends BaseController
         foreach ($archivos as $archivo) {
             if ($archivo->isValid() && !$archivo->hasMoved() && $archivo->getExtension() === 'pdf') {
                 $newName = $archivo->getRandomName();
-                if ($archivo->move($uploadPath, $newName)) {
-                    $rutasGuardadas[] = 'assets/instrumentos_juridicos/' . $newName;
+                $s3Key = $this->uploadFileToS3Storage($archivo->getTempName(), 'contratos', 'instrumentos', $newName);
+                if ($s3Key) {
+                    $rutasGuardadas[] = $s3Key;
                 }
             }
         }
@@ -4072,6 +4872,11 @@ class Principal extends BaseController
             }
         }
         $data['solicitudes'] = (!empty($solicitudes->data)) ? $solicitudes->data : [];
+        if (!empty($data['solicitudes'])) {
+            foreach ($data['solicitudes'] as &$sol) {
+                $sol->instrumento_urls = $this->mapInstrumentoUrls($sol->instrumento_juridico ?? null);
+            }
+        }
         $data['scripts'] = array('inicio');
         $data['contentView'] = 'personal/vListaSolicitudContrato';
         $this->_renderView($data);
@@ -8612,6 +9417,11 @@ class Principal extends BaseController
         }
 
         $data['solicitudes'] = (!empty($solicitudes->data)) ? $solicitudes->data : [];
+        if (!empty($data['solicitudes'])) {
+            foreach ($data['solicitudes'] as &$sol) {
+                $sol->instrumento_urls = $this->mapInstrumentoUrls($sol->instrumento_juridico ?? null);
+            }
+        }
         $data['scripts'] = array('inicio');
         $data['contentView'] = 'personal/vListaSolicitudConvenio';
         $this->_renderView($data);
@@ -8645,6 +9455,7 @@ class Principal extends BaseController
         $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
 
         $data['solicitud'] = $solicitud->data[0];
+        $data['solicitud']->archivo_suficiencia_url = $this->resolveStoredFileUrl($data['solicitud']->archivo_suficiencia ?? null, 'assets/uploads/convenios');
         $data['pagos'] = (!empty($pagos->data)) ? $pagos->data : [];
         
         $data['scripts'] = array('inicio');
@@ -8668,8 +9479,13 @@ class Principal extends BaseController
         if($file = $this->request->getFile('archivo_suficiencia')) {
              if ($file->isValid() && !$file->hasMoved()) {
                 $newName = $file->getRandomName();
-                $file->move(FCPATH . 'assets/uploads/convenios', $newName);
-                $archivo_suficiencia = $newName;
+                $uploadedKey = $this->uploadFileToS3Storage($file->getTempName(), 'convenios', 'suficiencia', $newName);
+                if ($uploadedKey) {
+                    $archivo_suficiencia = $uploadedKey;
+                } else {
+                    $response->respuesta = 'No fue posible guardar el archivo de suficiencia en AWS S3.';
+                    return $this->respond($response);
+                }
              }
         }
 
@@ -8885,10 +9701,10 @@ class Principal extends BaseController
                     $ext = pathinfo($originalName, PATHINFO_EXTENSION);
                     $randHash = substr(md5(uniqid(rand(), true)), 0, 8);
                     $newName = 'Inst_Convenio_' . $id . '_' . $randHash . '.' . $ext;
-                    $targetPath = FCPATH . 'assets/uploads/convenios/' . $newName;
+                    $s3Key = $this->uploadFileToS3Storage($tmpName, 'convenios', 'instrumentos', $newName);
                     
-                    if (move_uploaded_file($tmpName, $targetPath)) {
-                        $rutasGuardadas[] = 'assets/uploads/convenios/' . $newName;
+                    if ($s3Key) {
+                        $rutasGuardadas[] = $s3Key;
                         $exito = true;
                     }
                 }
@@ -8962,107 +9778,193 @@ class Principal extends BaseController
     }
     public function pdfFicha()
     {
-       // setlocale(LC_TIME, 'es_ES');
+        // setlocale(LC_TIME, 'es_ES');
         $id = $this->request->getGet('id_ficha_tecnica');
-        $response = new \stdClass();
-        $response->error = true;
-        $response->respuesta = "Error al validar usuario";
-        $session = \Config\Services::session();
-        $Mglobal = new Mglobal;
-        $data = array();
-     
-        $result = $Mglobal->getTabla(["tabla"=>"ficha_tecnica",'where' => ['id_ficha_tecnica' => $id]])->data[0];
-        
-        if (!$result) {
-            die("Ficha no encontrada.");
+          if(!$id){
+            echo "ID no válido"; return;
         }
+
+        $session = \Config\Services::session();
+        $globals = new \App\Models\Mglobal;
         
+        $ficha = $globals->getTabla(['tabla' => 'ficha_tecnica', 'where' => ['id_ficha_tecnica' => $id]])->data[0];
+
+        $data = array();
+        $data['id_ficha_tecnica']   = $ficha->id_ficha_tecnica;
+        $data['em_domicilio']       = $ficha->em_domicilio;
+        $data['fecha_realizacion']  = $ficha->fecha_realizacion;
+        $data['nombre_evento']      = $ficha->nombre_evento;
+        $data['persona_solicitud']  = $ficha->persona_solicitud;
+        $data['edicion']            = $ficha->edicion;
+        $data['periodicidad_desc']  = $ficha->periodicidad_desc;
+        $data['municipio_sede']     = $ficha->municipio_sede;
+        $data['periodicidad_radio'] = $ficha->periodicidad_radio;
+        $data['antecedentes']       = $ficha->antecedentes;
+        $data['objetivo_general']   = $ficha->objetivo_general;
+        $data['justificacion']      = $ficha->justificacion;
+        $data['nivel_habilidades']  = $ficha->nivel_habilidades;
+        $data['estrato']            = $ficha->estrato;
+        $data['asistentes_totales'] = $ficha->asistentes_totales;
+        $data['asistentes_local']   = $ficha->asistentes_local;
+        $data['asistentes_regional']= $ficha->asistentes_regional;
+        $data['asistentes_nacional']= $ficha->asistentes_nacional;
+        $data['asistentes_internacional'] = $ficha->asistentes_internacional;
+        $data['alcance']           = $ficha->alcance;
+        $data['derrama_total']     = $ficha->derrama_total;
+        $data['derrama_local']     = $ficha->derrama_local;
+        $data['derrama_foraneo']   = $ficha->derrama_foraneo;
+        $data['empleos_mujeres']   = $ficha->empleos_mujeres;
+        $data['empleos_hombres']   = $ficha->empleos_hombres;
+        $data['empleos_discapacidad'] = $ficha->empleos_discapacidad;
+        $data['cuota_acceso']     = (isset($ficha->cuota_acceso) && !empty($ficha->cuota_acceso)) ? $ficha->cuota_acceso : 'N/A';
+        $data['cuantas_cuotas']   = (isset($ficha->cuantas_cuotas) && !empty($ficha->cuantas_cuotas)) ? $ficha->cuantas_cuotas : 'N/A';
+        $data['costo_total']      = (isset($ficha->costo_total) && !empty($ficha->costo_total)) ? $ficha->costo_total : 'N/A';
+        $data['desglose_costo']      = $ficha->desglose_costo;
+        $data['cantidades_desglose']      = $ficha->cantidades_desglose;
+        $data['montos_desglose']      = $ficha->montos_desglose;
+        $data['antecedentes_evento']      = $ficha->antecedentes_evento;
+        $data['propuesta_valor']      = $ficha->propuesta_valor;
+        $data['inclusion_mujeres']      = $ficha->inclusion_mujeres;
+        $data['programa_preliminar']      = $ficha->programa_preliminar;
+        $data['otras_actividades']      = $ficha->otras_actividades;
+        $data['link_web']      = (isset($ficha->link_web) && !empty($ficha->link_web)) ? $ficha->link_web : 'N/A';
+        $data['facebook']      = (isset($ficha->facebook) && !empty($ficha->facebook)) ? $ficha->facebook : 'N/A';
+        $data['fb_seguidores']      = (isset($ficha->fb_seguidores) && !empty($ficha->fb_seguidores)) ? $ficha->fb_seguidores : 'N/A';
+        $data['twitter']      = (isset($ficha->twitter) && !empty($ficha->twitter)) ? $ficha->twitter : 'N/A';
+        $data['tw_seguidores']      = (isset($ficha->tw_seguidores) && !empty($ficha->tw_seguidores)) ? $ficha->tw_seguidores : 'N/A';
+        $data['youtube']      = (isset($ficha->youtube) && !empty($ficha->youtube)) ? $ficha->youtube : 'N/A';
+        $data['ig_seguidores']      = $ficha->ig_seguidores;
+        $data['twitter']      = $ficha->twitter;
+        $data['yt_seguidores']      = $ficha->yt_seguidores;
+        $data['instagram']      = $ficha->instagram;
+        $data['tiktok']      = $ficha->tiktok;
+        $data['tk_seguidores']      = $ficha->tk_seguidores;
+        $data['co_nombre']      = $ficha->co_nombre;
+        $data['co_telefono']      = $ficha->co_telefono;
+        $data['co_cargo']      = $ficha->co_cargo;
+        $data['co_celular']      = $ficha->co_celular;
+        $data['co_domicilio']      = $ficha->co_domicilio;
+        $data['co_ciudad_estado']      = $ficha->co_ciudad_estado;
+        $data['co_email']      = $ficha->co_email;
+        $data['em_nombre']      = $ficha->em_nombre;
+        $data['em_cargo']      = $ficha->em_cargo;
+        $data['em_celular']      = $ficha->em_celular;
+        $data['em_telefono_fijo']      = $ficha->em_telefono_fijo;
+        $data['em_ciudad_estado']      = $ficha->em_ciudad_estado;
+        $data['apoyo_federal']      = (isset($ficha->apoyo_federal) && !empty($ficha->apoyo_federal)) ? $ficha->apoyo_federal : 'N/A';
+        $data['apoyo_municipal']      = (isset($ficha->apoyo_municipal) && !empty($ficha->apoyo_municipal)) ? $ficha->apoyo_municipal : 'N/A';
+        $data['apoyo_estatal']      = (isset($ficha->apoyo_estatal) && !empty($ficha->apoyo_estatal)) ? $ficha->apoyo_estatal : 'N/A';
+        $data['descripcion_apoyos']      = (isset($ficha->descripcion_apoyos) && !empty($ficha->descripcion_apoyos)) ? $ficha->descripcion_apoyos : 'N/A';
+        $data['fecha_registro']      = (isset($ficha->fecha_registro) && !empty($ficha->fecha_registro)) ? $ficha->fecha_registro : 'N/A';
+
+      // die( var_dump( $ficha ) );
       
-       $data['em_domicilio']        = $result->em_domicilio;
-       $data['fecha_realizacion']   = $result->fecha_realizacion;
-       $data['nombre_evento']       = $result->nombre_evento;
-       $data['persona_solicitud']   = $result->persona_solicitud;
-       $data['municipio_sede']      = $result->municipio_sede;
-       $data['periodicidad_radio']  = $result->periodicidad_radio;
-       $data['antecedentes']        = $result->antecedentes;
-       $data['objetivo_general']    = $result->objetivo_general;
-       $data['justificacion']       = $result->justificacion;
-       $data['cadena_valor']        = $result->cadena_valor;
-       $data['nivel_habilidades']   = '';
-       $data['estrato']             = !$result->estrato?$result->estrato:'';
-       $data['asistentes_totales']  = $result->asistentes_totales;
-       $data['asistentes_local']    = $result->asistentes_local;
-       $data['asistentes_regional'] = $result->asistentes_regional;
-       $data['asistentes_nacional'] = $result->asistentes_nacional;
-       $data['asistentes_internacional']  = $result->asistentes_internacional;
-       $data['alcance']             = $result->alcance;
-       $data['derrama_total']       = $result->derrama_total;
-       $data['derrama_local']       = $result->derrama_local;
-       $data['derrama_foraneo']     = $result->derrama_foraneo;
-       $data['empleos_mujeres']     = $result->empleos_mujeres;
-       $data['empleos_hombres']     = $result->empleos_hombres;
-       $data['empleos_discapacidad']= $result->empleos_discapacidad;
-       $data['cuota_acceso']        = $result->cuota_acceso;
-       $data['cuantas_cuotas']      = (isset($result->cuantas_cuotas) && !empty($result->cuantas_cuotas))?$result->cuantas_cuotas:'N/A';
-       $data['costo_total']         = (isset($result->costo_total) && !empty($result->costo_total))?$result->costo_total:'N/A';
-       $data['desglose_costo']      = $result->desglose_costo;
-       $data['cantidades_desglose'] = (isset($result->cantidades_desglose) && !empty($result->cantidades_desglose))?$result->cantidades_desglose:'N/A';
-       $data['montos_desglose']     = $result->montos_desglose;
-       $data['antecedentes_evento'] = $result->antecedentes_evento;
-       $data['propuesta_valor']     = $result->propuesta_valor;
-       $data['inclusion_mujeres']   = $result->inclusion_mujeres;
-       $data['programa_preliminar'] = $result->programa_preliminar;
-       $data['otras_actividades']   = $result->otras_actividades;
-       $data['link_web']            = $result->link_web;
-       $data['facebook']            = $result->facebook;
-       $data['fb_seguidores']       = $result->fb_seguidores;
-       $data['twitter']             = $result->twitter;
-       $data['tw_seguidores']       = $result->tw_seguidores;
-       $data['instagram']           = $result->instagram;
-       $data['ig_seguidores']       = $result->ig_seguidores;
-       $data['youtube']             = $result->youtube;
-       $data['yt_seguidores']       = $result->yt_seguidores;
-       $data['tiktok']              = $result->tiktok;
-       $data['tk_seguidores']       = $result->tk_seguidores;
-       $data['co_nombre']           = $result->co_nombre;
-       $data['co_telefono']         = $result->co_telefono;
-       $data['co_razon_social']     = $result->co_razon_social;
-       $data['co_cargo']            = $result->co_cargo;
-       $data['co_celular']          = $result->co_celular;
-       $data['co_domicilio']        = $result->co_domicilio;
-       $data['co_ciudad_estado']    = $result->co_ciudad_estado;
-       $data['co_email']            = $result->co_email;
-       $data['em_nombre']           = $result->em_nombre;
-       $data['em_cargo']            = $result->em_cargo;
-       $data['em_celular']          = $result->em_celular;
-       $data['em_telefono_fijo']    = $result->em_telefono_fijo;
-       $data['em_ciudad_estado']    = $result->em_ciudad_estado;
-       $data['em_email']            = $result->em_email;
-       $data['apoyo_federal']       = $result->apoyo_federal;
-       $data['apoyo_municipal']     = $result->apoyo_municipal;
-       $data['apoyo_estatal']       = $result->apoyo_estatal;
-       $data['descripcion_apoyos']  = $result->descripcion_apoyos;
-     
-      // die(var_dump($data));
+       // $data['ficha'] = $ficha;
+
+        // Similar to Contrato PDF View
+        $html = view('personal/vFicha', $data);
         
-        $mpdfConfig = [
-            'mode' => 'utf-8',
-            'format' => 'Legal',
-            'orientation' => 'P',
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 10,
             'margin_left' => 10,
             'margin_right' => 10,
-            'margin_top' => 10,
             'margin_bottom' => 10,
-        ];
-        
-        $mpdf = new \Mpdf\Mpdf($mpdfConfig);
-        
-        $html = view("pdfs/vpdfFicha.php", $data);
-        //die(var_dump($html));
+            'format' => 'Letter'
+        ]);
+
         $mpdf->WriteHTML($html);
-        
-        $mpdf->Output('Ficha_Tecnica_'.$id.'.pdf', 'I');
-        exit;
+        $mpdf->Output('Ficha_Tecnica' . $id . '.pdf', 'I');
+        exit();
+ 
+    }
+    public function enviarFichaTecnica()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $emailService = \Config\Services::email();
+        $id = $this->request->getGet('id_ficha_tecnica');
+
+        if (empty($id)) {
+            return redirect()->to(base_url('index.php/Principal/fichaTecnica'))
+                ->with('error', 'No se recibió el identificador de la ficha técnica.');
+        }
+
+        $ficha = $globals->getTabla(['tabla' => 'ficha_tecnica', 'where' => ['id_ficha_tecnica' => $id, 'visible' => 1]]);
+        $result = (!empty($ficha->data)) ? $ficha->data[0] : null;
+
+        if (!$result) {
+            return redirect()->to(base_url('index.php/Principal/fichaTecnica'))
+                ->with('error', 'La ficha técnica no fue encontrada.');
+        }
+
+        if (empty($result->co_email)) {
+            return redirect()->to(base_url('index.php/Principal/fichaTecnica'))
+                ->with('error', 'La ficha técnica no cuenta con correo en el campo co_email.');
+        }
+
+        $dataFicha = $this->normalizeUtf8Value($this->obtenerFichaTecnicaData($result));
+        $pdfPath = '';
+
+        try {
+            $pdfPath = $this->generarPdfFichaTemporal($id, $dataFicha);
+
+            $nombreDestinatario = !empty($result->co_nombre) ? $result->co_nombre : 'Usuario';
+            $nombreEvento = !empty($result->nombre_evento) ? $result->nombre_evento : ('Ficha técnica ' . $id);
+
+            $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
+            $emailService->setTo($result->co_email);
+            $emailService->setSubject('Envío de ficha técnica - ' . $nombreEvento);
+            $emailService->setMailType('html');
+            $emailService->setMessage('
+                <p>Buen día, <strong>' . esc($nombreDestinatario) . '</strong>:</p>
+                <p>Por este medio se comparte la ficha técnica correspondiente al evento <strong>' . esc($nombreEvento) . '</strong>.</p>
+                <p>Se adjunta el archivo PDF para su consulta.</p>
+                <br>
+                <p>Saludos cordiales,</p>
+                <p><strong>SUSI - SECTURI</strong></p>
+            ');
+            $emailService->attach($pdfPath);
+
+            if (!$emailService->send()) {
+                if ($pdfPath !== '' && file_exists($pdfPath)) {
+                    unlink($pdfPath);
+                }
+
+                return redirect()->to(base_url('index.php/Principal/fichaTecnica'))
+                    ->with('error', 'No se pudo enviar el correo. Verifica la configuración del servidor de correo.');
+            }
+
+            if ($pdfPath !== '' && file_exists($pdfPath)) {
+                unlink($pdfPath);
+            }
+
+            $globals->saveTabla(
+                [
+                    'id_estatus' => 2,
+                    'usu_act' => $session->get('id_usuario'),
+                    'fec_act' => date('Y-m-d H:i:s'),
+                ],
+                [
+                    'tabla' => 'ficha_tecnica',
+                    'editar' => true,
+                    'idEditar' => ['id_ficha_tecnica' => $id],
+                ],
+                [
+                    'id_user' => $session->get('id_usuario'),
+                    'script' => 'Principal.php/enviarFichaTecnica',
+                ]
+            );
+
+            return redirect()->to(base_url('index.php/Principal/fichaTecnica'))
+                ->with('success', 'La ficha técnica se envió correctamente a ' . $result->co_email . '.');
+        } catch (\Throwable $e) {
+            if ($pdfPath !== '' && file_exists($pdfPath)) {
+                unlink($pdfPath);
+            }
+
+            return redirect()->to(base_url('index.php/Principal/fichaTecnica'))
+                ->with('error', 'Ocurrió un problema al generar o enviar la ficha técnica: ' . $e->getMessage());
+        }
     }
     
     public function subirArchivosSolicitudConvenio()
@@ -9107,13 +10009,13 @@ class Principal extends BaseController
                     $tmpName = $_FILES['archivos']['tmp_name'][$key];
                     $ext = pathinfo($originalName, PATHINFO_EXTENSION);
                     $newName = $id_solicitud . '_' . $key . '_' . time() . '.' . $ext;
-                    $targetPath = FCPATH . 'assets/uploads/convenios/' . $newName;
+                    $s3Key = $this->uploadFileToS3Storage($tmpName, 'convenios', 'documentos', $newName);
                     
-                    if (move_uploaded_file($tmpName, $targetPath)) {
+                    if ($s3Key) {
                         $dataInsert = [
                             'id_solicitud_convenio' => $id_solicitud,
                             'clave_documento' => $key,
-                            'nombre_archivo' => $newName,
+                            'nombre_archivo' => $s3Key,
                             'tipo' => $ext,
                             'usu_reg' => $session->id_usuario ?? 0,
                             'fec_reg' => date('Y-m-d H:i:s'),
@@ -9143,14 +10045,15 @@ class Principal extends BaseController
             $enlace = base_url('index.php/Principal/ListaSolicitudConvenio');
             
             $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
-            $emailService->setTo('lvelaga@guanajuato.gob.mx');
+            //$emailService->setTo('lvelaga@guanajuato.gob.mx');
+            $emailService->setTo('palafox.marin@hotmail.com');
             $emailService->setSubject('Nueva Solicitud de Convenio - Archivos Adjuntados');
             $emailService->setMailType('html');
             $emailService->setMessage("
                 <p>Buen día,</p>
-                <p>Se le notifica que se han subido documentos para la solicitud de convenio con ID <strong>{\$id_solicitud}</strong>.</p>
-                <p>Los archivos fueron agregados por el usuario: <strong>{\$nombreUsuario}</strong>.</p>
-                <p>Puede consultar los detalles ingresando al siguiente enlace: <a href='{\$enlace}'>{\$enlace}</a></p>
+                <p>Se le notifica que se han subido documentos para la solicitud de convenio con ID <strong>$id_solicitud</strong>.</p>
+                <p>Los archivos fueron agregados por el usuario: <strong>$nombreUsuario</strong>.</p>
+                <p>Puede consultar los detalles ingresando al siguiente enlace: <a href='$enlace'>$enlace</a></p>
                 <br>
                 <p>Saludos cordiales,</p>
                 <p><strong>Sistema Unificado SECTURI (SUSI)</strong></p>
@@ -9177,6 +10080,12 @@ class Principal extends BaseController
             'tabla' => 'solicitud_convenio_archivos',
             'where' => ['id_solicitud_convenio' => $id_solicitud, 'visible' => 1]
         ]);
+
+        if (!empty($archivos->data)) {
+            foreach ($archivos->data as &$archivo) {
+                $archivo->url_descarga = $this->resolveStoredFileUrl($archivo->nombre_archivo ?? null, 'assets/uploads/convenios');
+            }
+        }
         
         $data['id_solicitud'] = $id_solicitud;
         $data['archivos'] = (!empty($archivos->data)) ? $archivos->data : [];
@@ -9205,11 +10114,26 @@ class Principal extends BaseController
             echo "Solicitud no encontrada"; return;
         }
 
-        $data['solicitud'] = $solicitud->data[0];
-        $data['pagos'] = (!empty($pagos->data)) ? $pagos->data : [];
+        $data['solicitud'] = $this->normalizeUtf8Value($solicitud->data[0]);
+        $data['pagos'] = $this->normalizeUtf8Value((!empty($pagos->data)) ? $pagos->data : []);
+
+        $montoFields = [
+            'monto_secturi',
+            'monto_federal',
+            'monto_otra',
+            'monto_total',
+        ];
+
+        foreach ($montoFields as $field) {
+            $monto = (float) str_replace([',', '$', ' '], '', (string) ($data['solicitud']->$field ?? 0));
+            $textoField = $field . '_letra';
+            $data['solicitud']->$textoField = $monto > 0 ? $this->numeroEnLetras($monto) : 'CERO PESOS 00/100 M.N.';
+        }
         
         // Similar to Contrato PDF View
         $html = view('personal/vPdfSolicitudConvenio', $data);
+        $html = $this->normalizeUtf8Value($html);
+        $html = $this->cleanMpdfHtml($html);
         
         $mpdf = new \Mpdf\Mpdf([
             'margin_top' => 10,

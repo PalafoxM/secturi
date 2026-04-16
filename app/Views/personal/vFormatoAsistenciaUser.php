@@ -1,3 +1,10 @@
+<?php
+    $logoPath = FCPATH . 'assets/logo3.png';
+    $logoBase64 = '';
+    if (file_exists($logoPath)) {
+        $logoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
+    }
+?>
 <style>
      #qr {
         position: absolute;
@@ -10,6 +17,14 @@
         background-attachment: fixed;
     }
 </style>
+
+<!-- Logo centrado en la parte superior -->
+<div style="text-align: center; margin-bottom: 8px;">
+    <?php if ($logoBase64): ?>
+        <img src="<?= $logoBase64 ?>" alt="Logo" style="width: 220px; height: auto;">
+    <?php endif; ?>
+</div>
+
 <div  style="position:absolute; text-align:center; top:11%; left:70%; width:35%; height:18px;  font-size: 11px; ">
     <span class="proxima">Fecha: <?= date('d/m/Y'); ?></span>
 </div>

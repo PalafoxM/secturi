@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Solicitud de Elaboración de Contrato</title>
+    <title>Solicitud de Elaboracion de Contrato</title>
     <style>
         body { font-family: Arial, sans-serif; font-size: 12px; }
-        .header { text-align: center; margin-bottom: 20px;  background-color: #213E66;color: white; }
+        .header { text-align: center; margin-bottom: 20px; background-color: #213E66; color: white; }
         .section-title { background-color: #213E66; color: white; padding: 5px; font-weight: bold; margin-top: 15px; }
         .row { display: flex; flex-wrap: wrap; margin-bottom: 5px; }
         .label { font-weight: bold; width: 30%; display: inline-block; }
@@ -16,7 +16,6 @@
     </style>
 </head>
 <body>
-       <p>Fecha de registro: <?= date('d/m/Y H:i', strtotime($solicitud->fec_reg)) ?></p>
     <div class="header">
         <table style="width: 100%; border: none;">
             <tr>
@@ -24,22 +23,22 @@
                     <img src="<?= base_url('assets/logo3.png') ?>" width="100" alt="Logo">
                 </td>
                 <td style="width: 90%; border: none; background-color: #213E66; color: white; text-align: center;">
-                    <h3 style="margin: 5px 0;">SOLICITUD DE ELABORACIÓN DE CONTRATO</h3>
-                    <h4 style="margin: 5px 0;">DIRECCIÓN GENERAL JURÍDICA</h4>
+                    <h3 style="margin: 5px 0;">SOLICITUD DE ELABORACION DE CONTRATO</h3>
+                    <h4 style="margin: 5px 0;">DIRECCION GENERAL JURIDICA</h4>
                     <h4 style="margin: 5px 0;">DGJ-1</h4>
                 </td>
             </tr>
         </table>
     </div>
 
-    <div class="section-title">INFORMACIÓN DEL ÁREA SOLICITANTE</div>
+    <div class="section-title">INFORMACION DEL AREA SOLICITANTE</div>
     <div>
         <div class="row"><span class="label">Nombre y cargo del responsable del Proyecto:</span> <span class="value"><i><?= $solicitud->nombre_proyecto ?></i></span></div>
         <div class="row"><span class="label">Nombre y cargo del responsable de Seguimiento:</span> <span class="value"><i><?= $solicitud->nombre_seguimiento ?></i></span></div>
         <div class="row"><span class="label">Nombre y cargo del enlace de Comunicaciones:</span> <span class="value"><i><?= $solicitud->nombre_enlace ?></i></span></div>
     </div>
 
-    <div class="section-title">INFORMACIÓN PRESUPUESTAL</div>
+    <div class="section-title">INFORMACION PRESUPUESTAL</div>
     <table>
         <thead>
             <tr>
@@ -54,23 +53,30 @@
                 <td style="text-align: center;"><?= $solicitud->dsc_proyecto ?></td>
                 <td style="text-align: center;"><?= $solicitud->cuenta_cable ?></td>
                 <td style="text-align: center;"><?= $solicitud->clave_estandarizada ?></td>
-                <td style="text-align: center;">El proyecto cuenta con suficiencia presupuestal para a contratación de los servicios requeridos en la presente solicitud. Se sube captura de pantalla Sistema SAP/R3</td>
+                <td style="text-align: center;">El proyecto cuenta con suficiencia presupuestal para la contratación de los servicios requeridos en la presente solicitud. Se sube captura de pantalla Sistema SAP/R3</td>
             </tr>
         </tbody>
     </table>
     <div style="margin-top: 10px;">
-        <span class="label">Monto Total:</span> <span class="value"><?= $solicitud->monto_total ?></span>
+        <span class="label">Monto Total:</span> <span class="value"><?= $solicitud->monto_total_formateado ?? $solicitud->monto_total ?> (<?= strtoupper($solicitud->monto_total_texto ?? '') ?>)</span>
     </div>
     <div>
-        <span class="label">Garantía:</span> <span class="value"><?= $solicitud->garantia ?></span>
+        <span class="label">Tipo / Monto de Garantía:</span>
+        <span class="value">
+            <?= $solicitud->garantia ?>
+            <?php if (!empty($solicitud->monto_garantia_formateado) || !empty($solicitud->monto_garantia_texto)): ?>
+                <?= !empty($solicitud->monto_garantia_formateado) ? ' - ' . $solicitud->monto_garantia_formateado : '' ?>
+                <?= !empty($solicitud->monto_garantia_texto) ? ' (' . strtoupper($solicitud->monto_garantia_texto) . ')' : '' ?>
+            <?php endif; ?>
+        </span>
     </div>
 
-    <div class="section-title">DESCRIPCIÓN DEL SERVICIO</div>
+    <div class="section-title">DESCRIPCION DEL SERVICIO</div>
     <div style="border: 1px solid #ccc; padding: 10px; min-height: 50px; margin-bottom: 10px;">
         <?= nl2br($solicitud->objeto_contrato) ?>
     </div>
     <div>
-        <span class="label">Vigencia:</span> 
+        <span class="label">Vigencia:</span>
         <span class="value">Del <?= date('d/m/Y', strtotime($solicitud->fecha_inicio)) ?> al <?= date('d/m/Y', strtotime($solicitud->fecha_termino)) ?></span>
     </div>
 
@@ -85,12 +91,12 @@
             </tr>
         </thead>
         <tbody>
-            <?php if(!empty($pagos)): ?>
-                <?php foreach($pagos as $pago): ?>
+            <?php if (!empty($pagos)): ?>
+                <?php foreach ($pagos as $pago): ?>
                 <tr>
                     <td><?= $pago->numero_pago ?></td>
-                    <td><?= $pago->monto ?></td>
-                    <td><?= date('d/m/Y', strtotime($pago->fecha)) ?></td>
+                    <td><?= $pago->monto_formateado ?? $pago->monto ?></td>
+                    <td><?= $pago->fecha ?></td>
                     <td><?= $pago->entregable ?></td>
                 </tr>
                 <?php endforeach; ?>
@@ -100,33 +106,30 @@
         </tbody>
     </table>
 
-    <div class="section-title">INFORMACIÓN DEL PROVEEDOR</div>
+    <div class="section-title">INFORMACION DEL PROVEEDOR</div>
     <div>
         <div class="row"><span class="label">Nombre/Razón Social:</span> <span class="value"><?= $solicitud->proveedor_nombre ?></span></div>
         <div class="row"><span class="label">Domicilio fiscal:</span> <span class="value"><?= $solicitud->proveedor_domicilio ?></span></div>
         <div class="row"><span class="label">RFC:</span> <span class="value"><?= $solicitud->proveedor_rfc ?></span></div>
-        <div class="row"><span class="label">Cédula de Registro en el Padrón de Proveedores:</span> <span class="value"><?= $solicitud->proveedor_cedula ?></span></div>
+        <div class="row"><span class="label">Cedula de Registro en el Padron de Proveedores:</span> <span class="value"><?= $solicitud->proveedor_cedula ?></span></div>
         <div class="row"><span class="label">Nombre del Representante Legal (persona moral):</span> <span class="value"><?= $solicitud->proveedor_representante ?></span></div>
         <div class="row"><span class="label">Correo electrónico:</span> <span class="value"><?= $solicitud->proveedor_correo ?></span></div>
     </div>
+
     <div class="section-title">FIRMAS</div>
-
-        <table style="width: 100%; border: none;">
-          
-            <tr>
-                <td style="width: 50%; border: none; text-align: center;">
-                 <h3 style="margin: 5px 0;">_________________________________________</h3>
-                 <h3 style="margin: 5px 0;">Nombre Dir. Gral/Subsecretario</h3>
-                 <h4 style="margin: 5px 0;">Cargo</h4>
-                </td>
-                <td style="width: 50%; border: none; text-align: center;">
-                    <h3 style="margin: 5px 0;">_________________________________________</h3>
-                    <h4 style="margin: 5px 0;">Nombre Responsable del Proyecto</h4>
-                    <h4 style="margin: 5px 0;">Cargo</h4>
-                </td>
-            </tr>
-        </table>
-
-
+    <table style="width: 100%; border: none;">
+        <tr>
+            <td style="width: 50%; border: none; text-align: center;">
+                <h3 style="margin: 5px 0;">_________________________________________</h3>
+                <h3 style="margin: 5px 0;">Nombre Dir. Gral/Subsecretario</h3>
+                <h4 style="margin: 5px 0;">Cargo</h4>
+            </td>
+            <td style="width: 50%; border: none; text-align: center;">
+                <h3 style="margin: 5px 0;">_________________________________________</h3>
+                <h4 style="margin: 5px 0;">Nombre Responsable del Proyecto</h4>
+                <h4 style="margin: 5px 0;">Cargo</h4>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>

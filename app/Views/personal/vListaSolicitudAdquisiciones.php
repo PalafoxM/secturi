@@ -8,7 +8,7 @@
                         <div class="float-right">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="javascript:void(0);">SUSI</a></li>
-                                <li class="breadcrumb-item"><a href="javascript:void(0);">Administración</a></li>
+                                <li class="breadcrumb-item"><a href="javascript:void(0);">Administracion</a></li>
                                 <li class="breadcrumb-item active">Listado de Solicitudes Adquisiciones</li>
                             </ol>
                         </div>
@@ -28,7 +28,7 @@
                                     </a>
                                 </div>
                             </div>
-                            
+
                             <div class="table-responsive">
                                 <table id="datatable-adquisiciones" class="table table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                                     <thead>
@@ -40,53 +40,54 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php if(isset($solicitudes) && !empty($solicitudes)): ?>
-                                            <?php foreach($solicitudes as $sol): ?>
+                                        <?php if (!empty($solicitudes)): ?>
+                                            <?php foreach ($solicitudes as $sol): ?>
                                                 <tr>
                                                     <td><?= $sol->id_solicitud_adquisiciones ?></td>
-                                                    <td><?= isset($sol->fec_reg) ? date('d/m/Y H:i', strtotime($sol->fec_reg)) : '' ?></td>
+                                                    <td><?= !empty($sol->fec_reg) ? date('d/m/Y H:i', strtotime($sol->fec_reg)) : '' ?></td>
                                                     <td>
-                                                        <?php if(isset($sol->id_estatus) && $sol->id_estatus == 2): ?>
+                                                        <?php if ((int) ($sol->id_estatus ?? 1) === 1): ?>
+                                                            <span class="badge badge-secondary">Registrado</span>
+                                                        <?php endif; ?>
+                                                        <?php if ((int) ($sol->id_estatus ?? 0) === 2): ?>
                                                             <button class="btn btn-sm btn-outline-danger font-weight-bold shadow-sm" title="Clic para ver motivo" onclick="verMotivo('<?= htmlspecialchars($sol->motivo ?? '', ENT_QUOTES) ?>')">
                                                                 <i class="fas fa-exclamation-triangle"></i> Declinado
                                                             </button>
                                                         <?php endif; ?>
-                                                        <?php if(isset($sol->id_estatus) && $sol->id_estatus == 4): ?>
-                                                            <button class="btn btn-sm btn-soft-warning font-weight-bold" style="cursor: default; pointer-events: none;" title="En revisión por área">
+                                                        <?php if ((int) ($sol->id_estatus ?? 0) === 4): ?>
+                                                            <button class="btn btn-sm btn-soft-warning font-weight-bold" style="cursor: default; pointer-events: none;" title="En revision por area juridica">
                                                                 <i class="fas fa-circle-notch fa-spin mr-1"></i> En Espera
                                                             </button>
                                                         <?php endif; ?>
-                                                        <?php if(isset($sol->id_estatus) && $sol->id_estatus == 3): ?>
-                                                            <button class="btn btn-sm btn-success font-weight-bold" style="cursor: default; pointer-events: none;" title="Aprobado">
-                                                                <i class="fas fa-check-circle mr-1"></i> Aprobado
-                                                            </button>
-                                                        <?php endif; ?>
-                                                        <?php if(!isset($sol->id_estatus) || $sol->id_estatus == 1): ?>
-                                                             <span class="badge badge-secondary">Registrado</span>
+                                                        <?php if ((int) ($sol->id_estatus ?? 0) === 3): ?>
+                                                            <?php if (!empty($sol->instrumento_urls)): ?>
+                                                                <?php foreach ($sol->instrumento_urls as $index => $instrumento): ?>
+                                                                    <a href="<?= $instrumento['url'] ?>" target="_blank" class="btn btn-sm btn-success mb-1" title="Ver Instrumento <?= $index + 1 ?>">
+                                                                        <i class="fas fa-file-pdf"></i> Inst. <?= $index + 1 ?>
+                                                                    </a>
+                                                                <?php endforeach; ?>
+                                                            <?php else: ?>
+                                                                <span class="badge badge-success">Aprobado</span>
+                                                            <?php endif; ?>
                                                         <?php endif; ?>
                                                     </td>
                                                     <td class="text-center">
-                                                        <?php if($session->id_perfil != 7): ?>
+                                                        <?php if ($session->id_perfil != 7): ?>
                                                             <a href="<?= base_url('index.php/Principal/editarSolicitudAdquisiciones/' . $sol->id_solicitud_adquisiciones) ?>" class="btn btn-sm btn-warning" title="Editar"><i class="fas fa-edit"></i></a>
                                                         <?php endif; ?>
-
                                                         <a href="<?= base_url('index.php/Principal/verSolicitudAdquisicionesPDF/' . $sol->id_solicitud_adquisiciones) ?>" target="_blank" class="btn btn-sm btn-info" title="Ver PDF"><i class="fas fa-file-pdf"></i></a>
-
-                                                        <?php if($session->id_perfil != 7): ?>
-                                                         <button class="btn btn-sm btn-secondary" title="Adjuntar Archivos" onclick="abrirModalArchivos(<?= $sol->id_solicitud_adquisiciones ?>)"><i class="fas fa-paperclip"></i></button>
+                                                        <?php if ($session->id_perfil != 7 && in_array((int) ($sol->id_estatus ?? 1), [1, 2], true)): ?>
+                                                            <button class="btn btn-sm btn-secondary" title="Adjuntar Archivos" onclick="abrirModalArchivos(<?= $sol->id_solicitud_adquisiciones ?>)"><i class="fas fa-paperclip"></i></button>
                                                         <?php endif; ?>
-
-                                                        <?php if(isset($sol->tienen_archivos) && $sol->tienen_archivos): ?>
-                                                                <a href="<?= base_url('index.php/Principal/verArchivosSolicitudAdquisiciones/' . $sol->id_solicitud_adquisiciones) ?>" class="btn btn-sm btn-success" title="Ver Archivos"><i class="fas fa-eye"></i></a>
+                                                        <?php if (!empty($sol->tienen_archivos)): ?>
+                                                            <a href="<?= base_url('index.php/Principal/verArchivosSolicitudAdquisiciones/' . $sol->id_solicitud_adquisiciones) ?>" class="btn btn-sm btn-success" title="Ver Archivos"><i class="fas fa-eye"></i></a>
                                                         <?php endif; ?>
-                                                        
-                                                        <?php /*
-                                                        <?php if($session->id_perfil != 7): ?>
-                                                            <button class="btn btn-sm btn-danger" title="Eliminar" onclick="eliminarSolicitud(<?= $sol->id_solicitud_adquisiciones ?>)"><i class="fas fa-trash"></i></button>
+                                                        <?php if ((int) ($sol->id_estatus ?? 0) === 4 && in_array($session->id_perfil, [1, 7])): ?>
+                                                            <a onclick="declinaSolicitud(<?= $sol->id_solicitud_adquisiciones ?>);" class="btn btn-sm btn-danger" title="Declinar"><i class="fas fa-times text-white"></i></a>
+                                                            <button class="btn btn-sm btn-primary" title="Subir Instrumento Juridico" onclick="subirInstrumentoJuridico(<?= $sol->id_solicitud_adquisiciones ?>)"><i class="fas fa-upload"></i> Subir Instrumento</button>
                                                         <?php endif; ?>
-                                                        */ ?>
                                                     </td>
-                                                 </tr>
+                                                </tr>
                                             <?php endforeach; ?>
                                         <?php endif; ?>
                                     </tbody>
@@ -100,60 +101,24 @@
     </div>
 </div>
 
-<!-- Modal Selección de Archivos -->
 <div class="modal fade" id="modalSeleccionArchivos" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalLabel">Selección de Documentos a Subir</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <h5 class="modal-title" id="modalLabel">Seleccion de Documentos a Subir</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body">
                 <form id="formSeleccionArchivos" action="<?= base_url('index.php/Principal/subirArchivosSolicitudAdquisiciones') ?>" method="POST">
                     <input type="hidden" name="id_solicitud" id="modal_id_solicitud">
                     <table class="table table-bordered table-sm">
                         <thead class="thead-light">
-                            <tr>
-                                <th style="width: 5%;">Num.</th>
-                                <th>DOCUMENTO</th>
-                                <th style="width: 10%; text-align: center;">SI</th>
-
-                            </tr>
+                            <tr><th style="width: 5%;">Num.</th><th>DOCUMENTO</th><th style="width: 10%; text-align: center;">SI</th></tr>
                         </thead>
                         <tbody>
-                            <?php 
-                            $documentos = [
-                                1 => "Anexo Técnico (Términos de referencia)",
-                                2 => "Investigación de Mercado (Cotizaciones y consulta PEI)",
-                                3 => "Validación de partida restringida (SF)<br>Verificación de Alineación de Información Estratégica (DGIT)<br>Suficiencia presupuestal (R3)<br>Validación DGTIT/CGCS u otra",
-                                4 => "Justificación",
-                                5 => "Propuesta Técnico Económica (Anexo)",
-                                6 => "Aviso de privacidad integral",
-                                7 => "Cédula de Registro en el Padrón de Proveedores (Refrendo vigente)",
-                                8 => "Escritura Constitutiva/Documento que acredite la legal constitución de la persona moral (Modificaciones sustanciales e inscripción en el Registro Público)",
-                                9 => "Documento que acredite la representación de la persona moral (Poder)",
-                                10 => "Identificación oficial vigente (Personas morales Representante y Responsable de seguimiento)",
-                                11 => "Constancia de Situación Fiscal (RFC)",
-                                12 => "Comprobante de domicilio (Sólo cuando sea diferente al domicilio fiscal)",
-                                13 => "Opinión de cumplimiento de Obligaciones Fiscales<br>Manifiesto bajo protesta de cumplimiento de Obligaciones Fiscales",
-                                14 => "Manifiesto de no encontrarse impedido para Contratar",
-                                15 => "Carta de Declaración de intereses",
-                                16 => "Manifiesto de contar con infraestructura",
-                                17 => "Carta compromiso entrega de bienes (Excepción de Garantía)"
-                            ];
-                            foreach($documentos as $key => $doc): ?>
-                            <tr>
-                                <td><?= $key ?></td>
-                                <td><?= $doc ?></td>
-                                <td class="text-center">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input check-si" id="si_<?= $key ?>" name="documentos[<?= $key ?>]" value="<?= $doc ?>">
-                                        <label class="custom-control-label" for="si_<?= $key ?>"></label>
-                                    </div>
-                                </td>
-                            </tr>
+                            <?php $documentos = [1 => 'Anexo Tecnico (Terminos de referencia)', 2 => 'Investigacion de Mercado (Cotizaciones y consulta PEI)', 3 => 'Validacion de partida / Alineacion / R3 / otra', 4 => 'Justificacion', 5 => 'Propuesta Tecnico Economica', 6 => 'Aviso de privacidad integral', 7 => 'Cedula de Registro en el Padron de Proveedores', 8 => 'Escritura Constitutiva', 9 => 'Documento que acredita la representacion', 10 => 'Identificacion oficial vigente', 11 => 'Constancia de Situacion Fiscal', 12 => 'Comprobante de domicilio', 13 => 'Opinion de cumplimiento / Manifiesto fiscal', 14 => 'Manifiesto de no impedimento', 15 => 'Carta de Declaracion de intereses', 16 => 'Manifiesto de infraestructura', 17 => 'Carta compromiso entrega de bienes']; ?>
+                            <?php foreach ($documentos as $key => $doc): ?>
+                                <tr><td><?= $key ?></td><td><?= $doc ?></td><td class="text-center"><div class="custom-control custom-checkbox"><input type="checkbox" class="custom-control-input check-si" id="si_<?= $key ?>" name="documentos[<?= $key ?>]" value="<?= $doc ?>"><label class="custom-control-label" for="si_<?= $key ?>"></label></div></td></tr>
                             <?php endforeach; ?>
                         </tbody>
                     </table>
@@ -172,7 +137,6 @@
 <link href="<?= base_url() ?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
 <link href="<?= base_url() ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
 <link href="<?= base_url() ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
-
 <script src="<?= base_url() ?>assets/js/jquery.min.js"></script>
 <script src="<?= base_url() ?>assets/js/bootstrap.bundle.min.js"></script>
 <script src="<?= base_url() ?>assets/js/metismenu.min.js"></script>
@@ -181,23 +145,11 @@
 <script src="<?= base_url() ?>assets/js/jquery.slimscroll.min.js"></script>
 <script src="<?= base_url() ?>plugins/datatables/jquery.dataTables.min.js"></script>
 <script src="<?= base_url() ?>plugins/datatables/dataTables.bootstrap4.min.js"></script>
-
 <script>
-    $(document).ready(function() {
-        $('#datatable-adquisiciones').DataTable({
-            language: {
-                url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json'
-            }
-        });
-    });
-
-    function abrirModalArchivos(id) {
-        $('#modal_id_solicitud').val(id);
-        $('.check-si').prop('checked', false);
-        $('#modalSeleccionArchivos').modal('show');
-    }
-
-    function enviarFormularioArchivos() {
-        $('#formSeleccionArchivos').submit();
-    }
+$(document).ready(function(){ $('#datatable-adquisiciones').DataTable({ language:{ url:'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json' } }); });
+function abrirModalArchivos(id){ $('#modal_id_solicitud').val(id); $('.check-si').prop('checked', false); $('#modalSeleccionArchivos').modal('show'); }
+function enviarFormularioArchivos(){ $('#formSeleccionArchivos').submit(); }
+function verMotivo(motivo){ Swal.fire({ title:'Motivo de Declinacion', text: motivo || 'No se especifico un motivo.', icon:'info', confirmButtonText:'Cerrar', confirmButtonColor:'#5b73e8' }); }
+function declinaSolicitud(id){ Swal.fire({ title:'Deseas declinar la solicitud?', text:'Ingresa el motivo de la declinacion:', icon:'warning', input:'textarea', inputPlaceholder:'Escribe el motivo aqui...', showCancelButton:true, confirmButtonColor:'#d33', cancelButtonColor:'#3085d6', confirmButtonText:'Si, declinar', cancelButtonText:'Cancelar', preConfirm:(motivo)=>{ if(!motivo || motivo.trim()===''){ Swal.showValidationMessage('El motivo es obligatorio'); return false; } return motivo; } }).then((result)=>{ if(result.isConfirmed){ $.post('<?= base_url("index.php/Principal/declinarSolicitudAdquisiciones") ?>',{ id_solicitud:id, motivo:result.value },function(response){ if(!response.error){ Swal.fire('Declinado','El registro ha sido declinado.','success').then(()=>location.reload()); } else { Swal.fire('Error','No se pudo declinar el registro.','error'); } }); } }); }
+function subirInstrumentoJuridico(id){ Swal.fire({ title:'Subir Instrumentos Juridicos', input:'file', inputAttributes:{ accept:'application/pdf', multiple:'multiple', 'aria-label':'Subir Instrumentos Juridicos en PDF' }, showCancelButton:true, confirmButtonText:'Subir', cancelButtonText:'Cancelar', showLoaderOnConfirm:true, preConfirm:(files)=>{ if(!files || files.length===0){ Swal.showValidationMessage('Selecciona al menos un archivo PDF'); return false; } const formData=new FormData(); for(let i=0;i<files.length;i++){ formData.append('archivos[]', files[i]); } formData.append('id_solicitud', id); return fetch('<?= base_url("index.php/Principal/subirInstrumentoJuridicoAdquisiciones") ?>',{ method:'POST', body:formData }).then(response=>response.json()).catch(error=>{ Swal.showValidationMessage(`Error: ${error}`); }); }, allowOutsideClick:()=>!Swal.isLoading() }).then((result)=>{ if(result.isConfirmed){ if(result.value.error){ Swal.fire('Error', result.value.respuesta || 'Ocurrio un error al subir el archivo.', 'error'); } else { Swal.fire('Exito','El archivo se ha subido correctamente.','success').then(()=>location.reload()); } } }); }
 </script>

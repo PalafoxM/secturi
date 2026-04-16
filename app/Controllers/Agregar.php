@@ -5425,25 +5425,18 @@ class Agregar extends BaseController
             'mirrorMargins' => false,
         ]);
 
-        // Importar el PDF base
+          $html = view($formato, $data);
+        
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 10,
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_bottom' => 10,
+            'format' => 'Letter'
+        ]);
 
-        $pagecount = $mpdf->SetSourceFile(FCPATH . $doc);
-        $tplId = $mpdf->ImportPage(1);
-
-        // Página 1
-        $mpdf->AddPage();
-        $mpdf->UseTemplate($tplId);
         $mpdf->WriteHTML($html);
-
-        // Footer en todas las páginas
-        $mpdf->SetHTMLFooter('
-            <div style="text-align: right; font-size: 10px;">
-                Página {PAGENO} de {nbpg}
-            </div>
-        ');
-
-
-        $mpdf->Output('Formato_pt.pdf', 'I');
+        $mpdf->Output('Formato_Asistencia_' . $id_incidencia . '.pdf', 'I');
         exit();
 
     }
@@ -5687,7 +5680,7 @@ class Agregar extends BaseController
                                 <img src="' . base_url('assets/images/logo-sm.png') . '" alt="Logo" style="height: 60px;">
                             </div>
                             <div style="padding: 30px; color: #333;">
-                                <h1 style="color: #004080;">¡El estatus de su incidencia cambio!</h1>
+                                <h1 style="color: #004080;">¡El estatus de su incidencia cambió!</h1>
                                 <p style="font-size: 16px;">Favor de <strong> Ingresar a SUSI</strong>.</p>
                                 <p style="font-size: 15px;"><a href="' . base_url() . 'index.php/Agregar/Asistencia"><strong>Seguimiento Incidencia</strong></a></p>
                             </div>
