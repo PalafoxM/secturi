@@ -9749,6 +9749,7 @@ class Principal extends BaseController
                    if(isset($usuarioQuery->data) && !empty($usuarioQuery->data) && !empty($usuarioQuery->data[0]->correo)){
                        $correoDestino = $usuarioQuery->data[0]->correo;
                        $nombreUsuario = $usuarioQuery->data[0]->nombre_completo ?? 'Usuario';
+                       $enlaceListado = 'https://secturnet.guanajuato.gob.mx/susi/index.php/Principal/ListaSolicitudConvenio';
                        
                        $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
                        $emailService->setTo($correoDestino);
@@ -9761,7 +9762,20 @@ class Principal extends BaseController
                            <br>
                            <p>Saludos cordiales,</p>
                        ");
-                       $emailService->send();
+                       $emailService->setMessage("
+                            <p>Buen día, <strong>{$nombreUsuario}</strong>:</p>
+                            <p>El área Jurídica ha autorizado y adjuntado el/los instrumentos jurídicos correspondientes a su solicitud de convenio con ID <strong>{$id}</strong>.</p>
+                            <p>Puede consultar y descargar los documentos ingresando al siguiente enlace:</p>
+                            <p><a href='{$enlaceListado}' target='_blank'>{$enlaceListado}</a></p>
+                            <br>
+                            <p>Saludos cordiales,</p>
+                            <p><strong>Sistema Unificado SECTURI (SUSI)</strong></p>
+                        ");
+                       try {
+                           $emailService->send();
+                       } catch (\Throwable $e) {
+                           log_message('error', 'Error enviando correo de convenio aprobado: ' . $e->getMessage());
+                       }
                    }
                 }
 
