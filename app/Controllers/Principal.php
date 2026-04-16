@@ -3082,7 +3082,7 @@ class Principal extends BaseController
 
         $html = view('personal/vFormatoGRC', $data);
         $doc = 'public/assets/images/archivo_grc.pdf'; // Reference only, not used anymore
-       // 110943
+     
         // Crear PDF
       
         $mpdf = new \Mpdf\Mpdf([
@@ -4625,15 +4625,17 @@ class Principal extends BaseController
             }
         }
         
-/*         if ($count > 0) {
+         if ($count > 0) {
             // Enviar correo a lvelaga@guanajuato.gob.mx
             $emailService = \Config\Services::email();
             $usuarioQuery = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["id_usuario" => ($session->id_usuario ?? 0)]]);
             $nombreUsuario = (isset($usuarioQuery->data) && !empty($usuarioQuery->data)) ? $usuarioQuery->data[0]->nombre_completo : 'Usuario Desconocido';
             $enlace = base_url('index.php/Principal/ListaSolicitudContrato');
-            
             $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
-            $emailService->setTo('lvelaga@guanajuato.gob.mx');
+            $emailService->setTo([
+            'lvelaga@guanajuato.gob.mx',
+            'al.hernandezma@guanajuato.gob.mx'
+            ]);
             $emailService->setSubject('Nueva Solicitud de Contrato - Archivos Adjuntados');
             $emailService->setMailType('html');
             $emailService->setMessage("
@@ -4644,6 +4646,7 @@ class Principal extends BaseController
                 <br>
                 <p>Saludos cordiales,</p>
                 <p><strong>Sistema Unificado SECTURI (SUSI)</strong></p>
+                <a href='https://secturnet.guanajuato.gob.mx/susi/index.php/Principal/ListaSolicitudContrato'>Ir al sistema</a>
             ");
             $emailService->send();
 
@@ -4653,7 +4656,7 @@ class Principal extends BaseController
             $response->respuesta = $msg;
         } else {
             $response->respuesta = "No se guardó ningún archivo. " . ($errores > 0 ? "Hubo errores al procesar." : "No se seleccionaron archivos.");
-        } */
+        } 
 
         return $this->respond($response);
     }
@@ -4736,7 +4739,7 @@ class Principal extends BaseController
                    $correoDestino = $usuarioQuery->data[0]->correo;
                    $nombreUsuario = $usuarioQuery->data[0]->nombre_completo ?? 'Usuario';
                    $enlaceListado = 'https://secturnet.guanajuato.gob.mx/susi/index.php/Principal/ListaSolicitudContrato';
-                   $enlaceListado = 'https://secturnet.guanajuato.gob.mx/susi/index.php/Principal/ListaSolicitudContrato';
+                   //$enlaceListado = 'https://secturnet.guanajuato.gob.mx/susi/index.php/Principal/ListaSolicitudContrato';
                    
                    $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
                    $emailService->setTo($correoDestino);
