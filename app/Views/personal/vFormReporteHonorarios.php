@@ -167,14 +167,14 @@
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
-                                                <label for="nombre_responsable_area">Nombre responsable de area</label>
-                                                <input type="text" class="form-control" id="nombre_responsable_area" name="nombre_responsable_area" value="<?= esc($reporte->nombre_responsable_area ?? '') ?>" required>
+                                                <label for="nombre_responsable">Nombre responsable</label>
+                                                <input type="text" class="form-control" id="nombre_responsable" name="nombre_responsable" value="<?= esc($reporte->nombre_responsable ?? ($reporte->nombre_responsable_area ?? '')) ?>" required>
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
-                                                <label for="puesto_responsable_area">Puesto responsable de area</label>
-                                                <input type="text" class="form-control" id="puesto_responsable_area" name="puesto_responsable_area" value="<?= esc($reporte->puesto_responsable_area ?? '') ?>" required>
+                                                <label for="puesto_responsable">Puesto responsable</label>
+                                                <input type="text" class="form-control" id="puesto_responsable" name="puesto_responsable" value="<?= esc($reporte->puesto_responsable ?? ($reporte->puesto_responsable_area ?? '')) ?>" required>
                                             </div>
                                         </div>
                                     </div>

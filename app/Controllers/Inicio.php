@@ -873,16 +873,15 @@ class Inicio extends BaseController
         $fechaFirma = trim((string)($post['fecha_firma'] ?? ''));
         $nombrePrestador = trim((string)($post['nombre_prestador'] ?? ''));
         $puestoPrestador = trim((string)($post['puesto_prestador'] ?? ''));
-        $nombreResponsableArea = trim((string)($post['nombre_responsable_area'] ?? ''));
-        $puestoResponsableArea = trim((string)($post['puesto_responsable_area'] ?? ''));
-        $nombreResponsable = trim((string)($post['nombre_responsable'] ?? ''));
+        $nombreResponsable = trim((string)($post['nombre_responsable'] ?? ($post['nombre_responsable_area'] ?? '')));
+        $puestoResponsable = trim((string)($post['puesto_responsable'] ?? ($post['puesto_responsable_area'] ?? '')));
         $titulos = $post['actividad_titulo'] ?? [];
         $desgloses = $post['actividad_desglose'] ?? [];
 
         if (
             $responsable === '' || $area === '' || $numeroContrato === '' || $tipoReporte === '' ||
             $fechaInicio === '' || $fechaFin === '' || $fechaFirma === '' ||
-            $nombrePrestador === '' || $puestoPrestador === '' || $nombreResponsableArea === '' || $puestoResponsableArea === ''
+            $nombrePrestador === '' || $puestoPrestador === '' || $nombreResponsable === '' || $puestoResponsable === ''
         ) {
             $response->respuesta = 'Todos los campos del reporte son obligatorios.';
             return $this->response->setJSON($response);
@@ -928,12 +927,6 @@ class Inicio extends BaseController
             return $this->response->setJSON($response);
         }
 
-        // La columna nombre_responsable se alimenta desde el campo
-        // "Puesto responsable de area", segun el flujo solicitado.
-        if ($nombreResponsable === '') {
-            $nombreResponsable = $puestoResponsableArea;
-        }
-
         $dataSave = [
             'responsable_administrativo' => $responsable,
             'area' => $area,
@@ -944,9 +937,10 @@ class Inicio extends BaseController
             'fecha_firma' => $fechaFirma,
             'nombre_prestador' => $nombrePrestador,
             'puesto_prestador' => $puestoPrestador,
-            'nombre_responsable_area' => $nombreResponsableArea,
-            'puesto_responsable_area' => $puestoResponsableArea,
             'nombre_responsable' => $nombreResponsable,
+            'puesto_responsable' => $puestoResponsable,
+            'nombre_responsable_area' => $nombreResponsable,
+            'puesto_responsable_area' => $puestoResponsable,
             'pdf_referencia' => 'assets/Reporteactividades26.pdf',
             'visible' => 1
         ];

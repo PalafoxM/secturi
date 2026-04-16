@@ -1,43 +1,43 @@
 <?php
-    $reporte = $reporte ?? new stdClass();
-    $actividades = $actividades ?? [];
+$reporte = $reporte ?? new stdClass();
+$actividades = $actividades ?? [];
 
-    $meses = [
-        1 => 'enero', 2 => 'febrero', 3 => 'marzo', 4 => 'abril',
-        5 => 'mayo', 6 => 'junio', 7 => 'julio', 8 => 'agosto',
-        9 => 'septiembre', 10 => 'octubre', 11 => 'noviembre', 12 => 'diciembre'
+$meses = [
+    1 => 'enero', 2 => 'febrero', 3 => 'marzo', 4 => 'abril',
+    5 => 'mayo', 6 => 'junio', 7 => 'julio', 8 => 'agosto',
+    9 => 'septiembre', 10 => 'octubre', 11 => 'noviembre', 12 => 'diciembre'
+];
+
+$formatFecha = static function ($fecha) use ($meses) {
+    if (empty($fecha)) {
+        return ['dia' => '__', 'mes' => '__________', 'anio' => '20__'];
+    }
+
+    $timestamp = strtotime((string) $fecha);
+    if (!$timestamp) {
+        return ['dia' => '__', 'mes' => '__________', 'anio' => '20__'];
+    }
+
+    return [
+        'dia' => date('d', $timestamp),
+        'mes' => $meses[(int) date('n', $timestamp)] ?? '',
+        'anio' => date('Y', $timestamp),
     ];
+};
 
-    $formatFecha = static function ($fecha) use ($meses) {
-        if (empty($fecha)) {
-            return ['dia' => '__', 'mes' => '__________', 'anio' => '20__'];
-        }
+$fechaInicio = $formatFecha($reporte->fecha_inicio ?? null);
+$fechaFin = $formatFecha($reporte->fecha_fin ?? null);
+$fechaFirma = $formatFecha($reporte->fecha_firma ?? null);
+$tipoReporte = strtolower((string) ($reporte->tipo_reporte ?? 'trimestral'));
 
-        $timestamp = strtotime((string) $fecha);
-        if (!$timestamp) {
-            return ['dia' => '__', 'mes' => '__________', 'anio' => '20__'];
-        }
+$splitBullets = static function ($texto) {
+    $lineas = preg_split('/\r\n|\r|\n/', (string) $texto);
+    $lineas = array_values(array_filter(array_map('trim', $lineas), static function ($linea) {
+        return $linea !== '';
+    }));
 
-        return [
-            'dia' => date('d', $timestamp),
-            'mes' => $meses[(int) date('n', $timestamp)] ?? '',
-            'anio' => date('Y', $timestamp),
-        ];
-    };
-
-    $fechaInicio = $formatFecha($reporte->fecha_inicio ?? null);
-    $fechaFin = $formatFecha($reporte->fecha_fin ?? null);
-    $fechaFirma = $formatFecha($reporte->fecha_firma ?? null);
-    $tipoReporte = strtolower((string) ($reporte->tipo_reporte ?? 'trimestral'));
-
-    $splitBullets = static function ($texto) {
-        $lineas = preg_split('/\r\n|\r|\n/', (string) $texto);
-        $lineas = array_values(array_filter(array_map('trim', $lineas), static function ($linea) {
-            return $linea !== '';
-        }));
-
-        return empty($lineas) ? ['Sin desglose'] : $lineas;
-    };
+    return empty($lineas) ? ['Sin desglose'] : $lineas;
+};
 ?>
 <html>
 <head>
@@ -134,6 +134,7 @@
         .conformidad {
             margin-top: 2mm;
             margin-bottom: 0;
+            text-align: center;
         }
     </style>
 </head>
@@ -141,17 +142,17 @@
     <br>
     <div class="sheet">
         <p class="line">Nombre y puesto del responsable de administrativo: <?= esc($reporte->responsable_administrativo ?? '') ?></p>
-        <p class="line">Área: <?= esc($reporte->area ?? '') ?></p>
-        <p class="line">Secretaría de Turismo e Identidad</p>
+        <p class="line">Area: <?= esc($reporte->area ?? '') ?></p>
+        <p class="line">Secretaria de Turismo e Identidad</p>
 
         <div class="spacer-sm"></div>
 
         <p class="paragraph">
-            Por medio del presente, me dirijo a usted de la manera mas atenta, con el fin de dar cumplimiento a la CLAÚSULA SEGUNDA del Contrato de Servicios Profesionales por Honorarios Asimilados a Salarios No. <?= esc($reporte->numero_contrato ?? '') ?>, que tuve a bien celebrar con la Secretaría de Turismo e Identidad del Estado de Guanajuato.
+            Por medio del presente, me dirijo a usted de la manera mas atenta, con el fin de dar cumplimiento a la CLAUSULA SEGUNDA del Contrato de Servicios Profesionales por Honorarios Asimilados a Salarios No. <?= esc($reporte->numero_contrato ?? '') ?>, que tuve a bien celebrar con la Secretaria de Turismo e Identidad del Estado de Guanajuato.
         </p>
 
         <p class="paragraph">
-            Por lo anterior, me permito presentar el Informe <?= esc($tipoReporte) ?>, en el que se refleja la realizacion de las actividades señaladas en la CLAÚSULA PRIMERA del Contrato en mención.
+            Por lo anterior, me permito presentar el Informe <?= esc($tipoReporte) ?>, en el que se refleja la realizacion de las actividades senaladas en la CLAUSULA PRIMERA del Contrato en mencion.
         </p>
 
         <p class="title">Informe <?= esc(strtoupper($tipoReporte)) ?> de actividades</p>
@@ -170,7 +171,7 @@
 
         <div class="closing-block">
             <p class="paragraph closing-paragraph">
-                Finalmente, declaro que he dado cumplimiento a las políticas y obligaciones en materia de transparencia, rendición de cuentas, cultura de la legalidad, integridad y participación ciudadana para el combate a la corrupción, enunciadas en la CLAÚSULA QUINTA del Instrumento Juridico mencionado en supra líneas.
+                Finalmente, declaro que he dado cumplimiento a las politicas y obligaciones en materia de transparencia, rendicion de cuentas, cultura de la legalidad, integridad y participacion ciudadana para el combate a la corrupcion, enunciadas en la CLAUSULA QUINTA del Instrumento Juridico mencionado en supra lineas.
             </p>
 
             <div class="attention">A T E N T A M E N T E</div>
@@ -182,13 +183,12 @@
             <div class="signature-caption">Puesto: <?= esc($reporte->puesto_prestador ?? '') ?></div>
 
             <div class="spacer-md"></div>
-            <div class="conformidad">Recibí de Conformidad,</div>
+            <div class="conformidad">Recibi de Conformidad,</div>
 
             <div class="signature-space"></div>
             <div class="signature-line-wide"></div>
-            <div class="signature-caption">Director de área: <?= esc($reporte->nombre_responsable_area ?? '') ?></div>
-            <div class="signature-caption">Puesto: <?= esc($reporte->puesto_responsable_area ?? '') ?></div>
-            <div class="signature-caption">Responsable de administrar y verificar: <?= esc($reporte->nombre_responsable ?? ($reporte->nombre_responsable_area ?? '')) ?></div>
+            <div class="signature-caption">Nombre responsable: <?= esc($reporte->nombre_responsable ?? ($reporte->nombre_responsable_area ?? '')) ?></div>
+            <div class="signature-caption">Puesto: <?= esc($reporte->puesto_responsable ?? ($reporte->puesto_responsable_area ?? '')) ?></div>
         </div>
     </div>
 </body>
