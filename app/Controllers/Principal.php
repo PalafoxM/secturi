@@ -4311,6 +4311,12 @@ class Principal extends BaseController
             $montoTotalTexto = strtoupper($this->numeroEnLetras($montoTotal));
         }
 
+        $montoGarantia = (float) str_replace([',', '$', ' '], '', (string) ($post['monto_garantia'] ?? 0));
+        $montoGarantiaTexto = trim((string) ($post['monto_garantia_texto'] ?? ''));
+        if ($montoGarantiaTexto === '' && $montoGarantia > 0) {
+            $montoGarantiaTexto = strtoupper($this->numeroEnLetras($montoGarantia));
+        }
+
         // Datos principales
         $dataInsert = [
             'responsable_proyecto' => $post['responsable_proyecto'],
@@ -4323,6 +4329,7 @@ class Principal extends BaseController
             'monto_total_texto' => $montoTotalTexto,
             'garantia' => $post['garantia'],
             'monto_garantia' => $post['monto_garantia'] ?? null,
+            'monto_garantia_texto' => $montoGarantiaTexto,
             'proveedor_seguimiento' => $post['proveedor_seguimiento'],
             'objeto_contrato' => $post['objeto_contrato'],
             'fecha_inicio' => $post['fecha_inicio'],
@@ -4465,18 +4472,31 @@ class Principal extends BaseController
         
         // Cargar datos
         $solicitud = $globals->getTabla(['tabla' => 'vw_solicitud_contrato', 'where' => ['id_solicitud_contrato' => $id]]);
+        $solicitudBase = $globals->getTabla(['tabla' => 'solicitud_contrato', 'where' => ['id_solicitud_contrato' => $id, 'visible' => 1]]);
         $pagos = $globals->getTabla(['tabla' => 'solicitud_contrato_pagos', 'where' => ['id_solicitud_contrato' => $id, 'visible' => 1]]);
         
         if(empty($solicitud->data)){
             echo "Solicitud no encontrada"; return;
         }
 
-        $data['solicitud'] = $solicitud->data[0];
-        $data['pagos'] = (!empty($pagos->data)) ? $pagos->data : [];
+        $data['solicitud'] = $this->normalizeUtf8Value($solicitud->data[0]);
+        if (!empty($solicitudBase->data)) {
+            foreach ((array) $solicitudBase->data[0] as $key => $value) {
+                if (!isset($data['solicitud']->$key) || $data['solicitud']->$key === null || $data['solicitud']->$key === '') {
+                    $data['solicitud']->$key = $this->normalizeUtf8Value($value);
+                }
+            }
+        }
+        $data['pagos'] = $this->normalizeUtf8Value((!empty($pagos->data)) ? $pagos->data : []);
         $montoTotal = (float) str_replace([',', '$', ' '], '', (string) ($data['solicitud']->monto_total ?? 0));
         $data['solicitud']->monto_total_formateado = '$' . number_format($montoTotal, 2, '.', ',');
         if (empty($data['solicitud']->monto_total_texto)) {
             $data['solicitud']->monto_total_texto = strtoupper($this->numeroEnLetras($montoTotal));
+        }
+        $montoGarantia = (float) str_replace([',', '$', ' '], '', (string) ($data['solicitud']->monto_garantia ?? 0));
+        $data['solicitud']->monto_garantia_formateado = '$' . number_format($montoGarantia, 2, '.', ',');
+        if (empty($data['solicitud']->monto_garantia_texto) && $montoGarantia > 0) {
+            $data['solicitud']->monto_garantia_texto = strtoupper($this->numeroEnLetras($montoGarantia));
         }
         if (!empty($data['pagos'])) {
             foreach ($data['pagos'] as $pago) {
@@ -4488,6 +4508,8 @@ class Principal extends BaseController
         // Reutilizamos la vista de formulario pero en modo lectura o creamos una vista optimizada para impresión
         // Por ahora usaré una vista simple para PDF
         $html = view('personal/vPdfSolicitudContrato', $data);
+        $html = $this->normalizeUtf8Value($html);
+        $html = $this->cleanMpdfHtml($html);
         
         $mpdf = new \Mpdf\Mpdf([
             'margin_top' => 10,
@@ -10029,9 +10051,9 @@ class Principal extends BaseController
             $emailService->setMailType('html');
             $emailService->setMessage("
                 <p>Buen día,</p>
-                <p>Se le notifica que se han subido documentos para la solicitud de convenio con ID <strong>'.$id_solicitud.'</strong>.</p>
-                <p>Los archivos fueron agregados por el usuario: <strong>'.$nombreUsuario.'</strong>.</p>
-                <p>Puede consultar los detalles ingresando al siguiente enlace: <a href='{$enlace}'>{$enlace}</a></p>
+                <p>Se le notifica que se han subido documentos para la solicitud de convenio con ID <strong>$id_solicitud</strong>.</p>
+                <p>Los archivos fueron agregados por el usuario: <strong>$nombreUsuario</strong>.</p>
+                <p>Puede consultar los detalles ingresando al siguiente enlace: <a href='$enlace'>$enlace</a></p>
                 <br>
                 <p>Saludos cordiales,</p>
                 <p><strong>Sistema Unificado SECTURI (SUSI)</strong></p>

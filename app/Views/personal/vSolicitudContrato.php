@@ -138,6 +138,7 @@
                                             <label class="custom-control-label" for="custom_garantia_check">Ingresar otro monto o porcentaje de garantía</label>
                                         </div>
                                         <input type="text" class="form-control mt-2" name="monto_garantia" id="monto_garantia" value="<?= isset($solicitud) ? ($solicitud->monto_garantia ?? '') : '' ?>" readonly placeholder="12% del monto total">
+                                        <input type="text" class="form-control mt-2" name="monto_garantia_texto" id="monto_garantia_texto" value="<?= isset($solicitud) ? esc($solicitud->monto_garantia_texto ?? '') : '' ?>" readonly placeholder="Monto de garantÃ­a en letra">
                                     </div>
                                 </div>
 
@@ -384,12 +385,12 @@
                 $('#monto_total_texto').val(numeroALetras(parseFloat(valor)));
                 
                 if (!$('#custom_garantia_check').is(':checked')) {
-                    // Calcular 12%
+                    // Calcular monto mas 12% de IVA
                     var monto = parseFloat(valor);
                     var garantia = monto * 0.12;
                     var totalMonto = garantia + monto;
-                    // Formatear a 2 decimales
                     $('#monto_garantia').val(totalMonto.toFixed(2));
+                    $('#monto_garantia_texto').val(numeroALetras(totalMonto));
                 }
             }
         });
@@ -397,9 +398,23 @@
         $('#custom_garantia_check').on('change', function() {
             if ($(this).is(':checked')) {
                 $('#monto_garantia').removeAttr('readonly');
+                $('#monto_garantia').trigger('input');
             } else {
                 $('#monto_garantia').attr('readonly', true);
                 $('#monto_total').trigger('input'); // Recalcular monto original
+            }
+        });
+
+        $('#monto_garantia').on('input', function() {
+            var valorGarantia = $(this).val();
+            if (isNaN(valorGarantia) || valorGarantia.trim() === '') {
+                if (valorGarantia.trim() !== '') {
+                    $('#monto_garantia_texto').val('NUMERO NO LEGIBLE');
+                } else {
+                    $('#monto_garantia_texto').val('');
+                }
+            } else {
+                $('#monto_garantia_texto').val(numeroALetras(parseFloat(valorGarantia)));
             }
         });
         
@@ -414,6 +429,7 @@
                 $('#custom_garantia_check').prop('checked', true).trigger('change');
                 $('#monto_garantia').val(valOriginalGarantia);
             }
+            $('#monto_garantia').trigger('input');
         }
     });
 
