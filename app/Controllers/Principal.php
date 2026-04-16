@@ -4828,11 +4828,12 @@ class Principal extends BaseController
             if(isset($solicitudQuery->data) && !empty($solicitudQuery->data)){
                $usu_reg = $solicitudQuery->data[0]->usu_reg;
                $usuarioQuery = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["id_usuario" => $usu_reg]]);
-               if(isset($usuarioQuery->data) && !empty($usuarioQuery->data) && !empty($usuarioQuery->data[0]->correo)){
-                   $correoDestino = $usuarioQuery->data[0]->correo;
-                   $nombreUsuario = $usuarioQuery->data[0]->nombre_completo ?? 'Usuario';
-                   
-                   $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
+                if(isset($usuarioQuery->data) && !empty($usuarioQuery->data) && !empty($usuarioQuery->data[0]->correo)){
+                    $correoDestino = $usuarioQuery->data[0]->correo;
+                    $nombreUsuario = $usuarioQuery->data[0]->nombre_completo ?? 'Usuario';
+                    $enlaceListado = 'https://secturnet.guanajuato.gob.mx/susi/index.php/Principal/ListaSolicitudContrato';
+                    
+                    $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
                    $emailService->setTo($correoDestino);
                    $emailService->setSubject('Instrumento Jurídico Cargado');
                    $emailService->setMailType('html');
