@@ -153,13 +153,19 @@
                                     <hr class="section-divider">
 
                                     <div class="row">
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
                                             <div class="form-group">
-                                                <label for="nombre_prestador">Nombre prestador de servicio</label>
+                                                <label for="nombre_prestador">Nombre completo del prestador de servicio</label>
                                                 <input type="text" class="form-control" id="nombre_prestador" name="nombre_prestador" value="<?= esc($reporte->nombre_prestador ?? '') ?>" required>
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="puesto_prestador">Puesto del prestador de servicio</label>
+                                                <input type="text" class="form-control" id="puesto_prestador" name="puesto_prestador" value="<?= esc($reporte->puesto_prestador ?? '') ?>" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="nombre_responsable_area">Nombre responsable de area</label>
                                                 <input type="text" class="form-control" id="nombre_responsable_area" name="nombre_responsable_area" value="<?= esc($reporte->nombre_responsable_area ?? '') ?>" required>

@@ -872,6 +872,7 @@ class Inicio extends BaseController
         $fechaFin = trim((string)($post['fecha_fin'] ?? ''));
         $fechaFirma = trim((string)($post['fecha_firma'] ?? ''));
         $nombrePrestador = trim((string)($post['nombre_prestador'] ?? ''));
+        $puestoPrestador = trim((string)($post['puesto_prestador'] ?? ''));
         $nombreResponsableArea = trim((string)($post['nombre_responsable_area'] ?? ''));
         $titulos = $post['actividad_titulo'] ?? [];
         $desgloses = $post['actividad_desglose'] ?? [];
@@ -879,7 +880,7 @@ class Inicio extends BaseController
         if (
             $responsable === '' || $area === '' || $numeroContrato === '' || $tipoReporte === '' ||
             $fechaInicio === '' || $fechaFin === '' || $fechaFirma === '' ||
-            $nombrePrestador === '' || $nombreResponsableArea === ''
+            $nombrePrestador === '' || $puestoPrestador === '' || $nombreResponsableArea === ''
         ) {
             $response->respuesta = 'Todos los campos del reporte son obligatorios.';
             return $this->response->setJSON($response);
@@ -934,6 +935,7 @@ class Inicio extends BaseController
             'fecha_fin' => $fechaFin,
             'fecha_firma' => $fechaFirma,
             'nombre_prestador' => $nombrePrestador,
+            'puesto_prestador' => $puestoPrestador,
             'nombre_responsable_area' => $nombreResponsableArea,
             'pdf_referencia' => 'assets/Reporteactividades26.pdf',
             'visible' => 1

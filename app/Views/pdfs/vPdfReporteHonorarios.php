@@ -184,8 +184,8 @@
 
             <div class="signature-space"></div>
             <div class="signature-line"></div>
-            <div class="signature-caption"><?= esc($reporte->nombre_prestador ?? '') ?></div>
-            <div class="signature-caption">Nombre completo y firma del Prestador de Servicios por Honorarios Asimilados a Salarios</div>
+            <div class="signature-caption">Nombre completo: <?= esc($reporte->nombre_prestador ?? '') ?></div>
+            <div class="signature-caption">Puesto: <?= esc($reporte->puesto_prestador ?? '') ?></div>
 
             <div class="spacer-md"></div>
             <div class="conformidad">Recibí de Conformidad,</div>
