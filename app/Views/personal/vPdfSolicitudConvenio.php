@@ -32,7 +32,7 @@
             <td class="header-title">
                 <h2>SOLICITUD DE ELABORACIÓN DE CONVENIO</h2>
                 <h3>DIRECCIÓN DE ASUNTOS JURÍDICOS</h3>
-                <h4>DAJ-2</h4>
+                <h4>DAJ-1</h4>
             </td>
         </tr>
     </table>
