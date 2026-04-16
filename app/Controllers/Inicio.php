@@ -874,13 +874,14 @@ class Inicio extends BaseController
         $nombrePrestador = trim((string)($post['nombre_prestador'] ?? ''));
         $puestoPrestador = trim((string)($post['puesto_prestador'] ?? ''));
         $nombreResponsableArea = trim((string)($post['nombre_responsable_area'] ?? ''));
+        $puestoResponsableArea = trim((string)($post['puesto_responsable_area'] ?? ''));
         $titulos = $post['actividad_titulo'] ?? [];
         $desgloses = $post['actividad_desglose'] ?? [];
 
         if (
             $responsable === '' || $area === '' || $numeroContrato === '' || $tipoReporte === '' ||
             $fechaInicio === '' || $fechaFin === '' || $fechaFirma === '' ||
-            $nombrePrestador === '' || $puestoPrestador === '' || $nombreResponsableArea === ''
+            $nombrePrestador === '' || $puestoPrestador === '' || $nombreResponsableArea === '' || $puestoResponsableArea === ''
         ) {
             $response->respuesta = 'Todos los campos del reporte son obligatorios.';
             return $this->response->setJSON($response);
@@ -937,6 +938,7 @@ class Inicio extends BaseController
             'nombre_prestador' => $nombrePrestador,
             'puesto_prestador' => $puestoPrestador,
             'nombre_responsable_area' => $nombreResponsableArea,
+            'puesto_responsable_area' => $puestoResponsableArea,
             'pdf_referencia' => 'assets/Reporteactividades26.pdf',
             'visible' => 1
         ];
@@ -1127,10 +1129,12 @@ class Inicio extends BaseController
         }
 
         $mpdf->SetHTMLFooter('
-            <div style="text-align:center; font-size:9.4pt; line-height:1.35;">
-                Parque Guanajuato Bicentenario. Carretera de Cuota Silao-Guanajuato Km. 3.8 Silao, Gto. C.P. 36270<br>
-                Tel. (472) 103 9900<br>
-                guanajuato.mx
+            <div style="width:100%; margin:0 auto; padding:0; text-align:center;">
+                <div style="display:block; width:100%; text-align:center; font-size:9.2pt; line-height:1.3; margin:0 auto;">
+                    Parque Guanajuato Bicentenario. Carretera de Cuota Silao-Guanajuato Km. 3.8 Silao, Gto. C.P. 36270<br>
+                    Tel. (472) 103 9900<br>
+                    guanajuato.mx
+                </div>
             </div>
         ');
 

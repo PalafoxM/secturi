@@ -171,6 +171,12 @@
                                                 <input type="text" class="form-control" id="nombre_responsable_area" name="nombre_responsable_area" value="<?= esc($reporte->nombre_responsable_area ?? '') ?>" required>
                                             </div>
                                         </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="puesto_responsable_area">Puesto responsable de area</label>
+                                                <input type="text" class="form-control" id="puesto_responsable_area" name="puesto_responsable_area" value="<?= esc($reporte->puesto_responsable_area ?? '') ?>" required>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div class="text-right mt-4">
