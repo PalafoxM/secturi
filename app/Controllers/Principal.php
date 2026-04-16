@@ -4316,6 +4316,8 @@ class Principal extends BaseController
         if ($montoGarantiaTexto === '' && $montoGarantia > 0) {
             $montoGarantiaTexto = strtoupper($this->numeroEnLetras($montoGarantia));
         }
+        $proveedorCorreo = trim((string) ($post['proveedor_correo'] ?? ''));
+        $proveedorSeguimiento = trim((string) ($post['proveedor_seguimiento'] ?? ''));
 
         // Datos principales
         $dataInsert = [
@@ -4330,7 +4332,7 @@ class Principal extends BaseController
             'garantia' => $post['garantia'],
             'monto_garantia' => $post['monto_garantia'] ?? null,
             'monto_garantia_texto' => $montoGarantiaTexto,
-            'proveedor_seguimiento' => $post['proveedor_seguimiento'],
+            'proveedor_seguimiento' => $proveedorSeguimiento,
             'objeto_contrato' => $post['objeto_contrato'],
             'fecha_inicio' => $post['fecha_inicio'],
             'fecha_termino' => $post['fecha_termino'],
@@ -4339,7 +4341,7 @@ class Principal extends BaseController
             'proveedor_rfc' => $post['proveedor_rfc'],
             'proveedor_cedula' => $post['proveedor_cedula'],
             'proveedor_representante' => $post['proveedor_representante'],
-            'proveedor_correo' => $post['proveedor_correo'],
+            'proveedor_correo' => $proveedorCorreo,
            // 'correo_responsable' => $post['correo_responsable'],
         ];
 
