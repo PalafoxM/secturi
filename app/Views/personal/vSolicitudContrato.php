@@ -399,7 +399,7 @@
                     // Calcular monto total + 12%
                     var monto = montoNormalizado;
                     var garantia = monto * 0.12;
-                    var totalMonto = garantia + monto;
+                    var totalMonto = garantia;
                     $('#monto_garantia').val(totalMonto.toFixed(2));
                     $('#monto_garantia_texto').val(numeroALetras(totalMonto));
                 }
