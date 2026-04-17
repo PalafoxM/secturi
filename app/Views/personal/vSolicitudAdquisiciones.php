@@ -457,6 +457,28 @@
     }
 
     $(document).ready(function() {
+        const campoDescripcionBienes = $('textarea[name="descripcion_bienes"]');
+        const campoFechaInicio = $('input[name="fecha_inicio"]');
+        const campoLugarEntrega = $('input[name="lugar_entrega"]');
+
+        campoDescripcionBienes.closest('.form-group').prev('h5').hide();
+        campoDescripcionBienes.closest('.form-group').hide();
+        campoFechaInicio.closest('.form-row').hide();
+
+        campoDescripcionBienes.prop('required', false).removeAttr('name');
+        campoFechaInicio.prop('required', false).removeAttr('name');
+        campoLugarEntrega.prop('required', false).removeAttr('name');
+
+        if (!$('#form_solicitud_adquisiciones input[name="descripcion_bienes"]').length) {
+            $('#form_solicitud_adquisiciones').append('<input type="hidden" name="descripcion_bienes" value="N/A">');
+        }
+        if (!$('#form_solicitud_adquisiciones input[name="fecha_inicio"]').length) {
+            $('#form_solicitud_adquisiciones').append('<input type="hidden" name="fecha_inicio" value="N/A">');
+        }
+        if (!$('#form_solicitud_adquisiciones input[name="lugar_entrega"]').length) {
+            $('#form_solicitud_adquisiciones').append('<input type="hidden" name="lugar_entrega" value="N/A">');
+        }
+
         $(document).on('input', '.pago-monto', function() {
             var valor = $(this).val();
             var inputLetras = $(this).closest('tr').find('.pago-letra');
