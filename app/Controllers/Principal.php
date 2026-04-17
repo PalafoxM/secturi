@@ -3775,6 +3775,7 @@ class Principal extends BaseController
         $columnasSolicitudHonorario = $this->obtenerColumnasTablaServicio($globals, 'solicitud_honorario');
         $dataUpdate = [
             'id_estatus' => 3,
+            'instrumento_juridico' => json_encode(array_values($rutasGuardadas)),
             'usu_act' => $session->id_usuario ?? 0,
             'fec_act' => date('Y-m-d H:i:s')
         ];
