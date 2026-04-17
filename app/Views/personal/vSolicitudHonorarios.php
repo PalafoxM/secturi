@@ -20,6 +20,9 @@ if (empty($actividadesGuardadas)) {
     $actividadesGuardadas = [''];
 }
 
+$catalogoFirmantesHonorarios = json_encode($catalogo_firmantes ?? [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+$firmasSeleccionadasHonorarios = json_encode(array_values($firmas_seleccionadas ?? []), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
 $soportes = [
     'Autorizacion SFIA' => 'autorizacion_sfia',
     'Justificacion Oficial' => 'justificacion_oficial',
@@ -191,6 +194,19 @@ $soportes = [
                                         <?php endforeach; ?>
 
                                     </table>
+                                </div>
+
+                                <h5 class="bg-primary text-white p-2 mt-4">FIRMAS</h5>
+                                <div class="card border mb-3">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <p class="mb-0 text-muted">Agrega hasta 3 firmas para el formato de honorarios.</p>
+                                            <button type="button" class="btn btn-primary btn-sm" id="btnAgregarFirmaHonorarios">
+                                                <i class="fas fa-plus"></i> Agregar firma
+                                            </button>
+                                        </div>
+                                        <div id="contenedor_firmas_honorarios"></div>
+                                    </div>
                                 </div>
 
                                 <div class="text-center mt-4">
@@ -415,9 +431,92 @@ $soportes = [
 <script src="<?= base_url() ?>plugins/select2/select2.min.js"></script>
 
 <script>
+    const catalogoFirmantesHonorarios = <?= $catalogoFirmantesHonorarios ?>;
+    const firmasSeleccionadasHonorarios = <?= $firmasSeleccionadasHonorarios ?>;
+
     $(document).ready(function() {
         $('.select2').select2({
             width: '100%'
+        });
+
+        function opcionesFirmantesHonorarios(valorSeleccionado = '') {
+            let html = '<option value="">Seleccione un usuario</option>';
+            catalogoFirmantesHonorarios.forEach(usuario => {
+                const seleccionado = String(usuario.id_usuario) === String(valorSeleccionado) ? 'selected' : '';
+                const puesto = usuario.dsc_puesto ? String(usuario.dsc_puesto).replace(/"/g, '&quot;') : '';
+                html += `<option value="${usuario.id_usuario}" data-puesto="${puesto}" ${seleccionado}>${usuario.nombre_completo}</option>`;
+            });
+            return html;
+        }
+
+        function actualizarPuestoFirmaHonorarios(select) {
+            const puesto = $(select).find(':selected').data('puesto') || '';
+            $(select).closest('.firma-item').find('.firma-puesto').text(puesto);
+        }
+
+        function reindexarFirmasHonorarios() {
+            $('#contenedor_firmas_honorarios .firma-item').each(function(index) {
+                $(this).attr('data-index', index);
+                $(this).find('.firma-label').text(`Firma ${index + 1}`);
+                $(this).find('select').attr('name', `firmas[${index}]`);
+            });
+        }
+
+        function agregarFirmaHonorarios(valorSeleccionado = '') {
+            const contenedor = $('#contenedor_firmas_honorarios');
+            if (contenedor.find('.firma-item').length >= 3) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Limite de firmas',
+                    text: 'Solo puedes agregar hasta 3 firmas.'
+                });
+                return;
+            }
+
+            const index = contenedor.find('.firma-item').length;
+            const html = `
+                <div class="firma-item border rounded p-3 mb-3" data-index="${index}">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong class="firma-label">Firma ${index + 1}</strong>
+                        <button type="button" class="btn btn-outline-danger btn-sm btn-eliminar-firma-honorarios">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <select class="form-control select2 firma-select-honorarios" name="firmas[${index}]">
+                        ${opcionesFirmantesHonorarios(valorSeleccionado)}
+                    </select>
+                    <div class="firma-puesto text-uppercase small text-muted mt-2"></div>
+                </div>
+            `;
+
+            contenedor.append(html);
+            const nuevoItem = contenedor.find('.firma-item').last();
+            nuevoItem.find('.firma-select-honorarios').select2({ width: '100%' });
+            actualizarPuestoFirmaHonorarios(nuevoItem.find('.firma-select-honorarios'));
+        }
+
+        if (firmasSeleccionadasHonorarios.length > 0) {
+            firmasSeleccionadasHonorarios.forEach(firma => agregarFirmaHonorarios(firma));
+        } else {
+            agregarFirmaHonorarios();
+        }
+
+        $('#btnAgregarFirmaHonorarios').on('click', function() {
+            agregarFirmaHonorarios();
+        });
+
+        $(document).on('change', '.firma-select-honorarios', function() {
+            actualizarPuestoFirmaHonorarios(this);
+        });
+
+        $(document).on('click', '.btn-eliminar-firma-honorarios', function() {
+            const item = $(this).closest('.firma-item');
+            const select = item.find('.firma-select-honorarios');
+            if (select.hasClass('select2-hidden-accessible')) {
+                select.select2('destroy');
+            }
+            item.remove();
+            reindexarFirmasHonorarios();
         });
 
         function renumerarActividades() {

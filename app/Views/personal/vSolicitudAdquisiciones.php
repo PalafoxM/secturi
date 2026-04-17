@@ -217,6 +217,18 @@
                                     </div>
                                 </div>
 
+                                <h5 class="bg-primary text-white p-2 mt-4">FIRMAS</h5>
+                                <div class="card border mb-3">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <p class="mb-0 text-muted">Agrega hasta 3 firmas para el formato de adquisiciones.</p>
+                                            <button type="button" class="btn btn-primary btn-sm" id="btnAgregarFirmaAdquisiciones">
+                                                <i class="fas fa-plus"></i> Agregar firma
+                                            </button>
+                                        </div>
+                                        <div id="contenedor_firmas_adquisiciones"></div>
+                                    </div>
+                                </div>
 
                                 <div class="row mt-4">
                                     <div class="col-12 text-center">
@@ -250,6 +262,9 @@
 <script src="<?= base_url() ?>plugins/select2/select2.min.js"></script>
 
 <script>
+    const catalogoFirmantesAdquisiciones = <?= json_encode($catalogo_firmantes ?? [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+    const firmasSeleccionadasAdquisiciones = <?= json_encode(array_values($firmas_seleccionadas ?? []), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+
     function numeroALetras(amount) {
         if (amount == 0) return "CERO PESOS 00/100 M.N.";
         var pesos = Math.floor(amount);
@@ -360,6 +375,62 @@
         return "";
     }
 
+    function opcionesFirmantesAdquisiciones(valorSeleccionado = '') {
+        let html = '<option value="">Seleccione un usuario</option>';
+        catalogoFirmantesAdquisiciones.forEach(usuario => {
+            const seleccionado = String(usuario.id_usuario) === String(valorSeleccionado) ? 'selected' : '';
+            const puesto = usuario.dsc_puesto ? String(usuario.dsc_puesto).replace(/"/g, '&quot;') : '';
+            html += `<option value="${usuario.id_usuario}" data-puesto="${puesto}" ${seleccionado}>${usuario.nombre_completo}</option>`;
+        });
+        return html;
+    }
+
+    function actualizarPuestoFirmaAdquisiciones(select) {
+        const puesto = $(select).find(':selected').data('puesto') || '';
+        $(select).closest('.firma-item').find('.firma-puesto').text(puesto);
+    }
+
+    function reindexarFirmasAdquisiciones() {
+        $('#contenedor_firmas_adquisiciones .firma-item').each(function(index) {
+            $(this).attr('data-index', index);
+            $(this).find('.firma-label').text(`Firma ${index + 1}`);
+            $(this).find('select').attr('name', `firmas[${index}]`);
+        });
+    }
+
+    function agregarFirmaAdquisiciones(valorSeleccionado = '') {
+        const contenedor = $('#contenedor_firmas_adquisiciones');
+        if (contenedor.find('.firma-item').length >= 3) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Limite de firmas',
+                text: 'Solo puedes agregar hasta 3 firmas.'
+            });
+            return;
+        }
+
+        const index = contenedor.find('.firma-item').length;
+        const html = `
+            <div class="firma-item border rounded p-3 mb-3" data-index="${index}">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <strong class="firma-label">Firma ${index + 1}</strong>
+                    <button type="button" class="btn btn-outline-danger btn-sm btn-eliminar-firma-adquisiciones">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <select class="form-control select2 firma-select-adquisiciones" name="firmas[${index}]">
+                    ${opcionesFirmantesAdquisiciones(valorSeleccionado)}
+                </select>
+                <div class="firma-puesto text-uppercase small text-muted mt-2"></div>
+            </div>
+        `;
+
+        contenedor.append(html);
+        const nuevoItem = contenedor.find('.firma-item').last();
+        nuevoItem.find('.firma-select-adquisiciones').select2({ width: '100%' });
+        actualizarPuestoFirmaAdquisiciones(nuevoItem.find('.firma-select-adquisiciones'));
+    }
+
     const pagosExistentes = <?= isset($pagos) ? json_encode($pagos) : '[]' ?>;
 
     function agregarPago(data = null) {
@@ -404,6 +475,30 @@
 
         // Initialize Select2
         $('.select2').select2();
+
+        if (firmasSeleccionadasAdquisiciones.length > 0) {
+            firmasSeleccionadasAdquisiciones.forEach(firma => agregarFirmaAdquisiciones(firma));
+        } else {
+            agregarFirmaAdquisiciones();
+        }
+
+        $('#btnAgregarFirmaAdquisiciones').on('click', function() {
+            agregarFirmaAdquisiciones();
+        });
+
+        $(document).on('change', '.firma-select-adquisiciones', function() {
+            actualizarPuestoFirmaAdquisiciones(this);
+        });
+
+        $(document).on('click', '.btn-eliminar-firma-adquisiciones', function() {
+            const item = $(this).closest('.firma-item');
+            const select = item.find('.firma-select-adquisiciones');
+            if (select.hasClass('select2-hidden-accessible')) {
+                select.select2('destroy');
+            }
+            item.remove();
+            reindexarFirmasAdquisiciones();
+        });
 
         // Auto-fill nombre_partida when numero_partida changes
         $('#numero_partida').on('change', function() {

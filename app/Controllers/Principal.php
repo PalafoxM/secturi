@@ -197,9 +197,15 @@ class Principal extends BaseController
             return [];
         }
 
-        $instrumentos = json_decode($instrumentoRaw, true);
-        if (!is_array($instrumentos)) {
-            $instrumentos = [$instrumentoRaw];
+        if (is_array($instrumentoRaw)) {
+            $instrumentos = $instrumentoRaw;
+        } elseif (is_string($instrumentoRaw)) {
+            $instrumentos = json_decode($instrumentoRaw, true);
+            if (!is_array($instrumentos)) {
+                $instrumentos = [$instrumentoRaw];
+            }
+        } else {
+            $instrumentos = [(string) $instrumentoRaw];
         }
 
         $resultado = [];
@@ -3253,6 +3259,8 @@ class Principal extends BaseController
 
         $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
         $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+        $data['catalogo_firmantes'] = $this->construirCatalogoFirmantes($data['direccion'], $data['usuario']);
+        $data['firmas_seleccionadas'] = [];
         
         $data['scripts'] = array('inicio');
         $data['edita'] = 0;
@@ -3282,7 +3290,20 @@ class Principal extends BaseController
         if (!empty($solicitudes->data)) {
             foreach ($solicitudes->data as $solicitud) {
                 $solicitud->responsable_proyecto_nombre = $responsablesMap[(string) ($solicitud->responsable_proyecto ?? '')] ?? ($solicitud->responsable_proyecto ?? '');
-                $solicitud->tienen_archivos = true;
+                $archivosSolicitud = $globals->getTabla([
+                    'tabla' => 'solicitud_honorario_archivos',
+                    'where' => ['visible' => 1, 'id_solicitud_honorario' => $solicitud->id_solicitud_honorario]
+                ]);
+                $solicitud->tienen_archivos = !empty($archivosSolicitud->data);
+                $instrumentos = [];
+                if (!empty($archivosSolicitud->data)) {
+                    foreach ($archivosSolicitud->data as $archivoSolicitud) {
+                        if (($archivoSolicitud->clave_documento ?? '') === 'instrumento_juridico') {
+                            $instrumentos[] = $archivoSolicitud->nombre_archivo ?? '';
+                        }
+                    }
+                }
+                $solicitud->instrumento_urls = $this->mapInstrumentoUrls($instrumentos);
             }
         }
 
@@ -3349,6 +3370,7 @@ class Principal extends BaseController
         $data = [
             'solicitud' => $detalle['solicitud'],
             'actividades' => $detalle['actividades'],
+            'firmas_pdf' => $this->obtenerFirmasSolicitudDetalle(new Mglobal, $detalle['solicitud']),
         ];
 
         $html = view('pdfs/vPdfSolicitudHonorarios', $data);
@@ -3404,6 +3426,8 @@ class Principal extends BaseController
 
         $data['solicitud'] = $detalle['solicitud'];
         $data['actividades'] = $detalle['actividades'];
+        $data['catalogo_firmantes'] = $this->construirCatalogoFirmantes($data['direccion'], $data['usuario']);
+        $data['firmas_seleccionadas'] = $this->obtenerFirmasSolicitud($detalle['solicitud']);
         $data['scripts'] = array('inicio');
         $data['edita'] = 1;
         $data['contentView'] = 'personal/vSolicitudHonorarios';
@@ -3449,9 +3473,11 @@ class Principal extends BaseController
                 "editar" => true,
                 "idEditar" => ['id_solicitud_honorario' => $id_solicitud_honorario]
             ];
+            $dataInsert['id_estatus'] = 1;
             $dataInsert['usu_act'] = $session->id_usuario ?? 0;
             $dataInsert['fec_act'] = date('Y-m-d H:i:s');
         } else {
+            $dataInsert['id_estatus'] = 1;
             $dataInsert['usu_reg'] = $session->id_usuario ?? 0;
             $dataInsert['fec_reg'] = date('Y-m-d H:i:s');
         }
@@ -3470,6 +3496,16 @@ class Principal extends BaseController
             $response->respuesta = 'No fue posible identificar la solicitud guardada';
             return $this->respond($response);
         }
+
+        $this->guardarFirmasSolicitud(
+            $globals,
+            'solicitud_honorario',
+            'id_solicitud_honorario',
+            (int) $id_solicitud,
+            $post['firmas'] ?? [],
+            (int) ($session->id_usuario ?? 0),
+            'Principal.php/guardarSolicitudHonorariosFirmas'
+        );
 
         if ($id_solicitud_honorario) {
             $globals->saveTabla(
@@ -3615,6 +3651,179 @@ class Principal extends BaseController
             $response->respuesta = 'No se pudo guardar ningun archivo.';
         }
 
+        return $this->respond($response);
+    }
+
+    public function declinarSolicitudHonorarios()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $emailService = \Config\Services::email();
+        $response = new \stdClass();
+        $response->error = true;
+
+        $id = $this->request->getPost('id_solicitud');
+        $motivo = trim((string) $this->request->getPost('motivo'));
+
+        if (!$id) {
+            $response->respuesta = 'ID de solicitud no valido.';
+            return $this->respond($response);
+        }
+
+        $res = $globals->saveTabla([
+            'id_estatus' => 2,
+            'motivo' => $motivo,
+            'usu_act' => $session->id_usuario ?? 0,
+            'fec_act' => date('Y-m-d H:i:s')
+        ], [
+            'tabla' => 'solicitud_honorario',
+            'editar' => true,
+            'idEditar' => ['id_solicitud_honorario' => $id]
+        ], [
+            'id_user' => $session->id_usuario ?? 0,
+            'script' => 'Principal.php/declinarSolicitudHonorarios'
+        ]);
+
+        if ($res->error) {
+            $response->respuesta = 'No se pudo declinar la solicitud.';
+            return $this->respond($response);
+        }
+
+        $solicitudQuery = $globals->getTabla(['tabla' => 'solicitud_honorario', 'where' => ['id_solicitud_honorario' => $id]]);
+        if (!empty($solicitudQuery->data)) {
+            $usu_reg = $solicitudQuery->data[0]->usu_reg ?? 0;
+            $usuarioQuery = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['id_usuario' => $usu_reg]]);
+            if (!empty($usuarioQuery->data) && !empty($usuarioQuery->data[0]->correo)) {
+                $correoDestino = $usuarioQuery->data[0]->correo;
+                $nombreUsuario = $usuarioQuery->data[0]->nombre_completo ?? 'Usuario';
+                $enlaceListado = 'https://secturnet.guanajuato.gob.mx/susi/index.php/Principal/listadoHonorarios';
+
+                $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
+                $emailService->setTo($correoDestino);
+                $emailService->setSubject('Solicitud de Honorarios Declinada');
+                $emailService->setMailType('html');
+                $emailService->setMessage("
+                    <p>Buen dia, <strong>{$nombreUsuario}</strong>:</p>
+                    <p>Se le notifica que su solicitud de honorarios con ID <strong>{$id}</strong> ha sido <strong>declinada</strong>.</p>
+                    <p><strong>Motivo:</strong> {$motivo}</p>
+                    <p>Puede consultar mayores detalles ingresando al siguiente enlace:</p>
+                    <p><a href='{$enlaceListado}' target='_blank'>{$enlaceListado}</a></p>
+                    <br>
+                    <p>Saludos cordiales,</p>
+                    <p><strong>Sistema Unificado SECTURI (SUSI)</strong></p>
+                ");
+                $emailService->send();
+            }
+        }
+
+        $response->error = false;
+        $response->respuesta = 'Solicitud declinada correctamente.';
+        return $this->respond($response);
+    }
+
+    public function subirInstrumentoJuridicoHonorarios()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $emailService = \Config\Services::email();
+        $response = new \stdClass();
+        $response->error = true;
+
+        $id = $this->request->getPost('id_solicitud');
+        $archivos = $this->request->getFileMultiple('archivos');
+
+        if (!$id || empty($archivos)) {
+            $response->respuesta = 'Archivos o ID de solicitud no valido.';
+            return $this->respond($response);
+        }
+
+        $rutasGuardadas = [];
+        foreach ($archivos as $archivo) {
+            if (!$archivo->isValid() || $archivo->hasMoved() || strtolower((string) $archivo->getExtension()) !== 'pdf') {
+                continue;
+            }
+
+            $newName = $archivo->getRandomName();
+            $s3Key = $this->uploadFileToS3Storage($archivo->getTempName(), 'honorarios', 'instrumentos', $newName);
+            if (!$s3Key) {
+                continue;
+            }
+
+            $rutasGuardadas[] = $s3Key;
+            $globals->saveTabla([
+                'id_solicitud_honorario' => $id,
+                'clave_documento' => 'instrumento_juridico',
+                'nombre_documento' => 'Instrumento Juridico',
+                'nombre_archivo' => $s3Key,
+                'visible' => 1,
+                'usu_reg' => $session->id_usuario ?? 0,
+                'fec_reg' => date('Y-m-d H:i:s'),
+            ], [
+                'tabla' => 'solicitud_honorario_archivos',
+                'editar' => false
+            ], [
+                'id_user' => $session->id_usuario ?? 0,
+                'script' => 'Principal.php/subirInstrumentoJuridicoHonorariosArchivo'
+            ]);
+        }
+
+        if (empty($rutasGuardadas)) {
+            $response->respuesta = 'No se pudieron guardar los archivos o no son PDF validos.';
+            return $this->respond($response);
+        }
+
+        $columnasSolicitudHonorario = $this->obtenerColumnasTablaServicio($globals, 'solicitud_honorario');
+        $dataUpdate = [
+            'id_estatus' => 3,
+            'usu_act' => $session->id_usuario ?? 0,
+            'fec_act' => date('Y-m-d H:i:s')
+        ];
+        if (in_array('instrumento_juridico', $columnasSolicitudHonorario, true)) {
+            $dataUpdate['instrumento_juridico'] = json_encode($rutasGuardadas);
+        }
+
+        $res = $globals->saveTabla($dataUpdate, [
+            'tabla' => 'solicitud_honorario',
+            'editar' => true,
+            'idEditar' => ['id_solicitud_honorario' => $id]
+        ], [
+            'id_user' => $session->id_usuario ?? 0,
+            'script' => 'Principal.php/subirInstrumentoJuridicoHonorarios'
+        ]);
+
+        if ($res->error) {
+            $response->respuesta = 'No se pudo actualizar la solicitud.';
+            return $this->respond($response);
+        }
+
+        $solicitudQuery = $globals->getTabla(['tabla' => 'solicitud_honorario', 'where' => ['id_solicitud_honorario' => $id]]);
+        if (!empty($solicitudQuery->data)) {
+            $usu_reg = $solicitudQuery->data[0]->usu_reg ?? 0;
+            $usuarioQuery = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['id_usuario' => $usu_reg]]);
+            if (!empty($usuarioQuery->data) && !empty($usuarioQuery->data[0]->correo)) {
+                $correoDestino = $usuarioQuery->data[0]->correo;
+                $nombreUsuario = $usuarioQuery->data[0]->nombre_completo ?? 'Usuario';
+                $enlaceListado = 'https://secturnet.guanajuato.gob.mx/susi/index.php/Principal/listadoHonorarios';
+
+                $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
+                $emailService->setTo($correoDestino);
+                $emailService->setSubject('Solicitud de Honorarios Aprobada - Instrumento Disponible');
+                $emailService->setMailType('html');
+                $emailService->setMessage("
+                    <p>Buen dia, <strong>{$nombreUsuario}</strong>:</p>
+                    <p>El area Juridica ha autorizado y adjuntado el instrumento juridico correspondiente a su solicitud de honorarios con ID <strong>{$id}</strong>.</p>
+                    <p>Puede consultarlo ingresando al siguiente enlace:</p>
+                    <p><a href='{$enlaceListado}' target='_blank'>{$enlaceListado}</a></p>
+                    <br>
+                    <p>Saludos cordiales,</p>
+                    <p><strong>Sistema Unificado SECTURI (SUSI)</strong></p>
+                ");
+                $emailService->send();
+            }
+        }
+
+        $response->error = false;
+        $response->respuesta = 'Instrumento juridico subido y solicitud aprobada.';
         return $this->respond($response);
     }
 
@@ -3874,6 +4083,8 @@ class Principal extends BaseController
 
         $catPartida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
         $data['cat_partida'] = !empty($catPartida->data) ? $catPartida->data : [];
+        $data['catalogo_firmantes'] = $this->construirCatalogoFirmantes($data['direccion'], $data['usuario']);
+        $data['firmas_seleccionadas'] = [];
 
         $data['scripts'] = ['inicio'];
         $data['edita'] = 0;
@@ -3910,6 +4121,8 @@ class Principal extends BaseController
         $data['usuario'] = !empty($vwUsuario->data) ? $vwUsuario->data : [];
         $data['solicitud'] = $solicitud->data[0];
         $data['pagos'] = !empty($pagos->data) ? $pagos->data : [];
+        $data['catalogo_firmantes'] = $this->construirCatalogoFirmantes($data['direccion'], $data['usuario']);
+        $data['firmas_seleccionadas'] = $this->obtenerFirmasSolicitud($data['solicitud']);
         $data['scripts'] = ['inicio'];
         $data['edita'] = 1;
         $data['contentView'] = 'personal/vSolicitudAdquisiciones';
@@ -3985,6 +4198,16 @@ class Principal extends BaseController
             $response->respuesta = 'No fue posible identificar la solicitud guardada';
             return $this->respond($response);
         }
+
+        $this->guardarFirmasSolicitud(
+            $globals,
+            'solicitud_adquisiciones',
+            'id_solicitud_adquisiciones',
+            (int) $idGuardado,
+            $post['firmas'] ?? [],
+            (int) ($session->id_usuario ?? 0),
+            'Principal.php/guardarSolicitudAdquisicionesFirmas'
+        );
 
         if (!empty($idSolicitud)) {
             $globals->saveTabla(
@@ -4124,6 +4347,7 @@ class Principal extends BaseController
 
         $data['solicitud'] = $solicitud;
         $data['pagos'] = $pagos;
+        $data['firmas_pdf'] = $this->obtenerFirmasSolicitudDetalle($globals, $solicitud);
         $html = view('personal/vPdfSolicitudAdquisiciones', $data);
 
         $mpdf = new \Mpdf\Mpdf([

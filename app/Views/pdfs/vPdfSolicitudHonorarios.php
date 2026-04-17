@@ -145,6 +145,37 @@
     </tr>
 </table>
 
+<?php $firmasPdf = !empty($firmas_pdf) ? array_values($firmas_pdf) : []; ?>
+<table>
+    <tr><td class="section-title">VALIDACION DE SOLICITUD</td></tr>
+    <tr>
+        <td style="height: 120px; position: relative;">
+            <?php if (!empty($firmasPdf)): ?>
+                <?php
+                $totalFirmas = count($firmasPdf);
+                $posiciones = [50];
+                if ($totalFirmas === 2) {
+                    $posiciones = [25, 75];
+                } elseif ($totalFirmas >= 3) {
+                    $posiciones = [17, 50, 83];
+                }
+                ?>
+                <?php foreach ($firmasPdf as $index => $firma): ?>
+                    <div style="position: absolute; bottom: 14px; left: <?= $posiciones[$index] ?? 50 ?>%; transform: translateX(-50%); text-align: center; width: 180px;">
+                        <div style="border-top: 1px solid #000; padding-top: 4px; font-weight: bold;"><?= esc($firma->nombre ?? '') ?></div>
+                        <div style="margin-top: 2px;"><?= esc($firma->cargo ?? '') ?></div>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div style="position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); text-align: center; width: 200px;">
+                    <div style="border-top: 1px solid #000; padding-top: 4px; font-weight: bold;">Firma pendiente</div>
+                    <div style="margin-top: 2px;">Cargo</div>
+                </div>
+            <?php endif; ?>
+        </td>
+    </tr>
+</table>
+
 <div style="margin-top: 24px; text-align: right;">
     Fecha de impresion: <?= date('d/m/Y H:i:s') ?>
 </div>

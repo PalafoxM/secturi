@@ -38,6 +38,7 @@
                                             <th>Responsable</th>
                                             <th>Vigencia</th>
                                             <th>Monto</th>
+                                            <th>Estatus</th>
                                             <th>Acciones</th>
                                         </tr>
                                     </thead>
@@ -55,6 +56,32 @@
                                                         <?= !empty($solicitud->vigencia_fin) ? date('d/m/Y', strtotime($solicitud->vigencia_fin)) : '' ?>
                                                     </td>
                                                     <td>$<?= number_format((float) ($solicitud->monto_total_contrato ?? 0), 2, '.', ',') ?></td>
+                                                    <td>
+                                                        <?php if ((int) ($solicitud->id_estatus ?? 1) === 1): ?>
+                                                            <span class="badge badge-secondary">Registrado</span>
+                                                        <?php endif; ?>
+                                                        <?php if ((int) ($solicitud->id_estatus ?? 0) === 2): ?>
+                                                            <button class="btn btn-sm btn-outline-danger font-weight-bold shadow-sm" title="Clic para ver motivo" onclick="verMotivo('<?= htmlspecialchars($solicitud->motivo ?? '', ENT_QUOTES) ?>')">
+                                                                <i class="fas fa-exclamation-triangle"></i> Declinado
+                                                            </button>
+                                                        <?php endif; ?>
+                                                        <?php if ((int) ($solicitud->id_estatus ?? 0) === 4): ?>
+                                                            <button class="btn btn-sm btn-soft-warning font-weight-bold" style="cursor: default; pointer-events: none;" title="En revision por area juridica">
+                                                                <i class="fas fa-circle-notch fa-spin mr-1"></i> En Espera
+                                                            </button>
+                                                        <?php endif; ?>
+                                                        <?php if ((int) ($solicitud->id_estatus ?? 0) === 3): ?>
+                                                            <?php if (!empty($solicitud->instrumento_urls)): ?>
+                                                                <?php foreach ($solicitud->instrumento_urls as $index => $instrumento): ?>
+                                                                    <a href="<?= $instrumento['url'] ?>" target="_blank" class="btn btn-sm btn-success mb-1" title="Ver Instrumento <?= $index + 1 ?>">
+                                                                        <i class="fas fa-file-pdf"></i> Inst. <?= $index + 1 ?>
+                                                                    </a>
+                                                                <?php endforeach; ?>
+                                                            <?php else: ?>
+                                                                <span class="badge badge-success">Aprobado</span>
+                                                            <?php endif; ?>
+                                                        <?php endif; ?>
+                                                    </td>
                                                     <td class="text-center">
                                                         <?php if ($session->id_perfil != 7): ?>
                                                             <a href="<?= base_url('index.php/Principal/editarSolicitudHonorarios/' . $solicitud->id_solicitud_honorario) ?>" class="btn btn-sm btn-warning" title="Editar">
@@ -72,12 +99,20 @@
                                                         <a href="<?= base_url('index.php/Principal/verArchivosSolicitudHonorarios/' . $solicitud->id_solicitud_honorario) ?>" class="btn btn-sm btn-success" title="Ver Archivos">
                                                             <i class="fas fa-eye"></i>
                                                         </a>
+                                                        <?php if ((int) ($solicitud->id_estatus ?? 0) === 4 && in_array((int) ($session->id_perfil ?? 0), [1, 7], true)): ?>
+                                                            <a onclick="declinaSolicitudHonorarios(<?= $solicitud->id_solicitud_honorario ?>);" class="btn btn-sm btn-danger" title="Declinar">
+                                                                <i class="fas fa-times text-white"></i>
+                                                            </a>
+                                                            <button class="btn btn-sm btn-primary" title="Subir Instrumento Juridico" onclick="subirInstrumentoJuridicoHonorarios(<?= $solicitud->id_solicitud_honorario ?>)">
+                                                                <i class="fas fa-upload"></i> Subir Instrumento
+                                                            </button>
+                                                        <?php endif; ?>
                                                     </td>
                                                 </tr>
                                             <?php endforeach; ?>
                                         <?php else: ?>
                                             <tr>
-                                                <td colspan="7" class="text-center">No hay solicitudes de honorarios registradas.</td>
+                                                <td colspan="8" class="text-center">No hay solicitudes de honorarios registradas.</td>
                                             </tr>
                                         <?php endif; ?>
                                     </tbody>
@@ -157,5 +192,76 @@ function abrirModalArchivos(id){
 }
 function enviarFormularioArchivosHonorarios(){
     $('#formSeleccionArchivosHonorarios').submit();
+}
+function verMotivo(motivo){
+    Swal.fire({ title:'Motivo de Declinacion', text: motivo || 'No se especifico un motivo.', icon:'info', confirmButtonText:'Cerrar', confirmButtonColor:'#5b73e8' });
+}
+function declinaSolicitudHonorarios(id){
+    Swal.fire({
+        title:'Deseas declinar la solicitud?',
+        text:'Ingresa el motivo de la declinacion:',
+        icon:'warning',
+        input:'textarea',
+        inputPlaceholder:'Escribe el motivo aqui...',
+        showCancelButton:true,
+        confirmButtonColor:'#d33',
+        cancelButtonColor:'#3085d6',
+        confirmButtonText:'Si, declinar',
+        cancelButtonText:'Cancelar',
+        preConfirm:(motivo)=>{
+            if(!motivo || motivo.trim()===''){
+                Swal.showValidationMessage('El motivo es obligatorio');
+                return false;
+            }
+            return motivo;
+        }
+    }).then((result)=>{
+        if(result.isConfirmed){
+            $.post('<?= base_url("index.php/Principal/declinarSolicitudHonorarios") ?>',{ id_solicitud:id, motivo:result.value },function(response){
+                if(!response.error){
+                    Swal.fire('Declinado','El registro ha sido declinado.','success').then(()=>location.reload());
+                } else {
+                    Swal.fire('Error','No se pudo declinar el registro.','error');
+                }
+            });
+        }
+    });
+}
+function subirInstrumentoJuridicoHonorarios(id){
+    Swal.fire({
+        title:'Subir Instrumentos Juridicos',
+        input:'file',
+        inputAttributes:{ accept:'application/pdf', multiple:'multiple', 'aria-label':'Subir Instrumentos Juridicos en PDF' },
+        showCancelButton:true,
+        confirmButtonText:'Subir',
+        cancelButtonText:'Cancelar',
+        showLoaderOnConfirm:true,
+        preConfirm:(files)=>{
+            if(!files || files.length===0){
+                Swal.showValidationMessage('Selecciona al menos un archivo PDF');
+                return false;
+            }
+            const formData=new FormData();
+            for(let i=0;i<files.length;i++){
+                formData.append('archivos[]', files[i]);
+            }
+            formData.append('id_solicitud', id);
+            return fetch('<?= base_url("index.php/Principal/subirInstrumentoJuridicoHonorarios") ?>',{
+                method:'POST',
+                body:formData
+            }).then(response=>response.json()).catch(error=>{
+                Swal.showValidationMessage(`Error: ${error}`);
+            });
+        },
+        allowOutsideClick:()=>!Swal.isLoading()
+    }).then((result)=>{
+        if(result.isConfirmed){
+            if(result.value.error){
+                Swal.fire('Error', result.value.respuesta || 'Ocurrio un error al subir el archivo.', 'error');
+            } else {
+                Swal.fire('Exito','El archivo se ha subido correctamente.','success').then(()=>location.reload());
+            }
+        }
+    });
 }
 </script>
