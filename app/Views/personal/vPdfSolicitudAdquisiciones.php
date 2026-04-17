@@ -14,6 +14,11 @@
         .center { text-align: center; }
         .right { text-align: right; }
         .no-border { border: none; }
+        .firma-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .firma-table td { border: none; text-align: center; vertical-align: top; padding: 18px 8px 0 8px; }
+        .firma-linea { display: block; width: 72%; margin: 0 auto 4px auto; border-top: 1px solid #000; height: 1px; }
+        .firma-nombre { font-size: 12px; font-weight: bold; line-height: 1.2; text-transform: uppercase; }
+        .firma-cargo { font-size: 11px; line-height: 1.2; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -152,30 +157,23 @@
     <table style="margin-top: 8px;">
         <tr><td class="section-title">VALIDACION DE SOLICITUD</td></tr>
         <tr>
-            <td style="height: 140px; position: relative;">
-                <?php $firmasPdf = !empty($firmas_pdf) ? array_values($firmas_pdf) : []; ?>
-                <?php if (!empty($firmasPdf)): ?>
-                    <?php
-                    $totalFirmas = count($firmasPdf);
-                    $posiciones = [50];
-                    if ($totalFirmas === 2) {
-                        $posiciones = [25, 75];
-                    } elseif ($totalFirmas >= 3) {
-                        $posiciones = [17, 50, 83];
-                    }
-                    ?>
-                    <?php foreach ($firmasPdf as $index => $firma): ?>
-                        <div style="position: absolute; bottom: 18px; left: <?= $posiciones[$index] ?? 50 ?>%; transform: translateX(-50%); text-align: center; width: 220px;">
-                            <div style="border-top: 1px solid #000; padding-top: 4px; font-weight: bold;"><?= esc($firma->nombre ?? '') ?></div>
-                            <div style="margin-top: 2px;"><?= esc($firma->cargo ?? '') ?></div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <div style="position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); text-align: center; width: 320px;">
-                        <div style="border-top: 1px solid #000; padding-top: 4px; font-weight: bold;">Firma pendiente</div>
-                        <div style="margin-top: 2px;">Cargo</div>
-                    </div>
-                <?php endif; ?>
+            <td style="height: 120px;">
+                <?php
+                $firmasPdf = !empty($firmas_pdf) ? $firmas_pdf : [
+                    (object) ['nombre' => 'Firma pendiente', 'cargo' => 'Cargo'],
+                ];
+                ?>
+                <table class="firma-table">
+                    <tr>
+                        <?php foreach ($firmasPdf as $firma): ?>
+                            <td style="width: <?= 100 / max(count($firmasPdf), 1) ?>%;">
+                                <span class="firma-linea"></span>
+                                <div class="firma-nombre"><?= esc($firma->nombre ?? '') ?></div>
+                                <div class="firma-cargo"><?= esc($firma->cargo ?? '') ?></div>
+                            </td>
+                        <?php endforeach; ?>
+                    </tr>
+                </table>
             </td>
         </tr>
     </table>

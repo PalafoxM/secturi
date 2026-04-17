@@ -120,10 +120,30 @@
                                                     <select class="form-control select2" name="numero_partida" id="numero_partida" required>
                                                         <option value="">Seleccione una opción</option>
                                                         <?php if(isset($cat_partida)): foreach ($cat_partida as $u): ?>
-                                                            <option value="<?= $u->cuenta_cable ?>" data-nombre="<?= htmlspecialchars($u->nombre_fondo, ENT_QUOTES) ?>" <?= (isset($solicitud) && $solicitud->numero_partida == $u->cuenta_cable) ? 'selected' : '' ?>>
+                                                            <option value="<?= $u->cuenta_cable ?>" data-nombre="<?= htmlspecialchars($u->nombre_fondo, ENT_QUOTES) ?>" <?= (isset($solicitud) && in_array(trim((string) ($solicitud->numero_partida ?? '')), [trim((string) ($u->cuenta_cable ?? '')), trim((string) ($u->id_partida ?? ''))], true)) ? 'selected' : '' ?>>
                                                                 <?= $u->cuenta_cable ?>
                                                             </option>
                                                         <?php endforeach; endif; ?>
+                                                        <?php
+                                                            $numeroPartidaSeleccionada = isset($solicitud->numero_partida) ? trim((string) $solicitud->numero_partida) : '';
+                                                            $nombrePartidaSeleccionada = isset($solicitud->nombre_partida) ? (string) $solicitud->nombre_partida : '';
+                                                            $partidaEncontradaEnCatalogo = false;
+                                                            if ($numeroPartidaSeleccionada !== '' && isset($cat_partida) && is_array($cat_partida)) {
+                                                                foreach ($cat_partida as $partidaCatalogo) {
+                                                                    $valorCuentaCable = trim((string) ($partidaCatalogo->cuenta_cable ?? ''));
+                                                                    $valorIdPartida = trim((string) ($partidaCatalogo->id_partida ?? ''));
+                                                                    if (in_array($numeroPartidaSeleccionada, [$valorCuentaCable, $valorIdPartida], true)) {
+                                                                        $partidaEncontradaEnCatalogo = true;
+                                                                        break;
+                                                                    }
+                                                                }
+                                                            }
+                                                        ?>
+                                                        <?php if (!$partidaEncontradaEnCatalogo && $numeroPartidaSeleccionada !== ''): ?>
+                                                            <option value="<?= esc($numeroPartidaSeleccionada, 'attr') ?>" data-nombre="<?= htmlspecialchars($nombrePartidaSeleccionada, ENT_QUOTES) ?>" selected>
+                                                                <?= esc($numeroPartidaSeleccionada) ?>
+                                                            </option>
+                                                        <?php endif; ?>
                                                     </select>
                                                 </td>
                                                 <td><input type="text" class="form-control" name="nombre_partida" id="nombre_partida" value="<?= isset($solicitud) ? (isset($solicitud->nombre_partida) ? $solicitud->nombre_partida : '') : '' ?>"></td>
