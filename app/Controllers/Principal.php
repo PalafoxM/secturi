@@ -4519,6 +4519,7 @@ class Principal extends BaseController
                 if (isset($usuarioQuery->data) && !empty($usuarioQuery->data) && !empty($usuarioQuery->data[0]->correo)) {
                     $correoDestino = $usuarioQuery->data[0]->correo;
                     $nombreUsuario = $usuarioQuery->data[0]->nombre_completo ?? 'Usuario';
+                    $enlaceListado = 'https://secturnet.guanajuato.gob.mx/susi/index.php/Principal/ListaSolicitudAdquisiciones';
 
                     $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
                     $emailService->setTo($correoDestino);
@@ -4529,6 +4530,16 @@ class Principal extends BaseController
                         <p>Se le notifica que su solicitud de adquisiciones con ID <strong>{$id}</strong> ha sido <strong>declinada</strong>.</p>
                         <p><strong>Motivo:</strong> {$motivo}</p>
                         <p>Puede ingresar al sistema SUSI para volver a subir la documentación correspondiente.</p>
+                        <br>
+                        <p>Saludos cordiales,</p>
+                        <p><strong>Sistema Unificado SECTURI (SUSI)</strong></p>
+                    ");
+                    $emailService->setMessage("
+                        <p>Buen dÃ­a, <strong>{$nombreUsuario}</strong>:</p>
+                        <p>Se le notifica que su solicitud de adquisiciones con ID <strong>{$id}</strong> ha sido <strong>declinada</strong>.</p>
+                        <p><strong>Motivo:</strong> {$motivo}</p>
+                        <p>Puede consultar mayores detalles ingresando al siguiente enlace:</p>
+                        <p><a href='{$enlaceListado}' target='_blank'>{$enlaceListado}</a></p>
                         <br>
                         <p>Saludos cordiales,</p>
                         <p><strong>Sistema Unificado SECTURI (SUSI)</strong></p>
@@ -4618,6 +4629,7 @@ class Principal extends BaseController
                 if (isset($usuarioQuery->data) && !empty($usuarioQuery->data) && !empty($usuarioQuery->data[0]->correo)) {
                     $correoDestino = $usuarioQuery->data[0]->correo;
                     $nombreUsuario = $usuarioQuery->data[0]->nombre_completo ?? 'Usuario';
+                    $enlaceListado = 'https://secturnet.guanajuato.gob.mx/susi/index.php/Principal/ListaSolicitudAdquisiciones';
 
                     $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
                     $emailService->setTo($correoDestino);
@@ -4627,6 +4639,15 @@ class Principal extends BaseController
                         <p>Buen día, <strong>{$nombreUsuario}</strong>:</p>
                         <p>El área Jurídica ha autorizado y adjuntado el instrumento jurídico correspondiente a su solicitud de adquisiciones con ID <strong>{$id}</strong>.</p>
                         <p>Puede consultar los documentos ingresando al sistema SUSI.</p>
+                        <br>
+                        <p>Saludos cordiales,</p>
+                        <p><strong>Sistema Unificado SECTURI (SUSI)</strong></p>
+                    ");
+                    $emailService->setMessage("
+                        <p>Buen dÃ­a, <strong>{$nombreUsuario}</strong>:</p>
+                        <p>El Ã¡rea JurÃ­dica ha autorizado y adjuntado el instrumento jurÃ­dico correspondiente a su solicitud de adquisiciones con ID <strong>{$id}</strong>.</p>
+                        <p>Puede consultar los documentos ingresando al siguiente enlace:</p>
+                        <p><a href='{$enlaceListado}' target='_blank'>{$enlaceListado}</a></p>
                         <br>
                         <p>Saludos cordiales,</p>
                         <p><strong>Sistema Unificado SECTURI (SUSI)</strong></p>
