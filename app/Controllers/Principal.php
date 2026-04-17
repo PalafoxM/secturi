@@ -4154,7 +4154,7 @@ class Principal extends BaseController
             'numero_partida' => $post['numero_partida'] ?? null,
             'nombre_partida' => $post['nombre_partida'] ?? null,
             'descripcion_bienes' => 'N/A',
-            'fecha_inicio' => 'N/A',
+            'fecha_inicio' => null,
             'lugar_entrega' => 'N/A',
             'proveedor_nombre' => $post['proveedor_nombre'] ?? null,
             'proveedor_comercial' => $post['proveedor_comercial'] ?? null,

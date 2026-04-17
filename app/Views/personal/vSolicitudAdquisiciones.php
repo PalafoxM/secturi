@@ -473,7 +473,7 @@
             $('#form_solicitud_adquisiciones').append('<input type="hidden" name="descripcion_bienes" value="N/A">');
         }
         if (!$('#form_solicitud_adquisiciones input[name="fecha_inicio"]').length) {
-            $('#form_solicitud_adquisiciones').append('<input type="hidden" name="fecha_inicio" value="N/A">');
+            $('#form_solicitud_adquisiciones').append('<input type="hidden" name="fecha_inicio" value="">');
         }
         if (!$('#form_solicitud_adquisiciones input[name="lugar_entrega"]').length) {
             $('#form_solicitud_adquisiciones').append('<input type="hidden" name="lugar_entrega" value="N/A">');
