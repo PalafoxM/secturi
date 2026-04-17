@@ -25,7 +25,7 @@ $firmasSeleccionadasHonorarios = json_encode(array_values($firmas_seleccionadas 
 
 $soportes = [
     'Autorizacion SFIA' => 'autorizacion_sfia',
-    'Justificacion Oficial' => 'justificacion_oficial',
+    'Identificacion Oficial' => 'justificacion_oficial',
     'Cedula de Registro Federal de Contribuyentes' => 'cedula_rfc',
     'Comprobante de domicilio' => 'comprobante_domicilio',
     'Autorizacion de tratamiento datos' => 'autorizacion_datos',
@@ -89,7 +89,14 @@ $soportes = [
                                         <tr>
                                             <td class="label-cell">&Aacute;rea</td>
                                             <td colspan="2" class="field-cell">
-                                                <input type="text" class="form-control form-control-sm field-input" id="area" name="area" value="<?= isset($solicitud->area) ? esc($solicitud->area) : '' ?>">
+                                                <select class="form-control form-control-sm select2 field-input" id="area" name="area">
+                                                    <option value="">Seleccione una opci&oacute;n</option>
+                                                    <?php foreach (($cat_area ?? []) as $areaItem): ?>
+                                                        <option value="<?= $areaItem->id_area ?>" <?= (isset($solicitud->area) && (string) $solicitud->area === (string) $areaItem->id_area) ? 'selected' : '' ?>>
+                                                            <?= esc($areaItem->dsc_area ?? '') ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
                                             </td>
                                         </tr>
                                         <tr>
@@ -138,7 +145,14 @@ $soportes = [
                                         </tr>
                                         <tr>
                                             <td class="field-cell">
-                                                <input type="text" class="form-control form-control-sm field-input" name="clave_presupuestal" value="<?= isset($solicitud->clave_presupuestal) ? esc($solicitud->clave_presupuestal) : '' ?>">
+                                                <select class="form-control form-control-sm select2 field-input" name="clave_presupuestal">
+                                                    <option value="">Seleccione una opci&oacute;n</option>
+                                                    <?php foreach (($cat_proyecto ?? []) as $proyecto): ?>
+                                                        <option value="<?= $proyecto->id_proyecto ?>" <?= (isset($solicitud->clave_presupuestal) && (string) $solicitud->clave_presupuestal === (string) $proyecto->id_proyecto) ? 'selected' : '' ?>>
+                                                            <?= esc($proyecto->proyecto ?? '') ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
                                             </td>
                                             <td class="field-cell">
                                                 <select class="form-control form-control-sm select2 field-input" name="partida">
@@ -160,6 +174,28 @@ $soportes = [
                                             <td class="label-cell">Nombre Completo Prestaci&oacute;n de Servicios</td>
                                             <td colspan="2" class="field-cell">
                                                 <input type="text" class="form-control form-control-sm field-input" name="nombre_prestador" value="<?= isset($solicitud->nombre_prestador) ? esc($solicitud->nombre_prestador) : '' ?>">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="label-cell">Prestaci&oacute;n de Servicios</td>
+                                            <td colspan="2" class="field-cell">
+                                                <?php
+                                                    $puestoPrestadorSeleccionado = '';
+                                                    foreach (['prestacion_servicios', 'puesto_prestador', 'id_puesto'] as $campoPuestoPrestador) {
+                                                        if (isset($solicitud) && isset($solicitud->{$campoPuestoPrestador}) && $solicitud->{$campoPuestoPrestador} !== null && $solicitud->{$campoPuestoPrestador} !== '') {
+                                                            $puestoPrestadorSeleccionado = (string) $solicitud->{$campoPuestoPrestador};
+                                                            break;
+                                                        }
+                                                    }
+                                                ?>
+                                                <select class="form-control form-control-sm select2 field-input" name="prestacion_servicios">
+                                                    <option value="">Seleccione una opci&oacute;n</option>
+                                                    <?php foreach (($cat_puesto ?? []) as $puesto): ?>
+                                                        <option value="<?= $puesto->id_puesto ?>" <?= $puestoPrestadorSeleccionado !== '' && $puestoPrestadorSeleccionado === (string) $puesto->id_puesto ? 'selected' : '' ?>>
+                                                            <?= esc($puesto->dsc_puesto ?? '') ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
                                             </td>
                                         </tr>
                                         <tr>
@@ -541,20 +577,6 @@ $soportes = [
             $('#actividades_body').append(fila);
             renumerarActividades();
         }
-
-        function actualizarArea() {
-            var areaSeleccionada = $('#responsable_proyecto option:selected').data('area') || '';
-            if (!$('#area').val()) {
-                $('#area').val(areaSeleccionada);
-            }
-        }
-
-        actualizarArea();
-
-        $('#responsable_proyecto').on('change', function() {
-            var areaSeleccionada = $(this).find('option:selected').data('area') || '';
-            $('#area').val(areaSeleccionada);
-        });
 
         $('#agregar_actividad').on('click', function() {
             agregarFilaActividad('');

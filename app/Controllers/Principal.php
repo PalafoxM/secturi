@@ -3259,6 +3259,10 @@ class Principal extends BaseController
 
         $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
         $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+        $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
+        $data['cat_area'] = (!empty($cat_area->data)) ? $cat_area->data : [];
+        $cat_puesto = $globals->getTabla(['tabla' => 'cat_puesto', 'where' => ['visible' => 1]]);
+        $data['cat_puesto'] = (!empty($cat_puesto->data)) ? $cat_puesto->data : [];
         $data['catalogo_firmantes'] = $this->construirCatalogoFirmantes($data['direccion'], $data['usuario']);
         $data['firmas_seleccionadas'] = [];
         
@@ -3343,6 +3347,48 @@ class Principal extends BaseController
             }
         }
 
+        $areas = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
+        if (!empty($areas->data)) {
+            foreach ($areas->data as $area) {
+                if ((string) ($area->id_area ?? '') === (string) ($solicitud->area ?? '')) {
+                    $solicitud->area_nombre = $area->dsc_area ?? '';
+                    break;
+                }
+            }
+        }
+
+        $proyectos = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
+        if (!empty($proyectos->data)) {
+            foreach ($proyectos->data as $proyecto) {
+                if ((string) ($proyecto->id_proyecto ?? '') === (string) ($solicitud->clave_presupuestal ?? '')) {
+                    $solicitud->clave_presupuestal_nombre = $proyecto->proyecto ?? '';
+                    break;
+                }
+            }
+        }
+
+        $partidas = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        if (!empty($partidas->data)) {
+            foreach ($partidas->data as $partida) {
+                if ((string) ($partida->id_partida ?? '') === (string) ($solicitud->partida ?? '')) {
+                    $solicitud->partida_nombre = trim((string) (($partida->cuenta_cable ?? '') . ' - ' . ($partida->partida ?? $partida->nombre_fondo ?? '')));
+                    break;
+                }
+            }
+        }
+
+        $puestos = $globals->getTabla(['tabla' => 'cat_puesto', 'where' => ['visible' => 1]]);
+        if (!empty($puestos->data)) {
+            foreach ($puestos->data as $puesto) {
+                foreach (['prestacion_servicios', 'puesto_prestador', 'id_puesto'] as $campoPuesto) {
+                    if ((string) ($puesto->id_puesto ?? '') === (string) ($solicitud->{$campoPuesto} ?? '')) {
+                        $solicitud->puesto_prestador_nombre = $puesto->dsc_puesto ?? '';
+                        break 2;
+                    }
+                }
+            }
+        }
+
         $actividadesQuery = $globals->getTabla([
             'tabla' => 'actividades_honorario',
             'where' => ['id_solicitud_honorario' => $idSolicitudHonorario, 'visible' => 1]
@@ -3423,6 +3469,10 @@ class Principal extends BaseController
 
         $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
         $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+        $cat_area = $globals->getTabla(['tabla' => 'cat_area', 'where' => ['visible' => 1]]);
+        $data['cat_area'] = (!empty($cat_area->data)) ? $cat_area->data : [];
+        $cat_puesto = $globals->getTabla(['tabla' => 'cat_puesto', 'where' => ['visible' => 1]]);
+        $data['cat_puesto'] = (!empty($cat_puesto->data)) ? $cat_puesto->data : [];
 
         $data['solicitud'] = $detalle['solicitud'];
         $data['actividades'] = $detalle['actividades'];
@@ -3463,6 +3513,14 @@ class Principal extends BaseController
             'comprobante_domicilio' => !empty($post['comprobante_domicilio']) ? 1 : 0,
             'autorizacion_datos' => !empty($post['autorizacion_datos']) ? 1 : 0,
         ];
+
+        $columnasSolicitudHonorario = $this->obtenerColumnasTablaServicio($globals, 'solicitud_honorario');
+        foreach (['prestacion_servicios', 'puesto_prestador', 'id_puesto'] as $campoPuesto) {
+            if (in_array($campoPuesto, $columnasSolicitudHonorario, true)) {
+                $dataInsert[$campoPuesto] = $post['prestacion_servicios'] ?? null;
+                break;
+            }
+        }
 
         $dataConfig = ["tabla" => "solicitud_honorario", "editar" => false];
         $script = 'Principal.php/guardarSolicitudHonorarios';
