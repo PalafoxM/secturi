@@ -25,7 +25,7 @@
             <td class="header-title" style="width: 86%;">
                 <div style="font-size: 22px; margin-bottom: 6px;">SOLICITUD DE ELABORACION DE CONTRATO DE ADQUISICION</div>
                 <div style="font-size: 16px;">DIRECCION GENERAL JURIDICA</div>
-                <div style="font-size: 15px; margin-top: 4px;">DAJ-3</div>
+                <div style="font-size: 15px; margin-top: 4px;">DGJ-3</div>
             </td>
         </tr>
     </table>
