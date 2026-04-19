@@ -22,7 +22,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="text-center mb-4">
-                                <h4 class="mt-0">DIRECCIÓN DE ASUNTOS JURÍDICOS</h4>
+                                <h4 class="mt-0">DIRECCIÓN GENERAL JURÍDICA (DGJ-1)</h4>
                                 <h5>SOLICITUD DE ELABORACIÓN DE CONVENIO</h5>
                             </div>
                             
@@ -140,7 +140,7 @@
                                 </div>
 
                                 <!-- SECCION 4: VIGENCIA Y MINISTRACIONES -->
-                                <h5 class="bg-light font-weight-bold text-center p-2 mt-4" style="border: 1px solid #ccc;">Vigencia y Ministraciones del Convenio</h5>
+                                <h5 class="bg-primary text-white p-2 mt-4">VIGENCIA Y MINISTRACIONES</h5>
                                 <div class="form-row">
                                     <div class="col-md-6 mb-3">
                                         <label>Fecha de inicio:</label>

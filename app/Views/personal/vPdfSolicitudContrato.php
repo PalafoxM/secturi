@@ -18,6 +18,7 @@
         .firma-linea { display: block; width: 72%; margin: 0 auto 4px auto; border-top: 1px solid #000; height: 1px; }
         .firma-nombre { font-size: 12px; font-weight: bold; line-height: 1.2; text-transform: uppercase; }
         .firma-cargo { font-size: 11px; line-height: 1.2; text-transform: uppercase; }
+        .firma-delegatorio { font-size: 10px; line-height: 1.2; margin-top: 3px; }
     </style>
 </head>
 <body>
@@ -63,7 +64,7 @@
         </tbody>
     </table>
     <div style="margin-top: 10px;">
-        <span class="label">Monto Total:</span> <span class="value"><?= $solicitud->monto_total_formateado ?? $solicitud->monto_total ?> (<?= strtoupper($solicitud->monto_total_texto ?? '') ?>)</span>
+        <span class="label">Monto:</span> <span class="value"><?= $solicitud->monto_total_formateado ?? $solicitud->monto_total ?> (<?= strtoupper($solicitud->monto_total_texto ?? '') ?>)</span>
     </div>
     <div>
         <span class="label">Tipo / Monto de Garantía:</span>
@@ -118,7 +119,8 @@
         <div class="row"><span class="label">RFC:</span> <span class="value"><?= $solicitud->proveedor_rfc ?></span></div>
         <div class="row"><span class="label">Cedula de Registro en el Padron de Proveedores:</span> <span class="value"><?= $solicitud->proveedor_cedula ?></span></div>
         <div class="row"><span class="label">Nombre del Representante Legal (persona moral):</span> <span class="value"><?= $solicitud->proveedor_representante ?></span></div>
-        <div class="row"><span class="label">Correo electrónico:</span> <span class="value"><?= $solicitud->proveedor_nombre.' ('.$solicitud->proveedor_correo.')' ?></span></div>
+        <div class="row"><span class="label">Responsable de Seguimiento:</span> <span class="value"><?= $solicitud->proveedor_seguimiento ?></span></div>
+        <div class="row"><span class="label">Correo electrónico:</span> <span class="value"><?= $solicitud->proveedor_correo ?></span></div>
     </div>
 
     <div class="section-title">FIRMAS</div>
@@ -135,6 +137,9 @@
                     <span class="firma-linea"></span>
                     <div class="firma-nombre"><?= esc($firma->nombre ?? '') ?></div>
                     <div class="firma-cargo"><?= esc($firma->cargo ?? '') ?></div>
+                    <?php if (!empty($firma->no_delegatorio ?? '')): ?>
+                        <div class="firma-delegatorio">No. delegatorio: <?= esc($firma->no_delegatorio) ?></div>
+                    <?php endif; ?>
                 </td>
             <?php endforeach; ?>
         </tr>

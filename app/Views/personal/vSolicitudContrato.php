@@ -115,7 +115,7 @@
                                     </table>
                                 </div>
                                 <div class="form-group row">
-                                    <label class="col-sm-4 col-form-label">Monto Total del Contrato (con número y letra):</label>
+                                    <label class="col-sm-4 col-form-label">Monto (con número y letra):</label>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control" id="monto_total" name="monto_total" value="<?= isset($solicitud) ? $solicitud->monto_total : '' ?>" required>
                                         <input type="text" class="form-control mt-2" id="monto_total_texto" name="monto_total_texto" value="<?= isset($solicitud) ? esc($solicitud->monto_total_texto ?? '') : '' ?>" readonly placeholder="Monto en letra">
@@ -136,7 +136,7 @@
                                             <label class="custom-control-label" for="custom_garantia_check">Ingresar otro monto o porcentaje de garantía</label>
                                         </div>
                                         <input type="text" class="form-control mt-2" name="monto_garantia" id="monto_garantia" value="<?= isset($solicitud) ? ($solicitud->monto_garantia ?? '') : '' ?>" readonly placeholder="12% del monto total">
-                                        <input type="text" class="form-control mt-2" name="monto_garantia_texto" id="monto_garantia_texto" value="<?= isset($solicitud) ? esc($solicitud->monto_garantia_texto ?? '') : '' ?>" readonly placeholder="Monto de garantÃ­a en letra">
+                                        <input type="text" class="form-control mt-2" name="monto_garantia_texto" id="monto_garantia_texto" value="<?= isset($solicitud) ? esc($solicitud->monto_garantia_texto ?? '') : '' ?>" readonly placeholder="Monto de garantía en letra">
                                     </div>
                                 </div>
 
@@ -163,7 +163,7 @@
                                         <thead>
                                             <tr>
                                                 <th>Pagos</th>
-                                                <th>Monto TOTAL</th>
+                                                <th>Monto</th>
                                                 <th>Fecha</th>
                                                 <th>Entregable y contenido</th>
                                                 <th style="width:50px;"></th>
@@ -277,7 +277,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalLabelEdicion">Seleccion de Documentos a Reemplazar</h5>
+                <h5 class="modal-title" id="modalLabelEdicion">Selección de Documentos a Reemplazar</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body">
@@ -324,6 +324,11 @@
 <script>
     const catalogoFirmantesContrato = <?= json_encode($catalogo_firmantes ?? [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
     const firmasSeleccionadasContrato = <?= json_encode(array_values($firmas_seleccionadas ?? []), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+    const delegatoriosSeleccionadosContrato = <?= json_encode([
+        $solicitud->no_delegatorio_1 ?? '',
+        $solicitud->no_delegatorio_2 ?? '',
+        $solicitud->no_delegatorio_3 ?? '',
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
 
     function normalizarMonto(valor) {
         if (valor === null || valor === undefined) {
@@ -465,6 +470,11 @@
             $(this).attr('data-index', index);
             $(this).find('.firma-label').text(`Firma ${index + 1}`);
             $(this).find('select').attr('name', `firmas[${index}]`);
+            $(this).find('.no-delegatorio-check')
+                .attr('id', `no_delegatorio_check_${index}`)
+                .attr('name', `usar_no_delegatorio[${index}]`);
+            $(this).find('.custom-control-label').attr('for', `no_delegatorio_check_${index}`);
+            $(this).find('.no-delegatorio-input').attr('name', `no_delegatorio[${index}]`);
         });
     }
 
@@ -492,6 +502,11 @@
                     ${opcionesFirmantesContrato(valorSeleccionado)}
                 </select>
                 <div class="firma-puesto text-uppercase small text-muted mt-2"></div>
+                <div class="custom-control custom-checkbox mt-3">
+                    <input type="checkbox" class="custom-control-input no-delegatorio-check" id="no_delegatorio_check_${index}" name="usar_no_delegatorio[${index}]" value="1">
+                    <label class="custom-control-label" for="no_delegatorio_check_${index}">No. delegatorio</label>
+                </div>
+                <input type="text" class="form-control mt-2 no-delegatorio-input d-none" name="no_delegatorio[${index}]" placeholder="Ingrese el No. delegatorio">
             </div>
         `;
 
@@ -500,6 +515,12 @@
         nuevoItem.find('.firma-select').select2({
             width: '100%'
         });
+        nuevoItem.find('.no-delegatorio-check').prop('checked', false);
+        const delegatorioInicial = delegatoriosSeleccionadosContrato[index] || '';
+        if (delegatorioInicial !== '') {
+            nuevoItem.find('.no-delegatorio-check').prop('checked', true);
+            nuevoItem.find('.no-delegatorio-input').removeClass('d-none').val(delegatorioInicial);
+        }
         actualizarPuestoFirmaContrato(nuevoItem.find('.firma-select'));
     }
 
@@ -669,6 +690,15 @@
 
         $(document).on('change', '.firma-select', function() {
             actualizarPuestoFirmaContrato(this);
+        });
+
+        $(document).on('change', '.no-delegatorio-check', function() {
+            const input = $(this).closest('.firma-item').find('.no-delegatorio-input');
+            if ($(this).is(':checked')) {
+                input.removeClass('d-none');
+            } else {
+                input.addClass('d-none').val('');
+            }
         });
 
         $(document).on('click', '.btn-eliminar-firma', function() {

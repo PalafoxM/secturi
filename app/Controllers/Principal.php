@@ -4888,8 +4888,21 @@ class Principal extends BaseController
             'proveedor_cedula' => $post['proveedor_cedula'],
             'proveedor_representante' => $post['proveedor_representante'],
             'proveedor_correo' => $proveedorCorreo,
+            'no_delegatorio_1' => null,
+            'no_delegatorio_2' => null,
+            'no_delegatorio_3' => null,
            // 'correo_responsable' => $post['correo_responsable'],
         ];
+
+        $delegatorios = isset($post['no_delegatorio']) && is_array($post['no_delegatorio']) ? $post['no_delegatorio'] : [];
+        $delegatoriosActivos = isset($post['usar_no_delegatorio']) && is_array($post['usar_no_delegatorio']) ? $post['usar_no_delegatorio'] : [];
+        foreach ([1, 2, 3] as $indice) {
+            $key = (string) ($indice - 1);
+            if (!empty($delegatoriosActivos[$key])) {
+                $valorDelegatorio = trim((string) ($delegatorios[$key] ?? ''));
+                $dataInsert['no_delegatorio_' . $indice] = $valorDelegatorio !== '' ? $valorDelegatorio : null;
+            }
+        }
 
         if (!empty($archivo_suficiencia)) {
             $dataInsert['archivo_suficiencia'] = $archivo_suficiencia;
@@ -5052,6 +5065,9 @@ class Principal extends BaseController
         $data['solicitud']->nombre_seguimiento_puesto = $nombreSeguimientoConPuesto !== '' ? $nombreSeguimientoConPuesto : ($data['solicitud']->nombre_seguimiento ?? '');
         $data['solicitud']->nombre_enlace_puesto = $nombreEnlaceConPuesto !== '' ? $nombreEnlaceConPuesto : ($data['solicitud']->nombre_enlace ?? '');
         $data['firmas_pdf'] = $this->obtenerFirmasSolicitudDetalle($globals, $data['solicitud']);
+        foreach ($data['firmas_pdf'] as $indice => $firma) {
+            $firma->no_delegatorio = $data['solicitud']->{'no_delegatorio_' . ($indice + 1)} ?? '';
+        }
         $data['pagos'] = $this->normalizeUtf8Value((!empty($pagos->data)) ? $pagos->data : []);
         $montoTotal = (float) str_replace([',', '$', ' '], '', (string) ($data['solicitud']->monto_total ?? 0));
         $data['solicitud']->monto_total_formateado = '$' . number_format($montoTotal, 2, '.', ',');
