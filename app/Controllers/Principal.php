@@ -226,6 +226,14 @@ class Principal extends BaseController
         return $resultado;
     }
 
+    private function obtenerCorreosRevisionJuridica(): array
+    {
+        return [
+            'lvelaga@guanajuato.gob.mx',
+            'al.hernandezma@guanajuato.gob.mx',
+        ];
+    }
+
     public function verArchivoS3()
     {
         $storedPath = (string) $this->request->getGet('key');
@@ -3766,10 +3774,7 @@ class Principal extends BaseController
             $nombreUsuario = (isset($usuarioQuery->data) && !empty($usuarioQuery->data)) ? $usuarioQuery->data[0]->nombre_completo : 'Usuario Desconocido';
             $enlace = base_url('index.php/Principal/ListaSolicitudContrato');
             $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
-            $emailService->setTo([
-            'lvelaga@guanajuato.gob.mx',
-            'al.hernandezma@guanajuato.gob.mx'
-            ]);
+            $emailService->setTo($this->obtenerCorreosRevisionJuridica());
             $emailService->setSubject('Nueva Solicitud de Contrato - Archivos Adjuntados');
             $emailService->setMailType('html');
             $emailService->setMessage("
@@ -4625,10 +4630,7 @@ class Principal extends BaseController
             $nombreUsuario = (isset($usuarioQuery->data) && !empty($usuarioQuery->data)) ? $usuarioQuery->data[0]->nombre_completo : 'Usuario Desconocido';
             $enlace = base_url('index.php/Principal/ListaSolicitudContrato');
             $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
-            $emailService->setTo([
-            'lvelaga@guanajuato.gob.mx',
-            'al.hernandezma@guanajuato.gob.mx'
-            ]);
+            $emailService->setTo($this->obtenerCorreosRevisionJuridica());
             $emailService->setSubject('Nueva Solicitud de Contrato - Archivos Adjuntados');
             $emailService->setMailType('html');
             $emailService->setMessage("
@@ -5344,10 +5346,7 @@ class Principal extends BaseController
             $nombreUsuario = (isset($usuarioQuery->data) && !empty($usuarioQuery->data)) ? $usuarioQuery->data[0]->nombre_completo : 'Usuario Desconocido';
             $enlace = base_url('index.php/Principal/ListaSolicitudContrato');
             $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
-            $emailService->setTo([
-            'lvelaga@guanajuato.gob.mx',
-            'al.hernandezma@guanajuato.gob.mx'
-            ]);
+            $emailService->setTo($this->obtenerCorreosRevisionJuridica());
             $emailService->setSubject('Nueva Solicitud de Contrato - Archivos Adjuntados');
             $emailService->setMailType('html');
             $emailService->setMessage("
@@ -10841,7 +10840,7 @@ class Principal extends BaseController
             $enlace = base_url('index.php/Principal/ListaSolicitudConvenio');
             
             $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
-            $emailService->setTo(['lvelaga@guanajuato.gob.mx'. "al.hernandezma@guanajuato.gob.mx"]);
+            $emailService->setTo($this->obtenerCorreosRevisionJuridica());
             //$emailService->setTo('palafox.marin@hotmail.com');
             $emailService->setSubject('Nueva Solicitud de Convenio - Archivos Adjuntados');
             $emailService->setMailType('html');
