@@ -36,7 +36,7 @@
                                     <div class="col-sm-9">
                                         <select class="form-control select2" name="responsable_proyecto" required>
                                             <option value="">Seleccione una opción</option>
-                                            <?php foreach ($direccion as $u): ?>
+                                            <?php foreach ($usuario as $u): ?>
                                                 <option value="<?= $u->id_usuario ?>" <?= (isset($solicitud) && $solicitud->responsable_proyecto == $u->id_usuario) ? 'selected' : '' ?>>
                                                     <?= $u->nombre_completo .' - '. $u->dsc_puesto ?>
                                                 </option>
