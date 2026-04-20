@@ -9983,7 +9983,7 @@ class Principal extends BaseController
         $globals = new \App\Models\Mglobal;
         $data = array();
         
-        $vw_usuario = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1]]);
+        $vw_usuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
         $data['direccion'] = $vw_usuario->data;
         $vw_usuario = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
         $data['usuario'] = $vw_usuario->data;
