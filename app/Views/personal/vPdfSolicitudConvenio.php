@@ -18,6 +18,7 @@
         .monto-letra { display: block; font-size: 9px; margin-top: 2px; }
         .firma-table { margin-top: 35px; }
         .firma-table td { border: none; text-align: center; vertical-align: bottom; padding-top: 35px; }
+        .firma-table tr:first-child td { border: 1px solid #000; padding-top: 5px; padding-bottom: 5px; vertical-align: middle; }
         .firma-linea { display: block; width: 72%; margin: 0 auto 4px auto; border-top: 1px solid #000; height: 1px; }
         .firma-nombre { font-size: 11px; font-weight: bold; line-height: 1.2; text-transform: uppercase; }
         .firma-cargo { font-size: 10px; line-height: 1.2; text-transform: uppercase; }
@@ -128,7 +129,7 @@
     </table>
 
     <table>
-        <tr><td colspan="2" class="bg-primary text-center">INFORMACIÓN DEL PROVEEDOR/CONVENIO</td></tr>
+        <tr><td colspan="2" class="bg-primary text-center">INFORMACIÓN</td></tr>
         <tr><td width="30%"><strong>Nombre / Razón Social:</strong></td><td><?= isset($solicitud->proveedor_nombre) ? $solicitud->proveedor_nombre : '' ?></td></tr>
         <tr><td><strong>Domicilio fiscal:</strong></td><td><?= isset($solicitud->proveedor_domicilio) ? $solicitud->proveedor_domicilio : '' ?></td></tr>
         <tr><td><strong>Cédula de Reg. Proveedores:</strong></td><td><?= isset($solicitud->proveedor_cedula) ? $solicitud->proveedor_cedula : '' ?></td></tr>
@@ -138,14 +139,16 @@
         <tr><td><strong>Resp. Seguimiento:</strong></td><td><?= isset($solicitud->proveedor_seguimiento) ? $solicitud->proveedor_seguimiento : '' ?></td></tr>
         <tr><td><strong>Correo Electrónico:</strong></td><td><?= isset($solicitud->proveedor_correo) ? $solicitud->proveedor_correo : '' ?></td></tr>
     </table>
-
+ 
     <?php
         $firmasPdf = !empty($firmas_pdf) ? $firmas_pdf : [
             (object) ['nombre' => 'Nombre Dir. Gral/Subsecretario', 'cargo' => 'Cargo'],
             (object) ['nombre' => 'Nombre Responsable del Proyecto', 'cargo' => 'Cargo'],
         ];
     ?>
+  
     <table class="firma-table">
+        <tr><td colspan="2" class="bg-primary text-center">FIRMAS</td></tr>
         <tr>
             <?php foreach ($firmasPdf as $firma): ?>
                 <td width="<?= 100 / max(count($firmasPdf), 1) ?>%">
