@@ -184,11 +184,15 @@ class Principal extends BaseController
 
         try {
             $s3 = new \App\Libraries\S3Service();
-            return $s3->getPresignedUrl($storedPath, '+20 minutes');
+            $presignedUrl = $s3->getPresignedUrl($storedPath, '+20 minutes');
+            if (!empty($presignedUrl)) {
+                return $presignedUrl;
+            }
         } catch (\Throwable $e) {
             log_message('error', 'Error al resolver URL de archivo almacenado: ' . $e->getMessage());
-            return null;
         }
+
+        return base_url('index.php/Principal/verArchivoS3?key=' . rawurlencode($storedPath));
     }
 
     private function mapInstrumentoUrls($instrumentoRaw): array
@@ -220,6 +224,35 @@ class Principal extends BaseController
         }
 
         return $resultado;
+    }
+
+    public function verArchivoS3()
+    {
+        $storedPath = (string) $this->request->getGet('key');
+        if ($storedPath === '') {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Archivo no especificado.');
+        }
+
+        $s3 = new \App\Libraries\S3Service();
+        $tempFile = $s3->downloadToTempFile($storedPath, 's3_view_');
+
+        if ($tempFile === false || !is_file($tempFile)) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('No fue posible recuperar el archivo.');
+        }
+
+        $mimeType = function_exists('mime_content_type') ? mime_content_type($tempFile) : 'application/octet-stream';
+        if (empty($mimeType)) {
+            $mimeType = 'application/octet-stream';
+        }
+
+        $fileName = basename($storedPath);
+        $contents = file_get_contents($tempFile);
+        @unlink($tempFile);
+
+        return $this->response
+            ->setHeader('Content-Type', $mimeType)
+            ->setHeader('Content-Disposition', 'inline; filename="' . $fileName . '"')
+            ->setBody($contents === false ? '' : $contents);
     }
 
     private function obtenerNombreConPuesto(Mglobal $globals, $idUsuario, bool $usarDireccion = false): string
@@ -5480,7 +5513,24 @@ class Principal extends BaseController
         $data['solicitudes'] = (!empty($solicitudes->data)) ? $solicitudes->data : [];
         if (!empty($data['solicitudes'])) {
             foreach ($data['solicitudes'] as &$sol) {
-                $sol->instrumento_urls = $this->mapInstrumentoUrls($sol->instrumento_juridico ?? null);
+                $instrumentos = $sol->instrumento_juridico ?? null;
+
+                if (empty($instrumentos) && !empty($sol->id_solicitud_convenio)) {
+                    $solicitudBase = $globals->getTabla([
+                        'tabla' => 'solicitud_convenio',
+                        'where' => [
+                            'id_solicitud_convenio' => $sol->id_solicitud_convenio,
+                            'visible' => 1
+                        ]
+                    ]);
+
+                    if (!empty($solicitudBase->data)) {
+                        $instrumentos = $solicitudBase->data[0]->instrumento_juridico ?? null;
+                        $sol->instrumento_juridico = $instrumentos;
+                    }
+                }
+
+                $sol->instrumento_urls = $this->mapInstrumentoUrls($instrumentos);
             }
         }
         $data['scripts'] = array('inicio');
@@ -10027,7 +10077,24 @@ class Principal extends BaseController
         $data['solicitudes'] = (!empty($solicitudes->data)) ? $solicitudes->data : [];
         if (!empty($data['solicitudes'])) {
             foreach ($data['solicitudes'] as &$sol) {
-                $sol->instrumento_urls = $this->mapInstrumentoUrls($sol->instrumento_juridico ?? null);
+                $instrumentos = $sol->instrumento_juridico ?? null;
+
+                if (empty($instrumentos) && !empty($sol->id_solicitud_convenio)) {
+                    $solicitudBase = $globals->getTabla([
+                        'tabla' => 'solicitud_convenio',
+                        'where' => [
+                            'id_solicitud_convenio' => $sol->id_solicitud_convenio,
+                            'visible' => 1
+                        ]
+                    ]);
+
+                    if (!empty($solicitudBase->data)) {
+                        $instrumentos = $solicitudBase->data[0]->instrumento_juridico ?? null;
+                        $sol->instrumento_juridico = $instrumentos;
+                    }
+                }
+
+                $sol->instrumento_urls = $this->mapInstrumentoUrls($instrumentos);
             }
         }
         $data['scripts'] = array('inicio');
