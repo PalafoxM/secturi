@@ -77,7 +77,7 @@
         </span>
     </div>
 
-    <div class="section-title">DESCRIPCION DEL SERVICIO</div>
+    <div class="section-title">DESCRIPCION DEL SERVICIO A CONTRATAR O BIENES A ADQUIRIR</div>
     <div style="border: 1px solid #ccc; padding: 10px; min-height: 50px; margin-bottom: 10px;">
         <?= nl2br($solicitud->objeto_contrato) ?>
     </div>
@@ -112,7 +112,7 @@
         </tbody>
     </table>
 
-    <div class="section-title">INFORMACION DEL PROVEEDOR A CONTRATAR O BIENES A ADQUIRIR</div>
+    <div class="section-title">INFORMACION DEL PROVEEDOR</div>
     <div>
         <div class="row"><span class="label">Nombre/Razón Social:</span> <span class="value"><?= $solicitud->proveedor_nombre ?></span></div>
         <div class="row"><span class="label">Domicilio fiscal:</span> <span class="value"><?= $solicitud->proveedor_domicilio ?></span></div>
