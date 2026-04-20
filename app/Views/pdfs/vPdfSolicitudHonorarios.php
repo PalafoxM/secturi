@@ -135,7 +135,7 @@
         </tr>
         <tr>
             <th>Comprobante domicilio</th>
-            <th>Autorizacion datos</th>
+            <th>Autorizacion de tratamiento datos</th>
             <th></th>
         </tr>
         <tr>

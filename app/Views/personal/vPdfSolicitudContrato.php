@@ -48,9 +48,9 @@
     <table>
         <thead>
             <tr>
-                <th>Proyecto</th>
+                <th>Proyecto o Proceso</th>
                 <th>Partida</th>
-                <th>Clave Estándar</th>
+                <th>Clave Estándarizada</th>
                 <th>Suficiencia Presupuestal</th>
             </tr>
         </thead>
@@ -112,7 +112,7 @@
         </tbody>
     </table>
 
-    <div class="section-title">INFORMACION DEL PROVEEDOR</div>
+    <div class="section-title">INFORMACION DEL PROVEEDOR A CONTRATAR O BIENES A ADQUIRIR</div>
     <div>
         <div class="row"><span class="label">Nombre/Razón Social:</span> <span class="value"><?= $solicitud->proveedor_nombre ?></span></div>
         <div class="row"><span class="label">Domicilio fiscal:</span> <span class="value"><?= $solicitud->proveedor_domicilio ?></span></div>

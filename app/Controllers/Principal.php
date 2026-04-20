@@ -3414,10 +3414,27 @@ class Principal extends BaseController
         if (!empty($puestos->data)) {
             foreach ($puestos->data as $puesto) {
                 foreach (['prestacion_servicios', 'puesto_prestador', 'id_puesto'] as $campoPuesto) {
-                    if ((string) ($puesto->id_puesto ?? '') === (string) ($solicitud->{$campoPuesto} ?? '')) {
-                        $solicitud->puesto_prestador_nombre = $puesto->dsc_puesto ?? '';
+                    $valorSolicitudPuesto = trim((string) ($solicitud->{$campoPuesto} ?? ''));
+                    if ($valorSolicitudPuesto === '') {
+                        continue;
+                    }
+
+                    $descripcionPuesto = trim((string) ($puesto->dsc_puesto ?? $puesto->puesto ?? $puesto->nombre_puesto ?? ''));
+
+                    if ((string) ($puesto->id_puesto ?? '') === $valorSolicitudPuesto || $descripcionPuesto === $valorSolicitudPuesto) {
+                        $solicitud->puesto_prestador_nombre = $descripcionPuesto;
                         break 2;
                     }
+                }
+            }
+        }
+
+        if (empty($solicitud->puesto_prestador_nombre)) {
+            foreach (['prestacion_servicios', 'puesto_prestador', 'id_puesto'] as $campoPuesto) {
+                $valorSolicitudPuesto = trim((string) ($solicitud->{$campoPuesto} ?? ''));
+                if ($valorSolicitudPuesto !== '') {
+                    $solicitud->puesto_prestador_nombre = $valorSolicitudPuesto;
+                    break;
                 }
             }
         }
