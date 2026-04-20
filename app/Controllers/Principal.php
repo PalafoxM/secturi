@@ -10119,7 +10119,20 @@ class Principal extends BaseController
             'proveedor_asistente' => $post['proveedor_asistente'] ?? null,
             'proveedor_seguimiento' => $post['proveedor_seguimiento'],
             'proveedor_correo' => $post['proveedor_correo'],
+            'no_delegatorio_1' => null,
+            'no_delegatorio_2' => null,
+            'no_delegatorio_3' => null,
         ];
+
+        $delegatorios = isset($post['no_delegatorio']) && is_array($post['no_delegatorio']) ? $post['no_delegatorio'] : [];
+        $delegatoriosActivos = isset($post['usar_no_delegatorio']) && is_array($post['usar_no_delegatorio']) ? $post['usar_no_delegatorio'] : [];
+
+        foreach ([1, 2, 3] as $indice) {
+            $posicion = $indice - 1;
+            if (isset($delegatoriosActivos[$posicion]) && trim((string) ($delegatorios[$posicion] ?? '')) !== '') {
+                $dataInsert['no_delegatorio_' . $indice] = trim((string) $delegatorios[$posicion]);
+            }
+        }
 
         if (!empty($archivo_suficiencia)) {
             $dataInsert['archivo_suficiencia'] = $archivo_suficiencia;
@@ -10762,6 +10775,9 @@ class Principal extends BaseController
         $data['solicitud']->nombre_proyecto_puesto = $nombreProyectoConPuesto !== '' ? $nombreProyectoConPuesto : ($data['solicitud']->nombre_proyecto ?? '');
         $data['solicitud']->nombre_seguimiento_puesto = $nombreSeguimientoConPuesto !== '' ? $nombreSeguimientoConPuesto : ($data['solicitud']->nombre_seguimiento ?? '');
         $data['firmas_pdf'] = $this->obtenerFirmasSolicitudDetalle($globals, $data['solicitud']);
+        foreach ($data['firmas_pdf'] as $indice => $firma) {
+            $firma->no_delegatorio = $data['solicitud']->{'no_delegatorio_' . ($indice + 1)} ?? '';
+        }
 
         $montoFields = [
             'monto_secturi',

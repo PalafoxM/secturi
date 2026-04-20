@@ -21,6 +21,7 @@
         .firma-linea { display: block; width: 72%; margin: 0 auto 4px auto; border-top: 1px solid #000; height: 1px; }
         .firma-nombre { font-size: 11px; font-weight: bold; line-height: 1.2; text-transform: uppercase; }
         .firma-cargo { font-size: 10px; line-height: 1.2; text-transform: uppercase; }
+        .firma-delegatorio { font-size: 9px; line-height: 1.2; margin-top: 4px; }
     </style>
 </head>
 <body>
@@ -151,6 +152,9 @@
                     <span class="firma-linea"></span>
                     <div class="firma-nombre"><?= esc($firma->nombre ?? '') ?></div>
                     <div class="firma-cargo"><?= esc($firma->cargo ?? '') ?></div>
+                    <?php if (!empty($firma->no_delegatorio ?? '')): ?>
+                        <div class="firma-delegatorio">No. delegatorio: <?= esc($firma->no_delegatorio) ?></div>
+                    <?php endif; ?>
                 </td>
             <?php endforeach; ?>
         </tr>

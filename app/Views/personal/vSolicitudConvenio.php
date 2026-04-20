@@ -278,6 +278,11 @@
 <script>
     const catalogoFirmantesConvenio = <?= json_encode($catalogo_firmantes ?? [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
     const firmasSeleccionadasConvenio = <?= json_encode(array_values($firmas_seleccionadas ?? []), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+    const delegatoriosSeleccionadosConvenio = <?= json_encode([
+        $solicitud->no_delegatorio_1 ?? '',
+        $solicitud->no_delegatorio_2 ?? '',
+        $solicitud->no_delegatorio_3 ?? '',
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
 
     function numeroALetras(amount) {
         if (amount == 0) return "CERO PESOS 00/100 M.N.";
@@ -409,6 +414,13 @@
             $(this).attr('data-index', index);
             $(this).find('.firma-label').text(`Firma ${index + 1}`);
             $(this).find('select').attr('name', `firmas[${index}]`);
+            $(this).find('.no-delegatorio-check-convenio')
+                .attr('name', `usar_no_delegatorio[${index}]`)
+                .attr('id', `no_delegatorio_check_convenio_${index}`);
+            $(this).find('.no-delegatorio-label-convenio')
+                .attr('for', `no_delegatorio_check_convenio_${index}`);
+            $(this).find('.no-delegatorio-input-convenio')
+                .attr('name', `no_delegatorio[${index}]`);
         });
     }
 
@@ -436,6 +448,11 @@
                     ${opcionesFirmantesConvenio(valorSeleccionado)}
                 </select>
                 <div class="firma-puesto text-uppercase small text-muted mt-2"></div>
+                <div class="custom-control custom-checkbox mt-3">
+                    <input type="checkbox" class="custom-control-input no-delegatorio-check-convenio" id="no_delegatorio_check_convenio_${index}" name="usar_no_delegatorio[${index}]" value="1">
+                    <label class="custom-control-label no-delegatorio-label-convenio" for="no_delegatorio_check_convenio_${index}">No. delegatorio</label>
+                </div>
+                <input type="text" class="form-control mt-2 no-delegatorio-input-convenio d-none" name="no_delegatorio[${index}]" placeholder="Ingrese el No. delegatorio">
             </div>
         `;
 
@@ -445,6 +462,12 @@
             width: '100%'
         });
         actualizarPuestoFirmaConvenio(nuevoItem.find('.firma-select-convenio'));
+
+        const delegatorio = delegatoriosSeleccionadosConvenio[index] || '';
+        if (delegatorio !== '') {
+            nuevoItem.find('.no-delegatorio-check-convenio').prop('checked', true);
+            nuevoItem.find('.no-delegatorio-input-convenio').removeClass('d-none').val(delegatorio);
+        }
     }
 
     $(document).ready(function() {
@@ -584,6 +607,15 @@
 
         $(document).on('change', '.firma-select-convenio', function() {
             actualizarPuestoFirmaConvenio(this);
+        });
+
+        $(document).on('change', '.no-delegatorio-check-convenio', function() {
+            const input = $(this).closest('.firma-item').find('.no-delegatorio-input-convenio');
+            if ($(this).is(':checked')) {
+                input.removeClass('d-none');
+            } else {
+                input.addClass('d-none').val('');
+            }
         });
 
         $(document).on('click', '.btn-eliminar-firma-convenio', function() {
