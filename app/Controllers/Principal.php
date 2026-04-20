@@ -3759,6 +3759,39 @@ class Principal extends BaseController
             $response->respuesta = 'No se pudo guardar ningun archivo.';
         }
 
+        if ($count > 0) {
+            // Enviar correo a lvelaga@guanajuato.gob.mx
+            $emailService = \Config\Services::email();
+            $usuarioQuery = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["id_usuario" => ($session->id_usuario ?? 0)]]);
+            $nombreUsuario = (isset($usuarioQuery->data) && !empty($usuarioQuery->data)) ? $usuarioQuery->data[0]->nombre_completo : 'Usuario Desconocido';
+            $enlace = base_url('index.php/Principal/ListaSolicitudContrato');
+            $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
+            $emailService->setTo([
+            'lvelaga@guanajuato.gob.mx',
+            'al.hernandezma@guanajuato.gob.mx'
+            ]);
+            $emailService->setSubject('Nueva Solicitud de Contrato - Archivos Adjuntados');
+            $emailService->setMailType('html');
+            $emailService->setMessage("
+                <p>Buen día,</p>
+                <p>Se le notifica que se han subido documentos para la solicitud de contrato con ID <strong>{$id_solicitud}</strong>.</p>
+                <p>Los archivos fueron agregados por el usuario: <strong>{$nombreUsuario}</strong>.</p>
+                <p>Puede consultar los detalles ingresando al siguiente enlace: <a href='{$enlace}'>{$enlace}</a></p>
+                <br>
+                <p>Saludos cordiales,</p>
+                <p><strong>Sistema Unificado SECTURI (SUSI)</strong></p>
+                <a href='https://secturnet.guanajuato.gob.mx/susi/index.php/Principal/ListaSolicitudContrato'>Ir al sistema</a>
+            ");
+            $emailService->send();
+
+            $response->error = false;
+            $msg = "Se guardaron $count archivos correctamente.";
+            if ($errores > 0) $msg .= " Hubo problemas con $errores archivos.";
+            $response->respuesta = $msg;
+        } else {
+            $response->respuesta = "No se guardó ningún archivo. " . ($errores > 0 ? "Hubo errores al procesar." : "No se seleccionaron archivos.");
+        } 
+
         return $this->respond($response);
     }
 
@@ -4584,6 +4617,39 @@ class Principal extends BaseController
         } else {
             $response->respuesta = "No se guardÃ³ ningÃºn archivo." . ($errores > 0 ? " Hubo errores al procesar." : '');
         }
+
+              if ($count > 0) {
+            // Enviar correo a lvelaga@guanajuato.gob.mx
+            $emailService = \Config\Services::email();
+            $usuarioQuery = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["id_usuario" => ($session->id_usuario ?? 0)]]);
+            $nombreUsuario = (isset($usuarioQuery->data) && !empty($usuarioQuery->data)) ? $usuarioQuery->data[0]->nombre_completo : 'Usuario Desconocido';
+            $enlace = base_url('index.php/Principal/ListaSolicitudContrato');
+            $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
+            $emailService->setTo([
+            'lvelaga@guanajuato.gob.mx',
+            'al.hernandezma@guanajuato.gob.mx'
+            ]);
+            $emailService->setSubject('Nueva Solicitud de Contrato - Archivos Adjuntados');
+            $emailService->setMailType('html');
+            $emailService->setMessage("
+                <p>Buen día,</p>
+                <p>Se le notifica que se han subido documentos para la solicitud de contrato con ID <strong>{$id_solicitud}</strong>.</p>
+                <p>Los archivos fueron agregados por el usuario: <strong>{$nombreUsuario}</strong>.</p>
+                <p>Puede consultar los detalles ingresando al siguiente enlace: <a href='{$enlace}'>{$enlace}</a></p>
+                <br>
+                <p>Saludos cordiales,</p>
+                <p><strong>Sistema Unificado SECTURI (SUSI)</strong></p>
+                <a href='https://secturnet.guanajuato.gob.mx/susi/index.php/Principal/ListaSolicitudContrato'>Ir al sistema</a>
+            ");
+            $emailService->send();
+
+            $response->error = false;
+            $msg = "Se guardaron $count archivos correctamente.";
+            if ($errores > 0) $msg .= " Hubo problemas con $errores archivos.";
+            $response->respuesta = $msg;
+        } else {
+            $response->respuesta = "No se guardó ningún archivo. " . ($errores > 0 ? "Hubo errores al procesar." : "No se seleccionaron archivos.");
+        } 
 
         return $this->respond($response);
     }
@@ -10775,8 +10841,8 @@ class Principal extends BaseController
             $enlace = base_url('index.php/Principal/ListaSolicitudConvenio');
             
             $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
-            //$emailService->setTo('lvelaga@guanajuato.gob.mx');
-            $emailService->setTo('palafox.marin@hotmail.com');
+            $emailService->setTo(['lvelaga@guanajuato.gob.mx'. "al.hernandezma@guanajuato.gob.mx"]);
+            //$emailService->setTo('palafox.marin@hotmail.com');
             $emailService->setSubject('Nueva Solicitud de Convenio - Archivos Adjuntados');
             $emailService->setMailType('html');
             $emailService->setMessage("
