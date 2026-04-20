@@ -29,6 +29,21 @@
     </style>
 </head>
 <body>
+    <?php
+    $prestacionServicioPdf = '';
+    foreach ([
+        $solicitud->puesto_prestador_nombre ?? '',
+        $solicitud->prestacion_servicios ?? '',
+        $solicitud->puesto_prestador ?? '',
+        $solicitud->id_puesto ?? '',
+    ] as $valorPrestacionServicio) {
+        $valorPrestacionServicio = trim((string) $valorPrestacionServicio);
+        if ($valorPrestacionServicio !== '') {
+            $prestacionServicioPdf = $valorPrestacionServicio;
+            break;
+        }
+    }
+    ?>
     <table>
         <tr>
             <td class="no-border" style="width: 14%;">
@@ -109,7 +124,7 @@
         </tr>
         <tr>
             <td class="label">Prestacion de Servicios:</td>
-            <td class="value"><?= esc($solicitud->puesto_prestador_nombre ?? $solicitud->prestacion_servicios ?? $solicitud->puesto_prestador ?? '') ?></td>
+            <td class="value"><?= esc($prestacionServicioPdf) ?></td>
         </tr>
         <tr>
             <td class="label">RFC:</td>
