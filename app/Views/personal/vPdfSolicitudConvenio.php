@@ -32,7 +32,7 @@
             </td>
             <td class="header-title">
                 <h2>SOLICITUD DE ELABORACIÓN DE CONVENIO</h2>
-                <h3>DIRECCIÓN GENERAL JURÍDICOS</h3>
+                <h3>DIRECCIÓN GENERAL JURÍDICA</h3>
                 <h4>DGJ-1</h4>
             </td>
         </tr>
