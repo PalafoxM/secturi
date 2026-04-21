@@ -254,6 +254,42 @@ class Principal extends BaseController
         ];
     }
 
+    private function obtenerConfiguracionModuloArchivos(string $modulo): ?array
+    {
+        $configuraciones = [
+            'contrato' => [
+                'tabla' => 'solicitud_contrato_archivos',
+                'id_campo' => 'id_solicitud_contrato_archivo',
+                'id_solicitud_campo' => 'id_solicitud_contrato',
+                'storage_modulo' => 'contratos',
+                'ruta_listado' => 'index.php/Principal/ListaSolicitudContrato',
+            ],
+            'convenio' => [
+                'tabla' => 'solicitud_convenio_archivos',
+                'id_campo' => 'id_solicitud_convenio_archivo',
+                'id_solicitud_campo' => 'id_solicitud_convenio',
+                'storage_modulo' => 'convenios',
+                'ruta_listado' => 'index.php/Principal/ListaSolicitudConvenio',
+            ],
+            'honorarios' => [
+                'tabla' => 'solicitud_honorario_archivos',
+                'id_campo' => 'id_solicitud_honorario_archivo',
+                'id_solicitud_campo' => 'id_solicitud_honorario',
+                'storage_modulo' => 'honorarios',
+                'ruta_listado' => 'index.php/Principal/listadoHonorarios',
+            ],
+            'adquisiciones' => [
+                'tabla' => 'solicitud_adquisiciones_archivos',
+                'id_campo' => 'id_solicitud_adquisiciones_archivo',
+                'id_solicitud_campo' => 'id_solicitud_adquisiciones',
+                'storage_modulo' => 'adquisiciones',
+                'ruta_listado' => 'index.php/Principal/ListaSolicitudAdquisiciones',
+            ],
+        ];
+
+        return $configuraciones[$modulo] ?? null;
+    }
+
     public function verArchivoS3()
     {
         $storedPath = (string) $this->request->getGet('key');
@@ -4012,9 +4048,9 @@ class Principal extends BaseController
 
         $data['id_solicitud'] = $id_solicitud;
         $data['archivos'] = !empty($archivos->data) ? $archivos->data : [];
-        $data['documentos_honorarios'] = $this->documentosSolicitudHonorarios();
+        $data['modulo_archivos'] = 'honorarios';
         $data['scripts'] = [];
-        $data['contentView'] = 'secciones/vVerArchivosSolicitudHonorarios';
+        $data['contentView'] = 'secciones/vVerArchivosSolicitud';
         $this->_renderView($data);
     }
 
@@ -4562,8 +4598,9 @@ class Principal extends BaseController
 
         $data['id_solicitud'] = $id_solicitud;
         $data['archivos'] = !empty($archivos->data) ? $archivos->data : [];
+        $data['modulo_archivos'] = 'adquisiciones';
         $data['scripts'] = [];
-        $data['contentView'] = 'secciones/vVerArchivosSolicitudAdquisiciones';
+        $data['contentView'] = 'secciones/vVerArchivosSolicitud';
         $this->_renderView($data);
     }
 
@@ -5278,6 +5315,7 @@ class Principal extends BaseController
         
         $data['id_solicitud'] = $id_solicitud;
         $data['archivos'] = (!empty($archivos->data)) ? $archivos->data : [];
+        $data['modulo_archivos'] = 'contrato';
         $data['scripts'] = array(); // No scripts needed for basic list
         $data['contentView'] = 'secciones/vVerArchivosSolicitud';
         
@@ -5290,10 +5328,12 @@ class Principal extends BaseController
         $response = new \stdClass();
         $response->error = true;
 
-        $id_solicitud_contrato_archivo = $this->request->getPost('id_solicitud_contrato_archivo');
+        $modulo = (string) ($this->request->getPost('modulo') ?? 'contrato');
+        $configModulo = $this->obtenerConfiguracionModuloArchivos($modulo);
+        $id_solicitud_contrato_archivo = $this->request->getPost('id_archivo') ?? $this->request->getPost('id_solicitud_contrato_archivo');
         $archivoNuevo = $this->request->getFile('archivo');
         
-        if (!$id_solicitud_contrato_archivo) {
+        if ($configModulo === null || !$id_solicitud_contrato_archivo) {
             $response->respuesta = "ID de archivo no válido.";
             return $this->respond($response);
         }
@@ -5309,8 +5349,8 @@ class Principal extends BaseController
         }
 
         $archivoActualQuery = $globals->getTabla([
-            'tabla' => 'solicitud_contrato_archivos',
-            'where' => ['id_solicitud_contrato_archivo' => $id_solicitud_contrato_archivo, 'visible' => 1]
+            'tabla' => $configModulo['tabla'],
+            'where' => [$configModulo['id_campo'] => $id_solicitud_contrato_archivo, 'visible' => 1]
         ]);
 
         if (empty($archivoActualQuery->data)) {
@@ -5321,14 +5361,14 @@ class Principal extends BaseController
         $extension = strtolower((string) $archivoNuevo->getExtension());
         $nombreOriginal = (string) $archivoNuevo->getClientName();
         $nombreGuardado = 'edicion_' . $id_solicitud_contrato_archivo . '_' . time() . '_' . substr(md5(uniqid((string) $id_solicitud_contrato_archivo, true)), 0, 8) . '.' . $extension;
-        $s3Key = $this->uploadFileToS3Storage($archivoNuevo->getTempName(), 'contratos', 'documentos', $nombreGuardado);
+        $s3Key = $this->uploadFileToS3Storage($archivoNuevo->getTempName(), $configModulo['storage_modulo'], 'documentos', $nombreGuardado);
 
         if (empty($s3Key)) {
             $response->respuesta = "No fue posible guardar el archivo editado en AWS S3.";
             return $this->respond($response);
         }
 
-        $columnasArchivo = $this->obtenerColumnasTablaServicio($globals, 'solicitud_contrato_archivos');
+        $columnasArchivo = $this->obtenerColumnasTablaServicio($globals, $configModulo['tabla']);
         $dataUpdate = [
             'id_estatus' => 4,
             'nombre_archivo' => $s3Key,
@@ -5364,8 +5404,8 @@ class Principal extends BaseController
 
         $res = $globals->saveTabla(
             $dataUpdate,
-            ["tabla" => "solicitud_contrato_archivos", "editar" => true, "idEditar" => ["id_solicitud_contrato_archivo" => $id_solicitud_contrato_archivo]],
-            ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/reemplazarArchivosSolicitudContrato']
+            ["tabla" => $configModulo['tabla'], "editar" => true, "idEditar" => [$configModulo['id_campo'] => $id_solicitud_contrato_archivo]],
+            ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/EditarArchivo']
         );
 
         if ($res->error) {
@@ -5384,17 +5424,19 @@ class Principal extends BaseController
         $response = new \stdClass();
         $response->error = true;
 
-        $id_solicitud_contrato_archivo = $this->request->getPost('id_solicitud_contrato_archivo');
+        $modulo = (string) ($this->request->getPost('modulo') ?? 'contrato');
+        $configModulo = $this->obtenerConfiguracionModuloArchivos($modulo);
+        $id_solicitud_contrato_archivo = $this->request->getPost('id_archivo') ?? $this->request->getPost('id_solicitud_contrato_archivo');
         
-        if (!$id_solicitud_contrato_archivo) {
+        if ($configModulo === null || !$id_solicitud_contrato_archivo) {
             $response->respuesta = "ID de archivo no válido.";
             return $this->respond($response);
         }
 
         $globals->saveTabla(
             ['id_estatus' => 2],
-            ["tabla" => "solicitud_contrato_archivos", "editar" => true, "idEditar" => ["id_solicitud_contrato_archivo" => $id_solicitud_contrato_archivo]],
-            ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/reemplazarArchivosSolicitudContrato']
+            ["tabla" => $configModulo['tabla'], "editar" => true, "idEditar" => [$configModulo['id_campo'] => $id_solicitud_contrato_archivo]],
+            ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/DeclinarArchivo']
         );
 
         $response->error = false;
@@ -5408,9 +5450,11 @@ class Principal extends BaseController
         $response = new \stdClass();
         $response->error = true;
 
-        $id_solicitud_contrato_archivo = $this->request->getPost('id_solicitud_contrato_archivo');
+        $modulo = (string) ($this->request->getPost('modulo') ?? 'contrato');
+        $configModulo = $this->obtenerConfiguracionModuloArchivos($modulo);
+        $id_solicitud_contrato_archivo = $this->request->getPost('id_archivo') ?? $this->request->getPost('id_solicitud_contrato_archivo');
         
-        if (!$id_solicitud_contrato_archivo) {
+        if ($configModulo === null || !$id_solicitud_contrato_archivo) {
             $response->respuesta = "ID de archivo no válido.";
             return $this->respond($response);
         }
@@ -5418,11 +5462,11 @@ class Principal extends BaseController
     
 
         $dataConfig = [
-            'tabla' => 'solicitud_contrato_archivos',
+            'tabla' => $configModulo['tabla'],
             "editar" => true,
-            "idEditar" => ["id_solicitud_contrato_archivo" => $id_solicitud_contrato_archivo],
+            "idEditar" => [$configModulo['id_campo'] => $id_solicitud_contrato_archivo],
         ];
-        $dataBitacora = ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/reemplazarArchivosSolicitudContrato'];
+        $dataBitacora = ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/AceptarArchivo'];
         $archivos = $globals->saveTabla(["id_estatus" => 3],$dataConfig, $dataBitacora);
       
        $response->error = false;
@@ -11050,7 +11094,7 @@ class Principal extends BaseController
         
         $data['id_solicitud'] = $id_solicitud;
         $data['archivos'] = (!empty($archivos->data)) ? $archivos->data : [];
-        $data['es_convenio'] = true;
+        $data['modulo_archivos'] = 'convenio';
         $data['scripts'] = array();
         // Reciclamos la vista de archivos pasándole si es convenio o contrato
         // o creamos una view sencilla:
