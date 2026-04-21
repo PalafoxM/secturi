@@ -194,6 +194,27 @@ class Principal extends BaseController
         return base_url('index.php/Principal/verArchivoS3?key=' . rawurlencode($storedPath));
     }
 
+    private function resolveStoredFilePreviewUrl(?string $storedPath, string $localPrefix = ''): ?string
+    {
+        if (empty($storedPath)) {
+            return null;
+        }
+
+        if (preg_match('#^https?://#i', $storedPath)) {
+            return $storedPath;
+        }
+
+        if (strpos($storedPath, 'assets/') === 0) {
+            return base_url($storedPath);
+        }
+
+        if ($localPrefix !== '' && strpos($storedPath, '/') === false) {
+            return base_url(trim($localPrefix, '/') . '/' . $storedPath);
+        }
+
+        return base_url('index.php/Principal/verArchivoS3?key=' . rawurlencode($storedPath));
+    }
+
     private function mapInstrumentoUrls($instrumentoRaw): array
     {
         if (empty($instrumentoRaw)) {
@@ -3985,7 +4006,7 @@ class Principal extends BaseController
 
         if (!empty($archivos->data)) {
             foreach ($archivos->data as &$archivo) {
-                $archivo->url_descarga = $this->resolveStoredFileUrl($archivo->nombre_archivo ?? null, 'assets/uploads/honorarios');
+                $archivo->url_descarga = $this->resolveStoredFilePreviewUrl($archivo->nombre_archivo ?? null, 'assets/uploads/honorarios');
             }
         }
 
@@ -4535,7 +4556,7 @@ class Principal extends BaseController
 
         if (!empty($archivos->data)) {
             foreach ($archivos->data as &$archivo) {
-                $archivo->url_descarga = $this->resolveStoredFileUrl($archivo->nombre_archivo ?? null, 'assets/uploads/adquisiciones');
+                $archivo->url_descarga = $this->resolveStoredFilePreviewUrl($archivo->nombre_archivo ?? null, 'assets/uploads/adquisiciones');
             }
         }
 
@@ -5251,7 +5272,7 @@ class Principal extends BaseController
 
         if (!empty($archivos->data)) {
             foreach ($archivos->data as &$archivo) {
-                $archivo->url_descarga = $this->resolveStoredFileUrl($archivo->nombre_archivo ?? null, 'assets/uploads/contratos');
+                $archivo->url_descarga = $this->resolveStoredFilePreviewUrl($archivo->nombre_archivo ?? null, 'assets/uploads/contratos');
             }
         }
         
@@ -5270,17 +5291,87 @@ class Principal extends BaseController
         $response->error = true;
 
         $id_solicitud_contrato_archivo = $this->request->getPost('id_solicitud_contrato_archivo');
+        $archivoNuevo = $this->request->getFile('archivo');
         
         if (!$id_solicitud_contrato_archivo) {
             $response->respuesta = "ID de archivo no válido.";
             return $this->respond($response);
         }
 
-        $globals->saveTabla(
-            ['id_estatus' => 4],
+        if (!$archivoNuevo || !$archivoNuevo->isValid() || $archivoNuevo->hasMoved()) {
+            $response->respuesta = "Debe seleccionar un archivo válido.";
+            return $this->respond($response);
+        }
+
+        if (strtolower((string) $archivoNuevo->getExtension()) !== 'pdf') {
+            $response->respuesta = "Solo se permiten archivos PDF.";
+            return $this->respond($response);
+        }
+
+        $archivoActualQuery = $globals->getTabla([
+            'tabla' => 'solicitud_contrato_archivos',
+            'where' => ['id_solicitud_contrato_archivo' => $id_solicitud_contrato_archivo, 'visible' => 1]
+        ]);
+
+        if (empty($archivoActualQuery->data)) {
+            $response->respuesta = "No se encontró el archivo a editar.";
+            return $this->respond($response);
+        }
+
+        $extension = strtolower((string) $archivoNuevo->getExtension());
+        $nombreOriginal = (string) $archivoNuevo->getClientName();
+        $nombreGuardado = 'edicion_' . $id_solicitud_contrato_archivo . '_' . time() . '_' . substr(md5(uniqid((string) $id_solicitud_contrato_archivo, true)), 0, 8) . '.' . $extension;
+        $s3Key = $this->uploadFileToS3Storage($archivoNuevo->getTempName(), 'contratos', 'documentos', $nombreGuardado);
+
+        if (empty($s3Key)) {
+            $response->respuesta = "No fue posible guardar el archivo editado en AWS S3.";
+            return $this->respond($response);
+        }
+
+        $columnasArchivo = $this->obtenerColumnasTablaServicio($globals, 'solicitud_contrato_archivos');
+        $dataUpdate = [
+            'id_estatus' => 4,
+            'nombre_archivo' => $s3Key,
+        ];
+
+        if (in_array('tipo', $columnasArchivo, true)) {
+            $dataUpdate['tipo'] = $extension;
+        }
+
+        foreach (['ruta_s3', 'ruta_archivo', 'archivo_ruta', 'ruta_relativa'] as $columnaRuta) {
+            if (in_array($columnaRuta, $columnasArchivo, true)) {
+                $dataUpdate[$columnaRuta] = $s3Key;
+            }
+        }
+
+        foreach (['nombre_original', 'nombre_real', 'archivo_nombre', 'nombre_archivo_original'] as $columnaNombre) {
+            if (in_array($columnaNombre, $columnasArchivo, true)) {
+                $dataUpdate[$columnaNombre] = $nombreOriginal;
+            }
+        }
+
+        foreach (['usu_act', 'id_usuario_act'] as $columnaUsuarioAct) {
+            if (in_array($columnaUsuarioAct, $columnasArchivo, true)) {
+                $dataUpdate[$columnaUsuarioAct] = $session->id_usuario ?? 0;
+            }
+        }
+
+        foreach (['fec_act', 'fecha_actualizacion'] as $columnaFechaAct) {
+            if (in_array($columnaFechaAct, $columnasArchivo, true)) {
+                $dataUpdate[$columnaFechaAct] = date('Y-m-d H:i:s');
+            }
+        }
+
+        $res = $globals->saveTabla(
+            $dataUpdate,
             ["tabla" => "solicitud_contrato_archivos", "editar" => true, "idEditar" => ["id_solicitud_contrato_archivo" => $id_solicitud_contrato_archivo]],
             ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/reemplazarArchivosSolicitudContrato']
         );
+
+        if ($res->error) {
+            $response->respuesta = $res->respuesta ?? "No fue posible actualizar el archivo editado.";
+            return $this->respond($response);
+        }
 
         $response->error = false;
         $response->respuesta = "Archivo editado correctamente.";
@@ -10953,7 +11044,7 @@ class Principal extends BaseController
 
         if (!empty($archivos->data)) {
             foreach ($archivos->data as &$archivo) {
-                $archivo->url_descarga = $this->resolveStoredFileUrl($archivo->nombre_archivo ?? null, 'assets/uploads/convenios');
+                $archivo->url_descarga = $this->resolveStoredFilePreviewUrl($archivo->nombre_archivo ?? null, 'assets/uploads/convenios');
             }
         }
         
