@@ -229,6 +229,7 @@
 <script src="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.js"></script>
 
 <script src="<?php echo base_url(); ?>assets/pages/jquery.analytics_customers.init.js"></script>
+
 <script>
 $(document).ready(function() {
 

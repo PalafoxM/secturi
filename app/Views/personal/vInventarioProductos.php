@@ -1,4 +1,4 @@
-﻿<div class="page-wrapper">
+<div class="page-wrapper">
     <div class="page-content-tab">
         <div class="container-fluid">
 

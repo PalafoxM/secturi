@@ -1,5 +1,4 @@
-<?php
-namespace App\Controllers;
+<?php namespace App\Controllers;
 use CodeIgniter\Controller;
 use App\Libraries\Curps;
 use App\Libraries\Fechas;
@@ -5262,6 +5261,82 @@ class Principal extends BaseController
         $data['contentView'] = 'secciones/vVerArchivosSolicitud';
         
         $this->_renderView($data);
+    }
+    public function EditarArchivo()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+
+        $id_solicitud_contrato_archivo = $this->request->getPost('id_solicitud_contrato_archivo');
+        
+        if (!$id_solicitud_contrato_archivo) {
+            $response->respuesta = "ID de archivo no válido.";
+            return $this->respond($response);
+        }
+
+        $globals->saveTabla(
+            ['id_estatus' => 4],
+            ["tabla" => "solicitud_contrato_archivos", "editar" => true, "idEditar" => ["id_solicitud_contrato_archivo" => $id_solicitud_contrato_archivo]],
+            ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/reemplazarArchivosSolicitudContrato']
+        );
+
+        $response->error = false;
+        $response->respuesta = "Archivo editado correctamente.";
+        return $this->respond($response);
+    }
+    public function DeclinarArchivo()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+
+        $id_solicitud_contrato_archivo = $this->request->getPost('id_solicitud_contrato_archivo');
+        
+        if (!$id_solicitud_contrato_archivo) {
+            $response->respuesta = "ID de archivo no válido.";
+            return $this->respond($response);
+        }
+
+        $globals->saveTabla(
+            ['id_estatus' => 2],
+            ["tabla" => "solicitud_contrato_archivos", "editar" => true, "idEditar" => ["id_solicitud_contrato_archivo" => $id_solicitud_contrato_archivo]],
+            ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/reemplazarArchivosSolicitudContrato']
+        );
+
+        $response->error = false;
+        $response->respuesta = "Archivo declinado correctamente.";
+        return $this->respond($response);
+    }
+    public function AceptarArchivo()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+
+        $id_solicitud_contrato_archivo = $this->request->getPost('id_solicitud_contrato_archivo');
+        
+        if (!$id_solicitud_contrato_archivo) {
+            $response->respuesta = "ID de archivo no válido.";
+            return $this->respond($response);
+        }
+
+    
+
+        $dataConfig = [
+            'tabla' => 'solicitud_contrato_archivos',
+            "editar" => true,
+            "idEditar" => ["id_solicitud_contrato_archivo" => $id_solicitud_contrato_archivo],
+        ];
+        $dataBitacora = ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/reemplazarArchivosSolicitudContrato'];
+        $archivos = $globals->saveTabla(["id_estatus" => 3],$dataConfig, $dataBitacora);
+      
+       $response->error = false;
+        $response->respuesta = "Archivo aceptado correctamente.";
+        return $this->respond($response);
     }
 
     public function guardarArchivosSolicitud()
