@@ -263,6 +263,7 @@ class Principal extends BaseController
                 'id_solicitud_campo' => 'id_solicitud_contrato',
                 'storage_modulo' => 'contratos',
                 'ruta_listado' => 'index.php/Principal/ListaSolicitudContrato',
+                'ruta_modulo' => 'solicitud_contrato',
             ],
             'convenio' => [
                 'tabla' => 'solicitud_convenio_archivos',
@@ -270,6 +271,7 @@ class Principal extends BaseController
                 'id_solicitud_campo' => 'id_solicitud_convenio',
                 'storage_modulo' => 'convenios',
                 'ruta_listado' => 'index.php/Principal/ListaSolicitudConvenio',
+                'ruta_modulo' => 'solicitud_convenio',
             ],
             'honorarios' => [
                 'tabla' => 'solicitud_honorario_archivos',
@@ -277,6 +279,7 @@ class Principal extends BaseController
                 'id_solicitud_campo' => 'id_solicitud_honorario',
                 'storage_modulo' => 'honorarios',
                 'ruta_listado' => 'index.php/Principal/listadoHonorarios',
+                'ruta_modulo' => 'solicitud_honorario',
             ],
             'adquisiciones' => [
                 'tabla' => 'solicitud_adquisiciones_archivos',
@@ -284,6 +287,7 @@ class Principal extends BaseController
                 'id_solicitud_campo' => 'id_solicitud_adquisiciones',
                 'storage_modulo' => 'adquisiciones',
                 'ruta_listado' => 'index.php/Principal/ListaSolicitudAdquisiciones',
+                'ruta_modulo' => 'solicitud_adquisiciones',
             ],
         ];
 
@@ -5358,6 +5362,9 @@ class Principal extends BaseController
             return $this->respond($response);
         }
 
+        $archivoActual = $archivoActualQuery->data[0];
+        $idSolicitudPadre = $archivoActual->{$configModulo['id_solicitud_campo']} ?? null;
+
         $extension = strtolower((string) $archivoNuevo->getExtension());
         $nombreOriginal = (string) $archivoNuevo->getClientName();
         $nombreGuardado = 'edicion_' . $id_solicitud_contrato_archivo . '_' . time() . '_' . substr(md5(uniqid((string) $id_solicitud_contrato_archivo, true)), 0, 8) . '.' . $extension;
@@ -5407,6 +5414,14 @@ class Principal extends BaseController
             ["tabla" => $configModulo['tabla'], "editar" => true, "idEditar" => [$configModulo['id_campo'] => $id_solicitud_contrato_archivo]],
             ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/EditarArchivo']
         );
+
+        if (!$res->error && !empty($idSolicitudPadre)) {
+            $globals->saveTabla(
+                ["id_estatus" => 4],
+                ["tabla" => $configModulo['ruta_modulo'], "editar" => true, "idEditar" => [$configModulo['id_solicitud_campo'] => $idSolicitudPadre]],
+                ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/EditarArchivo']
+            );
+        }
 
         if ($res->error) {
             $response->respuesta = $res->respuesta ?? "No fue posible actualizar el archivo editado.";
