@@ -93,10 +93,10 @@
                                                 </td>
                                                 <td>
                                                     <p class="small text-muted mb-0">El proyecto cuenta con la suficiencia presupuestal para convenir las acciones solicitadas a través de la presente solicitud. Se anexa captura de pantalla Sistema SAP/R3</p>
-                                                    <input type="file" class="form-control-file mt-2" name="archivo_suficiencia">
-                                                    <?php if(isset($solicitud) && !empty($solicitud->archivo_suficiencia_url)): ?>
-                                                        <a href="<?= $solicitud->archivo_suficiencia_url ?>" target="_blank" class="d-block mt-2">Ver archivo actual</a>
-                                                    <?php endif; ?>
+                                                    <div class="custom-control custom-checkbox mt-2">
+                                                        <input type="checkbox" class="custom-control-input" id="archivo_suficiencia" name="archivo_suficiencia" value="1" <?= (isset($solicitud) && $solicitud->archivo_suficiencia == 1) ? 'checked' : '' ?>>
+                                                        <label class="custom-control-label" for="archivo_suficiencia">Cuenta con suficiencia presupuestal</label>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         </tbody>
