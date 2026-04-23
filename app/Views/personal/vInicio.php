@@ -448,17 +448,17 @@ $tarjetasError = session()->getFlashdata('tarjetas_error');
                                                     <div class="blog-card">
                                                         <div class="ratio ratio-16x9"> <!-- BS5 -->
                                                             <iframe
-                                                                src="<?= base_url() ?>assets/pdf/plantillas/Integración del trámite SECTURI 2026.pdf"
+                                                                src="<?= base_url() ?>assets/pdf/plantillas/Disposiciones Administrativas SECTURI 2026.pdf"
                                                                 title="Disposiciones Administrativas" style="border:0"
                                                                 loading="lazy" width="100%">
                                                             </iframe>
                                                         </div>
-                                                        <p class="text-muted text-truncate">Integración del trámite SECTURI 2026</p>
+                                                        <p class="text-muted text-truncate">Disposiciones Administrativas SECTURI 2026</p>
                                                         <hr class="hr-dashed">
                                                         <div class="d-flex justify-content-between">
 
                                                             <div class="align-self-center">
-                                                                <a href="<?= base_url() ?>assets/pdf/plantillas/Integración del trámite SECTURI 2026.pdf"
+                                                                <a href="<?= base_url() ?>assets/pdf/plantillas/Disposiciones Administrativas SECTURI 2026.pdf"
                                                                     target="_blank" class="text-primary">Leer más <i
                                                                         class="fas fa-long-arrow-alt-right"></i></a>
                                                             </div>
