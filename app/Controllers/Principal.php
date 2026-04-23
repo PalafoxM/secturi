@@ -2367,7 +2367,7 @@ class Principal extends BaseController
         $term = $request->getGet('term') ?? ''; // Select2 sends 'term'
 
 
-        $like = ['razon_social' => "%$term%"];
+        $like = ['razon_social' => "%$term%", "no_proveedor" => "%$term%", "rfc"=>"%$term%"];
         $dataDB = array('tabla' => 'proveedor', 'where' => ['visible' => 1], 'orlike' => $like, );
         $response = $globals->getTabla($dataDB);
         

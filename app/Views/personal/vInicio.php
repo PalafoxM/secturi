@@ -444,23 +444,21 @@ $tarjetasError = session()->getFlashdata('tarjetas_error');
                                         <div class="col-lg-6">
                                             <div class="card">
                                                 <div class="card-body">
-                                                    <h4 class="mt-0  mb-4">Código de Ética</h4>
+                                                    <h4 class="mt-0  mb-4">Disposiciones Administrativas</h4>
                                                     <div class="blog-card">
                                                         <div class="ratio ratio-16x9"> <!-- BS5 -->
                                                             <iframe
-                                                                src="<?= base_url() ?>assets/pdf/plantillas/Codigo_de_Conducta_SECTUR3.pdf"
-                                                                title="Código de Conducta" style="border:0"
+                                                                src="<?= base_url() ?>assets/pdf/plantillas/Integración del trámite SECTURI 2026.pdf"
+                                                                title="Disposiciones Administrativas" style="border:0"
                                                                 loading="lazy" width="100%">
                                                             </iframe>
                                                         </div>
-                                                        <p class="text-muted text-truncate">PERIODICO OFICIAL DEL
-                                                            GOBIERNO DEL
-                                                            ESTADO DE GUANAJUATO.</p>
+                                                        <p class="text-muted text-truncate">Integración del trámite SECTURI 2026</p>
                                                         <hr class="hr-dashed">
                                                         <div class="d-flex justify-content-between">
 
                                                             <div class="align-self-center">
-                                                                <a href="<?= base_url() ?>assets/pdf/plantillas/Codigo_de_Conducta_SECTUR3.pdf"
+                                                                <a href="<?= base_url() ?>assets/pdf/plantillas/Integración del trámite SECTURI 2026.pdf"
                                                                     target="_blank" class="text-primary">Leer más <i
                                                                         class="fas fa-long-arrow-alt-right"></i></a>
                                                             </div>
