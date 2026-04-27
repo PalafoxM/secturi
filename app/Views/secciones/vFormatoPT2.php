@@ -113,19 +113,19 @@ $fechaFormateada = $dia . ' DE ' . $mes . ' DEL ' . $anio;
         </div>
         <div style="position:absolute; top:55%; left:14%; width:75%; height:40px; background-color:white; font-size:13px; text-align:justify;">
             <span class="proxima">
-                Daremos seguimiento al intrumento jurídico, con la finalidad de asegurar y garantizar que los recursos erogados cumplan con lo establecido,
+                Daremos seguimiento al instrumento jurídico, con la finalidad de asegurar y garantizar que los recursos erogados cumplan con lo establecido,
                 así como dar continuidad a las acciones del mencionado instrumento.
             </span>
         </div>
          <div style="position:absolute; top:61%; left:14%; width:75%; height:40px; background-color:white; font-size:13px; text-align:justify;">
             <span class="proxima">
-               La adquisicion del producto se realizó garantizado las mejores condiciones en cuanto a precio, calidad, financiamiento, oportunidad y demás elementos,
+               La adquisición del producto se realizó garantizando las mejores condiciones en cuanto a precio, calidad, financiamiento, oportunidad y demás elementos,
                en términos de la normatividad del gasto público.
             </span>
         </div>
         <div style="position:absolute; top:67%; left:14%; width:75%; height:20px; background-color:white; font-size:13px; text-align:justify;">
             <span class="proxima">
-              Sin otro particular por el momento, aprovecho la ocasión para enviarle un coridal saludo.
+              Sin otro particular por el momento, aprovecho la ocasión para enviarle un cordial saludo.
             </span>
         </div>
         <div style="position:absolute; top:75%; left:14%; width:75%; height:20px; background-color:white; font-size:13px; text-align:center;">

@@ -143,19 +143,19 @@
 
     <!-- Content Body 4 -->
     <div class="content">
-        Daremos seguimiento al intrumento jurídico, con la finalidad de asegurar y garantizar que los recursos
+        Daremos seguimiento al instrumento jurídico, con la finalidad de asegurar y garantizar que los recursos
         erogados cumplan con lo establecido, así como dar continuidad a las acciones del mencionado instrumento.
     </div>
 
     <!-- Content Body 5 -->
     <div class="content">
-        La adquisicion del producto se realizó garantizado las mejores condiciones en cuanto a precio, calidad,
+        La adquisición del producto se realizó garantizando las mejores condiciones en cuanto a precio, calidad,
         financiamiento, oportunidad y demás elementos, en términos de la normatividad del gasto público.
     </div>
 
     <!-- Closing -->
     <div class="content">
-        Sin otro particular por el momento, aprovecho la ocasión para enviarle un coridal saludo.
+        Sin otro particular por el momento, aprovecho la ocasión para enviarle un cordial saludo.
     </div>
 
     <!-- Signature -->
