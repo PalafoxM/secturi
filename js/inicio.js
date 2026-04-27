@@ -223,8 +223,10 @@ ini.inicio = (function () {
                 dataType: "json",
                 data: { id_usuario: id },
                 success: function (data) {
-                    let img = (data.ruta_foto_relativa) ? `<img src="${base_url + data.ruta_foto_relativa}" class="img-fluid rounded"/>` : '';
                     if (data) {
+                        let img = (data.ruta_foto_relativa)
+                            ? `<img src="${base_url + data.ruta_foto_relativa}" class="img-fluid rounded" onerror="this.onerror=null;this.src='${base_url}assets/images/users/user-3.jpg';"/>`
+                            : `<img src="${base_url}assets/images/users/user-3.jpg" class="img-fluid rounded"/>`;
                         $(".met-profile-main-pic").html(`
                             <p> ${data.nombre} ${data.primer_apellido} ${data.segundo_apellido}</p>
                             <p><strong> Personal de:  ${data.dsc_tipo_empleado} | ${data.dsc_puesto}</strong></p>
@@ -274,10 +276,10 @@ ini.inicio = (function () {
                 dataType: "json",
                 data: { id_usuario: id },
                 success: function (data) {
-                    let img = (data.ruta_foto_relativa)
-                        ? `<img src="${base_url + data.ruta_foto_relativa}" class="img-fluid rounded"/>`
-                        : '';
                     if (data) {
+                        let img = (data.ruta_foto_relativa)
+                            ? `<img src="${base_url + data.ruta_foto_relativa}" class="img-fluid rounded" onerror="this.onerror=null;this.src='${base_url}assets/images/users/user-3.jpg';"/>`
+                            : `<img src="${base_url}assets/images/users/user-3.jpg" class="img-fluid rounded"/>`;
                         $(".met-profile-main-pic2").html(`
                         <p>${data.nombre} ${data.primer_apellido} ${data.segundo_apellido}</p>
                         ${img}

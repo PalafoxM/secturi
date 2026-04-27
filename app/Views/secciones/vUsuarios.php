@@ -1,5 +1,23 @@
 <!-- Top Bar End -->
-<?php $session = \Config\Services::session(); ?>
+<?php
+$session = \Config\Services::session();
+$fotoDefault = base_url('assets/images/users/user-3.jpg');
+$fotoUsuarioUrl = static function ($ruta) use ($fotoDefault) {
+    $ruta = trim((string) $ruta);
+
+    if ($ruta === '') {
+        return $fotoDefault;
+    }
+
+    $rutaLocal = ltrim(str_replace('\\', '/', $ruta), '/');
+
+    if (!is_file(FCPATH . $rutaLocal)) {
+        return $fotoDefault;
+    }
+
+    return base_url($rutaLocal);
+};
+?>
 <div class="page-wrapper">
 
     <!-- Page Content-->
@@ -59,11 +77,12 @@
 
                                     <tbody>
                                         <?php foreach ($usuario as $u): ?>
+                                        <?php $fotoUrl = $fotoUsuarioUrl($u->ruta_foto_relativa ?? ''); ?>
                                         <tr>
                                             <td class="text-center"><?= $u->id_usuario ?></td>
                                             <td class="text-center">
                                                 <a href="javascript:void(0);" onclick="ini.inicio.verDetalles(<?= $u->id_usuario ?>)">
-                                                <img src="<?= base_url() . $u->ruta_foto_relativa ?>" alt="" class="rounded-circle thumb-sm mr-1">
+                                                <img src="<?= $fotoUrl ?>" alt="Foto de <?= esc($u->nombre_completo ?? 'usuario') ?>" class="rounded-circle thumb-sm mr-1" onerror="this.onerror=null;this.src='<?= $fotoDefault ?>';">
                                                  </a>
                                             </td>
                                             <td class="text-center"><?= $u->nombre_completo ?></td>

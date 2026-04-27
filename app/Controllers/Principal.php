@@ -1630,6 +1630,7 @@ class Principal extends BaseController
         $res = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
         
         if (!$res->error) {
+            $session->set('foto', $ruta_relativa);
             $response->error = $res->error;
             $response->respuesta = $res->respuesta;
             $response->nueva_foto = $ruta_relativa;
