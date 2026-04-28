@@ -71,9 +71,13 @@ $session = \Config\Services::session();
                                                  <a class="btn btn-outline-warning btn-round" onclick="descargarExcel(<?= $e->id_formulario_pt ?>)" title="Anexo 001"><i
                                                         class="mdi mdi-file-excel font-18"></i></a> 
                                                 <?php if(isset($anio) && $anio == 2025): ?>
+                                                <a class="btn btn-outline-primary btn-round" href="<?php echo base_url().'index.php/Inicio/generarFormatoPT?id='.$e->id_formulario_pt.'&seguir_pagando=1&anio=2025'?>" title="Seguir pagando" ><i
+                                                        class="mdi mdi-cash-plus font-18"></i></a>
                                                 <a class="btn btn-outline-warning btn-round" href="<?php echo base_url().'index.php/Inicio/generarFormatoPT?id='.$e->id_formulario_pt.'&editar=1&anio=2025'?>" title="Editar" ><i
                                                         class="mdi mdi-lead-pencil font-18"></i></a> 
                                                 <?php else: ?>
+                                                <a class="btn btn-outline-primary btn-round" href="<?php echo base_url().'index.php/Inicio/generarFormatoPT?id='.$e->id_formulario_pt.'&seguir_pagando=1&anio=2026'?>" title="Seguir pagando" ><i
+                                                        class="mdi mdi-cash-plus font-18"></i></a>
                                                 <a class="btn btn-outline-warning btn-round" href="<?php echo base_url().'index.php/Inicio/generarFormatoPT?id='.$e->id_formulario_pt.'&editar=1&anio=2026'?>" title="Editar" ><i
                                                         class="mdi mdi-lead-pencil font-18"></i></a> 
                                                 <?php endif; ?>

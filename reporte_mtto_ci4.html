@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte Ejecutivo MTTO 2026</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        /* SCOPED STYLES - Encapsulated for CI4 Integration */
+        .mtto-report {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --accent: #8b5cf6;
+            --glass: rgba(30, 41, 59, 0.7);
+        }
+
+        .mtto-report * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .mtto-report {
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animations */
+        @keyframes mtto-fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes mtto-slideInRight {
+            from {
+                transform: translateX(100px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes mtto-pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .mtto-report .mtto-animate {
+            animation: mtto-fadeIn 0.8s ease forwards;
+        }
+
+        /* Layout */
+        .mtto-report .mtto-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Header / Hero */
+        .mtto-report header {
+            padding: 4rem 0 2rem;
+            text-align: center;
+            background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.15), transparent);
+        }
+
+        .mtto-report .mtto-badge {
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .mtto-report h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .mtto-report .mtto-subtitle {
+            color: var(--text-dim);
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 3rem;
+        }
+
+        /* Stats Grid */
+        .mtto-report .mtto-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 4rem;
+        }
+
+        .mtto-report .mtto-stat-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .mtto-report .mtto-stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .mtto-report .mtto-stat-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.03), transparent);
+            pointer-events: none;
+        }
+
+        .mtto-report .mtto-stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            font-family: 'Outfit', sans-serif;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .mtto-report .mtto-stat-label {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .mtto-report .mtto-stat-icon {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            font-size: 1.5rem;
+            opacity: 0.5;
+        }
+
+        /* Sections */
+        .mtto-report section {
+            margin-bottom: 5rem;
+        }
+
+        .mtto-report h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .mtto-report h2::before {
+            content: '';
+            width: 4px;
+            height: 30px;
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        /* Critical Grid */
+        .mtto-report .mtto-critical-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .mtto-report .mtto-critical-item {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 1.5rem;
+            border-radius: 20px;
+            display: flex;
+            gap: 1rem;
+            transition: 0.3s;
+        }
+
+        .mtto-report .mtto-critical-item:hover {
+            border-color: var(--danger);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .mtto-report .mtto-critical-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .mtto-report .mtto-critical-content h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .mtto-report .mtto-critical-content p {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        .mtto-report .mtto-critical-meta {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--danger);
+            text-transform: uppercase;
+        }
+
+        /* Table */
+        .mtto-report .mtto-table-container {
+            background: var(--card-bg);
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+        }
+
+        .mtto-report table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .mtto-report th {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 1.25rem 1.5rem;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .mtto-report td {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            font-size: 0.95rem;
+        }
+
+        .mtto-report tr:last-child td {
+            border-bottom: none;
+        }
+
+        .mtto-report tr:hover td {
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .mtto-report .mtto-status-pill {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .mtto-report .mtto-pill-success {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--success);
+        }
+
+        .mtto-report .mtto-pill-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .mtto-report .mtto-pill-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        /* Footer */
+        .mtto-report footer {
+            padding: 4rem 0;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        .mtto-report .mtto-brand-pills {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .mtto-report .mtto-brand-pill {
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* Charts Section (Simple CSS Bars) */
+        .mtto-report .mtto-chart-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 24px;
+        }
+
+        .mtto-report .mtto-bar-row {
+            display: grid;
+            grid-template-columns: 150px 1fr 60px;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .mtto-report .mtto-bar-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .mtto-report .mtto-bar-outer {
+            height: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .mtto-report .mtto-bar-inner {
+            height: 100%;
+            border-radius: 10px;
+            transition: 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+            width: 0;
+        }
+
+        .mtto-report .mtto-bar-val {
+            font-weight: 800;
+            color: var(--primary);
+            text-align: right;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .mtto-report h1 {
+                font-size: 2.5rem;
+            }
+
+            .mtto-report .mtto-bar-row {
+                grid-template-columns: 100px 1fr 40px;
+                gap: 0.5rem;
+            }
+
+            .mtto-report .mtto-container {
+                padding: 0 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mtto-report">
+        <header>
+            <div class="mtto-container mtto-animate">
+                <span class="mtto-badge">Auditoría IT 2026</span>
+                <h1>Resumen de Mantenimiento</h1>
+                <p class="mtto-subtitle">Análisis técnico de infraestructura informática y plan de acción preventivo/correctivo
+                    para el ejercicio 2026.</p>
+            </div>
+        </header>
+
+        <main class="mtto-container">
+            <!-- Stats Section -->
+            <section class="mtto-stats-grid">
+                <div class="mtto-stat-card mtto-animate" style="animation-delay: 0.1s">
+                    <span class="mtto-stat-icon">💻</span>
+                    <span class="mtto-stat-value">76</span>
+                    <span class="mtto-stat-label">Total Equipos</span>
+                </div>
+                <div class="mtto-stat-card mtto-animate" style="animation-delay: 0.2s">
+                    <span class="mtto-stat-icon" style="color: var(--success)">✓</span>
+                    <span class="mtto-stat-value">54</span>
+                    <span class="mtto-stat-label">Atendidos</span>
+                </div>
+                <div class="mtto-stat-card mtto-animate" style="animation-delay: 0.3s">
+                    <span class="mtto-stat-icon" style="color: var(--danger)">⚠</span>
+                    <span class="mtto-stat-value">15</span>
+                    <span class="mtto-stat-label">Puntos Críticos</span>
+                </div>
+                <div class="mtto-stat-card mtto-animate" style="animation-delay: 0.4s">
+                    <span class="mtto-stat-icon" style="color: var(--warning)">📅</span>
+                    <span class="mtto-stat-value">22</span>
+                    <span class="mtto-stat-label">No Asistieron</span>
+                </div>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="mtto-animate" style="animation-delay: 0.5s">
+                <h2>Inventario por Marcas</h2>
+                <div class="mtto-chart-container">
+                    <div class="mtto-bar-row">
+                        <div class="mtto-bar-label">Lenovo</div>
+                        <div class="mtto-bar-outer">
+                            <div class="mtto-bar-inner" style="width: 55%; background: var(--primary);"></div>
+                        </div>
+                        <div class="mtto-bar-val">30</div>
+                    </div>
+                    <div class="mtto-bar-row">
+                        <div class="mtto-bar-label">HP</div>
+                        <div class="mtto-bar-outer">
+                            <div class="mtto-bar-inner" style="width: 33%; background: var(--accent);"></div>
+                        </div>
+                        <div class="mtto-bar-val">18</div>
+                    </div>
+                    <div class="mtto-bar-row">
+                        <div class="mtto-bar-label">Dell</div>
+                        <div class="mtto-bar-outer">
+                            <div class="mtto-bar-inner" style="width: 5%; background: var(--secondary);"></div>
+                        </div>
+                        <div class="mtto-bar-val">3</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Critical Section -->
+            <section class="mtto-animate" style="animation-delay: 0.6s">
+                <h2>Alertas de Infraestructura</h2>
+                <div class="mtto-critical-grid">
+                    <div class="mtto-critical-item">
+                        <div class="mtto-critical-icon">❗</div>
+                        <div class="mtto-critical-content">
+                            <h3>Yazmín Gutiérrez H.</h3>
+                            <p>Carcasa rota bajo teclado y mancha en pantalla. Riesgo estructural alto.</p>
+                            <div class="mtto-critical-meta">Urgente</div>
+                        </div>
+                    </div>
+                    <div class="mtto-critical-item">
+                        <div class="mtto-critical-icon">🔋</div>
+                        <div class="mtto-critical-content">
+                            <h3>Paula Hernández R.</h3>
+                            <p>Falla en micrófono, batería y cargador. Operación limitada.</p>
+                            <div class="mtto-critical-meta">Crítico</div>
+                        </div>
+                    </div>
+                    <div class="mtto-critical-item">
+                        <div class="mtto-critical-icon">💻</div>
+                        <div class="mtto-critical-content">
+                            <h3>Daniela Baeza O.</h3>
+                            <p>Equipo catalogado como OBSOLETO. Se requiere sustitución inmediata.</p>
+                            <div class="mtto-critical-meta">Obsolescencia</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Replacement Justification Section -->
+            <section class="mtto-animate" style="animation-delay: 0.65s">
+                <h2>Justificación de Renovación Tecnológica</h2>
+                <div class="mtto-critical-grid">
+                    <!-- HP ProBook 4440s -->
+                    <div class="mtto-stat-card"
+                        style="grid-column: span 1; background: linear-gradient(145deg, var(--card-bg), rgba(99, 102, 241, 0.05)); border: 1px solid rgba(99, 102, 241, 0.2);">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+                            <div>
+                                <h3 style="font-family: 'Outfit'; font-size: 1.4rem; color: var(--primary);">HP ProBook
+                                    4440s</h3>
+                                <p style="font-size: 0.8rem; color: var(--text-dim);">Lanzamiento: 2012 (Legacy System)</p>
+                            </div>
+                            <span class="mtto-status-pill mtto-pill-danger" style="padding: 0.4rem 1rem;">OBSOLETO</span>
+                        </div>
+                        <ul style="list-style: none; font-size: 0.9rem; color: var(--text-dim);">
+                            <li style="margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="color: var(--danger);">✕</span> Procesador Intel 3ra Gen (Arquitectura de 14
+                                años)
+                            </li>
+                            <li style="margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="color: var(--danger);">✕</span> Memoria RAM DDR3 (Lenta y escasa)
+                            </li>
+                            <li style="margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="color: var(--danger);">✕</span> Incompatible con Windows 11 (Sin TPM 2.0)
+                            </li>
+                            <li style="margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="color: var(--danger);">✕</span> Alto riesgo de falla en componentes mecánicos
+                                (HDD)
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- HP Elite Series -->
+                    <div class="mtto-stat-card"
+                        style="grid-column: span 1; background: linear-gradient(145deg, var(--card-bg), rgba(139, 92, 246, 0.05)); border: 1px solid rgba(139, 92, 246, 0.2);">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+                            <div>
+                                <h3 style="font-family: 'Outfit'; font-size: 1.4rem; color: var(--accent);">HP EliteBook
+                                    (G1-G3)</h3>
+                                <p style="font-size: 0.8rem; color: var(--text-dim);">Lanzamiento: 2013-2016 (Professional
+                                    Legacy)</p>
+                            </div>
+                            <span class="mtto-status-pill mtto-pill-warning" style="padding: 0.4rem 1rem;">CRÍTICO</span>
+                        </div>
+                        <ul style="list-style: none; font-size: 0.9rem; color: var(--text-dim);">
+                            <li style="margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="color: var(--warning);">⚠</span> Procesadores Intel 4ta a 6ta Gen (Bajo
+                                rendimiento actual)
+                            </li>
+                            <li style="margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="color: var(--warning);">⚠</span> Vulnerabilidades de seguridad a nivel Firmware
+                                (Spectre/Meltdown)
+                            </li>
+                            <li style="margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="color: var(--warning);">⚠</span> Baterías con ciclos de vida agotados
+                                (Degradación química)
+                            </li>
+                            <li style="margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="color: var(--warning);">⚠</span> Fin de soporte oficial por parte de HP para
+                                drivers modernos
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Strategic Reasoning -->
+                <div
+                    style="margin-top: 2rem; background: var(--glass); padding: 2rem; border-radius: 24px; border: 1px solid rgba(255,255,255,0.05);">
+                    <h3 style="margin-bottom: 1.5rem; font-family: 'Outfit';">¿Por qué es imperativo el cambio en 2026?</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                        <div>
+                            <h4 style="color: var(--primary); margin-bottom: 0.5rem;">Seguridad</h4>
+                            <p style="font-size: 0.85rem; color: var(--text-dim);">El cese de soporte para Windows 10 en
+                                2025 convierte a estos equipos en puertas de entrada para ataques de Ransomware.</p>
+                        </div>
+                        <div>
+                            <h4 style="color: var(--accent); margin-bottom: 0.5rem;">Productividad</h4>
+                            <p style="font-size: 0.85rem; color: var(--text-dim);">La pérdida de tiempo productivo por
+                                lentitud del sistema equivale a una merma económica superior al costo del equipo nuevo.</p>
+                        </div>
+                        <div>
+                            <h4 style="color: var(--secondary); margin-bottom: 0.5rem;">Sostenibilidad</h4>
+                            <p style="font-size: 0.85rem; color: var(--text-dim);">La dificultad para encontrar refacciones
+                                originales genera una dependencia de piezas de baja calidad y alto riesgo.</p>
+                        </div>
+                        <div>
+                            <h4 style="color: var(--success); margin-bottom: 0.5rem;">Impacto en Flota</h4>
+                            <p style="font-size: 0.85rem; color: var(--text-dim);">Dado que representan el 33% del
+                                inventario total, su obsolescencia masiva pone en riesgo la continuidad operativa de áreas
+                                clave.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Urgent Replacement List Section -->
+            <section class="mtto-animate" style="animation-delay: 0.7s">
+                <h2>Equipos Identificados para Cambio Urgente</h2>
+
+                <!-- HP ProBook 4440s / 440 -->
+                <h3
+                    style="color: var(--primary); margin-bottom: 1rem; padding-left: 1rem; border-left: 4px solid var(--primary);">
+                    Prioridad 1: Serie HP ProBook 4440s / 440</h3>
+                <div class="mtto-critical-grid" style="margin-bottom: 3rem;">
+                    <div class="mtto-critical-item" style="border-color: rgba(99, 102, 241, 0.3);">
+                        <div class="mtto-critical-icon">👤</div>
+                        <div class="mtto-critical-content">
+                            <h3>Daniela Baeza Ortiz</h3>
+                            <p><strong>Modelo:</strong> HP ProBook 440s (#GOB 101637212)</p>
+                            <p><strong>Estado:</strong> OBSOLETA. Rendimiento degradado e incompatibilidad de sistema.</p>
+                            <div class="mtto-critical-meta">Sustitución Inmediata</div>
+                        </div>
+                    </div>
+                    <div class="mtto-critical-item" style="border-color: rgba(99, 102, 241, 0.3);">
+                        <div class="mtto-critical-icon">👤</div>
+                        <div class="mtto-critical-content">
+                            <h3>Juan Antonio Acosta Ponce</h3>
+                            <p><strong>Modelo:</strong> HP ProBook 4440 (#GOB 101637229)</p>
+                            <p><strong>Estado:</strong> En lista de cambios. Equipo con 14 años de antigüedad técnica.</p>
+                            <div class="mtto-critical-meta">Prioridad Alta</div>
+                        </div>
+                    </div>
+                    <div class="mtto-critical-item" style="border-color: rgba(99, 102, 241, 0.3);">
+                        <div class="mtto-critical-icon">👤</div>
+                        <div class="mtto-critical-content">
+                            <h3>Mariana Camila Ramírez Mata</h3>
+                            <p><strong>Modelo:</strong> HP ProBook 4440 (#GOB 101637253)</p>
+                            <p><strong>Estado:</strong> Antigüedad crítica. Riesgo de falla en disco duro mecánico.</p>
+                            <div class="mtto-critical-meta">Programado</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HP EliteBook -->
+                <h3
+                    style="color: var(--accent); margin-bottom: 1rem; padding-left: 1rem; border-left: 4px solid var(--accent);">
+                    Prioridad 2: Serie HP EliteBook 8570w</h3>
+                <div class="mtto-critical-grid">
+                    <div class="mtto-critical-item" style="border-color: rgba(139, 92, 246, 0.3);">
+                        <div class="mtto-critical-icon">👤</div>
+                        <div class="mtto-critical-content">
+                            <h3>Ana Guadalupe Enríquez Muñoz</h3>
+                            <p><strong>Modelo:</strong> HP EliteBook 8570w (#GOB 101637494)</p>
+                            <p><strong>Estado:</strong> Obsoleto por antigüedad. Desgaste físico avanzado del chasis.</p>
+                            <div class="mtto-critical-meta">Cambio en Fila</div>
+                        </div>
+                    </div>
+                    <div class="mtto-critical-item" style="border-color: rgba(139, 92, 246, 0.3);">
+                        <div class="mtto-critical-icon">👤</div>
+                        <div class="mtto-critical-content">
+                            <h3>Martha Elisa Cornejo Rodríguez</h3>
+                            <p><strong>Modelo:</strong> HP EliteBook 8570w (#GOB 101637495)</p>
+                            <p><strong>Estado:</strong> Rendimiento insuficiente para aplicaciones modernas. Antigüedad
+                                extrema.</p>
+                            <div class="mtto-critical-meta">Cambio en Fila</div>
+                        </div>
+                    </div>
+                    <div class="mtto-critical-item" style="border-color: rgba(139, 92, 246, 0.3);">
+                        <div class="mtto-critical-icon">👤</div>
+                        <div class="mtto-critical-content">
+                            <h3>Daniel Michael Lugo Meléndez</h3>
+                            <p><strong>Modelo:</strong> HP EliteBook 8570w (#GOB 101637497)</p>
+                            <p><strong>Estado:</strong> Fin de vida útil profesional. Incompatible con estándares de
+                                seguridad 2026.</p>
+                            <div class="mtto-critical-meta">Cambio en Fila</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Table Section -->
+            <section class="mtto-animate" style="animation-delay: 0.7s">
+                <h2>Requerimientos de Compra</h2>
+                <div class="mtto-table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Área</th>
+                                <th>Pieza / Componente</th>
+                                <th>Prioridad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Cynthia Rendón</td>
+                                <td>Hospedaje</td>
+                                <td>Batería PF4NV20C</td>
+                                <td><span class="mtto-status-pill mtto-pill-danger">Alta</span></td>
+                            </tr>
+                            <tr>
+                                <td>José M. Melgar</td>
+                                <td>Relaciones Públicas</td>
+                                <td>Teclado Lenovo E14</td>
+                                <td><span class="mtto-status-pill mtto-pill-warning">Media</span></td>
+                            </tr>
+                            <tr>
+                                <td>Alejandro Ayala</td>
+                                <td>Sostenibilidad</td>
+                                <td>SSD 480GB+</td>
+                                <td><span class="mtto-status-pill mtto-pill-warning">Media</span></td>
+                            </tr>
+                            <tr>
+                                <td>José Carlos R.</td>
+                                <td>Administrativa</td>
+                                <td>Batería Dell Latitude</td>
+                                <td><span class="mtto-status-pill mtto-pill-danger">Alta</span></td>
+                            </tr>
+                            <tr>
+                                <td>Varios</td>
+                                <td>General</td>
+                                <td>Renovación (HP 8570W)</td>
+                                <td><span class="mtto-status-pill mtto-pill-success">Planificada</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <div class="mtto-container mtto-animate" style="animation-delay: 0.8s">
+                <p>© 2026 SECTURI IT Department</p>
+                <div class="mtto-brand-pills">
+                    <span class="mtto-brand-pill">LENOVO 55%</span>
+                    <span class="mtto-brand-pill">HP 33%</span>
+                    <span class="mtto-brand-pill">DELL 5%</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Animate bars on load
+        window.addEventListener('load', () => {
+            const bars = document.querySelectorAll('.mtto-report .mtto-bar-inner');
+            bars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 100);
+            });
+        });
+    </script>
+</body>
+
+</html>

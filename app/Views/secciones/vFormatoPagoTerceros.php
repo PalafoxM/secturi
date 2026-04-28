@@ -118,6 +118,7 @@
     <?php
     $anio_actual = (isset($es2025) && $es2025) ? '2025' : '2026';
     $prefix_found = '';
+    $seguir_pagando = isset($seguir_pagando) && $seguir_pagando == 1;
     // Helper to extract no_consecutivo and prefix from full folio string if editing
     // Expected format: PT [PREFIX] [NUMBER]/[YEAR]
     if (isset($registro_pt->no_consecutivo) && (!isset($no_consecutivo) || empty($no_consecutivo))) {
@@ -130,17 +131,25 @@
             if (substr($prefix_found, -1) === '/') {
                 $prefix_found = substr($prefix_found, 0, -1);
             }
-            $no_consecutivo = $matches[2];
+            if (!$seguir_pagando) {
+                $no_consecutivo = $matches[2];
+            }
             $anio_actual = $matches[3];
         } else if (preg_match('/([0-9]{3,})\/([0-9]{4})$/', trim($registro_pt->no_consecutivo), $matches)) {
-            $no_consecutivo = $matches[1];
+            if (!$seguir_pagando) {
+                $no_consecutivo = $matches[1];
+            }
             $anio_actual = $matches[2];
         } else if (preg_match('/([0-9]{3,})/', trim($registro_pt->no_consecutivo), $matches)) {
-            $no_consecutivo = $matches[1];
+            if (!$seguir_pagando) {
+                $no_consecutivo = $matches[1];
+            }
         } else {
              // Fallback: try to find the last occurring number logic if format differs?
              // For now assume the standard format described in JS.
-             $no_consecutivo = $registro_pt->no_consecutivo;
+             if (!$seguir_pagando) {
+                 $no_consecutivo = $registro_pt->no_consecutivo;
+             }
         }
     } else if (isset($consecutivo) && (!isset($no_consecutivo) || empty($no_consecutivo))) {
         $no_consecutivo = $consecutivo;

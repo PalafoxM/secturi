@@ -4111,9 +4111,11 @@ class Inicio extends BaseController
         
         $id = $this->request->getGet('id');
         $editar = $this->request->getGet('editar');
+        $seguirPagando = $this->request->getGet('seguir_pagando');
         $anio = $this->request->getGet('anio');
         
         $data['editar'] = ($editar == 1) ? 1 : 0;
+        $data['seguir_pagando'] = ($seguirPagando == 1) ? 1 : 0;
         $data['es2025'] = ($anio == 2025) ? true : false;
         $data['id_reserva'] = 0; // Default or fetch if needed
         $data['no_consecutivo'] = ''; // Logic to generate new consecutive if needed, or leave blank
@@ -4121,7 +4123,7 @@ class Inicio extends BaseController
          $proveedores = $globals->getTabla(["tabla" => "proveedor", "where" => ["visible" => 1],'limit' => 10]);
         $data['proveedores'] = $proveedores->data;
 
-        if ($data['editar'] == 1 && $id) {
+        if (($data['editar'] == 1 || $data['seguir_pagando'] == 1) && $id) {
             // Fetch main record
             $registroNumero = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["id_formulario_pt" => $id, 'usu_reg' => $session->get('id_usuario')]]);
             // We don't overwrite no_consecutivo here with count() because it corrupts the read value from the db.
