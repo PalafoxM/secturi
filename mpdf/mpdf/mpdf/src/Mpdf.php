@@ -9073,7 +9073,43 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
 	// =============================================================
 	/* -- HTML-CSS -- */
 
-	function _getObjAttr($t)
+    function _getObjAttr($t)
+    {
+        // Initialize result array
+        $sp = [];
+        // Expected delimiter used by mpdf to separate attribute data
+        $delimiter = "\xbb\xa4\xac";
+        $parts = explode($delimiter, $t, 2);
+        if (count($parts) < 2) {
+            // Unexpected format, return null
+            return null;
+        }
+        // After delimiter we expect CSV like "key1=value1,key2=value2"
+        $c = explode(",", $parts[1], 2);
+        foreach ($c as $v) {
+            $pair = explode("=", $v, 2);
+            if (isset($pair[0], $pair[1])) {
+                $sp[$pair[0]] = $pair[1];
+            }
+        }
+        if (!isset($sp['objattr'])) {
+            return null;
+        }
+        $data = $sp['objattr'];
+        // Safe unserialize, disallow class instantiation
+        $obj = @unserialize($data, ['allowed_classes' => false]);
+        if ($obj === false && $data !== 'b:0;') {
+            // Attempt to trim trailing garbage after serialized payload
+            $lastBracePos = strrpos($data, '}');
+            if ($lastBracePos !== false) {
+                $trimmed = substr($data, 0, $lastBracePos + 1);
+                $obj = @unserialize($trimmed, ['allowed_classes' => false]);
+            }
+        }
+        return $obj;
+    }
+
+	/* function _getObjAttr($t)
 	{
 		$c = explode("\xbb\xa4\xac", $t, 2);
 		$c = explode(",", $c[1], 2);
@@ -9082,7 +9118,7 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
 			$sp[$v[0]] = $v[1];
 		}
 		return (unserialize($sp['objattr']));
-	}
+	} */
 
 	function inlineObject($type, $x, $y, $objattr, $Lmargin, $widthUsed, $maxWidth, $lineHeight, $paint = false, $is_table = false)
 	{
