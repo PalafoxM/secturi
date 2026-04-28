@@ -531,7 +531,7 @@
                                     <select name="nombre_responsable_1" id="nombre_responsable_1" class="form-control-plaintext select2 mb-2">
                                         <option value="">Seleccione...</option>
                                         <?php foreach ($usuarios as $usuario): ?>
-                                            <?php if(in_array($usuario->id_usuario, [152, 40, 105,18, 99, 120])): ?>
+                                            <?php if(in_array($usuario->id_usuario, [152, 40, 105,18, 99, 120, 35, 17])): ?>
                                             <option value="<?= $usuario->nombre_completo ?>" <?= isset($registro_pt->nombre_responsable) && $registro_pt->nombre_responsable == $usuario->nombre_completo ? 'selected' : '' ?>><?= $usuario->nombre_completo ?></option>
                                             <?php endif ?>
                                         <?php endforeach; ?>
