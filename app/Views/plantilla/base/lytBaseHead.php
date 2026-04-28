@@ -757,6 +757,20 @@
                     </div>
                 </li> -->
 
+                <li class="dropdown notification-list">
+                    <a class="nav-link arrow-none waves-light waves-effect"
+                        href="https://secturnet.guanajuato.gob.mx/susi/reporte_mtto_ci4.html"
+                        target="_blank"
+                        rel="noopener"
+                        role="button"
+                        aria-haspopup="false"
+                        aria-expanded="false"
+                        title="Notificaciones">
+                        <i class="ti-bell noti-icon"></i>
+                        <span class="badge badge-danger badge-pill noti-icon-badge">1</span>
+                    </a>
+                </li>
+
                 <li class="dropdown">
                     <a class="nav-link dropdown-toggle waves-effect waves-light nav-user" data-toggle="dropdown"
                         href="#" role="button" aria-haspopup="false" aria-expanded="false">
