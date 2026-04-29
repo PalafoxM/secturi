@@ -36,7 +36,7 @@ $configuracionModulo = [
     'convenio' => [
         'ruta_listado' => 'index.php/Principal/ListaSolicitudConvenio',
         'titulo' => 'Archivos de Solicitud',
-        'campo_id_archivo' => 'id_solicitud_convenio_archivo',
+        'campo_id_archivo' => 'id_archivo',
         'ruta_archivo' => 'assets/uploads/convenios/',
         'documentos' => [
             1 => 'Acta de Sesion de Comite',
@@ -148,11 +148,11 @@ $tituloVista = $moduloActivo['titulo'];
                                                     </td>
                                                     <td><?= esc($archivo->nombre_archivo ?? '') ?></td>
                                                     <td>
-                                                        <?php if ((int) ($archivo->id_estatus ?? 0) === 1): ?>
+                                                        <?php if ((int) ($archivo->id_estatus) === 1): ?>
                                                             <span class="badge badge-warning">Pendiente</span>
-                                                        <?php elseif ((int) ($archivo->id_estatus ?? 0) === 2): ?>
+                                                        <?php elseif ((int) ($archivo->id_estatus) === 2): ?>
                                                             <span class="badge badge-danger">Declinado</span>
-                                                        <?php elseif ((int) ($archivo->id_estatus ?? 0) === 3): ?>
+                                                        <?php elseif ((int) ($archivo->id_estatus) === 3): ?>
                                                             <span class="badge badge-success">Aceptado</span>
                                                         <?php elseif ((int) ($archivo->id_estatus ?? 0) === 4): ?>
                                                             <span class="badge badge-info">Editado</span>
@@ -164,12 +164,12 @@ $tituloVista = $moduloActivo['titulo'];
                                                         <a href="<?= esc($archivo->url_descarga ?? base_url($rutaArchivo . ($archivo->nombre_archivo ?? ''))) ?>" target="_blank" class="btn btn-info btn-sm">
                                                             <i class="fas fa-eye"></i>
                                                         </a>
-                                                        <?php if ($idArchivo > 0 && (int) ($archivo->id_estatus ?? 0) === 2): ?>
+                                                        <?php if ($idArchivo > 0 && (int) ($archivo->id_estatus) === 2 && (int) ($session->get('id_perfil') ?? 0) !== 7): ?>
                                                             <a onclick="editarArchivo(<?= $idArchivo ?>)" class="btn btn-warning btn-sm">
                                                                 <i class="fas fa-edit text-white"></i>
                                                             </a>
                                                         <?php endif; ?>
-                                                        <?php if ($idArchivo > 0 && in_array((int) ($archivo->id_estatus ?? 0), [1, 4], true) && in_array((int) ($session->get('id_perfil') ?? 0), [1, 7], true)): ?>
+                                                        <?php if (in_array((int) ($session->get('id_perfil') ?? 0), [1, 7], true) && (!in_array((int) ($archivo->id_estatus) ?? 0, [2, 3], true))): ?>
                                                             <a onclick="declinarArchivo(<?= $idArchivo ?>)" class="btn btn-danger btn-sm">
                                                                 <i class="fas fa-trash text-white"></i>
                                                             </a>
@@ -286,6 +286,17 @@ $tituloVista = $moduloActivo['titulo'];
                 data: formData,
                 processData: false,
                 contentType: false,
+                beforeSend: function() {
+                    Swal.fire({
+                        title: 'Actualizando archivo',
+                        text: 'Por favor espera mientras se sube el documento.',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                },
                 success: function(response) {
                     if (typeof response === 'string') {
                         try {

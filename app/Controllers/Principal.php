@@ -267,7 +267,7 @@ class Principal extends BaseController
             ],
             'convenio' => [
                 'tabla' => 'solicitud_convenio_archivos',
-                'id_campo' => 'id_solicitud_convenio_archivo',
+                'id_campo' => 'id_archivo',
                 'id_solicitud_campo' => 'id_solicitud_convenio',
                 'storage_modulo' => 'convenios',
                 'ruta_listado' => 'index.php/Principal/ListaSolicitudConvenio',
@@ -292,6 +292,31 @@ class Principal extends BaseController
         ];
 
         return $configuraciones[$modulo] ?? null;
+    }
+
+    private function actualizarEstatusSolicitudArchivo(Mglobal $globals, array $configModulo, int $idSolicitud, int $idEstatus, string $script): void
+    {
+        if ($idSolicitud <= 0 || empty($configModulo['ruta_modulo']) || empty($configModulo['id_solicitud_campo'])) {
+            return;
+        }
+
+        $session = \Config\Services::session();
+        $dataUpdate = ['id_estatus' => $idEstatus];
+        $columnasSolicitud = $this->obtenerColumnasTablaServicio($globals, $configModulo['ruta_modulo']);
+
+        if (in_array('usu_act', $columnasSolicitud, true)) {
+            $dataUpdate['usu_act'] = $session->id_usuario ?? 0;
+        }
+
+        if (in_array('fec_act', $columnasSolicitud, true)) {
+            $dataUpdate['fec_act'] = date('Y-m-d H:i:s');
+        }
+
+        $globals->saveTabla(
+            $dataUpdate,
+            ["tabla" => $configModulo['ruta_modulo'], "editar" => true, "idEditar" => [$configModulo['id_solicitud_campo'] => $idSolicitud]],
+            ['id_user' => $session->id_usuario ?? 0, 'script' => $script]
+        );
     }
 
     public function verArchivoS3()
@@ -5338,6 +5363,11 @@ class Principal extends BaseController
         $id_solicitud_contrato_archivo = $this->request->getPost('id_archivo') ?? $this->request->getPost('id_solicitud_contrato_archivo');
         $archivoNuevo = $this->request->getFile('archivo');
         
+        if ((int) ($session->get('id_perfil') ?? 0) === 7) {
+            $response->respuesta = "No tiene permisos para editar archivos.";
+            return $this->respond($response);
+        }
+
         if ($configModulo === null || !$id_solicitud_contrato_archivo) {
             $response->respuesta = "ID de archivo no válido.";
             return $this->respond($response);
@@ -5365,6 +5395,11 @@ class Principal extends BaseController
 
         $archivoActual = $archivoActualQuery->data[0];
         $idSolicitudPadre = $archivoActual->{$configModulo['id_solicitud_campo']} ?? null;
+
+        if ((int) ($archivoActual->id_estatus ?? 0) !== 2) {
+            $response->respuesta = "Solo se pueden editar archivos declinados.";
+            return $this->respond($response);
+        }
 
         $extension = strtolower((string) $archivoNuevo->getExtension());
         $nombreOriginal = (string) $archivoNuevo->getClientName();
@@ -5417,11 +5452,7 @@ class Principal extends BaseController
         );
 
         if (!$res->error && !empty($idSolicitudPadre)) {
-            $globals->saveTabla(
-                ["id_estatus" => 4],
-                ["tabla" => $configModulo['ruta_modulo'], "editar" => true, "idEditar" => [$configModulo['id_solicitud_campo'] => $idSolicitudPadre]],
-                ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/EditarArchivo']
-            );
+            $this->actualizarEstatusSolicitudArchivo($globals, $configModulo, (int) $idSolicitudPadre, 4, 'Principal.php/EditarArchivo');
         }
 
         if ($res->error) {
@@ -5443,22 +5474,46 @@ class Principal extends BaseController
         $modulo = (string) ($this->request->getPost('modulo') ?? 'contrato');
         $configModulo = $this->obtenerConfiguracionModuloArchivos($modulo);
         $id_solicitud_contrato_archivo = $this->request->getPost('id_archivo') ?? $this->request->getPost('id_solicitud_contrato_archivo');
-        
-        if ($configModulo === null || !$id_solicitud_contrato_archivo) {
-            $response->respuesta = "ID de archivo no válido.";
+
+        if (!in_array((int) ($session->get('id_perfil') ?? 0), [1, 7], true)) {
+            $response->respuesta = "No tiene permisos para declinar archivos.";
             return $this->respond($response);
         }
 
-        $globals->saveTabla(
+        if ($configModulo === null || !$id_solicitud_contrato_archivo) {
+            $response->respuesta = "ID de archivo no valido.";
+            return $this->respond($response);
+        }
+
+        $archivoActualQuery = $globals->getTabla([
+            'tabla' => $configModulo['tabla'],
+            'where' => [$configModulo['id_campo'] => $id_solicitud_contrato_archivo, 'visible' => 1]
+        ]);
+
+        if (empty($archivoActualQuery->data)) {
+            $response->respuesta = "No se encontro el archivo a declinar.";
+            return $this->respond($response);
+        }
+
+        $archivoActual = $archivoActualQuery->data[0];
+        $idSolicitudPadre = (int) ($archivoActual->{$configModulo['id_solicitud_campo']} ?? 0);
+
+        $res = $globals->saveTabla(
             ['id_estatus' => 2],
             ["tabla" => $configModulo['tabla'], "editar" => true, "idEditar" => [$configModulo['id_campo'] => $id_solicitud_contrato_archivo]],
             ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/DeclinarArchivo']
         );
 
+        if ($res->error) {
+            $response->respuesta = $res->respuesta ?? "No fue posible declinar el archivo.";
+            return $this->respond($response);
+        }
+
         $response->error = false;
         $response->respuesta = "Archivo declinado correctamente.";
         return $this->respond($response);
     }
+
     public function AceptarArchivo()
     {
         $session = \Config\Services::session();
@@ -5469,27 +5524,45 @@ class Principal extends BaseController
         $modulo = (string) ($this->request->getPost('modulo') ?? 'contrato');
         $configModulo = $this->obtenerConfiguracionModuloArchivos($modulo);
         $id_solicitud_contrato_archivo = $this->request->getPost('id_archivo') ?? $this->request->getPost('id_solicitud_contrato_archivo');
-        
-        if ($configModulo === null || !$id_solicitud_contrato_archivo) {
-            $response->respuesta = "ID de archivo no válido.";
+
+        if (!in_array((int) ($session->get('id_perfil') ?? 0), [1, 7], true)) {
+            $response->respuesta = "No tiene permisos para aceptar archivos.";
             return $this->respond($response);
         }
 
-    
+        if ($configModulo === null || !$id_solicitud_contrato_archivo) {
+            $response->respuesta = "ID de archivo no valido.";
+            return $this->respond($response);
+        }
 
-        $dataConfig = [
+        $archivoActualQuery = $globals->getTabla([
             'tabla' => $configModulo['tabla'],
-            "editar" => true,
-            "idEditar" => [$configModulo['id_campo'] => $id_solicitud_contrato_archivo],
-        ];
-        $dataBitacora = ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/AceptarArchivo'];
-        $archivos = $globals->saveTabla(["id_estatus" => 3],$dataConfig, $dataBitacora);
-      
-       $response->error = false;
+            'where' => [$configModulo['id_campo'] => $id_solicitud_contrato_archivo, 'visible' => 1]
+        ]);
+
+        if (empty($archivoActualQuery->data)) {
+            $response->respuesta = "No se encontro el archivo a aceptar.";
+            return $this->respond($response);
+        }
+
+        $archivoActual = $archivoActualQuery->data[0];
+        $idSolicitudPadre = (int) ($archivoActual->{$configModulo['id_solicitud_campo']} ?? 0);
+
+        $res = $globals->saveTabla(
+            ["id_estatus" => 3],
+            ["tabla" => $configModulo['tabla'], "editar" => true, "idEditar" => [$configModulo['id_campo'] => $id_solicitud_contrato_archivo]],
+            ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/AceptarArchivo']
+        );
+
+        if ($res->error) {
+            $response->respuesta = $res->respuesta ?? "No fue posible aceptar el archivo.";
+            return $this->respond($response);
+        }
+
+        $response->error = false;
         $response->respuesta = "Archivo aceptado correctamente.";
         return $this->respond($response);
     }
-
     public function guardarArchivosSolicitud()
     {
         $session = \Config\Services::session();
@@ -11107,7 +11180,7 @@ class Principal extends BaseController
                 $archivo->url_descarga = $this->resolveStoredFilePreviewUrl($archivo->nombre_archivo ?? null, 'assets/uploads/convenios');
             }
         }
-        
+       // die( var_dump($archivos->data));
         $data['id_solicitud'] = $id_solicitud;
         $data['archivos'] = (!empty($archivos->data)) ? $archivos->data : [];
         $data['modulo_archivos'] = 'convenio';
