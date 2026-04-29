@@ -119,6 +119,28 @@
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control" id="monto_total" name="monto_total" value="<?= isset($solicitud) ? $solicitud->monto_total : '' ?>" required>
                                         <input type="text" class="form-control mt-2" id="monto_total_texto" name="monto_total_texto" value="<?= isset($solicitud) ? esc($solicitud->monto_total_texto ?? '') : '' ?>" readonly placeholder="Monto en letra">
+                                        
+                                        <div class="custom-control custom-switch mt-2">
+                                            <input type="checkbox" class="custom-control-input" id="check_tipo_cambio" <?= (isset($solicitud) && (!empty($solicitud->moneda_tipo_cambio) || !empty($solicitud->valor_tipo_cambio))) ? 'checked' : '' ?>>
+                                            <label class="custom-control-label" for="check_tipo_cambio">Tipo de cambio</label>
+                                        </div>
+                                        <div id="div_tipo_cambio" class="mt-2 row" style="<?= (isset($solicitud) && (!empty($solicitud->moneda_tipo_cambio) || !empty($solicitud->valor_tipo_cambio))) ? '' : 'display: none;' ?>">
+                                            <div class="col-sm-6 mt-2 mt-sm-0">
+                                                <input type="text" class="form-control" name="moneda_tipo_cambio" placeholder="Moneda (ej. USD, EUR)" value="<?= isset($solicitud) ? esc($solicitud->moneda_tipo_cambio ?? '') : '' ?>">
+                                            </div>
+                                            <div class="col-sm-6 mt-2 mt-sm-0">
+                                                <input type="text" class="form-control" name="valor_tipo_cambio" placeholder="Valor del tipo de cambio" value="<?= isset($solicitud) ? esc($solicitud->valor_tipo_cambio ?? '') : '' ?>">
+                                            </div>
+                                        </div>
+                                        <script>
+                                            document.addEventListener('DOMContentLoaded', function() {
+                                                var checkTipoCambio = document.getElementById('check_tipo_cambio');
+                                                var divTipoCambio = document.getElementById('div_tipo_cambio');
+                                                checkTipoCambio.addEventListener('change', function() {
+                                                    divTipoCambio.style.display = this.checked ? '' : 'none';
+                                                });
+                                            });
+                                        </script>
                                     </div>
                                 </div>
                                 <div class="form-group row">
