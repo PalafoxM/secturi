@@ -275,7 +275,7 @@ class Principal extends BaseController
             ],
             'honorarios' => [
                 'tabla' => 'solicitud_honorario_archivos',
-                'id_campo' => 'id_solicitud_honorario_archivo',
+                'id_campo' => 'id_solicitud_honorario_archivos',
                 'id_solicitud_campo' => 'id_solicitud_honorario',
                 'storage_modulo' => 'honorarios',
                 'ruta_listado' => 'index.php/Principal/listadoHonorarios',
@@ -284,6 +284,13 @@ class Principal extends BaseController
             'adquisiciones' => [
                 'tabla' => 'solicitud_adquisiciones_archivos',
                 'id_campo' => 'id_solicitud_adquisiciones_archivo',
+                'id_campos_posibles' => [
+                    'id_solicitud_adquisiciones_archivo',
+                    'id_solicitud_adquisiciones_archivos',
+                    'id_solicitud_adquisicion_archivo',
+                    'id_solicitud_adquisicion_archivos',
+                    'id_archivo',
+                ],
                 'id_solicitud_campo' => 'id_solicitud_adquisiciones',
                 'storage_modulo' => 'adquisiciones',
                 'ruta_listado' => 'index.php/Principal/ListaSolicitudAdquisiciones',
@@ -292,6 +299,27 @@ class Principal extends BaseController
         ];
 
         return $configuraciones[$modulo] ?? null;
+    }
+
+    private function obtenerCampoIdArchivoModulo(Mglobal $globals, array $configModulo): string
+    {
+        $camposPosibles = array_values(array_unique(array_filter(array_merge(
+            [$configModulo['id_campo'] ?? null],
+            $configModulo['id_campos_posibles'] ?? []
+        ))));
+
+        $columnasArchivo = $this->obtenerColumnasTablaServicio($globals, $configModulo['tabla']);
+        if (empty($columnasArchivo)) {
+            return (string) ($camposPosibles[0] ?? ($configModulo['id_campo'] ?? 'id_archivo'));
+        }
+
+        foreach ($camposPosibles as $campo) {
+            if (in_array($campo, $columnasArchivo, true)) {
+                return (string) $campo;
+            }
+        }
+
+        return (string) ($configModulo['id_campo'] ?? 'id_archivo');
     }
 
     private function actualizarEstatusSolicitudArchivo(Mglobal $globals, array $configModulo, int $idSolicitud, int $idEstatus, string $script): void
@@ -3858,20 +3886,20 @@ class Principal extends BaseController
             $emailService = \Config\Services::email();
             $usuarioQuery = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["id_usuario" => ($session->id_usuario ?? 0)]]);
             $nombreUsuario = (isset($usuarioQuery->data) && !empty($usuarioQuery->data)) ? $usuarioQuery->data[0]->nombre_completo : 'Usuario Desconocido';
-            $enlace = base_url('index.php/Principal/ListaSolicitudContrato');
+            $enlace = base_url('index.php/Principal/listadoHonorarios');
             $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
             $emailService->setTo($this->obtenerCorreosRevisionJuridica());
-            $emailService->setSubject('Nueva Solicitud de Contrato - Archivos Adjuntados');
+            $emailService->setSubject('Nueva Solicitud de Honorarios - Archivos Adjuntados');
             $emailService->setMailType('html');
             $emailService->setMessage("
                 <p>Buen día,</p>
-                <p>Se le notifica que se han subido documentos para la solicitud de contrato con ID <strong>{$id_solicitud}</strong>.</p>
+                <p>Se le notifica que se han subido documentos para la solicitud de honorarios con ID <strong>{$id_solicitud}</strong>.</p>
                 <p>Los archivos fueron agregados por el usuario: <strong>{$nombreUsuario}</strong>.</p>
                 <p>Puede consultar los detalles ingresando al siguiente enlace: <a href='{$enlace}'>{$enlace}</a></p>
                 <br>
                 <p>Saludos cordiales,</p>
                 <p><strong>Sistema Unificado SECTURI (SUSI)</strong></p>
-                <a href='https://secturnet.guanajuato.gob.mx/susi/index.php/Principal/ListaSolicitudContrato'>Ir al sistema</a>
+                <a href='https://secturnet.guanajuato.gob.mx/susi/index.php/Principal/listadoHonorarios'>Ir al sistema</a>
             ");
             $emailService->send();
 
@@ -3928,21 +3956,16 @@ class Principal extends BaseController
             if (!empty($usuarioQuery->data) && !empty($usuarioQuery->data[0]->correo)) {
                 $correoDestino = $usuarioQuery->data[0]->correo;
                 $nombreUsuario = $usuarioQuery->data[0]->nombre_completo ?? 'Usuario';
-                $enlaceListado = 'https://secturnet.guanajuato.gob.mx/susi/index.php/Principal/listadoHonorarios';
-
                 $emailService->setFrom('noreply@susi.gob.mx', 'SUSI - SECTURI');
                 $emailService->setTo($correoDestino);
                 $emailService->setSubject('Solicitud de Honorarios Declinada');
                 $emailService->setMailType('html');
                 $emailService->setMessage("
-                    <p>Buen dia, <strong>{$nombreUsuario}</strong>:</p>
-                    <p>Se le notifica que su solicitud de honorarios con ID <strong>{$id}</strong> ha sido <strong>declinada</strong>.</p>
+                    <p>Buen día, <strong>{$nombreUsuario}</strong>:</p>
+                    <p>Se le notifica que su solicitud de elaboración de honorarios con ID <strong>{$id}</strong> ha sido <strong>declinada</strong>.</p>
                     <p><strong>Motivo:</strong> {$motivo}</p>
-                    <p>Puede consultar mayores detalles ingresando al siguiente enlace:</p>
-                    <p><a href='{$enlaceListado}' target='_blank'>{$enlaceListado}</a></p>
                     <br>
                     <p>Saludos cordiales,</p>
-                    <p><strong>Sistema Unificado SECTURI (SUSI)</strong></p>
                 ");
                 $emailService->send();
             }
@@ -4710,7 +4733,7 @@ class Principal extends BaseController
             $response->respuesta = "No se guardÃ³ ningÃºn archivo." . ($errores > 0 ? " Hubo errores al procesar." : '');
         }
 
-              if ($count > 0) {
+        if ($count > 0 && !in_array($session->get('id_usuario'), [1, 149])) {
             // Enviar correo a lvelaga@guanajuato.gob.mx
             $emailService = \Config\Services::email();
             $usuarioQuery = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["id_usuario" => ($session->id_usuario ?? 0)]]);
@@ -4869,8 +4892,10 @@ class Principal extends BaseController
             return $this->respond($response);
         }
 
+        $instrumentoJson = json_encode(array_values($rutasGuardadas));
         $dataUpdate = [
             'id_estatus' => 3,
+            'instrumento_juridico' => $instrumentoJson,
             'usu_act' => $session->id_usuario ?? 0,
             'fec_act' => date('Y-m-d H:i:s')
         ];
@@ -5383,9 +5408,10 @@ class Principal extends BaseController
             return $this->respond($response);
         }
 
+        $campoIdArchivo = $this->obtenerCampoIdArchivoModulo($globals, $configModulo);
         $archivoActualQuery = $globals->getTabla([
             'tabla' => $configModulo['tabla'],
-            'where' => [$configModulo['id_campo'] => $id_solicitud_contrato_archivo, 'visible' => 1]
+            'where' => [$campoIdArchivo => $id_solicitud_contrato_archivo, 'visible' => 1]
         ]);
 
         if (empty($archivoActualQuery->data)) {
@@ -5447,7 +5473,7 @@ class Principal extends BaseController
 
         $res = $globals->saveTabla(
             $dataUpdate,
-            ["tabla" => $configModulo['tabla'], "editar" => true, "idEditar" => [$configModulo['id_campo'] => $id_solicitud_contrato_archivo]],
+            ["tabla" => $configModulo['tabla'], "editar" => true, "idEditar" => [$campoIdArchivo => $id_solicitud_contrato_archivo]],
             ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/EditarArchivo']
         );
 
@@ -5485,9 +5511,10 @@ class Principal extends BaseController
             return $this->respond($response);
         }
 
+        $campoIdArchivo = $this->obtenerCampoIdArchivoModulo($globals, $configModulo);
         $archivoActualQuery = $globals->getTabla([
             'tabla' => $configModulo['tabla'],
-            'where' => [$configModulo['id_campo'] => $id_solicitud_contrato_archivo, 'visible' => 1]
+            'where' => [$campoIdArchivo => $id_solicitud_contrato_archivo, 'visible' => 1]
         ]);
 
         if (empty($archivoActualQuery->data)) {
@@ -5500,7 +5527,7 @@ class Principal extends BaseController
 
         $res = $globals->saveTabla(
             ['id_estatus' => 2],
-            ["tabla" => $configModulo['tabla'], "editar" => true, "idEditar" => [$configModulo['id_campo'] => $id_solicitud_contrato_archivo]],
+            ["tabla" => $configModulo['tabla'], "editar" => true, "idEditar" => [$campoIdArchivo => $id_solicitud_contrato_archivo]],
             ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/DeclinarArchivo']
         );
 
@@ -5535,9 +5562,10 @@ class Principal extends BaseController
             return $this->respond($response);
         }
 
+        $campoIdArchivo = $this->obtenerCampoIdArchivoModulo($globals, $configModulo);
         $archivoActualQuery = $globals->getTabla([
             'tabla' => $configModulo['tabla'],
-            'where' => [$configModulo['id_campo'] => $id_solicitud_contrato_archivo, 'visible' => 1]
+            'where' => [$campoIdArchivo => $id_solicitud_contrato_archivo, 'visible' => 1]
         ]);
 
         if (empty($archivoActualQuery->data)) {
@@ -5550,7 +5578,7 @@ class Principal extends BaseController
 
         $res = $globals->saveTabla(
             ["id_estatus" => 3],
-            ["tabla" => $configModulo['tabla'], "editar" => true, "idEditar" => [$configModulo['id_campo'] => $id_solicitud_contrato_archivo]],
+            ["tabla" => $configModulo['tabla'], "editar" => true, "idEditar" => [$campoIdArchivo => $id_solicitud_contrato_archivo]],
             ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/AceptarArchivo']
         );
 

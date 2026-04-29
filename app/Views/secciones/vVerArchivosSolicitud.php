@@ -58,7 +58,7 @@ $configuracionModulo = [
     'honorarios' => [
         'ruta_listado' => 'index.php/Principal/listadoHonorarios',
         'titulo' => 'Archivos de Solicitud',
-        'campo_id_archivo' => 'id_solicitud_honorario_archivo',
+        'campo_id_archivo' => 'id_solicitud_honorario_archivos',
         'ruta_archivo' => 'assets/uploads/honorarios/',
         'documentos' => [
             1 => 'Oficio de solicitud',
@@ -100,6 +100,18 @@ $configuracionModulo = [
 $moduloActivo = $configuracionModulo[$moduloArchivos] ?? $configuracionModulo['contrato'];
 $rutaListado = $moduloActivo['ruta_listado'];
 $campoIdArchivo = $moduloActivo['campo_id_archivo'];
+$camposIdArchivo = array_values(array_unique([
+    $campoIdArchivo,
+    'id_archivo',
+    'id_solicitud_contrato_archivo',
+    'id_solicitud_convenio_archivo',
+    'id_solicitud_honorario_archivos',
+    'id_solicitud_honorario_archivo',
+    'id_solicitud_adquisiciones_archivo',
+    'id_solicitud_adquisiciones_archivos',
+    'id_solicitud_adquisicion_archivo',
+    'id_solicitud_adquisicion_archivos',
+]));
 $rutaArchivo = $moduloActivo['ruta_archivo'];
 $nombresDocs = $moduloActivo['documentos'];
 $tituloVista = $moduloActivo['titulo'];
@@ -141,7 +153,15 @@ $tituloVista = $moduloActivo['titulo'];
                                     <tbody>
                                         <?php if (!empty($archivos)): ?>
                                             <?php foreach ($archivos as $archivo): ?>
-                                                <?php $idArchivo = (int) ($archivo->{$campoIdArchivo} ?? 0); ?>
+                                                <?php
+                                                $idArchivo = 0;
+                                                foreach ($camposIdArchivo as $campoPosibleId) {
+                                                    $idArchivo = (int) ($archivo->{$campoPosibleId} ?? 0);
+                                                    if ($idArchivo > 0) {
+                                                        break;
+                                                    }
+                                                }
+                                                ?>
                                                 <tr>
                                                     <td>
                                                         <?= esc($nombresDocs[$archivo->clave_documento] ?? ($archivo->nombre_documento ?? ('Documento ' . $archivo->clave_documento))) ?>
@@ -169,7 +189,7 @@ $tituloVista = $moduloActivo['titulo'];
                                                                 <i class="fas fa-edit text-white"></i>
                                                             </a>
                                                         <?php endif; ?>
-                                                        <?php if (in_array((int) ($session->get('id_perfil') ?? 0), [1, 7], true) && (!in_array((int) ($archivo->id_estatus) ?? 0, [2, 3], true))): ?>
+                                                        <?php if ($idArchivo > 0 && in_array((int) ($session->get('id_perfil') ?? 0), [1, 7], true) && (!in_array((int) ($archivo->id_estatus) ?? 0, [2, 3], true))): ?>
                                                             <a onclick="declinarArchivo(<?= $idArchivo ?>)" class="btn btn-danger btn-sm">
                                                                 <i class="fas fa-trash text-white"></i>
                                                             </a>
