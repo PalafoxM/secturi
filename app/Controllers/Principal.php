@@ -4292,6 +4292,7 @@ class Principal extends BaseController
 
         $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
         $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+        $data['partidas_extra'] = [];
         $data['catalogo_firmantes'] = $this->construirCatalogoFirmantes($data['direccion'], $data['usuario']);
         $data['firmas_seleccionadas'] = [];
        //die( var_dump( $data['cat_partida']  ) );
@@ -5000,6 +5001,11 @@ class Principal extends BaseController
         ]);
         $data['archivos_soporte'] = !empty($archivosSoporte->data) ? $archivosSoporte->data : [];
         $data['pagos'] = (!empty($pagos->data)) ? $pagos->data : [];
+        $partidasExtra = $globals->getTabla([
+            'tabla' => 'solicitud_contrato_partida',
+            'where' => ['id_solicitud_contrato' => $id_solicitud, 'visible' => 1]
+        ]);
+        $data['partidas_extra'] = (!empty($partidasExtra->data)) ? $partidasExtra->data : [];
         $montoTotal = (float) str_replace([',', '$', ' '], '', (string) ($data['solicitud']->monto_total ?? 0));
         if (empty($data['solicitud']->monto_total_texto)) {
             $data['solicitud']->monto_total_texto = strtoupper($this->numeroEnLetras($montoTotal));
@@ -5079,6 +5085,21 @@ class Principal extends BaseController
         if(empty($post['enlace_comunicaciones'])){
             $response->respuesta = 'El enlace de comunicaciones es requerido.';
             return $this->respond($response);
+        }
+        if (isset($post['partidas_extra']) && is_array($post['partidas_extra'])) {
+            foreach (array_slice($post['partidas_extra'], 0, 3) as $partidaExtra) {
+                $idProyectoExtra = trim((string) ($partidaExtra['id_proyecto'] ?? ''));
+                $idPartidaExtra = trim((string) ($partidaExtra['id_partida'] ?? ''));
+                $claveExtra = trim((string) ($partidaExtra['clave'] ?? ''));
+
+                if ($idProyectoExtra === '' && $idPartidaExtra === '' && $claveExtra === '') {
+                    continue;
+                }
+                if ($idProyectoExtra === '' || $idPartidaExtra === '' || $claveExtra === '') {
+                    $response->respuesta = 'Completa proyecto, partida y clave en las partidas adicionales.';
+                    return $this->respond($response);
+                }
+            }
         }
 
         $montoTotal = (float) str_replace([',', '$', ' '], '', (string) ($post['monto_total'] ?? 0));
@@ -5165,6 +5186,47 @@ class Principal extends BaseController
 
         if (!$res->error) {
             $id_solicitud = $id_solicitud_contrato ? $id_solicitud_contrato : $res->idRegistro;
+            if (isset($post['partidas_extra']) && is_array($post['partidas_extra'])) {
+                foreach (array_slice($post['partidas_extra'], 0, 3) as $partidaExtra) {
+                    $idProyectoExtra = trim((string) ($partidaExtra['id_proyecto'] ?? ''));
+                    $idPartidaExtra = trim((string) ($partidaExtra['id_partida'] ?? ''));
+                    $claveExtra = trim((string) ($partidaExtra['clave'] ?? ''));
+                    $idPartidaContrato = trim((string) ($partidaExtra['id_solicitud_contrato_partida'] ?? ''));
+
+                    if ($idProyectoExtra === '' && $idPartidaExtra === '' && $claveExtra === '') {
+                        continue;
+                    }
+
+                    $dataPartidaExtra = [
+                        'id_solicitud_contrato' => $id_solicitud,
+                        'id_proyecto' => $idProyectoExtra !== '' ? $idProyectoExtra : null,
+                        'id_partida' => $idPartidaExtra !== '' ? $idPartidaExtra : null,
+                        'clave' => $claveExtra,
+                        'visible' => 1
+                    ];
+                    $dataConfigPartida = [
+                        'tabla' => 'solicitud_contrato_partida',
+                        'editar' => false
+                    ];
+
+                    if ($idPartidaContrato !== '') {
+                        $dataConfigPartida = [
+                            'tabla' => 'solicitud_contrato_partida',
+                            'editar' => true,
+                            'idEditar' => ['id_solicitud_contrato_partida' => $idPartidaContrato]
+                        ];
+                    }
+
+                    $resPartida = $globals->saveTabla($dataPartidaExtra, $dataConfigPartida, [
+                        'id_user' => $session->id_usuario,
+                        'script' => 'Principal.php/guardarSolicitudContratoPartida'
+                    ]);
+                    if ($resPartida->error) {
+                        $response->respuesta = $resPartida->respuesta;
+                        return $this->respond($response);
+                    }
+                }
+            }
             $this->guardarFirmasSolicitud(
                 $globals,
                 'solicitud_contrato',
@@ -5274,6 +5336,7 @@ class Principal extends BaseController
         $solicitud = $globals->getTabla(['tabla' => 'vw_solicitud_contrato', 'where' => ['id_solicitud_contrato' => $id]]);
         $solicitudBase = $globals->getTabla(['tabla' => 'solicitud_contrato', 'where' => ['id_solicitud_contrato' => $id, 'visible' => 1]]);
         $pagos = $globals->getTabla(['tabla' => 'solicitud_contrato_pagos', 'where' => ['id_solicitud_contrato' => $id, 'visible' => 1]]);
+        $partidasExtra = $globals->getTabla(['tabla' => 'solicitud_contrato_partida', 'where' => ['id_solicitud_contrato' => $id, 'visible' => 1]]);
         
         if(empty($solicitud->data)){
             echo "Solicitud no encontrada"; return;
@@ -5299,6 +5362,23 @@ class Principal extends BaseController
             $firma->no_delegatorio = $data['solicitud']->{'no_delegatorio_' . ($indice + 1)} ?? '';
         }
         $data['pagos'] = $this->normalizeUtf8Value((!empty($pagos->data)) ? $pagos->data : []);
+        $data['partidas_extra'] = $this->normalizeUtf8Value((!empty($partidasExtra->data)) ? $partidasExtra->data : []);
+        if (!empty($data['partidas_extra'])) {
+            $catProyectoPdf = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
+            $catPartidaPdf = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+            $proyectosPdf = [];
+            $partidasPdf = [];
+            foreach ((!empty($catProyectoPdf->data) ? $catProyectoPdf->data : []) as $proyectoPdf) {
+                $proyectosPdf[(string) $proyectoPdf->id_proyecto] = $proyectoPdf->proyecto;
+            }
+            foreach ((!empty($catPartidaPdf->data) ? $catPartidaPdf->data : []) as $partidaPdf) {
+                $partidasPdf[(string) $partidaPdf->id_partida] = $partidaPdf->cuenta_cable;
+            }
+            foreach ($data['partidas_extra'] as $partidaExtraPdf) {
+                $partidaExtraPdf->dsc_proyecto = $proyectosPdf[(string) ($partidaExtraPdf->id_proyecto ?? '')] ?? '';
+                $partidaExtraPdf->cuenta_cable = $partidasPdf[(string) ($partidaExtraPdf->id_partida ?? '')] ?? '';
+            }
+        }
         $montoTotal = (float) str_replace([',', '$', ' '], '', (string) ($data['solicitud']->monto_total ?? 0));
         $data['solicitud']->monto_total_formateado = '$' . number_format($montoTotal, 2, '.', ',');
         if (empty($data['solicitud']->monto_total_texto)) {

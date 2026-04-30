@@ -74,7 +74,7 @@
                                 <!-- SECCION 2: INFORMACIÓN PRESUPUESTAL -->
                                 <h5 class="bg-primary text-white p-2 mt-4">INFORMACIÓN PRESUPUESTAL</h5>
                                 <div class="table-responsive">
-                                    <table class="table table-bordered">
+                                    <table class="table table-bordered" id="tabla_presupuestal_contrato">
                                         <thead>
                                             <tr>
                                                 <th>Proyecto</th>
@@ -108,10 +108,48 @@
                                                 <td><input type="text" class="form-control" name="clave_estandarizada" value="<?= isset($solicitud) ? $solicitud->clave_estandarizada : '' ?>"></td>
                                                 <td>
                                                     <p class="small text-muted mb-0">El proyecto cuenta con la suficiencia presupuestal para la contratación de los servicios requeridos en la presente solicitud. Se anexa captura de pantalla Sistema SAP/R3</p>
-                                                     <input type="checkbox" class="form-control mt-2 ml-2 d-flex align-items-center justify-content-center" style="width: 20px;" name="suficiencia_presupuestal" value="1" <?= (isset($solicitud) && $solicitud->suficiencia_presupuestal == 1) ? 'checked' : '' ?>> 
+                                                     <input type="checkbox" class="form-control mt-2 ml-2 d-flex align-items-center justify-content-center" style="width: 20px;" name="suficiencia_presupuestal" value="1" <?= (isset($solicitud) && $solicitud->suficiencia_presupuestal == 1) ? 'checked' : 'checked' ?>> 
                                                 </td>
                                             </tr>
+                                            <?php if (!empty($partidas_extra)): ?>
+                                                <?php foreach (array_slice($partidas_extra, 0, 3) as $indexPartidaExtra => $partidaExtra): ?>
+                                                    <tr class="partida-extra-row">
+                                                        <td>
+                                                            <input type="hidden" name="partidas_extra[<?= $indexPartidaExtra ?>][id_solicitud_contrato_partida]" value="<?= esc($partidaExtra->id_solicitud_contrato_partida ?? '') ?>">
+                                                            <select class="form-control select2 partida-extra-proyecto" name="partidas_extra[<?= $indexPartidaExtra ?>][id_proyecto]">
+                                                                <option value="">Seleccione una opción</option>
+                                                                <?php foreach ($cat_proyecto as $p): ?>
+                                                                    <option value="<?= $p->id_proyecto ?>" <?= (isset($partidaExtra->id_proyecto) && $partidaExtra->id_proyecto == $p->id_proyecto) ? 'selected' : '' ?>>
+                                                                        <?= $p->proyecto ?>
+                                                                    </option>
+                                                                <?php endforeach; ?>
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <select class="form-control select2 partida-extra-partida" name="partidas_extra[<?= $indexPartidaExtra ?>][id_partida]">
+                                                                <option value="">Seleccione una opción</option>
+                                                                <?php foreach ($cat_partida as $p): ?>
+                                                                    <option value="<?= $p->id_partida ?>" <?= (isset($partidaExtra->id_partida) && $partidaExtra->id_partida == $p->id_partida) ? 'selected' : '' ?>>
+                                                                        <?= $p->cuenta_cable ?>
+                                                                    </option>
+                                                                <?php endforeach; ?>
+                                                            </select>
+                                                        </td>
+                                                        <td><input type="text" class="form-control partida-extra-clave" name="partidas_extra[<?= $indexPartidaExtra ?>][clave]" value="<?= esc($partidaExtra->clave ?? '') ?>"></td>
+                                                        <td><span class="text-muted small">Partida adicional</span></td>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            <?php endif; ?>
                                         </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="4" class="text-right">
+                                                    <button type="button" class="btn btn-secondary btn-sm" id="btnAgregarPartidaContrato">
+                                                        <i class="fas fa-plus"></i> Agregar partida
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
                                     </table>
                                 </div>
                                 <div class="form-group row">
@@ -351,6 +389,8 @@
         $solicitud->no_delegatorio_2 ?? '',
         $solicitud->no_delegatorio_3 ?? '',
     ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+    const proyectosSolicitudContrato = <?= json_encode(array_values($cat_proyecto ?? []), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+    const partidasSolicitudContrato = <?= json_encode(array_values($cat_partida ?? []), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
 
     function normalizarMonto(valor) {
         if (valor === null || valor === undefined) {
@@ -546,7 +586,84 @@
         actualizarPuestoFirmaContrato(nuevoItem.find('.firma-select'));
     }
 
+    function escaparHtml(valor) {
+        return String(valor ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function opcionesProyectosContrato() {
+        let html = '<option value="">Seleccione una opción</option>';
+        proyectosSolicitudContrato.forEach(proyecto => {
+            html += `<option value="${escaparHtml(proyecto.id_proyecto)}">${escaparHtml(proyecto.proyecto)}</option>`;
+        });
+        return html;
+    }
+
+    function opcionesPartidasContrato() {
+        let html = '<option value="">Seleccione una opción</option>';
+        partidasSolicitudContrato.forEach(partida => {
+            html += `<option value="${escaparHtml(partida.id_partida)}">${escaparHtml(partida.cuenta_cable)}</option>`;
+        });
+        return html;
+    }
+
+    function agregarPartidaContrato() {
+        const tbody = $('#tabla_presupuestal_contrato tbody');
+        const totalExtras = tbody.find('.partida-extra-row').length;
+        if (totalExtras >= 3) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Lí­mite de partidas',
+                text: 'Solo puedes agregar hasta 3 partidas adicionales.'
+            });
+            return;
+        }
+
+        const index = totalExtras;
+        const html = `
+            <tr class="partida-extra-row">
+                <td>
+                    <input type="hidden" name="partidas_extra[${index}][id_solicitud_contrato_partida]" value="">
+                    <select class="form-control select2 partida-extra-proyecto" name="partidas_extra[${index}][id_proyecto]">
+                        ${opcionesProyectosContrato()}
+                    </select>
+                </td>
+                <td>
+                    <select class="form-control select2 partida-extra-partida" name="partidas_extra[${index}][id_partida]">
+                        ${opcionesPartidasContrato()}
+                    </select>
+                </td>
+                <td><input type="text" class="form-control partida-extra-clave" name="partidas_extra[${index}][clave]"></td>
+                <td><span class="text-muted small">Partida adicional</span></td>
+            </tr>
+        `;
+        tbody.append(html);
+        tbody.find('.partida-extra-row').last().find('.select2').select2({ width: '100%' });
+    }
+
+    function validarPartidasExtraContrato() {
+        let valido = true;
+        $('.partida-extra-row').each(function() {
+            const proyecto = $(this).find('.partida-extra-proyecto').val();
+            const partida = $(this).find('.partida-extra-partida').val();
+            const clave = $(this).find('.partida-extra-clave').val().trim();
+            if ((proyecto || partida || clave) && (!proyecto || !partida || !clave)) {
+                valido = false;
+                return false;
+            }
+        });
+        return valido;
+    }
+
     $(document).ready(function() {
+        $('#btnAgregarPartidaContrato').on('click', function() {
+            agregarPartidaContrato();
+        });
+
         $('#monto_total').on('input', function() {
             var valor = $(this).val();
             var montoNormalizado = normalizarMonto(valor);
@@ -748,6 +865,16 @@
         
         $('#form_solicitud_contrato').on('submit', function(e) {
             e.preventDefault();
+
+            if (!validarPartidasExtraContrato()) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Completa proyecto, partida y clave en las partidas adicionales.',
+                    showConfirmButton: true
+                });
+                return;
+            }
 
             if (!validarMontoPagos(true)) {
                 return;

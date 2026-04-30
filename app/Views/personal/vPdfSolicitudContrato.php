@@ -61,6 +61,16 @@
                 <td style="text-align: center;"><?= $solicitud->clave_estandarizada ?></td>
                 <td style="text-align: center;">El proyecto cuenta con suficiencia presupuestal para la contratación de los servicios requeridos en la presente solicitud. Se sube captura de pantalla Sistema SAP/R3</td>
             </tr>
+            <?php if (!empty($partidas_extra)): ?>
+                <?php foreach ($partidas_extra as $partidaExtra): ?>
+                    <tr>
+                        <td style="text-align: center;"><?= $partidaExtra->dsc_proyecto ?? '' ?></td>
+                        <td style="text-align: center;"><?= $partidaExtra->cuenta_cable ?? '' ?></td>
+                        <td style="text-align: center;"><?= $partidaExtra->clave ?? '' ?></td>
+                        <td style="text-align: center;">Partida adicional</td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </tbody>
     </table>
     <div style="margin-top: 10px;">
