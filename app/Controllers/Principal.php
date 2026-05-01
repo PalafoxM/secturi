@@ -5101,11 +5101,21 @@ class Principal extends BaseController
                 }
             }
         }
+        $usarMontoSinImpuesto = !empty($post['sin_impuesto']);
+        $montoSinImpuesto = (float) str_replace([',', '$', ' '], '', (string) ($post['monto_sin_impuesto'] ?? 0));
+        if ($usarMontoSinImpuesto && $montoSinImpuesto <= 0) {
+            $response->respuesta = 'El monto sin impuesto es requerido.';
+            return $this->respond($response);
+        }
 
         $montoTotal = (float) str_replace([',', '$', ' '], '', (string) ($post['monto_total'] ?? 0));
         $montoTotalTexto = trim((string) ($post['monto_total_texto'] ?? ''));
         if ($montoTotalTexto === '') {
             $montoTotalTexto = strtoupper($this->numeroEnLetras($montoTotal));
+        }
+        $montoSinImpuestoTexto = trim((string) ($post['monto_sin_impuesto_texto'] ?? ''));
+        if ($usarMontoSinImpuesto && $montoSinImpuestoTexto === '') {
+            $montoSinImpuestoTexto = strtoupper($this->numeroEnLetras($montoSinImpuesto));
         }
 
         $montoGarantia = (float) str_replace([',', '$', ' '], '', (string) ($post['monto_garantia'] ?? 0));
@@ -5124,6 +5134,8 @@ class Principal extends BaseController
             'proyecto' => $post['proyecto'],
             'partida' => $post['partida'],
             'clave_estandarizada' => $post['clave_estandarizada'],
+            'monto_sin_impuesto' => $usarMontoSinImpuesto ? ($post['monto_sin_impuesto'] ?? null) : null,
+            'monto_sin_impuesto_texto' => $usarMontoSinImpuesto ? $montoSinImpuestoTexto : null,
             'monto_total' => $post['monto_total'],
             'monto_total_texto' => $montoTotalTexto,
             'garantia' => $post['garantia'],
@@ -5383,6 +5395,13 @@ class Principal extends BaseController
         $data['solicitud']->monto_total_formateado = '$' . number_format($montoTotal, 2, '.', ',');
         if (empty($data['solicitud']->monto_total_texto)) {
             $data['solicitud']->monto_total_texto = strtoupper($this->numeroEnLetras($montoTotal));
+        }
+        $montoSinImpuesto = (float) str_replace([',', '$', ' '], '', (string) ($data['solicitud']->monto_sin_impuesto ?? 0));
+        if ($montoSinImpuesto > 0) {
+            $data['solicitud']->monto_sin_impuesto_formateado = '$' . number_format($montoSinImpuesto, 2, '.', ',');
+            if (empty($data['solicitud']->monto_sin_impuesto_texto)) {
+                $data['solicitud']->monto_sin_impuesto_texto = strtoupper($this->numeroEnLetras($montoSinImpuesto));
+            }
         }
         $montoGarantia = (float) str_replace([',', '$', ' '], '', (string) ($data['solicitud']->monto_garantia ?? 0));
         $data['solicitud']->monto_garantia_formateado = '$' . number_format($montoGarantia, 2, '.', ',');

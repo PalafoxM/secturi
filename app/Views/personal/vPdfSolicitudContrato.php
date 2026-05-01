@@ -76,6 +76,12 @@
     <div style="margin-top: 10px;">
         <span class="label">Monto:</span> <span class="value"><?= $solicitud->monto_total_formateado ?? $solicitud->monto_total ?> (<?= strtoupper($solicitud->monto_total_texto ?? '') ?>)</span>
     </div>
+    <?php if (!empty($solicitud->monto_sin_impuesto)): ?>
+    <div>
+        <span class="label">Monto del contrato SIN INCLUIR IMPUESTO:</span>
+        <span class="value"><?= $solicitud->monto_sin_impuesto_formateado ?? $solicitud->monto_sin_impuesto ?> (<?= strtoupper($solicitud->monto_sin_impuesto_texto ?? '') ?>)</span>
+    </div>
+    <?php endif; ?>
     <div>
         <span class="label">Tipo / Monto de Garantía:</span>
         <span class="value">
