@@ -4,32 +4,33 @@
     <meta charset="UTF-8">
     <title>Solicitud de Elaboración de Convenio</title>
     <style>
-        body { font-family: Arial, sans-serif; font-size: 11px; color: #000; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
-        th, td { border: 1px solid #000; padding: 5px; text-align: left; vertical-align: top; }
+        body { font-family: Arial, sans-serif; font-size: 10.7px; color: #000; line-height: 1.18; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 7px; page-break-inside: avoid; }
+        th, td { border: 1px solid #000; padding: 4px 5px; text-align: left; vertical-align: top; line-height: 1.18; }
         .text-center { text-align: center; }
         .header-table td { border: 1px solid #000; }
-        .header-logo { width: 90px; text-align: center; background: #fff; }
+        .header-logo { width: 86px; text-align: center; background: #fff; }
         .header-title { background-color: #1f4e79; color: #fff; text-align: center; }
-        .header-title h2 { margin: 6px 0; font-size: 16px; }
-        .header-title h3 { margin: 4px 0; font-size: 12px; }
-        .header-title h4 { margin: 2px 0; font-size: 10px; font-weight: normal; }
+        .header-title h2 { margin: 4px 0; font-size: 14.8px; }
+        .header-title h3 { margin: 2px 0; font-size: 11.5px; }
+        .header-title h4 { margin: 1px 0; font-size: 9.8px; font-weight: normal; }
         .bg-primary { background-color: #1f4e79; color: white; font-weight: bold; }
-        .monto-letra { display: block; font-size: 9px; margin-top: 2px; }
-        .firma-table { margin-top: 35px; }
-        .firma-table td { border: none; text-align: center; vertical-align: bottom; padding-top: 35px; }
-        .firma-table tr:first-child td { border: 1px solid #000; padding-top: 5px; padding-bottom: 5px; vertical-align: middle; }
-        .firma-linea { display: block; width: 72%; margin: 0 auto 4px auto; border-top: 1px solid #000; height: 1px; }
-        .firma-nombre { font-size: 11px; font-weight: bold; line-height: 1.2; text-transform: uppercase; }
-        .firma-cargo { font-size: 10px; line-height: 1.2; text-transform: uppercase; }
-        .firma-delegatorio { font-size: 9px; line-height: 1.2; margin-top: 4px; }
+        .monto-letra { display: block; font-size: 9.2px; margin-top: 1px; line-height: 1.1; }
+        .firma-table { margin-top: 22px; page-break-inside: avoid; }
+        .firma-table td { border: none; text-align: center; vertical-align: bottom; padding-top: 38px; }
+        .firma-table tr:first-child td { border: 1px solid #000; padding-top: 3px; padding-bottom: 3px; vertical-align: middle; }
+        .firma-linea { display: block; width: 72%; margin: 0 auto 3px auto; border-top: 1px solid #000; height: 1px; }
+        .firma-nombre { font-size: 10.1px; font-weight: bold; line-height: 1.14; text-transform: uppercase; }
+        .firma-cargo { font-size: 9.3px; line-height: 1.14; text-transform: uppercase; }
+        .firma-delegatorio { font-size: 8.6px; line-height: 1.14; margin-top: 2px; }
+        h5 { margin: 4px 0 6px 0; font-size: 10.7px; }
     </style>
 </head>
 <body>
     <table class="header-table">
         <tr>
             <td class="header-logo">
-                <img src="<?= base_url('assets/logo3.png') ?>" width="70" alt="Logo">
+                <img src="<?= base_url('assets/logo3.png') ?>" width="68" alt="Logo">
             </td>
             <td class="header-title">
                 <h2>SOLICITUD DE ELABORACIÓN DE CONVENIO</h2>
