@@ -117,7 +117,12 @@
                 </tr>
                 <?php endforeach; ?>
             <?php else: ?>
-                <tr><td colspan="4" style="text-align:center;">No hay pagos registrados</td></tr>
+                <tr>
+                    <td>N/A</td>
+                    <td><?= $solicitud->monto_total_formateado ?? $solicitud->monto_total ?></td>
+                    <td>Contra Devengo</td>
+                    <td>Entrega de material difundido, ordenes generales y estados de cuenta</td>
+                </tr>
             <?php endif; ?>
         </tbody>
     </table>
