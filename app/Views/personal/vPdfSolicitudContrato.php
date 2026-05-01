@@ -107,8 +107,22 @@
             </tr>
         </thead>
         <tbody>
-            <?php if (!empty($pagos)): ?>
-                <?php foreach ($pagos as $pago): ?>
+            <?php
+                $pagosValidos = [];
+                if (!empty($pagos)) {
+                    foreach ($pagos as $pagoItem) {
+                        $numeroPago = trim((string) ($pagoItem->numero_pago ?? ''));
+                        $montoPago = trim((string) ($pagoItem->monto ?? ''));
+                        $fechaPago = trim((string) ($pagoItem->fecha ?? ''));
+                        $entregablePago = trim((string) ($pagoItem->entregable ?? ''));
+                        if ($numeroPago !== '' || $montoPago !== '' || $fechaPago !== '' || $entregablePago !== '') {
+                            $pagosValidos[] = $pagoItem;
+                        }
+                    }
+                }
+            ?>
+            <?php if (!empty($pagosValidos)): ?>
+                <?php foreach ($pagosValidos as $pago): ?>
                 <tr>
                     <td><?= $pago->numero_pago ?></td>
                     <td><?= $pago->monto_formateado ?? $pago->monto ?></td>
