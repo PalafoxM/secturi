@@ -91,7 +91,7 @@
                                                         <a href="<?= base_url('index.php/Principal/pdfSolicitudHonorarios/' . $solicitud->id_solicitud_honorario) ?>" target="_blank" class="btn btn-sm btn-outline-danger" title="PDF">
                                                             PDF
                                                         </a>
-                                                        <?php if ($session->id_perfil != 7 && in_array((int) ($solicitud->id_estatus ?? 1), [1, 2], true)): ?>
+                                                        <?php if ($solicitud->id_estatus == 1): ?>
                                                             <button class="btn btn-sm btn-secondary" title="Adjuntar Archivos" onclick="abrirModalArchivos(<?= $solicitud->id_solicitud_honorario ?>)">
                                                                 <i class="fas fa-paperclip"></i>
                                                             </button>
