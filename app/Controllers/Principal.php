@@ -4092,11 +4092,17 @@ class Principal extends BaseController
             'tabla' => 'solicitud_honorario_archivos',
             'where' => ['id_solicitud_honorario' => $id_solicitud, 'visible' => 1]
         ]);
-
+        //die( var_dump($archivos) );
         if (!empty($archivos->data)) {
+            $archivosFiltrados = [];
             foreach ($archivos->data as &$archivo) {
+                if (isset($archivo->clave_documento) && $archivo->clave_documento === 'instrumento_juridico') {
+                    continue;
+                }
                 $archivo->url_descarga = $this->resolveStoredFilePreviewUrl($archivo->nombre_archivo ?? null, 'assets/uploads/honorarios');
+                $archivosFiltrados[] = $archivo;
             }
+            $archivos->data = $archivosFiltrados;
         }
 
         $data['id_solicitud'] = $id_solicitud;
