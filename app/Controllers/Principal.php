@@ -10578,7 +10578,7 @@ class Principal extends BaseController
             // Ejemplo: Filtrar por creador o responsable
             // $solicitudes = $globals->getTabla(['tabla' => 'vw_solicitud_convenio', 'where' => ['usu_reg' => $session->get('id_usuario'), 'visible' => 1]]);
             // Para mantener consistencia con contrato base, veremos si allá filtran. Allá no filtran en esta versión, lo traen todo:
-            $solicitudes = $globals->getTabla(['tabla' => 'vw_solicitud_convenio', 'where' => ['visible' => 1]]);
+            $solicitudes = $globals->getTabla(['tabla' => 'vw_solicitud_convenio', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]]);
         }
 
         if(isset($solicitudes->data) && !empty($solicitudes->data)){
