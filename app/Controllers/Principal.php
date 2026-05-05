@@ -4528,8 +4528,8 @@ class Principal extends BaseController
         $data = [];
 
         $where = ['visible' => 1];
-        if (!in_array($session->id_perfil ?? 0, [1, 7])) {
-            $where['usu_reg'] = $session->id_usuario ?? 0;
+        if (!in_array($session->id_perfil, [1, 7])) {
+            $where['usu_reg'] = $session->id_usuario;
         }
 
         $solicitudes = $globals->getTabla([
