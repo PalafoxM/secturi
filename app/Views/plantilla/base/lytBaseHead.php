@@ -654,7 +654,7 @@
                         </li>
                         <?php endif ?>
                         
-                        <li class="nav-item"><a class="nav-link"
+                      <!--   <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Principal/SolicitudContrato">Solicitud Contrato</a>
                         </li>
                        
@@ -666,18 +666,18 @@
                         </li>
                         <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Principal/SolicitudHonorarios">Solicitud Honorarios</a>
-                        </li>
+                        </li> -->
                          <li class="nav-item"><a class="nav-link"
-                                href="<?php echo base_url(); ?>index.php/Principal/ListaSolicitudContrato">Listado de Contratos</a>
+                                href="<?php echo base_url(); ?>index.php/Principal/ListaSolicitudContrato">Solicitud de Contratos</a>
                         </li>
                         <li class="nav-item"><a class="nav-link"
-                                href="<?php echo base_url(); ?>index.php/Principal/ListaSolicitudConvenio">Listado de Convenios</a>
+                                href="<?php echo base_url(); ?>index.php/Principal/ListaSolicitudConvenio">Solicitud de Convenios</a>
                         </li>
                         <li class="nav-item"><a class="nav-link"
-                                href="<?php echo base_url(); ?>index.php/Principal/listadoHonorarios">Listado de Honorarios</a>
+                                href="<?php echo base_url(); ?>index.php/Principal/listadoHonorarios">Solicitud de Honorarios</a>
                         </li>
                          <li class="nav-item"><a class="nav-link"
-                                href="<?php echo base_url(); ?>index.php/Principal/ListaSolicitudAdquisiciones">Listado de Adquisiciones</a>
+                                href="<?php echo base_url(); ?>index.php/Principal/ListaSolicitudAdquisiciones">Solicitud de Adquisiciones</a>
                         </li>
 
                     </ul>
