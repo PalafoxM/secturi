@@ -568,7 +568,7 @@
             sumaPagos += parseFloat($(this).val()) || 0;
         });
 
-        if (sumaPagos > montoTotal) {
+    /*     if (sumaPagos > montoTotal) {
             if (mostrarError) {
                 Swal.fire({
                     icon: 'error',
@@ -587,7 +587,7 @@
                 });
             }
             return false;
-        }
+        } */
         return true;
     }
 
