@@ -36,7 +36,7 @@
                                             <th>ID</th>
                                             <th>Fecha Registro</th>
                                             <th>Responsable Proyecto</th>
-                                            <th>Responsable Seguimiento</th>
+                                            <th>Responsable Registro</th>
                                             <th>Monto Total</th>
                                             <th>Estatus</th>
                                             <th>Acciones</th>
@@ -49,7 +49,7 @@
                                                     <td><?= $sol->id_solicitud_convenio ?></td>
                                                     <td><?= date('d/m/Y H:i', strtotime($sol->fec_reg)) ?></td>
                                                     <td><?= $sol->nombre_proyecto ?></td>
-                                                    <td><?= $sol->nombre_seguimiento ?></td>
+                                                    <td><?= $sol->nombre_registra ?></td>
                                                     <td><?= $sol->monto_total ?></td>
                                                     <td>
                                                         <?php if ((int) $sol->id_estatus === 1): ?>
