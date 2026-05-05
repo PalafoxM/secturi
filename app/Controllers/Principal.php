@@ -2659,8 +2659,9 @@ class Principal extends BaseController
         $globals = new Mglobal;
         $email = \Config\Services::email();
         $result = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_tipo_empleado' => 1]])->data;
+        $email->setTo('rsalbap@guanajuato.gob.mx');
 
-       $email->setTo([
+   /*     $email->setTo([
             'agascag@guanajuato.gob.mx',
             'ccampos@guanajuato.gob.mx',
             'ztorrest@guanajuato.gob.mx',
@@ -2674,7 +2675,7 @@ class Principal extends BaseController
             'rgonzalezgu@guanajuato.gob.mx',
             'yjimenez@guanajuato.gob.mx',
             'mamoralesg@guanajuato.gob.mx',
-        ]);
+        ]); */
  
         /*  $email->setTo([
                     'alopez@guanajuato.gob.mx',
