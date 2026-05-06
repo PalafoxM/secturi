@@ -5504,13 +5504,15 @@ class Principal extends BaseController
             'tabla' => 'solicitud_contrato_archivos',
             'where' => ['id_solicitud_contrato' => $id_solicitud, 'visible' => 1]
         ]);
-
+        
+       
         if (!empty($archivos->data)) {
-            foreach ($archivos->data as &$archivo) {
+         foreach ($archivos->data as &$archivo) {
                 $archivo->url_descarga = $this->resolveStoredFilePreviewUrl($archivo->nombre_archivo ?? null, 'assets/uploads/contratos');
+              // var_dump($archivo->url_descarga);            
             }
         }
-        
+       //  die();
         $data['id_solicitud'] = $id_solicitud;
         $data['archivos'] = (!empty($archivos->data)) ? $archivos->data : [];
         $data['modulo_archivos'] = 'contrato';
@@ -6066,6 +6068,99 @@ class Principal extends BaseController
             $response->respuesta = "Instrumento jurídico subido y guardado correctamente.";
         } else {
             $response->respuesta = "No se pudo actualizar la solicitud.";
+        }
+
+        return $this->respond($response);
+    }
+
+    public function reemplazarInstrumentoContrato()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'No fue posible reemplazar el instrumento.';
+
+        if (!in_array((int) ($session->id_perfil ?? 0), [1, 7], true)) {
+            $response->respuesta = 'No tiene permisos para editar instrumentos.';
+            return $this->respond($response);
+        }
+
+        $id = (int) ($this->request->getPost('id_solicitud') ?? 0);
+        $indice = (int) ($this->request->getPost('indice') ?? -1);
+        $archivo = $this->request->getFile('archivo');
+
+        if ($id <= 0 || $indice < 0) {
+            $response->respuesta = 'Solicitud o instrumento no valido.';
+            return $this->respond($response);
+        }
+
+        if (!$archivo || !$archivo->isValid() || $archivo->hasMoved()) {
+            $response->respuesta = 'Debe seleccionar un archivo PDF.';
+            return $this->respond($response);
+        }
+
+        if (strtolower((string) $archivo->getExtension()) !== 'pdf') {
+            $response->respuesta = 'Solo se permiten archivos PDF.';
+            return $this->respond($response);
+        }
+
+        $solicitudQuery = $globals->getTabla([
+            'tabla' => 'solicitud_contrato',
+            'where' => ['id_solicitud_contrato' => $id, 'visible' => 1]
+        ]);
+
+        if (empty($solicitudQuery->data)) {
+            $response->respuesta = 'Solicitud no encontrada.';
+            return $this->respond($response);
+        }
+
+        $instrumentoRaw = $solicitudQuery->data[0]->instrumento_juridico ?? '';
+        $instrumentos = [];
+        if (is_string($instrumentoRaw) && $instrumentoRaw !== '') {
+            $decoded = json_decode($instrumentoRaw, true);
+            $instrumentos = is_array($decoded) ? $decoded : [$instrumentoRaw];
+        } elseif (is_array($instrumentoRaw)) {
+            $instrumentos = $instrumentoRaw;
+        }
+
+        if (!isset($instrumentos[$indice])) {
+            $response->respuesta = 'El instrumento seleccionado no existe.';
+            return $this->respond($response);
+        }
+
+        $newName = 'Inst_Contrato_' . $id . '_' . ($indice + 1) . '_' . substr(md5(uniqid((string) $id, true)), 0, 8) . '.pdf';
+        $s3Key = $this->uploadFileToS3Storage($archivo->getTempName(), 'contratos', 'instrumentos', $newName);
+
+        if (empty($s3Key)) {
+            $response->respuesta = 'No fue posible guardar el instrumento en AWS S3.';
+            return $this->respond($response);
+        }
+
+        $instrumentos[$indice] = $s3Key;
+
+        $res = $globals->saveTabla(
+            [
+                'instrumento_juridico' => json_encode(array_values($instrumentos)),
+                'usu_act' => $session->id_usuario ?? 0,
+                'fec_act' => date('Y-m-d H:i:s')
+            ],
+            [
+                'tabla' => 'solicitud_contrato',
+                'editar' => true,
+                'idEditar' => ['id_solicitud_contrato' => $id]
+            ],
+            [
+                'id_user' => $session->id_usuario ?? 0,
+                'script' => 'Principal.php/reemplazarInstrumentoContrato'
+            ]
+        );
+
+        if (!$res->error) {
+            $response->error = false;
+            $response->respuesta = 'Instrumento reemplazado correctamente.';
+        } else {
+            $response->respuesta = $res->respuesta ?? $response->respuesta;
         }
 
         return $this->respond($response);
