@@ -34,7 +34,11 @@
                                                 <h6 class="m-0"><?= $nombre_doc ?></h6>
                                             </div>
                                             <div class="card-body">
-                                                <input type="file" name="archivos[<?= $key ?>]" class="form-control-file" accept=".pdf,.jpg,.png,.zip">
+                                                <?php $permiteMultiples = in_array((string) $key, ['3a', '3d'], true); ?>
+                                                <input type="file" name="archivos[<?= $key ?>]<?= $permiteMultiples ? '[]' : '' ?>" class="form-control-file" accept=".pdf,.jpg,.png,.zip" <?= $permiteMultiples ? 'multiple data-max-files="3"' : '' ?>>
+                                                <?php if ($permiteMultiples): ?>
+                                                    <small class="text-muted">Puede subir hasta 3 archivos.</small>
+                                                <?php endif; ?>
                                             </div>
                                         </div>
                                     </div>
@@ -85,6 +89,23 @@
 
     function guardarArchivosSolicitud() {
         var form = $('#formSubirArchivos')[0];
+        var excedeLimite = false;
+        $('input[type="file"][data-max-files]').each(function() {
+            var maxFiles = parseInt($(this).data('max-files'), 10);
+            if (this.files && this.files.length > maxFiles) {
+                excedeLimite = true;
+            }
+        });
+
+        if (excedeLimite) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Validacion de partida y Validacion complementaria permiten hasta 3 archivos.'
+            });
+            return;
+        }
+
         var formData = new FormData(form);
 
         Swal.fire({

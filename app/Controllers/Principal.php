@@ -5753,7 +5753,11 @@ class Principal extends BaseController
         $tieneNuevosArchivos = false;
         if (isset($_FILES['archivos']) && is_array($_FILES['archivos']['name'])) {
             foreach ($_FILES['archivos']['name'] as $originalName) {
-                if (!empty($originalName)) {
+                if (is_array($originalName) && !empty(array_filter($originalName))) {
+                    $tieneNuevosArchivos = true;
+                    break;
+                }
+                if (!is_array($originalName) && !empty($originalName)) {
                     $tieneNuevosArchivos = true;
                     break;
                 }
@@ -5770,42 +5774,66 @@ class Principal extends BaseController
         
         // Verificar si hay archivos enviados
         if (isset($_FILES['archivos']) && is_array($_FILES['archivos']['name'])) {
-            foreach ($_FILES['archivos']['name'] as $key => $originalName) {
-                if (empty($originalName)) continue;
-                
-                if ($_FILES['archivos']['error'][$key] === UPLOAD_ERR_OK) {
-                    $tmpName = $_FILES['archivos']['tmp_name'][$key];
-                    $ext = pathinfo($originalName, PATHINFO_EXTENSION);
-                    $newName = $id_solicitud . '_' . $key . '_' . time() . '.' . $ext;
-                    $s3Key = $this->uploadFileToS3Storage($tmpName, 'contratos', 'documentos', $newName);
-                    
-                    if ($s3Key) {
-                        
-                        $dataInsert = [
-                            'id_solicitud_contrato' => $id_solicitud,
-                            'clave_documento' => $key,
-                            'nombre_archivo' => $s3Key,
-                            'tipo' => $ext,
-                            'usu_reg' => $session->id_usuario ?? 0,
-                            'fec_reg' => date('Y-m-d H:i:s'),
-                            'visible' => 1
-                        ];
-                        
-                        $res = $globals->saveTabla($dataInsert, ["tabla" => "solicitud_contrato_archivos", "editar" => false], ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/guardarArchivosSolicitud']);
-                        $response->respuesta = $res->respuesta;
-                        $response->error = $res->error;
-                        $globals->saveTabla(['id_estatus' => 4], ["tabla" => "solicitud_contrato", "editar" => true, "idEditar" => ["id_solicitud_contrato" => $id_solicitud]], ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/guardarArchivosSolicitud']);
-                        if (!$res->error) {
-                            $count++;
-                        } else {
-                            $errores++;
-                        }
+            $guardarArchivoContrato = function ($key, $originalName, $tmpName, $error, $indice = 0) use ($globals, $session, $id_solicitud, &$response, &$count, &$errores) {
+                if (empty($originalName)) {
+                    return;
+                }
+
+                if ($error !== UPLOAD_ERR_OK) {
+                    $errores++;
+                    return;
+                }
+
+                $ext = pathinfo($originalName, PATHINFO_EXTENSION);
+                $newName = $id_solicitud . '_' . $key . '_' . time() . '_' . $indice . '.' . $ext;
+                $s3Key = $this->uploadFileToS3Storage($tmpName, 'contratos', 'documentos', $newName);
+
+                if ($s3Key) {
+                    $dataInsert = [
+                        'id_solicitud_contrato' => $id_solicitud,
+                        'clave_documento' => $key,
+                        'nombre_archivo' => $s3Key,
+                        'tipo' => $ext,
+                        'usu_reg' => $session->id_usuario ?? 0,
+                        'fec_reg' => date('Y-m-d H:i:s'),
+                        'visible' => 1
+                    ];
+
+                    $res = $globals->saveTabla($dataInsert, ["tabla" => "solicitud_contrato_archivos", "editar" => false], ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/guardarArchivosSolicitud']);
+                    $response->respuesta = $res->respuesta;
+                    $response->error = $res->error;
+                    $globals->saveTabla(['id_estatus' => 4], ["tabla" => "solicitud_contrato", "editar" => true, "idEditar" => ["id_solicitud_contrato" => $id_solicitud]], ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/guardarArchivosSolicitud']);
+                    if (!$res->error) {
+                        $count++;
                     } else {
                         $errores++;
                     }
                 } else {
-                     $errores++;
+                    $errores++;
                 }
+            };
+
+            foreach ($_FILES['archivos']['name'] as $key => $originalName) {
+                if (is_array($originalName)) {
+                    $limite = in_array((string) $key, ['3a', '3d'], true) ? 3 : 1;
+                    foreach (array_slice($originalName, 0, $limite) as $indice => $nombreArchivo) {
+                        $guardarArchivoContrato(
+                            $key,
+                            $nombreArchivo,
+                            $_FILES['archivos']['tmp_name'][$key][$indice] ?? '',
+                            $_FILES['archivos']['error'][$key][$indice] ?? UPLOAD_ERR_NO_FILE,
+                            $indice
+                        );
+                    }
+                    continue;
+                }
+
+                $guardarArchivoContrato(
+                    $key,
+                    $originalName,
+                    $_FILES['archivos']['tmp_name'][$key] ?? '',
+                    $_FILES['archivos']['error'][$key] ?? UPLOAD_ERR_NO_FILE
+                );
             }
         }
         
@@ -6060,6 +6088,14 @@ class Principal extends BaseController
                      "where" => ["visible" => 1, 'id_solicitud_contrato' => $sol->id_solicitud_contrato]
                  ]);
                  $sol->tienen_archivos = (!empty($archivos->data));
+                 $solicitudBase = $globals->getTabla([
+                     "tabla" => "solicitud_contrato",
+                     "where" => ["visible" => 1, "id_solicitud_contrato" => $sol->id_solicitud_contrato],
+                     "limit" => 1
+                 ]);
+                 if (!empty($solicitudBase->data)) {
+                     $sol->no_contrato = $solicitudBase->data[0]->no_contrato ?? '';
+                 }
             }
         }
         $data['solicitudes'] = (!empty($solicitudes->data)) ? $solicitudes->data : [];
@@ -6088,6 +6124,59 @@ class Principal extends BaseController
         $data['scripts'] = array('inicio');
         $data['contentView'] = 'personal/vListaSolicitudContrato';
         $this->_renderView($data);
+    }
+
+    public function guardarNoContratoSolicitudContrato()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'No fue posible guardar el No. contrato.';
+
+        if (!in_array((int) ($session->id_perfil ?? 0), [1, 6], true)) {
+            $response->respuesta = 'No tiene permisos para guardar el No. contrato.';
+            return $this->respond($response);
+        }
+
+        $idSolicitud = (int) ($this->request->getPost('id_solicitud_contrato') ?? 0);
+        $noContrato = trim((string) ($this->request->getPost('no_contrato') ?? ''));
+
+        if ($idSolicitud <= 0) {
+            $response->respuesta = 'Solicitud no valida.';
+            return $this->respond($response);
+        }
+
+        if ($noContrato === '') {
+            $response->respuesta = 'El No. contrato es requerido.';
+            return $this->respond($response);
+        }
+
+        $res = $globals->saveTabla(
+            [
+                'no_contrato' => $noContrato,
+                'usu_act' => $session->id_usuario ?? 0,
+                'fec_act' => date('Y-m-d H:i:s')
+            ],
+            [
+                'tabla' => 'solicitud_contrato',
+                'editar' => true,
+                'idEditar' => ['id_solicitud_contrato' => $idSolicitud]
+            ],
+            [
+                'id_user' => $session->id_usuario ?? 0,
+                'script' => 'Principal.php/guardarNoContratoSolicitudContrato'
+            ]
+        );
+
+        if (!$res->error) {
+            $response->error = false;
+            $response->respuesta = 'No. contrato guardado correctamente.';
+        } else {
+            $response->respuesta = $res->respuesta ?? $response->respuesta;
+        }
+
+        return $this->respond($response);
     }
 
     public function deletePT()
