@@ -5339,7 +5339,44 @@ class Principal extends BaseController
              $response->respuesta = 'ID no válido';
          }
          
-         return $this->respond($response);
+        return $this->respond($response);
+    }
+
+    public function buscarProveedorContrato()
+    {
+        $globals = new Mglobal;
+        $term = trim((string) $this->request->getGet('q'));
+        $results = [];
+
+        if ($term !== '') {
+            $proveedores = $globals->getTabla([
+                'tabla' => 'proveedor',
+                'where' => ['visible' => 1],
+                'orlike' => [
+                    'razon_social' => $term,
+                    'rfc' => $term,
+                    'no_proveedor' => $term,
+                ],
+                'limit' => 20,
+            ]);
+
+            if (!empty($proveedores->data)) {
+                foreach ($proveedores->data as $proveedor) {
+                    $razonSocial = (string) ($proveedor->razon_social ?? '');
+                    $rfc = (string) ($proveedor->rfc ?? '');
+                    $noProveedor = (string) ($proveedor->no_proveedor ?? '');
+                    $results[] = [
+                        'id' => $proveedor->id_proveedor,
+                        'text' => trim($razonSocial . ' - ' . $rfc . ' - ' . $noProveedor),
+                        'razon_social' => $razonSocial,
+                        'rfc' => $rfc,
+                        'no_proveedor' => $noProveedor,
+                    ];
+                }
+            }
+        }
+
+        return $this->response->setJSON(['results' => $results]);
     }
     
     public function verSolicitudContratoPDF($id = null)
@@ -10615,6 +10652,68 @@ class Principal extends BaseController
         $data['scripts'] = array('inicio');
         $data['contentView'] = 'personal/vListaSolicitudConvenio';
         $this->_renderView($data);
+    }
+    public function liberarSolicitudContrato()
+    {
+         $session = \Config\Services::session();
+        $globals = new \App\Models\Mglobal;
+        $response = new \stdClass();
+
+        $id = $this->request->getPost('id_solicitud_contrato');
+
+        if ($id) {
+            $resultado = $globals->getTabla([
+                'tabla' => 'solicitud_contrato',
+                'where' => ['id_solicitud_contrato' => $id]
+            ]);
+          
+          if(!$resultado->error){
+            $datos = $resultado->data[0];
+            $proveedor = $globals->getTabla(['tabla' => 'proveedor', "where" => ['razon_social' => trim($datos->proveedor_nombre) ] ]);
+            if(empty($proveedor->data)){
+                $response->error = true;
+                $response->respuesta = 'Atención el proveedor no se encontro en la base de datos';
+                return $this->response->setJSON($response);
+            }
+            $proveedorBanco = $globals->getTabla(['tabla' => 'proveedor_banco', "where" => ['idproveedor' => $proveedor->data[0]->id_proveedor] ]);
+           
+             $dataInsert = [
+                "id_proveedor"       => $proveedor->data[0]->id_proveedor,
+                "id_estatus"         => 1,
+                "id_proveedor_banco" => $proveedorBanco->data[0]->id_proveedor_banco,
+                "folio"              => "PT-".date('YmdHis'),
+                "no_reserva"         => '',
+                "no_convenio"        => '',
+                "nuevo_fondo"        => '',
+                "total_importe"      => number_format($datos->monto_total, 2, '.', ','),
+                "comentarios_instrumento" => '',
+                "instrumento"        => $datos->instrumento_juridico,
+                "ruta_absoluta"      => '',
+                "observaciones"      => $datos->objeto_contrato,
+                "fec_reg"            => date('Y-m-d H:i:s'),
+                "usu_reg"            => $session->id_usuario,
+                "promo"              => (in_array($session->id_usuario, [17,11, 14, 59, 38, 80]))?1:0,
+            ]; 
+            $dataConfig = [
+                "tabla" => "reserva",
+                "editar" => false,
+            ];
+            $dataBitacora = ['id_user' => $session->id_usuario, 'script' => 'Agregar.php/guardaReserva'];
+
+            $result =  $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+            if(!$result->error){
+              $response->error = false;
+              $response->respuesta = 'El contrato paso a CRFyAP';
+
+            }
+          
+          }else{
+            $response->error = true;
+            $response->respuesta = 'Error al liberar la solicitud';
+          } 
+        }
+        //APL11094
+        return $this->response->setJSON($response);
     }
 
     public function editarSolicitudConvenio($id_solicitud = null)

@@ -262,7 +262,12 @@
                                 <div class="form-group row">
                                     <label class="col-sm-3 col-form-label">Nombre/Razón Social:</label>
                                     <div class="col-sm-9">
-                                        <input type="text" class="form-control" name="proveedor_nombre" value="<?= isset($solicitud) ? $solicitud->proveedor_nombre : '' ?>" required>
+                                        <input type="hidden" id="proveedor_nombre" name="proveedor_nombre" value="<?= isset($solicitud) ? esc($solicitud->proveedor_nombre ?? '') : '' ?>">
+                                        <select class="form-control" id="proveedor_select" required>
+                                            <?php if (isset($solicitud) && !empty($solicitud->proveedor_nombre)): ?>
+                                                <option value="actual" selected><?= esc($solicitud->proveedor_nombre) ?></option>
+                                            <?php endif; ?>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="form-group row">
@@ -274,13 +279,13 @@
                                 <div class="form-group row">
                                     <label class="col-sm-3 col-form-label">RFC:</label>
                                     <div class="col-sm-9">
-                                        <input type="text" class="form-control" name="proveedor_rfc" value="<?= isset($solicitud) ? $solicitud->proveedor_rfc : '' ?>">
+                                        <input type="text" class="form-control" id="proveedor_rfc" name="proveedor_rfc" value="<?= isset($solicitud) ? $solicitud->proveedor_rfc : '' ?>">
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <label class="col-sm-3 col-form-label">Cédula de Registro (Padrón de Proveedores):</label>
                                     <div class="col-sm-9">
-                                        <input type="text" class="form-control" name="proveedor_cedula" value="<?= isset($solicitud) ? $solicitud->proveedor_cedula : '' ?>">
+                                        <input type="text" class="form-control" id="proveedor_cedula" name="proveedor_cedula" value="<?= isset($solicitud) ? $solicitud->proveedor_cedula : '' ?>">
                                     </div>
                                 </div>
                                 <div class="form-group row">
@@ -679,6 +684,31 @@
             agregarPartidaContrato();
         });
 
+        $('#proveedor_select').select2({
+            width: '100%',
+            placeholder: 'Buscar proveedor por nombre, RFC o no. proveedor',
+            minimumInputLength: 2,
+            ajax: {
+                url: '<?= base_url("index.php/Principal/buscarProveedorContrato") ?>',
+                dataType: 'json',
+                delay: 350,
+                data: function(params) {
+                    return { q: params.term || '' };
+                },
+                processResults: function(data) {
+                    return { results: data.results || [] };
+                },
+                cache: true
+            }
+        });
+
+        $('#proveedor_select').on('select2:select', function(e) {
+            var proveedor = e.params.data || {};
+            $('#proveedor_nombre').val(proveedor.razon_social || '');
+            $('#proveedor_rfc').val(proveedor.rfc || '');
+            $('#proveedor_cedula').val(proveedor.no_proveedor || '');
+        });
+
         $('#check_sin_impuesto').on('change', function() {
             if ($(this).is(':checked')) {
                 $('#div_sin_impuesto').show();
@@ -901,6 +931,16 @@
         
         $('#form_solicitud_contrato').on('submit', function(e) {
             e.preventDefault();
+
+            if ($('#proveedor_nombre').val().trim() === '') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Selecciona un proveedor.',
+                    showConfirmButton: true
+                });
+                return;
+            }
 
             if (!validarPartidasExtraContrato()) {
                 Swal.fire({

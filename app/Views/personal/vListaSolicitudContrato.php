@@ -95,6 +95,9 @@
                                                         <?php if ($session->id_perfil != 7): ?>
                                                             <button class="btn btn-sm btn-danger" title="Eliminar" onclick="eliminarSolicitud(<?= $sol->id_solicitud_contrato ?>)"><i class="fas fa-trash"></i></button>
                                                         <?php endif; ?>
+                                                        <?php if ($sol->id_estatus == 3 && $session->id_usuario == 1): ?>
+                                                            <a onclick="liberarSolicitud(<?= $sol->id_solicitud_contrato ?>);" class="btn btn-sm btn-pulse-purple" title="Enviar a CRFyAP"><i class="fas fa-paper-plane text-white"></i></a>
+                                                        <?php endif; ?>
                                                     </td>
                                                 </tr>
                                             <?php endforeach; ?>
@@ -146,6 +149,24 @@
 <link href="<?= base_url() ?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
 <link href="<?= base_url() ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
 <link href="<?= base_url() ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
+<style>
+@keyframes pulse-animation-purple {
+  0% { box-shadow: 0 0 0 0 rgba(156, 39, 176, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(156, 39, 176, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(156, 39, 176, 0); }
+}
+.btn-pulse-purple {
+  background-color: #9c27b0 !important;
+  border-color: #9c27b0 !important;
+  color: white !important;
+  animation: pulse-animation-purple 2s infinite;
+}
+.btn-pulse-purple:hover {
+  background-color: #7b1fa2 !important;
+  border-color: #7b1fa2 !important;
+  color: white !important;
+}
+</style>
 <script src="<?= base_url() ?>assets/js/jquery.min.js"></script>
 <script src="<?= base_url() ?>assets/js/bootstrap.bundle.min.js"></script>
 <script src="<?= base_url() ?>assets/js/metismenu.min.js"></script>
@@ -162,4 +183,52 @@ function eliminarSolicitud(id){ Swal.fire({ title:'Deseas eliminar la solicitud?
 function abrirModalArchivos(id){ $('#modal_id_solicitud').val(id); $('.check-si').prop('checked', false); $('#modalSeleccionArchivos').modal('show'); }
 function enviarFormularioArchivos(){ $('#formSeleccionArchivos').submit(); }
 function subirInstrumentoJuridico(id){ Swal.fire({ title:'Subir Instrumentos Juridicos', input:'file', inputAttributes:{ accept:'application/pdf', multiple:'multiple', 'aria-label':'Subir Instrumentos Juridicos en PDF' }, showCancelButton:true, confirmButtonText:'Subir', cancelButtonText:'Cancelar', showLoaderOnConfirm:true, preConfirm:(files)=>{ if(!files || files.length===0){ Swal.showValidationMessage('Selecciona al menos un archivo PDF'); return false; } const formData=new FormData(); for(let i=0;i<files.length;i++){ formData.append('archivos[]', files[i]); } formData.append('id_solicitud', id); return fetch('<?= base_url("index.php/Principal/subirInstrumentoJuridico") ?>',{ method:'POST', body:formData }).then(response=>response.json()).catch(error=>{ Swal.showValidationMessage(`Error: ${error}`); }); }, allowOutsideClick:()=>!Swal.isLoading() }).then((result)=>{ if(result.isConfirmed){ if(result.value.error){ Swal.fire('Error', result.value.respuesta || 'Ocurrio un error al subir el archivo.', 'error'); } else { Swal.fire('Exito','El archivo se ha subido correctamente.','success').then(()=>location.reload()); } } }); }
+function liberarSolicitud(id_solicitud){
+    Swal.fire({
+        title: 'Enviar a CRFyAP',
+        text: '¿Estás seguro de enviar esta solicitud para que pase a revisión?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, enviar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: '<?= base_url("index.php/Principal/liberarSolicitudContrato") ?>',
+                type: 'POST',
+                data: {
+                    id_solicitud_contrato: id_solicitud
+                },
+                success: function(response) {
+                    if (response.error) {
+                        Swal.fire({
+                            title: 'Error',
+                            text: response.respuesta,
+                            icon: 'error',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    } else {
+                        Swal.fire({
+                            title: '¡Liberada!',
+                            text: 'La solicitud ha sido liberada exitosamente.',
+                            icon: 'success',
+                            confirmButtonText: 'Aceptar'
+                        }).then(() => {
+                     
+                             window.location.href = "<?php echo base_url() ?>" + "index.php/Principal/listaReservaPT";
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    Swal.fire({
+                        title: 'Error de Conexión',
+                        text: 'No se pudo establecer conexión con el servidor.',
+                        icon: 'error',
+                        confirmButtonText: 'Aceptar'
+                    });
+                }
+            });
+        }
+    });
+}
 </script>
