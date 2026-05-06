@@ -2455,7 +2455,7 @@ class Principal extends BaseController
             return $this->respond($response);
         }
         $dataInsert = [
-            "contrasenia" => md5($data['contrasenia']),
+            "contrasenia" => $this->hashContrasenia($data['contrasenia']),
             "usu_act" => $session->id_usuario
         ];
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Principal.php/cambioContrasenia'];

@@ -278,12 +278,23 @@ class Login extends BaseController {
         $contrasenia = $this->request->getPost('contrasenia');
 
   
-        $dataDB = array('tabla' => 'usuario', 'where' =>[ "usuario" => $usuario, "contrasenia"  => md5($contrasenia), "visible" => 1]);
+        $dataDB = array('tabla' => 'usuario', 'where' =>[ "usuario" => $usuario, "visible" => 1]);
     
         if($usuario && $contrasenia){
             $result = $catalogos->getTabla($dataDB);
             
-            if(isset($result->data) && !empty($result->data)){
+            if(isset($result->data) && !empty($result->data) && $this->validarContrasenia($contrasenia, $result->data[0]->contrasenia)){
+                if ($this->requiereRehashContrasenia($result->data[0]->contrasenia)) {
+                    $catalogos->saveTabla(
+                        ['contrasenia' => $this->hashContrasenia($contrasenia)],
+                        [
+                            'tabla' => 'usuario',
+                            'editar' => true,
+                            'idEditar' => ['id_usuario' => $result->data[0]->id_usuario]
+                        ],
+                        ['id_user' => $result->data[0]->id_usuario, 'script' => 'Login.php/validar_usuario']
+                    );
+                }
                 $session->set('logueado', 1);
                 $session->set('id_usuario',$result->data[0]->id_usuario);
                 $session->set('id_sexo',$result->data[0]->id_sexo);
@@ -322,12 +333,23 @@ class Login extends BaseController {
         $Latitud     = $this->request->getPost('latitud');
         $Longitud    = $this->request->getPost('longitud');
   
-        $dataDB = array('tabla' => 'usuario', 'where' =>[ "usuario" => $usuario, "contrasenia"  => md5($contrasenia), "visible" => 1]);
+        $dataDB = array('tabla' => 'usuario', 'where' =>[ "usuario" => $usuario, "visible" => 1]);
        
         if($usuario && $contrasenia){
             $result = $catalogos->getTabla($dataDB);
             
-            if(isset($result->data) && !empty($result->data)){
+            if(isset($result->data) && !empty($result->data) && $this->validarContrasenia($contrasenia, $result->data[0]->contrasenia)){
+                if ($this->requiereRehashContrasenia($result->data[0]->contrasenia)) {
+                    $catalogos->saveTabla(
+                        ['contrasenia' => $this->hashContrasenia($contrasenia)],
+                        [
+                            'tabla' => 'usuario',
+                            'editar' => true,
+                            'idEditar' => ['id_usuario' => $result->data[0]->id_usuario]
+                        ],
+                        ['id_user' => $result->data[0]->id_usuario, 'script' => 'Login.php/validar_usuario2']
+                    );
+                }
                 $session->set('logueado', 1);
                 $session->set('id_usuario',$result->data[0]->id_usuario);
                 $session->set('usuario',$result->data[0]->usuario);

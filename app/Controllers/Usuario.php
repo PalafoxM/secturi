@@ -103,7 +103,7 @@ class Usuario extends BaseController
             'segundo_apellido' => $usuario->segundo_apellido,
             'correo' => $usuario->correo,
             'curp' => $usuario->curp,
-            'contrasenia' => md5($usuario->curp),
+            'contrasenia' => $this->hashContrasenia($usuario->curp),
             'rfc' => $usuario->rfc,
             'denominacion_funcional' => $usuario->denominacion_funcional,
             'area' => $usuario->area,
@@ -124,7 +124,7 @@ class Usuario extends BaseController
             "idEditar" => ['id_participante' => $id_participante]
         ];
         $response = $this->globals->saveTabla(['visible' => 0], $dataConfig, $dataBitacora);
-        $contrasenia = md5($usuario->curp);
+        $contrasenia = $usuario->curp;
         $response->error = false;
         $response->respuesta = "Correo enviado correctamente.";
         return $this->respond($response);
@@ -2798,7 +2798,7 @@ class Usuario extends BaseController
 
         $dataInsert = [
             'usuario' => $data['usuario'],
-            'contrasenia' => md5($data['contrasenia']),
+            'contrasenia' => $this->hashContrasenia($data['contrasenia']),
             'correo' => $data['correo'],
             'id_perfil' => $data['perfil'],
             'id_sexo' => $data['sexo'],

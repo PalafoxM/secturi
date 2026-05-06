@@ -4146,9 +4146,9 @@ class Agregar extends BaseController
             if (!empty($curp->data)) {
                 throw new Exception("El campo de <strong>CURP</strong> ya existe en la base de datos");
             }
-            $existente = $this->globals->getTabla(['tabla' => 'usuario', 'where' => ['usuario' => $data['usuario'], 'contrasenia' => md5($data['contrasenia']), 'visible' => 1]]);
+            $existente = $this->globals->getTabla(['tabla' => 'usuario', 'where' => ['usuario' => $data['usuario'], 'visible' => 1]]);
             if (!empty($existente->data)) {
-                throw new Exception("El <strong> usuario y/o contraseña</strong> ya existe en la base de datos, favor de cambiar los datos");
+                throw new Exception("El <strong> usuario</strong> ya existe en la base de datos, favor de cambiar los datos");
             }
         }
         if (isset($file) && !empty($file) && $file->getSize() > 0) {
@@ -4201,7 +4201,7 @@ class Agregar extends BaseController
 
 
         if (isset($data['contrasenia']) && !empty($data['contrasenia'])) {
-            $dataInsert['contrasenia'] = md5($data['contrasenia']);
+            $dataInsert['contrasenia'] = $this->hashContrasenia($data['contrasenia']);
         }
         if (isset($data['no_empleado']) && !empty($data['no_empleado'])) {
             $dataInsert['no_empleado'] = $data['no_empleado'];
@@ -4288,7 +4288,7 @@ class Agregar extends BaseController
             return $this->respond($response);
         }
         $usuario = $Mglobal->getTabla(["tabla" => "usuario", "where" => ["id_usuario" => $data['id_usuario'], "visible" => 1]])->data[0];
-        if ($usuario->contrasenia == md5($data['contrasenia'])) {
+        if ($this->validarContrasenia($data['contrasenia'], $usuario->contrasenia)) {
             $response->error = true;
             $response->respuesta = 'La contraseña no puede ser la misma que ya esta registrada';
             return $this->respond($response);
@@ -4296,7 +4296,7 @@ class Agregar extends BaseController
         }
         $dataInsert = [
             'cambio_pass' => 1,
-            'contrasenia' => md5($data['contrasenia'])
+            'contrasenia' => $this->hashContrasenia($data['contrasenia'])
         ];
         $dataConfig = [
             "tabla" => "usuario",

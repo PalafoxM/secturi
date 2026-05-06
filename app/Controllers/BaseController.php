@@ -55,4 +55,39 @@ abstract class BaseController extends Controller
 
         // E.g.: $this->session = \Config\Services::session();
     }
+
+    protected function hashContrasenia(string $contrasenia): string
+    {
+        return password_hash($contrasenia, PASSWORD_BCRYPT);
+    }
+
+    protected function validarContrasenia(string $contrasenia, ?string $hash): bool
+    {
+        if ($hash === null || $hash === '') {
+            return false;
+        }
+
+        if (!empty(password_get_info($hash)['algo'])) {
+            return password_verify($contrasenia, $hash);
+        }
+
+        if (strlen($hash) === 32 && ctype_xdigit($hash)) {
+            return hash_equals(strtolower($hash), md5($contrasenia));
+        }
+
+        return false;
+    }
+
+    protected function requiereRehashContrasenia(?string $hash): bool
+    {
+        if ($hash === null || $hash === '') {
+            return true;
+        }
+
+        if (empty(password_get_info($hash)['algo'])) {
+            return true;
+        }
+
+        return password_needs_rehash($hash, PASSWORD_BCRYPT);
+    }
 }
