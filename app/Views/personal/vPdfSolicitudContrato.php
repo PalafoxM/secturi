@@ -132,7 +132,7 @@
                 <tr>
                     <td><?= $pago->numero_pago ?></td>
                     <td><?= $pago->monto_formateado ?? $pago->monto ?></td>
-                    <td><?= $pago->fecha ?></td>
+                    <td>Preferentemente <?= $pago->fecha ?></td>
                     <td><?= $pago->entregable ?></td>
                 </tr>
                 <?php endforeach; ?>

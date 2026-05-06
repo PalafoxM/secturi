@@ -120,7 +120,7 @@
             <tr>
                 <td><?= $p->numero_pago ?></td>
                 <td>$<?= number_format((float) $p->monto, 2, '.', ',') ?></td>
-                <td><?= $p->fecha ?></td>
+                <td>Preferentemente <?= $p->fecha ?></td>
                 <td><?= $p->entregable ?></td>
             </tr>
             <?php endforeach; ?>
