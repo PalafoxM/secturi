@@ -62,7 +62,7 @@
         <tr>
             <td><?= isset($solicitud->dsc_proyecto) ? $solicitud->dsc_proyecto : '' ?></td>
             <td><?= isset($solicitud->cuenta_cable) ? $solicitud->cuenta_cable : '' ?></td>
-            <td>Anexa: <?= !empty($solicitud->archivo_suficiencia) ? 'Sí' : 'No' ?></td>
+            <td>Anexa: Sí</td>
         </tr>
     </table>
 
