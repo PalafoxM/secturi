@@ -6426,6 +6426,59 @@ class Principal extends BaseController
         return $this->respond($response);
     }
 
+    public function guardarNoConvenioSolicitudConvenio()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'No fue posible guardar el No. convenio.';
+
+        if (!in_array((int) ($session->id_perfil ?? 0), [1, 7], true)) {
+            $response->respuesta = 'No tiene permisos para guardar el No. convenio.';
+            return $this->respond($response);
+        }
+
+        $idSolicitud = (int) ($this->request->getPost('id_solicitud_convenio') ?? 0);
+        $noConvenio = trim((string) ($this->request->getPost('no_convenio') ?? ''));
+
+        if ($idSolicitud <= 0) {
+            $response->respuesta = 'Solicitud no valida.';
+            return $this->respond($response);
+        }
+
+        if ($noConvenio === '') {
+            $response->respuesta = 'El No. convenio es requerido.';
+            return $this->respond($response);
+        }
+
+        $res = $globals->saveTabla(
+            [
+                'no_convenio' => $noConvenio,
+                'usu_act' => $session->id_usuario ?? 0,
+                'fec_act' => date('Y-m-d H:i:s')
+            ],
+            [
+                'tabla' => 'solicitud_convenio',
+                'editar' => true,
+                'idEditar' => ['id_solicitud_convenio' => $idSolicitud]
+            ],
+            [
+                'id_user' => $session->id_usuario ?? 0,
+                'script' => 'Principal.php/guardarNoConvenioSolicitudConvenio'
+            ]
+        );
+
+        if (!$res->error) {
+            $response->error = false;
+            $response->respuesta = 'No. convenio guardado correctamente.';
+        } else {
+            $response->respuesta = $res->respuesta ?? $response->respuesta;
+        }
+
+        return $this->respond($response);
+    }
+
     public function deletePT()
     {
         $session = \Config\Services::session();
@@ -10959,6 +11012,14 @@ class Principal extends BaseController
             foreach($solicitudes->data as &$s){
                 $archivos = $globals->getTabla(['tabla' => 'solicitud_convenio_archivos', 'where' => ['id_solicitud_convenio' => $s->id_solicitud_convenio, 'visible' => 1]]);
                 $s->tienen_archivos = !empty($archivos->data);
+                $solicitudBase = $globals->getTabla([
+                    'tabla' => 'solicitud_convenio',
+                    'where' => ['id_solicitud_convenio' => $s->id_solicitud_convenio, 'visible' => 1],
+                    'limit' => 1
+                ]);
+                if (!empty($solicitudBase->data)) {
+                    $s->no_convenio = $solicitudBase->data[0]->no_convenio ?? '';
+                }
             }
         }
 

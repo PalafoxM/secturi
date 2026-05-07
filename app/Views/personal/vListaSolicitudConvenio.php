@@ -99,6 +99,11 @@
                                                             <a onclick="declinaSolicitud(<?= $sol->id_solicitud_convenio ?>);" class="btn btn-sm btn-danger" title="Declinar"><i class="fas fa-times text-white"></i></a>
                                                             <button class="btn btn-sm btn-primary" title="Subir Instrumento Juridico" onclick="subirInstrumentoJuridico(<?= $sol->id_solicitud_convenio ?>)"><i class="fas fa-upload"></i> Subir Instrumento</button>
                                                         <?php endif; ?>
+                                                        <?php if (in_array((int) ($session->id_perfil ?? 0), [1, 7], true)): ?>
+                                                            <button class="btn btn-sm <?=($sol->no_convenio)?'btn-pink':'btn-dark'?>" title="Subir No. Convenio" onclick='subirNoConvenio(<?= (int) $sol->id_solicitud_convenio ?>, <?= json_encode((string) ($sol->no_convenio ?? ''), JSON_HEX_APOS | JSON_HEX_QUOT) ?>)'>
+                                                                <i class="fas fa-file-signature"></i>
+                                                            </button>
+                                                        <?php endif; ?>
                                                         <?php if ($session->id_perfil != 7): ?>
                                                             <button class="btn btn-sm btn-danger" title="Eliminar" onclick="eliminarSolicitud(<?= $sol->id_solicitud_convenio ?>)"><i class="fas fa-trash"></i></button>
                                                         <?php endif; ?>
@@ -216,6 +221,39 @@ function editarInstrumentoConvenio(id, indice){
             Swal.fire('Error', result.value.respuesta || 'No se pudo reemplazar el instrumento.', 'error');
         } else {
             Swal.fire('Exito', (result.value && result.value.respuesta) || 'Instrumento reemplazado correctamente.', 'success').then(() => location.reload());
+        }
+    });
+}
+function subirNoConvenio(id, noConvenioActual){
+    Swal.fire({
+        title: 'Subir No. Convenio',
+        input: 'text',
+        inputValue: noConvenioActual || '',
+        inputPlaceholder: 'Escribe el No. convenio',
+        showCancelButton: true,
+        confirmButtonText: 'Guardar',
+        cancelButtonText: 'Cancelar',
+        preConfirm: (noConvenio) => {
+            if (!noConvenio || noConvenio.trim() === '') {
+                Swal.showValidationMessage('El No. convenio es requerido');
+                return false;
+            }
+            return $.post('<?= base_url("index.php/Principal/guardarNoConvenioSolicitudConvenio") ?>', {
+                id_solicitud_convenio: id,
+                no_convenio: noConvenio.trim()
+            }).then(response => response).catch(() => {
+                Swal.showValidationMessage('No se pudo guardar el No. convenio');
+            });
+        }
+    }).then((result) => {
+        if (!result.isConfirmed) {
+            return;
+        }
+        const response = result.value || {};
+        if (response.error) {
+            Swal.fire('Error', response.respuesta || 'No se pudo guardar el No. convenio.', 'error');
+        } else {
+            Swal.fire('Exito', response.respuesta || 'No. convenio guardado correctamente.', 'success').then(() => location.reload());
         }
     });
 }
