@@ -5504,7 +5504,27 @@ class Principal extends BaseController
             'tabla' => 'solicitud_contrato_archivos',
             'where' => ['id_solicitud_contrato' => $id_solicitud, 'visible' => 1]
         ]);
+
+        $archivosAceptadosOcultos = $globals->getTabla([
+            'tabla' => 'solicitud_contrato_archivos',
+            'where' => ['id_solicitud_contrato' => $id_solicitud, 'visible' => 0, 'id_estatus' => 3]
+        ]);
         
+        if (!empty($archivosAceptadosOcultos->data)) {
+            $archivos->data = $archivos->data ?? [];
+            $idsArchivosVisibles = [];
+            foreach ($archivos->data as $archivoVisible) {
+                $idsArchivosVisibles[(int) ($archivoVisible->id_solicitud_contrato_archivo ?? 0)] = true;
+            }
+
+            foreach ($archivosAceptadosOcultos->data as $archivoAceptado) {
+                $idArchivoAceptado = (int) ($archivoAceptado->id_solicitud_contrato_archivo ?? 0);
+                if ($idArchivoAceptado > 0 && empty($idsArchivosVisibles[$idArchivoAceptado])) {
+                    $archivoAceptado->visible = 1;
+                    $archivos->data[] = $archivoAceptado;
+                }
+            }
+        }
        
         if (!empty($archivos->data)) {
          foreach ($archivos->data as &$archivo) {
@@ -5752,27 +5772,6 @@ class Principal extends BaseController
 
         $count = 0;
         $errores = 0;
-        $tieneNuevosArchivos = false;
-        if (isset($_FILES['archivos']) && is_array($_FILES['archivos']['name'])) {
-            foreach ($_FILES['archivos']['name'] as $originalName) {
-                if (is_array($originalName) && !empty(array_filter($originalName))) {
-                    $tieneNuevosArchivos = true;
-                    break;
-                }
-                if (!is_array($originalName) && !empty($originalName)) {
-                    $tieneNuevosArchivos = true;
-                    break;
-                }
-            }
-        }
-
-        if ($tieneNuevosArchivos) {
-            $globals->saveTabla(
-                ['visible' => 0],
-                ["tabla" => "solicitud_contrato_archivos", "editar" => true, "idEditar" => ["id_solicitud_contrato" => $id_solicitud]],
-                ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/reemplazarArchivosSolicitudContrato']
-            );
-        }
         
         // Verificar si hay archivos enviados
         if (isset($_FILES['archivos']) && is_array($_FILES['archivos']['name'])) {
