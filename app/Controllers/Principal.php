@@ -6381,7 +6381,7 @@ class Principal extends BaseController
         $response->error = true;
         $response->respuesta = 'No fue posible guardar el No. contrato.';
 
-        if (!in_array((int) ($session->id_perfil ?? 0), [1, 6], true)) {
+        if (!in_array((int) ($session->id_perfil ?? 0), [1, 7], true)) {
             $response->respuesta = 'No tiene permisos para guardar el No. contrato.';
             return $this->respond($response);
         }
