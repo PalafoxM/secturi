@@ -74,7 +74,7 @@ $soportes = [
                                             <td colspan="2" class="field-cell">
                                                 <select class="form-control form-control-sm select2 field-input" id="responsable_proyecto" name="responsable_proyecto">
                                                     <option value="">Seleccione una opci&oacute;n</option>
-                                                    <?php foreach ($direccion as $u): ?>
+                                                    <?php foreach ($usuario as $u): ?>
                                                         <option
                                                             value="<?= $u->id_usuario ?>"
                                                             data-area="<?= esc($u->dsc_area ?? '', 'attr') ?>"

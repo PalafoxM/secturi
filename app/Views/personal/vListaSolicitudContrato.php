@@ -99,7 +99,7 @@
                                                             <a onclick="declinaSolicitud(<?= $sol->id_solicitud_contrato ?>);" class="btn btn-sm btn-danger" title="Declinar"><i class="fas fa-times text-white"></i></a>
                                                             <button class="btn btn-sm btn-primary" title="Subir Instrumento Juridico" onclick="subirInstrumentoJuridico(<?= $sol->id_solicitud_contrato ?>)"><i class="fas fa-upload"></i> Subir Instrumento</button>
                                                         <?php endif; ?>
-                                                        <?php if (in_array((int) ($session->id_perfil ?? 0), [1, 6], true)): ?>
+                                                        <?php if (in_array($session->id_perfil, [1,7])): ?>
                                                             <button class="btn btn-sm btn-dark" title="Subir No. Contrato" onclick='subirNoContrato(<?= (int) $sol->id_solicitud_contrato ?>, <?= json_encode((string) ($sol->no_contrato ?? ''), JSON_HEX_APOS | JSON_HEX_QUOT) ?>)'>
                                                                 <i class="fas fa-file-signature"></i>
                                                             </button>
@@ -107,7 +107,7 @@
                                                         <?php if ($session->id_perfil != 7): ?>
                                                             <button class="btn btn-sm btn-danger" title="Eliminar" onclick="eliminarSolicitud(<?= $sol->id_solicitud_contrato ?>)"><i class="fas fa-trash"></i></button>
                                                         <?php endif; ?>
-                                                        <?php if ($sol->id_estatus == 3 && $session->id_usuario == 1): ?>
+                                                        <?php if ($sol->id_estatus == 3 && in_array($session->id_perfil, [1,7])): ?>
                                                             <a onclick="liberarSolicitud(<?= $sol->id_solicitud_contrato ?>);" class="btn btn-sm btn-pulse-purple" title="Enviar a CRFyAP"><i class="fas fa-paper-plane text-white"></i></a>
                                                         <?php endif; ?>
                                                     </td>
