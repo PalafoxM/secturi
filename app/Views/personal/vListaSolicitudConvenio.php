@@ -68,9 +68,16 @@
                                                         <?php if ((int) $sol->id_estatus === 3): ?>
                                                             <?php if (!empty($sol->instrumento_urls)): ?>
                                                                 <?php foreach ($sol->instrumento_urls as $index => $instrumento): ?>
-                                                                    <a href="<?= $instrumento['url'] ?>" target="_blank" class="btn btn-sm btn-success mb-1" title="Ver Instrumento <?= $index + 1 ?>">
-                                                                        <i class="fas fa-file-pdf"></i> Inst. <?= $index + 1 ?>
-                                                                    </a>
+                                                                    <span class="d-inline-block mb-1">
+                                                                        <a href="<?= $instrumento['url'] ?>" target="_blank" class="btn btn-sm btn-success" title="Ver Instrumento <?= $index + 1 ?>">
+                                                                            <i class="fas fa-file-pdf"></i> Inst. <?= $index + 1 ?>
+                                                                        </a>
+                                                                        <?php if (in_array((int) ($session->id_perfil ?? 0), [1, 7], true)): ?>
+                                                                            <button type="button" class="btn btn-sm btn-outline-warning" title="Editar Inst. <?= $index + 1 ?>" onclick="editarInstrumentoConvenio(<?= (int) $sol->id_solicitud_convenio ?>, <?= (int) $index ?>)">
+                                                                                <i class="fas fa-pen"></i>
+                                                                            </button>
+                                                                        <?php endif; ?>
+                                                                    </span>
                                                                 <?php endforeach; ?>
                                                             <?php else: ?>
                                                                 <span class="badge badge-success">Aprobado</span>
@@ -163,5 +170,53 @@ function verMotivo(motivo){ Swal.fire({ title:'Motivo de Declinacion', text: mot
 function eliminarSolicitud(id){ Swal.fire({ title:'Deseas eliminar la solicitud?', text:'No podras revertir esto', icon:'warning', showCancelButton:true, confirmButtonColor:'#3085d6', cancelButtonColor:'#d33', confirmButtonText:'Si, eliminar', cancelButtonText:'Cancelar' }).then((result)=>{ if(result.isConfirmed){ $.post('<?= base_url("index.php/Principal/eliminarSolicitudConvenio") ?>',{ id_solicitud:id },function(response){ if(!response.error){ Swal.fire('Eliminado','El registro ha sido eliminado.','success').then(()=>location.reload()); } else { Swal.fire('Error','No se pudo eliminar el registro.','error'); } }); } }); }
 function abrirModalArchivos(id){ $('#modal_id_solicitud').val(id); $('.check-si').prop('checked', false); $('#modalSeleccionArchivos').modal('show'); }
 function enviarFormularioArchivos(){ $('#formSeleccionArchivos').submit(); }
-function subirInstrumentoJuridico(id){ Swal.fire({ title:'Subir Instrumentos Juridicos', input:'file', inputAttributes:{ accept:'application/pdf', multiple:'multiple', 'aria-label':'Subir Instrumentos Juridicos en PDF' }, showCancelButton:true, confirmButtonText:'Subir', cancelButtonText:'Cancelar', showLoaderOnConfirm:true, preConfirm:(files)=>{ if(!files || files.length===0){ Swal.showValidationMessage('Selecciona al menos un archivo PDF'); return false; } const formData=new FormData(); for(let i=0;i<files.length;i++){ formData.append('archivos[]', files[i]); } formData.append('id_solicitud', id); return fetch('<?= base_url("index.php/Principal/subirInstrumentoJuridicoConvenio") ?>',{ method:'POST', body:formData }).then(response=>response.json()).catch(error=>{ Swal.showValidationMessage(`Error: ${error}`); }); }, allowOutsideClick:()=>!Swal.isLoading() }).then((result)=>{ if(result.isConfirmed){ if(result.value.error){ Swal.fire('Error', result.value.respuesta || 'Ocurrio un error al subir el archivo.', 'error'); } else { Swal.fire('Exito','El archivo se ha subido correctamente.','success').then(()=>location.reload()); } } }); }
+function subirInstrumentoJuridico(id){ Swal.fire({ title:'Subir Instrumentos Juridicos', input:'file', inputAttributes:{ accept:'application/pdf', multiple:'multiple', 'aria-label':'Subir Instrumentos Juridicos en PDF' }, showCancelButton:true, confirmButtonText:'Subir', cancelButtonText:'Cancelar', showLoaderOnConfirm:true, preConfirm:(files)=>{ if(!files || files.length===0){ Swal.showValidationMessage('Selecciona al menos un archivo PDF'); return false; } if(files.length>4){ Swal.showValidationMessage('Solo puedes subir hasta 4 archivos PDF'); return false; } const formData=new FormData(); for(let i=0;i<files.length;i++){ formData.append('archivos[]', files[i]); } formData.append('id_solicitud', id); return fetch('<?= base_url("index.php/Principal/subirInstrumentoJuridicoConvenio") ?>',{ method:'POST', body:formData }).then(response=>response.json()).catch(error=>{ Swal.showValidationMessage(`Error: ${error}`); }); }, allowOutsideClick:()=>!Swal.isLoading() }).then((result)=>{ if(result.isConfirmed){ if(result.value.error){ Swal.fire('Error', result.value.respuesta || 'Ocurrio un error al subir el archivo.', 'error'); } else { Swal.fire('Exito','El archivo se ha subido correctamente.','success').then(()=>location.reload()); } } }); }
+function editarInstrumentoConvenio(id, indice){
+    Swal.fire({
+        title: 'Editar Instrumento',
+        text: 'Seleccione hasta 4 PDFs. Se reemplazaran desde el instrumento elegido.',
+        input: 'file',
+        inputAttributes: {
+            accept: 'application/pdf',
+            multiple: 'multiple',
+            'aria-label': 'Subir instrumentos juridicos en PDF'
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Reemplazar',
+        cancelButtonText: 'Cancelar',
+        showLoaderOnConfirm: true,
+        preConfirm: (files) => {
+            if (!files || files.length === 0) {
+                Swal.showValidationMessage('Selecciona al menos un archivo PDF');
+                return false;
+            }
+            if (files.length > 4) {
+                Swal.showValidationMessage('Solo puedes subir hasta 4 archivos PDF');
+                return false;
+            }
+            const formData = new FormData();
+            formData.append('id_solicitud', id);
+            formData.append('indice', indice);
+            for (let i = 0; i < files.length; i++) {
+                formData.append('archivos[]', files[i]);
+            }
+            return fetch('<?= base_url("index.php/Principal/reemplazarInstrumentoConvenio") ?>', {
+                method: 'POST',
+                body: formData
+            }).then(response => response.json()).catch(error => {
+                Swal.showValidationMessage(`Error: ${error}`);
+            });
+        },
+        allowOutsideClick: () => !Swal.isLoading()
+    }).then((result) => {
+        if (!result.isConfirmed) {
+            return;
+        }
+        if (result.value && result.value.error) {
+            Swal.fire('Error', result.value.respuesta || 'No se pudo reemplazar el instrumento.', 'error');
+        } else {
+            Swal.fire('Exito', (result.value && result.value.respuesta) || 'Instrumento reemplazado correctamente.', 'success').then(() => location.reload());
+        }
+    });
+}
 </script>

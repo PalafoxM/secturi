@@ -3993,6 +3993,11 @@ class Principal extends BaseController
             return $this->respond($response);
         }
 
+        if (count($archivos) > 4) {
+            $response->respuesta = "Solo se permiten hasta 4 instrumentos juridicos.";
+            return $this->respond($response);
+        }
+
         $rutasGuardadas = [];
         foreach ($archivos as $archivo) {
             if (!$archivo->isValid() || $archivo->hasMoved() || strtolower((string) $archivo->getExtension()) !== 'pdf') {
@@ -5994,6 +5999,11 @@ class Principal extends BaseController
             return $this->respond($response);
         }
 
+        if (count($archivos) > 4) {
+            $response->respuesta = "Solo se permiten hasta 4 instrumentos juridicos.";
+            return $this->respond($response);
+        }
+
         $rutasGuardadas = [];
         $uploadPath = FCPATH . 'assets/instrumentos_juridicos/';
         if (!is_dir($uploadPath)) {
@@ -6087,20 +6097,24 @@ class Principal extends BaseController
 
         $id = (int) ($this->request->getPost('id_solicitud') ?? 0);
         $indice = (int) ($this->request->getPost('indice') ?? -1);
-        $archivo = $this->request->getFile('archivo');
+        $archivos = $this->request->getFileMultiple('archivos');
+        if (empty($archivos)) {
+            $archivoUnico = $this->request->getFile('archivo');
+            $archivos = $archivoUnico ? [$archivoUnico] : [];
+        }
 
         if ($id <= 0 || $indice < 0) {
             $response->respuesta = 'Solicitud o instrumento no valido.';
             return $this->respond($response);
         }
 
-        if (!$archivo || !$archivo->isValid() || $archivo->hasMoved()) {
-            $response->respuesta = 'Debe seleccionar un archivo PDF.';
+        if (empty($archivos)) {
+            $response->respuesta = 'Debe seleccionar al menos un archivo PDF.';
             return $this->respond($response);
         }
 
-        if (strtolower((string) $archivo->getExtension()) !== 'pdf') {
-            $response->respuesta = 'Solo se permiten archivos PDF.';
+        if (count($archivos) > 4) {
+            $response->respuesta = 'Solo se permiten hasta 4 instrumentos.';
             return $this->respond($response);
         }
 
@@ -6128,15 +6142,36 @@ class Principal extends BaseController
             return $this->respond($response);
         }
 
-        $newName = 'Inst_Contrato_' . $id . '_' . ($indice + 1) . '_' . substr(md5(uniqid((string) $id, true)), 0, 8) . '.pdf';
-        $s3Key = $this->uploadFileToS3Storage($archivo->getTempName(), 'contratos', 'instrumentos', $newName);
-
-        if (empty($s3Key)) {
-            $response->respuesta = 'No fue posible guardar el instrumento en AWS S3.';
+        if (($indice + count($archivos)) > 4) {
+            $response->respuesta = 'La edicion no puede superar 4 instrumentos.';
             return $this->respond($response);
         }
 
-        $instrumentos[$indice] = $s3Key;
+        $rutasNuevas = [];
+        foreach ($archivos as $offset => $archivo) {
+            if (!$archivo || !$archivo->isValid() || $archivo->hasMoved()) {
+                $response->respuesta = 'Debe seleccionar archivos PDF validos.';
+                return $this->respond($response);
+            }
+
+            if (strtolower((string) $archivo->getExtension()) !== 'pdf') {
+                $response->respuesta = 'Solo se permiten archivos PDF.';
+                return $this->respond($response);
+            }
+
+            $newName = 'Inst_Contrato_' . $id . '_' . ($indice + $offset + 1) . '_' . substr(md5(uniqid((string) $id, true)), 0, 8) . '.pdf';
+            $s3Key = $this->uploadFileToS3Storage($archivo->getTempName(), 'contratos', 'instrumentos', $newName);
+
+            if (empty($s3Key)) {
+                $response->respuesta = 'No fue posible guardar el instrumento en AWS S3.';
+                return $this->respond($response);
+            }
+
+            $rutasNuevas[] = $s3Key;
+        }
+
+        array_splice($instrumentos, $indice, count($rutasNuevas), $rutasNuevas);
+        $instrumentos = array_slice(array_values($instrumentos), 0, 4);
 
         $res = $globals->saveTabla(
             [
@@ -6152,6 +6187,124 @@ class Principal extends BaseController
             [
                 'id_user' => $session->id_usuario ?? 0,
                 'script' => 'Principal.php/reemplazarInstrumentoContrato'
+            ]
+        );
+
+        if (!$res->error) {
+            $response->error = false;
+            $response->respuesta = 'Instrumento reemplazado correctamente.';
+        } else {
+            $response->respuesta = $res->respuesta ?? $response->respuesta;
+        }
+
+        return $this->respond($response);
+    }
+
+    public function reemplazarInstrumentoConvenio()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'No fue posible reemplazar el instrumento.';
+
+        if (!in_array((int) ($session->id_perfil ?? 0), [1, 7], true)) {
+            $response->respuesta = 'No tiene permisos para editar instrumentos.';
+            return $this->respond($response);
+        }
+
+        $id = (int) ($this->request->getPost('id_solicitud') ?? 0);
+        $indice = (int) ($this->request->getPost('indice') ?? -1);
+        $archivos = $this->request->getFileMultiple('archivos');
+        if (empty($archivos)) {
+            $archivoUnico = $this->request->getFile('archivo');
+            $archivos = $archivoUnico ? [$archivoUnico] : [];
+        }
+
+        if ($id <= 0 || $indice < 0) {
+            $response->respuesta = 'Solicitud o instrumento no valido.';
+            return $this->respond($response);
+        }
+
+        if (empty($archivos)) {
+            $response->respuesta = 'Debe seleccionar al menos un archivo PDF.';
+            return $this->respond($response);
+        }
+
+        if (count($archivos) > 4) {
+            $response->respuesta = 'Solo se permiten hasta 4 instrumentos.';
+            return $this->respond($response);
+        }
+
+        $solicitudQuery = $globals->getTabla([
+            'tabla' => 'solicitud_convenio',
+            'where' => ['id_solicitud_convenio' => $id, 'visible' => 1]
+        ]);
+
+        if (empty($solicitudQuery->data)) {
+            $response->respuesta = 'Solicitud no encontrada.';
+            return $this->respond($response);
+        }
+
+        $instrumentoRaw = $solicitudQuery->data[0]->instrumento_juridico ?? '';
+        $instrumentos = [];
+        if (is_string($instrumentoRaw) && $instrumentoRaw !== '') {
+            $decoded = json_decode($instrumentoRaw, true);
+            $instrumentos = is_array($decoded) ? $decoded : [$instrumentoRaw];
+        } elseif (is_array($instrumentoRaw)) {
+            $instrumentos = $instrumentoRaw;
+        }
+
+        if (!isset($instrumentos[$indice])) {
+            $response->respuesta = 'El instrumento seleccionado no existe.';
+            return $this->respond($response);
+        }
+
+        if (($indice + count($archivos)) > 4) {
+            $response->respuesta = 'La edicion no puede superar 4 instrumentos.';
+            return $this->respond($response);
+        }
+
+        $rutasNuevas = [];
+        foreach ($archivos as $offset => $archivo) {
+            if (!$archivo || !$archivo->isValid() || $archivo->hasMoved()) {
+                $response->respuesta = 'Debe seleccionar archivos PDF validos.';
+                return $this->respond($response);
+            }
+
+            if (strtolower((string) $archivo->getExtension()) !== 'pdf') {
+                $response->respuesta = 'Solo se permiten archivos PDF.';
+                return $this->respond($response);
+            }
+
+            $newName = 'Inst_Convenio_' . $id . '_' . ($indice + $offset + 1) . '_' . substr(md5(uniqid((string) $id, true)), 0, 8) . '.pdf';
+            $s3Key = $this->uploadFileToS3Storage($archivo->getTempName(), 'convenios', 'instrumentos', $newName);
+
+            if (empty($s3Key)) {
+                $response->respuesta = 'No fue posible guardar el instrumento en AWS S3.';
+                return $this->respond($response);
+            }
+
+            $rutasNuevas[] = $s3Key;
+        }
+
+        array_splice($instrumentos, $indice, count($rutasNuevas), $rutasNuevas);
+        $instrumentos = array_slice(array_values($instrumentos), 0, 4);
+
+        $res = $globals->saveTabla(
+            [
+                'instrumento_juridico' => json_encode(array_values($instrumentos)),
+                'usu_act' => $session->id_usuario ?? 0,
+                'fec_act' => date('Y-m-d H:i:s')
+            ],
+            [
+                'tabla' => 'solicitud_convenio',
+                'editar' => true,
+                'idEditar' => ['id_solicitud_convenio' => $id]
+            ],
+            [
+                'id_user' => $session->id_usuario ?? 0,
+                'script' => 'Principal.php/reemplazarInstrumentoConvenio'
             ]
         );
 
@@ -11191,6 +11344,12 @@ class Principal extends BaseController
         }
 
         if (isset($_FILES['archivos']) && is_array($_FILES['archivos']['name'])) {
+            $archivosSeleccionados = array_values(array_filter($_FILES['archivos']['name'], static fn($nombre) => !empty($nombre)));
+            if ((count($rutasGuardadas) + count($archivosSeleccionados)) > 4) {
+                $response->respuesta = "Solo se permiten hasta 4 instrumentos juridicos.";
+                return $this->respond($response);
+            }
+
             foreach ($_FILES['archivos']['name'] as $key => $originalName) {
                 if ($_FILES['archivos']['error'][$key] === UPLOAD_ERR_OK) {
                     $tmpName = $_FILES['archivos']['tmp_name'][$key];
