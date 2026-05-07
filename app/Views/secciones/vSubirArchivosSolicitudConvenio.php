@@ -28,13 +28,17 @@
                                 
                                 <div class="row">
                                     <?php foreach($documentos as $key => $nombre_doc): ?>
+                                    <?php $permiteMultiples = in_array((int) $key, [3, 11], true); ?>
                                     <div class="col-md-6 mb-4">
                                         <div class="card border">
                                             <div class="card-header bg-light">
                                                 <h6 class="m-0"><?= $nombre_doc ?></h6>
                                             </div>
                                             <div class="card-body">
-                                                <input type="file" name="archivos[<?= $key ?>]" class="form-control-file" accept=".pdf,.jpg,.png,.zip">
+                                                <input type="file" name="archivos[<?= $key ?>]<?= $permiteMultiples ? '[]' : '' ?>" class="form-control-file" accept=".pdf,.jpg,.png,.zip" <?= $permiteMultiples ? 'multiple' : '' ?>>
+                                                <?php if ($permiteMultiples): ?>
+                                                    <small class="text-muted">Puede subir hasta 4 archivos.</small>
+                                                <?php endif; ?>
                                             </div>
                                         </div>
                                     </div>

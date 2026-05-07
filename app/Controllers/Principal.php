@@ -11671,39 +11671,64 @@ class Principal extends BaseController
         $errores = 0;
         
         if (isset($_FILES['archivos']) && is_array($_FILES['archivos']['name'])) {
-            foreach ($_FILES['archivos']['name'] as $key => $originalName) {
-                if (empty($originalName)) continue;
-                
-                if ($_FILES['archivos']['error'][$key] === UPLOAD_ERR_OK) {
-                    $tmpName = $_FILES['archivos']['tmp_name'][$key];
-                    $ext = pathinfo($originalName, PATHINFO_EXTENSION);
-                    $newName = $id_solicitud . '_' . $key . '_' . time() . '.' . $ext;
+            $guardarArchivoConvenio = function ($key, $originalName, $tmpName, $error, $indice = 0) use ($globals, $session, $id_solicitud, &$count, &$errores) {
+                if (empty($originalName)) {
+                    return;
+                }
+
+                if ($error !== UPLOAD_ERR_OK) {
+                    $errores++;
+                    return;
+                }
+
+                $ext = pathinfo($originalName, PATHINFO_EXTENSION);
+                $newName = $id_solicitud . '_' . $key . '_' . time() . '_' . $indice . '.' . $ext;
                     $s3Key = $this->uploadFileToS3Storage($tmpName, 'convenios', 'documentos', $newName);
                     
-                    if ($s3Key) {
-                        $dataInsert = [
-                            'id_solicitud_convenio' => $id_solicitud,
-                            'clave_documento' => $key,
-                            'nombre_archivo' => $s3Key,
-                            'tipo' => $ext,
-                            'usu_reg' => $session->id_usuario ?? 0,
-                            'fec_reg' => date('Y-m-d H:i:s'),
-                            'visible' => 1
-                        ];
-                        
-                        $res = $globals->saveTabla($dataInsert, ["tabla" => "solicitud_convenio_archivos", "editar" => false], ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/subirArchivosSolicitudConvenio']);
-                        $globals->saveTabla(['id_estatus' => 4], ["tabla" => "solicitud_convenio", "editar" => true, "idEditar" => ["id_solicitud_convenio" => $id_solicitud]], ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/subirArchivosSolicitudConvenio']);
-                        if (!$res->error) {
-                            $count++;
-                        } else {
-                            $errores++;
-                        }
+                if ($s3Key) {
+                    $dataInsert = [
+                        'id_solicitud_convenio' => $id_solicitud,
+                        'clave_documento' => $key,
+                        'nombre_archivo' => $s3Key,
+                        'tipo' => $ext,
+                        'usu_reg' => $session->id_usuario ?? 0,
+                        'fec_reg' => date('Y-m-d H:i:s'),
+                        'visible' => 1
+                    ];
+                    
+                    $res = $globals->saveTabla($dataInsert, ["tabla" => "solicitud_convenio_archivos", "editar" => false], ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/subirArchivosSolicitudConvenio']);
+                    $globals->saveTabla(['id_estatus' => 4], ["tabla" => "solicitud_convenio", "editar" => true, "idEditar" => ["id_solicitud_convenio" => $id_solicitud]], ['id_user' => $session->id_usuario ?? 0, 'script' => 'Principal.php/subirArchivosSolicitudConvenio']);
+                    if (!$res->error) {
+                        $count++;
                     } else {
                         $errores++;
                     }
                 } else {
-                     $errores++;
+                    $errores++;
                 }
+            };
+
+            foreach ($_FILES['archivos']['name'] as $key => $originalName) {
+                if (is_array($originalName)) {
+                    $limite = in_array((int) $key, [3, 11], true) ? 4 : 1;
+                    foreach (array_slice($originalName, 0, $limite) as $indice => $nombreArchivo) {
+                        $guardarArchivoConvenio(
+                            $key,
+                            $nombreArchivo,
+                            $_FILES['archivos']['tmp_name'][$key][$indice] ?? '',
+                            $_FILES['archivos']['error'][$key][$indice] ?? UPLOAD_ERR_NO_FILE,
+                            $indice
+                        );
+                    }
+                    continue;
+                }
+
+                $guardarArchivoConvenio(
+                    $key,
+                    $originalName,
+                    $_FILES['archivos']['tmp_name'][$key] ?? '',
+                    $_FILES['archivos']['error'][$key] ?? UPLOAD_ERR_NO_FILE
+                );
             }
         }
         
