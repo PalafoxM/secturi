@@ -50,7 +50,8 @@
                                                     <td><?= date('d/m/Y H:i', strtotime($sol->fec_reg)) ?></td>
                                                     <td><?= $sol->nombre_proyecto ?></td>
                                                     <td><?= $sol->nombre_registra ?></td>
-                                                    <td><?= $sol->monto_total; ?></td>
+                                                    <?php $montoTotalLista = (float) str_replace(['$', ',', ' '], '', (string) ($sol->monto_total ?? 0)); ?>
+                                                    <td>$<?= number_format($montoTotalLista, 2, '.', ','); ?></td>
                                                     <td>
                                                         <?php if ((int) $sol->id_estatus === 1): ?>
                                                             <span class="badge badge-secondary">Registrado</span>
