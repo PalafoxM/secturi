@@ -6,8 +6,8 @@ use CodeIgniter\Config\BaseConfig;
 
 class Email extends BaseConfig
 {
-    public string $fromEmail  = 'palafox.marin31@gmail.com';
-    public string $fromName   = 'Agustin Palafox Marin';
+    public string $fromEmail  = '';
+    public string $fromName   = 'SUSI';
     public string $recipients = '';
 
     /**
@@ -28,20 +28,17 @@ class Email extends BaseConfig
     /**
      * SMTP Server Address
      */
-    public string $SMTPHost = 'smtp.gmail.com';
+    public string $SMTPHost = '';
 
     /**
      * SMTP Username
      */
-    public string $SMTPUser = 'a.palafoxm@guanajuato.gob.mx';
+    public string $SMTPUser = '';
 
     /**
      * SMTP Password
      */
-    //public string $SMTPPass = 'PalafoxMarin198931##';
-    public string $SMTPPass = 'bqku unlh lpli mmab';
-    //public string $SMTPPass = 'fohs cwuv udom uajp';
-    //public string $SMTPPass = 'kaej sezv flls fuzk';
+    public string $SMTPPass = '';
 
     /**
      * SMTP Port
@@ -124,4 +121,21 @@ class Email extends BaseConfig
      * Enable notify message from server
      */
     public bool $DSN = false;
+
+    public function __construct()
+    {
+        $this->fromEmail = (string) env('email.fromEmail', '');
+        $this->fromName = (string) env('email.fromName', 'SUSI');
+        $this->protocol = (string) env('email.protocol', 'smtp');
+        $this->SMTPHost = (string) env('email.SMTPHost', '');
+        $this->SMTPUser = (string) env('email.SMTPUser', '');
+        $this->SMTPPass = (string) env('email.SMTPPass', '');
+        $this->SMTPPort = (int) env('email.SMTPPort', 587);
+        $this->SMTPTimeout = (int) env('email.SMTPTimeout', 5);
+        $this->SMTPCrypto = (string) env('email.SMTPCrypto', 'tls');
+        $this->mailType = (string) env('email.mailType', 'html');
+        $this->charset = (string) env('email.charset', 'UTF-8');
+        $this->newline = (string) env('email.newline', "\r\n");
+        $this->CRLF = (string) env('email.CRLF', "\r\n");
+    }
 }
