@@ -104,6 +104,11 @@
                                                                 <i class="fas fa-file-signature"></i>
                                                             </button>
                                                         <?php endif; ?>
+                                                        <?php if (!empty($sol->no_convenio)): ?>
+                                                            <button class="btn btn-sm btn-outline-info" title="Ver No. Convenio" onclick='verNoDocumento("No. Convenio", <?= json_encode((string) $sol->no_convenio, JSON_HEX_APOS | JSON_HEX_QUOT) ?>)'>
+                                                                <i class="fas fa-hashtag"></i>
+                                                            </button>
+                                                        <?php endif; ?>
                                                         <?php if ($session->id_perfil != 7): ?>
                                                             <button class="btn btn-sm btn-danger" title="Eliminar" onclick="eliminarSolicitud(<?= $sol->id_solicitud_convenio ?>)"><i class="fas fa-trash"></i></button>
                                                         <?php endif; ?>
@@ -172,6 +177,7 @@
 $(document).ready(function(){ $('#datatable-convenios').DataTable({ language:{ url:'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json' } }); });
 function declinaSolicitud(id){ Swal.fire({ title:'Deseas declinar la solicitud?', text:'Ingresa el motivo de la declinacion:', icon:'warning', input:'textarea', inputPlaceholder:'Escribe el motivo aqui...', showCancelButton:true, confirmButtonColor:'#d33', cancelButtonColor:'#3085d6', confirmButtonText:'Si, declinar', cancelButtonText:'Cancelar', preConfirm:(motivo)=>{ if(!motivo || motivo.trim()===''){ Swal.showValidationMessage('El motivo es obligatorio'); return false; } return motivo; } }).then((result)=>{ if(result.isConfirmed){ $.post('<?= base_url("index.php/Principal/declinarSolicitudConvenio") ?>',{ id_solicitud:id, motivo:result.value },function(response){ if(!response.error){ Swal.fire('Declinado','El registro ha sido declinado.','success').then(()=>location.reload()); } else { Swal.fire('Error','No se pudo declinar el registro.','error'); } }); } }); }
 function verMotivo(motivo){ Swal.fire({ title:'Motivo de Declinacion', text: motivo || 'No se especifico un motivo.', icon:'info', confirmButtonText:'Cerrar', confirmButtonColor:'#5b73e8' }); }
+function verNoDocumento(titulo, valor){ Swal.fire({ title: titulo, text: valor, icon: 'info', confirmButtonText: 'Cerrar', confirmButtonColor: '#5b73e8' }); }
 function eliminarSolicitud(id){ Swal.fire({ title:'Deseas eliminar la solicitud?', text:'No podras revertir esto', icon:'warning', showCancelButton:true, confirmButtonColor:'#3085d6', cancelButtonColor:'#d33', confirmButtonText:'Si, eliminar', cancelButtonText:'Cancelar' }).then((result)=>{ if(result.isConfirmed){ $.post('<?= base_url("index.php/Principal/eliminarSolicitudConvenio") ?>',{ id_solicitud:id },function(response){ if(!response.error){ Swal.fire('Eliminado','El registro ha sido eliminado.','success').then(()=>location.reload()); } else { Swal.fire('Error','No se pudo eliminar el registro.','error'); } }); } }); }
 function abrirModalArchivos(id){ $('#modal_id_solicitud').val(id); $('.check-si').prop('checked', false); $('#modalSeleccionArchivos').modal('show'); }
 function enviarFormularioArchivos(){ $('#formSeleccionArchivos').submit(); }
