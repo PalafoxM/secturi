@@ -273,28 +273,30 @@ class Login extends BaseController {
         $response->respuesta = "Error al validar usuario";
         $session = \Config\Services::session();
         $catalogos = new Mglobal;
+         $client = \Config\Services::curlrequest();
         
         $usuario     = $this->request->getPost('usuario');
         $contrasenia = $this->request->getPost('contrasenia');
 
-  
-        $dataDB = array('tabla' => 'usuario', 'where' =>[ "usuario" => $usuario, "visible" => 1]);
+        $data = [
+           'where' =>["usuario" => $usuario, "contrasenia" => $contrasenia, "visible" => 1],
+           "tabla" => "usuario"
+        ];
+
+
+          try {
+            // Hacemos la petición POST a Node.js
+            $baseUrl = env('NODE_API_BASE_URL');
+            $apiResponse = $client->post($baseUrl.'login', [
+                'json' => ['data'=> $data]
+            ]);
     
-        if($usuario && $contrasenia){
-            $result = $catalogos->getTabla($dataDB);
-            
-            if(isset($result->data) && !empty($result->data) && $this->validarContrasenia($contrasenia, $result->data[0]->contrasenia)){
-                if ($this->requiereRehashContrasenia($result->data[0]->contrasenia)) {
-                    $catalogos->saveTabla(
-                        ['contrasenia' => $this->hashContrasenia($contrasenia)],
-                        [
-                            'tabla' => 'usuario',
-                            'editar' => true,
-                            'idEditar' => ['id_usuario' => $result->data[0]->id_usuario]
-                        ],
-                        ['id_user' => $result->data[0]->id_usuario, 'script' => 'Login.php/validar_usuario']
-                    );
-                }
+            $result = json_decode($apiResponse->getBody());
+      
+            if (isset($result->error) && $result->error === false) {
+                $response->error = false;
+                $response->respuesta = $result->respuesta ?? 'Operación exitosa';
+                $response->data = $result->data ?? [];
                 $session->set('logueado', 1);
                 $session->set('id_usuario',$result->data[0]->id_usuario);
                 $session->set('id_sexo',$result->data[0]->id_sexo);
@@ -312,13 +314,14 @@ class Login extends BaseController {
                 $session->set('esJefe', $esJefe);
                 $response->error     = $result->error;
                 $response->respuesta = $result->respuesta;
-                //$asistencia = $this->registrarAsistencia($result->data[0]->id_usuario );
-              /*   if(!$asistencia->error){
-                   $response->asistencia = $asistencia->asistencia;
-                } */
-                
-            }     
-        }        
+            } else {
+                $response->respuesta = $result->respuesta ?? 'Error desconocido en la respuesta';
+            }
+        
+            } catch (\Exception $e) {
+            log_message('error', 'Error al conectar con la API de Node.js: ' . $e->getMessage());
+            $response->respuesta = 'Error|Conexión fallida con Node.js';
+        }       
         return $this->respond($response);
     }
     public function validar_usuario2(){

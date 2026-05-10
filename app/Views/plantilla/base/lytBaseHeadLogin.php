@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -8,13 +8,13 @@
     <meta content="Sistema de Administración de Capacitación" name="description" />
     <meta content="Agustin Palafox Marin" name="author" />
     <meta name="developer" content="palafox.marin@hotmail.com">
-    <!-- App favicon -->
+  
     <link rel="shortcut icon" href="<?php echo base_url(); ?>assets/huella.png">
 
     <link href="<?php echo base_url(); ?>plugins/sweet-alert2/sweetalert2.min.css" rel="stylesheet" type="text/css">
     <link href="<?php echo base_url(); ?>plugins/animate/animate.css" rel="stylesheet" type="text/css">
 
-    <!-- App css -->
+
     <link href="<?php echo base_url(); ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="<?php echo base_url(); ?>assets/css/jquery-ui.min.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
@@ -50,112 +50,7 @@
     /* ===== Fireflies (compiled to plain CSS) ===== */
 body{background:grey;overflow:hidden;}
 
-@-moz-keyframes nieve{	
-	from{top:-40px;}
-    to{top:101%;}
-}
-@-webkit-keyframes nieve{	
-	from{top:-40px;}
-    to{top:2000px;}
-}
-@keyframes nieve{	
-	from{top:-40px;}
-    to{top:2000px;}
-}
 
-@-moz-keyframes horiz2{
-    20%{transform:translateX(0);}
-    50%{transform:translateX(150px);}
-    80%{transform:translateX(0);}
-}
-@-webkit-keyframes horiz2{
-    20%{transform:translateX(0);}
-    50%{transform:translateX(150px);}
-    80%{transform:translateX(0);}
-}
-@keyframes horiz2{
-    20%{transform:translateX(0);}
-    50%{transform:translateX(-70px);}
-    80%{transform:translateX(0);}
-}
-
-@-moz-keyframes horiz{
-    20%{transform:translateX(0);}
-    50%{transform:translateX(150px);}
-    80%{transform:translateX(0);}
-}
-@-webkit-keyframes horiz{
-    20%{transform:translateX(0);}
-    50%{transform:translateX(150px);}
-    80%{transform:translateX(0);}
-}
-@keyframes horiz{
-    20%{transform:translateX(0);}
-    50%{transform:translateX(150px);}
-    80%{transform: translateX(0);}
-}
-	
-.tpl-snow > div{position:fixed;-webkit-animation:ease-in infinite normal;-moz-animation:ease-in infinite normal;animation:ease-in infinite normal;}	
-
-.tpl-snow > div{z-index:9999999999999;width:5px;height:5px;-moz-border-radius:50%;-webkit-border-radius:50%;border-radius:50%;background-color:#fff;-webkit-animation-name:nieve,horiz;-moz-animation-name:nieve,horiz;animation-name:nieve,horiz;}
-.tpl-snow > div:nth-of-type(odd){width:2px; height:2px;-webkit-animation-name:nieve,horiz2;-moz-animation-name:nieve,horiz2;animation-name:nieve,horiz2;}
-
-.tpl-snow > div:nth-of-type(1){left:40px;-webkit-animation-duration:5.5s;-moz-animation-duration:5.5s;animation-duration:5.5s;-webkit-animation-delay:1s;-moz-animation-delay:1s;animation-delay:1s;}
-.tpl-snow > div:nth-of-type(2){left:120px;-webkit-animation-duration:7s;-moz-animation-duration:7s;animation-duration:7s;}
-.tpl-snow > div:nth-of-type(3){left:200px;-webkit-animation-duration:8s;-moz-animation-duration:8s;animation-duration:8s;}
-.tpl-snow > div:nth-of-type(4){left:20%;-webkit-animation-duration:6s;-moz-animation-duration:6s;animation-duration:6s;-webkit-animation-delay:1s;-moz-animation-delay:1s;animation-delay:1s;}
-.tpl-snow > div:nth-of-type(5){left:30%;-webkit-animation-duration:9s;-moz-animation-duration:9s;animation-duration:9s;}
-.tpl-snow > div:nth-of-type(6){left:40%;-webkit-animation-duration:7.2s;-moz-animation-duration:7.2s;animation-duration:7.2s;-webkit-animation-delay:1s;-moz-animation-delay:1s;animation-delay:1s;}
-.tpl-snow > div:nth-of-type(7){left:50%;-webkit-animation-duration:10s;-moz-animation-duration:10s;animation-duration:10s;}
-.tpl-snow > div:nth-of-type(8){left:60%;-webkit-animation-duration:6.4s;-moz-animation-duration:6.4s;animation-duration:6.4s;-webkit-animation-delay:1s;-moz-animation-delay:1s;animation-delay:1s;}
-.tpl-snow > div:nth-of-type(9){left:70%;-webkit-animation-duration:10s;-moz-animation-duration:10s;animation-duration:10s;-webkit-animation-delay:1.4s;-moz-animation-delay:1.4s;animation-delay:1.4s;}
-.tpl-snow > div:nth-of-type(10){left:80%;-webkit-animation-duration:8s;-moz-animation-duration:8s;animation-duration:8s;}
-.tpl-snow > div:nth-of-type(11){left:90%;-webkit-animation-duration:7.1s;-moz-animation-duration:7.1s;animation-duration:7.1s;-webkit-animation-delay:2s;-moz-animation-delay:2s;animation-delay:2s;}
-.tpl-snow > div:nth-of-type(12){left:99%;-webkit-animation-duration:6.6s;-moz-animation-duration:6.6s;animation-duration:6.6s;-webkit-animation-delay:1.6s;-moz-animation-delay:1.6s;animation-delay:1.6s;}
-.tpl-snow > div:nth-of-type(13){left:10px;-webkit-animation-duration:10.2s;-moz-animation-duration:10.2s;animation-duration:10.2s;}
-.tpl-snow > div:nth-of-type(14){left:180px;-webkit-animation-duration:12s;-moz-animation-duration:12s;animation-duration:12s;}
-.tpl-snow > div:nth-of-type(15){left:213px;-webkit-animation-duration:7.3s;-moz-animation-duration:7.3s;animation-duration:7.3s;-webkit-animation-delay:.5s;-moz-animation-delay:.5s;animation-delay:.5s;}
-.tpl-snow > div:nth-of-type(16){left:23%;-webkit-animation-duration:9.2s;-moz-animation-duration:9.2s;animation-duration:9.2s;}
-.tpl-snow > div:nth-of-type(17){left:38%;-webkit-animation-duration:5s;-moz-animation-duration:5s;animation-duration:5s;}
-.tpl-snow > div:nth-of-type(18){left:45%;-webkit-animation-duration:15s;-moz-animation-duration:15s;animation-duration:15s;}
-.tpl-snow > div:nth-of-type(19){left:58%;-webkit-animation-duration:5s;-moz-animation-duration:5s;animation-duration:5s;}
-.tpl-snow > div:nth-of-type(20){left:64%;-webkit-animation-duration:12s;-moz-animation-duration:12s;animation-duration:12s;}
-.tpl-snow > div:nth-of-type(21){left:76%;-webkit-animation-duration:5.6s;-moz-animation-duration:5.6s;animation-duration:5.6s;-webkit-animation-delay:1s;-moz-animation-delay:1s;animation-delay:1s;}
-.tpl-snow > div:nth-of-type(22){left:86%;-webkit-animation-duration:8.5s;-moz-animation-duration:8.5s;animation-duration:8.5s;}
-.tpl-snow > div:nth-of-type(23){left:83%;-webkit-animation-duration:14.4s;-moz-animation-duration:14.4s;animation-duration:14.4s;}
-.tpl-snow > div:nth-of-type(24){left:95%;-webkit-animation-duration:12s;-moz-animation-duration:12s;animation-duration:12s;}
-.tpl-snow > div:nth-of-type(25){left:55px;-webkit-animation-duration:8.7s;-moz-animation-duration:8.7s;animation-duration:8.7s;-webkit-animation-delay:1.2s;-moz-animation-delay:1.2s;animation-delay:1.2s;}
-.tpl-snow > div:nth-of-type(26){left:133px;-webkit-animation-duration:5.2s;-moz-animation-duration:5.2s;animation-duration:5.2s;}
-.tpl-snow > div:nth-of-type(27){left:215px;-webkit-animation-duration:10.4s;-moz-animation-duration:10.4s;animation-duration:10.4s;-webkit-animation-delay:1.6s;-moz-animation-delay:1.6s;animation-delay:1.6s;}
-.tpl-snow > div:nth-of-type(28){left:26%;-webkit-animation-duration:9s;-moz-animation-duration:9s;animation-duration:9s;}
-.tpl-snow > div:nth-of-type(29){left:33%;-webkit-animation-duration:12s;-moz-animation-duration:12s;animation-duration:12s;}
-.tpl-snow > div:nth-of-type(30){left:49%;-webkit-animation-duration:9.4s;-moz-animation-duration:9.4s;animation-duration:9.4s;-webkit-animation-delay:1s;-moz-animation-delay:1s;animation-delay:1s;}
-.tpl-snow > div:nth-of-type(31){left:55%;-webkit-animation-duration:9.1s;-moz-animation-duration:9.1s;animation-duration:9.1s;}
-.tpl-snow > div:nth-of-type(32){left:68%;-webkit-animation-duration:9.6s;-moz-animation-duration:9.6s;animation-duration:9.6s;-webkit-animation-delay:.5s;-moz-animation-delay:.5s;animation-delay:.5s;}
-.tpl-snow > div:nth-of-type(33){left:73%;-webkit-animation-duration:12.4s;-moz-animation-duration:12.4s;animation-duration:12.4s;-webkit-animation-delay:1s;-moz-animation-delay:1s;animation-delay:1s;}
-.tpl-snow > div:nth-of-type(34){left:85%;-webkit-animation-duration:9s;-moz-animation-duration:9s;animation-duration:9s;-webkit-animation-delay:1.5s;-moz-animation-delay:1.5s;animation-delay:1.5s;}
-.tpl-snow > div:nth-of-type(35){left:93%;-webkit-animation-duration:5s;-moz-animation-duration:5s;animation-duration:5s;}
-.tpl-snow > div:nth-of-type(36){left:99%;-webkit-animation-duration:10.6s;-moz-animation-duration:10.6s;animation-duration:10.6s;}
-.tpl-snow > div:nth-of-type(37){left:15px;-webkit-animation-duration:9.6s;-moz-animation-duration:9.6s;animation-duration:9.6s;}
-.tpl-snow > div:nth-of-type(38){left:99px;-webkit-animation-duration:7.5s;-moz-animation-duration:7.5s;animation-duration:7.5s;}
-.tpl-snow > div:nth-of-type(39){left:260px;-webkit-animation-duration:11s;-moz-animation-duration:11s;animation-duration:11s;-webkit-animation-delay:1s;-moz-animation-delay:1s;animation-delay:1s;}
-.tpl-snow > div:nth-of-type(40){left:28%;-webkit-animation-duration:19s;-moz-animation-duration:19s;animation-duration:19s;}
-.tpl-snow > div:nth-of-type(41){left:35%;-webkit-animation-duration:14s;-moz-animation-duration:14s;animation-duration:14s;}
-.tpl-snow > div:nth-of-type(42){left:43%;-webkit-animation-duration:5.6s;-moz-animation-duration:5.6s;animation-duration:5.6s;}
-.tpl-snow > div:nth-of-type(43){left:53%;-webkit-animation-duration:8.8s;-moz-animation-duration:8.8s;animation-duration:8.8s;-webkit-animation-delay:1s;-moz-animation-delay:1s;animation-delay:1s;}
-.tpl-snow > div:nth-of-type(44){left:66%;-webkit-animation-duration:16s;-moz-animation-duration:16s;animation-duration:16s;}
-.tpl-snow > div:nth-of-type(45){left:78%;-webkit-animation-duration:6s;-moz-animation-duration:6s;animation-duration:6s;}
-.tpl-snow > div:nth-of-type(46){left:88%;-webkit-animation-duration:9.5s;-moz-animation-duration:9.5s;animation-duration:9.5s;-webkit-animation-delay:.5s;-moz-animation-delay:.5s;animation-delay:.5s;}
-.tpl-snow > div:nth-of-type(47){left:94%;-webkit-animation-duration:7.6s;-moz-animation-duration:7.6s;animation-duration:7.6s;}
-.tpl-snow > div:nth-of-type(48){left:96%;-webkit-animation-duration:8.2s;-moz-animation-duration:8.2s;animation-duration:8.2s;-webkit-animation-delay:.3s;-moz-animation-delay:.3s;animation-delay:.3s;}
-
-@media(max-width:600px){
-	.tpl-snow > div:nth-of-type(24) ~ *{display:none;}
-}
-
-@media(max-width:800px){
-	.tpl-snow > div:nth-of-type(36) ~ *{display:none;}
-}
 
 
 
@@ -167,57 +62,8 @@ body.forest-bg #particles-js { display: none; }
 </head>
 
 <body class="account-body accountbg">
- <div id="particles-js"></div>
-<!-- <div class="tpl-snow">
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-</div>-->
+ <div id="particles-js"></div> 
+
 <script>
   var base_url = "<?php echo base_url(); ?>";
 
@@ -253,4 +99,47 @@ body.forest-bg #particles-js { display: none; }
   }
 
   window.addEventListener('load', setRandomBackground);
+</script>-->
+<!DOCTYPE html>
+<?php
+$loginDefaultBackgroundUrl = base_url('images/fondo_susi.png');
+$loginLoadingBackgroundUrl = base_url('images/fondo_susi.png');
+$loginBackgroundUrls = [$loginDefaultBackgroundUrl];
+?>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>SUSI</title>
+    <meta name="csrf-token" content="<?= esc(csrf_hash(), 'attr'); ?>">
+    <meta name="csrf-header" content="<?= esc(csrf_header(), 'attr'); ?>">
+    <meta name="csrf-token-name" content="<?= esc(csrf_token(), 'attr'); ?>">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="shortcut icon" href="<?= base_url(); ?>assets/images/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" type="text/css" href="<?= base_url('parallax.js_files/styles.css') ?>">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
+    <script>
+        (function () {
+            var mainBackgrounds = <?= json_encode($loginBackgroundUrls) ?>;
+            var currentBackground = <?= json_encode($loginDefaultBackgroundUrl) ?>;
+            var loadingBackground = <?= json_encode($loginLoadingBackgroundUrl) ?>;
+
+            if (Array.isArray(mainBackgrounds) && mainBackgrounds.length > 0) {
+                currentBackground = mainBackgrounds[Math.floor(Math.random() * mainBackgrounds.length)];
+            }
+
+            document.documentElement.style.setProperty('--fic-login-loading-bg', 'url("' + loadingBackground.replace(/"/g, '\\"') + '")');
+            document.documentElement.style.setProperty('--fic-login-main-bg', 'url("' + currentBackground.replace(/"/g, '\\"') + '")');
+        })();
+    </script>
+    <?php if (isset($scripts)) : foreach ($scripts as $js) : ?>
+    <script src="<?= base_url("js/{$js}.js") ?>?filever=<?= time() ?>" type="text/javascript"></script>
+    <?php endforeach; endif; ?>
+</head>
+<body class="fic-login-body" data-base-url="<?= esc(base_url(), 'attr') ?>">
+<script>
+    var base_url = "<?= base_url(); ?>";
 </script>
