@@ -32,7 +32,7 @@ $session = \Config\Services::session();
                                 <table id="datatableUsuario" class="table">
                                     <thead class="thead-light">
                                         <tr>
-                                            <th class="text-center">FEC. TRAMITE</th>
+                                            <th class="text-center">CONTRATO/CONVENIO</th>
                                             <th class="text-center">FOLIO</th>
                                             <th class="text-center">NO. RESERVA</th>
                                             <th class="text-center">PROVEEDOR</th>
@@ -48,7 +48,7 @@ $session = \Config\Services::session();
                                     <tbody>
                                         <?php foreach($dataHojaAzul as $e): ?>
                                         <tr>
-                                            <td  class="text-center"><?= date('d/m/Y', strtotime($e->fecha_tramite)) ?></td>
+                                            <td  class="text-center"><?= $e->no_convenio ?></td>
                                             <td  class="text-center"><?= $e->no_consecutivo?></td>
                                             <td  class="text-center"><?= $e->no_reserva?></td>
                                             <td  class="text-center"><?= $e->nombre_proveedor_1?></td>
