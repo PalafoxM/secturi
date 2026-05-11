@@ -48,7 +48,7 @@ $session = \Config\Services::session();
                                     <tbody>
                                         <?php foreach($dataHojaAzul as $e): ?>
                                         <tr>
-                                            <td  class="text-center"><?= $e->no_convenio ?></td>
+                                            <td  class="text-center"><?= empty($e->no_convenio) ? 'NO APLICA' : $e->no_convenio ?></td>
                                             <td  class="text-center"><?= $e->no_consecutivo?></td>
                                             <td  class="text-center"><?= $e->no_reserva?></td>
                                             <td  class="text-center"><?= $e->nombre_proveedor_1?></td>
