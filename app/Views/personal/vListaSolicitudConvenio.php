@@ -83,6 +83,9 @@
                                                                 <span class="badge badge-success">Aprobado</span>
                                                             <?php endif; ?>
                                                         <?php endif; ?>
+                                                        <?php if((int) $sol->id_estatus === 3 && in_array($session->id_perfil, [1, 7], true)): ?>
+                                                            <input onclick="envioCRFyAP(this)" id="sol_<?= (int) $sol->id_solicitud_convenio ?>" type="checkbox" name="seleccionados[]" class="ms-3" style="zoom:1;" value="<?= (int) $sol->id_solicitud_convenio ?>" <?= ($sol->ok === 1)? 'checked' : '' ?>>
+                                                        <?php endif; ?>
                                                     </td>
                                                     <td class="text-center">
                                                         <?php if ($session->id_perfil != 7): ?>
@@ -111,6 +114,9 @@
                                                         <?php endif; ?>
                                                         <?php if ($session->id_perfil != 7): ?>
                                                             <button class="btn btn-sm btn-danger" title="Eliminar" onclick="eliminarSolicitud(<?= $sol->id_solicitud_convenio ?>)"><i class="fas fa-trash"></i></button>
+                                                        <?php endif; ?>
+                                                        <?php if($sol->ok === 1): ?>
+                                                            <button class="btn btn-sm btn-pulse-purple" title="Enviar a CRFyAP" onclick="enviarCRFyAP(<?= $sol->id_solicitud_convenio ?>)"><i class="fas fa-paper-plane text-white"></i></button>
                                                         <?php endif; ?>
                                                     </td>
                                                 </tr>
@@ -159,7 +165,24 @@
         </div>
     </div>
 </div>
-
+<style>
+@keyframes pulse-animation-purple {
+  0% { box-shadow: 0 0 0 0 rgba(156, 39, 176, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(156, 39, 176, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(156, 39, 176, 0); }
+}
+.btn-pulse-purple {
+  background-color: #9c27b0 !important;
+  border-color: #9c27b0 !important;
+  color: white !important;
+  animation: pulse-animation-purple 2s infinite;
+}
+.btn-pulse-purple:hover {
+  background-color: #7b1fa2 !important;
+  border-color: #7b1fa2 !important;
+  color: white !important;
+}
+</style>
 <link href="<?= base_url() ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
 <link href="<?= base_url() ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 <link href="<?= base_url() ?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
@@ -262,5 +285,62 @@ function subirNoConvenio(id, noConvenioActual){
             Swal.fire('Exito', response.respuesta || 'No. convenio guardado correctamente.', 'success').then(() => location.reload());
         }
     });
+}
+
+function envioCRFyAP(e){
+    if(e.checked){
+        Swal.fire({
+            title: 'Envio de Solicitud',
+            text: '¿Se activara el envio de la solicitud de convenio a CRFyAP?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sí',
+            cancelButtonText: 'Cancelar',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post('<?= base_url("index.php/Principal/activarEnvioSolicitudConvenio") ?>', {
+                    id_solicitud_convenio: e.value
+                }).then(response => response).catch(() => {
+                    Swal.showValidationMessage('No se pudo guardar el No. convenio');
+                });
+                const response = result.value || {};
+                if (response.error) {
+                    Swal.fire('Error', response.respuesta || 'No se pudo guardar el No. convenio.', 'error');
+                } else {
+                    Swal.fire('Exito', response.respuesta || 'No. convenio guardado correctamente.', 'success').then(() => location.reload());
+                }
+                
+            }else{
+                $(e).prop('checked', false);
+            }
+        })
+        
+    }
+}
+
+function enviarCRFyAP(id){
+    Swal.fire({
+        title: 'Envio de Solicitud',
+        text: '¿Se activara el envio de la solicitud de convenio a CRFyAP?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sí',
+        cancelButtonText: 'Cancelar',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.post('<?= base_url("index.php/Principal/activarEnvioSolicitudConvenio") ?>', {
+                id_solicitud_convenio: id
+            }).then(response => response).catch(() => {
+                Swal.showValidationMessage('No se pudo guardar el No. convenio');
+            });
+            const response = result.value || {};
+            if (response.error) {
+                Swal.fire('Error', response.respuesta || 'No se pudo guardar el No. convenio.', 'error');
+            } else {
+                Swal.fire('Exito', response.respuesta || 'No. convenio guardado correctamente.', 'success').then(() => location.reload());
+            }
+            
+        }
+    })
 }
 </script>

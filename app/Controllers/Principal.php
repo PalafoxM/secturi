@@ -11050,6 +11050,44 @@ class Principal extends BaseController
         $data['contentView'] = 'personal/vListaSolicitudConvenio';
         $this->_renderView($data);
     }
+    
+    public function activarEnvioSolicitudConvenio()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response = new \stdClass();
+
+        $id = $this->request->getPost('id_solicitud_convenio');
+
+        if ($id) {
+            $dataConfig = [
+                "tabla" => "solicitud_convenio",
+                "editar" => true,
+                "idEditar" => ["id_solicitud_convenio" => $id]
+                
+            ];
+            $dataInsert = [
+                "ok" => 1,
+                "usu_act" => $session->id_usuario, 
+                
+            ];
+
+           $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Principal.php/liberarSolicitudContrato'];
+
+            $resultado = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+           var_dump($resultado);die();
+
+            if($resultado->error){
+                $response->error = true;
+                $response->respuesta = $resultado->respuesta;
+            }
+            $response->error = false;
+            $response->respuesta = 'Convenio liberado';
+          
+        }
+        return $this->respond($response);
+    }
+
     public function liberarSolicitudContrato()
     {
          $session = \Config\Services::session();
