@@ -328,7 +328,7 @@ function enviarCRFyAP(id){
         cancelButtonText: 'Cancelar',
     }).then((result) => {
         if (result.isConfirmed) {
-            $.post('<?= base_url("index.php/Principal/activarEnvioSolicitudConvenio") ?>', {
+            $.post('<?= base_url("index.php/Principal/enviarCRFyAPConvenio") ?>', {
                 id_solicitud_convenio: id
             }).then(response => response).catch(() => {
                 Swal.showValidationMessage('No se pudo guardar el No. convenio');

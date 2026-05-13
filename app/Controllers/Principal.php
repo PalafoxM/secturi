@@ -10993,6 +10993,55 @@ class Principal extends BaseController
         $this->_renderView($data);
     }
 
+    public function enviarCRFyAPConvenio()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+         $response = new \stdClass();
+        $id_solicitud_convenio = $this->request->getPost('id_solicitud_convenio');
+        $solicitudes = $globals->getTabla(['tabla' => 'vw_solicitud_convenio', 'where' => ["id_solicitud_convenio"=> $id_solicitud_convenio, 'visible' => 1]]);
+        if(empty($solicitudes->data)){
+             $response->error = true;
+             $response->respuesta = 'No se encontro Solicitud';
+            return $this->respond($response);
+        }
+
+       
+        $sol = $solicitudes->data[0];
+        $proveedores = $globals->getTabla(["tabla" =>"proveedor", 'where' => ['rfc' => $sol->proveedor_rfc]]);
+        $idProveedor = 0;
+        $idPOroveedorBanco = 'N/A';
+
+        if(!empty($proveedores->data)){
+            $idProveedor = $proveedores->data[0]->id_proveedor;
+            $banco = $globals->getTabla(["tabla" =>"proveedor_banco", 'where' => ['idproveedor' => $idProveedor]]);
+            $idPOroveedorBanco =  $banco->data[0]->id_proveedor_banco;
+
+
+        }
+      
+        $dataInsert = [
+            "id_proveedor" =>$idProveedor,
+            "id_estatus" => 1,
+            "id_proveedor_banco" => $idPOroveedorBanco,
+            "folio" => "PT-".date("YmdHis"),
+            "no_reserva" => "",
+            "no_convenio" => $sol->no_convenio,
+            "nuevo_fondo" => "",
+            "total_importe" => $sol->monto_total,
+            "comentarios_instrumento" => "",
+            "instrumento" => $sol->instrumento_juridico,
+            "ruta_absoluta" => "",
+            "observaciones" => "",
+            "fec_act" => date("Y-m-d"),
+            "usu_act" => $session->id_usuario,
+        ];
+
+          var_dump($dataInsert);
+        die();
+        
+    }
+
     public function ListaSolicitudConvenio()
     {
         $session = \Config\Services::session();
