@@ -428,36 +428,6 @@ class Inicio extends BaseController
 
     }
 
-    public function setupColorDB()
-    {
-        $db = \Config\Database::connect();
-        
-        $sql1 = "CREATE TABLE IF NOT EXISTS colores (
-            id_color INT AUTO_INCREMENT PRIMARY KEY,
-            codigo_hex VARCHAR(10) NOT NULL,
-            nombre VARCHAR(50),
-            visible INT DEFAULT 1,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );";
-
-        $sql2 = "CREATE TABLE IF NOT EXISTS rel_producto_color (
-            id_rel INT AUTO_INCREMENT PRIMARY KEY,
-            id_producto INT NOT NULL,
-            id_color INT NOT NULL,
-            cantidad INT DEFAULT 0,
-            visible INT DEFAULT 1,
-            FOREIGN KEY (id_producto) REFERENCES cat_inventario_promo(id_inventario_promo),
-            FOREIGN KEY (id_color) REFERENCES colores(id_color)
-        );";
-
-        try {
-            $db->query($sql1);
-            $db->query($sql2);
-            echo "Tablas creadas correctamente.";
-        } catch (\Throwable $th) {
-            echo "Error al crear tablas: " . $th->getMessage();
-        }
-    }
 
     public function Perfil()
     {
