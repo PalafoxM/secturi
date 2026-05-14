@@ -75,10 +75,15 @@
                                                             <td class="text-center"><?= $p->observaciones ?? '' ?></td>
                                                         <?php else: ?>
                                                             <td class="text-center">
-                                                                <?php if (!empty($p->instrumento)) : ?>
-                                                                    <a target="_blank" href="<?= base_url() . $p->instrumento ?>" class="btn btn-gradient-info px-4">
-                                                                        <i class="dripicons-document-new font-21"></i>
-                                                                    </a>
+                                                                <?php if (!empty($p->instrumento_urls)) : ?>
+                                                                    <?php foreach ($p->instrumento_urls as $indexInstrumento => $instrumento): ?>
+                                                                        <a target="_blank" href="<?= esc($instrumento['url'] ?? '') ?>" class="btn btn-gradient-info px-3 mb-1" title="Ver instrumento <?= $indexInstrumento + 1 ?>">
+                                                                            <i class="dripicons-document-new font-21"></i>
+                                                                            <?php if (count($p->instrumento_urls) > 1): ?>
+                                                                                <?= $indexInstrumento + 1 ?>
+                                                                            <?php endif; ?>
+                                                                        </a>
+                                                                    <?php endforeach; ?>
                                                                 <?php endif; ?>
                                                             </td>
                                                         <?php endif; ?>

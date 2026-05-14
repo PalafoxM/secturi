@@ -1,6 +1,31 @@
 var ini = window.ssa || {};
 
 ini.inicio = (function () {
+    function renderInstrumentoLinks(reserva) {
+        const urls = Array.isArray(reserva.instrumento_urls) ? reserva.instrumento_urls : [];
+
+        if (urls.length > 0) {
+            return urls.map((instrumento, index) => {
+                const etiqueta = urls.length > 1 ? ` Ver archivo ${index + 1}` : ' Ver archivo';
+                return `<a href="${instrumento.url}" target="_blank" class="me-2">
+                            <i class="mdi mdi-file"></i>${etiqueta}
+                        </a>`;
+            }).join('');
+        }
+
+        if (!reserva.instrumento) {
+            return '';
+        }
+
+        const fileUrl = /^https?:\/\//i.test(reserva.instrumento)
+            ? reserva.instrumento
+            : base_url + reserva.instrumento;
+
+        return `<a href="${fileUrl}" target="_blank" class="me-2">
+                    <i class="mdi mdi-file"></i> Ver archivo
+                </a>`;
+    }
+
     return {
 
         abrirVentanaPdf: function (idTurno) {
@@ -842,13 +867,8 @@ ini.inicio = (function () {
                         $("#total_importe_editar").val(reserva.total_importe || '');
                         $("#id_reserva").val(reserva.id_reserva || '');
                         $("#previews2").empty(); // Limpiar contenido anterior del contenedor
-                        // Verifica que haya un instrumento antes de agregar el enlace
-                        if (reserva.instrumento) {
-
-                            const fileUrl = base_url + reserva.instrumento;
-                            const link = `<a href="${fileUrl}" target="_blank" class="me-2">
-                                            <i class="mdi mdi-file"></i> Ver archivo
-                                        </a>`;
+                        const link = renderInstrumentoLinks(reserva);
+                        if (link) {
                             $("#previews2").append(link);
                         }
                         $("#no_convenio_editar").val(reserva.no_convenio || '');
@@ -1334,11 +1354,8 @@ ini.inicio = (function () {
                         $("#validar_no_proveedor").val(reserva.no_proveedor || '');
                         $("#validar_total_importe").val(reserva.total_importe || '');
                         $("#comentarios_instrumento_estatus").val(reserva.comentarios_instrumento || '');
-                        if (reserva.instrumento) {
-                            const fileUrl = base_url + reserva.instrumento;
-                            const link = `<a href="${fileUrl}" target="_blank" class="me-2">
-                                            <i class="mdi mdi-file font-21"></i> Ver archivo
-                                        </a>`;
+                        const link = renderInstrumentoLinks(reserva);
+                        if (link) {
                             $("#previews").append(link);
                         }
 
@@ -1436,11 +1453,8 @@ ini.inicio = (function () {
                         $("#validar_no_proveedor").val(reserva.no_proveedor || '');
                         $("#validar_total_importe").val(reserva.total_importe || '');
                         $("#comentarios_instrumento_estatus").val(comentarios_instrumento || '');
-                        if (reserva.instrumento) {
-                            const fileUrl = base_url + reserva.instrumento;
-                            const link = `<a href="${fileUrl}" target="_blank" class="me-2">
-                                            <i class="mdi mdi-file font-21"></i> Ver archivo
-                                        </a>`;
+                        const link = renderInstrumentoLinks(reserva);
+                        if (link) {
                             $("#previews").append(link);
                         }
 

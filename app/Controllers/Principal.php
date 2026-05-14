@@ -234,7 +234,7 @@ class Principal extends BaseController
 
         $resultado = [];
         foreach ($instrumentos as $ruta) {
-            $url = $this->resolveStoredFileUrl($ruta);
+            $url = $this->resolveStoredFilePreviewUrl($ruta);
             if ($url) {
                 $resultado[] = [
                     'ruta' => $ruta,
@@ -2939,7 +2939,12 @@ class Principal extends BaseController
         $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
         $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
         $proveedor = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit' => 100]);
-        $data['reserva'] = (!empty($reserva->data)) ? $reserva->data : [];
+        $reservas = (!empty($reserva->data)) ? $reserva->data : [];
+        foreach ($reservas as $itemReserva) {
+            $itemReserva->instrumento_urls = $this->mapInstrumentoUrls($itemReserva->instrumento ?? null);
+        }
+
+        $data['reserva'] = $reservas;
         $data['scripts'] = array('inicio');
         $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
         $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
@@ -9886,7 +9891,11 @@ class Principal extends BaseController
             $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
             $response->error = $reserva->error;
             $response->respuesta = $reserva->respuesta;
-            $response->data['reserva'] = (isset($reserva->data[0]) && !empty($reserva->data[0])) ? $reserva->data[0] : [];
+            $reservaData = (isset($reserva->data[0]) && !empty($reserva->data[0])) ? $reserva->data[0] : [];
+            if (!empty($reservaData)) {
+                $reservaData->instrumento_urls = $this->mapInstrumentoUrls($reservaData->instrumento ?? null);
+            }
+            $response->data['reserva'] = $reservaData;
             $response->data['presupuesto'] = (isset($reserva->data[0]) && !empty($reserva->data[0])) ? $reserva->data : [];
             $response->data['proyecto'] = (isset($cat_proyecto->data[0]) && !empty($cat_proyecto->data[0])) ? $cat_proyecto->data : [];
             $response->data['partida'] = (isset($cat_partida->data[0]) && !empty($cat_partida->data[0])) ? $cat_partida->data : [];
@@ -9913,7 +9922,11 @@ class Principal extends BaseController
             $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
             $response->error = $reserva->error;
             $response->respuesta = $reserva->respuesta;
-            $response->data['reserva'] = (isset($reserva->data[0]) && !empty($reserva->data[0])) ? $reserva->data[0] : [];
+            $reservaData = (isset($reserva->data[0]) && !empty($reserva->data[0])) ? $reserva->data[0] : [];
+            if (!empty($reservaData)) {
+                $reservaData->instrumento_urls = $this->mapInstrumentoUrls($reservaData->instrumento ?? null);
+            }
+            $response->data['reserva'] = $reservaData;
             $response->data['presupuesto'] = (isset($reserva->data[0]) && !empty($reserva->data[0])) ? $reserva->data : [];
             $response->data['proyecto'] = (isset($cat_proyecto->data[0]) && !empty($cat_proyecto->data[0])) ? $cat_proyecto->data : [];
             $response->data['partida'] = (isset($cat_partida->data[0]) && !empty($cat_partida->data[0])) ? $cat_partida->data : [];
