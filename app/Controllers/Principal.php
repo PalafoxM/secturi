@@ -11086,6 +11086,10 @@ class Principal extends BaseController
             ["tabla" => "solicitud_convenio", "editar" => true, "idEditar" => ["id_solicitud_convenio" => $id_solicitud_convenio]],
             ['id_user' => $session->id_usuario, 'script' => 'Principal.php/enviarCRFyAPConvenio']
         );
+        if($session->id_usuario != 1){
+           $this->enviarEmail(1);
+        }
+        
 
         $response->error = false;
         $response->respuesta = 'El convenio paso a CRFyAP';
@@ -11171,6 +11175,42 @@ class Principal extends BaseController
         $this->_renderView($data);
     }
     
+    public function activarEnvioSolicitudContrato()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response = new \stdClass();
+
+        $id = $this->request->getPost('id_solicitud_contrato');
+
+        if ($id) {
+            $dataConfig = [
+                "tabla" => "solicitud_contrato",
+                "editar" => true,
+                "idEditar" => ["id_solicitud_contrato" => $id]
+                
+            ];
+            $dataInsert = [
+                "ok" => 1,
+                "usu_act" => $session->id_usuario, 
+                
+            ];
+
+            $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Principal.php/liberarSolicitudContrato'];
+
+            $resultado = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+
+            if($resultado->error){
+                $response->error = true;
+                $response->respuesta = $resultado->respuesta;
+                return $this->respond($response);
+            }
+            $response->error = false;
+            $response->respuesta = 'Convenio liberado';
+          
+        }
+        return $this->respond($response);
+    }
     public function activarEnvioSolicitudConvenio()
     {
         $session = \Config\Services::session();
@@ -11207,7 +11247,7 @@ class Principal extends BaseController
         }
         return $this->respond($response);
     }
-
+    
     public function liberarSolicitudContrato()
     {
          $session = \Config\Services::session();
@@ -11224,7 +11264,7 @@ class Principal extends BaseController
           
           if(!$resultado->error){
             $datos = $resultado->data[0];
-            $proveedor = $globals->getTabla(['tabla' => 'proveedor', "where" => ['razon_social' => trim($datos->proveedor_nombre) ] ]);
+            $proveedor = $globals->getTabla(['tabla' => 'proveedor', "where" => ['rfc' => trim($datos->proveedor_rfc) ] ]);
             if(empty($proveedor->data)){
                 $response->error = true;
                 $response->respuesta = 'Atención el proveedor no se encontro en la base de datos';
@@ -11238,10 +11278,10 @@ class Principal extends BaseController
                 "id_proveedor_banco" => $proveedorBanco->data[0]->id_proveedor_banco,
                 "folio"              => "PT-".date('YmdHis'),
                 "no_reserva"         => '',
-                "no_convenio"        => '',
+                "no_convenio"        => $datos->no_contrato,
                 "nuevo_fondo"        => '',
-                "total_importe"      => number_format($datos->monto_total, 2, '.', ','),
-                "comentarios_instrumento" => '',
+                "total_importe"      => $datos->monto_total,
+                "comentarios_instrumento" => $datos->objeto_contrato,
                 "instrumento"        => $datos->instrumento_juridico,
                 "ruta_absoluta"      => '',
                 "observaciones"      => $datos->objeto_contrato,
@@ -11261,6 +11301,32 @@ class Principal extends BaseController
               $response->respuesta = 'El contrato paso a CRFyAP';
 
             }
+            $dataInsert = [
+                 "id_reserva"  => $result->idRegistro,
+                 "id_partida"  => $datos->partida,
+                 "id_proyecto" => $datos->proyecto,
+                 "importe"     => $datos->monto_total,
+                 "fec_reg"     => date('Y-m-d H:i:s'),
+                 "usu_reg"     => $session->id_usuario,
+                ];
+            $dataConfig = [
+                "tabla" => "presupuesto",
+                "editar" => false
+            ];
+             $result =  $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+            if($session->id_usuario != 1){
+            $this->enviarEmail(1);
+            }
+                
+        $globals->saveTabla(
+            ["ok" => 2, "usu_act" => $session->id_usuario, "fec_act" => date("Y-m-d H:i:s")],
+            ["tabla" => "solicitud_contrato", "editar" => true, "idEditar" => ["id_solicitud_contrato" => $id]],
+            ['id_user' => $session->id_usuario, 'script' => 'Principal.php/enviarCRFyAPConvenio']
+        );
+
+        $response->error = false;
+        $response->respuesta = 'El convenio paso a CRFyAP';
+        return $this->respond($response);
           
           }else{
             $response->error = true;

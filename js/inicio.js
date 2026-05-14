@@ -1,6 +1,42 @@
 var ini = window.ssa || {};
 
 ini.inicio = (function () {
+    function parseMoneyValue(value) {
+        if (typeof value === 'number') {
+            return Number.isFinite(value) ? value : 0;
+        }
+
+        if (value === null || value === undefined) {
+            return 0;
+        }
+
+        let cleanValue = String(value).trim();
+        if (cleanValue === '') {
+            return 0;
+        }
+
+        cleanValue = cleanValue.replace(/[$\s]/g, '').replace(/MXN/ig, '');
+
+        if (cleanValue.includes(',') && cleanValue.includes('.')) {
+            cleanValue = cleanValue.replace(/,/g, '');
+        } else if (cleanValue.includes(',') && !cleanValue.includes('.')) {
+            const decimalComma = /,\d{1,2}$/.test(cleanValue);
+            cleanValue = decimalComma ? cleanValue.replace(',', '.') : cleanValue.replace(/,/g, '');
+        }
+
+        cleanValue = cleanValue.replace(/[^0-9.-]/g, '');
+
+        const parsedValue = parseFloat(cleanValue);
+        return Number.isFinite(parsedValue) ? parsedValue : 0;
+    }
+
+    function formatMoneyValue(value) {
+        return new Intl.NumberFormat('es-MX', {
+            style: 'currency',
+            currency: 'MXN'
+        }).format(parseMoneyValue(value));
+    }
+
     function renderInstrumentoLinks(reserva) {
         const urls = Array.isArray(reserva.instrumento_urls) ? reserva.instrumento_urls : [];
 
@@ -1352,7 +1388,7 @@ ini.inicio = (function () {
 
                         $("#varlidar_nombre_proveedor").val(reserva.razon_social || '');
                         $("#validar_no_proveedor").val(reserva.no_proveedor || '');
-                        $("#validar_total_importe").val(reserva.total_importe || '');
+                        $("#validar_total_importe").val(formatMoneyValue(reserva.total_importe));
                         $("#comentarios_instrumento_estatus").val(reserva.comentarios_instrumento || '');
                         const link = renderInstrumentoLinks(reserva);
                         if (link) {
@@ -1398,10 +1434,7 @@ ini.inicio = (function () {
                                                     autocomplete="off" 
                                                     class="form-control" 
                                                     name="importe[]" 
-                                                    value="${new Intl.NumberFormat('es-MX', {
-                                style: 'currency',
-                                currency: 'MXN'
-                            }).format(p.importe)}" 
+                                                    value="${formatMoneyValue(p.importe)}" 
                                                     readonly>
                                         </td>
                                          <td>
@@ -1451,7 +1484,7 @@ ini.inicio = (function () {
 
                         $("#varlidar_nombre_proveedor").val(reserva.razon_social || '');
                         $("#validar_no_proveedor").val(reserva.no_proveedor || '');
-                        $("#validar_total_importe").val(reserva.total_importe || '');
+                        $("#validar_total_importe").val(formatMoneyValue(reserva.total_importe));
                         $("#comentarios_instrumento_estatus").val(comentarios_instrumento || '');
                         const link = renderInstrumentoLinks(reserva);
                         if (link) {
@@ -1497,10 +1530,7 @@ ini.inicio = (function () {
                                                     autocomplete="off" 
                                                     class="form-control" 
                                                     name="importe[]" 
-                                                    value="${new Intl.NumberFormat('es-MX', {
-                                style: 'currency',
-                                currency: 'MXN'
-                            }).format(p.importe)}" 
+                                                    value="${formatMoneyValue(p.importe)}" 
                                                     readonly>
                                         </td>
                                         

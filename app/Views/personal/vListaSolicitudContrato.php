@@ -45,6 +45,7 @@
                                     <tbody>
                                         <?php if (!empty($solicitudes)): ?>
                                             <?php foreach ($solicitudes as $sol): ?>
+                                                <?php if( $sol->ok != 2 ): ?>
                                                 <tr>
                                                     <td><?= $sol->id_solicitud_contrato ?></td>
                                                     <td><?= date('d/m/Y H:i', strtotime($sol->fec_reg)) ?></td>
@@ -82,6 +83,9 @@
                                                                 <span class="badge badge-success">Aprobado</span>
                                                             <?php endif; ?>
                                                         <?php endif; ?>
+                                                        <?php if((int) $sol->id_estatus === 3 && in_array($session->id_perfil, [1, 7], true)): ?>
+                                                            <input onclick="envioCRFyAP(this)" id="sol_<?= (int) $sol->id_solicitud_contrato ?>" type="checkbox" name="seleccionados[]" class="ms-3" style="zoom:1;" value="<?= (int) $sol->id_solicitud_contrato ?>" <?= ($sol->ok === 1)? 'checked' : '' ?>>
+                                                        <?php endif; ?>
                                                     </td>
                                                     <td class="text-center">
                                                         <?php if ($session->id_perfil != 7): ?>
@@ -113,11 +117,12 @@
                                                         <?php if ($session->id_perfil != 7): ?>
                                                             <button class="btn btn-sm btn-danger" title="Eliminar" onclick="eliminarSolicitud(<?= $sol->id_solicitud_contrato ?>)"><i class="fas fa-trash"></i></button>
                                                         <?php endif; ?>
-                                                        <?php if ($sol->id_estatus == 3 && in_array($session->id_perfil, [1,7])): ?>
+                                                        <?php if ($sol->ok == 1): ?>
                                                             <a onclick="liberarSolicitud(<?= $sol->id_solicitud_contrato ?>);" class="btn btn-sm btn-pulse-purple" title="Enviar a CRFyAP"><i class="fas fa-paper-plane text-white"></i></a>
                                                         <?php endif; ?>
                                                     </td>
                                                 </tr>
+                                                <?php endif; ?>
                                             <?php endforeach; ?>
                                         <?php endif; ?>
                                     </tbody>
@@ -330,5 +335,35 @@ function liberarSolicitud(id_solicitud){
             });
         }
     });
+}
+function envioCRFyAP(e){
+    if(e.checked){
+        Swal.fire({
+            title: 'Envio de Solicitud',
+            text: '¿Se activara el envio de la solicitud de convenio a CRFyAP?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sí',
+            cancelButtonText: 'Cancelar',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post('<?= base_url("index.php/Principal/activarEnvioSolicitudContrato") ?>', {
+                    id_solicitud_contrato: e.value
+                }).then(response => response).catch(() => {
+                    Swal.showValidationMessage('No se pudo guardar el No. convenio');
+                });
+                const response = result.value || {};
+                if (response.error) {
+                    Swal.fire('Error', response.respuesta || 'No se pudo guardo la activacion.', 'error');
+                } else {
+                    Swal.fire('Exito', response.respuesta || 'Activacion guardada correctamente.', 'success').then(() => location.reload() );
+                }
+                
+            }else{
+                $(e).prop('checked', false);
+            }
+        })
+        
+    }
 }
 </script>
