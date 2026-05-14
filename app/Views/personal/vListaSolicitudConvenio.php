@@ -45,6 +45,8 @@
                                     <tbody>
                                         <?php if (!empty($solicitudes)): ?>
                                             <?php foreach ($solicitudes as $sol): ?>
+                                              
+                                                <?php if($sol->ok != 2): ?>
                                                 <tr>
                                                     <td><?= $sol->id_solicitud_convenio ?></td>
                                                     <td><?= date('d/m/Y H:i', strtotime($sol->fec_reg)) ?></td>
@@ -120,6 +122,8 @@
                                                         <?php endif; ?>
                                                     </td>
                                                 </tr>
+                                                <?php endif; ?>
+                                              
                                             <?php endforeach; ?>
                                         <?php endif; ?>
                                     </tbody>

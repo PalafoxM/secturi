@@ -11056,6 +11056,18 @@ class Principal extends BaseController
             return $this->respond($response);
         }
 
+        $dataInsert = [
+            "id_reserva" => $result->idRegistro,
+            "id_proyecto" => $sol->proyecto,
+            "id_partida" => $sol->partida,
+            "importe" => $sol->monto_total,
+            "usu_reg" => $session->id_usuario,
+            "fec_reg" => date('Y-m-d H:i:s'),
+        ];
+        $dataBitacora = ['id_user' => $session->id_usuario, 'script' => 'Principal.php/enviarCRFyAPConvenio'];
+        $globals->saveTabla($dataInsert,["tabla" => "presupuesto", "editar" => false],$dataBitacora);
+
+
         $globals->saveTabla(
             ["ok" => 2, "usu_act" => $session->id_usuario, "fec_act" => date("Y-m-d H:i:s")],
             ["tabla" => "solicitud_convenio", "editar" => true, "idEditar" => ["id_solicitud_convenio" => $id_solicitud_convenio]],
