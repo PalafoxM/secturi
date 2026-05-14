@@ -1,4 +1,4 @@
-<?php $session = \Config\Services::session(); ?>
+﻿<?php $session = \Config\Services::session(); ?>
 <div class="page-wrapper">
     <div class="page-content-tab">
         <div class="container-fluid">
@@ -197,6 +197,25 @@
 <script src="<?= base_url() ?>plugins/datatables/jquery.dataTables.min.js"></script>
 <script src="<?= base_url() ?>plugins/datatables/dataTables.bootstrap4.min.js"></script>
 <script>
+const crfyapConvenios = <?= json_encode(array_reduce($solicitudes ?? [], function ($carry, $sol) {
+    $instrumentos = $sol->instrumento_urls ?? [];
+    $carry[(int) $sol->id_solicitud_convenio] = [
+        'id' => (int) $sol->id_solicitud_convenio,
+        'nombre_proveedor' => $sol->crfyap_nombre_proveedor ?? $sol->proveedor_nombre ?? $sol->nombre_proveedor ?? $sol->proveedor_rfc ?? 'N/D',
+        'no_proveedor' => $sol->crfyap_no_proveedor ?? $sol->id_proveedor ?? $sol->no_proveedor ?? 'N/D',
+        'banco' => $sol->crfyap_banco ?? $sol->banco ?? $sol->nombre_banco ?? 'N/D',
+        'no_convenio' => $sol->no_convenio ?? '',
+        'comentarios' => $sol->objeto_convenio ?? $sol->nombre_proyecto ?? '',
+        'instrumentos' => is_array($instrumentos) ? count($instrumentos) : 0,
+        'presupuesto' => [[
+            'proyecto' => $sol->dsc_proyecto ?? 'N/D',
+            'partida' => $sol->cuenta_cable ?? $sol->cuenta_cable ?? 'N/D',
+            'importe' => number_format((float) ($sol->monto_total ?? 0), 2, '.', ','),
+        ]],
+    ];
+    return $carry;
+}, []), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
+
 $(document).ready(function(){ $('#datatable-convenios').DataTable({ language:{ url:'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json' } }); });
 function declinaSolicitud(id){ Swal.fire({ title:'Deseas declinar la solicitud?', text:'Ingresa el motivo de la declinacion:', icon:'warning', input:'textarea', inputPlaceholder:'Escribe el motivo aqui...', showCancelButton:true, confirmButtonColor:'#d33', cancelButtonColor:'#3085d6', confirmButtonText:'Si, declinar', cancelButtonText:'Cancelar', preConfirm:(motivo)=>{ if(!motivo || motivo.trim()===''){ Swal.showValidationMessage('El motivo es obligatorio'); return false; } return motivo; } }).then((result)=>{ if(result.isConfirmed){ $.post('<?= base_url("index.php/Principal/declinarSolicitudConvenio") ?>',{ id_solicitud:id, motivo:result.value },function(response){ if(!response.error){ Swal.fire('Declinado','El registro ha sido declinado.','success').then(()=>location.reload()); } else { Swal.fire('Error','No se pudo declinar el registro.','error'); } }); } }); }
 function verMotivo(motivo){ Swal.fire({ title:'Motivo de Declinacion', text: motivo || 'No se especifico un motivo.', icon:'info', confirmButtonText:'Cerrar', confirmButtonColor:'#5b73e8' }); }
@@ -305,9 +324,9 @@ function envioCRFyAP(e){
                 });
                 const response = result.value || {};
                 if (response.error) {
-                    Swal.fire('Error', response.respuesta || 'No se pudo guardar el No. convenio.', 'error');
+                    Swal.fire('Error', response.respuesta || 'No se pudo guardo la activacion.', 'error');
                 } else {
-                    Swal.fire('Exito', response.respuesta || 'No. convenio guardado correctamente.', 'success').then(() => location.reload());
+                    Swal.fire('Exito', response.respuesta || 'Activacion guardada correctamente.', 'success').then(() => location.reload() );
                 }
                 
             }else{
@@ -318,29 +337,102 @@ function envioCRFyAP(e){
     }
 }
 
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, function(character) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[character];
+    });
+}
+
+function construirPreviewCRFyAP(datos) {
+    const presupuesto = Array.isArray(datos.presupuesto) ? datos.presupuesto : [];
+    const filasPresupuesto = presupuesto.map(row => `
+        <tr>
+            <td>${escapeHtml(row.proyecto || 'N/D')}</td>
+            <td>${escapeHtml(row.partida || 'N/D')}</td>
+            <td style="text-align:right;">$${escapeHtml(row.importe || '0.00')}</td>
+        </tr>
+    `).join('');
+
+    return `
+        <div style="text-align:left;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px 22px; margin-bottom:16px;">
+                <div>
+                    <div style="font-size:12px; color:#5b6aa0; margin-bottom:5px;">Nombre Proveedor</div>
+                    <div style="border:1px solid #e1e6f0; border-radius:4px; padding:9px 12px; min-height:22px;">${escapeHtml(datos.nombre_proveedor)}</div>
+                </div>
+                <div>
+                    <div style="font-size:12px; color:#5b6aa0; margin-bottom:5px;">No. Proveedor</div>
+                    <div style="border:1px solid #e1e6f0; border-radius:4px; padding:9px 12px; min-height:22px;">${escapeHtml(datos.no_proveedor)}</div>
+                </div>
+                <div>
+                    <div style="font-size:12px; color:#5b6aa0; margin-bottom:5px;">Banco</div>
+                    <div style="border:1px solid #e1e6f0; border-radius:4px; padding:9px 12px; min-height:22px;">${escapeHtml(datos.banco)}</div>
+                </div>
+                <div>
+                    <div style="font-size:12px; color:#5b6aa0; margin-bottom:5px;">No. Convenio/Contrato</div>
+                    <div style="border:1px solid #e1e6f0; border-radius:4px; padding:9px 12px; min-height:22px;">${escapeHtml(datos.no_convenio || 'Sin capturar')}</div>
+                </div>
+                <div>
+                    <div style="font-size:12px; color:#5b6aa0; margin-bottom:5px;">Instrumento Juridico</div>
+                    <div style="border:1px solid #e1e6f0; border-radius:4px; padding:9px 12px; min-height:22px;">${escapeHtml(datos.instrumentos)} archivo(s)</div>
+                </div>
+                <div>
+                    <div style="font-size:12px; color:#5b6aa0; margin-bottom:5px;">Comentarios</div>
+                    <div style="border:1px solid #e1e6f0; border-radius:4px; padding:9px 12px; min-height:48px;">${escapeHtml(datos.comentarios || 'Sin comentarios')}</div>
+                </div>
+            </div>
+            <div style="font-weight:700; color:#6b7fc0; margin:8px 0 10px;">PRESUPUESTO</div>
+            <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                <thead>
+                    <tr style="background:#eef2f8; color:#30446f;">
+                        <th style="padding:10px; text-align:left;">PROYECTO-META</th>
+                        <th style="padding:10px; text-align:left;">PARTIDA</th>
+                        <th style="padding:10px; text-align:right;">IMPORTE</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${filasPresupuesto || '<tr><td colspan="3" style="padding:10px; text-align:center;">Sin presupuesto</td></tr>'}
+                </tbody>
+            </table>
+        </div>
+    `;
+}
+
 function enviarCRFyAP(id){
+    const datos = crfyapConvenios[id] || { presupuesto: [] };
     Swal.fire({
-        title: 'Envio de Solicitud',
-        text: '¿Se activara el envio de la solicitud de convenio a CRFyAP?',
-        icon: 'question',
+        title: 'Previsualizacion de envio a CRFyAP',
+        html: construirPreviewCRFyAP(datos),
+        width: 760,
+        icon: 'info',
         showCancelButton: true,
-        confirmButtonText: 'Sí',
+        confirmButtonText: 'Enviar a CRFyAP',
         cancelButtonText: 'Cancelar',
-    }).then((result) => {
-        if (result.isConfirmed) {
-            $.post('<?= base_url("index.php/Principal/enviarCRFyAPConvenio") ?>', {
-                id_solicitud_convenio: id
-            }).then(response => response).catch(() => {
-                Swal.showValidationMessage('No se pudo guardar el No. convenio');
+        showLoaderOnConfirm: true,
+        preConfirm: () => {
+            const formData = new FormData();
+            formData.append('id_solicitud_convenio', id);
+            return fetch('<?= base_url("index.php/Principal/enviarCRFyAPConvenio") ?>', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .catch(() => {
+                Swal.showValidationMessage('No se pudo guardar el envio.');
             });
-            const response = result.value || {};
-            if (response.error) {
-                Swal.fire('Error', response.respuesta || 'No se pudo guardar el No. convenio.', 'error');
-            } else {
-                Swal.fire('Exito', response.respuesta || 'No. convenio guardado correctamente.', 'success').then(() => location.reload());
-            }
-            
+        },
+        allowOutsideClick: () => !Swal.isLoading()
+    }).then((result) => {
+        if (!result.isConfirmed) {
+            return;
         }
-    })
+
+        const response = result.value || {};
+        if (response.error) {
+            Swal.fire('Error', response.respuesta || 'No se pudo guardar el envio.', 'error');
+        } else {
+            Swal.fire('Exito', response.respuesta || 'El envio se realizo correctamente.', 'success').then(() => window.location.href = '<?= base_url("index.php/Principal/listaReservaPT") ?>');
+        }
+    });
 }
 </script>

@@ -11010,14 +11010,20 @@ class Principal extends BaseController
         $sol = $solicitudes->data[0];
         $proveedores = $globals->getTabla(["tabla" =>"proveedor", 'where' => ['rfc' => $sol->proveedor_rfc]]);
         $idProveedor = 0;
-        $idPOroveedorBanco = 'N/A';
+        $idPOroveedorBanco = 0;
 
         if(!empty($proveedores->data)){
             $idProveedor = $proveedores->data[0]->id_proveedor;
             $banco = $globals->getTabla(["tabla" =>"proveedor_banco", 'where' => ['idproveedor' => $idProveedor]]);
-            $idPOroveedorBanco =  $banco->data[0]->id_proveedor_banco;
+            if (!empty($banco->data)) {
+                $idPOroveedorBanco =  $banco->data[0]->id_proveedor_banco;
+            }
+        }
 
-
+        if (empty($idProveedor)) {
+            $response->error = true;
+            $response->respuesta = 'No se encontro el proveedor para enviar a CRFyAP';
+            return $this->respond($response);
         }
       
         $dataInsert = [
@@ -11032,13 +11038,33 @@ class Principal extends BaseController
             "comentarios_instrumento" => "",
             "instrumento" => $sol->instrumento_juridico,
             "ruta_absoluta" => "",
-            "observaciones" => "",
-            "fec_act" => date("Y-m-d"),
-            "usu_act" => $session->id_usuario,
+            "observaciones" => $sol->objeto_convenio ?? ($sol->nombre_proyecto ?? ''),
+            "fec_reg" => date("Y-m-d H:i:s"),
+            "usu_reg" => $session->id_usuario,
+            "promo" => (in_array((int) $session->id_usuario, [17, 11, 14, 59, 38, 80], true)) ? 1 : 0,
         ];
 
-          var_dump($dataInsert);
-        die();
+        $result = $globals->saveTabla(
+            $dataInsert,
+            ["tabla" => "reserva", "editar" => false],
+            ['id_user' => $session->id_usuario, 'script' => 'Principal.php/enviarCRFyAPConvenio']
+        );
+
+        if ($result->error) {
+            $response->error = true;
+            $response->respuesta = $result->respuesta ?? 'No se pudo enviar la solicitud a CRFyAP';
+            return $this->respond($response);
+        }
+
+        $globals->saveTabla(
+            ["ok" => 2, "usu_act" => $session->id_usuario, "fec_act" => date("Y-m-d H:i:s")],
+            ["tabla" => "solicitud_convenio", "editar" => true, "idEditar" => ["id_solicitud_convenio" => $id_solicitud_convenio]],
+            ['id_user' => $session->id_usuario, 'script' => 'Principal.php/enviarCRFyAPConvenio']
+        );
+
+        $response->error = false;
+        $response->respuesta = 'El convenio paso a CRFyAP';
+        return $this->respond($response);
         
     }
 
@@ -11051,9 +11077,6 @@ class Principal extends BaseController
         if (in_array($session->get('id_perfil'), [1, 7])) {
             $solicitudes = $globals->getTabla(['tabla' => 'vw_solicitud_convenio', 'where' => ['visible' => 1]]);
         } else {
-            // Ejemplo: Filtrar por creador o responsable
-            // $solicitudes = $globals->getTabla(['tabla' => 'vw_solicitud_convenio', 'where' => ['usu_reg' => $session->get('id_usuario'), 'visible' => 1]]);
-            // Para mantener consistencia con contrato base, veremos si allá filtran. Allá no filtran en esta versión, lo traen todo:
             $solicitudes = $globals->getTabla(['tabla' => 'vw_solicitud_convenio', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]]);
         }
 
@@ -11068,6 +11091,29 @@ class Principal extends BaseController
                 ]);
                 if (!empty($solicitudBase->data)) {
                     $s->no_convenio = $solicitudBase->data[0]->no_convenio ?? '';
+                }
+
+                if (!empty($s->proveedor_rfc)) {
+                    $proveedor = $globals->getTabla([
+                        'tabla' => 'proveedor',
+                        'where' => ['rfc' => $s->proveedor_rfc],
+                        'limit' => 1
+                    ]);
+
+                    if (!empty($proveedor->data)) {
+                        $s->crfyap_nombre_proveedor = $proveedor->data[0]->razon_social ?? ($s->proveedor_rfc ?? '');
+                        $s->crfyap_no_proveedor = $proveedor->data[0]->id_proveedor ?? '';
+
+                        $banco = $globals->getTabla([
+                            'tabla' => 'proveedor_banco',
+                            'where' => ['idproveedor' => $proveedor->data[0]->id_proveedor],
+                            'limit' => 1
+                        ]);
+
+                        if (!empty($banco->data)) {
+                            $s->crfyap_banco = $banco->data[0]->nombre_banco ?? $banco->data[0]->banco ?? $banco->data[0]->cuenta ?? 'Registrado';
+                        }
+                    }
                 }
             }
         }
@@ -11121,14 +11167,14 @@ class Principal extends BaseController
                 
             ];
 
-           $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Principal.php/liberarSolicitudContrato'];
+            $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Principal.php/liberarSolicitudContrato'];
 
             $resultado = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
-           var_dump($resultado);die();
 
             if($resultado->error){
                 $response->error = true;
                 $response->respuesta = $resultado->respuesta;
+                return $this->respond($response);
             }
             $response->error = false;
             $response->respuesta = 'Convenio liberado';
