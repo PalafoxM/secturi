@@ -4896,6 +4896,17 @@ class Agregar extends BaseController
             $anio . '-01-01' => 'Asueto',
         ];
 
+        if( $session->get('id_usuario') == 164){
+            $diasFestivos = array_merge($diasFestivos, [
+               
+                '2026-05-04' => 'Nuevo Ingreso',
+                '2026-05-05' => 'Nuevo Ingreso',
+                '2026-05-06' => 'Nuevo Ingreso',
+                '2026-05-07' => 'Nuevo Ingreso',
+                '2026-05-08' => 'Nuevo Ingreso',
+            ]);
+        }
+
         $data['diasFestivos'] = $diasFestivos;
         // Agregar días festivos al resultado
         foreach ($diasFestivos as $fecha => $titulo) {

@@ -1,4 +1,4 @@
-﻿<?php $session = \Config\Services::session(); ?>
+<?php $session = \Config\Services::session(); ?>
 <div class="page-wrapper">
     <div class="page-content-tab">
         <div class="container-fluid">
