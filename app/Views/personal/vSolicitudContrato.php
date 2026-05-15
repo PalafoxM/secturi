@@ -152,7 +152,7 @@
                                         </tfoot>
                                     </table>
                                 </div>
-                                <?php $tieneMontoSinImpuesto = isset($solicitud) && (!empty($solicitud->monto_sin_impuesto) || !empty($solicitud->monto_sin_impuesto_texto)); ?>
+                                <?php $tieneMontoSinImpuesto = true; ?>
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label">Sin impuesto:</label>
                                     <div class="col-sm-8">
@@ -717,6 +717,7 @@
                 $('#div_sin_impuesto').hide();
                 $('#monto_sin_impuesto').val('');
                 $('#monto_sin_impuesto_texto').val('');
+                recalcularGarantiaContrato();
             }
         });
 
@@ -728,7 +729,28 @@
             } else {
                 $('#monto_sin_impuesto_texto').val(numeroALetras(montoSinImpuesto));
             }
+            recalcularGarantiaContrato();
         });
+
+        function recalcularGarantiaContrato() {
+            if ($('#custom_garantia_check').is(':checked')) {
+                return;
+            }
+
+            var montoBase = $('#check_sin_impuesto').is(':checked')
+                ? normalizarMonto($('#monto_sin_impuesto').val())
+                : normalizarMonto($('#monto_total').val());
+
+            if (montoBase <= 0) {
+                $('#monto_garantia').val('');
+                $('#monto_garantia_texto').val('');
+                return;
+            }
+
+            var garantia = montoBase * 0.12;
+            $('#monto_garantia').val(garantia.toFixed(2));
+            $('#monto_garantia_texto').val(numeroALetras(garantia));
+        }
 
         $('#monto_total').on('input', function() {
             var valor = $(this).val();
@@ -742,16 +764,8 @@
                  }
             } else {
                 $('#monto_total_texto').val(numeroALetras(montoNormalizado));
-                
-                if (!$('#custom_garantia_check').is(':checked')) {
-                    // Calcular monto total + 12%
-                    var monto = montoNormalizado;
-                    var garantia = monto * 0.12;
-                    var totalMonto = garantia;
-                    $('#monto_garantia').val(totalMonto.toFixed(2));
-                    $('#monto_garantia_texto').val(numeroALetras(totalMonto));
-                }
             }
+            recalcularGarantiaContrato();
         });
         
         $('#custom_garantia_check').on('change', function() {
