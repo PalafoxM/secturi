@@ -53,6 +53,9 @@ $configuracionModulo = [
             12 => 'Carta de declaracion de intereses',
             13 => 'Manifestacion de no impedimento legal',
             14 => 'Manifiesto de contar con infraestructura',
+            15 => 'Informe de Justificacion de proveedor unico',
+            16 => 'Padron de proveedores',
+            17 => 'Suficiencia presupuestal',
         ],
     ],
     'honorarios' => [
