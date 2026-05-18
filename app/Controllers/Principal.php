@@ -11426,7 +11426,7 @@ class Principal extends BaseController
             ];
              $result =  $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
             if($session->id_usuario != 1){
-            $this->enviarEmail(1);
+              $this->enviarEmail(1);
             }
                 
         $globals->saveTabla(

@@ -45,7 +45,7 @@
                                     <tbody>
                                         <?php if (!empty($solicitudes)): ?>
                                             <?php foreach ($solicitudes as $sol): ?>
-                                                <?php if( $sol->ok != 2 ): ?>
+                                                <?php if($sol->ok != 2 || in_array((int) ($session->id_perfil ?? 0), [1, 7], true)): ?>
                                                 <tr>
                                                     <td><?= $sol->id_solicitud_contrato ?></td>
                                                     <td><?= date('d/m/Y H:i', strtotime($sol->fec_reg)) ?></td>
@@ -67,6 +67,7 @@
                                                                 <i class="fas fa-circle-notch fa-spin mr-1"></i> En Espera
                                                             </button>
                                                         <?php endif; ?>
+                                                       
                                                         <?php if ((int) $sol->id_estatus === 3): ?>
                                                             <?php if (!empty($sol->instrumento_urls)): ?>
                                                                 <?php foreach ($sol->instrumento_urls as $index => $instrumento): ?>
@@ -119,6 +120,9 @@
                                                         <?php endif; ?>
                                                         <?php if ($sol->ok == 1): ?>
                                                             <a onclick="liberarSolicitud(<?= $sol->id_solicitud_contrato ?>);" class="btn btn-sm btn-pulse-purple" title="Enviar a CRFyAP"><i class="fas fa-paper-plane text-white"></i></a>
+                                                        <?php endif; ?>
+                                                        <?php if ($sol->ok == 2): ?>
+                                                          <div class="spinner-grow text-secondary" role="status"></div>
                                                         <?php endif; ?>
                                                     </td>
                                                 </tr>
