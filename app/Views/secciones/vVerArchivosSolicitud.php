@@ -141,9 +141,14 @@ $tituloVista = $moduloActivo['titulo'];
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h4 class="card-title mt-0 mb-0">Documentacion Cargada</h4>
                                 <?php if ($moduloArchivos === 'contrato'): ?>
-                                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalAgregarArchivoSolicitud">
-                                        <i class="fas fa-plus"></i> Agregar archivo
-                                    </button>
+                                    <div>
+                                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalAgregarArchivoSolicitud">
+                                            <i class="fas fa-plus"></i> Agregar archivo
+                                        </button>
+                                        <a href="<?= base_url('index.php/Principal/descargarChecklistSolicitud/' . $id_solicitud) ?>" class="btn btn-success btn-sm">
+                                            <i class="fas fa-download"></i> Descargar Check List
+                                        </a>
+                                    </div>
                                 <?php endif; ?>
                             </div>
 

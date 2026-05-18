@@ -5505,6 +5505,117 @@ class Principal extends BaseController
         $this->_renderView($data);
     }
 
+    private function obtenerDocumentosContratoSolicitud(): array
+    {
+        return [
+            1 => 'Anexo Tecnico (Terminos de referencia)',
+            '2a' => 'Investigacion de Mercado (Cotizaciones y consulta PEI)',
+            '2b' => 'Analisis de Ofertas turisticas',
+            '2c' => 'Argumentacion Tecnica',
+            '3a' => 'Validacion de partida restringida (SF)',
+            '3b' => 'Verificacion de Alineacion de Informacion Estrategica (DGIT)',
+            '3c' => 'Suficiencia presupuestal (R3)',
+            '3d' => 'Validacion DGTIT/CGCS u otra',
+            4 => 'Justificacion',
+            5 => 'Propuesta Tecnico Economica (Anexo)',
+            6 => 'Aviso de privacidad integral',
+            7 => 'Cedula de Registro en el Padron de Proveedores',
+            8 => 'Escritura Constitutiva',
+            9 => 'Documento de representacion legal (Poder)',
+            10 => 'Identificacion oficial vigente',
+            11 => 'Constancia de situacion fiscal',
+            12 => 'Comprobante de domicilio',
+            '13a' => 'Opinion de cumplimiento de obligaciones fiscales',
+            '13b' => 'Manifiesto bajo protesta de cumplimiento fiscal',
+            14 => 'Manifiesto de no impedimento para contratar',
+            15 => 'Carta de declaracion de intereses',
+            16 => 'Manifiesto de contar con infraestructura',
+        ];
+    }
+
+    public function descargarChecklistSolicitud($id_solicitud)
+    {
+        $globals = new Mglobal;
+        $documentosContrato = $this->obtenerDocumentosContratoSolicitud();
+
+        $archivos = $globals->getTabla([
+            'tabla' => 'solicitud_contrato_archivos',
+            'where' => ['id_solicitud_contrato' => $id_solicitud, 'visible' => 1]
+        ]);
+
+        $archivosAceptadosOcultos = $globals->getTabla([
+            'tabla' => 'solicitud_contrato_archivos',
+            'where' => ['id_solicitud_contrato' => $id_solicitud, 'visible' => 0, 'id_estatus' => 3]
+        ]);
+
+        $archivosChecklist = (!empty($archivos->data)) ? $archivos->data : [];
+        if (!empty($archivosAceptadosOcultos->data)) {
+            foreach ($archivosAceptadosOcultos->data as $archivoAceptado) {
+                $archivosChecklist[] = $archivoAceptado;
+            }
+        }
+
+        $documentosCapturados = [];
+        foreach ($archivosChecklist as $archivo) {
+            $claveDocumento = (string) ($archivo->clave_documento ?? '');
+            if ($claveDocumento === '') {
+                continue;
+            }
+
+            $documentosCapturados[$claveDocumento] = $documentosContrato[$claveDocumento]
+                ?? $documentosContrato[(int) $claveDocumento]
+                ?? ($archivo->nombre_documento ?? ('Documento ' . $claveDocumento));
+        }
+
+        $filas = '';
+        foreach ($documentosCapturados as $nombreDocumento) {
+            $filas .= '<tr>
+                <td class="check">X</td>
+                <td>' . htmlspecialchars((string) $nombreDocumento, ENT_QUOTES, 'UTF-8') . '</td>
+            </tr>';
+        }
+
+        if ($filas === '') {
+            $filas = '<tr><td colspan="2" class="empty">No se encontraron documentos capturados.</td></tr>';
+        }
+
+        $html = '
+            <style>
+                body { font-family: sans-serif; font-size: 11pt; color: #222; }
+                h2 { text-align: center; margin-bottom: 4px; }
+                .subtitle { text-align: center; margin-bottom: 20px; color: #555; }
+                table { width: 100%; border-collapse: collapse; }
+                th, td { border: 1px solid #555; padding: 8px; }
+                th { background: #efefef; text-align: left; }
+                .check { width: 45px; text-align: center; font-weight: bold; }
+                .empty { text-align: center; color: #777; }
+            </style>
+            <h2>Check List de Documentacion Capturada</h2>
+            <div class="subtitle">Solicitud de contrato #' . htmlspecialchars((string) $id_solicitud, ENT_QUOTES, 'UTF-8') . '</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="check">Check</th>
+                        <th>Documento</th>
+                    </tr>
+                </thead>
+                <tbody>' . $filas . '</tbody>
+            </table>';
+
+        $html = $this->cleanMpdfHtml($html);
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 12,
+            'margin_left' => 12,
+            'margin_right' => 12,
+            'margin_bottom' => 12,
+            'format' => 'Letter'
+        ]);
+
+        $mpdf->WriteHTML($html);
+        $mpdf->Output('CheckList_Solicitud_Contrato_' . $id_solicitud . '.pdf', 'D');
+        exit();
+    }
+
     public function verArchivosSolicitud($id_solicitud)
     {
         $session = \Config\Services::session();
