@@ -106,10 +106,10 @@
     <table>
         <thead>
             <tr>
-                <th>Pago</th>
-                <th>Monto</th>
-                <th>Fecha</th>
-                <th>Entregable</th>
+                <th style="width: 10%;">Pago</th>
+                <th style="width: 15%;">Monto</th>
+                <th style="width: 15%;">Fecha</th>
+                <th style="width: 60%;">Entregable</th>
             </tr>
         </thead>
         <tbody>
@@ -158,26 +158,28 @@
         <div class="row"><span class="label">Correo electrónico:</span> <span class="value"><?= $solicitud->proveedor_correo ?></span></div>
     </div>
 
-    <div class="section-title">FIRMAS</div>
-    <?php
-        $firmasPdf = !empty($firmas_pdf) ? $firmas_pdf : [
-            (object) ['nombre' => 'Nombre Dir. Gral/Subsecretario', 'cargo' => 'Cargo'],
-            (object) ['nombre' => 'Nombre Responsable del Proyecto', 'cargo' => 'Cargo'],
-        ];
-    ?>
-    <table class="firma-table">
-        <tr>
-            <?php foreach ($firmasPdf as $firma): ?>
-                <td style="width: <?= 100 / max(count($firmasPdf), 1) ?>%;">
-                    <span class="firma-linea"></span>
-                    <div class="firma-nombre"><?= esc($firma->nombre ?? '') ?></div>
-                    <div class="firma-cargo"><?= esc($firma->cargo ?? '') ?></div>
-                    <?php if (!empty($firma->no_delegatorio ?? '')): ?>
-                        <div class="firma-delegatorio">No. delegatorio: <?= esc($firma->no_delegatorio) ?></div>
-                    <?php endif; ?>
-                </td>
-            <?php endforeach; ?>
-        </tr>
-    </table>
+    <div style="page-break-inside: avoid;">
+        <div class="section-title">FIRMAS</div>
+        <?php
+            $firmasPdf = !empty($firmas_pdf) ? $firmas_pdf : [
+                (object) ['nombre' => 'Nombre Dir. Gral/Subsecretario', 'cargo' => 'Cargo'],
+                (object) ['nombre' => 'Nombre Responsable del Proyecto', 'cargo' => 'Cargo'],
+            ];
+        ?>
+        <table class="firma-table">
+            <tr>
+                <?php foreach ($firmasPdf as $firma): ?>
+                    <td style="width: <?= 100 / max(count($firmasPdf), 1) ?>%;">
+                        <span class="firma-linea"></span>
+                        <div class="firma-nombre"><?= esc($firma->nombre ?? '') ?></div>
+                        <div class="firma-cargo"><?= esc($firma->cargo ?? '') ?></div>
+                        <?php if (!empty($firma->no_delegatorio ?? '')): ?>
+                            <div class="firma-delegatorio">No. delegatorio: <?= esc($firma->no_delegatorio) ?></div>
+                        <?php endif; ?>
+                    </td>
+                <?php endforeach; ?>
+            </tr>
+        </table>
+    </div>
 </body>
 </html>
