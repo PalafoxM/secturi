@@ -94,7 +94,7 @@
                                                       
                                                             <a href="<?= base_url('index.php/Principal/verSolicitudContratoPDF/' . $sol->id_solicitud_contrato) ?>" target="_blank" class="btn btn-sm btn-info" title="Ver PDF"><i class="fas fa-file-pdf"></i></a>
                                                       
-                                                        <?php if ($session->id_perfil != 7 && in_array((int) $sol->id_estatus, [1], true)): ?>
+                                                        <?php if ($session->id_perfil != 7 && $sol->id_estatus == 1 && empty($sol->tienen_archivos)): ?>
                                                             <button class="btn btn-sm btn-secondary" title="Adjuntar Archivos" onclick="abrirModalArchivos(<?= $sol->id_solicitud_contrato ?>)"><i class="fas fa-paperclip"></i></button>
                                                         <?php endif; ?>
                                                         <?php if (!empty($sol->tienen_archivos)): ?>
