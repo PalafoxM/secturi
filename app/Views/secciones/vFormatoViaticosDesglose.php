@@ -10,6 +10,7 @@
         .header-info { margin-bottom: 20px; }
         .text-align-center { text-align: center; }
         .color-red { color: red; }
+        .firma-cell { height: 42px; }
     </style>
 </head>
 <body>
@@ -24,10 +25,10 @@
                 <td colspan="4" class="section-title" style="text-align: center; font-weight: bold; border: none; font-size: 12pt;">DESGLOSE DE GASTOS (VIÁTICOS POR PERSONA)</td>
             </tr>
             <tr class="header-row">
-                <th style="width: 35%;">NOMBRE</th>
-                <th style="width: 25%;">RFC</th>
+                <th style="width: 30%;">NOMBRE</th>
+                <th style="width: 20%;">RFC</th>
                 <th style="width: 25%;">TOTAL GASTO EN VIATICOS (3760-3750)</th>
-                <th style="width: 15%;">FIRMA</th>
+                <th style="width: 25%;">FIRMA</th>
             </tr>
         </thead>
             <tbody>
@@ -41,7 +42,7 @@
                 <td class="text-align-center"><?= $v->nombre ?></td>
                 <td class="text-align-center"><?= $v->rfc ?></td>
                 <td class="text-right">$<?= number_format($v->importe, 2) ?></td>
-                <td></td>
+                <td class="firma-cell"></td>
             </tr>
             <?php endforeach; ?>
             <tr>
@@ -59,4 +60,3 @@
     </table>
 </body>
 </html>
-
