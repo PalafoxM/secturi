@@ -11403,6 +11403,7 @@ class Principal extends BaseController
 
         $dataInsert = [
             'responsable_proyecto' => $post['responsable_proyecto'],
+            'responsable_enlace' => $post['responsable_enlace'],
             'responsable_seguimiento' => $post['responsable_seguimiento'],
             'proyecto' => $post['proyecto'],
             'partida' => $post['partida'],

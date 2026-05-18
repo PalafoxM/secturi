@@ -50,6 +50,10 @@
             <td><strong>Responsable de Seguimiento:</strong></td>
             <td><?= isset($solicitud->nombre_seguimiento_puesto) ? $solicitud->nombre_seguimiento_puesto : (isset($solicitud->nombre_seguimiento) ? $solicitud->nombre_seguimiento : '') ?></td>
         </tr>
+        <tr>
+            <td><strong>Responsable de Enlace:</strong></td>
+            <td><?= isset($solicitud->nombre_enlace) ? $solicitud->nombre_enlace : (isset($solicitud->nombre_enlace) ? $solicitud->nombre_enlace : '') ?></td>
+        </tr>
     </table>
 
     <table>

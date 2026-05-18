@@ -57,6 +57,19 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Nombre y cargo del Responsable de Enlace:</label>
+                                    <div class="col-sm-9">
+                                        <select class="form-control select2" name="responsable_enlace" required>
+                                            <option value="">Seleccione una opción</option>
+                                            <?php foreach ($usuario as $u): ?>
+                                                <option value="<?= $u->id_usuario ?>" <?= (isset($solicitud) && $solicitud->responsable_seguimiento == $u->id_usuario) ? 'selected' : '' ?>>
+                                                     <?= $u->correo." - ". $u->nombre_completo .' - '. $u->dsc_puesto ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                </div>
 
                                 <!-- SECCION 2: INFORMACIÓN PRESUPUESTAL -->
                                 <h5 class="bg-primary text-white p-2 mt-4">INFORMACIÓN PRESUPUESTAL</h5>
