@@ -138,7 +138,14 @@ $tituloVista = $moduloActivo['titulo'];
                 <div class="col-12">
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="card-title mt-0">Documentacion Cargada</h4>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h4 class="card-title mt-0 mb-0">Documentacion Cargada</h4>
+                                <?php if ($moduloArchivos === 'contrato'): ?>
+                                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalAgregarArchivoSolicitud">
+                                        <i class="fas fa-plus"></i> Agregar archivo
+                                    </button>
+                                <?php endif; ?>
+                            </div>
 
                             <div class="table-responsive">
                                 <table class="table table-bordered mb-0">
@@ -220,6 +227,53 @@ $tituloVista = $moduloActivo['titulo'];
     </div>
 </div>
 
+<?php if ($moduloArchivos === 'contrato'): ?>
+    <div class="modal fade" id="modalAgregarArchivoSolicitud" tabindex="-1" role="dialog" aria-labelledby="modalAgregarArchivoSolicitudLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalAgregarArchivoSolicitudLabel">Seleccion de Documentos a Subir</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formAgregarArchivoSolicitud" action="<?= base_url('index.php/Principal/subirArchivosSolicitud') ?>" method="POST">
+                        <input type="hidden" name="id_solicitud" value="<?= esc($id_solicitud) ?>">
+                        <table class="table table-bordered table-sm mb-0">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th style="width: 10%;">Num.</th>
+                                    <th>Documento</th>
+                                    <th class="text-center" style="width: 12%;">Seleccionar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($nombresDocs as $key => $nombreDocumento): ?>
+                                    <tr>
+                                        <td><?= esc($key) ?></td>
+                                        <td><?= esc($nombreDocumento) ?></td>
+                                        <td class="text-center">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input documento-agregar-check" id="documento_agregar_<?= esc($key) ?>" name="documentos[<?= esc($key) ?>]" value="<?= esc($nombreDocumento) ?>">
+                                                <label class="custom-control-label" for="documento_agregar_<?= esc($key) ?>"></label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="enviarAgregarArchivoSolicitud()">Continuar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
 <link href="<?= base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
 <link href="<?= base_url(); ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 <link href="<?= base_url(); ?>assets/css/jquery-ui.min.css" rel="stylesheet">
@@ -235,6 +289,16 @@ $tituloVista = $moduloActivo['titulo'];
 
 <script>
     const moduloArchivos = '<?= esc($moduloArchivos, 'js') ?>';
+
+    function enviarAgregarArchivoSolicitud() {
+        const documentosSeleccionados = $('#formAgregarArchivoSolicitud .documento-agregar-check:checked').length;
+        if (documentosSeleccionados === 0) {
+            Swal.fire('Atencion', 'Seleccione al menos un documento para subir.', 'warning');
+            return;
+        }
+
+        $('#formAgregarArchivoSolicitud').submit();
+    }
 
     function declinarArchivo(idArchivo) {
         Swal.fire({
