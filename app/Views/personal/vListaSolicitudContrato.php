@@ -58,8 +58,9 @@
                                                             <span class="badge badge-secondary">Registrado</span>
                                                         <?php endif; ?>
                                                         <?php if ((int) $sol->id_estatus === 2): ?>
-                                                            <button class="btn btn-sm btn-outline-danger font-weight-bold shadow-sm" title="Clic para ver motivo" onclick="verMotivo('<?= htmlspecialchars($sol->motivo ?? '', ENT_QUOTES) ?>')">
-                                                                <i class="fas fa-exclamation-triangle"></i> Declinado
+                                                            <span class="badge badge-soft-danger">Declinado</span>
+                                                            <button class="btn btn-link btn-sm text-danger p-0 ml-1 align-baseline" title="Ver motivo" onclick="verMotivo('<?= htmlspecialchars($sol->motivo ?? '', ENT_QUOTES) ?>')">
+                                                                ver motivo
                                                             </button>
                                                         <?php endif; ?>
                                                         <?php if ((int) $sol->id_estatus === 4): ?>
@@ -68,8 +69,11 @@
                                                             </button>
                                                         <?php endif; ?>
                                                        
-                                                        <?php if ((int) $sol->id_estatus === 3): ?>
-                                                            <?php if (!empty($sol->instrumento_urls)): ?>
+                                                        <?php if ((int) $sol->id_estatus === 3 && empty($sol->instrumento_urls)): ?>
+                                                                <span class="badge badge-success">Aprobado</span>
+                                                        <?php endif; ?>
+                                                        <?php if (!empty($sol->instrumento_urls)): ?>
+                                                            <div class="mt-1">
                                                                 <?php foreach ($sol->instrumento_urls as $index => $instrumento): ?>
                                                                     <span class="d-inline-block mb-1">
                                                                         <a href="<?= $instrumento['url'] ?>" target="_blank" class="btn btn-sm btn-success" title="Ver Instrumento <?= $index + 1 ?>"><i class="fas fa-file-pdf"></i> Inst. <?= $index + 1 ?></a>
@@ -80,9 +84,7 @@
                                                                         <?php endif; ?>
                                                                     </span>
                                                                 <?php endforeach; ?>
-                                                            <?php else: ?>
-                                                                <span class="badge badge-success">Aprobado</span>
-                                                            <?php endif; ?>
+                                                            </div>
                                                         <?php endif; ?>
                                                         <?php if((int) $sol->id_estatus === 3 && in_array($session->id_perfil, [1, 7], true)): ?>
                                                             <input onclick="envioCRFyAP(this)" id="sol_<?= (int) $sol->id_solicitud_contrato ?>" type="checkbox" name="seleccionados[]" class="ms-3" style="zoom:1;" value="<?= (int) $sol->id_solicitud_contrato ?>" <?= ($sol->ok === 1)? 'checked' : '' ?>>
