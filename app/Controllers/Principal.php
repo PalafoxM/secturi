@@ -215,7 +215,20 @@ class Principal extends BaseController
         return base_url('index.php/Principal/verArchivoS3?key=' . rawurlencode($storedPath));
     }
 
-    private function mapInstrumentoUrls($instrumentoRaw): array
+    private function resolveStoredFileDownloadUrl(?string $storedPath): ?string
+    {
+        if (empty($storedPath)) {
+            return null;
+        }
+
+        if (preg_match('#^https?://#i', $storedPath)) {
+            return $storedPath;
+        }
+
+        return base_url('index.php/Principal/descargarArchivoAlmacenado?path=' . rawurlencode($storedPath));
+    }
+
+    private function mapInstrumentoUrls($instrumentoRaw, bool $forzarDescarga = false): array
     {
         if (empty($instrumentoRaw)) {
             return [];
@@ -234,7 +247,7 @@ class Principal extends BaseController
 
         $resultado = [];
         foreach ($instrumentos as $ruta) {
-            $url = $this->resolveStoredFilePreviewUrl($ruta);
+            $url = $forzarDescarga ? $this->resolveStoredFileDownloadUrl($ruta) : $this->resolveStoredFilePreviewUrl($ruta);
             if ($url) {
                 $resultado[] = [
                     'ruta' => $ruta,
@@ -373,6 +386,52 @@ class Principal extends BaseController
         return $this->response
             ->setHeader('Content-Type', $mimeType)
             ->setHeader('Content-Disposition', 'inline; filename="' . $fileName . '"')
+            ->setBody($contents === false ? '' : $contents);
+    }
+
+    public function descargarArchivoAlmacenado()
+    {
+        $storedPath = trim((string) $this->request->getGet('path'));
+        if ($storedPath === '') {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Archivo no especificado.');
+        }
+
+        $fileName = basename($storedPath);
+        $tempFile = null;
+
+        if (strpos($storedPath, 'assets/') === 0) {
+            $fullPath = realpath(FCPATH . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $storedPath));
+            $assetsPath = realpath(FCPATH . 'assets');
+
+            if ($fullPath === false || $assetsPath === false || strpos($fullPath, $assetsPath) !== 0 || !is_file($fullPath)) {
+                throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('No fue posible recuperar el archivo.');
+            }
+
+            $filePath = $fullPath;
+        } else {
+            $s3 = new \App\Libraries\S3Service();
+            $tempFile = $s3->downloadToTempFile($storedPath, 's3_download_');
+
+            if ($tempFile === false || !is_file($tempFile)) {
+                throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('No fue posible recuperar el archivo.');
+            }
+
+            $filePath = $tempFile;
+        }
+
+        $mimeType = function_exists('mime_content_type') ? mime_content_type($filePath) : 'application/octet-stream';
+        if (empty($mimeType)) {
+            $mimeType = 'application/octet-stream';
+        }
+
+        $contents = file_get_contents($filePath);
+        if ($tempFile !== null) {
+            @unlink($tempFile);
+        }
+
+        return $this->response
+            ->setHeader('Content-Type', $mimeType)
+            ->setHeader('Content-Disposition', 'attachment; filename="' . $fileName . '"')
             ->setBody($contents === false ? '' : $contents);
     }
 
@@ -2940,8 +2999,9 @@ class Principal extends BaseController
         $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
         $proveedor = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit' => 100]);
         $reservas = (!empty($reserva->data)) ? $reserva->data : [];
+        $forzarDescargaInstrumento = (int) ($session->get('id_perfil') ?? 0) === 2;
         foreach ($reservas as $itemReserva) {
-            $itemReserva->instrumento_urls = $this->mapInstrumentoUrls($itemReserva->instrumento ?? null);
+            $itemReserva->instrumento_urls = $this->mapInstrumentoUrls($itemReserva->instrumento ?? null, $forzarDescargaInstrumento);
         }
 
         $data['reserva'] = $reservas;

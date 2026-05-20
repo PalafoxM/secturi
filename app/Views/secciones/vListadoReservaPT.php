@@ -76,8 +76,9 @@
                                                         <?php else: ?>
                                                             <td class="text-center">
                                                                 <?php if (!empty($p->instrumento_urls)) : ?>
+                                                                    <?php $accionInstrumento = ((int) ($session->get('id_perfil') ?? 0) === 2) ? 'Descargar' : 'Ver'; ?>
                                                                     <?php foreach ($p->instrumento_urls as $indexInstrumento => $instrumento): ?>
-                                                                        <a target="_blank" href="<?= esc($instrumento['url'] ?? '') ?>" class="btn btn-gradient-info px-3 mb-1" title="Ver instrumento <?= $indexInstrumento + 1 ?>">
+                                                                        <a target="_blank" href="<?= esc($instrumento['url'] ?? '') ?>" class="btn btn-gradient-info px-3 mb-1" title="<?= $accionInstrumento ?> instrumento <?= $indexInstrumento + 1 ?>">
                                                                             <i class="dripicons-document-new font-21"></i>
                                                                             <?php if (count($p->instrumento_urls) > 1): ?>
                                                                                 <?= $indexInstrumento + 1 ?>
