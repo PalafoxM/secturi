@@ -555,56 +555,70 @@
 
                                                         <div class="custom-dd dd" id="nestable_list_1">
                                                             <ol class="dd-list">
-                                                             <!--   <a target="_blank" href="<?= base_url()?>assets/documentos/DAJ_3_Autorizacion_tratamiento_datos_personales-338f.xlsx" >
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/Acta de cierre Contrato.docx" >
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
-                                                                            Autorizacion de Tratamiento de Datos
+                                                                            Acta de cierre Contrato
                                                                         </div>
                                                                     </li>
-                                                                </a> -->
+                                                                </a>
                                                                 
-                                                               <!--  <a target="_blank" href="<?= base_url()?>assets/documentos/SOLICITUD_DE_CONVENIO_2026.xlsx" >
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/Acta de cierre Convenio.docx" >
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
-                                                                    Formato Solicitud de Convenios
+                                                                    Acta de cierre Convenio
                                                                         </div>
                                                                     </li>  
                                                                 </a>
-                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/DAJ-3 Solicitud de elaboracipon de Contrato de Adquisicion.xlsx" >
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/Analisis de ofertas.docx" >
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
-                                                                        Solicitud de Contratos de Adquisición
+                                                                        Analisis de ofertas
                                                                         </div>
                                                                     </li> 
                                                                 </a> 
-                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/DAJ-1 Solicitud de elaboración de Contrato de Prestación de Servicios.xlsx">
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/Argumentación técnica.docx">
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
-                                                                      Solicitud de Contrato de Prestación de Servicios
+                                                                      Argumentación técnica
                                                                     </div>
                                                                 </li>  
                                                                 </a>
-                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/DGJ-4 Solicitud de elaboración de Contrato de Honorarios Asimilados a Salarios.xlsx">
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/Formatos Contratación (Excepción de Ley).docx">
                                                                  <li class="dd-item" data-id="2">
                                                                     <div class="dd-handle">
-                                                                       Solicitud de Honorarios Asimilados a Salarios
+                                                                       Formatos Contratación (Excepción de Ley)
                                                                     </div>
                                                                 </li>
-                                                                 </a> -->
-                                                               <!--  <a target="_blank" href="<?= base_url()?>assets/documentos/F-DAJ-12-2022_Solicitud_de_Honorarios-f9f3.xlsx">
+                                                                 </a> 
+                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/Formatos Convenios.docx">
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
-                                                                            Autorización de Tratamiento de Datos Personales-HONORARIOS
+                                                                            Formatos Convenios
                                                                         </div>
                                                                     </li> 
                                                                  </a>
-                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/F-A-07-2024 Formato_Inventario_Documental.xlsx">
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/Justificación.docx">
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
-                                                                        Inventario
+                                                                      Justificación
                                                                         </div>
                                                                     </li>
-                                                                 </a> -->
+                                                                 </a>
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/Justificación.docx">
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                      Justificación
+                                                                        </div>
+                                                                    </li>
+                                                                 </a>
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/Formatos Contratación (Ley).docx">
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                      Formatos Contratación (Ley)
+                                                                        </div>
+                                                                    </li>
+                                                                 </a>
                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/AVISO_PRIVACIDAD_INTEGRAL_ACTUALIZADO_2025.pdf">
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
