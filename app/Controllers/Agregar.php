@@ -6611,85 +6611,75 @@ class Agregar extends BaseController
         $response->error = false;
         $response->respuesta = "Éxito|La información se guardó correctamente.";
 
-        // --- EMAIL SENDING LOGIC ---
-        //die( var_dump( $data ) );
-        if(isset($data['es2025']) && $data['es2025'] == 0 && $data['tipo_formato'] == 'PT'){
-            if($session->get('id_usuario') != 1){
-                if($data['editar'] == 0 || $data['editar'] == ''){
-                    try {
-                        $email = \Config\Services::email();
-                        $globals = new Mglobal; // Ensure instance matches if needed, usually $this->globals
-                        
-                        // 1. Get User Name
-                        $nombreUsuario = $session->get('nombre_completo');    
-                        // 2. Get Files to Attach
-                        $filesToAttach = [];
-                        $tempFilesToDelete = [];
-                        // Query active rows for this record
-                        $activeRows = $this->globals->getTabla(['tabla' => 'manual_factura', 'where' => ['id_registro_pt' => $id_registro_pt, 'visible' => 1]]);
-                        
-                        if(isset($activeRows->data)){
-                            foreach($activeRows->data as $row){
-                                if(!empty($row->pdf)){
-                                    $resolvedPdfPath = $this->resolveManualFacturaFilePath($row->pdf, 'mail_pdf_');
-                                    if($resolvedPdfPath){
-                                        $filesToAttach[] = $resolvedPdfPath;
-                                        if(strpos($row->pdf, 'FACTURAS/') === 0){
-                                            $tempFilesToDelete[] = $resolvedPdfPath;
-                                        }
-                                    }
-                                }
-                                if(!empty($row->xml)){
-                                    $resolvedXmlPath = $this->resolveManualFacturaFilePath($row->xml, 'mail_xml_');
-                                    if($resolvedXmlPath){
-                                        $filesToAttach[] = $resolvedXmlPath;
-                                        if(strpos($row->xml, 'FACTURAS/') === 0){
-                                            $tempFilesToDelete[] = $resolvedXmlPath;
-                                        }
-                                    }
+        $esEdicion = (string) ($data['editar'] ?? '') === '1';
+        $esRefrendo2025 = filter_var($data['es2025'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        $tipoFormato = strtoupper((string) ($data['tipo_formato'] ?? 'PT'));
+        $debeEnviarCorreoFacturasPt = !$esEdicion
+            && !$esRefrendo2025
+            && (int) $session->get('id_usuario') !== 1
+            && $tipoFormato === 'PT';
+
+        if ($debeEnviarCorreoFacturasPt) {
+            $tempFilesToDelete = [];
+
+            try {
+                $email = \Config\Services::email();
+                $nombreUsuario = $session->get('nombre_completo');
+                $filesToAttach = [];
+                $activeRows = $this->globals->getTabla(['tabla' => 'manual_factura', 'where' => ['id_registro_pt' => $id_registro_pt, 'visible' => 1]]);
+
+                if (isset($activeRows->data)) {
+                    foreach ($activeRows->data as $row) {
+                        if (!empty($row->pdf)) {
+                            $resolvedPdfPath = $this->resolveManualFacturaFilePath($row->pdf, 'mail_pdf_');
+                            if ($resolvedPdfPath) {
+                                $filesToAttach[] = $resolvedPdfPath;
+                                if (strpos($row->pdf, 'FACTURAS/') === 0) {
+                                    $tempFilesToDelete[] = $resolvedPdfPath;
                                 }
                             }
                         }
 
-                        // 3. Configure Email
-                        $email->setFrom('a.palafox@guanajuato.gob.mx', $nombreUsuario); // Sending ON BEHALF of user
-                        $email->setTo('dasedetur@guanajuato.gob.mx');
-                        $email->setCC($session->get('correo')); 
-                        
-                        $subject = 'Registro Formato ' . $dataInsert['no_consecutivo'];
-                        $body = 'Estimado usuario,<br><br>';
-                        $body .= 'Se ha realizado el registro del <strong>Formato PT</strong> con consecutivo <strong>' . $dataInsert['no_consecutivo'] . '</strong>.<br>';
-                        $body .= 'Registrado por: <strong>' . $nombreUsuario . '</strong>.<br><br>';
-                        $body .= 'Se adjuntan los archivos correspondientes (PDF/XML).<br>';
-                        $body .= '<br>Saludos cordiales.';
-
-                        $email->setSubject($subject);
-                        $email->setMessage($body);
-
-                        // 4. Attach Files
-                        foreach($filesToAttach as $filePath){
-                            $email->attach($filePath);
+                        if (!empty($row->xml)) {
+                            $resolvedXmlPath = $this->resolveManualFacturaFilePath($row->xml, 'mail_xml_');
+                            if ($resolvedXmlPath) {
+                                $filesToAttach[] = $resolvedXmlPath;
+                                if (strpos($row->xml, 'FACTURAS/') === 0) {
+                                    $tempFilesToDelete[] = $resolvedXmlPath;
+                                }
+                            }
                         }
-
-                        // 5. Send
-                        if($email->send()){
-                            // Success logging or modify response if needed
-                        // log_message('info', 'Email sent for PT ' . $id_registro_pt);
-                        } else {
-                        // log_message('error', 'Email failed: ' . $email->printDebugger(['headers']));
-                        }
-
-                        foreach($tempFilesToDelete as $tempFile){
-                            @unlink($tempFile);
-                        }
-
-                    } catch (\Exception $e) {
-                        // Do not fail the main save operation if email fails
-                    // log_message('error', 'Email exception: ' . $e->getMessage());
                     }
                 }
+
+                if (!empty($filesToAttach)) {
+                    $email->setFrom('a.palafox@guanajuato.gob.mx', $nombreUsuario);
+                    $email->setTo('dasedetur@guanajuato.gob.mx');
+                    $email->setCC($session->get('correo'));
+
+                    $subject = 'Registro Formato ' . $dataInsert['no_consecutivo'];
+                    $body = 'Estimado usuario,<br><br>';
+                    $body .= 'Se ha realizado el registro del <strong>Formato PT</strong> con consecutivo <strong>' . $dataInsert['no_consecutivo'] . '</strong>.<br>';
+                    $body .= 'Registrado por: <strong>' . $nombreUsuario . '</strong>.<br><br>';
+                    $body .= 'Se adjuntan los archivos correspondientes (PDF/XML).<br>';
+                    $body .= '<br>Saludos cordiales.';
+
+                    $email->setSubject($subject);
+                    $email->setMessage($body);
+
+                    foreach ($filesToAttach as $filePath) {
+                        $email->attach($filePath);
+                    }
+
+                    $email->send();
+                }
+            } catch (\Throwable $e) {
+                log_message('error', 'Error al enviar correo de facturas PT: ' . $e->getMessage());
+            } finally {
+                foreach ($tempFilesToDelete as $tempFile) {
+                    @unlink($tempFile);
+                }
             }
-           
         }
 
         return $this->respond($response);
