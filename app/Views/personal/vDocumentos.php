@@ -555,15 +555,15 @@
 
                                                         <div class="custom-dd dd" id="nestable_list_1">
                                                             <ol class="dd-list">
-                                                               <a target="_blank" href="<?= base_url()?>assets/documentos/DAJ_3_Autorizacion_tratamiento_datos_personales-338f.xlsx" >
+                                                             <!--   <a target="_blank" href="<?= base_url()?>assets/documentos/DAJ_3_Autorizacion_tratamiento_datos_personales-338f.xlsx" >
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
                                                                             Autorizacion de Tratamiento de Datos
                                                                         </div>
                                                                     </li>
-                                                                </a>
+                                                                </a> -->
                                                                 
-                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/SOLICITUD_DE_CONVENIO_2026.xlsx" >
+                                                               <!--  <a target="_blank" href="<?= base_url()?>assets/documentos/SOLICITUD_DE_CONVENIO_2026.xlsx" >
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
                                                                     Formato Solicitud de Convenios
@@ -590,8 +590,8 @@
                                                                        Solicitud de Honorarios Asimilados a Salarios
                                                                     </div>
                                                                 </li>
-                                                                 </a>
-                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/F-DAJ-12-2022_Solicitud_de_Honorarios-f9f3.xlsx">
+                                                                 </a> -->
+                                                               <!--  <a target="_blank" href="<?= base_url()?>assets/documentos/F-DAJ-12-2022_Solicitud_de_Honorarios-f9f3.xlsx">
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
                                                                             Autorización de Tratamiento de Datos Personales-HONORARIOS
@@ -604,7 +604,7 @@
                                                                         Inventario
                                                                         </div>
                                                                     </li>
-                                                                 </a>
+                                                                 </a> -->
                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/AVISO_PRIVACIDAD_INTEGRAL_ACTUALIZADO_2025.pdf">
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
