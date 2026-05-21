@@ -562,6 +562,13 @@
                                                                         </div>
                                                                     </li>
                                                                 </a>
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/CARTA.docx" >
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                            CARTA DE AUTORIZACIÓN DE USO DE IMAGEN
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
                                                                 
                                                                  <a target="_blank" href="<?= base_url()?>assets/documentos/Acta de cierre Convenio.docx" >
                                                                     <li class="dd-item" data-id="2">
