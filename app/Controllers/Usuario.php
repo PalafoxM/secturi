@@ -171,6 +171,393 @@ class Usuario extends BaseController
      } */
 
     }
+    private function obtenerPeriodoReporteAsistencia(?string $periodoInicio): array
+    {
+        if (empty($periodoInicio)) {
+            $periodoInicio = date('Y-m-d');
+        }
+
+        $dia = date('d', strtotime($periodoInicio));
+        $ultimoDiaMes = date('t', strtotime($periodoInicio));
+
+        if ($dia === '01') {
+            return [
+                date('Y-m-01', strtotime($periodoInicio)),
+                date('Y-m-15', strtotime($periodoInicio)),
+            ];
+        }
+
+        return [
+            date('Y-m-16', strtotime($periodoInicio)),
+            date('Y-m-' . $ultimoDiaMes, strtotime($periodoInicio)),
+        ];
+    }
+
+    private function normalizarHoraReporte($hora): string
+    {
+        if (empty($hora) || $hora === '00:00:00') {
+            return '';
+        }
+
+        $timestamp = strtotime((string) $hora);
+        return $timestamp ? date('H:i:s', $timestamp) : '';
+    }
+
+    private function crearDiaReporte(): array
+    {
+        return [
+            'entrada' => '',
+            'salida' => '',
+            'incidencias' => [],
+        ];
+    }
+
+    private function obtenerFechaAsistenciaReporte($asistencia): ?string
+    {
+        $fecha = $asistencia->fechas_asistencias ?? ($asistencia->fecha ?? ($asistencia->fecha_inicio ?? null));
+        if (empty($fecha)) {
+            return null;
+        }
+
+        $timestamp = strtotime((string) $fecha);
+        return $timestamp ? date('Y-m-d', $timestamp) : null;
+    }
+
+    private function obtenerNombreReporteAsistencia($usuario): string
+    {
+        $partes = [
+            trim((string) ($usuario->primer_apellido ?? '')),
+            trim((string) ($usuario->segundo_apellido ?? '')),
+            trim((string) ($usuario->nombre ?? '')),
+        ];
+        $nombre = trim(implode(' ', array_filter($partes)));
+
+        if ($nombre === '') {
+            $nombre = trim((string) ($usuario->nombre_completo ?? 'Sin nombre'));
+        }
+
+        return strtoupper($nombre !== '' ? $nombre : 'Sin nombre');
+    }
+
+    private function obtenerRangoIncidenciaReporte($incidencia): array
+    {
+        $tipo = (int) ($incidencia->tipo ?? 1);
+        $inicio = null;
+        $fin = null;
+
+        if ($tipo === 2 && !empty($incidencia->fecha) && strpos((string) $incidencia->fecha, ' - ') !== false) {
+            $partes = explode(' - ', (string) $incidencia->fecha);
+            $inicio = \DateTime::createFromFormat('m/d/Y', trim($partes[0])) ?: null;
+            $fin = \DateTime::createFromFormat('m/d/Y', trim($partes[1] ?? '')) ?: null;
+        }
+
+        if (!$inicio && !empty($incidencia->fecha_inicio_incidencia)) {
+            $inicio = new \DateTime($incidencia->fecha_inicio_incidencia);
+        }
+
+        if (!$fin && !empty($incidencia->fecha_fin_incidencia)) {
+            $fin = new \DateTime($incidencia->fecha_fin_incidencia);
+        }
+
+        if (!$inicio && !empty($incidencia->fecha)) {
+            $inicio = new \DateTime($incidencia->fecha);
+        }
+
+        if (!$fin && $inicio) {
+            $fin = clone $inicio;
+        }
+
+        return [$inicio, $fin];
+    }
+
+    private function integrarAsistenciasReporte(array $registros): array
+    {
+        $manana = [];
+        $tarde = [];
+        $salidas = [];
+
+        foreach ($registros as $registro) {
+            $horaInicio = $this->normalizarHoraReporte($registro->hora_inicio ?? ($registro->entrada ?? ''));
+            $horaFin = $this->normalizarHoraReporte($registro->hora_fin ?? ($registro->salida ?? ''));
+
+            foreach ([$horaInicio, $horaFin] as $hora) {
+                if ($hora === '') {
+                    continue;
+                }
+
+                if ($hora < '12:00:00') {
+                    $manana[] = $hora;
+                } else {
+                    $tarde[] = $hora;
+                }
+            }
+
+            if ($horaFin !== '') {
+                $salidas[] = $horaFin;
+            }
+        }
+
+        sort($manana);
+        sort($tarde);
+        sort($salidas);
+
+        return [
+            'entrada' => !empty($manana) ? $manana[0] : '',
+            'salida' => !empty($tarde) ? end($tarde) : (!empty($salidas) ? end($salidas) : ''),
+        ];
+    }
+
+    private function prepararReporteAsistenciaIncidencia(?string $periodoInicio): array
+    {
+        $globals = new Mglobal;
+        [$fec_ini, $fec_fin] = $this->obtenerPeriodoReporteAsistencia($periodoInicio);
+        $anio = date('Y', strtotime($fec_ini));
+
+        $diasFestivosGenerales = [
+            $anio . '-01-01' => 'Asueto',
+            $anio . '-02-02' => 'Dia de la Constitucion',
+            $anio . '-03-30' => 'Semana Santa',
+            $anio . '-03-31' => 'Semana Santa',
+            $anio . '-04-01' => 'Semana Santa',
+            $anio . '-04-02' => 'Semana Santa',
+            $anio . '-04-03' => 'Semana Santa',
+            $anio . '-05-01' => 'Dia del Trabajo',
+            $anio . '-09-16' => 'Dia de la Independencia',
+            $anio . '-11-17' => 'Asueto',
+            $anio . '-12-12' => 'Dia de la Virgen de Guadalupe',
+            $anio . '-12-25' => 'Navidad',
+        ];
+
+        $start = new \DateTime($fec_ini);
+        $end = new \DateTime($fec_fin);
+        $end->modify('+1 day');
+        $period = new \DatePeriod($start, new \DateInterval('P1D'), $end);
+
+        $fechasDelPeriodo = [];
+        foreach ($period as $d) {
+            if ($d->format('N') < 6) {
+                $fechasDelPeriodo[] = $d->format('Y-m-d');
+            }
+        }
+
+        $usuarios = [];
+        $cumpleanosUsuarios = [];
+        $usuariosPorId = [];
+        $usuariosPorNoEmpleado = [];
+        $asistenciasTablaQuery = $globals->getTabla([
+            'tabla' => 'asistencia',
+            'where' => ['visible' => 1],
+            'whereBetween' => [['fecha', $fec_ini, $fec_fin]],
+        ]);
+        $asistenciasTabla = (!empty($asistenciasTablaQuery->data)) ? $asistenciasTablaQuery->data : [];
+        $noEmpleadosChecador = [];
+
+        foreach ($asistenciasTabla as $asistenciaTabla) {
+            if (!empty($asistenciaTabla->no_empleado)) {
+                $noEmpleadosChecador[trim((string) $asistenciaTabla->no_empleado)] = true;
+            }
+        }
+
+        $usuariosBase = $globals->getTabla([
+            'tabla' => 'vw_usuario',
+            'where' => ['visible' => 1, 'id_tipo_empleado' => 1],
+        ]);
+        $usuariosInfo = (!empty($usuariosBase->data)) ? $usuariosBase->data : [];
+        $usuariosInfoReporte = [];
+
+        foreach ($usuariosInfo as $usuario) {
+            if (empty($usuario->no_empleado) || !isset($noEmpleadosChecador[trim((string) $usuario->no_empleado)])) {
+                continue;
+            }
+
+            $nombre = $this->obtenerNombreReporteAsistencia($usuario);
+            $usuarios[$nombre] = [];
+            $usuariosInfoReporte[] = $usuario;
+            if (isset($usuario->id_usuario)) {
+                $usuariosPorId[(int) $usuario->id_usuario] = $usuario;
+            }
+            if (!empty($usuario->no_empleado)) {
+                $usuariosPorNoEmpleado[trim((string) $usuario->no_empleado)] = $usuario;
+            }
+            if (!empty($usuario->fec_nac)) {
+                $cumpleanosUsuarios[$nombre] = $usuario->fec_nac;
+            }
+        }
+
+        $filtroAsistencias = [
+            'tabla' => 'vw_asistencia',
+            'where' => ['visible' => 1, 'id_tipo_empleado' => 1],
+            'whereBetween' => [['fechas_asistencias', $fec_ini, $fec_fin]],
+        ];
+        $asistenciasQuery = $globals->getTabla($filtroAsistencias);
+        $asistencias = (!empty($asistenciasQuery->data)) ? $asistenciasQuery->data : [];
+
+        if (empty($asistencias)) {
+            $filtroAsistencias['whereBetween'] = [['fecha', $fec_ini, $fec_fin]];
+            $asistenciasQuery = $globals->getTabla($filtroAsistencias);
+            $asistencias = (!empty($asistenciasQuery->data)) ? $asistenciasQuery->data : [];
+        }
+
+        if (empty($asistencias)) {
+            unset($filtroAsistencias['whereBetween']);
+            $asistenciasQuery = $globals->getTabla($filtroAsistencias);
+            $asistencias = (!empty($asistenciasQuery->data)) ? $asistenciasQuery->data : [];
+        }
+
+        if (!empty($asistenciasTabla)) {
+            $asistencias = array_merge($asistencias, $asistenciasTabla);
+        }
+
+        $asistenciasPorUsuarioFecha = [];
+
+        foreach ($asistencias as $asistencia) {
+            if (isset($asistencia->visible_asistencia) && (int) $asistencia->visible_asistencia !== 1) {
+                continue;
+            }
+
+            $fechaYmd = $this->obtenerFechaAsistenciaReporte($asistencia);
+            if (!$fechaYmd) {
+                continue;
+            }
+
+            if (!in_array($fechaYmd, $fechasDelPeriodo, true)) {
+                continue;
+            }
+
+            $usuarioAsistencia = null;
+            if (isset($asistencia->id_usuario) && isset($usuariosPorId[(int) $asistencia->id_usuario])) {
+                $usuarioAsistencia = $usuariosPorId[(int) $asistencia->id_usuario];
+            } elseif (!empty($asistencia->no_empleado) && isset($usuariosPorNoEmpleado[trim((string) $asistencia->no_empleado)])) {
+                $usuarioAsistencia = $usuariosPorNoEmpleado[trim((string) $asistencia->no_empleado)];
+            }
+
+            if (!$usuarioAsistencia && isset($asistencia->nombre_completo) && isset($usuarios[strtoupper(trim($asistencia->nombre_completo))])) {
+                $nombre = strtoupper(trim($asistencia->nombre_completo));
+            } elseif ($usuarioAsistencia) {
+                $nombre = $this->obtenerNombreReporteAsistencia($usuarioAsistencia);
+            } else {
+                continue;
+            }
+
+            if (!isset($usuarios[$nombre])) {
+                continue;
+            }
+
+            $asistenciasPorUsuarioFecha[$nombre][$fechaYmd][] = $asistencia;
+        }
+
+        foreach ($asistenciasPorUsuarioFecha as $nombre => $fechas) {
+            foreach ($fechas as $fechaYmd => $registros) {
+                if (!isset($usuarios[$nombre][$fechaYmd])) {
+                    $usuarios[$nombre][$fechaYmd] = $this->crearDiaReporte();
+                }
+
+                $asistenciaDia = $this->integrarAsistenciasReporte($registros);
+                $usuarios[$nombre][$fechaYmd]['entrada'] = $asistenciaDia['entrada'];
+                $usuarios[$nombre][$fechaYmd]['salida'] = $asistenciaDia['salida'];
+            }
+        }
+
+        $incidenciasQuery = $globals->getTabla([
+            'tabla' => 'vw_incidenica',
+            'where' => ['visible' => 1],
+        ]);
+        $incidencias = (!empty($incidenciasQuery->data)) ? $incidenciasQuery->data : [];
+        $inicioReporte = strtotime($fec_ini);
+        $finReporte = strtotime($fec_fin);
+
+        foreach ($incidencias as $incidencia) {
+            if (isset($incidencia->id_tipo_empleado) && (int) $incidencia->id_tipo_empleado !== 1) {
+                continue;
+            }
+
+            [$inicioIncidencia, $finIncidencia] = $this->obtenerRangoIncidenciaReporte($incidencia);
+            if (!$inicioIncidencia || !$finIncidencia) {
+                continue;
+            }
+
+            if ($inicioIncidencia->getTimestamp() > $finReporte || $finIncidencia->getTimestamp() < $inicioReporte) {
+                continue;
+            }
+
+            $usuarioIncidencia = null;
+            if (isset($incidencia->id_usuario) && isset($usuariosPorId[(int) $incidencia->id_usuario])) {
+                $usuarioIncidencia = $usuariosPorId[(int) $incidencia->id_usuario];
+            } elseif (!empty($incidencia->no_empleado) && isset($usuariosPorNoEmpleado[trim((string) $incidencia->no_empleado)])) {
+                $usuarioIncidencia = $usuariosPorNoEmpleado[trim((string) $incidencia->no_empleado)];
+            }
+
+            $nombre = $usuarioIncidencia
+                ? $this->obtenerNombreReporteAsistencia($usuarioIncidencia)
+                : strtoupper(trim($incidencia->nombre_completo ?? 'Sin nombre'));
+            if (!isset($usuarios[$nombre])) {
+                continue;
+            }
+
+            $finIncidencia = clone $finIncidencia;
+            $finIncidencia->modify('+1 day');
+            $periodoIncidencia = new \DatePeriod($inicioIncidencia, new \DateInterval('P1D'), $finIncidencia);
+
+            foreach ($periodoIncidencia as $fechaIncidencia) {
+                $fechaYmd = $fechaIncidencia->format('Y-m-d');
+                if (!in_array($fechaYmd, $fechasDelPeriodo, true)) {
+                    continue;
+                }
+
+                if (!isset($usuarios[$nombre][$fechaYmd])) {
+                    $usuarios[$nombre][$fechaYmd] = $this->crearDiaReporte();
+                }
+
+                $usuarios[$nombre][$fechaYmd]['incidencias'][] = [
+                    'estatus' => $incidencia->id_estatus ?? null,
+                    'cat_incidencia' => $incidencia->cat_id_incidencia ?? ($incidencia->cat_incidencia ?? null),
+                    'hora_inicio' => $this->normalizarHoraReporte($incidencia->hora_inicio ?? ''),
+                    'hora_fin' => $this->normalizarHoraReporte($incidencia->hora_fin ?? ''),
+                    'nombre' => $incidencia->nombre_incidencia ?? ($incidencia->dsc_incidencia ?? 'INCIDENCIA'),
+                    'tipo' => $incidencia->tipo ?? null,
+                ];
+            }
+        }
+
+        foreach ($usuarios as $nombre => $fechas) {
+            foreach ($fechasDelPeriodo as $fechaYmd) {
+                if (isset($diasFestivosGenerales[$fechaYmd])) {
+                    if (!isset($usuarios[$nombre][$fechaYmd])) {
+                        $usuarios[$nombre][$fechaYmd] = $this->crearDiaReporte();
+                    }
+                    $usuarios[$nombre][$fechaYmd]['incidencias'][] = [
+                        'estatus' => 3,
+                        'nombre' => strtoupper($diasFestivosGenerales[$fechaYmd]),
+                        'tipo' => null,
+                    ];
+                }
+            }
+
+            if (isset($cumpleanosUsuarios[$nombre])) {
+                $cumpleAnioActual = $anio . '-' . date('m-d', strtotime($cumpleanosUsuarios[$nombre]));
+                if (date('N', strtotime($cumpleAnioActual)) < 6 && in_array($cumpleAnioActual, $fechasDelPeriodo, true)) {
+                    if (!isset($usuarios[$nombre][$cumpleAnioActual])) {
+                        $usuarios[$nombre][$cumpleAnioActual] = $this->crearDiaReporte();
+                    }
+                    $usuarios[$nombre][$cumpleAnioActual]['incidencias'][] = [
+                        'estatus' => 3,
+                        'nombre' => 'CUMPLEANOS',
+                        'tipo' => null,
+                    ];
+                }
+            }
+        }
+
+        return [
+            'fec_ini' => $fec_ini,
+            'fec_fin' => $fec_fin,
+            'anio' => $anio,
+            'fechasDelPeriodo' => $fechasDelPeriodo,
+            'usuarios' => $usuarios,
+            'resul' => $usuariosInfoReporte,
+        ];
+    }
+
     public function validarReporteExcel2()
     {
         $session = \Config\Services::session();
@@ -178,6 +565,17 @@ class Usuario extends BaseController
         $response->error = true;
         $globals = new Mglobal;
         $periodoInicio = $this->request->getPost('periodoInicio');
+        $datosReporte = $this->prepararReporteAsistenciaIncidencia($periodoInicio);
+        $resul = $datosReporte['resul'];
+
+        if (empty($resul)) {
+            $response->respuesta = "No se encontrarÃ³n datos en el<strong> periodo indicado</strong>";
+        }
+        else {
+            $response->error = false;
+            $response->respuesta = "Datos Correctos";
+        }
+        return $this->respond($response);
 
         $dia = date('d', strtotime($periodoInicio));
 
@@ -422,6 +820,7 @@ class Usuario extends BaseController
     {
         $session = \Config\Services::session();
         $globals = new Mglobal;
+        if (false) {
 
         if (empty($periodoInicio)) {
             $periodoInicio = date('Y-m-d');
@@ -687,6 +1086,16 @@ class Usuario extends BaseController
             }
         }
 
+        }
+
+        $datosReporte = $this->prepararReporteAsistenciaIncidencia($periodoInicio);
+        $fec_ini = $datosReporte['fec_ini'];
+        $fec_fin = $datosReporte['fec_fin'];
+        $anio = $datosReporte['anio'];
+        $fechasDelPeriodo = $datosReporte['fechasDelPeriodo'];
+        $usuarios = $datosReporte['usuarios'];
+        $resul = $datosReporte['resul'];
+
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
@@ -795,7 +1204,7 @@ class Usuario extends BaseController
 
             $numeroEmpleado = '';
             foreach ($resul as $r) {
-                if (trim($r->nombre_completo ?: 'Sin nombre') === $nombre) {
+                if ($this->obtenerNombreReporteAsistencia($r) === $nombre) {
                     $numeroEmpleado = isset($r->no_empleado) ? $r->no_empleado : 'N/A';
                     break;
                 }
