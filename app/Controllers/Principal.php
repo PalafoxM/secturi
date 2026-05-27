@@ -5568,27 +5568,27 @@ class Principal extends BaseController
     private function obtenerDocumentosContratoSolicitud(): array
     {
         return [
-            1 => 'Anexo Tecnico (Terminos de referencia)',
-            '2a' => 'Investigacion de Mercado (Cotizaciones y consulta PEI)',
-            '2b' => 'Analisis de Ofertas turisticas',
-            '2c' => 'Argumentacion Tecnica',
-            '3a' => 'Validacion de partida restringida (SF)',
-            '3b' => 'Verificacion de Alineacion de Informacion Estrategica (DGIT)',
+            1 => 'Anexo Técnico (Términos de referencia)',
+            '2a' => 'Investigación de mercado (Cotizaciones y consulta PEI)',
+            '2b' => 'Análisis de ofertas turísticas',
+            '2c' => 'Argumentación técnica',
+            '3a' => 'Validación de partida restringida (SF)',
+            '3b' => 'Verificación de alineación de información estratégica (DGIT)',
             '3c' => 'Suficiencia presupuestal (R3)',
-            '3d' => 'Validacion DGTIT/CGCS u otra',
-            4 => 'Justificacion',
-            5 => 'Propuesta Tecnico Economica (Anexo)',
+            '3d' => 'Validación DGTIT/CGCS u otra',
+            4 => 'Justificación',
+            5 => 'Propuesta técnico-económica (Anexo)',
             6 => 'Aviso de privacidad integral',
-            7 => 'Cedula de Registro en el Padron de Proveedores',
+            7 => 'Cédula de registro en el Padrón de Proveedores',
             8 => 'Escritura Constitutiva',
-            9 => 'Documento de representacion legal (Poder)',
-            10 => 'Identificacion oficial vigente',
-            11 => 'Constancia de situacion fiscal',
+            9 => 'Documento de representación legal (Poder)',
+            10 => 'Identificación oficial vigente',
+            11 => 'Constancia de situación fiscal',
             12 => 'Comprobante de domicilio',
-            '13a' => 'Opinion de cumplimiento de obligaciones fiscales',
+            '13a' => 'Opinión de cumplimiento de obligaciones fiscales',
             '13b' => 'Manifiesto bajo protesta de cumplimiento fiscal',
             14 => 'Manifiesto de no impedimento para contratar',
-            15 => 'Carta de declaracion de intereses',
+            15 => 'Carta de declaración de intereses',
             16 => 'Manifiesto de contar con infraestructura',
         ];
     }
@@ -5650,7 +5650,7 @@ class Principal extends BaseController
                 .check { width: 45px; text-align: center; font-weight: bold; }
                 .empty { text-align: center; color: #777; }
             </style>
-            <h2>Check List de Documentacion Capturada</h2>
+            <h2>Check List de Documentación Capturada</h2>
             <div class="subtitle">Solicitud de contrato #' . htmlspecialchars((string) $id_solicitud, ENT_QUOTES, 'UTF-8') . '</div>
             <table>
                 <thead>
