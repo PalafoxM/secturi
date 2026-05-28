@@ -65,7 +65,7 @@
                                                         <?php endif; ?>
                                                     </td>
                                                     <td class="text-center">
-                                                        <?php if ((int) ($sol->id_estatus ?? 0) === 3 && !empty($sol->instrumento_urls)): ?>
+                                                        <?php if (!empty($sol->instrumento_urls)): ?>
                                                             <?php foreach ($sol->instrumento_urls as $index => $instrumento): ?>
                                                                 <a href="<?= $instrumento['url'] ?>" target="_blank" class="btn btn-sm btn-success mb-1" title="Ver Instrumento <?= $index + 1 ?>">
                                                                     <i class="fas fa-file-pdf"></i> Inst. <?= $index + 1 ?>

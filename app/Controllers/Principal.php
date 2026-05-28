@@ -4615,15 +4615,30 @@ class Principal extends BaseController
                     'where' => ['visible' => 1, 'id_solicitud_adquisiciones' => $sol->id_solicitud_adquisiciones]
                 ]);
                 $sol->tienen_archivos = !empty($archivos->data);
+
+                $instrumentos = [];
+                if (!empty($sol->instrumento_juridico)) {
+                    $decoded = json_decode((string) $sol->instrumento_juridico, true);
+                    $instrumentos = is_array($decoded) ? $decoded : [$sol->instrumento_juridico];
+                } elseif (!empty($sol->instrumento)) {
+                    $decoded = json_decode((string) $sol->instrumento, true);
+                    $instrumentos = is_array($decoded) ? $decoded : [$sol->instrumento];
+                }
+
+                if (!empty($archivos->data)) {
+                    foreach ($archivos->data as $archivoSolicitud) {
+                        if (($archivoSolicitud->clave_documento ?? '') === 'instrumento_juridico' && !empty($archivoSolicitud->nombre_archivo)) {
+                            $instrumentos[] = $archivoSolicitud->nombre_archivo;
+                        }
+                    }
+                }
+
+                $instrumentos = array_values(array_unique(array_filter($instrumentos)));
+                $sol->instrumento_urls = $this->mapInstrumentoUrls(array_slice($instrumentos, 0, 4));
             }
         }
 
         $data['solicitudes'] = !empty($solicitudes->data) ? $solicitudes->data : [];
-        if (!empty($data['solicitudes'])) {
-            foreach ($data['solicitudes'] as &$sol) {
-                $sol->instrumento_urls = $this->mapInstrumentoUrls($sol->instrumento_juridico ?? null);
-            }
-        }
         $data['scripts'] = ['inicio'];
         $data['contentView'] = 'personal/vListaSolicitudAdquisiciones';
         $this->_renderView($data);
