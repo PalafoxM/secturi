@@ -3632,6 +3632,7 @@ ini.inicio = (function () {
             document.getElementById("formAgregarAlba").reset();
             $("#previewFoto").attr("src", "").hide();
             $("#previewProtocolo").attr("src", "").hide();
+            $("#previewArchivo").attr("src", "").hide();
 
         },
         formConfiguracion: function () {
@@ -3688,6 +3689,8 @@ ini.inicio = (function () {
 
                         $('#editar').val(1);
                         $('#id_alba').val(id_alba);
+                        $("#previewArchivo").hide();
+                        return;
                         $('#nombre').val(data.nombre);
                         $('#primer_apellido').val(data.primer_apellido);
                         $('#segundo_apellido').val(data.segundo_apellido);
@@ -3999,9 +4002,14 @@ ini.inicio = (function () {
             $("#formAgregarAlba").submit(function (e) {
                 e.preventDefault();
                 var formData = new FormData(this); // Usar FormData en lugar de serialize
-                var foto = $('#foto')[0].files[0];
-                var protocolo = $('#protocolo')[0].files[0];
+                var archivo = $('#archivo')[0].files[0];
+                var foto = archivo;
+                var protocolo = archivo;
                 let id_alba = $('#id_alba').val();
+                if (id_alba == 0 && !archivo) {
+                    Swal.fire("AtenciÃ³n", 'El <strong>archivo PDF o imagen</strong> es requerido', 'info');
+                    return;
+                }
                 if (id_alba == 0) {
                     if (!foto) {
                         Swal.fire("Atención", 'La <strong>Foto</strong> es requerida', 'info');

@@ -333,13 +333,34 @@ $tarjetasError = session()->getFlashdata('tarjetas_error');
                                                         <div class="carousel-inner">
                                                             <?php foreach ($lista_alba as $index => $l): ?>
                                                                 <?php
-                                                                $nombreCompleto = trim(($l->nombre ?? '') . ' ' . ($l->primer_apellido ?? '') . ' ' . ($l->segundo_apellido ?? ''));
-                                                                $foto = !empty($l->foto)
-                                                                    ? base_url() . $l->foto
-                                                                    : base_url() . 'assets/images/placeholder-xxl.jpg'; // tu placeholder
+                                                                $archivo = $l->archivo ?? '';
+                                                                $archivoUrl = !empty($archivo)
+                                                                    ? base_url('index.php/Principal/verArchivoS3?key=' . rawurlencode($archivo))
+                                                                    : base_url() . 'assets/images/placeholder-xxl.jpg';
+                                                                $extension = strtolower(pathinfo($archivo, PATHINFO_EXTENSION));
+                                                                $esPdf = $extension === 'pdf';
                                                                 ?>
                                                                 <div
                                                                     class="carousel-item <?= $index === 0 ? 'active' : '' ?>">
+                                                                    <?php if (true): ?>
+                                                                    <div class="media align-items-center">
+                                                                        <?php if ($esPdf): ?>
+                                                                            <iframe src="<?= $archivoUrl ?>" class="mr-3" style="width: 100%; height: 260px; border: 0;"></iframe>
+                                                                        <?php else: ?>
+                                                                            <img src="<?= $archivoUrl ?>"
+                                                                                alt="Archivo ALBA"
+                                                                                class="mr-3 align-self-center"
+                                                                                style="max-width: 100%; max-height: 260px; object-fit: contain;"
+                                                                                loading="<?= $index === 0 ? 'eager' : 'lazy' ?>"
+                                                                                onerror="this.onerror=null;this.src='<?= base_url() ?>assets/images/placeholder-xxl.jpg';">
+                                                                        <?php endif; ?>
+                                                                        <a target="_blank" rel="noopener"
+                                                                            href="<?= $archivoUrl ?>"
+                                                                            class="bg-soft-purple px-2 py-1">
+                                                                            <i class="dripicons-preview"></i>
+                                                                        </a>
+                                                                    </div>
+                                                                    <?php else: ?>
                                                                     <div class="media">
                                                                         <img src="<?= $foto ?>"
                                                                             alt="Foto de <?= htmlspecialchars($nombreCompleto, ENT_QUOTES, 'UTF-8') ?>"
@@ -365,6 +386,7 @@ $tarjetasError = session()->getFlashdata('tarjetas_error');
                                                                             </a>
                                                                         </div>
                                                                     </div>
+                                                                    <?php endif; ?>
                                                                 </div>
 
                                                             <?php endforeach; ?>

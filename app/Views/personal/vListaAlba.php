@@ -41,18 +41,8 @@
                                 <table id="usuariosTable" class="table">
                                     <thead class="thead-light">
                                         <tr>
-                                            <th class="text-center">FOTO</th>
-                                            <th class="text-center">NOMBRE</th>
-                                            <th class="text-center">FECHA NAC.</th>
-                                            <th class="text-center">EDAD</th>
-                                            <th class="text-center">SEXO</th>
-                                            <th class="text-center">NACIONALIDAD</th>
-                                            <?php if(in_array($session->get('id_perfil'), [1,6])): ?>
-                                            <th class="text-center">ESTATUS</th>
-                                            <th class="text-center">DIFUSION</th>
-                                            <th class="text-center">FEC. ACTIVACION</th>
-                                            <th class="text-center">FE. DESACTIVACION</th>
-                                            <?php endif; ?>
+                                            <th class="text-center">ARCHIVO</th>
+                                            <th class="text-center">FECHA REG.</th>
                                             <th class="text-center">ACCIONES</th>
                                         </tr>
                                         <!--end tr-->
@@ -61,30 +51,26 @@
                                     <tbody>
                                         <?php foreach($usuario as $u): ?>
                                         <tr>
+                                            <?php
+                                                $archivoUrl = base_url('index.php/Principal/verArchivoS3?key=' . rawurlencode($u->archivo ?? ''));
+                                                $extension = strtolower(pathinfo($u->archivo ?? '', PATHINFO_EXTENSION));
+                                            ?>
                                             <td class="text-center">
-                                                <a class="user-avatar mr-2" href="#">
-                                                    <img src="<?= base_url().$u->foto ?>" alt="user" class="thumb-xl rounded">
-                                                </a>
+                                                <?php if (in_array($extension, ['png', 'jpg', 'jpeg', 'webp'], true)): ?>
+                                                    <img src="<?= $archivoUrl ?>" alt="ALBA" class="thumb-xl rounded">
+                                                <?php else: ?>
+                                                    <span class="badge badge-soft-danger">PDF</span>
+                                                <?php endif; ?>
                                             </td>
-                                            <td class="text-center"><?= $u->nombre.' '.$u->primer_apellido.' '.$u->segundo_apellido ?></td>
-                                            <td class="text-center"><?= date('d-m-Y', strtotime($u->fecha_nacimiento)) ?></td>
-                                            <td class="text-center"><?= $u->edad?></td>
-                                            <td class="text-center"><?= $u->id_sexo==1?'HOMBRE':'MUJER' ?></td>
-                                            <td class="text-center"><?= $u->nacionalidad?></td>
-                                            <?php if(in_array($session->get('id_perfil'), [1,6])): ?>
-                                            <td class="text-center"><?= ($u->id_estatus==1)?'<span class="badge badge-soft-danger">Activa</span>':'<span class="badge badge-soft-info">Desactivada</span>'?></td>
-                                            <td class="text-center"><?= ($u->id_difusion==1)?'<span class="badge badge-soft-success">Interna</span>':'<span class="badge badge-soft-warning">Externa</span>'?></td>
-                                            <td class="text-center"><?= date('d-m-Y', strtotime($u->fec_activacion))?></td>
-                                            <td class="text-center"><?= date('d-m-Y', strtotime($u->fec_desactivacion))?></td>
-                                               <?php endif; ?>
+                                            <td class="text-center"><?= !empty($u->fec_reg) ? date('d-m-Y', strtotime($u->fec_reg)) : '' ?></td>
                                             <td class="text-center">
-                                         <?php if(in_array($session->get('id_perfil'), [1,6])): ?>
+                                          <?php if(in_array($session->get('id_perfil'), [1,6])): ?>
                                                 <a href="javascript:void(0);"
                                                 onclick="ini.inicio.getAlba(<?= $u->id_alba ?>)" >
                                                 <i class="mdi mdi-pencil text-success font-18"></i>
                                                 </a>
                                         <?php endif; ?>
-                                                 <a href="<?php echo base_url().$u->protocolo ?>" target="_blank"
+                                                 <a href="<?= $archivoUrl ?>" target="_blank"
                                                     data-animation="bounce" ><i
                                                         class="mdi mdi-eye text-success font-18"></i></a>
                                         <?php if(in_array($session->get('id_perfil'), [1,6])): ?>
@@ -129,7 +115,7 @@
                                     <!--init card -->
                                     <div class="card-body">
 
-                                        <div class="row">
+                                        <div class="row" style="display:none;">
                                          
                                             <div class="col-md-3">
                                                 <div class="mb-3 position-relative" id="">
@@ -168,7 +154,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="row">
+                                        <div class="row" style="display:none;">
 
                                            
                                             <div class="col-md-3">
@@ -210,7 +196,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="row">
+                                        <div class="row" style="display:none;">
                                             <div class="col-md-3">
                                                 <div class="mb-3 position-relative" id="">
                                                     <label for="id_estatus" class="form-label campoObligatorio">ESTATUS</label>
@@ -250,18 +236,11 @@
                                             </div>
                                         </div>
                                         <div class="row">
-                                          <div class="col-md-6">
+                                          <div class="col-md-12">
                                                 <div class="mb-3 position-relative">
-                                                    <label for="foto" class="form-label">FOTO</label>
-                                                    <input type="file" class="form-control" id="foto" name="foto" accept=".png">
-                                                    <img id="previewFoto" src="" class="mt-2 img-thumbnail" style="max-width: 150px; display:none;">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="mb-3 position-relative">
-                                                    <label for="protocolo" class="form-label">PROTOCOLO</label>
-                                                    <input type="file" class="form-control" id="protocolo" name="protocolo">
-                                                    <img id="previewProtocolo" src="" class="mt-2 img-thumbnail" style="max-width: 150px; display:none;">
+                                                    <label for="archivo" class="form-label">ARCHIVO PDF O IMAGEN</label>
+                                                    <input type="file" class="form-control" id="archivo" name="archivo" accept=".pdf,image/*">
+                                                    <img id="previewArchivo" src="" class="mt-2 img-thumbnail" style="max-width: 150px; display:none;">
                                                 </div>
                                             </div>
                                         </div>

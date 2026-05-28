@@ -347,7 +347,7 @@ class Inicio extends BaseController
         else {
             $vista = 'personal/vInicio';
             $data['datos'] = $globas->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario]])->data[0];
-            $data['lista_alba'] = $globas->getTabla(['tabla' => 'lista_alba', 'where' => ['visible' => 1]])->data;
+            $data['lista_alba'] = $globas->getTabla(['tabla' => 'alba', 'where' => ['visible' => 1]])->data;
 
         }
         $mes_actual = date('m');
@@ -517,7 +517,7 @@ class Inicio extends BaseController
         $data['configuracion'] = (isset($configuracion[0]) && !empty($configuracion)) ? $configuracion[0] : '';
         $data['personal'] = $personal;
         $data['datos'] = $globas->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario]])->data[0];
-        $data['lista_alba'] = $globas->getTabla(['tabla' => 'lista_alba', 'where' => ['visible' => 1]])->data;
+        $data['lista_alba'] = $globas->getTabla(['tabla' => 'alba', 'where' => ['visible' => 1]])->data;
         $data['tarjetas'] = $this->getTablaData($globas, [
             'tabla' => 'tarjetas',
             'where' => ['visible' => 1],

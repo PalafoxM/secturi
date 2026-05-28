@@ -4941,7 +4941,7 @@ class Agregar extends BaseController
         $id_alba = $this->request->getPost('id_alba');
         $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/guardaViatico'];
         $dataConfig = [
-            "tabla" => "lista_alba",
+            "tabla" => "alba",
             "editar" => true,
             "idEditar" => ['id_alba' => $id_alba]
         ];
@@ -4953,6 +4953,31 @@ class Agregar extends BaseController
         return $this->respond($response);
 
     }
+    private function subirArchivoAlbaS3($file): ?string
+    {
+        if (!$file || !$file->isValid() || $file->hasMoved()) {
+            return null;
+        }
+
+        $extension = strtolower($file->getClientExtension());
+        if (!in_array($extension, ['pdf', 'png', 'jpg', 'jpeg', 'webp'], true)) {
+            return null;
+        }
+
+        $s3 = new \App\Libraries\S3Service();
+        if (!$s3->folderExists('ALBA')) {
+            $s3->createFolder('ALBA');
+        }
+
+        $baseName = pathinfo($file->getClientName(), PATHINFO_FILENAME);
+        $baseName = preg_replace('/[^A-Za-z0-9_-]+/', '_', $baseName);
+        $baseName = trim($baseName, '_') ?: 'archivo';
+        $fileName = $baseName . '_' . date('Ymd_His') . '_' . bin2hex(random_bytes(3)) . '.' . $extension;
+        $s3Key = 'ALBA/' . $fileName;
+
+        return $s3->uploadFile($file->getTempName(), $s3Key) ? $s3Key : null;
+    }
+
     public function albaAlta()
     {
         $session = \Config\Services::session();
@@ -4961,6 +4986,63 @@ class Agregar extends BaseController
         $response->respuesta = 'Error al insertar en la tabla';
         $globals = new Mglobal;
         $data = $this->request->getPost();
+        $archivoAlba = $this->request->getFile('archivo');
+        $idAlba = (int) ($data['id_alba'] ?? 0);
+        $esEdicion = !empty($data['editar']) && (int) $data['editar'] === 1;
+        $s3Key = null;
+
+        if ($archivoAlba && $archivoAlba->isValid() && !$archivoAlba->hasMoved()) {
+            $maxSize = 8 * 1024 * 1024;
+            if ($archivoAlba->getSize() > $maxSize) {
+                $response->respuesta = "El archivo no debe exceder 8 MB.";
+                return $this->respond($response);
+            }
+
+            $s3Key = $this->subirArchivoAlbaS3($archivoAlba);
+            if (empty($s3Key)) {
+                $response->respuesta = 'No fue posible guardar el archivo PDF o imagen en AWS S3.';
+                return $this->respond($response);
+            }
+        }
+
+        if (!$esEdicion && empty($s3Key)) {
+            $response->respuesta = 'El archivo PDF o imagen es requerido';
+            return $this->respond($response);
+        }
+
+        $dataInsert = [
+            'usu_act' => (int) $session->get('id_usuario'),
+            'fec_act' => date('Y-m-d H:i:s'),
+        ];
+
+        if (!empty($s3Key)) {
+            $dataInsert['archivo'] = $s3Key;
+        }
+
+        if ($esEdicion) {
+            $dataConfig = [
+                "tabla" => "alba",
+                "editar" => true,
+                "idEditar" => ['id_alba' => $idAlba]
+            ];
+        } else {
+            $dataInsert['usu_reg'] = (int) $session->get('id_usuario');
+            $dataInsert['fec_reg'] = date('Y-m-d H:i:s');
+            $dataConfig = [
+                "tabla" => "alba",
+                "editar" => false
+            ];
+        }
+
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Agregar.php/albaAlta'];
+        $result = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+
+        if (!$result->error) {
+            $response->error = false;
+            $response->respuesta = $result->respuesta;
+        }
+        return $this->respond($response);
+
         $file = $this->request->getFile('foto');
         $file2 = $this->request->getFile('protocolo');
         if ($file && $file->isValid() && !$file->hasMoved()) {
@@ -5075,7 +5157,7 @@ class Agregar extends BaseController
         $response->respuesta = 'Error al traer la tabla';
         $globals = new Mglobal;
         $id_alba = $this->request->getPost('id_alba');
-        $result = $globals->getTabla(["tabla" => "lista_alba", 'where' => ['visible' => 1, 'id_alba' => $id_alba]]);
+        $result = $globals->getTabla(["tabla" => "alba", 'where' => ['visible' => 1, 'id_alba' => $id_alba]]);
         //var_dump( $result);
         // die();
         if (!$result->error) {
@@ -5515,7 +5597,7 @@ class Agregar extends BaseController
         $session = \Config\Services::session();
         $data = array();
         $globals = new Mglobal;
-        $usuario = $globals->getTabla(['tabla' => 'lista_alba', 'where' => ['visible' => 1]]);
+        $usuario = $globals->getTabla(['tabla' => 'alba', 'where' => ['visible' => 1]]);
         $cat_municipios = $globals->getTabla(['tabla' => 'cat_municipios', 'where' => ['id_estado' => 11, 'visible' => 1]]);
         $data['usuario'] = $usuario->data;
         $data['cat_municipios'] = $cat_municipios->data;
