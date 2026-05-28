@@ -86,7 +86,7 @@
                                                         <?php if (!empty($sol->tienen_archivos)): ?>
                                                             <a href="<?= base_url('index.php/Principal/verArchivosSolicitudAdquisiciones/' . $sol->id_solicitud_adquisiciones) ?>" class="btn btn-sm btn-success" title="Ver Archivos"><i class="fas fa-eye"></i></a>
                                                         <?php endif; ?>
-                                                        <?php if ((int) ($sol->id_estatus ?? 0) === 4 && in_array($session->id_perfil, [1, 7])): ?>
+                                                        <?php if (in_array((int) ($session->id_perfil ?? 0), [1, 7], true)): ?>
                                                             <a onclick="declinaSolicitud(<?= $sol->id_solicitud_adquisiciones ?>);" class="btn btn-sm btn-danger" title="Declinar"><i class="fas fa-times text-white"></i></a>
                                                             <button class="btn btn-sm btn-primary" title="Subir Instrumento Juridico" onclick="subirInstrumentoJuridico(<?= $sol->id_solicitud_adquisiciones ?>)"><i class="fas fa-upload"></i> Subir Instrumento</button>
                                                         <?php endif; ?>
