@@ -174,6 +174,30 @@
                                         </tfoot>
                                     </table>
                                 </div>
+                                <div class="table-responsive mt-3">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Tipo de Garantia</th>
+                                                <th>Monto de Garantia</th>
+                                                <th>Monto en letra</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <input type="text" class="form-control" name="garantia" value="<?= isset($solicitud) ? esc($solicitud->garantia ?? '', 'attr') : '' ?>" placeholder="Tipo de garantia">
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control garantia-monto" name="monto_garantia" value="<?= isset($solicitud) ? esc($solicitud->monto_garantia ?? '', 'attr') : '' ?>" placeholder="$">
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control garantia-letra" name="texto_monto_garantia" value="<?= isset($solicitud) ? esc($solicitud->texto_monto_garantia ?? '', 'attr') : '' ?>" readonly placeholder="Monto en letra">
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
 
                                 <!-- SECCION 3: DESCRIPCIÓN DEL BIEN O SERVICIO -->
                                 <h5 class="bg-primary text-white p-2 mt-4">DESCRIPCIÓN DE LOS BIENES O SERVICIOS A ADQUIRIR</h5>
@@ -509,10 +533,24 @@
             }
         });
 
+        $(document).on('input', '.garantia-monto', function() {
+            var valor = $(this).val().replace(/[$,\s]/g, '');
+            var inputLetras = $('.garantia-letra');
+            if (isNaN(valor) || valor.trim() === '') {
+                inputLetras.val(valor.trim() !== '' ? 'NUMERO NO LEGIBLE' : '');
+            } else {
+                inputLetras.val(numeroALetras(parseFloat(valor)));
+            }
+        });
+
         if (pagosExistentes && pagosExistentes.length > 0) {
             pagosExistentes.forEach(pago => agregarPago(pago));
         } else {
             agregarPago();
+        }
+
+        if ($('.garantia-monto').val()) {
+            $('.garantia-monto').trigger('input');
         }
 
         // Initialize Select2

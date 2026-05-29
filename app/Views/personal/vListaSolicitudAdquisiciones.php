@@ -35,6 +35,8 @@
                                         <tr>
                                             <th>ID</th>
                                             <th>Fecha Registro</th>
+                                            <th>Responsable Proyecto</th>
+                                            <th>Usuario Registro</th>
                                             <th>Estatus</th>
                                             <th>Instrumento Juridico</th>
                                             <th>Acciones</th>
@@ -46,6 +48,8 @@
                                                 <tr>
                                                     <td><?= $sol->id_solicitud_adquisiciones ?></td>
                                                     <td><?= !empty($sol->fec_reg) ? date('d/m/Y H:i', strtotime($sol->fec_reg)) : '' ?></td>
+                                                    <td><?= esc($sol->nombre_proyecto ?? '') ?></td>
+                                                    <td><?= esc($sol->nombre_registra ?? '') ?></td>
                                                     <td>
                                                         <?php if ((int) ($sol->id_estatus ?? 1) === 1): ?>
                                                             <span class="badge badge-secondary">Registrado</span>

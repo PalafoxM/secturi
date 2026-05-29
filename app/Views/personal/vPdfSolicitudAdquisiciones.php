@@ -118,6 +118,20 @@
     </table>
 
     <table style="margin-top: 8px;">
+        <tr><td colspan="3" class="section-title">GARANTIA</td></tr>
+        <tr>
+            <th>Tipo de Garantia</th>
+            <th>Monto de Garantia</th>
+            <th>Monto en letra</th>
+        </tr>
+        <tr>
+            <td><?= esc($solicitud->garantia ?? '') ?></td>
+            <td class="right"><?= !empty($solicitud->monto_garantia) ? '$' . number_format((float) str_replace([',', '$', ' '], '', (string) $solicitud->monto_garantia), 2) : '' ?></td>
+            <td><?= esc($solicitud->texto_monto_garantia ?? '') ?></td>
+        </tr>
+    </table>
+
+    <table style="margin-top: 8px;">
         <tr><td colspan="2" class="section-title">INFORMACION DEL PROVEEDOR</td></tr>
         <tr>
             <td class="label">Nombre/Razon Social:</td>

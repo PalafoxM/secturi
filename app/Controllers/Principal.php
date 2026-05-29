@@ -4487,6 +4487,9 @@ class Principal extends BaseController
             'fondo' => $post['fondo'] ?? null,
             'numero_partida' => $post['numero_partida'] ?? null,
             'nombre_partida' => $post['nombre_partida'] ?? null,
+            'garantia' => $post['garantia'] ?? null,
+            'monto_garantia' => $post['monto_garantia'] ?? null,
+            'texto_monto_garantia' => $post['texto_monto_garantia'] ?? null,
             'descripcion_bienes' => 'N/A',
             'fecha_inicio' => null,
             'lugar_entrega' => 'N/A',
@@ -4609,12 +4612,31 @@ class Principal extends BaseController
         ]);
 
         if (!empty($solicitudes->data)) {
+            $responsables = $globals->getTabla(['tabla' => 'vw_direccion', 'where' => ['visible' => 1]]);
+            $usuariosRegistro = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1]]);
+            $responsablesMap = [];
+            $usuariosMap = [];
+
+            if (!empty($responsables->data)) {
+                foreach ($responsables->data as $responsable) {
+                    $responsablesMap[(string) ($responsable->id_usuario ?? '')] = trim(($responsable->nombre_completo ?? '') . ' - ' . ($responsable->dsc_puesto ?? ''));
+                }
+            }
+
+            if (!empty($usuariosRegistro->data)) {
+                foreach ($usuariosRegistro->data as $usuarioRegistro) {
+                    $usuariosMap[(string) ($usuarioRegistro->id_usuario ?? '')] = trim((string) ($usuarioRegistro->nombre_completo ?? ''));
+                }
+            }
+
             foreach ($solicitudes->data as &$sol) {
                 $archivos = $globals->getTabla([
                     'tabla' => 'solicitud_adquisiciones_archivos',
                     'where' => ['visible' => 1, 'id_solicitud_adquisiciones' => $sol->id_solicitud_adquisiciones]
                 ]);
                 $sol->tienen_archivos = !empty($archivos->data);
+                $sol->nombre_proyecto = $responsablesMap[(string) ($sol->responsable_proyecto ?? '')] ?? $usuariosMap[(string) ($sol->responsable_proyecto ?? '')] ?? ($sol->responsable_proyecto ?? '');
+                $sol->nombre_registra = $usuariosMap[(string) ($sol->usu_reg ?? '')] ?? ($sol->usu_reg ?? '');
 
                 $instrumentos = [];
                 if (!empty($sol->instrumento_juridico)) {
