@@ -4720,6 +4720,170 @@ class Inicio extends BaseController
         $mpdf->Output('FormatGO_' . $id . '.pdf', 'I');
         exit;
     }
+    public function Edenred()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $edenred = $globals->getTabla(["tabla" => "vw_edenred", "where" => ["visible" => 1]]);
+        $usuarios = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["visible" => 1]]);
+
+        $data['edenred'] = $edenred->data ?? [];
+        $data['usuarios'] = $usuarios->data ?? [];
+        $data['scripts'] = array('inicio');
+        $data['title'] = 'Lista de Gastos de Operación';
+        $data['contentView'] = 'secciones/vListaEdenred';
+        $this->_renderView($data);
+
+    }
+    public function guardarEdenred()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response = new stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error al guardar el registro';
+        $post = $this->request->getPost();
+
+        $idEdenred = (int) ($post['id_edenred'] ?? 0);
+        $esEdicion = !empty($post['editar']) && (int) $post['editar'] === 1 && $idEdenred > 0;
+
+        if (empty($post['id_usuario'])) {
+            $response->respuesta = 'El usuario es requerido';
+            return $this->respond($response);
+        }
+        if (empty($post['placa'])) {
+            $response->respuesta = 'La placa es requerida';
+            return $this->respond($response);
+        }
+        if (empty($post['fecha'])) {
+            $response->respuesta = 'La fecha es requerida';
+            return $this->respond($response);
+        }
+
+        $dataInsert = [
+            'id_usuario' => (int) $post['id_usuario'],
+            'placa' => trim((string) ($post['placa'] ?? '')),
+            'km_inicial' => $post['km_inicial'] ?? null,
+            'km_servicio' => $post['km_servicio'] ?? null,
+            'km_ultimo_servicio' => $post['km_ultimo_servicio'] ?? null,
+            'fecha' => date('Y-m-d', strtotime($post['fecha'])),
+            'taller' => trim((string) ($post['taller'] ?? '')),
+            'estatus' => (int) ($post['estatus'] ?? 0),
+        ];
+
+        if ($esEdicion) {
+            $dataConfig = [
+                'tabla' => 'edenred',
+                'editar' => true,
+                'idEditar' => ['id_edenred' => $idEdenred]
+            ];
+        } else {
+            $dataInsert['visible'] = 1;
+            $dataConfig = [
+                'tabla' => 'edenred',
+                'editar' => false
+            ];
+        }
+
+        $result = $globals->saveTabla($dataInsert, $dataConfig, [
+            'id_user' => $session->get('id_usuario'),
+            'script' => 'Inicio.php/guardarEdenred'
+        ]);
+
+        if (!$result->error) {
+            $response->error = false;
+            $response->respuesta = $result->respuesta;
+        } else {
+            $response->respuesta = $result->respuesta ?? $response->respuesta;
+        }
+
+        return $this->respond($response);
+    }
+
+    public function getEdenred()
+    {
+        $globals = new Mglobal;
+        $response = new stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error al consultar el registro';
+        $idEdenred = (int) $this->request->getPost('id_edenred');
+
+        $result = $globals->getTabla([
+            'tabla' => 'edenred',
+            'where' => ['visible' => 1, 'id_edenred' => $idEdenred]
+        ]);
+
+        if (!$result->error && !empty($result->data)) {
+            $response->error = false;
+            $response->respuesta = $result->respuesta;
+            $response->data = $result->data[0];
+        } else {
+            $response->respuesta = 'No se encontro el registro';
+        }
+
+        return $this->respond($response);
+    }
+
+    public function deleteEdenred()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response = new stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error al eliminar el registro';
+        $idEdenred = (int) $this->request->getPost('id_edenred');
+
+        $result = $globals->saveTabla([
+            'visible' => 0
+        ], [
+            'tabla' => 'edenred',
+            'editar' => true,
+            'idEditar' => ['id_edenred' => $idEdenred]
+        ], [
+            'id_user' => $session->get('id_usuario'),
+            'script' => 'Inicio.php/deleteEdenred'
+        ]);
+
+        if (!$result->error) {
+            $response->error = false;
+            $response->respuesta = $result->respuesta;
+        } else {
+            $response->respuesta = $result->respuesta ?? $response->respuesta;
+        }
+
+        return $this->respond($response);
+    }
+
+    public function edenredListo()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response = new stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error al cambiar el estatus';
+        $idEdenred = (int) $this->request->getPost('id_edenred');
+
+        $result = $globals->saveTabla([
+            'estatus' => 1
+        ], [
+            'tabla' => 'edenred',
+            'editar' => true,
+            'idEditar' => ['id_edenred' => $idEdenred]
+        ], [
+            'id_user' => $session->get('id_usuario'),
+            'script' => 'Inicio.php/edenredListo'
+        ]);
+
+        if (!$result->error) {
+            $response->error = false;
+            $response->respuesta = $result->respuesta;
+        } else {
+            $response->respuesta = $result->respuesta ?? $response->respuesta;
+        }
+
+        return $this->respond($response);
+    }
+
     public function pdfOficioLiberacion()
     {
         $session = \Config\Services::session();

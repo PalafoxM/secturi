@@ -4619,7 +4619,7 @@ class Principal extends BaseController
 
             if (!empty($responsables->data)) {
                 foreach ($responsables->data as $responsable) {
-                    $responsablesMap[(string) ($responsable->id_usuario ?? '')] = trim(($responsable->nombre_completo ?? '') . ' - ' . ($responsable->dsc_puesto ?? ''));
+                    $responsablesMap[(string) ($responsable->id_usuario ?? '')] = trim(($responsable->nombre_completo ?? ''));
                 }
             }
 
