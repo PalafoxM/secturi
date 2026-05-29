@@ -29,7 +29,7 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-body">
-                            <?php if(in_array($session->get('id_perfil'), [1,6])): ?>
+                            <?php if(in_array($session->get('id_perfil'), [1,6,7])): ?>
                             <button onclick="ini.inicio.agregarAlba()"
                                 class="btn btn-gradient-danger px-4 float-right mt-0 mb-3"><i
                                     class="mdi mdi-account-plus-outline mr-2"></i>Agregar</button>
