@@ -67,9 +67,16 @@
                                                     <td class="text-center">
                                                         <?php if (!empty($sol->instrumento_urls)): ?>
                                                             <?php foreach ($sol->instrumento_urls as $index => $instrumento): ?>
-                                                                <a href="<?= $instrumento['url'] ?>" target="_blank" class="btn btn-sm btn-success mb-1" title="Ver Instrumento <?= $index + 1 ?>">
-                                                                    <i class="fas fa-file-pdf"></i> Inst. <?= $index + 1 ?>
-                                                                </a>
+                                                                <span class="d-inline-block mb-1">
+                                                                    <a href="<?= $instrumento['url'] ?>" target="_blank" class="btn btn-sm btn-success" title="Ver Instrumento <?= $index + 1 ?>">
+                                                                        <i class="fas fa-file-pdf"></i> Inst. <?= $index + 1 ?>
+                                                                    </a>
+                                                                    <?php if (in_array((int) ($session->id_perfil ?? 0), [1, 7], true)): ?>
+                                                                        <button type="button" class="btn btn-sm btn-outline-warning" title="Editar Inst. <?= $index + 1 ?>" onclick="editarInstrumentoAdquisiciones(<?= (int) $sol->id_solicitud_adquisiciones ?>, <?= (int) $index ?>)">
+                                                                            <i class="fas fa-pen"></i>
+                                                                        </button>
+                                                                    <?php endif; ?>
+                                                                </span>
                                                             <?php endforeach; ?>
                                                         <?php else: ?>
                                                             <span class="text-muted">Sin instrumento</span>
@@ -89,6 +96,16 @@
                                                         <?php if (in_array((int) ($session->id_perfil ?? 0), [1, 7], true)): ?>
                                                             <a onclick="declinaSolicitud(<?= $sol->id_solicitud_adquisiciones ?>);" class="btn btn-sm btn-danger" title="Declinar"><i class="fas fa-times text-white"></i></a>
                                                             <button class="btn btn-sm btn-primary" title="Subir Instrumento Juridico" onclick="subirInstrumentoJuridico(<?= $sol->id_solicitud_adquisiciones ?>)"><i class="fas fa-upload"></i> Subir Instrumento</button>
+                                                        <?php endif; ?>
+                                                        <?php if (in_array((int) ($session->id_perfil ?? 0), [1, 7], true)): ?>
+                                                            <button class="btn btn-sm <?= !empty($sol->no_convenio) ? 'btn-pink' : 'btn-dark' ?>" title="Subir No. Convenio" onclick='subirNoConvenioAdquisiciones(<?= (int) $sol->id_solicitud_adquisiciones ?>, <?= json_encode((string) ($sol->no_convenio ?? ''), JSON_HEX_APOS | JSON_HEX_QUOT) ?>)'>
+                                                                <i class="fas fa-file-signature"></i>
+                                                            </button>
+                                                        <?php endif; ?>
+                                                        <?php if (!empty($sol->no_convenio)): ?>
+                                                            <button class="btn btn-sm btn-outline-info" title="Ver No. Convenio" onclick='verNoDocumento("No. Convenio", <?= json_encode((string) $sol->no_convenio, JSON_HEX_APOS | JSON_HEX_QUOT) ?>)'>
+                                                                <i class="fas fa-hashtag"></i>
+                                                            </button>
                                                         <?php endif; ?>
                                                     </td>
                                                 </tr>
@@ -154,6 +171,66 @@ $(document).ready(function(){ $('#datatable-adquisiciones').DataTable({ language
 function abrirModalArchivos(id){ $('#modal_id_solicitud').val(id); $('.check-si').prop('checked', false); $('#modalSeleccionArchivos').modal('show'); }
 function enviarFormularioArchivos(){ $('#formSeleccionArchivos').submit(); }
 function verMotivo(motivo){ Swal.fire({ title:'Motivo de Declinacion', text: motivo || 'No se especifico un motivo.', icon:'info', confirmButtonText:'Cerrar', confirmButtonColor:'#5b73e8' }); }
+function verNoDocumento(titulo, valor){ Swal.fire({ title: titulo, text: valor, icon: 'info', confirmButtonText: 'Cerrar', confirmButtonColor: '#5b73e8' }); }
 function declinaSolicitud(id){ Swal.fire({ title:'Deseas declinar la solicitud?', text:'Ingresa el motivo de la declinacion:', icon:'warning', input:'textarea', inputPlaceholder:'Escribe el motivo aqui...', showCancelButton:true, confirmButtonColor:'#d33', cancelButtonColor:'#3085d6', confirmButtonText:'Si, declinar', cancelButtonText:'Cancelar', preConfirm:(motivo)=>{ if(!motivo || motivo.trim()===''){ Swal.showValidationMessage('El motivo es obligatorio'); return false; } return motivo; } }).then((result)=>{ if(result.isConfirmed){ $.post('<?= base_url("index.php/Principal/declinarSolicitudAdquisiciones") ?>',{ id_solicitud:id, motivo:result.value },function(response){ if(!response.error){ Swal.fire('Declinado','El registro ha sido declinado.','success').then(()=>location.reload()); } else { Swal.fire('Error','No se pudo declinar el registro.','error'); } }); } }); }
 function subirInstrumentoJuridico(id){ Swal.fire({ title:'Subir Instrumentos Juridicos', input:'file', inputAttributes:{ accept:'application/pdf', multiple:'multiple', 'aria-label':'Subir Instrumentos Juridicos en PDF' }, showCancelButton:true, confirmButtonText:'Subir', cancelButtonText:'Cancelar', showLoaderOnConfirm:true, preConfirm:(files)=>{ if(!files || files.length===0){ Swal.showValidationMessage('Selecciona al menos un archivo PDF'); return false; } const formData=new FormData(); for(let i=0;i<files.length;i++){ formData.append('archivos[]', files[i]); } formData.append('id_solicitud', id); return fetch('<?= base_url("index.php/Principal/subirInstrumentoJuridicoAdquisiciones") ?>',{ method:'POST', body:formData }).then(response=>response.json()).catch(error=>{ Swal.showValidationMessage(`Error: ${error}`); }); }, allowOutsideClick:()=>!Swal.isLoading() }).then((result)=>{ if(result.isConfirmed){ if(result.value.error){ Swal.fire('Error', result.value.respuesta || 'Ocurrio un error al subir el archivo.', 'error'); } else { Swal.fire('Exito','El archivo se ha subido correctamente.','success').then(()=>location.reload()); } } }); }
+function editarInstrumentoAdquisiciones(id, indice){
+    Swal.fire({
+        title: 'Editar Instrumento',
+        text: 'Seleccione hasta 4 PDFs. Se reemplazaran desde el instrumento elegido.',
+        input: 'file',
+        inputAttributes: { accept: 'application/pdf', multiple: 'multiple', 'aria-label': 'Subir instrumentos juridicos en PDF' },
+        showCancelButton: true,
+        confirmButtonText: 'Reemplazar',
+        cancelButtonText: 'Cancelar',
+        showLoaderOnConfirm: true,
+        preConfirm: (files) => {
+            if (!files || files.length === 0) { Swal.showValidationMessage('Selecciona al menos un archivo PDF'); return false; }
+            if (files.length > 4) { Swal.showValidationMessage('Solo puedes subir hasta 4 archivos PDF'); return false; }
+            const formData = new FormData();
+            formData.append('id_solicitud', id);
+            formData.append('indice', indice);
+            for (let i = 0; i < files.length; i++) { formData.append('archivos[]', files[i]); }
+            return fetch('<?= base_url("index.php/Principal/reemplazarInstrumentoAdquisiciones") ?>', { method: 'POST', body: formData })
+                .then(response => response.json())
+                .catch(error => { Swal.showValidationMessage(`Error: ${error}`); });
+        },
+        allowOutsideClick: () => !Swal.isLoading()
+    }).then((result) => {
+        if (!result.isConfirmed) { return; }
+        if (result.value && result.value.error) {
+            Swal.fire('Error', result.value.respuesta || 'No se pudo reemplazar el instrumento.', 'error');
+        } else {
+            Swal.fire('Exito', (result.value && result.value.respuesta) || 'Instrumento reemplazado correctamente.', 'success').then(() => location.reload());
+        }
+    });
+}
+function subirNoConvenioAdquisiciones(id, noConvenioActual){
+    Swal.fire({
+        title: 'Subir No. Convenio',
+        input: 'text',
+        inputValue: noConvenioActual || '',
+        inputPlaceholder: 'Escribe el No. convenio',
+        showCancelButton: true,
+        confirmButtonText: 'Guardar',
+        cancelButtonText: 'Cancelar',
+        preConfirm: (noConvenio) => {
+            if (!noConvenio || noConvenio.trim() === '') { Swal.showValidationMessage('El No. convenio es requerido'); return false; }
+            return $.post('<?= base_url("index.php/Principal/guardarNoConvenioSolicitudAdquisiciones") ?>', {
+                id_solicitud_adquisiciones: id,
+                no_convenio: noConvenio.trim()
+            }).then(response => response).catch(() => {
+                Swal.showValidationMessage('No se pudo guardar el No. convenio');
+            });
+        }
+    }).then((result) => {
+        if (!result.isConfirmed) { return; }
+        const response = result.value || {};
+        if (response.error) {
+            Swal.fire('Error', response.respuesta || 'No se pudo guardar el No. convenio.', 'error');
+        } else {
+            Swal.fire('Exito', response.respuesta || 'No. convenio guardado correctamente.', 'success').then(() => location.reload());
+        }
+    });
+}
 </script>

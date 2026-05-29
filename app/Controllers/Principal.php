@@ -5047,6 +5047,104 @@ class Principal extends BaseController
         return $this->respond($response);
     }
 
+    public function reemplazarInstrumentoAdquisiciones()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'No fue posible reemplazar el instrumento.';
+
+        if (!in_array((int) ($session->id_perfil ?? 0), [1, 7], true)) {
+            $response->respuesta = 'No tiene permisos para editar instrumentos.';
+            return $this->respond($response);
+        }
+
+        $idSolicitud = (int) ($this->request->getPost('id_solicitud') ?? 0);
+        $indice = (int) ($this->request->getPost('indice') ?? -1);
+        $archivos = $this->request->getFileMultiple('archivos');
+
+        if ($idSolicitud <= 0 || $indice < 0 || empty($archivos)) {
+            $response->respuesta = 'Solicitud o instrumento no valido.';
+            return $this->respond($response);
+        }
+
+        $solicitudQuery = $globals->getTabla([
+            'tabla' => 'solicitud_adquisiciones',
+            'where' => ['id_solicitud_adquisiciones' => $idSolicitud, 'visible' => 1],
+        ]);
+        if (empty($solicitudQuery->data)) {
+            $response->respuesta = 'No se encontro la solicitud.';
+            return $this->respond($response);
+        }
+
+        $instrumentoRaw = $solicitudQuery->data[0]->instrumento_juridico ?? '';
+        $instrumentos = [];
+        if (is_string($instrumentoRaw) && $instrumentoRaw !== '') {
+            $decoded = json_decode($instrumentoRaw, true);
+            $instrumentos = is_array($decoded) ? $decoded : [$instrumentoRaw];
+        } elseif (is_array($instrumentoRaw)) {
+            $instrumentos = $instrumentoRaw;
+        }
+
+        if (!isset($instrumentos[$indice])) {
+            $response->respuesta = 'El instrumento seleccionado no existe.';
+            return $this->respond($response);
+        }
+
+        if (($indice + count($archivos)) > 4) {
+            $response->respuesta = 'La edicion no puede superar 4 instrumentos.';
+            return $this->respond($response);
+        }
+
+        $rutasNuevas = [];
+        foreach ($archivos as $archivo) {
+            if (!$archivo->isValid() || $archivo->hasMoved() || strtolower((string) $archivo->getExtension()) !== 'pdf') {
+                continue;
+            }
+
+            $newName = $archivo->getRandomName();
+            $s3Key = $this->uploadFileToS3Storage($archivo->getTempName(), 'adquisiciones', 'instrumentos', $newName);
+            if ($s3Key) {
+                $rutasNuevas[] = $s3Key;
+            }
+        }
+
+        if (empty($rutasNuevas)) {
+            $response->respuesta = 'No se pudo guardar el nuevo instrumento.';
+            return $this->respond($response);
+        }
+
+        array_splice($instrumentos, $indice, count($rutasNuevas), $rutasNuevas);
+        $instrumentos = array_slice(array_values($instrumentos), 0, 4);
+
+        $res = $globals->saveTabla(
+            [
+                'instrumento_juridico' => json_encode(array_values($instrumentos)),
+                'usu_act' => $session->id_usuario ?? 0,
+                'fec_act' => date('Y-m-d H:i:s'),
+            ],
+            [
+                'tabla' => 'solicitud_adquisiciones',
+                'editar' => true,
+                'idEditar' => ['id_solicitud_adquisiciones' => $idSolicitud],
+            ],
+            [
+                'id_user' => $session->id_usuario ?? 0,
+                'script' => 'Principal.php/reemplazarInstrumentoAdquisiciones',
+            ]
+        );
+
+        if (!$res->error) {
+            $response->error = false;
+            $response->respuesta = 'Instrumento reemplazado correctamente.';
+        } else {
+            $response->respuesta = $res->respuesta ?? $response->respuesta;
+        }
+
+        return $this->respond($response);
+    }
+
     public function editarSolicitudContrato($id_solicitud = null)
     {
         $session = \Config\Services::session();
@@ -6657,6 +6755,59 @@ class Principal extends BaseController
             [
                 'id_user' => $session->id_usuario ?? 0,
                 'script' => 'Principal.php/guardarNoConvenioSolicitudConvenio'
+            ]
+        );
+
+        if (!$res->error) {
+            $response->error = false;
+            $response->respuesta = 'No. convenio guardado correctamente.';
+        } else {
+            $response->respuesta = $res->respuesta ?? $response->respuesta;
+        }
+
+        return $this->respond($response);
+    }
+
+    public function guardarNoConvenioSolicitudAdquisiciones()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'No fue posible guardar el No. convenio.';
+
+        if (!in_array((int) ($session->id_perfil ?? 0), [1, 7], true)) {
+            $response->respuesta = 'No tiene permisos para guardar el No. convenio.';
+            return $this->respond($response);
+        }
+
+        $idSolicitud = (int) ($this->request->getPost('id_solicitud_adquisiciones') ?? 0);
+        $noConvenio = trim((string) ($this->request->getPost('no_convenio') ?? ''));
+
+        if ($idSolicitud <= 0) {
+            $response->respuesta = 'Solicitud no valida.';
+            return $this->respond($response);
+        }
+
+        if ($noConvenio === '') {
+            $response->respuesta = 'El No. convenio es requerido.';
+            return $this->respond($response);
+        }
+
+        $res = $globals->saveTabla(
+            [
+                'no_convenio' => $noConvenio,
+                'usu_act' => $session->id_usuario ?? 0,
+                'fec_act' => date('Y-m-d H:i:s')
+            ],
+            [
+                'tabla' => 'solicitud_adquisiciones',
+                'editar' => true,
+                'idEditar' => ['id_solicitud_adquisiciones' => $idSolicitud]
+            ],
+            [
+                'id_user' => $session->id_usuario ?? 0,
+                'script' => 'Principal.php/guardarNoConvenioSolicitudAdquisiciones'
             ]
         );
 
