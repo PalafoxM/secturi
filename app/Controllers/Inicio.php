@@ -4764,6 +4764,7 @@ class Inicio extends BaseController
             'id_usuario' => (int) $post['id_usuario'],
             'placa' => trim((string) ($post['placa'] ?? '')),
             'km_inicial' => $post['km_inicial'] ?? null,
+            'km_final' => $post['km_final'] ?? null,
             'km_servicio' => $post['km_servicio'] ?? null,
             'km_ultimo_servicio' => $post['km_ultimo_servicio'] ?? null,
             'fecha' => date('Y-m-d', strtotime($post['fecha'])),
@@ -4862,23 +4863,78 @@ class Inicio extends BaseController
         $response->error = true;
         $response->respuesta = 'Error al cambiar el estatus';
         $idEdenred = (int) $this->request->getPost('id_edenred');
+        $correo = $this->request->getPost('correo');
 
-        $result = $globals->saveTabla([
-            'estatus' => 1
-        ], [
-            'tabla' => 'edenred',
-            'editar' => true,
-            'idEditar' => ['id_edenred' => $idEdenred]
-        ], [
-            'id_user' => $session->get('id_usuario'),
-            'script' => 'Inicio.php/edenredListo'
-        ]);
+        if (empty($idEdenred) || empty($correo)) {
+            $response->respuesta = 'Datos incompletos';
+            return $this->respond($response);
+        }
 
-        if (!$result->error) {
+        // Obtener datos del registro Edenred
+        $edenred = $globals->getTabla(["tabla" => "edenred", "where" => ["id_edenred" => $idEdenred]]);
+        
+        if (empty($edenred->data)) {
+            $response->respuesta = 'Registro no encontrado';
+            return $this->respond($response);
+        }
+
+        $registro = $edenred->data[0];
+        $mailer = new \App\Libraries\Mailer();
+        
+        $mensajeHTML = '
+        <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+            <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+                <div style="background-color: #d32f2f; padding: 20px; text-align: center;">
+                    <h2 style="color: #ffffff; margin: 0;">⚠️ Servicio de Vehículo Requerido</h2>
+                </div>
+                <div style="padding: 30px; color: #333;">
+                    <p style="font-size: 16px;">Estimado usuario,</p>
+                    <p style="font-size: 16px;">Le informamos que su vehículo <strong>' . htmlspecialchars($registro->placa ?? '') . '</strong> requiere atención inmediata.</p>
+                    
+                    <div style="margin: 20px 0; padding: 15px; background-color: #fff3cd; border-left: 5px solid #ffc107; border-radius: 4px;">
+                        <p style="margin: 5px 0; font-size: 14px;"><strong>Detalles del servicio:</strong></p>
+                        <ul style="margin: 10px 0; padding-left: 20px;">
+                            <li><strong>KM Inicial:</strong> ' . htmlspecialchars($registro->km_inicial ?? 'N/A') . '</li>
+                            <li><strong>KM Final:</strong> ' . htmlspecialchars($registro->km_final ?? 'N/A') . '</li>
+                            <li><strong>Taller:</strong> ' . htmlspecialchars($registro->taller ?? 'N/A') . '</li>
+                            <li><strong>Fecha:</strong> ' . (!empty($registro->fecha) ? date('d/m/Y', strtotime($registro->fecha)) : 'N/A') . '</li>
+                        </ul>
+                    </div>
+
+                    <p style="font-size: 16px; color: #d32f2f;"><strong>Por favor, asegúrese de atender el servicio de su vehículo lo antes posible.</strong></p>
+                    <p style="font-size: 14px; color: #666;">En caso de dudas, comuníquese con el departamento de mantenimiento.</p>
+                    
+                    <div style="margin-top: 25px; padding: 15px; background-color: #e3f2fd; border-left: 5px solid #2196f3; border-radius: 4px;">
+                        <p style="margin: 0; font-size: 14px; color: #0d47a1;"><strong>Nota:</strong> Este es un mensaje automático del sistema SUSI, favor de no responder a esta dirección.</p>
+                    </div>
+                </div>
+                <div style="background-color: #e0e0e0; text-align: center; padding: 15px; font-size: 12px; color: #666;">
+                    © ' . date('Y') . ' Sistema de Atención SUSI. Todos los derechos reservados.
+                </div>
+            </div>
+        </div>';
+
+        // Enviar correo al usuario
+        $mailer->send(
+            $mensajeHTML, 
+            $session->get('id_usuario'), 
+            [$correo], 
+            2, 
+            false, 
+            [], 
+            "Servicio de Vehículo Requerido - SUSI"
+        );
+
+        // Actualizar estatus a "Hecho" (1)
+        $dataBitacora = ['id_user' => $session->get('id_usuario'), 'script' => 'Login.php/guardaEndenred'];  
+        $dataConfig = ['tabla' => 'edenred', 'editar' => true, 'idEditar' => ['id_edenred' => $idEdenred]];
+        $result = $globals->saveTabla(['estatus' => 1], $dataConfig,  $dataBitacora );
+
+        if ($result) {
             $response->error = false;
-            $response->respuesta = $result->respuesta;
+            $response->respuesta = 'Correo enviado y registro actualizado correctamente';
         } else {
-            $response->respuesta = $result->respuesta ?? $response->respuesta;
+            $response->respuesta = 'El correo se envió pero ocurrió un error al actualizar el registro';
         }
 
         return $this->respond($response);

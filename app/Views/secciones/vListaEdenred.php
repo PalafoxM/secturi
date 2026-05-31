@@ -36,11 +36,11 @@
                                             <th class="text-center">Usuario</th>
                                             <th class="text-center">Placa</th>
                                             <th class="text-center">KM inicial</th>
-                                            <th class="text-center">KM servicio</th>
+                                            <th class="text-center">KM final</th>
                                             <th class="text-center">KM ultimo servicio</th>
                                             <th class="text-center">Fecha</th>
                                             <th class="text-center">Taller</th>
-                                            <th class="text-center">Estatus</th>
+                                            <th class="text-center">Consumo</th>
                                             <th class="text-center">Acciones</th>
                                         </tr>
                                     </thead>
@@ -51,24 +51,33 @@
                                                 <td><?= esc($p->nombre_completo ?? '') ?></td>
                                                 <td class="text-center"><?= esc($p->placa ?? '') ?></td>
                                                 <td class="text-center"><?= esc($p->km_inicial ?? '') ?></td>
-                                                <td class="text-center"><?= esc($p->km_servicio ?? '') ?></td>
+                                                <td class="text-center"><?= esc($p->km_final ?? '') ?></td>
                                                 <td class="text-center"><?= esc($p->km_ultimo_servicio ?? '') ?></td>
                                                 <td class="text-center"><?= !empty($p->fecha) ? date('d/m/Y', strtotime($p->fecha)) : '' ?></td>
                                                 <td><?= esc($p->taller ?? '') ?></td>
                                                 <td class="text-center">
-                                                    <?php if ((int) ($p->estatus ?? 0) === 1): ?>
-                                                        <span class="badge badge-success">Hecho</span>
-                                                    <?php else: ?>
-                                                        <span class="badge badge-warning">Pendiente</span>
-                                                    <?php endif; ?>
+                                                    <?php
+                                                        $consumo = '';
+                                                        if (isset($p->km_inicial) && isset($p->km_final)) {
+                                                            $consumo = number_format((float) ($p->km_final - $p->km_inicial), 2);
+                                                        }
+                                                        if($consumo <= 5000) {
+                                                            echo '<span class="badge badge-success">' . $consumo . '</span>';
+                                                        } elseif ($consumo > 5001 && $consumo <= 9000) {
+                                                            echo '<span class="badge badge-warning">' . $consumo . '</span>';
+                                                        } elseif ($consumo > 9001) {
+                                                            echo '<span class="badge badge-danger">' . $consumo . '</span>';
+                                                        }
+                                                    
+                                                    ?>
                                                 </td>
                                                 <td class="text-center">
                                                     <button type="button" class="btn btn-sm btn-warning" title="Editar" onclick="editarEdenred(<?= (int) ($p->id_edenred ?? 0) ?>)">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
                                                     <?php if ((int) ($p->estatus ?? 0) === 0): ?>
-                                                        <button type="button" class="btn btn-sm btn-info" title="Marcar como hecho" onclick="edenredListo(<?= (int) ($p->id_edenred ?? 0) ?>)">
-                                                            <i class="fas fa-check"></i>
+                                                        <button type="button" class="btn btn-sm btn-info" title="Enviar Correo" onclick="edenredListo(<?= (int) ($p->id_edenred ?? 0) ?>)">
+                                                            <i class="fas fa-truck"></i>
                                                         </button>
                                                     <?php endif; ?>
                                                     <button type="button" class="btn btn-sm btn-danger" title="Eliminar" onclick="eliminarEdenred(<?= (int) ($p->id_edenred ?? 0) ?>)">
@@ -121,15 +130,22 @@
                     </div>
 
                     <div class="form-row">
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-6">
                             <label>KM inicial</label>
                             <input type="number" step="0.01" class="form-control" name="km_inicial" id="km_inicial_edenred">
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-6">
+                            <label>KM final</label>
+                            <input type="number" step="0.01" class="form-control" name="km_final" id="km_final_edenred">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                      
+                        <div class="form-group col-md-6">
                             <label>KM servicio</label>
                             <input type="number" step="0.01" class="form-control" name="km_servicio" id="km_servicio_edenred">
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-6">
                             <label>KM ultimo servicio</label>
                             <input type="number" step="0.01" class="form-control" name="km_ultimo_servicio" id="km_ultimo_servicio_edenred">
                         </div>
@@ -207,6 +223,7 @@
                 $('#id_usuario_edenred').val(data.id_usuario || '').trigger('change');
                 $('#placa_edenred').val(data.placa || '');
                 $('#km_inicial_edenred').val(data.km_inicial || '');
+                $('#km_final_edenred').val(data.km_final || '');
                 $('#km_servicio_edenred').val(data.km_servicio || '');
                 $('#km_ultimo_servicio_edenred').val(data.km_ultimo_servicio || '');
                 $('#fecha_edenred').val(data.fecha ? String(data.fecha).substring(0, 10) : '');
@@ -254,12 +271,26 @@
 
     function edenredListo(idEdenred) {
         Swal.fire({
-            title: 'Marcar como hecho',
-            text: 'El registro cambiara a estatus hecho.',
-            icon: 'question',
+            title: 'Enviar Correo',
+            text: 'Ingrese el correo electrónico para enviar el registro',
+            icon: 'info',
+            input: 'email',
+            inputPlaceholder: 'ejemplo@guanajuato.gob.mx',
+            inputAttributes: {
+                autocapitalize: 'off'
+            },
             showCancelButton: true,
-            confirmButtonText: 'Hecho',
-            cancelButtonText: 'Cancelar'
+            confirmButtonText: 'Enviar',
+            cancelButtonText: 'Cancelar',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Debe ingresar un correo electrónico'
+                }
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(value)) {
+                    return 'Por favor ingrese un correo válido'
+                }
+            }
         }).then((result) => {
             if (!result.isConfirmed) {
                 return;
@@ -269,7 +300,10 @@
                 type: 'POST',
                 url: base_url + 'index.php/Inicio/edenredListo',
                 dataType: 'json',
-                data: { id_edenred: idEdenred },
+                data: { 
+                    id_edenred: idEdenred,
+                    correo: result.value
+                },
                 success: function(response) {
                     if (response.error) {
                         Swal.fire('Error', response.respuesta, 'error');
