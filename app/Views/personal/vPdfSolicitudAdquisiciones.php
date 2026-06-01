@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <title>Solicitud de Adquisicion</title>
     <style>
-        body { font-family: Arial, sans-serif; font-size: 11px; color: #111; }
+        body { font-family: Arial, sans-serif; font-size: 12px; color: #111; }
         table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #222; padding: 4px 6px; vertical-align: middle; }
+        th, td { border: 1px solid #222; padding: 3px 4px; vertical-align: middle; line-height: 1.16; }
         .header-title { background: #214f7a; color: #fff; text-align: center; font-weight: bold; }
         .section-title { background: #214f7a; color: #fff; text-align: center; font-weight: bold; }
         .label { width: 35%; font-weight: bold; text-align: right; background: #f8f8f8; }
@@ -14,28 +14,29 @@
         .center { text-align: center; }
         .right { text-align: right; }
         .no-border { border: none; }
-        .firma-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .firma-table td { border: none; text-align: center; vertical-align: top; padding: 18px 8px 0 8px; }
-        .firma-linea { display: block; width: 72%; margin: 0 auto 4px auto; border-top: 1px solid #000; height: 1px; }
-        .firma-nombre { font-size: 12px; font-weight: bold; line-height: 1.2; text-transform: uppercase; }
-        .firma-cargo { font-size: 11px; line-height: 1.2; text-transform: uppercase; }
+        .mt { margin-top: 5px; }
+        .firma-table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+        .firma-table td { border: none; text-align: center; vertical-align: top; padding: 16px 7px 0 7px; }
+        .firma-linea { display: block; width: 72%; margin: 0 auto 3px auto; border-top: 1px solid #000; height: 1px; }
+        .firma-nombre { font-size: 9.8px; font-weight: bold; line-height: 1.16; text-transform: uppercase; }
+        .firma-cargo { font-size: 9.2px; line-height: 1.16; text-transform: uppercase; }
     </style>
 </head>
 <body>
     <table>
         <tr>
             <td class="no-border" style="width: 14%;">
-                <img src="<?= base_url('assets/logo3.png') ?>" width="90" alt="Logo">
+                <img src="<?= base_url('assets/logo3.png') ?>" width="76" alt="Logo">
             </td>
             <td class="header-title" style="width: 86%;">
-                <div style="font-size: 22px; margin-bottom: 6px;">SOLICITUD DE ELABORACION DE CONTRATO DE ADQUISICION</div>
-                <div style="font-size: 16px;">DIRECCION GENERAL JURIDICA</div>
-                <div style="font-size: 15px; margin-top: 4px;">DGJ-3</div>
+                <div style="font-size: 17px; margin-bottom: 4px;">SOLICITUD DE ELABORACION DE CONTRATO DE ADQUISICION</div>
+                <div style="font-size: 12px;">DIRECCION GENERAL JURIDICA</div>
+                <div style="font-size: 11px; margin-top: 2px;">DGJ-3</div>
             </td>
         </tr>
     </table>
 
-    <table style="margin-top: 8px;">
+    <table class="mt">
         <tr><td colspan="2" class="section-title">INFORMACION DEL AREA SOLICITANTE</td></tr>
         <tr>
             <td class="label">Area Solicitante:</td>
@@ -47,7 +48,7 @@
         </tr>
     </table>
 
-    <table style="margin-top: 8px;">
+    <table class="mt">
         <tr><td colspan="2" class="section-title">INFORMACION DEL CONTRATO</td></tr>
         <tr>
             <td class="label">Responsable del seguimiento (SECTURI):</td>
@@ -63,7 +64,7 @@
         </tr>
     </table>
 
-    <table style="margin-top: 8px;">
+    <table class="mt">
         <tr><td colspan="2" class="section-title">PROCESO DE CONTRATACION</td></tr>
         <tr>
             <td class="label">Tipo de proceso:</td>
@@ -79,7 +80,7 @@
         </tr>
     </table>
 
-    <table style="margin-top: 8px;">
+    <table class="mt">
         <tr><td colspan="4" class="section-title">INFORMACION PRESUPUESTAL</td></tr>
         <tr>
             <th>Codigo Programatico</th>
@@ -95,7 +96,7 @@
         </tr>
     </table>
 
-    <table style="margin-top: 8px;">
+    <table class="mt">
         <tr><td colspan="3" class="section-title">PAGOS</td></tr>
         <tr>
             <th style="width: 10%;">No.</th>
@@ -117,7 +118,7 @@
         <?php endif; ?>
     </table>
 
-    <table style="margin-top: 8px;">
+    <table class="mt">
         <tr><td colspan="3" class="section-title">GARANTIA</td></tr>
         <tr>
             <th>Tipo de Garantia</th>
@@ -131,7 +132,7 @@
         </tr>
     </table>
 
-    <table style="margin-top: 8px;">
+    <table class="mt">
         <tr><td colspan="2" class="section-title">INFORMACION DEL PROVEEDOR</td></tr>
         <tr>
             <td class="label">Nombre/Razon Social:</td>
@@ -163,15 +164,15 @@
         </tr>
     </table>
 
-    <table style="margin-top: 8px;">
+    <table class="mt">
         <tr><td class="section-title">DOCUMENTOS Y ANEXOS</td></tr>
         <tr><td class="center">SOPORTE DOCUMENTAL SE RELACIONA EN DOCUMENTO ANEXO</td></tr>
     </table>
 
-    <table style="margin-top: 8px;">
+    <table class="mt">
         <tr><td class="section-title">VALIDACION DE SOLICITUD</td></tr>
         <tr>
-            <td style="height: 120px;">
+            <td style="height: 92px;">
                 <?php
                 $firmasPdf = !empty($firmas_pdf) ? $firmas_pdf : [
                     (object) ['nombre' => 'Firma pendiente', 'cargo' => 'Cargo'],

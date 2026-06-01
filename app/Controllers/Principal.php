@@ -4722,12 +4722,13 @@ class Principal extends BaseController
         $html = view('personal/vPdfSolicitudAdquisiciones', $data);
 
         $mpdf = new \Mpdf\Mpdf([
-            'margin_top' => 10,
-            'margin_left' => 10,
-            'margin_right' => 10,
-            'margin_bottom' => 10,
+            'margin_top' => 5,
+            'margin_left' => 6,
+            'margin_right' => 6,
+            'margin_bottom' => 5,
             'format' => 'Letter'
         ]);
+        $mpdf->shrink_tables_to_fit = 1;
 
         $mpdf->WriteHTML($html);
         $mpdf->Output('Solicitud_Adquisicion_' . $id . '.pdf', 'I');

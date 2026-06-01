@@ -4967,10 +4967,10 @@ class Inicio extends BaseController
 
             $columnas = $this->detectarColumnasEdenred($sheet, $highestColumn);
 
-            die( var_dump($columnas) );
-            $columnas['Km Ant Transacción'] = $columnas['km_ant'] ?? null;
-            $columnas['Km Transacción'] = $columnas['km_transaccion'] ?? null;
-            $columnas['Placa'] = $columnas['placa'] ?? null;
+            //die( var_dump($columnas) );
+            $columnas['Km Ant Transacción'] = $columnas['Km Ant Transacción'] ?? null;
+            $columnas['Km Transacción'] = $columnas['Km Transacción'] ?? null;
+            $columnas['Placa'] = $columnas['Placa'] ?? null;
             foreach (['Km Ant Transacción', 'Km Transacción', 'Placa'] as $campo) {
                 if (empty($columnas[$campo])) {
                     $response->respuesta = 'No se encontro la columna requerida: ' . $campo;
@@ -5067,6 +5067,8 @@ class Inicio extends BaseController
             log_message('error', 'Error al procesar Excel Edenred: ' . $e->getMessage());
             $response->respuesta = 'No fue posible leer el archivo Excel';
         }
+
+
 
         return $this->respond($response);
     }
