@@ -4940,6 +4940,187 @@ class Inicio extends BaseController
         return $this->respond($response);
     }
 
+    public function subirExcelEdenred()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response = new stdClass();
+        $response->error = true;
+        $response->respuesta = 'Error al procesar el archivo';
+
+        $archivo = $this->request->getFile('archivo_edenred');
+        if (!$archivo || !$archivo->isValid() || $archivo->hasMoved()) {
+            $response->respuesta = 'El archivo .xlsx es requerido';
+            return $this->respond($response);
+        }
+
+        if (strtolower($archivo->getClientExtension()) !== 'xlsx') {
+            $response->respuesta = 'Solo se permite cargar archivos .xlsx';
+            return $this->respond($response);
+        }
+
+        try {
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($archivo->getTempName());
+            $sheet = $spreadsheet->getActiveSheet();
+            $highestRow = $sheet->getHighestDataRow();
+            $highestColumn = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($sheet->getHighestDataColumn());
+
+            $columnas = $this->detectarColumnasEdenred($sheet, $highestColumn);
+
+            die( var_dump($columnas) );
+            $columnas['Km Ant Transacción'] = $columnas['km_ant'] ?? null;
+            $columnas['Km Transacción'] = $columnas['km_transaccion'] ?? null;
+            $columnas['Placa'] = $columnas['placa'] ?? null;
+            foreach (['Km Ant Transacción', 'Km Transacción', 'Placa'] as $campo) {
+                if (empty($columnas[$campo])) {
+                    $response->respuesta = 'No se encontro la columna requerida: ' . $campo;
+                    return $this->respond($response);
+                }
+            }
+
+            $vehiculos = $globals->getTabla(['tabla' => 'vehiculo', 'where' => ['visible' => 1]]);
+            $vehiculosPorPlaca = [];
+            foreach (($vehiculos->data ?? []) as $vehiculo) {
+                $placaVehiculo = $this->normalizarPlacaEdenred($vehiculo->placa ?? '');
+                if ($placaVehiculo !== '') {
+                    $vehiculosPorPlaca[$placaVehiculo] = $vehiculo;
+                }
+            }
+
+            $registrosPorPlaca = [];
+            $placasSinVehiculo = [];
+            $filasOmitidas = 0;
+
+            $filaInicio = max(8, (int) ($columnas['_header_row'] ?? 7) + 1);
+            for ($row = $filaInicio; $row <= $highestRow; $row++) {
+                $placaOriginal = trim((string) $sheet->getCellByColumnAndRow($columnas['placa'], $row)->getCalculatedValue());
+                $placa = $this->normalizarPlacaEdenred($placaOriginal);
+                if ($placa === '') {
+                    $filasOmitidas++;
+                    continue;
+                }
+
+                if (empty($vehiculosPorPlaca[$placa])) {
+                    $placasSinVehiculo[$placaOriginal] = true;
+                    continue;
+                }
+
+                $kmAnt = $this->normalizarNumeroEdenred($sheet->getCellByColumnAndRow($columnas['km_ant'], $row)->getCalculatedValue());
+                $kmTransaccion = $this->normalizarNumeroEdenred($sheet->getCellByColumnAndRow($columnas['km_transaccion'], $row)->getCalculatedValue());
+                if ($kmTransaccion === null) {
+                    $filasOmitidas++;
+                    continue;
+                }
+
+                $nombre = trim((string) $sheet->getCellByColumnAndRow($columnas['nombre'], $row)->getCalculatedValue());
+                if (!isset($registrosPorPlaca[$placa]) || $kmTransaccion > $registrosPorPlaca[$placa]['km_final']) {
+                    $registrosPorPlaca[$placa] = [
+                        'placa' => $placaOriginal,
+                        'nombre' => $nombre,
+                        'km_inicial' => $kmAnt,
+                        'km_final' => $kmTransaccion,
+                        'vehiculo' => $vehiculosPorPlaca[$placa],
+                    ];
+                }
+            }
+
+            $guardados = 0;
+            $erroresGuardado = 0;
+            foreach ($registrosPorPlaca as $registro) {
+                $vehiculo = $registro['vehiculo'];
+                $result = $globals->saveTabla([
+                    'id_usuario' => (int) ($vehiculo->id_usuario ?? 0),
+                    'placa' => $vehiculo->placa ?? $registro['placa'],
+                    'km_inicial' => $registro['km_inicial'],
+                    'km_final' => $registro['km_final'],
+                    'fecha' => date('Y-m-d'),
+                    'taller' => $registro['nombre'],
+                    'estatus' => 0,
+                    'visible' => 1
+                ], [
+                    'tabla' => 'edenred',
+                    'editar' => false
+                ], [
+                    'id_user' => $session->get('id_usuario'),
+                    'script' => 'Inicio.php/subirExcelEdenred'
+                ]);
+
+                if (!$result->error) {
+                    $guardados++;
+                } else {
+                    $erroresGuardado++;
+                }
+            }
+
+            $response->error = false;
+            $response->respuesta = 'Excel procesado. Registros guardados: ' . $guardados .
+                '. Placas sin vehiculo: ' . count($placasSinVehiculo) .
+                '. Filas omitidas: ' . $filasOmitidas .
+                '. Errores al guardar: ' . $erroresGuardado . '.';
+            $response->resumen = [
+                'guardados' => $guardados,
+                'placas_sin_vehiculo' => array_keys($placasSinVehiculo),
+                'filas_omitidas' => $filasOmitidas,
+                'errores_guardado' => $erroresGuardado,
+            ];
+        } catch (\Throwable $e) {
+            log_message('error', 'Error al procesar Excel Edenred: ' . $e->getMessage());
+            $response->respuesta = 'No fue posible leer el archivo Excel';
+        }
+
+        return $this->respond($response);
+    }
+
+    private function detectarColumnasEdenred($sheet, int $highestColumn): array
+    {
+        $columnas = [];
+        for ($row = 1; $row <= 7; $row++) {
+            for ($col = 1; $col <= $highestColumn; $col++) {
+                $valor = $this->normalizarTextoEdenred($sheet->getCellByColumnAndRow($col, $row)->getCalculatedValue());
+                if ($valor === '') {
+                    continue;
+                }
+
+                if ($valor === 'nombre') {
+                    $columnas['nombre'] = $col;
+                } elseif ($valor === 'km ant transaccion' || $valor === 'km anterior transaccion') {
+                    $columnas['km_ant'] = $col;
+                } elseif ($valor === 'km transaccion') {
+                    $columnas['km_transaccion'] = $col;
+                } elseif ($valor === 'placa') {
+                    $columnas['placa'] = $col;
+                }
+            }
+        }
+
+        return $columnas;
+    }
+
+    private function normalizarTextoEdenred($valor): string
+    {
+        $texto = trim((string) $valor);
+        $texto = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $texto);
+        $texto = strtolower($texto ?: '');
+        $texto = preg_replace('/\s+/', ' ', $texto);
+        return trim($texto);
+    }
+
+    private function normalizarPlacaEdenred($valor): string
+    {
+        return strtoupper(preg_replace('/[^A-Za-z0-9]/', '', (string) $valor));
+    }
+
+    private function normalizarNumeroEdenred($valor): ?float
+    {
+        $numero = trim((string) $valor);
+        if ($numero === '') {
+            return null;
+        }
+
+        $numero = str_replace(['$', ',', ' '], '', $numero);
+        return is_numeric($numero) ? (float) $numero : null;
+    }
+
     public function pdfOficioLiberacion()
     {
         $session = \Config\Services::session();

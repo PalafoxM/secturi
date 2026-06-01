@@ -23,9 +23,14 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <span class="font-weight-bold">EDENRED</span>
-                                <button type="button" class="btn btn-gradient-primary px-4" onclick="abrirModalEdenred()">
-                                    <i class="mdi mdi-plus-circle-outline mr-2"></i>Agregar Registro
-                                </button>
+                                <div>
+                                    <button type="button" class="btn btn-gradient-warning px-4 mr-2" data-toggle="modal" data-target="#modalExcelEdenred">
+                                        <i class="mdi mdi-file-excel mr-2"></i>Subir Excel
+                                    </button>
+                                    <button type="button" class="btn btn-gradient-primary px-4" onclick="abrirModalEdenred()">
+                                        <i class="mdi mdi-plus-circle-outline mr-2"></i>Agregar Registro
+                                    </button>
+                                </div>
                             </div>
 
                             <div class="table-responsive">
@@ -58,8 +63,8 @@
                                                 <td class="text-center">
                                                     <?php
                                                         $consumo = '';
-                                                        if (isset($p->km_inicial) && isset($p->km_final)) {
-                                                            $consumo = number_format((float) ($p->km_final - $p->km_inicial), 2);
+                                                        if (isset($p->km_ultimo_servicio) && isset($p->km_final)) {
+                                                            $consumo = number_format((float) ($p->km_final - $p->km_ultimo_servicio), 2);
                                                         }
                                                         if($consumo <= 5000) {
                                                             echo '<span class="badge badge-success">' . $consumo . '</span>';
@@ -173,6 +178,37 @@
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-primary" id="btnGuardarEdenred">
                         <i class="mdi mdi-content-save"></i> Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalExcelEdenred" tabindex="-1" role="dialog" aria-labelledby="modalExcelEdenredLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="formExcelEdenred" enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalExcelEdenredLabel">Subir Excel Edenred</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Archivo .xlsx</label>
+                        <input type="file" class="form-control" name="archivo_edenred" id="archivo_edenred" accept=".xlsx" required>
+                    </div>
+                    <small class="text-muted">
+                        Se procesa desde la fila 8 y se leen las columnas Nombre, Km Ant Transaccion, Km Transaccion y Placa.
+                    </small>
+                    <div id="resultadoExcelEdenred" class="alert alert-info mt-3 d-none"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning" id="btnSubirExcelEdenred">
+                        <i class="mdi mdi-upload"></i> Procesar
                     </button>
                 </div>
             </form>
@@ -331,6 +367,45 @@
         $('.select2-edenred').select2({
             width: '100%',
             dropdownParent: $('#modalEdenred')
+        });
+
+        $('#formExcelEdenred').on('submit', function(e) {
+            e.preventDefault();
+            const btn = $('#btnSubirExcelEdenred');
+            const resultado = $('#resultadoExcelEdenred');
+            const formData = new FormData(this);
+
+            resultado.addClass('d-none').removeClass('alert-danger alert-success').addClass('alert-info').text('');
+            btn.prop('disabled', true).html('<i class="mdi mdi-loading mdi-spin"></i> Procesando');
+
+            $.ajax({
+                type: 'POST',
+                url: base_url + 'index.php/Inicio/subirExcelEdenred',
+                dataType: 'json',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.error) {
+                        resultado.removeClass('d-none alert-info alert-success').addClass('alert-danger').text(response.respuesta);
+                        return;
+                    }
+
+                    let mensaje = response.respuesta;
+                    if (response.resumen && response.resumen.placas_sin_vehiculo && response.resumen.placas_sin_vehiculo.length) {
+                        mensaje += ' Placas no encontradas: ' + response.resumen.placas_sin_vehiculo.join(', ');
+                    }
+
+                    resultado.removeClass('d-none alert-info alert-danger').addClass('alert-success').text(mensaje);
+                    Swal.fire('Correcto', response.respuesta, 'success').then(() => window.location.reload());
+                },
+                error: function() {
+                    resultado.removeClass('d-none alert-info alert-success').addClass('alert-danger').text('No fue posible procesar el Excel.');
+                },
+                complete: function() {
+                    btn.prop('disabled', false).html('<i class="mdi mdi-upload"></i> Procesar');
+                }
+            });
         });
 
         $('#formEdenred').on('submit', function(e) {

@@ -73,7 +73,7 @@
                                                  <a href="<?= $archivoUrl ?>" target="_blank"
                                                     data-animation="bounce" ><i
                                                         class="mdi mdi-eye text-success font-18"></i></a>
-                                        <?php if(in_array($session->get('id_perfil'), [1,6])): ?>
+                                        <?php if(in_array($session->get('id_perfil'), [1,6,7])): ?>
                                                 <a href="javascript:void(0);"
                                                     onclick="ini.inicio.deleteAlba(<?=$u->id_alba?>)"><i
                                                         class="mdi mdi-trash-can text-danger font-18"></i></a>
