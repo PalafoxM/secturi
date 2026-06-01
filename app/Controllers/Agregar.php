@@ -5593,7 +5593,7 @@ class Agregar extends BaseController
 
     }
     public function ListaAlba()
-    {
+    { 
         $session = \Config\Services::session();
         $data = array();
         $globals = new Mglobal;
@@ -6701,7 +6701,7 @@ class Agregar extends BaseController
             && (int) $session->get('id_usuario') !== 1
             && $tipoFormato === 'PT';
 
-        if ($debeEnviarCorreoFacturasPt) {
+       /*  if ($debeEnviarCorreoFacturasPt) {
             $tempFilesToDelete = [];
 
             try {
@@ -6762,7 +6762,7 @@ class Agregar extends BaseController
                     @unlink($tempFile);
                 }
             }
-        }
+        } */
 
         return $this->respond($response);
     }
@@ -7200,7 +7200,7 @@ class Agregar extends BaseController
 
         // --- EMAIL SENDING LOGIC ---
       //  var_dump($data);
-        if($session->get('id_usuario') != 1){
+    /*     if($session->get('id_usuario') != 1){
             if($data['editar'] == 0 || $data['editar'] == ''){
                 try {
                     $email = \Config\Services::email();
@@ -7279,7 +7279,7 @@ class Agregar extends BaseController
                     // Do not fail the main save operation if email fails
                 }
             }
-        }
+        } */
 
 
 
