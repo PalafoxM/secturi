@@ -63,16 +63,19 @@
                                                 <td class="text-center">
                                                     <?php
                                                         $consumo = '';
+                                                        $consumo_real = '';
                                                         if (isset($p->km_ultimo_servicio) && isset($p->km_final)) {
+                                                            $consumo_real = (float) ($p->km_final - $p->km_ultimo_servicio);
                                                             $consumo = number_format((float) ($p->km_final - $p->km_ultimo_servicio), 2);
                                                         }
-                                                        if($consumo <= 5000) {
+                                                        if($consumo_real <= 5000) {
                                                             echo '<span class="badge badge-success">' . $consumo . '</span>';
-                                                        } elseif ($consumo > 5001 && $consumo <= 9000) {
+                                                        } elseif ($consumo_real > 5001 && $consumo_real <= 9000) {
                                                             echo '<span class="badge badge-warning">' . $consumo . '</span>';
-                                                        } elseif ($consumo > 9001) {
+                                                        } elseif ($consumo_real > 9001) {
                                                             echo '<span class="badge badge-danger">' . $consumo . '</span>';
                                                         }
+                                                    
                                                     
                                                     ?>
                                                 </td>
@@ -80,9 +83,9 @@
                                                     <button type="button" class="btn btn-sm btn-warning" title="Editar" onclick="editarEdenred(<?= (int) ($p->id_edenred ?? 0) ?>)">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
-                                                    <?php if ((int) ($p->estatus ?? 0) === 0): ?>
+                                                    <?php if ($consumo_real > 9001): ?>
                                                         <button type="button" class="btn btn-sm btn-info" title="Enviar Correo" onclick="edenredListo(<?= (int) ($p->id_edenred ?? 0) ?>)">
-                                                            <i class="fas fa-truck"></i>
+                                                            <i class="mdi mdi-email-outline"></i>
                                                         </button>
                                                     <?php endif; ?>
                                                     <button type="button" class="btn btn-sm btn-danger" title="Eliminar" onclick="eliminarEdenred(<?= (int) ($p->id_edenred ?? 0) ?>)">

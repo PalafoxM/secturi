@@ -4966,18 +4966,17 @@ class Inicio extends BaseController
             $highestColumn = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($sheet->getHighestDataColumn());
 
             $columnas = $this->detectarColumnasEdenred($sheet, $highestColumn);
-
-            //die( var_dump($columnas) );
-            $columnas['Km Ant Transacción'] = $columnas['Km Ant Transacción'] ?? null;
-            $columnas['Km Transacción'] = $columnas['Km Transacción'] ?? null;
-            $columnas['Placa'] = $columnas['Placa'] ?? null;
-            foreach (['Km Ant Transacción', 'Km Transacción', 'Placa'] as $campo) {
+            $columnasRequeridas = [
+                'km_ant' => 'Km Ant Transaccion',
+                'km_transaccion' => 'Km Transaccion',
+                'placa' => 'Placa',
+            ];
+            foreach ($columnasRequeridas as $campo => $etiqueta) {
                 if (empty($columnas[$campo])) {
-                    $response->respuesta = 'No se encontro la columna requerida: ' . $campo;
+                    $response->respuesta = 'No se encontro la columna requerida: ' . $etiqueta;
                     return $this->respond($response);
                 }
             }
-
             $vehiculos = $globals->getTabla(['tabla' => 'vehiculo', 'where' => ['visible' => 1]]);
             $vehiculosPorPlaca = [];
             foreach (($vehiculos->data ?? []) as $vehiculo) {
@@ -5012,7 +5011,9 @@ class Inicio extends BaseController
                     continue;
                 }
 
-                $nombre = trim((string) $sheet->getCellByColumnAndRow($columnas['nombre'], $row)->getCalculatedValue());
+                $nombre = !empty($columnas['nombre'])
+                    ? trim((string) $sheet->getCellByColumnAndRow($columnas['nombre'], $row)->getCalculatedValue())
+                    : '';
                 if (!isset($registrosPorPlaca[$placa]) || $kmTransaccion > $registrosPorPlaca[$placa]['km_final']) {
                     $registrosPorPlaca[$placa] = [
                         'placa' => $placaOriginal,
@@ -5076,14 +5077,16 @@ class Inicio extends BaseController
     private function detectarColumnasEdenred($sheet, int $highestColumn): array
     {
         $columnas = [];
-        for ($row = 1; $row <= 7; $row++) {
+        for ($row = 1; $row <= 8; $row++) {
             for ($col = 1; $col <= $highestColumn; $col++) {
                 $valor = $this->normalizarTextoEdenred($sheet->getCellByColumnAndRow($col, $row)->getCalculatedValue());
                 if ($valor === '') {
                     continue;
                 }
 
-                if ($valor === 'nombre') {
+                if ($valor === 'razon social afiliado') {
+                    $columnas['nombre'] = $col;
+                } elseif (in_array($valor, ['nombre', 'descripcion vehiculo', 'conductor'], true) && empty($columnas['nombre'])) {
                     $columnas['nombre'] = $col;
                 } elseif ($valor === 'km ant transaccion' || $valor === 'km anterior transaccion') {
                     $columnas['km_ant'] = $col;
@@ -5092,6 +5095,11 @@ class Inicio extends BaseController
                 } elseif ($valor === 'placa') {
                     $columnas['placa'] = $col;
                 }
+            }
+
+            if (!empty($columnas['km_ant']) && !empty($columnas['km_transaccion']) && !empty($columnas['placa'])) {
+                $columnas['_header_row'] = $row;
+                return $columnas;
             }
         }
 
@@ -5103,6 +5111,7 @@ class Inicio extends BaseController
         $texto = trim((string) $valor);
         $texto = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $texto);
         $texto = strtolower($texto ?: '');
+        $texto = str_replace(["'", "`", "´"], '', $texto);
         $texto = preg_replace('/\s+/', ' ', $texto);
         return trim($texto);
     }
