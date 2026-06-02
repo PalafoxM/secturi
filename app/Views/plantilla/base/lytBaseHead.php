@@ -632,6 +632,8 @@
                                 href="<?php echo base_url(); ?>index.php/Principal/Ombudsperson">Ombudsperson</a></li> -->
                         <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Principal/ControlInterno">Control Interno</a></li>
+                        <li class="nav-item"><a class="nav-link"
+                                href="<?php echo base_url(); ?>index.php/Principal/GeneradorQr">Generador QR</a></li>
                     </ul>
                 </div><!-- end Pages -->
                 <div id="MetricaAuthentication" class="main-icon-menu-pane">

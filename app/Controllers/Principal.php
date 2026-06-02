@@ -596,6 +596,57 @@ class Principal extends BaseController
         $this->_renderView($data);
 
     }
+
+    public function GeneradorQr()
+    {
+        $data = [];
+        $data['scripts'] = [];
+        $data['contentView'] = 'personal/vGeneradorQr';
+        $this->_renderView($data);
+    }
+
+    public function generarQrLink()
+    {
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'No fue posible generar el codigo QR';
+
+        $link = trim((string) $this->request->getPost('link'));
+        if ($link === '') {
+            $response->respuesta = 'El link es requerido';
+            return $this->respond($response);
+        }
+
+        if (!filter_var($link, FILTER_VALIDATE_URL)) {
+            $response->respuesta = 'El link no tiene un formato valido';
+            return $this->respond($response);
+        }
+
+        try {
+            $qr = Builder::create()
+                ->writer(new PngWriter())
+                ->data($link)
+                ->encoding(new Encoding('UTF-8'))
+                ->errorCorrectionLevel(new ErrorCorrectionLevelHigh())
+                ->size(420)
+                ->margin(12)
+                ->roundBlockSizeMode(new RoundBlockSizeModeMargin())
+                ->labelText('')
+                ->labelFont(new NotoSans(16))
+                ->labelAlignment(new LabelAlignmentCenter())
+                ->build();
+
+            $response->error = false;
+            $response->respuesta = 'Codigo QR generado correctamente';
+            $response->dataUri = $qr->getDataUri();
+            $response->link = $link;
+        } catch (\Throwable $e) {
+            log_message('error', 'Error al generar QR: ' . $e->getMessage());
+        }
+
+        return $this->respond($response);
+    }
+
     public function uploadCSV()
     {
         $response = new \stdClass();
