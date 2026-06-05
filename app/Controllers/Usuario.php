@@ -1517,7 +1517,7 @@ class Usuario extends BaseController
                     $total_faltas++;
                 }
                 elseif (!$validadoSalida && (empty($salida) || !$salida)) {
-                    $valorSalida = 'Sin validar';
+                    $valorSalida = $tieneIncidencias ? 'Sin validar' : 'Sin registro';
                     $sheet->getStyle($colSalida . $fila)
                         ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                         ->getStartColor()->setARGB('FFFF0000'); // rojo
@@ -1541,9 +1541,12 @@ class Usuario extends BaseController
                                 $total_faltas++;
                             }
                         }
-                        else if (!$validadoEntrada && $entrada === '') {
-                        // Missing entry but present exit or just general missing
-                        // (Do nothing or mark red depending on prefs, staying keeping logic minimal to avoid breaking existing flows)
+                        else if ($entrada === '') {
+                            $valorEntrada = $tieneIncidencias ? 'Sin validar' : 'Sin registro';
+                            $sheet->getStyle($colEntrada . $fila)
+                                ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                ->getStartColor()->setARGB('FFFF0000');
+                            $total_faltas++;
                         }
                     }
 
