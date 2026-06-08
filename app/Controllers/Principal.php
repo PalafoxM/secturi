@@ -5355,12 +5355,13 @@ class Principal extends BaseController
                 $idProyectoExtra = trim((string) ($partidaExtra['id_proyecto'] ?? ''));
                 $idPartidaExtra = trim((string) ($partidaExtra['id_partida'] ?? ''));
                 $claveExtra = trim((string) ($partidaExtra['clave'] ?? ''));
+                $montoExtra = (float) str_replace([',', '$', ' '], '', (string) ($partidaExtra['monto'] ?? 0));
 
-                if ($idProyectoExtra === '' && $idPartidaExtra === '' && $claveExtra === '') {
+                if ($idProyectoExtra === '' && $idPartidaExtra === '' && $claveExtra === '' && $montoExtra <= 0) {
                     continue;
                 }
-                if ($idProyectoExtra === '' || $idPartidaExtra === '' || $claveExtra === '') {
-                    $response->respuesta = 'Completa proyecto, partida y clave en las partidas adicionales.';
+                if ($idProyectoExtra === '' || $idPartidaExtra === '' || $claveExtra === '' || $montoExtra <= 0) {
+                    $response->respuesta = 'Completa proyecto, partida, clave y monto en las partidas adicionales.';
                     return $this->respond($response);
                 }
             }
@@ -5467,9 +5468,10 @@ class Principal extends BaseController
                     $idProyectoExtra = trim((string) ($partidaExtra['id_proyecto'] ?? ''));
                     $idPartidaExtra = trim((string) ($partidaExtra['id_partida'] ?? ''));
                     $claveExtra = trim((string) ($partidaExtra['clave'] ?? ''));
+                    $montoExtra = (float) str_replace([',', '$', ' '], '', (string) ($partidaExtra['monto'] ?? 0));
                     $idPartidaContrato = trim((string) ($partidaExtra['id_solicitud_contrato_partida'] ?? ''));
 
-                    if ($idProyectoExtra === '' && $idPartidaExtra === '' && $claveExtra === '') {
+                    if ($idProyectoExtra === '' && $idPartidaExtra === '' && $claveExtra === '' && $montoExtra <= 0) {
                         continue;
                     }
 
@@ -5478,6 +5480,7 @@ class Principal extends BaseController
                         'id_proyecto' => $idProyectoExtra !== '' ? $idProyectoExtra : null,
                         'id_partida' => $idPartidaExtra !== '' ? $idPartidaExtra : null,
                         'clave' => $claveExtra,
+                        'monto' => $montoExtra,
                         'visible' => 1
                     ];
                     $dataConfigPartida = [

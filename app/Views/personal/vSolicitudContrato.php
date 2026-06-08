@@ -80,6 +80,7 @@
                                                 <th>Proyecto</th>
                                                 <th>Partida</th>
                                                 <th>Clave estandarizada</th>
+                                                <th>Monto</th>
                                                 <th>Suficiencia Presupuestal</th>
                                             </tr>
                                         </thead>
@@ -106,6 +107,7 @@
                                                     </select>
                                                 </td>
                                                 <td><input type="text" class="form-control" name="clave_estandarizada" value="<?= isset($solicitud) ? $solicitud->clave_estandarizada : '' ?>"></td>
+                                                <td><span class="text-muted small">Incluido en el monto total</span></td>
                                                 <td>
                                                     <p class="small text-muted mb-0">El proyecto cuenta con la suficiencia presupuestal para la contratación de los servicios requeridos en la presente solicitud. Se anexa captura de pantalla Sistema SAP/R3</p>
                                                      <input type="checkbox" class="form-control mt-2 ml-2 d-flex align-items-center justify-content-center" style="width: 20px;" name="suficiencia_presupuestal" value="1" <?= (isset($solicitud) && $solicitud->suficiencia_presupuestal == 1) ? 'checked' : 'checked' ?>> 
@@ -136,6 +138,7 @@
                                                             </select>
                                                         </td>
                                                         <td><input type="text" class="form-control partida-extra-clave" name="partidas_extra[<?= $indexPartidaExtra ?>][clave]" value="<?= esc($partidaExtra->clave ?? '') ?>"></td>
+                                                        <td><input type="number" min="0" step="0.01" class="form-control partida-extra-monto" name="partidas_extra[<?= $indexPartidaExtra ?>][monto]" value="<?= esc($partidaExtra->monto ?? '') ?>" placeholder="$0.00"></td>
                                                         <td><span class="text-muted small">Partida adicional</span></td>
                                                     </tr>
                                                 <?php endforeach; ?>
@@ -143,7 +146,7 @@
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <td colspan="4" class="text-right">
+                                                <td colspan="5" class="text-right">
                                                     <button type="button" class="btn btn-secondary btn-sm" id="btnAgregarPartidaContrato">
                                                         <i class="fas fa-plus"></i> Agregar partida
                                                     </button>
@@ -658,6 +661,7 @@
                     </select>
                 </td>
                 <td><input type="text" class="form-control partida-extra-clave" name="partidas_extra[${index}][clave]"></td>
+                <td><input type="number" min="0" step="0.01" class="form-control partida-extra-monto" name="partidas_extra[${index}][monto]" placeholder="$0.00"></td>
                 <td><span class="text-muted small">Partida adicional</span></td>
             </tr>
         `;
@@ -671,7 +675,8 @@
             const proyecto = $(this).find('.partida-extra-proyecto').val();
             const partida = $(this).find('.partida-extra-partida').val();
             const clave = $(this).find('.partida-extra-clave').val().trim();
-            if ((proyecto || partida || clave) && (!proyecto || !partida || !clave)) {
+            const monto = $(this).find('.partida-extra-monto').val().trim();
+            if ((proyecto || partida || clave || monto) && (!proyecto || !partida || !clave || normalizarMonto(monto) <= 0)) {
                 valido = false;
                 return false;
             }
@@ -851,7 +856,7 @@
                     ${options}
                 </select>
             </td>
-            <td><input type="text" class="form-control" name="pagos[${count}][entregable]" value="${entregable}" placeholder="Descripción"></td>
+            <td><textarea class="form-control" name="pagos[${count}][entregable]" rows="3" placeholder="Descripción del entregable">${escaparHtml(entregable)}</textarea></td>
             <td class="text-center">
                 <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()"><i class="mdi mdi-trash-can"></i></button>
             </td>
@@ -960,7 +965,7 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Completa proyecto, partida y clave en las partidas adicionales.',
+                    text: 'Completa proyecto, partida, clave y monto en las partidas adicionales.',
                     showConfirmButton: true
                 });
                 return;
