@@ -167,21 +167,6 @@
                                         </tfoot>
                                     </table>
                                 </div>
-                                <?php $tieneMontoSinImpuesto = true; ?>
-                                <div class="form-group row">
-                                    <label class="col-sm-4 col-form-label">Sin impuesto:</label>
-                                    <div class="col-sm-8">
-                                        <div class="custom-control custom-checkbox mt-2">
-                                            <input type="checkbox" class="custom-control-input" id="check_sin_impuesto" name="sin_impuesto" value="1" <?= $tieneMontoSinImpuesto ? 'checked' : '' ?>>
-                                            <label class="custom-control-label" for="check_sin_impuesto">Sin impuesto</label>
-                                        </div>
-                                        <div id="div_sin_impuesto" class="mt-2" style="<?= $tieneMontoSinImpuesto ? '' : 'display: none;' ?>">
-                                            <label class="mb-1">Monto del contrato SIN INCLUIR IMPUESTO</label>
-                                            <input type="text" class="form-control" id="monto_sin_impuesto" name="monto_sin_impuesto" value="<?= isset($solicitud) ? esc($solicitud->monto_sin_impuesto ?? '') : '' ?>">
-                                            <input type="text" class="form-control mt-2" id="monto_sin_impuesto_texto" name="monto_sin_impuesto_texto" value="<?= isset($solicitud) ? esc($solicitud->monto_sin_impuesto_texto ?? '') : '' ?>" readonly placeholder="Monto sin impuesto en letra">
-                                        </div>
-                                    </div>
-                                </div>
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label">Monto (con número y letra):</label>
                                     <div class="col-sm-8">
@@ -212,6 +197,13 @@
                                     </div>
                                 </div>
                                 <div class="form-group row">
+                                    <label class="col-sm-4 col-form-label">Monto del contrato SIN INCLUIR IMPUESTO:</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="monto_sin_impuesto" name="monto_sin_impuesto" value="<?= isset($solicitud) ? esc($solicitud->monto_sin_impuesto ?? '') : '' ?>" readonly required>
+                                        <input type="text" class="form-control mt-2" id="monto_sin_impuesto_texto" name="monto_sin_impuesto_texto" value="<?= isset($solicitud) ? esc($solicitud->monto_sin_impuesto_texto ?? '') : '' ?>" readonly placeholder="Monto sin IVA en letra">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
                                     <label class="col-sm-4 col-form-label">Tipo y monto de Garantía (con número y letra):</label>
                                     <div class="col-sm-8">
                                         <select class="form-control" name="garantia">
@@ -225,7 +217,7 @@
                                             <input type="checkbox" class="custom-control-input" id="custom_garantia_check">
                                             <label class="custom-control-label" for="custom_garantia_check">Ingresar otro monto o porcentaje de garantía</label>
                                         </div>
-                                        <input type="text" class="form-control mt-2" name="monto_garantia" id="monto_garantia" value="<?= isset($solicitud) ? ($solicitud->monto_garantia ?? '') : '' ?>" readonly placeholder="12% del monto total">
+                                        <input type="text" class="form-control mt-2" name="monto_garantia" id="monto_garantia" value="<?= isset($solicitud) ? ($solicitud->monto_garantia ?? '') : '' ?>" readonly placeholder="12% del monto sin IVA">
                                         <input type="text" class="form-control mt-2" name="monto_garantia_texto" id="monto_garantia_texto" value="<?= isset($solicitud) ? esc($solicitud->monto_garantia_texto ?? '') : '' ?>" readonly placeholder="Monto de garantía en letra">
                                     </div>
                                 </div>
@@ -740,37 +732,25 @@
             $('#proveedor_cedula').val(proveedor.no_proveedor || '');
         });
 
-        $('#check_sin_impuesto').on('change', function() {
-            if ($(this).is(':checked')) {
-                $('#div_sin_impuesto').show();
-                $('#monto_sin_impuesto').trigger('input');
-            } else {
-                $('#div_sin_impuesto').hide();
+        function recalcularMontoSinImpuesto() {
+            var montoTotal = normalizarMonto($('#monto_total').val());
+            if (montoTotal <= 0) {
                 $('#monto_sin_impuesto').val('');
                 $('#monto_sin_impuesto_texto').val('');
-                recalcularGarantiaContrato();
+                return;
             }
-        });
 
-        $('#monto_sin_impuesto').on('input', function() {
-            var valorSinImpuesto = $(this).val();
-            var montoSinImpuesto = normalizarMonto(valorSinImpuesto);
-            if (valorSinImpuesto.trim() === '' || montoSinImpuesto <= 0) {
-                $('#monto_sin_impuesto_texto').val(valorSinImpuesto.trim() !== '' ? 'NUMERO NO LEGIBLE' : '');
-            } else {
-                $('#monto_sin_impuesto_texto').val(numeroALetras(montoSinImpuesto));
-            }
-            recalcularGarantiaContrato();
-        });
+            var montoSinImpuesto = montoTotal / 1.16;
+            $('#monto_sin_impuesto').val(montoSinImpuesto.toFixed(2));
+            $('#monto_sin_impuesto_texto').val(numeroALetras(montoSinImpuesto));
+        }
 
         function recalcularGarantiaContrato() {
             if ($('#custom_garantia_check').is(':checked')) {
                 return;
             }
 
-            var montoBase = $('#check_sin_impuesto').is(':checked')
-                ? normalizarMonto($('#monto_sin_impuesto').val())
-                : normalizarMonto($('#monto_total').val());
+            var montoBase = normalizarMonto($('#monto_sin_impuesto').val());
 
             if (montoBase <= 0) {
                 $('#monto_garantia').val('');
@@ -796,6 +776,7 @@
             } else {
                 $('#monto_total_texto').val(numeroALetras(montoNormalizado));
             }
+            recalcularMontoSinImpuesto();
             recalcularGarantiaContrato();
         });
         
@@ -997,7 +978,7 @@
                 return;
             }
 
-            if ($('#check_sin_impuesto').is(':checked') && normalizarMonto($('#monto_sin_impuesto').val()) <= 0) {
+            if (normalizarMonto($('#monto_sin_impuesto').val()) <= 0) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',

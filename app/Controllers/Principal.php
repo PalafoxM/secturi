@@ -5376,22 +5376,18 @@ class Principal extends BaseController
                 }
             }
         }
-        $usarMontoSinImpuesto = !empty($post['sin_impuesto']);
-        $montoSinImpuesto = (float) str_replace([',', '$', ' '], '', (string) ($post['monto_sin_impuesto'] ?? 0));
-        if ($usarMontoSinImpuesto && $montoSinImpuesto <= 0) {
-            $response->respuesta = 'El monto sin impuesto es requerido.';
+        $montoTotal = (float) str_replace([',', '$', ' '], '', (string) ($post['monto_total'] ?? 0));
+        if ($montoTotal <= 0) {
+            $response->respuesta = 'El monto total es requerido.';
             return $this->respond($response);
         }
 
-        $montoTotal = (float) str_replace([',', '$', ' '], '', (string) ($post['monto_total'] ?? 0));
+        $montoSinImpuesto = round($montoTotal / 1.16, 2);
         $montoTotalTexto = trim((string) ($post['monto_total_texto'] ?? ''));
         if ($montoTotalTexto === '') {
             $montoTotalTexto = strtoupper($this->numeroEnLetras($montoTotal));
         }
-        $montoSinImpuestoTexto = trim((string) ($post['monto_sin_impuesto_texto'] ?? ''));
-        if ($usarMontoSinImpuesto && $montoSinImpuestoTexto === '') {
-            $montoSinImpuestoTexto = strtoupper($this->numeroEnLetras($montoSinImpuesto));
-        }
+        $montoSinImpuestoTexto = strtoupper($this->numeroEnLetras($montoSinImpuesto));
 
         $montoGarantia = (float) str_replace([',', '$', ' '], '', (string) ($post['monto_garantia'] ?? 0));
         $montoGarantiaTexto = trim((string) ($post['monto_garantia_texto'] ?? ''));
@@ -5410,8 +5406,8 @@ class Principal extends BaseController
             'partida' => $post['partida'],
             'clave_estandarizada' => $post['clave_estandarizada'],
             'monto' => $tienePartidasExtra ? $montoPartidaInicial : null,
-            'monto_sin_impuesto' => $usarMontoSinImpuesto ? ($post['monto_sin_impuesto'] ?? null) : null,
-            'monto_sin_impuesto_texto' => $usarMontoSinImpuesto ? $montoSinImpuestoTexto : null,
+            'monto_sin_impuesto' => $montoSinImpuesto,
+            'monto_sin_impuesto_texto' => $montoSinImpuestoTexto,
             'monto_total' => $post['monto_total'],
             'monto_total_texto' => $montoTotalTexto,
             'garantia' => $post['garantia'],
