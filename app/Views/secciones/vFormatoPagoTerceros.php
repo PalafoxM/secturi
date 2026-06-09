@@ -527,7 +527,7 @@
                                     <select name="nombre_responsable_1" id="nombre_responsable_1">
                                         <option value="">Seleccione una opción</option>
                                         <?php foreach ($usuarios as $usuario): ?>
-                                            <?php if(in_array($usuario->id_usuario, [152, 40, 105,18, 99, 120,34,17, 35])): ?>
+                                            <?php if(in_array($usuario->id_usuario, [152, 40, 105,18, 99, 120,34,17, 35, 34])): ?>
                                             <option value="<?= $usuario->nombre_completo ?>" <?= isset($registro_pt->nombre_responsable) ? ($registro_pt->nombre_responsable == $usuario->nombre_completo ? 'selected' : '') : '' ?>><?= $usuario->nombre_completo ?></option>
                                             <?php endif ?>
                                         <?php endforeach; ?>
