@@ -4306,7 +4306,7 @@ class Principal extends BaseController
             }
         }
 
-        $firmas = array_values(array_unique(array_filter($firmas)));
+        $firmas = array_values(array_filter($firmas));
         return array_slice($firmas, 0, 3);
     }
 
@@ -4356,7 +4356,7 @@ class Principal extends BaseController
             }
         }
 
-        $firmasNormalizadas = array_slice(array_values(array_unique($firmasNormalizadas)), 0, 3);
+        $firmasNormalizadas = array_slice(array_values($firmasNormalizadas), 0, 3);
         $columnas = $this->obtenerColumnasTablaServicio($globals, $tabla);
         if (empty($columnas)) {
             return null;
