@@ -5350,7 +5350,17 @@ class Principal extends BaseController
             $response->respuesta = 'El enlace de comunicaciones es requerido.';
             return $this->respond($response);
         }
-        if (isset($post['partidas_extra']) && is_array($post['partidas_extra'])) {
+        $tienePartidasExtra = isset($post['partidas_extra'])
+            && is_array($post['partidas_extra'])
+            && count(array_slice($post['partidas_extra'], 0, 3)) > 0;
+        $montoPartidaInicial = (float) str_replace([',', '$', ' '], '', (string) ($post['monto'] ?? 0));
+
+        if ($tienePartidasExtra && $montoPartidaInicial <= 0) {
+            $response->respuesta = 'Completa el monto de la partida inicial.';
+            return $this->respond($response);
+        }
+
+        if ($tienePartidasExtra) {
             foreach (array_slice($post['partidas_extra'], 0, 3) as $partidaExtra) {
                 $idProyectoExtra = trim((string) ($partidaExtra['id_proyecto'] ?? ''));
                 $idPartidaExtra = trim((string) ($partidaExtra['id_partida'] ?? ''));
@@ -5399,6 +5409,7 @@ class Principal extends BaseController
             'proyecto' => $post['proyecto'],
             'partida' => $post['partida'],
             'clave_estandarizada' => $post['clave_estandarizada'],
+            'monto' => $tienePartidasExtra ? $montoPartidaInicial : null,
             'monto_sin_impuesto' => $usarMontoSinImpuesto ? ($post['monto_sin_impuesto'] ?? null) : null,
             'monto_sin_impuesto_texto' => $usarMontoSinImpuesto ? $montoSinImpuestoTexto : null,
             'monto_total' => $post['monto_total'],

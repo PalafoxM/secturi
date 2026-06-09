@@ -107,7 +107,19 @@
                                                     </select>
                                                 </td>
                                                 <td><input type="text" class="form-control" name="clave_estandarizada" value="<?= isset($solicitud) ? $solicitud->clave_estandarizada : '' ?>"></td>
-                                                <td><span class="text-muted small">Incluido en el monto total</span></td>
+                                                <td>
+                                                    <input
+                                                        type="number"
+                                                        min="0"
+                                                        step="0.01"
+                                                        class="form-control"
+                                                        id="monto_partida_inicial"
+                                                        name="monto"
+                                                        value="<?= isset($solicitud) ? esc($solicitud->monto ?? '') : '' ?>"
+                                                        placeholder="$0.00"
+                                                        <?= empty($partidas_extra) ? 'disabled' : 'required' ?>
+                                                    >
+                                                </td>
                                                 <td>
                                                     <p class="small text-muted mb-0">El proyecto cuenta con la suficiencia presupuestal para la contratación de los servicios requeridos en la presente solicitud. Se anexa captura de pantalla Sistema SAP/R3</p>
                                                      <input type="checkbox" class="form-control mt-2 ml-2 d-flex align-items-center justify-content-center" style="width: 20px;" name="suficiencia_presupuestal" value="1" <?= (isset($solicitud) && $solicitud->suficiencia_presupuestal == 1) ? 'checked' : 'checked' ?>> 
@@ -667,10 +679,22 @@
         `;
         tbody.append(html);
         tbody.find('.partida-extra-row').last().find('.select2').select2({ width: '100%' });
+        actualizarMontoPartidaInicial();
+    }
+
+    function actualizarMontoPartidaInicial() {
+        const tienePartidasAdicionales = $('.partida-extra-row').length > 0;
+        $('#monto_partida_inicial')
+            .prop('disabled', !tienePartidasAdicionales)
+            .prop('required', tienePartidasAdicionales);
     }
 
     function validarPartidasExtraContrato() {
         let valido = true;
+        if ($('.partida-extra-row').length > 0 && normalizarMonto($('#monto_partida_inicial').val()) <= 0) {
+            return false;
+        }
+
         $('.partida-extra-row').each(function() {
             const proyecto = $(this).find('.partida-extra-proyecto').val();
             const partida = $(this).find('.partida-extra-partida').val();
@@ -685,6 +709,8 @@
     }
 
     $(document).ready(function() {
+        actualizarMontoPartidaInicial();
+
         $('#btnAgregarPartidaContrato').on('click', function() {
             agregarPartidaContrato();
         });
@@ -813,7 +839,7 @@
 
     const pagosExistentes = <?= isset($pagos) ? json_encode($pagos) : '[]' ?>;
 
-    const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre', 'Devengo'];
 
     function agregarPago(data = null) {
         const tbody = document.querySelector('#tabla_pagos tbody');
@@ -965,7 +991,7 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Completa proyecto, partida, clave y monto en las partidas adicionales.',
+                    text: 'Completa el monto de la partida inicial y los datos de las partidas adicionales.',
                     showConfirmButton: true
                 });
                 return;
