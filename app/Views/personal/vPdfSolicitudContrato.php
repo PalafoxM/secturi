@@ -13,6 +13,7 @@
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { border: 1px solid #ddd; padding: 5px; text-align: left; width: 25%; }
         th { background-color: #f2f2f2; }
+        .presupuesto-table th, .presupuesto-table td { width: 20%; }
         .firma-table { width: 100%; border: none; margin-top: 35px; table-layout: fixed; }
         .firma-table td { border: none; text-align: center; vertical-align: bottom; padding: 0 10px; }
         .firma-linea { display: block; width: 72%; margin: 0 auto 4px auto; border-top: 1px solid #000; height: 1px; }
@@ -45,12 +46,13 @@
     </div>
 
     <div class="section-title">INFORMACION PRESUPUESTAL</div>
-    <table>
+    <table class="presupuesto-table">
         <thead>
             <tr>
                 <th>Proyecto o Proceso</th>
                 <th>Partida</th>
                 <th>Clave Estándarizada</th>
+                <th>Monto</th>
                 <th>Suficiencia Presupuestal</th>
             </tr>
         </thead>
@@ -59,6 +61,7 @@
                 <td style="text-align: center;"><?= $solicitud->dsc_proyecto ?></td>
                 <td style="text-align: center;"><?= $solicitud->cuenta_cable ?></td>
                 <td style="text-align: center;"><?= $solicitud->clave_estandarizada ?></td>
+                <td style="text-align: center;"><?= $solicitud->monto_partida_formateado ?? '-' ?></td>
                 <td style="text-align: center;">El proyecto cuenta con suficiencia presupuestal</td>
             </tr>
             <?php if (!empty($partidas_extra)): ?>
@@ -67,6 +70,7 @@
                         <td style="text-align: center;"><?= $partidaExtra->dsc_proyecto ?? '' ?></td>
                         <td style="text-align: center;"><?= $partidaExtra->cuenta_cable ?? '' ?></td>
                         <td style="text-align: center;"><?= $partidaExtra->clave ?? '' ?></td>
+                        <td style="text-align: center;"><?= $partidaExtra->monto_formateado ?? '-' ?></td>
                         <td style="text-align: center;">Partida adicional</td>
                     </tr>
                 <?php endforeach; ?>

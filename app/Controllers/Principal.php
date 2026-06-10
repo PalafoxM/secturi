@@ -5700,7 +5700,13 @@ class Principal extends BaseController
             foreach ($data['partidas_extra'] as $partidaExtraPdf) {
                 $partidaExtraPdf->dsc_proyecto = $proyectosPdf[(string) ($partidaExtraPdf->id_proyecto ?? '')] ?? '';
                 $partidaExtraPdf->cuenta_cable = $partidasPdf[(string) ($partidaExtraPdf->id_partida ?? '')] ?? '';
+                $montoPartidaExtra = (float) str_replace([',', '$', ' '], '', (string) ($partidaExtraPdf->monto ?? 0));
+                $partidaExtraPdf->monto_formateado = '$' . number_format($montoPartidaExtra, 2, '.', ',');
             }
+        }
+        $montoPartidaInicial = (float) str_replace([',', '$', ' '], '', (string) ($data['solicitud']->monto ?? 0));
+        if ($montoPartidaInicial > 0) {
+            $data['solicitud']->monto_partida_formateado = '$' . number_format($montoPartidaInicial, 2, '.', ',');
         }
         $montoTotal = (float) str_replace([',', '$', ' '], '', (string) ($data['solicitud']->monto_total ?? 0));
         $data['solicitud']->monto_total_formateado = '$' . number_format($montoTotal, 2, '.', ',');
