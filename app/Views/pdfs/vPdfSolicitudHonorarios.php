@@ -4,23 +4,23 @@
     <meta charset="UTF-8">
     <title>Solicitud de Honorarios</title>
     <style>
-        body { font-family: Arial, sans-serif; font-size: 11px; color: #111; }
+        body { font-family: Arial, sans-serif; font-size: 9px; color: #111; }
         table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #222; padding: 4px 6px; vertical-align: middle; }
+        th, td { border: 1px solid #222; padding: 2px 4px; vertical-align: middle; line-height: 1.15; }
         .header-title { background: #214f7a; color: #fff; text-align: center; font-weight: bold; }
         .section-title { background: #214f7a; color: #fff; text-align: center; font-weight: bold; }
         .label { width: 35%; font-weight: bold; text-align: right; background: #f8f8f8; }
         .value { width: 65%; }
         .center { text-align: center; }
         .no-border { border: none; }
-        .firma-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .firma-table td { border: none; text-align: center; vertical-align: top; padding: 20px 8px 0 8px; }
+        .firma-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .firma-table td { border: none; text-align: center; vertical-align: top; padding: 12px 6px 0 6px; }
         .firma-linea { display: block; width: 72%; margin: 0 auto 4px auto; border-top: 1px solid #000; height: 1px; }
-        .firma-nombre { font-size: 12px; font-weight: bold; line-height: 1.2; text-transform: uppercase; }
-        .firma-cargo { font-size: 11px; line-height: 1.2; text-transform: uppercase; }
+        .firma-nombre { font-size: 9px; font-weight: bold; line-height: 1.1; text-transform: uppercase; }
+        .firma-cargo { font-size: 8px; line-height: 1.1; text-transform: uppercase; }
         .grid-cell {
             position: relative;
-            min-height: 110px;
+            min-height: 75px;
             background-image:
                 linear-gradient(to right, rgba(31, 78, 121, 0.12) 1px, transparent 1px),
                 linear-gradient(to bottom, rgba(31, 78, 121, 0.12) 1px, transparent 1px);
@@ -50,15 +50,15 @@
                 <img src="<?= base_url('assets/logo3.png') ?>" width="90" alt="Logo">
             </td>
             <td class="header-title" style="width: 86%;">
-                <div style="font-size: 18px; margin-bottom: 6px;">SOLICITUD DE ELABORACION DE CONTRATO DE PRESTACION DE SERVICIOS</div>
-                <div style="font-size: 18px; margin-bottom: 6px;">PERSONALES POR HONORARIOS ASIMILADOS A SALARIOS</div>
-                <div style="font-size: 16px;">DIRECCION GENERAL JURIDICA</div>
-                <div style="font-size: 15px; margin-top: 4px;">DGJ-4</div>
+                <div style="font-size: 14px; margin-bottom: 3px;">SOLICITUD DE ELABORACION DE CONTRATO DE PRESTACION DE SERVICIOS</div>
+                <div style="font-size: 14px; margin-bottom: 3px;">PERSONALES POR HONORARIOS ASIMILADOS A SALARIOS</div>
+                <div style="font-size: 12px;">DIRECCION GENERAL JURIDICA</div>
+                <div style="font-size: 11px; margin-top: 2px;">DGJ-4</div>
             </td>
         </tr>
     </table>
 
-    <table style="margin-top: 8px;">
+    <table style="margin-top: 4px;">
         <tr><td colspan="2" class="section-title">INFORMACION DEL CONTRATO</td></tr>
         <tr>
             <td class="label">Responsable del Proyecto:</td>
@@ -82,7 +82,7 @@
         </tr>
     </table>
 
-    <table style="margin-top: 8px;">
+    <table style="margin-top: 4px;">
         <tr><td colspan="3" class="section-title">ACTIVIDADES A REALIZAR</td></tr>
         <tr>
             <th style="width: 10%;">No.</th>
@@ -102,7 +102,7 @@
         <?php endif; ?>
     </table>
 
-    <table style="margin-top: 8px;">
+    <table style="margin-top: 4px;">
         <tr><td colspan="3" class="section-title">INFORMACION PRESUPUESTAL</td></tr>
         <tr>
             <th>Clave presupuestal</th>
@@ -116,7 +116,7 @@
         </tr>
     </table>
 
-    <table style="margin-top: 8px;">
+    <table style="margin-top: 4px;">
         <tr><td colspan="2" class="section-title">INFORMACION DEL PRESTADOR DE SERVICIOS PERSONALES POR HONORARIOS</td></tr>
         <tr>
             <td class="label">Nombre Completo Prestacion de Servicios:</td>
@@ -136,7 +136,7 @@
         </tr>
     </table>
 
-    <table style="margin-top: 8px;">
+    <table style="margin-top: 4px;">
         <tr><td colspan="3" class="section-title">SOPORTE DOCUMENTAL</td></tr>
         <tr>
             <th>Autorizacion SFIA</th>
@@ -160,7 +160,7 @@
         </tr>
     </table>
 
-    <table style="margin-top: 8px;">
+    <table style="margin-top: 4px;">
         <tr><td class="section-title">VALIDACION DE SOLICITUD</td></tr>
         <tr>
             <td class="grid-cell">
