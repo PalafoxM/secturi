@@ -668,7 +668,7 @@
                                                             </ol>
                                                             <ol class="dd-list">
                                                                  <p class="text-muted mb-4">Coodinación de Recursos Financieros</p>
-                                                                <a target="_blank" href="<?= base_url()?>assets/pdf/plantillas/Disposiciones Administrativas SECTURI 2026_v1.pdf">  
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/Disposiciones Administrativas SECTURI 2026_v1.pdf">  
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
                                                                         Disposiciones Administrativas SECTURI 2026
