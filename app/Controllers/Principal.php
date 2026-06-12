@@ -5423,6 +5423,8 @@ class Principal extends BaseController
             'proveedor_cedula' => $post['proveedor_cedula'],
             'proveedor_representante' => $post['proveedor_representante'],
             'proveedor_correo' => $proveedorCorreo,
+            'moneda_tipo_cambio' => $post['moneda_tipo_cambio'] ?? null,
+            'valor_tipo_cambio' => $post['valor_tipo_cambio'] ?? null,
             'no_delegatorio_1' => null,
             'no_delegatorio_2' => null,
             'no_delegatorio_3' => null,

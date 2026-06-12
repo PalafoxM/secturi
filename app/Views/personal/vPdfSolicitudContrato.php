@@ -96,7 +96,17 @@
             <?php endif; ?>
         </span>
     </div>
-
+    <?php if (!empty($solicitud->valor_tipo_cambio)): ?>
+    <div>
+        <span class="label">Moneda Tipo de Cambio</span>
+        <span class="value">
+            <?= $solicitud->moneda_tipo_cambio ?>
+            <?php if (!empty($solicitud->valor_tipo_cambio)): ?>
+                <?= !empty($solicitud->valor_tipo_cambio) ? ' - ' . $solicitud->valor_tipo_cambio : '' ?>
+            <?php endif; ?>
+        </span>
+    </div>
+   <?php endif; ?>
     <div class="section-title">DESCRIPCION DEL SERVICIO A CONTRATAR O BIENES A ADQUIRIR</div>
     <div style="border: 1px solid #ccc; padding: 10px; min-height: 50px; margin-bottom: 10px;">
         <?= nl2br($solicitud->objeto_contrato) ?>
