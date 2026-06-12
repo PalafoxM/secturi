@@ -325,7 +325,7 @@ $tarjetasError = session()->getFlashdata('tarjetas_error');
 
                                 <div class="col-lg-8">
                                     <div class="row">
-                                        <div class="col-lg-12">
+                                        <div class="col-lg-6">
                                             <div class="card dash-info-carousel">
                                                 <div class="card-body">
                                                     <h4 class="mt-0 header-title mb-4">Protocolo ALBA Guanajuato</h4>
@@ -427,6 +427,33 @@ $tarjetasError = session()->getFlashdata('tarjetas_error');
 
 
                                         </div><!-- end col-->
+                                          <div class="col-lg-6">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <h4 class="mt-0  mb-4">Disposiciones Administrativas</h4>
+                                                    <div class="blog-card">
+                                                        <div class="ratio ratio-16x9"> <!-- BS5 -->
+                                                            <iframe
+                                                                src="<?= base_url() ?>assets/pdf/plantillas/Disposiciones Administrativas SECTURI 2026.pdf"
+                                                                title="Disposiciones Administrativas" style="border:0"
+                                                                loading="lazy" width="100%">
+                                                            </iframe>
+                                                        </div>
+                                                        <p class="text-muted text-truncate">Disposiciones Administrativas SECTURI 2026</p>
+                                                        <hr class="hr-dashed">
+                                                        <div class="d-flex justify-content-between">
+
+                                                            <div class="align-self-center">
+                                                                <a href="<?= base_url() ?>assets/pdf/plantillas/Disposiciones Administrativas SECTURI 2026.pdf"
+                                                                    target="_blank" class="text-primary">Leer más <i
+                                                                        class="fas fa-long-arrow-alt-right"></i></a>
+                                                            </div>
+                                                        </div>
+                                                    </div><!--end blog-card-->
+                                                </div><!--end card-body-->
+                                            </div><!--end card-->
+
+                                        </div> <!--end col-->
                                    <!--      <?php if (!$votoHombre || !$votoMujer): ?>
                                             <div class="col-lg-4">
                                                 <div class="card client-card">
@@ -463,12 +490,12 @@ $tarjetasError = session()->getFlashdata('tarjetas_error');
 
                                     <div class="row">
 
-                                        <div class="col-lg-6">
+                                     <!--    <div class="col-lg-6">
                                             <div class="card">
                                                 <div class="card-body">
                                                     <h4 class="mt-0  mb-4">Disposiciones Administrativas</h4>
                                                     <div class="blog-card">
-                                                        <div class="ratio ratio-16x9"> <!-- BS5 -->
+                                                        <div class="ratio ratio-16x9">
                                                             <iframe
                                                                 src="<?= base_url() ?>assets/pdf/plantillas/Disposiciones Administrativas SECTURI 2026.pdf"
                                                                 title="Disposiciones Administrativas" style="border:0"
@@ -485,14 +512,14 @@ $tarjetasError = session()->getFlashdata('tarjetas_error');
                                                                         class="fas fa-long-arrow-alt-right"></i></a>
                                                             </div>
                                                         </div>
-                                                    </div><!--end blog-card-->
-                                                </div><!--end card-body-->
-                                            </div><!--end card-->
+                                                    </div>
+                                                </div>
+                                            </div>
 
-                                        </div> <!--end col-->
+                                        </div>  -->
 
                                        
-                                        <div class="col-lg-6">
+                                        <div class="col-lg-12">
                                             <div class="card h-100">
                                                 <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
                                                     <div class="ribbon4 rib4-primary">
