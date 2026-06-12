@@ -4,23 +4,23 @@
     <meta charset="UTF-8">
     <title>Solicitud de Honorarios</title>
     <style>
-        body { font-family: Arial, sans-serif; font-size: 9px; color: #111; }
+        body { font-family: Arial, sans-serif; font-size: 10px; color: #111; }
         table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #222; padding: 2px 4px; vertical-align: middle; line-height: 1.15; }
+        th, td { border: 1px solid #222; padding: 3px 5px; vertical-align: middle; line-height: 1.2; }
         .header-title { background: #214f7a; color: #fff; text-align: center; font-weight: bold; }
         .section-title { background: #214f7a; color: #fff; text-align: center; font-weight: bold; }
         .label { width: 35%; font-weight: bold; text-align: right; background: #f8f8f8; }
         .value { width: 65%; }
         .center { text-align: center; }
         .no-border { border: none; }
-        .firma-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .firma-table td { border: none; text-align: center; vertical-align: top; padding: 12px 6px 0 6px; }
+        .firma-table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+        .firma-table td { border: none; text-align: center; vertical-align: top; padding: 18px 7px 0 7px; }
         .firma-linea { display: block; width: 72%; margin: 0 auto 4px auto; border-top: 1px solid #000; height: 1px; }
-        .firma-nombre { font-size: 9px; font-weight: bold; line-height: 1.1; text-transform: uppercase; }
-        .firma-cargo { font-size: 8px; line-height: 1.1; text-transform: uppercase; }
+        .firma-nombre { font-size: 10px; font-weight: bold; line-height: 1.15; text-transform: uppercase; }
+        .firma-cargo { font-size: 9px; line-height: 1.15; text-transform: uppercase; }
         .grid-cell {
             position: relative;
-            min-height: 75px;
+            min-height: 90px;
             background-image:
                 linear-gradient(to right, rgba(31, 78, 121, 0.12) 1px, transparent 1px),
                 linear-gradient(to bottom, rgba(31, 78, 121, 0.12) 1px, transparent 1px);
@@ -50,10 +50,10 @@
                 <img src="<?= base_url('assets/logo3.png') ?>" width="90" alt="Logo">
             </td>
             <td class="header-title" style="width: 86%;">
-                <div style="font-size: 14px; margin-bottom: 3px;">SOLICITUD DE ELABORACION DE CONTRATO DE PRESTACION DE SERVICIOS</div>
-                <div style="font-size: 14px; margin-bottom: 3px;">PERSONALES POR HONORARIOS ASIMILADOS A SALARIOS</div>
-                <div style="font-size: 12px;">DIRECCION GENERAL JURIDICA</div>
-                <div style="font-size: 11px; margin-top: 2px;">DGJ-4</div>
+                <div style="font-size: 16px; margin-bottom: 4px;">SOLICITUD DE ELABORACION DE CONTRATO DE PRESTACION DE SERVICIOS</div>
+                <div style="font-size: 16px; margin-bottom: 4px;">PERSONALES POR HONORARIOS ASIMILADOS A SALARIOS</div>
+                <div style="font-size: 14px;">DIRECCION GENERAL JURIDICA</div>
+                <div style="font-size: 13px; margin-top: 3px;">DGJ-4</div>
             </td>
         </tr>
     </table>

@@ -3711,10 +3711,10 @@ class Principal extends BaseController
         $html = view('pdfs/vPdfSolicitudHonorarios', $data);
 
         $mpdf = new \Mpdf\Mpdf([
-            'margin_top' => 7,
-            'margin_left' => 8,
-            'margin_right' => 8,
-            'margin_bottom' => 7,
+            'margin_top' => 9,
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_bottom' => 9,
             'format' => 'Letter'
         ]);
 
