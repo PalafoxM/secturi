@@ -5,6 +5,7 @@ $moduloArchivos = $modulo_archivos ?? (!empty($es_convenio) ? 'convenio' : 'cont
 $configuracionModulo = [
     'contrato' => [
         'ruta_listado' => 'index.php/Principal/ListaSolicitudContrato',
+        'ruta_subir_archivos' => 'index.php/Principal/subirArchivosSolicitud',
         'titulo' => 'Archivos de Solicitud',
         'campo_id_archivo' => 'id_solicitud_contrato_archivo',
         'ruta_archivo' => 'assets/uploads/contratos/',
@@ -60,6 +61,7 @@ $configuracionModulo = [
     ],
     'honorarios' => [
         'ruta_listado' => 'index.php/Principal/listadoHonorarios',
+        'ruta_subir_archivos' => 'index.php/Principal/subirArchivosSolicitudHonorarios',
         'titulo' => 'Archivos de Solicitud',
         'campo_id_archivo' => 'id_solicitud_honorario_archivos',
         'ruta_archivo' => 'assets/uploads/honorarios/',
@@ -102,6 +104,7 @@ $configuracionModulo = [
 
 $moduloActivo = $configuracionModulo[$moduloArchivos] ?? $configuracionModulo['contrato'];
 $rutaListado = $moduloActivo['ruta_listado'];
+$rutaSubirArchivos = $moduloActivo['ruta_subir_archivos'] ?? '';
 $campoIdArchivo = $moduloActivo['campo_id_archivo'];
 $camposIdArchivo = array_values(array_unique([
     $campoIdArchivo,
@@ -143,14 +146,16 @@ $tituloVista = $moduloActivo['titulo'];
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h4 class="card-title mt-0 mb-0">Documentacion Cargada</h4>
-                                <?php if ($moduloArchivos === 'contrato'): ?>
+                                <?php if ($rutaSubirArchivos !== ''): ?>
                                     <div>
                                         <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalAgregarArchivoSolicitud">
                                             <i class="fas fa-plus"></i> Agregar archivo
                                         </button>
-                                        <a href="<?= base_url('index.php/Principal/descargarChecklistSolicitud/' . $id_solicitud) ?>" class="btn btn-success btn-sm">
-                                            <i class="fas fa-download"></i> Descargar Check List
-                                        </a>
+                                        <?php if ($moduloArchivos === 'contrato'): ?>
+                                            <a href="<?= base_url('index.php/Principal/descargarChecklistSolicitud/' . $id_solicitud) ?>" class="btn btn-success btn-sm">
+                                                <i class="fas fa-download"></i> Descargar Check List
+                                            </a>
+                                        <?php endif; ?>
                                     </div>
                                 <?php endif; ?>
                             </div>
@@ -235,7 +240,7 @@ $tituloVista = $moduloActivo['titulo'];
     </div>
 </div>
 
-<?php if ($moduloArchivos === 'contrato'): ?>
+<?php if ($rutaSubirArchivos !== ''): ?>
     <div class="modal fade" id="modalAgregarArchivoSolicitud" tabindex="-1" role="dialog" aria-labelledby="modalAgregarArchivoSolicitudLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
@@ -246,7 +251,7 @@ $tituloVista = $moduloActivo['titulo'];
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="formAgregarArchivoSolicitud" action="<?= base_url('index.php/Principal/subirArchivosSolicitud') ?>" method="POST">
+                    <form id="formAgregarArchivoSolicitud" action="<?= base_url($rutaSubirArchivos) ?>" method="POST">
                         <input type="hidden" name="id_solicitud" value="<?= esc($id_solicitud) ?>">
                         <table class="table table-bordered table-sm mb-0">
                             <thead class="thead-light">
