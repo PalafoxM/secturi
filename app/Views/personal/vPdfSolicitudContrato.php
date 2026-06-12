@@ -142,11 +142,16 @@
                 }
             ?>
             <?php if (!empty($pagosValidos)): ?>
+                <?php $mesesPreferentes = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']; ?>
                 <?php foreach ($pagosValidos as $pago): ?>
+                <?php
+                    $fechaPago = trim((string) ($pago->fecha ?? ''));
+                    $prefijoFecha = in_array($fechaPago, $mesesPreferentes, true) ? 'Preferentemente ' : '';
+                ?>
                 <tr>
                     <td><?= $pago->numero_pago ?></td>
                     <td><?= $pago->monto_formateado ?? $pago->monto ?></td>
-                    <td> <?= $pago->fecha == 'Devengo' ? '' : 'Preferentemente' ?><?= $pago->fecha ?></td>
+                    <td><?= $prefijoFecha ?><?= $fechaPago ?></td>
                     <td><?= $pago->entregable ?></td>
                 </tr>
                 <?php endforeach; ?>

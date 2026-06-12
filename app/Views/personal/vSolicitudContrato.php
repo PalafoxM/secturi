@@ -831,37 +831,27 @@
         let monto = data ? data.monto : '';
         let entregable = data ? data.entregable : '';
         
-        // Determinar mes seleccionado
-        let mesSeleccionado = '';
-        if (data && data.fecha) {
-            // Si es formato fecha YYYY-MM-DD
-            if (data.fecha.match(/^\d{4}-\d{2}-\d{2}/)) {
-                let parts = data.fecha.split('-'); // [YYYY, MM, DD]
-                if(parts.length >= 2) {
-                    let mesIndex = parseInt(parts[1]) - 1;
-                    if(mesIndex >= 0 && mesIndex < 12) {
-                        mesSeleccionado = meses[mesIndex];
-                    }
-                }
-            } else {
-                // Si ya es texto
-                mesSeleccionado = data.fecha;
-            }
-        }
+        let fechaGuardada = data && data.fecha ? String(data.fecha) : '';
+        let esFechaPredefinida = meses.includes(fechaGuardada);
+        let mesSeleccionado = esFechaPredefinida ? fechaGuardada : (fechaGuardada !== '' ? 'Otro' : '');
+        let fechaOtro = mesSeleccionado === 'Otro' ? fechaGuardada : '';
 
         let options = '<option value="">Seleccione mes</option>';
         meses.forEach(mes => {
             let selected = (mes === mesSeleccionado) ? 'selected' : '';
             options += `<option value="${mes}" ${selected}>${mes}</option>`;
         });
+        options += `<option value="Otro" ${mesSeleccionado === 'Otro' ? 'selected' : ''}>Otro</option>`;
 
         row.innerHTML = `
             <td><input type="text" class="form-control" name="pagos[${count}][numero]" value="${numero}" placeholder="Ej. 1er Pago"></td>
             <td><input type="text" class="form-control" name="pagos[${count}][monto]" value="${monto}" placeholder="$"></td>
             <td>
-                <select class="form-control" name="pagos[${count}][fecha]">
+                <select class="form-control pago-fecha-select">
                     ${options}
                 </select>
+                <input type="text" class="form-control mt-2 pago-fecha-otro" value="${escaparHtml(fechaOtro)}" placeholder="Especifique la fecha" style="${mesSeleccionado === 'Otro' ? '' : 'display: none;'}">
+                <input type="hidden" class="pago-fecha-valor" name="pagos[${count}][fecha]" value="${escaparHtml(fechaGuardada)}">
             </td>
             <td><textarea class="form-control" name="pagos[${count}][entregable]" rows="3" placeholder="Descripción del entregable">${escaparHtml(entregable)}</textarea></td>
             <td class="text-center">
@@ -945,6 +935,24 @@
         // Real-time validation
         $(document).on('input', '#monto_total, #tabla_pagos input[name*="[monto]"]', function() {
             validarMontoPagos(false);
+        });
+
+        $(document).on('change', '.pago-fecha-select', function() {
+            const contenedor = $(this).closest('td');
+            const fechaOtro = contenedor.find('.pago-fecha-otro');
+            const fechaValor = contenedor.find('.pago-fecha-valor');
+
+            if ($(this).val() === 'Otro') {
+                fechaOtro.show().focus();
+                fechaValor.val(fechaOtro.val());
+            } else {
+                fechaOtro.hide().val('');
+                fechaValor.val($(this).val());
+            }
+        });
+
+        $(document).on('input', '.pago-fecha-otro', function() {
+            $(this).closest('td').find('.pago-fecha-valor').val($(this).val());
         });
 
         if (pagosExistentes && pagosExistentes.length > 0) {
