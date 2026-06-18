@@ -72,11 +72,20 @@
                                                         <?php endif; ?>
                                                         <?php if ((int) ($solicitud->id_estatus ?? 0) === 3): ?>
                                                             <?php if (!empty($solicitud->instrumento_urls)): ?>
-                                                                <?php foreach ($solicitud->instrumento_urls as $index => $instrumento): ?>
-                                                                    <a href="<?= $instrumento['url'] ?>" target="_blank" class="btn btn-sm btn-success mb-1" title="Ver Instrumento <?= $index + 1 ?>">
-                                                                        <i class="fas fa-file-pdf"></i> Inst. <?= $index + 1 ?>
-                                                                    </a>
-                                                                <?php endforeach; ?>
+                                                                <div class="mt-1">
+                                                                    <?php foreach ($solicitud->instrumento_urls as $index => $instrumento): ?>
+                                                                        <span class="d-inline-block mb-1">
+                                                                            <a href="<?= $instrumento['url'] ?>" target="_blank" class="btn btn-sm btn-success" title="Ver Instrumento <?= $index + 1 ?>">
+                                                                                <i class="fas fa-file-pdf"></i> Inst. <?= $index + 1 ?>
+                                                                            </a>
+                                                                            <?php if (in_array((int) ($session->id_perfil ?? 0), [1, 7], true)): ?>
+                                                                                <button type="button" class="btn btn-sm btn-outline-warning" title="Editar Inst. <?= $index + 1 ?>" onclick="editarInstrumentoHonorarios(<?= (int) $solicitud->id_solicitud_honorario ?>, <?= (int) $index ?>)">
+                                                                                    <i class="fas fa-pen"></i>
+                                                                                </button>
+                                                                            <?php endif; ?>
+                                                                        </span>
+                                                                    <?php endforeach; ?>
+                                                                </div>
                                                             <?php else: ?>
                                                                 <span class="badge badge-success">Aprobado</span>
                                                             <?php endif; ?>
@@ -105,8 +114,20 @@
                                                             <a onclick="declinaSolicitudHonorarios(<?= $solicitud->id_solicitud_honorario ?>);" class="btn btn-sm btn-danger" title="Declinar">
                                                                 <i class="fas fa-times text-white"></i>
                                                             </a>
+                                                        <?php endif; ?>
+                                                        <?php if (in_array((int) ($session->id_perfil ?? 0), [1, 7], true)): ?>
                                                             <button class="btn btn-sm btn-primary" title="Subir Instrumento Juridico" onclick="subirInstrumentoJuridicoHonorarios(<?= $solicitud->id_solicitud_honorario ?>)">
                                                                 <i class="fas fa-upload"></i> Subir Instrumento
+                                                            </button>
+                                                        <?php endif; ?>
+                                                        <?php if (in_array((int) ($session->id_perfil ?? 0), [1, 7], true)): ?>
+                                                            <button class="btn btn-sm <?= !empty($solicitud->no_convenio) ? 'btn-pink' : 'btn-dark' ?>" title="Subir No. Convenio" onclick='subirNoConvenioHonorarios(<?= (int) $solicitud->id_solicitud_honorario ?>, <?= json_encode((string) ($solicitud->no_convenio ?? ''), JSON_HEX_APOS | JSON_HEX_QUOT) ?>)'>
+                                                                <i class="fas fa-file-signature"></i>
+                                                            </button>
+                                                        <?php endif; ?>
+                                                        <?php if (!empty($solicitud->no_convenio)): ?>
+                                                            <button class="btn btn-sm btn-outline-info" title="Ver No. Convenio" onclick='verNoDocumento("No. Convenio", <?= json_encode((string) $solicitud->no_convenio, JSON_HEX_APOS | JSON_HEX_QUOT) ?>)'>
+                                                                <i class="fas fa-hashtag"></i>
                                                             </button>
                                                         <?php endif; ?>
                                                     </td>
@@ -243,6 +264,10 @@ function subirInstrumentoJuridicoHonorarios(id){
                 Swal.showValidationMessage('Selecciona al menos un archivo PDF');
                 return false;
             }
+            if(files.length>4){
+                Swal.showValidationMessage('Solo puedes subir hasta 4 archivos PDF');
+                return false;
+            }
             const formData=new FormData();
             for(let i=0;i<files.length;i++){
                 formData.append('archivos[]', files[i]);
@@ -264,6 +289,91 @@ function subirInstrumentoJuridicoHonorarios(id){
                 Swal.fire('Exito','El archivo se ha subido correctamente.','success').then(()=>location.reload());
             }
         }
+    });
+}
+function editarInstrumentoHonorarios(id, indice){
+    Swal.fire({
+        title:'Editar Instrumento',
+        text:'Seleccione hasta 4 PDFs. Se reemplazaran desde el instrumento elegido.',
+        input:'file',
+        inputAttributes:{ accept:'application/pdf', multiple:'multiple', 'aria-label':'Subir instrumentos juridicos en PDF' },
+        showCancelButton:true,
+        confirmButtonText:'Reemplazar',
+        cancelButtonText:'Cancelar',
+        showLoaderOnConfirm:true,
+        preConfirm:(files)=>{
+            if(!files || files.length===0){
+                Swal.showValidationMessage('Selecciona al menos un archivo PDF');
+                return false;
+            }
+            if(files.length>4){
+                Swal.showValidationMessage('Solo puedes subir hasta 4 archivos PDF');
+                return false;
+            }
+            const formData=new FormData();
+            formData.append('id_solicitud', id);
+            formData.append('indice', indice);
+            for(let i=0;i<files.length;i++){
+                formData.append('archivos[]', files[i]);
+            }
+            return fetch('<?= base_url("index.php/Principal/reemplazarInstrumentoHonorarios") ?>',{
+                method:'POST',
+                body:formData
+            }).then(response=>response.json()).catch(error=>{
+                Swal.showValidationMessage(`Error: ${error}`);
+            });
+        },
+        allowOutsideClick:()=>!Swal.isLoading()
+    }).then((result)=>{
+        if(!result.isConfirmed){
+            return;
+        }
+        if(result.value && result.value.error){
+            Swal.fire('Error', result.value.respuesta || 'No se pudo reemplazar el instrumento.', 'error');
+        } else {
+            Swal.fire('Exito', (result.value && result.value.respuesta) || 'Instrumento reemplazado correctamente.', 'success').then(()=>location.reload());
+        }
+    });
+}
+function subirNoConvenioHonorarios(id, noConvenioActual){
+    Swal.fire({
+        title:'Subir No. Convenio',
+        input:'text',
+        inputValue:noConvenioActual || '',
+        inputPlaceholder:'Escribe el No. convenio',
+        showCancelButton:true,
+        confirmButtonText:'Guardar',
+        cancelButtonText:'Cancelar',
+        preConfirm:(noConvenio)=>{
+            if(!noConvenio || noConvenio.trim()===''){
+                Swal.showValidationMessage('El No. convenio es requerido');
+                return false;
+            }
+            return $.post('<?= base_url("index.php/Principal/guardarNoConvenioSolicitudHonorarios") ?>',{
+                id_solicitud_honorario:id,
+                no_convenio:noConvenio.trim()
+            }).then(response=>response).catch(()=>{
+                Swal.showValidationMessage('No se pudo guardar el No. convenio');
+            });
+        }
+    }).then((result)=>{
+        if(!result.isConfirmed){
+            return;
+        }
+        const response=result.value || {};
+        if(response.error){
+            Swal.fire('Error', response.respuesta || 'No se pudo guardar el No. convenio.', 'error');
+        } else {
+            Swal.fire('Exito', response.respuesta || 'No. convenio guardado correctamente.', 'success').then(()=>location.reload());
+        }
+    });
+}
+function verNoDocumento(titulo, valor){
+    Swal.fire({
+        title: titulo,
+        html: `<div style="font-size:18px;font-weight:600;">${$('<div>').text(valor || 'Sin capturar').html()}</div>`,
+        icon: 'info',
+        confirmButtonText: 'Cerrar'
     });
 }
 </script>

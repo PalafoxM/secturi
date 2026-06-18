@@ -3572,14 +3572,20 @@ class Principal extends BaseController
                 ]);
                 $solicitud->tienen_archivos = !empty($archivosSolicitud->data);
                 $instrumentos = [];
+                if (!empty($solicitud->instrumento_juridico)) {
+                    $decoded = json_decode((string) $solicitud->instrumento_juridico, true);
+                    $instrumentos = is_array($decoded) ? $decoded : [$solicitud->instrumento_juridico];
+                }
                 if (!empty($archivosSolicitud->data)) {
                     foreach ($archivosSolicitud->data as $archivoSolicitud) {
-                        if (($archivoSolicitud->clave_documento ?? '') === 'instrumento_juridico') {
+                        if (($archivoSolicitud->clave_documento ?? '') === 'instrumento_juridico' && empty($instrumentos)) {
                             $instrumentos[] = $archivoSolicitud->nombre_archivo ?? '';
                         }
                     }
                 }
-                $solicitud->instrumento_urls = $this->mapInstrumentoUrls($instrumentos);
+                $instrumentos = array_values(array_unique(array_filter($instrumentos)));
+                $solicitud->instrumento_urls = $this->mapInstrumentoUrls(array_slice($instrumentos, 0, 4));
+                $solicitud->no_convenio = $solicitud->no_convenio ?? ($solicitud->no_contrato ?? '');
             }
         }
 
@@ -4109,7 +4115,44 @@ class Principal extends BaseController
             return $this->respond($response);
         }
 
-        if (count($archivos) > 4) {
+        $solicitudQuery = $globals->getTabla([
+            'tabla' => 'solicitud_honorario',
+            'where' => ['id_solicitud_honorario' => $id, 'visible' => 1]
+        ]);
+
+        if (empty($solicitudQuery->data)) {
+            $response->respuesta = 'Solicitud no encontrada.';
+            return $this->respond($response);
+        }
+
+        $instrumentosActuales = [];
+        $instrumentoRaw = $solicitudQuery->data[0]->instrumento_juridico ?? '';
+        if (is_string($instrumentoRaw) && $instrumentoRaw !== '') {
+            $decoded = json_decode($instrumentoRaw, true);
+            $instrumentosActuales = is_array($decoded) ? $decoded : [$instrumentoRaw];
+        } elseif (is_array($instrumentoRaw)) {
+            $instrumentosActuales = $instrumentoRaw;
+        }
+        if (empty($instrumentosActuales)) {
+            $archivosInstrumento = $globals->getTabla([
+                'tabla' => 'solicitud_honorario_archivos',
+                'where' => [
+                    'id_solicitud_honorario' => $id,
+                    'clave_documento' => 'instrumento_juridico',
+                    'visible' => 1
+                ]
+            ]);
+            if (!empty($archivosInstrumento->data)) {
+                foreach ($archivosInstrumento->data as $archivoInstrumento) {
+                    if (!empty($archivoInstrumento->nombre_archivo)) {
+                        $instrumentosActuales[] = $archivoInstrumento->nombre_archivo;
+                    }
+                }
+            }
+        }
+        $instrumentosActuales = array_values(array_unique(array_filter($instrumentosActuales)));
+
+        if ((count($instrumentosActuales) + count($archivos)) > 4) {
             $response->respuesta = "Solo se permiten hasta 4 instrumentos juridicos.";
             return $this->respond($response);
         }
@@ -4149,15 +4192,15 @@ class Principal extends BaseController
             return $this->respond($response);
         }
 
+        $instrumentosFinales = array_slice(array_values(array_merge($instrumentosActuales, $rutasGuardadas)), 0, 4);
         $columnasSolicitudHonorario = $this->obtenerColumnasTablaServicio($globals, 'solicitud_honorario');
         $dataUpdate = [
             'id_estatus' => 3,
-            'instrumento_juridico' => json_encode(array_values($rutasGuardadas)),
             'usu_act' => $session->id_usuario ?? 0,
             'fec_act' => date('Y-m-d H:i:s')
         ];
         if (in_array('instrumento_juridico', $columnasSolicitudHonorario, true)) {
-            $dataUpdate['instrumento_juridico'] = json_encode($rutasGuardadas);
+            $dataUpdate['instrumento_juridico'] = json_encode($instrumentosFinales);
         }
 
         $res = $globals->saveTabla($dataUpdate, [
@@ -4202,6 +4245,211 @@ class Principal extends BaseController
 
         $response->error = false;
         $response->respuesta = 'Instrumento juridico subido y solicitud aprobada.';
+        return $this->respond($response);
+    }
+
+    public function reemplazarInstrumentoHonorarios()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'No fue posible reemplazar el instrumento.';
+
+        if (!in_array((int) ($session->id_perfil ?? 0), [1, 7], true)) {
+            $response->respuesta = 'No tiene permisos para editar instrumentos.';
+            return $this->respond($response);
+        }
+
+        $id = (int) ($this->request->getPost('id_solicitud') ?? 0);
+        $indice = (int) ($this->request->getPost('indice') ?? -1);
+        $archivos = $this->request->getFileMultiple('archivos');
+        if (empty($archivos)) {
+            $archivoUnico = $this->request->getFile('archivo');
+            $archivos = $archivoUnico ? [$archivoUnico] : [];
+        }
+
+        if ($id <= 0 || $indice < 0) {
+            $response->respuesta = 'Solicitud o instrumento no valido.';
+            return $this->respond($response);
+        }
+
+        if (empty($archivos)) {
+            $response->respuesta = 'Debe seleccionar al menos un archivo PDF.';
+            return $this->respond($response);
+        }
+
+        if (count($archivos) > 4) {
+            $response->respuesta = 'Solo se permiten hasta 4 instrumentos.';
+            return $this->respond($response);
+        }
+
+        $solicitudQuery = $globals->getTabla([
+            'tabla' => 'solicitud_honorario',
+            'where' => ['id_solicitud_honorario' => $id, 'visible' => 1]
+        ]);
+
+        if (empty($solicitudQuery->data)) {
+            $response->respuesta = 'Solicitud no encontrada.';
+            return $this->respond($response);
+        }
+
+        $instrumentoRaw = $solicitudQuery->data[0]->instrumento_juridico ?? '';
+        $instrumentos = [];
+        if (is_string($instrumentoRaw) && $instrumentoRaw !== '') {
+            $decoded = json_decode($instrumentoRaw, true);
+            $instrumentos = is_array($decoded) ? $decoded : [$instrumentoRaw];
+        } elseif (is_array($instrumentoRaw)) {
+            $instrumentos = $instrumentoRaw;
+        }
+        if (empty($instrumentos)) {
+            $archivosInstrumento = $globals->getTabla([
+                'tabla' => 'solicitud_honorario_archivos',
+                'where' => [
+                    'id_solicitud_honorario' => $id,
+                    'clave_documento' => 'instrumento_juridico',
+                    'visible' => 1
+                ]
+            ]);
+            if (!empty($archivosInstrumento->data)) {
+                foreach ($archivosInstrumento->data as $archivoInstrumento) {
+                    if (!empty($archivoInstrumento->nombre_archivo)) {
+                        $instrumentos[] = $archivoInstrumento->nombre_archivo;
+                    }
+                }
+            }
+        }
+        $instrumentos = array_values(array_unique(array_filter($instrumentos)));
+
+        if (!isset($instrumentos[$indice])) {
+            $response->respuesta = 'El instrumento seleccionado no existe.';
+            return $this->respond($response);
+        }
+
+        if (($indice + count($archivos)) > 4) {
+            $response->respuesta = 'La edicion no puede superar 4 instrumentos.';
+            return $this->respond($response);
+        }
+
+        $rutasNuevas = [];
+        foreach ($archivos as $offset => $archivo) {
+            if (!$archivo || !$archivo->isValid() || $archivo->hasMoved()) {
+                $response->respuesta = 'Debe seleccionar archivos PDF validos.';
+                return $this->respond($response);
+            }
+
+            if (strtolower((string) $archivo->getExtension()) !== 'pdf') {
+                $response->respuesta = 'Solo se permiten archivos PDF.';
+                return $this->respond($response);
+            }
+
+            $newName = 'Inst_Honorarios_' . $id . '_' . ($indice + $offset + 1) . '_' . substr(md5(uniqid((string) $id, true)), 0, 8) . '.pdf';
+            $s3Key = $this->uploadFileToS3Storage($archivo->getTempName(), 'honorarios', 'instrumentos', $newName);
+
+            if (empty($s3Key)) {
+                $response->respuesta = 'No fue posible guardar el instrumento en AWS S3.';
+                return $this->respond($response);
+            }
+
+            $rutasNuevas[] = $s3Key;
+        }
+
+        array_splice($instrumentos, $indice, count($rutasNuevas), $rutasNuevas);
+        $instrumentos = array_slice(array_values($instrumentos), 0, 4);
+
+        $columnasSolicitudHonorario = $this->obtenerColumnasTablaServicio($globals, 'solicitud_honorario');
+        if (!in_array('instrumento_juridico', $columnasSolicitudHonorario, true)) {
+            $response->respuesta = 'La tabla solicitud_honorario no tiene columna instrumento_juridico.';
+            return $this->respond($response);
+        }
+
+        $res = $globals->saveTabla(
+            [
+                'instrumento_juridico' => json_encode(array_values($instrumentos)),
+                'usu_act' => $session->id_usuario ?? 0,
+                'fec_act' => date('Y-m-d H:i:s')
+            ],
+            [
+                'tabla' => 'solicitud_honorario',
+                'editar' => true,
+                'idEditar' => ['id_solicitud_honorario' => $id]
+            ],
+            [
+                'id_user' => $session->id_usuario ?? 0,
+                'script' => 'Principal.php/reemplazarInstrumentoHonorarios'
+            ]
+        );
+
+        if (!$res->error) {
+            $response->error = false;
+            $response->respuesta = 'Instrumento reemplazado correctamente.';
+        } else {
+            $response->respuesta = $res->respuesta ?? $response->respuesta;
+        }
+
+        return $this->respond($response);
+    }
+
+    public function guardarNoConvenioSolicitudHonorarios()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'No fue posible guardar el No. convenio.';
+
+        if (!in_array((int) ($session->id_perfil ?? 0), [1, 7], true)) {
+            $response->respuesta = 'No tiene permisos para guardar el No. convenio.';
+            return $this->respond($response);
+        }
+
+        $idSolicitud = (int) ($this->request->getPost('id_solicitud_honorario') ?? 0);
+        $noConvenio = trim((string) ($this->request->getPost('no_convenio') ?? ''));
+
+        if ($idSolicitud <= 0) {
+            $response->respuesta = 'Solicitud no valida.';
+            return $this->respond($response);
+        }
+
+        if ($noConvenio === '') {
+            $response->respuesta = 'El No. convenio es requerido.';
+            return $this->respond($response);
+        }
+
+        $columnas = $this->obtenerColumnasTablaServicio($globals, 'solicitud_honorario');
+        $campoNumero = in_array('no_convenio', $columnas, true)
+            ? 'no_convenio'
+            : (in_array('no_contrato', $columnas, true) ? 'no_contrato' : '');
+
+        if ($campoNumero === '') {
+            $response->respuesta = 'La tabla solicitud_honorario no tiene columna no_convenio o no_contrato.';
+            return $this->respond($response);
+        }
+
+        $res = $globals->saveTabla(
+            [
+                $campoNumero => $noConvenio,
+                'usu_act' => $session->id_usuario ?? 0,
+                'fec_act' => date('Y-m-d H:i:s')
+            ],
+            [
+                'tabla' => 'solicitud_honorario',
+                'editar' => true,
+                'idEditar' => ['id_solicitud_honorario' => $idSolicitud]
+            ],
+            [
+                'id_user' => $session->id_usuario ?? 0,
+                'script' => 'Principal.php/guardarNoConvenioSolicitudHonorarios'
+            ]
+        );
+
+        if (!$res->error) {
+            $response->error = false;
+            $response->respuesta = 'No. convenio guardado correctamente.';
+        } else {
+            $response->respuesta = $res->respuesta ?? $response->respuesta;
+        }
+
         return $this->respond($response);
     }
 
