@@ -157,9 +157,16 @@
                                                                 </li>
                                                                
                                                                 <li class="dd-item" data-id="1">
-                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/PROSECTUR__2025_2030.pdf' ?>">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Guia de alineacion Programas Estatales y Municipales al PROSECTUR.pdf' ?>">
                                                                         <div class="dd-handle">
                                                                         Programa Sectorial de Turismo Federal 2025-2030
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dd-item" data-id="1">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/PROSECTUR__2025_2030.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Guía de alineación para Programas Estatales y Municipales de Turismo con el PROSECTUR
                                                                         </div>
                                                                     </a>
                                                                 </li>
