@@ -774,11 +774,12 @@
                     </a>
                 </li> -->
 
-                <li class="mr-2">
-                    <a href="https://sectur.guanajuato.gob.mx/ctisoli/" target="_blank" rel="noopener" 
-                        class="btn btn-danger btn-lg text-white d-flex align-items-center" 
-                        style="font-weight:700; padding:8px 14px; background: linear-gradient(45deg,#ff4d4d,#ff1a1a); border: none;">
-                        <i class="fas fa-headset mr-2" aria-hidden="true"></i> Solicitudes TI
+                <li class="nav-item mr-2">
+                    <a href="https://sectur.guanajuato.gob.mx/ctisoli/" target="_blank" rel="noopener"
+                        class="nav-link btn btn-primary btn-sm d-flex align-items-center"
+                        style="font-weight:600; padding:6px 10px;">
+                        <i data-feather="message-circle" class="align-self-center mr-2"></i>
+                        Solicitudes TI
                     </a>
                 </li>
 
