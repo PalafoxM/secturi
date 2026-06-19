@@ -760,7 +760,7 @@
                     </div>
                 </li> -->
 
-                <li class="dropdown notification-list">
+               <!--  <li class="dropdown notification-list">
                     <a class="nav-link arrow-none waves-light waves-effect"
                         href="https://secturnet.guanajuato.gob.mx/susi/reporte_mtto_ci4.html"
                         target="_blank"
@@ -771,6 +771,14 @@
                         title="Notificaciones">
                         <i class="ti-bell noti-icon"></i>
                         <span class="badge badge-danger badge-pill noti-icon-badge">1</span>
+                    </a>
+                </li> -->
+
+                <li class="mr-2">
+                    <a href="https://sectur.guanajuato.gob.mx/ctisoli/" target="_blank" rel="noopener" 
+                        class="btn btn-danger btn-lg text-white d-flex align-items-center" 
+                        style="font-weight:700; padding:8px 14px; background: linear-gradient(45deg,#ff4d4d,#ff1a1a); border: none;">
+                        <i class="fas fa-headset mr-2" aria-hidden="true"></i> Solicitudes TI
                     </a>
                 </li>
 
