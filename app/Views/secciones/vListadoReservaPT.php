@@ -53,7 +53,7 @@
                                                         <?php if(isset($es_declinado) && $es_declinado): ?>
                                                             <th class="text-center">OBSERVACIONES</th>
                                                         <?php else: ?>
-                                                            <th class="text-center">INSTRUMENTO</th>
+                                                            <th class="text-center">NO RESERVA</th>
                                                         <?php endif; ?>
                                                         <th class="text-center">REGISTRO</th>
                                                          <th class="text-center">ESTATUS</th>
@@ -75,7 +75,8 @@
                                                             <td class="text-center"><?= $p->observaciones ?? '' ?></td>
                                                         <?php else: ?>
                                                             <td class="text-center">
-                                                                <?php if (!empty($p->instrumento_urls)) : ?>
+                                                                <?= $p->no_reserva ?? '' ?>
+                                                              <!--   <?php if (!empty($p->instrumento_urls)) : ?>
                                                                     <?php $accionInstrumento = ((int) ($session->get('id_perfil') ?? 0) === 2) ? 'Descargar' : 'Ver'; ?>
                                                                     <?php foreach ($p->instrumento_urls as $indexInstrumento => $instrumento): ?>
                                                                         <a target="_blank" href="<?= esc($instrumento['url'] ?? '') ?>" class="btn btn-gradient-info px-3 mb-1" title="<?= $accionInstrumento ?> instrumento <?= $indexInstrumento + 1 ?>">
@@ -85,7 +86,7 @@
                                                                             <?php endif; ?>
                                                                         </a>
                                                                     <?php endforeach; ?>
-                                                                <?php endif; ?>
+                                                                <?php endif; ?> -->
                                                             </td>
                                                         <?php endif; ?>
 
@@ -106,7 +107,7 @@
                                                                 break;
                                                            case 4:
                                                                 $color = 'badge-soft-warning';
-                                                                $texto = 'Enviado';
+                                                                $texto = 'Finalizado';
                                                                 break;
                                                            case 5:
                                                                 $color = 'badge-soft-info';

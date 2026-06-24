@@ -3069,7 +3069,7 @@ class Principal extends BaseController
         $session = \Config\Services::session();
         $globals = new Mglobal;
         if (in_array($session->get('id_perfil'), [1, 2])) {
-            $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1, "id_estatus"=> 3]]);
+            $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1, "id_estatus"=> 3, "id_estatus"=> 4]]);
         } else {
             if(in_array($session->get('id_usuario'), [14,80, 59, 11,38,17])){
                 $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1, "promo"=> 1, 'id_estatus' => 3]]);
