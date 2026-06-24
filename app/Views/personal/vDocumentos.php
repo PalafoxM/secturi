@@ -787,7 +787,7 @@
                                                                     </div>
                                                                 </li>
                                                                 </a> 
-                                                                  <a target="_blank" href="<?= base_url()?>assets/documentos/L-RF-14-2026 Lista de Asistencia.xlsx" > 
+                                                                  <a target="_blank" href="<?= base_url()?>assets/documentos/L-RF-14-2026 Lista de Asistencia_aviso.xlsx" > 
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
                                                                         Lista de Asistencia
