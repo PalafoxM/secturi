@@ -6,11 +6,12 @@ use DateTime;
 use stdClass;
 
 class Funciones {    
+    private $globals;
     private $secretKey;
     public function __construct()
     {
         $this->globals = new Globals();
-        $this->secretKey = 'ORnsLEykJAMTEvacurIPAMAeRvelINclOg';
+        $this->secretKey = env('TOKEN_API') ?: 'ORnsLEykJAMTEvacurICINGeRvelINclOg';
     }
 
     function encode($data) {

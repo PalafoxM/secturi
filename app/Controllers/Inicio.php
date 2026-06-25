@@ -334,6 +334,7 @@ class Inicio extends BaseController
         $data['eventos'] = "";
         $votoH = $globas->getTabla(['tabla' => 'vw_honestidad', 'where' => ['visible' => 1, 'usu_reg' => $session->id_usuario, 'id_sexo' => 1]]);
         $votoM = $globas->getTabla(['tabla' => 'vw_honestidad', 'where' => ['visible' => 1, 'usu_reg' => $session->id_usuario, 'id_sexo' => 2]]);
+     //  die( var_dump($votoM) );
         if (isset($votoH->data) && !empty($votoH->data)) {
             $votoHombre = true;
         }
@@ -423,6 +424,7 @@ class Inicio extends BaseController
         $data['scripts'] = array('principal', 'inicio');
         $data['edita'] = 0;
         $data['nombre_completo'] = $session->nombre_completo;
+  
         $data['contentView'] = $vista;
         $this->_renderView($data);
 
