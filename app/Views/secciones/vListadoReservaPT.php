@@ -56,6 +56,7 @@
                                                             <th class="text-center">NO RESERVA</th>
                                                         <?php endif; ?>
                                                         <th class="text-center">REGISTRO</th>
+                                                        <th class="text-center">DOCUMENTO</th>
                                                          <th class="text-center">ESTATUS</th>
                                                         <th class="text-center text-nowrap">ACCIONES</th>
                                                     </tr>
@@ -76,7 +77,17 @@
                                                         <?php else: ?>
                                                             <td class="text-center">
                                                                 <?= $p->no_reserva ?? '' ?>
-                                                              <!--   <?php if (!empty($p->instrumento_urls)) : ?>
+                                                        
+                                                            </td>
+                                                        <?php endif; ?>
+                                                      
+
+                                                          <td class="text-center"><?= (empty($p->nombre_completo))?'S/O':$p->nombre_completo?></td>
+                                                          <td class="text-center">
+
+                                                   
+                                                          
+                                                              <?php if (!empty($p->instrumento_urls)) : ?>
                                                                     <?php $accionInstrumento = ((int) ($session->get('id_perfil') ?? 0) === 2) ? 'Descargar' : 'Ver'; ?>
                                                                     <?php foreach ($p->instrumento_urls as $indexInstrumento => $instrumento): ?>
                                                                         <a target="_blank" href="<?= esc($instrumento['url'] ?? '') ?>" class="btn btn-gradient-info px-3 mb-1" title="<?= $accionInstrumento ?> instrumento <?= $indexInstrumento + 1 ?>">
@@ -86,11 +97,9 @@
                                                                             <?php endif; ?>
                                                                         </a>
                                                                     <?php endforeach; ?>
-                                                                <?php endif; ?> -->
-                                                            </td>
-                                                        <?php endif; ?>
-
-                                                          <td class="text-center"><?= (empty($p->nombre_completo))?'S/O':$p->nombre_completo?></td>
+                                                                <?php endif; ?> 
+                                                      
+                                                          </td>
                                                         <?php
                                                         switch ($p->id_estatus) {
                                                             case 1:
