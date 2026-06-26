@@ -1,4 +1,15 @@
-<?php $usuarios = $usuarios ?? []; ?>
+<?php
+$usuarios = $usuarios ?? [];
+$normalizarKm = static function ($valor): ?float {
+    if ($valor === null || $valor === '') {
+        return null;
+    }
+
+    $valor = preg_replace('/[^\d.-]/', '', (string) $valor);
+
+    return is_numeric($valor) ? (float) $valor : null;
+};
+?>
 <div class="page-wrapper">
     <div class="page-content-tab">
         <div class="container-fluid">
@@ -63,12 +74,16 @@
                                                 <td class="text-center">
                                                     <?php
                                                         $consumo = '';
-                                                        $consumo_real = '';
-                                                        if (isset($p->km_ultimo_servicio) && isset($p->km_final)) {
-                                                            $consumo_real = (float) ($p->km_final - $p->km_ultimo_servicio);
-                                                            $consumo = number_format((float) ($p->km_final - $p->km_ultimo_servicio), 2);
+                                                        $consumo_real = null;
+                                                        $kmFinal = $normalizarKm($p->km_final ?? null);
+                                                        $kmUltimoServicio = $normalizarKm($p->km_ultimo_servicio ?? null);
+
+                                                        if ($kmFinal !== null && $kmUltimoServicio !== null) {
+                                                            $consumo_real = $kmFinal - $kmUltimoServicio;
+                                                            $consumo = number_format($consumo_real, 2);
                                                         }
-                                                        if($consumo_real <= 5000) {
+
+                                                        if ($consumo_real !== null && $consumo_real <= 5000) {
                                                             echo '<span class="badge badge-success">' . $consumo . '</span>';
                                                         } elseif ($consumo_real > 5001 && $consumo_real <= 9000) {
                                                             echo '<span class="badge badge-warning">' . $consumo . '</span>';
@@ -83,7 +98,7 @@
                                                     <button type="button" class="btn btn-sm btn-warning" title="Editar" onclick="editarEdenred(<?= (int) ($p->id_edenred ?? 0) ?>)">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
-                                                    <?php if ($consumo_real > 9001): ?>
+                                                    <?php if ($consumo_real !== null && $consumo_real > 9001): ?>
                                                         <button type="button" class="btn btn-sm btn-info" title="Enviar Correo" onclick="edenredListo(<?= (int) ($p->id_edenred ?? 0) ?>)">
                                                             <i class="mdi mdi-email-outline"></i>
                                                         </button>
