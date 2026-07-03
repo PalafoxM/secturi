@@ -62,6 +62,48 @@ st.agregar = (function () {
                 }
             });
         },
+        guardarAsistenciaManual: function () {
+            const id_asistencia = $('#manual_id_asistencia').val();
+            const id_usuario = $('#manual_id_usuario').val();
+            const fecha = $('#manual_fecha').val();
+            const entrada = $('#manual_entrada').val();
+            const salida = $('#manual_salida').val();
+
+            if (!fecha) {
+                Swal.fire("Atención", "Selecciona el día de asistencia.", "info");
+                return;
+            }
+
+            if (!entrada && !salida) {
+                Swal.fire("Atención", "Captura entrada o salida.", "info");
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: base_url + "index.php/Agregar/guardarAsistenciaManual",
+                dataType: "json",
+                data: { id_asistencia, id_usuario, fecha, entrada, salida },
+                beforeSend: function () {
+                    $('#btnGuardarAsistenciaManual').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                },
+                success: function (response) {
+                    if (!response.error) {
+                        Swal.fire("Éxito", response.respuesta, "success").then(function () {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire("Error", response.respuesta, "error");
+                    }
+                },
+                complete: function () {
+                    $('#btnGuardarAsistenciaManual').prop('disabled', false).html('Guardar');
+                },
+                error: function () {
+                    Swal.fire("Error", "No se pudo guardar la asistencia.", "error");
+                }
+            });
+        },
         modalSala: function (id) {
             $("#verSala").modal('show');
             let img = "";
