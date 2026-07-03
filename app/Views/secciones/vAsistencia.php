@@ -439,6 +439,45 @@
 </div>
 
 
+<?php if (!empty($puedeEditarAsistencia)): ?>
+<div class="modal fade" id="modalAsistenciaManual" tabindex="-1" role="dialog" aria-labelledby="modalAsistenciaManualLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalAsistenciaManualLabel">Editar asistencia</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="formAsistenciaManual">
+                <div class="modal-body">
+                    <input type="hidden" id="manual_id_asistencia" name="id_asistencia">
+                    <input type="hidden" id="manual_id_usuario" name="id_usuario" value="<?= (int) ($asistenciaUserId ?? 0) ?>">
+                    <div class="form-group">
+                        <label for="manual_fecha">Día</label>
+                        <input type="date" class="form-control" id="manual_fecha" name="fecha" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="manual_entrada">Entrada</label>
+                        <input type="time" class="form-control" id="manual_entrada" name="entrada">
+                    </div>
+                    <div class="form-group">
+                        <label for="manual_salida">Salida</label>
+                        <input type="time" class="form-control" id="manual_salida" name="salida">
+                    </div>
+                    <small class="text-muted">Solo el usuario administrador puede crear o editar estos registros.</small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success" id="btnGuardarAsistenciaManual">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
+
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
@@ -483,6 +522,8 @@
     var eventosAsistencia = <?= json_encode($asistencia) ?>;
     var onlyAsistencias = <?= json_encode($onlyAsistencias) ?>;
     var diasFestivos = <?= json_encode($diasFestivos) ?>;
+    var puedeEditarAsistencia = <?= !empty($puedeEditarAsistencia) ? 'true' : 'false' ?>;
+    var asistenciaUserId = <?= (int) ($asistenciaUserId ?? 0) ?>;
 
 
     function normalizarFecha(fecha) {
@@ -592,6 +633,10 @@
     }
 
     $(document).ready(function () {
+        $('#formAsistenciaManual').on('submit', function (event) {
+            event.preventDefault();
+            st.agregar.guardarAsistenciaManual();
+        });
         $('#tipo_incidencia').on('change', function () {
             st.agregar.validacionIncapacidad();
         });
@@ -679,6 +724,23 @@
             if (!hora || typeof hora !== 'string' || !hora.includes(':')) return null;
             const [hh, mm, ss] = hora.split(':').map(x => parseInt(x, 10) || 0);
             return hh * 3600 + mm * 60 + ss;
+        }
+        function horaParaInput(hora) {
+            if (!hora || hora === 'Sin salida' || hora === '--:--' || hora === '00:00:00') {
+                return '';
+            }
+            return String(hora).substring(0, 5);
+        }
+        function abrirModalAsistenciaManual(fecha, entrada, salida, idAsistencia) {
+            if (!puedeEditarAsistencia) {
+                return;
+            }
+            $('#manual_id_asistencia').val(idAsistencia || '');
+            $('#manual_id_usuario').val(asistenciaUserId);
+            $('#manual_fecha').val(normalizarFecha(fecha));
+            $('#manual_entrada').val(horaParaInput(entrada));
+            $('#manual_salida').val(horaParaInput(salida));
+            $('#modalAsistenciaManual').modal('show');
         }
         function justificar(info, fechaLabel, esSemana){
             console.log(info.event.extendedProps.observaciones);
@@ -900,6 +962,8 @@
                     horas_agrupadas: item.horas_agrupadas,
                     observaciones:item.observaciones,
                     id_incidencia:item.id_incidencia,
+                    id_asistencia: item.id_asistencia,
+                    fecha: fechaBase,
                     rango_legible: esSemana ? (startDate + ' - ' + dayBefore(endDate)) : null
                 }
             };
@@ -1013,6 +1077,15 @@
                     Swal.fire('Justificado por', info.event.title, "info");
                     return;
                 }
+                if (puedeEditarAsistencia) {
+                    abrirModalAsistenciaManual(
+                        info.event.extendedProps.fecha || info.event.start,
+                        entrada,
+                        salida,
+                        info.event.extendedProps.id_asistencia
+                    );
+                    return;
+                }
                 if (multiple && idEstatus == 1) {
                     Swal.fire('Atención', 'Se encuentra en validación', "info");
                     return;
@@ -1054,6 +1127,10 @@
                     return;
                 }
                 let dia = info.dateStr;
+                if (puedeEditarAsistencia) {
+                    abrirModalAsistenciaManual(dia, '', '', '');
+                    return;
+                }
                 if (fechasConRegistroIncompleto.has(dia)) {
                     const registro = fechasConRegistroIncompleto.get(dia);
                     mostrarModalRegistroIncompleto(dia, registro.entrada, registro.salida);
@@ -1144,3 +1221,4 @@ var marker = L.marker([20.956852, -101.359318]).addTo(map)
         radius: 150
     }).addTo(map); 
 </script>
+

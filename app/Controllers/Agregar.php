@@ -4742,6 +4742,7 @@ class Agregar extends BaseController
         $response = new stdClass();
         $Mglobal = new Mglobal;
         $calendarStatic = true;
+        $asistenciaUserId = !empty($user) ? (int) $user : (int) $session->get('id_usuario');
         $idTipoEmpleado = $Mglobal->getTabla([
             'tabla' => 'vw_usuario',
             'where' => [
@@ -4786,7 +4787,7 @@ class Agregar extends BaseController
         $data['onlyAsistencias'] = [];
         $onlyAsistencias = $Mglobal->getTabla([
             'tabla' => 'asistencia',
-            'where' => ['visible' => 1, 'id_usuario' => $session->id_usuario]
+            'where' => ['visible' => 1, 'id_usuario' => $asistenciaUserId]
         ]);
 
         if (isset($onlyAsistencias->data) && !empty($onlyAsistencias->data)) {
@@ -4922,6 +4923,8 @@ class Agregar extends BaseController
         //$faltas = $this->getFaltasRangoQuincena($inicio, $fin);
         // $data['faltas'] = $faltas;
         $data['asistencia'] = $registrosAgrupados;
+        $data['puedeEditarAsistencia'] = ((int) $session->get('id_usuario') === 1);
+        $data['asistenciaUserId'] = $asistenciaUserId;
         //$data['cat_incidencia'] = $cat_incidencia->data;
         // $data['incidencia'] = (isset($incidencia->data) && !empty($incidencia->data))?$incidencia->data:[];
         //die();
@@ -4930,6 +4933,113 @@ class Agregar extends BaseController
         $data['scripts'] = array('agregar', 'inicio');
         $data['contentView'] = 'secciones/vAsistencia';
         $this->_renderView($data);
+    }
+
+    private function normalizarHoraAsistencia(?string $hora): string
+    {
+        $hora = trim((string) $hora);
+        if ($hora === '') {
+            return '00:00:00';
+        }
+
+        if (preg_match('/^\d{2}:\d{2}$/', $hora)) {
+            return $hora . ':00';
+        }
+
+        if (preg_match('/^\d{2}:\d{2}:\d{2}$/', $hora)) {
+            return $hora;
+        }
+
+        return '';
+    }
+
+    public function guardarAsistenciaManual()
+    {
+        $session = \Config\Services::session();
+        $response = new stdClass();
+        $response->error = true;
+        $response->respuesta = 'No fue posible guardar la asistencia.';
+
+        if ((int) $session->get('id_usuario') !== 1) {
+            $response->respuesta = 'No tienes permiso para editar asistencias.';
+            return $this->respond($response);
+        }
+
+        $data = $this->request->getPost();
+        $idUsuario = (int) ($data['id_usuario'] ?? 0);
+        $idAsistencia = (int) ($data['id_asistencia'] ?? 0);
+        $fecha = trim((string) ($data['fecha'] ?? ''));
+        $entrada = $this->normalizarHoraAsistencia($data['entrada'] ?? '');
+        $salida = $this->normalizarHoraAsistencia($data['salida'] ?? '');
+
+        if ($idUsuario <= 0 || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $fecha)) {
+            $response->respuesta = 'Usuario o fecha inválida.';
+            return $this->respond($response);
+        }
+
+        if ($entrada === '' || $salida === '') {
+            $response->respuesta = 'La entrada y salida deben tener formato HH:MM.';
+            return $this->respond($response);
+        }
+
+        if ($entrada === '00:00:00' && $salida === '00:00:00') {
+            $response->respuesta = 'Captura al menos una hora de entrada o salida.';
+            return $this->respond($response);
+        }
+
+        $globals = new Mglobal;
+        $asistenciaExistente = null;
+
+        if ($idAsistencia > 0) {
+            $consulta = $globals->getTabla([
+                'tabla' => 'asistencia',
+                'where' => [
+                    'visible' => 1,
+                    'id_asistencia' => $idAsistencia,
+                    'id_usuario' => $idUsuario,
+                ],
+            ]);
+            $asistenciaExistente = $consulta->data[0] ?? null;
+        }
+
+        if (!$asistenciaExistente) {
+            $consulta = $globals->getTabla([
+                'tabla' => 'asistencia',
+                'where' => [
+                    'visible' => 1,
+                    'id_usuario' => $idUsuario,
+                    'fecha' => $fecha,
+                ],
+            ]);
+            $asistenciaExistente = $consulta->data[0] ?? null;
+        }
+
+        $dataInsert = [
+            'id_usuario' => $idUsuario,
+            'fecha' => $fecha,
+            'entrada' => $entrada,
+            'salida' => $salida,
+            'turno' => 'DIA(08:30-16:00)',
+        ];
+
+        $dataConfig = [
+            'tabla' => 'asistencia',
+            'editar' => !empty($asistenciaExistente),
+        ];
+
+        if (!empty($asistenciaExistente)) {
+            $dataConfig['idEditar'] = ['id_asistencia' => (int) $asistenciaExistente->id_asistencia];
+        }
+
+        $result = $globals->saveTabla($dataInsert, $dataConfig, ['script' => 'Agregar.php/guardarAsistenciaManual']);
+        if (!$result->error) {
+            $response->error = false;
+            $response->respuesta = 'Asistencia guardada correctamente.';
+        } else {
+            $response->respuesta = $result->respuesta ?? $response->respuesta;
+        }
+
+        return $this->respond($response);
     }
     public function deleteAlba()
     {
