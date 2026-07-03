@@ -3070,8 +3070,8 @@ class Principal extends BaseController
         $globals = new Mglobal;
         if($session->get('id_perfil') == 1){
           $reserva = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['visible' => 1]]);
-        }
-        if ($session->get('id_perfil') ==2) {
+          //var_dump(  $reserva);
+        }else if ($session->get('id_perfil') ==2) {
             $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1, "id_estatus"=> 3, "id_estatus"=> 4]]);
         } else {
             if(in_array($session->get('id_usuario'), [14,80, 59, 11,38,17])){
@@ -3080,7 +3080,7 @@ class Principal extends BaseController
                 $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['usu_reg' => $session->get('id_usuario'), 'visible' => 1, "id_estatus"=> 3]]);
             }
         }
-       // die( var_dump($reserva ) );
+       //die( var_dump($reserva ) );
         $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
         $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
         $proveedor = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit' => 100]);
