@@ -3068,7 +3068,10 @@ class Principal extends BaseController
 
         $session = \Config\Services::session();
         $globals = new Mglobal;
-        if (in_array($session->get('id_perfil'), [1, 2])) {
+        if($session->get('id_perfil') == 1){
+          $reserva = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['visible' => 1]]);
+        }
+        if ($session->get('id_perfil') ==2) {
             $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1, "id_estatus"=> 3, "id_estatus"=> 4]]);
         } else {
             if(in_array($session->get('id_usuario'), [14,80, 59, 11,38,17])){
@@ -3119,11 +3122,14 @@ class Principal extends BaseController
 
         $session = \Config\Services::session();
         $globals = new Mglobal;
-        if (in_array($session->get('id_perfil'), [1, 2])) {
+        if ($session->get('id_perfil') == 1) {
             $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva_go', 'where' => ['visible' => 1, "id_estatus"=> 3]]);
-        } else {
+        } else if($session->get('id_perfil') == 2) {
              // Redireccionar o mostrar error si no tiene permiso, aunque el menú lo oculta.
-                $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva_go', 'where' => ['visible' => 1, "id_estatus"=> 3, 'usu_reg' => $session->get('id_usuario')]]);
+                $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva_go', 'where' => ['visible' => 1, "id_estatus"=> 3]]);
+                }else{
+                      $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva_go', 'where' => ['visible' => 1, "id_estatus"=> 3, 'usu_reg' => $session->get('id_usuario')]]);
+
         }
        // die( var_dump($reserva ) );
         $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
