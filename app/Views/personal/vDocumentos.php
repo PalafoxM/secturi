@@ -271,7 +271,7 @@
                                                                     </a>
                                                                 </li>
                                                                 <li class="dd-item" data-id="1">
-                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Ley_de_Turismo_para_el_Estado_de_Guanajuato_y_sus_Municipios-1a2a.pdf' ?>">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/LEY DE TURISMO PARA EL ESTADO DE GUANAJUATO  Y SUS MUNICIPIOS.pdf' ?>">
                                                                         <div class="dd-handle">
                                                                         Ley de Turismo para el Estado de Guanajuato y sus Municipios
                                                                         </div>
@@ -397,7 +397,7 @@
                                                                     </a>
                                                                 </li>
                                                                 <li class="dd-item" data-id="1">
-                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Reglamento_de_la_Ley_General_de_Turismo-f621.pdf' ?>">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/REGLAMENTO DE LA LEY DE TURISMO.pdf' ?>">
                                                                         <div class="dd-handle">
                                                                        Reglamento de la Ley General de Turismo
                                                                         </div>
