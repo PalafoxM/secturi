@@ -406,7 +406,7 @@
                                                                 <li class="dd-item" data-id="1">
                                                                     <a target="_blank" href="<?= base_url().'assets/documentos/Lineamientos-Inversión 2026.pdf' ?>">
                                                                         <div class="dd-handle">
-                                                                         Lineamientos Generales para la Aplicación de Recursos en Materia de Proyectos de Inversión 2025
+                                                                         Lineamientos Generales para la Aplicación de Recursos en Materia de Proyectos de Inversión 2026
                                                                         </div>
                                                                     </a>
                                                                 </li>
