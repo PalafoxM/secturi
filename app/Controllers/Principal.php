@@ -1885,7 +1885,6 @@ class Principal extends BaseController
     }
     public function guardarReserva()
     {
-
         $session = \Config\Services::session();
         $email = \Config\Services::email();
         $globals = new Mglobal;
@@ -1896,7 +1895,7 @@ class Principal extends BaseController
         $ruta_absoluta = "";
         $ruta_relativa = "";
         $file = $this->request->getFile('instrumento');
-         if (isset($data['no_convenio']) && empty($data['no_convenio'])) {
+        if (isset($data['no_convenio']) && empty($data['no_convenio'])) {
             $response->error = true;
             $response->respuesta = "El campo No. Convenio es requerido";
             return $this->respond($response);
@@ -1945,7 +1944,7 @@ class Principal extends BaseController
         $hoy = date("Y-m-d H:i:s");
         $folio = 'PT-' . date('YmdHis'); // Ejemplo: FOL-20250725133045
 
-        $reviucionInterna = (in_array($session->get('id_usuario'), [80,17,14,59,38,11])) ? true : false;
+        $reviucionInterna = (in_array($session->get('id_usuario'), [17,14,59,38,11])) ? true : false;
 
         $dataInsert = [
             "id_proveedor" => (int) $data['id_proveedor'],
@@ -1960,7 +1959,7 @@ class Principal extends BaseController
             $dataInsert['id_estatus'] = 5;
             $dataInsert['promo'] = 1;
                 $email->setTo([
-                'mamedinaher@guanajuato.gob.mx',
+                'promocionydifusionsectur@guanajuato.gob.mx',
                  $session->get('correo')
                 ]);  
 
@@ -3028,7 +3027,7 @@ class Principal extends BaseController
             if($session->get('id_usuario')==80){
                 $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1, 'promo' => 1, "id_estatus"=> 5]]);
             }else{
-                 if(in_array($session->get('id_usuario'), [14,80,17, 59, 11, 38])){
+                 if(in_array($session->get('id_usuario'), [14,17, 59, 11, 38])){
                 $resultado = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1, 'promo' => 1]]);
                   $datosFiltrados = [];
                     foreach($resultado->data as $r) {
