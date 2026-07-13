@@ -392,7 +392,7 @@
                                 </table>                                                                      
                               </div>                                                                                                                       
                          </div>
-                         <?php if($session->get('id_usuario') != 80): ?>
+                         <?php if($session->get('id_usuario') != 34): ?>
                             <div class="row">
                               <div class="col-lg-6">
                                     <div class="form-group">
