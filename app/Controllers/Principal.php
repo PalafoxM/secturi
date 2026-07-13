@@ -1615,7 +1615,7 @@ class Principal extends BaseController
 
         if ($file && $file->isValid() && !$file->hasMoved()) {
 
-            $maxSize = 1 * 1024 * 1024; // 1 MB
+            $maxSize = 2 * 1024 * 1024; // 1 MB
 
             if ($file->getSize() > $maxSize) {
                 $response->respuesta = "El archivo no debe exceder 1 MB.";
