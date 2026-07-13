@@ -245,10 +245,28 @@ class Usuario extends BaseController
         $inicio = null;
         $fin = null;
 
-        if ($tipo === 2 && !empty($incidencia->fecha) && strpos((string) $incidencia->fecha, ' - ') !== false) {
+        // vw_incidenica expone fecha_inicio/fecha_fin. Usarlas primero evita
+        // depender del texto localizado de fecha (por ejemplo: 09/18/2025 - 09/19/2025).
+        if (!empty($incidencia->fecha_inicio)) {
+            try {
+                $inicio = new \DateTime((string) $incidencia->fecha_inicio);
+            } catch (\Exception $e) {
+                $inicio = null;
+            }
+        }
+
+        if (!empty($incidencia->fecha_fin)) {
+            try {
+                $fin = new \DateTime((string) $incidencia->fecha_fin);
+            } catch (\Exception $e) {
+                $fin = null;
+            }
+        }
+
+        if ((!$inicio || !$fin) && $tipo === 2 && !empty($incidencia->fecha) && strpos((string) $incidencia->fecha, ' - ') !== false) {
             $partes = explode(' - ', (string) $incidencia->fecha);
-            $inicio = \DateTime::createFromFormat('m/d/Y', trim($partes[0])) ?: null;
-            $fin = \DateTime::createFromFormat('m/d/Y', trim($partes[1] ?? '')) ?: null;
+            $inicio = $inicio ?: (\DateTime::createFromFormat('!m/d/Y', trim($partes[0])) ?: null);
+            $fin = $fin ?: (\DateTime::createFromFormat('!m/d/Y', trim($partes[1] ?? '')) ?: null);
         }
 
         if (!$inicio && !empty($incidencia->fecha_inicio_incidencia)) {
@@ -265,6 +283,10 @@ class Usuario extends BaseController
 
         if (!$fin && $inicio) {
             $fin = clone $inicio;
+        }
+
+        if ($inicio && $fin && $inicio > $fin) {
+            [$inicio, $fin] = [$fin, $inicio];
         }
 
         return [$inicio, $fin];
@@ -1252,6 +1274,23 @@ class Usuario extends BaseController
                         $horaFin = isset($inc['hora_fin']) ? $inc['hora_fin'] : '';
                         $nombreInc = isset($inc['nombre']) ? strtoupper($inc['nombre']) : '';
                         $tipo = isset($inc['tipo']) ? (int)$inc['tipo'] : null;
+
+                        // Una incidencia diaria aprobada sin horas especificas cubre el dia completo.
+                        // La vista representa esas horas como 00:00:00 y se normalizan como vacias.
+                        if ($tipo === 1 && $estatus === 3 && $horaInicio === '' && $horaFin === '') {
+                            $valorEntrada = $nombreInc;
+                            $valorSalida = $nombreInc;
+                            $sheet->getStyle($colEntrada . $fila)
+                                ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                ->getStartColor()->setARGB('FF00B050');
+                            $sheet->getStyle($colSalida . $fila)
+                                ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                ->getStartColor()->setARGB('FF00B050');
+                            $validadoEntrada = true;
+                            $validadoSalida = true;
+                            $stopIncProcessing = true;
+                            break;
+                        }
 
                         // Si es tipo 2 (multi-día) y está aprobada, cubre todo el día automáticamente
                         if ($tipo === 2 && $estatus === 3) {
