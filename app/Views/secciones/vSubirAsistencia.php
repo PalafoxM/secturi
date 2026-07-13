@@ -71,6 +71,7 @@
                                             <table id="datatableCategorias" class="table" data-toggle="table">
                                                 <thead class="thead-light">
                                                     <tr>
+                                                        <th class="text-center">NO. EMPLEADO</th>
                                                         <th class="text-center">PERSONAL</th>
                                                         <th class="text-center">ENE</th>
                                                         <th class="text-center">FEB</th>
@@ -92,6 +93,7 @@
                                                 <tbody>
                                                     <?php foreach($cat_usuario as $p): ?>
                                                         <tr>
+                                                            <td class="text-center"><?= $p->no_empleado ?></td>
                                                             <td class="text-center"><?= $p->nombre_completo ?></td>
                                                             <td class="text-center" style="cursor:pointer;" title="número de asistencias <?= $p->ene ?>" >
                                                                 <a href="<?= base_url().'index.php/Agregar/Asistencia/1/'.$p->id_usuario?>" ><i class="mdi mdi-calendar <?= ($p->ene <= 5)?'text-danger':'text-success' ?> font-18" ></i>
