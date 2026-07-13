@@ -4004,7 +4004,7 @@ class Inicio extends BaseController
         if(in_array($session->get('id_perfil'), [1,2])){
             $dataDB = array('tabla' => 'formulario_pt', 'where' => ['visible' => 1, 'tipo_formato' => 'PT']);
         }else{
-              if(in_array($session->get('id_usuario'), [14,80,17, 59, 11, 38])){
+              if(in_array($session->get('id_usuario'), [14,34,17, 59, 11, 38])){
                 $dataDB = array('tabla' => 'formulario_pt', 'where' => ['visible' => 1, "promo"=> 1]);
             }else{
                 $dataDB = array('tabla' => 'formulario_pt', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario'), 'tipo_formato' => 'PT']);
