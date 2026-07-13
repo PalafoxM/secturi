@@ -3081,7 +3081,7 @@ class Principal extends BaseController
         if (in_array($session->get('id_perfil'), [1, 2])) {
             $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1, "id_estatus"=> 1]]);
         } else {
-            if($session->get('id_usuario')==80){
+            if($session->get('id_usuario')==34){
                 $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1, 'promo' => 1, "id_estatus"=> 5]]);
             }else{
                   if($this->esUsuarioRevisionInternaReservaPT($session->get('id_usuario'))){
@@ -10651,7 +10651,7 @@ class Principal extends BaseController
         $response->respuesta = 'Error|Error al traer los proveedor';
         $globals = new Mglobal;
         $id_reserva = $this->request->getPost('id_reserva');
-        if($session->get('id_usuario') == 80){
+        if($session->get('id_usuario') == 34){
             $this->enviarEmail(1);
         }
         $data = [];
@@ -11793,7 +11793,7 @@ class Principal extends BaseController
             "observaciones" => $sol->objeto_convenio ?? ($sol->nombre_proyecto ?? ''),
             "fec_reg" => date("Y-m-d H:i:s"),
             "usu_reg" => $session->id_usuario,
-            "promo" => (in_array((int) $session->id_usuario, [17, 11, 14, 59, 38, 80], true)) ? 1 : 0,
+            "promo" => (in_array((int) $session->id_usuario, [17, 11, 14, 59, 38, 34], true)) ? 1 : 0,
         ];
 
         $result = $globals->saveTabla(
@@ -12026,7 +12026,7 @@ class Principal extends BaseController
                 "observaciones"      => $datos->objeto_contrato,
                 "fec_reg"            => date('Y-m-d H:i:s'),
                 "usu_reg"            => $session->id_usuario,
-                "promo"              => (in_array($session->id_usuario, [17,11, 14, 59, 38, 80]))?1:0,
+                "promo"              => (in_array($session->id_usuario, [17,11, 14, 59, 38, 34]))?1:0,
             ]; 
             $dataConfig = [
                 "tabla" => "reserva",
