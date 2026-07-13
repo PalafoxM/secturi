@@ -169,7 +169,7 @@
                                                             </a> -->
                                                             <?php endif; ?>
                                                         <!-- Validacion Interna -->
-                                                             <?php if($session->get('id_usuario') == 80): ?>
+                                                             <?php if($session->get('id_usuario') == 34): ?>
                                                             <a style="color:white;"  onclick="ini.inicio.estatusReservaInterna(<?=$p->id_reserva?>);" data-toggle="tooltip" data-placement="top" title="" data-original-title="Revisar reserva"
                                                                 class="btn <?= (in_array($p->id_estatus,[3,4]))?'btn-gradient-info':'btn-gradient-warning'?> px-4"><i
                                                                     class="mdi mdi-lock-open font-21"></i>
