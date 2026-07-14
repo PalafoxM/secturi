@@ -3128,7 +3128,7 @@ class Principal extends BaseController
           $reserva = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['visible' => 1]]);
           //var_dump(  $reserva);
         }else if ($session->get('id_perfil') ==2) {
-            $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1, "id_estatus"=> 3, "id_estatus"=> 4]]);
+            $reserva = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['visible' => 1]]);
         } else {
             if($session->get('id_usuario') == 34 || $this->esUsuarioRevisionInternaReservaPT($session->get('id_usuario'))){
                 $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1, "promo"=> 1, 'id_estatus' => 3]]);
