@@ -30,7 +30,7 @@
                                     <h3 class="mt-0 header-title">TIPO DE DENUNCIA<strong></strong></h3>
                                     
                                      <div class="row">
-                                        <div class="col-lg-6">
+                                        <div class="col-lg-4">
                                             <div class="card text-white bg-primary">
                                                 <a href="javascript:void(0)" onclick="mostrarForm1();">
                                                 <div class="card-body">
@@ -43,7 +43,7 @@
                                             </div><!--end card-->
                                         </div><!--end col-->
                                                 
-                                        <div class="col-lg-6">
+                                        <div class="col-lg-4">
                                             <div class="card text-white bg-warning">
                                                 <a href="javascript:void(0)" onclick="mostrarForm2();">
                                                 <div class="card-body">
@@ -55,6 +55,18 @@
                                                 </a>
                                             </div><!--end card-->
                                         </div><!--end col-->
+
+                                        <div class="col-lg-4">
+                                            <div class="card text-white bg-success">
+                                                <a href="javascript:void(0)" onclick="mostrarModalCondicionInsegura();">
+                                                    <div class="card-body">
+                                                        <blockquote class="card-bodyquote mb-0">
+                                                            <center><h4 class="text-white">Reporte de actos y condiciones inseguras.</h4></center>
+                                                        </blockquote>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </div>
                                     </div><!--end row-->                                      
                         </div><!--end card-body-->
                     </div><!--end card-->
@@ -169,6 +181,111 @@
      </div>
 </div>
 
+<div id="modalCondicionInsegura" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="tituloCondicionInsegura" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tituloCondicionInsegura">Reporte de acto o condición insegura</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="form_condicion_insegura" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        El reporte puede realizarse de manera anónima. Todos los campos son obligatorios.
+                    </div>
+
+                    <h5>I. ¿Qué deseas reportar?</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="reporte_inseguro">Tipo de reporte <span class="text-danger">*</span></label>
+                            <select class="form-control" id="reporte_inseguro" name="id_reporte" required>
+                                <option value="">Selecciona una opción</option>
+                                <option value="1">a) Acto inseguro</option>
+                                <option value="2">b) Condición insegura</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="anonimo_inseguro">¿Deseas realizarlo de manera anónima? <span class="text-danger">*</span></label>
+                            <select class="form-control" id="anonimo_inseguro" name="anonimo" required>
+                                <option value="">Selecciona una opción</option>
+                                <option value="1">Sí</option>
+                                <option value="2">No</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="accion_insegura">Acción o condición observada <span class="text-danger">*</span></label>
+                            <select class="form-control" id="accion_insegura" name="id_accion" required disabled>
+                                <option value="">Primero selecciona el tipo de reporte</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row campos-acto-inseguro" style="display:none;">
+                        <div class="col-md-12 mb-3">
+                            <label for="quien_inseguro">1. ¿Quién llevó a cabo el acto inseguro? <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="quien_inseguro" name="quien" maxlength="250">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="descripcion_insegura" id="label_descripcion_insegura">Descripción detallada <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="descripcion_insegura" name="descripcion" rows="4" required></textarea>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="ubicacion_insegura" id="label_ubicacion_insegura">Ubicación exacta <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="ubicacion_insegura" name="ubicacion" maxlength="500" required>
+                        </div>
+                    </div>
+
+                    <div class="row campos-acto-inseguro" style="display:none;">
+                        <div class="col-md-6 mb-3">
+                            <label for="fecha_hechos_inseguros">4. ¿Cuándo ocurrieron los hechos? <span class="text-danger">*</span></label>
+                            <input type="datetime-local" class="form-control" id="fecha_hechos_inseguros" name="fecha_hechos">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="testigos_inseguros">5. ¿Hubo más personas que presenciaran el hecho? <span class="text-danger">*</span></label>
+                            <select class="form-control" id="testigos_inseguros" name="testigos">
+                                <option value="">Selecciona una opción</option>
+                                <option value="1">Sí</option>
+                                <option value="2">No</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="evidencia_insegura">Añadir evidencia <span class="text-danger">*</span></label>
+                            <input type="file" class="form-control" id="evidencia_insegura" name="evidencia_insegura" accept=".jpg,.jpeg,.png,.pdf,.mp4,.mov" required>
+                            <small class="form-text text-muted">Formatos permitidos: JPG, PNG, PDF, MP4 o MOV. Máximo 10 MB.</small>
+                        </div>
+                    </div>
+
+                    <h5>II. ¿Qué propones para solucionar o mejorar la situación?</h5>
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="propuesta_insegura">Propuesta <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="propuesta_insegura" name="propuesta" rows="4" required></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success" id="btnCondicionInsegura">Enviar reporte</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 
 <link href="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet"
     type="text/css" />
@@ -202,12 +319,55 @@
 
 <!-- Al final de tu archivo, antes de cerrar el body -->
 <script>
+const accionesInseguras = <?= json_encode($acciones_inseguras ?? [], JSON_UNESCAPED_UNICODE) ?>;
+
 $(document).ready(function() {
     // Inicializar todos los elementos con clase select2
     $('.select2').select2();
     
     console.log('Select2 inicializado'); // Para debug
+
+    $('#form_condicion_insegura').on('submit', function (event) {
+        event.preventDefault();
+        ini.inicio.formCondicionInsegura();
+    });
 });
+
+$('#reporte_inseguro').on('change', function () {
+    const tipo = String($(this).val());
+    const $accion = $('#accion_insegura');
+    const esActo = tipo === '1';
+
+    $accion.empty().append('<option value="">Selecciona una opción</option>');
+    if (accionesInseguras[tipo]) {
+        Object.keys(accionesInseguras[tipo]).forEach(function (id) {
+            $accion.append($('<option>', { value: id, text: accionesInseguras[tipo][id] }));
+        });
+        $accion.prop('disabled', false);
+    } else {
+        $accion.prop('disabled', true);
+    }
+
+    $('.campos-acto-inseguro').toggle(esActo);
+    $('#quien_inseguro, #fecha_hechos_inseguros, #testigos_inseguros').prop('required', esActo);
+    if (!esActo) {
+        $('#quien_inseguro, #fecha_hechos_inseguros, #testigos_inseguros').val('');
+    }
+
+    $('#label_descripcion_insegura').html(esActo
+        ? '2. ¿Qué acto inseguro realizó? <span class="text-danger">*</span>'
+        : '2. Describe detalladamente la condición insegura que pudiste observar <span class="text-danger">*</span>');
+    $('#label_ubicacion_insegura').html(esActo
+        ? '3. ¿Dónde ocurrieron los hechos? <span class="text-danger">*</span>'
+        : '1. ¿En dónde se encuentra la condición insegura? (Ubicación exacta) <span class="text-danger">*</span>');
+});
+
+function mostrarModalCondicionInsegura() {
+    $('#form_condicion_insegura')[0].reset();
+    $('#reporte_inseguro').trigger('change');
+    $('#modalCondicionInsegura').modal('show');
+}
+
 $(document).on('change', '#denunciando', function () {
   if ($(this).val() === "0") {
     // Opción "NO APLICA"

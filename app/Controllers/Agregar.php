@@ -798,6 +798,28 @@ class Agregar extends BaseController
         $response = $globals->getTabla(['tabla' => 'denuncia', 'where' => ['id_denuncia' => $id_denuncia]]);
         return $this->respond($response->data[0]);
     }
+
+    private function catalogoAccionesInseguras(): array
+    {
+        return [
+            1 => [
+                1 => 'Fumar en áreas no autorizadas',
+                2 => 'Desechar residuos fuera de los contenedores',
+                3 => 'Manejar de forma imprudente',
+                4 => 'Otro acto inseguro',
+            ],
+            2 => [
+                5 => 'Equipos o vehículos en mal estado',
+                6 => 'Pisos en mal estado',
+                7 => 'Falta de orden y aseo',
+                8 => 'Cables sueltos',
+                9 => 'Baños en mal estado',
+                10 => 'Iluminación o ventilación inadecuada',
+                11 => 'Otra condición insegura',
+            ],
+        ];
+    }
+
     public function Denuncia()
     {
         $session = \Config\Services::session();
@@ -807,6 +829,7 @@ class Agregar extends BaseController
             'tabla' => 'vw_usuario',
             'where' => ['visible' => 1]
         ])->data;
+        $data['acciones_inseguras'] = $this->catalogoAccionesInseguras();
         $data['scripts'] = array('inicio');
         $data['contentView'] = 'personal/vDenuncia';
         $this->_renderView($data);
@@ -2865,6 +2888,132 @@ class Agregar extends BaseController
             $this->enviarCorreoDenuncia();
 
         }
+        return $this->respond($response);
+    }
+
+    public function formCondicionInsegura()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal();
+        $response = new \stdClass();
+        $response->error = true;
+
+        $idReporte = (int) $this->request->getPost('id_reporte');
+        $idAccion = (int) $this->request->getPost('id_accion');
+        $anonimo = (int) $this->request->getPost('anonimo');
+        $ubicacion = trim((string) $this->request->getPost('ubicacion'));
+        $descripcion = trim((string) $this->request->getPost('descripcion'));
+        $propuesta = trim((string) $this->request->getPost('propuesta'));
+        $quien = trim((string) $this->request->getPost('quien'));
+        $fechaHechos = trim((string) $this->request->getPost('fecha_hechos'));
+        $testigos = (int) $this->request->getPost('testigos');
+        $catalogo = $this->catalogoAccionesInseguras();
+
+        if (!isset($catalogo[$idReporte][$idAccion])) {
+            $response->respuesta = 'Selecciona un tipo de reporte y una acción válidos.';
+            return $this->respond($response);
+        }
+
+        if (!in_array($anonimo, [1, 2], true) || $ubicacion === '' || $descripcion === '' || $propuesta === '') {
+            $response->respuesta = 'Todos los campos son obligatorios.';
+            return $this->respond($response);
+        }
+
+        if ($idReporte === 1 && ($quien === '' || $fechaHechos === '' || !in_array($testigos, [1, 2], true))) {
+            $response->respuesta = 'Completa todos los datos del acto inseguro.';
+            return $this->respond($response);
+        }
+
+        if ($idReporte === 1) {
+            $fecha = \DateTime::createFromFormat('Y-m-d\TH:i', $fechaHechos);
+            if (!$fecha || $fecha->format('Y-m-d\TH:i') !== $fechaHechos) {
+                $response->respuesta = 'La fecha y hora de los hechos no es válida.';
+                return $this->respond($response);
+            }
+            $fechaHechos = $fecha->format('Y-m-d H:i:s');
+        }
+
+        $evidencia = $this->request->getFile('evidencia_insegura');
+        if (!$evidencia || !$evidencia->isValid()) {
+            $response->respuesta = 'Es obligatorio adjuntar una evidencia válida.';
+            return $this->respond($response);
+        }
+
+        $extension = strtolower((string) $evidencia->getClientExtension());
+        $extensionesPermitidas = ['jpg', 'jpeg', 'png', 'pdf', 'mp4', 'mov'];
+        if (!in_array($extension, $extensionesPermitidas, true)) {
+            $response->respuesta = 'La evidencia debe ser JPG, PNG, PDF, MP4 o MOV.';
+            return $this->respond($response);
+        }
+
+        $tiposPermitidos = [
+            'image/jpeg',
+            'image/png',
+            'application/pdf',
+            'video/mp4',
+            'video/quicktime',
+        ];
+        if (!in_array((string) $evidencia->getMimeType(), $tiposPermitidos, true)) {
+            $response->respuesta = 'El contenido del archivo de evidencia no es válido.';
+            return $this->respond($response);
+        }
+
+        if ($evidencia->getSize() > 10 * 1024 * 1024) {
+            $response->respuesta = 'La evidencia no debe superar 10 MB.';
+            return $this->respond($response);
+        }
+
+        $rutaDestino = FCPATH . 'assets/uploads/condicion_insegura/';
+        if (!is_dir($rutaDestino) && !mkdir($rutaDestino, 0775, true) && !is_dir($rutaDestino)) {
+            $response->respuesta = 'No fue posible preparar la carpeta para la evidencia.';
+            return $this->respond($response);
+        }
+
+        $nombreArchivo = $evidencia->getRandomName();
+        try {
+            $evidencia->move($rutaDestino, $nombreArchivo);
+        } catch (\Throwable $e) {
+            log_message('error', 'Error al guardar evidencia de condición insegura: ' . $e->getMessage());
+            $response->respuesta = 'No fue posible guardar la evidencia.';
+            return $this->respond($response);
+        }
+
+        $rutaRelativa = 'assets/uploads/condicion_insegura/' . $nombreArchivo;
+        $detalle = [
+            'anonimo' => $anonimo === 1 ? 'SI' : 'NO',
+            'tipo_reporte' => $idReporte === 1 ? 'ACTO INSEGURO' : 'CONDICIÓN INSEGURA',
+            'accion' => $catalogo[$idReporte][$idAccion],
+            'quien' => $idReporte === 1 ? $quien : null,
+            'descripcion' => $descripcion,
+            'ubicacion' => $ubicacion,
+            'fecha_hechos' => $idReporte === 1 ? $fechaHechos : null,
+            'hubo_testigos' => $idReporte === 1 ? ($testigos === 1 ? 'SI' : 'NO') : null,
+            'evidencia' => $rutaRelativa,
+            'propuesta' => $propuesta,
+        ];
+
+        $dataInsert = [
+            'id_reporte' => $idReporte,
+            'id_accion' => $idAccion,
+            'propuesta' => json_encode($detalle, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT),
+            'usu_reg' => $session->get('id_usuario'),
+            'fec_reg' => date('Y-m-d H:i:s'),
+            'visible' => 1,
+        ];
+        $dataConfig = [
+            'tabla' => 'condicion_insegura',
+            'editar' => false,
+        ];
+        $dataBitacora = [
+            'id_user' => $session->get('id_usuario'),
+            'script' => 'Agregar.php/formCondicionInsegura',
+        ];
+
+        $response = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
+        if ($response->error && is_file(FCPATH . $rutaRelativa)) {
+            unlink(FCPATH . $rutaRelativa);
+        }
+
         return $this->respond($response);
     }
     public function formInventario()
