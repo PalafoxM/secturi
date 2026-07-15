@@ -36,6 +36,7 @@ $configuracionModulo = [
     ],
     'convenio' => [
         'ruta_listado' => 'index.php/Principal/ListaSolicitudConvenio',
+        'ruta_subir_archivos' => 'index.php/Principal/subirArchivosSolicitudConvenio',
         'titulo' => 'Archivos de Solicitud',
         'campo_id_archivo' => 'id_archivo',
         'ruta_archivo' => 'assets/uploads/convenios/',
