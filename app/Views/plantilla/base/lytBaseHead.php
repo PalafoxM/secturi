@@ -553,6 +553,7 @@
                                     </li>
                                     <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaIncidencia">Lista de
                                             Incidencia</a></li>
+                                    <li><a href="<?php echo base_url(); ?>index.php/Inicio/listaInsegura">Denuncias</a></li>
 
                                 </ul>
                             </li><!--end nav-item-->

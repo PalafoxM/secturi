@@ -2883,6 +2883,75 @@ class Inicio extends BaseController
         $this->_renderView($data);
 
     }
+    public function listaInsegura()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal();
+        $data = array();
+
+        $consultaReportes = $globals->getTabla([
+            'tabla' => 'condicion_insegura',
+            'where' => ['visible' => 1],
+            'order' => ['id_condicion_insegura' => 'DESC'],
+        ]);
+        $registros = (!empty($consultaReportes->data)) ? $consultaReportes->data : [];
+
+        $consultaUsuarios = $globals->getTabla([
+            'tabla' => 'vw_usuario',
+            'where' => ['visible' => 1],
+        ]);
+        $usuarios = [];
+        foreach (($consultaUsuarios->data ?? []) as $usuario) {
+            if (isset($usuario->id_usuario)) {
+                $usuarios[(int) $usuario->id_usuario] = trim((string) ($usuario->nombre_completo ?? ''));
+            }
+        }
+
+        $reportes = [];
+        foreach ($registros as $registro) {
+            $detalle = json_decode((string) ($registro->propuesta ?? ''), true);
+            if (!is_array($detalle)) {
+                $detalle = ['propuesta' => (string) ($registro->propuesta ?? '')];
+            }
+
+            $idReporte = (int) ($registro->id_reporte ?? 0);
+            $idAccion = (int) ($registro->id_accion ?? 0);
+            $esAnonimo = strtoupper(trim((string) ($detalle['anonimo'] ?? 'NO'))) === 'SI';
+            $idUsuario = (int) ($registro->usu_reg ?? 0);
+            $evidencia = ltrim(str_replace('\\', '/', (string) ($detalle['evidencia'] ?? '')), '/');
+            $evidenciaUrl = strpos($evidencia, 'assets/uploads/condicion_insegura/') === 0
+                ? base_url($evidencia)
+                : '';
+
+            $reportes[] = [
+                'id' => (int) ($registro->id_condicion_insegura ?? 0),
+                'id_reporte' => $idReporte,
+                'tipo_reporte' => (string) ($detalle['tipo_reporte'] ?? ($idReporte === 1 ? 'ACTO INSEGURO' : 'CONDICIÓN INSEGURA')),
+                'id_accion' => $idAccion,
+                'accion' => (string) ($detalle['accion'] ?? ('Acción #' . $idAccion)),
+                'anonimo' => $esAnonimo ? 'SI' : 'NO',
+                'reportante' => $esAnonimo
+                    ? 'ANÓNIMO'
+                    : ($usuarios[$idUsuario] ?? ($idUsuario > 0 ? 'Usuario #' . $idUsuario : 'No disponible')),
+                'quien' => (string) ($detalle['quien'] ?? ''),
+                'descripcion' => (string) ($detalle['descripcion'] ?? ''),
+                'ubicacion' => (string) ($detalle['ubicacion'] ?? ''),
+                'fecha_hechos' => (string) ($detalle['fecha_hechos'] ?? ''),
+                'hubo_testigos' => (string) ($detalle['hubo_testigos'] ?? ''),
+                'evidencia' => $evidencia,
+                'evidencia_url' => $evidenciaUrl,
+                'propuesta' => (string) ($detalle['propuesta'] ?? ''),
+                'fecha_registro' => (string) ($registro->fec_reg ?? ''),
+            ];
+        }
+
+        $data['reportes'] = $reportes;
+        $data['scripts'] = array('principal', 'inicio');
+        $data['edita'] = 0;
+        $data['contentView'] = 'secciones/vlistaInsegura';
+        $this->_renderView($data);
+
+    }
     public function Preinscritos()
     {
         $session = \Config\Services::session();
