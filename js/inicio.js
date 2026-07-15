@@ -3616,6 +3616,49 @@ ini.inicio = (function () {
             });
 
         },
+        formCondicionInsegura: function () {
+            const form = document.getElementById('form_condicion_insegura');
+            if (!form || !form.checkValidity()) {
+                if (form) {
+                    form.reportValidity();
+                }
+                return;
+            }
+
+            const formData = new FormData(form);
+            $.ajax({
+                type: "POST",
+                url: base_url + "index.php/Agregar/formCondicionInsegura",
+                data: formData,
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                beforeSend: function () {
+                    $('#btnCondicionInsegura').prop('disabled', true)
+                        .html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                },
+                success: function (response) {
+                    if (response.error) {
+                        Swal.fire("Error", response.respuesta, "error");
+                        return;
+                    }
+
+                    $('#modalCondicionInsegura').modal('hide');
+                    form.reset();
+                    Swal.fire("Reporte enviado", response.respuesta || "El reporte se guardó correctamente.", "success");
+                },
+                complete: function () {
+                    $('#btnCondicionInsegura').prop('disabled', false).html('Enviar reporte');
+                },
+                error: function (xhr) {
+                    let mensaje = 'No fue posible guardar el reporte.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        mensaje = xhr.responseJSON.message;
+                    }
+                    Swal.fire("Error", mensaje, "error");
+                }
+            });
+        },
         agregarInventario: function () {
 
             $("#modelInventarios").modal('show');
