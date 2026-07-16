@@ -10311,6 +10311,245 @@ class Principal extends BaseController
         $data['contentView'] = 'secciones/vFormatoPagoTerceros';
         $this->_renderView($data);
     }
+    public function Igto()
+    {
+        $globals = new Mglobal;
+        $proyecto = $globals->getTabla([
+            'tabla' => 'cat_proyecto_q',
+            'where' => ['visible' => 1],
+        ]);
+
+        $data = [];
+        $data['proyecto'] = (!empty($proyecto->data)) ? $proyecto->data : [];
+        $data['scripts'] = ['principal'];
+        $data['contentView'] = 'secciones/vIgto';
+        $this->_renderView($data);
+    }
+
+    public function guardarIgto()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $post = $this->request->getPost();
+
+        $required = [
+            'folio_obra_accion' => 'Folio de obra/acción',
+            'ejercicio' => 'Ejercicio',
+            'proyecto_de_inversion' => 'Proyecto de inversión',
+            'meta_sed' => 'Meta SED',
+            'dependencia' => 'Dependencia',
+            'nombre_obra_accion' => 'Nombre de la obra o acción',
+            'empleos_permanentes_mujeres' => 'Empleos permanentes de mujeres',
+            'empleos_eventuales_mujeres' => 'Empleos eventuales de mujeres',
+            'empleos_protegidos_mujeres' => 'Empleos protegidos de mujeres',
+            'empleos_permanentes_hombres' => 'Empleos permanentes de hombres',
+            'empleos_eventuales_hombres' => 'Empleos eventuales de hombres',
+            'empleos_protegidos_hombres' => 'Empleos protegidos de hombres',
+            'nombre_simplificado' => 'Nombre simplificado',
+            'categoria' => 'Categoría',
+            'subcategoria' => 'Subcategoría',
+            'fecha_entrega' => 'Fecha de entrega',
+            'latitud' => 'Latitud',
+            'longitud' => 'Longitud',
+            'estado' => 'Estado',
+            'municipio' => 'Municipio',
+            'localidad' => 'Localidad',
+            'tipo_asentamiento' => 'Tipo de asentamiento',
+            'monto_total_modificado_sfia' => 'Monto total modificado SFIA',
+            'monto_total_pagado_mas_devengado_sfia' => 'Monto total pagado más devengado SFIA',
+            'es_refrendo' => 'Es refrendo',
+            'ano_de_refrendo' => 'Año de refrendo',
+            'tipo_obraaccion' => 'Tipo de obra/acción',
+            'tipo' => 'Tipo',
+            'estatus' => 'Estatus',
+            'estatus_avance' => 'Estatus de avance',
+            'beneficiarios_totales' => 'Beneficiarios totales',
+            'beneficiarios_mujeres' => 'Beneficiarias mujeres',
+            'beneficiarios_hombres' => 'Beneficiarios hombres',
+            'informe_de_gobierno' => 'Informe de gobierno',
+            'situacion' => 'Situación',
+            'avance_financiero' => 'Avance financiero',
+            'avance_fisico' => 'Avance físico',
+            'avance_financiero_sfia' => 'Avance financiero SFIA',
+            'eje_estrategico' => 'Eje estratégico',
+            'cifras_estimadas' => 'Cifras estimadas',
+            'activo' => 'Activo',
+        ];
+
+        $modifiedFields = [
+            'monto_modificado_estatal', 'monto_modificado_deuda',
+            'monto_modificado_recurso_propio', 'monto_modificado_federal',
+            'monto_modificado_municipal', 'monto_modificado_otro',
+            'monto_modificado_beneficiario',
+        ];
+        $accruedFields = [
+            'monto_pagado_mas_devengado_estatal', 'monto_pagado_mas_devengado_deuda',
+            'monto_pagado_mas_devengado_recurso_propios', 'monto_pagado_mas_devengado_federal',
+            'monto_pagado_mas_devengado_municipal', 'monto_pagado_mas_devengado_otro',
+            'monto_pagado_mas_devengado_beneficiario',
+        ];
+        foreach (array_merge($modifiedFields, $accruedFields) as $field) {
+            $required[$field] = str_replace('_', ' ', ucfirst($field));
+        }
+
+        foreach ($required as $field => $label) {
+            if (!array_key_exists($field, $post) || trim((string) $post[$field]) === '') {
+                return $this->response->setJSON([
+                    'error' => true,
+                    'respuesta' => 'El campo «' . $label . '» es obligatorio.',
+                ]);
+            }
+        }
+
+        $numericFields = array_merge($modifiedFields, $accruedFields, [
+            'ejercicio', 'empleos_permanentes_mujeres', 'empleos_eventuales_mujeres',
+            'empleos_protegidos_mujeres', 'empleos_permanentes_hombres',
+            'empleos_eventuales_hombres', 'empleos_protegidos_hombres', 'latitud', 'longitud',
+            'monto_total_modificado_sfia', 'monto_total_pagado_mas_devengado_sfia',
+            'ano_de_refrendo', 'beneficiarios_totales', 'beneficiarios_mujeres',
+            'beneficiarios_hombres', 'informe_de_gobierno', 'avance_financiero',
+            'avance_fisico', 'avance_financiero_sfia', 'cifras_estimadas',
+        ]);
+        foreach ($numericFields as $field) {
+            if (!is_numeric($post[$field] ?? null)) {
+                return $this->response->setJSON([
+                    'error' => true,
+                    'respuesta' => 'El campo «' . str_replace('_', ' ', $field) . '» debe ser numérico.',
+                ]);
+            }
+        }
+
+        $integerFields = [
+            'ejercicio', 'empleos_permanentes_mujeres', 'empleos_eventuales_mujeres',
+            'empleos_protegidos_mujeres', 'empleos_permanentes_hombres',
+            'empleos_eventuales_hombres', 'empleos_protegidos_hombres', 'ano_de_refrendo',
+            'beneficiarios_totales', 'beneficiarios_mujeres', 'beneficiarios_hombres',
+            'informe_de_gobierno', 'cifras_estimadas',
+        ];
+        foreach ($integerFields as $field) {
+            if (filter_var($post[$field], FILTER_VALIDATE_INT) === false || (int) $post[$field] < 0) {
+                return $this->response->setJSON([
+                    'error' => true,
+                    'respuesta' => 'El campo «' . str_replace('_', ' ', $field) . '» debe ser un entero mayor o igual a cero.',
+                ]);
+            }
+        }
+        foreach (array_merge($modifiedFields, $accruedFields, [
+            'monto_total_modificado_sfia', 'monto_total_pagado_mas_devengado_sfia',
+            'avance_financiero_sfia',
+        ]) as $field) {
+            if ((float) $post[$field] < 0) {
+                return $this->response->setJSON(['error' => true, 'respuesta' => 'Los montos no pueden ser negativos.']);
+            }
+        }
+        foreach (['numero_exterior', 'numero_exterior_2'] as $field) {
+            if (isset($post[$field]) && trim((string) $post[$field]) !== '' &&
+                (filter_var($post[$field], FILTER_VALIDATE_INT) === false || (int) $post[$field] < 0)) {
+                return $this->response->setJSON(['error' => true, 'respuesta' => 'Los números exteriores deben ser enteros válidos.']);
+            }
+        }
+        if (!in_array((string) $post['es_refrendo'], ['0', '1'], true) ||
+            !in_array((string) $post['activo'], ['SI', 'NO'], true)) {
+            return $this->response->setJSON(['error' => true, 'respuesta' => 'Los valores de control no son válidos.']);
+        }
+        $deliveryDate = \DateTime::createFromFormat('Y-m-d', (string) $post['fecha_entrega']);
+        if (!$deliveryDate || $deliveryDate->format('Y-m-d') !== $post['fecha_entrega']) {
+            return $this->response->setJSON(['error' => true, 'respuesta' => 'La fecha de entrega no es válida.']);
+        }
+
+        $latitude = (float) $post['latitud'];
+        $longitude = (float) $post['longitud'];
+        if ($latitude < -90 || $latitude > 90 || $longitude < -180 || $longitude > 180) {
+            return $this->response->setJSON(['error' => true, 'respuesta' => 'Las coordenadas no son válidas.']);
+        }
+        foreach (['avance_financiero', 'avance_fisico'] as $field) {
+            $value = (float) $post[$field];
+            if ($value < 0 || $value > 100) {
+                return $this->response->setJSON([
+                    'error' => true,
+                    'respuesta' => 'Los porcentajes de avance deben estar entre 0 y 100.',
+                ]);
+            }
+        }
+
+        $folio = trim((string) $post['folio_obra_accion']);
+        $existing = $globals->getTabla([
+            'tabla' => 'obras_acciones',
+            'where' => ['folio_obra_accion' => $folio],
+        ]);
+        if (!empty($existing->data)) {
+            return $this->response->setJSON([
+                'error' => true,
+                'respuesta' => 'Ya existe una obra o acción con el folio ' . $folio . '.',
+            ]);
+        }
+
+        $nullableFields = [
+            'nombre_asentamiento', 'tipo_vialidad', 'nombre_vialidad', 'numero_exterior',
+            'numero_exterior_2', 'codigo_postal', 'zona_impulso',
+            'observaciones_estatus_avance', 'observaciones_generales', 'cct',
+            'observaciones_avance_fisico', 'folio_relacionado', 'metas',
+            'alineacion_programa_gobierno_y_sectorial',
+            'alineacion_agenda_transversal_y_programa_especial',
+            'alineacion_otros_instrumentos', 'enfoque',
+        ];
+        $allowedFields = array_unique(array_merge(array_keys($required), $nullableFields));
+        $dataInsert = [];
+        foreach ($allowedFields as $field) {
+            $value = isset($post[$field]) ? trim((string) $post[$field]) : '';
+            $dataInsert[$field] = in_array($field, $nullableFields, true) && $value === '' ? null : $value;
+        }
+
+        $dataInsert['monto_total_modificado'] = array_sum(array_map(
+            static fn($field) => (float) $post[$field],
+            $modifiedFields
+        ));
+        $dataInsert['monto_total_pagado_mas_devengado'] = array_sum(array_map(
+            static fn($field) => (float) $post[$field],
+            $accruedFields
+        ));
+        $dataInsert['beneficiarios_totales'] = (int) $post['beneficiarios_mujeres'] + (int) $post['beneficiarios_hombres'];
+        $dataInsert['es_refrendo'] = ((int) $post['es_refrendo'] === 1) ? 1 : 0;
+        $dataInsert['ano_de_refrendo'] = $dataInsert['es_refrendo'] ? (int) $post['ano_de_refrendo'] : 0;
+        $dataInsert['visible'] = 1;
+
+        $now = date('Y-m-d H:i:s');
+        $userName = trim((string) ($session->get('nombre_completo') ?: $session->get('usuario') ?: 'SUSI'));
+        $dataInsert['primera_actualizacion'] = $now;
+        $dataInsert['ultima_actualizacion'] = $now;
+        $dataInsert['usuario_inserto'] = mb_substr($userName, 0, 50);
+        $dataInsert['usuario_ultima_modificacion'] = mb_substr($userName, 0, 50);
+
+        $result = $globals->saveTabla(
+            $dataInsert,
+            ['tabla' => 'obras_acciones', 'editar' => false],
+            ['id_user' => $session->get('id_usuario'), 'script' => 'Principal.php/guardarIgto']
+        );
+
+        return $this->response->setJSON([
+            'error' => (bool) ($result->error ?? true),
+            'respuesta' => ($result->error ?? true)
+                ? ($result->respuesta ?? 'No fue posible guardar el registro.')
+                : 'La obra o acción se guardó correctamente.',
+        ]);
+    }
+
+    public function ListaIgto()
+    {
+        $globals = new Mglobal;
+        $data = array();
+        $data['editar'] = 0;
+
+        $proyecto = $globals->getTabla(["tabla" => "cat_proyecto_q", "where" => ["visible" => 1]]);
+        $registro = $globals->getTabla(["tabla" => "obras_acciones", "where" => ["visible" => 1]]);
+        $data['proyecto'] = (!empty($proyecto->data)) ? $proyecto->data : [];
+        $data['registro'] = (!empty($registro->data)) ? $registro->data : [];
+
+        $data['scripts'] = array('principal');
+        $data['contentView'] = 'secciones/vListaIgto';
+        $this->_renderView($data);
+
+    }
     public function FormatoMateriales()
     {
         $session = \Config\Services::session();
