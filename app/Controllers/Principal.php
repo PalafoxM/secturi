@@ -10474,7 +10474,7 @@ class Principal extends BaseController
 
         $folio = trim((string) $post['folio_obra_accion']);
         $existing = $globals->getTabla([
-            'tabla' => 'obras_acciones',
+            'tabla' => 'obras_acciones_turismo',
             'where' => ['folio_obra_accion' => $folio],
         ]);
         if (!empty($existing->data)) {
@@ -10522,7 +10522,7 @@ class Principal extends BaseController
 
         $result = $globals->saveTabla(
             $dataInsert,
-            ['tabla' => 'obras_acciones', 'editar' => false],
+            ['tabla' => 'obras_acciones_turismo', 'editar' => false],
             ['id_user' => $session->get('id_usuario'), 'script' => 'Principal.php/guardarIgto']
         );
 
