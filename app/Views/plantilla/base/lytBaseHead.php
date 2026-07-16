@@ -389,6 +389,11 @@
                         data-trigger="hover" title="" data-original-title="Jurídico">
                         <i class="fas fa-balance-scale align-self-center menu-icon icon-dual"></i>
                     </a> <!--end MetricaAuthentication-->
+
+                    <a href="#MetricaAuthentication2" class="nav-link" data-toggle="tooltip-custom" data-placement="right"
+                        data-trigger="hover" title="" data-original-title="Registro IGTO">
+                        <i class="fas fa-map-marker-alt align-self-center menu-icon icon-dual"></i>
+                    </a> <!--end MetricaAuthentication-->
          
 
 
@@ -686,6 +691,21 @@
 
                     </ul>
                 </div><!-- end Authentication-->
+                <?php if (in_array($session->get('id_perfil'),[1,10])): ?>
+                <div id="MetricaAuthentication2" class="main-icon-menu-pane">
+                    <div class="title-box">
+                        <h6 class="menu-title">IGTO</h6>
+                    </div>
+                    <ul class="nav">
+                         <li class="nav-item"><a class="nav-link"
+                                href="<?php echo base_url(); ?>index.php/Principal/Igto">Nueva obra o acción</a>
+                        </li>
+                         <li class="nav-item"><a class="nav-link"
+                                href="<?php echo base_url(); ?>index.php/Principal/ListaIgto">Lista IGTO</a>
+                        </li>
+                    </ul>
+                </div><!-- end Authentication-->
+                <?php endif; ?>
             </div>
             <!--end menu-body-->
         </div><!-- end main-menu-inner-->
