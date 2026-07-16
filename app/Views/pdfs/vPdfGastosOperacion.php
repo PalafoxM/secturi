@@ -157,18 +157,6 @@
                             'tipo' => 'principal'
                         ];
 
-                        if ($tieneRetenciones) {
-                            $detalleRows[] = [
-                                'comprobante' => $r->no_comprobante ?? '',
-                                'proyecto' => 'IVA',
-                                'partida' => '',
-                                'importe' => '$' . number_format((float) ($r->iva_calculado ?? 0), 2),
-                                'proveedor' => $r->proveedor ?? '',
-                                'rfc' => $r->rfc ?? '',
-                                'tipo' => 'impuesto'
-                            ];
-                        }
-
                         if (isset($r->isr) && (float)$r->isr > 0) {
                             $detalleRows[] = [
                                 'comprobante' => $r->no_comprobante ?? '',

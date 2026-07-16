@@ -4721,7 +4721,7 @@ class Inicio extends BaseController
                 $subtotal = $subtotalCapturado > 0
                     ? $subtotalCapturado
                     : ($subtotalXml > 0 ? $subtotalXml : $importe);
-                $iva = max(0, round($importe - $subtotal, 2));
+                $iva = round($subtotal * 0.16, 2);
             }
 
             $factura->tiene_retenciones_calculadas = $tieneRetenciones;
