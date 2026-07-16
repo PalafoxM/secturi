@@ -10541,7 +10541,7 @@ class Principal extends BaseController
         $data['editar'] = 0;
 
         $proyecto = $globals->getTabla(["tabla" => "cat_proyecto_q", "where" => ["visible" => 1]]);
-        $registro = $globals->getTabla(["tabla" => "obras_acciones", "where" => ["visible" => 1]]);
+        $registro = $globals->getTabla(["tabla" => "obras_acciones_turismo", "where" => ["visible" => 1]]);
         $data['proyecto'] = (!empty($proyecto->data)) ? $proyecto->data : [];
         $data['registro'] = (!empty($registro->data)) ? $registro->data : [];
 
