@@ -89,6 +89,15 @@ foreach ($records as $record) {
     </div>
 </div>
 
+<link href="<?= base_url() ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+<link href="<?= base_url() ?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
+<script src="<?= base_url() ?>assets/js/jquery.min.js"></script>
+<script src="<?= base_url() ?>plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="<?= base_url() ?>plugins/datatables/dataTables.bootstrap4.min.js"></script>
+<script src="<?= base_url() ?>plugins/select2/select2.min.js"></script>
+<link href="<?php echo base_url(); ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
+
+
 <script>
 const igtoRecords = <?= json_encode($recordsForJs, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?: '[]' ?>;
 const igtoLabels = {
