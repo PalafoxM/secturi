@@ -4701,23 +4701,47 @@ class Inicio extends BaseController
         return $letras;
     }
 
-    private function calcularImporteNetoFacturas(array $facturas): float
+    private function prepararDesgloseFiscalFacturas(array $facturas): array
     {
-        $importeNeto = 0.0;
+        $resultado = [];
 
         foreach ($facturas as $factura) {
             $importe = (float) str_replace(',', '', (string) ($factura->importe ?? 0));
             $propina = (float) str_replace(',', '', (string) ($factura->propinas ?? 0));
             $isr = (float) str_replace(',', '', (string) ($factura->isr ?? 0));
             $isrCedular = (float) str_replace(',', '', (string) ($factura->impuesto_local ?? 0));
+            $tieneRetenciones = $isr > 0 || $isrCedular > 0;
 
-            $importeNeto += $importe + $propina;
-            if ($isr > 0) {
-                $importeNeto -= $isr;
+            $subtotal = $importe;
+            $iva = 0.0;
+
+            if ($tieneRetenciones) {
+                $subtotalCapturado = (float) str_replace(',', '', (string) ($factura->sub_total ?? 0));
+                $subtotalXml = (float) str_replace(',', '', (string) ($factura->xml_subtotal ?? 0));
+                $subtotal = $subtotalCapturado > 0
+                    ? $subtotalCapturado
+                    : ($subtotalXml > 0 ? $subtotalXml : $importe);
+                $iva = max(0, round($importe - $subtotal, 2));
             }
-            if ($isrCedular > 0) {
-                $importeNeto -= $isrCedular;
-            }
+
+            $factura->tiene_retenciones_calculadas = $tieneRetenciones;
+            $factura->subtotal_calculado = round($subtotal, 2);
+            $factura->iva_calculado = round($iva, 2);
+            $factura->total_calculado = $tieneRetenciones
+                ? round($subtotal + $iva - $isr - $isrCedular, 2)
+                : round($importe + $propina, 2);
+            $resultado[] = $factura;
+        }
+
+        return $resultado;
+    }
+
+    private function calcularImporteNetoFacturas(array $facturas): float
+    {
+        $importeNeto = 0.0;
+
+        foreach ($this->prepararDesgloseFiscalFacturas($facturas) as $factura) {
+            $importeNeto += (float) $factura->total_calculado;
         }
 
         return round($importeNeto, 2);
@@ -4778,12 +4802,13 @@ class Inicio extends BaseController
                 
                 // Fetch items
                 $items = $globals->getTabla(["tabla" => "manual_factura", "where" => ["id_registro_pt" => $id, "visible" => 1]]);
-                $data['periodo_factura_rows'] = $items->data ?? [];
+                $data['periodo_factura_rows'] = $this->prepararDesgloseFiscalFacturas($items->data ?? []);
                 $rows = count($data['periodo_factura_rows']);
                 $data['rows'] = $rows;
 
                 /*
-                 * Total por factura: importe + propina - ISR - ISR cedular.
+                 * Total por factura con retenciones:
+                 * subtotal + IVA - ISR - ISR cedular.
                  * Cada retención se descuenta únicamente de la factura que la contiene.
                  */
                 $importeTotalPdf = $this->calcularImporteNetoFacturas($data['periodo_factura_rows']);
