@@ -59,7 +59,7 @@
                 <div style="color: #666; font-weight: bold; margin-bottom: 5px;">SECRETARÍA DE TURISMO E IDENTIDAD</div>
             </td>
              <td width="55%" class="no-border" style="vertical-align: top; text-align: right; font-size: 8pt;">
-                Relación de <span style="border-bottom: 1px solid #000; padding: 0 5px;">&nbsp;<?= $registro_pt->relacion ?>&nbsp;</span> documentos que amparan un importe de <span style="border-bottom: 1px solid #000; padding: 0 5px;">&nbsp;<?= isset($registro_pt->importe_total_num) ? $registro_pt->importe_total_num : '0.00' ?>&nbsp;</span><br>
+                Relación de <span style="border-bottom: 1px solid #000; padding: 0 5px;">&nbsp;<?= $registro_pt->relacion ?>&nbsp;</span> documentos que amparan un importe de <span style="border-bottom: 1px solid #000; padding: 0 5px;">&nbsp;<?= $importe_total_pdf_formato ?? ($registro_pt->importe_total_num ?? '$0.00') ?>&nbsp;</span><br>
                 que se envían para su revisión y trámite de pago
             </td>
         </tr>
@@ -142,18 +142,7 @@
 
                 if (!empty($rows)) {
                     foreach ($rows as $r) {
-                        $tieneRetenciones = (isset($r->isr) && (float)$r->isr > 0) || (isset($r->impuesto_local) && (float)$r->impuesto_local > 0);
                         $importePrincipal = (float)str_replace(',', '', $r->importe ?? 0) + (float)str_replace(',', '', $r->propinas ?? 0);
-
-                        if ($tieneRetenciones) {
-                            if (isset($r->sub_total) && $r->sub_total !== '' && $r->sub_total !== null) {
-                                $importePrincipal = (float)str_replace(',', '', $r->sub_total);
-                            } elseif (isset($r->xml_subtotal) && $r->xml_subtotal !== '' && $r->xml_subtotal !== null) {
-                                $importePrincipal = (float)str_replace(',', '', $r->xml_subtotal);
-                            } elseif (isset($r->subtotal) && $r->subtotal !== '' && $r->subtotal !== null) {
-                                $importePrincipal = (float)str_replace(',', '', $r->subtotal);
-                            }
-                        }
 
                         $detalleRows[] = [
                             'comprobante' => $r->no_comprobante ?? '',
@@ -170,7 +159,7 @@
                                 'comprobante' => $r->no_comprobante ?? '',
                                 'proyecto' => 'ISR',
                                 'partida' => '',
-                                'importe' => '$' . number_format((float)$r->isr, 2),
+                                'importe' => '-$' . number_format((float)$r->isr, 2),
                                 'proveedor' =>   $r->proveedor ?? '',
                                 'rfc' => $r->rfc ?? '',
                                 'tipo' => 'retencion'
@@ -182,7 +171,7 @@
                                 'comprobante' => $r->no_comprobante ?? '',
                                 'proyecto' => ' ISR CEDULAR',
                                 'partida' => '',
-                                'importe' => '$' . number_format((float)$r->impuesto_local, 2),
+                                'importe' => '-$' . number_format((float)$r->impuesto_local, 2),
                                 'proveedor' => $r->proveedor ?? '',
                                 'rfc' => $r->rfc ?? '',
                                 'tipo' => 'retencion'
@@ -222,10 +211,10 @@
                     IMPORTE TOTAL
                 </td>
                 <td class="text-center font-bold" style="border-top: 1px solid #000;">
-                    <?= isset($registro_pt->importe_total_num) ? $registro_pt->importe_total_num : '0.00' ?>
+                    <?= $importe_total_pdf_formato ?? ($registro_pt->importe_total_num ?? '$0.00') ?>
                 </td>
                 <td colspan="2" class="text-center font-bold" style="background-color: #f9f9f9; border-top: 1px solid #000;">
-                    <?= isset($registro_pt->importe_letra) ? $registro_pt->importe_letra : '' ?>
+                    <?= $importe_total_pdf_letra ?? ($registro_pt->importe_letra ?? '') ?>
                 </td>
             </tr>
         </tfoot>
