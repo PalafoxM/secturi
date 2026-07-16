@@ -40,7 +40,7 @@
     <div class="body-text">
         Por medio de la presente, me permito solicitar su apoyo para que se realice el tramite de Gasto de Operación 
         con folio <strong><?= isset($registro_pt->no_consecutivo) ? $registro_pt->no_consecutivo : '000' ?></strong> 
-        por la cantidad de <strong><?= $registro_pt->importe_total_num ?> (<?= $registro_pt->importe_letra ?? 'CERO PESOS 00/100 M.N.' ?>)</strong>,
+        por la cantidad de <strong><?= $subtotal_neto_formato ?? ($registro_pt->importe_total_num ?? '$0.00') ?> (<?= $subtotal_neto_letra ?? ($registro_pt->importe_letra ?? 'CERO PESOS 00/100 M.N.') ?>)</strong>,
         por concepto de <?= isset($registro_pt->concepto) ? $registro_pt->concepto : 'Concepto no especificado' ?>.
     </div>
 
