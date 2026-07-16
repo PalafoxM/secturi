@@ -24,6 +24,9 @@ foreach ($records as $record) {
             <div class="col-sm-12">
                 <div class="page-title-box">
                     <div class="float-right">
+                        <a class="btn btn-info mr-2" href="<?= base_url('index.php/Principal/Mapa') ?>">
+                            <i class="fas fa-map-marked-alt mr-1"></i>Mapa
+                        </a>
                         <a class="btn btn-primary" href="<?= base_url('index.php/Principal/Igto') ?>">
                             <i class="fas fa-plus mr-1"></i>Nueva obra o acción
                         </a>

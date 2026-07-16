@@ -10550,6 +10550,22 @@ class Principal extends BaseController
         $this->_renderView($data);
 
     }
+    public function Mapa()
+    {
+        $globals = new Mglobal;
+        $registro = $globals->getTabla([
+            'tabla' => 'obras_acciones_turismo',
+            'select' => 'folio_obra_accion, nombre_obra_accion, latitud, longitud',
+            'where' => ['visible' => 1],
+        ]);
+
+        $data = [];
+        $data['registro'] = (!empty($registro->data)) ? $registro->data : [];
+        $data['scripts'] = ['principal'];
+        $data['contentView'] = 'secciones/vMapa';
+        $this->_renderView($data);
+    }
+
     public function FormatoMateriales()
     {
         $session = \Config\Services::session();
