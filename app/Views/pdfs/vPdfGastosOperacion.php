@@ -142,17 +142,32 @@
 
                 if (!empty($rows)) {
                     foreach ($rows as $r) {
-                        $importePrincipal = (float)str_replace(',', '', $r->importe ?? 0) + (float)str_replace(',', '', $r->propinas ?? 0);
+                        $tieneRetenciones = !empty($r->tiene_retenciones_calculadas);
+                        $importePrincipal = $tieneRetenciones
+                            ? (float) ($r->subtotal_calculado ?? 0)
+                            : (float) str_replace(',', '', $r->importe ?? 0) + (float) str_replace(',', '', $r->propinas ?? 0);
 
                         $detalleRows[] = [
                             'comprobante' => $r->no_comprobante ?? '',
-                            'proyecto' => $r->proyecto ?? '',
+                            'proyecto' => $tieneRetenciones ? 'SUBTOTAL' : ($r->proyecto ?? ''),
                             'partida' => $r->partida ?? '',
                             'importe' => '$' . number_format($importePrincipal, 2),
                             'proveedor' => $r->proveedor ?? '',
                             'rfc' => $r->rfc ?? '',
                             'tipo' => 'principal'
                         ];
+
+                        if ($tieneRetenciones) {
+                            $detalleRows[] = [
+                                'comprobante' => $r->no_comprobante ?? '',
+                                'proyecto' => 'IVA',
+                                'partida' => '',
+                                'importe' => '$' . number_format((float) ($r->iva_calculado ?? 0), 2),
+                                'proveedor' => $r->proveedor ?? '',
+                                'rfc' => $r->rfc ?? '',
+                                'tipo' => 'impuesto'
+                            ];
+                        }
 
                         if (isset($r->isr) && (float)$r->isr > 0) {
                             $detalleRows[] = [
