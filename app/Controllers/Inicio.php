@@ -4701,6 +4701,28 @@ class Inicio extends BaseController
         return $letras;
     }
 
+    private function calcularImporteNetoFacturas(array $facturas): float
+    {
+        $importeNeto = 0.0;
+
+        foreach ($facturas as $factura) {
+            $importe = (float) str_replace(',', '', (string) ($factura->importe ?? 0));
+            $propina = (float) str_replace(',', '', (string) ($factura->propinas ?? 0));
+            $isr = (float) str_replace(',', '', (string) ($factura->isr ?? 0));
+            $isrCedular = (float) str_replace(',', '', (string) ($factura->impuesto_local ?? 0));
+
+            $importeNeto += $importe + $propina;
+            if ($isr > 0) {
+                $importeNeto -= $isr;
+            }
+            if ($isrCedular > 0) {
+                $importeNeto -= $isrCedular;
+            }
+        }
+
+        return round($importeNeto, 2);
+    }
+
 
     public function listaGastosOperacion()
     {
@@ -4764,23 +4786,7 @@ class Inicio extends BaseController
                  * Total por factura: importe + propina - ISR - ISR cedular.
                  * Cada retención se descuenta únicamente de la factura que la contiene.
                  */
-                $importeTotalPdf = 0.0;
-                foreach ($data['periodo_factura_rows'] as $item) {
-                    $importeFactura = (float) str_replace(',', '', (string) ($item->importe ?? 0));
-                    $propina = (float) str_replace(',', '', (string) ($item->propinas ?? 0));
-                    $isr = (float) str_replace(',', '', (string) ($item->isr ?? 0));
-                    $isrCedular = (float) str_replace(',', '', (string) ($item->impuesto_local ?? 0));
-
-                    $importeTotalPdf += $importeFactura + $propina;
-                    if ($isr > 0) {
-                        $importeTotalPdf -= $isr;
-                    }
-                    if ($isrCedular > 0) {
-                        $importeTotalPdf -= $isrCedular;
-                    }
-                }
-
-                $importeTotalPdf = round($importeTotalPdf, 2);
+                $importeTotalPdf = $this->calcularImporteNetoFacturas($data['periodo_factura_rows']);
                 $data['importe_total_pdf'] = $importeTotalPdf;
                 $data['importe_total_pdf_formato'] = '$' . number_format($importeTotalPdf, 2);
                 $data['importe_total_pdf_letra'] = $this->numeroALetras($importeTotalPdf);
@@ -5249,9 +5255,17 @@ class Inicio extends BaseController
             $registro = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["id_formulario_pt" => $id]]);
             if (!empty($registro->data)) {
                 $data['registro_pt'] = $registro->data[0];
-                
-                // Helper to convert number to letters (reuse existing logic or simple one)
-              
+
+                $items = $globals->getTabla([
+                    "tabla" => "manual_factura",
+                    "where" => ["id_registro_pt" => $id, "visible" => 1],
+                ]);
+                $facturas = $items->data ?? [];
+                $subtotalNeto = $this->calcularImporteNetoFacturas($facturas);
+
+                $data['subtotal_neto'] = $subtotalNeto;
+                $data['subtotal_neto_formato'] = '$' . number_format($subtotalNeto, 2);
+                $data['subtotal_neto_letra'] = $this->numeroALetras($subtotalNeto);
             }
         }
         //die(var_dump($data));
