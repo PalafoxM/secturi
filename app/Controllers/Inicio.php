@@ -4756,9 +4756,34 @@ class Inicio extends BaseController
                 
                 // Fetch items
                 $items = $globals->getTabla(["tabla" => "manual_factura", "where" => ["id_registro_pt" => $id, "visible" => 1]]);
-                $data['periodo_factura_rows'] = $items->data;
-                $rows = count( $items->data);
+                $data['periodo_factura_rows'] = $items->data ?? [];
+                $rows = count($data['periodo_factura_rows']);
                 $data['rows'] = $rows;
+
+                /*
+                 * Total por factura: importe + propina - ISR - ISR cedular.
+                 * Cada retención se descuenta únicamente de la factura que la contiene.
+                 */
+                $importeTotalPdf = 0.0;
+                foreach ($data['periodo_factura_rows'] as $item) {
+                    $importeFactura = (float) str_replace(',', '', (string) ($item->importe ?? 0));
+                    $propina = (float) str_replace(',', '', (string) ($item->propinas ?? 0));
+                    $isr = (float) str_replace(',', '', (string) ($item->isr ?? 0));
+                    $isrCedular = (float) str_replace(',', '', (string) ($item->impuesto_local ?? 0));
+
+                    $importeTotalPdf += $importeFactura + $propina;
+                    if ($isr > 0) {
+                        $importeTotalPdf -= $isr;
+                    }
+                    if ($isrCedular > 0) {
+                        $importeTotalPdf -= $isrCedular;
+                    }
+                }
+
+                $importeTotalPdf = round($importeTotalPdf, 2);
+                $data['importe_total_pdf'] = $importeTotalPdf;
+                $data['importe_total_pdf_formato'] = '$' . number_format($importeTotalPdf, 2);
+                $data['importe_total_pdf_letra'] = $this->numeroALetras($importeTotalPdf);
 
                 // Data for View Headers (Areas, default banks, etc)
                  if(isset($data['registro_pt']->nombre_proveedor_1) && is_numeric($data['registro_pt']->nombre_proveedor_1) && $data['registro_pt']->nombre_proveedor_1 > 0){
