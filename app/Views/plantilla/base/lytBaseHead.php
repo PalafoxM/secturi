@@ -389,13 +389,13 @@
                         data-trigger="hover" title="" data-original-title="Jurídico">
                         <i class="fas fa-balance-scale align-self-center menu-icon icon-dual"></i>
                     </a> <!--end MetricaAuthentication-->
-
+                 <?php if (in_array($session->id_perfil, [1, 10])): ?>
                     <a href="#MetricaAuthentication2" class="nav-link" data-toggle="tooltip-custom" data-placement="right"
                         data-trigger="hover" title="" data-original-title="Registro IGTO">
                         <i class="fas fa-map-marker-alt align-self-center menu-icon icon-dual"></i>
                     </a> <!--end MetricaAuthentication-->
          
-
+                   <?php endif; ?>
 
 
             </nav><!--end nav-->
