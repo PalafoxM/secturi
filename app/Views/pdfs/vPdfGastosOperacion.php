@@ -149,7 +149,7 @@
 
                         $detalleRows[] = [
                             'comprobante' => $r->no_comprobante ?? '',
-                            'proyecto' => $tieneRetenciones ? 'SUBTOTAL' : ($r->proyecto ?? ''),
+                            'proyecto' => $tieneRetenciones ? $r->proyecto : ($r->proyecto ?? ''),
                             'partida' => $r->partida ?? '',
                             'importe' => '$' . number_format($importePrincipal, 2),
                             'proveedor' => $r->proveedor ?? '',
