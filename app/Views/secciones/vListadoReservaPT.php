@@ -432,7 +432,7 @@
           <?php if($session->get('id_usuario') != 34): ?>
           <button type="button" class="btn btn-primary" id="btnConfirmarReserva">Guardar</button>
           <?php endif; ?>
-          <?php if($session->get('id_usuario') == 34): ?>
+          <?php if( in_array($session->get('id_usuario'), [34, 88]) ): ?>
           <button type="button" class="btn btn-primary" id="btnValidarReserva">Validar Reserva</button>
           <?php endif; ?>
         <button type="button" onclick="ini.inicio.cerrarModalAdmin()" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
