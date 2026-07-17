@@ -144,7 +144,7 @@
                     foreach ($rows as $r) {
                         $tieneRetenciones = !empty($r->tiene_retenciones_calculadas);
                         $importePrincipal = $tieneRetenciones
-                            ? (float) ($r->subtotal_calculado ?? 0)
+                            ? (float) ($r->subtotal_calculado ?? 0) + (float) ($r->iva_calculado ?? 0)
                             : (float) str_replace(',', '', $r->importe ?? 0) + (float) str_replace(',', '', $r->propinas ?? 0);
 
                         $detalleRows[] = [
