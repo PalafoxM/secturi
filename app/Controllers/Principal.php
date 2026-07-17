@@ -36,7 +36,7 @@ class Principal extends BaseController
         'contentView' => 'vUndefined',
         'stylecss' => '',
     );
-    private array $usuariosRevisionInternaReservaPT = [17, 14, 59, 38, 11, 34];
+    private array $usuariosRevisionInternaReservaPT = [17, 14, 59, 38, 11, 34, 88];
 
     public function __construct()
     {
@@ -3081,7 +3081,7 @@ class Principal extends BaseController
         if (in_array($session->get('id_perfil'), [1, 2])) {
             $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1, "id_estatus"=> 1]]);
         } else {
-            if($session->get('id_usuario')==34){
+            if( in_array($session->get('id_usuario'), [34, 88]) ){
                 $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1, 'promo' => 1, "id_estatus"=> 5]]);
             }else{
                   if($this->esUsuarioRevisionInternaReservaPT($session->get('id_usuario'))){
@@ -3130,7 +3130,7 @@ class Principal extends BaseController
         }else if ($session->get('id_perfil') ==2) {
             $reserva = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['visible' => 1]]);
         } else {
-            if($session->get('id_usuario') == 34 || $this->esUsuarioRevisionInternaReservaPT($session->get('id_usuario'))){
+            if( in_array($session->get('id_usuario'), [34, 88]) || $this->esUsuarioRevisionInternaReservaPT($session->get('id_usuario'))){
                 $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['visible' => 1, "promo"=> 1, 'id_estatus' => 3]]);
             }else{
                 $reserva = $globals->getTabla(['tabla' => 'vw_lista_reserva', 'where' => ['usu_reg' => $session->get('id_usuario'), 'visible' => 1, "id_estatus"=> 3]]);
