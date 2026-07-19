@@ -469,7 +469,6 @@ $tarjetasError = session()->getFlashdata('tarjetas_error');
                                                         <div class="mb-4">
                                                             <h5 class="font-18 text-dark mb-2">Política de prevención de riesgos psicosociales</h5>
                                                             <p class="text-muted mb-1" style="font-size: 0.9rem;">RIESGOS 2026</p>
-                                                            <p class="text-muted mb-0" style="font-size: 0.85rem;">LA PERSONA SERVIDORA PÚBLICA HONESTA</p>
                                                         </div>
                                                         
                                                         <div class="d-flex w-100 mt-auto justify-content-center flex-wrap">
