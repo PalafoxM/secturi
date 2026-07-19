@@ -451,7 +451,37 @@ $tarjetasError = session()->getFlashdata('tarjetas_error');
                                                         </div>
                                                     </div><!--end blog-card-->
                                                 </div><!--end card-body-->
+                                                
                                             </div><!--end card-->
+                                               <div class="col-lg-12">
+                                                <div class="card h-100">
+                                                    <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                                                        <div class="ribbon4 rib4-success">
+                                                            <span class="ribbon4-band ribbon4-band-success text-white text-center">Documento</span>
+                                                        </div><!--end ribbon-->
+                                                        
+                                                        <div class="my-4">
+                                                            <div class="icon-info mb-0">
+                                                                <i class="fas fa-file-pdf bg-soft-danger text-danger" style="font-size: 4rem; padding: 25px; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.1);"></i>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div class="mb-4">
+                                                            <h5 class="font-18 text-dark mb-2">Política de prevención de riesgos psicosociales</h5>
+                                                            <p class="text-muted mb-1" style="font-size: 0.9rem;">RIESGOS 2026</p>
+                                                            <p class="text-muted mb-0" style="font-size: 0.85rem;">LA PERSONA SERVIDORA PÚBLICA HONESTA</p>
+                                                        </div>
+                                                        
+                                                        <div class="d-flex w-100 mt-auto justify-content-center flex-wrap">
+                                                            <a href="<?= base_url() . 'assets/documentos/Política de prevención de riesgos psicosociales 2026.pdf' ?>" target="_blank" class="btn btn-soft-primary px-4 m-1 rounded-pill">
+                                                                <i class="fas fa-eye mr-2"></i> Ver Documento
+                                                            </a>
+                                                            <a href="<?= base_url() . 'assets/documentos/Política de prevención de riesgos psicosociales 2026.pdf' ?>" download class="btn btn-danger px-4 m-1 rounded-pill">
+                                                                <i class="fas fa-download mr-2"></i> Descargar
+                                                            </a>
+                                                        </div>
+                                                    </div><!--end card-body-->
+                                                </div><!--end card-->
 
                                         </div> <!--end col-->
                                    <!--      <?php if (!$votoHombre || !$votoMujer): ?>
