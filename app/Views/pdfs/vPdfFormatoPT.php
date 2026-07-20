@@ -110,29 +110,55 @@
         <tbody>
             <?php 
             $rows = isset($periodo_factura_rows) && !empty($periodo_factura_rows) ? $periodo_factura_rows : [];
-            $total_rows = count($rows) > 0 ? count($rows) : 1;
-            
-            // Dummy row if empty
-            if(empty($rows)) $rows = [(object)['encabezado' => '', 'proyecto_clave' => '', 'partida_clave' => '', 'importe' => '']];
+            $detalleRows = [];
 
-            foreach($rows as $index => $row): 
+            foreach ($rows as $row) {
+                $tieneRetenciones = !empty($mostrar_retenciones_pt) && !empty($row->tiene_retenciones_calculadas);
+                $importePrincipal = $tieneRetenciones
+                    ? (float) ($row->subtotal_calculado ?? 0) + (float) ($row->iva_calculado ?? 0)
+                    : (float) str_replace(',', '', (string) ($row->importe ?? 0));
+
+                $detalleRows[] = [
+                    'comprobante' => $row->no_comprobante ?? '',
+                    'proyecto' => $tieneRetenciones ? 'SUBTOTAL' : ($row->proyecto ?? ''),
+                    'partida' => $row->partida ?? '',
+                    'importe' => $importePrincipal,
+                ];
+
+                if ($tieneRetenciones && isset($row->isr) && (float) $row->isr > 0) {
+                    $detalleRows[] = [
+                        'comprobante' => $row->no_comprobante ?? '',
+                        'proyecto' => 'ISR',
+                        'partida' => '',
+                        'importe' => -(float) $row->isr,
+                    ];
+                }
+
+                if ($tieneRetenciones && isset($row->impuesto_local) && (float) $row->impuesto_local > 0) {
+                    $detalleRows[] = [
+                        'comprobante' => $row->no_comprobante ?? '',
+                        'proyecto' => 'ISR CEDULAR',
+                        'partida' => '',
+                        'importe' => -(float) $row->impuesto_local,
+                    ];
+                }
+            }
+
+            if (empty($detalleRows)) {
+                $detalleRows[] = ['comprobante' => '', 'proyecto' => '', 'partida' => '', 'importe' => 0];
+            }
+
+            foreach($detalleRows as $index => $detalle):
             ?>
             <tr>
-                <td><?= isset($row->no_comprobante) ? $row->no_comprobante : '' ?></td>
-                <td><?= isset($row->proyecto) ? $row->proyecto : '' ?></td>
-                <td><?= isset($row->partida) ? $row->partida : '' ?></td>
-                <td>$<?= isset($row->importe) ? ($row->importe) : '0.00' ?></td>
+                <td><?= $detalle['comprobante'] ?></td>
+                <td><?= $detalle['proyecto'] ?></td>
+                <td><?= $detalle['partida'] ?></td>
+                <td><?= $detalle['importe'] < 0 ? '-$' : '$' ?><?= number_format(abs((float) $detalle['importe']), 2) ?></td>
                 
                 <?php if($index === 0): ?>
-                <td rowspan="<?= count($rows) ?>" class="text-left" style="vertical-align: top;">
+                <td rowspan="<?= count($detalleRows) ?>" class="text-left" style="vertical-align: top;">
                     <div class="font-bold">DATOS DEL PROVEEDOR NACIONAL</div>
-                    <?php if(!empty($row->nombre_proveedor_1)): ?>
-                        <div><?= $row->nombre_proveedor_1 ?></div>
-                    <?php endif; ?>
-                    
-                    <?php // Try to use row specific fields if they were saved in the item (which they weren't in the schema showed) 
-                          // Or use variables passed to view if available
-                    ?>
                    <!-- Hardcoded example structure as per requirements, could be dynamic -->
                    <div><span class="font-bold">No. PROVEEDOR:</span> <?= isset($registro_pt->no_proveedor) ? $registro_pt->no_proveedor : '' ?></div>
                    <div><span class="font-bold">RFC:</span> <?= isset($registro_pt->rfc_proveedor) ? $registro_pt->rfc_proveedor : '' ?></div>
@@ -156,12 +182,12 @@
                 <span class="font-bold">No. RESERVA:</span> <?= isset($registro_pt->no_reserva) ? $registro_pt->no_reserva : '' ?>
             </td>
             <td width="30%" class="font-bold">
-                 $<?= isset($registro_pt->importe_total_num) ? $registro_pt->importe_total_num : '' ?>
+                <?= $importe_total_pt_formato ?? ('$' . ($registro_pt->importe_total_num ?? '')) ?>
             </td>
         </tr>
         <tr>
             <td colspan="4" class="text-center font-bold">
-                <?= isset($registro_pt->importe_letra) ? $registro_pt->importe_letra : '' ?>
+                <?= $importe_total_pt_letra ?? ($registro_pt->importe_letra ?? '') ?>
             </td>
         </tr>
     </table>

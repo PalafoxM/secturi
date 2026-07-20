@@ -4266,7 +4266,24 @@ class Inicio extends BaseController
               //  $data['proveedor'] = $proveedor->data[0];
                 $data['registro_pt'] = $registro->data[0];
                 $items = $globals->getTabla(["tabla" => "manual_factura", "where" => ["id_registro_pt" => $id , "visible" => 1]]);
-                $data['periodo_factura_rows'] = $items->data;
+                $facturas = $items->data ?? [];
+                $facturasPreparadas = $this->prepararDesgloseFiscalFacturas($facturas);
+                $tieneRetenciones = false;
+                foreach ($facturasPreparadas as $factura) {
+                    if (!empty($factura->tiene_retenciones_calculadas)) {
+                        $tieneRetenciones = true;
+                        break;
+                    }
+                }
+
+                // El desglose fiscal sólo se presenta cuando alguna factura tiene ISR o ISR cedular.
+                $data['periodo_factura_rows'] = $tieneRetenciones ? $facturasPreparadas : $facturas;
+                $data['mostrar_retenciones_pt'] = $tieneRetenciones;
+                if ($tieneRetenciones) {
+                    $importeTotalPt = $this->calcularImporteNetoFacturas($facturasPreparadas);
+                    $data['importe_total_pt_formato'] = '$' . number_format($importeTotalPt, 2);
+                    $data['importe_total_pt_letra'] = $this->numeroALetras($importeTotalPt);
+                }
                 $data['edit'] = 1; // For view logic if reused
             }
         }
