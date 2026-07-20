@@ -36,7 +36,7 @@ class Principal extends BaseController
         'contentView' => 'vUndefined',
         'stylecss' => '',
     );
-    private array $usuariosRevisionInternaReservaPT = [17, 14, 59, 38, 11, 34];
+    private array $usuariosRevisionInternaReservaPT = [17, 14, 59, 38, 11, 34, 88];
 
     public function __construct()
     {
