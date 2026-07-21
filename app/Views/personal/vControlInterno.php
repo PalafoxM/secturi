@@ -1,11 +1,5 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Control Interno | Sistema Integrado de Gestión de Riesgos</title>
   <style>
-    :root {
+    .ci-shell {
       --bg: #eef3fb;
       --bg-soft: rgba(255, 255, 255, 0.72);
       --panel: rgba(255, 255, 255, 0.88);
@@ -20,16 +14,8 @@
       --radius-xl: 28px;
       --radius-lg: 20px;
       --radius-md: 14px;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: "Aptos", "Segoe UI", sans-serif;
+      position: relative;
+      overflow: hidden;
       color: var(--text);
       background:
         radial-gradient(circle at top left, rgba(81, 127, 255, 0.18), transparent 30%),
@@ -37,10 +23,19 @@
         linear-gradient(180deg, #f6f9ff 0%, #eef3fb 42%, #e9eff8 100%);
     }
 
-    body::before,
-    body::after {
+    .ci-shell,
+    .ci-shell * {
+      box-sizing: border-box;
+    }
+
+    .ci-shell {
+      font-family: "Aptos", "Segoe UI", sans-serif;
+    }
+
+    .ci-shell::before,
+    .ci-shell::after {
       content: "";
-      position: fixed;
+      position: absolute;
       inset: auto;
       width: 320px;
       height: 320px;
@@ -51,27 +46,28 @@
       z-index: 0;
     }
 
-    body::before {
+    .ci-shell::before {
       top: -120px;
       right: -90px;
       background: rgba(53, 102, 216, 0.18);
     }
 
-    body::after {
+    .ci-shell::after {
       bottom: -120px;
       left: -70px;
       background: rgba(255, 109, 95, 0.14);
     }
 
-    .page {
+    .ci-page {
       position: relative;
       z-index: 1;
-      width: min(1180px, calc(100% - 32px));
+      width: calc(100% - 32px);
+      max-width: 1180px;
       margin: 0 auto;
       padding: 32px 0 48px;
     }
 
-    .hero {
+    .ci-hero {
       position: relative;
       overflow: hidden;
       padding: 34px;
@@ -83,7 +79,7 @@
       color: #fff;
     }
 
-    .hero::after {
+    .ci-hero::after {
       content: "";
       position: absolute;
       right: -40px;
@@ -95,7 +91,7 @@
       transform: rotate(24deg);
     }
 
-    .hero-top {
+    .ci-hero-top {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
@@ -104,7 +100,7 @@
       z-index: 1;
     }
 
-    .eyebrow {
+    .ci-eyebrow {
       display: inline-flex;
       align-items: center;
       gap: 8px;
@@ -116,13 +112,14 @@
       text-transform: uppercase;
     }
 
-    h1 {
+    .ci-page h1 {
       margin: 18px 0 10px;
       font-size: clamp(2rem, 4vw, 3rem);
       line-height: 1.05;
+      color: #fff;
     }
 
-    .hero p {
+    .ci-hero p {
       max-width: 720px;
       margin: 0;
       color: rgba(255, 255, 255, 0.84);
@@ -130,7 +127,7 @@
       line-height: 1.6;
     }
 
-    .year-chip {
+    .ci-year-chip {
       flex-shrink: 0;
       padding: 16px 18px;
       min-width: 150px;
@@ -141,19 +138,19 @@
       box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
     }
 
-    .year-chip strong {
+    .ci-year-chip strong {
       display: block;
       font-size: 2.2rem;
       line-height: 1;
       margin-top: 8px;
     }
 
-    .dashboard {
+    .ci-dashboard {
       margin-top: -28px;
       padding: 0 14px;
     }
 
-    .panel {
+    .ci-panel {
       border: 1px solid var(--panel-border);
       border-radius: var(--radius-xl);
       background: var(--bg-soft);
@@ -161,11 +158,11 @@
       box-shadow: var(--shadow);
     }
 
-    .content {
+    .ci-content {
       padding: 24px;
     }
 
-    .toolbar {
+    .ci-toolbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -174,17 +171,17 @@
       flex-wrap: wrap;
     }
 
-    .toolbar-copy h2 {
+    .ci-toolbar-copy h2 {
       margin: 0;
       font-size: 1.4rem;
     }
 
-    .toolbar-copy p {
+    .ci-toolbar-copy p {
       margin: 8px 0 0;
       color: var(--muted);
     }
 
-    .toggle {
+    .ci-toggle {
       display: inline-flex;
       padding: 6px;
       border-radius: 999px;
@@ -193,7 +190,7 @@
       box-shadow: inset 0 0 0 1px rgba(53, 102, 216, 0.1);
     }
 
-    .toggle button {
+    .ci-toggle button {
       border: 0;
       border-radius: 999px;
       padding: 12px 18px;
@@ -205,20 +202,20 @@
       transition: 0.25s ease;
     }
 
-    .toggle button.active {
+    .ci-toggle button.active {
       background: linear-gradient(135deg, var(--brand), var(--brand-strong));
       color: #fff;
       box-shadow: 0 10px 20px rgba(35, 78, 180, 0.25);
     }
 
-    .stats {
+    .ci-stats {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(180px, 240px));
       gap: 16px;
       margin-bottom: 22px;
     }
 
-    .stat-card {
+    .ci-stat-card {
       padding: 18px 20px;
       border-radius: var(--radius-lg);
       background: var(--panel);
@@ -226,24 +223,24 @@
       box-shadow: 0 10px 25px rgba(39, 72, 139, 0.08);
     }
 
-    .stat-card span {
+    .ci-stat-card span {
       display: block;
       color: var(--muted);
       font-size: 0.9rem;
       margin-bottom: 8px;
     }
 
-    .stat-card strong {
+    .ci-stat-card strong {
       font-size: 1.65rem;
     }
 
-    .grid {
+    .ci-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 16px;
     }
 
-    .link-card {
+    .ci-link-card {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -258,40 +255,40 @@
       transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
     }
 
-    .link-card:hover,
-    .link-card:focus-visible {
+    .ci-link-card:hover,
+    .ci-link-card:focus-visible {
       transform: translateY(-3px);
       box-shadow: 0 18px 30px rgba(53, 102, 216, 0.12);
       border-color: rgba(53, 102, 216, 0.24);
       outline: none;
     }
 
-    .link-card.is-disabled {
+    .ci-link-card.is-disabled {
       cursor: default;
       opacity: 0.88;
     }
 
-    .link-card.is-disabled:hover,
-    .link-card.is-disabled:focus-visible {
+    .ci-link-card.is-disabled:hover,
+    .ci-link-card.is-disabled:focus-visible {
       transform: none;
       box-shadow: none;
       border-color: rgba(53, 102, 216, 0.12);
     }
 
-    .link-card__text strong {
+    .ci-link-card__text strong {
       display: block;
       font-size: 1.03rem;
       line-height: 1.35;
     }
 
-    .link-card__text span {
+    .ci-link-card__text span {
       display: inline-block;
       margin-top: 6px;
       color: var(--muted);
       font-size: 0.9rem;
     }
 
-    .link-card__icon {
+    .ci-link-card__icon {
       display: grid;
       place-items: center;
       width: 48px;
@@ -304,11 +301,11 @@
       box-shadow: 0 12px 20px rgba(35, 78, 180, 0.26);
     }
 
-    .full-width {
+    .ci-full-width {
       grid-column: 1 / -1;
     }
 
-    .document-panel {
+    .ci-document-panel {
       margin-top: 22px;
       padding: 22px;
       display: flex;
@@ -320,19 +317,19 @@
       border: 1px solid rgba(255, 109, 95, 0.14);
     }
 
-    .document-panel small {
+    .ci-document-panel small {
       color: var(--muted);
       display: block;
       margin-bottom: 6px;
       font-size: 0.88rem;
     }
 
-    .document-panel strong {
+    .ci-document-panel strong {
       font-size: 1.12rem;
       line-height: 1.35;
     }
 
-    .pdf-button {
+    .ci-pdf-button {
       display: inline-flex;
       align-items: center;
       gap: 10px;
@@ -346,7 +343,7 @@
       white-space: nowrap;
     }
 
-    .timeline {
+    .ci-timeline {
       margin-top: 24px;
       padding: 20px 22px;
       border-radius: var(--radius-lg);
@@ -354,25 +351,25 @@
       border: 1px solid rgba(53, 102, 216, 0.1);
     }
 
-    .timeline h3 {
+    .ci-timeline h3 {
       margin: 0 0 14px;
       font-size: 1rem;
     }
 
-    .timeline-track {
+    .ci-timeline-track {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 14px;
     }
 
-    .timeline-step {
+    .ci-timeline-step {
       padding: 16px;
       border-radius: 16px;
       background: rgba(255, 255, 255, 0.82);
       border: 1px solid rgba(53, 102, 216, 0.12);
     }
 
-    .timeline-step span {
+    .ci-timeline-step span {
       display: inline-flex;
       width: 32px;
       height: 32px;
@@ -385,24 +382,24 @@
       font-weight: 800;
     }
 
-    .timeline-step strong {
+    .ci-timeline-step strong {
       display: block;
       margin-bottom: 6px;
       font-size: 0.98rem;
     }
 
-    .timeline-step p {
+    .ci-timeline-step p {
       margin: 0;
       color: var(--muted);
       line-height: 1.45;
       font-size: 0.92rem;
     }
 
-    .fade-in {
-      animation: fade-in 0.45s ease;
+    .ci-fade-in {
+      animation: ci-fade-in 0.45s ease;
     }
 
-    @keyframes fade-in {
+    @keyframes ci-fade-in {
       from {
         opacity: 0;
         transform: translateY(8px);
@@ -414,98 +411,100 @@
     }
 
     @media (max-width: 900px) {
-      .hero-top,
-      .document-panel {
+      .ci-hero-top,
+      .ci-document-panel {
         flex-direction: column;
         align-items: flex-start;
       }
 
-      .stats,
-      .grid,
-      .timeline-track {
+      .ci-stats,
+      .ci-grid,
+      .ci-timeline-track {
         grid-template-columns: 1fr;
       }
 
-      .dashboard {
+      .ci-dashboard {
         padding: 0;
         margin-top: 20px;
       }
     }
 
     @media (max-width: 640px) {
-      .page {
-        width: min(100% - 20px, 1180px);
+      .ci-page {
+        width: calc(100% - 20px);
         padding-top: 18px;
       }
 
-      .hero,
-      .content {
+      .ci-hero,
+      .ci-content {
         padding: 20px;
       }
 
-      .toggle {
+      .ci-toggle {
         width: 100%;
+        flex-direction: column;
+        border-radius: 18px;
       }
 
-      .toggle button {
+      .ci-toggle button {
         flex: 1;
       }
 
-      .link-card {
+      .ci-link-card {
         min-height: auto;
       }
     }
   </style>
-</head>
-<body>
-  <main class="page">
-    <section class="hero">
-      <div class="hero-top">
+  <div class="page-content-tab ci-shell">
+    <div class="container-fluid">
+  <main class="ci-page">
+    <section class="ci-hero">
+      <div class="ci-hero-top">
         <div>
-          <div class="eyebrow">Sistema Integrado de Gestión de Riesgos</div>
+          <div class="ci-eyebrow">Sistema Integrado de Gestión de Riesgos</div>
           <h1>Control Interno</h1>
         </div>
-        <div class="year-chip">
+        <div class="ci-year-chip">
           Vista principal
           <strong id="hero-year">2026</strong>
         </div>
       </div>
     </section>
 
-    <section class="dashboard">
-      <div class="panel content">
-        <div class="toolbar">
-          <div class="toolbar-copy">
+    <section class="ci-dashboard">
+      <div class="ci-panel ci-content">
+        <div class="ci-toolbar">
+          <div class="ci-toolbar-copy">
             <h2 id="section-title">Control Interno 2026</h2>
             <p id="section-subtitle">Mostrando los accesos correspondientes al ejercicio 2025.</p>
           </div>
-          <div class="toggle" aria-label="Selector de año">
+          <div class="ci-toggle" aria-label="Selector de año">
             <button id="btn-2024" type="button">Control Interno 2024</button>
             <button id="btn-2025" type="button" class="active">Control Interno 2025</button>
             <button id="btn-2026" type="button">Control Interno 2026</button>
           </div>
         </div>
 
-        <div class="stats">
-          <article class="stat-card">
+        <div class="ci-stats">
+          <article class="ci-stat-card">
             <span>Año visible</span>
             <strong id="stat-display-year">2026</strong>
           </article>
-          <article class="stat-card">
+          <article class="ci-stat-card">
             <span>Total de accesos</span>
             <strong id="stat-total-links">8</strong>
           </article>
         </div>
 
-        <div id="links-grid" class="grid fade-in"></div>
+        <div id="links-grid" class="ci-grid ci-fade-in"></div>
 
-        <div class="document-panel">
+        <div class="ci-document-panel">
           <div>
             <small>Documento externo (PDF)</small>
             <strong>Lineamientos Generales de Control Interno · Poder Ejecutivo GTO</strong>
           </div>
           <a
-            class="pdf-button"
+            class="ci-pdf-button"
             href="https://secturnet.guanajuato.gob.mx/susi/assets/pdf/plantillas/LGCI-2022.pdf"
             target="_blank"
             rel="noopener noreferrer"
@@ -514,20 +513,20 @@
           </a>
         </div>
 
-        <div class="timeline">
+        <div class="ci-timeline">
           <h3>Ruta rápida de consulta</h3>
-          <div class="timeline-track">
-            <div class="timeline-step">
+          <div class="ci-timeline-track">
+            <div class="ci-timeline-step">
               <span>1</span>
               <strong>Selecciona el año</strong>
               <p>Usa los botones superiores para alternar entre los recursos de 2024, 2025 y 2026.</p>
             </div>
-            <div class="timeline-step">
+            <div class="ci-timeline-step">
               <span>2</span>
               <strong>Abre el documento</strong>
               <p>Ingresa a cada hoja o matriz directamente desde las tarjetas de acceso rápido.</p>
             </div>
-            <div class="timeline-step">
+            <div class="ci-timeline-step">
               <span>3</span>
               <strong>Consulta lineamientos</strong>
               <p>Apóyate en el PDF general para revisar criterios y lineamientos de control interno.</p>
@@ -537,9 +536,14 @@
       </div>
     </section>
   </main>
+    </div>
+  </div>
 
   <script>
-    const data = {
+  (function () {
+    "use strict";
+
+    const controlInternoData = {
       2024: {
         displayYear: "2024",
         headlineYear: "2024",
@@ -709,7 +713,7 @@
 
     function makeCard(item) {
       const card = document.createElement(item.disabled ? "div" : "a");
-      card.className = `link-card${item.fullWidth ? " full-width" : ""}${item.disabled ? " is-disabled" : ""}`;
+      card.className = `ci-link-card${item.fullWidth ? " ci-full-width" : ""}${item.disabled ? " is-disabled" : ""}`;
 
       if (!item.disabled) {
         card.href = item.url;
@@ -718,20 +722,20 @@
       }
 
       card.innerHTML = `
-        <div class="link-card__text">
+        <div class="ci-link-card__text">
           <strong>${item.title}</strong>
           <span>${item.note}</span>
         </div>
-        <div class="link-card__icon">↗</div>
+        <div class="ci-link-card__icon">↗</div>
       `;
       return card;
     }
 
     function render(year) {
-      const yearData = data[year];
-      linksGrid.classList.remove("fade-in");
+      const yearData = controlInternoData[year];
+      linksGrid.classList.remove("ci-fade-in");
       void linksGrid.offsetWidth;
-      linksGrid.classList.add("fade-in");
+      linksGrid.classList.add("ci-fade-in");
 
       heroYear.textContent = yearData.headlineYear;
       sectionTitle.textContent = yearData.title;
@@ -751,6 +755,5 @@
     buttons[2026].addEventListener("click", () => render(2026));
 
     render(2026);
+  })();
   </script>
-</body>
-</html>
