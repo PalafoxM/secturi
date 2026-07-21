@@ -169,7 +169,7 @@
                                                             </a> -->
                                                             <?php endif; ?>
                                                         <!-- Validacion Interna -->
-                                                             <?php if($session->get('id_usuario') == 34): ?>
+                                                             <?php if($session->get('id_usuario') == 88): ?>
                                                             <a style="color:white;"  onclick="ini.inicio.estatusReservaInterna(<?=$p->id_reserva?>);" data-toggle="tooltip" data-placement="top" title="" data-original-title="Revisar reserva"
                                                                 class="btn <?= (in_array($p->id_estatus,[3,4]))?'btn-gradient-info':'btn-gradient-warning'?> px-4"><i
                                                                     class="mdi mdi-lock-open font-21"></i>
@@ -392,7 +392,7 @@
                                 </table>                                                                      
                               </div>                                                                                                                       
                          </div>
-                         <?php if($session->get('id_usuario') != 34): ?>
+                         <?php if($session->get('id_usuario') != 88): ?>
                             <div class="row">
                               <div class="col-lg-6">
                                     <div class="form-group">
@@ -429,7 +429,7 @@
         </form>
       </div>
       <div class="modal-footer">
-          <?php if($session->get('id_usuario') != 34): ?>
+          <?php if($session->get('id_usuario') != 88): ?>
           <button type="button" class="btn btn-primary" id="btnConfirmarReserva">Guardar</button>
           <?php endif; ?>
           <?php if( in_array($session->get('id_usuario'), [34, 88]) ): ?>
