@@ -539,14 +539,20 @@
     </div>
   </div>
 
-  <script src="<?php echo base_url() ?>plugins/moment/moment.js"></script>
-  
-  <script src="<?php echo base_url() ?>assets/js/jquery-ui.min.js"></script>
-  <script src="<?php echo base_url() ?>assets/js/bootstrap.bundle.min.js"></script>
-  <script src="<?php echo base_url() ?>assets/js/metismenu.min.js"></script>
-  <script src="<?php echo base_url() ?>assets/js/waves.js"></script>
-  <script src="<?php echo base_url() ?>assets/js/feather.min.js"></script>
-  <script src="<?php echo base_url() ?>assets/js/jquery.slimscroll.min.js"></script>
+  <link href="<?= base_url()?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+  <link href="<?= base_url()?>assets/css/jquery-ui.min.css" rel="stylesheet">
+  <link href="<?= base_url()?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+  <link href="<?= base_url()?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
+  <link href="<?= base_url()?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
+
+
+<script src="<?= base_url()?>assets/js/jquery.min.js"></script>
+  <script src="<?= base_url()?>assets/js/bootstrap.bundle.min.js"></script>
+  <script src="<?= base_url()?>assets/js/metisMenu.min.js"></script>
+  <script src="<?= base_url()?>assets/js/waves.min.js"></script>
+  <script src="<?= base_url()?>assets/js/feather.min.js"></script>
+  <script src="<?= base_url()?>assets/js/simplebar.min.js"></script>
+  <script src="<?= base_url()?>assets/js/app.js"></script>
 
   <script>
   (function () {
