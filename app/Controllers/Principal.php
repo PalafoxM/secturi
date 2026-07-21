@@ -2013,7 +2013,7 @@ class Principal extends BaseController
         ];
 
         if($revisionInterna){
-            $dataInsert['id_estatus'] = 5;
+            $dataInsert['id_estatus'] = ($session->get('id_usuario') == 88) ? 1 : 5;
             $dataInsert['promo'] = 1;
                 $email->setTo([
                 'promocionydifusionsectur@guanajuato.gob.mx',
