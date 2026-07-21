@@ -1,4 +1,10 @@
- <style>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control Interno | Sistema Integrado de Gestión de Riesgos</title>
+  <style>
     :root {
       --bg: #eef3fb;
       --bg-soft: rgba(255, 255, 255, 0.72);
@@ -746,3 +752,5 @@
 
     render(2026);
   </script>
+</body>
+</html>
