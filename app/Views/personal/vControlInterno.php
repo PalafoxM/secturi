@@ -539,6 +539,8 @@
     </div>
   </div>
 
+  <script src="<?php echo base_url() ?>plugins/moment/moment.js"></script>
+
   <script>
   (function () {
     "use strict";
