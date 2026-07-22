@@ -6811,7 +6811,7 @@ class Agregar extends BaseController
         if(isset($data['es2025']) && $data['es2025']){
             $dataInsert['tipo_formato'] = 'REFRENDO';
         }
-        if(isset($data['es2025']) && !$data['es2025'] && in_array($session->get('id_usuario'), [14,17, 59, 11, 38, 34])){
+        if(isset($data['es2025']) && !$data['es2025'] && in_array($session->get('id_usuario'), [14,17, 59, 11, 38, 34,88])){
             $dataInsert['promo'] = 1;
         }
        
