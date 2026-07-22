@@ -4744,8 +4744,9 @@ class Inicio extends BaseController
             $factura->tiene_retenciones_calculadas = $tieneRetenciones;
             $factura->subtotal_calculado = round($subtotal, 2);
             $factura->iva_calculado = round($iva, 2);
+            $factura->propina_calculada = round($propina, 2);
             $factura->total_calculado = $tieneRetenciones
-                ? round($subtotal + $iva - $isr - $isrCedular, 2)
+                ? round($subtotal + $iva + $propina - $isr - $isrCedular, 2)
                 : round($importe + $propina, 2);
             $resultado[] = $factura;
         }
@@ -4825,7 +4826,7 @@ class Inicio extends BaseController
 
                 /*
                  * Total por factura con retenciones:
-                 * subtotal + IVA - ISR - ISR cedular.
+                 * subtotal + IVA + propina - ISR - ISR cedular.
                  * Cada retención se descuenta únicamente de la factura que la contiene.
                  */
                 $importeTotalPdf = $this->calcularImporteNetoFacturas($data['periodo_factura_rows']);
