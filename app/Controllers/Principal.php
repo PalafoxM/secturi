@@ -10192,6 +10192,7 @@ class Principal extends BaseController
         $data['periodo_factura'] = new stdClass();
         $data['proveedor'] = new stdClass();
         $data['proveedor_banco'] = []; // Initialized as array to match view expectations
+        $data['proveedor_bancos'] = [];
 
   
         $data['no_consecutivo'] = '';
@@ -10292,15 +10293,42 @@ class Principal extends BaseController
                       }
                  }
             }
+
+            // Load every active bank account for the selected provider.
+            if(isset($realIdProveedor)) {
+                 $bancosProveedor = $globals->getTabla([
+                     "tabla" => "proveedor_banco",
+                     "where" => ["idproveedor" => $realIdProveedor, "visible" => 1]
+                 ]);
+                 $data['proveedor_bancos'] = $bancosProveedor->data ?? [];
+            }
             
             // Fetch Bank Data (Linked or Default)
             if(!empty($data['id_proveedor_banco'])){
-                 $banco = $globals->getTabla(["tabla" => "proveedor_banco", "where" => ["id_proveedor_banco" => $data['id_proveedor_banco']]]);
-                 if(!empty($banco->data)) $data['proveedor_banco'] = $banco->data[0];
+                 foreach ($data['proveedor_bancos'] as $bancoProveedor) {
+                     if ((string) $bancoProveedor->id_proveedor_banco === (string) $data['id_proveedor_banco']) {
+                         $data['proveedor_banco'] = $bancoProveedor;
+                         break;
+                     }
+                 }
+
+                 // Keep compatibility with reservations linked to an inactive bank account.
+                 if(empty($data['proveedor_banco'])) {
+                     $banco = $globals->getTabla(["tabla" => "proveedor_banco", "where" => ["id_proveedor_banco" => $data['id_proveedor_banco']]]);
+                     if(!empty($banco->data)) $data['proveedor_banco'] = $banco->data[0];
+                 }
             } elseif(isset($realIdProveedor)) {
                  // Fallback to default bank
-                 $banco = $globals->getTabla(["tabla" => "proveedor_banco", "where" => ["idproveedor" => $realIdProveedor, "fic" => 1]]);
-                 if(!empty($banco->data)) $data['proveedor_banco'] = $banco->data[0];
+                 foreach ($data['proveedor_bancos'] as $bancoProveedor) {
+                     if (!empty($bancoProveedor->fic)) {
+                         $data['proveedor_banco'] = $bancoProveedor;
+                         break;
+                     }
+                 }
+
+                 if(empty($data['proveedor_banco']) && !empty($data['proveedor_bancos'])) {
+                     $data['proveedor_banco'] = $data['proveedor_bancos'][0];
+                 }
             }
 
 
