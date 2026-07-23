@@ -414,8 +414,17 @@
                                                 <option value="">Seleccione un banco</option>
                                                 <?php 
                                                     $selectedBanco = isset($registro_pt->banco) ? $registro_pt->banco : (isset($proveedor_banco->banco) ? $proveedor_banco->banco : '');
+                                                    $selectedBancoId = $id_proveedor_banco ?? ($proveedor_banco->id_proveedor_banco ?? '');
+                                                    $bancosProveedor = isset($proveedor_bancos) && is_array($proveedor_bancos) ? $proveedor_bancos : [];
                                                 ?>
-                                                <?php if($selectedBanco): ?>
+                                                <?php foreach ($bancosProveedor as $indiceBanco => $bancoProveedor): ?>
+                                                    <option
+                                                        value="<?= esc($bancoProveedor->banco) ?>"
+                                                        data-bank-index="<?= $indiceBanco ?>"
+                                                        <?= (string) $bancoProveedor->id_proveedor_banco === (string) $selectedBancoId ? 'selected' : '' ?>
+                                                    ><?= esc($bancoProveedor->banco) ?> - <?= esc($bancoProveedor->no_cuenta ?? '') ?></option>
+                                                <?php endforeach; ?>
+                                                <?php if(empty($bancosProveedor) && $selectedBanco): ?>
                                                     <option value="<?= $selectedBanco ?>" selected><?= $selectedBanco ?></option>
                                                 <?php endif; ?>
                                             </select>
@@ -691,7 +700,10 @@
       });
       
       // Global variable to store current provider banks
-      var currentProviderBanks = [];
+      var currentProviderBanks = <?= json_encode(
+          array_values($bancosProveedor ?? []),
+          JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+      ) ?>;
 
       // AJAX to fetch provider details
       $('#nombre_proveedor_1').on('change', function() {
@@ -718,12 +730,15 @@
                           $bancoSelect.append('<option value="">Seleccione un banco</option>');
 
                           if(bancos && bancos.length > 0) {
-                              bancos.forEach(function(banco) {
-                                  $bancoSelect.append(`<option value="${banco.banco}">${banco.banco} - ${banco.no_cuenta}</option>`);
+                              bancos.forEach(function(banco, index) {
+                                  $('<option>', {
+                                      value: banco.banco,
+                                      text: banco.banco + ' - ' + (banco.no_cuenta || '')
+                                  }).attr('data-bank-index', index).appendTo($bancoSelect);
                               });
                               
                               // Automatically select the first one and trigger change
-                              $bancoSelect.val(bancos[0].banco).trigger('change');
+                              $bancoSelect.prop('selectedIndex', 1).trigger('change');
                           } else {
                               // Clear dependent fields if no banks
                               $('#no_cuenta').val('');
@@ -751,16 +766,12 @@
 
       // Handle Bank Selection Change
       $('#banco').on('change', function() {
-          var selectedBancoName = $(this).val();
-          if (selectedBancoName && currentProviderBanks.length > 0) {
-              var selectedBank = currentProviderBanks.find(function(b) {
-                  return b.banco === selectedBancoName;
-              });
+          var selectedBankIndex = $(this).find('option:selected').attr('data-bank-index');
+          if (selectedBankIndex !== undefined && currentProviderBanks[selectedBankIndex]) {
+              var selectedBank = currentProviderBanks[selectedBankIndex];
 
-              if (selectedBank) {
-                  $('#no_cuenta').val(selectedBank.no_cuenta);
-                  $('#clabe').val(selectedBank.clabe);
-              }
+              $('#no_cuenta').val(selectedBank.no_cuenta || '');
+              $('#clabe').val(selectedBank.clabe || '');
           } else {
                $('#no_cuenta').val('');
                $('#clabe').val('');
