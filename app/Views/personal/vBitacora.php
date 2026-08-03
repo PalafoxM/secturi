@@ -60,6 +60,7 @@
                                                         <th class="text-center">PERSONAL</th>
                                                         <th class="text-center">ENTRADA</th>
                                                         <th class="text-center">SALIADA</th>
+                                                        <th class="text-center">TIPO REGISTRO</th>
                                              
                                                         <th class="text-center">NO EMPLEADO</th>
                                                     </tr>
@@ -76,6 +77,9 @@
                                                              </td>
                                                             <td class="text-center" style="cursor:pointer;" >
                                                                 <?= $p->hora_fin ?> 
+                                                             </td>                                                                                                     
+                                                            <td class="text-center" style="cursor:pointer;" >
+                                                                <?= $p->tipo_registro ?> 
                                                              </td>                                                                                                     
                                                             <td class="text-center">
                                                                   <?= $p->no_empleado ?> 
