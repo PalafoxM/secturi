@@ -79,7 +79,7 @@
                                                                 <?= $p->hora_fin ?> 
                                                              </td>                                                                                                     
                                                             <td class="text-center" style="cursor:pointer;" >
-                                                                <?= $p->tipo_registro ?> 
+                                                                <?= $p->registro ?> 
                                                              </td>                                                                                                     
                                                             <td class="text-center">
                                                                   <?= $p->no_empleado ?> 
