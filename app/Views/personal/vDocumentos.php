@@ -178,9 +178,9 @@
                                                                     </a>
                                                                 </li>
                                                                  <li class="dd-item" data-id="1">
-                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Programa Anual de Mejora Continua 2025.pdf' ?>">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Programa_Anual_de_Mejora_Continua_2026_firmado.pdf' ?>">
                                                                         <div class="dd-handle">
-                                                                        Programa Anual de Mejora Continua 2025
+                                                                        Programa Anual de Mejora Continua 2026
                                                                         </div>
                                                                     </a>
                                                                 </li>
