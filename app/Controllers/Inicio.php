@@ -4160,6 +4160,8 @@ class Inicio extends BaseController
         $data['es2025'] = ($anio == 2025) ? true : false;
         $data['id_reserva'] = 0; // Default or fetch if needed
         $data['no_consecutivo'] = ''; // Logic to generate new consecutive if needed, or leave blank
+        $data['proveedor_bancos'] = [];
+        $data['proveedor_banco'] = null;
 
          $proveedores = $globals->getTabla(["tabla" => "proveedor", "where" => ["visible" => 1],'limit' => 10]);
         $data['proveedores'] = $proveedores->data;
@@ -4198,9 +4200,48 @@ class Inicio extends BaseController
                     if (!empty($prov->data)) {
                         $data['proveedor'] = $prov->data[0];
                         
-                         // Fetch banks for this provider
-                        $bancos = $globals->getTabla(["tabla" => "proveedor_banco", "where" => ["id_proveedor" => $data['registro_pt']->nombre_proveedor_1, "visible" => 1]]);
-                        $data['proveedor_banco'] = (!empty($bancos->data)) ? $bancos->data[0] : null; // Pass first bank or null, and maybe list for JS?
+                        // Fetch every active bank account for this provider.
+                        $bancos = $globals->getTabla([
+                            "tabla" => "proveedor_banco",
+                            "where" => [
+                                "idproveedor" => $data['registro_pt']->nombre_proveedor_1,
+                                "visible" => 1,
+                            ],
+                        ]);
+                        $data['proveedor_bancos'] = $bancos->data ?? [];
+
+                        // Keep selected the account already stored in the payment form.
+                        $cuentaGuardada = preg_replace('/\s+/', '', (string) ($data['registro_pt']->no_cuenta ?? ''));
+                        $clabeGuardada = preg_replace('/\s+/', '', (string) ($data['registro_pt']->clabe ?? ''));
+                        $bancoGuardado = trim((string) ($data['registro_pt']->banco ?? ''));
+
+                        foreach ($data['proveedor_bancos'] as $bancoProveedor) {
+                            $cuentaProveedor = preg_replace('/\s+/', '', (string) ($bancoProveedor->no_cuenta ?? ''));
+                            $clabeProveedor = preg_replace('/\s+/', '', (string) ($bancoProveedor->clabe ?? ''));
+
+                            if (($cuentaGuardada !== '' && $cuentaGuardada === $cuentaProveedor)
+                                || ($clabeGuardada !== '' && $clabeGuardada === $clabeProveedor)) {
+                                $data['proveedor_banco'] = $bancoProveedor;
+                                break;
+                            }
+                        }
+
+                        if (empty($data['proveedor_banco']) && $bancoGuardado !== '') {
+                            foreach ($data['proveedor_bancos'] as $bancoProveedor) {
+                                if (strcasecmp(trim((string) ($bancoProveedor->banco ?? '')), $bancoGuardado) === 0) {
+                                    $data['proveedor_banco'] = $bancoProveedor;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (empty($data['proveedor_banco']) && !empty($data['proveedor_bancos'])) {
+                            $data['proveedor_banco'] = $data['proveedor_bancos'][0];
+                        }
+
+                        if (!empty($data['proveedor_banco']->id_proveedor_banco)) {
+                            $data['id_proveedor_banco'] = $data['proveedor_banco']->id_proveedor_banco;
+                        }
                     }
                 }
             }
