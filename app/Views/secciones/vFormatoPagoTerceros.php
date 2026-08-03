@@ -417,15 +417,21 @@
                                                     $selectedBancoId = $id_proveedor_banco ?? ($proveedor_banco->id_proveedor_banco ?? '');
                                                     $bancosProveedor = isset($proveedor_bancos) && is_array($proveedor_bancos) ? $proveedor_bancos : [];
                                                 ?>
-                                                <?php foreach ($bancosProveedor as $indiceBanco => $bancoProveedor): ?>
+                                                <?php foreach ($bancosProveedor as $bancoProveedor): ?>
                                                     <option
                                                         value="<?= esc($bancoProveedor->banco) ?>"
-                                                        data-bank-index="<?= $indiceBanco ?>"
+                                                        data-no-cuenta="<?= esc($bancoProveedor->no_cuenta ?? '', 'attr') ?>"
+                                                        data-clabe="<?= esc($bancoProveedor->clabe ?? '', 'attr') ?>"
                                                         <?= (string) $bancoProveedor->id_proveedor_banco === (string) $selectedBancoId ? 'selected' : '' ?>
                                                     ><?= esc($bancoProveedor->banco) ?> - <?= esc($bancoProveedor->no_cuenta ?? '') ?></option>
                                                 <?php endforeach; ?>
                                                 <?php if(empty($bancosProveedor) && $selectedBanco): ?>
-                                                    <option value="<?= $selectedBanco ?>" selected><?= $selectedBanco ?></option>
+                                                    <option
+                                                        value="<?= esc($selectedBanco) ?>"
+                                                        data-no-cuenta="<?= esc($registro_pt->no_cuenta ?? ($proveedor_banco->no_cuenta ?? ''), 'attr') ?>"
+                                                        data-clabe="<?= esc($registro_pt->clabe ?? ($proveedor_banco->clabe ?? ''), 'attr') ?>"
+                                                        selected
+                                                    ><?= esc($selectedBanco) ?></option>
                                                 <?php endif; ?>
                                             </select>
                                         </div>
@@ -699,12 +705,6 @@
           }
       });
       
-      // Global variable to store current provider banks
-      var currentProviderBanks = <?= json_encode(
-          array_values($bancosProveedor ?? []),
-          JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
-      ) ?>;
-
       // AJAX to fetch provider details
       $('#nombre_proveedor_1').on('change', function() {
           var id_proveedor = $(this).val();
@@ -718,7 +718,6 @@
                       if(!response.error) {
                           var proveedor = response.data.proveedor;
                           var bancos = response.data.proveedor_banco;
-                          currentProviderBanks = bancos || []; // Store banks
 
                           $('#no_proveedor').val(proveedor.no_proveedor);
                           $('#rfc_proveedor').val(proveedor.rfc);
@@ -730,11 +729,14 @@
                           $bancoSelect.append('<option value="">Seleccione un banco</option>');
 
                           if(bancos && bancos.length > 0) {
-                              bancos.forEach(function(banco, index) {
+                              bancos.forEach(function(banco) {
                                   $('<option>', {
                                       value: banco.banco,
                                       text: banco.banco + ' - ' + (banco.no_cuenta || '')
-                                  }).attr('data-bank-index', index).appendTo($bancoSelect);
+                                  }).attr({
+                                      'data-no-cuenta': banco.no_cuenta || '',
+                                      'data-clabe': banco.clabe || ''
+                                  }).appendTo($bancoSelect);
                               });
                               
                               // Automatically select the first one and trigger change
@@ -760,22 +762,14 @@
               $('#no_cuenta').val('');
               $('#banco').empty().append('<option value="">Seleccione un banco</option>');;
               $('#clabe').val('');
-              currentProviderBanks = [];
           }
       });
 
       // Handle Bank Selection Change
       $('#banco').on('change', function() {
-          var selectedBankIndex = $(this).find('option:selected').attr('data-bank-index');
-          if (selectedBankIndex !== undefined && currentProviderBanks[selectedBankIndex]) {
-              var selectedBank = currentProviderBanks[selectedBankIndex];
-
-              $('#no_cuenta').val(selectedBank.no_cuenta || '');
-              $('#clabe').val(selectedBank.clabe || '');
-          } else {
-               $('#no_cuenta').val('');
-               $('#clabe').val('');
-          }
+          var $selectedBank = $(this).find('option:selected');
+          $('#no_cuenta').val($selectedBank.attr('data-no-cuenta') || '');
+          $('#clabe').val($selectedBank.attr('data-clabe') || '');
       });
 
 
