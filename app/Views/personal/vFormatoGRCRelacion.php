@@ -171,8 +171,8 @@
             <td class="border center" style="vertical-align: bottom; padding-bottom: 2mm;">
                 <div style="line-height: 5mm;">&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;</div>
                 <?php if ($firmanteDos): ?>
-                    <div class="signature-name"><?= esc($firmanteDos->nombre_completo ?? '') ?></div>
-                    <div class="signature-role"><?= esc($firmanteDos->dsc_puesto ?? '') ?></div>
+                    <div class="signature-name"><?= esc($firmanteDos->nombre_completo == 'MARÍA GUADALUPE ROBLES LEÓN' ? $firmanteUno->nombre_completo : '') ?></div>
+                    <div class="signature-role"><?= esc($firmanteDos->dsc_puesto == 'SECRETARIO/A DE TURISMO E IDENTIDAD' ?  $firmanteUno->dsc_puesto : '') ?></div>
                 <?php endif; ?>
             </td>
         </tr>
