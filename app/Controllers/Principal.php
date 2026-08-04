@@ -3500,6 +3500,112 @@ class Principal extends BaseController
         $mpdf->Output('Solicitud_GRC_' . $id_solicitud . '.pdf', 'I');
         exit();
     }
+
+    public function FormatoGRC($id_solicitud = null)
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+
+        if (empty($id_solicitud)) {
+            return $this->response->setStatusCode(400)->setBody('ID no válido');
+        }
+
+        $solicitudQuery = $globals->getTabla([
+            'tabla' => 'vw_solicitud_grc',
+            'where' => ['id_solicitud_grc' => $id_solicitud, 'visible' => 1],
+        ]);
+
+        if (empty($solicitudQuery->data)) {
+            return $this->response->setStatusCode(404)->setBody('Solicitud no encontrada');
+        }
+
+        $solicitud = $solicitudQuery->data[0];
+        $perfil = (int) ($session->get('id_perfil') ?? 0);
+        $usuarioSesion = (int) ($session->get('id_usuario') ?? 0);
+        if (!in_array($perfil, [1, 2], true) && (int) ($solicitud->usu_reg ?? 0) !== $usuarioSesion) {
+            return $this->response->setStatusCode(403)->setBody('No tiene permisos para consultar este formato');
+        }
+
+        $detallesQuery = $globals->getTabla([
+            'tabla' => 'vw_solicitud_grc_detalle',
+            'where' => ['id_solicitud_grc' => $id_solicitud, 'visible' => 1],
+        ]);
+        $comprobacionesQuery = $globals->getTabla([
+            'tabla' => 'solicitud_grc_comprobacion',
+            'where' => ['id_solicitud_grc' => $id_solicitud, 'visible' => 1],
+        ]);
+
+        $detalles = $detallesQuery->data ?? [];
+        $comprobaciones = $comprobacionesQuery->data ?? [];
+        $obtenerUsuario = static function ($idUsuario) use ($globals) {
+            if (empty($idUsuario)) {
+                return null;
+            }
+
+            $usuario = $globals->getTabla([
+                'tabla' => 'vw_usuario',
+                'where' => ['id_usuario' => $idUsuario, 'visible' => 1],
+            ]);
+
+            return !empty($usuario->data) ? $usuario->data[0] : null;
+        };
+
+        $responsable = $obtenerUsuario($solicitud->nombre_responsable ?? null);
+        $jefeResponsable = $obtenerUsuario($responsable->id_jefe_inmediato ?? null);
+        $superiorResponsable = $obtenerUsuario($jefeResponsable->id_jefe_inmediato ?? null);
+        $secretarioQuery = $globals->getTabla([
+            'tabla' => 'cat_secretario',
+            'where' => ['visible' => 1],
+            'limit' => 1,
+        ]);
+
+        $cantidad = (float) ($solicitud->cantidad ?? 0);
+        $totalComprobado = 0.0;
+        foreach ($comprobaciones as $comprobacion) {
+            $totalComprobado += (float) ($comprobacion->importe ?? 0);
+        }
+        $reintegro = !empty($comprobaciones) ? max(round($cantidad - $totalComprobado, 2), 0) : 0.0;
+
+        $partidas = [];
+        foreach ($detalles as $detalle) {
+            $partida = trim((string) ($detalle->id_partida ?? ''));
+            if ($partida !== '') {
+                $partidas[] = $partida;
+            }
+        }
+        $partidas = array_values(array_unique($partidas));
+
+        $data = [
+            'solicitud' => $solicitud,
+            'detalles' => $detalles,
+            'comprobaciones' => $comprobaciones,
+            'responsable' => $responsable,
+            'jefe_responsable' => $jefeResponsable,
+            'superior_responsable' => $superiorResponsable,
+            'secretario' => !empty($secretarioQuery->data) ? $secretarioQuery->data[0] : null,
+            'numero_documentos' => !empty($comprobaciones) ? count($comprobaciones) : count($detalles),
+            'partida_texto' => count($partidas) > 1 ? 'VARIOS' : ($partidas[0] ?? 'VARIOS'),
+            'cantidad' => $cantidad,
+            'cantidad_letra' => mb_strtoupper($this->numeroEnLetras($cantidad), 'UTF-8'),
+            'reintegro' => $reintegro,
+            'reintegro_letra' => mb_strtoupper($this->numeroEnLetras($reintegro), 'UTF-8'),
+            'logo' => FCPATH . 'assets/logo-guanajuato.png',
+        ];
+
+        $html = view('personal/vFormatoGRCRelacion', $data);
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 4,
+            'margin_left' => 4,
+            'margin_right' => 4,
+            'margin_bottom' => 4,
+            'format' => 'Letter',
+            'tempDir' => sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'mpdf',
+        ]);
+        $mpdf->WriteHTML($html);
+        $mpdf->Output('Formato_GRC_' . $id_solicitud . '.pdf', 'I');
+        exit();
+    }
+
     public function ArchivoComprobacion($id_solicitud = null)
     {
         $session = \Config\Services::session();
