@@ -8,11 +8,11 @@ foreach (($proyecto ?? []) as $project) {
 $recordsForJs = [];
 foreach ($records as $record) {
     $row = (array) $record;
-    if (isset($row['es_refrendo']) && is_string($row['es_refrendo']) && strlen($row['es_refrendo']) === 1) {
-        $row['es_refrendo'] = ord($row['es_refrendo']) === 1 ? 'Sí' : 'No';
+    if (isset($row['es_refrendo'])) {
+        $row['es_refrendo'] = (int) $row['es_refrendo'] === 1 ? 'Sí' : 'No';
     }
-    if (isset($row['proyecto_de_inversion'], $projectsById[(string) $row['proyecto_de_inversion']])) {
-        $row['proyecto_de_inversion'] .= ' - ' . $projectsById[(string) $row['proyecto_de_inversion']];
+    if (isset($row['proyecto_inversion'], $projectsById[(string) $row['proyecto_inversion']])) {
+        $row['proyecto_inversion'] .= ' - ' . $projectsById[(string) $row['proyecto_inversion']];
     }
     $recordsForJs[] = $row;
 }
@@ -42,8 +42,9 @@ foreach ($records as $record) {
                     <table id="tableIgto" class="table table-striped table-bordered dt-responsive nowrap" style="width:100%">
                         <thead>
                             <tr>
-                                <th>Folio</th>
+                                <th>ID</th>
                                 <th>Ejercicio</th>
+                                <th>Proyecto de inversi&oacute;n</th>
                                 <th>Obra o acción</th>
                                 <th>Municipio</th>
                                 <th>Estatus</th>
@@ -55,11 +56,12 @@ foreach ($records as $record) {
                         <tbody>
                             <?php foreach ($records as $index => $item): ?>
                                 <tr>
-                                    <td><?= esc($item->folio_obra_accion ?? '') ?></td>
+                                    <td><?= esc($item->id ?? '') ?></td>
                                     <td><?= esc($item->ejercicio ?? '') ?></td>
+                                    <td><?= esc($projectsById[(string) ($item->proyecto_inversion ?? '')] ?? ($item->proyecto_inversion ?? '')) ?></td>
                                     <td><?= esc($item->nombre_simplificado ?? $item->nombre_obra_accion ?? '') ?></td>
                                     <td><?= esc($item->municipio ?? '') ?></td>
-                                    <td><?= esc($item->estatus ?? '') ?></td>
+                                    <td><?= esc($item->estatus_avance ?? '') ?></td>
                                     <td><?= number_format((float) ($item->avance_fisico ?? 0), 2) ?>%</td>
                                     <td>$<?= number_format((float) ($item->monto_total_modificado ?? 0), 2) ?></td>
                                     <td>
@@ -104,12 +106,13 @@ foreach ($records as $record) {
 <script>
 const igtoRecords = <?= json_encode($recordsForJs, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?: '[]' ?>;
 const igtoLabels = {
-    folio_obra_accion: 'Folio de obra/acción', proyecto_de_inversion: 'Proyecto de inversión',
-    meta_sed: 'Meta SED', nombre_obra_accion: 'Nombre de la obra/acción',
+    id: 'ID', proyecto_inversion: 'Proyecto de inversión', icono_mapa: 'Icono del mapa',
+    nombre_obra_accion: 'Nombre de la obra/acción',
     nombre_simplificado: 'Nombre simplificado', fecha_entrega: 'Fecha de entrega',
-    tipo_obraaccion: 'Tipo de obra/acción', es_refrendo: 'Es refrendo',
-    ano_de_refrendo: 'Año de refrendo', cct: 'CCT',
-    primera_actualizacion: 'Primera actualización', ultima_actualizacion: 'Última actualización',
+    tipo_obra_accion: 'Tipo de obra/acción', es_refrendo: 'Es refrendo',
+    anio_refrendo: 'Año de refrendo', monto_pagado_devengado_estatal: 'Monto pagado/devengado estatal',
+    monto_total_pagado_devengado: 'Monto total pagado/devengado',
+    monto_total_pagado_devengado_sfia: 'Monto total pagado/devengado SFIA',
     usuario_inserto: 'Usuario que insertó', usuario_ultima_modificacion: 'Usuario que modificó'
 };
 
@@ -124,7 +127,6 @@ function showIgtoDetail(index) {
     const content = document.getElementById('igtoDetailContent');
     content.innerHTML = '';
     Object.keys(record).forEach(function (field) {
-        if (field === 'visible') return;
         const column = document.createElement('div');
         column.className = 'col-md-6 col-lg-4 mb-3';
         const card = document.createElement('div');
@@ -140,7 +142,7 @@ function showIgtoDetail(index) {
         column.appendChild(card);
         content.appendChild(column);
     });
-    document.getElementById('modalIgtoDetailTitle').textContent = 'Detalle: ' + (record.folio_obra_accion || 'obra/acción');
+    document.getElementById('modalIgtoDetailTitle').textContent = 'Detalle: ' + (record.nombre_simplificado || record.nombre_obra_accion || ('registro #' + record.id));
     $('#modalIgtoDetail').modal('show');
 }
 
