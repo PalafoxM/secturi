@@ -15,9 +15,13 @@ foreach ($records as $record) {
         continue;
     }
 
-    $icon = trim((string) ($record->icono_mapa ?? ''));
-    if ($icon !== '' && !preg_match('~^(?:https?:)?//|^data:~i', $icon)) {
-        $icon = base_url(ltrim(str_replace('\\', '/', $icon), '/'));
+    $iconValue = trim((string) ($record->icono_mapa ?? ''));
+    $iconId = ctype_digit($iconValue) ? $iconValue : '33';
+    $iconUrl = '';
+    if ($iconValue !== '' && !ctype_digit($iconValue)) {
+        $iconUrl = preg_match('~^(?:https?:)?//|^data:~i', $iconValue)
+            ? $iconValue
+            : base_url(ltrim(str_replace('\\', '/', $iconValue), '/'));
     }
 
     $markers[] = [
@@ -31,7 +35,8 @@ foreach ($records as $record) {
         'localidad' => (string) ($record->localidad ?? ''),
         'estatus' => (string) ($record->estatus_avance ?? ''),
         'avance_fisico' => (float) ($record->avance_fisico ?? 0),
-        'icono' => $icon,
+        'icono_id' => $iconId,
+        'icono_url' => $iconUrl,
         'latitud' => $latitude,
         'longitud' => $longitude,
     ];
@@ -73,6 +78,45 @@ foreach ($records as $record) {
     .mapa-container { position: relative; }
     .leaflet-popup-content .obra-popup-name { font-weight: 600; color: #263b5e; line-height: 1.35; }
     .leaflet-popup-content .obra-popup-detail { margin-top: .35rem; color: #5b6b82; line-height: 1.4; }
+    .obra-marker-wrapper { background: transparent; border: 0; }
+    .obra-marker {
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 3px solid #fff;
+        border-radius: 50% 50% 50% 0;
+        color: #fff;
+        font-size: 16px;
+        box-shadow: 0 3px 9px rgba(25, 40, 65, .38);
+        transform: rotate(-45deg);
+    }
+    .obra-marker i { transform: rotate(45deg); }
+    .obra-map-legend {
+        max-width: 230px;
+        padding: 9px 11px;
+        background: rgba(255, 255, 255, .96);
+        border-radius: .35rem;
+        box-shadow: 0 1px 7px rgba(0, 0, 0, .25);
+        color: #33415c;
+        line-height: 1.25;
+    }
+    .obra-map-legend strong { display: block; margin-bottom: 6px; }
+    .obra-map-legend-item { display: flex; align-items: center; margin-top: 5px; }
+    .obra-map-legend-symbol {
+        width: 24px;
+        height: 24px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 24px;
+        margin-right: 7px;
+        border: 2px solid #fff;
+        border-radius: 50%;
+        color: #fff;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, .25);
+    }
     @media (max-width: 767.98px) {
         #mapaObrasTurismo { height: 65vh; min-height: 420px; }
         .page-title-box .float-right { float: none !important; margin-bottom: 1rem; }
@@ -138,6 +182,32 @@ foreach ($records as $record) {
     const obras = <?= json_encode($markers, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?: '[]' ?>;
     const map = L.map('mapaObrasTurismo', { scrollWheelZoom: true }).setView([20.8756, -100.9867], 8);
 
+    const iconCatalog = {
+        '3':  { icon: 'fas fa-bullhorn', color: '#e83e8c', label: 'Promoción y comercialización' },
+        '6':  { icon: 'fas fa-building', color: '#5969ff', label: 'Edificios y paradores' },
+        '8':  { icon: 'fas fa-calendar-alt', color: '#f59f00', label: 'Festivales, cultura y eventos' },
+        '24': { icon: 'fas fa-lightbulb', color: '#17a2b8', label: 'Inteligencia y productos turísticos' },
+        '31': { icon: 'fas fa-hand-holding-usd', color: '#28a745', label: 'Incentivos a prestadores' },
+        '33': { icon: 'fas fa-map-marker-alt', color: '#6c757d', label: 'Obra o acción general' },
+        '48': { icon: 'fas fa-leaf', color: '#20c997', label: 'Sustentabilidad turística' },
+        '58': { icon: 'fas fa-film', color: '#6f42c1', label: 'Industria cinematográfica' }
+    };
+
+    function getIconDefinition(iconId) {
+        return iconCatalog[String(iconId)] || iconCatalog['33'];
+    }
+
+    function createMarkerIcon(iconId) {
+        const definition = getIconDefinition(iconId);
+        return L.divIcon({
+            className: 'obra-marker-wrapper',
+            html: '<div class="obra-marker" style="background-color:' + definition.color + '"><i class="' + definition.icon + '"></i></div>',
+            iconSize: [38, 38],
+            iconAnchor: [19, 38],
+            popupAnchor: [0, -38]
+        });
+    }
+
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
@@ -151,14 +221,16 @@ foreach ($records as $record) {
             alt: 'Ubicación de ' + obra.nombre
         };
 
-        if (obra.icono) {
+        if (obra.icono_url) {
             markerOptions.icon = L.icon({
-                iconUrl: obra.icono,
+                iconUrl: obra.icono_url,
                 iconSize: [38, 38],
                 iconAnchor: [19, 38],
                 popupAnchor: [0, -36],
                 className: 'obra-map-icon'
             });
+        } else {
+            markerOptions.icon = createMarkerIcon(obra.icono_id);
         }
 
         const marker = L.marker(point, markerOptions).addTo(map);
@@ -170,6 +242,7 @@ foreach ($records as $record) {
         popup.appendChild(name);
 
         const details = [
+            'Tipo: ' + getIconDefinition(obra.icono_id).label,
             obra.proyecto ? 'Proyecto: ' + obra.proyecto : '',
             obra.municipio ? 'Municipio: ' + obra.municipio : '',
             obra.localidad ? 'Localidad: ' + obra.localidad : '',
@@ -190,6 +263,32 @@ foreach ($records as $record) {
         map.setView(bounds[0], 16);
     } else if (bounds.length > 1) {
         map.fitBounds(bounds, { padding: [35, 35], maxZoom: 16 });
+    }
+
+    const usedIconIds = [...new Set(obras.map(function (obra) {
+        return String(obra.icono_id || '33');
+    }))];
+    if (usedIconIds.length) {
+        const legend = L.control({ position: 'bottomright' });
+        legend.onAdd = function () {
+            const container = L.DomUtil.create('div', 'obra-map-legend');
+            const title = document.createElement('strong');
+            title.textContent = 'Tipos de obra o acción';
+            container.appendChild(title);
+
+            usedIconIds.forEach(function (iconId) {
+                const definition = getIconDefinition(iconId);
+                const row = document.createElement('div');
+                row.className = 'obra-map-legend-item';
+                row.innerHTML = '<span class="obra-map-legend-symbol" style="background-color:' + definition.color + '"><i class="' + definition.icon + '"></i></span><span></span>';
+                row.lastElementChild.textContent = definition.label;
+                container.appendChild(row);
+            });
+
+            L.DomEvent.disableClickPropagation(container);
+            return container;
+        };
+        legend.addTo(map);
     }
 
     L.control.scale({ imperial: false, position: 'bottomleft' }).addTo(map);
