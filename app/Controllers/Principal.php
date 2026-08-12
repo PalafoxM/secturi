@@ -10696,12 +10696,17 @@ class Principal extends BaseController
         $globals = new Mglobal;
         $registro = $globals->getTabla([
             'tabla' => 'obras_acciones_turismo',
-            'select' => 'id, proyecto_inversion, nombre_obra_accion, nombre_simplificado, categoria, subcategoria, icono_mapa, municipio, localidad, estatus_avance, avance_fisico, latitud, longitud',
+            'select' => 'id, ejercicio, proyecto_inversion, nombre_obra_accion, nombre_simplificado, categoria, subcategoria, icono_mapa, municipio, localidad, estatus_avance, avance_fisico, latitud, longitud',
             'order' => 'ejercicio DESC, id DESC',
+        ]);
+        $proyecto = $globals->getTabla([
+            'tabla' => 'cat_proyecto_q',
+            'where' => ['visible' => 1],
         ]);
 
         $data = [];
         $data['registro'] = (!empty($registro->data)) ? $registro->data : [];
+        $data['proyecto'] = (!empty($proyecto->data)) ? $proyecto->data : [];
         $data['scripts'] = ['principal'];
         $data['contentView'] = 'secciones/vMapa';
         $this->_renderView($data);
