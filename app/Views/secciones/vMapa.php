@@ -2,6 +2,10 @@
 $records = $registro ?? [];
 $markers = [];
 $omitted = 0;
+$projectsById = [];
+foreach (($proyecto ?? []) as $project) {
+    $projectsById[(string) ($project->id_cat_proyecto_q ?? '')] = (string) ($project->dsc_proyecto_q ?? '');
+}
 
 foreach ($records as $record) {
     $latitude = isset($record->latitud) ? (float) $record->latitud : null;
@@ -26,7 +30,9 @@ foreach ($records as $record) {
 
     $markers[] = [
         'id' => (int) ($record->id ?? 0),
+        'ejercicio' => (string) ($record->ejercicio ?? ''),
         'proyecto' => (string) ($record->proyecto_inversion ?? ''),
+        'proyecto_nombre' => $projectsById[(string) ($record->proyecto_inversion ?? '')] ?? (string) ($record->proyecto_inversion ?? ''),
         'nombre' => (string) ($record->nombre_obra_accion ?? $record->nombre_simplificado ?? 'Obra o acción sin nombre'),
         'nombre_simplificado' => (string) ($record->nombre_simplificado ?? ''),
         'categoria' => (string) ($record->categoria ?? ''),
@@ -41,6 +47,24 @@ foreach ($records as $record) {
         'longitud' => $longitude,
     ];
 }
+
+$filterProjects = [];
+$filterSubcategories = [];
+$filterYears = [];
+foreach ($markers as $marker) {
+    if ($marker['proyecto'] !== '') {
+        $filterProjects[$marker['proyecto']] = $marker['proyecto_nombre'];
+    }
+    if ($marker['subcategoria'] !== '') {
+        $filterSubcategories[$marker['subcategoria']] = $marker['subcategoria'];
+    }
+    if ($marker['ejercicio'] !== '') {
+        $filterYears[$marker['ejercicio']] = $marker['ejercicio'];
+    }
+}
+natcasesort($filterProjects);
+natcasesort($filterSubcategories);
+krsort($filterYears, SORT_NATURAL);
 ?>
 <link href="<?= base_url() ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
 <link href="<?= base_url() ?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
@@ -62,6 +86,8 @@ foreach ($records as $record) {
     }
     .mapa-summary .media { min-width: 145px; }
     .mapa-summary .icon-info { width: 38px; height: 38px; line-height: 38px; text-align: center; border-radius: 50%; }
+    .mapa-filters { padding: .85rem 1rem; background: #f7f9fc; border: 1px solid #e3e8f0; border-radius: .4rem; }
+    .mapa-filters label { margin-bottom: .3rem; color: #33415c; font-weight: 600; }
     .mapa-empty {
         position: absolute;
         top: 50%;
@@ -148,7 +174,7 @@ foreach ($records as $record) {
                     <div class="d-flex flex-wrap mt-3 mt-md-0">
                         <div class="media align-items-center mr-4">
                             <div class="icon-info bg-soft-primary text-primary mr-2"><i class="fas fa-map-marker-alt"></i></div>
-                            <div class="media-body"><small class="text-muted d-block">En el mapa</small><strong><?= count($markers) ?></strong></div>
+                            <div class="media-body"><small class="text-muted d-block">En el mapa</small><strong id="mapaVisibleCount"><?= count($markers) ?></strong></div>
                         </div>
                         <?php if ($omitted > 0): ?>
                             <div class="media align-items-center">
@@ -159,15 +185,50 @@ foreach ($records as $record) {
                     </div>
                 </div>
 
+                <div class="mapa-filters mb-3">
+                    <div class="form-row align-items-end">
+                        <div class="form-group col-lg-5 col-md-6 mb-2">
+                            <label for="mapFilterProject"><i class="fas fa-project-diagram mr-1"></i>Proyecto de inversión</label>
+                            <select id="mapFilterProject" class="form-control">
+                                <option value="">Todos los proyectos</option>
+                                <?php foreach ($filterProjects as $value => $label): ?>
+                                    <option value="<?= esc($value) ?>"><?= esc($label !== '' ? $label : $value) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-4 col-md-6 mb-2">
+                            <label for="mapFilterSubcategory"><i class="fas fa-tags mr-1"></i>Subcategoría</label>
+                            <select id="mapFilterSubcategory" class="form-control">
+                                <option value="">Todas las subcategorías</option>
+                                <?php foreach ($filterSubcategories as $value => $label): ?>
+                                    <option value="<?= esc($value) ?>"><?= esc($label) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-2 col-md-6 mb-2">
+                            <label for="mapFilterYear"><i class="far fa-calendar-alt mr-1"></i>Año</label>
+                            <select id="mapFilterYear" class="form-control">
+                                <option value="">Todos los años</option>
+                                <?php foreach ($filterYears as $value => $label): ?>
+                                    <option value="<?= esc($value) ?>"><?= esc($label) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-1 col-md-6 mb-2">
+                            <button type="button" id="mapFilterClear" class="btn btn-outline-secondary btn-block" title="Limpiar filtros" aria-label="Limpiar filtros">
+                                <i class="fas fa-eraser"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="mapa-container">
                     <div id="mapaObrasTurismo" aria-label="Mapa de obras y acciones turísticas"></div>
-                    <?php if (empty($markers)): ?>
-                        <div class="mapa-empty">
+                        <div id="mapaEmptyMessage" class="mapa-empty<?= empty($markers) ? '' : ' d-none' ?>">
                             <i class="fas fa-map-marker-alt fa-2x text-muted mb-2"></i>
-                            <h5>No hay ubicaciones disponibles</h5>
-                            <p class="text-muted mb-0">Las obras registradas no tienen coordenadas válidas para mostrarse.</p>
+                            <h5 id="mapaEmptyTitle">No hay ubicaciones disponibles</h5>
+                            <p id="mapaEmptyText" class="text-muted mb-0">No existen obras con coordenadas válidas para los filtros seleccionados.</p>
                         </div>
-                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -213,7 +274,7 @@ foreach ($records as $record) {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
     }).addTo(map);
 
-    const bounds = [];
+    const markerEntries = [];
     obras.forEach(function (obra) {
         const point = [obra.latitud, obra.longitud];
         const markerOptions = {
@@ -233,7 +294,7 @@ foreach ($records as $record) {
             markerOptions.icon = createMarkerIcon(obra.icono_id);
         }
 
-        const marker = L.marker(point, markerOptions).addTo(map);
+        const marker = L.marker(point, markerOptions);
 
         const popup = document.createElement('div');
         const name = document.createElement('div');
@@ -243,7 +304,8 @@ foreach ($records as $record) {
 
         const details = [
             'Tipo: ' + getIconDefinition(obra.icono_id).label,
-            obra.proyecto ? 'Proyecto: ' + obra.proyecto : '',
+            obra.ejercicio ? 'Año: ' + obra.ejercicio : '',
+            obra.proyecto_nombre ? 'Proyecto: ' + obra.proyecto_nombre : '',
             obra.municipio ? 'Municipio: ' + obra.municipio : '',
             obra.localidad ? 'Localidad: ' + obra.localidad : '',
             obra.estatus ? 'Estatus: ' + obra.estatus : '',
@@ -256,14 +318,8 @@ foreach ($records as $record) {
             popup.appendChild(detail);
         }
         marker.bindPopup(popup, { maxWidth: 340 });
-        bounds.push(point);
+        markerEntries.push({ obra: obra, marker: marker, point: point });
     });
-
-    if (bounds.length === 1) {
-        map.setView(bounds[0], 16);
-    } else if (bounds.length > 1) {
-        map.fitBounds(bounds, { padding: [35, 35], maxZoom: 16 });
-    }
 
     const usedIconIds = [...new Set(obras.map(function (obra) {
         return String(obra.icono_id || '33');
@@ -290,6 +346,54 @@ foreach ($records as $record) {
         };
         legend.addTo(map);
     }
+
+    const projectFilter = document.getElementById('mapFilterProject');
+    const subcategoryFilter = document.getElementById('mapFilterSubcategory');
+    const yearFilter = document.getElementById('mapFilterYear');
+    const clearFilters = document.getElementById('mapFilterClear');
+    const visibleCount = document.getElementById('mapaVisibleCount');
+    const emptyMessage = document.getElementById('mapaEmptyMessage');
+
+    function applyMapFilters() {
+        const selectedProject = projectFilter.value;
+        const selectedSubcategory = subcategoryFilter.value;
+        const selectedYear = yearFilter.value;
+        const visiblePoints = [];
+
+        markerEntries.forEach(function (entry) {
+            const matches = (!selectedProject || entry.obra.proyecto === selectedProject) &&
+                (!selectedSubcategory || entry.obra.subcategoria === selectedSubcategory) &&
+                (!selectedYear || entry.obra.ejercicio === selectedYear);
+
+            if (matches) {
+                entry.marker.addTo(map);
+                visiblePoints.push(entry.point);
+            } else if (map.hasLayer(entry.marker)) {
+                map.removeLayer(entry.marker);
+            }
+        });
+
+        visibleCount.textContent = String(visiblePoints.length);
+        emptyMessage.classList.toggle('d-none', visiblePoints.length > 0);
+
+        if (visiblePoints.length === 1) {
+            map.setView(visiblePoints[0], 16);
+        } else if (visiblePoints.length > 1) {
+            map.fitBounds(visiblePoints, { padding: [35, 35], maxZoom: 16 });
+        }
+    }
+
+    [projectFilter, subcategoryFilter, yearFilter].forEach(function (filter) {
+        filter.addEventListener('change', applyMapFilters);
+    });
+    clearFilters.addEventListener('click', function () {
+        projectFilter.value = '';
+        subcategoryFilter.value = '';
+        yearFilter.value = '';
+        applyMapFilters();
+    });
+
+    applyMapFilters();
 
     L.control.scale({ imperial: false, position: 'bottomleft' }).addTo(map);
     window.setTimeout(function () { map.invalidateSize(); }, 250);
