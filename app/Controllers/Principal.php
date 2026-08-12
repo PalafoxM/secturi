@@ -10679,7 +10679,10 @@ class Principal extends BaseController
         $data['editar'] = 0;
 
         $proyecto = $globals->getTabla(["tabla" => "cat_proyecto_q", "where" => ["visible" => 1]]);
-        $registro = $globals->getTabla(["tabla" => "obras_acciones_turismo", "where" => ["visible" => 1]]);
+        $registro = $globals->getTabla([
+            "tabla" => "obras_acciones_turismo",
+            "order" => "ejercicio DESC, id DESC",
+        ]);
         $data['proyecto'] = (!empty($proyecto->data)) ? $proyecto->data : [];
         $data['registro'] = (!empty($registro->data)) ? $registro->data : [];
 
@@ -10693,8 +10696,8 @@ class Principal extends BaseController
         $globals = new Mglobal;
         $registro = $globals->getTabla([
             'tabla' => 'obras_acciones_turismo',
-            'select' => 'folio_obra_accion, nombre_obra_accion, latitud, longitud',
-            'where' => ['visible' => 1],
+            'select' => 'id, proyecto_inversion, nombre_obra_accion, nombre_simplificado, categoria, subcategoria, icono_mapa, municipio, localidad, estatus_avance, avance_fisico, latitud, longitud',
+            'order' => 'ejercicio DESC, id DESC',
         ]);
 
         $data = [];

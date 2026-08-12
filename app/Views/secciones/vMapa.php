@@ -15,9 +15,23 @@ foreach ($records as $record) {
         continue;
     }
 
+    $icon = trim((string) ($record->icono_mapa ?? ''));
+    if ($icon !== '' && !preg_match('~^(?:https?:)?//|^data:~i', $icon)) {
+        $icon = base_url(ltrim(str_replace('\\', '/', $icon), '/'));
+    }
+
     $markers[] = [
-        'folio' => (string) ($record->folio_obra_accion ?? ''),
-        'nombre' => (string) ($record->nombre_obra_accion ?? 'Obra o acción sin nombre'),
+        'id' => (int) ($record->id ?? 0),
+        'proyecto' => (string) ($record->proyecto_inversion ?? ''),
+        'nombre' => (string) ($record->nombre_obra_accion ?? $record->nombre_simplificado ?? 'Obra o acción sin nombre'),
+        'nombre_simplificado' => (string) ($record->nombre_simplificado ?? ''),
+        'categoria' => (string) ($record->categoria ?? ''),
+        'subcategoria' => (string) ($record->subcategoria ?? ''),
+        'municipio' => (string) ($record->municipio ?? ''),
+        'localidad' => (string) ($record->localidad ?? ''),
+        'estatus' => (string) ($record->estatus_avance ?? ''),
+        'avance_fisico' => (float) ($record->avance_fisico ?? 0),
+        'icono' => $icon,
         'latitud' => $latitude,
         'longitud' => $longitude,
     ];
@@ -58,6 +72,7 @@ foreach ($records as $record) {
     }
     .mapa-container { position: relative; }
     .leaflet-popup-content .obra-popup-name { font-weight: 600; color: #263b5e; line-height: 1.35; }
+    .leaflet-popup-content .obra-popup-detail { margin-top: .35rem; color: #5b6b82; line-height: 1.4; }
     @media (max-width: 767.98px) {
         #mapaObrasTurismo { height: 65vh; min-height: 420px; }
         .page-title-box .float-right { float: none !important; margin-bottom: 1rem; }
@@ -131,14 +146,42 @@ foreach ($records as $record) {
     const bounds = [];
     obras.forEach(function (obra) {
         const point = [obra.latitud, obra.longitud];
-        const marker = L.marker(point, {
+        const markerOptions = {
             title: obra.nombre,
             alt: 'Ubicación de ' + obra.nombre
-        }).addTo(map);
+        };
+
+        if (obra.icono) {
+            markerOptions.icon = L.icon({
+                iconUrl: obra.icono,
+                iconSize: [38, 38],
+                iconAnchor: [19, 38],
+                popupAnchor: [0, -36],
+                className: 'obra-map-icon'
+            });
+        }
+
+        const marker = L.marker(point, markerOptions).addTo(map);
 
         const popup = document.createElement('div');
-        popup.className = 'obra-popup-name';
-        popup.textContent = obra.nombre;
+        const name = document.createElement('div');
+        name.className = 'obra-popup-name';
+        name.textContent = obra.nombre;
+        popup.appendChild(name);
+
+        const details = [
+            obra.proyecto ? 'Proyecto: ' + obra.proyecto : '',
+            obra.municipio ? 'Municipio: ' + obra.municipio : '',
+            obra.localidad ? 'Localidad: ' + obra.localidad : '',
+            obra.estatus ? 'Estatus: ' + obra.estatus : '',
+            'Avance físico: ' + Number(obra.avance_fisico || 0).toFixed(2) + '%'
+        ].filter(Boolean);
+        if (details.length) {
+            const detail = document.createElement('div');
+            detail.className = 'obra-popup-detail';
+            detail.textContent = details.join(' · ');
+            popup.appendChild(detail);
+        }
         marker.bindPopup(popup, { maxWidth: 340 });
         bounds.push(point);
     });
