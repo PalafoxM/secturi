@@ -117,6 +117,9 @@
 <div class="page-wrapper">
     <?php
     $anio_actual = (isset($es2025) && $es2025) ? '2025' : '2026';
+    $es_refrendo = isset($es_refrendo)
+        ? (bool) $es_refrendo
+        : (isset($registro_pt->tipo_formato) && strtoupper((string) $registro_pt->tipo_formato) === 'REFRENDO');
     $prefix_found = '';
     $seguir_pagando = isset($seguir_pagando) && $seguir_pagando == 1;
     // Helper to extract no_consecutivo and prefix from full folio string if editing
@@ -197,6 +200,7 @@
                     <input type="hidden" name="id_reserva" value="<?= $id_reserva ?>">
                     <input type="hidden" name="editar" value="<?= $editar ?>">
                     <input type="hidden" name="es2025" value="<?= $es2025 ?>">
+                    <input type="hidden" name="tipo_formato" value="<?= $es_refrendo ? 'REFRENDO' : esc($tipo_formato ?? 'PT') ?>">
                   
                     <?php if($editar == 1): ?>
                     <input type="hidden" name="id_formulario_pt" value="<?= isset($registro_pt->id_formulario_pt) ? $registro_pt->id_formulario_pt : '' ?>">
@@ -244,6 +248,9 @@
                                         <input type="text" name="no_consecutivo" autocomplete="off" class="form-control-plaintext mx-1" style="width: 80px;" value="<?= isset($no_consecutivo) ? $no_consecutivo : '' ?>" placeholder="001">
                                         <span style="font-weight:bold; font-size: 1.2em;">/</span>
                                         <select id="anio_consecutivo" name="anio_consecutivo" class="form-control-plaintext mx-1" style="width: 70px;">
+                                            <?php if ($anio_actual === '2025' || $es_refrendo): ?>
+                                                <option value="2025" <?= $anio_actual == '2025' ? 'selected' : '' ?>>2025</option>
+                                            <?php endif; ?>
                                             <option value="2026" <?= $anio_actual == '2026' ? 'selected' : '' ?>>2026</option>
                                         </select>
                                     </div>
@@ -779,7 +786,7 @@
           var prefix = $('#folio option:selected').text().trim();
           var consecutivo = $('input[name="no_consecutivo"]').val();
           var anio = $('#anio_consecutivo').val();
-          let refrendo = "<?= isset($es2025) && !empty($es2025)?'REFRENDO ':'' ?>";
+          let refrendo = "<?= $es_refrendo ? 'REFRENDO ' : '' ?>";
         
           if(prefix && consecutivo) {
               // Si el prefijo termina en diagonal (ej. "SECTURI/DGA/"), no le agregamos espacio antes del consecutivo.
@@ -1188,7 +1195,7 @@
                             confirmButtonText: 'Aceptar'
                         }).then((result) => {
                             if(is2025){
-                                window.location.href = "<?php echo base_url(); ?>index.php/Inicio/ListaHojaAzulRefrendo";
+                                window.location.href = "<?php echo base_url(); ?>index.php/Inicio/ListaHojaAzulRefrendo/2025";
                             }else{
                                 window.location.href = "<?php echo base_url(); ?>index.php/Inicio/ListaHojaAzul";
                             }
