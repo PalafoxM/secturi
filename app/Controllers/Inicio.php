@@ -4123,6 +4123,7 @@ class Inicio extends BaseController
     {
         $session = \Config\Services::session();
         $globas = new Mglobal;
+        $anio = $anio ?: 2025;
         if(in_array($session->get('id_perfil'), [1,2])){
             $dataDB = array('tabla' => 'formulario_pt', 'where' => ['visible' => 1, 'tipo_formato' => 'REFRENDO']);
         }else{
@@ -4149,6 +4150,8 @@ class Inicio extends BaseController
         $globals = new Mglobal;
         $data = array();
         $data['es2025'] = false;
+        $data['es_refrendo'] = false;
+        $data['tipo_formato'] = 'PT';
         
         $id = $this->request->getGet('id');
         $editar = $this->request->getGet('editar');
@@ -4158,6 +4161,7 @@ class Inicio extends BaseController
         $data['editar'] = ($editar == 1) ? 1 : 0;
         $data['seguir_pagando'] = ($seguirPagando == 1) ? 1 : 0;
         $data['es2025'] = ($anio == 2025) ? true : false;
+        $data['es_refrendo'] = $data['es2025'];
         $data['id_reserva'] = 0; // Default or fetch if needed
         $data['no_consecutivo'] = ''; // Logic to generate new consecutive if needed, or leave blank
         $data['proveedor_bancos'] = [];
@@ -4174,6 +4178,12 @@ class Inicio extends BaseController
             $registro = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["id_formulario_pt" => $id]]);
             if (!empty($registro->data)) {
                 $data['registro_pt'] = $registro->data[0];
+                $tipoFormatoRegistro = strtoupper(trim((string) ($data['registro_pt']->tipo_formato ?? 'PT')));
+                $data['tipo_formato'] = $tipoFormatoRegistro;
+                $data['es_refrendo'] = $tipoFormatoRegistro === 'REFRENDO';
+                if ($data['es_refrendo']) {
+                    $data['es2025'] = true;
+                }
             //die(var_dump($data['registro_pt']));
                 // Fetch items
                 $items = $globals->getTabla(["tabla" => "manual_factura", "where" => ["id_registro_pt" => $id, "visible" => 1]]);

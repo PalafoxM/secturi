@@ -6755,6 +6755,28 @@ class Agregar extends BaseController
         $this->globals = new Mglobal();
         $data = $this->request->getPost();
        // $archivos_post = $this->request->getFiles();
+
+        $esEdicion = (int) ($data['editar'] ?? 0) === 1 && !empty($data['id_formulario_pt']);
+        $tipoFormato = strtoupper(trim((string) ($data['tipo_formato'] ?? 'PT')));
+        if ($esEdicion) {
+            $registroActual = $this->globals->getTabla([
+                'tabla' => 'formulario_pt',
+                'where' => ['id_formulario_pt' => $data['id_formulario_pt']],
+                'limit' => 1,
+            ]);
+            if (!empty($registroActual->data)) {
+                // Al editar se conserva el tipo original; un refrendo nunca debe convertirse en PT.
+                $tipoFormato = strtoupper(trim((string) ($registroActual->data[0]->tipo_formato ?? 'PT')));
+            }
+        } elseif (filter_var($data['es2025'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
+            $tipoFormato = 'REFRENDO';
+        }
+
+        $tipoFormato = $tipoFormato === 'REFRENDO' ? 'REFRENDO' : 'PT';
+        $folioCompleto = trim((string) ($data['folioCompleto'] ?? ''));
+        $folioSinTipo = preg_replace('/^(?:REFRENDO\s+)?PT\s+/i', '', $folioCompleto);
+        $folioCompleto = ($tipoFormato === 'REFRENDO' ? 'REFRENDO PT ' : 'PT ')
+            . ltrim((string) $folioSinTipo);
         
         // 1. Validaciones Básicas
         if (isset($data['no_consecutivo']) && empty($data['no_consecutivo'])) {
@@ -6767,8 +6789,8 @@ class Agregar extends BaseController
 
 
       //validar que no se repita el no_consecutivo
-      if($data['editar'] != 1 ){
-        $existe = $this->globals->getTabla(['tabla' => 'formulario_pt', 'where' => ['no_consecutivo' => $data['folioCompleto'], 'visible' => 1]]);
+      if(!$esEdicion){
+        $existe = $this->globals->getTabla(['tabla' => 'formulario_pt', 'where' => ['no_consecutivo' => $folioCompleto, 'visible' => 1]]);
             if(!$existe->error && !empty($existe->data)){
                 $usuario = $this->globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['id_usuario' => $existe->data[0]->usu_reg]])->data[0]->nombre_completo;
                 $response->error = true;
@@ -6781,7 +6803,7 @@ class Agregar extends BaseController
         
        
         $dataInsert = [
-            'no_consecutivo' => $data['folioCompleto'],
+            'no_consecutivo' => $folioCompleto,
             'nombre_proveedor_1' => $data['nombre_proveedor_1'],
             'rfc_proveedor' => $data['rfc_proveedor'],
             'nombre_proveedor_2' => $data['nombre_proveedor_2'],
@@ -6806,17 +6828,13 @@ class Agregar extends BaseController
             'concepto' => $data['concepto'] ?? ''
         ];
 
-        $dataInsert['tipo_formato'] = isset($data['tipo_formato']) && !empty($data['tipo_formato']) ? $data['tipo_formato'] : 'PT';
-
-        if(isset($data['es2025']) && $data['es2025']){
-            $dataInsert['tipo_formato'] = 'REFRENDO';
-        }
+        $dataInsert['tipo_formato'] = $tipoFormato;
         if(isset($data['es2025']) && !$data['es2025'] && in_array($session->get('id_usuario'), [14,17, 59, 11, 38, 34,88])){
             $dataInsert['promo'] = 1;
         }
        
         $id_registro_pt = null;
-        if($data['editar'] == 1 && isset($data['id_formulario_pt'])){
+        if($esEdicion){
             $id_registro_pt = $data['id_formulario_pt'];
             $dataConfig = ["tabla" => "formulario_pt", "editar" => true, "idEditar" => ['id_formulario_pt' => $id_registro_pt]];
             $dataInsert['usu_act'] = $session->get('id_usuario');
@@ -6830,7 +6848,7 @@ class Agregar extends BaseController
             $id_registro_pt = $responseMain->idRegistro;
         }
        
-         if($data['editar'] == 1 && isset($data['id_formulario_pt'])){
+         if($esEdicion){
           //  $filasActuales = $this->globals->getTabla(['tabla' => 'manual_factura', 'where' => ['id_registro_pt' => $id_registro_pt, 'visible' => 1]]);
 
     
