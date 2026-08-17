@@ -2827,7 +2827,7 @@ class Principal extends BaseController
         $result = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_tipo_empleado' => 1]])->data;
         $email->setTo('rsalbap@guanajuato.gob.mx');
 
-        $email->setTo([
+        /*$email->setTo([
             'ccampos@guanajuato.gob.mx',
             'ztorrest@guanajuato.gob.mx',
             'ajassome@guanajuato.gob.mx',
@@ -2841,9 +2841,9 @@ class Principal extends BaseController
             'yjimenez@guanajuato.gob.mx',
             'mamoralesg@guanajuato.gob.mx',
             'jrojas@guanajuato.gob.mx',
-        ]); 
+        ]); */
  
-          /*$email->setTo([
+          $email->setTo([
                     'alopez@guanajuato.gob.mx',
                     'cchernandezp@guanajuato.gob.mx',
                     'csoto@guanajuato.gob.mx',
@@ -2887,7 +2887,7 @@ class Principal extends BaseController
                     'daniela.tafoya@guanajuato.gob.mx',
                     'mvivianam@guanajuato.gob.mx',
                     'dbaezao@guanajuato.gob.mx',
-                ]);*/
+                ]);
         $email->setSubject('Recordatorio: Revisión de Asistencias - Sistema SUSI');
         $email->setMessage('
             <!DOCTYPE html>
@@ -2920,9 +2920,9 @@ class Principal extends BaseController
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Estimado personal,</p>
                         
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-                            En caso de que aún no hayas realizado las <strong>justificaciones de tu personal correspondientes a la quincena 14/2026</strong>, 
-                            la cual comprende el periodo del <strong>16 al 31 de julio de 2026</strong>, 
-                            tienes hasta el día <strong>lunes 10 de agosto hasta las 16:00 hrs</strong> para realizarlas.
+                            En caso de que aún no hayas realizado las <strong>justificaciones correspondientes a la quincena 15/2026</strong>, 
+                            la cual comprende el periodo del <strong>01 al 15 de agosto de 2026</strong>, 
+                            tienes hasta el día <strong>viernes 21 de agosto hasta las 16:00 hrs</strong> para realizarlas.
                         </p>
 
                         <div class="highlight-box">
@@ -2938,7 +2938,7 @@ class Principal extends BaseController
                         </p>
 
                         <div style="text-align: center; margin: 30px 0;">
-                            <a href="https://secturnet.guanajuato.gob.mx/susi/index.php/Principal/incidenciaSubordinado" class="btn" style="color: white; text-decoration: none;">
+                            <a href="https://secturnet.guanajuato.gob.mx/susi/index.php/Agregar/Asistencia" class="btn" style="color: white; text-decoration: none;">
                                 📋 Revisar Incidencias
                             </a>
                         </div>
