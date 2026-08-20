@@ -101,6 +101,8 @@ $nombresDias = [
     </div>
 </div>
 
+<!-- Esta plantilla carga los complementos de jQuery en el pie, pero no carga el núcleo. -->
+<script src="<?= base_url('assets/js/jquery.min.js') ?>"></script>
 <script>
 (function () {
     'use strict';
