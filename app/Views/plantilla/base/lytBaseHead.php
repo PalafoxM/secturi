@@ -616,6 +616,9 @@
                                 href="<?php echo base_url(); ?>index.php/Agregar/Asistencia">Asistencias</a>
                         </li>
                         <li class="nav-item"><a class="nav-link"
+                                href="<?php echo base_url(); ?>index.php/Inicio/CitasFirmas">Citas para firmas</a>
+                        </li>
+                        <li class="nav-item"><a class="nav-link"
                                 href="<?php echo base_url(); ?>index.php/Agregar/Documentos">Normatividad</a>
                         </li>
                         <li class="nav-item"><a class="nav-link"

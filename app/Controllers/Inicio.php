@@ -4144,6 +4144,48 @@ class Inicio extends BaseController
         $this->_renderView($data);
     }
 
+    public function CitasFirmas()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $fechasPermitidas = [
+            '2026-08-24',
+            '2026-08-25',
+            '2026-08-26',
+            '2026-08-27',
+            '2026-08-28',
+        ];
+        $horasPermitidas = ['10:00:00', '11:00:00', '12:00:00', '13:00:00', '14:00:00', '15:00:00'];
+
+        $consulta = $globals->getTabla([
+            'tabla' => 'cita_firmas',
+            'where' => ['visible' => 1],
+            'order' => 'fecha ASC, hora ASC',
+        ]);
+
+        $citas = [];
+        foreach (($consulta->data ?? []) as $cita) {
+            $fecha = date('Y-m-d', strtotime((string) ($cita->fecha ?? '')));
+            $hora = date('H:i:s', strtotime((string) ($cita->hora ?? '')));
+            if (!in_array($fecha, $fechasPermitidas, true) || !in_array($hora, $horasPermitidas, true)) {
+                continue;
+            }
+
+            $citas[$fecha][$hora] = [
+                'ocupada' => true,
+                'propia' => (int) ($cita->id_usuario ?? 0) === (int) $session->get('id_usuario'),
+            ];
+        }
+
+        $data = [];
+        $data['fechas_permitidas'] = $fechasPermitidas;
+        $data['horas_permitidas'] = $horasPermitidas;
+        $data['citas'] = $citas;
+        $data['scripts'] = ['inicio'];
+        $data['contentView'] = 'secciones/vCitasFirmas';
+        $this->_renderView($data);
+    }
+
     public function generarFormatoPT()
     {
         $session = \Config\Services::session();
