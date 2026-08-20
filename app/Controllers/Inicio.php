@@ -4169,6 +4169,20 @@ class Inicio extends BaseController
             'where' => ['visible' => 1],
             'order' => 'fecha ASC, hora ASC',
         ]);
+        $consultaUsuarios = $globals->getTabla([
+            'tabla' => 'vw_usuario',
+            'select' => 'id_usuario, nombre, nombre_completo',
+            'where' => ['visible' => 1],
+        ]);
+        $nombresUsuarios = [];
+        foreach (($consultaUsuarios->data ?? []) as $usuario) {
+            $primerNombre = trim((string) ($usuario->nombre ?? ''));
+            if ($primerNombre === '') {
+                $nombreCompleto = trim((string) ($usuario->nombre_completo ?? ''));
+                $primerNombre = $nombreCompleto !== '' ? explode(' ', $nombreCompleto)[0] : 'Usuario';
+            }
+            $nombresUsuarios[(int) ($usuario->id_usuario ?? 0)] = $primerNombre;
+        }
 
         $citas = [];
         foreach (($consulta->data ?? []) as $cita) {
@@ -4178,9 +4192,11 @@ class Inicio extends BaseController
                 continue;
             }
 
+            $idUsuarioCita = (int) ($cita->id_usuario ?? 0);
             $citas[$fecha][$hora] = [
                 'ocupada' => true,
-                'propia' => (int) ($cita->id_usuario ?? 0) === (int) $session->get('id_usuario'),
+                'propia' => $idUsuarioCita === (int) $session->get('id_usuario'),
+                'nombre' => $nombresUsuarios[$idUsuarioCita] ?? 'Usuario',
             ];
         }
 
