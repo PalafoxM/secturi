@@ -57,7 +57,7 @@ $nombresDias = [
                 <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
                     <div>
                         <h4 class="mt-0 mb-1">Horarios disponibles</h4>
-                        <p class="text-muted mb-0">Cada horario admite solamente una cita.</p>
+                        <p class="text-muted mb-0">Citas cada 30 minutos; cada horario admite solamente un registro.</p>
                     </div>
                     <div class="citas-legend text-muted mt-2 mt-md-0">
                         <span><i class="bg-primary"></i>Disponible</span>
