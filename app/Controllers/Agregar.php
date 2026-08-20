@@ -6748,6 +6748,85 @@ class Agregar extends BaseController
     }
 
 
+    public function guardarCitaFirmas()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $fecha = trim((string) $this->request->getPost('fecha'));
+        $hora = trim((string) $this->request->getPost('hora'));
+        $fechasPermitidas = [
+            '2026-08-24',
+            '2026-08-25',
+            '2026-08-26',
+            '2026-08-27',
+            '2026-08-28',
+        ];
+        $horasPermitidas = ['10:00:00', '11:00:00', '12:00:00', '13:00:00', '14:00:00', '15:00:00'];
+
+        if (!in_array($fecha, $fechasPermitidas, true)) {
+            return $this->response->setJSON([
+                'error' => true,
+                'respuesta' => 'La fecha seleccionada no está dentro del periodo permitido.',
+            ]);
+        }
+
+        if (preg_match('/^\d{2}:\d{2}$/', $hora)) {
+            $hora .= ':00';
+        }
+        if (!in_array($hora, $horasPermitidas, true)) {
+            return $this->response->setJSON([
+                'error' => true,
+                'respuesta' => 'El horario debe estar entre las 10:00 y las 15:00 horas.',
+            ]);
+        }
+
+        $fechaRegistro = $fecha . ' 00:00:00';
+        $existentes = $globals->getTabla([
+            'tabla' => 'cita_firmas',
+            'where' => ['visible' => 1],
+        ]);
+        $horarioOcupado = false;
+        foreach (($existentes->data ?? []) as $cita) {
+            $fechaExistente = date('Y-m-d', strtotime((string) ($cita->fecha ?? '')));
+            $horaExistente = date('H:i:s', strtotime((string) ($cita->hora ?? '')));
+            if ($fechaExistente === $fecha && $horaExistente === $hora) {
+                $horarioOcupado = true;
+                break;
+            }
+        }
+        if ($horarioOcupado) {
+            return $this->response->setJSON([
+                'error' => true,
+                'respuesta' => 'Ese horario acaba de ser registrado. Seleccione otro horario disponible.',
+            ]);
+        }
+
+        $ahora = date('Y-m-d H:i:s');
+        $resultado = $globals->saveTabla([
+            'id_usuario' => (int) $session->get('id_usuario'),
+            'fecha' => $fechaRegistro,
+            'hora' => $hora,
+            'usu_reg' => (int) $session->get('id_usuario'),
+            'fec_reg' => $ahora,
+            'usu_act' => (int) $session->get('id_usuario'),
+            'fec_act' => $ahora,
+            'visible' => 1,
+        ], [
+            'tabla' => 'cita_firmas',
+            'editar' => false,
+        ], [
+            'id_user' => (int) $session->get('id_usuario'),
+            'script' => 'Agregar.php/guardarCitaFirmas',
+        ]);
+
+        return $this->response->setJSON([
+            'error' => (bool) ($resultado->error ?? true),
+            'respuesta' => ($resultado->error ?? true)
+                ? ($resultado->respuesta ?? 'No fue posible registrar la cita.')
+                : 'La cita se registró correctamente.',
+        ]);
+    }
+
     public function guardaFormatoPT()
     {
         $session = \Config\Services::session();
