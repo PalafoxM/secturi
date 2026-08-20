@@ -24,6 +24,9 @@ $nombresDias = [
     .cita-slot.btn-light { border: 1px solid #dce3ee; color: #33415c; background: #fff; }
     .cita-slot.btn-light:hover { border-color: #1761fd; color: #1761fd; background: #eef4ff; }
     .cita-slot-ocupada { cursor: not-allowed; opacity: .8; }
+    .cita-persona { font-size: .68rem; font-weight: 700; padding: .18rem .38rem; border-radius: 1rem; }
+    .btn-success .cita-persona { color: #176b3a; background: rgba(255,255,255,.88); }
+    .btn-outline-danger .cita-persona { color: #b42335; background: #fff1f3; }
     .citas-legend span { display: inline-flex; align-items: center; margin-right: 1rem; margin-bottom: .35rem; }
     .citas-legend i { width: 10px; height: 10px; border-radius: 50%; margin-right: .35rem; }
     @media (max-width: 767.98px) { .citas-header { padding: 1.1rem; } }
@@ -77,12 +80,13 @@ $nombresDias = [
                                         $estado = $citas[$fecha][$hora] ?? null;
                                         $ocupada = !empty($estado['ocupada']);
                                         $propia = !empty($estado['propia']);
+                                        $nombre = (string) ($estado['nombre'] ?? 'Usuario');
                                         $horaTexto = date('H:i', strtotime($hora));
                                         ?>
                                         <?php if ($ocupada): ?>
                                             <button type="button" class="btn <?= $propia ? 'btn-success' : 'btn-outline-danger' ?> cita-slot cita-slot-ocupada" disabled>
                                                 <strong><?= esc($horaTexto) ?></strong>
-                                                <span><?= $propia ? 'Tu cita' : 'Ocupado' ?></span>
+                                                <span><?= $propia ? 'Tu cita' : 'Ocupado' ?> <small class="cita-persona ml-1"><?= esc($nombre) ?></small></span>
                                             </button>
                                         <?php else: ?>
                                             <button type="button" class="btn btn-light cita-slot js-reservar-cita" data-fecha="<?= esc($fecha, 'attr') ?>" data-hora="<?= esc($hora, 'attr') ?>" data-etiqueta="<?= esc(($nombresDias[$fecha] ?? $fecha) . ' a las ' . $horaTexto, 'attr') ?>">
