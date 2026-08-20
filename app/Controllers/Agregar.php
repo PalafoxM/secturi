@@ -6761,7 +6761,14 @@ class Agregar extends BaseController
             '2026-08-27',
             '2026-08-28',
         ];
-        $horasPermitidas = ['10:00:00', '11:00:00', '12:00:00', '13:00:00', '14:00:00', '15:00:00'];
+        $horasPermitidas = [
+            '10:00:00', '10:30:00',
+            '11:00:00', '11:30:00',
+            '12:00:00', '12:30:00',
+            '13:00:00', '13:30:00',
+            '14:00:00', '14:30:00',
+            '15:00:00',
+        ];
 
         if (!in_array($fecha, $fechasPermitidas, true)) {
             return $this->response->setJSON([
@@ -6776,7 +6783,7 @@ class Agregar extends BaseController
         if (!in_array($hora, $horasPermitidas, true)) {
             return $this->response->setJSON([
                 'error' => true,
-                'respuesta' => 'El horario debe estar entre las 10:00 y las 15:00 horas.',
+                'respuesta' => 'El horario debe corresponder a un intervalo de 30 minutos entre las 10:00 y las 15:00 horas.',
             ]);
         }
 
