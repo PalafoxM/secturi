@@ -1,4 +1,4 @@
-<!-- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -97,8 +97,8 @@ body.forest-bg #particles-js { display: none; }
   }
 
   window.addEventListener('load', setRandomBackground);
-</script>-->
-<!DOCTYPE html>
+</script>
+<!-- <!DOCTYPE html>
 <?php
 $loginDefaultBackgroundUrl = base_url('images/fondo_susi.png');
 $loginLoadingBackgroundUrl = base_url('images/fondo_susi.png');
@@ -132,13 +132,13 @@ $loginBackgroundUrls = [$loginDefaultBackgroundUrl];
             document.documentElement.style.setProperty('--fic-login-main-bg', 'url("' + currentBackground.replace(/"/g, '\\"') + '")');
         })();
     </script>
-    <!-- El login y sus modos de acceso utilizan jQuery en los scripts dinámicos. -->
+
     <script src="<?= base_url('assets/js/jquery.min.js') ?>"></script>
     <?php if (isset($scripts)) : foreach ($scripts as $js) : ?>
     <script src="<?= base_url("js/{$js}.js") ?>?filever=<?= time() ?>" type="text/javascript"></script>
     <?php endforeach; endif; ?>
 </head>
-<body class="fic-login-body" data-base-url="<?= esc(base_url(), 'attr') ?>">
+<body class="fic-login-body" data-base-url="<?= esc(base_url(), 'attr') ?>"> -->
 <script>
     var base_url = "<?= base_url(); ?>";
 </script>
