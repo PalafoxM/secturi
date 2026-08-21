@@ -346,7 +346,8 @@
     }
 </style>
 
-<body>
+<!-- El panel informativo del menú inicia colapsado y se abre con el botón del menú. -->
+<body class="enlarge-menu">
 
     <script>
         var base_url = "<?php echo base_url(); ?>";
