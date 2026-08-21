@@ -27,6 +27,9 @@
     <link href="<?php echo base_url(); ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
     <link href="<?php echo base_url(); ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
 
+    <!-- jQuery debe cargarse antes de los scripts dinámicos principal.js e inicio.js. -->
+    <script src="<?php echo base_url(); ?>assets/js/jquery.min.js"></script>
+
     <?php if (isset($scripts)):
         foreach ($scripts as $js): ?>
             <script src="<?php echo base_url() . "js/{$js}.js" ?>?filever=<?php echo time() ?>" type="text/javascript">

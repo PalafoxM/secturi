@@ -179,6 +179,11 @@
     }
 
     function initRightbarChart() {
+        var rightbarChart = document.querySelector("#rightbar_chart");
+        if (!rightbarChart || typeof ApexCharts === 'undefined') {
+            return;
+        }
+
         //Apex-radialbar2
             var options = {
                 chart: {
@@ -228,7 +233,7 @@
             }
             
             var chart = new ApexCharts(
-                document.querySelector("#rightbar_chart"),
+                rightbarChart,
                 options
             );
             

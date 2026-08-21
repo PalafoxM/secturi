@@ -14,7 +14,6 @@
     <link href="<?php echo base_url(); ?>plugins/sweet-alert2/sweetalert2.min.css" rel="stylesheet" type="text/css">
     <link href="<?php echo base_url(); ?>plugins/animate/animate.css" rel="stylesheet" type="text/css">
 
-
     <link href="<?php echo base_url(); ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="<?php echo base_url(); ?>assets/css/jquery-ui.min.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
@@ -116,8 +115,7 @@ $loginBackgroundUrls = [$loginDefaultBackgroundUrl];
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <link rel="shortcut icon" href="<?= base_url(); ?>assets/images/favicon.ico" type="image/x-icon">
 
-    <link rel="stylesheet" type="text/css" href="<?= base_url('parallax.js_files/styles.css') ?>">
-    
+  
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
@@ -135,6 +133,8 @@ $loginBackgroundUrls = [$loginDefaultBackgroundUrl];
             document.documentElement.style.setProperty('--fic-login-main-bg', 'url("' + currentBackground.replace(/"/g, '\\"') + '")');
         })();
     </script>
+    <!-- El login y sus modos de acceso utilizan jQuery en los scripts dinámicos. -->
+    <script src="<?= base_url('assets/js/jquery.min.js') ?>"></script>
     <?php if (isset($scripts)) : foreach ($scripts as $js) : ?>
     <script src="<?= base_url("js/{$js}.js") ?>?filever=<?= time() ?>" type="text/javascript"></script>
     <?php endforeach; endif; ?>

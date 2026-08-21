@@ -997,7 +997,6 @@ $tarjetasError = session()->getFlashdata('tarjetas_error');
 
 <link href="<?= base_url() ?>plugins/dropify/css/dropify.min.css" rel="stylesheet">
 <link href="<?= base_url() ?>plugins/filter/magnific-popup.css" rel="stylesheet" type="text/css" />
-<link href="<?= base_url() ?>plugins/lightpick/lightpick.css" rel="stylesheet" />
 
 <!-- App css -->
 <link href="<?= base_url() ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
@@ -1010,16 +1009,7 @@ $tarjetasError = session()->getFlashdata('tarjetas_error');
 <link href="<?= base_url() ?>plugins/ion-rangeslider/ion.rangeSlider.css" rel="stylesheet" type="text/css" />
 
 
-<!-- jQuery  -->
-<script src="<?= base_url() ?>assets/js/jquery.min.js"></script>
-<script src="<?= base_url() ?>assets/js/jquery-ui.min.js"></script>
-<script src="<?= base_url() ?>assets/js/bootstrap.bundle.min.js"></script>
-<script src="<?= base_url() ?>assets/js/metismenu.min.js"></script>
-<script src="<?= base_url() ?>assets/js/waves.js"></script>
-<script src="<?= base_url() ?>assets/js/feather.min.js"></script>
-<script src="<?= base_url() ?>assets/js/jquery.slimscroll.min.js"></script>
-
-
+<!-- jQuery y los componentes base se cargan una sola vez desde la plantilla. -->
 <script src="<?= base_url() ?>plugins/dropify/js/dropify.min.js"></script>
 <script src="<?= base_url() ?>plugins/moment/moment.js"></script>
 <script src="<?= base_url() ?>plugins/filter/isotope.pkgd.min.js"></script>
@@ -1027,8 +1017,8 @@ $tarjetasError = session()->getFlashdata('tarjetas_error');
 <script src="<?= base_url() ?>plugins/filter/jquery.magnific-popup.min.js"></script>
 <script src="<?= base_url() ?>plugins/chartjs/chart.min.js"></script>
 <script src="<?= base_url() ?>plugins/chartjs/roundedBar.min.js"></script>
-<script src="<?= base_url() ?>plugins/lightpick/lightpick.js"></script>
-<script src="<?= base_url() ?>assets/pages/jquery.profile.init.js"></script>
+
+<script src="<?= base_url() ?>assets/pages/jquery.profile.init.js?v=<?= filemtime(FCPATH . 'assets/pages/jquery.profile.init.js') ?>"></script>
 
 <script src="<?= base_url() ?>plugins/hopscotch/hopscotch.js"></script>
 <script src="<?= base_url() ?>assets/pages/jquery.tour.init.js"></script>
@@ -1037,7 +1027,7 @@ $tarjetasError = session()->getFlashdata('tarjetas_error');
 <script src="<?= base_url() ?>plugins/ion-rangeslider/ion.rangeSlider.min.js"></script>
 <script src="<?= base_url() ?>assets/pages/jquery.rangeslider.init.js"></script>
 
-<script src="<?= base_url(); ?>assets/pages/jquery.analytics_dashboard.init.js"></script>
+
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1"></script>
 <script>

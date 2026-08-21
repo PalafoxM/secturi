@@ -13,7 +13,7 @@
         <script src="<?php echo base_url(); ?>plugins/jvectormap/jquery-jvectormap-us-aea-en.js"></script>
         
         <!-- App js -->
-        <script src="<?php echo base_url(); ?>assets/js/app.js"></script>
+        <script src="<?php echo base_url(); ?>assets/js/app.js?v=<?php echo filemtime(FCPATH . 'assets/js/app.js'); ?>"></script>
  
          <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
          <script>
