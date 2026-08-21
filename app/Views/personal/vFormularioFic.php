@@ -365,8 +365,7 @@
 <script src="<?= base_url() ?>assets/js/waves.js"></script>
 <script src="<?= base_url() ?>assets/js/feather.min.js"></script>
 
-<script src="<?= base_url() ?>plugins/tiny-editable/mindmup-editabletable.js"></script>
-<script src="<?= base_url() ?>plugins/tiny-editable/numeric-input-example.js"></script>
+
 <script src="<?= base_url() ?>plugins/bootable/bootstable.js"></script>
 <script src="<?= base_url() ?>assets/pages/jquery.tabledit.init.js"></script>
 <script src="<?= base_url(); ?>plugins/select2/select2.min.js"></script>

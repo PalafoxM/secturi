@@ -310,8 +310,7 @@
 
 <script src="<?= base_url() ?>assets/js/feather.min.js"></script>
 
-<script src="<?= base_url() ?>plugins/tiny-editable/mindmup-editabletable.js"></script>
-<script src="<?= base_url() ?>plugins/tiny-editable/numeric-input-example.js"></script>
+
 <script src="<?= base_url() ?>plugins/bootable/bootstable.js"></script> 
 <link href="<?php echo base_url(); ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
 
