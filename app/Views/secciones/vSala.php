@@ -303,103 +303,545 @@
             margin-top: 15px;
         }
     }
+
+    /* Renovación visual de Reservar Sala */
+    .sala-page {
+        --sala-navy: #102a56;
+        --sala-blue: #3568df;
+        --sala-sky: #eaf1ff;
+        --sala-ink: #182a4d;
+        --sala-muted: #7180a1;
+        --sala-line: #e4eaf4;
+        background: #f3f6fb;
+        padding-bottom: 40px;
+    }
+
+    .sala-page .container-fluid {
+        max-width: 1600px;
+        padding: 24px 28px 0;
+    }
+
+    .sala-hero {
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        min-height: 190px;
+        margin-bottom: 24px;
+        padding: 34px 38px;
+        color: #fff;
+        border-radius: 22px;
+        background: linear-gradient(125deg, #102a56 0%, #2457bd 58%, #4a7be8 100%);
+        box-shadow: 0 18px 42px rgba(36, 87, 189, .22);
+    }
+
+    .sala-hero::before,
+    .sala-hero::after {
+        content: '';
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, .08);
+    }
+
+    .sala-hero::before {
+        width: 280px;
+        height: 280px;
+        right: -72px;
+        top: -152px;
+    }
+
+    .sala-hero::after {
+        width: 170px;
+        height: 170px;
+        right: 180px;
+        bottom: -120px;
+    }
+
+    .sala-hero__copy,
+    .sala-hero__stats {
+        position: relative;
+        z-index: 1;
+    }
+
+    .sala-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        color: #cbdcff;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+    }
+
+    .sala-eyebrow::before {
+        content: '';
+        width: 26px;
+        height: 2px;
+        border-radius: 5px;
+        background: #8db1ff;
+    }
+
+    .sala-hero h1 {
+        margin: 0 0 10px;
+        color: #fff;
+        font-size: clamp(28px, 3vw, 42px);
+        font-weight: 650;
+        letter-spacing: -.035em;
+    }
+
+    .sala-hero p {
+        max-width: 650px;
+        margin: 0;
+        color: rgba(255, 255, 255, .8);
+        font-size: 14px;
+    }
+
+    .sala-hero__stats {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(125px, 1fr));
+        gap: 12px;
+        min-width: 290px;
+    }
+
+    .sala-stat {
+        padding: 18px 20px;
+        border: 1px solid rgba(255, 255, 255, .18);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, .12);
+        backdrop-filter: blur(8px);
+    }
+
+    .sala-stat span {
+        display: block;
+        margin-bottom: 5px;
+        color: #dce7ff;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .sala-stat strong {
+        display: block;
+        color: #fff;
+        font-size: 27px;
+        line-height: 1;
+    }
+
+    .sala-panel {
+        height: 100%;
+        margin-bottom: 24px;
+        overflow: hidden;
+        border: 1px solid var(--sala-line);
+        border-radius: 18px;
+        background: #fff;
+        box-shadow: 0 10px 28px rgba(27, 48, 89, .07);
+    }
+
+    .sala-panel__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 22px 24px;
+        border-bottom: 1px solid var(--sala-line);
+    }
+
+    .sala-panel__title {
+        margin: 0;
+        color: var(--sala-ink);
+        font-size: 17px;
+        font-weight: 650;
+    }
+
+    .sala-panel__subtitle {
+        margin: 4px 0 0;
+        color: var(--sala-muted);
+        font-size: 12px;
+    }
+
+    .sala-date-pill {
+        flex: 0 0 auto;
+        padding: 7px 11px;
+        color: #285dc9;
+        border-radius: 30px;
+        background: var(--sala-sky);
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .sala-agenda {
+        max-height: 670px;
+        padding: 10px 18px 18px;
+        overflow-y: auto;
+    }
+
+    .sala-agenda__item {
+        display: grid;
+        grid-template-columns: 54px minmax(0, 1fr);
+        gap: 13px;
+        align-items: center;
+        padding: 15px 4px;
+        border-bottom: 1px solid #edf1f7;
+    }
+
+    .sala-agenda__item:last-child { border-bottom: 0; }
+
+    .sala-agenda__image {
+        width: 54px;
+        height: 54px;
+        object-fit: cover;
+        border: 3px solid #fff;
+        border-radius: 14px;
+        box-shadow: 0 4px 14px rgba(30, 55, 104, .14);
+        transition: transform .2s ease;
+    }
+
+    .sala-agenda__image:hover { transform: translateY(-2px); }
+
+    .sala-agenda__name {
+        overflow: hidden;
+        margin: 0 0 5px;
+        color: var(--sala-ink);
+        font-size: 13px;
+        font-weight: 650;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .sala-agenda__meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        color: var(--sala-muted);
+        font-size: 11px;
+    }
+
+    .sala-room-badge {
+        padding: 3px 8px;
+        color: #285dc9;
+        border-radius: 20px;
+        background: var(--sala-sky);
+        font-weight: 700;
+    }
+
+    .sala-empty {
+        padding: 55px 24px;
+        text-align: center;
+    }
+
+    .sala-empty__icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 58px;
+        height: 58px;
+        margin-bottom: 14px;
+        color: var(--sala-blue);
+        border-radius: 18px;
+        background: var(--sala-sky);
+        font-size: 25px;
+    }
+
+    .sala-empty strong { display: block; color: var(--sala-ink); }
+    .sala-empty span { display: block; margin-top: 5px; color: var(--sala-muted); font-size: 12px; }
+
+    .sala-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 0 24px 18px;
+    }
+
+    .sala-legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #667493;
+        font-size: 11px;
+    }
+
+    .sala-legend i {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+    }
+
+    .sala-calendar-wrap { padding: 6px 22px 24px; }
+    .sala-page #calendario { min-height: 610px; }
+
+    .sala-page .fc-toolbar h2 {
+        color: var(--sala-ink);
+        font-size: 19px;
+        font-weight: 650;
+        text-transform: capitalize;
+    }
+
+    .sala-page .fc-button,
+    .sala-page .fc .fc-button {
+        min-height: 35px;
+        padding: 7px 12px !important;
+        color: #50617f !important;
+        border: 1px solid #dce4f1 !important;
+        border-radius: 9px !important;
+        background: #fff !important;
+        box-shadow: none !important;
+        animation: none !important;
+        font-size: 11px !important;
+        font-weight: 600 !important;
+        text-transform: capitalize !important;
+    }
+
+    .sala-page .fc-button:hover,
+    .sala-page .fc-button-active {
+        color: #fff !important;
+        border-color: var(--sala-blue) !important;
+        background: var(--sala-blue) !important;
+        transform: none !important;
+    }
+
+    .sala-page .fc-day-header {
+        padding: 11px 4px;
+        color: #63718e;
+        background: #f7f9fc;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .sala-page .fc-event {
+        padding: 4px 6px;
+        border: 0;
+        border-radius: 7px;
+        box-shadow: 0 3px 8px rgba(27, 48, 89, .12);
+    }
+
+    .sala-page .fc-event-title { font-size: 10px; }
+    .sala-page .fc-event-details { font-size: 9px; opacity: .9; }
+
+    #calendarModal .modal-content,
+    #calendarModal2 .modal-content,
+    #verSala .modal-content {
+        overflow: hidden;
+        border: 0;
+        border-radius: 20px;
+        box-shadow: 0 28px 70px rgba(12, 35, 74, .25);
+    }
+
+    #calendarModal main,
+    #calendarModal2 main { padding: 0; background: #f7f9fc; }
+
+    #calendarModal2 .card {
+        margin: 0;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    #calendarModal .step,
+    #calendarModal2 .step {
+        max-width: none;
+        padding: 30px;
+        border-radius: 0;
+        background: #fff;
+        box-shadow: none;
+    }
+
+    #calendarModal .step h2,
+    #calendarModal2 .step h2 {
+        padding: 0;
+        color: var(--sala-ink);
+        background: none;
+        text-shadow: none;
+        font-size: 21px;
+    }
+
+    #calendarModal .rooms {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 22px;
+    }
+
+    #calendarModal .room {
+        position: relative;
+        display: grid;
+        grid-template-columns: 82px 1fr;
+        gap: 15px;
+        align-items: center;
+        padding: 13px;
+        text-align: left;
+        border: 1px solid var(--sala-line);
+        border-radius: 15px;
+        background: #fff;
+    }
+
+    #calendarModal .room:hover {
+        border-color: #8aabef;
+        background: #f7faff;
+        box-shadow: 0 9px 22px rgba(36, 87, 189, .1);
+        transform: translateY(-2px);
+    }
+
+    #calendarModal .room img {
+        width: 82px;
+        height: 68px;
+        object-fit: cover;
+        border-radius: 11px;
+    }
+
+    #calendarModal .room strong { display: block; color: var(--sala-ink); font-size: 14px; }
+    #calendarModal .room small { color: var(--sala-muted); font-size: 11px; }
+
+    #calendarModal2 .form-control {
+        height: 43px;
+        border: 1px solid #dfe6f1;
+        border-radius: 10px;
+        background: #fbfcfe;
+        box-shadow: none;
+    }
+
+    #calendarModal2 label {
+        margin-bottom: 7px;
+        color: #4d5c78;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+    }
+
+    #calendarModal2 .wizard-actions { width: 100%; margin-top: 10px; }
+    #calendarModal2 #finishWizard {
+        min-width: 150px;
+        padding: 11px 22px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #2457bd, #4277e8);
+        box-shadow: 0 8px 20px rgba(36, 87, 189, .22);
+        animation: none;
+        font-weight: 650;
+    }
+
+    @media (max-width: 991.98px) {
+        .sala-page .container-fluid { padding: 18px 16px 0; }
+        .sala-hero { align-items: flex-start; flex-direction: column; padding: 28px; }
+        .sala-hero__stats { width: 100%; min-width: 0; }
+        .sala-agenda { max-height: 420px; }
+    }
+
+    @media (max-width: 767.98px) {
+        .sala-hero { border-radius: 16px; }
+        .sala-panel__header { align-items: flex-start; flex-direction: column; }
+        .sala-calendar-wrap { padding: 4px 12px 18px; overflow-x: auto; }
+        .sala-page #calendario { min-width: 720px; }
+        #calendarModal .rooms { grid-template-columns: 1fr; }
+        .sala-page .fc-toolbar { align-items: flex-start; flex-direction: column; gap: 10px; }
+    }
 </style>
 
 <div class="page-wrapper">
-
-    <!-- Page Content-->
-    <div class="page-content-tab">
-
+    <div class="page-content-tab sala-page">
         <div class="container-fluid">
-            <!-- Page-Title -->
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="page-title-box">
-                        <div class="float-right">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="javascript:void(0);">SUSI</a></li>
-                                <li class="breadcrumb-item"><a href="javascript:void(0);">Sala de juntas</a></li>
-                                <li class="breadcrumb-item active">Calendario</li>
-                            </ol>
-                        </div>
-                        <h4 class="page-title">Calendario</h4>
-                    </div><!--end page-title-box-->
-                </div><!--end col-->
-            </div>
-            <!-- end page title end breadcrumb -->
-            <div class="row">
-                <div class="col-lg-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <img src="<?php echo base_url() ?>assets/images/widgets/calendar.svg" alt=""
-                                class="img-fluid">
-                            <h6>Agenda de hoy</h6>
-                            <ul class="list-group">
+            <section class="sala-hero" aria-labelledby="salaPageTitle">
+                <div class="sala-hero__copy">
+                    <span class="sala-eyebrow">Gestión de espacios</span>
+                    <h1 id="salaPageTitle">Reserva tu sala</h1>
+                    <p>Consulta la disponibilidad y agenda un espacio para tu próxima reunión de forma rápida y sencilla.</p>
+                </div>
+                <div class="sala-hero__stats" aria-label="Resumen de salas">
+                    <div class="sala-stat">
+                        <span>Reservas de hoy</span>
+                        <strong><?= count($sala_hoy) ?></strong>
+                    </div>
+                    <div class="sala-stat">
+                        <span>Espacios disponibles</span>
+                        <strong>4</strong>
+                    </div>
+                </div>
+            </section>
+
+            <div class="row align-items-stretch">
+                <div class="col-xl-4 col-lg-5">
+                    <section class="sala-panel" aria-labelledby="agendaHoyTitle">
+                        <header class="sala-panel__header">
+                            <div>
+                                <h2 class="sala-panel__title" id="agendaHoyTitle">Agenda de hoy</h2>
+                                <p class="sala-panel__subtitle">Reuniones programadas para este día</p>
+                            </div>
+                            <span class="sala-date-pill"><?= date('d/m/Y') ?></span>
+                        </header>
+
+                        <div class="sala-agenda">
+                            <?php if (empty($sala_hoy)): ?>
+                                <div class="sala-empty">
+                                    <span class="sala-empty__icon"><i class="far fa-calendar-check"></i></span>
+                                    <strong>No hay reservas para hoy</strong>
+                                    <span>Selecciona una fecha en el calendario para comenzar.</span>
+                                </div>
+                            <?php else: ?>
+                                <?php
+                                $imagenesSala = [
+                                    'A' => ['archivo' => 'salaA.jpg', 'modal' => 1],
+                                    'B' => ['archivo' => 'salaB.jpg', 'modal' => 2],
+                                    'AB' => ['archivo' => 'salaAB.jpg', 'modal' => 3],
+                                    'TI' => ['archivo' => 'salaTI.jpg', 'modal' => 4],
+                                ];
+                                ?>
                                 <?php foreach ($sala_hoy as $s): ?>
-                                    <li class="list-group-item align-items-center d-flex">
-                                        <div class="media">
-                                            <?php if ($s->sala == "A"): ?>
-                                                <a href="javascript:void(0)" onclick="st.agregar.modalSala(1);">
-                                                    <img src="<?= base_url('assets/images/fotos/alba/salas/salaA.jpg') ?>"
-                                                        class="mr-3 thumb-sm align-self-center rounded-circle" alt="...">
-                                                </a>
-                                            <?php endif; ?>
-                                            <?php if ($s->sala == "B"): ?>
-                                                <a href="javascript:void(0)" onclick="st.agregar.modalSala(2);">
-                                                    <img src="<?= base_url('assets/images/fotos/alba/salas/salaB.jpg') ?>"
-                                                        class="mr-3 thumb-sm align-self-center rounded-circle" alt="...">
-                                                </a>
-
-                                            <?php endif; ?>
-                                            <?php if ($s->sala == "AB"): ?>
-                                                <a href="javascript:void(0)" onclick="st.agregar.modalSala(3);">
-                                                    <img src="<?= base_url('assets/images/fotos/alba/salas/salaAB.jpg') ?>"
-                                                        class="mr-3 thumb-sm align-self-center rounded-circle" alt="...">
-                                                </a>
-                                            <?php endif; ?>
-                                            <?php if ($s->sala == "TI"): ?>
-                                                <a href="javascript:void(0)" onclick="st.agregar.modalSala(4);">
-                                                    <img src="<?= base_url('assets/images/fotos/alba/salas/salaTI.jpg') ?>"
-                                                        class="mr-3 thumb-sm align-self-center rounded-circle" alt="...">
-                                                </a>
-                                            <?php endif; ?>
-
-                                            <div class="media-body align-self-center">
-                                                <h5 class="mt-0 mb-1"><?= $s->evento ?></h5>
-                                                <p class="text-muted mb-0">sala :
-                                                    <?= $s->sala . ' inicia ' . $s->hora_inicio . ' termina ' . $s->hora_fin ?>
-                                                </p>
-                                            </div><!--end media body-->
+                                    <?php $datosSala = $imagenesSala[$s->sala] ?? $imagenesSala['A']; ?>
+                                    <article class="sala-agenda__item">
+                                        <a href="javascript:void(0)" onclick="st.agregar.modalSala(<?= $datosSala['modal'] ?>);"
+                                            aria-label="Ver sala <?= esc($s->sala) ?>">
+                                            <img src="<?= base_url('assets/images/fotos/alba/salas/' . $datosSala['archivo']) ?>"
+                                                class="sala-agenda__image" alt="Sala <?= esc($s->sala) ?>">
+                                        </a>
+                                        <div>
+                                            <h3 class="sala-agenda__name"><?= esc($s->evento) ?></h3>
+                                            <div class="sala-agenda__meta">
+                                                <span class="sala-room-badge">Sala <?= esc($s->sala) ?></span>
+                                                <span><i class="far fa-clock mr-1"></i><?= esc(substr($s->hora_inicio, 0, 5)) ?>–<?= esc(substr($s->hora_fin, 0, 5)) ?></span>
+                                            </div>
                                         </div>
-                                    <?php endforeach; ?>
-                                </li>
-                            </ul>
-                        </div><!--end card-body-->
-                    </div><!--end card-->
-                </div><!--end col-->
-                <div class="col-lg-8">
-                    <div class="card">
-                        <div class="card-body">
-                            <div id='calendario'></div>
-                            <div style='clear:both'></div>
-                        </div><!--end card-body-->
-                    </div><!--end card-->
-                </div><!--end col-->
-            </div><!-- End row -->
+                                    </article>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </div>
+                    </section>
+                </div>
 
-        </div><!-- container -->
+                <div class="col-xl-8 col-lg-7">
+                    <section class="sala-panel" aria-labelledby="calendarioTitle">
+                        <header class="sala-panel__header">
+                            <div>
+                                <h2 class="sala-panel__title" id="calendarioTitle">Calendario de disponibilidad</h2>
+                                <p class="sala-panel__subtitle">Haz clic en un día disponible para crear una reserva</p>
+                            </div>
+                            <span class="sala-date-pill"><i class="far fa-calendar-alt mr-1"></i> Lunes a viernes</span>
+                        </header>
+                        <div class="sala-legend" aria-label="Identificación de salas">
+                            <span><i style="background:#007bff"></i>Sala A</span>
+                            <span><i style="background:#28a745"></i>Sala B</span>
+                            <span><i style="background:#6f42c1"></i>Combinada</span>
+                            <span><i style="background:#fd7e14"></i>Sala TI</span>
+                        </div>
+                        <div class="sala-calendar-wrap">
+                            <div id="calendario"></div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
     </div>
-    <!-- end page content -->
 </div>
-<!-- end page-wrapper -->
 
 
 
-<div class="modal fade" id="verSala" tabindex="-1" aria-labelledby="" aria-hidden="true">
+<div class="modal fade" id="verSala" tabindex="-1" aria-labelledby="verSalaTitle" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title" id="">Salas</h5>
+            <div class="modal-header">
+                <h5 class="modal-title" id="verSalaTitle">Conoce nuestras salas</h5>
                 <button type="button" onclick="st.agregar.cerrarSala()" class="btn-close" data-bs-dismiss="modal"
                     aria-label="Cerrar"></button>
             </div>
@@ -519,16 +961,7 @@
 
 
 
-<!-- jQuery  -->
-<script src="<?php echo base_url() ?>assets/js/jquery.min.js"></script>
-<script src="<?php echo base_url() ?>assets/js/jquery-ui.min.js"></script>
-<script src="<?php echo base_url() ?>assets/js/bootstrap.bundle.min.js"></script>
-<script src="<?php echo base_url() ?>assets/js/metismenu.min.js"></script>
-<script src="<?php echo base_url() ?>assets/js/waves.js"></script>
-<script src="<?php echo base_url() ?>assets/js/feather.min.js"></script>
-<script src="<?php echo base_url() ?>assets/js/jquery.slimscroll.min.js"></script>
-
-
+<!-- Las dependencias base se cargan desde la plantilla principal. -->
 <script src="<?php echo base_url() ?>plugins/moment/moment.js"></script>
 <script src='<?php echo base_url() ?>plugins/fullcalendar/packages/core/main.js'></script>
 <script src='<?php echo base_url() ?>plugins/fullcalendar/packages/daygrid/main.js'></script>
@@ -539,13 +972,17 @@
 
 
 <script>
+    var finishWizardButton = document.getElementById('finishWizard');
+    if (finishWizardButton) {
+        finishWizardButton.innerHTML = 'Confirmar reserva <i class="fas fa-arrow-right ml-2"></i>';
+    }
+
     st.agregar.registroSala();
 
     document.addEventListener('DOMContentLoaded', function () {
         var calendarEl = document.getElementById('calendario');
         const salas = <?= json_encode($sala_junta ?? []); ?>;
         const id_perfil = <?= $session->get('id_perfil'); ?>;
-        console.log(salas);
         const eventos = salas.map(s => ({
             id: s.id_sala,
             title: s.sala,
@@ -600,9 +1037,6 @@
                 const hoyTimestamp = fechaHoy.getTime();
                 const seleccionadaTimestamp = fechaSeleccionada.getTime();
 
-                console.log(seleccionadaTimestamp);
-                console.log(hoyTimestamp);
-
                 if (seleccionadaTimestamp < hoyTimestamp) {
                     Swal.fire("Error", "No puedes agendar en una fecha pasada", "error");
                     return;
@@ -611,12 +1045,14 @@
                 st.agregar.calendarModal();
                 let html = `<main>
                     <div id="step1" class="step active">
-                        <h2>1) Selecciona la sala</h2>
+                        <span class="sala-eyebrow" style="color:#3568df">Nueva reserva</span>
+                        <h2>Selecciona la sala</h2>
+                        <p class="text-muted">Elige el espacio que mejor se adapte a tu reunión.</p>
                         <div class="rooms">
-                            <div class="room" data-sala="A"><img src="https://sectur.guanajuato.gob.mx/wp-content/uploads/2025/06/SALAA.png"><div>Sala A</div></div>
-                            <div class="room" data-sala="B"><img src="https://sectur.guanajuato.gob.mx/wp-content/uploads/2025/06/SALAB.png"><div>Sala B</div></div>
-                            <div class="room" data-sala="AB"><img src="https://sectur.guanajuato.gob.mx/wp-content/uploads/2025/06/SALAAB.png"><div>Combinada</div></div>
-                            <div class="room" data-sala="TI"><img src="https://sectur.guanajuato.gob.mx/wp-content/uploads/2025/06/SALATI.png"><div>Sala TI</div></div>
+                            <div class="room" data-sala="A"><img src="<?= base_url('assets/images/fotos/alba/salas/salaA.jpg') ?>" alt="Sala A"><div><strong>Sala A</strong><small>Espacio para reuniones</small></div></div>
+                            <div class="room" data-sala="B"><img src="<?= base_url('assets/images/fotos/alba/salas/salaB.jpg') ?>" alt="Sala B"><div><strong>Sala B</strong><small>Espacio para reuniones</small></div></div>
+                            <div class="room" data-sala="AB"><img src="<?= base_url('assets/images/fotos/alba/salas/salaAB.jpg') ?>" alt="Sala combinada"><div><strong>Sala combinada</strong><small>Mayor capacidad</small></div></div>
+                            <div class="room" data-sala="TI"><img src="<?= base_url('assets/images/fotos/alba/salas/salaTI.jpg') ?>" alt="Sala TI"><div><strong>Sala TI</strong><small>Espacio con tecnología</small></div></div>
                         </div>
                         <div id="step1Error" class="error"></div>
                     </div>
@@ -679,14 +1115,12 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         const eventId = info.event.id;
-                        console.log(eventId);
                         $.ajax({
                             type: "POST",
                             url: base_url + "index.php/Usuario/deleteSala",
                             dataType: "json",
                             data: { id_sala_juntas: eventId },
                             success: function (data) {
-                                console.log(data);
                                 if (!data.error) {
                                     Swal.fire("Éxito", "Se guardo correctamente.", "success")
                                 } else {
