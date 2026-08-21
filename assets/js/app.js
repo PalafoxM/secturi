@@ -11,6 +11,16 @@
 
     'use strict';
 
+    function initSidebarCollapsed() {
+        // Cada vista debe iniciar únicamente con la barra de iconos visible.
+        $('body').addClass('enlarge-menu');
+
+        // También corrige páginas restauradas desde la caché de navegación.
+        $(window).on('pageshow', function () {
+            $('body').addClass('enlarge-menu');
+        });
+    }
+
     function initSlimscroll() {
         $('.slimscroll').slimscroll({
             height: 'auto',
@@ -179,6 +189,11 @@
     }
 
     function initRightbarChart() {
+        var rightbarChart = document.querySelector("#rightbar_chart");
+        if (!rightbarChart || typeof ApexCharts === 'undefined') {
+            return;
+        }
+
         //Apex-radialbar2
             var options = {
                 chart: {
@@ -228,7 +243,7 @@
             }
             
             var chart = new ApexCharts(
-                document.querySelector("#rightbar_chart"),
+                rightbarChart,
                 options
             );
             
@@ -250,6 +265,7 @@
 
 
     function init() {
+        initSidebarCollapsed();
         initSlimscroll();
         initMetisMenu();
         initLeftMenuCollapse();

@@ -11,7 +11,7 @@ class Funciones {
     public function __construct()
     {
         $this->globals = new Globals();
-        $this->secretKey = env('TOKEN_API') ?: 'ORnsLEykJAMTEvacurICINGeRvelINclOg';
+        $this->secretKey = env('TOKEN_API');
     }
 
     function encode($data) {
@@ -48,18 +48,18 @@ class Funciones {
     public function encrypt($q)
     {
         $q = json_encode($q);
-        $ciphering = "AES-256-CTR";
-        $encryption_iv = '1234567891011121';
-        $encryption_key = "v5bQr9UhrmzrlMst9WDD6rkp1";
+        $ciphering = env('CIPHERING');
+        $encryption_iv = env('APP_ENCRYPTION_IV');
+        $encryption_key = env('APP_ENCRYPTION_KEY');
         $encryption = openssl_encrypt($q, $ciphering, $encryption_key, 0, $encryption_iv);
         return rtrim(strtr(base64_encode($encryption), '+/', '-_'), '=');
     }
 
     public function decrypt($q)
     {
-        $ciphering = "AES-256-CTR";
-        $decryption_iv = '1234567891011121';
-        $decryption_key = "v5bQr9UhrmzrlMst9WDD6rkp1";
+        $ciphering = env('CIPHERING');
+        $encryption_iv = env('APP_ENCRYPTION_IV');
+        $encryption_key = env('APP_ENCRYPTION_KEY');
         $decryption = openssl_decrypt(base64_decode(str_pad(strtr($q, '-_', '+/'), strlen($q) % 4, '=', STR_PAD_RIGHT)), $ciphering, $decryption_key, 0, $decryption_iv);
         return json_decode($decryption);
     }

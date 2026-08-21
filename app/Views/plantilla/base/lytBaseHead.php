@@ -13,8 +13,7 @@
     <link rel="shortcut icon" href="<?php echo base_url(); ?>assets/huella.png">
 
 
-    <!-- jvectormap -->
-    <link href="<?php echo base_url(); ?>plugins/jvectormap/jquery-jvectormap-2.0.2.css" rel="stylesheet">
+
 
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.22.3/dist/sweetalert2.min.css
 " rel="stylesheet">
@@ -26,6 +25,9 @@
     <link href="<?php echo base_url(); ?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
     <link href="<?php echo base_url(); ?>assets/css/metisMenu.min.css" rel="stylesheet" type="text/css" />
     <link href="<?php echo base_url(); ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
+
+    <!-- jQuery debe cargarse antes de los scripts dinámicos principal.js e inicio.js. -->
+    <script src="<?php echo base_url(); ?>assets/js/jquery.min.js"></script>
 
     <?php if (isset($scripts)):
         foreach ($scripts as $js): ?>
@@ -344,7 +346,8 @@
     }
 </style>
 
-<body>
+<!-- El panel informativo del menú inicia colapsado y se abre con el botón del menú. -->
+<body class="enlarge-menu">
 
     <script>
         var base_url = "<?php echo base_url(); ?>";

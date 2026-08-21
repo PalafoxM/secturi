@@ -153,8 +153,11 @@ $('.mfp-image').magnificPopup({
     });
 })(jQuery);
 
-// light_datepick
-new Lightpick({
-    field: document.getElementById('light_datepick'),
-    inline: true,                
-});
+// Inicializar el calendario solamente en las vistas que lo incluyen.
+var lightDatepickField = document.getElementById('light_datepick');
+if (lightDatepickField && typeof Lightpick !== 'undefined') {
+    new Lightpick({
+        field: lightDatepickField,
+        inline: true,
+    });
+}

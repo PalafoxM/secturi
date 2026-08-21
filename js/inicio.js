@@ -1372,6 +1372,7 @@ ini.inicio = (function () {
             $('#motivo').val('');
             $('#observaciones').val('');
             $('#validar_no_reserva').val('');
+            $('#previews').empty();
             $.ajax({
                 url: base_url + "index.php/Principal/editarReserva",
                 type: 'POST',
@@ -1391,9 +1392,7 @@ ini.inicio = (function () {
                         $("#validar_total_importe").val(formatMoneyValue(reserva.total_importe));
                         $("#comentarios_instrumento_estatus").val(reserva.comentarios_instrumento || '');
                         const link = renderInstrumentoLinks(reserva);
-                        if (link) {
-                            $("#previews").append(link);
-                        }
+                        $("#previews").html(link);
 
                         if (reserva.no_reserva) {
                             $('#numero').show();
@@ -1466,6 +1465,7 @@ ini.inicio = (function () {
             $('#motivo').val('');
             $('#observaciones').val('');
             $('#validar_no_reserva').val('');
+            $('#previews').empty();
             $.ajax({
                 url: base_url + "index.php/Principal/editarReserva",
                 type: 'POST',
@@ -1487,9 +1487,7 @@ ini.inicio = (function () {
                         $("#validar_total_importe").val(formatMoneyValue(reserva.total_importe));
                         $("#comentarios_instrumento_estatus").val(comentarios_instrumento || '');
                         const link = renderInstrumentoLinks(reserva);
-                        if (link) {
-                            $("#previews").append(link);
-                        }
+                        $("#previews").html(link);
 
                         if (reserva.no_reserva) {
                             $('#numero').show();
