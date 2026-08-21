@@ -9,8 +9,7 @@
         <script src="<?php echo base_url(); ?>assets/js/jquery.slimscroll.min.js"></script>
    
         
-        <script src="<?php echo base_url(); ?>plugins/jvectormap/jquery-jvectormap-2.0.2.min.js"></script>
-        <script src="<?php echo base_url(); ?>plugins/jvectormap/jquery-jvectormap-us-aea-en.js"></script>
+
         
         <!-- App js -->
         <script src="<?php echo base_url(); ?>assets/js/app.js?v=<?php echo filemtime(FCPATH . 'assets/js/app.js'); ?>"></script>
