@@ -60,7 +60,7 @@ window.addEventListener('load', function () {
 })(window, document);
 </script>
 
-<!-- bundle      
+     
    
         <script src="<?php echo base_url();?>assets/js/jquery.min.js"></script>
         <script src="<?php echo base_url();?>assets/js/jquery-ui.min.js"></script>
@@ -182,7 +182,7 @@ particlesJS("particles-js", {
   },
   "retina_detect": true
 });
-       </script>  -->
+       </script>  
 
     </body>
 
