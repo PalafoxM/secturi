@@ -404,8 +404,8 @@
             </nav><!--end nav-->
             <!--end nav-->
             <div class="pro-metrica-end">
-                <a style="cursor: pointer;" class="help" data-toggle="tooltip-custom" data-placement="top"
-                    title="Subir un Tiket" onclick="ini.inicio.openSupportModal()">
+                <a href="https://sectur.guanajuato.gob.mx/ctisoli/" style="cursor: pointer;" class="help" data-toggle="tooltip-custom" data-placement="top"
+                    title="Subir un Tiket">
                     <i data-feather="message-circle" class="align-self-center menu-icon icon-md icon-dual mb-4"></i>
                 </a>
                 <a href="" class="profile">
