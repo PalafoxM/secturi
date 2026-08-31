@@ -2825,7 +2825,7 @@ class Principal extends BaseController
         $globals = new Mglobal;
         $email = \Config\Services::email();
         $result = $globals->getTabla(['tabla' => 'vw_usuario', 'where' => ['visible' => 1, 'id_tipo_empleado' => 1]])->data;
-        $email->setTo('rsalbap@guanajuato.gob.mx');
+        //$email->setTo('rsalbap@guanajuato.gob.mx');
 
         /*$email->setTo([
             'ccampos@guanajuato.gob.mx',
@@ -2846,6 +2846,7 @@ class Principal extends BaseController
           $email->setTo([
                     'alopez@guanajuato.gob.mx',
                     'cchernandezp@guanajuato.gob.mx',
+                    'ecalderoni@guanajuato.gob.mx',
                     'csoto@guanajuato.gob.mx',
                     'emartinezes@guanajuato.gob.mx',
                     'evazquezro@guanajuato.gob.mx',
@@ -2870,7 +2871,6 @@ class Principal extends BaseController
                     'dmontiello@guanajuato.gob.mx',
                     'jacostap@guanajuato.gob.mx',
                     'jrojas@guanajuato.gob.mx',
-                    'miguel.salazarc@guanajuato.gob.mx',
                     'mrcarballo@guanajuato.gob.mx',
                     'murrutiac@guanajuato.gob.mx',
                     'negonzalez@guanajuato.gob.mx',
@@ -2887,91 +2887,80 @@ class Principal extends BaseController
                     'daniela.tafoya@guanajuato.gob.mx',
                     'mvivianam@guanajuato.gob.mx',
                     'dbaezao@guanajuato.gob.mx',
+                    'averam@guanajuato.gob.mx',
                 ]);
         $email->setSubject('Recordatorio: Revisión de Asistencias - Sistema SUSI');
         $email->setMessage('
             <!DOCTYPE html>
             <html>
-            <head>
-                <meta charset="utf-8">
-                <style>
-                    body { font-family: "Segoe UI", Arial, sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px; }
-                    .container { max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-                    .header { background: linear-gradient(135deg, #004080, #0066cc); padding: 25px; text-align: center; }
-                    .content { padding: 35px; color: #333; }
-                    .footer { background-color: #e9ecef; text-align: center; padding: 20px; font-size: 13px; color: #6c757d; line-height: 1.5; }
-                    .btn { display: inline-block; padding: 12px 28px; background: linear-gradient(135deg, #004080, #0066cc); color: white; text-decoration: none; border-radius: 6px; margin: 10px 8px; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 2px 5px rgba(0,64,128,0.3); }
-                    .btn:hover { background: linear-gradient(135deg, #003366, #0052a3); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,64,128,0.4); }
-                    .highlight-box { background-color: #f0f7ff; border-left: 4px solid #004080; padding: 15px; margin: 20px 0; border-radius: 0 8px 8px 0; }
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <!-- Encabezado -->
-                    <div class="header">
-                        <img src="cid:logo_susi" alt="SUSI - Sistema Unificado SECTURI" style="height: 65px;">
-                    </div>
-                    
-                    <!-- Contenido principal -->
-                    <div class="content">
-                        <h1 style="color: #004080; margin-bottom: 10px; text-align: center;">Recordatorio de Asistencias</h1>
-                        <p style="text-align: center; color: #666; margin-bottom: 25px; font-size: 16px;">Sistema Unificado SECTURI</p>
+                <head>
+                    <meta charset="utf-8">
+                    <style>
+                        body { font-family: "Segoe UI", Arial, sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px; }
+                        .container { max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+                        .header { background: linear-gradient(135deg, #004080, #0066cc); padding: 25px; text-align: center; }
+                        .content { padding: 35px; color: #333; }
+                        .footer { background-color: #e9ecef; text-align: center; padding: 20px; font-size: 13px; color: #6c757d; line-height: 1.5; }
+                        .btn { display: inline-block; padding: 12px 28px; background: linear-gradient(135deg, #004080, #0066cc); color: white; text-decoration: none; border-radius: 6px; margin: 10px 8px; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 2px 5px rgba(0,64,128,0.3); }
+                        .btn:hover { background: linear-gradient(135deg, #003366, #0052a3); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,64,128,0.4); }
+                        .highlight-box { background-color: #f0f7ff; border-left: 4px solid #004080; padding: 15px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <!-- Encabezado -->
+                        <div class="header">
+                            <img src="cid:logo_susi" alt="SUSI - Sistema Unificado SECTURI" style="height: 65px;">
+                        </div>
                         
-                        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Estimado personal,</p>
-                        
-                        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-                            En caso de que aún no hayas realizado las <strong>justificaciones correspondientes a la quincena 15/2026</strong>, 
-                            la cual comprende el periodo del <strong>01 al 15 de agosto de 2026</strong>, 
-                            tienes hasta el día <strong>viernes 21 de agosto hasta las 16:00 hrs</strong> para realizarlas.
-                        </p>
+                        <!-- Contenido principal -->
+                        <div class="content">
+                            <h1 style="color: #004080; margin-bottom: 10px; text-align: center;">Recordatorio de Asistencias</h1>
+                            <p style="text-align: center; color: #666; margin-bottom: 25px; font-size: 16px;">Sistema Unificado SECTURI</p>
+                            
+                            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Estimado personal,</p>
+                            
+                            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                                En caso de que aún no hayas realizado las <strong>justificaciones correspondientes a la quincena 16/2026</strong>, 
+                                la cual comprende el periodo del <strong>16 al 31 de agosto de 2026</strong>, 
+                                tienes hasta el día <strong>viernes 04 de septiembre hasta las 16:00 hrs</strong> para realizarlas.
+                            </p>
 
-                        <div class="highlight-box">
-                            <p style="font-size: 15px; line-height: 1.6; margin: 0;">
-                                Para cualquier duda o aclaración, favor de comunicarse a la 
-                                <strong>Coordinación de Recursos Humanos</strong> o 
-                                <strong>Coordinación de Tecnologías de la Información</strong>.
+                            <div class="highlight-box">
+                                <p style="font-size: 15px; line-height: 1.6; margin: 0;">
+                                    Para cualquier duda o aclaración, favor de comunicarse a la 
+                                    <strong>Coordinación de Recursos Humanos</strong> o 
+                                    <strong>Coordinación de Tecnologías de la Información</strong>.
+                                </p>
+                            </div>
+
+                            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
+                                Le invitamos a revisar las incidencias en el sistema SUSI.
+                            </p>
+
+                            <div style="text-align: center; margin: 30px 0;">
+                                <a href="https://secturnet.guanajuato.gob.mx/susi/index.php/Agregar/Asistencia" class="btn" style="color: white; text-decoration: none;">
+                                    📋 Revisar Incidencias
+                                </a>
+                            </div>
+
+                            <p style="font-size: 14px; color: #666; border-top: 1px solid #dee2e6; padding-top: 20px; margin-top: 25px;">
+                                <strong>Nota:</strong> Este es un mensaje automático generado por el Sistema Unificado SECTURI (SUSI). 
+                                Por favor, no responda a este correo.
                             </p>
                         </div>
-
-                        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
-                            Le invitamos a revisar las incidencias en el sistema SUSI.
-                        </p>
-
-                        <div style="text-align: center; margin: 30px 0;">
-                            <a href="https://secturnet.guanajuato.gob.mx/susi/index.php/Agregar/Asistencia" class="btn" style="color: white; text-decoration: none;">
-                                📋 Revisar Incidencias
-                            </a>
+                        
+                        <!-- Pie de página -->
+                        <div class="footer">
+                            <strong>© ' . date('Y') . ' Sistema Unificado SECTURI (SUSI)</strong><br>
+                            Todos los derechos reservados - Secretaría de Turismo e Identidad
                         </div>
-
-                        <p style="font-size: 14px; color: #666; border-top: 1px solid #dee2e6; padding-top: 20px; margin-top: 25px;">
-                            <strong>Nota:</strong> Este es un mensaje automático generado por el Sistema Unificado SECTURI (SUSI). 
-                            Por favor, no responda a este correo.
-                        </p>
                     </div>
-                    
-                    <!-- Pie de página -->
-                    <div class="footer">
-                        <strong>© ' . date('Y') . ' Sistema Unificado SECTURI (SUSI)</strong><br>
-                        Todos los derechos reservados - Secretaría de Turismo e Identidad
-                    </div>
-                </div>
-            </body>
+                </body>
             </html>
         ');
 
-
-        /*    // ✅ SOLUCIÓN PARA LA IMAGEN - AGREGAR COMO ADJUNTO EMBEBIDO
-           $logoPath = FCPATH . 'assets/pdf/plantillas/ManualPersonaSuperior.pdf';
-           if (file_exists($logoPath)) {
-               $email->attach($logoPath);
-               $email->setHeader('Content-ID', '<logo_susi>');
-           }
-
-           // Configuraciones adicionales recomendadas */
         $email->setMailType('html');
-
-
-        // Intentar enviar el correo
         if ($email->send()) {
             $response->error = false;
             $response->respuesta = "✅ Notificación enviada correctamente a los destinatarios.";
