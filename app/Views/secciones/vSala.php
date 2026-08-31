@@ -1052,7 +1052,7 @@
                             <div class="room" data-sala="A"><img src="<?= base_url('assets/images/fotos/alba/salas/salaA.jpg') ?>" alt="Sala A"><div><strong>Sala A</strong><small>Espacio para reuniones</small></div></div>
                             <div class="room" data-sala="B"><img src="<?= base_url('assets/images/fotos/alba/salas/salaB.jpg') ?>" alt="Sala B"><div><strong>Sala B</strong><small>Espacio para reuniones</small></div></div>
                             <div class="room" data-sala="AB"><img src="<?= base_url('assets/images/fotos/alba/salas/salaAB.jpg') ?>" alt="Sala combinada"><div><strong>Sala combinada</strong><small>Mayor capacidad</small></div></div>
-                            <div class="room" data-sala="TI"><img src="<?= base_url('assets/images/fotos/alba/salas/salaTI.jpg') ?>" alt="Sala TI"><div><strong>Sala TI</strong><small>Espacio con tecnología</small></div></div>
+                            <div class="room" data-sala="TI"><img src="<?= base_url('assets/images/fotos/alba/salas/salaTI.jpg') ?>" alt="Sala TI"><div><strong>Sala TI</strong><small>Espacio TI</small></div></div>
                         </div>
                         <div id="step1Error" class="error"></div>
                     </div>
