@@ -667,9 +667,8 @@
           },
           {
             title: "PTCI-2026-SECTURI",
-            url: "#",
-            note: "Enlace pendiente",
-            disabled: true
+            url: "https://docs.google.com/spreadsheets/d/16fCbU57IsQDIJqt5hqUHjyROUoleGIkH/edit?gid=726375960#gid=726375960",
+            note: "Programa de trabajo"
           },
           {
             title: "Reporte anual Comportamiento de Riesgos-2026",
@@ -685,15 +684,13 @@
           },
           {
             title: "DDCI y Estrategias CI-2026",
-            url: "#",
-            note: "Enlace pendiente",
-            disabled: true
+            url: "https://docs.google.com/spreadsheets/d/1M0JxEZCzMoA5SwKmtpaiR0KyWu01TDQg/edit?gid=28348282#gid=28348282",
+            note: "Seguimiento estratégico"
           },
           {
-            title: "B.1. Matriz Evaluación Riesgos SECTURI · 1er trimestre 2026",
-            url: "#",
-            note: "Enlace pendiente",
-            disabled: true
+            title: "B.1. Matriz Evaluación Riesgos SECTURI · 1er semestre 2026",
+            url: "https://docs.google.com/spreadsheets/d/1uwjf6t3G-1dUjii00yp0g4EYHu7Y31yc/edit?gid=1023817726#gid=1023817726",
+            note: "Matriz de riesgos"
           },
           {
             title: "Proceso de verificación y evaluación de riesgos (Permanencia en matriz)",
