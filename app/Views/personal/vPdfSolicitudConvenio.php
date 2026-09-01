@@ -123,7 +123,7 @@
             <?php foreach ($pagos as $p): ?>
             <tr>
                 <td><?= $p->numero_pago ?></td>
-                <td>$<?= number_format((float) $p->monto, 2, '.', ',') ?></td>
+                <td>$<?= number_format((float) str_replace([',', '$', ' '], '', (string) ($p->monto ?? 0)), 2, '.', ',') ?></td>
                 <td>Preferentemente <?= $p->fecha ?></td>
                 <td><?= $p->entregable ?></td>
             </tr>
