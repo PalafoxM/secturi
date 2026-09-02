@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
+<!-- <head>
     <meta charset="utf-8" />
     <title>SUSI</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -98,13 +98,13 @@ body.forest-bg #particles-js { display: none; }
 
   window.addEventListener('load', setRandomBackground);
 </script>
-<!-- <!DOCTYPE html>
+
 <?php
 $loginDefaultBackgroundUrl = base_url('images/fondo_susi.png');
 $loginLoadingBackgroundUrl = base_url('images/fondo_susi.png');
 $loginBackgroundUrls = [$loginDefaultBackgroundUrl];
-?>
-<html lang="es">
+?> -->
+<!-- <html lang="es">
 <head>
     <meta charset="utf-8">
     <title>SUSI</title>
@@ -137,8 +137,14 @@ $loginBackgroundUrls = [$loginDefaultBackgroundUrl];
     <?php if (isset($scripts)) : foreach ($scripts as $js) : ?>
     <script src="<?= base_url("js/{$js}.js") ?>?filever=<?= time() ?>" type="text/javascript"></script>
     <?php endforeach; endif; ?>
+</head> -->
+<html lang="es">
+<head>
+     <meta charset="utf-8" />
+    <title>SUSI</title>
+    <link rel="shortcut icon" href="<?php echo base_url(); ?>assets/huella.png">
 </head>
-<body class="fic-login-body" data-base-url="<?= esc(base_url(), 'attr') ?>"> -->
+<body class="fic-login-body" data-base-url="<?= esc(base_url(), 'attr') ?>">
 <script>
     var base_url = "<?= base_url(); ?>";
 </script>
