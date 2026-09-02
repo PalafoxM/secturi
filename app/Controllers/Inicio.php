@@ -1213,6 +1213,25 @@ class Inicio extends BaseController
         $fecEveRaw = trim((string)$this->request->getPost('fec_eve'));
         $fecEve = ($fecEveRaw !== '') ? ($fecEveRaw . ' 00:00:00') : null;
 
+        $fecReciboRaw = trim((string)$this->request->getPost('fec_recibo'));
+        $fecRecibo = null;
+        if ($fecReciboRaw !== '') {
+            $fecReciboDt = \DateTime::createFromFormat('Y-m-d', $fecReciboRaw);
+            $fecReciboErrors = \DateTime::getLastErrors();
+            $fecReciboInvalida = !$fecReciboDt
+                || ($fecReciboErrors !== false && ($fecReciboErrors['warning_count'] > 0 || $fecReciboErrors['error_count'] > 0))
+                || $fecReciboDt->format('Y-m-d') !== $fecReciboRaw;
+
+            if ($fecReciboInvalida) {
+                return $this->response->setJSON([
+                    'error' => true,
+                    'respuesta' => 'La fecha del recibo no es válida.'
+                ]);
+            }
+
+            $fecRecibo = $fecReciboDt->format('Y-m-d');
+        }
+
         $conceptoRaw = trim((string)$this->request->getPost('concepto'));
         $concepto = ($conceptoRaw !== '') ? $conceptoRaw : null;
 
@@ -1320,6 +1339,7 @@ class Inicio extends BaseController
                 'telefono'           => $tel,
                 'correo'             => $correo,
                 'fec_eve'            => $fecEve,
+                'fec_recibo'         => $fecRecibo,
                 'concepto'           => $concepto,
                 'usu_act'            => $session->get('id_usuario'),
                 'fec_act'            => date('Y-m-d H:i:s')
@@ -1379,6 +1399,7 @@ class Inicio extends BaseController
             'telefono'           => $tel,
             'correo'             => $correo,
             'fec_eve'            => $fecEve,
+            'fec_recibo'         => $fecRecibo,
             'concepto'           => $concepto,
             'folio'              => $folio,
             'usu_reg'            => $session->get('id_usuario'),
@@ -1628,6 +1649,7 @@ class Inicio extends BaseController
             'telefono' => $registro->telefono,
             'correo' => $registro->correo,
             'fec_eve' => $registro->fec_eve ? date('d/m/Y', strtotime($registro->fec_eve)) : '',
+            'fec_recibo' => $registro->fec_recibo ?? null,
             'lugar' => $registro->lugar,
 
             // ✅ SOLO lo del folio

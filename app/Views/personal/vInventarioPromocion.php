@@ -177,10 +177,10 @@
                                                 <small class="text-muted d-block">Precio</small>
                                             </th>
 
-                                            <th class="py-3">
+                                            <!--<th class="py-3">
                                                 <i class="mdi mdi-calendar-remove text-dark d-block mb-0"></i>
                                                 <small class="text-muted d-block">Fecha de ingreso</small>
-                                            </th>
+                                            </th>-->
 
                                             <th class="py-3" style="width:15%;">
                                                 <i class="mdi mdi-cog-outline text-secondary d-block mb-0"></i>
@@ -336,19 +336,6 @@
                                                         </div>
                                                     </td>
 
-                                                    <!-- Fecha de ingreso -->
-                                                    <td class="text-center">
-                                                        <?php 
-                                                        $fechaRaw = $item->fecha_entrada ?? $item->created_at ?? null;
-                                                        if($fechaRaw):
-                                                            $fecha = new DateTime($fechaRaw);
-                                                            echo '<span class="badge badge-soft-success font-13">';
-                                                            echo $fecha->format('d/m/Y h:i A');
-                                                            echo '</span>';
-                                                        endif;
-                                                        ?>
-                                                    </td>
-
                                                     <!-- Acciones -->
                                                     <td class="text-center text-nowrap">
 
@@ -376,7 +363,7 @@
                                             <?php endforeach; ?>
                                             <?php else: ?>
                                             <tr>
-                                                <td colspan="10" class="text-center text-muted py-4">
+                                                <td colspan="9" class="text-center text-muted py-4">
                                                     No hay productos registrados
                                                 </td>
                                             </tr>

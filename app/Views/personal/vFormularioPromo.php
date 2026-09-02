@@ -92,6 +92,11 @@ $id_salida_inventario= $id_salida_inventario?? $idSalida;
                                                         <label>Fecha del evento </label>
                                                         <input type="date" class="form-control" name="fec_eve" value="<?= isset($registro) && $registro->fec_eve ? date('Y-m-d', strtotime($registro->fec_eve)) : '' ?>" >
                                                     </div>
+
+                                                    <div class="col-md-4 mb-3">
+                                                        <label>Fecha del recibo </label>
+                                                        <input type="date" class="form-control" name="fec_recibo" value="<?= isset($registro) && !empty($registro->fec_recibo) ? date('Y-m-d', strtotime($registro->fec_recibo)) : date('Y-m-d') ?>" >
+                                                    </div>
                                                 </div>
 
                                                 <!-- PESTAÑAS PARA  DOCUMENTOS -->

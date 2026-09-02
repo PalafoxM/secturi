@@ -103,9 +103,14 @@
                         '12' => 'diciembre'
                     ];
 
-                    $dia  = date('d');
-                    $mes  = $meses[date('m')];
-                    $anio = date('Y');
+                    $fechaReciboTimestamp = !empty($fec_recibo) ? strtotime($fec_recibo) : false;
+                    if (!$fechaReciboTimestamp) {
+                        $fechaReciboTimestamp = time();
+                    }
+
+                    $dia  = date('d', $fechaReciboTimestamp);
+                    $mes  = $meses[date('m', $fechaReciboTimestamp)];
+                    $anio = date('Y', $fechaReciboTimestamp);
                 ?>
 
                 <div style="text-align:right;">
