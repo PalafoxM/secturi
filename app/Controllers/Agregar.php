@@ -5742,7 +5742,6 @@ class Agregar extends BaseController
         }
 
 
-        $tempQrPath = FCPATH . 'assets/images/qr_final.png';
         $folio = 'GTO - ' . date('YmdHis') . substr((string) microtime(), 1, 4);
         // Generar el QR
         $result = Builder::create()
@@ -5758,9 +5757,10 @@ class Agregar extends BaseController
             ->labelAlignment(new LabelAlignmentCenter())
             ->build();
 
-        $result->saveToFile($tempQrPath);
-        $dataImagen = $this->encode_img_base64(FCPATH . 'assets/images/qr_final.png', 'png');
-        $data['dataImagen'] = $dataImagen;
+        // El QR se incrusta directamente en el PDF. No se escribe en assets/images,
+        // ya que esa carpeta no es escribible en producción y el nombre compartido
+        // podía provocar cruces entre reportes generados al mismo tiempo.
+        $data['dataImagen'] = $result->getDataUri();
         $data['folio'] = $folio;
 
         $vista = ($usuario == 'todos') ? 'personal/vFormatoAsistenciaAll.php' : 'personal/vFormatoAsistenciaUser.php';
