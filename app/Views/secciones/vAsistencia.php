@@ -135,6 +135,13 @@
                         </div>
                         <h4 class="page-title">Calendario</h4>
                         <a href="javascript: history.go(-1)" class="btn btn-gradient-danger">Atrás</a>
+                        <a href="<?= base_url('index.php/Agregar/descargarVacaciones') ?>"
+                            target="_blank"
+                            rel="noopener"
+                            class="btn btn-gradient-success ml-2"
+                            title="Descargar vacaciones aprobadas">
+                            <i class="mdi mdi-file-pdf-outline mr-1"></i> Descargar vacaciones
+                        </a>
                     </div><!--end page-title-box-->
                 </div><!--end col-->
             </div>

@@ -5084,6 +5084,74 @@ class Agregar extends BaseController
         $this->_renderView($data);
     }
 
+    public function descargarVacaciones()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $idUsuario = (int) $session->get('id_usuario');
+
+        if ($idUsuario <= 0) {
+            return redirect()->to(base_url('index.php/Login/cerrar?inactividad=1'));
+        }
+
+        $resultadoVacaciones = $globals->getTabla([
+            'tabla' => 'incidencia',
+            'where' => [
+                'visible' => 1,
+                'id_usuario' => $idUsuario,
+                'id_estatus' => 3,
+                'cat_id_incidencia' => 5,
+            ],
+        ]);
+
+        $resultadoUsuario = $globals->getTabla([
+            'tabla' => 'vw_usuario',
+            'where' => [
+                'visible' => 1,
+                'id_usuario' => $idUsuario,
+            ],
+        ]);
+
+        $vacaciones = !empty($resultadoVacaciones->data) ? $resultadoVacaciones->data : [];
+        usort($vacaciones, static function ($a, $b) {
+            $fechaA = $a->fecha_inicio ?? $a->fecha ?? '';
+            $fechaB = $b->fecha_inicio ?? $b->fecha ?? '';
+            return strcmp((string) $fechaB, (string) $fechaA);
+        });
+
+        $usuario = !empty($resultadoUsuario->data)
+            ? $resultadoUsuario->data[0]
+            : (object) [
+                'nombre_completo' => (string) ($session->get('nombre_completo') ?? ''),
+                'no_empleado' => '',
+                'dsc_area' => '',
+            ];
+
+        $html = view('personal/vPdfVacaciones', [
+            'usuario' => $usuario,
+            'vacaciones' => $vacaciones,
+            'fechaGeneracion' => date('d/m/Y H:i'),
+        ]);
+
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 10,
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_bottom' => 14,
+            'format' => 'Letter',
+        ]);
+        $mpdf->SetTitle('Vacaciones aprobadas');
+        $mpdf->SetAuthor('SUSI');
+        $mpdf->SetHTMLFooter('
+            <div style="text-align: right; font-size: 8px; color: #667085;">
+                Página {PAGENO} de {nbpg}
+            </div>
+        ');
+        $mpdf->WriteHTML($html);
+        $mpdf->Output('Vacaciones_aprobadas_' . $idUsuario . '.pdf', 'I');
+        exit();
+    }
+
     private function normalizarHoraAsistencia(?string $hora): string
     {
         $hora = trim((string) $hora);
