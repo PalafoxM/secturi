@@ -5093,7 +5093,7 @@ class Agregar extends BaseController
         if ($idUsuario <= 0) {
             return redirect()->to(base_url('index.php/Login/cerrar?inactividad=1'));
         }
-       $inicioStr = (new DateTime('2026-06-01'))->format('Y-m-d');
+       $inicioStr = (new DateTime('2026-01-06'))->format('Y-m-d');
         $finStr = (new DateTime('2026-12-31'))->format('Y-m-d');
         $resultadoVacaciones = $globals->getTabla([
             'tabla' => 'incidencia',
