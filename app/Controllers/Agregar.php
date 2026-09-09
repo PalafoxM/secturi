@@ -5093,7 +5093,8 @@ class Agregar extends BaseController
         if ($idUsuario <= 0) {
             return redirect()->to(base_url('index.php/Login/cerrar?inactividad=1'));
         }
-
+       $inicioStr = (new DateTime('2026-06-01'))->format('Y-m-d');
+        $finStr = (new DateTime('2026-12-31'))->format('Y-m-d');
         $resultadoVacaciones = $globals->getTabla([
             'tabla' => 'incidencia',
             'where' => [
@@ -5102,6 +5103,7 @@ class Agregar extends BaseController
                 'id_estatus' => 3,
                 'cat_id_incidencia' => 5,
             ],
+            'whereBetween' => [['fecha_inicio', $inicioStr, $finStr]]
         ]);
 
         $resultadoUsuario = $globals->getTabla([
