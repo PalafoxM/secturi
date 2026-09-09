@@ -17,6 +17,25 @@ $formatearFecha = static function ($fecha): string {
     $timestamp = strtotime($fecha);
     return $timestamp ? date('d/m/Y', $timestamp) : $fecha;
 };
+
+$calcularDias = static function ($fechaInicio, $fechaFin): int {
+    $inicioTimestamp = strtotime((string) $fechaInicio);
+    $finTimestamp = strtotime((string) $fechaFin);
+
+    if (!$inicioTimestamp) {
+        return 0;
+    }
+
+    if (!$finTimestamp) {
+        $finTimestamp = $inicioTimestamp;
+    }
+
+    $inicio = new DateTimeImmutable(date('Y-m-d', $inicioTimestamp));
+    $fin = new DateTimeImmutable(date('Y-m-d', $finTimestamp));
+    $diferencia = (int) $inicio->diff($fin)->format('%r%a');
+
+    return $diferencia >= 0 ? $diferencia + 1 : 1;
+};
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -157,30 +176,34 @@ $formatearFecha = static function ($fecha): string {
         <thead>
             <tr>
                 <th width="6%" class="center">No.</th>
-                <th width="23%">Periodo</th>
-                <th width="24%">Detalles</th>
-                <th width="20%">Comentarios</th>
-                <th width="17%">Observaciones</th>
-                <th width="10%" class="center">Estatus</th>
+                <th width="22%">Periodo</th>
+                <th width="8%" class="center">Días</th>
+                <th width="28%">Detalles</th>
+                <th width="24%">Comentarios</th>
+                <th width="12%" class="center">Estatus</th>
             </tr>
         </thead>
         <tbody>
             <?php if (!empty($vacaciones)): ?>
                 <?php foreach ($vacaciones as $indice => $vacacion): ?>
                     <?php
-                    $fechaInicio = $vacacion->fecha_inicio ?? $vacacion->fecha ?? '';
-                    $fechaFin = $vacacion->fecha_fin ?? $fechaInicio;
+                    $fechaInicio = trim((string) ($vacacion->fecha_inicio ?? $vacacion->fecha ?? ''));
+                    $fechaFin = trim((string) ($vacacion->fecha_fin ?? ''));
+                    if ($fechaFin === '' || $fechaFin === '0000-00-00') {
+                        $fechaFin = $fechaInicio;
+                    }
                     $periodo = $formatearFecha($fechaInicio);
                     if ($fechaFin !== '' && $fechaFin !== $fechaInicio) {
                         $periodo .= ' al ' . $formatearFecha($fechaFin);
                     }
+                    $totalDias = $calcularDias($fechaInicio, $fechaFin);
                     ?>
                     <tr>
                         <td class="center"><?= $indice + 1 ?></td>
                         <td><?= esc($periodo) ?></td>
+                        <td class="center"><strong><?= $totalDias ?></strong></td>
                         <td><?= nl2br(esc((string) ($vacacion->detalles ?? '-'))) ?></td>
                         <td><?= nl2br(esc((string) ($vacacion->comentario ?? '-'))) ?></td>
-                        <td><?= nl2br(esc((string) ($vacacion->observaciones ?? '-'))) ?></td>
                         <td class="center status">Aprobado</td>
                     </tr>
                 <?php endforeach; ?>
