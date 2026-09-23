@@ -537,6 +537,7 @@ class Usuario extends BaseController
                     'hora_fin' => $this->normalizarHoraReporte($incidencia->hora_fin ?? ''),
                     'nombre' => $incidencia->nombre_incidencia ?? ($incidencia->dsc_incidencia ?? 'INCIDENCIA'),
                     'tipo' => $incidencia->tipo ?? null,
+                    'detalles' => trim((string) ($incidencia->detalles ?? '')),
                 ];
             }
         }
@@ -1120,6 +1121,8 @@ class Usuario extends BaseController
 
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
+        $totalCols = 2 + (count($fechasDelPeriodo) * 2) + 3; // Retardos, Faltas y Detalles
+        $lastCol = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($totalCols);
 
         // AGREGAR LOGOTIPO
         $logoPath = FCPATH . 'assets/logo-guanajuato.png'; // Ajusta la ruta según tu estructura
@@ -1150,14 +1153,14 @@ class Usuario extends BaseController
         // Título del reporte (fila 2)
         $sheet->setCellValue('A2', 'REPORTE DE ASISTENCIAS E INCIDENCIAS');
         $sheet->getStyle('A2')->getFont()->setBold(true)->setSize(14);
-        $sheet->mergeCells('A2:' . \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(count($fechasDelPeriodo) * 2) . '2');
+        $sheet->mergeCells('A2:' . $lastCol . '2');
         $sheet->getStyle('A2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
         // Periodo del reporte (fila 3)
         $periodoTexto = 'Periodo: ' . date('d/m/Y', strtotime($fec_ini)) . ' al ' . date('d/m/Y', strtotime($fec_fin));
         $sheet->setCellValue('A3', $periodoTexto);
         $sheet->getStyle('A3')->getFont()->setBold(true);
-        $sheet->mergeCells('A3:' . \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(count($fechasDelPeriodo) * 2) . '3');
+        $sheet->mergeCells('A3:' . $lastCol . '3');
         $sheet->getStyle('A3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
         // AHORA LOS ENCABEZADOS EMPIEZAN EN LA FILA 4
@@ -1193,9 +1196,10 @@ class Usuario extends BaseController
             $colIndex += 2;
         }
 
-        // Agregar columnas finales: Retardos y Faltas
+        // Agregar columnas finales: Retardos, Faltas y Detalles
         $colRetardos = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
         $colFaltas = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 1);
+        $colDetalles = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 2);
 
         $sheet->setCellValue($colRetardos . '4', 'Retardos');
         $sheet->mergeCells("{$colRetardos}4:{$colRetardos}5");
@@ -1214,6 +1218,16 @@ class Usuario extends BaseController
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('FFD9D9D9');
         $sheet->getStyle($colFaltas . '4')->getAlignment()
+            ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)
+            ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+
+        $sheet->setCellValue($colDetalles . '4', 'Detalles');
+        $sheet->mergeCells("{$colDetalles}4:{$colDetalles}5");
+        $sheet->getStyle($colDetalles . '4')->getFont()->setBold(true);
+        $sheet->getStyle($colDetalles . '4')->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFD9D9D9');
+        $sheet->getStyle($colDetalles . '4')->getAlignment()
             ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)
             ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
 
@@ -1241,6 +1255,7 @@ class Usuario extends BaseController
             
             $total_retardos = 0;
             $total_faltas = 0;
+            $detallesIncidencias = [];
 
             foreach ($fechasDelPeriodo as $fecha) {
                 $colEntrada = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
@@ -1252,6 +1267,14 @@ class Usuario extends BaseController
                 $salida = $dataDia['salida'];
                 $incArr = $dataDia['incidencias'];
                 $tieneIncidencias = !empty($incArr);
+
+                foreach ($incArr as $incidenciaDia) {
+                    $detalle = trim((string) ($incidenciaDia['detalles'] ?? ''));
+                    if ($detalle !== '') {
+                        // Una incidencia de varios días se replica por fecha; conservar el detalle una sola vez.
+                        $detallesIncidencias[$detalle] = $detalle;
+                    }
+                }
 
                 $valorEntrada = $entrada;
                 $valorSalida = $salida;
@@ -1610,12 +1633,17 @@ class Usuario extends BaseController
 
             }
             
-            // Escribir Retardos y Faltas
+            // Escribir Retardos, Faltas y los detalles de las incidencias del periodo.
             $colRetardosVal = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
             $colFaltasVal = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 1);
+            $colDetallesVal = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 2);
             
             $sheet->setCellValue($colRetardosVal . $fila, $total_retardos);
             $sheet->setCellValue($colFaltasVal . $fila, $total_faltas);
+            $sheet->setCellValue($colDetallesVal . $fila, implode("\n", array_values($detallesIncidencias)));
+            $sheet->getStyle($colDetallesVal . $fila)->getAlignment()
+                ->setWrapText(true)
+                ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP);
 
             if ($total_retardos > 0) {
                 $sheet->getStyle($colRetardosVal . $fila)
@@ -1638,15 +1666,14 @@ class Usuario extends BaseController
         // Ajustar dimensiones de columnas
         $sheet->getColumnDimension('A')->setWidth(15); // ← No. Empleado
         $sheet->getColumnDimension('B')->setWidth(40); // ← Nombre
-        $totalCols = 2 + (count($fechasDelPeriodo) * 2) + 2; // + 2 por las columnas de Faltas y Retardos
         for ($i = 3; $i <= $totalCols; $i++) {
             $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i);
             $sheet->getColumnDimension($colLetter)->setWidth(18);
         }
+        $sheet->getColumnDimension($colDetalles)->setWidth(45);
 
         // Agregar bordes a la tabla de datos
         $lastRow = $fila - 1;
-        $lastCol = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($totalCols);
         $tableRange = 'A5:' . $lastCol . $lastRow;
         $sheet->getStyle($tableRange)->getBorders()->getAllBorders()
             ->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
