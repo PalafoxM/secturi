@@ -119,7 +119,7 @@
                     </h4>
                     <div style="margin-top:4px;">
                         Recibo/<?= esc($folio ?? '') ?><br>
-                        Dirección de Promoción y Difusión<br>
+                        Dirección General de Difusión e Imagen<br>
                         Silao, Gto. <?= esc($dia ?? '') ?> de <?= esc($mes ?? '') ?> del <?= esc($anio ?? '') ?>
                     </div>
                 </div>
@@ -237,7 +237,7 @@
                 <div class="footer-text">
                     El solicitante se compromete a realizar la entrega de evidencia fotográfica del amterial promocional
                     distribuido en el evento y actividad programada a más tardar 5 días hábiles al correo electrónico 
-                    apenriquez@guanajuato.gob.mx, mamedinaher@guanajuato.gob.mx, mascencio@guanajuato.gob.mx y 
+                    apenriquez@guanajuato.gob.mx, mascencio@guanajuato.gob.mx y 
                     zulema.lira@guanajuato.gob.mx.
                 </div>
             </div>
