@@ -208,8 +208,8 @@
             <tr style="height: 100px;">
                 <td style="height: 80px; vertical-align: bottom;">
                     <br><br><br>
-                    <strong><?= if(date('Y-m-d', strtotime($registro_pt->fecha_tramite)) >= '2026-09-24')?'ANGÉLICA LÓPEZ LÓPEZ': ''?> </strong><br>
-                    <span style="font-size: 8pt;"><? if(date('Y-m-d', strtotime($registro_pt->fecha_tramite)) >= '2026-09-24')?'COORDINADORA DE RECURSOS FINANCIEROS Y APLICACIÓN PRESUPUESTAL': ''?></span>
+                    <strong><?php echo (date('Y-m-d', strtotime($registro_pt->fecha_tramite)) >= '2026-09-24') ? 'ANGÉLICA LÓPEZ LÓPEZ' : '' ?> </strong><br>
+                    <span style="font-size: 8pt;"><?php echo (date('Y-m-d', strtotime($registro_pt->fecha_tramite)) >= '2026-09-24') ? 'COORDINADORA DE RECURSOS FINANCIEROS Y APLICACIÓN PRESUPUESTAL' : '' ?></span>
                     <span style="font-size: 3pt;">No. Delagatorio SECTURI/DS/333/2026</span>
                 </td>
                 <td style="height: 80px; vertical-align: bottom;">
