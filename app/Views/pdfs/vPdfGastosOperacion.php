@@ -234,15 +234,16 @@
                 <table style="width: 100%; border-collapse: collapse; border: 1px solid #000; border-top: none;">
                     <tr>
                          <td style="height: 100px; vertical-align: bottom; text-align: center; font-weight: bold; font-size: 8pt; border: none; padding-bottom: 2px;">
-                             L.R.I. RODRIGO GONZALEZ GUERRERO
+                              <?php echo (date('Y-m-d', strtotime($registro_pt->fecha_tramite)) >= '2026-09-24') ? 'ANGÉLICA LÓPEZ LÓPEZ' : 'L.R.I. RODRIGO GONZÁLEZ GUERRERO' ?> 
                         </td>
                     </tr>
                 </table>
                 <div class="signature-title-box" style="border-top: none;">
-                    DIRECTOR GENERAL ADMINISTRATIVO
+                   <?php echo (date('Y-m-d', strtotime($registro_pt->fecha_tramite)) >= '2026-09-24') ? 'COORDINADORA DE RECURSOS FINANCIEROS Y APLICACIÓN PRESUPUESTAL' : 'DIRECTOR GENERAL ADMINISTRATIVO' ?>
                 </div>
             </td>
 
+ 
             <!-- COL 2 -->
              <td width="33%" class="signature-cell">
                 <div style="border: 1px solid #000; border-left: none; text-align: center; font-size: 7pt; padding: 1px;">AUTORIZA</div>
