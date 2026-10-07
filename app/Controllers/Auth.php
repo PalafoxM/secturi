@@ -34,7 +34,7 @@ class Auth extends Controller
         return redirect()->to($authUrl);
     }
 
-     public function activarActividad($id_usuario)
+     protected function activarActividad($id_usuario)
     {
         $session = \Config\Services::session();
         $response = new \stdClass();
