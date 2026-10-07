@@ -77,11 +77,16 @@ class Auth extends Controller
         $state = $this->request->getGet('state');
         $storedState = $session->get('oauth2state');
 
-        if (!$state || !$storedState || !hash_equals((string) $storedState, (string) $state)) {
-            log_message('error', 'Google Auth Error: State mismatch. Received state: ' . ($state ?: 'null') . ', Stored state: ' . ($storedState ?: 'null'));
+       if (
+            !is_string($state) || $state === ''
+            || !is_string($storedState) || $storedState === ''
+            || !hash_equals($storedState, $state)
+        ) {
+            log_message('warning', 'Google Auth: estado OAuth inválido.');
             $session->remove('oauth2state');
+
             return redirect()->to(base_url('index.php/Login'))
-                            ->with('error', 'Estado de seguridad inválido. Inténtalo de nuevo.');
+                ->with('error', 'Estado de seguridad inválido. Inténtalo de nuevo.');
         }
 
         $session->remove('oauth2state');
