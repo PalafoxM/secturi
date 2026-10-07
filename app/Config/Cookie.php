@@ -7,6 +7,17 @@ use DateTimeInterface;
 
 class Cookie extends BaseConfig
 {
+    public function __construct()
+    {
+        parent::__construct();
+
+        // Permite sesiones OAuth en localhost por HTTP, pero conserva la
+        // cookie segura cuando la aplicación se ejecuta en producción.
+        if (env('cookie.secure') === null) {
+            $this->secure = ENVIRONMENT === 'production';
+        }
+    }
+
     /**
      * --------------------------------------------------------------------------
      * Cookie Prefix

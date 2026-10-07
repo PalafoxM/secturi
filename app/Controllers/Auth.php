@@ -3,16 +3,13 @@
 namespace App\Controllers;
 
 use CodeIgniter\Controller;
-//use CodeIgniter\API\ResponseTrait;
 use League\OAuth2\Client\Provider\Google;
 use App\Models\Mglobal;
-use stdClass;
 
 
 class Auth extends Controller
 {
     protected $googleProvider;
-   // use ResponseTrait; 
     
 
     public function __construct()
@@ -26,7 +23,13 @@ class Auth extends Controller
 
     public function login()
     {
-        $authUrl = $this->googleProvider->getAuthorizationUrl();
+        if (session()->get('logueado') == 1) {
+            return redirect()->to(base_url('index.php/Inicio'));
+        }
+
+        $authUrl = $this->googleProvider->getAuthorizationUrl([
+            'prompt' => 'select_account',
+        ]);
         session()->set('oauth2state', $this->googleProvider->getState());
         return redirect()->to($authUrl);
     }
@@ -63,18 +66,25 @@ class Auth extends Controller
 
     public function callback()
     {
-          $session = session();
+        $session = session();
 
-        // ✅ CORRECCIÓN: Verifica que el estado COINCIDA
+        if ($this->request->getGet('error')) {
+            $session->remove('oauth2state');
+            return redirect()->to(base_url('index.php/Login'))
+                ->with('error', 'El acceso con Google fue cancelado o no fue autorizado.');
+        }
+
         $state = $this->request->getGet('state');
         $storedState = $session->get('oauth2state');
 
-        if (!$state || $state !== $storedState) {
+        if (!$state || !$storedState || !hash_equals((string) $storedState, (string) $state)) {
             log_message('error', 'Google Auth Error: State mismatch. Received state: ' . ($state ?: 'null') . ', Stored state: ' . ($storedState ?: 'null'));
             $session->remove('oauth2state');
-            return redirect()->to('/Login')
+            return redirect()->to(base_url('index.php/Login'))
                             ->with('error', 'Estado de seguridad inválido. Inténtalo de nuevo.');
         }
+
+        $session->remove('oauth2state');
 
         try {
             // Obtener token
@@ -84,12 +94,19 @@ class Auth extends Controller
 
             // Obtener datos del usuario de Google
             $ownerDetails = $this->googleProvider->getResourceOwner($token);
-            $email = $ownerDetails->getEmail();
+            $googleProfile = $ownerDetails->toArray();
+            $email = strtolower(trim((string) $ownerDetails->getEmail()));
 
             if (!$email) {
                 log_message('error', 'Google Auth Error: No email obtained from token.');
-                return redirect()->to('/login')
+                return redirect()->to(base_url('index.php/Login'))
                                 ->with('error', 'No se pudo obtener tu correo de Google. ¿Permitiste el acceso?');
+            }
+
+            if (empty($googleProfile['email_verified'])) {
+                log_message('error', 'Google Auth Error: Unverified email -> ' . $email);
+                return redirect()->to(base_url('index.php/Login'))
+                    ->with('error', 'Tu correo de Google no está verificado.');
             }
 
             $catalogos = new Mglobal();
@@ -108,7 +125,8 @@ class Auth extends Controller
             if (isset($result->data) && !empty($result->data)) {
                 $user = $result->data[0];
 
-                // Iniciar sesión (igual que en validar_usuario)
+                // Regenerar el identificador evita reutilizar la sesión anónima del login.
+                $session->regenerate(true);
                 $session->set('logueado', 1);
                 $session->set('id_usuario', $user->id_usuario);
                 $session->set('id_sexo', $user->id_sexo);
@@ -133,20 +151,20 @@ class Auth extends Controller
                 $session->set('esJefe', $esJefe);
 
                 // Redirigir al inicio
-                return redirect()->to('/Inicio');
+                return redirect()->to(base_url('index.php/Inicio'));
 
             } else {
                 // Usuario no registrado → mensaje claro
                 log_message('error', 'Google Auth Error: Email not registered -> ' . $email);
-                return redirect()->to('/login')
+                return redirect()->to(base_url('index.php/Login'))
                                 ->with('error', "Tu cuenta de Google (<strong>" . esc($email) . "</strong>) no está registrada en el sistema.");
             }
 
         } catch (\Exception $e) {
             log_message('error', 'OAuth Google error: ' . $e->getMessage());
             
-            return redirect()->to('/login')
-                           ->with('error', 'Error al iniciar sesión con Google. Por favor, de contactar al administrador TI.');
+            return redirect()->to(base_url('index.php/Login'))
+                           ->with('error', 'Error al iniciar sesión con Google. Favor de contactar al administrador TI.');
         }
     }
 
