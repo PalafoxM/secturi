@@ -1,4 +1,4 @@
-window.location.href = new URL('index.php/Auth/login', document.body.dataset.baseUrl).href;
+
 const container = document.querySelector('.login-parallax');
 const parallaxElements = document.querySelectorAll('.parallax');
 
