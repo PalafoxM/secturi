@@ -99,7 +99,7 @@ function iniciarGoogle() {
     $('#btn_load').show();
 
     setTimeout(() => {
-        window.location.href = '<?= base_url("index.php/Auth/login") ?>';
+        window.location.href =  new URL('index.php/Auth/login', document.body.dataset.baseUrl).href;
     }, 300);
 }
 
