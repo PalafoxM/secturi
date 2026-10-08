@@ -85,7 +85,7 @@
 
     <!-- Recipient -->
     <div class="recipient">
-        <div>L.R.I. Rodrigo González Guerrero</div> <!-- Hardcoded as per image -->
+        <div>ANGÉLICA LÓPEZ LÓPEZ</div> <!-- Hardcoded as per image -->
         <div>Director General Administrativo</div>
         <div>Presente</div>
     </div>
