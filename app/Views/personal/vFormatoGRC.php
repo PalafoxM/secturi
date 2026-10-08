@@ -282,7 +282,7 @@
                 </div>
             </td>
             <td style="width: 50%; text-align: center; vertical-align: bottom; border: none; padding-bottom: 0;">
-                <div style="margin-bottom: 5px; font-weight: bold; font-size: 10pt;">L.R.I. Rodrigo González Guerrero</div>
+                <div style="margin-bottom: 5px; font-weight: bold; font-size: 10pt;"><?php echo (date('Y-m-d', strtotime($solicitud->fecha_inicio)) >= '2026-09-24') ? 'ANGÉLICA LÓPEZ LÓPEZ' : 'L.R.I. RODRIGO GONZÁLEZ GUERRERO' ?> </div>
                 <div style="border-top: 1px solid black; padding-top: 2px; font-size: 9pt;">
                     Nombre y Firma de la persona Titular del Área<br>Administrativa
                 </div>
