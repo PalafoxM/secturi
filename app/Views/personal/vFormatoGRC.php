@@ -97,7 +97,7 @@
 <BR>
     <div style="font-size: 9pt; font-weight: bold; margin-bottom: 10px;">
         <span class="number-box" style="text-align: left;">1</span><br>
-        L.R.I. Rodrigo González Guerrero
+        <?php echo (date('Y-m-d', strtotime($solicitud->fecha_inicio)) >= '2026-09-24') ? 'ANGÉLICA LÓPEZ LÓPEZ' : 'L.R.I. RODRIGO GONZÁLEZ GUERRERO' ?>
     </div>
 
     <div style="font-size: 9pt; margin-bottom: 15px;">
