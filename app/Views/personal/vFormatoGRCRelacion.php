@@ -145,7 +145,7 @@
         <tr style="height: 25mm;">
             <td class="border center" style="vertical-align: bottom; padding-bottom: 3mm;">
                 <div style="line-height: 5mm;">&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;</div>
-                <div class="signature-name">L.R.I. Rodrigo González Guerrero</div>
+                <div class="signature-name">ANGÉLICA LÓPEZ LÓPEZ</div>
             </td>
             <td class="border center" style="vertical-align: bottom; padding-bottom: 3mm;">
                 <div style="line-height: 5mm;">&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;</div>
