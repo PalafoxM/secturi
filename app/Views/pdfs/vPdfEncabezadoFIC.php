@@ -24,14 +24,12 @@
     <table>
         <thead><tr><th colspan="2" class="header">ENCABEZADO DE COMPROBANTE FIC</th></tr></thead>
         <tbody>
-            <tr><td class="label">RESPONSABLE / CARGO / ÁREA:</td><td class="value"><?= esc(mb_strtoupper($responsable, 'UTF-8')) ?></td></tr>
-            <tr><td class="label">PROVEEDOR:</td><td class="value"><?= esc(mb_strtoupper($proveedor, 'UTF-8')) ?></td></tr>
-            <tr><td class="label">RFC:</td><td class="value"><?= esc($establecimiento->rfc ?? '') ?></td></tr>
-            <tr><td class="label">CONTRATO / CONVENIO:</td><td class="value"><?= esc($establecimiento->no_contrato ?? 'NO APLICA') ?></td></tr>
-            <tr><td class="label">PROYECTO:</td><td class="value"><?= esc($proyecto->proyecto ?? 'E027QC04182601') ?></td></tr>
+            <tr><td class="label">RESPONSABLE / CARGO / ÁREA:</td><td class="value">MTRO. DAVID AYALA SAUCEDO - SUBSECRETARIO DE IDENTIDAD Y DESARROLLO TURÍSTICO</td></tr>
+            <tr><td class="label">COMISION / REUNION / EVENTO:</td><td class="value">Consumo de alimentos durante la edición 54 del FIC del 17 de Sep al 19 Oct. 2026</td></tr>
+            <tr><td class="label">CONCEPTO DEL PAGO:</td><td class="value">Consumo de alimentos durante la edición 54 del FIC del 17 de Sep al 19 Oct. 2026</td></tr>
             <tr><td class="label">PARTIDA:</td><td class="value"><?= esc($pago_fic->partida ?? '') ?><?= !empty($partida->nombre_fondo) ? ' - ' . esc($partida->nombre_fondo) : '' ?></td></tr>
             <tr><td class="label">FACTURA / RECIBO No.:</td><td class="value"><?= esc($pago_fic->comprobante ?? '') ?></td></tr>
-            <tr><td class="label">FECHA DEL TRÁMITE:</td><td class="value"><?= !empty($pago_fic->fec_tramite) ? date('d/m/Y', strtotime($pago_fic->fec_tramite)) : '' ?></td></tr>
+            <tr><td class="label">FECHA DEL TRÁMITE:</td><td class="value">del 17 de septiembre al 19 de octubre de 2026</td></tr>
             <tr><td class="label">RESERVA:</td><td class="value"><?= esc($pago_fic->reserva ?? '') ?></td></tr>
             <tr>
                 <td class="label">IMPORTE EN PESOS (MXN):</td>
