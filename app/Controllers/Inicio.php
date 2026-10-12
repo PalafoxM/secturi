@@ -4026,11 +4026,19 @@ class Inicio extends BaseController
         return false;
     }
 
+    public function generarFormatoFIC()
+    {
+        $Mglobal = new Mglobal;
 
+        $data['scripts'] = array('principal');
+        $data['contentView'] = 'secciones/vFormatoPagoFic';
+        $this->_renderView($data);
+       
 
+    }
     public function pdfLiberacionPago()
     {
-        {
+        
         $globals = new Mglobal;
         $id = $this->request->getGet('id');
         $data = [];
@@ -4086,7 +4094,7 @@ class Inicio extends BaseController
         $mpdf->WriteHTML($html);
         $mpdf->Output('LiberacionPago_' . $id . '.pdf', 'I');
         exit;
-    }
+    
     }
     public function ListaHojaAzul()
     {
