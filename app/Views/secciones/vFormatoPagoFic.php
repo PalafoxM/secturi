@@ -371,50 +371,7 @@
                         </tbody>
                     </table>
 
-                    <!-- TABLE 4: AUTORIZACIONES -->
-                    <table class="table table-bordered text-center mt-4">
-                        <thead>
-                            <tr class="bg-black">
-                                <th colspan="3" class="text-uppercase" style="color: white;">AUTORIZACIONES</th>
-                            </tr>
-                            <tr class="bg-grey">
-                                <th width="33%">DIRECTOR/A GENERAL ADMINISTRATIVO/A</th>
-                                <th width="33%">AUTORIZA</th>
-                                <th width="33%">RESPONSABLE DEL PROYECTO</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr style="height: 100px;">
-                                <td class="align-bottom pb-3">
-                                    <input type="text" name="nombre_director_general" class="form-control-plaintext font-weight-bold mb-1" value="RODRIGO GONZALEZ GUERRERO">
-                                    <input type="text" name="cargo_director_general" class="form-control-plaintext small" value="DIRECTOR/A GENERAL ADMINISTRATIVO/A">
-                                </td>
-                                <td class="align-bottom pb-3">
-
-                                   
-                                    <input type="text" name="cargo_autoriza" class="form-control-plaintext small" value="">
-                                    
-                                </td>
-                                <td class="align-bottom pb-3">
-                                   
-
-                                    <input type="text" name="cargo_responsable_1" class="form-control-plaintext small" value="">
-                                </td>
-                            </tr>
-                             <tr>
-                                <td colspan="2" style="border: none;"></td>
-                                <td class="bg-grey font-weight-bold border">RESPONSABLE DEL PROYECTO</td>
-                            </tr>
-                             <tr>
-                                <td colspan="2" style="border: none;"></td>
-                                <td class="align-bottom pb-3 border" style="height: 100px;">
-                                  
-                                  
-                                    <input type="text" name="cargo_responsable_2" class="form-control-plaintext small" value="">
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+              
 
                     <!-- Action Buttons -->
                     <div class="row mt-4">
