@@ -234,26 +234,26 @@
                                         <label for="pdf_pt" class="file-upload-btn btn-pdf">
                                             <i class="feather icon-file-text"></i> PDF
                                         </label>
-                                        <input type="file" id="pdf_pt" name="pdf_pt_<?= $index ?>" class="d-none input-pdf" accept=".pdf" onchange="updateFileName(this)">
-                                        <input type="hidden" name="pdf_current_<?= $index ?>" value="">
-                                        <span class="file-name-display" id="name_pdf_pt_<?= $index ?>"></span>
+                                        <input type="file" id="pdf_pt" name="pdf_pt" class="d-none input-pdf" accept=".pdf" onchange="updateFileName(this)">
+                                        <input type="hidden" name="pdf_current" value="">
+                                        <span class="file-name-display" id="name_pdf_pt"></span>
 
                                         <!-- XML Button -->
-                                        <label for="xml_pt_<?= $index ?>" class="file-upload-btn btn-xm">
+                                        <label for="xml_pt" class="file-upload-btn btn-xm">
                                             <i class="feather icon-code"></i> XML
                                         </label>
-                                        <input type="file" id="xml_pt_<?= $index ?>" name="xml_pt_<?= $index ?>" class="d-none input-xml" accept=".xml" onchange="updateFileName(this)">
-                                        <input type="hidden" name="xml_current_<?= $index ?>" value="">
-                                        <span class="file-name-display" id="name_xml_pt_<?= $index ?>"></span>
+                                        <input type="file" id="xml_pt" name="xml_pt" class="d-none input-xml" accept=".xml" onchange="updateFileName(this)">
+                                        <input type="hidden" name="xml_current" value="">
+                                        <span class="file-name-display" id="name_xml_pt"></span>
                                         
-                                        <input type="hidden" name="row_index[]" value="<?= $index ?>">
+                                        <input type="hidden" name="row_index[]" value="">
                                     </div>
 
                                 </td>
 
                                 <!-- OBSERVACIONES / PROVIDER DATA (Solo en la primera fila con rowspan) -->
                            
-                                <td class="text-left" style="padding: 15px; vertical-align: top;" rowspan="<?= $totalRows ?>" id="tdProvider">
+                                <td class="text-left" style="padding: 15px; vertical-align: top;" rowspan="" id="tdProvider">
                                     <div class="label-bold mb-2">DATOS DEL PROVEEDOR NACIONAL</div>
                                     
                                     <div class="provider-section">
