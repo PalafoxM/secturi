@@ -4286,7 +4286,7 @@ class Inicio extends BaseController
             $wherePago['usu_reg'] = $session->get('id_usuario');
         }
         $pago = $globals->getTabla([
-            'tabla' => 'pago_fic',
+            'tabla' => 'pagos_fic',
             'where' => $wherePago,
             'limit' => 1,
         ]);
