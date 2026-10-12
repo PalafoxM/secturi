@@ -75,25 +75,34 @@
         <tr><td colspan="4" class="font-bold"><?= esc($pago_fic->importe_letra ?? '') ?></td></tr>
     </table>
 
-    <table style="margin-top: 20px;">
+    <table style="margin-top: 20px; margin-bottom: 0;">
         <tr><th colspan="3" class="bg-black">AUTORIZACIONES</th></tr>
         <tr class="bg-grey">
-            <td width="33%">DIRECTOR/A GENERAL ADMINISTRATIVO/A </td>
+            <td width="33%">DIRECTOR/A GENERAL ADMINISTRATIVO/A</td>
             <td width="33%">AUTORIZA</td>
             <td width="34%">RESPONSABLE DEL PROYECTO</td>
         </tr>
-        <tr style="height: 105px;">
-            <td style="vertical-align: bottom;">
+        <tr>
+            <td rowspan="3" style="height: 220px; vertical-align: top; padding-top: 65px;">
                 <strong>RODRIGO GONZALEZ GUERRERO</strong><br>
                 <span style="font-size: 7pt;">DIRECTOR/A GENERAL ADMINISTRATIVO/A</span>
             </td>
-            <td>
+            <td rowspan="3" style="vertical-align: top; padding-top: 58px;">
                 <strong>MTRO. DAVID AYALA SAUCEDO</strong><br>
                 <span style="font-size: 7pt;">SUBSECRETARIO DE IDENTIDAD Y DESARROLLO TURÍSTICO POR ACUERDO SECRETARIAL N° 003-02/2026</span>
             </td>
-            <td style="vertical-align: bottom;">
+            <td style="height: 90px;">
                 <strong>MTRO. DAVID AYALA SAUCEDO</strong><br>
                 <span style="font-size: 7pt;">SUBSECRETARIO DE IDENTIDAD Y DESARROLLO TURÍSTICO</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="bg-grey" style="height: 18px; padding: 4px;">RESPONSABLE DEL PROYECTO</td>
+        </tr>
+        <tr>
+            <td style="height: 100px;">
+                <strong>HUGO RAMÍREZ DUARTE</strong><br>
+                <span style="font-size: 7pt;">DIRECTOR GENERAL DE COMPETITIVIDAD TURÍSTICA</span>
             </td>
         </tr>
     </table>
