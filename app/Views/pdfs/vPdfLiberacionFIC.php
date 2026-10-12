@@ -23,9 +23,16 @@
         $comprobantes = array_map(static function ($concepto) {
             return $concepto->comprobante;
         }, $conceptos_fic);
-        $partidas = array_map(static function ($concepto) {
-            return $concepto->partida . ($concepto->descripcion_partida !== '' ? ' (' . $concepto->descripcion_partida . ')' : '');
-        }, $conceptos_fic);
+        $partidasUnicas = [];
+        foreach ($conceptos_fic as $concepto) {
+            if (!array_key_exists($concepto->partida, $partidasUnicas)) {
+                $partidasUnicas[$concepto->partida] = $concepto->descripcion_partida;
+            }
+        }
+        $partidas = array_keys($partidasUnicas);
+        $descripcionesPartidas = array_values(array_filter($partidasUnicas, static function ($descripcion) {
+            return $descripcion !== '';
+        }));
     ?>
 
     <div class="date-folio">
@@ -51,7 +58,8 @@
     <div class="content">
         El pago se realizará con cargo al proyecto <strong><?= esc($proyecto->proyecto ?? 'E027QC04182601') ?></strong>
         y <?= count($partidas) === 1 ? 'a la partida presupuestal' : 'a las partidas presupuestales' ?>
-        <strong><?= esc(implode(', ', array_unique($partidas))) ?></strong>,
+        <strong><?= esc(implode(', ', $partidas)) ?></strong>
+        <?php if (!empty($descripcionesPartidas)): ?><strong>(<?= esc(implode(') (', $descripcionesPartidas)) ?>)</strong><?php endif; ?>,
         con reserva No. <strong><?= esc($pago_fic->reserva ?? '') ?></strong>.
     </div>
 
