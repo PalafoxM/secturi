@@ -4063,6 +4063,7 @@ class Inicio extends BaseController
                     $nombre,
                     $establecimiento->rfc ?? '',
                     $establecimiento->no_proveedor ?? '',
+                    $establecimiento->dsc_establecimiento ?? '',
                 ])),
                 'no_proveedor' => $establecimiento->no_proveedor ?? '',
                 'razon_social' => $razonSocial,
