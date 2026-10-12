@@ -12,13 +12,23 @@
         .text-right { text-align: right; }
         .font-bold { font-weight: bold; }
         .no-border { border: none; }
-        .logo { width: 230px; height: 70px; background: url('<?= $logo ?>') no-repeat left center; background-size: contain; }
+        .logo { width: 230px; max-height: 70px; }
     </style>
 </head>
 <body>
+    <?php
+        $logoSrc = '';
+        if (!empty($logo) && is_file($logo)) {
+            $logoSrc = 'data:image/png;base64,' . base64_encode((string) file_get_contents($logo));
+        }
+    ?>
     <table style="border: none; margin-bottom: 16px;">
         <tr>
-            <td width="35%" class="no-border text-left"><div class="logo"></div></td>
+            <td width="35%" class="no-border text-left">
+                <?php if ($logoSrc !== ''): ?>
+                    <img src="<?= $logoSrc ?>" class="logo" alt="Turismo Guanajuato">
+                <?php endif; ?>
+            </td>
             <td width="65%" class="no-border">
                 <div class="font-bold" style="font-size: 12pt;">GOBIERNO DEL ESTADO DE GUANAJUATO</div>
                 <div style="font-size: 10pt; margin-top: 5px;">FORMATO DE PAGO A TERCEROS</div>
