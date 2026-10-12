@@ -17,7 +17,7 @@
     <?php
         $meses = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
         $timestamp = strtotime((string) ($pago_fic->fec_tramite ?? date('Y-m-d')));
-        $fechaTexto = 'SILAO, GTO. ' . date('d', $timestamp) . ' DE ' . $meses[(int) date('n', $timestamp) - 1] . ' DEL ' . date('Y', $timestamp);
+        $fechaTexto = 'SILAO, GTO. ' . date('d', $timestamp) . ' DE ' . $meses[(int) date('n', $timestamp) - 2] . ' DEL ' . date('Y', $timestamp);
         $importe = (float) str_replace(',', '', (string) ($pago_fic->importe ?? 0));
         $proveedor = $establecimiento->razon_social ?? $establecimiento->dsc_establecimiento ?? 'PROVEEDOR';
         $descripcionPartida = $partida->nombre_fondo ?? '';
