@@ -140,7 +140,7 @@
             <div class="container-fluid" style="background: white; padding: 20px;">
                 
                 <form id="formPagoTerceros" enctype="multipart/form-data">
-                    <input type="hidden" name="id_reserva" value="<?= $id_reserva ?>">
+                    <input type="hidden" name="id_reserva" value=">">
                     <!-- HEADER -->
                     <div class="row mb-4">
                         <div class="col-md-12 text-center">
@@ -176,7 +176,7 @@
                                 <td>
                                     <div class="d-flex align-items-center justify-content-center">
                                         PT SECTURI/SSIDT/DGCT/FIC/TA/
-                                        <input type="text" name="no_consecutivo" autocomplete="off" class="form-control-plaintext mx-1" style="width: 80px;" value="<?= isset($no_consecutivo) ? $no_consecutivo : '' ?>" placeholder="001">
+                                        <input type="text" name="no_consecutivo" autocomplete="off" class="form-control-plaintext mx-1" style="width: 80px;" value="" placeholder="001">
                                         2026
                                     </div>
                                     <span id="folio_error" class="text-success d-block mt-1"></span>
@@ -211,7 +211,7 @@
                             <tr class="item-row">
                                 <!-- No. COMPROBANTE -->
                                 <td style="vertical-align: top;">
-                                    <input type="text" name="no_comprobante[]" class="form-control-plaintext mb-2" value="<?= isset($row->no_comprobante) ? $row->no_comprobante : '' ?>" placeholder="3220">
+                                    <input type="text" name="no_comprobante[]" class="form-control-plaintext mb-2" value="" placeholder="3220">
                                 </td>
 
                                 <!-- PROYECTO META -->
@@ -231,19 +231,19 @@
                                     <!-- File Inputs -->
                                     <div class="mt-2 text-center">
                                         <!-- PDF Button -->
-                                        <label for="pdf_pt_<?= $index ?>" class="file-upload-btn btn-pdf <?= !empty($row->pdf) ? 'btn-loaded' : '' ?>">
+                                        <label for="pdf_pt" class="file-upload-btn btn-pdf">
                                             <i class="feather icon-file-text"></i> PDF
                                         </label>
-                                        <input type="file" id="pdf_pt_<?= $index ?>" name="pdf_pt_<?= $index ?>" class="d-none input-pdf" accept=".pdf" onchange="updateFileName(this)">
-                                        <input type="hidden" name="pdf_current_<?= $index ?>" value="<?= isset($row->pdf) ? $row->pdf : '' ?>">
+                                        <input type="file" id="pdf_pt" name="pdf_pt_<?= $index ?>" class="d-none input-pdf" accept=".pdf" onchange="updateFileName(this)">
+                                        <input type="hidden" name="pdf_current_<?= $index ?>" value="">
                                         <span class="file-name-display" id="name_pdf_pt_<?= $index ?>"></span>
 
                                         <!-- XML Button -->
-                                        <label for="xml_pt_<?= $index ?>" class="file-upload-btn btn-xml <?= !empty($row->xml) ? 'btn-loaded' : '' ?>">
+                                        <label for="xml_pt_<?= $index ?>" class="file-upload-btn btn-xm">
                                             <i class="feather icon-code"></i> XML
                                         </label>
                                         <input type="file" id="xml_pt_<?= $index ?>" name="xml_pt_<?= $index ?>" class="d-none input-xml" accept=".xml" onchange="updateFileName(this)">
-                                        <input type="hidden" name="xml_current_<?= $index ?>" value="<?= isset($row->xml) ? $row->xml : '' ?>">
+                                        <input type="hidden" name="xml_current_<?= $index ?>" value="">
                                         <span class="file-name-display" id="name_xml_pt_<?= $index ?>"></span>
                                         
                                         <input type="hidden" name="row_index[]" value="<?= $index ?>">
@@ -268,25 +268,25 @@
                                         <!-- No. Proveedor -->
                                         <div class="d-flex mb-1 align-items-center">
                                             <span class="label-bold me-2 align-self-start">No. PROVEEDOR:</span>
-                                            <input type="text" id="no_proveedor" name="no_proveedor" class="flex-grow-1" placeholder="103156" value="<?= isset($registro_pt->no_proveedor) ? $registro_pt->no_proveedor : (isset($proveedor->no_proveedor) ? $proveedor->no_proveedor : '') ?>">
+                                            <input type="text" id="no_proveedor" name="no_proveedor" class="flex-grow-1" placeholder="103156" value="">
                                         </div>
 
                                         <!-- RFC -->
                                         <div class="d-flex mb-1 align-items-center">
                                             <span class="label-bold me-2">RFC:</span>
-                                            <input type="text" id="rfc_proveedor" name="rfc_proveedor" class="flex-grow-1" placeholder="N0011499A" value="<?= isset($registro_pt->rfc_proveedor) ? $registro_pt->rfc_proveedor : (isset($proveedor->rfc) ? $proveedor->rfc : '') ?>">
+                                            <input type="text" id="rfc_proveedor" name="rfc_proveedor" class="flex-grow-1" placeholder="N0011499A" value="">
                                         </div>
 
                                         <!-- Nombre Proveedor (Repetido en imagen) -->
                                         <div class="d-flex mb-1 align-items-center">
                                             <span class="label-bold me-2 align-self-start">NOMBRE:</span>
-                                            <input type="text" id="nombre_proveedor_2" name="nombre_proveedor_2" class="flex-grow-1" placeholder="ORGANIZACION MUNDIAL DEL TURISMO" value="<?= isset($registro_pt->nombre_proveedor_2) ? $registro_pt->nombre_proveedor_2 : (isset($proveedor->razon_social) ? $proveedor->razon_social : '') ?>">
+                                            <input type="text" id="nombre_proveedor_2" name="nombre_proveedor_2" class="flex-grow-1" placeholder="ORGANIZACION MUNDIAL DEL TURISMO" value="">
                                         </div>
 
                                         <!-- No. Cuenta -->
                                         <div class="d-flex mb-1 align-items-center">
                                             <span class="label-bold me-2">NO. CUENTA:</span>
-                                            <input type="text" id="no_cuenta" name="no_cuenta" class="flex-grow-1" placeholder="610081057237000168" value="<?= isset($registro_pt->no_cuenta) ? $registro_pt->no_cuenta : (isset($proveedor_banco->no_cuenta) ? $proveedor_banco->no_cuenta : (isset($proveedor_banco->cuenta) ? $proveedor_banco->cuenta : '')) ?>">
+                                            <input type="text" id="no_cuenta" name="no_cuenta" class="flex-grow-1" placeholder="610081057237000168" value="">
                                         </div>
 
                                         <!-- Banco -->
@@ -301,7 +301,7 @@
                                         <!-- CLABE -->
                                         <div class="d-flex mb-1 align-items-center">
                                             <span class="label-bold me-2">CLABE:</span>
-                                            <input type="text" id="clabe" name="clabe" class="flex-grow-1" placeholder="012180001057237008" value="<?= isset($registro_pt->clabe) ? $registro_pt->clabe : (isset($proveedor_banco->clabe) ? $proveedor_banco->clabe : '') ?>">
+                                            <input type="text" id="clabe" name="clabe" class="flex-grow-1" placeholder="012180001057237008" value="">
                                         </div>
 
                                     </div>
@@ -390,13 +390,13 @@
                                 <td class="align-bottom pb-3">
 
                                    
-                                    <input type="text" name="cargo_autoriza" class="form-control-plaintext small" value="<?= isset($registro_pt->cargo_autoriza) ? $registro_pt->cargo_autoriza : '' ?>">
+                                    <input type="text" name="cargo_autoriza" class="form-control-plaintext small" value="">
                                     
                                 </td>
                                 <td class="align-bottom pb-3">
                                    
 
-                                    <input type="text" name="cargo_responsable_1" class="form-control-plaintext small" value="<?= isset($registro_pt->cargo_responsable) ? $registro_pt->cargo_responsable : '' ?>">
+                                    <input type="text" name="cargo_responsable_1" class="form-control-plaintext small" value="">
                                 </td>
                             </tr>
                              <tr>
@@ -408,7 +408,7 @@
                                 <td class="align-bottom pb-3 border" style="height: 100px;">
                                   
                                   
-                                    <input type="text" name="cargo_responsable_2" class="form-control-plaintext small" value="<?= isset($registro_pt->cargo_responsable_2) ? $registro_pt->cargo_responsable_2 : '' ?>">
+                                    <input type="text" name="cargo_responsable_2" class="form-control-plaintext small" value="">
                                 </td>
                             </tr>
                         </tbody>
