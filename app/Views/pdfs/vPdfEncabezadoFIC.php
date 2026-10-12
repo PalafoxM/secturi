@@ -23,7 +23,7 @@
             <tr><td class="label">CONCEPTO DEL PAGO:</td><td class="value">Consumo de alimentos durante la edición 54 del FIC del 17 de Sep al 19 Oct. 2026</td></tr>
             <tr><td class="label">PARTIDA:</td><td class="value"><?= esc($pago_fic->partida ?? '') ?><?= !empty($partida->nombre_fondo) ? ' - ' . esc($partida->nombre_fondo) : '' ?></td></tr>
             <tr><td class="label">FACTURA / RECIBO No.:</td><td class="value"><?= esc($pago_fic->comprobante ?? '') ?></td></tr>
-            <tr><td class="label">FECHA DEL GASTO:</td><td class="value">del 17 de septiembre al 19 de octubre de 2026</td></tr>
+            <tr><td class="label">FECHA DEL GASTO:</td><td class="value">del 17 de septiembre al 09 de octubre de 2026</td></tr>
             <tr>
                 <td class="label">IMPORTE EN PESOS (MXN):</td>
                 <td class="value">$<?= number_format($importe, 2) ?> M.N.</td>
