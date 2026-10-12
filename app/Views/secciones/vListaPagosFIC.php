@@ -73,6 +73,11 @@
                                                        target="_blank" title="Encabezado FIC">
                                                         <i class="mdi mdi-file-document-box-multiple font-18"></i>
                                                     </a>
+                                                    <a class="btn btn-outline-warning btn-round"
+                                                       href="<?= base_url('index.php/Inicio/descargarAnexo01FIC?id=' . $pago->id_pago_fic) ?>"
+                                                       title="ANEXO 01">
+                                                        <i class="mdi mdi-file-excel font-18"></i>
+                                                    </a>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>

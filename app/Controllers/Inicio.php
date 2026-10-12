@@ -4494,6 +4494,93 @@ class Inicio extends BaseController
         exit;
     }
 
+    public function descargarAnexo01FIC()
+    {
+        $data = $this->obtenerDatosPagoFIC((int) $this->request->getGet('id'));
+        $registro = $data['pago_fic'];
+        $establecimiento = $data['establecimiento'];
+        $plantilla = FCPATH . 'assets/documentos/Anexo1_Reporte_d_ integracion_documental_2026.xlsx';
+
+        if (!is_file($plantilla) || !is_readable($plantilla)) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound(
+                'No se encontró la plantilla del ANEXO 01.'
+            );
+        }
+
+        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($plantilla);
+        $sheet = $spreadsheet->getActiveSheet();
+        $rutaLogo = FCPATH . 'assets/logo3.png';
+
+        if (is_file($rutaLogo) && is_readable($rutaLogo)) {
+            $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
+            $drawing->setName('Logo');
+            $drawing->setDescription('Logo');
+            $drawing->setPath($rutaLogo);
+            $drawing->setHeight(140);
+            $drawing->setCoordinates('A1');
+            $drawing->setOffsetX(10);
+            $drawing->setWorksheet($sheet);
+        }
+
+        $sheet->getStyle('A1:E6')->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFFFFFFF');
+
+        $fechaTramite = !empty($registro->fec_tramite)
+            ? date('d/m/Y', strtotime($registro->fec_tramite))
+            : '';
+        $nombreProveedor = $establecimiento->razon_social
+            ?? $establecimiento->dsc_establecimiento
+            ?? '';
+        $numeroContrato = trim((string) ($establecimiento->no_contrato ?? ''));
+        $importe = (float) str_replace(',', '', (string) ($registro->importe ?? 0));
+        $importeLetra = trim((string) ($registro->importe_letra ?? ''));
+        if ($importeLetra === '') {
+            $importeLetra = $this->numeroALetras($importe);
+        }
+
+        $sheet->setCellValue('H7', $fechaTramite);
+        $sheet->setCellValue('H9', (string) ($registro->folio ?? ''));
+        $sheet->getStyle('H9')->getFont()->setSize(8);
+
+        // Conserva el mismo criterio del ANEXO 01 usado en ListaHojaAzul.
+        $sheet->setCellValue('B15', '');
+        $sheet->setCellValue('B17', '');
+        $sheet->setCellValue('F19', '');
+        $sheet->setCellValue('D32', '');
+        $sheet->setCellValue('D33', '');
+        $sheet->setCellValue('D34', '');
+
+        $sheet->setCellValue('B24', $nombreProveedor);
+        $sheet->setCellValue('H24', (string) ($registro->partida ?? ''));
+        $sheet->setCellValue(
+            'B25',
+            'Consumo de alimentos durante la edición 54 del FIC del 17 de Sep al 19 Oct. 2026'
+        );
+        $sheet->setCellValue('H26', $numeroContrato !== '' ? $numeroContrato : 'NO APLICA');
+        $sheet->setCellValue('B26', (string) ($registro->comprobante ?? ''));
+        $sheet->setCellValue(
+            'B27',
+            '$' . number_format($importe, 2, '.', ',') . ' (' . $importeLetra . ')'
+        );
+        $sheet->getStyle('B24:H27')->getAlignment()->setWrapText(true);
+
+        $folioArchivo = preg_replace(
+            '/[^A-Za-z0-9_-]+/',
+            '_',
+            (string) ($registro->folio ?? $registro->id_pago_fic)
+        );
+        $nombreArchivo = 'Anexo1_FIC_' . trim($folioArchivo, '_') . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $nombreArchivo . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save('php://output');
+        exit;
+    }
+
     private function obtenerDatosPagoFIC(int $idPagoFic): array
     {
         if ($idPagoFic <= 0) {

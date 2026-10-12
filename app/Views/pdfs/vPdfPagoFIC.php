@@ -107,7 +107,7 @@
                 <td style="height: 80px; vertical-align: bottom;">
                     <br><br><br>
                      <strong>MTRO. DAVID AYALA SAUCEDO</strong><br>
-                    <span style="font-size: 6pt;">SUBSECRETARIO DE IDENTIDAD Y DESARROLLO TURÍSTICO POR ACUERDO SECRETARIAL N° 003-02/2026</span>
+                    <span style="font-size: 6pt;">SUBSECRETARIO DE IDENTIDAD Y DESARROLLO TURÍSTICO POR ACUERDO SECRETARIAL N° SECTURI-02/2026</span>
                 </td>
                 <td style="height: 80px; vertical-align: bottom;">
                     <br><br><br>
