@@ -589,7 +589,19 @@ $(function () {
                 );
                 $('input[name="importe_letra"]').val(response.data.importe_letra || '');
             }
-            mostrarMensajeFIC('success', 'Guardado', response.respuesta);
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Guardado',
+                    text: response.respuesta,
+                    confirmButtonText: 'Ver lista'
+                }).then(function () {
+                    window.location.href = '<?= base_url('index.php/Inicio/ListaPagosFIC') ?>';
+                });
+            } else {
+                alert(response.respuesta);
+                window.location.href = '<?= base_url('index.php/Inicio/ListaPagosFIC') ?>';
+            }
         }).fail(function () {
             mostrarMensajeFIC('error', 'Error', 'Ocurrió un error al guardar el pago FIC.');
         }).always(function () {

@@ -4220,6 +4220,141 @@ class Inicio extends BaseController
         ];
     }
 
+    public function ListaPagosFIC()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $where = ['visible' => 1];
+
+        if (!in_array((int) $session->get('id_perfil'), [1, 2], true)) {
+            $where['usu_reg'] = $session->get('id_usuario');
+        }
+
+        $consulta = $globals->getTabla([
+            'tabla' => 'pago_fic',
+            'where' => $where,
+            'order' => ['id_pago_fic' => 'DESC'],
+        ]);
+        $pagos = $consulta->data ?? [];
+
+        foreach ($pagos as $pago) {
+            $establecimiento = $globals->getTabla([
+                'tabla' => 'establecimiento',
+                'where' => ['id_establecimiento' => $pago->id_establecimiento],
+                'limit' => 1,
+            ]);
+            $usuario = $globals->getTabla([
+                'tabla' => 'vw_usuario',
+                'where' => ['id_usuario' => $pago->usu_reg],
+                'limit' => 1,
+            ]);
+
+            $datosEstablecimiento = $establecimiento->data[0] ?? null;
+            $datosUsuario = $usuario->data[0] ?? null;
+            $pago->nombre_establecimiento = $datosEstablecimiento->razon_social
+                ?? $datosEstablecimiento->dsc_establecimiento
+                ?? 'SIN ESTABLECIMIENTO';
+            $pago->no_contrato = $datosEstablecimiento->no_contrato ?? '';
+            $pago->nombre_usuario = $datosUsuario->nombre_completo ?? '';
+        }
+
+        $data = [];
+        $data['pagos_fic'] = $pagos;
+        $data['scripts'] = ['inicio'];
+        $data['contentView'] = 'secciones/vListaPagosFIC';
+        $this->_renderView($data);
+    }
+
+    public function pdfPagoFIC()
+    {
+        $data = $this->obtenerDatosPagoFIC((int) $this->request->getGet('id'));
+        $this->generarDocumentoPagoFIC('pdfs/vPdfPagoFIC', $data, 'PagoFIC_' . $data['pago_fic']->id_pago_fic . '.pdf');
+    }
+
+    public function pdfLiberacionFIC()
+    {
+        $data = $this->obtenerDatosPagoFIC((int) $this->request->getGet('id'));
+        $this->generarDocumentoPagoFIC('pdfs/vPdfLiberacionFIC', $data, 'LiberacionFIC_' . $data['pago_fic']->id_pago_fic . '.pdf');
+    }
+
+    public function pdfEncabezadoFIC()
+    {
+        $data = $this->obtenerDatosPagoFIC((int) $this->request->getGet('id'));
+        $this->generarDocumentoPagoFIC('pdfs/vPdfEncabezadoFIC', $data, 'EncabezadoFIC_' . $data['pago_fic']->id_pago_fic . '.pdf');
+    }
+
+    private function obtenerDatosPagoFIC(int $idPagoFic): array
+    {
+        if ($idPagoFic <= 0) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Pago FIC no encontrado.');
+        }
+
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $wherePago = ['id_pago_fic' => $idPagoFic, 'visible' => 1];
+        if (!in_array((int) $session->get('id_perfil'), [1, 2], true)) {
+            $wherePago['usu_reg'] = $session->get('id_usuario');
+        }
+        $pago = $globals->getTabla([
+            'tabla' => 'pago_fic',
+            'where' => $wherePago,
+            'limit' => 1,
+        ]);
+        if (empty($pago->data)) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Pago FIC no encontrado.');
+        }
+
+        $registro = $pago->data[0];
+        $establecimiento = $globals->getTabla([
+            'tabla' => 'establecimiento',
+            'where' => ['id_establecimiento' => $registro->id_establecimiento],
+            'limit' => 1,
+        ]);
+        $usuario = $globals->getTabla([
+            'tabla' => 'vw_usuario',
+            'where' => ['id_usuario' => $registro->usu_reg],
+            'limit' => 1,
+        ]);
+        $partida = $globals->getTabla([
+            'tabla' => 'cat_partida',
+            'where' => ['cuenta_cable' => $registro->partida, 'visible' => 1],
+            'limit' => 1,
+        ]);
+        $proyecto = $globals->getTabla([
+            'tabla' => 'cat_proyecto',
+            'where' => ['proyecto' => 'E027QC04182601'],
+            'limit' => 1,
+        ]);
+
+        if (empty($registro->importe_letra)) {
+            $registro->importe_letra = $this->numeroALetras($registro->importe ?? 0);
+        }
+
+        return [
+            'pago_fic' => $registro,
+            'establecimiento' => $establecimiento->data[0] ?? (object) [],
+            'usuario_registro' => $usuario->data[0] ?? (object) [],
+            'partida' => $partida->data[0] ?? (object) [],
+            'proyecto' => $proyecto->data[0] ?? (object) ['proyecto' => 'E027QC04182601'],
+            'logo' => FCPATH . 'assets/logo-guanajuato.png',
+        ];
+    }
+
+    private function generarDocumentoPagoFIC(string $vista, array $data, string $nombreArchivo): void
+    {
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 10,
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_bottom' => 10,
+            'format' => 'Letter',
+            'tempDir' => sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'mpdf',
+        ]);
+        $mpdf->WriteHTML(view($vista, $data));
+        $mpdf->Output($nombreArchivo, 'I');
+        exit;
+    }
+
     public function pdfLiberacionPago()
     {
         

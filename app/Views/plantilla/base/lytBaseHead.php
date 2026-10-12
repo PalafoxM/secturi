@@ -514,7 +514,10 @@
                                 <li><a href="<?php echo base_url(); ?>index.php/Inicio/ListaHojaAzulRefrendo/2025">Lista Hoja Azul</a>
                                 </li>
                                 <li>
-                                    <a href="<?php echo base_url(); ?>index.php/Inicio/generarFormatoFIC">Pagos FIC</a>
+                                    <a href="<?php echo base_url(); ?>index.php/Inicio/generarFormatoFIC">Nuevo Pago FIC</a>
+                                </li>
+                                <li>
+                                    <a href="<?php echo base_url(); ?>index.php/Inicio/ListaPagosFIC">Lista Pagos FIC</a>
                                 </li>
                           
                             </ul>
