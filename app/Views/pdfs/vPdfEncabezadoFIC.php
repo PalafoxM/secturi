@@ -22,7 +22,7 @@
         ]));
     ?>
     <table>
-        <thead><tr><th colspan="2" class="header">ENCABEZADO DE COMPROBANTE FIC</th></tr></thead>
+        <thead><tr><th colspan="2" class="header">ENCABEZADO DE FACTURA</th></tr></thead>
         <tbody>
             <tr><td class="label">RESPONSABLE / CARGO / ÁREA:</td><td class="value">MTRO. DAVID AYALA SAUCEDO - SUBSECRETARIO DE IDENTIDAD Y DESARROLLO TURÍSTICO</td></tr>
             <tr><td class="label">COMISION / REUNION / EVENTO:</td><td class="value">Consumo de alimentos durante la edición 54 del FIC del 17 de Sep al 19 Oct. 2026</td></tr>
