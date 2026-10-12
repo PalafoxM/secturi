@@ -262,11 +262,8 @@
                                     <div class="provider-section">
                                         <!-- Organization Name -->
                                         <div class="mb-2">
-                                            <select id="nombre_proveedor_1" name="nombre_proveedor_1" class="form-control-plaintext select2" placeholder="ORGANIZACION MUNDIAL DEL TURISMO">
+                                            <select id="nombre_proveedor_1" name="nombre_proveedor_1" class="form-control-plaintext" style="width: 100%;">
                                                 <option value="">Seleccione un proveedor</option>
-                                                <?php foreach ($establecimientos as $establecimiento): ?>
-                                                    <option value="<?= $establecimiento->id_establecimiento ?>"><?= $establecimiento->dsc_establecimiento ?></option>
-                                                <?php endforeach; ?>
                                             </select>
                                         </div>
 
@@ -346,7 +343,7 @@
                                 <td colspan="4" class="text-left bg-white" style="border-bottom: none !important;">
                                     <div class="d-flex align-items-center">
                                         <span class="label-bold me-2">No. CONTRATO y/o CONVENIO:</span>
-                                        <input type="text" name="no_convenio"  class="form-control-plaintext text-left w-50" value="">
+                                        <input type="text" id="no_contrato" name="no_convenio" class="form-control-plaintext text-left w-50" value="">
                                     </div>
                                     <div class="d-flex align-items-center">
                                         <span class="label-bold me-2">No. RESERVA:</span>
@@ -470,8 +467,108 @@
 
 
 <script>
+$(function () {
+    var proveedorBancos = [];
+    var $proveedor = $('#nombre_proveedor_1');
+    var $banco = $('#banco');
 
-    // Inject PHP data for Select2
+    function limpiarBanco() {
+        proveedorBancos = [];
+        $banco.empty().append(new Option('Seleccione un banco', ''));
+        $('#no_cuenta, #clabe').val('');
+    }
 
+    function limpiarProveedor() {
+        $('#no_proveedor, #rfc_proveedor, #nombre_proveedor_2, #no_contrato').val('');
+        limpiarBanco();
+    }
+
+    function seleccionarBanco(indice) {
+        var banco = proveedorBancos[indice];
+        $('#no_cuenta').val(banco ? (banco.no_cuenta || banco.cuenta || '') : '');
+        $('#clabe').val(banco ? (banco.clabe || '') : '');
+    }
+
+    $proveedor.select2({
+        width: '100%',
+        placeholder: 'Buscar por nombre, RFC o No. proveedor',
+        allowClear: true,
+        minimumInputLength: 2,
+        ajax: {
+            url: '<?= base_url('index.php/Principal/buscarProveedorSelect2') ?>',
+            dataType: 'json',
+            delay: 300,
+            data: function (params) {
+                return { term: params.term || '' };
+            },
+            processResults: function (data) {
+                return {
+                    results: $.map(data || [], function (item) {
+                        return {
+                            id: item.id_proveedor,
+                            text: [item.razon_social, item.rfc, item.no_proveedor]
+                                .filter(Boolean)
+                                .join(' / ')
+                        };
+                    })
+                };
+            },
+            cache: true
+        }
+    });
+
+    $proveedor.on('select2:select', function (event) {
+        var idProveedor = event.params.data.id;
+
+        limpiarProveedor();
+
+        $.ajax({
+            url: '<?= base_url('index.php/Principal/getProveedor') ?>',
+            type: 'POST',
+            dataType: 'json',
+            data: { id_proveedor: idProveedor }
+        }).done(function (response) {
+            if (response.error || !response.data || !response.data.proveedor) {
+                limpiarProveedor();
+                return;
+            }
+
+            var proveedor = response.data.proveedor;
+            proveedorBancos = response.data.proveedor_banco || [];
+
+            $('#no_proveedor').val(proveedor.no_proveedor || '');
+            $('#rfc_proveedor').val(proveedor.rfc || '');
+            $('#nombre_proveedor_2').val(proveedor.razon_social || '');
+            $('#no_contrato').val(response.data.no_contrato || proveedor.no_contrato || proveedor.no_convenio || '');
+
+            $banco.empty().append(new Option('Seleccione un banco', ''));
+            $.each(proveedorBancos, function (indice, cuenta) {
+                var descripcion = cuenta.banco || 'Banco sin nombre';
+                if (cuenta.no_cuenta || cuenta.cuenta) {
+                    descripcion += ' - ' + (cuenta.no_cuenta || cuenta.cuenta);
+                }
+
+                var opcion = new Option(descripcion, cuenta.banco || '', indice === 0, indice === 0);
+                $(opcion).attr('data-indice', indice);
+                $banco.append(opcion);
+            });
+
+            if (proveedorBancos.length) {
+                seleccionarBanco(0);
+            } else {
+                $('#no_cuenta, #clabe').val('');
+            }
+        }).fail(function () {
+            limpiarProveedor();
+        });
+    });
+
+    $proveedor.on('select2:clear', limpiarProveedor);
+
+    $banco.on('change', function () {
+        var indice = $(this).find('option:selected').attr('data-indice');
+        seleccionarBanco(indice === undefined ? -1 : Number(indice));
+    });
+});
 </script>
 

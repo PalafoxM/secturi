@@ -2574,6 +2574,25 @@ class Principal extends BaseController
             $response->respuesta = $proveedor->respuesta;
             $response->data['proveedor'] = (isset($proveedor->data) && !empty($proveedor->data)) ? $proveedor->data[0] : [];
             $response->data['proveedor_banco'] = (isset($proveedor_banco->data) && !empty($proveedor_banco->data)) ? $proveedor_banco->data : [];
+            $response->data['no_contrato'] = '';
+
+            if (!empty($proveedor->data[0]->rfc)) {
+                $solicitudesContrato = $globals->getTabla([
+                    'tabla' => 'solicitud_contrato',
+                    'where' => [
+                        'visible' => 1,
+                        'proveedor_rfc' => $proveedor->data[0]->rfc,
+                    ],
+                    'order' => ['id_solicitud_contrato' => 'DESC'],
+                ]);
+
+                foreach (($solicitudesContrato->data ?? []) as $solicitudContrato) {
+                    if (!empty($solicitudContrato->no_contrato)) {
+                        $response->data['no_contrato'] = $solicitudContrato->no_contrato;
+                        break;
+                    }
+                }
+            }
         }
         return $this->respond($response);
     }
@@ -2588,7 +2607,12 @@ class Principal extends BaseController
 
 
         $like = ['razon_social' => "%$term%", "no_proveedor" => "%$term%", "rfc"=>"%$term%"];
-        $dataDB = array('tabla' => 'proveedor', 'where' => ['visible' => 1], 'orlike' => $like, );
+        $dataDB = array(
+            'tabla' => 'proveedor',
+            'where' => ['visible' => 1],
+            'orlike' => $like,
+            'limit' => 20,
+        );
         $response = $globals->getTabla($dataDB);
         
         
