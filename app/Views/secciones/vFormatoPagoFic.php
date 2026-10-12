@@ -175,7 +175,6 @@
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center justify-content-center">
-                                        PT SECTURI/SSIDT/DGCT/FIC/TA/
                                         <select name="anio" class="form-control-plaintext mx-1" style="width: 80px;">
                                             <option value="PT SECTURI/SSIDT/DGCT/FIC/TA/">PT SECTURI/SSIDT/DGCT/FIC/TA/</option>
                                             <option value="PT SECTURI/SSIDT/DGCT/FIC/TH/">PT SECTURI/SSIDT/DGCT/FIC/TH/</option>
