@@ -78,19 +78,22 @@
     <table style="margin-top: 20px;">
         <tr><th colspan="3" class="bg-black">AUTORIZACIONES</th></tr>
         <tr class="bg-grey">
-            <td width="33%">RECURSOS FINANCIEROS</td>
+            <td width="33%">DIRECTOR/A GENERAL ADMINISTRATIVO/A </td>
             <td width="33%">AUTORIZA</td>
             <td width="34%">RESPONSABLE DEL PROYECTO</td>
         </tr>
         <tr style="height: 105px;">
             <td style="vertical-align: bottom;">
-                <strong>ANGÉLICA LÓPEZ LÓPEZ</strong><br>
-                <span style="font-size: 7pt;">COORDINADORA DE RECURSOS FINANCIEROS Y APLICACIÓN PRESUPUESTAL</span>
+                <strong>RODRIGO GONZALEZ GUERRERO</strong><br>
+                <span style="font-size: 7pt;">DIRECTOR/A GENERAL ADMINISTRATIVO/A</span>
             </td>
-            <td></td>
+            <td>
+                <strong>MTRO. DAVID AYALA SAUCEDO</strong><br>
+                <span style="font-size: 7pt;">SUBSECRETARIO DE IDENTIDAD Y DESARROLLO TURÍSTICO POR ACUERDO SECRETARIAL N° 003-02/2026</span>
+            </td>
             <td style="vertical-align: bottom;">
-                <strong><?= esc($usuario_registro->nombre_completo ?? '') ?></strong><br>
-                <span style="font-size: 7pt;"><?= esc($usuario_registro->dsc_puesto ?? '') ?></span>
+                <strong>MTRO. DAVID AYALA SAUCEDO</strong><br>
+                <span style="font-size: 7pt;">SUBSECRETARIO DE IDENTIDAD Y DESARROLLO TURÍSTICO</span>
             </td>
         </tr>
     </table>
