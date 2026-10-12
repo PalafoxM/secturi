@@ -4077,6 +4077,148 @@ class Inicio extends BaseController
         return $this->respond(['results' => $results]);
     }
 
+    public function guardarPagoFIC()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $data = $this->request->getPost();
+
+        $idEstablecimiento = (int) ($data['nombre_proveedor_1'] ?? 0);
+        $folio = trim((string) ($data['folioCompleto'] ?? ''));
+        $fechaTramite = trim((string) ($data['fecha_tramite'] ?? ''));
+        $partida = trim((string) ($data['no_partida'] ?? ''));
+        $reserva = trim((string) ($data['no_reserva_visual'] ?? ''));
+        $xmlFile = $this->request->getFile('xml_fic');
+
+        if ($idEstablecimiento <= 0) {
+            return $this->respond(['error' => true, 'respuesta' => 'Seleccione un establecimiento.']);
+        }
+        if ($folio === '') {
+            return $this->respond(['error' => true, 'respuesta' => 'Capture el consecutivo para generar el folio.']);
+        }
+        if ($fechaTramite === '' || $partida === '' || $reserva === '') {
+            return $this->respond(['error' => true, 'respuesta' => 'Complete fecha de trámite, partida y reserva.']);
+        }
+        if (!$xmlFile || !$xmlFile->isValid() || $xmlFile->hasMoved()) {
+            return $this->respond(['error' => true, 'respuesta' => 'Seleccione un archivo XML válido.']);
+        }
+        if (strtolower($xmlFile->getClientExtension()) !== 'xml') {
+            return $this->respond(['error' => true, 'respuesta' => 'El comprobante debe ser un archivo XML.']);
+        }
+
+        try {
+            $datosXml = $this->extraerDatosXmlFIC($xmlFile->getTempName());
+        } catch (\RuntimeException $exception) {
+            return $this->respond(['error' => true, 'respuesta' => $exception->getMessage()]);
+        }
+
+        $establecimiento = $globals->getTabla([
+            'tabla' => 'establecimiento',
+            'where' => [
+                'id_establecimiento' => $idEstablecimiento,
+                'visible' => 1,
+            ],
+            'limit' => 1,
+        ]);
+        if (empty($establecimiento->data)) {
+            return $this->respond(['error' => true, 'respuesta' => 'El establecimiento seleccionado no está disponible.']);
+        }
+
+        $duplicado = $globals->getTabla([
+            'tabla' => 'pago_fic',
+            'where' => [
+                'visible' => 1,
+                'comprobante' => $datosXml['comprobante'],
+            ],
+            'limit' => 1,
+        ]);
+        if (!empty($duplicado->data)) {
+            return $this->respond(['error' => true, 'respuesta' => 'El comprobante ya se encuentra registrado.']);
+        }
+
+        $importe = number_format($datosXml['importe'], 2, '.', '');
+        $importeLetra = $this->numeroALetras($datosXml['importe']);
+        $resultado = $globals->saveTabla([
+            'id_establecimiento' => $idEstablecimiento,
+            'folio' => $folio,
+            'fec_tramite' => $fechaTramite,
+            'comprobante' => $datosXml['comprobante'],
+            'partida' => $partida,
+            'importe' => $importe,
+            'reserva' => $reserva,
+            'importe_letra' => $importeLetra,
+            'fec_reg' => date('Y-m-d H:i:s'),
+            'usu_reg' => $session->get('id_usuario'),
+            'visible' => 1,
+        ], [
+            'tabla' => 'pago_fic',
+            'editar' => false,
+        ], [
+            'id_user' => $session->get('id_usuario'),
+            'script' => 'Inicio.php/guardarPagoFIC',
+        ]);
+
+        if ($resultado->error ?? true) {
+            return $this->respond([
+                'error' => true,
+                'respuesta' => $resultado->respuesta ?? 'No fue posible guardar el pago FIC.',
+            ]);
+        }
+
+        return $this->respond([
+            'error' => false,
+            'respuesta' => 'El pago FIC se guardó correctamente.',
+            'data' => [
+                'id_pago_fic' => $resultado->idRegistro ?? null,
+                'comprobante' => $datosXml['comprobante'],
+                'importe' => $importe,
+                'importe_letra' => $importeLetra,
+            ],
+        ]);
+    }
+
+    private function extraerDatosXmlFIC(string $rutaXml): array
+    {
+        $contenido = @file_get_contents($rutaXml);
+        if ($contenido === false || trim($contenido) === '') {
+            throw new \RuntimeException('No fue posible leer el archivo XML.');
+        }
+
+        $estadoAnterior = libxml_use_internal_errors(true);
+        $xml = simplexml_load_string($contenido, 'SimpleXMLElement', LIBXML_NONET | LIBXML_NOCDATA);
+        libxml_clear_errors();
+        libxml_use_internal_errors($estadoAnterior);
+
+        if ($xml === false) {
+            throw new \RuntimeException('El archivo seleccionado no contiene un XML válido.');
+        }
+
+        $atributos = $xml->attributes();
+        $folio = isset($atributos['Folio']) ? trim((string) $atributos['Folio']) : trim((string) ($atributos['folio'] ?? ''));
+        $totalTexto = isset($atributos['Total']) ? (string) $atributos['Total'] : (string) ($atributos['total'] ?? '');
+        $importe = (float) str_replace(',', '', $totalTexto);
+
+        $uuid = '';
+        $timbres = $xml->xpath('//*[local-name()="TimbreFiscalDigital"]');
+        if (!empty($timbres[0])) {
+            $atributosTimbre = $timbres[0]->attributes();
+            $uuid = isset($atributosTimbre['UUID']) ? trim((string) $atributosTimbre['UUID']) : '';
+        }
+
+        $comprobante = $folio !== '' ? $folio : $uuid;
+        if ($comprobante === '') {
+            throw new \RuntimeException('El XML no contiene Folio ni UUID para identificar el comprobante.');
+        }
+        if ($importe <= 0) {
+            throw new \RuntimeException('El XML no contiene un importe total válido.');
+        }
+
+        return [
+            'comprobante' => $comprobante,
+            'importe' => $importe,
+        ];
+    }
+
     public function pdfLiberacionPago()
     {
         

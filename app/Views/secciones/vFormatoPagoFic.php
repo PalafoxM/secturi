@@ -140,7 +140,6 @@
             <div class="container-fluid" style="background: white; padding: 20px;">
                 
                 <form id="formPagoTerceros" enctype="multipart/form-data">
-                    <input type="hidden" name="id_reserva" value=">">
                     <!-- HEADER -->
                     <div class="row mb-4">
                         <div class="col-md-12 text-center">
@@ -180,7 +179,7 @@
                                             <option value="PT SECTURI/SSIDT/DGCT/FIC/TH/">PT SECTURI/SSIDT/DGCT/FIC/TH/</option>
                                         </select>
                                         <input type="text" name="no_consecutivo" autocomplete="off" class="form-control-plaintext mx-1" style="width: 80px;" value="" placeholder="001">
-                                        2026
+                                        <?= date('Y') ?>
                                     </div>
                                     <span id="folio_error" class="text-success d-block mt-1"></span>
                               
@@ -214,7 +213,7 @@
                             <tr class="item-row">
                                 <!-- No. COMPROBANTE -->
                                 <td style="vertical-align: top;">
-                                    <input type="text" name="no_comprobante[]" class="form-control-plaintext mb-2" value="" placeholder="3220">
+                                    <input type="text" id="comprobante" name="comprobante" class="form-control-plaintext mb-2" value="" placeholder="Folio del XML" readonly>
                                 </td>
 
                                 <!-- PROYECTO META -->
@@ -233,7 +232,7 @@
 
                                 <!-- IMPORTE -->
                                 <td style="vertical-align: top;">
-                                    <input type="text" name="importe" class="form-control-plaintext input-importe" value="0.00" placeholder="$0.00">
+                                    <input type="text" id="importe" name="importe" class="form-control-plaintext input-importe" value="" placeholder="$0.00" readonly>
                                     
                                     <!-- File Inputs -->
                                     <div class="mt-2 text-center">
@@ -246,14 +245,11 @@
                                         <span class="file-name-display" id="name_pdf_pt"></span>
 
                                         <!-- XML Button -->
-                                        <label for="xml_pt" class="file-upload-btn btn-xm">
+                                        <label for="xml_fic" class="file-upload-btn btn-xml">
                                             <i class="feather icon-code"></i> XML
                                         </label>
-                                        <input type="file" id="xml_pt" name="xml_pt" class="d-none input-xml" accept=".xml" onchange="updateFileName(this)">
-                                        <input type="hidden" name="xml_current" value="">
-                                        <span class="file-name-display" id="name_xml_pt"></span>
-                                        
-                                        <input type="hidden" name="row_index[]" value="">
+                                        <input type="file" id="xml_fic" name="xml_fic" class="d-none input-xml" accept=".xml,text/xml,application/xml" onchange="leerXmlFIC(this)">
+                                        <span class="file-name-display" id="name_xml_fic"></span>
                                     </div>
 
                                 </td>
@@ -320,7 +316,7 @@
                            
                              <tr>
                                  <td colspan="4" class="text-left">
-                                     <button type="button" class="btn btn-info btn-sm" id="btnAddRow">+ Agregar Fila</button>
+                                     <small class="text-muted">El No. de comprobante y el importe se obtienen del XML.</small>
                                  </td>
                                  <td colspan="1" class="text-left">
                                      <span class="label-bold me-2">CLAUSULA</span>
@@ -471,9 +467,91 @@
 
 
 <script>
+function mostrarMensajeFIC(icono, titulo, mensaje) {
+    if (typeof Swal !== 'undefined') {
+        Swal.fire({ icon: icono, title: titulo, text: mensaje });
+        return;
+    }
+    alert(mensaje);
+}
+
+function updateFileName(input) {
+    var nombre = input.files && input.files[0] ? input.files[0].name : '';
+    $('#name_' + input.id).text(nombre).attr('title', nombre);
+    $('label[for="' + input.id + '"]').toggleClass('btn-loaded', nombre !== '');
+}
+
+function leerXmlFIC(input) {
+    updateFileName(input);
+    $('#comprobante, #importe, input[name="importe_total_num"], input[name="importe_letra"]').val('');
+
+    if (!input.files || !input.files[0]) {
+        return;
+    }
+
+    var archivo = input.files[0];
+    if (!/\.xml$/i.test(archivo.name)) {
+        input.value = '';
+        updateFileName(input);
+        mostrarMensajeFIC('warning', 'Archivo incorrecto', 'Seleccione un archivo XML.');
+        return;
+    }
+
+    var lector = new FileReader();
+    lector.onload = function (evento) {
+        var documento = new DOMParser().parseFromString(evento.target.result, 'application/xml');
+        if (documento.getElementsByTagName('parsererror').length) {
+            input.value = '';
+            updateFileName(input);
+            mostrarMensajeFIC('error', 'XML inválido', 'No fue posible interpretar el archivo seleccionado.');
+            return;
+        }
+
+        var comprobanteXml = documento.documentElement;
+        var folio = comprobanteXml.getAttribute('Folio') || comprobanteXml.getAttribute('folio') || '';
+        var totalTexto = comprobanteXml.getAttribute('Total') || comprobanteXml.getAttribute('total') || '';
+        var importe = Number(String(totalTexto).replace(/,/g, ''));
+        var uuid = '';
+        var timbres = documento.getElementsByTagNameNS('*', 'TimbreFiscalDigital');
+        if (timbres.length) {
+            uuid = timbres[0].getAttribute('UUID') || '';
+        }
+
+        var numeroComprobante = folio || uuid;
+        if (!numeroComprobante || !Number.isFinite(importe) || importe <= 0) {
+            input.value = '';
+            updateFileName(input);
+            mostrarMensajeFIC('error', 'XML incompleto', 'El XML debe contener Folio o UUID y un importe total válido.');
+            return;
+        }
+
+        var importeFormateado = importe.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+        $('#comprobante').val(numeroComprobante);
+        $('#importe, input[name="importe_total_num"]').val(importeFormateado);
+    };
+    lector.onerror = function () {
+        mostrarMensajeFIC('error', 'Error', 'No fue posible leer el archivo XML.');
+    };
+    lector.readAsText(archivo);
+}
+
 $(function () {
     var $proveedor = $('#nombre_proveedor_1');
     var $banco = $('#banco');
+
+    function actualizarFolio() {
+        var prefijo = $('select[name="anio"]').val() || '';
+        var consecutivo = $.trim($('input[name="no_consecutivo"]').val() || '');
+        var folio = consecutivo ? prefijo + consecutivo + '/<?= date('Y') ?>' : '';
+        $('#folio_error').text(folio);
+        $('#folioCompleto').val(folio);
+    }
+
+    $('select[name="anio"], input[name="no_consecutivo"]').on('change input', actualizarFolio);
+    actualizarFolio();
 
     function limpiarEstablecimiento() {
         $('#no_proveedor, #rfc_proveedor, #nombre_proveedor_2, #no_contrato, #no_cuenta, #clabe').val('');
@@ -516,6 +594,51 @@ $(function () {
     });
 
     $proveedor.on('select2:clear', limpiarEstablecimiento);
+
+    $('#btnGuardarPT').on('click', function () {
+        actualizarFolio();
+
+        if (!$proveedor.val() || !$('#folioCompleto').val() || !$('#xml_fic').val()
+            || !$('#comprobante').val() || !$('select[name="no_partida"]').val()
+            || !$('select[name="no_reserva_visual"]').val()) {
+            mostrarMensajeFIC('warning', 'Datos incompletos', 'Seleccione establecimiento, partida, reserva, consecutivo y archivo XML.');
+            return;
+        }
+
+        var $boton = $(this);
+        var textoOriginal = $boton.html();
+        $boton.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Guardando...');
+
+        $.ajax({
+            url: '<?= base_url('index.php/Inicio/guardarPagoFIC') ?>',
+            type: 'POST',
+            data: new FormData(document.getElementById('formPagoTerceros')),
+            processData: false,
+            contentType: false,
+            dataType: 'json'
+        }).done(function (response) {
+            if (response.error) {
+                mostrarMensajeFIC('error', 'No fue posible guardar', response.respuesta || 'Revise la información capturada.');
+                return;
+            }
+
+            if (response.data) {
+                $('#comprobante').val(response.data.comprobante || $('#comprobante').val());
+                $('#importe, input[name="importe_total_num"]').val(
+                    Number(response.data.importe || 0).toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    })
+                );
+                $('input[name="importe_letra"]').val(response.data.importe_letra || '');
+            }
+            mostrarMensajeFIC('success', 'Guardado', response.respuesta);
+        }).fail(function () {
+            mostrarMensajeFIC('error', 'Error', 'Ocurrió un error al guardar el pago FIC.');
+        }).always(function () {
+            $boton.prop('disabled', false).html(textoOriginal);
+        });
+    });
 });
 </script>
 
