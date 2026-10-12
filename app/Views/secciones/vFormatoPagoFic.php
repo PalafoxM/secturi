@@ -265,7 +265,7 @@
                                             <select id="nombre_proveedor_1" name="nombre_proveedor_1" class="form-control-plaintext select2" placeholder="ORGANIZACION MUNDIAL DEL TURISMO">
                                                 <option value="">Seleccione un proveedor</option>
                                                 <?php foreach ($establecimientos as $establecimiento): ?>
-                                                    <option value="<?= $establecimiento['dsc_establecimiento'] ?>"><?= $establecimiento['dsc_establecimiento'] ?></option>
+                                                    <option value="<?= $establecimiento->id_establecimiento ?>"><?= $establecimiento->dsc_establecimiento ?></option>
                                                 <?php endforeach; ?>
                                             </select>
                                         </div>

@@ -4035,8 +4035,7 @@ class Inicio extends BaseController
             $data['establecimientos'] = $estableciemientos->data;
 
          }
-        var_dump($data['establecimientos']);   
-         die();
+      
 
 
         $data['scripts'] = array('principal');
