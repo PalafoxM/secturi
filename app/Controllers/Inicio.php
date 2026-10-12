@@ -4033,6 +4033,50 @@ class Inicio extends BaseController
         $data['contentView'] = 'secciones/vFormatoPagoFic';
         $this->_renderView($data);
     }
+
+    public function buscarEstablecimientoFIC()
+    {
+        $term = trim((string) $this->request->getGet('term'));
+        $globals = new Mglobal;
+        $establecimientos = $globals->getTabla([
+            'tabla' => 'establecimiento',
+            'where' => ['visible' => 1],
+            'orlike' => [
+                'razon_social' => "%{$term}%",
+                'dsc_establecimiento' => "%{$term}%",
+                'no_proveedor' => "%{$term}%",
+                'rfc' => "%{$term}%",
+                'no_contrato' => "%{$term}%",
+            ],
+            'limit' => 20,
+        ]);
+
+        $results = [];
+        foreach (($establecimientos->data ?? []) as $establecimiento) {
+            $razonSocial = trim((string) ($establecimiento->razon_social ?? ''));
+            $descripcion = trim((string) ($establecimiento->dsc_establecimiento ?? ''));
+            $nombre = $razonSocial !== '' ? $razonSocial : $descripcion;
+
+            $results[] = [
+                'id' => $establecimiento->id_establecimiento,
+                'text' => implode(' / ', array_filter([
+                    $nombre,
+                    $establecimiento->rfc ?? '',
+                    $establecimiento->no_proveedor ?? '',
+                ])),
+                'no_proveedor' => $establecimiento->no_proveedor ?? '',
+                'razon_social' => $razonSocial,
+                'rfc' => $establecimiento->rfc ?? '',
+                'no_contrato' => $establecimiento->no_contrato ?? '',
+                'banco' => $establecimiento->banco ?? '',
+                'no_cuenta' => $establecimiento->no_cuenta ?? '',
+                'clabe' => $establecimiento->clabe ?? '',
+            ];
+        }
+
+        return $this->respond(['results' => $results]);
+    }
+
     public function pdfLiberacionPago()
     {
         
