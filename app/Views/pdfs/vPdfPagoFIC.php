@@ -21,7 +21,7 @@
             <td width="35%" class="no-border text-left"><div class="logo"></div></td>
             <td width="65%" class="no-border">
                 <div class="font-bold" style="font-size: 12pt;">GOBIERNO DEL ESTADO DE GUANAJUATO</div>
-                <div style="font-size: 10pt; margin-top: 5px;">FORMATO DE PAGO FIC</div>
+                <div style="font-size: 10pt; margin-top: 5px;">FORMATO DE PAGO A TERCEROS</div>
             </td>
         </tr>
     </table>
