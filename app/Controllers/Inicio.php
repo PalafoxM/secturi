@@ -4125,17 +4125,7 @@ class Inicio extends BaseController
             return $this->respond(['error' => true, 'respuesta' => 'El establecimiento seleccionado no está disponible.']);
         }
 
-        $duplicado = $globals->getTabla([
-            'tabla' => 'pagos_fic',
-            'where' => [
-                'visible' => 1,
-                'comprobante' => $datosXml['comprobante'],
-            ],
-            'limit' => 1,
-        ]);
-        if (!empty($duplicado->data)) {
-            return $this->respond(['error' => true, 'respuesta' => 'El comprobante ya se encuentra registrado.']);
-        }
+       
 
         $importe = number_format($datosXml['importe'], 2, '.', '');
         $importeLetra = $this->numeroALetras($datosXml['importe']);
