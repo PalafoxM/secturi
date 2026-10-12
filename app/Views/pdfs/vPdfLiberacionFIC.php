@@ -39,7 +39,7 @@
         <strong><?= esc($pago_fic->folio ?? '') ?></strong>, por la cantidad de
         <strong>$<?= number_format($importe, 2) ?> (<?= esc($pago_fic->importe_letra ?? '') ?>)</strong>,
         correspondiente al comprobante fiscal No. <strong><?= esc($pago_fic->comprobante ?? '') ?></strong>,
-        por concepto de Consumo de alimentos durante la edición 54 del FIC del 17 de Sep al 19 Oct. 2026 al proveedor<strong><?= esc($proveedor) ?></strong>.
+        por concepto de Consumo de alimentos durante la edición 54 del FIC del 17 de Sep al 19 Oct. 2026 al proveedor <strong><?= esc($proveedor) ?></strong>.
     </div>
 
     <div class="content">
