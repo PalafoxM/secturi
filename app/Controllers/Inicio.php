@@ -59,6 +59,122 @@ class Inicio extends BaseController
         return file_exists($fullPath) ? $fullPath : null;
     }
 
+    private function guardarPdfFIC($pdfFile): ?string
+    {
+        $extension = strtolower((string) $pdfFile->getClientExtension());
+        $nombreArchivo = 'FIC_' . date('Ymd_His') . '_' . uniqid() . '.' . $extension;
+        $s3Key = 'FACTURAS/PDF/' . $nombreArchivo;
+
+        try {
+            $s3 = new \App\Libraries\S3Service();
+            if ($s3->uploadFile($pdfFile->getTempName(), $s3Key)) {
+                return $s3Key;
+            }
+        } catch (\Throwable $exception) {
+            log_message('error', 'No fue posible subir el PDF FIC a S3: ' . $exception->getMessage());
+        }
+
+        $directorio = FCPATH . 'assets/pdf/fic/';
+        if (!is_dir($directorio) && !@mkdir($directorio, 0775, true) && !is_dir($directorio)) {
+            return null;
+        }
+
+        try {
+            $pdfFile->move($directorio, $nombreArchivo);
+        } catch (\Throwable $exception) {
+            log_message('error', 'No fue posible guardar localmente el PDF FIC: ' . $exception->getMessage());
+            return null;
+        }
+
+        return 'assets/pdf/fic/' . $nombreArchivo;
+    }
+
+    private function anexarPdfDebajoDelEncabezado($mpdf, string $archivoPdf, string $nombreOriginal): void
+    {
+        $archivoImportacion = $archivoPdf;
+        $archivoConvertido = null;
+        $directorioTemporal = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'mpdf_fic_merge';
+
+        if (!is_dir($directorioTemporal)) {
+            @mkdir($directorioTemporal, 0775, true);
+        }
+
+        $ejecutableGs = null;
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $candidatos = [
+                'C:\\Program Files\\gs\\gs10.06.0\\bin\\gswin64c.exe',
+                'C:\\Program Files (x86)\\gs\\gs10.06.0\\bin\\gswin32c.exe',
+            ];
+            foreach ($candidatos as $candidato) {
+                if (is_file($candidato)) {
+                    $ejecutableGs = $candidato;
+                    break;
+                }
+            }
+        } else {
+            $ejecutableGs = 'gs';
+        }
+
+        if ($ejecutableGs !== null && is_dir($directorioTemporal) && function_exists('shell_exec')) {
+            $archivoConvertido = $directorioTemporal . DIRECTORY_SEPARATOR . 'fic_' . uniqid('', true) . '.pdf';
+            $comando = escapeshellarg($ejecutableGs)
+                . ' -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH'
+                . ' -sOutputFile=' . escapeshellarg($archivoConvertido)
+                . ' ' . escapeshellarg($archivoPdf);
+            @shell_exec($comando);
+
+            if (is_file($archivoConvertido) && filesize($archivoConvertido) > 0) {
+                $archivoImportacion = $archivoConvertido;
+            }
+        }
+
+        try {
+            $totalPaginas = $mpdf->SetSourceFile($archivoImportacion);
+            $anchoPagina = 216;
+            $altoPagina = 279;
+            $margenLateral = 10;
+            $margenInferior = 10;
+            $anchoDisponible = $anchoPagina - ($margenLateral * 2);
+
+            for ($pagina = 1; $pagina <= $totalPaginas; $pagina++) {
+                if ($pagina === 1) {
+                    $posicionY = $mpdf->y + 5;
+                    $altoDisponible = $altoPagina - $posicionY - $margenInferior;
+                    if ($altoDisponible < 40) {
+                        $mpdf->AddPage();
+                        $posicionY = 10;
+                        $altoDisponible = $altoPagina - 20;
+                    }
+                } else {
+                    $mpdf->AddPage();
+                    $posicionY = 10;
+                    $altoDisponible = $altoPagina - 20;
+                }
+
+                $plantilla = $mpdf->ImportPage($pagina);
+                $medidas = $mpdf->getTemplateSize($plantilla);
+                $escala = min(
+                    $anchoDisponible / $medidas['width'],
+                    $altoDisponible / $medidas['height']
+                );
+                $ancho = $medidas['width'] * $escala;
+                $alto = $medidas['height'] * $escala;
+                $posicionX = $margenLateral + (($anchoDisponible - $ancho) / 2);
+                $mpdf->UseTemplate($plantilla, $posicionX, $posicionY, $ancho, $alto);
+            }
+        } catch (\Throwable $exception) {
+            $mpdf->SetXY(10, min($mpdf->y + 8, 250));
+            $mpdf->SetFont('Arial', 'B', 10);
+            $mpdf->SetTextColor(190, 0, 0);
+            $mpdf->WriteCell(196, 8, 'No fue posible integrar el PDF adjunto: ' . basename($nombreOriginal), 0, 1, 'C');
+            log_message('error', 'Error al integrar PDF FIC: ' . $exception->getMessage());
+        } finally {
+            if ($archivoConvertido && is_file($archivoConvertido)) {
+                @unlink($archivoConvertido);
+            }
+        }
+    }
+
     private function getTablaData(Mglobal $globals, array $config): array
     {
         $result = $globals->getTabla($config);
@@ -4090,6 +4206,7 @@ class Inicio extends BaseController
         $partida = trim((string) ($data['no_partida'] ?? ''));
         $reserva = trim((string) ($data['no_reserva_visual'] ?? ''));
         $xmlFile = $this->request->getFile('xml_fic');
+        $pdfFile = $this->request->getFile('pdf_pt');
 
         if ($idEstablecimiento <= 0) {
             return $this->respond(['error' => true, 'respuesta' => 'Seleccione un establecimiento.']);
@@ -4105,6 +4222,12 @@ class Inicio extends BaseController
         }
         if (strtolower($xmlFile->getClientExtension()) !== 'xml') {
             return $this->respond(['error' => true, 'respuesta' => 'El comprobante debe ser un archivo XML.']);
+        }
+        if (!$pdfFile || !$pdfFile->isValid() || $pdfFile->hasMoved()) {
+            return $this->respond(['error' => true, 'respuesta' => 'Seleccione el comprobante en formato PDF.']);
+        }
+        if (strtolower($pdfFile->getClientExtension()) !== 'pdf') {
+            return $this->respond(['error' => true, 'respuesta' => 'El comprobante adjunto debe ser un archivo PDF.']);
         }
 
         try {
@@ -4127,6 +4250,11 @@ class Inicio extends BaseController
 
        
 
+        $rutaPdf = $this->guardarPdfFIC($pdfFile);
+        if ($rutaPdf === null) {
+            return $this->respond(['error' => true, 'respuesta' => 'No fue posible almacenar el comprobante PDF.']);
+        }
+
         $importe = number_format($datosXml['importe'], 2, '.', '');
         $importeLetra = $this->numeroALetras($datosXml['importe']);
         $resultado = $globals->saveTabla([
@@ -4138,6 +4266,7 @@ class Inicio extends BaseController
             'importe' => $importe,
             'reserva' => $reserva,
             'importe_letra' => $importeLetra,
+            'pdf' => $rutaPdf,
             'fec_reg' => date('Y-m-d H:i:s'),
             'usu_reg' => $session->get('id_usuario'),
             'visible' => 1,
@@ -4150,6 +4279,9 @@ class Inicio extends BaseController
         ]);
 
         if ($resultado->error ?? true) {
+            if (strpos($rutaPdf, 'assets/pdf/') === 0) {
+                @unlink(FCPATH . $rutaPdf);
+            }
             return $this->respond([
                 'error' => true,
                 'respuesta' => $resultado->respuesta ?? 'No fue posible guardar el pago FIC.',
@@ -4270,7 +4402,39 @@ class Inicio extends BaseController
     public function pdfEncabezadoFIC()
     {
         $data = $this->obtenerDatosPagoFIC((int) $this->request->getGet('id'));
-        $this->generarDocumentoPagoFIC('pdfs/vPdfEncabezadoFIC', $data, 'EncabezadoFIC_' . $data['pago_fic']->id_pago_fic . '.pdf');
+        $registro = $data['pago_fic'];
+        $directorioTemporal = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'mpdf';
+        if (!is_dir($directorioTemporal)) {
+            @mkdir($directorioTemporal, 0775, true);
+        }
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 10,
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_bottom' => 10,
+            'format' => 'Letter',
+            'tempDir' => $directorioTemporal,
+        ]);
+
+        $mpdf->WriteHTML(view('pdfs/vPdfEncabezadoFIC', $data));
+
+        if (!empty($registro->pdf)) {
+            $rutaTemporal = $this->resolveFacturaPdfPath($registro->pdf, 'factura_fic_');
+            if ($rutaTemporal && is_file($rutaTemporal)) {
+                $this->anexarPdfDebajoDelEncabezado($mpdf, $rutaTemporal, $registro->pdf);
+                if (strpos($registro->pdf, 'FACTURAS/') === 0) {
+                    @unlink($rutaTemporal);
+                }
+            } else {
+                $mpdf->SetXY(10, min($mpdf->y + 8, 250));
+                $mpdf->SetFont('Arial', 'B', 10);
+                $mpdf->SetTextColor(190, 0, 0);
+                $mpdf->WriteCell(196, 8, 'No se encontró el comprobante PDF asociado.', 0, 1, 'C');
+            }
+        }
+
+        $mpdf->Output('EncabezadoFIC_' . $registro->id_pago_fic . '.pdf', 'I');
+        exit;
     }
 
     private function obtenerDatosPagoFIC(int $idPagoFic): array

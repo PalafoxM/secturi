@@ -555,10 +555,10 @@ $(function () {
     $('#btnGuardarPT').on('click', function () {
         actualizarFolio();
 
-        if (!$proveedor.val() || !$('#folioCompleto').val() || !$('#xml_fic').val()
+        if (!$proveedor.val() || !$('#folioCompleto').val() || !$('#pdf_pt').val() || !$('#xml_fic').val()
             || !$('#comprobante').val() || !$('select[name="no_partida"]').val()
             || !$('select[name="no_reserva_visual"]').val()) {
-            mostrarMensajeFIC('warning', 'Datos incompletos', 'Seleccione establecimiento, partida, reserva, consecutivo y archivo XML.');
+            mostrarMensajeFIC('warning', 'Datos incompletos', 'Seleccione establecimiento, partida, reserva, consecutivo y los archivos PDF y XML.');
             return;
         }
 
