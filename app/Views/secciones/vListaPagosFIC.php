@@ -51,9 +51,17 @@
                                                 <td class="text-center"><?= esc($pago->folio ?? '') ?></td>
                                                 <td class="text-center"><?= esc($pago->reserva ?? '') ?></td>
                                                 <td><?= esc($pago->nombre_establecimiento ?? '') ?></td>
-                                                <td class="text-center"><?= esc($pago->comprobante ?? '') ?></td>
-                                                <td class="text-center"><?= esc($pago->partida ?? '') ?></td>
-                                                <td class="text-right">$<?= number_format((float) str_replace(',', '', (string) ($pago->importe ?? 0)), 2) ?></td>
+                                                <td class="text-center">
+                                                    <?= esc(implode(', ', array_map(static function ($concepto) {
+                                                        return $concepto->comprobante;
+                                                    }, $pago->conceptos_fic ?? []))) ?>
+                                                </td>
+                                                <td class="text-center">
+                                                    <?= esc(implode(', ', array_unique(array_map(static function ($concepto) {
+                                                        return $concepto->partida;
+                                                    }, $pago->conceptos_fic ?? [])))) ?>
+                                                </td>
+                                                <td class="text-right">$<?= number_format((float) ($pago->importe_total_fic ?? 0), 2) ?></td>
                                                 <?php if (in_array((int) $session->get('id_perfil'), [1, 2], true)): ?>
                                                     <td><?= esc($pago->nombre_usuario ?? '') ?></td>
                                                 <?php endif; ?>

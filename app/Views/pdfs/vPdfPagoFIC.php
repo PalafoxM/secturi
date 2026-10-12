@@ -57,21 +57,25 @@
             <td width="15%">IMPORTE</td>
             <td width="37%">OBSERVACIONES</td>
         </tr>
-        <tr>
-            <td><?= esc($pago_fic->comprobante ?? '') ?></td>
-            <td><?= esc($proyecto->proyecto ?? 'E027QC04182601') ?></td>
-            <td><?= esc($pago_fic->partida ?? '') ?></td>
-            <td>$<?= number_format((float) str_replace(',', '', (string) ($pago_fic->importe ?? 0)), 2) ?></td>
-            <td class="text-left" style="vertical-align: top;">
-                <div class="font-bold">DATOS DEL PROVEEDOR NACIONAL</div>
-                <div><span class="font-bold">No. PROVEEDOR:</span> <?= esc($establecimiento->no_proveedor ?? '') ?></div>
-                <div><span class="font-bold">RFC:</span> <?= esc($establecimiento->rfc ?? '') ?></div>
-                <div><span class="font-bold">NOMBRE:</span> <?= esc($establecimiento->razon_social ?? $establecimiento->dsc_establecimiento ?? '') ?></div>
-                <div><span class="font-bold">NO. CUENTA:</span> <?= esc($establecimiento->no_cuenta ?? '') ?></div>
-                <div><span class="font-bold">BANCO:</span> <?= esc($establecimiento->banco ?? '') ?></div>
-                <div><span class="font-bold">CLABE:</span> <?= esc($establecimiento->clabe ?? '') ?></div>
-            </td>
-        </tr>
+        <?php foreach ($conceptos_fic as $indice => $concepto): ?>
+            <tr>
+                <td><?= esc($concepto->comprobante) ?></td>
+                <td><?= esc($proyecto->proyecto ?? 'E027QC04182601') ?></td>
+                <td><?= esc($concepto->partida) ?></td>
+                <td>$<?= number_format($concepto->importe, 2) ?></td>
+                <?php if ($indice === 0): ?>
+                    <td class="text-left" style="vertical-align: top;" rowspan="<?= count($conceptos_fic) ?>">
+                        <div class="font-bold">DATOS DEL PROVEEDOR NACIONAL</div>
+                        <div><span class="font-bold">No. PROVEEDOR:</span> <?= esc($establecimiento->no_proveedor ?? '') ?></div>
+                        <div><span class="font-bold">RFC:</span> <?= esc($establecimiento->rfc ?? '') ?></div>
+                        <div><span class="font-bold">NOMBRE:</span> <?= esc($establecimiento->razon_social ?? $establecimiento->dsc_establecimiento ?? '') ?></div>
+                        <div><span class="font-bold">NO. CUENTA:</span> <?= esc($establecimiento->no_cuenta ?? '') ?></div>
+                        <div><span class="font-bold">BANCO:</span> <?= esc($establecimiento->banco ?? '') ?></div>
+                        <div><span class="font-bold">CLABE:</span> <?= esc($establecimiento->clabe ?? '') ?></div>
+                    </td>
+                <?php endif; ?>
+            </tr>
+        <?php endforeach; ?>
     </table>
 
     <table>
@@ -80,7 +84,7 @@
                 <span class="font-bold">No. CONTRATO y/o CONVENIO:</span> <?= esc($establecimiento->no_contrato ?? 'NO APLICA') ?><br>
                 <span class="font-bold">No. RESERVA:</span> <?= esc($pago_fic->reserva ?? '') ?>
             </td>
-            <td width="30%" class="font-bold">$<?= number_format((float) str_replace(',', '', (string) ($pago_fic->importe ?? 0)), 2) ?></td>
+            <td width="30%" class="font-bold">$<?= number_format($importe_total_fic, 2) ?></td>
         </tr>
         <tr><td colspan="4" class="font-bold"><?= esc($pago_fic->importe_letra ?? '') ?></td></tr>
     </table>

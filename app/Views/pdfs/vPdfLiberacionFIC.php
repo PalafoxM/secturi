@@ -17,10 +17,15 @@
     <?php
         $meses = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
         $timestamp = strtotime((string) ($pago_fic->fec_tramite ?? date('Y-m-d')));
-        $fechaTexto = 'SILAO, GTO. ' . date('d', $timestamp) . ' DE OCTUBRE DEL ' . date('Y', $timestamp);
-        $importe = (float) str_replace(',', '', (string) ($pago_fic->importe ?? 0));
+        $fechaTexto = 'SILAO, GTO. ' . date('d', $timestamp) . ' DE ' . $meses[(int) date('n', $timestamp) - 1] . ' DEL ' . date('Y', $timestamp);
+        $importe = $importe_total_fic;
         $proveedor = $establecimiento->razon_social ?? $establecimiento->dsc_establecimiento ?? 'PROVEEDOR';
-        $descripcionPartida = $partida->nombre_fondo ?? '';
+        $comprobantes = array_map(static function ($concepto) {
+            return $concepto->comprobante;
+        }, $conceptos_fic);
+        $partidas = array_map(static function ($concepto) {
+            return $concepto->partida . ($concepto->descripcion_partida !== '' ? ' (' . $concepto->descripcion_partida . ')' : '');
+        }, $conceptos_fic);
     ?>
 
     <div class="date-folio">
@@ -38,13 +43,15 @@
         Por medio del presente, solicito su apoyo para realizar el trámite del Pago FIC con folio
         <strong><?= esc($pago_fic->folio ?? '') ?></strong>, por la cantidad de
         <strong>$<?= number_format($importe, 2) ?> (<?= esc($pago_fic->importe_letra ?? '') ?>)</strong>,
-        correspondiente al comprobante fiscal No. <strong><?= esc($pago_fic->comprobante ?? '') ?></strong>,
+        correspondiente <?= count($comprobantes) === 1 ? 'al comprobante fiscal No.' : 'a los comprobantes fiscales No.' ?>
+        <strong><?= esc(implode(', ', $comprobantes)) ?></strong>,
         por concepto de Consumo de alimentos durante la edición 54 del FIC del 17 de septiembre al 09 de octubre de 2026 al proveedor <strong><?= esc($proveedor) ?></strong>.
     </div>
 
     <div class="content">
         El pago se realizará con cargo al proyecto <strong><?= esc($proyecto->proyecto ?? 'E027QC04182601') ?></strong>
-        y a la partida presupuestal <strong><?= esc($pago_fic->partida ?? '') ?><?= $descripcionPartida ? ' (' . esc($descripcionPartida) . ')' : '' ?></strong>,
+        y <?= count($partidas) === 1 ? 'a la partida presupuestal' : 'a las partidas presupuestales' ?>
+        <strong><?= esc(implode(', ', array_unique($partidas))) ?></strong>,
         con reserva No. <strong><?= esc($pago_fic->reserva ?? '') ?></strong>.
     </div>
 

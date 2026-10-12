@@ -4252,10 +4252,8 @@ class Inicio extends BaseController
         $idEstablecimiento = (int) ($data['nombre_proveedor_1'] ?? 0);
         $folio = trim((string) ($data['folioCompleto'] ?? ''));
         $fechaTramite = trim((string) ($data['fecha_tramite'] ?? ''));
-        $partida = trim((string) ($data['no_partida'] ?? ''));
         $reserva = trim((string) ($data['no_reserva_visual'] ?? ''));
-        $xmlFile = $this->request->getFile('xml_fic');
-        $pdfFile = $this->request->getFile('pdf_pt');
+        $cantidadFilas = max(1, min(3, (int) ($data['filas_fic'] ?? 1)));
 
         if ($idEstablecimiento <= 0) {
             return $this->respond(['error' => true, 'respuesta' => 'Seleccione un establecimiento.']);
@@ -4263,26 +4261,46 @@ class Inicio extends BaseController
         if ($folio === '') {
             return $this->respond(['error' => true, 'respuesta' => 'Capture el consecutivo para generar el folio.']);
         }
-        if ($fechaTramite === '' || $partida === '' || $reserva === '') {
-            return $this->respond(['error' => true, 'respuesta' => 'Complete fecha de trámite, partida y reserva.']);
-        }
-        if (!$xmlFile || !$xmlFile->isValid() || $xmlFile->hasMoved()) {
-            return $this->respond(['error' => true, 'respuesta' => 'Seleccione un archivo XML válido.']);
-        }
-        if (strtolower($xmlFile->getClientExtension()) !== 'xml') {
-            return $this->respond(['error' => true, 'respuesta' => 'El comprobante debe ser un archivo XML.']);
-        }
-        if (!$pdfFile || !$pdfFile->isValid() || $pdfFile->hasMoved()) {
-            return $this->respond(['error' => true, 'respuesta' => 'Seleccione el comprobante en formato PDF.']);
-        }
-        if (strtolower($pdfFile->getClientExtension()) !== 'pdf') {
-            return $this->respond(['error' => true, 'respuesta' => 'El comprobante adjunto debe ser un archivo PDF.']);
+        if ($fechaTramite === '' || $reserva === '') {
+            return $this->respond(['error' => true, 'respuesta' => 'Complete la fecha de trámite y la reserva.']);
         }
 
-        try {
-            $datosXml = $this->extraerDatosXmlFIC($xmlFile->getTempName());
-        } catch (\RuntimeException $exception) {
-            return $this->respond(['error' => true, 'respuesta' => $exception->getMessage()]);
+        $filas = [];
+        for ($numeroFila = 1; $numeroFila <= $cantidadFilas; $numeroFila++) {
+            $sufijo = $numeroFila === 1 ? '' : '_' . $numeroFila;
+            $partida = trim((string) ($data['no_partida' . $sufijo] ?? ''));
+            $xmlFile = $this->request->getFile('xml_fic' . $sufijo);
+            $pdfFile = $this->request->getFile('pdf_pt' . $sufijo);
+
+            if ($partida === '') {
+                return $this->respond(['error' => true, 'respuesta' => "Seleccione la partida de la fila {$numeroFila}."]);
+            }
+            if (!$xmlFile || !$xmlFile->isValid() || $xmlFile->hasMoved()
+                || strtolower($xmlFile->getClientExtension()) !== 'xml') {
+                return $this->respond(['error' => true, 'respuesta' => "Seleccione un archivo XML válido en la fila {$numeroFila}."]);
+            }
+            if (!$pdfFile || !$pdfFile->isValid() || $pdfFile->hasMoved()
+                || strtolower($pdfFile->getClientExtension()) !== 'pdf') {
+                return $this->respond(['error' => true, 'respuesta' => "Seleccione un comprobante PDF válido en la fila {$numeroFila}."]);
+            }
+
+            try {
+                $datosXml = $this->extraerDatosXmlFIC($xmlFile->getTempName());
+            } catch (\RuntimeException $exception) {
+                return $this->respond([
+                    'error' => true,
+                    'respuesta' => "Fila {$numeroFila}: " . $exception->getMessage(),
+                ]);
+            }
+
+            $filas[] = [
+                'numero' => $numeroFila,
+                'sufijo' => $sufijo,
+                'partida' => $partida,
+                'pdf_file' => $pdfFile,
+                'comprobante' => $datosXml['comprobante'],
+                'importe' => (float) $datosXml['importe'],
+            ];
         }
 
         $establecimiento = $globals->getTabla([
@@ -4297,29 +4315,46 @@ class Inicio extends BaseController
             return $this->respond(['error' => true, 'respuesta' => 'El establecimiento seleccionado no está disponible.']);
         }
 
-       
-
-        $rutaPdf = $this->guardarPdfFIC($pdfFile);
-        if ($rutaPdf === null) {
-            return $this->respond(['error' => true, 'respuesta' => 'No fue posible almacenar el comprobante PDF.']);
+        $rutasPdf = [];
+        foreach ($filas as $indice => $fila) {
+            $rutaPdf = $this->guardarPdfFIC($fila['pdf_file']);
+            if ($rutaPdf === null) {
+                foreach ($rutasPdf as $rutaGuardada) {
+                    if (strpos($rutaGuardada, 'assets/pdf/') === 0) {
+                        @unlink(FCPATH . $rutaGuardada);
+                    }
+                }
+                return $this->respond([
+                    'error' => true,
+                    'respuesta' => 'No fue posible almacenar el comprobante PDF de la fila ' . ($indice + 1) . '.',
+                ]);
+            }
+            $rutasPdf[] = $rutaPdf;
+            $filas[$indice]['pdf'] = $rutaPdf;
         }
 
-        $importe = number_format($datosXml['importe'], 2, '.', '');
-        $importeLetra = $this->numeroALetras($datosXml['importe']);
-        $resultado = $globals->saveTabla([
+        $importeTotal = array_sum(array_column($filas, 'importe'));
+        $importeLetra = $this->numeroALetras($importeTotal);
+        $datosGuardar = [
             'id_establecimiento' => $idEstablecimiento,
             'folio' => $folio,
             'fec_tramite' => $fechaTramite,
-            'comprobante' => $datosXml['comprobante'],
-            'partida' => $partida,
-            'importe' => $importe,
             'reserva' => $reserva,
             'importe_letra' => $importeLetra,
-            'pdf' => $rutaPdf,
             'fec_reg' => date('Y-m-d H:i:s'),
             'usu_reg' => $session->get('id_usuario'),
             'visible' => 1,
-        ], [
+        ];
+
+        foreach ($filas as $fila) {
+            $sufijoColumna = $fila['numero'] === 1 ? '' : '_' . $fila['numero'];
+            $datosGuardar['comprobante' . $sufijoColumna] = $fila['comprobante'];
+            $datosGuardar['partida' . $sufijoColumna] = $fila['partida'];
+            $datosGuardar['importe' . $sufijoColumna] = number_format($fila['importe'], 2, '.', '');
+            $datosGuardar['pdf' . $sufijoColumna] = $fila['pdf'];
+        }
+
+        $resultado = $globals->saveTabla($datosGuardar, [
             'tabla' => 'pagos_fic',
             'editar' => false,
         ], [
@@ -4328,8 +4363,10 @@ class Inicio extends BaseController
         ]);
 
         if ($resultado->error ?? true) {
-            if (strpos($rutaPdf, 'assets/pdf/') === 0) {
-                @unlink(FCPATH . $rutaPdf);
+            foreach ($rutasPdf as $rutaGuardada) {
+                if (strpos($rutaGuardada, 'assets/pdf/') === 0) {
+                    @unlink(FCPATH . $rutaGuardada);
+                }
             }
             return $this->respond([
                 'error' => true,
@@ -4342,8 +4379,8 @@ class Inicio extends BaseController
             'respuesta' => 'El pago FIC se guardó correctamente.',
             'data' => [
                 'id_pago_fic' => $resultado->idRegistro ?? null,
-                'comprobante' => $datosXml['comprobante'],
-                'importe' => $importe,
+                'comprobantes' => array_column($filas, 'comprobante'),
+                'importe' => number_format($importeTotal, 2, '.', ''),
                 'importe_letra' => $importeLetra,
             ],
         ]);
@@ -4427,6 +4464,10 @@ class Inicio extends BaseController
                 ?? 'SIN ESTABLECIMIENTO';
             $pago->no_contrato = $datosEstablecimiento->no_contrato ?? '';
             $pago->nombre_usuario = $datosUsuario->nombre_completo ?? '';
+            $pago->conceptos_fic = $this->construirConceptosPagoFIC($pago, $globals, false);
+            $pago->importe_total_fic = array_sum(array_map(static function ($concepto) {
+                return $concepto->importe;
+            }, $pago->conceptos_fic));
         }
 
         $data = [];
@@ -4465,33 +4506,87 @@ class Inicio extends BaseController
             'tempDir' => $directorioTemporal,
         ]);
 
-        $mpdf->WriteHTML(view('pdfs/vPdfEncabezadoFIC', $data));
+        foreach ($data['conceptos_fic'] as $indice => $concepto) {
+            if ($indice > 0) {
+                $mpdf->AddPage();
+            }
 
-        if (!empty($registro->pdf)) {
-            $rutaTemporal = $this->resolveFacturaPdfPath($registro->pdf, 'factura_fic_');
-            if ($rutaTemporal && is_file($rutaTemporal)) {
-                $this->anexarPdfDebajoDelEncabezado($mpdf, $rutaTemporal, $registro->pdf);
-                $directorioTemporalSistema = realpath(sys_get_temp_dir());
-                $rutaReal = realpath($rutaTemporal);
-                if ($directorioTemporalSistema !== false && $rutaReal !== false
-                    && strpos($rutaReal, $directorioTemporalSistema) === 0) {
-                    @unlink($rutaTemporal);
+            $dataEncabezado = $data;
+            $dataEncabezado['concepto_fic'] = $concepto;
+            $mpdf->SetTextColor(0, 0, 0);
+            $mpdf->WriteHTML(view('pdfs/vPdfEncabezadoFIC', $dataEncabezado));
+
+            if (!empty($concepto->pdf)) {
+                $rutaTemporal = $this->resolveFacturaPdfPath($concepto->pdf, 'factura_fic_' . $concepto->numero . '_');
+                if ($rutaTemporal && is_file($rutaTemporal)) {
+                    $this->anexarPdfDebajoDelEncabezado($mpdf, $rutaTemporal, $concepto->pdf);
+                    $directorioTemporalSistema = realpath(sys_get_temp_dir());
+                    $rutaReal = realpath($rutaTemporal);
+                    if ($directorioTemporalSistema !== false && $rutaReal !== false
+                        && strpos($rutaReal, $directorioTemporalSistema) === 0) {
+                        @unlink($rutaTemporal);
+                    }
+                } else {
+                    $mpdf->SetXY(10, min($mpdf->y + 8, 250));
+                    $mpdf->SetFont('Arial', 'B', 10);
+                    $mpdf->SetTextColor(190, 0, 0);
+                    $mpdf->WriteCell(196, 8, 'No se encontró el comprobante PDF asociado a la fila ' . $concepto->numero . '.', 0, 1, 'C');
                 }
             } else {
                 $mpdf->SetXY(10, min($mpdf->y + 8, 250));
                 $mpdf->SetFont('Arial', 'B', 10);
                 $mpdf->SetTextColor(190, 0, 0);
-                $mpdf->WriteCell(196, 8, 'No se encontró el comprobante PDF asociado.', 0, 1, 'C');
+                $mpdf->WriteCell(196, 8, 'La fila ' . $concepto->numero . ' no tiene un comprobante PDF asociado.', 0, 1, 'C');
             }
-        } else {
-            $mpdf->SetXY(10, min($mpdf->y + 8, 250));
-            $mpdf->SetFont('Arial', 'B', 10);
-            $mpdf->SetTextColor(190, 0, 0);
-            $mpdf->WriteCell(196, 8, 'Este registro no tiene un comprobante PDF asociado.', 0, 1, 'C');
         }
 
         $mpdf->Output('EncabezadoFIC_' . $registro->id_pago_fic . '.pdf', 'I');
         exit;
+    }
+
+    private function construirConceptosPagoFIC(
+        object $registro,
+        Mglobal $globals,
+        bool $incluirDescripcionPartida = true
+    ): array
+    {
+        $conceptos = [];
+        for ($numero = 1; $numero <= 3; $numero++) {
+            $sufijo = $numero === 1 ? '' : '_' . $numero;
+            $campoComprobante = 'comprobante' . $sufijo;
+            $campoPartida = 'partida' . $sufijo;
+            $campoImporte = 'importe' . $sufijo;
+            $campoPdf = 'pdf' . $sufijo;
+            $comprobante = trim((string) ($registro->{$campoComprobante} ?? ''));
+            $partida = trim((string) ($registro->{$campoPartida} ?? ''));
+            $importe = (float) str_replace(',', '', (string) ($registro->{$campoImporte} ?? 0));
+            $pdf = trim((string) ($registro->{$campoPdf} ?? ''));
+
+            if ($comprobante === '' && $partida === '' && $importe <= 0 && $pdf === '') {
+                continue;
+            }
+
+            $descripcionPartida = '';
+            if ($incluirDescripcionPartida && $partida !== '') {
+                $consultaPartida = $globals->getTabla([
+                    'tabla' => 'cat_partida',
+                    'where' => ['cuenta_cable' => $partida, 'visible' => 1],
+                    'limit' => 1,
+                ]);
+                $descripcionPartida = $consultaPartida->data[0]->nombre_fondo ?? '';
+            }
+
+            $conceptos[] = (object) [
+                'numero' => $numero,
+                'comprobante' => $comprobante,
+                'partida' => $partida,
+                'descripcion_partida' => $descripcionPartida,
+                'importe' => $importe,
+                'pdf' => $pdf,
+            ];
+        }
+
+        return $conceptos;
     }
 
     public function descargarAnexo01FIC()
@@ -4499,6 +4594,7 @@ class Inicio extends BaseController
         $data = $this->obtenerDatosPagoFIC((int) $this->request->getGet('id'));
         $registro = $data['pago_fic'];
         $establecimiento = $data['establecimiento'];
+        $conceptos = $data['conceptos_fic'];
         $plantilla = FCPATH . 'assets/documentos/Anexo1_Reporte_d_ integracion_documental_2026.xlsx';
 
         if (!is_file($plantilla) || !is_readable($plantilla)) {
@@ -4533,7 +4629,7 @@ class Inicio extends BaseController
             ?? $establecimiento->dsc_establecimiento
             ?? '';
         $numeroContrato = trim((string) ($establecimiento->no_contrato ?? ''));
-        $importe = (float) str_replace(',', '', (string) ($registro->importe ?? 0));
+        $importe = (float) $data['importe_total_fic'];
         $importeLetra = trim((string) ($registro->importe_letra ?? ''));
         if ($importeLetra === '') {
             $importeLetra = $this->numeroALetras($importe);
@@ -4544,21 +4640,37 @@ class Inicio extends BaseController
         $sheet->getStyle('H9')->getFont()->setSize(8);
 
         // Conserva el mismo criterio del ANEXO 01 usado en ListaHojaAzul.
-        $sheet->setCellValue('B15', '');
-        $sheet->setCellValue('B17', '');
-        $sheet->setCellValue('F19', '');
-        $sheet->setCellValue('D32', '');
-        $sheet->setCellValue('D33', '');
-        $sheet->setCellValue('D34', '');
+        $sheet->setCellValue('B13', 'SI');
+        $sheet->setCellValue('B14', 'NO');
+        $sheet->setCellValue('B15', 'SI');
+        $sheet->setCellValue('B16', 'SI');
+        $sheet->setCellValue('B17', 'NO');
+        $sheet->setCellValue('B18', 'NO');
+        $sheet->setCellValue('B19', 'NO');
+        $sheet->setCellValue('B20', 'NO');
+        $sheet->setCellValue('F13', 'NO');
+        $sheet->setCellValue('F14', 'NO');
+        $sheet->setCellValue('F15', 'SI');
+        $sheet->setCellValue('F16', 'NO');
+        $sheet->setCellValue('F17', 'NO');
+        $sheet->setCellValue('F18', 'NO');
+        $sheet->setCellValue('F19', 'SI');
+        $sheet->setCellValue('D32', 'SI');
+        $sheet->setCellValue('D33', 'SI');
+        $sheet->setCellValue('D34', 'SI');
 
         $sheet->setCellValue('B24', $nombreProveedor);
-        $sheet->setCellValue('H24', (string) ($registro->partida ?? ''));
+        $sheet->setCellValue('H24', implode(', ', array_unique(array_map(static function ($concepto) {
+            return $concepto->partida;
+        }, $conceptos))));
         $sheet->setCellValue(
             'B25',
-            'Consumo de alimentos durante la edición 54 del FIC del 17 de Sep al 19 Oct. 2026'
+            'Consumo de alimentos durante la edición 54 del FIC del 17 de Sep al 09 Oct. 2026'
         );
         $sheet->setCellValue('H26', $numeroContrato !== '' ? $numeroContrato : 'NO APLICA');
-        $sheet->setCellValue('B26', (string) ($registro->comprobante ?? ''));
+        $sheet->setCellValue('B26', implode(', ', array_map(static function ($concepto) {
+            return $concepto->comprobante;
+        }, $conceptos)));
         $sheet->setCellValue(
             'B27',
             '$' . number_format($importe, 2, '.', ',') . ' (' . $importeLetra . ')'
@@ -4603,6 +4715,13 @@ class Inicio extends BaseController
         }
 
         $registro = $pago->data[0];
+        $conceptos = $this->construirConceptosPagoFIC($registro, $globals);
+        if (empty($conceptos)) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('El pago FIC no contiene comprobantes.');
+        }
+        $importeTotal = array_sum(array_map(static function ($concepto) {
+            return $concepto->importe;
+        }, $conceptos));
         $establecimiento = $globals->getTabla([
             'tabla' => 'establecimiento',
             'where' => ['id_establecimiento' => $registro->id_establecimiento],
@@ -4625,11 +4744,13 @@ class Inicio extends BaseController
         ]);
 
         if (empty($registro->importe_letra)) {
-            $registro->importe_letra = $this->numeroALetras($registro->importe ?? 0);
+            $registro->importe_letra = $this->numeroALetras($importeTotal);
         }
 
         return [
             'pago_fic' => $registro,
+            'conceptos_fic' => $conceptos,
+            'importe_total_fic' => $importeTotal,
             'establecimiento' => $establecimiento->data[0] ?? (object) [],
             'usuario_registro' => $usuario->data[0] ?? (object) [],
             'partida' => $partida->data[0] ?? (object) [],

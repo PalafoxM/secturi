@@ -98,6 +98,18 @@
         border-top: 1px dashed #ccc;
         padding-top: 5px;
     }
+
+    .btn-agregar-fila-fic {
+        border-radius: 18px;
+        font-weight: 600;
+        padding: 6px 16px;
+    }
+
+    .btn-quitar-fila-fic {
+        font-size: 10px;
+        margin-top: 8px;
+        padding: 3px 9px;
+    }
     
     /* Fix para visualización de textos largos en Select2 */
     .select2-container .select2-selection--single {
@@ -140,6 +152,7 @@
             <div class="container-fluid" style="background: white; padding: 20px;">
                 
                 <form id="formPagoTerceros" enctype="multipart/form-data">
+                    <input type="hidden" name="filas_fic" id="filas_fic" value="1">
                     <!-- HEADER -->
                     <div class="row mb-4">
                         <div class="col-md-12 text-center">
@@ -210,10 +223,10 @@
                            
                             
                           
-                            <tr class="item-row">
+                            <tr class="item-row" data-row="1">
                                 <!-- No. COMPROBANTE -->
                                 <td style="vertical-align: top;">
-                                    <input type="text" id="comprobante" name="comprobante" class="form-control-plaintext mb-2" value="" placeholder="Folio del XML" readonly>
+                                    <input type="text" id="comprobante" name="comprobante" class="form-control-plaintext mb-2 input-comprobante" value="" placeholder="Folio del XML" readonly>
                                 </td>
 
                                 <!-- PROYECTO META -->
@@ -223,7 +236,7 @@
 
                                 <!-- No. PARTIDA -->
                                 <td style="vertical-align: top;">
-                                   <select name="no_partida" class="form-control-plaintext">
+                                   <select name="no_partida" id="no_partida" class="form-control-plaintext input-partida">
                                         <option value="">Seleccione una partida</option>
                                         <option value="3390">3390</option>
                                         <option value="2210">2210</option>
@@ -256,7 +269,7 @@
 
                                 <!-- OBSERVACIONES / PROVIDER DATA (Solo en la primera fila con rowspan) -->
                            
-                                <td class="text-left" style="padding: 15px; vertical-align: top;" rowspan="" id="tdProvider">
+                                <td class="text-left" style="padding: 15px; vertical-align: top;" rowspan="1" id="tdProvider">
                                     <div class="label-bold mb-2">DATOS DEL PROVEEDOR NACIONAL</div>
                                     
                                     <div class="provider-section">
@@ -317,6 +330,10 @@
                              <tr>
                                  <td colspan="4" class="text-left">
                                      <small class="text-muted">El No. de comprobante y el importe se obtienen del XML.</small>
+                                     <button type="button" id="btnAgregarFilaFIC" class="btn btn-outline-primary btn-sm btn-agregar-fila-fic ml-3">
+                                         <i class="mdi mdi-plus"></i> Agregar otra fila
+                                     </button>
+                                     <small class="text-muted ml-2">Máximo 3 comprobantes.</small>
                                  </td>
                                  <td colspan="1" class="text-left">
                                      <span class="label-bold me-2">CLAUSULA</span>
@@ -438,9 +455,32 @@ function updateFileName(input) {
     $('label[for="' + input.id + '"]').toggleClass('btn-loaded', nombre !== '');
 }
 
+function sufijoFilaFIC(numeroFila) {
+    return numeroFila === 1 ? '' : '_' + numeroFila;
+}
+
+function recalcularTotalFIC() {
+    var total = 0;
+    $('.item-row .input-importe').each(function () {
+        var importe = Number(String($(this).val() || '').replace(/,/g, ''));
+        if (Number.isFinite(importe)) {
+            total += importe;
+        }
+    });
+
+    $('input[name="importe_total_num"]').val(total.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }));
+    $('input[name="importe_letra"]').val('');
+}
+
 function leerXmlFIC(input) {
     updateFileName(input);
-    $('#comprobante, #importe, input[name="importe_total_num"], input[name="importe_letra"]').val('');
+    var numeroFila = Number(input.getAttribute('data-row') || 1);
+    var sufijo = sufijoFilaFIC(numeroFila);
+    $('#comprobante' + sufijo + ', #importe' + sufijo).val('');
+    recalcularTotalFIC();
 
     if (!input.files || !input.files[0]) {
         return;
@@ -486,8 +526,9 @@ function leerXmlFIC(input) {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
         });
-        $('#comprobante').val(numeroComprobante);
-        $('#importe, input[name="importe_total_num"]').val(importeFormateado);
+        $('#comprobante' + sufijo).val(numeroComprobante);
+        $('#importe' + sufijo).val(importeFormateado);
+        recalcularTotalFIC();
     };
     lector.onerror = function () {
         mostrarMensajeFIC('error', 'Error', 'No fue posible leer el archivo XML.');
@@ -498,6 +539,64 @@ function leerXmlFIC(input) {
 $(function () {
     var $proveedor = $('#nombre_proveedor_1');
     var $banco = $('#banco');
+    var filasActuales = 1;
+
+    function crearFilaFIC(numeroFila) {
+        var sufijo = sufijoFilaFIC(numeroFila);
+        return ''
+            + '<tr class="item-row" data-row="' + numeroFila + '">'
+            + '  <td style="vertical-align: top;">'
+            + '    <input type="text" id="comprobante' + sufijo + '" name="comprobante' + sufijo + '" class="form-control-plaintext mb-2 input-comprobante" placeholder="Folio del XML" readonly>'
+            + '    <button type="button" class="btn btn-outline-danger btn-sm btn-quitar-fila-fic" data-row="' + numeroFila + '"><i class="mdi mdi-close"></i> Quitar fila</button>'
+            + '  </td>'
+            + '  <td style="vertical-align: top;">E027QC04182601</td>'
+            + '  <td style="vertical-align: top;">'
+            + '    <select name="no_partida' + sufijo + '" id="no_partida' + sufijo + '" class="form-control-plaintext input-partida">'
+            + '      <option value="">Seleccione una partida</option>'
+            + '      <option value="3390">3390</option>'
+            + '      <option value="2210">2210</option>'
+            + '    </select>'
+            + '  </td>'
+            + '  <td style="vertical-align: top;">'
+            + '    <input type="text" id="importe' + sufijo + '" name="importe' + sufijo + '" class="form-control-plaintext input-importe" placeholder="$0.00" readonly>'
+            + '    <div class="mt-2 text-center">'
+            + '      <label for="pdf_pt' + sufijo + '" class="file-upload-btn btn-pdf"><i class="feather icon-file-text"></i> PDF</label>'
+            + '      <input type="file" id="pdf_pt' + sufijo + '" name="pdf_pt' + sufijo + '" class="d-none input-pdf" accept=".pdf,application/pdf" onchange="updateFileName(this)">'
+            + '      <span class="file-name-display" id="name_pdf_pt' + sufijo + '"></span>'
+            + '      <label for="xml_fic' + sufijo + '" class="file-upload-btn btn-xml"><i class="feather icon-code"></i> XML</label>'
+            + '      <input type="file" id="xml_fic' + sufijo + '" name="xml_fic' + sufijo + '" data-row="' + numeroFila + '" class="d-none input-xml" accept=".xml,text/xml,application/xml" onchange="leerXmlFIC(this)">'
+            + '      <span class="file-name-display" id="name_xml_fic' + sufijo + '"></span>'
+            + '    </div>'
+            + '  </td>'
+            + '</tr>';
+    }
+
+    function actualizarFilasFIC() {
+        $('#filas_fic').val(filasActuales);
+        $('#tdProvider').attr('rowspan', filasActuales);
+        $('#btnAgregarFilaFIC').prop('disabled', filasActuales >= 3);
+        $('.btn-quitar-fila-fic').toggleClass('d-none', false);
+    }
+
+    $('#btnAgregarFilaFIC').on('click', function () {
+        if (filasActuales >= 3) {
+            return;
+        }
+        filasActuales++;
+        $('#pagoterceros_items_table tbody').append(crearFilaFIC(filasActuales));
+        actualizarFilasFIC();
+    });
+
+    $('#pagoterceros_items_table').on('click', '.btn-quitar-fila-fic', function () {
+        var numeroFila = Number($(this).attr('data-row'));
+        if (numeroFila !== filasActuales || filasActuales <= 1) {
+            return;
+        }
+        $(this).closest('tr').remove();
+        filasActuales--;
+        actualizarFilasFIC();
+        recalcularTotalFIC();
+    });
 
     function actualizarFolio() {
         var prefijo = $('select[name="anio"]').val() || '';
@@ -555,8 +654,17 @@ $(function () {
     $('#btnGuardarPT').on('click', function () {
         actualizarFolio();
 
-        if (!$proveedor.val() || !$('#folioCompleto').val() || !$('#pdf_pt').val() || !$('#xml_fic').val()
-            || !$('#comprobante').val() || !$('select[name="no_partida"]').val()
+        var filasCompletas = true;
+        for (var numeroFila = 1; numeroFila <= filasActuales; numeroFila++) {
+            var sufijo = sufijoFilaFIC(numeroFila);
+            if (!$('#pdf_pt' + sufijo).val() || !$('#xml_fic' + sufijo).val()
+                || !$('#comprobante' + sufijo).val() || !$('#no_partida' + sufijo).val()) {
+                filasCompletas = false;
+                break;
+            }
+        }
+
+        if (!$proveedor.val() || !$('#folioCompleto').val() || !filasCompletas
             || !$('select[name="no_reserva_visual"]').val()) {
             mostrarMensajeFIC('warning', 'Datos incompletos', 'Seleccione establecimiento, partida, reserva, consecutivo y los archivos PDF y XML.');
             return;
@@ -580,8 +688,7 @@ $(function () {
             }
 
             if (response.data) {
-                $('#comprobante').val(response.data.comprobante || $('#comprobante').val());
-                $('#importe, input[name="importe_total_num"]').val(
+                $('input[name="importe_total_num"]').val(
                     Number(response.data.importe || 0).toLocaleString('en-US', {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2
