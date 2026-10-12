@@ -4029,6 +4029,12 @@ class Inicio extends BaseController
     public function generarFormatoFIC()
     {
         $Mglobal = new Mglobal;
+        $estableciemientos = $Mglobal->getTabla(['tabla' => 'establecimiento', 'where' => ['visible' => 1]]);
+         if(isset($estableciemientos->data) && !empty($estableciemientos->data)){
+            $data['establecimientos'] = $estableciemientos->data;
+
+         }
+
 
         $data['scripts'] = array('principal');
         $data['contentView'] = 'secciones/vFormatoPagoFic';
