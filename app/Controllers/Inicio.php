@@ -4029,11 +4029,14 @@ class Inicio extends BaseController
     public function generarFormatoFIC()
     {
         $Mglobal = new Mglobal;
+        $data = array();
         $estableciemientos = $Mglobal->getTabla(['tabla' => 'establecimiento', 'where' => ['visible' => 1]]);
          if(isset($estableciemientos->data) && !empty($estableciemientos->data)){
             $data['establecimientos'] = $estableciemientos->data;
 
          }
+        var_dump($data['establecimientos']);   
+         diet();
 
 
         $data['scripts'] = array('principal');
