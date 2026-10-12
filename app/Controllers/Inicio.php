@@ -4126,7 +4126,7 @@ class Inicio extends BaseController
         }
 
         $duplicado = $globals->getTabla([
-            'tabla' => 'pago_fic',
+            'tabla' => 'pagos_fic',
             'where' => [
                 'visible' => 1,
                 'comprobante' => $datosXml['comprobante'],
@@ -4152,7 +4152,7 @@ class Inicio extends BaseController
             'usu_reg' => $session->get('id_usuario'),
             'visible' => 1,
         ], [
-            'tabla' => 'pago_fic',
+            'tabla' => 'pagos_fic',
             'editar' => false,
         ], [
             'id_user' => $session->get('id_usuario'),
