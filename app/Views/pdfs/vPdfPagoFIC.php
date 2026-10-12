@@ -75,32 +75,32 @@
         <tr><td colspan="4" class="font-bold"><?= esc($pago_fic->importe_letra ?? '') ?></td></tr>
     </table>
 
-    <table style="margin-top: 20px; margin-bottom: 0;">
+    <table style="margin-top: 20px; margin-bottom: 0; font-size: 8pt;">
         <tr><th colspan="3" class="bg-black">AUTORIZACIONES</th></tr>
         <tr class="bg-grey">
-            <td width="33%">DIRECTOR/A GENERAL ADMINISTRATIVO/A</td>
-            <td width="33%">AUTORIZA</td>
-            <td width="34%">RESPONSABLE DEL PROYECTO</td>
+            <td width="33%" style="height: 30px;">DIRECTOR/A GENERAL<br>ADMINISTRATIVO/A</td>
+            <td width="33%" style="height: 30px;">AUTORIZA</td>
+            <td width="34%" style="height: 30px;">RESPONSABLE DEL PROYECTO</td>
         </tr>
         <tr>
-            <td rowspan="3" style="height: 220px; vertical-align: top; padding-top: 65px;">
+            <td rowspan="3" style="height: 170px; vertical-align: bottom; padding-bottom: 6px;">
                 <strong>RODRIGO GONZALEZ GUERRERO</strong><br>
                 <span style="font-size: 7pt;">DIRECTOR/A GENERAL ADMINISTRATIVO/A</span>
             </td>
-            <td rowspan="3" style="vertical-align: top; padding-top: 58px;">
+            <td rowspan="3" style="height: 170px; vertical-align: bottom; padding-bottom: 6px;">
                 <strong>MTRO. DAVID AYALA SAUCEDO</strong><br>
-                <span style="font-size: 7pt;">SUBSECRETARIO DE IDENTIDAD Y DESARROLLO TURÍSTICO POR ACUERDO SECRETARIAL N° 003-02/2026</span>
+                <span style="font-size: 5.5pt;">SUBSECRETARIO DE IDENTIDAD Y DESARROLLO TURÍSTICO POR<br>ACUERDO SECRETARIAL N° 003-02/2026</span>
             </td>
-            <td style="height: 90px;">
+            <td style="height: 67px; vertical-align: bottom; padding-bottom: 5px;">
                 <strong>MTRO. DAVID AYALA SAUCEDO</strong><br>
                 <span style="font-size: 7pt;">SUBSECRETARIO DE IDENTIDAD Y DESARROLLO TURÍSTICO</span>
             </td>
         </tr>
         <tr>
-            <td class="bg-grey" style="height: 18px; padding: 4px;">RESPONSABLE DEL PROYECTO</td>
+            <td class="bg-grey" style="height: 17px; padding: 3px;">RESPONSABLE DEL PROYECTO</td>
         </tr>
         <tr>
-            <td style="height: 100px;">
+            <td style="height: 67px; vertical-align: bottom; padding-bottom: 5px;">
                 <strong>HUGO RAMÍREZ DUARTE</strong><br>
                 <span style="font-size: 7pt;">DIRECTOR GENERAL DE COMPETITIVIDAD TURÍSTICA</span>
             </td>

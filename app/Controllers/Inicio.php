@@ -46,17 +46,66 @@ class Inicio extends BaseController
 
     private function resolveFacturaPdfPath(?string $storedPath, string $prefix = 'factura_pdf_')
     {
-        if (empty($storedPath)) {
+        $storedPath = trim((string) $storedPath);
+        if ($storedPath === '') {
             return null;
         }
 
-        if (strpos($storedPath, 'FACTURAS/') === 0) {
-            $s3 = new \App\Libraries\S3Service();
-            return $s3->downloadToTempFile($storedPath, $prefix);
+        $normalizado = str_replace('\\', '/', $storedPath);
+        $posicionFacturas = stripos($normalizado, 'FACTURAS/');
+        if ($posicionFacturas !== false) {
+            $s3Key = rawurldecode(substr($normalizado, $posicionFacturas));
+            try {
+                $s3 = new \App\Libraries\S3Service();
+                $archivoTemporal = $s3->downloadToTempFile($s3Key, $prefix);
+                if ($archivoTemporal && is_file($archivoTemporal)) {
+                    return $archivoTemporal;
+                }
+            } catch (\Throwable $exception) {
+                log_message('error', 'No fue posible descargar el PDF desde S3: ' . $exception->getMessage());
+            }
         }
 
-        $fullPath = FCPATH . ltrim($storedPath, '/\\');
-        return file_exists($fullPath) ? $fullPath : null;
+        if (filter_var($storedPath, FILTER_VALIDATE_URL)) {
+            $contenido = @file_get_contents($storedPath);
+            if ($contenido !== false && strncmp($contenido, '%PDF', 4) === 0) {
+                $archivoTemporal = tempnam(sys_get_temp_dir(), $prefix);
+                if ($archivoTemporal !== false) {
+                    $archivoPdf = $archivoTemporal . '.pdf';
+                    @rename($archivoTemporal, $archivoPdf);
+                    if (@file_put_contents($archivoPdf, $contenido) !== false) {
+                        return $archivoPdf;
+                    }
+                }
+            }
+            return null;
+        }
+
+        if (is_file($storedPath)) {
+            return $storedPath;
+        }
+
+        $rutaUrl = parse_url($normalizado, PHP_URL_PATH);
+        if (is_string($rutaUrl)) {
+            $normalizado = ltrim(rawurldecode($rutaUrl), '/');
+            $posicionAssets = stripos($normalizado, 'assets/');
+            if ($posicionAssets !== false) {
+                $normalizado = substr($normalizado, $posicionAssets);
+            }
+        }
+
+        $candidatos = [
+            FCPATH . ltrim($normalizado, '/'),
+            FCPATH . 'assets/pdf/fic/' . basename($normalizado),
+            FCPATH . 'assets/pdf/' . basename($normalizado),
+        ];
+        foreach ($candidatos as $candidato) {
+            if (is_file($candidato)) {
+                return $candidato;
+            }
+        }
+
+        return null;
     }
 
     private function guardarPdfFIC($pdfFile): ?string
@@ -4422,7 +4471,10 @@ class Inicio extends BaseController
             $rutaTemporal = $this->resolveFacturaPdfPath($registro->pdf, 'factura_fic_');
             if ($rutaTemporal && is_file($rutaTemporal)) {
                 $this->anexarPdfDebajoDelEncabezado($mpdf, $rutaTemporal, $registro->pdf);
-                if (strpos($registro->pdf, 'FACTURAS/') === 0) {
+                $directorioTemporalSistema = realpath(sys_get_temp_dir());
+                $rutaReal = realpath($rutaTemporal);
+                if ($directorioTemporalSistema !== false && $rutaReal !== false
+                    && strpos($rutaReal, $directorioTemporalSistema) === 0) {
                     @unlink($rutaTemporal);
                 }
             } else {
@@ -4431,6 +4483,11 @@ class Inicio extends BaseController
                 $mpdf->SetTextColor(190, 0, 0);
                 $mpdf->WriteCell(196, 8, 'No se encontró el comprobante PDF asociado.', 0, 1, 'C');
             }
+        } else {
+            $mpdf->SetXY(10, min($mpdf->y + 8, 250));
+            $mpdf->SetFont('Arial', 'B', 10);
+            $mpdf->SetTextColor(190, 0, 0);
+            $mpdf->WriteCell(196, 8, 'Este registro no tiene un comprobante PDF asociado.', 0, 1, 'C');
         }
 
         $mpdf->Output('EncabezadoFIC_' . $registro->id_pago_fic . '.pdf', 'I');
