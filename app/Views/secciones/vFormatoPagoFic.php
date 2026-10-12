@@ -459,6 +459,75 @@ function sufijoFilaFIC(numeroFila) {
     return numeroFila === 1 ? '' : '_' + numeroFila;
 }
 
+function convertirDecenasFIC(numero) {
+    var unidades = ['', 'UN', 'DOS', 'TRES', 'CUATRO', 'CINCO', 'SEIS', 'SIETE', 'OCHO', 'NUEVE'];
+    var especiales = ['DIEZ', 'ONCE', 'DOCE', 'TRECE', 'CATORCE', 'QUINCE', 'DIECISÉIS', 'DIECISIETE', 'DIECIOCHO', 'DIECINUEVE'];
+    var decenas = ['', 'DIEZ', 'VEINTE', 'TREINTA', 'CUARENTA', 'CINCUENTA', 'SESENTA', 'SETENTA', 'OCHENTA', 'NOVENTA'];
+    var decena = Math.floor(numero / 10);
+    var unidad = numero % 10;
+
+    if (decena === 0) {
+        return unidades[unidad];
+    }
+    if (decena === 1) {
+        return especiales[unidad];
+    }
+    if (decena === 2 && unidad > 0) {
+        return 'VEINTI' + unidades[unidad];
+    }
+    return decenas[decena] + (unidad > 0 ? ' Y ' + unidades[unidad] : '');
+}
+
+function convertirCentenasFIC(numero) {
+    var centenas = ['', 'CIENTO', 'DOSCIENTOS', 'TRESCIENTOS', 'CUATROCIENTOS', 'QUINIENTOS', 'SEISCIENTOS', 'SETECIENTOS', 'OCHOCIENTOS', 'NOVECIENTOS'];
+    if (numero === 100) {
+        return 'CIEN';
+    }
+
+    var centena = Math.floor(numero / 100);
+    var resto = numero % 100;
+    return [centenas[centena], resto > 0 ? convertirDecenasFIC(resto) : ''].filter(Boolean).join(' ');
+}
+
+function convertirEnteroFIC(numero) {
+    if (numero === 0) {
+        return 'CERO';
+    }
+
+    var partes = [];
+    var millones = Math.floor(numero / 1000000);
+    var miles = Math.floor((numero % 1000000) / 1000);
+    var unidades = numero % 1000;
+
+    if (millones > 0) {
+        partes.push(millones === 1 ? 'UN MILLÓN' : convertirCentenasFIC(millones) + ' MILLONES');
+    }
+    if (miles > 0) {
+        partes.push(miles === 1 ? 'MIL' : convertirCentenasFIC(miles) + ' MIL');
+    }
+    if (unidades > 0) {
+        partes.push(convertirCentenasFIC(unidades));
+    }
+
+    return partes.join(' ');
+}
+
+function numeroALetrasFIC(importe) {
+    var importeRedondeado = Math.round((Number(importe) + Number.EPSILON) * 100) / 100;
+    var pesos = Math.floor(importeRedondeado);
+    var centavos = Math.round((importeRedondeado - pesos) * 100);
+
+    if (centavos === 100) {
+        pesos++;
+        centavos = 0;
+    }
+
+    return convertirEnteroFIC(pesos)
+        + (pesos === 1 ? ' PESO ' : ' PESOS ')
+        + String(centavos).padStart(2, '0')
+        + '/100 M.N.';
+}
+
 function recalcularTotalFIC() {
     var total = 0;
     $('.item-row .input-importe').each(function () {
@@ -472,7 +541,7 @@ function recalcularTotalFIC() {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     }));
-    $('input[name="importe_letra"]').val('');
+    $('input[name="importe_letra"]').val(total > 0 ? numeroALetrasFIC(total) : '');
 }
 
 function leerXmlFIC(input) {
