@@ -75,6 +75,52 @@
         <tr><td colspan="4" class="font-bold"><?= esc($pago_fic->importe_letra ?? '') ?></td></tr>
     </table>
 
+<!--   
+    <table style="margin-top: 20px;">
+        <thead>
+            <tr class="bg-black">
+                <th colspan="3" style="color:white;">AUTORIZACIONES</th>
+            </tr>
+            <tr class="bg-grey">
+                <th width="33%">DIRECTOR/A GENERAL ADMINISTRATIVO/A</th>
+                <th width="33%">AUTORIZA</th>
+                <th width="33%">RESPONSABLE DEL PROYECTO</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="height: 100px;">
+                <td style="height: 80px; vertical-align: bottom;">
+                    <br><br><br>
+                    <strong>RODRIGO GONZALEZ GUERRERO</strong><br>
+                    <span style="font-size: 8pt;">DIRECTOR/A GENERAL ADMINISTRATIVO/A</span>
+                </td>
+                <td style="height: 80px; vertical-align: bottom;">
+                    <br><br><br>
+                     <strong>MTRO. DAVID AYALA SAUCEDO</strong><br>
+                    <span style="font-size: 6pt;">SUBSECRETARIO DE IDENTIDAD Y DESARROLLO TURÍSTICO POR ACUERDO SECRETARIAL N° 003-02/2026</span>
+                </td>
+                <td style="height: 80px; vertical-align: bottom;">
+                    <br><br><br>
+                     <strong>MTRO. DAVID AYALA SAUCEDO</strong><br>
+                    <span style="font-size: 8pt;">SUBSECRETARIO DE IDENTIDAD Y DESARROLLO TURÍSTICO</span>
+                </td>
+            </tr>
+            <tr>
+                 <td colspan="2" class="no-border"></td>
+                 <td class="bg-grey font-bold">RESPONSABLE DEL PROYECTO</td>
+            </tr>
+             <tr>
+                 <td colspan="2" class="no-border"></td>
+                 <td style="height: 80px; vertical-align: bottom;">
+                      <br><br><br>
+                     <strong>HUGO RAMÍREZ DUARTE</strong><br>
+                    <span style="font-size: 8pt;">DIRECTOR GENERAL DE COMPETITIVIDAD TURÍSTICA</span>
+                 </td>
+            </tr>
+        </tbody>
+    </table>
+ -->
+
     <table style="margin-top: 20px; margin-bottom: 0; font-size: 8pt;">
         <tr><th colspan="3" class="bg-black">AUTORIZACIONES</th></tr>
         <tr class="bg-grey">
@@ -105,6 +151,10 @@
                 <span style="font-size: 7pt;">DIRECTOR GENERAL DE COMPETITIVIDAD TURÍSTICA</span>
             </td>
         </tr>
-    </table>
+    </table> 
+
+     <div style="margin-top: 30px; font-size: 8pt; text-align: justify; font-style: italic;">
+        El presente documento fue recibido y firmado de conformidad con la Ley sobre el uso de medios electrónicos y firma electrónica para el Estado de Guanajuato y sus Municipios. En virtud de la equivalencia funcional, la firma electrónica certificada se equipara a la firma autógrafa. Se privilegian las políticas de ahorro, racionalidad y austeridad del gasto público, contenidas en el artículo 55, de la Ley para el Ejercicio y Control de los Recursos Públicos para el Estado y los Municipios de Guanajuato; y, Artículos 1 y 15, segundo párrafo de los Lineamientos Generales de Racionalidad, Austeridad y Disciplina Presupuestal de la Administración Pública Estatal para el Ejercicio Fiscal 2026.
+    </div>
 </body>
 </html>
