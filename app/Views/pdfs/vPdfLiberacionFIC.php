@@ -60,9 +60,8 @@
     <div class="signature">
         ATENTAMENTE<br><br><br>
         <div class="signature-line"></div>
-        <?= esc($usuario_registro->nombre_completo ?? '') ?><br>
-        <span style="font-size: 9pt; font-weight: normal;"><?= esc($usuario_registro->dsc_puesto ?? '') ?></span><br>
-        <span style="font-size: 8pt; font-weight: normal;"><?= esc($usuario_registro->dsc_area ?? '') ?></span>
+       MTRO. DAVID AYALA SAUCEDO<br>
+        <span style="font-size: 9pt; font-weight: normal;">SUBSECRETARIO DE IDENTIDAD Y DESARROLLO TURÍSTICO</span><br>
     </div>
 </body>
 </html>
