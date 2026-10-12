@@ -30,7 +30,6 @@
             <tr><td class="label">PARTIDA:</td><td class="value"><?= esc($pago_fic->partida ?? '') ?><?= !empty($partida->nombre_fondo) ? ' - ' . esc($partida->nombre_fondo) : '' ?></td></tr>
             <tr><td class="label">FACTURA / RECIBO No.:</td><td class="value"><?= esc($pago_fic->comprobante ?? '') ?></td></tr>
             <tr><td class="label">FECHA DEL TRÁMITE:</td><td class="value">del 17 de septiembre al 19 de octubre de 2026</td></tr>
-            <tr><td class="label">RESERVA:</td><td class="value"><?= esc($pago_fic->reserva ?? '') ?></td></tr>
             <tr>
                 <td class="label">IMPORTE EN PESOS (MXN):</td>
                 <td class="value">$<?= number_format($importe, 2) ?> (<?= esc($pago_fic->importe_letra ?? '') ?>)</td>
