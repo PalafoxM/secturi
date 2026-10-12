@@ -4221,7 +4221,7 @@ class Inicio extends BaseController
         }
 
         $consulta = $globals->getTabla([
-            'tabla' => 'pago_fic',
+            'tabla' => 'pagos_fic',
             'where' => $where,
             'order' => ['id_pago_fic' => 'DESC'],
         ]);
