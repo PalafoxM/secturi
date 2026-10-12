@@ -224,7 +224,11 @@
 
                                 <!-- No. PARTIDA -->
                                 <td style="vertical-align: top;">
-                                   2210
+                                   <select name="no_partida" class="form-control-plaintext">
+                                        <option value="">Seleccione una partida</option>
+                                        <option value="3390">3390</option>
+                                        <option value="2210">2210</option>
+                                    </select>
                                 </td>
 
                                 <!-- IMPORTE -->
@@ -352,10 +356,6 @@
                                             <option value="5413298">5413298</option>
                                             <option value="5413302">5413302</option>
                                         </select>
-                                    </div>
-                                    <div class="d-flex align-items-center mt-2">
-                                        <span class="label-bold me-2">CONCEPTO SOLICITUD:</span>
-                                        <input type="text" name="concepto" class="form-control-plaintext text-left w-50" rows="2" placeholder="Concepto de la solicitud..." value="">
                                     </div>
                                 </td>
                             </tr>
