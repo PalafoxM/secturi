@@ -81,6 +81,11 @@
                                                        target="_blank" title="Encabezado FIC">
                                                         <i class="mdi mdi-file-document-box-multiple font-18"></i>
                                                     </a>
+                                                    <a class="btn btn-outline-success btn-round"
+                                                       href="<?= base_url('index.php/Inicio/pdfExpedienteFIC?id=' . $pago->id_pago_fic) ?>"
+                                                       target="_blank" title="PDF unificado FIC">
+                                                        <i class="mdi mdi-file-multiple font-18"></i>
+                                                    </a>
                                                     <a class="btn btn-outline-warning btn-round"
                                                        href="<?= base_url('index.php/Inicio/descargarAnexo01FIC?id=' . $pago->id_pago_fic) ?>"
                                                        title="ANEXO 01">

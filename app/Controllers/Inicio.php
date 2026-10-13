@@ -4506,8 +4506,43 @@ class Inicio extends BaseController
             'tempDir' => $directorioTemporal,
         ]);
 
+        $this->agregarEncabezadosFIC($mpdf, $data);
+
+        $mpdf->Output('EncabezadoFIC_' . $registro->id_pago_fic . '.pdf', 'I');
+        exit;
+    }
+
+    public function pdfExpedienteFIC()
+    {
+        $data = $this->obtenerDatosPagoFIC((int) $this->request->getGet('id'));
+        $registro = $data['pago_fic'];
+        $directorioTemporal = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'mpdf';
+        if (!is_dir($directorioTemporal)) {
+            @mkdir($directorioTemporal, 0775, true);
+        }
+
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_top' => 10,
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_bottom' => 10,
+            'format' => 'Letter',
+            'tempDir' => $directorioTemporal,
+        ]);
+
+        $mpdf->WriteHTML(view('pdfs/vPdfPagoFIC', $data));
+        $mpdf->AddPage();
+        $mpdf->WriteHTML(view('pdfs/vPdfLiberacionFIC', $data));
+        $this->agregarEncabezadosFIC($mpdf, $data, true);
+
+        $mpdf->Output('ExpedienteFIC_' . $registro->id_pago_fic . '.pdf', 'I');
+        exit;
+    }
+
+    private function agregarEncabezadosFIC($mpdf, array $data, bool $agregarPaginaInicial = false): void
+    {
         foreach ($data['conceptos_fic'] as $indice => $concepto) {
-            if ($indice > 0) {
+            if ($agregarPaginaInicial || $indice > 0) {
                 $mpdf->AddPage();
             }
 
@@ -4539,9 +4574,6 @@ class Inicio extends BaseController
                 $mpdf->WriteCell(196, 8, 'La fila ' . $concepto->numero . ' no tiene un comprobante PDF asociado.', 0, 1, 'C');
             }
         }
-
-        $mpdf->Output('EncabezadoFIC_' . $registro->id_pago_fic . '.pdf', 'I');
-        exit;
     }
 
     private function construirConceptosPagoFIC(
