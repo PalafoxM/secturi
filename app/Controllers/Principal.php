@@ -6157,17 +6157,122 @@ class Principal extends BaseController
         $html = $this->normalizeUtf8Value($html);
         $html = $this->cleanMpdfHtml($html);
         
-        $mpdf = new \Mpdf\Mpdf([
+        $this->generarSolicitudContratoEnUnaPagina($html, 'Solicitud_Contrato_' . $id . '.pdf');
+        exit();
+    }
+
+    private function generarSolicitudContratoEnUnaPagina(string $html, string $nombreArchivo): void
+    {
+        $directorioTemporal = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'mpdf_solicitud_contrato';
+        if (!is_dir($directorioTemporal)) {
+            @mkdir($directorioTemporal, 0775, true);
+        }
+
+        $configuracionCarta = [
             'margin_top' => 10,
             'margin_left' => 10,
             'margin_right' => 10,
             'margin_bottom' => 10,
-            'format' => 'Letter'
-        ]);
+            'format' => 'Letter',
+            'tempDir' => $directorioTemporal,
+        ];
 
-        $mpdf->WriteHTML($html);
-        $mpdf->Output('Solicitud_Contrato_' . $id . '.pdf', 'I');
-        exit();
+        $documentoCarta = new \Mpdf\Mpdf($configuracionCarta);
+        $documentoCarta->WriteHTML($html);
+
+        // Si el contenido ya cabe, conserva el tamaño y la legibilidad originales.
+        if ($documentoCarta->page <= 1) {
+            $documentoCarta->Output($nombreArchivo, 'I');
+            return;
+        }
+
+        // Renderiza temporalmente sobre una hoja alta para evitar saltos internos y
+        // después escala todo el contenido de manera proporcional a una hoja carta.
+        $alturaTemporal = min(2000, max(400, (int) ceil(279 * ($documentoCarta->page + 0.5))));
+        $documentoAlto = null;
+
+        for ($intento = 0; $intento < 4; $intento++) {
+            $documentoAlto = new \Mpdf\Mpdf([
+                'margin_top' => 10,
+                'margin_left' => 10,
+                'margin_right' => 10,
+                'margin_bottom' => 10,
+                'format' => [216, $alturaTemporal],
+                'tempDir' => $directorioTemporal,
+            ]);
+            $documentoAlto->WriteHTML($html);
+
+            if ($documentoAlto->page <= 1 || $alturaTemporal >= 2000) {
+                break;
+            }
+
+            $alturaTemporal = min(2000, (int) ceil($alturaTemporal * 1.5));
+        }
+
+        if ($documentoAlto === null || $documentoAlto->page > 1) {
+            // Salvaguarda para contenidos extraordinariamente extensos.
+            $documentoCarta->Output($nombreArchivo, 'I');
+            return;
+        }
+
+        $alturaContenido = min(2000, max(279, (int) ceil($documentoAlto->y + 12)));
+        $documentoAjustado = new \Mpdf\Mpdf([
+            'margin_top' => 10,
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_bottom' => 10,
+            'format' => [216, $alturaContenido],
+            'tempDir' => $directorioTemporal,
+        ]);
+        $documentoAjustado->WriteHTML($html);
+
+        if ($documentoAjustado->page > 1) {
+            $documentoAjustado = new \Mpdf\Mpdf([
+                'margin_top' => 10,
+                'margin_left' => 10,
+                'margin_right' => 10,
+                'margin_bottom' => 10,
+                'format' => [216, $alturaTemporal],
+                'tempDir' => $directorioTemporal,
+            ]);
+            $documentoAjustado->WriteHTML($html);
+        }
+
+        $archivoTemporal = tempnam($directorioTemporal, 'contrato_');
+        if ($archivoTemporal === false) {
+            $documentoCarta->Output($nombreArchivo, 'I');
+            return;
+        }
+
+        try {
+            $documentoAjustado->Output($archivoTemporal, 'F');
+
+            $documentoFinal = new \Mpdf\Mpdf($configuracionCarta);
+            $totalPaginas = $documentoFinal->SetSourceFile($archivoTemporal);
+            if ($totalPaginas < 1) {
+                $documentoCarta->Output($nombreArchivo, 'I');
+                return;
+            }
+
+            $plantilla = $documentoFinal->ImportPage(1);
+            $medidas = $documentoFinal->getTemplateSize($plantilla);
+            $anchoDisponible = 196;
+            $altoDisponible = 259;
+            $escala = min(
+                $anchoDisponible / $medidas['width'],
+                $altoDisponible / $medidas['height']
+            );
+            $ancho = $medidas['width'] * $escala;
+            $alto = $medidas['height'] * $escala;
+            $posicionX = 10 + (($anchoDisponible - $ancho) / 2);
+
+            $documentoFinal->UseTemplate($plantilla, $posicionX, 10, $ancho, $alto);
+            $documentoFinal->Output($nombreArchivo, 'I');
+        } finally {
+            if (is_file($archivoTemporal)) {
+                @unlink($archivoTemporal);
+            }
+        }
     }
 
     public function subirArchivosSolicitud()
