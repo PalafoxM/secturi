@@ -4697,7 +4697,7 @@ class Inicio extends BaseController
         }, $conceptos))));
         $sheet->setCellValue(
             'B25',
-            'Consumo de alimentos durante la edición 54 del FIC del 17 de Sep al 09 Oct. 2026'
+            'Consumo de alimentos y hospedaje durante la edición 54 del FIC del 17 de Sep al 09 Oct. 2026'
         );
         $sheet->setCellValue('H26', $numeroContrato !== '' ? $numeroContrato : 'NO APLICA');
         $sheet->setCellValue('B26', implode(', ', array_map(static function ($concepto) {
