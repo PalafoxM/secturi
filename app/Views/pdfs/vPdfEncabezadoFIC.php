@@ -15,13 +15,19 @@
     <?php
         $conceptoActual = $concepto_fic ?? ($conceptos_fic[0] ?? (object) []);
         $importe = (float) ($conceptoActual->importe ?? 0);
+        $partidaActual = trim((string) ($conceptoActual->partida ?? ''));
+        $reservaActual = trim((string) ($pago_fic->reserva ?? ''));
+        $esHospedaje = $partidaActual === '5413302' || $reservaActual === '5413302';
+        $descripcionConcepto = $esHospedaje
+            ? 'Servicio de hospedaje durante la edición 54 del FIC del 17 de septiembre al 09 de octubre de 2026'
+            : 'Consumo de alimentos durante la edición 54 del FIC del 17 de septiembre al 09 de octubre de 2026';
     ?>
     <table>
         <thead><tr><th colspan="2" class="header">ENCABEZADO DE FACTURA</th></tr></thead>
         <tbody>
             <tr><td class="label">RESPONSABLE / CARGO / ÁREA:</td><td class="value">MTRO. DAVID AYALA SAUCEDO - SUBSECRETARIO DE IDENTIDAD Y DESARROLLO TURÍSTICO</td></tr>
-            <tr><td class="label">COMISION / REUNION / EVENTO:</td><td class="value">Consumo de alimentos y hospedaje durante la edición 54 del FIC del 17 de septiembre al 09 de octubre de 2026</td></tr>
-            <tr><td class="label">CONCEPTO DEL PAGO:</td><td class="value">Consumo de alimentos y hospedaje durante la edición 54 del FIC del 17 de septiembre al 09 de octubre de 2026</td></tr>
+            <tr><td class="label">COMISION / REUNION / EVENTO:</td><td class="value"><?= esc($descripcionConcepto) ?></td></tr>
+            <tr><td class="label">CONCEPTO DEL PAGO:</td><td class="value"><?= esc($descripcionConcepto) ?></td></tr>
             <tr><td class="label">PARTIDA:</td><td class="value"><?= esc($conceptoActual->partida ?? '') ?><?= !empty($conceptoActual->descripcion_partida) ? ' - ' . esc($conceptoActual->descripcion_partida) : '' ?></td></tr>
             <tr><td class="label">FACTURA / RECIBO No.:</td><td class="value"><?= esc($conceptoActual->comprobante ?? '') ?></td></tr>
             <tr><td class="label">FECHA DEL GASTO:</td><td class="value">del 17 de septiembre al 09 de octubre de 2026</td></tr>
