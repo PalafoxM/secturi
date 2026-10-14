@@ -4666,6 +4666,16 @@ class Inicio extends BaseController
         if ($importeLetra === '') {
             $importeLetra = $this->numeroALetras($importe);
         }
+        $esHospedaje = trim((string) ($registro->reserva ?? '')) === '5413302';
+        foreach ($conceptos as $concepto) {
+            if (trim((string) ($concepto->partida ?? '')) === '5413302') {
+                $esHospedaje = true;
+                break;
+            }
+        }
+        $descripcionConcepto = $esHospedaje
+            ? 'Servicio de hospedaje durante la edición 54 del FIC del 17 de Sep al 09 Oct. 2026'
+            : 'Consumo de alimentos durante la edición 54 del FIC del 17 de Sep al 09 Oct. 2026';
 
         $sheet->setCellValue('H7', $fechaTramite);
         $sheet->setCellValue('H9', (string) ($registro->folio ?? ''));
@@ -4697,7 +4707,7 @@ class Inicio extends BaseController
         }, $conceptos))));
         $sheet->setCellValue(
             'B25',
-            'Consumo de alimentos y hospedaje durante la edición 54 del FIC del 17 de Sep al 09 Oct. 2026'
+            $descripcionConcepto
         );
         $sheet->setCellValue('H26', $numeroContrato !== '' ? $numeroContrato : 'NO APLICA');
         $sheet->setCellValue('B26', implode(', ', array_map(static function ($concepto) {
