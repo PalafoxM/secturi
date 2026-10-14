@@ -52,7 +52,7 @@
         <strong>$<?= number_format($importe, 2) ?> (<?= esc($pago_fic->importe_letra ?? '') ?>)</strong>,
         correspondiente <?= count($comprobantes) === 1 ? 'al comprobante fiscal No.' : 'a los comprobantes fiscales No.' ?>
         <strong><?= esc(implode(', ', $comprobantes)) ?></strong>,
-        por concepto de Consumo de alimentos durante la edición 54 del FIC del 17 de septiembre al 09 de octubre de 2026 al proveedor <strong><?= esc($proveedor) ?></strong>.
+        por concepto de <?php echo ($pago_fic->reserva == 5413302) ? 'hospedaje' : 'Consumo de alimentos'; ?> durante la edición 54 del FIC del 17 de septiembre al 09 de octubre de 2026 al proveedor <strong><?= esc($proveedor) ?></strong>.
     </div>
 
     <div class="content">
