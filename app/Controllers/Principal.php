@@ -2929,9 +2929,9 @@ class Principal extends BaseController
                             <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Estimado personal,</p>
                             
                             <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-                                En caso de que aún no hayas realizado las <strong>justificaciones correspondientes a la quincena 18/2026</strong>, 
-                                la cual comprende el periodo del <strong>16 al 30 de septiembre de 2026</strong>, 
-                                tienes hasta el día <strong>miercoles 07 de octubre hasta las 16:00 hrs</strong> para realizarlas.
+                                En caso de que aún no hayas realizado las <strong>justificaciones correspondientes a la quincena 19/2026</strong>, 
+                                la cual comprende el periodo del <strong>01 al 15 de octubre de 2026</strong>, 
+                                tienes hasta el día <strong>jueves 22 de octubre hasta las 16:00 hrs</strong> para realizarlas.
                             </p>
 
                             <div class="highlight-box">
