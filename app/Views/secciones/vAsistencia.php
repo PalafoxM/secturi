@@ -1115,7 +1115,7 @@
                 if(salida == null || salida == 'Sin salida') {
                      justificar(info,fechaLabel, esSemana);
                 }
-                if(entrada > '09:01:00'){
+                if(entrada > '09:00:59'){
                   justificar(info,fechaLabel, esSemana);
                 }
                 if(salida < '16:00:00'){

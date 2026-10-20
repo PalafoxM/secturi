@@ -3448,12 +3448,10 @@ class Principal extends BaseController
     {
         $session = \Config\Services::session();
         $globals = new Mglobal;
-
         if (!$id_solicitud) {
             echo "ID no válido";
             return;
         }
-
         // Obtener datos de la solicitud (usando vista para nombres)
         $solicitud = $globals->getTabla(['tabla' => 'vw_solicitud_grc', 'where' => ['id_solicitud_grc' => $id_solicitud, 'visible' => 1]]);
         
