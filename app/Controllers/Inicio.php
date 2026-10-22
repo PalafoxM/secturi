@@ -5442,7 +5442,10 @@ class Inicio extends BaseController
 
                 foreach($items->data as $item){
                     $currentIndex++;
-                    $item->importe_letra = $this->numeroALetras($item->importe);
+                    $importeFactura = (float) str_replace([',', '$'], '', (string) ($item->importe ?? 0));
+                    $propina = (float) str_replace([',', '$'], '', (string) ($item->propinas ?? 0));
+                    $item->importe_encabezado = round($importeFactura + $propina, 2);
+                    $item->importe_letra = $this->numeroALetras($item->importe_encabezado);
                     
                     if ($currentIndex > 1) {
                          $mpdf->AddPage();

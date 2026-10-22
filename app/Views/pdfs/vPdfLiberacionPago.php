@@ -85,7 +85,7 @@
 
     <!-- Recipient -->
     <div class="recipient">
-        <div>ANGÉLICA LÓPEZ LÓPEZ</div> <!-- Hardcoded as per image -->
+        <div>RODRIGO GONZÁLEZ GUERRERO</div> <!-- Hardcoded as per image -->
         <div>Director General Administrativo</div>
         <div>Presente</div>
     </div>

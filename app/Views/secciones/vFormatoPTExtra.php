@@ -117,7 +117,7 @@
             </span>
         </div>
          <div  style="position:absolute;  text-align:center; top:66%; left:15%; width:30%; background-color:white; font-size: 12px;  height:18px;">
-            <span class="proxima "><?= 'L.R.I. RODRIGO GONZÁLEZ GUERRERO' ?></span>
+            <span class="proxima ">L.R.I. RODRIGO GONZÁLEZ GUERRERO</span>
         </div>
 
          <div  style="position:absolute;  text-align:center; top:66%; left:50%; width:24%; background-color:WHITE; font-size: 12px;  height:18px;">

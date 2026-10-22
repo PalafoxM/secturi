@@ -32,7 +32,7 @@
     </div>
 
     <div class="addressee">
-        ANGÉLICA LÓPEZ LÓPEZ<br>
+        RODRIGO GONZÁLEZ GUERRERO<br>
        <!--  DIRECTOR GENERAL ADMINISTRATIVO<br> -->
         PRESENTE
     </div>

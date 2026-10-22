@@ -97,7 +97,9 @@
             <tr>
                 <td class="label-cell">IMPORTE EN PESOS (MXN):</td>
                 <td class="value-cell">
-                    $<?= $row->importe ?> 
+                    $<?= isset($row->importe_encabezado)
+                        ? number_format((float) $row->importe_encabezado, 2)
+                        : ($row->importe ?? '') ?>
                     (<?= isset($row->importe_letra) ? $row->importe_letra : '' ?>)
                 </td>
             </tr>
