@@ -239,7 +239,7 @@
                     </tr>
                 </table>
                 <div class="signature-title-box" style="border-top: none;">
-                   <?php echo (date('Y-m-d', strtotime($registro_pt->fecha_tramite)) >= '2026-09-24') ? 'COORDINADORA DE RECURSOS FINANCIEROS Y APLICACIÓN PRESUPUESTAL' : 'DIRECTOR GENERAL ADMINISTRATIVO' ?>
+                   DIRECTOR GENERAL ADMINISTRATIVO
                 </div>
             </td>
 
