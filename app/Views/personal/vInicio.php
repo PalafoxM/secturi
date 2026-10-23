@@ -731,7 +731,7 @@ $tarjetasError = session()->getFlashdata('tarjetas_error');
                             </div><!--end row-->
 
                             <div class="row mb-4">
-                                <div class="col-lg-6 mb-3 mb-lg-0">
+                                <div class="col-lg-4 mb-3 mb-lg-0">
                                     <div class="card h-100">
                                         <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
                                             <div class="ribbon4 rib4-primary">
@@ -758,7 +758,7 @@ $tarjetasError = session()->getFlashdata('tarjetas_error');
                                     </div>
                                 </div>
 
-                                <div class="col-lg-6">
+                                <div class="col-lg-4 mb-3 mb-lg-0">
                                     <div class="card h-100">
                                         <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
                                             <div class="ribbon4 rib4-success">
@@ -778,6 +778,33 @@ $tarjetasError = session()->getFlashdata('tarjetas_error');
                                                     <i class="fas fa-eye mr-2"></i> Ver documento
                                                 </a>
                                                 <a href="<?= base_url() ?>assets/pdf/plantillas/Codigo_de_Etica_y_Honestidad_POGEG_09-12-2025.pdf" download class="btn btn-danger px-4 m-1 rounded-pill">
+                                                    <i class="fas fa-download mr-2"></i> Descargar
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4">
+                                    <div class="card h-100">
+                                        <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                                            <div class="ribbon4 rib4-primary">
+                                                <span class="ribbon4-band ribbon4-band-primary text-white text-center">Documento</span>
+                                            </div>
+                                            <div class="my-4">
+                                                <div class="icon-info mb-0">
+                                                    <i class="fas fa-file-pdf bg-soft-danger text-danger" style="font-size: 4rem; padding: 25px; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.1);"></i>
+                                                </div>
+                                            </div>
+                                            <div class="mb-4">
+                                                <h5 class="font-18 text-dark mb-2">Disposiciones Administrativas</h5>
+                                                <p class="text-muted mb-0" style="font-size: 0.9rem;">SECTURI 2026</p>
+                                            </div>
+                                            <div class="d-flex w-100 mt-auto justify-content-center flex-wrap">
+                                                <a href="<?= base_url() ?>assets/documentos/Disposiciones Administrativas SECTURI 2026_v1.pdf" target="_blank" rel="noopener" class="btn btn-soft-primary px-4 m-1 rounded-pill">
+                                                    <i class="fas fa-eye mr-2"></i> Ver documento
+                                                </a>
+                                                <a href="<?= base_url() ?>assets/documentos/Disposiciones Administrativas SECTURI 2026_v1.pdf" download class="btn btn-danger px-4 m-1 rounded-pill">
                                                     <i class="fas fa-download mr-2"></i> Descargar
                                                 </a>
                                             </div>
