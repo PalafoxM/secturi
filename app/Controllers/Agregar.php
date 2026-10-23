@@ -5679,6 +5679,20 @@ class Agregar extends BaseController
         $data = [];
 
         $sala_junta = $Mglobal->getTabla(['tabla' => 'vw_sala_junta', 'where' => ['visible' => 1]]);
+        $salasPropias = $Mglobal->getTabla([
+            'tabla' => 'sala_junta',
+            'where' => [
+                'visible' => 1,
+                'id_usuario' => (int) $session->get('id_usuario'),
+            ],
+        ]);
+        $idsSalasPropias = [];
+        foreach (($salasPropias->data ?? []) as $salaPropia) {
+            $idsSalasPropias[(int) $salaPropia->id_sala] = true;
+        }
+        foreach (($sala_junta->data ?? []) as $reservaSala) {
+            $reservaSala->puede_eliminar = isset($idsSalasPropias[(int) $reservaSala->id_sala]);
+        }
 
         $hoy = date("Y-m-d");
         $sala_hoy = $Mglobal->getTabla([

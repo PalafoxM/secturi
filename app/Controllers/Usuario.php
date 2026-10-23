@@ -3025,8 +3025,29 @@ class Usuario extends BaseController
         $session = \Config\Services::session();
         $response = new \stdClass();
         $response->error = true;
-        $response->respuesta = 'Error| Error al Generar Sala de Juntas';
-        $id_sala_juntas = $this->request->getPost('id_sala_juntas');
+        $response->respuesta = 'No fue posible eliminar la reserva.';
+        $id_sala_juntas = (int) $this->request->getPost('id_sala_juntas');
+        $id_usuario = (int) $session->get('id_usuario');
+
+        if ($id_sala_juntas <= 0 || $id_usuario <= 0) {
+            $response->respuesta = 'La reserva o la sesión no son válidas.';
+            return $this->respond($response, 400);
+        }
+
+        $reserva = $this->globals->getTabla([
+            'tabla' => 'sala_junta',
+            'where' => [
+                'id_sala' => $id_sala_juntas,
+                'id_usuario' => $id_usuario,
+                'visible' => 1,
+            ],
+            'limit' => 1,
+        ]);
+
+        if (empty($reserva->data)) {
+            $response->respuesta = 'Solo la persona que realizó la reserva puede eliminarla.';
+            return $this->respond($response, 403);
+        }
 
         $dataInsert = [
             'visible' => 0,
@@ -3034,10 +3055,17 @@ class Usuario extends BaseController
         $dataConfig = [
             "tabla" => "sala_junta",
             "editar" => true,
-            "idEditar" => ['id_sala' => $id_sala_juntas]
+            "idEditar" => [
+                'id_sala' => $id_sala_juntas,
+                'id_usuario' => $id_usuario,
+                'visible' => 1,
+            ]
         ];
 
-        $response = $this->globals->saveTabla($dataInsert, $dataConfig, ["script" => "sala_junta.eliminarjunta"]);
+        $response = $this->globals->saveTabla($dataInsert, $dataConfig, [
+            'id_user' => $id_usuario,
+            'script' => 'sala_junta.eliminarjunta',
+        ]);
         return $this->respond($response);
     }
     public function activarPeriodo()

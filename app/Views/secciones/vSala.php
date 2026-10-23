@@ -982,7 +982,6 @@
     document.addEventListener('DOMContentLoaded', function () {
         var calendarEl = document.getElementById('calendario');
         const salas = <?= json_encode($sala_junta ?? []); ?>;
-        const id_perfil = <?= $session->get('id_perfil'); ?>;
         const eventos = salas.map(s => ({
             id: s.id_sala,
             title: s.sala,
@@ -997,6 +996,7 @@
                 hora_inicio: s.hora_inicio,
                 hora_fin: s.hora_fin,
                 usuario: s.nombre_completo,
+                puede_eliminar: s.puede_eliminar === true || Number(s.puede_eliminar) === 1,
 
             }
 
@@ -1102,13 +1102,14 @@
                     day: 'numeric', hour: '2-digit', minute: '2-digit'
                 });
                 const usuario = info.event.extendedProps.usuario;
+                const puedeEliminar = info.event.extendedProps.puede_eliminar === true;
 
                 Swal.fire({
                     title: `SALA ` + info.event.title,
                     text: `Fecha: ${fecha} a ${horaFin} registro: ${usuario} `,
                     icon: "warning",
                     showCancelButton: true,
-                    showConfirmButton: (id_perfil == 1),
+                    showConfirmButton: puedeEliminar,
                     confirmButtonColor: "#3085d6",
                     cancelButtonColor: "#d33",
                     confirmButtonText: "Eliminar"
@@ -1122,18 +1123,19 @@
                             data: { id_sala_juntas: eventId },
                             success: function (data) {
                                 if (!data.error) {
-                                    Swal.fire("Éxito", "Se guardo correctamente.", "success")
+                                    Swal.fire("Éxito", "La reserva se eliminó correctamente.", "success")
+                                        .then(function () {
+                                            window.location.reload();
+                                        });
                                 } else {
-                                    Swal.fire("Error", "Error al guardar comentario.", "error");
+                                    Swal.fire("Error", data.respuesta || "No fue posible eliminar la reserva.", "error");
                                 }
-                                //  ini.inicio.obtenerCategorias(); 
-
                             },
-                            complete: function(){
-                             window.location.reload();
-                            },
-                            error: function () {
-                                Swal.fire("Error", "Error al guardar comentario.", "error")
+                            error: function (xhr) {
+                                const mensaje = xhr.responseJSON && xhr.responseJSON.respuesta
+                                    ? xhr.responseJSON.respuesta
+                                    : "No fue posible eliminar la reserva.";
+                                Swal.fire("Error", mensaje, "error");
                             }
                         });
                     }
