@@ -208,7 +208,7 @@
             <tr style="height: 100px;">
                 <td style="height: 80px; vertical-align: bottom;">
                     <br><br><br>
-                    <strong>'RODRIGO GONZÁLEZ GUERRERO'</strong><br>
+                    <strong>RODRIGO GONZÁLEZ GUERRERO</strong><br>
                     <span style="font-size: 8pt;">'DIRECTOR GENERAL ADMINISTRATIVO'</span><br>
                    
                 </td>
