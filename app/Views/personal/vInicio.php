@@ -453,7 +453,8 @@ $tarjetasError = session()->getFlashdata('tarjetas_error');
                                                 </div><!--end card-body-->
                                                 
                                             </div><!--end card-->
-                                               <div class="col-lg-12">
+                                        </div><!--end col-->
+                                        <div class="col-lg-6">
                                                 <div class="card h-100">
                                                     <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
                                                         <div class="ribbon4 rib4-success">
