@@ -5043,6 +5043,7 @@ class Agregar extends BaseController
             $anio . '-' . $cumple => 'Mi cumpleaños',
             '2025-12-25' => 'Asueto',
             $anio . '-12-25' => 'Asueto',
+            $anio . '-11-16' => 'Asueto',
             $anio . '-01-01' => 'Asueto',
         ];
 
