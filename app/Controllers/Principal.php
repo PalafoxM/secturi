@@ -5678,6 +5678,13 @@ class Principal extends BaseController
             'tabla' => 'solicitud_contrato_archivos',
             'where' => ['id_solicitud_contrato' => $id_solicitud, 'visible' => 1]
         ]);
+        $archivosSoporteAceptados = $globals->getTabla([
+            'tabla' => 'solicitud_contrato_archivos',
+            'where' => ['id_solicitud_contrato' => $id_solicitud, 'visible' => 0, 'id_estatus' => 3]
+        ]);
+        if (!empty($archivosSoporteAceptados->data)) {
+            $archivosSoporte->data = array_merge($archivosSoporte->data ?? [], $archivosSoporteAceptados->data);
+        }
         $data['archivos_soporte'] = !empty($archivosSoporte->data) ? $archivosSoporte->data : [];
         $data['pagos'] = (!empty($pagos->data)) ? $pagos->data : [];
         $partidasExtra = $globals->getTabla([
@@ -5714,8 +5721,26 @@ class Principal extends BaseController
         // $response->post_received = $post;
         // return $this->respond($response); 
 
-        // Manejo de archivo
+        // En edición conservamos la referencia actual si no se adjunta un archivo nuevo.
         $archivo_suficiencia = '';
+        if ($id_solicitud_contrato) {
+            $solicitudActual = $globals->getTabla([
+                'tabla' => 'solicitud_contrato',
+                'where' => [
+                    'id_solicitud_contrato' => $id_solicitud_contrato,
+                    'visible' => 1,
+                ],
+                'limit' => 1,
+            ]);
+
+            if (empty($solicitudActual->data)) {
+                $response->respuesta = 'No se encontró la solicitud de contrato a editar.';
+                return $this->respond($response);
+            }
+
+            $archivo_suficiencia = (string) ($solicitudActual->data[0]->archivo_suficiencia ?? '');
+        }
+
         if($file = $this->request->getFile('archivo_suficiencia')) {
              if ($file->isValid() && !$file->hasMoved()) {
                 $newName = $file->getRandomName();
@@ -7235,7 +7260,15 @@ class Principal extends BaseController
                      "tabla" => "solicitud_contrato_archivos", 
                      "where" => ["visible" => 1, 'id_solicitud_contrato' => $sol->id_solicitud_contrato]
                  ]);
-                 $sol->tienen_archivos = (!empty($archivos->data));
+                 $archivosAceptados = $globals->getTabla([
+                     "tabla" => "solicitud_contrato_archivos",
+                     "where" => [
+                         "visible" => 0,
+                         "id_estatus" => 3,
+                         'id_solicitud_contrato' => $sol->id_solicitud_contrato,
+                     ],
+                 ]);
+                 $sol->tienen_archivos = !empty($archivos->data) || !empty($archivosAceptados->data);
                  $solicitudBase = $globals->getTabla([
                      "tabla" => "solicitud_contrato",
                      "where" => ["visible" => 1, "id_solicitud_contrato" => $sol->id_solicitud_contrato],
@@ -12352,7 +12385,15 @@ class Principal extends BaseController
         if(isset($solicitudes->data) && !empty($solicitudes->data)){
             foreach($solicitudes->data as &$s){
                 $archivos = $globals->getTabla(['tabla' => 'solicitud_convenio_archivos', 'where' => ['id_solicitud_convenio' => $s->id_solicitud_convenio, 'visible' => 1]]);
-                $s->tienen_archivos = !empty($archivos->data);
+                $archivosAceptados = $globals->getTabla([
+                    'tabla' => 'solicitud_convenio_archivos',
+                    'where' => [
+                        'id_solicitud_convenio' => $s->id_solicitud_convenio,
+                        'visible' => 0,
+                        'id_estatus' => 3,
+                    ],
+                ]);
+                $s->tienen_archivos = !empty($archivos->data) || !empty($archivosAceptados->data);
                 $solicitudBase = $globals->getTabla([
                     'tabla' => 'solicitud_convenio',
                     'where' => ['id_solicitud_convenio' => $s->id_solicitud_convenio, 'visible' => 1],
@@ -12627,7 +12668,26 @@ class Principal extends BaseController
         $post = $this->request->getPost();
         $id_solicitud_convenio = isset($post['id_solicitud_convenio']) ? $post['id_solicitud_convenio'] : null;
 
+        // En edición conservamos la referencia actual si no se adjunta un archivo nuevo.
         $archivo_suficiencia = '';
+        if ($id_solicitud_convenio) {
+            $solicitudActual = $globals->getTabla([
+                'tabla' => 'solicitud_convenio',
+                'where' => [
+                    'id_solicitud_convenio' => $id_solicitud_convenio,
+                    'visible' => 1,
+                ],
+                'limit' => 1,
+            ]);
+
+            if (empty($solicitudActual->data)) {
+                $response->respuesta = 'No se encontró la solicitud de convenio a editar.';
+                return $this->respond($response);
+            }
+
+            $archivo_suficiencia = (string) ($solicitudActual->data[0]->archivo_suficiencia ?? '');
+        }
+
         if($file = $this->request->getFile('archivo_suficiencia')) {
              if ($file->isValid() && !$file->hasMoved()) {
                 $newName = $file->getRandomName();
@@ -13300,6 +13360,27 @@ class Principal extends BaseController
             'tabla' => 'solicitud_convenio_archivos',
             'where' => ['id_solicitud_convenio' => $id_solicitud, 'visible' => 1]
         ]);
+
+        $archivosAceptadosOcultos = $globals->getTabla([
+            'tabla' => 'solicitud_convenio_archivos',
+            'where' => ['id_solicitud_convenio' => $id_solicitud, 'visible' => 0, 'id_estatus' => 3]
+        ]);
+
+        if (!empty($archivosAceptadosOcultos->data)) {
+            $archivos->data = $archivos->data ?? [];
+            $idsArchivosVisibles = [];
+            foreach ($archivos->data as $archivoVisible) {
+                $idsArchivosVisibles[(int) ($archivoVisible->id_archivo ?? 0)] = true;
+            }
+
+            foreach ($archivosAceptadosOcultos->data as $archivoAceptado) {
+                $idArchivoAceptado = (int) ($archivoAceptado->id_archivo ?? 0);
+                if ($idArchivoAceptado > 0 && empty($idsArchivosVisibles[$idArchivoAceptado])) {
+                    $archivoAceptado->visible = 1;
+                    $archivos->data[] = $archivoAceptado;
+                }
+            }
+        }
 
         if (!empty($archivos->data)) {
             foreach ($archivos->data as &$archivo) {

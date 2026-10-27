@@ -4486,12 +4486,14 @@ class Inicio extends BaseController
     public function pdfLiberacionFIC()
     {
         $data = $this->obtenerDatosPagoFIC((int) $this->request->getGet('id'));
+        $data['periodo_fic'] = $this->obtenerPeriodoFIC($this->request->getGet('periodo'));
         $this->generarDocumentoPagoFIC('pdfs/vPdfLiberacionFIC', $data, 'LiberacionFIC_' . $data['pago_fic']->id_pago_fic . '.pdf');
     }
 
     public function pdfEncabezadoFIC()
     {
         $data = $this->obtenerDatosPagoFIC((int) $this->request->getGet('id'));
+        $data['periodo_fic'] = $this->obtenerPeriodoFIC($this->request->getGet('periodo'));
         $registro = $data['pago_fic'];
         $directorioTemporal = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'mpdf';
         if (!is_dir($directorioTemporal)) {
@@ -4515,6 +4517,7 @@ class Inicio extends BaseController
     public function pdfExpedienteFIC()
     {
         $data = $this->obtenerDatosPagoFIC((int) $this->request->getGet('id'));
+        $data['periodo_fic'] = $this->obtenerPeriodoFIC($this->request->getGet('periodo'));
         $registro = $data['pago_fic'];
         $directorioTemporal = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'mpdf';
         if (!is_dir($directorioTemporal)) {
@@ -4537,6 +4540,25 @@ class Inicio extends BaseController
 
         $mpdf->Output('ExpedienteFIC_' . $registro->id_pago_fic . '.pdf', 'I');
         exit;
+    }
+
+    private function obtenerPeriodoFIC($periodoSeleccionado): array
+    {
+        $periodos = [
+            '1' => [
+                'id' => 1,
+                'etiqueta' => '10 al 26 de octubre de 2026',
+                'texto' => 'del 10 al 26 de octubre de 2026',
+            ],
+            '2' => [
+                'id' => 2,
+                'etiqueta' => '17 de septiembre al 26 de octubre de 2026',
+                'texto' => 'del 17 de septiembre al 26 de octubre de 2026',
+            ],
+        ];
+
+        $clavePeriodo = (string) $periodoSeleccionado;
+        return $periodos[$clavePeriodo] ?? $periodos['2'];
     }
 
     private function agregarEncabezadosFIC($mpdf, array $data, bool $agregarPaginaInicial = false): void

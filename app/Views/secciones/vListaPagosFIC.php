@@ -81,11 +81,11 @@
                                                        target="_blank" title="Encabezado FIC">
                                                         <i class="mdi mdi-file-document-box-multiple font-18"></i>
                                                     </a>
-                                                    <a class="btn btn-outline-success btn-round"
-                                                       href="<?= base_url('index.php/Inicio/pdfExpedienteFIC?id=' . $pago->id_pago_fic) ?>"
-                                                       target="_blank" title="PDF unificado FIC">
+                                                    <button type="button" class="btn btn-outline-success btn-round"
+                                                       onclick="abrirPeriodosPdfFIC(<?= (int) $pago->id_pago_fic ?>)"
+                                                       title="PDF unificado FIC">
                                                         <i class="mdi mdi-file-multiple font-18"></i>
-                                                    </a>
+                                                    </button>
                                                     <a class="btn btn-outline-warning btn-round"
                                                        href="<?= base_url('index.php/Inicio/descargarAnexo01FIC?id=' . $pago->id_pago_fic) ?>"
                                                        title="ANEXO 01">
@@ -105,11 +105,75 @@
     </div>
 </div>
 
+<div class="modal fade" id="modalPeriodoPdfFIC" tabindex="-1" role="dialog" aria-labelledby="modalPeriodoPdfFICTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalPeriodoPdfFICTitulo">
+                    <i class="mdi mdi-calendar-range mr-1"></i> Seleccionar periodo del FIC
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-3">El periodo seleccionado aparecerá en la Liberación y en todos los Encabezados del PDF unificado.</p>
+                <div class="custom-control custom-radio border rounded p-3 mb-3" style="padding-left: 2.75rem !important;">
+                    <input type="radio" id="periodoFic1" name="periodo_pdf_fic" class="custom-control-input" value="1">
+                    <label class="custom-control-label font-weight-bold" for="periodoFic1">
+                        10 al 26 de octubre de 2026
+                    </label>
+                </div>
+                <div class="custom-control custom-radio border rounded p-3" style="padding-left: 2.75rem !important;">
+                    <input type="radio" id="periodoFic2" name="periodo_pdf_fic" class="custom-control-input" value="2">
+                    <label class="custom-control-label font-weight-bold" for="periodoFic2">
+                        17 de septiembre al 26 de octubre de 2026
+                    </label>
+                </div>
+                <div id="errorPeriodoPdfFIC" class="text-danger small mt-3 d-none">
+                    Selecciona uno de los dos periodos para continuar.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="generarPdfUnificadoFIC()">
+                    <i class="mdi mdi-file-multiple mr-1"></i> Generar PDF unificado
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <link href="<?= base_url('plugins/datatables/dataTables.bootstrap4.min.css') ?>" rel="stylesheet" type="text/css">
 <script src="<?= base_url('assets/js/jquery.min.js') ?>"></script>
 <script src="<?= base_url('plugins/datatables/jquery.dataTables.min.js') ?>"></script>
 <script src="<?= base_url('plugins/datatables/dataTables.bootstrap4.min.js') ?>"></script>
 <script>
+var idPagoPeriodoFIC = null;
+
+function abrirPeriodosPdfFIC(idPagoFIC) {
+    idPagoPeriodoFIC = idPagoFIC;
+    $('input[name="periodo_pdf_fic"]').prop('checked', false);
+    $('#errorPeriodoPdfFIC').addClass('d-none');
+    $('#modalPeriodoPdfFIC').modal('show');
+}
+
+function generarPdfUnificadoFIC() {
+    var periodo = $('input[name="periodo_pdf_fic"]:checked').val();
+
+    if (!periodo || !idPagoPeriodoFIC) {
+        $('#errorPeriodoPdfFIC').removeClass('d-none');
+        return;
+    }
+
+    var url = <?= json_encode(base_url('index.php/Inicio/pdfExpedienteFIC'), JSON_UNESCAPED_SLASHES) ?>
+        + '?id=' + encodeURIComponent(idPagoPeriodoFIC)
+        + '&periodo=' + encodeURIComponent(periodo);
+
+    $('#modalPeriodoPdfFIC').modal('hide');
+    window.open(url, '_blank', 'noopener');
+}
+
 $(function () {
     $('#datatablePagosFIC').DataTable({
         language: {

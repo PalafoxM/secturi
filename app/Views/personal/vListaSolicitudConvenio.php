@@ -94,10 +94,10 @@
                                                             <a href="<?= base_url('index.php/Principal/editarSolicitudConvenio/' . $sol->id_solicitud_convenio) ?>" class="btn btn-sm btn-warning" title="Editar"><i class="fas fa-edit"></i></a>
                                                         <?php endif; ?>
                                                         <a href="<?= base_url('index.php/Principal/verSolicitudConvenioPDF/' . $sol->id_solicitud_convenio) ?>" target="_blank" class="btn btn-sm btn-info" title="Ver PDF"><i class="fas fa-file-pdf"></i></a>
-                                                        <?php if ($session->id_perfil != 7 && $sol->id_estatus ==1): ?>
+                                                        <?php if ($session->id_perfil != 7 && $sol->id_estatus == 1 && empty($sol->tienen_archivos)): ?>
                                                             <button class="btn btn-sm btn-secondary" title="Adjuntar Archivos" onclick="abrirModalArchivos(<?= $sol->id_solicitud_convenio ?>)"><i class="fas fa-paperclip"></i></button>
                                                         <?php endif; ?>
-                                                        <?php if (!empty($sol->tienen_archivos) && $sol->id_estatus != 1): ?>
+                                                        <?php if (!empty($sol->tienen_archivos)): ?>
                                                             <a href="<?= base_url('index.php/Principal/verArchivosSolicitudConvenio/' . $sol->id_solicitud_convenio) ?>" class="btn btn-sm btn-success" title="Ver Archivos"><i class="fas fa-eye"></i></a>
                                                         <?php endif; ?>
                                                         <?php if (in_array($session->id_perfil, [1, 7])): ?>
