@@ -4547,8 +4547,8 @@ class Inicio extends BaseController
         $periodos = [
             '1' => [
                 'id' => 1,
-                'etiqueta' => '10 al 26 de octubre de 2026',
-                'texto' => 'del 10 al 26 de octubre de 2026',
+                'etiqueta' => '10 de octubre al 26 de octubre de 2026',
+                'texto' => 'del 10 de octubre al 26 de octubre de 2026',
             ],
             '2' => [
                 'id' => 2,
