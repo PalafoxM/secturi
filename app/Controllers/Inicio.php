@@ -4646,6 +4646,8 @@ class Inicio extends BaseController
     public function descargarAnexo01FIC()
     {
         $data = $this->obtenerDatosPagoFIC((int) $this->request->getGet('id'));
+        $periodoFic = $this->obtenerPeriodoFIC($this->request->getGet('periodo'));
+        $esIsr = (string) $this->request->getGet('isr') === '1';
         $registro = $data['pago_fic'];
         $establecimiento = $data['establecimiento'];
         $conceptos = $data['conceptos_fic'];
@@ -4695,9 +4697,13 @@ class Inicio extends BaseController
                 break;
             }
         }
-        $descripcionConcepto = $esHospedaje
-            ? 'Servicio de hospedaje durante la edición 54 del FIC del 17 de Sep al 09 Oct. 2026'
-            : 'Consumo de alimentos durante la edición 54 del FIC del 17 de Sep al 09 Oct. 2026';
+        $conceptoServicio = $esHospedaje
+            ? 'servicio de hospedaje'
+            : 'consumo de alimentos';
+        $descripcionConcepto = ($esIsr
+            ? 'Retención de ISR correspondiente al ' . $conceptoServicio
+            : ucfirst($conceptoServicio))
+            . ' durante la edición 54 del FIC ' . $periodoFic['texto'];
 
         $sheet->setCellValue('H7', $fechaTramite);
         $sheet->setCellValue('H9', (string) ($registro->folio ?? ''));

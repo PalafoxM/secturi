@@ -86,11 +86,11 @@
                                                        title="PDF unificado FIC">
                                                         <i class="mdi mdi-file-multiple font-18"></i>
                                                     </button>
-                                                    <a class="btn btn-outline-warning btn-round"
-                                                       href="<?= base_url('index.php/Inicio/descargarAnexo01FIC?id=' . $pago->id_pago_fic) ?>"
+                                                    <button type="button" class="btn btn-outline-warning btn-round"
+                                                       onclick="abrirModalAnexoFIC(<?= (int) $pago->id_pago_fic ?>)"
                                                        title="ANEXO 01">
                                                         <i class="mdi mdi-file-excel font-18"></i>
-                                                    </a>
+                                                    </button>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -100,6 +100,58 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalAnexoFIC" tabindex="-1" role="dialog" aria-labelledby="modalAnexoFICTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalAnexoFICTitulo">
+                    <i class="mdi mdi-file-excel mr-1"></i> Generar ANEXO 01
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h6 class="font-weight-bold mb-2">Periodo del gasto</h6>
+                <div class="custom-control custom-radio border rounded p-3 mb-2" style="padding-left: 2.75rem !important;">
+                    <input type="radio" id="periodoAnexoFic1" name="periodo_anexo_fic" class="custom-control-input" value="1">
+                    <label class="custom-control-label" for="periodoAnexoFic1">
+                        10 de octubre al 26 de octubre de 2026
+                    </label>
+                </div>
+                <div class="custom-control custom-radio border rounded p-3 mb-4" style="padding-left: 2.75rem !important;">
+                    <input type="radio" id="periodoAnexoFic2" name="periodo_anexo_fic" class="custom-control-input" value="2">
+                    <label class="custom-control-label" for="periodoAnexoFic2">
+                        17 de septiembre al 26 de octubre de 2026
+                    </label>
+                </div>
+
+                <h6 class="font-weight-bold mb-2">¿El concepto corresponde a ISR?</h6>
+                <div class="d-flex">
+                    <div class="custom-control custom-radio mr-4">
+                        <input type="radio" id="anexoFicIsrNo" name="isr_anexo_fic" class="custom-control-input" value="0">
+                        <label class="custom-control-label" for="anexoFicIsrNo">No</label>
+                    </div>
+                    <div class="custom-control custom-radio">
+                        <input type="radio" id="anexoFicIsrSi" name="isr_anexo_fic" class="custom-control-input" value="1">
+                        <label class="custom-control-label" for="anexoFicIsrSi">Sí</label>
+                    </div>
+                </div>
+
+                <div id="errorAnexoFIC" class="text-danger small mt-3 d-none">
+                    Selecciona el periodo y especifica si corresponde a ISR.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-warning" onclick="descargarAnexoFIC()">
+                    <i class="mdi mdi-download mr-1"></i> Descargar ANEXO 01
+                </button>
             </div>
         </div>
     </div>
@@ -121,7 +173,7 @@
                 <div class="custom-control custom-radio border rounded p-3 mb-3" style="padding-left: 2.75rem !important;">
                     <input type="radio" id="periodoFic1" name="periodo_pdf_fic" class="custom-control-input" value="1">
                     <label class="custom-control-label font-weight-bold" for="periodoFic1">
-                        10 al 26 de octubre de 2026
+                        10 de octubre al 26 de octubre de 2026
                     </label>
                 </div>
                 <div class="custom-control custom-radio border rounded p-3" style="padding-left: 2.75rem !important;">
@@ -150,6 +202,7 @@
 <script src="<?= base_url('plugins/datatables/dataTables.bootstrap4.min.js') ?>"></script>
 <script>
 var idPagoPeriodoFIC = null;
+var idPagoAnexoFIC = null;
 
 function abrirPeriodosPdfFIC(idPagoFIC) {
     idPagoPeriodoFIC = idPagoFIC;
@@ -172,6 +225,31 @@ function generarPdfUnificadoFIC() {
 
     $('#modalPeriodoPdfFIC').modal('hide');
     window.open(url, '_blank', 'noopener');
+}
+
+function abrirModalAnexoFIC(idPagoFIC) {
+    idPagoAnexoFIC = idPagoFIC;
+    $('input[name="periodo_anexo_fic"], input[name="isr_anexo_fic"]').prop('checked', false);
+    $('#errorAnexoFIC').addClass('d-none');
+    $('#modalAnexoFIC').modal('show');
+}
+
+function descargarAnexoFIC() {
+    var periodo = $('input[name="periodo_anexo_fic"]:checked').val();
+    var esIsr = $('input[name="isr_anexo_fic"]:checked').val();
+
+    if (!periodo || typeof esIsr === 'undefined' || !idPagoAnexoFIC) {
+        $('#errorAnexoFIC').removeClass('d-none');
+        return;
+    }
+
+    var url = <?= json_encode(base_url('index.php/Inicio/descargarAnexo01FIC'), JSON_UNESCAPED_SLASHES) ?>
+        + '?id=' + encodeURIComponent(idPagoAnexoFIC)
+        + '&periodo=' + encodeURIComponent(periodo)
+        + '&isr=' + encodeURIComponent(esIsr);
+
+    $('#modalAnexoFIC').modal('hide');
+    window.location.href = url;
 }
 
 $(function () {
