@@ -338,8 +338,6 @@
                                  <td colspan="1" class="text-left">
                                      <span class="label-bold me-2">CLAUSULA</span>
                                     <select class="form-control-plaintext flex-grow-1" name="clausula">
-                                        <option value="PRIMERA">PRIMERA</option>
-                                        <option value="SEGUNDA">SEGUNDA</option>
                                         <option value="TERCERA">TERCERA</option>
                                         <option value="NO APLICA">NO APLICA</option>
                                     </select>
