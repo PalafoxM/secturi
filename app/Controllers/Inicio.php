@@ -108,6 +108,108 @@ class Inicio extends BaseController
         return null;
     }
 
+    private function localizarGhostscript(): ?string
+    {
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $candidatos = [];
+            foreach ([
+                'C:\\Program Files\\gs\\gs*\\bin\\gswin64c.exe',
+                'C:\\Program Files\\gs\\gs*\\bin\\gswin32c.exe',
+                'C:\\Program Files (x86)\\gs\\gs*\\bin\\gswin64c.exe',
+                'C:\\Program Files (x86)\\gs\\gs*\\bin\\gswin32c.exe',
+            ] as $patron) {
+                $encontrados = glob($patron) ?: [];
+                natsort($encontrados);
+                $candidatos = array_merge($candidatos, array_reverse($encontrados));
+            }
+
+            foreach ($candidatos as $candidato) {
+                if (is_file($candidato)) {
+                    return $candidato;
+                }
+            }
+
+            foreach (['gswin64c.exe', 'gswin32c.exe'] as $comando) {
+                $resultado = @shell_exec('where ' . $comando . ' 2>NUL');
+                if (is_string($resultado)) {
+                    foreach (preg_split('/\r\n|\r|\n/', trim($resultado)) as $ruta) {
+                        if (is_file($ruta)) {
+                            return $ruta;
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        foreach (['/usr/bin/gs', '/usr/local/bin/gs'] as $candidato) {
+            if (is_executable($candidato)) {
+                return $candidato;
+            }
+        }
+
+        $resultado = @shell_exec('command -v gs 2>/dev/null');
+        $ruta = is_string($resultado) ? trim($resultado) : '';
+        return $ruta !== '' ? $ruta : null;
+    }
+
+    private function normalizarPdfParaImportacion(string $archivoPdf, string $prefijo = 'factura_'): ?string
+    {
+        if (!function_exists('shell_exec')) {
+            log_message('warning', 'shell_exec no esta disponible para normalizar el PDF: ' . basename($archivoPdf));
+            return null;
+        }
+
+        $ghostscript = $this->localizarGhostscript();
+        if ($ghostscript === null) {
+            log_message('warning', 'Ghostscript no esta disponible para normalizar el PDF: ' . basename($archivoPdf));
+            return null;
+        }
+
+        $directorioTemporal = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'mpdf_merge_new';
+        if (!is_dir($directorioTemporal) && !@mkdir($directorioTemporal, 0775, true) && !is_dir($directorioTemporal)) {
+            return null;
+        }
+
+        $archivoTemporal = tempnam($directorioTemporal, $prefijo);
+        if ($archivoTemporal === false) {
+            return null;
+        }
+        @unlink($archivoTemporal);
+        $archivoConvertido = $archivoTemporal . '.pdf';
+
+        $opcionesFuentes = '';
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $directorioFuentes = getenv('WINDIR') ?: 'C:\\Windows';
+            $directorioFuentes .= DIRECTORY_SEPARATOR . 'Fonts';
+            if (is_dir($directorioFuentes)) {
+                $opcionesFuentes = ' -sFONTPATH=' . escapeshellarg($directorioFuentes);
+            }
+        }
+
+        $comando = escapeshellarg($ghostscript)
+            . ' -sDEVICE=pdfwrite -dCompatibilityLevel=1.4'
+            . ' -dEmbedAllFonts=true -dSubsetFonts=true -dPDFSTOPONERROR=false'
+            . ' -dNOPAUSE -dQUIET -dBATCH'
+            . $opcionesFuentes
+            . ' -sOutputFile=' . escapeshellarg($archivoConvertido)
+            . ' ' . escapeshellarg($archivoPdf)
+            . ' 2>&1';
+        $salida = @shell_exec($comando);
+
+        if (is_file($archivoConvertido) && filesize($archivoConvertido) > 0) {
+            return $archivoConvertido;
+        }
+
+        @unlink($archivoConvertido);
+        log_message(
+            'error',
+            'Ghostscript no pudo normalizar el PDF ' . basename($archivoPdf) . ': ' . trim((string) $salida)
+        );
+        return null;
+    }
+
     private function guardarPdfFIC($pdfFile): ?string
     {
         $extension = strtolower((string) $pdfFile->getClientExtension());
@@ -5317,22 +5419,10 @@ class Inicio extends BaseController
                         $fullPath = $this->resolveFacturaPdfPath($item->pdf, 'factura_pt_');
                         if ($fullPath && file_exists($fullPath)) {
                             
-                            // GS Conversion: Down-convert to PDF 1.4 to assure FPDI compatibility
-                            $gsTempFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'mpdf_merge_new' . DIRECTORY_SEPARATOR . 'gs_' . uniqid() . '.pdf';
-                            
-                            // Validar sistema operativo para elegir el ejecutable Ghostscript
-                            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-                                $gsPath = '"C:\Program Files (x86)\gs\gs10.06.0\bin\gswin32c.exe"';
-                            } else {
-                                $gsPath = 'gs'; // Ruta universal del comando en Linux
-                            }
-                            
-                            // Command to convert PDF down to 1.4
-                            $cmd = $gsPath . ' -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH -sOutputFile="' . $gsTempFile . '" "' . $fullPath . '"';
-                            shell_exec($cmd);
-
-                            // If conversion succeeded, use it; otherwise fallback to original
-                            $importFile = file_exists($gsTempFile) && filesize($gsTempFile) > 0 ? $gsTempFile : $fullPath;
+                            // Algunas facturas no incrustan sus fuentes. Se normalizan antes de
+                            // importarlas para que FPDI no genere páginas dañadas o ilegibles.
+                            $gsTempFile = $this->normalizarPdfParaImportacion($fullPath, 'factura_pt_');
+                            $importFile = $gsTempFile ?: $fullPath;
 
                             try {
                                 $pagecount = $mpdf->SetSourceFile($importFile);
@@ -5341,15 +5431,29 @@ class Inicio extends BaseController
                                 if ($pagecount >= 1) {
                                     $tplId = $mpdf->ImportPage(1);
                                     
-                                    // Calculate dynamic position
-                                    $y_start = $mpdf->y + 5; // 5mm margin below header
-                                    $page_height = 279; // Letter height in mm (approx)
+                                    $y_start = $mpdf->y + 5;
+                                    $page_width = 216;
+                                    $page_height = 279;
+                                    $side_margin = 10;
                                     $bottom_margin = 10;
+                                    $max_width = $page_width - ($side_margin * 2);
                                     $max_height = $page_height - $y_start - $bottom_margin;
+                                    $templateSize = $mpdf->getTemplateSize($tplId);
+                                    $scale = min(
+                                        $max_width / $templateSize['width'],
+                                        $max_height / $templateSize['height']
+                                    );
+                                    $templateWidth = $templateSize['width'] * $scale;
+                                    $templateHeight = $templateSize['height'] * $scale;
+                                    $templateX = $side_margin + (($max_width - $templateWidth) / 2);
 
-                                    // Usage: UseTemplate($tplId, x, y, w, h)
-                                    // Use full width (approx 200mm) and calculated max height to avoid overflow
-                                    $mpdf->UseTemplate($tplId, 5, $y_start, 205, $max_height);
+                                    $mpdf->UseTemplate(
+                                        $tplId,
+                                        $templateX,
+                                        $y_start,
+                                        $templateWidth,
+                                        $templateHeight
+                                    );
                                 }
 
                                 // Append remaining pages as new pages
@@ -5373,7 +5477,9 @@ class Inicio extends BaseController
                                 $mpdf->WriteCell(190, 10, "Error técnico: " . $e->getMessage(), 0, 1, 'C');
                             }
                             
-                            @unlink($gsTempFile); // Cleanup ghostscript file
+                            if ($gsTempFile && is_file($gsTempFile)) {
+                                @unlink($gsTempFile);
+                            }
                             if (strpos($item->pdf, 'FACTURAS/') === 0) {
                                 @unlink($fullPath);
                             }

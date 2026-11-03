@@ -2859,7 +2859,6 @@ class Principal extends BaseController
                     'jmelgar@guanajuato.gob.mx',
                     'jordaz@guanajuato.gob.mx',
                     'kporrasp@guanajuato.gob.mx',
-                    'lorozcot@guanajuato.gob.mx',
                     'lsantibanezr@guanajuato.gob.mx',
                     'lvelaga@guanajuato.gob.mx',
                     'mgmena@guanajuato.gob.mx',
