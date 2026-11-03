@@ -92,22 +92,27 @@ function iniciarParticulasLogin() {
 
   const context = canvas.getContext('2d');
   const reducirMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const colores = ['#ff9f1c', '#f15a24', '#ffd166', '#b56cff', '#ffffff'];
+  const colores = ['#fff7a8', '#ffe66d', '#ffd43b', '#d9ff70'];
   let ancho = 0;
   let alto = 0;
   let escala = 1;
+  let tiempo = 0;
   let particulas = [];
 
   function crearParticula(aleatoriaEnPantalla) {
     return {
       x: Math.random() * ancho,
-      y: aleatoriaEnPantalla ? Math.random() * alto : alto + Math.random() * 80,
-      radio: 1.2 + Math.random() * 2.8,
-      velocidadX: -0.18 + Math.random() * 0.36,
-      velocidadY: -(0.18 + Math.random() * 0.52),
-      oscilacion: Math.random() * Math.PI * 2,
+      y: aleatoriaEnPantalla ? Math.random() * alto : alto + 15 + Math.random() * 60,
+      radio: 1.1 + Math.random() * 2.1,
+      velocidadX: -0.06 + Math.random() * 0.12,
+      velocidadY: -(0.04 + Math.random() * 0.12),
+      faseViento: Math.random() * Math.PI * 2,
+      frecuenciaViento: 0.007 + Math.random() * 0.01,
+      fuerzaViento: 0.08 + Math.random() * 0.18,
+      faseBrillo: Math.random() * Math.PI * 2,
+      frecuenciaBrillo: 0.018 + Math.random() * 0.025,
       color: colores[Math.floor(Math.random() * colores.length)],
-      opacidad: 0.28 + Math.random() * 0.5
+      opacidad: 0.32 + Math.random() * 0.48
     };
   }
 
@@ -121,34 +126,63 @@ function iniciarParticulasLogin() {
     canvas.style.height = alto + 'px';
     context.setTransform(escala, 0, 0, escala, 0, 0);
 
-    const cantidad = Math.max(28, Math.min(75, Math.round((ancho * alto) / 18000)));
+    const cantidadBase = ancho < 768 ? 18 : 32;
+    const cantidad = Math.min(52, cantidadBase + Math.round((ancho * alto) / 80000));
     particulas = Array.from({ length: cantidad }, () => crearParticula(true));
+  }
+
+  function dibujarLuciernaga(particula) {
+    const pulso = 0.42 + ((Math.sin(
+      tiempo * particula.frecuenciaBrillo + particula.faseBrillo
+    ) + 1) / 2) * 0.58;
+    const opacidad = particula.opacidad * pulso;
+    const radioBrillo = particula.radio * (4.5 + pulso * 2.5);
+
+    context.save();
+    context.translate(particula.x, particula.y);
+    context.globalAlpha = opacidad * 0.45;
+    const halo = context.createRadialGradient(0, 0, 0, 0, 0, radioBrillo);
+    halo.addColorStop(0, particula.color);
+    halo.addColorStop(0.35, 'rgba(255, 230, 109, 0.55)');
+    halo.addColorStop(1, 'rgba(255, 214, 59, 0)');
+    context.fillStyle = halo;
+    context.beginPath();
+    context.arc(0, 0, radioBrillo, 0, Math.PI * 2);
+    context.fill();
+
+    context.globalAlpha = Math.min(1, opacidad + 0.25);
+    context.fillStyle = particula.color;
+    context.beginPath();
+    context.arc(0, 0, particula.radio, 0, Math.PI * 2);
+    context.fill();
+    context.restore();
   }
 
   function dibujar() {
     context.clearRect(0, 0, ancho, alto);
 
     particulas.forEach((particula) => {
-      context.beginPath();
-      context.arc(particula.x, particula.y, particula.radio, 0, Math.PI * 2);
-      context.fillStyle = particula.color;
-      context.globalAlpha = particula.opacidad;
-      context.shadowBlur = 8;
-      context.shadowColor = particula.color;
-      context.fill();
-      context.shadowBlur = 0;
+      dibujarLuciernaga(particula);
     });
 
     context.globalAlpha = 1;
   }
 
   function animar() {
-    particulas.forEach((particula, indice) => {
-      particula.oscilacion += 0.012;
-      particula.x += particula.velocidadX + Math.sin(particula.oscilacion) * 0.08;
-      particula.y += particula.velocidadY;
+    tiempo += 1;
 
-      if (particula.y < -12 || particula.x < -12 || particula.x > ancho + 12) {
+    particulas.forEach((particula, indice) => {
+      const viento = Math.sin(
+        tiempo * particula.frecuenciaViento + particula.faseViento
+      ) * particula.fuerzaViento;
+
+      particula.x += particula.velocidadX + viento;
+      particula.y += particula.velocidadY + Math.cos(
+        tiempo * particula.frecuenciaViento * 0.7 + particula.faseViento
+      ) * 0.05;
+
+      const margen = 20;
+      if (particula.y < -margen || particula.x < -margen || particula.x > ancho + margen) {
         particulas[indice] = crearParticula(false);
       }
     });
