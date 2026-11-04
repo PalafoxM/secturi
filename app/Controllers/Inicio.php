@@ -143,15 +143,21 @@ class Inicio extends BaseController
             return null;
         }
 
-        foreach (['/usr/bin/gs', '/usr/local/bin/gs'] as $candidato) {
+        // En Linux puede coexistir la versión del sistema con otra más reciente.
+        // Se respeta primero la versión configurada en el PATH del servidor.
+        $resultado = @shell_exec('command -v gs 2>/dev/null');
+        $ruta = is_string($resultado) ? trim($resultado) : '';
+        if ($ruta !== '' && is_executable($ruta)) {
+            return $ruta;
+        }
+
+        foreach (['/usr/local/bin/gs', '/usr/bin/gs'] as $candidato) {
             if (is_executable($candidato)) {
                 return $candidato;
             }
         }
 
-        $resultado = @shell_exec('command -v gs 2>/dev/null');
-        $ruta = is_string($resultado) ? trim($resultado) : '';
-        return $ruta !== '' ? $ruta : null;
+        return null;
     }
 
     private function normalizarPdfParaImportacion(string $archivoPdf, string $prefijo = 'factura_'): ?string
@@ -242,42 +248,11 @@ class Inicio extends BaseController
 
     private function anexarPdfDebajoDelEncabezado($mpdf, string $archivoPdf, string $nombreOriginal): void
     {
-        $archivoImportacion = $archivoPdf;
-        $archivoConvertido = null;
-        $directorioTemporal = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'mpdf_fic_merge';
-
-        if (!is_dir($directorioTemporal)) {
-            @mkdir($directorioTemporal, 0775, true);
-        }
-
-        $ejecutableGs = null;
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            $candidatos = [
-                'C:\\Program Files\\gs\\gs10.06.0\\bin\\gswin64c.exe',
-                'C:\\Program Files (x86)\\gs\\gs10.06.0\\bin\\gswin32c.exe',
-            ];
-            foreach ($candidatos as $candidato) {
-                if (is_file($candidato)) {
-                    $ejecutableGs = $candidato;
-                    break;
-                }
-            }
-        } else {
-            $ejecutableGs = 'gs';
-        }
-
-        if ($ejecutableGs !== null && is_dir($directorioTemporal) && function_exists('shell_exec')) {
-            $archivoConvertido = $directorioTemporal . DIRECTORY_SEPARATOR . 'fic_' . uniqid('', true) . '.pdf';
-            $comando = escapeshellarg($ejecutableGs)
-                . ' -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH'
-                . ' -sOutputFile=' . escapeshellarg($archivoConvertido)
-                . ' ' . escapeshellarg($archivoPdf);
-            @shell_exec($comando);
-
-            if (is_file($archivoConvertido) && filesize($archivoConvertido) > 0) {
-                $archivoImportacion = $archivoConvertido;
-            }
-        }
+        // Las facturas generadas por Telerik y otros sistemas suelen utilizar
+        // fuentes Identity-H sin incrustarlas. Se normalizan antes de que FPDI
+        // las importe para evitar páginas dañadas o texto ilegible.
+        $archivoConvertido = $this->normalizarPdfParaImportacion($archivoPdf, 'factura_fic_');
+        $archivoImportacion = $archivoConvertido ?: $archivoPdf;
 
         try {
             $totalPaginas = $mpdf->SetSourceFile($archivoImportacion);
