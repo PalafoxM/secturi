@@ -216,6 +216,143 @@ class Inicio extends BaseController
         return null;
     }
 
+    private function pdfRequiereRasterizacion(string $archivoPdf): bool
+    {
+        $archivo = @fopen($archivoPdf, 'rb');
+        if ($archivo === false) {
+            return false;
+        }
+
+        $usaIdentity = false;
+        $tieneFuenteIncrustada = false;
+        $remanente = '';
+
+        try {
+            while (!feof($archivo)) {
+                $bloque = fread($archivo, 8192);
+                if ($bloque === false) {
+                    break;
+                }
+
+                $contenido = $remanente . $bloque;
+                $usaIdentity = $usaIdentity || stripos($contenido, '/Identity-H') !== false;
+                $tieneFuenteIncrustada = $tieneFuenteIncrustada || stripos($contenido, '/FontFile') !== false;
+
+                if ($usaIdentity && $tieneFuenteIncrustada) {
+                    break;
+                }
+
+                $remanente = substr($contenido, -32);
+            }
+        } finally {
+            fclose($archivo);
+        }
+
+        return $usaIdentity && !$tieneFuenteIncrustada;
+    }
+
+    private function rasterizarPdfAImagenes(string $archivoPdf): array
+    {
+        if (!function_exists('shell_exec')) {
+            return [];
+        }
+
+        $ghostscript = $this->localizarGhostscript();
+        if ($ghostscript === null) {
+            return [];
+        }
+
+        $directorioBase = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'mpdf_fic_raster';
+        if (!is_dir($directorioBase) && !@mkdir($directorioBase, 0775, true) && !is_dir($directorioBase)) {
+            return [];
+        }
+
+        $directorioTrabajo = $directorioBase . DIRECTORY_SEPARATOR . uniqid('factura_', true);
+        if (!@mkdir($directorioTrabajo, 0775, true) && !is_dir($directorioTrabajo)) {
+            return [];
+        }
+
+        $patronSalida = $directorioTrabajo . DIRECTORY_SEPARATOR . 'pagina_%03d.png';
+        $comando = escapeshellarg($ghostscript)
+            . ' -dSAFER -dNOPAUSE -dQUIET -dBATCH'
+            . ' -sDEVICE=png16m -r144 -dTextAlphaBits=4 -dGraphicsAlphaBits=4'
+            . ' -sOutputFile=' . escapeshellarg($patronSalida)
+            . ' ' . escapeshellarg($archivoPdf)
+            . ' 2>&1';
+        $salida = @shell_exec($comando);
+
+        $paginas = glob($directorioTrabajo . DIRECTORY_SEPARATOR . 'pagina_*.png') ?: [];
+        natsort($paginas);
+        $paginas = array_values(array_filter($paginas, static function ($pagina) {
+            return is_file($pagina) && filesize($pagina) > 0;
+        }));
+
+        if (empty($paginas)) {
+            @rmdir($directorioTrabajo);
+            log_message(
+                'error',
+                'Ghostscript no pudo rasterizar el PDF ' . basename($archivoPdf) . ': ' . trim((string) $salida)
+            );
+        }
+
+        return $paginas;
+    }
+
+    private function anexarImagenesDebajoDelEncabezado($mpdf, array $paginas): void
+    {
+        $anchoPagina = 216;
+        $altoPagina = 279;
+        $margenLateral = 10;
+        $margenInferior = 10;
+        $anchoDisponible = $anchoPagina - ($margenLateral * 2);
+
+        foreach ($paginas as $indice => $pagina) {
+            if ($indice === 0) {
+                $posicionY = $mpdf->y + 5;
+                $altoDisponible = $altoPagina - $posicionY - $margenInferior;
+                if ($altoDisponible < 40) {
+                    $mpdf->AddPage();
+                    $posicionY = 10;
+                    $altoDisponible = $altoPagina - 20;
+                }
+            } else {
+                $mpdf->AddPage();
+                $posicionY = 10;
+                $altoDisponible = $altoPagina - 20;
+            }
+
+            $medidas = @getimagesize($pagina);
+            if ($medidas === false || empty($medidas[0]) || empty($medidas[1])) {
+                continue;
+            }
+
+            $escala = min(
+                $anchoDisponible / $medidas[0],
+                $altoDisponible / $medidas[1]
+            );
+            $ancho = $medidas[0] * $escala;
+            $alto = $medidas[1] * $escala;
+            $posicionX = $margenLateral + (($anchoDisponible - $ancho) / 2);
+
+            $mpdf->Image($pagina, $posicionX, $posicionY, $ancho, $alto, 'png');
+        }
+    }
+
+    private function limpiarImagenesRasterizadas(array $paginas): void
+    {
+        $directorio = null;
+        foreach ($paginas as $pagina) {
+            $directorio = dirname($pagina);
+            if (is_file($pagina)) {
+                @unlink($pagina);
+            }
+        }
+
+        if ($directorio && is_dir($directorio)) {
+            @rmdir($directorio);
+        }
+    }
+
     private function guardarPdfFIC($pdfFile): ?string
     {
         $extension = strtolower((string) $pdfFile->getClientExtension());
@@ -248,6 +385,21 @@ class Inicio extends BaseController
 
     private function anexarPdfDebajoDelEncabezado($mpdf, string $archivoPdf, string $nombreOriginal): void
     {
+        if ($this->pdfRequiereRasterizacion($archivoPdf)) {
+            $paginasRasterizadas = $this->rasterizarPdfAImagenes($archivoPdf);
+            if (!empty($paginasRasterizadas)) {
+                try {
+                    $this->anexarImagenesDebajoDelEncabezado($mpdf, $paginasRasterizadas);
+                    log_message('info', 'PDF FIC rasterizado por fuentes no incrustadas: ' . basename($nombreOriginal));
+                } catch (\Throwable $exception) {
+                    log_message('error', 'Error al integrar imagenes del PDF FIC: ' . $exception->getMessage());
+                } finally {
+                    $this->limpiarImagenesRasterizadas($paginasRasterizadas);
+                }
+                return;
+            }
+        }
+
         // Las facturas generadas por Telerik y otros sistemas suelen utilizar
         // fuentes Identity-H sin incrustarlas. Se normalizan antes de que FPDI
         // las importe para evitar páginas dañadas o texto ilegible.
