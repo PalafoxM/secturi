@@ -1067,17 +1067,30 @@ ini.inicio = (function () {
 
             // Validar que todas las filas tengan datos completos
             var filasValidas = true;
+            var mensajeFila = "Debe agregar al menos un proyecto/partida/fondo/importe";
             $('#makeEditable2 tbody tr').each(function () {
+                const capturaManual = $(this).find('.fondo-manual-check').is(':checked');
+                const fondo = capturaManual
+                    ? $.trim($(this).find('.fondo-manual-input').val())
+                    : $.trim($(this).find('.fondo-catalogo').val() || '');
+
                 if ($(this).find('[name="proyecto[]"]').val() === '' ||
                     $(this).find('[name="partida[]"]').val() === '' ||
+                    fondo === '' ||
                     $(this).find('[name="importe[]"]').val() === '') {
                     filasValidas = false;
                     return false; // Sale del each
                 }
+
+                if (!/^\d{10}$/.test(fondo)) {
+                    filasValidas = false;
+                    mensajeFila = "El fondo debe contener exactamente 10 dígitos";
+                    return false;
+                }
             });
 
             if (!filasValidas) {
-                Swal.fire("Error", "Debe agregar al menos un proyecto/partida/importe", "error");
+                Swal.fire("Error", mensajeFila, "error");
                 return false;
             }
 
@@ -1978,8 +1991,14 @@ ini.inicio = (function () {
 
                 // Agregar datos de la tabla
                 $('#makeEditable2 tbody tr').each(function (index) {
+                    const capturaManual = $(this).find('.fondo-manual-check').is(':checked');
+                    const fondo = capturaManual
+                        ? $.trim($(this).find('.fondo-manual-input').val())
+                        : $.trim($(this).find('.fondo-catalogo').val() || '');
+
                     formData.append('proyecto[]', $(this).find('[name="proyecto[]"]').val());
                     formData.append('partida[]', $(this).find('[name="partida[]"]').val());
+                    formData.append('fondo[]', fondo);
                     formData.append('importe[]', $(this).find('[name="importe[]"]').val());
                 });
 

@@ -1960,6 +1960,30 @@ class Principal extends BaseController
             return $this->respond($response);
         }
 
+        $proyectos = $data['proyecto'] ?? [];
+        $partidas = $data['partida'] ?? [];
+        $fondos = $data['fondo'] ?? [];
+        $importes = $data['importe'] ?? [];
+        $totalFilas = is_array($proyectos) ? count($proyectos) : 0;
+
+        if ($totalFilas === 0
+            || !is_array($partidas)
+            || !is_array($fondos)
+            || !is_array($importes)
+            || count($partidas) !== $totalFilas
+            || count($fondos) !== $totalFilas
+            || count($importes) !== $totalFilas) {
+            $response->respuesta = 'Debe capturar proyecto, partida, fondo e importe en cada fila.';
+            return $this->respond($response);
+        }
+
+        foreach ($fondos as $fondo) {
+            if (!preg_match('/^\d{10}$/', trim((string) $fondo))) {
+                $response->respuesta = 'Cada fondo es obligatorio y debe contener exactamente 10 dígitos.';
+                return $this->respond($response);
+            }
+        }
+
         // Validación de unicidad para no_convenio
         if ($noConvenio !== '' && strtoupper($noConvenio) !== 'NO APLICA') {
             $dataCheck = [
@@ -2078,14 +2102,17 @@ class Principal extends BaseController
             $datosCombinados = [];
 
             // Verificar que todos los arrays tengan la misma longitud
-            if (count($data['proyecto']) === count($data['partida']) && count($data['partida']) === count($data['importe'])) {
-                foreach ($data['proyecto'] as $index => $proyecto) {
+            if (count($proyectos) === count($partidas)
+                && count($partidas) === count($fondos)
+                && count($fondos) === count($importes)) {
+                foreach ($proyectos as $index => $proyecto) {
                     // Solo agregar si todos los valores existen
-                    if (!empty($data['proyecto']) && !empty($data['partida'][$index]) && !empty($data['importe'][$index])) {
+                    if (!empty($proyecto) && !empty($partidas[$index]) && !empty($fondos[$index]) && !empty($importes[$index])) {
                         $datosCombinados[] = [
                             'proyecto' => $proyecto,
-                            'partida' => $data['partida'][$index],
-                            'importe' => str_replace(',', '', $data['importe'][$index]) // Elimina comas del formato numérico
+                            'partida' => $partidas[$index],
+                            'fondo' => trim((string) $fondos[$index]),
+                            'importe' => str_replace(',', '', $importes[$index]) // Elimina comas del formato numérico
                         ];
                     }
                 }
@@ -2100,6 +2127,7 @@ class Principal extends BaseController
                     "id_reserva" => $id_reserva,
                     "id_proyecto" => $d['proyecto'],
                     "id_partida" => $d['partida'],
+                    "fondo" => $d['fondo'],
                     "importe" => $d['importe'],
                     "fec_reg" => $hoy,
                     "usu_reg" => $session->get('id_usuario')
@@ -3256,12 +3284,14 @@ class Principal extends BaseController
         $cat_perfil = $globals->getTabla(['tabla' => 'perfil', 'where' => ['visible' => 1]]);
         $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
         $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $cat_fondo = $globals->getTabla(['tabla' => 'cat_fondo', 'where' => ['visible' => 1]]);
         $proveedor = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit' => 10]);
         //die( var_dump( $proveedor ) );
         $data['cat_perfil'] = (!empty($cat_perfil->data)) ? $cat_perfil->data : [];
         $data['proveedor'] = (!empty($proveedor->data)) ? $proveedor->data : [];
         $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
         $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
+        $data['cat_fondo'] = (!empty($cat_fondo->data)) ? $cat_fondo->data : [];
 
         $data['scripts'] = array('inicio');
         $data['edita'] = 0;

@@ -206,6 +206,7 @@
                                                                                     <tr>
                                                                                         <th>PROYECTO-META</th>
                                                                                         <th>PARTIDA</th>
+                                                                                        <th>FONDO</th>
                                                                                         <th>IMPORTE</th>
                                                                                         <th>ACCIONES</th>
                                                                                     </tr>
@@ -227,6 +228,22 @@
                                                                                                 <option value="<?= $p->id_partida?>"><?= $p->cuenta_cable ?></option>
                                                                                                 <?php endforeach; ?>
                                                                                             </select>
+                                                                                        </td>
+                                                                                        <td style="min-width: 250px;">
+                                                                                            <select class="select2 form-control fondo-catalogo" name="fondo_catalogo[]">
+                                                                                                <option value="">Seleccione</option>
+                                                                                                <?php foreach($cat_fondo as $f): ?>
+                                                                                                <?php $codigoFondo = trim((string) $f->dsc_fondo); ?>
+                                                                                                <option value="<?= esc($codigoFondo, 'attr') ?>"><?= esc($codigoFondo) ?></option>
+                                                                                                <?php endforeach; ?>
+                                                                                            </select>
+                                                                                            <div class="custom-control custom-checkbox mt-2">
+                                                                                                <input type="checkbox" class="custom-control-input fondo-manual-check" id="fondo_manual_check_0">
+                                                                                                <label class="custom-control-label small" for="fondo_manual_check_0">No encuentro el fondo</label>
+                                                                                            </div>
+                                                                                            <input type="text" class="form-control mt-2 d-none fondo-manual-input"
+                                                                                                name="fondo_manual[]" maxlength="10" inputmode="numeric"
+                                                                                                pattern="[0-9]{10}" placeholder="Fondo de 10 dígitos" disabled>
                                                                                         </td>
                                                                                         <td><input type="text" autocomplete="off" class="form-control" name="importe[]" placeholder="0,000.00"></td>
                                                                                         <td>
@@ -346,7 +363,10 @@ function calcularTotal() {
 function formatNumber(num) {
     return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 }
+let fondoRowCounter = 1;
+
    $('#but_add').click(function() {
+    const fondoCheckId = 'fondo_manual_check_' + fondoRowCounter++;
     var newRow = `<tr>
             <td>
                 <select class="select2 form-control" name="proyecto[]">
@@ -363,6 +383,22 @@ function formatNumber(num) {
                     <option value="<?= $p->id_partida?>"><?= $p->cuenta_cable ?></option>
                     <?php endforeach; ?>
                 </select>
+            </td>
+            <td style="min-width: 250px;">
+                <select class="select2 form-control fondo-catalogo" name="fondo_catalogo[]">
+                    <option value="">Seleccione</option>
+                    <?php foreach($cat_fondo as $f): ?>
+                    <?php $codigoFondo = trim((string) $f->dsc_fondo); ?>
+                    <option value="<?= esc($codigoFondo, 'attr') ?>"><?= esc($codigoFondo) ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <div class="custom-control custom-checkbox mt-2">
+                    <input type="checkbox" class="custom-control-input fondo-manual-check" id="${fondoCheckId}">
+                    <label class="custom-control-label small" for="${fondoCheckId}">No encuentro el fondo</label>
+                </div>
+                <input type="text" class="form-control mt-2 d-none fondo-manual-input"
+                    name="fondo_manual[]" maxlength="10" inputmode="numeric"
+                    pattern="[0-9]{10}" placeholder="Fondo de 10 dígitos" disabled>
             </td>
             <td>
                 <input autocomplete="off" type="text" class="form-control" name="importe[]" placeholder="0,000.000">
@@ -392,6 +428,26 @@ function formatNumber(num) {
     });
     $(document).on('click', '.remove-row', function() {
         $(this).closest('tr').remove();
+        calcularTotal();
+    });
+
+    $(document).on('change', '.fondo-manual-check', function() {
+        const fila = $(this).closest('tr');
+        const selectFondo = fila.find('.fondo-catalogo');
+        const inputFondo = fila.find('.fondo-manual-input');
+        const capturaManual = $(this).is(':checked');
+
+        if (capturaManual) {
+            selectFondo.prop('disabled', true).val(null).trigger('change');
+            inputFondo.prop('disabled', false).removeClass('d-none').val('').focus();
+        } else {
+            inputFondo.val('').prop('disabled', true).addClass('d-none');
+            selectFondo.prop('disabled', false).trigger('change');
+        }
+    });
+
+    $(document).on('input', '.fondo-manual-input', function() {
+        this.value = this.value.replace(/\D/g, '').slice(0, 10);
     });
   // Inicializar Select2 cuando el modal se muestra
     $('#modalReserva').on('shown.bs.modal', function () {
