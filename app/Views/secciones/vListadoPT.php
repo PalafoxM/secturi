@@ -474,24 +474,48 @@ let fondoRowCounter = 1;
     });
   // Inicializar Select2 cuando el modal se muestra
     $('#modalReserva').on('shown.bs.modal', function () {
-        $('.select2').select2({
-            placeholder: "Seleccione una opción",
-            allowClear: true
+        $('.select2').each(function() {
+            if (!$(this).hasClass('select2-hidden-accessible')) {
+                $(this).select2({
+                    placeholder: "Seleccione una opción",
+                    allowClear: true,
+                    dropdownParent: $('#modalReserva')
+                });
+            }
         });
     });
 
+    const opcionesInstrumentoOriginales = $('#no_convenio option[data-tipo]').clone();
+
     function filtrarInstrumentos(tipo) {
         const selectInstrumento = $('#no_convenio');
-        const opciones = selectInstrumento.find('option[data-tipo]');
 
-        selectInstrumento.val('').prop('disabled', !tipo);
-        opciones.prop('disabled', true);
-
-        if (tipo) {
-            opciones.filter(`[data-tipo="${tipo}"]`).prop('disabled', false);
+        if (selectInstrumento.hasClass('select2-hidden-accessible')) {
+            selectInstrumento.select2('destroy');
         }
 
-        selectInstrumento.trigger('change');
+        selectInstrumento.empty().append(
+            $('<option>', {
+                value: '',
+                text: tipo
+                    ? 'Seleccione una opción'
+                    : 'Primero seleccione Contrato o Convenio'
+            })
+        );
+
+        if (tipo) {
+            opcionesInstrumentoOriginales.each(function() {
+                if ($(this).data('tipo') === tipo) {
+                    selectInstrumento.append($(this).clone());
+                }
+            });
+        }
+
+        selectInstrumento.val('').prop('disabled', !tipo).select2({
+            placeholder: tipo ? 'Seleccione una opción' : 'Primero seleccione Contrato o Convenio',
+            allowClear: true,
+            dropdownParent: $('#modalReserva')
+        });
     }
 
     $(document).on('change', '.tipo-instrumento-check', function() {
