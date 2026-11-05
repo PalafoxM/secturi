@@ -1960,6 +1960,33 @@ class Principal extends BaseController
             return $this->respond($response);
         }
 
+        if ($noConvenio !== '') {
+            $tipoInstrumento = trim((string) ($data['tipo_instrumento'] ?? ''));
+            $configInstrumento = [
+                'contrato' => ['tabla' => 'solicitud_contrato', 'campo' => 'no_contrato'],
+                'convenio' => ['tabla' => 'solicitud_convenio', 'campo' => 'no_convenio'],
+            ];
+
+            if (!isset($configInstrumento[$tipoInstrumento])) {
+                $response->respuesta = 'Debe indicar si el instrumento es Contrato o Convenio.';
+                return $this->respond($response);
+            }
+
+            $instrumentoSeleccionado = $configInstrumento[$tipoInstrumento];
+            $instrumentoExiste = $globals->getTabla([
+                'tabla' => $instrumentoSeleccionado['tabla'],
+                'where' => [
+                    $instrumentoSeleccionado['campo'] => $noConvenio,
+                    'visible' => 1,
+                ],
+            ]);
+
+            if ($instrumentoExiste->error || empty($instrumentoExiste->data)) {
+                $response->respuesta = 'El contrato o convenio seleccionado no es válido.';
+                return $this->respond($response);
+            }
+        }
+
         $proyectos = $data['proyecto'] ?? [];
         $partidas = $data['partida'] ?? [];
         $fondos = $data['fondo'] ?? [];
@@ -3285,6 +3312,8 @@ class Principal extends BaseController
         $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
         $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
         $cat_fondo = $globals->getTabla(['tabla' => 'cat_fondo', 'where' => ['visible' => 1]]);
+        $solicitud_contrato = $globals->getTabla(['tabla' => 'solicitud_contrato', 'where' => ['visible' => 1]]);
+        $solicitud_convenio = $globals->getTabla(['tabla' => 'solicitud_convenio', 'where' => ['visible' => 1]]);
         $proveedor = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1], 'limit' => 10]);
         //die( var_dump( $proveedor ) );
         $data['cat_perfil'] = (!empty($cat_perfil->data)) ? $cat_perfil->data : [];
@@ -3292,6 +3321,8 @@ class Principal extends BaseController
         $data['cat_proyecto'] = (!empty($cat_proyecto->data)) ? $cat_proyecto->data : [];
         $data['cat_partida'] = (!empty($cat_partida->data)) ? $cat_partida->data : [];
         $data['cat_fondo'] = (!empty($cat_fondo->data)) ? $cat_fondo->data : [];
+        $data['solicitud_contrato'] = (!empty($solicitud_contrato->data)) ? $solicitud_contrato->data : [];
+        $data['solicitud_convenio'] = (!empty($solicitud_convenio->data)) ? $solicitud_convenio->data : [];
 
         $data['scripts'] = array('inicio');
         $data['edita'] = 0;

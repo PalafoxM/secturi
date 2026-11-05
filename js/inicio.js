@@ -1058,6 +1058,18 @@ ini.inicio = (function () {
                 return false;
             }
 
+            if (!$('#customSwitch1').is(':checked')) {
+                if ($('.tipo-instrumento-check:checked').length !== 1) {
+                    Swal.fire("Atención", "Debe seleccionar si el instrumento es Contrato o Convenio", "info");
+                    return false;
+                }
+
+                if (!$('#no_convenio').val()) {
+                    Swal.fire("Atención", "Debe seleccionar el contrato o convenio correspondiente", "info");
+                    return false;
+                }
+            }
+
             // Validar que al menos haya una fila en la tabla
             if ($('#makeEditable2 tbody tr').length === 0) {
                 //toastr.warning('Debe agregar al menos un proyecto');
@@ -1979,6 +1991,7 @@ ini.inicio = (function () {
                 formData.append('comentarios_instrumento', $('#comentarios_instrumento').val());
 
                 if (!sinInstrumento) {
+                    formData.append('tipo_instrumento', $('.tipo-instrumento-check:checked').val());
                     var instrumentoFile = $('#instrumento')[0].files[0];
                     if (instrumentoFile) {
                         formData.append('instrumento', instrumentoFile);

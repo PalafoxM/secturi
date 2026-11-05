@@ -107,8 +107,24 @@
 
 <!--Inicio Modal -->
 
+<style>
+    #modalReserva .modal-dialog {
+        width: 96%;
+        max-width: 1400px;
+    }
+
+    #modalReserva .modal-content {
+        max-height: 95vh;
+        overflow-y: auto;
+    }
+
+    #modalReserva #makeEditable2 {
+        min-width: 1050px;
+    }
+</style>
+
 <div class="modal fade" id="modalReserva" tabindex="-1" role="dialog" aria-labelledby="supportModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content">
                 <main>
                    <div class="row">
@@ -165,28 +181,35 @@
                                                                 <?php if(isset($PT) && !empty($PT)): ?>
                                                                 <div class="form-group" id="id_convenio">
                                                                     <label for="no_convenio">No. Convenio/Contrato</label>
-                                                                    <div class="input-group">
-                                                                        <div class="btn-group">
-                                                                            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                                V/T <i class="mdi mdi-chevron-down"></i>
-                                                                            </button>
-                                                                            <div class="dropdown-menu">
-                                                                                <a class="dropdown-item" onclick="setConvenio('SECTURI/CONV/')">SECTURI/CONV/</a>
-                                                                                <a class="dropdown-item" onclick="setConvenio('SECTURI/CTO/')">SECTURI/CTO/</a>
-                                                                                <a class="dropdown-item" onclick="setConvenio('NO APLICA')">NO APLICA</a>
-                                                                            </div>
+                                                                    <div class="d-flex flex-wrap mb-2">
+                                                                        <div class="custom-control custom-checkbox mr-4">
+                                                                            <input type="checkbox" class="custom-control-input tipo-instrumento-check"
+                                                                                id="tipo_instrumento_contrato" value="contrato">
+                                                                            <label class="custom-control-label" for="tipo_instrumento_contrato">Contrato</label>
                                                                         </div>
-                                                                        <input type="text" id="no_convenio" name="no_convenio" class="form-control" placeholder="025" autocomplete="off">
-                                                                        <div class="input-group-append">
-                                                                            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                                 AÑO <i class="mdi mdi-chevron-down"></i>
-                                                                            </button>
-                                                                            <div class="dropdown-menu">
-                                                                                <a class="dropdown-item"  onclick="setAnio('/2026')">2026</a>
-                                                                                <a class="dropdown-item"  onclick="setAnio('/2027')">2027</a>
-                                                                            </div>
+                                                                        <div class="custom-control custom-checkbox">
+                                                                            <input type="checkbox" class="custom-control-input tipo-instrumento-check"
+                                                                                id="tipo_instrumento_convenio" value="convenio">
+                                                                            <label class="custom-control-label" for="tipo_instrumento_convenio">Convenio</label>
                                                                         </div>
                                                                     </div>
+                                                                    <select class="form-control select2" id="no_convenio" name="no_convenio" disabled>
+                                                                        <option value="">Primero seleccione Contrato o Convenio</option>
+                                                                        <?php foreach($solicitud_contrato as $sc): ?>
+                                                                            <?php $numeroContrato = trim((string) $sc->no_contrato); ?>
+                                                                            <?php if ($numeroContrato === '') continue; ?>
+                                                                            <option value="<?= esc($numeroContrato, 'attr') ?>" data-tipo="contrato">
+                                                                                <?= esc($numeroContrato) ?>
+                                                                            </option>
+                                                                        <?php endforeach; ?>
+                                                                        <?php foreach($solicitud_convenio as $sco): ?>
+                                                                            <?php $numeroConvenio = trim((string) $sco->no_convenio); ?>
+                                                                            <?php if ($numeroConvenio === '') continue; ?>
+                                                                            <option value="<?= esc($numeroConvenio, 'attr') ?>" data-tipo="convenio">
+                                                                                <?= esc($numeroConvenio) ?>
+                                                                            </option>
+                                                                        <?php endforeach; ?>
+                                                                    </select>
                                                                 </div>
                                                                 <?php endif; ?> 
                                                                  <div class="form-group" id="id_comentarios_instrumento">
@@ -456,6 +479,35 @@ let fondoRowCounter = 1;
             allowClear: true
         });
     });
+
+    function filtrarInstrumentos(tipo) {
+        const selectInstrumento = $('#no_convenio');
+        const opciones = selectInstrumento.find('option[data-tipo]');
+
+        selectInstrumento.val('').prop('disabled', !tipo);
+        opciones.prop('disabled', true);
+
+        if (tipo) {
+            opciones.filter(`[data-tipo="${tipo}"]`).prop('disabled', false);
+        }
+
+        selectInstrumento.trigger('change');
+    }
+
+    $(document).on('change', '.tipo-instrumento-check', function() {
+        if ($(this).is(':checked')) {
+            $('.tipo-instrumento-check').not(this).prop('checked', false);
+            filtrarInstrumentos($(this).val());
+        } else {
+            filtrarInstrumentos('');
+        }
+    });
+
+    $('#modalReserva').on('hidden.bs.modal', function () {
+        $('.tipo-instrumento-check').prop('checked', false);
+        filtrarInstrumentos('');
+    });
+
 function debounce(func, delay) {
     let timeout;
     return function(...args) {
@@ -466,16 +518,5 @@ function debounce(func, delay) {
 $('#buscar_proveedor').on('keyup', debounce(function () {
     ini.inicio.busquedaProveedor();
 }, 500));
-
-
-
-   function setConvenio(valor) {
-        document.getElementById('no_convenio').value = valor;
-    }
-
-    function setAnio(anio) {
-        let input = document.getElementById('no_convenio');
-        input.value = input.value + anio;
-    }
 
 </script>
