@@ -1644,6 +1644,33 @@ class Principal extends BaseController
             $response->respuesta = "El campo No. Convenio es requerido";
             return $this->respond($response);
         }
+
+        $idsPresupuesto = $data['id_presupuesto'] ?? [];
+        $proyectos = $data['proyecto'] ?? [];
+        $partidas = $data['partida'] ?? [];
+        $fondos = $data['fondo'] ?? [];
+        $importes = $data['importe'] ?? [];
+        $totalFilas = is_array($idsPresupuesto) ? count($idsPresupuesto) : 0;
+
+        if ($totalFilas === 0
+            || !is_array($proyectos)
+            || !is_array($partidas)
+            || !is_array($fondos)
+            || !is_array($importes)
+            || count($proyectos) !== $totalFilas
+            || count($partidas) !== $totalFilas
+            || count($fondos) !== $totalFilas
+            || count($importes) !== $totalFilas) {
+            $response->respuesta = 'Debe capturar proyecto, partida, fondo e importe en cada fila.';
+            return $this->respond($response);
+        }
+
+        foreach ($fondos as $fondo) {
+            if (!preg_match('/^\d{10}$/', trim((string) $fondo))) {
+                $response->respuesta = 'Cada fondo es obligatorio y debe contener exactamente 10 dígitos.';
+                return $this->respond($response);
+            }
+        }
         $hoy = date("Y-m-d H:i:s");
 
         /**==================================================== */
@@ -1718,12 +1745,12 @@ class Principal extends BaseController
         $response = $globals->saveTabla($dataInsert, $dataConfig, $dataBitacora);
 
         if (!$response->error) {
-            $i = 0;
-            foreach ($data['id_presupuesto'] as $d) {
+            foreach ($idsPresupuesto as $i => $d) {
                 $dataInsert = [
-                    "id_proyecto" => $data['proyecto'][$i],
-                    "id_partida" => $data['partida'][$i],
-                    "importe" => $data['importe'][$i],
+                    "id_proyecto" => $proyectos[$i],
+                    "id_partida" => $partidas[$i],
+                    "fondo" => trim((string) $fondos[$i]),
+                    "importe" => $importes[$i],
                     "usu_act" => $session->get('id_usuario')
 
                 ];
@@ -1739,7 +1766,6 @@ class Principal extends BaseController
                     $response->respuesta = $res->respuesta;
 
                 }
-                $i++;
             }
 
         }
@@ -11252,6 +11278,7 @@ class Principal extends BaseController
         $data = [];
         if (!empty($id_reserva)) {
             $reserva = $globals->getTabla(['tabla' => 'vw_reserva', 'where' => ['visible' => 1, 'id_reserva' => $id_reserva]]);
+            $presupuesto = $globals->getTabla(['tabla' => 'presupuesto', 'where' => ['visible' => 1, 'id_reserva' => $id_reserva]]);
             $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
             $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
             $response->error = $reserva->error;
@@ -11261,7 +11288,7 @@ class Principal extends BaseController
                 $reservaData->instrumento_urls = $this->mapInstrumentoUrls($reservaData->instrumento ?? null);
             }
             $response->data['reserva'] = $reservaData;
-            $response->data['presupuesto'] = (isset($reserva->data[0]) && !empty($reserva->data[0])) ? $reserva->data : [];
+            $response->data['presupuesto'] = (!empty($presupuesto->data)) ? $presupuesto->data : [];
             $response->data['proyecto'] = (isset($cat_proyecto->data[0]) && !empty($cat_proyecto->data[0])) ? $cat_proyecto->data : [];
             $response->data['partida'] = (isset($cat_partida->data[0]) && !empty($cat_partida->data[0])) ? $cat_partida->data : [];
         }

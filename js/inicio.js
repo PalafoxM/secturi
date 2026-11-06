@@ -832,6 +832,7 @@ ini.inicio = (function () {
                             partidas.forEach(pa => {
                                 opcionesPartida += `<option value="${pa.id_partida}" ${(pa.id_partida == p.id_partida) ? 'selected' : ''}>${pa.cuenta_cable}</option>`;
                             });
+                            const fondoActual = String(p.fondo || '').replace(/\D/g, '').slice(0, 10);
 
                             const fila = `
                                     <tr>
@@ -937,7 +938,13 @@ ini.inicio = (function () {
                                             </select>
                                         </td>
                                         <td>
-                                            <input type="text" autocomplete="off" class="form-control" name="importe[]" value=${p.importe} placeholder="0,000.00">
+                                            <input type="text" autocomplete="off" class="form-control fondo-editar"
+                                                name="fondo[]" value="${fondoActual}" maxlength="10"
+                                                inputmode="numeric" pattern="[0-9]{10}"
+                                                placeholder="Fondo de 10 dígitos">
+                                        </td>
+                                        <td>
+                                            <input type="text" autocomplete="off" class="form-control" name="importe[]" value="${p.importe}" placeholder="0,000.00">
                                         </td>
                                         <td>
                                             <button type="button" class="btn btn-sm btn-danger remove-row">
@@ -1166,6 +1173,35 @@ ini.inicio = (function () {
             $('#btn_guardar_edicion').click(function (e) {
                 e.preventDefault();
 
+                if (!$('#customSwitch1').is(':checked') && !$.trim($('#no_convenio_editar').val())) {
+                    Swal.fire("Atención", "El número de contrato o convenio es obligatorio", "info");
+                    return false;
+                }
+
+                let filasValidas = true;
+                let mensajeFila = "Debe capturar proyecto, partida, fondo e importe en cada fila";
+                $('#makeEditableEditar tbody tr').each(function () {
+                    const fondo = $.trim($(this).find('[name="fondo[]"]').val());
+                    if (!$(this).find('[name="proyecto[]"]').val()
+                        || !$(this).find('[name="partida[]"]').val()
+                        || !$(this).find('[name="importe[]"]').val()
+                        || !fondo) {
+                        filasValidas = false;
+                        return false;
+                    }
+
+                    if (!/^\d{10}$/.test(fondo)) {
+                        filasValidas = false;
+                        mensajeFila = "El fondo debe contener exactamente 10 dígitos";
+                        return false;
+                    }
+                });
+
+                if (!filasValidas) {
+                    Swal.fire("Error", mensajeFila, "error");
+                    return false;
+                }
+
                 // Crear FormData para enviar tanto el formulario como el archivo
                 var formData = new FormData();
 
@@ -1187,6 +1223,7 @@ ini.inicio = (function () {
                 $('#makeEditableEditar tbody tr').each(function (index) {
                     formData.append('proyecto[]', $(this).find('[name="proyecto[]"]').val());
                     formData.append('partida[]', $(this).find('[name="partida[]"]').val());
+                    formData.append('fondo[]', $.trim($(this).find('[name="fondo[]"]').val()));
                     formData.append('importe[]', $(this).find('[name="importe[]"]').val());
                     formData.append('id_presupuesto[]', $(this).find('[name="id_presupuesto[]"]').val());
                 });

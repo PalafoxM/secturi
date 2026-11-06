@@ -205,7 +205,7 @@
 <!--Inicio Modal -->
 
 <div class="modal fade" id="modalEditarReserva2" tabindex="-1" role="dialog" aria-labelledby="supportModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">EDITAR RESERVA</h5>
@@ -248,28 +248,9 @@
                                                                 </div>
                                                                 <div class="form-group" id="id_convenio">
                                                                     <label for="no_convenio_editar">No. Convenio/Contrato</label>
-                                                                    <div class="input-group">
-                                                                        <div class="btn-group">
-                                                                            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                                V/T <i class="mdi mdi-chevron-down"></i>
-                                                                            </button>
-                                                                            <div class="dropdown-menu">
-                                                                                <a class="dropdown-item" href="#" onclick="setConvenio('SECTURI/CONV/')">SECTURI/CONV/</a>
-                                                                                <a class="dropdown-item" href="#" onclick="setConvenio('SECTURI/CTO/')">SECTURI/CTO/</a>
-                                                                            </div>
-                                                                        </div>
-                                                                        <input type="text" id="no_convenio_editar" name="no_convenio_editar" class="form-control" placeholder="025" autocomplete="off">
-                                                                        <div class="input-group-append">
-                                                                            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                                 AÑO <i class="mdi mdi-chevron-down"></i>
-                                                                            </button>
-                                                                            <div class="dropdown-menu">
-                                                                                <a class="dropdown-item" href="#" onclick="setAnio('/2025')">2025</a>
-                                                                                <a class="dropdown-item" href="#" onclick="setAnio('/2024')">2024</a>
-                                                                                <a class="dropdown-item" href="#" onclick="setAnio('/2023')">2023</a>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
+                                                                    <input type="text" id="no_convenio_editar" name="no_convenio_editar"
+                                                                        class="form-control" autocomplete="off"
+                                                                        placeholder="Número de contrato o convenio">
                                                                 </div>
                                                                 <div class="form-group" id="id_comentarios_instrumento_editar">
                                                                     <label for="comentarios_instrumento_editar">Comentarios</label>
@@ -288,6 +269,7 @@
                                                                                     <tr>
                                                                                         <th>PROYECTO-META</th>
                                                                                         <th>PARTIDA</th>
+                                                                                        <th>FONDO</th>
                                                                                         <th>IMPORTE</th>
                                                                                         <th>ACCIONES</th>
                                                                                     </tr>
@@ -521,6 +503,10 @@ $(document).ready(function() {
         calcularTotal();
     });
 
+    $(document).on('input', '.fondo-editar', function() {
+        this.value = this.value.replace(/\D/g, '').slice(0, 10);
+    });
+
     // 2. Función para calcular el total
     function calcularTotal() {
         let total = 0;
@@ -535,16 +521,6 @@ $(document).ready(function() {
     function formatNumber(num) {
         return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
     }
-  function setConvenio(valor) {
-        document.getElementById('no_convenio_editar').value = valor;
-    }
-
-    function setAnio(anio) {
-        let input = document.getElementById('no_convenio_editar');
-        input.value = input.value + anio;
-    }
-
-
     function verObservacion(observacion) {
         Swal.fire({
             title: 'Motivo de Declinación',
