@@ -140,7 +140,7 @@
                                                                         </div>
                                                                     </a>
                                                                 </li>
-                                                              
+                                                          
                                                                 <li class="dd-item" data-id="1">
                                                                     <a target="_blank" href="<?= base_url().'assets/documentos/Programa de Gobierno 2024-2030.pdf' ?>">
                                                                         <div class="dd-handle">
@@ -517,9 +517,9 @@
                                                                     </a>
                                                                 </li>
                                                                 <li class="dd-item" data-id="2">
-                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/Manual_de_Organizacion_SECTUR-d937.pdf' ?>">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/P.O_MANUAL DE ORGANIZACION SECTURI_21.10.26.pdf' ?>">
                                                                         <div class="dd-handle">
-                                                                       Manual de Organización SECTUR
+                                                                       Manual de Organización SECTURI
                                                                         </div>
                                                                     </a>
                                                                 </li>
