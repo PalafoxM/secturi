@@ -265,12 +265,148 @@ function iniciarGoogle() {
 
 
 
-function mostrarLoginGoogle() {
-    $('#login_google_access').removeClass('is-hidden');
+function mostrarLoginTradicional() {
+    const accesoGoogle = document.getElementById('login_google_access');
+    const accesoTradicional = document.getElementById('login_traditional_access');
+    const botonAcceso = document.getElementById('mostrarLoginTradicionalBtn');
+
+    accesoGoogle?.classList.add('is-hidden');
+    accesoTradicional?.classList.add('is-active');
+    accesoTradicional?.setAttribute('aria-hidden', 'false');
+
+    if (botonAcceso) {
+        botonAcceso.setAttribute('aria-label', 'Mostrar acceso con Google');
+        botonAcceso.setAttribute('title', 'Acceso con Google');
+    }
+
+    window.setTimeout(() => document.getElementById('usuario')?.focus(), 50);
 }
+
+function mostrarLoginGoogle() {
+    const accesoGoogle = document.getElementById('login_google_access');
+    const accesoTradicional = document.getElementById('login_traditional_access');
+    const botonAcceso = document.getElementById('mostrarLoginTradicionalBtn');
+
+    accesoTradicional?.classList.remove('is-active');
+    accesoTradicional?.setAttribute('aria-hidden', 'true');
+    accesoGoogle?.classList.remove('is-hidden');
+
+    if (botonAcceso) {
+        botonAcceso.setAttribute('aria-label', 'Mostrar acceso con usuario y contraseña');
+        botonAcceso.setAttribute('title', 'Acceso con usuario y contraseña');
+    }
+}
+
+function alternarTipoLogin() {
+    const accesoTradicional = document.getElementById('login_traditional_access');
+
+    if (accesoTradicional?.classList.contains('is-active')) {
+        mostrarLoginGoogle();
+        return;
+    }
+
+    mostrarLoginTradicional();
+}
+
+function alternarVisibilidadContrasenia() {
+    const input = document.getElementById('contrasenia');
+    const boton = document.getElementById('toggleLoginPassword');
+
+    if (!input || !boton) {
+        return;
+    }
+
+    const mostrar = input.type === 'password';
+    input.type = mostrar ? 'text' : 'password';
+    boton.setAttribute('aria-pressed', mostrar ? 'true' : 'false');
+    boton.setAttribute('aria-label', mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña');
+    boton.setAttribute('title', mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña');
+}
+
+async function iniciarLoginTradicional(event) {
+    event.preventDefault();
+
+    const usuario = document.getElementById('usuario')?.value.trim() || '';
+    const contrasenia = document.getElementById('contrasenia')?.value || '';
+    const boton = document.getElementById('btnTraditionalLogin');
+
+    if (!usuario || !contrasenia) {
+        Swal.fire('Atención', 'Ingresa tu usuario y contraseña.', 'warning');
+        return;
+    }
+
+    const textoOriginal = boton?.innerHTML || 'Ingresar';
+
+    if (boton) {
+        boton.disabled = true;
+        boton.innerHTML = '<span class="spinner-border" aria-hidden="true"></span> Validando...';
+    }
+
+    try {
+        const datos = new URLSearchParams({ usuario, contrasenia });
+        const respuestaHttp = await fetch(
+            new URL('index.php/Login/validar_usuario', document.body.dataset.baseUrl).href,
+            {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: datos.toString()
+            }
+        );
+
+        if (!respuestaHttp.ok) {
+            throw new Error('Respuesta HTTP ' + respuestaHttp.status);
+        }
+
+        const response = await respuestaHttp.json();
+
+        if (response.error) {
+            Swal.fire('No fue posible ingresar', response.respuesta || 'Verifica tus credenciales.', 'error');
+            return;
+        }
+
+        await Swal.fire({
+            title: 'Acceso correcto',
+            text: 'Bienvenida, persona servidora pública.',
+            icon: 'success',
+            timer: 1100,
+            showConfirmButton: false
+        });
+
+        window.location.href = new URL('index.php/Inicio', document.body.dataset.baseUrl).href;
+    } catch (error) {
+        console.error('Error al iniciar sesión:', error);
+        Swal.fire('Error de conexión', 'No fue posible validar tus credenciales. Inténtalo nuevamente.', 'error');
+    } finally {
+        if (boton) {
+            boton.disabled = false;
+            boton.innerHTML = textoOriginal;
+        }
+    }
+}
+
+document.getElementById('mostrarLoginTradicionalBtn')
+    ?.addEventListener('click', alternarTipoLogin);
+
+document.getElementById('mostrarLoginTradicionalBtn')
+    ?.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            alternarTipoLogin();
+        }
+    });
 
 document.getElementById('mostrarLoginGoogleBtn')
     ?.addEventListener('click', mostrarLoginGoogle);
+
+document.getElementById('toggleLoginPassword')
+    ?.addEventListener('click', alternarVisibilidadContrasenia);
+
+document.getElementById('loginTraditionalForm')
+    ?.addEventListener('submit', iniciarLoginTradicional);
 
 document.getElementById('iniciarGoogleBtn')
     ?.addEventListener('click', iniciarGoogle);

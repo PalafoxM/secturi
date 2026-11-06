@@ -325,7 +325,7 @@ $tarjetasError = session()->getFlashdata('tarjetas_error');
 
                                 <div class="col-lg-8">
                                     <div class="row">
-                                        <div class="col-lg-6">
+                                        <div class="col-lg-4">
                                             <div class="card dash-info-carousel">
                                                 <div class="card-body">
                                                     <h4 class="mt-0 header-title mb-4">Protocolo ALBA Guanajuato</h4>
@@ -427,7 +427,7 @@ $tarjetasError = session()->getFlashdata('tarjetas_error');
 
 
                                         </div><!-- end col-->
-                                          <div class="col-lg-6">
+                                          <div class="col-lg-8">
                                             <div class="card">
                                                 <div class="card-body">
                                                     <h4 class="mt-0  mb-4">Disposiciones Administrativas</h4>
@@ -484,72 +484,7 @@ $tarjetasError = session()->getFlashdata('tarjetas_error');
                                                 </div><!--end card-->
 
                                         </div> <!--end col-->
-                                   <!--      <?php if (!$votoHombre || !$votoMujer): ?>
-                                            <div class="col-lg-4">
-                                                <div class="card client-card">
-                                                    <div class="card-body text-center">
-                                         
-                                                        <div class="icon-info mb-3">
-                                                            <i class="fas fa-award float-color-icon"
-                                                                style="font-size: 3rem;">
-                                                            </i>
-                                                        </div>
-                                                        <h5 class="client-name">Postular a la persona</h5>
-                                                        <span class="text-muted mr-3">
-                                                            RECONOCIMIENTO 2025 SECTURI
-                                                        </span>
-                                                        <p class="text-muted text-center mt-3">LA PERSONA SERVIDORA PÚBLICA
-                                                            HONESTA</p>
-                                                        <?php if (!$votoHombre): ?>
-                                                            <a href="<?= base_url() . 'index.php/Principal/Postulacion/1' ?>"
-                                                                class="btn btn-sm btn-soft-secondary">Hombre</a>
-                                                        <?php endif; ?>
-                                                        <?php if (!$votoMujer): ?>
-                                                            <a href="<?= base_url() . 'index.php/Principal/Postulacion/2' ?>"
-                                                                class="btn btn-sm btn-soft-primary">Mujer</a>
-                                                        <?php endif; ?>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        <?php endif; ?> -->
-                                        
-                                           
-                                     
-                                    </div><!--end row-->
-
-
-                                    <div class="row">
-
-                                     <!--    <div class="col-lg-6">
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <h4 class="mt-0  mb-4">Disposiciones Administrativas</h4>
-                                                    <div class="blog-card">
-                                                        <div class="ratio ratio-16x9">
-                                                            <iframe
-                                                                src="<?= base_url() ?>assets/pdf/plantillas/Disposiciones Administrativas SECTURI 2026.pdf"
-                                                                title="Disposiciones Administrativas" style="border:0"
-                                                                loading="lazy" width="100%">
-                                                            </iframe>
-                                                        </div>
-                                                        <p class="text-muted text-truncate">Disposiciones Administrativas SECTURI 2026</p>
-                                                        <hr class="hr-dashed">
-                                                        <div class="d-flex justify-content-between">
-
-                                                            <div class="align-self-center">
-                                                                <a href="<?= base_url() ?>assets/pdf/plantillas/Disposiciones Administrativas SECTURI 2026.pdf"
-                                                                    target="_blank" class="text-primary">Leer más <i
-                                                                        class="fas fa-long-arrow-alt-right"></i></a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                        </div>  -->
-
-                                       
-                                        <div class="col-lg-12">
+                                        <div class="col-lg-6">
                                             <div class="card h-100">
                                                 <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
                                                     <div class="ribbon4 rib4-primary">
@@ -582,8 +517,12 @@ $tarjetasError = session()->getFlashdata('tarjetas_error');
                                             </div><!--end card-->
                                         </div><!--end col-->
                                         
+                                           
                                      
                                     </div><!--end row-->
+
+
+       
                                 </div><!--end col-->
                             </div><!--end row-->
                             <?php if (!empty($tarjetas)): ?>

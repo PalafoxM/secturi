@@ -261,6 +261,101 @@ class Login extends BaseController {
     
    
     }
+
+    public function validar_usuario()
+    {
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'Usuario o contraseña incorrectos.';
+
+        if (strtolower($this->request->getMethod()) !== 'post') {
+            return $this->respond($response);
+        }
+
+        $usuario = trim((string) $this->request->getPost('usuario'));
+        $contrasenia = (string) $this->request->getPost('contrasenia');
+
+        if ($usuario === '' || $contrasenia === '') {
+            $response->respuesta = 'Es necesario ingresar usuario y contraseña.';
+            return $this->respond($response);
+        }
+
+        $session = \Config\Services::session();
+        $intentos = (int) $session->get('intentos_login_tradicional');
+        $bloqueoHasta = (int) $session->get('bloqueo_login_tradicional');
+
+        if ($bloqueoHasta > time()) {
+            $response->respuesta = 'Demasiados intentos. Espera un minuto antes de volver a intentar.';
+            return $this->respond($response);
+        }
+
+        $catalogos = new Mglobal;
+        $result = $catalogos->getTabla([
+            'tabla' => 'usuario',
+            'where' => ['usuario' => $usuario, 'visible' => 1],
+            'limit' => 1,
+        ]);
+
+        $user = (!empty($result->data)) ? $result->data[0] : null;
+
+        if (!$user || !$this->validarContrasenia($contrasenia, $user->contrasenia ?? null)) {
+            $intentos++;
+
+            if ($intentos >= 5) {
+                $session->set('intentos_login_tradicional', 0);
+                $session->set('bloqueo_login_tradicional', time() + 60);
+                $response->respuesta = 'Demasiados intentos. Espera un minuto antes de volver a intentar.';
+            } else {
+                $session->set('intentos_login_tradicional', $intentos);
+            }
+
+            return $this->respond($response);
+        }
+
+        if ($this->requiereRehashContrasenia($user->contrasenia ?? null)) {
+            $catalogos->saveTabla(
+                ['contrasenia' => $this->hashContrasenia($contrasenia)],
+                [
+                    'tabla' => 'usuario',
+                    'editar' => true,
+                    'idEditar' => ['id_usuario' => $user->id_usuario],
+                ],
+                ['id_user' => $user->id_usuario, 'script' => 'Login.php/validar_usuario']
+            );
+        }
+
+        $session->regenerate(true);
+        $session->remove(['intentos_login_tradicional', 'bloqueo_login_tradicional']);
+        $session->set('logueado', 1);
+        $session->set('id_usuario', $user->id_usuario);
+        $session->set('id_sexo', $user->id_sexo ?? null);
+        $session->set('usuario', $user->usuario);
+        $session->set('nombre_completo', trim(
+            ($user->nombre ?? '') . ' ' .
+            ($user->primer_apellido ?? '') . ' ' .
+            ($user->segundo_apellido ?? '')
+        ));
+        $session->set('id_perfil', $user->id_perfil ?? null);
+        $session->set('fec_nac', $user->fec_nac ?? null);
+        $session->set('correo', $user->correo ?? null);
+        $session->set('foto', $user->ruta_foto_relativa ?? null);
+        $session->set('id_tipo_empleado', $user->id_tipo_empleado ?? null);
+        $session->set('no_empleado', $user->no_empleado ?? null);
+
+        $this->activarActividad($user->id_usuario);
+
+        $subordinados = $catalogos->getTabla([
+            'tabla' => 'vw_usuario',
+            'where' => ['visible' => 1, 'id_jefe_inmediato' => $user->id_usuario],
+        ]);
+        $session->set('esJefe', !empty($subordinados->data));
+
+        $response->error = false;
+        $response->respuesta = 'Acceso correcto.';
+
+        return $this->respond($response);
+    }
+
     public function cerrar() {
         $session = \Config\Services::session();  
         $session->destroy();

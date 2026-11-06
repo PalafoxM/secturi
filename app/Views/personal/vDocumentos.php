@@ -523,6 +523,13 @@
                                                                         </div>
                                                                     </a>
                                                                 </li>
+                                                                <li class="dd-item" data-id="2">
+                                                                    <a target="_blank" href="<?= base_url().'assets/documentos/P.O. MANUAL DE ORGANIZACION 6.NOV.2023.pdf' ?>">
+                                                                        <div class="dd-handle">
+                                                                       Manual de Organización SECTUR 2023
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
                                                              
                                                                 <li class="dd-item" data-id="2">
                                                                     <a target="_blank" href="<?= base_url().'assets/documentos/Manual_de_Procesos_y_Procedimientos_2024-1086.pdf' ?>">
