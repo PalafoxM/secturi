@@ -417,12 +417,12 @@
                                     
                                     <!-- Extra Buttons Container (Hidden by default or smaller) -->
                                     <div class="commission-container d-flex justify-content-center">
-                                        <input type="hidden" name="comision[]" value="<?= isset($row->comision) ? $row->comision : '' ?>">
+                                        <input type="hidden" name="comision[]" value="<?= htmlspecialchars(isset($row->comision) ? $row->comision : '', ENT_QUOTES, 'UTF-8') ?>">
                                         <button type="button" class="btn btn-icon-custom btn-comision <?= !empty($row->comision) ? 'btn-loaded' : '' ?>" onclick="editComision(this)" data-toggle="tooltip" data-placement="top" title="Comisión">
                                             <i class="fas fa-briefcase"></i>
                                         </button>
 
-                                        <input type="hidden" name="concepto_gasto[]" value="<?= isset($row->concepto_gasto) ? $row->concepto_gasto : '' ?>">
+                                        <input type="hidden" name="concepto_gasto[]" value="<?= htmlspecialchars(isset($row->concepto_gasto) ? $row->concepto_gasto : '', ENT_QUOTES, 'UTF-8') ?>">
                                         <button type="button" class="btn btn-icon-custom btn-concepto <?= !empty($row->concepto_gasto) ? 'btn-loaded' : '' ?>" onclick="editConcepto(this)" data-toggle="tooltip" data-placement="top" title="Concepto">
                                             <i class="fas fa-file-alt"></i>
                                         </button>
@@ -1457,48 +1457,46 @@
         }
     });
 
-    function editConcepto(btn) { 
-        var $btn = $(btn);
-        var $hidden = $btn.closest('.commission-container').find('input[name="concepto_gasto[]"]');
+    function openLongTextEditor(title, $hidden, $btn) {
         Swal.fire({
-            title: 'Concepto Gasto',
+            title: title,
             input: 'textarea',
-            inputValue: $hidden.val(),
+            inputValue: $hidden.val() || '',
+            width: '700px',
             showCancelButton: true,
-             confirmButtonText: 'Guardar',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if(result.isConfirmed) {
-                $hidden.val(result.value);
-                if(result.value.trim() !== '') {
-                    $btn.addClass('btn-loaded');
-                } else {
-                    $btn.removeClass('btn-loaded');
+            confirmButtonText: 'Guardar',
+            cancelButtonText: 'Cancelar',
+            inputAttributes: {
+                'aria-label': title,
+                'rows': 8,
+                'style': 'min-height: 180px; max-height: 50vh; resize: vertical; overflow-y: auto;'
+            },
+            didOpen: function(popup) {
+                var textarea = popup.querySelector('.swal2-textarea');
+                if (textarea) {
+                    textarea.style.height = Math.min(Math.max(textarea.scrollHeight, 180), window.innerHeight * 0.5) + 'px';
+                    textarea.setSelectionRange(textarea.value.length, textarea.value.length);
                 }
+            }
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                var value = result.value || '';
+                $hidden.val(value);
+                $btn.toggleClass('btn-loaded', value.trim() !== '');
             }
         });
     }
+
+    function editConcepto(btn) {
+        var $btn = $(btn);
+        var $hidden = $btn.closest('.commission-container').find('input[name="concepto_gasto[]"]');
+        openLongTextEditor('Concepto Gasto', $hidden, $btn);
+    }
     
-    function editComision(btn) { 
+    function editComision(btn) {
         var $btn = $(btn);
         var $hidden = $btn.closest('.commission-container').find('input[name="comision[]"]');
-         Swal.fire({
-            title: 'Comisión / Evento',
-            input: 'textarea',
-             inputValue: $hidden.val(),
-            showCancelButton: true,
-            confirmButtonText: 'Guardar',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if(result.isConfirmed) {
-                $hidden.val(result.value);
-                if(result.value.trim() !== '') {
-                    $btn.addClass('btn-loaded');
-                } else {
-                    $btn.removeClass('btn-loaded');
-                }
-            }
-        });
+        openLongTextEditor('Comisión / Evento', $hidden, $btn);
     }
 
     function editFechas(btn) {
