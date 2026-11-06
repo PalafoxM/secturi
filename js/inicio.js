@@ -832,8 +832,6 @@ ini.inicio = (function () {
                             partidas.forEach(pa => {
                                 opcionesPartida += `<option value="${pa.id_partida}" ${(pa.id_partida == p.id_partida) ? 'selected' : ''}>${pa.cuenta_cable}</option>`;
                             });
-                            const fondoActual = String(p.fondo || '').replace(/\D/g, '').slice(0, 10);
-
                             const fila = `
                                     <tr>
                                         <td>
@@ -923,6 +921,7 @@ ini.inicio = (function () {
                             partidas.forEach(pa => {
                                 opcionesPartida += `<option value="${pa.id_partida}" ${(pa.id_partida == p.id_partida) ? 'selected' : ''}>${pa.cuenta_cable}</option>`;
                             });
+                            const fondoActual = String(p.fondo || '').replace(/\D/g, '').slice(0, 10);
 
                             const fila = `
                                     <tr>
