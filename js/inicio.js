@@ -1465,6 +1465,7 @@ ini.inicio = (function () {
                         tbody.empty();
 
                         presupuesto.forEach(p => {
+                            const fondo = String(p.fondo || '').replace(/[^0-9]/g, '').slice(0, 10);
                             let opcionesProyecto = '<option value="">Seleccione</option>';
                             proyectos.forEach(c => {
                                 opcionesProyecto += `<option value="${c.id_proyecto}" ${(c.id_proyecto == p.id_proyecto) ? 'selected' : ''}>${c.proyecto}</option>`;
@@ -1498,7 +1499,13 @@ ini.inicio = (function () {
                                                     readonly>
                                         </td>
                                          <td>
-                                            <input class="form-control" type="number" name="fondo[]"  >
+                                            <input
+                                                class="form-control"
+                                                type="text"
+                                                name="fondo[]"
+                                                value="${fondo}"
+                                                maxlength="10"
+                                                readonly>
                                         </td>
                                     </tr>
                                 `;
@@ -1560,6 +1567,7 @@ ini.inicio = (function () {
                         tbody.empty();
 
                         presupuesto.forEach(p => {
+                            const fondo = String(p.fondo || '').replace(/[^0-9]/g, '').slice(0, 10);
                             let opcionesProyecto = '<option value="">Seleccione</option>';
                             proyectos.forEach(c => {
                                 opcionesProyecto += `<option value="${c.id_proyecto}" ${(c.id_proyecto == p.id_proyecto) ? 'selected' : ''}>${c.proyecto}</option>`;
@@ -1592,7 +1600,15 @@ ini.inicio = (function () {
                                                     value="${formatMoneyValue(p.importe)}" 
                                                     readonly>
                                         </td>
-                                        
+                                        <td>
+                                            <input
+                                                class="form-control"
+                                                type="text"
+                                                name="fondo[]"
+                                                value="${fondo}"
+                                                maxlength="10"
+                                                readonly>
+                                        </td>
                                     </tr>
                                 `;
                             tbody.append(fila);

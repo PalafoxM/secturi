@@ -1,0 +1,14 @@
+# Permite recibir el instrumento jurídico final (la aplicación rechaza 500 MB o más).
+<IfModule php_module>
+    php_value upload_max_filesize 500M
+    php_value post_max_size 510M
+    php_value max_execution_time 600
+    php_value max_input_time 600
+</IfModule>
+
+<IfModule mod_php.c>
+    php_value upload_max_filesize 500M
+    php_value post_max_size 510M
+    php_value max_execution_time 600
+    php_value max_input_time 600
+</IfModule>

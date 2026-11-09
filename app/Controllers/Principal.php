@@ -3334,6 +3334,541 @@ class Principal extends BaseController
 
         $session = \Config\Services::session();
         $globals = new Mglobal;
+        if ($session->get('id_perfil') == 1) {
+             $solicitud_contrato = $globals->getTabla(['tabla' => 'solicitud_contrato', 'where' => ['visible' => 1]]);
+             $solicitud_convenio = $globals->getTabla(['tabla' => 'solicitud_convenio', 'where' => ['visible' => 1]]);
+        }else{
+             $solicitud_contrato = $globals->getTabla(['tabla' => 'solicitud_contrato', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]]);
+             $solicitud_convenio = $globals->getTabla(['tabla' => 'solicitud_convenio', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]]);
+        }
+       
+        $contratosConveion = [];
+        $solicitud_contrato = (!empty($solicitud_contrato->data)) ? $solicitud_contrato->data : [];
+        $solicitud_convenio = (!empty($solicitud_convenio->data)) ? $solicitud_convenio->data : [];
+
+        foreach ($solicitud_contrato as $contrato) {
+            $instrumentoFinalUrl = $this->resolveStoredFilePreviewUrl($contrato->instrumento_juridico_final ?? null);
+            $contratosConveion[] = [
+                'id' => $contrato->id_solicitud_contrato,
+                'tipo' => 'contrato',
+                'proveedor_seguimiento' => $contrato->proveedor_seguimiento,
+                'monto_total' => $contrato->monto_total,
+                'no_contrato_convenio' => $contrato->no_contrato,
+                'no_proveedor' => $contrato->proveedor_cedula,
+                'proveedor_rfc' => $contrato->proveedor_rfc,
+                'proveedor_representante' => $contrato->proveedor_representante,
+                'fec_reg' => $contrato->fec_reg,
+                'tiene_instrumento_final' => !empty($instrumentoFinalUrl),
+                'instrumento_final_url' => $instrumentoFinalUrl,
+
+            ];
+        }
+        foreach ($solicitud_convenio as $convenio) {
+            $instrumentoFinalUrl = $this->resolveStoredFilePreviewUrl($convenio->instrumento_juridico_final ?? null);
+            $contratosConveion[] = [
+                'id' => $convenio->id_solicitud_convenio,
+                'tipo' => 'convenio',
+                'proveedor_seguimiento' => $convenio->proveedor_seguimiento,
+                'monto_total' => $convenio->monto_total,
+                'no_contrato_convenio' => $convenio->no_convenio,
+                'no_proveedor' => $convenio->proveedor_cedula,
+                'proveedor_rfc' => $convenio->proveedor_rfc,
+                'proveedor_representante' => $convenio->proveedor_representante,
+                'fec_reg' => $convenio->fec_reg,
+                'tiene_instrumento_final' => !empty($instrumentoFinalUrl),
+                'instrumento_final_url' => $instrumentoFinalUrl,
+            ];
+        }
+
+        $data['contratosConveion'] = $contratosConveion;
+        //die( var_dump($data['contratosConveion']) );
+        $data['scripts'] = array('inicio');
+        $data['edita'] = 0;
+        $data['PT'] = 1;
+        $data['contentView'] = 'secciones/vListadoJuridico';
+        $this->_renderView($data);
+
+    }
+
+    public function subirInstrumentoJuridicoFinalPT()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $response = new \stdClass();
+        $response->error = true;
+        $response->respuesta = 'No fue posible guardar el instrumento jurídico final.';
+
+        $id = (int) ($this->request->getPost('id_solicitud') ?? 0);
+        $tipo = strtolower(trim((string) $this->request->getPost('tipo')));
+        $configuraciones = [
+            'contrato' => [
+                'tabla' => 'solicitud_contrato',
+                'campo_id' => 'id_solicitud_contrato',
+                'modulo' => 'contratos',
+                'prefijo' => 'Contrato',
+            ],
+            'convenio' => [
+                'tabla' => 'solicitud_convenio',
+                'campo_id' => 'id_solicitud_convenio',
+                'modulo' => 'convenios',
+                'prefijo' => 'Convenio',
+            ],
+        ];
+
+        if ($id <= 0 || !isset($configuraciones[$tipo])) {
+            $response->respuesta = 'La solicitud indicada no es válida.';
+            return $this->respond($response);
+        }
+
+        $configuracion = $configuraciones[$tipo];
+        $solicitud = $globals->getTabla([
+            'tabla' => $configuracion['tabla'],
+            'where' => [
+                $configuracion['campo_id'] => $id,
+                'visible' => 1,
+               // 'ok' => 1,
+            ],
+        ]);
+
+        if (empty($solicitud->data)) {
+            $response->respuesta = 'No se encontró la solicitud o todavía no está disponible para revisión.';
+            return $this->respond($response);
+        }
+
+        $archivo = $this->request->getFile('archivo');
+
+        if (!$archivo || !$archivo->isValid() || $archivo->hasMoved()) {
+            $errorSubida = $archivo ? $archivo->getError() : UPLOAD_ERR_NO_FILE;
+            $response->respuesta = in_array($errorSubida, [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE], true)
+                ? 'El archivo supera el tamaño permitido por el servidor.'
+                : 'Selecciona un archivo PDF válido.';
+            return $this->respond($response);
+        }
+
+        $limiteBytes = 500 * 1024 * 1024;
+        $tamanoArchivo = (int) $archivo->getSize();
+
+        if ($tamanoArchivo <= 0 || $tamanoArchivo >= $limiteBytes) {
+            $response->respuesta = 'El PDF debe pesar menos de 500 MB.';
+            return $this->respond($response);
+        }
+
+        if (strtolower((string) $archivo->getExtension()) !== 'pdf') {
+            $response->respuesta = 'Solo se permiten archivos en formato PDF.';
+            return $this->respond($response);
+        }
+
+        $manejador = @fopen($archivo->getTempName(), 'rb');
+        $firmaPdf = $manejador ? fread($manejador, 5) : false;
+        if (is_resource($manejador)) {
+            fclose($manejador);
+        }
+
+        if ($firmaPdf !== '%PDF-') {
+            $response->respuesta = 'El archivo seleccionado no contiene un PDF válido.';
+            return $this->respond($response);
+        }
+
+        $nombreArchivo = 'Instrumento_Final_' . $configuracion['prefijo'] . '_' . $id . '_'
+            . date('Ymd_His') . '_' . substr(md5(uniqid((string) $id, true)), 0, 8) . '.pdf';
+        $s3Key = $this->uploadFileToS3Storage(
+            $archivo->getTempName(),
+            $configuracion['modulo'],
+            'instrumentos_finales',
+            $nombreArchivo
+        );
+
+        if (empty($s3Key)) {
+            $response->respuesta = 'No fue posible almacenar el PDF. Inténtalo nuevamente.';
+            return $this->respond($response);
+        }
+
+        $resultado = $globals->saveTabla(
+            [
+                'instrumento_juridico_final' => $s3Key,
+                'usu_act' => $session->get('id_usuario') ?? 0,
+                'fec_act' => date('Y-m-d H:i:s'),
+            ],
+            [
+                'tabla' => $configuracion['tabla'],
+                'editar' => true,
+                'idEditar' => [$configuracion['campo_id'] => $id],
+            ],
+            [
+                'id_user' => $session->get('id_usuario') ?? 0,
+                'script' => 'Principal.php/subirInstrumentoJuridicoFinalPT',
+            ]
+        );
+
+        if ($resultado->error) {
+            $response->respuesta = $resultado->respuesta ?? $response->respuesta;
+            return $this->respond($response);
+        }
+
+        $response->error = false;
+        $response->respuesta = 'Instrumento jurídico final guardado correctamente.';
+        $response->url = $this->resolveStoredFilePreviewUrl($s3Key);
+        $response->nombre_archivo = $nombreArchivo;
+
+        return $this->respond($response);
+    }
+
+    private function obtenerContextoReservaSolicitudPT(int $id, string $tipo): array
+    {
+        $tipo = strtolower(trim($tipo));
+        $configuraciones = [
+            'contrato' => [
+                'tabla' => 'solicitud_contrato',
+                'campo_id' => 'id_solicitud_contrato',
+                'campo_numero' => 'no_contrato',
+                'campo_objeto' => ' objeto_contrato',
+                'comentario_instrumento' => 'comentario_instrumento',
+            ],
+            'convenio' => [
+                'tabla' => 'solicitud_convenio',
+                'campo_id' => 'id_solicitud_convenio',
+                'campo_numero' => 'no_convenio',
+                'campo_objeto' => 'objeto_convenio',
+                'comentario_instrumento' => 'comentario_instrumento',
+            ],
+        ];
+
+        if ($id <= 0 || !isset($configuraciones[$tipo])) {
+            return ['error' => true, 'mensaje' => 'La solicitud indicada no es válida.'];
+        }
+
+        $globals = new Mglobal;
+        $configuracion = $configuraciones[$tipo];
+        $solicitudQuery = $globals->getTabla([
+            'tabla' => $configuracion['tabla'],
+            'where' => [
+                $configuracion['campo_id'] => $id,
+                'visible' => 1,
+               // 'ok' => 1,
+            ],
+            'limit' => 1,
+        ]);
+
+        if (empty($solicitudQuery->data)) {
+            return ['error' => true, 'mensaje' => 'La solicitud no está disponible para generar una reserva.'];
+        }
+
+        $solicitud = $solicitudQuery->data[0];
+        $instrumentoFinal = trim((string) ($solicitud->instrumento_juridico_final ?? ''));
+        if ($instrumentoFinal === '') {
+            return ['error' => true, 'mensaje' => 'Primero debe cargar el instrumento jurídico final.'];
+        }
+
+        $rfc = trim((string) ($solicitud->proveedor_rfc ?? ''));
+        $numeroProveedor = trim((string) ($solicitud->proveedor_cedula ?? ''));
+        $proveedoresQuery = $globals->getTabla([
+            'tabla' => 'proveedor',
+            'where' => ['rfc' => $rfc, 'visible' => 1],
+        ]);
+        $proveedores = !empty($proveedoresQuery->data) ? $proveedoresQuery->data : [];
+        $proveedor = null;
+
+        foreach ($proveedores as $candidato) {
+            if ($numeroProveedor !== '' && trim((string) ($candidato->no_proveedor ?? '')) === $numeroProveedor) {
+                $proveedor = $candidato;
+                break;
+            }
+        }
+        if ($proveedor === null && !empty($proveedores)) {
+            $proveedor = $proveedores[0];
+        }
+
+        if ($proveedor === null) {
+            return ['error' => true, 'mensaje' => 'No se encontró el proveedor asociado a la solicitud.'];
+        }
+
+        $bancosQuery = $globals->getTabla([
+            'tabla' => 'proveedor_banco',
+            'where' => ['idproveedor' => $proveedor->id_proveedor, 'visible' => 1],
+        ]);
+        $bancos = [];
+        foreach (!empty($bancosQuery->data) ? $bancosQuery->data : [] as $banco) {
+            $bancos[] = [
+                'id' => (int) $banco->id_proveedor_banco,
+                'banco' => trim((string) ($banco->banco ?? '')),
+                'no_cuenta' => trim((string) ($banco->no_cuenta ?? '')),
+                'clabe' => trim((string) ($banco->clabe ?? '')),
+            ];
+        }
+
+        $proyectosQuery = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
+        $partidasQuery = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
+        $mapaProyectos = [];
+        $mapaPartidas = [];
+        foreach (!empty($proyectosQuery->data) ? $proyectosQuery->data : [] as $proyecto) {
+            $mapaProyectos[(int) $proyecto->id_proyecto] = trim((string) $proyecto->proyecto);
+        }
+        foreach (!empty($partidasQuery->data) ? $partidasQuery->data : [] as $partida) {
+            $descripcion = trim((string) ($partida->nombre_fondo ?? ''));
+            $clave = trim((string) ($partida->cuenta_cable ?? ''));
+            $mapaPartidas[(int) $partida->id_partida] = trim($clave . ($descripcion !== '' ? ' - ' . $descripcion : ''));
+        }
+
+        $normalizarImporte = static function ($valor): float {
+            $limpio = preg_replace('/[^0-9.\-]/', '', (string) $valor);
+            return is_numeric($limpio) ? (float) $limpio : 0.0;
+        };
+        $presupuestosOrigen = [[
+            'id_proyecto' => (int) ($solicitud->proyecto ?? 0),
+            'id_partida' => (int) ($solicitud->partida ?? 0),
+            'importe' => $normalizarImporte(
+                $tipo === 'contrato' && trim((string) ($solicitud->monto ?? '')) !== ''
+                    ? $solicitud->monto
+                    : ($solicitud->monto_total ?? 0)
+            ),
+        ]];
+
+        if ($tipo === 'contrato') {
+            $partidasExtraQuery = $globals->getTabla([
+                'tabla' => 'solicitud_contrato_partida',
+                'where' => ['id_solicitud_contrato' => $id, 'visible' => 1],
+            ]);
+            foreach (!empty($partidasExtraQuery->data) ? $partidasExtraQuery->data : [] as $partidaExtra) {
+                $presupuestosOrigen[] = [
+                    'id_proyecto' => (int) ($partidaExtra->id_proyecto ?? 0),
+                    'id_partida' => (int) ($partidaExtra->id_partida ?? 0),
+                    'importe' => $normalizarImporte($partidaExtra->monto ?? 0),
+                ];
+            }
+        }
+
+        $presupuestos = [];
+        foreach ($presupuestosOrigen as $presupuesto) {
+            if ($presupuesto['id_proyecto'] <= 0 || $presupuesto['id_partida'] <= 0 || $presupuesto['importe'] <= 0) {
+                continue;
+            }
+            $presupuestos[] = [
+                'id_proyecto' => $presupuesto['id_proyecto'],
+                'proyecto' => $mapaProyectos[$presupuesto['id_proyecto']] ?? (string) $presupuesto['id_proyecto'],
+                'id_partida' => $presupuesto['id_partida'],
+                'partida' => $mapaPartidas[$presupuesto['id_partida']] ?? (string) $presupuesto['id_partida'],
+                'importe' => $presupuesto['importe'],
+            ];
+        }
+
+        if (empty($presupuestos)) {
+            return ['error' => true, 'mensaje' => 'La solicitud no contiene presupuesto válido.'];
+        }
+
+        $fondosQuery = $globals->getTabla(['tabla' => 'cat_fondo', 'where' => ['visible' => 1]]);
+        $fondos = [];
+        foreach (!empty($fondosQuery->data) ? $fondosQuery->data : [] as $fondo) {
+            $codigo = trim((string) ($fondo->dsc_fondo ?? ''));
+            if (preg_match('/^\d{10}$/', $codigo)) {
+                $fondos[] = $codigo;
+            }
+        }
+
+        return [
+            'error' => false,
+            'tipo' => $tipo,
+            'configuracion' => $configuracion,
+            'solicitud' => $solicitud,
+            'proveedor' => $proveedor,
+            'bancos' => $bancos,
+            'fondos' => array_values(array_unique($fondos)),
+            'presupuestos' => $presupuestos,
+            'numero_instrumento' => trim((string) ($solicitud->{$configuracion['campo_numero']} ?? '')),
+            'objeto' => trim((string) ($solicitud->{$configuracion['campo_objeto']} ?? '')),
+            'instrumento' => $instrumentoFinal,
+            'instrumento_url' => $this->resolveStoredFilePreviewUrl($instrumentoFinal),
+        ];
+    }
+
+    public function obtenerDatosReservaSolicitudPT()
+    {
+        $id = (int) ($this->request->getPost('id_solicitud') ?? 0);
+        $tipo = (string) $this->request->getPost('tipo');
+        $contexto = $this->obtenerContextoReservaSolicitudPT($id, $tipo);
+
+        if (!empty($contexto['error'])) {
+            return $this->respond([
+                'error' => true,
+                'respuesta' => $contexto['mensaje'] ?? 'No fue posible cargar la solicitud.',
+            ]);
+        }
+
+        $proveedor = $contexto['proveedor'];
+        return $this->respond([
+            'error' => false,
+            'data' => [
+                'id_solicitud' => $id,
+                'tipo' => $contexto['tipo'],
+                'numero_instrumento' => $contexto['numero_instrumento'],
+                'objeto' => $contexto['objeto'],
+                'instrumento_url' => $contexto['instrumento_url'],
+                'proveedor' => [
+                    'id_proveedor' => (int) $proveedor->id_proveedor,
+                    'nombre' => trim((string) ($proveedor->razon_social ?? '')),
+                    'no_proveedor' => trim((string) ($proveedor->no_proveedor ?? '')),
+                    'rfc' => trim((string) ($proveedor->rfc ?? '')),
+                ],
+                'bancos' => $contexto['bancos'],
+                'fondos' => $contexto['fondos'],
+                'presupuestos' => $contexto['presupuestos'],
+            ],
+        ]);
+    }
+
+    public function guardarReservaDesdeSolicitudPT()
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $id = (int) ($this->request->getPost('id_solicitud') ?? 0);
+        $tipo = (string) $this->request->getPost('tipo');
+        $idBanco = (int) ($this->request->getPost('id_proveedor_banco') ?? 0);
+        $fondos = $this->request->getPost('fondos');
+        $comentariosInstrumento = trim((string) ($this->request->getPost('comentarios_instrumento') ?? ''));
+        $contexto = $this->obtenerContextoReservaSolicitudPT($id, $tipo);
+
+        if (!empty($contexto['error'])) {
+            return $this->respond([
+                'error' => true,
+                'respuesta' => $contexto['mensaje'] ?? 'No fue posible validar la solicitud.',
+            ]);
+        }
+
+        $idsBancos = array_column($contexto['bancos'], 'id');
+        if ($idBanco <= 0 || !in_array($idBanco, $idsBancos, true)) {
+            return $this->respond(['error' => true, 'respuesta' => 'Selecciona un banco válido del proveedor.']);
+        }
+
+        if (!is_array($fondos) || count($fondos) !== count($contexto['presupuestos'])) {
+            return $this->respond(['error' => true, 'respuesta' => 'Selecciona el fondo de cada presupuesto.']);
+        }
+        foreach ($fondos as $fondo) {
+            if (!preg_match('/^\d{10}$/', trim((string) $fondo))) {
+                return $this->respond(['error' => true, 'respuesta' => 'Cada fondo debe contener exactamente 10 dígitos.']);
+            }
+        }
+
+        if (mb_strlen($comentariosInstrumento, 'UTF-8') > 5000) {
+            return $this->respond(['error' => true, 'respuesta' => 'Los comentarios no pueden exceder 5,000 caracteres.']);
+        }
+
+        $numeroInstrumento = $contexto['numero_instrumento'];
+        if ($numeroInstrumento === '') {
+            return $this->respond(['error' => true, 'respuesta' => 'La solicitud no tiene número de contrato o convenio.']);
+        }
+
+        $reservaExistente = $globals->getTabla([
+            'tabla' => 'reserva',
+            'where' => ['no_convenio' => $numeroInstrumento, 'visible' => 1],
+            'limit' => 1,
+        ]);
+        if (!empty($reservaExistente->data)) {
+            return $this->respond(['error' => true, 'respuesta' => 'Ya existe una reserva para este contrato o convenio.']);
+        }
+
+        $totalImporte = array_sum(array_column($contexto['presupuestos'], 'importe'));
+        $ahora = date('Y-m-d H:i:s');
+        $proveedor = $contexto['proveedor'];
+        $dataReserva = [
+            'id_proveedor' => (int) $proveedor->id_proveedor,
+            'total_importe' => $totalImporte,
+            'id_proveedor_banco' => $idBanco,
+            'folio' => 'PT-' . date('YmdHis'),
+            'no_convenio' => $numeroInstrumento,
+            'comentarios_instrumento' => $comentariosInstrumento,
+            'instrumento' => $contexto['instrumento'],
+            'ruta_absoluta' => $contexto['instrumento_url'] ?? '',
+            'fec_reg' => $ahora,
+            'usu_reg' => $session->get('id_usuario'),
+            'promo' => in_array((int) $session->get('id_usuario'), [17, 11, 14, 59, 38, 34], true) ? 1 : 0,
+        ];
+        $bitacora = [
+            'id_user' => $session->get('id_usuario'),
+            'script' => 'Principal.php/guardarReservaDesdeSolicitudPT',
+        ];
+        $resultadoReserva = $globals->saveTabla(
+            $dataReserva,
+            ['tabla' => 'reserva', 'editar' => false],
+            $bitacora
+        );
+
+        if ($resultadoReserva->error) {
+            return $this->respond([
+                'error' => true,
+                'respuesta' => $resultadoReserva->respuesta ?? 'No fue posible guardar la reserva.',
+            ]);
+        }
+
+        $idReserva = (int) $resultadoReserva->idRegistro;
+        foreach ($contexto['presupuestos'] as $indice => $presupuesto) {
+            $resultadoPresupuesto = $globals->saveTabla(
+                [
+                    'id_reserva' => $idReserva,
+                    'id_proyecto' => $presupuesto['id_proyecto'],
+                    'id_partida' => $presupuesto['id_partida'],
+                    'fondo' => trim((string) $fondos[$indice]),
+                    'importe' => $presupuesto['importe'],
+                    'fec_reg' => $ahora,
+                    'usu_reg' => $session->get('id_usuario'),
+                ],
+                ['tabla' => 'presupuesto', 'editar' => false],
+                $bitacora
+            );
+
+            if ($resultadoPresupuesto->error) {
+                $globals->saveTabla(
+                    ['visible' => 0],
+                    ['tabla' => 'presupuesto', 'editar' => true, 'idEditar' => ['id_reserva' => $idReserva]],
+                    $bitacora
+                );
+                $globals->saveTabla(
+                    ['visible' => 0],
+                    ['tabla' => 'reserva', 'editar' => true, 'idEditar' => ['id_reserva' => $idReserva]],
+                    $bitacora
+                );
+                return $this->respond(['error' => true, 'respuesta' => 'No fue posible guardar todos los presupuestos.']);
+            }
+        }
+
+        $configuracion = $contexto['configuracion'];
+        $resultadoSolicitud = $globals->saveTabla(
+            ['ok' => 2, 'usu_act' => $session->get('id_usuario'), 'fec_act' => $ahora],
+            [
+                'tabla' => $configuracion['tabla'],
+                'editar' => true,
+                'idEditar' => [$configuracion['campo_id'] => $id],
+            ],
+            $bitacora
+        );
+
+        if ($resultadoSolicitud->error) {
+            $globals->saveTabla(
+                ['visible' => 0],
+                ['tabla' => 'presupuesto', 'editar' => true, 'idEditar' => ['id_reserva' => $idReserva]],
+                $bitacora
+            );
+            $globals->saveTabla(
+                ['visible' => 0],
+                ['tabla' => 'reserva', 'editar' => true, 'idEditar' => ['id_reserva' => $idReserva]],
+                $bitacora
+            );
+            return $this->respond([
+                'error' => true,
+                'respuesta' => 'No fue posible finalizar la reserva. Inténtalo nuevamente.',
+            ]);
+        }
+
+        return $this->respond([
+            'error' => false,
+            'respuesta' => 'Reserva guardada correctamente.',
+            'id_reserva' => $idReserva,
+        ]);
+    }
+
+    public function listadoPT2()
+    {
+
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
         $cat_perfil = $globals->getTabla(['tabla' => 'perfil', 'where' => ['visible' => 1]]);
         $cat_proyecto = $globals->getTabla(['tabla' => 'cat_proyecto', 'where' => ['visible' => 1]]);
         $cat_partida = $globals->getTabla(['tabla' => 'cat_partida', 'where' => ['visible' => 1]]);
