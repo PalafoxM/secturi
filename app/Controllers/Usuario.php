@@ -1995,9 +1995,9 @@ class Usuario extends BaseController
                         'no_convenio' => $usuReg[0]->no_convenio,
                         'total_importe' => $usuReg[0]->total_importe
                     ];
-                  //  $this->enviarCorreoAceptacion($correo, $datosCorreo);
+                    $this->enviarCorreoAceptacion($correo, $datosCorreo);
                 } else {
-                  //  $this->enviarCorreoPagos($correo);
+                    $this->enviarCorreoPagos($correo);
                 }
            }
         }
