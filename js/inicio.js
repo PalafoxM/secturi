@@ -1002,10 +1002,6 @@ ini.inicio = (function () {
                         let bancoSelect = $("#banco");
                         const bancos = Array.isArray(response.data.banco) ? response.data.banco : [];
 
-                        if ($.fn.select2 && bancoSelect.hasClass('select2-hidden-accessible')) {
-                            bancoSelect.select2('destroy');
-                        }
-
                         bancoSelect.empty().prop('disabled', false);
                         bancoSelect.append(new Option('Selecciona un banco', '', true, false));
 
@@ -1024,7 +1020,7 @@ ini.inicio = (function () {
                                 .prop('disabled', true);
                         }
 
-                        if ($.fn.select2) {
+                        if ($.fn.select2 && !bancoSelect.hasClass('select2-hidden-accessible')) {
                             bancoSelect.select2({
                                 placeholder: 'Selecciona un banco',
                                 allowClear: true,

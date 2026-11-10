@@ -321,28 +321,12 @@
                                                     <!--FIN MODAL -->
 <link href="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet"
     type="text/css" />
-<!-- App css -->
-<link href="<?php echo base_url(); ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-<link href="<?php echo base_url(); ?>assets/css/jquery-ui.min.css" rel="stylesheet">
-<link href="<?php echo base_url(); ?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
-<link href="<?= base_url()?>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
 <link href="<?= base_url()?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
-<!-- jQuery  -->
- 
-<script src="<?php echo base_url(); ?>assets/js/jquery.min.js"></script>
-<script src="<?php echo base_url(); ?>assets/js/jquery-ui.min.js"></script>
-<script src="<?php echo base_url(); ?>assets/js/bootstrap.bundle.min.js"></script>
-<script src="<?php echo base_url(); ?>assets/js/jquery.slimscroll.min.js"></script>
 
 
 <!-- Required datatable js -->
 <script src="<?php echo base_url(); ?>plugins/datatables/jquery.dataTables.min.js"></script>
 <script src="<?php echo base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.js"></script>
-
-<!-- App js -->
-<script src="<?= base_url()?>assets/js/app.js"></script>
-<script src="<?= base_url()?>assets/js/waves.js"></script>
-<script src="<?= base_url()?>assets/js/feather.min.js"></script>
 
 <script src="<?= base_url()?>plugins/tiny-editable/mindmup-editabletable.js"></script>
 <script src="<?= base_url()?>plugins/tiny-editable/numeric-input-example.js"></script>
