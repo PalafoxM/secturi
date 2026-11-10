@@ -33,7 +33,10 @@
                                      
                                         <div class="card-body">
                                          
-                                            <span>LISTA DE CONTRATOS Y CONVENIOS</span>
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <span>LISTA DE CONTRATOS Y CONVENIOS</span>
+                                                <a href="<?= base_url('index.php/Principal/listadoPT2') ?>" class="btn btn-primary btn-sm">Reserva Tradicional</a>
+                                            </div>
                                        
                                            
                                             <table id="datatableProveedores" class="table" data-toggle="table">
