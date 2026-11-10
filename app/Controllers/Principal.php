@@ -3348,10 +3348,12 @@ class Principal extends BaseController
 
         foreach ($solicitud_contrato as $contrato) {
             $instrumentoFinalUrl = $this->resolveStoredFilePreviewUrl($contrato->instrumento_juridico_final ?? null);
+            $pagos = $globals->getTabla(['tabla' => 'solicitud_contrato_pagos', 'where' => ['id_solicitud_contrato' => $contrato->id_solicitud_contrato, 'visible' => 1]]);
+            $proveedor = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['no_proveedor' => $contrato->proveedor_cedula, 'visible' => 1]])->data;
             $contratosConveion[] = [
                 'id' => $contrato->id_solicitud_contrato,
                 'tipo' => 'contrato',
-                'proveedor_seguimiento' => $contrato->proveedor_seguimiento,
+                'proveedor_seguimiento' => $proveedor[0]->razon_social ?? null,
                 'monto_total' => $contrato->monto_total,
                 'no_contrato_convenio' => $contrato->no_contrato,
                 'no_proveedor' => $contrato->proveedor_cedula,
@@ -3360,11 +3362,14 @@ class Principal extends BaseController
                 'fec_reg' => $contrato->fec_reg,
                 'tiene_instrumento_final' => !empty($instrumentoFinalUrl),
                 'instrumento_final_url' => $instrumentoFinalUrl,
+                'ok' => $contrato->ok,
+               'pagos' => $pagos->data,
 
             ];
         }
         foreach ($solicitud_convenio as $convenio) {
             $instrumentoFinalUrl = $this->resolveStoredFilePreviewUrl($convenio->instrumento_juridico_final ?? null);
+            $pagos = $globals->getTabla(['tabla' => 'solicitud_convenio_pagos', 'where' => ['id_solicitud_convenio' => $convenio->id_solicitud_convenio, 'visible' => 1]]);
             $contratosConveion[] = [
                 'id' => $convenio->id_solicitud_convenio,
                 'tipo' => 'convenio',
@@ -3377,6 +3382,8 @@ class Principal extends BaseController
                 'fec_reg' => $convenio->fec_reg,
                 'tiene_instrumento_final' => !empty($instrumentoFinalUrl),
                 'instrumento_final_url' => $instrumentoFinalUrl,
+                'ok' => $convenio->ok,
+                'pagos' => $pagos->data,
             ];
         }
 

@@ -474,7 +474,18 @@ let fondoRowCounter = 1;
     });
   // Inicializar Select2 cuando el modal se muestra
     $('#modalReserva').on('shown.bs.modal', function () {
-        $('.select2').each(function() {
+        const bancoSelect = $('#banco');
+        if (bancoSelect.length && !bancoSelect.hasClass('select2-hidden-accessible')) {
+            bancoSelect.select2({
+                placeholder: 'Selecciona un banco',
+                allowClear: true,
+                width: '100%',
+                minimumResultsForSearch: 0,
+                dropdownParent: $('#modalReserva')
+            });
+        }
+
+        $('.select2').not('#banco').each(function() {
             if (!$(this).hasClass('select2-hidden-accessible')) {
                 $(this).select2({
                     placeholder: "Seleccione una opción",

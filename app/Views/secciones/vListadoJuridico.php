@@ -39,16 +39,16 @@
                                             <table id="datatableProveedores" class="table" data-toggle="table">
                                                 <thead class="thead-light">
                                                     <tr>
-                                                        <th class="text-center">ID PROVEEDOR</th>
+                                                
                                                         <th class="text-center">TIPO</th>
                                                         <th class="text-center">PROVEEDOR</th>
                                                         <th class="text-center">MONTO TOTAL</th>
                                                         <th class="text-center">NO. CONTRATO/CONVENIO</th>
                                                         <th class="text-center">NO. PROVEEDOR</th>
-                                                        <th class="text-center">RFC</th>
-                                                        <th class="text-center">REPRESENTANTE</th>
                                                         <th class="text-center">FECHA DE REGISTRO</th>
-                                                        <th class="text-center">ACCIONES</th>
+                                                        <th class="text-center">INSTRUMENTO FINAL</th>
+                                                        <th class="text-center">ESTATUS</th>
+                                                        <th class="text-center">MINISTRACION</th>
                                                     </tr>
                                                     <!--end tr-->
                                                 </thead>
@@ -57,23 +57,26 @@
                                                 <tbody>
                                                     <?php foreach($contratosConveion as $p): ?>
                                                         <?php $fechaRegistro = strtotime($p['fec_reg']); ?>
+                                                        <?php $montoTotal = trim(str_replace(['$', ','], '', (string) ($p['monto_total'] ?? ''))); ?>
                                                     <tr>
-                                                        <td class="text-center"><?= (int) $p['id'] ?></td>
+                                             
                                                         <td class="text-center"><?= esc($p['tipo']) ?></td>
                                                         <td class="text-center"><?= esc($p['proveedor_seguimiento']) ?></td>
-                                                        <td class="text-center"><?= esc($p['monto_total']) ?></td>
+                                                        <td class="text-center">
+                                                            <?= is_numeric($montoTotal) ? '$' . number_format((float) $montoTotal, 2, '.', ',') : esc($p['monto_total'] ?? '') ?>
+                                                        </td>
                                                         <td class="text-center"><?= esc($p['no_contrato_convenio']) ?></td>
                                                         <td class="text-center"><?= esc($p['no_proveedor']) ?></td>
-                                                        <td class="text-center"><?= esc($p['proveedor_rfc']) ?></td>
-                                                        <td class="text-center"><?= esc($p['proveedor_representante']) ?></td>
                                                         <td class="text-center"><?= date('d', $fechaRegistro) . ' ' . $mesesCortos[(int) date('n', $fechaRegistro) - 1] . ' ' . date('Y', $fechaRegistro) ?></td>
-                                                        <td class="text-center">
+                                                        <td class="text-center">      
+                                                            
+                                                            <?php if ($p['ok'] != 2): ?>
                                                             <button
                                                                 id="subir-instrumento-<?= (int) $p['id'] ?>-<?= esc($p['tipo'], 'attr') ?>"
                                                                 type="button"
                                                                 class="btn btn-primary btn-sm"
                                                                 onclick="subirArchivo(<?= (int) $p['id'] ?>, '<?= esc($p['tipo'], 'attr') ?>')">
-                                                                <?= empty($p['tiene_instrumento_final']) ? 'Subir instrumento final' : 'Reemplazar instrumento final' ?>
+                                                                <?= empty($p['tiene_instrumento_final']) ? 'Subir' : 'Reemplazar instrumento final' ?>
                                                             </button>
                                                             <button
                                                                 id="revisar-instrumento-<?= (int) $p['id'] ?>-<?= esc($p['tipo'], 'attr') ?>"
@@ -82,6 +85,42 @@
                                                                 class="btn btn-success btn-sm<?= empty($p['tiene_instrumento_final']) ? ' d-none' : '' ?>">
                                                                 Revisar
                                                             </button>
+                                                            <?php endif; ?>
+                                                        </td>
+                                                        <td class="text-center">      
+                                                            <?php if ($p['ok'] == 1): ?>
+                                                                <div class="spinner-grow-sm spinner-grow text-primary" role="status"></div>
+                                                                <span class="badge badge-boxed  badge-soft-primary">Registrado</span>
+                                                            <?php endif; ?>
+                                                            <?php if ($p['ok'] == 2): ?>
+                                                                <div class="spinner-grow-sm spinner-grow text-warning" role="status"></div>
+                                                                <span class="badge badge-boxed  badge-soft-warning">En revisión</span>
+                                                            <?php endif; ?>
+                                                            <?php if ($p['ok'] == 3): ?>
+                                                                <div class="spinner-grow-sm spinner-grow text-success" role="status"></div>
+                                                                <span class="badge badge-boxed  badge-soft-success">Aprobado</span>
+                                                            <?php endif; ?>
+                                                            <?php if ($p['ok'] == 4): ?>
+                                                                <div class="spinner-grow-sm spinner-grow text-danger" role="status"></div>
+                                                                <span class="badge badge-boxed  badge-soft-danger">Rechazado</span>
+                                                            <?php endif; ?>
+                                                        </td>
+                                                        <td class="text-center">  
+                                                            <?php if($p['ok'] == 3): ?>
+                                                              
+                                                            <div class="dropdown">
+                                                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                    Pagos <i class="mdi mdi-chevron-down"></i>
+                                                                </button>
+                                                                <div class="dropdown-menu">
+                                                                    <?php foreach ($p['pagos'] as $pago): ?>
+                                                                        <a href="<?= base_url('/index.php/Principal/generarFormatoPT' . (int) $p['id'], 'url') ?>" class="dropdown-item" title="<?= esc($pago->monto) ?>"><?= esc($pago->numero_pago) ?></span>
+                                                                        <span class="dropdown-item" title="<?= esc($pago->monto) ?>"><?= esc($pago->numero_pago) ?></span>
+                                                                        </a>
+                                                                    <?php endforeach; ?>
+                                                                </div>
+                                                            </div>
+                                                            <?php endif; ?>
                                                         </td>
                                                     </tr>
                                                     <?php endforeach; ?>
@@ -228,7 +267,7 @@
                                     </div>
                                     <div class="form-group mb-lg-0">
                                         <label for="reserva_banco">Banco <span class="text-danger">*</span></label>
-                                        <select class="form-control" id="reserva_banco" name="id_proveedor_banco" required>
+                                        <select class="form-control select2" id="reserva_banco" name="id_proveedor_banco" required>
                                             <option value="">Seleccione una opción</option>
                                         </select>
                                     </div>
@@ -298,8 +337,10 @@
 </div>
 
 <link href="<?= base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+<link href="<?= base_url(); ?>plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
 <script src="<?= base_url(); ?>plugins/datatables/jquery.dataTables.min.js"></script>
 <script src="<?= base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.js"></script>
+<script src="<?= base_url(); ?>plugins/select2/select2.min.js"></script>
 <script>
     function escaparHtml(valor) {
         return String(valor ?? '')

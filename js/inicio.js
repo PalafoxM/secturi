@@ -1671,6 +1671,7 @@ ini.inicio = (function () {
                 const motivo = $('#motivo').val();
                 const observaciones = $('#validar_observaciones').val();
                 const numero_reserva = $('#validar_no_reserva').val();
+                const numero_convenio = $('#validar_no_convenio').val();
 
                 const id_presupuesto_estatus = $('input[name="id_presupuesto_estatus[]"]').map(function () { return $(this).val(); }).get();
                 const id_proyecto_estatus = $('select[name="id_proyecto_estatus[]"]').map(function () { return $(this).val(); }).get();
@@ -1698,7 +1699,8 @@ ini.inicio = (function () {
                         id_presupuesto_estatus: id_presupuesto_estatus,
                         id_proyecto_estatus: id_proyecto_estatus,
                         id_partida_estatus: id_partida_estatus,
-                        fondo: ampliacion
+                        fondo: ampliacion,
+                        numero_convenio: numero_convenio
                     },
                     beforeSend: function () {
                         $('#btnConfirmarReserva').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
