@@ -420,7 +420,10 @@ let fondoRowCounter = 1;
         $('#makeEditable2 tbody').append(newRow);
         
         // Inicializar Select2 en la nueva fila
-        $('#makeEditable2 tbody tr:last .select2').select2();
+        $('#makeEditable2 tbody tr:last select.select2').select2({
+            width: '100%',
+            dropdownParent: $('#modalReserva')
+        });
         
         // Inicializar máscara para el campo de importe (opcional)
         $('#makeEditable2 tbody tr:last input[name="importe[]"]').inputmask('numeric', {
@@ -469,7 +472,7 @@ let fondoRowCounter = 1;
             });
         }
 
-        $('.select2').not('#banco').each(function() {
+        $('#modalReserva select.select2').not('#banco').each(function() {
             if (!$(this).hasClass('select2-hidden-accessible')) {
                 $(this).select2({
                     placeholder: "Seleccione una opción",
