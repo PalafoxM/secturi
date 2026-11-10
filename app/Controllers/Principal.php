@@ -3370,10 +3370,11 @@ class Principal extends BaseController
         foreach ($solicitud_convenio as $convenio) {
             $instrumentoFinalUrl = $this->resolveStoredFilePreviewUrl($convenio->instrumento_juridico_final ?? null);
             $pagos = $globals->getTabla(['tabla' => 'solicitud_convenio_pagos', 'where' => ['id_solicitud_convenio' => $convenio->id_solicitud_convenio, 'visible' => 1]]);
+            $proveedor = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['no_proveedor' => $convenio->proveedor_cedula, 'visible' => 1]])->data;
             $contratosConveion[] = [
                 'id' => $convenio->id_solicitud_convenio,
                 'tipo' => 'convenio',
-                'proveedor_seguimiento' => $convenio->proveedor_seguimiento,
+                'proveedor_seguimiento' => $proveedor[0]->razon_social ?? null,
                 'monto_total' => $convenio->monto_total,
                 'no_contrato_convenio' => $convenio->no_convenio,
                 'no_proveedor' => $convenio->proveedor_cedula,
