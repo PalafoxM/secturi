@@ -1922,15 +1922,15 @@ class Usuario extends BaseController
         $response->error = true;
         $response->respuesta = 'Error! Error al guardar en la base de datos';
         $data = $this->request->getPost();
- var_dump($data);
-       die();
+ //var_dump($data);
+   //    die();
        if(!isset($data['numero_convenio']) && empty($data['numero_convenio'])){
             $response->respuesta = 'Error! El No. Contrato y/o Convenio es obligatorio';
             return $this->respond($response);
        }
        $no_convenio = $principal->getTabla(['tabla' => 'solicitud_contrato', 'where' => ['no_contrato' => $data['numero_convenio'], 'visible' => 1]])->data;
-       var_dump($no_convenio);
-       die();
+       //var_dump($no_convenio);
+      // die();
        if (!empty($no_convenio)) {
             $principal->saveTabla(['ok' => $data['motivo']], ['tabla' => 'solicitud_contrato', 'editar' => true, 'idEditar' => ['no_contrato' => $data['numero_convenio']]], ['id_user' => $session->get('id_usuario'), "script" => "estatus.Reserva"]);
          }else{

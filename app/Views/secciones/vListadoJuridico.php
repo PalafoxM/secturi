@@ -627,7 +627,8 @@
 
                     $('#modalRevisionReserva').modal('hide');
                     Swal.fire('Correcto', response.respuesta, 'success').then(function() {
-                        window.location.href = '<?= base_url("index.php/Principal/listaReservaPT") ?>';
+                      
+                        window.location.reload();
                     });
                 },
                 error: function() {
