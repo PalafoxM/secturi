@@ -1000,7 +1000,14 @@ ini.inicio = (function () {
                         $("#no_proveedor").val(response.data.proveedor.no_proveedor);
                         $("#id_proveedor").val(response.data.proveedor.id_proveedor);
                         let bancoSelect = $("#banco");
-                        const bancos = Array.isArray(response.data.banco) ? response.data.banco : [];
+                        const bancosRespuesta = response.data.banco || [];
+                        const bancos = Array.isArray(bancosRespuesta)
+                            ? bancosRespuesta
+                            : Object.values(bancosRespuesta);
+
+                        if ($.fn.select2 && bancoSelect.hasClass('select2-hidden-accessible')) {
+                            bancoSelect.select2('destroy');
+                        }
 
                         bancoSelect.empty().prop('disabled', false);
                         bancoSelect.append(new Option('Selecciona un banco', '', true, false));
@@ -1020,7 +1027,7 @@ ini.inicio = (function () {
                                 .prop('disabled', true);
                         }
 
-                        if ($.fn.select2 && !bancoSelect.hasClass('select2-hidden-accessible')) {
+                        if ($.fn.select2) {
                             bancoSelect.select2({
                                 placeholder: 'Selecciona un banco',
                                 allowClear: true,
@@ -1030,7 +1037,10 @@ ini.inicio = (function () {
                             });
                         }
 
-                        bancoSelect.val('').trigger('change');
+                        const bancoPredeterminado = bancos.length === 1
+                            ? String(bancos[0].id_proveedor_banco)
+                            : '';
+                        bancoSelect.val(bancoPredeterminado).trigger('change');
 
                     }
                 },
