@@ -114,7 +114,7 @@
                                                                 </button>
                                                                 <div class="dropdown-menu">
                                                                     <?php foreach ($p['pagos'] as $pago): ?>
-                                                                        <a href="<?= base_url('/index.php/Principal/generarFormatoPT' . (int) $p['id'], 'url') ?>" class="dropdown-item" title="<?= esc($pago->monto) ?>"><?= esc($pago->numero_pago) ?></span>
+                                                                        <a target="_blank" href="<?= base_url('/index.php/Principal/generarFormatoPT/' . (int) $p['id']) ?>" >
                                                                         <span class="dropdown-item" title="<?= esc($pago->monto) ?>"><?= esc($pago->numero_pago) ?></span>
                                                                         </a>
                                                                     <?php endforeach; ?>

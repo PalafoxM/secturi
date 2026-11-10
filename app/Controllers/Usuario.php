@@ -1928,14 +1928,23 @@ class Usuario extends BaseController
             $response->respuesta = 'Error! El No. Contrato y/o Convenio es obligatorio';
             return $this->respond($response);
        }
-       $no_convenio = $principal->getTabla(['tabla' => 'solicitud_contrato', 'where' => ['no_contrato' => $data['numero_convenio'], 'visible' => 1]])->data;
-       //var_dump($no_convenio);
-      // die();
-       if (!empty($no_convenio)) {
-            $principal->saveTabla(['ok' => $data['motivo']], ['tabla' => 'solicitud_contrato', 'editar' => true, 'idEditar' => ['no_contrato' => $data['numero_convenio']]], ['id_user' => $session->get('id_usuario'), "script" => "estatus.Reserva"]);
-         }else{
+       $no_convenio = $principal->getTabla(['tabla' => 'solicitud_contrato', 'where' => ['no_contrato' => $data['numero_convenio'], 'visible' => 1]]);
+      
+       if (isset($no_convenio->data) && !empty($no_convenio->data)) {
+            $dataConfig = [
+                "tabla" => "solicitud_contrato",
+                "editar" => true,
+                "idEditar" => ['id_solicitud_contrato' => $no_convenio->data[0]->id_solicitud_contrato]
+            ];
+           $ok = $principal->saveTabla(['ok' => $data['motivo']], $dataConfig, ['id_user' => $session->get('id_usuario'), "script" => "estatus.Reserva"]);
+           }else{
              $no_convenio = $principal->getTabla(['tabla' => 'solicitud_convenio', 'where' => ['no_convenio' => $data['numero_convenio'], 'visible' => 1]])->data;
-            $principal->saveTabla(['ok' => $data['motivo']], ['tabla' => 'solicitud_convenio', 'editar' => true, 'idEditar' => ['no_convenio' => $data['numero_convenio']]], ['id_user' => $session->get('id_usuario'), "script" => "estatus.Reserva"]);
+            $dataConfig = [
+                "tabla" => "solicitud_convenio",
+                "editar" => true,
+                "idEditar" => ['id_solicitud_convenio' => $no_convenio->data[0]->id_solicitud_convenio]
+            ];
+             $ok = $principal->saveTabla(['ok' => $data['motivo']], $dataConfig, ['id_user' => $session->get('id_usuario'), "script" => "estatus.Reserva"]);
          }
 
         $dataConfig = [
