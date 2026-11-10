@@ -3843,7 +3843,7 @@ class Principal extends BaseController
 
         $configuracion = $contexto['configuracion'];
         $resultadoSolicitud = $globals->saveTabla(
-            ['ok' => 2, 'usu_act' => $session->get('id_usuario'), 'fec_act' => $ahora],
+            ['ok' => 4, 'usu_act' => $session->get('id_usuario'), 'fec_act' => $ahora],
             [
                 'tabla' => $configuracion['tabla'],
                 'editar' => true,

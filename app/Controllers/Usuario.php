@@ -1946,8 +1946,7 @@ class Usuario extends BaseController
             ];
              $ok = $principal->saveTabla(['ok' => $data['motivo']], $dataConfig, ['id_user' => $session->get('id_usuario'), "script" => "estatus.Reserva"]);
          }
-        
-
+       
         $dataConfig = [
             "tabla" => "reserva",
             "editar" => true,

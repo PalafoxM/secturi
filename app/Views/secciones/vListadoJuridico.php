@@ -77,7 +77,7 @@
                                                         </td>
                                                         <td class="text-center">      
                                                             
-                                                            <?php if ($p['ok'] != 2): ?>
+                                                            <?php if ($p['ok'] != 4): ?>
                                                             <button
                                                                 id="subir-instrumento-<?= (int) $p['id'] ?>-<?= esc($p['tipo'], 'attr') ?>"
                                                                 type="button"
@@ -99,7 +99,7 @@
                                                                 <div class="spinner-grow-sm spinner-grow text-primary" role="status"></div>
                                                                 <span class="badge badge-boxed  badge-soft-primary">Registrado</span>
                                                             <?php endif; ?>
-                                                            <?php if ($p['ok'] == 2): ?>
+                                                            <?php if ($p['ok'] == 4): ?>
                                                                 <div class="spinner-grow-sm spinner-grow text-warning" role="status"></div>
                                                                 <span class="badge badge-boxed  badge-soft-warning">En revisión</span>
                                                             <?php endif; ?>
@@ -107,7 +107,7 @@
                                                                 <div class="spinner-grow-sm spinner-grow text-success" role="status"></div>
                                                                 <span class="badge badge-boxed  badge-soft-success">Aprobado</span>
                                                             <?php endif; ?>
-                                                            <?php if ($p['ok'] == 4): ?>
+                                                            <?php if ($p['ok'] == 2): ?>
                                                                 <div class="spinner-grow-sm spinner-grow text-danger" role="status"></div>
                                                                 <span class="badge badge-boxed  badge-soft-danger">Rechazado</span>
                                                             <?php endif; ?>
