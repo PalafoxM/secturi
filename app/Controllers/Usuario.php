@@ -1938,7 +1938,7 @@ class Usuario extends BaseController
             ];
            $ok = $principal->saveTabla(['ok' => $data['motivo']], $dataConfig, ['id_user' => $session->get('id_usuario'), "script" => "estatus.Reserva"]);
            }else{
-             $no_convenio = $principal->getTabla(['tabla' => 'solicitud_convenio', 'where' => ['no_convenio' => $data['numero_convenio'], 'visible' => 1]])->data;
+             $no_convenio = $principal->getTabla(['tabla' => 'solicitud_convenio', 'where' => ['no_convenio' => $data['numero_convenio'], 'visible' => 1]]);
             $dataConfig = [
                 "tabla" => "solicitud_convenio",
                 "editar" => true,
@@ -1946,6 +1946,7 @@ class Usuario extends BaseController
             ];
              $ok = $principal->saveTabla(['ok' => $data['motivo']], $dataConfig, ['id_user' => $session->get('id_usuario'), "script" => "estatus.Reserva"]);
          }
+        
 
         $dataConfig = [
             "tabla" => "reserva",

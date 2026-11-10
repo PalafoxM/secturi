@@ -3350,6 +3350,7 @@ class Principal extends BaseController
             $instrumentoFinalUrl = $this->resolveStoredFilePreviewUrl($contrato->instrumento_juridico_final ?? null);
             $pagos = $globals->getTabla(['tabla' => 'solicitud_contrato_pagos', 'where' => ['id_solicitud_contrato' => $contrato->id_solicitud_contrato, 'visible' => 1]]);
             $proveedor = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['no_proveedor' => $contrato->proveedor_cedula, 'visible' => 1]])->data;
+            $reserva = $globals->getTabla(['tabla' => 'reserva', 'where' => ['no_convenio' => $contrato->no_contrato, 'visible' => 1]])->data;
             $contratosConveion[] = [
                 'id' => $contrato->id_solicitud_contrato,
                 'tipo' => 'contrato',
@@ -3362,6 +3363,7 @@ class Principal extends BaseController
                 'fec_reg' => $contrato->fec_reg,
                 'tiene_instrumento_final' => !empty($instrumentoFinalUrl),
                 'instrumento_final_url' => $instrumentoFinalUrl,
+                'reserva' =>(isset($reserva[0]->id_reserva) && !empty($reserva[0]->id_reserva)) ? $reserva[0]->id_reserva : null,
                 'ok' => $contrato->ok,
                'pagos' => $pagos->data,
 
@@ -3371,6 +3373,7 @@ class Principal extends BaseController
             $instrumentoFinalUrl = $this->resolveStoredFilePreviewUrl($convenio->instrumento_juridico_final ?? null);
             $pagos = $globals->getTabla(['tabla' => 'solicitud_convenio_pagos', 'where' => ['id_solicitud_convenio' => $convenio->id_solicitud_convenio, 'visible' => 1]]);
             $proveedor = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['no_proveedor' => $convenio->proveedor_cedula, 'visible' => 1]])->data;
+            $reserva = $globals->getTabla(['tabla' => 'reserva', 'where' => ['no_convenio' => $convenio->no_convenio, 'visible' => 1]])->data;
             $contratosConveion[] = [
                 'id' => $convenio->id_solicitud_convenio,
                 'tipo' => 'convenio',
@@ -3383,6 +3386,7 @@ class Principal extends BaseController
                 'fec_reg' => $convenio->fec_reg,
                 'tiene_instrumento_final' => !empty($instrumentoFinalUrl),
                 'instrumento_final_url' => $instrumentoFinalUrl,
+                'reserva' =>(isset($reserva[0]->id_reserva) && !empty($reserva[0]->id_reserva)) ? $reserva[0]->id_reserva : null,
                 'ok' => $convenio->ok,
                 'pagos' => $pagos->data,
             ];
