@@ -33,7 +33,7 @@
                                      
                                         <div class="card-body">
                                          
-                                            <span>LISTA DE PROVEEDORES</span>
+                                            <span>LISTA DE CONTRATOS Y CONVENIOS</span>
                                        
                                            
                                             <table id="datatableProveedores" class="table" data-toggle="table">
@@ -56,7 +56,7 @@
                                                 <?php $mesesCortos = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']; ?>
                                                 <tbody>
                                                     <?php foreach($contratosConveion as $p): ?>
-                                                        <?php $fechaRegistro = strtotime($p['fec_reg']); ?>
+                                                        <?php $fechaRegistro = !empty($p['fec_reg']) ? strtotime((string) $p['fec_reg']) : false; ?>
                                                         <?php $montoTotal = trim(str_replace(['$', ','], '', (string) ($p['monto_total'] ?? ''))); ?>
                                                     <tr>
                                              
@@ -67,7 +67,11 @@
                                                         </td>
                                                         <td class="text-center"><?= esc($p['no_contrato_convenio']) ?></td>
                                                         <td class="text-center"><?= esc($p['no_proveedor']) ?></td>
-                                                        <td class="text-center"><?= date('d', $fechaRegistro) . ' ' . $mesesCortos[(int) date('n', $fechaRegistro) - 1] . ' ' . date('Y', $fechaRegistro) ?></td>
+                                                        <td class="text-center">
+                                                            <?= $fechaRegistro !== false
+                                                                ? date('d', $fechaRegistro) . ' ' . $mesesCortos[(int) date('n', $fechaRegistro) - 1] . ' ' . date('Y', $fechaRegistro)
+                                                                : 'Sin fecha' ?>
+                                                        </td>
                                                         <td class="text-center">      
                                                             
                                                             <?php if ($p['ok'] != 2): ?>
@@ -114,7 +118,7 @@
                                                                 </button>
                                                                 <div class="dropdown-menu">
                                                                     <?php foreach ($p['pagos'] as $pago): ?>
-                                                                        <a target="_blank" href="<?= base_url('/index.php/Principal/generarFormatoPT/' . (int) $p['reserva']) ?>" >
+                                                                        <a target="_blank" href="<?= base_url('/index.php/Principal/generarFormatoPTJ/' . (int) $p['reserva']). '/' . (isset($pago->id_solicitud_contrato_pagos) && !empty($pago->id_solicitud_contrato_pagos) ? (int) $pago->id_solicitud_contrato_pagos : $pago->id_pago) ?>" >
                                                                         <span class="dropdown-item" title="<?= esc($pago->monto) ?>"><?= esc($pago->numero_pago) ?></span>
                                                                         </a>
                                                                     <?php endforeach; ?>

@@ -3365,7 +3365,7 @@ class Principal extends BaseController
                 'instrumento_final_url' => $instrumentoFinalUrl,
                 'reserva' =>(isset($reserva[0]->id_reserva) && !empty($reserva[0]->id_reserva)) ? $reserva[0]->id_reserva : null,
                 'ok' => $contrato->ok,
-               'pagos' => $pagos->data,
+                'pagos' => (!empty($pagos->data)) ? $pagos->data : [],
 
             ];
         }
@@ -3388,12 +3388,12 @@ class Principal extends BaseController
                 'instrumento_final_url' => $instrumentoFinalUrl,
                 'reserva' =>(isset($reserva[0]->id_reserva) && !empty($reserva[0]->id_reserva)) ? $reserva[0]->id_reserva : null,
                 'ok' => $convenio->ok,
-                'pagos' => $pagos->data,
+                'pagos' => (!empty($pagos->data)) ? $pagos->data : [],
             ];
         }
 
         $data['contratosConveion'] = $contratosConveion;
-        //die( var_dump($data['contratosConveion']) );
+    //die( var_dump($data['contratosConveion']) );
         $data['scripts'] = array('inicio');
         $data['edita'] = 0;
         $data['PT'] = 1;
@@ -11216,6 +11216,169 @@ class Principal extends BaseController
         $data['contentView'] = 'secciones/vFormatoPagoTerceros';
         $this->_renderView($data);
     }
+    public function generarFormatoPTJ($id_reserva = null, $id_pago = null)
+    {
+        $session = \Config\Services::session();
+        $globals = new Mglobal;
+        $data = array();
+        var_dump($id_reserva, $id_pago);
+        die();
+        
+        $data['id_reserva'] = $id_reserva;
+        $data['id_pago'] = $id_pago;
+        $data['editar'] = $edita;
+        $data['es2025'] = ($anio == '2025')?true:false;
+        $data['registro_pt'] = new stdClass();
+        $data['periodo_factura'] = new stdClass();
+        $data['proveedor'] = new stdClass();
+        $data['proveedor_banco'] = []; // Initialized as array to match view expectations
+        $data['proveedor_bancos'] = [];
+
+  
+        $data['no_consecutivo'] = '';
+
+        // Default values to avoid errors in view
+        $data['periodo_factura']->encabezado = '';
+        $data['periodo_factura']->proyecto_clave = ''; 
+        $data['periodo_factura']->partida_clave = '';
+        $data['periodo_factura']->importe = '';
+
+         $data['no_reserva']="";
+         $data['no_convenio']="";
+         if($data['es2025']){
+            $formulario_pt = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["visible" => 1, 'usu_reg' => $session->get('id_usuario')], 'tipo_formato' => 'REFRENDO']);
+         }else{
+            $formulario_pt = $globals->getTabla(["tabla" => "formulario_pt", "where" => ["visible" => 1, 'usu_reg' => $session->get('id_usuario')], 'tipo_formato' => 'PT']);
+         }
+            $no_consecutivo = count($formulario_pt->data) + 1 ;
+            if (strlen($no_consecutivo) == 1) {
+                $no_consecutivo = '00' . $no_consecutivo;
+            }
+            if (strlen($no_consecutivo) == 2) {
+                $no_consecutivo = '0' . $no_consecutivo;
+            }
+            if (strlen($no_consecutivo) >= 3) {
+                $no_consecutivo = $no_consecutivo;
+            }
+          $data['consecutivo'] = $no_consecutivo;
+
+        $proveedores = $globals->getTabla(["tabla" => "proveedor", "where" => ["visible" => 1],'limit' => 10]);
+        $data['proveedores'] = $proveedores->data;
+
+        $cat_area = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'id_pago' => 1]]);
+        $data['cat_area'] = $cat_area->data;
+        if($data['es2025']){
+            $cat_proyecto = $globals->getTabla(["tabla" => "cat_proyecto", "where" => ["servicios" => 1]]);
+        }else{
+            $cat_proyecto = $globals->getTabla(["tabla" => "cat_proyecto", "where" => ["visible" => 1]]);
+        }
+        $data['cat_proyecto'] = $cat_proyecto->data;
+
+        $cat_partida = $globals->getTabla(["tabla" => "cat_partida", "where" => ["visible" => 1]]);
+        $data['cat_partida'] = $cat_partida->data;
+
+        $usuarios = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["visible" => 1]]);
+        $data['usuarios'] = $usuarios->data;
+        $usu = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["visible" => 1, 'id_usuario' => $session->get('id_usuario')]]);
+
+
+        if($usu->data[0]->id_usuario){
+            $tieneArea = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'titular' => $usu->data[0]->id_usuario]]);
+            if(isset($tieneArea->data) && !empty($tieneArea->data)){
+                $data['id_area'] = $tieneArea->data[0]->id_area;
+            }else{
+                $tieneArea = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'titular' => $usu->data[0]->id_jefe_inmediato]]);
+                if(isset($tieneArea->data) && !empty($tieneArea->data)){
+                    $data['id_area'] = $tieneArea->data[0]->id_area;
+                }else{
+                        $data['id_area'] = $cat_area->data[0]->id_area;
+                }
+            }
+        }
+
+        if($id_reserva){
+
+            $registro_pt = $globals->getTabla(["tabla" => "reserva", "where" => ["id_reserva" => $id_reserva, "visible" => 1]]);
+            $data['no_reserva'] = (!empty($anio) && $anio == '2025')?'':$registro_pt->data[0]->no_reserva;
+            $data['no_convenio'] =  (!empty($anio) && $anio == '2025')?'':$registro_pt->data[0]->no_convenio;
+            $data['id_proveedor'] = $registro_pt->data[0]->id_proveedor;
+            $data['id_proveedor_banco'] = $registro_pt->data[0]->id_proveedor_banco;
+            // Fetch Provider Data (Handle ID or Name)
+            $provIdOrName = $data['id_proveedor'];
+            if(!empty($provIdOrName)){
+                $whereProv = [];
+                if(is_numeric($provIdOrName)){
+                    $whereProv = ["id_proveedor" => $provIdOrName];
+                } else {
+                    $whereProv = ["razon_social" => $provIdOrName];
+                }
+
+                 $prov = $globals->getTabla(["tabla" => "proveedor", "where" => $whereProv]);
+                 if(!empty($prov->data)){
+                      $data['proveedor'] = $prov->data[0];
+                      $realIdProveedor = $data['proveedor']->id_proveedor;
+
+                      // Ensure in dropdown list
+                      $inList = false;
+                      if (!empty($data['proveedores'])) {
+                           foreach ($data['proveedores'] as $pList) {
+                               if ($pList->id_proveedor == $realIdProveedor) {
+                                   $inList = true;
+                                   break;
+                               }
+                           }
+                      }
+                      if (!$inList) {
+                          $data['proveedores'][] = $data['proveedor'];
+                      }
+                 }
+            }
+
+            // Load every active bank account for the selected provider.
+            if(isset($realIdProveedor)) {
+                 $bancosProveedor = $globals->getTabla([
+                     "tabla" => "proveedor_banco",
+                     "where" => ["idproveedor" => $realIdProveedor, "visible" => 1]
+                 ]);
+                 $data['proveedor_bancos'] = $bancosProveedor->data ?? [];
+            }
+            
+            // Fetch Bank Data (Linked or Default)
+            if(!empty($data['id_proveedor_banco'])){
+                 foreach ($data['proveedor_bancos'] as $bancoProveedor) {
+                     if ((string) $bancoProveedor->id_proveedor_banco === (string) $data['id_proveedor_banco']) {
+                         $data['proveedor_banco'] = $bancoProveedor;
+                         break;
+                     }
+                 }
+
+                 // Keep compatibility with reservations linked to an inactive bank account.
+                 if(empty($data['proveedor_banco'])) {
+                     $banco = $globals->getTabla(["tabla" => "proveedor_banco", "where" => ["id_proveedor_banco" => $data['id_proveedor_banco']]]);
+                     if(!empty($banco->data)) $data['proveedor_banco'] = $banco->data[0];
+                 }
+            } elseif(isset($realIdProveedor)) {
+                 // Fallback to default bank
+                 foreach ($data['proveedor_bancos'] as $bancoProveedor) {
+                     if (!empty($bancoProveedor->fic)) {
+                         $data['proveedor_banco'] = $bancoProveedor;
+                         break;
+                     }
+                 }
+
+                 if(empty($data['proveedor_banco']) && !empty($data['proveedor_bancos'])) {
+                     $data['proveedor_banco'] = $data['proveedor_bancos'][0];
+                 }
+            }
+
+
+
+        }
+        
+        $data['scripts'] = array('principal');
+        $data['contentView'] = 'secciones/vFormatoPagoTerceros';
+        $this->_renderView($data);
+    }
     public function Igto()
     {
         $globals = new Mglobal;
@@ -11760,22 +11923,24 @@ class Principal extends BaseController
         if (!empty($id_proveedor)) {
             $proveedor = $globals->getTabla(['tabla' => 'proveedor', 'where' => ['visible' => 1, 'id_proveedor' => $id_proveedor]]);
             $banco = $globals->getTabla(['tabla' => 'proveedor_banco', 'where' => ['idproveedor' => $id_proveedor, 'visible' => 1]]);
-           // var_dump($banco);
-            //die();
-            if (isset($banco->data[0]) && !empty($banco->data[0])) {
-                if ($session->get('id_perfil') != 1) {
-                    if (empty($banco->data[0]->no_cuenta) || empty($banco->data[0]->clabe)) {
-                        $response->error = true;
-                        $response->respuesta = 'El proveedor no tiene No. de cuenta y/o clabe, favor de solIcitar un Tiket a la área TI';
-                        return $this->respond($response);
-                    }
-                }
+            $bancosProveedor = !empty($banco->data) ? $banco->data : [];
 
+            if ($session->get('id_perfil') != 1 && !empty($bancosProveedor)) {
+                $bancosProveedor = array_values(array_filter($bancosProveedor, static function ($cuenta) {
+                    return !empty(trim((string) ($cuenta->no_cuenta ?? '')))
+                        && !empty(trim((string) ($cuenta->clabe ?? '')));
+                }));
+
+                if (empty($bancosProveedor)) {
+                    $response->respuesta = 'El proveedor no tiene una cuenta bancaria completa. Solicita mediante ticket al área de TI que registren el número de cuenta y la CLABE.';
+                    return $this->respond($response);
+                }
             }
+
             $response->error = $proveedor->error;
             $response->respuesta = $proveedor->respuesta;
             $response->data['proveedor'] = (isset($proveedor->data[0]) && !empty($proveedor->data[0])) ? $proveedor->data[0] : [];
-            $response->data['banco'] = (isset($banco->data[0]) && !empty($banco->data[0])) ? $banco->data : [];
+            $response->data['banco'] = $bancosProveedor;
 
 
         }

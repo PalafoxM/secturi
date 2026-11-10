@@ -1000,14 +1000,41 @@ ini.inicio = (function () {
                         $("#no_proveedor").val(response.data.proveedor.no_proveedor);
                         $("#id_proveedor").val(response.data.proveedor.id_proveedor);
                         let bancoSelect = $("#banco");
-                        bancoSelect.empty(); // Limpia opciones anteriores
-                        bancoSelect.append('<option value="">Selecciona un banco</option>');
-                        response.data.banco.forEach(function (item) {
-                            console.log(item);
-                            bancoSelect.append(
-                                `<option value="${item.id_proveedor_banco}">${item.banco + '-' + item.no_cuenta}</option>`
-                            );
+                        const bancos = Array.isArray(response.data.banco) ? response.data.banco : [];
+
+                        if ($.fn.select2 && bancoSelect.hasClass('select2-hidden-accessible')) {
+                            bancoSelect.select2('destroy');
+                        }
+
+                        bancoSelect.empty().prop('disabled', false);
+                        bancoSelect.append(new Option('Selecciona un banco', '', true, false));
+
+                        bancos.forEach(function (item) {
+                            const datosBanco = [item.banco, item.no_cuenta, item.clabe]
+                                .filter(function (valor) { return valor !== null && valor !== undefined && String(valor).trim() !== ''; })
+                                .join(' · ');
+
+                            bancoSelect.append(new Option(datosBanco, item.id_proveedor_banco, false, false));
                         });
+
+                        if (!bancos.length) {
+                            bancoSelect
+                                .empty()
+                                .append(new Option('El proveedor no tiene bancos registrados', '', true, true))
+                                .prop('disabled', true);
+                        }
+
+                        if ($.fn.select2) {
+                            bancoSelect.select2({
+                                placeholder: 'Selecciona un banco',
+                                allowClear: true,
+                                width: '100%',
+                                minimumResultsForSearch: 0,
+                                dropdownParent: $('#modalReserva')
+                            });
+                        }
+
+                        bancoSelect.val('').trigger('change');
 
                     }
                 },
