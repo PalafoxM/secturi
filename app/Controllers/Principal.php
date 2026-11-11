@@ -3334,12 +3334,19 @@ class Principal extends BaseController
 
         $session = \Config\Services::session();
         $globals = new Mglobal;
+        
         if ($session->get('id_perfil') == 1) {
              $solicitud_contrato = $globals->getTabla(['tabla' => 'solicitud_contrato', 'where' => ['visible' => 1]]);
              $solicitud_convenio = $globals->getTabla(['tabla' => 'solicitud_convenio', 'where' => ['visible' => 1]]);
         }else{
-             $solicitud_contrato = $globals->getTabla(['tabla' => 'solicitud_contrato', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]]);
-             $solicitud_convenio = $globals->getTabla(['tabla' => 'solicitud_convenio', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]]);
+             $promo = in_array($session->get('id_usuario'), $this->usuariosRevisionInternaReservaPT) ;
+             if($promo){
+                    $solicitud_contrato = $globals->getTabla(['tabla' => 'solicitud_contrato', 'where' => ['visible' => 1, 'promo' => 1]]);
+                    $solicitud_convenio = $globals->getTabla(['tabla' => 'solicitud_convenio', 'where' => ['visible' => 1, 'promo' => 1]]);
+                }else{
+                    $solicitud_contrato = $globals->getTabla(['tabla' => 'solicitud_contrato', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]]);
+                    $solicitud_convenio = $globals->getTabla(['tabla' => 'solicitud_convenio', 'where' => ['visible' => 1, 'usu_reg' => $session->get('id_usuario')]]);
+                } 
         }
        
         $contratosConveion = [];
