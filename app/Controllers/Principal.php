@@ -6657,6 +6657,7 @@ class Principal extends BaseController
         $proveedorSeguimiento = trim((string) ($post['proveedor_seguimiento'] ?? ''));
 
         // Datos principales
+        $promo = in_array($session->get('id_usuario'), $this->usuariosRevisionInternaReservaPT) ? 1 : 0;
         $dataInsert = [
             'responsable_proyecto' => $post['responsable_proyecto'],
             'responsable_seguimiento' => $post['responsable_seguimiento'],
@@ -6687,6 +6688,7 @@ class Principal extends BaseController
             'no_delegatorio_1' => null,
             'no_delegatorio_2' => null,
             'no_delegatorio_3' => null,
+            'promo' => $promo,
            // 'correo_responsable' => $post['correo_responsable'],
         ];
 
