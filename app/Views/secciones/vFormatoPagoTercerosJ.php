@@ -197,6 +197,11 @@
             <div class="container-fluid" style="background: white; padding: 20px;">
                 
                 <form id="formPagoTerceros" enctype="multipart/form-data">
+                    <input type="hidden" name="id_reserva" value="<?= (int) ($id_reserva ?? 0) ?>">
+                    <input type="hidden" name="editar" value="0">
+                    <input type="hidden" name="es2025" value="0">
+                    <input type="hidden" name="tipo_formato" value="PT">
+                    <input type="hidden" name="nombre_proveedor_1" value="<?= (int) ($reserva->id_proveedor ?? 0) ?>">
 
                     <!-- HEADER -->
                     <div class="row mb-4">
@@ -228,7 +233,7 @@
                                     <input type="text" name="division" class="form-control-plaintext" value="21">
                                 </td>
                                 <td>
-                                    <input type="date" name="fecha_tramite" class="form-control-plaintext" value="<?= isset($reserva->fec_reg) ? date('Y-m-d', strtotime($reserva->fec_reg)) : date('d-m-Y') ?>">
+                                    <input type="date" name="fecha_tramite" class="form-control-plaintext" value="<?= isset($reserva->fec_reg) ? date('Y-m-d', strtotime($reserva->fec_reg)) : date('Y-m-d') ?>">
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center justify-content-center">
@@ -286,7 +291,7 @@
 
                                 <!-- IMPORTE -->
                                 <td style="vertical-align: top;">
-                                    <input type="text" name="importe[]" class="form-control-plaintext input-importe" value="<?= isset($row->importe) ? number_format($row->importe, 2, '.', ',') : '' ?>" placeholder="$0.00">
+                                    <input type="text" name="importe[]" class="form-control-plaintext input-importe" value="<?= isset($monto) ? $monto : '' ?>" placeholder="$0.00">
                                     
                                     <!-- File Inputs -->
                                     <div class="mt-2 text-center">
@@ -430,7 +435,7 @@
                                      <!-- Espacio vacío alineado a la derecha del importe superior -->
                                 </td>
                                 <td width="30%" class="text-center" style="border-top: 1px solid #000;">
-                                    <input type="text" name="importe_total_num" class="form-control-plaintext input-importe font-weight-bold" value="$<?= isset($monto) ? $monto : '' ?>" placeholder="$0.00" readonly>
+                                    <input type="text" name="importe_total_num" class="form-control-plaintext input-importe font-weight-bold" value="<?= isset($monto) ? $monto : '' ?>" placeholder="$0.00" readonly>
                                 </td>
                             </tr>
                              <tr>
@@ -463,27 +468,29 @@
                                     <select name="nombre_autoriza" id="nombre_autoriza">
                                         <option value="">Seleccione una opción</option>
                                         <?php foreach ($usuarios as $user): ?>
-                                            <option value="<?= $user->nombre_completo ?>" > 
-                                                <?= $user->nombre_completo ?>
+                                            <option value="<?= esc($user->nombre_completo, 'attr') ?>"
+                                                data-cargo="<?= esc($user->dsc_puesto ?? '', 'attr') ?>">
+                                                <?= esc($user->nombre_completo) ?>
                                             </option>
                                         <?php endforeach; ?>
                                       
                                     </select>
                                    
-                                    <input type="text" name="cargo_autoriza" class="form-control-plaintext small" value="<?= isset($registro_pt->cargo_autoriza) ? $registro_pt->cargo_autoriza : '' ?>">
+                                    <input type="text" name="cargo_autoriza" class="form-control-plaintext small" value="<?= isset($registro_pt->cargo_autoriza) ? $registro_pt->cargo_autoriza : '' ?>" readonly placeholder="Cargo de la persona seleccionada">
                                     
                                 </td>
                                 <td class="align-bottom pb-3">
                                     <select name="nombre_responsable_1" id="nombre_responsable_1">
                                           <option value="">Seleccione una opción</option>
                                         <?php foreach ($usuarios as $user): ?>
-                                            <option value="<?= $user->nombre_completo ?>" > 
-                                                <?= $user->nombre_completo ?>
+                                            <option value="<?= esc($user->nombre_completo, 'attr') ?>"
+                                                data-cargo="<?= esc($user->dsc_puesto ?? '', 'attr') ?>">
+                                                <?= esc($user->nombre_completo) ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
 
-                                    <input type="text" name="cargo_responsable_1" class="form-control-plaintext small" value="<?= isset($registro_pt->cargo_responsable) ? $registro_pt->cargo_responsable : '' ?>">
+                                    <input type="text" name="cargo_responsable_1" class="form-control-plaintext small" value="<?= isset($registro_pt->cargo_responsable) ? $registro_pt->cargo_responsable : '' ?>" readonly placeholder="Cargo de la persona seleccionada">
                                 </td>
                             </tr>
                              <tr>
@@ -496,13 +503,14 @@
                                      <select name="nombre_responsable_2" id="nombre_responsable_2">
                                         <option value="">Seleccione una opción</option>
                                          <?php foreach ($usuarios as $user): ?>
-                                            <option value="<?= $user->nombre_completo ?>" > 
-                                                <?= $user->nombre_completo ?>
+                                            <option value="<?= esc($user->nombre_completo, 'attr') ?>"
+                                                data-cargo="<?= esc($user->dsc_puesto ?? '', 'attr') ?>">
+                                                <?= esc($user->nombre_completo) ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
                                   
-                                    <input type="text" name="cargo_responsable_2" class="form-control-plaintext small" value="<?= isset($registro_pt->cargo_responsable_2) ? $registro_pt->cargo_responsable_2 : '' ?>">
+                                    <input type="text" name="cargo_responsable_2" class="form-control-plaintext small" value="<?= isset($registro_pt->cargo_responsable_2) ? $registro_pt->cargo_responsable_2 : '' ?>" readonly placeholder="Cargo de la persona seleccionada">
                                 </td>
                             </tr>
                         </tbody>
@@ -560,11 +568,303 @@
     $(function() {
         $('#folio').select2({
             placeholder: 'Selecciona una opción',
-            width: 'resolve'
+            width: '140px'
         });
         $('#nombre_autoriza, #nombre_responsable_1, #nombre_responsable_2').select2({
             placeholder: 'Selecciona una opción',
-            width: 'resolve'
+            width: '100%'
+        });
+
+        function actualizarCargo(selectId, inputName) {
+            var cargo = $(selectId).find('option:selected').attr('data-cargo') || '';
+            $('input[name="' + inputName + '"]').val(cargo);
+        }
+
+        $('#nombre_autoriza').on('change', function() {
+            actualizarCargo('#nombre_autoriza', 'cargo_autoriza');
+        });
+        $('#nombre_responsable_1').on('change', function() {
+            actualizarCargo('#nombre_responsable_1', 'cargo_responsable_1');
+        });
+        $('#nombre_responsable_2').on('change', function() {
+            actualizarCargo('#nombre_responsable_2', 'cargo_responsable_2');
+        });
+
+        function actualizarFolio() {
+            var prefijo = $.trim($('#folio option:selected').text());
+            var consecutivo = $.trim($('input[name="no_consecutivo"]').val());
+            var folioCompleto = '';
+
+            if (prefijo && consecutivo) {
+                var separador = prefijo.slice(-1) === '/' ? '' : '/';
+                folioCompleto = 'PT ' + prefijo + separador + consecutivo + '/2026';
+            }
+
+            $('#folioCompleto').val(folioCompleto);
+            $('#folio_error').text(folioCompleto);
+        }
+
+        $('#folio').on('change', actualizarFolio);
+        $('input[name="no_consecutivo"]').on('input change', actualizarFolio);
+        actualizarFolio();
+
+        $('#formPagoTerceros').on('input change', '.is-invalid', function() {
+            $(this).removeClass('is-invalid');
+        });
+
+        $(document).on('change', '.input-xml', function(event) {
+            var input = this;
+            var archivo = event.target.files && event.target.files[0];
+
+            if (!archivo) {
+                return;
+            }
+
+            var lector = new FileReader();
+            lector.onload = function(resultado) {
+                try {
+                    var documento = new DOMParser().parseFromString(resultado.target.result, 'text/xml');
+                    if (documento.getElementsByTagName('parsererror').length) {
+                        throw new Error('El archivo no contiene un XML válido.');
+                    }
+
+                    var elementos = Array.prototype.slice.call(documento.getElementsByTagName('*'));
+                    var comprobante = elementos.find(function(elemento) {
+                        return elemento.localName === 'Comprobante';
+                    });
+
+                    if (!comprobante) {
+                        throw new Error('No se encontró el nodo Comprobante del CFDI.');
+                    }
+
+                    var numeroComprobante = comprobante.getAttribute('Folio') || comprobante.getAttribute('folio');
+                    if (!numeroComprobante) {
+                        var timbre = elementos.find(function(elemento) {
+                            return elemento.localName === 'TimbreFiscalDigital';
+                        });
+                        numeroComprobante = timbre
+                            ? (timbre.getAttribute('UUID') || timbre.getAttribute('Uuid') || '')
+                            : '';
+                    }
+
+                    if (!numeroComprobante) {
+                        throw new Error('El XML no contiene Folio ni UUID para identificar el comprobante.');
+                    }
+
+                    $(input).closest('tr').find('input[name="no_comprobante[]"]').val(numeroComprobante);
+                } catch (error) {
+                    input.value = '';
+                    updateFileName(input);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'XML no válido',
+                        text: error.message || 'No fue posible leer el comprobante.'
+                    });
+                }
+            };
+            lector.onerror = function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'No fue posible leer el XML',
+                    text: 'Seleccione nuevamente el archivo.'
+                });
+            };
+            lector.readAsText(archivo);
+        });
+
+        $('#btnGuardarPT').on('click', function() {
+            actualizarFolio();
+
+            var camposRequeridos = [
+                { selector: 'input[name="no_consecutivo"]', etiqueta: 'No. consecutivo' },
+                { selector: '#nombre_autoriza', etiqueta: 'Nombre de quien autoriza' },
+                { selector: '#nombre_responsable_1', etiqueta: 'Primer responsable del proyecto' },
+                { selector: '#nombre_responsable_2', etiqueta: 'Segundo responsable del proyecto' }
+            ];
+            var faltantes = [];
+
+            camposRequeridos.forEach(function(campo) {
+                var $campo = $(campo.selector);
+                if (!$.trim($campo.val() || '')) {
+                    faltantes.push(campo.etiqueta);
+                    $campo.addClass('is-invalid');
+                } else {
+                    $campo.removeClass('is-invalid');
+                }
+            });
+
+            if (!$('#folioCompleto').val()) {
+                faltantes.push('Folio');
+            }
+
+            if (faltantes.length) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Faltan datos requeridos',
+                    text: 'Complete: ' + faltantes.join(', ') + '.'
+                });
+                return;
+            }
+
+            var $boton = $('#btnGuardarPT');
+            var textoOriginal = $boton.html();
+            $boton.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Guardando...');
+
+            $.ajax({
+                url: '<?= base_url() ?>index.php/Agregar/guardaFormatoPT',
+                type: 'POST',
+                data: new FormData(document.getElementById('formPagoTerceros')),
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function(respuesta) {
+                    if (respuesta.error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'No fue posible guardar',
+                            text: respuesta.respuesta || 'Revise la información del formulario.'
+                        });
+                        $boton.prop('disabled', false).html(textoOriginal);
+                        return;
+                    }
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Formulario guardado',
+                        text: respuesta.respuesta || 'La información se guardó correctamente.',
+                        confirmButtonText: 'Aceptar'
+                    }).then(function() {
+                        window.location.href = '<?= base_url() ?>index.php/Inicio/ListaHojaAzul';
+                    });
+                },
+                error: function(xhr) {
+                    var mensaje = 'Ocurrió un error inesperado al guardar.';
+                    if (xhr.responseJSON && xhr.responseJSON.respuesta) {
+                        mensaje = xhr.responseJSON.respuesta;
+                    }
+                    Swal.fire({ icon: 'error', title: 'Error', text: mensaje });
+                    $boton.prop('disabled', false).html(textoOriginal);
+                }
+            });
         });
     });
+
+    function updateFileName(input) {
+        var nombre = input.files && input.files[0] ? input.files[0].name : '';
+        var extensionEsperada = $(input).hasClass('input-xml') ? 'xml' : 'pdf';
+        var extension = nombre.indexOf('.') !== -1 ? nombre.split('.').pop().toLowerCase() : '';
+
+        if (nombre && extension !== extensionEsperada) {
+            input.value = '';
+            nombre = '';
+            Swal.fire({
+                icon: 'warning',
+                title: 'Archivo no permitido',
+                text: 'Seleccione un archivo ' + extensionEsperada.toUpperCase() + '.'
+            });
+        }
+
+        $('#name_' + input.id).text(nombre).attr('title', nombre);
+        var $boton = $('label[for="' + input.id + '"]');
+        $boton.toggleClass('btn-loaded', nombre !== '');
+    }
+
+    function actualizarBotonCaptura($boton, valor, tituloPredeterminado) {
+        var tieneValor = $.trim(valor || '') !== '';
+        $boton.toggleClass('btn-loaded', tieneValor);
+        $boton.toggleClass('btn-secondary', !tieneValor);
+        $boton.attr('title', tieneValor ? valor : tituloPredeterminado);
+    }
+
+    function editComision(boton) {
+        var $boton = $(boton);
+        var $campo = $boton.closest('.commission-container').find('input[name="comision[]"]');
+
+        Swal.fire({
+            title: 'Comisión / Evento',
+            input: 'text',
+            inputValue: $campo.val(),
+            inputPlaceholder: 'Escriba el lugar o nombre de la comisión',
+            showCancelButton: true,
+            confirmButtonText: 'Guardar',
+            cancelButtonText: 'Cancelar',
+            inputAttributes: { maxlength: 500 }
+        }).then(function(resultado) {
+            if (resultado.isConfirmed) {
+                var valor = $.trim(resultado.value || '');
+                $campo.val(valor);
+                actualizarBotonCaptura($boton, valor, 'Comisión / Evento');
+            }
+        });
+    }
+
+    function editConcepto(boton) {
+        var $boton = $(boton);
+        var $campo = $boton.closest('.commission-container').find('input[name="concepto_gasto[]"]');
+
+        Swal.fire({
+            title: 'Concepto del gasto',
+            input: 'textarea',
+            inputValue: $campo.val(),
+            inputPlaceholder: 'Describa el concepto del gasto',
+            showCancelButton: true,
+            confirmButtonText: 'Guardar',
+            cancelButtonText: 'Cancelar',
+            inputAttributes: { maxlength: 1000, rows: 5 }
+        }).then(function(resultado) {
+            if (resultado.isConfirmed) {
+                var valor = $.trim(resultado.value || '');
+                $campo.val(valor);
+                actualizarBotonCaptura($boton, valor, 'Concepto del gasto');
+            }
+        });
+    }
+
+    function editFechas(boton) {
+        var $boton = $(boton);
+        var $campo = $boton.closest('.commission-container').find('input[name="fechas[]"]');
+        var fechasActuales = ($campo.val() || '').split(' / ');
+        var fechaInicio = fechasActuales[0] || '';
+        var fechaFin = fechasActuales[1] || '';
+
+        Swal.fire({
+            title: 'Periodo del gasto',
+            html:
+                '<div class="row text-left">' +
+                    '<div class="col-md-6">' +
+                        '<label for="swal-fecha-inicio">Fecha inicial</label>' +
+                        '<input type="date" id="swal-fecha-inicio" class="form-control" value="' + fechaInicio + '">' +
+                    '</div>' +
+                    '<div class="col-md-6">' +
+                        '<label for="swal-fecha-fin">Fecha final</label>' +
+                        '<input type="date" id="swal-fecha-fin" class="form-control" value="' + fechaFin + '">' +
+                    '</div>' +
+                '</div>',
+            showCancelButton: true,
+            confirmButtonText: 'Guardar',
+            cancelButtonText: 'Cancelar',
+            focusConfirm: false,
+            preConfirm: function() {
+                var inicio = document.getElementById('swal-fecha-inicio').value;
+                var fin = document.getElementById('swal-fecha-fin').value;
+
+                if (!inicio || !fin) {
+                    Swal.showValidationMessage('Seleccione la fecha inicial y la fecha final.');
+                    return false;
+                }
+                if (fin < inicio) {
+                    Swal.showValidationMessage('La fecha final no puede ser anterior a la fecha inicial.');
+                    return false;
+                }
+
+                return { inicio: inicio, fin: fin };
+            }
+        }).then(function(resultado) {
+            if (resultado.isConfirmed) {
+                var valor = resultado.value.inicio + ' / ' + resultado.value.fin;
+                $campo.val(valor);
+                actualizarBotonCaptura($boton, valor, 'Fechas');
+            }
+        });
+    }
 </script>

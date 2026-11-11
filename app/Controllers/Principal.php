@@ -11403,6 +11403,8 @@ class Principal extends BaseController
         $area = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1, 'id_area' => $Usuario->data[0]->id_area]]);
        
         $data = array();
+        $data['id_reserva'] = (int) $id_reserva;
+        $data['id_pago'] = (int) $id_pago;
         $data['usuarios'] = $globals->getTabla(["tabla" => "vw_usuario", "where" => ["visible" => 1]])->data;
         if(isset($area->data) && !empty($area->data)){
             $data['cat_area'] = $globals->getTabla(["tabla" => "cat_area", "where" => ["visible" => 1]])->data;
