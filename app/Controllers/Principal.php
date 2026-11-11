@@ -36,7 +36,7 @@ class Principal extends BaseController
         'contentView' => 'vUndefined',
         'stylecss' => '',
     );
-    private array $usuariosRevisionInternaReservaPT = [17, 14, 59, 38, 11, 34, 88];
+    private array $usuariosRevisionInternaReservaPT = [17, 14, 59, 38, 11, 34, 88, 174];
 
     public function __construct()
     {
@@ -13594,7 +13594,7 @@ class Principal extends BaseController
                 }
              }
         }
-        $promo = (in_array((int) $session->id_usuario, [17, 11, 14, 59, 38, 34], true)) ? 1 : 0;
+        $promo = (in_array((int) $session->id_usuario, [17, 11, 14, 59, 38, 34, 174], true)) ? 1 : 0;
         $dataInsert = [
             'responsable_proyecto' => $post['responsable_proyecto'],
             'responsable_enlace' => $post['responsable_enlace'],
