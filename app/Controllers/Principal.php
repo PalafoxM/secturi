@@ -13594,7 +13594,7 @@ class Principal extends BaseController
                 }
              }
         }
-
+        $promo = (in_array((int) $session->id_usuario, [17, 11, 14, 59, 38, 34], true)) ? 1 : 0;
         $dataInsert = [
             'responsable_proyecto' => $post['responsable_proyecto'],
             'responsable_enlace' => $post['responsable_enlace'],
@@ -13619,6 +13619,7 @@ class Principal extends BaseController
             'no_delegatorio_1' => null,
             'no_delegatorio_2' => null,
             'no_delegatorio_3' => null,
+            'promo' => $promo,
         ];
 
         $delegatorios = isset($post['no_delegatorio']) && is_array($post['no_delegatorio']) ? $post['no_delegatorio'] : [];
