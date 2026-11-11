@@ -187,10 +187,15 @@
                                                                                 id="tipo_instrumento_contrato" value="contrato">
                                                                             <label class="custom-control-label" for="tipo_instrumento_contrato">Contrato</label>
                                                                         </div>
-                                                                        <div class="custom-control custom-checkbox">
+                                                                        <div class="custom-control custom-checkbox mr-4">
                                                                             <input type="checkbox" class="custom-control-input tipo-instrumento-check"
                                                                                 id="tipo_instrumento_convenio" value="convenio">
                                                                             <label class="custom-control-label" for="tipo_instrumento_convenio">Convenio</label>
+                                                                        </div>
+                                                                        <div class="custom-control custom-checkbox">
+                                                                            <input type="checkbox" class="custom-control-input"
+                                                                                id="instrumento_manual_check">
+                                                                            <label class="custom-control-label" for="instrumento_manual_check">N/A</label>
                                                                         </div>
                                                                     </div>
                                                                     <select class="form-control select2" id="no_convenio" name="no_convenio" disabled>
@@ -210,6 +215,12 @@
                                                                             </option>
                                                                         <?php endforeach; ?>
                                                                     </select>
+                                                                    <div id="instrumento_manual_container" class="mt-2 d-none">
+                                                                        <input type="text" class="form-control" id="no_convenio_manual"
+                                                                            maxlength="100" autocomplete="off"
+                                                                            placeholder="Capture el número de contrato o convenio">
+                                                                        <small class="form-text text-muted">Escriba el número exactamente como aparece en el instrumento jurídico.</small>
+                                                                    </div>
                                                                 </div>
                                                                 <?php endif; ?> 
                                                                  <div class="form-group" id="id_comentarios_instrumento">
@@ -518,6 +529,10 @@ let fondoRowCounter = 1;
 
     $(document).on('change', '.tipo-instrumento-check', function() {
         if ($(this).is(':checked')) {
+            $('#instrumento_manual_check').prop('checked', false);
+            $('#instrumento_manual_container').addClass('d-none');
+            $('#no_convenio_manual').val('');
+            $('.tipo-instrumento-check').prop('disabled', false);
             $('.tipo-instrumento-check').not(this).prop('checked', false);
             filtrarInstrumentos($(this).val());
         } else {
@@ -525,8 +540,29 @@ let fondoRowCounter = 1;
         }
     });
 
+    $(document).on('change', '#instrumento_manual_check', function() {
+        const capturaManual = $(this).is(':checked');
+
+        if (capturaManual) {
+            $('.tipo-instrumento-check').prop('checked', false).prop('disabled', true);
+            filtrarInstrumentos('');
+            $('#no_convenio').prop('disabled', true);
+            $('#instrumento_manual_container').removeClass('d-none');
+            $('#no_convenio_manual').val('').focus();
+        } else {
+            $('.tipo-instrumento-check').prop('disabled', false);
+            $('#instrumento_manual_container').addClass('d-none');
+            $('#no_convenio_manual').val('');
+            filtrarInstrumentos('');
+        }
+    });
+
     $('#modalReserva').on('hidden.bs.modal', function () {
         $('.tipo-instrumento-check').prop('checked', false);
+        $('.tipo-instrumento-check').prop('disabled', false);
+        $('#instrumento_manual_check').prop('checked', false);
+        $('#instrumento_manual_container').addClass('d-none');
+        $('#no_convenio_manual').val('');
         filtrarInstrumentos('');
     });
 

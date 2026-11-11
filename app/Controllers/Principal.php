@@ -1979,6 +1979,10 @@ class Principal extends BaseController
         $file = $this->request->getFile('instrumento');
         $revisionInterna = $this->esUsuarioRevisionInternaReservaPT($session->get('id_usuario'));
         $noConvenio = trim((string) ($data['no_convenio'] ?? ''));
+        $capturaManualInstrumento = filter_var(
+            $data['captura_manual_instrumento'] ?? false,
+            FILTER_VALIDATE_BOOLEAN
+        );
 
         if (!$revisionInterna && isset($data['no_convenio']) && empty($data['no_convenio'])) {
             $response->error = true;
@@ -1986,7 +1990,12 @@ class Principal extends BaseController
             return $this->respond($response);
         }
 
-        if ($noConvenio !== '') {
+        if ($capturaManualInstrumento && mb_strlen($noConvenio) > 100) {
+            $response->respuesta = 'El número de contrato o convenio no puede exceder 100 caracteres.';
+            return $this->respond($response);
+        }
+
+        if ($noConvenio !== '' && !$capturaManualInstrumento) {
             $tipoInstrumento = trim((string) ($data['tipo_instrumento'] ?? ''));
             $configInstrumento = [
                 'contrato' => ['tabla' => 'solicitud_contrato', 'campo' => 'no_contrato'],

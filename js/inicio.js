@@ -1098,14 +1098,22 @@ ini.inicio = (function () {
             }
 
             if (!$('#customSwitch1').is(':checked')) {
-                if ($('.tipo-instrumento-check:checked').length !== 1) {
-                    Swal.fire("Atención", "Debe seleccionar si el instrumento es Contrato o Convenio", "info");
-                    return false;
-                }
+                const capturaManualInstrumento = $('#instrumento_manual_check').is(':checked');
+                if (capturaManualInstrumento) {
+                    if (!$.trim($('#no_convenio_manual').val())) {
+                        Swal.fire("Atención", "Debe capturar manualmente el número de contrato o convenio", "info");
+                        return false;
+                    }
+                } else {
+                    if ($('.tipo-instrumento-check:checked').length !== 1) {
+                        Swal.fire("Atención", "Debe seleccionar si el instrumento es Contrato o Convenio", "info");
+                        return false;
+                    }
 
-                if (!$('#no_convenio').val()) {
-                    Swal.fire("Atención", "Debe seleccionar el contrato o convenio correspondiente", "info");
-                    return false;
+                    if (!$('#no_convenio').val()) {
+                        Swal.fire("Atención", "Debe seleccionar el contrato o convenio correspondiente", "info");
+                        return false;
+                    }
                 }
             }
 
@@ -2078,11 +2086,18 @@ ini.inicio = (function () {
                 formData.append('comentarios_instrumento', $('#comentarios_instrumento').val());
 
                 if (!sinInstrumento) {
-                    formData.append('tipo_instrumento', $('.tipo-instrumento-check:checked').val());
+                    const capturaManualInstrumento = $('#instrumento_manual_check').is(':checked');
+                    formData.append('captura_manual_instrumento', capturaManualInstrumento ? '1' : '0');
+                    formData.append('tipo_instrumento', capturaManualInstrumento
+                        ? 'manual'
+                        : $('.tipo-instrumento-check:checked').val());
+                    formData.append('no_convenio', capturaManualInstrumento
+                        ? $.trim($('#no_convenio_manual').val())
+                        : $('#no_convenio').val());
+
                     var instrumentoFile = $('#instrumento')[0].files[0];
                     if (instrumentoFile) {
                         formData.append('instrumento', instrumentoFile);
-                        formData.append('no_convenio', $('#no_convenio').val());
                     } else {
                         Swal.fire("Atención", 'Sin Instrumento Jurídico', 'info');
                         return false;
