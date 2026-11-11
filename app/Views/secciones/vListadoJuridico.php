@@ -75,24 +75,34 @@
                                                                 ? date('d', $fechaRegistro) . ' ' . $mesesCortos[(int) date('n', $fechaRegistro) - 1] . ' ' . date('Y', $fechaRegistro)
                                                                 : 'Sin fecha' ?>
                                                         </td>
-                                                        <td class="text-center">      
-                                                            
+                                                        <td class="text-center">
+                                                            <?php if ($p['ok'] != 3): ?>
                                                             <?php if ($p['ok'] != 4): ?>
-                                                            <button
-                                                                id="subir-instrumento-<?= (int) $p['id'] ?>-<?= esc($p['tipo'], 'attr') ?>"
-                                                                type="button"
-                                                                class="btn btn-primary btn-sm"
-                                                                onclick="subirArchivo(<?= (int) $p['id'] ?>, '<?= esc($p['tipo'], 'attr') ?>')">
-                                                                <?= empty($p['tiene_instrumento_final']) ? 'Subir' : 'Reemplazar instrumento final' ?>
-                                                            </button>
-                                                            <button
-                                                                id="revisar-instrumento-<?= (int) $p['id'] ?>-<?= esc($p['tipo'], 'attr') ?>"
-                                                                type="button"
-                                                                onclick="abrirModalRevision(<?= (int) $p['id'] ?>, '<?= esc($p['tipo'], 'attr') ?>')"
-                                                                class="btn btn-success btn-sm<?= empty($p['tiene_instrumento_final']) ? ' d-none' : '' ?>">
-                                                                Revisar
-                                                            </button>
+                                                                <button
+                                                                    id="subir-instrumento-<?= (int) $p['id'] ?>-<?= esc($p['tipo'], 'attr') ?>"
+                                                                    type="button"
+                                                                    class="btn btn-primary btn-sm"
+                                                                    onclick="subirArchivo(<?= (int) $p['id'] ?>, '<?= esc($p['tipo'], 'attr') ?>')">
+                                                                    <?= empty($p['tiene_instrumento_final']) ? 'Subir' : 'Reemplazar instrumento final' ?>
+                                                                </button>
+                                                                <button
+                                                                    id="revisar-instrumento-<?= (int) $p['id'] ?>-<?= esc($p['tipo'], 'attr') ?>"
+                                                                    type="button"
+                                                                    onclick="abrirModalRevision(<?= (int) $p['id'] ?>, '<?= esc($p['tipo'], 'attr') ?>')"
+                                                                    class="btn <?= (int) $p['ok'] === 2 ? 'btn-warning' : 'btn-success' ?> btn-sm<?= empty($p['tiene_instrumento_final']) ? ' d-none' : '' ?>">
+                                                                    <?= (int) $p['ok'] === 2 ? 'Editar reserva' : 'Revisar' ?>
+                                                                </button>
+                                                                <?php endif; ?>
+                                                                <?php if ($p['ok'] == 2): ?>
+                                                                <button
+                                                                    type="button"
+                                                                    onclick="abrirModalRechazo(<?= esc(json_encode((string) ($p['observaciones'] ?? ''), JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP), 'attr') ?>)"
+                                                                    class="btn btn-danger btn-sm">
+                                                                    Ver Rechazo
+                                                                </button>
+                                                                <?php endif; ?>
                                                             <?php endif; ?>
+
                                                         </td>
                                                         <td class="text-center">      
                                                             <?php if ($p['ok'] == 1): ?>
@@ -256,6 +266,7 @@
             <form id="formReservaSolicitudPT">
                 <input type="hidden" id="reserva_solicitud_id" name="id_solicitud">
                 <input type="hidden" id="reserva_solicitud_tipo" name="tipo">
+                <input type="hidden" id="reserva_es_edicion" value="0">
 
                 <div class="modal-body">
                     <div id="reserva_modal_loading" class="text-center py-5">
@@ -299,6 +310,12 @@
                                         <a id="reserva_instrumento_link" class="btn btn-outline-danger" href="#" target="_blank" rel="noopener noreferrer">
                                             <i class="fas fa-file-pdf mr-1"></i> Ver instrumento PDF
                                         </a>
+                                    </div>
+                                    <div id="reserva_instrumento_edicion" class="mt-3 d-none">
+                                        <label for="reserva_instrumento_archivo">Reemplazar instrumento jurídico</label>
+                                        <input type="file" class="form-control" id="reserva_instrumento_archivo"
+                                            name="instrumento_juridico_final" accept=".pdf,application/pdf">
+                                        <small class="form-text text-muted">Opcional. Si no seleccionas otro PDF se conservará el actual.</small>
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
@@ -349,6 +366,15 @@
 <script src="<?= base_url(); ?>plugins/datatables/dataTables.bootstrap4.min.js"></script>
 <script src="<?= base_url(); ?>plugins/select2/select2.min.js"></script>
 <script>
+    function abrirModalRechazo(observaciones) {
+        Swal.fire({
+            title: 'Observaciones del rechazo',
+            text: observaciones || 'No se registraron observaciones.',
+            icon: 'info',
+            confirmButtonText: 'Cerrar'
+        });
+    }
+
     function escaparHtml(valor) {
         return String(valor ?? '')
             .replace(/&/g, '&amp;')
@@ -373,6 +399,11 @@
         }
 
         $('#formReservaSolicitudPT')[0].reset();
+        $('#reserva_es_edicion').val('0');
+        $('#reserva_instrumento_edicion').addClass('d-none');
+        $('#reserva_instrumento_archivo').val('');
+        $('#modalRevisionReservaLabel').text('Reserva PT');
+        $('#btnGuardarReservaSolicitud').html('<i class="fas fa-save mr-1"></i> Guardar reserva');
         $('#tablaPresupuestoReserva tbody').empty();
         $('#reserva_banco').html('<option value="">Seleccione una opción</option>');
         $('#reserva_modal_loading').removeClass('d-none');
@@ -414,28 +445,45 @@
                 }
 
                 const data = response.data;
+                const esEdicion = Boolean(data.es_edicion);
                 $('#reserva_solicitud_id').val(data.id_solicitud);
                 $('#reserva_solicitud_tipo').val(data.tipo);
+                $('#reserva_es_edicion').val(esEdicion ? '1' : '0');
                 $('#reserva_nombre_proveedor').val(data.proveedor.nombre || '');
                 $('#reserva_no_proveedor').val(data.proveedor.no_proveedor || '');
                 $('#reserva_numero_label').text(data.tipo === 'contrato' ? 'No. contrato' : 'No. convenio');
                 $('#reserva_numero_instrumento').val(data.numero_instrumento || '');
                 $('#reserva_instrumento_link').attr('href', data.instrumento_url || '#');
+                $('#comentarios_instrumento').val(data.comentarios_instrumento || '');
+                $('#reserva_instrumento_edicion').toggleClass('d-none', !esEdicion);
+                $('#modalRevisionReservaLabel').text(esEdicion ? 'Editar reserva rechazada' : 'Reserva PT');
+                $('#btnGuardarReservaSolicitud').html(
+                    esEdicion
+                        ? '<i class="fas fa-save mr-1"></i> Guardar cambios'
+                        : '<i class="fas fa-save mr-1"></i> Guardar reserva'
+                );
 
                 const $banco = $('#reserva_banco');
                 (data.bancos || []).forEach(function(item) {
                     const detalles = [item.banco, item.no_cuenta, item.clabe].filter(Boolean).join(' · ');
                     $banco.append(new Option(detalles, item.id));
                 });
+                $banco.val(data.id_proveedor_banco ? String(data.id_proveedor_banco) : '');
 
                 const fondos = data.fondos || [];
                 let total = 0;
                 const $tbody = $('#tablaPresupuestoReserva tbody');
                 (data.presupuestos || []).forEach(function(presupuesto, indice) {
                     total += Number(presupuesto.importe) || 0;
+                    const fondoActual = String(presupuesto.fondo || '').trim();
+                    const fondosFila = fondos.slice();
+                    if (fondoActual && fondosFila.indexOf(fondoActual) === -1) {
+                        fondosFila.push(fondoActual);
+                    }
                     const opcionesFondo = ['<option value="">Seleccione una opción</option>']
-                        .concat(fondos.map(function(fondo) {
-                            return '<option value="' + escaparHtml(fondo) + '">' + escaparHtml(fondo) + '</option>';
+                        .concat(fondosFila.map(function(fondo) {
+                            const seleccionado = fondo === fondoActual ? ' selected' : '';
+                            return '<option value="' + escaparHtml(fondo) + '"' + seleccionado + '>' + escaparHtml(fondo) + '</option>';
                         }))
                         .join('');
 
@@ -611,6 +659,31 @@
                 return;
             }
 
+            const archivoInstrumento = $('#reserva_instrumento_archivo')[0].files[0] || null;
+            if (archivoInstrumento) {
+                const extension = archivoInstrumento.name.split('.').pop().toLowerCase();
+                if (extension !== 'pdf' || archivoInstrumento.type && archivoInstrumento.type !== 'application/pdf') {
+                    Swal.fire('Atención', 'El instrumento jurídico debe estar en formato PDF.', 'warning');
+                    return;
+                }
+                if (archivoInstrumento.size <= 0 || archivoInstrumento.size >= 500 * 1024 * 1024) {
+                    Swal.fire('Atención', 'El instrumento jurídico debe pesar menos de 500 MB.', 'warning');
+                    return;
+                }
+            }
+
+            const formData = new FormData();
+            formData.append('id_solicitud', idSolicitud);
+            formData.append('tipo', tipo);
+            formData.append('id_proveedor_banco', idBanco);
+            formData.append('comentarios_instrumento', comentariosInstrumento);
+            fondos.forEach(function(fondo) {
+                formData.append('fondos[]', fondo);
+            });
+            if (archivoInstrumento) {
+                formData.append('instrumento_juridico_final', archivoInstrumento, archivoInstrumento.name);
+            }
+
             const $boton = $('#btnGuardarReservaSolicitud');
             const textoOriginal = $boton.html();
             $boton.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Guardando...');
@@ -619,13 +692,9 @@
                 url: '<?= base_url("index.php/Principal/guardarReservaDesdeSolicitudPT") ?>',
                 type: 'POST',
                 dataType: 'json',
-                data: {
-                    id_solicitud: idSolicitud,
-                    tipo: tipo,
-                    id_proveedor_banco: idBanco,
-                    fondos: fondos,
-                    comentarios_instrumento: comentariosInstrumento
-                },
+                data: formData,
+                processData: false,
+                contentType: false,
                 success: function(response) {
                     if (response.error) {
                         Swal.fire('Error', response.respuesta || 'No fue posible guardar la reserva.', 'error');
