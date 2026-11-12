@@ -738,7 +738,11 @@
                 },
                 error: function(xhr, status, error) {
                     console.error('Error:', error);
-                    alert('Ocurrió un error al procesar la solicitud');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Ocurrió un error al procesar la solicitud'
+                    });
                     btnSubmit.prop('disabled', false);
                     btnSubmit.html('<i class="mdi mdi-content-save"></i> Guardar Solicitud');
                 }
