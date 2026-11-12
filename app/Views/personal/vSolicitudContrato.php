@@ -429,6 +429,10 @@
         return isNaN(numero) ? 0 : numero;
     }
 
+    function montoACentavos(valor) {
+        return Math.round(normalizarMonto(valor) * 100);
+    }
+
     function numeroALetras(amount) {
         if (amount == 0) return "CERO PESOS 00/100 M.N.";
         var pesos = Math.floor(amount);
@@ -863,14 +867,16 @@
     
     // Validate payment sum
     function validarMontoPagos(mostrarError = false) {
-        var montoTotal = normalizarMonto($('#monto_total').val());
-        var sumaPagos = 0;
+        var montoTotalCentavos = montoACentavos($('#monto_total').val());
+        var sumaPagosCentavos = 0;
 
         $('#tabla_pagos tbody input[name*="[monto]"]').each(function() {
-            sumaPagos += normalizarMonto($(this).val());
+            sumaPagosCentavos += montoACentavos($(this).val());
         });
 
-        if (sumaPagos > montoTotal) {
+        if (sumaPagosCentavos > montoTotalCentavos) {
+            var sumaPagos = sumaPagosCentavos / 100;
+            var montoTotal = montoTotalCentavos / 100;
             if (mostrarError) {
                 Swal.fire({
                     icon: 'error',

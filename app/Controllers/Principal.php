@@ -6650,6 +6650,28 @@ class Principal extends BaseController
             return $this->respond($response);
         }
 
+        $montoTotalCentavos = (int) round($montoTotal * 100);
+        $sumaPagosCentavos = 0;
+        if (isset($post['pagos']) && is_array($post['pagos'])) {
+            foreach ($post['pagos'] as $pago) {
+                $montoPago = (float) str_replace(
+                    [',', '$', ' '],
+                    '',
+                    (string) ($pago['monto'] ?? 0)
+                );
+                $sumaPagosCentavos += (int) round($montoPago * 100);
+            }
+        }
+
+        if ($sumaPagosCentavos > $montoTotalCentavos) {
+            $response->respuesta = 'La suma de los pagos ($'
+                . number_format($sumaPagosCentavos / 100, 2, '.', ',')
+                . ') no debe ser mayor al monto total del contrato ($'
+                . number_format($montoTotalCentavos / 100, 2, '.', ',')
+                . ').';
+            return $this->respond($response);
+        }
+
         $montoSinImpuesto = round($montoTotal / 1.16, 2);
         $montoTotalTexto = trim((string) ($post['monto_total_texto'] ?? ''));
         if ($montoTotalTexto === '') {
