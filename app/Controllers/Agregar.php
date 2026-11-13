@@ -5155,11 +5155,11 @@ class Agregar extends BaseController
         exit();
     }
 
-    private function normalizarHoraAsistencia(?string $hora): string
+    private function normalizarHoraAsistencia(?string $hora): ?string
     {
         $hora = trim((string) $hora);
         if ($hora === '') {
-            return '00:00:00';
+            return null;
         }
 
         if (preg_match('/^\d{2}:\d{2}$/', $hora)) {
@@ -5202,7 +5202,7 @@ class Agregar extends BaseController
             return $this->respond($response);
         }
 
-        if ($entrada === '00:00:00' && $salida === '00:00:00') {
+        if ($entrada === null && $salida === null) {
             $response->respuesta = 'Captura al menos una hora de entrada o salida.';
             return $this->respond($response);
         }
