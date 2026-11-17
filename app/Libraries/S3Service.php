@@ -113,13 +113,20 @@ class S3Service
 
     public function downloadToTempFile($keyName, $prefix = 's3_')
     {
+        $tempFile = null;
+
         try {
             $extension = pathinfo($keyName, PATHINFO_EXTENSION);
             $tempFile = tempnam(sys_get_temp_dir(), $prefix);
+            if ($tempFile === false) {
+                throw new \RuntimeException('No fue posible crear el archivo temporal.');
+            }
 
             if ($extension) {
                 $renamedTempFile = $tempFile . '.' . $extension;
-                rename($tempFile, $renamedTempFile);
+                if (!rename($tempFile, $renamedTempFile)) {
+                    throw new \RuntimeException('No fue posible preparar el archivo temporal.');
+                }
                 $tempFile = $renamedTempFile;
             }
 
@@ -130,8 +137,11 @@ class S3Service
             ]);
 
             return $tempFile;
-        } catch (AwsException $e) {
-            log_message('error', 'Error descargando archivo temporal desde S3: ' . $e->getMessage());
+        } catch (\Throwable $e) {
+            if (is_string($tempFile) && is_file($tempFile)) {
+                @unlink($tempFile);
+            }
+            log_message('error', 'Error descargando archivo temporal desde S3 [' . $keyName . ']: ' . $e->getMessage());
             return false;
         }
     }

@@ -369,16 +369,38 @@ class Principal extends BaseController
 
     public function verArchivoS3()
     {
-        $storedPath = (string) $this->request->getGet('key');
+        $storedPath = ltrim(trim((string) $this->request->getGet('key')), '/');
         if ($storedPath === '') {
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Archivo no especificado.');
+        }
+
+        if (str_contains($storedPath, '..') || str_contains($storedPath, "\\")) {
+            return $this->response
+                ->setStatusCode(400)
+                ->setBody('La ruta del archivo no es válida.');
         }
 
         $s3 = new \App\Libraries\S3Service();
         $tempFile = $s3->downloadToTempFile($storedPath, 's3_view_');
 
         if ($tempFile === false || !is_file($tempFile)) {
-            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('No fue posible recuperar el archivo.');
+            log_message('warning', 'No fue posible descargar temporalmente el archivo S3 para vista previa: ' . $storedPath);
+
+            // En producción puede no estar habilitada la escritura en el directorio
+            // temporal. La URL firmada permite visualizar el mismo objeto sin crear
+            // un archivo local en el servidor.
+            try {
+                $presignedUrl = $s3->getPresignedUrl($storedPath, '+20 minutes');
+                if (!empty($presignedUrl)) {
+                    return redirect()->to($presignedUrl);
+                }
+            } catch (\Throwable $e) {
+                log_message('error', 'Error generando URL alterna para archivo S3 [' . $storedPath . ']: ' . $e->getMessage());
+            }
+
+            return $this->response
+                ->setStatusCode(404)
+                ->setBody('No fue posible recuperar el archivo solicitado desde el almacenamiento.');
         }
 
         $mimeType = function_exists('mime_content_type') ? mime_content_type($tempFile) : 'application/octet-stream';
