@@ -1221,11 +1221,11 @@ var marker = L.marker([20.956852, -101.359318]).addTo(map)
     fillColor: '#3388ff',
     fillOpacity: 0.3
 }).addTo(map); */
-     var circle = L.circle([20.956990, -101.360116], {
+     var circle = L.circle([20.956852, -101.359318], {
         color: 'blue',
         fillColor: '#3388ff',
         fillOpacity: 0.5,
-        radius: 150
+        radius: 125
     }).addTo(map); 
 </script>
 

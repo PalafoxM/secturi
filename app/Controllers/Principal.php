@@ -2986,6 +2986,7 @@ class Principal extends BaseController
                     'jgomezch@guanajuato.gob.mx',
                     'zulema.lira@guanajuato.gob.mx',
                     'ariveragon@guanajuato.gob.mx',
+                    'al.hernandezma@guanajuato.gob.mx',
                 ]);
         $email->setSubject('Recordatorio: Revisión de Asistencias - Sistema SUSI');
         $email->setMessage('
@@ -3019,9 +3020,9 @@ class Principal extends BaseController
                             <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Estimado personal,</p>
                             
                             <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-                                En caso de que aún no hayas realizado las <strong>justificaciones correspondientes a la quincena 20/2026</strong>, 
-                                la cual comprende el periodo del <strong>16 al 31 de octubre de 2026</strong>, 
-                                tienes hasta el día <strong>viernes 6 de noviembre de 2026</strong> hasta las 16:00 hrs para realizarlas.
+                                En caso de que aún no hayas realizado las <strong>justificaciones correspondientes a la quincena 21/2026</strong>, 
+                                la cual comprende el periodo del <strong>01 al 15 de noviembre de 2026</strong>, 
+                                tienes hasta el día <strong>viernes 20 de noviembre de 2026</strong> hasta las 16:00 hrs para realizarlas.
                             </p>
 
                             <div class="highlight-box">
