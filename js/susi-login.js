@@ -323,15 +323,35 @@ function alternarVisibilidadContrasenia() {
     boton.setAttribute('title', mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña');
 }
 
+function renovarCaptchaLogin(enfocar = false) {
+    const imagen = document.getElementById('loginCaptchaImage');
+    const input = document.getElementById('loginCaptcha');
+
+    if (imagen) {
+        const url = new URL('index.php/Login/captcha', document.body.dataset.baseUrl);
+        url.searchParams.set('refresh', '1');
+        url.searchParams.set('_', Date.now().toString());
+        imagen.src = url.href;
+    }
+
+    if (input) {
+        input.value = '';
+        if (enfocar) {
+            input.focus();
+        }
+    }
+}
+
 async function iniciarLoginTradicional(event) {
     event.preventDefault();
 
     const usuario = document.getElementById('usuario')?.value.trim() || '';
     const contrasenia = document.getElementById('contrasenia')?.value || '';
+    const captcha = document.getElementById('loginCaptcha')?.value.trim().toUpperCase() || '';
     const boton = document.getElementById('btnTraditionalLogin');
 
-    if (!usuario || !contrasenia) {
-        Swal.fire('Atención', 'Ingresa tu usuario y contraseña.', 'warning');
+    if (!usuario || !contrasenia || !captcha) {
+        Swal.fire('Atención', 'Ingresa tu usuario, contraseña y código de seguridad.', 'warning');
         return;
     }
 
@@ -343,7 +363,7 @@ async function iniciarLoginTradicional(event) {
     }
 
     try {
-        const datos = new URLSearchParams({ usuario, contrasenia });
+        const datos = new URLSearchParams({ usuario, contrasenia, captcha });
         const respuestaHttp = await fetch(
             new URL('index.php/Login/validar_usuario', document.body.dataset.baseUrl).href,
             {
@@ -357,15 +377,28 @@ async function iniciarLoginTradicional(event) {
             }
         );
 
-        if (!respuestaHttp.ok) {
-            throw new Error('Respuesta HTTP ' + respuestaHttp.status);
+        let response;
+        try {
+            response = await respuestaHttp.json();
+        } catch (errorJson) {
+            throw new Error('El servidor devolvió una respuesta no válida.');
         }
 
-        const response = await respuestaHttp.json();
+        if (response.renovar_captcha) {
+            renovarCaptchaLogin(true);
+        }
 
         if (response.error) {
-            Swal.fire('No fue posible ingresar', response.respuesta || 'Verifica tus credenciales.', 'error');
+            Swal.fire(
+                respuestaHttp.status === 429 ? 'Acceso temporalmente bloqueado' : 'No fue posible ingresar',
+                response.respuesta || 'Verifica tus credenciales y el código de seguridad.',
+                respuestaHttp.status === 429 ? 'warning' : 'error'
+            );
             return;
+        }
+
+        if (!respuestaHttp.ok) {
+            throw new Error('Respuesta HTTP ' + respuestaHttp.status);
         }
 
         await Swal.fire({
@@ -404,6 +437,11 @@ document.getElementById('mostrarLoginGoogleBtn')
 
 document.getElementById('toggleLoginPassword')
     ?.addEventListener('click', alternarVisibilidadContrasenia);
+
+document.getElementById('refreshLoginCaptcha')
+    ?.addEventListener('click', function() {
+        renovarCaptchaLogin(true);
+    });
 
 document.getElementById('loginTraditionalForm')
     ?.addEventListener('submit', iniciarLoginTradicional);

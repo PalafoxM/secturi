@@ -111,6 +111,21 @@ class S3Service
         }
     }
 
+    public function objectExists($keyName): bool
+    {
+        try {
+            $this->client->headObject([
+                'Bucket' => $this->bucket,
+                'Key' => $keyName,
+            ]);
+
+            return true;
+        } catch (\Throwable $e) {
+            log_message('warning', 'Objeto no encontrado o no accesible en S3 [' . $keyName . ']: ' . $e->getMessage());
+            return false;
+        }
+    }
+
     public function downloadToTempFile($keyName, $prefix = 's3_')
     {
         $tempFile = null;

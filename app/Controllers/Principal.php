@@ -163,7 +163,12 @@ class Principal extends BaseController
             $s3Key = $targetFolder . '/' . $fileName;
             $uploaded = $s3->uploadFile($sourceFile, $s3Key);
 
-            return $uploaded ? $s3Key : null;
+            if (!$uploaded || !$s3->objectExists($s3Key)) {
+                log_message('error', 'La carga S3 no pudo verificarse después de subir el archivo: ' . $s3Key);
+                return null;
+            }
+
+            return $s3Key;
         } catch (\Throwable $e) {
             log_message('error', 'Error al subir archivo de ' . $module . ' a S3: ' . $e->getMessage());
             return null;
@@ -386,13 +391,35 @@ class Principal extends BaseController
         if ($tempFile === false || !is_file($tempFile)) {
             log_message('warning', 'No fue posible descargar temporalmente el archivo S3 para vista previa: ' . $storedPath);
 
+            // Algunas cargas anteriores se conservaron en almacenamiento local.
+            $legacyCandidates = [
+                FCPATH . 'assets/instrumentos_juridicos/' . basename($storedPath),
+                FCPATH . 'assets/uploads/contratos/' . basename($storedPath),
+            ];
+            foreach ($legacyCandidates as $legacyFile) {
+                if (!is_file($legacyFile)) {
+                    continue;
+                }
+
+                $legacyMime = function_exists('mime_content_type')
+                    ? mime_content_type($legacyFile)
+                    : 'application/pdf';
+
+                return $this->response
+                    ->setHeader('Content-Type', $legacyMime ?: 'application/pdf')
+                    ->setHeader('Content-Disposition', 'inline; filename="' . basename($legacyFile) . '"')
+                    ->setBody((string) file_get_contents($legacyFile));
+            }
+
             // En producción puede no estar habilitada la escritura en el directorio
             // temporal. La URL firmada permite visualizar el mismo objeto sin crear
             // un archivo local en el servidor.
             try {
-                $presignedUrl = $s3->getPresignedUrl($storedPath, '+20 minutes');
-                if (!empty($presignedUrl)) {
-                    return redirect()->to($presignedUrl);
+                if ($s3->objectExists($storedPath)) {
+                    $presignedUrl = $s3->getPresignedUrl($storedPath, '+20 minutes');
+                    if (!empty($presignedUrl)) {
+                        return redirect()->to($presignedUrl);
+                    }
                 }
             } catch (\Throwable $e) {
                 log_message('error', 'Error generando URL alterna para archivo S3 [' . $storedPath . ']: ' . $e->getMessage());
@@ -400,7 +427,7 @@ class Principal extends BaseController
 
             return $this->response
                 ->setStatusCode(404)
-                ->setBody('No fue posible recuperar el archivo solicitado desde el almacenamiento.');
+                ->setBody('El archivo ya no existe en el almacenamiento S3. Es necesario volver a cargar el PDF.');
         }
 
         $mimeType = function_exists('mime_content_type') ? mime_content_type($tempFile) : 'application/octet-stream';

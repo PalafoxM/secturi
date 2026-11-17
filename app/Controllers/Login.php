@@ -7,6 +7,12 @@ use CodeIgniter\API\ResponseTrait;
 class Login extends BaseController {
 
     use ResponseTrait;
+    private const CAPTCHA_TTL = 300;
+    private const LOGIN_RATE_WINDOW = 300;
+    private const LOGIN_RATE_BLOCK = 300;
+    private const LOGIN_MAX_USER_ATTEMPTS = 5;
+    private const LOGIN_MAX_IP_ATTEMPTS = 10;
+
     private $defaultData = array(
         'title' => 'Sitema de Turnos 2.0',
         'layout' => 'plantilla/lytDefault',
@@ -60,6 +66,199 @@ class Login extends BaseController {
         $data['layout'] = 'plantilla/lytLogin';
         $data['contentView'] = 'secciones/vLogin';                
         $this->_renderView($data);        
+    }
+
+    private function generarCaptchaLogin(): string
+    {
+        if (!function_exists('imagecreatetruecolor')) {
+            throw new \RuntimeException('La extensión GD es necesaria para generar el CAPTCHA.');
+        }
+
+        $caracteres = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+        $codigo = '';
+        $longitud = strlen($caracteres);
+
+        for ($i = 0; $i < 5; $i++) {
+            $codigo .= $caracteres[random_int(0, $longitud - 1)];
+        }
+
+        $ancho = 210;
+        $alto = 64;
+        $imagen = imagecreatetruecolor($ancho, $alto);
+        $fondo = imagecolorallocate($imagen, 238, 244, 251);
+        $textoColor = imagecolorallocate($imagen, 23, 54, 95);
+        imagefilledrectangle($imagen, 0, 0, $ancho, $alto, $fondo);
+
+        for ($i = 0; $i < 9; $i++) {
+            $ruido = imagecolorallocate(
+                $imagen,
+                random_int(105, 170),
+                random_int(135, 185),
+                random_int(170, 215)
+            );
+            imageline(
+                $imagen,
+                random_int(0, $ancho),
+                random_int(0, $alto),
+                random_int(0, $ancho),
+                random_int(0, $alto),
+                $ruido
+            );
+        }
+
+        foreach (str_split($codigo) as $indice => $caracter) {
+            $glifo = imagecreatetruecolor(18, 22);
+            imagealphablending($glifo, false);
+            imagesavealpha($glifo, true);
+            $transparente = imagecolorallocatealpha($glifo, 0, 0, 0, 127);
+            imagefilledrectangle($glifo, 0, 0, 18, 22, $transparente);
+            $colorGlifo = imagecolorallocate($glifo, 23, 54, 95);
+            imagestring($glifo, 5, 4, 3, $caracter, $colorGlifo);
+
+            $glifoEscalado = imagescale($glifo, 31, 43, IMG_BICUBIC_FIXED);
+            $glifoRotado = imagerotate($glifoEscalado, random_int(-15, 15), $transparente);
+            imagealphablending($imagen, true);
+            imagecopy(
+                $imagen,
+                $glifoRotado,
+                20 + ($indice * 38),
+                random_int(8, 15),
+                0,
+                0,
+                imagesx($glifoRotado),
+                imagesy($glifoRotado)
+            );
+
+            imagedestroy($glifo);
+            imagedestroy($glifoEscalado);
+            imagedestroy($glifoRotado);
+        }
+
+        for ($i = 0; $i < 55; $i++) {
+            imagesetpixel($imagen, random_int(0, $ancho - 1), random_int(0, $alto - 1), $textoColor);
+        }
+
+        ob_start();
+        imagepng($imagen, null, 6);
+        $png = (string) ob_get_clean();
+        imagedestroy($imagen);
+
+        $session = \Config\Services::session();
+        $session->set([
+            'login_captcha_hash' => hash('sha256', $codigo),
+            'login_captcha_expires' => time() + self::CAPTCHA_TTL,
+            'login_captcha_image' => base64_encode($png),
+        ]);
+
+        return $png;
+    }
+
+    public function captcha()
+    {
+        $session = \Config\Services::session();
+        $renovar = filter_var($this->request->getGet('refresh'), FILTER_VALIDATE_BOOLEAN);
+        $imagenCodificada = (string) $session->get('login_captcha_image');
+        $imagen = $imagenCodificada !== '' ? base64_decode($imagenCodificada, true) : false;
+        $expira = (int) $session->get('login_captcha_expires');
+
+        if ($renovar || $imagen === false || $expira <= time()) {
+            $imagen = $this->generarCaptchaLogin();
+        }
+
+        return $this->response
+            ->setHeader('Content-Type', 'image/png')
+            ->setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->setHeader('Pragma', 'no-cache')
+            ->setBody($imagen);
+    }
+
+    private function validarCaptchaLogin(string $respuesta): bool
+    {
+        $session = \Config\Services::session();
+        $hashEsperado = (string) $session->get('login_captcha_hash');
+        $expira = (int) $session->get('login_captcha_expires');
+
+        // Cada reto sólo puede utilizarse una vez, incluso si la respuesta es incorrecta.
+        $session->remove(['login_captcha_hash', 'login_captcha_expires', 'login_captcha_image']);
+
+        $respuesta = strtoupper(trim($respuesta));
+        return $hashEsperado !== ''
+            && $expira > time()
+            && preg_match('/^[A-Z0-9]{5}$/', $respuesta) === 1
+            && hash_equals($hashEsperado, hash('sha256', $respuesta));
+    }
+
+    private function clavesLimiteLogin(string $usuario): array
+    {
+        $ip = (string) $this->request->getIPAddress();
+        $usuarioNormalizado = strtolower(trim($usuario));
+
+        return [
+            ['tipo' => 'ip', 'base' => 'login_ip_' . hash('sha256', $ip), 'limite' => self::LOGIN_MAX_IP_ATTEMPTS],
+            ['tipo' => 'usuario', 'base' => 'login_user_' . hash('sha256', $usuarioNormalizado), 'limite' => self::LOGIN_MAX_USER_ATTEMPTS],
+        ];
+    }
+
+    private function segundosBloqueoLogin(string $usuario): int
+    {
+        $cache = \Config\Services::cache();
+        $bloqueadoHasta = 0;
+
+        foreach ($this->clavesLimiteLogin($usuario) as $configuracion) {
+            $bloqueadoHasta = max(
+                $bloqueadoHasta,
+                (int) ($cache->get($configuracion['base'] . '_blocked') ?: 0)
+            );
+        }
+
+        return max(0, $bloqueadoHasta - time());
+    }
+
+    private function registrarIntentoFallidoLogin(string $usuario, bool $incluirUsuario = true): int
+    {
+        $cache = \Config\Services::cache();
+        $bloqueo = 0;
+
+        foreach ($this->clavesLimiteLogin($usuario) as $configuracion) {
+            if (!$incluirUsuario && $configuracion['tipo'] === 'usuario') {
+                continue;
+            }
+
+            $contadorKey = $configuracion['base'] . '_count';
+            $bloqueoKey = $configuracion['base'] . '_blocked';
+            $contadorActual = $cache->get($contadorKey);
+
+            if ($contadorActual === null) {
+                $intentos = 1;
+                $cache->save($contadorKey, $intentos, self::LOGIN_RATE_WINDOW);
+            } else {
+                $incrementado = $cache->increment($contadorKey, 1);
+                $intentos = $incrementado === false
+                    ? ((int) $contadorActual + 1)
+                    : (int) $incrementado;
+                if ($incrementado === false) {
+                    $cache->save($contadorKey, $intentos, self::LOGIN_RATE_WINDOW);
+                }
+            }
+
+            if ($intentos >= (int) $configuracion['limite']) {
+                $bloqueadoHasta = time() + self::LOGIN_RATE_BLOCK;
+                $cache->save($bloqueoKey, $bloqueadoHasta, self::LOGIN_RATE_BLOCK);
+                $cache->delete($contadorKey);
+                $bloqueo = max($bloqueo, self::LOGIN_RATE_BLOCK);
+            }
+        }
+
+        return $bloqueo;
+    }
+
+    private function limpiarIntentosLogin(string $usuario): void
+    {
+        $cache = \Config\Services::cache();
+        foreach ($this->clavesLimiteLogin($usuario) as $configuracion) {
+            $cache->delete($configuracion['base'] . '_count');
+            $cache->delete($configuracion['base'] . '_blocked');
+        }
     }
     public function guardarUbicacion()
     {
@@ -274,19 +473,31 @@ class Login extends BaseController {
 
         $usuario = trim((string) $this->request->getPost('usuario'));
         $contrasenia = (string) $this->request->getPost('contrasenia');
+        $captcha = (string) $this->request->getPost('captcha');
 
-        if ($usuario === '' || $contrasenia === '') {
-            $response->respuesta = 'Es necesario ingresar usuario y contraseña.';
+        if ($usuario === '' || $contrasenia === '' || trim($captcha) === '') {
+            $response->respuesta = 'Es necesario ingresar usuario, contraseña y CAPTCHA.';
+            $response->renovar_captcha = true;
             return $this->respond($response);
         }
 
         $session = \Config\Services::session();
-        $intentos = (int) $session->get('intentos_login_tradicional');
-        $bloqueoHasta = (int) $session->get('bloqueo_login_tradicional');
+        $segundosBloqueo = $this->segundosBloqueoLogin($usuario);
+        if ($segundosBloqueo > 0) {
+            $response->respuesta = 'Demasiados intentos. Intenta nuevamente en ' . $segundosBloqueo . ' segundos.';
+            $response->renovar_captcha = true;
+            $response->espera_segundos = $segundosBloqueo;
+            return $this->respond($response, 429);
+        }
 
-        if ($bloqueoHasta > time()) {
-            $response->respuesta = 'Demasiados intentos. Espera un minuto antes de volver a intentar.';
-            return $this->respond($response);
+        if (!$this->validarCaptchaLogin($captcha)) {
+            $bloqueo = $this->registrarIntentoFallidoLogin($usuario, false);
+            $response->respuesta = $bloqueo > 0
+                ? 'Demasiados intentos. Intenta nuevamente en ' . $bloqueo . ' segundos.'
+                : 'El código CAPTCHA es incorrecto o expiró.';
+            $response->renovar_captcha = true;
+            $response->espera_segundos = $bloqueo;
+            return $this->respond($response, $bloqueo > 0 ? 429 : 400);
         }
 
         $catalogos = new Mglobal;
@@ -299,17 +510,13 @@ class Login extends BaseController {
         $user = (!empty($result->data)) ? $result->data[0] : null;
 
         if (!$user || !$this->validarContrasenia($contrasenia, $user->contrasenia ?? null)) {
-            $intentos++;
-
-            if ($intentos >= 5) {
-                $session->set('intentos_login_tradicional', 0);
-                $session->set('bloqueo_login_tradicional', time() + 60);
-                $response->respuesta = 'Demasiados intentos. Espera un minuto antes de volver a intentar.';
-            } else {
-                $session->set('intentos_login_tradicional', $intentos);
-            }
-
-            return $this->respond($response);
+            $bloqueo = $this->registrarIntentoFallidoLogin($usuario);
+            $response->respuesta = $bloqueo > 0
+                ? 'Demasiados intentos. Intenta nuevamente en ' . $bloqueo . ' segundos.'
+                : 'Usuario, contraseña o CAPTCHA incorrectos.';
+            $response->renovar_captcha = true;
+            $response->espera_segundos = $bloqueo;
+            return $this->respond($response, $bloqueo > 0 ? 429 : 401);
         }
 
         if ($this->requiereRehashContrasenia($user->contrasenia ?? null)) {
@@ -325,7 +532,14 @@ class Login extends BaseController {
         }
 
         $session->regenerate(true);
-        $session->remove(['intentos_login_tradicional', 'bloqueo_login_tradicional']);
+        $this->limpiarIntentosLogin($usuario);
+        $session->remove([
+            'intentos_login_tradicional',
+            'bloqueo_login_tradicional',
+            'login_captcha_hash',
+            'login_captcha_expires',
+            'login_captcha_image',
+        ]);
         $session->set('logueado', 1);
         $session->set('id_usuario', $user->id_usuario);
         $session->set('id_sexo', $user->id_sexo ?? null);

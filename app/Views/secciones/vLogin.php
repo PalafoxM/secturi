@@ -170,6 +170,8 @@ body {
         z-index: 25;
         width: min(92vw, 420px);
         padding: 28px;
+        max-height: calc(100vh - 40px);
+        overflow-y: auto;
         border-radius: 16px;
         background: rgba(255, 255, 255, 0.92);
         box-shadow: 0 20px 60px rgba(16, 24, 40, 0.22);
@@ -322,6 +324,51 @@ body {
         outline: none;
     }
 
+    .login-captcha-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .login-captcha-image {
+        display: block;
+        width: 210px;
+        max-width: calc(100% - 52px);
+        height: 64px;
+        border: 1px solid #cfd9e6;
+        border-radius: 9px;
+        background: #eef4fb;
+    }
+
+    .login-captcha-refresh {
+        flex: 0 0 42px;
+        width: 42px;
+        height: 42px;
+        border: 1px solid #cfd9e6;
+        border-radius: 50%;
+        color: #2869c7;
+        background: #fff;
+        font-size: 20px;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    .login-captcha-refresh:hover,
+    .login-captcha-refresh:focus {
+        border-color: #3979db;
+        background: #eef4fb;
+        outline: none;
+    }
+
+    .login-captcha-help {
+        display: block;
+        margin-top: 6px;
+        color: #64748b;
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+    }
+
     .login-google-link {
         display: block;
         width: 100%;
@@ -469,6 +516,35 @@ body {
                             aria-pressed="false"
                             title="Mostrar contraseña">&#128065;</button>
                     </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="loginCaptcha">Código de seguridad</label>
+                    <div class="login-captcha-row">
+                        <img
+                            id="loginCaptchaImage"
+                            class="login-captcha-image"
+                            src="<?= base_url('index.php/Login/captcha') ?>"
+                            alt="Código CAPTCHA de seguridad">
+                        <button
+                            type="button"
+                            id="refreshLoginCaptcha"
+                            class="login-captcha-refresh"
+                            aria-label="Generar otro código CAPTCHA"
+                            title="Generar otro código">&#8635;</button>
+                    </div>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="loginCaptcha"
+                        name="captcha"
+                        placeholder="Escribe los 5 caracteres"
+                        autocomplete="off"
+                        autocapitalize="characters"
+                        spellcheck="false"
+                        maxlength="5"
+                        required>
+                    <small class="login-captcha-help">El código distingue únicamente letras y números, no mayúsculas y minúsculas.</small>
                 </div>
 
                 <button id="btnTraditionalLogin" class="btn btn-gradient-primary" type="submit">
