@@ -689,6 +689,13 @@
                                                             </ol>
                                                             <ol class="dd-list">
                                                                  <p class="text-muted mb-4">Coodinación de Recursos Financieros</p>
+                                                                <a target="_blank" href="<?= base_url()?>assets/documentos/Designacion_responsable de seguimiento del tramite.docx">  
+                                                                    <li class="dd-item" data-id="2">
+                                                                        <div class="dd-handle">
+                                                                        Designación responsable de seguimiento del tramite
+                                                                        </div>
+                                                                    </li>
+                                                                </a>
                                                                 <a target="_blank" href="<?= base_url()?>assets/documentos/Disposiciones Administrativas SECTURI 2026_v1.pdf">  
                                                                     <li class="dd-item" data-id="2">
                                                                         <div class="dd-handle">
